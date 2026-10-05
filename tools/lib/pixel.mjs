@@ -137,60 +137,67 @@ function resampleNearest(img, sx, sy) {
  *  - 목표의 절반 이하면: 정수배 확대 후 맞춤 → 'upscale'(픽셀이 굵어짐, 경고)
  *  - 크면: 그림이 들어가면 빈 여백만 잘라 맞춤('crop'), 안 들어가면 축소('downscale', 경고)
  */
-export function fitToTarget(native, spec) {
-  const [T, TH] = spec.logical;
-  let img = native;
-  let fit = 'pad';
-  if (native.width <= T / 2 && native.height <= TH / 2) {
-    const k = Math.floor(Math.min(T / native.width, TH / native.height));
-    img = resampleNearest(native, k, k);
-    fit = 'upscale';
-  }
-  // 칸 좌표 기준: 칸 가운데 ↔ 프레임 가운데, 칸 기준선 ↔ 프레임 기준선
-  let ox = Math.round((T - img.width) / 2);
-  let oy = Math.round(spec.baseline * TH - spec.baseline * img.height);
-  const box = contentBox(img);
-  if (box && (box.minX + ox < 0 || box.maxX + ox >= T || box.minY + oy < 0 || box.maxY + oy >= TH)) {
-    if (box.w <= T && box.h <= TH) {
-      // 내용은 들어간다: 내용이 프레임 안에 오도록 위치만 조정
-      ox = Math.min(Math.max(ox, -box.minX), T - 1 - box.maxX);
-      oy = Math.min(Math.max(oy, -box.minY), TH - 1 - box.maxY);
-      fit = fit === 'upscale' ? fit : 'crop';
-    } else {
-      const s = Math.min((T - 2) / box.w, (TH - 2) / box.h);
-      img = resampleNearest(img, s, s);
-      fit = 'downscale';
-      ox = Math.round((T - img.width) / 2);
-      oy = Math.round(spec.baseline * TH - spec.baseline * img.height);
-      const b2 = contentBox(img);
-      if (b2) {
-        ox = Math.min(Math.max(ox, -b2.minX), T - 1 - b2.maxX);
-        oy = Math.min(Math.max(oy, -b2.minY), TH - 1 - b2.maxY);
-      }
-    }
-  }
-  const out = Buffer.alloc(T * TH * 4);
-  for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) {
-    const tx = x + ox, ty = y + oy;
-    if (tx < 0 || ty < 0 || tx >= T || ty >= TH) continue;
-    img.data.copy(out, (ty * T + tx) * 4, (y * img.width + x) * 4, (y * img.width + x) * 4 + 4);
-  }
-  return { img: { data: out, width: T, height: TH }, fit, native: [native.width, native.height] };
-}
+/** 그림이 프레임 가장자리에 닿지 않게 남기는 최소 여백(논리 px) */
+const EDGE = 1;
 
 /**
- * 픽셀 시트 전체 처리: 키 제거 → 격자 감지 → 칸마다 샘플링 → 목표 프레임에 맞춤.
- * @returns {{ grid, frames: { n, img, purity, native, fit }[] }}
+ * 칸마다 샘플링한 원래 해상도 그림을 목표 프레임(spec.logical)에 담는다.
+ * 시트 전체에 같은 배율·같은 세로 위치를 써서 프레임끼리 크기와 발 높이가 흔들리지 않게 한다.
+ * - 원래 해상도가 목표의 절반 이하면 정수배 확대(upscale)
+ * - 캐릭터: 모든 칸에서 가장 낮은 그림 줄(발)을 기준선 줄에 맞춘다. 그 외(fx 등): 칸 기준선 ↔ 프레임 기준선
+ * - 가로는 칸 가운데 ↔ 프레임 가운데(움직임 보존), 가장자리에 닿으면 안쪽으로 민다(crop)
+ * - 여백 1px을 두고도 들어가지 않으면 시트 전체를 같은 비율로 줄인다(downscale)
  */
+export function fitFrames(natives, spec) {
+  const [T, TH] = spec.logical;
+  const grounded = spec.type === 'character-ref' || spec.type === 'character-anim';
+  let imgs = natives;
+  let fit = 'pad';
+  if (natives.every((n) => n.width <= T / 2 && n.height <= TH / 2)) {
+    const k = Math.floor(Math.min(...natives.map((n) => Math.min(T / n.width, TH / n.height))));
+    imgs = natives.map((n) => resampleNearest(n, k, k));
+    fit = 'upscale';
+  } else if (natives.some((n) => n.width > T || n.height > TH)) {
+    fit = 'crop';
+  }
+  let boxes = imgs.map(contentBox);
+  const union = (list) => {
+    const b = list.filter(Boolean);
+    return b.length ? { minY: Math.min(...b.map((x) => x.minY)), maxY: Math.max(...b.map((x) => x.maxY)), w: Math.max(...b.map((x) => x.w)) } : null;
+  };
+  let u = union(boxes);
+  if (u && (u.maxY - u.minY + 1 > TH - 2 * EDGE || u.w > T - 2 * EDGE)) {
+    const s = Math.min((TH - 2 * EDGE) / (u.maxY - u.minY + 1), (T - 2 * EDGE) / u.w);
+    imgs = imgs.map((img) => resampleNearest(img, s, s));
+    boxes = imgs.map(contentBox);
+    u = union(boxes);
+    fit = 'downscale';
+  }
+  // 세로 위치는 시트 공통
+  let oy;
+  if (grounded && u) oy = Math.round(spec.baseline * TH) - 1 - u.maxY;
+  else oy = Math.round(spec.baseline * TH - spec.baseline * Math.max(...imgs.map((i) => i.height)));
+  if (u) oy = Math.min(Math.max(oy, EDGE - u.minY), TH - 1 - EDGE - u.maxY);
+  return imgs.map((img, i) => {
+    const box = boxes[i];
+    let ox = Math.round((T - img.width) / 2);
+    if (box) ox = Math.min(Math.max(ox, EDGE - box.minX), T - 1 - EDGE - box.maxX);
+    const out = Buffer.alloc(T * TH * 4);
+    for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) {
+      const tx = x + ox, ty = y + oy;
+      if (tx < 0 || ty < 0 || tx >= T || ty >= TH) continue;
+      img.data.copy(out, (ty * T + tx) * 4, (y * img.width + x) * 4, (y * img.width + x) * 4 + 4);
+    }
+    return { img: { data: out, width: T, height: TH }, fit, native: [natives[i].width, natives[i].height] };
+  });
+}
+
 export function processPixelSheet(raw, spec, palette, cells) {
   const keyed = keyOut(raw, spec);
   const grid = detectGrid(keyed, spec);
-  const frames = cells.map((n) => {
-    const rect = cellRect(spec, n, raw);
-    const sampled = sampleCell(keyed, rect, grid, spec, palette);
-    const fitted = fitToTarget(sampled.img, spec);
-    return { n, img: fitted.img, purity: sampled.purity, native: fitted.native, fit: fitted.fit };
-  });
+  const sampled = cells.map((n) => sampleCell(keyed, cellRect(spec, n, raw), grid, spec, palette));
+  const fitted = fitFrames(sampled.map((s) => s.img), spec);
+  const frames = cells.map((n, i) => ({ n, img: fitted[i].img, purity: sampled[i].purity, native: fitted[i].native, fit: fitted[i].fit }));
   return { grid, frames, keyed };
 }
 
