@@ -102,9 +102,9 @@ export function advanceStage(data: GameData, run: RunState): boolean {
   return true;
 }
 
-export function addCard(run: RunState, cardId: string, upgraded = false): CardInstance {
+export function addCard(run: RunState, cardId: string, level = 0): CardInstance {
   run.counter += 1;
-  const card = { uid: `c${run.counter}`, cardId, upgraded };
+  const card = { uid: `c${run.counter}`, cardId, level };
   run.deck.push(card);
   return card;
 }
@@ -231,10 +231,23 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
   return list;
 }
 
-export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number): string[] {
+/** pick: 선택지에 고르는 강화(upgrade_card choose)가 있으면 사람이 고른 카드 uid */
+export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number, pick?: string): string[] {
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
-  return applyRunOps(data, run, choice.effects);
+  return applyRunOps(data, run, choice.effects, { pick });
+}
+
+/** 선택지가 강화할 카드를 사람에게 고르게 하는가 */
+export function choiceNeedsPick(choice: { effects: Effect[] }): Effect | undefined {
+  return choice.effects.find((e) => e.op === 'upgrade_card' && e.choose);
+}
+
+/** 강화할 수 있는 카드(강화 정의가 있고 최대 단계 미만, filter에 맞음) */
+export function upgradeCandidates(data: GameData, run: RunState, filter?: Effect['filter']): CardInstance[] {
+  return run.deck.filter(
+    (c) => !!data.cards.get(c.cardId)!.upgrade && c.level < data.balance.upgrade.maxLevel && matchesFilter(data, c, filter),
+  );
 }
 
 function matchesFilter(data: GameData, card: CardInstance, filter: Effect['filter']): boolean {
@@ -246,8 +259,8 @@ function matchesFilter(data: GameData, card: CardInstance, filter: Effect['filte
   return true;
 }
 
-/** 런 단위 동작 해석. 결과 메시지 목록을 돌려준다. */
-export function applyRunOps(data: GameData, run: RunState, effects: Effect[]): string[] {
+/** 런 단위 동작 해석. 결과 메시지 목록을 돌려준다. opts.pick: 고르는 강화에서 사람이 고른 카드 uid */
+export function applyRunOps(data: GameData, run: RunState, effects: Effect[], opts: { pick?: string } = {}): string[] {
   const out: string[] = [];
   for (const e of effects) {
     run.counter += 1;
@@ -270,10 +283,14 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[]): s
         break;
       }
       case 'upgrade_card': {
-        const pool = run.deck.filter((c) => !c.upgraded && data.cards.get(c.cardId)!.upgrade && matchesFilter(data, c, e.filter));
-        for (const c of rng.shuffle([...pool]).slice(0, e.count ?? 1)) {
-          c.upgraded = true;
-          out.push(`카드 강화: ${data.cards.get(c.cardId)!.name}+`);
+        // 한 번에 한 단계씩(+1). 고르는 강화는 사람이 고른 카드, 아니면 무작위
+        const pool = upgradeCandidates(data, run, e.filter);
+        const chosen = e.choose && opts.pick ? pool.filter((c) => c.uid === opts.pick) : rng.shuffle([...pool]).slice(0, e.count ?? 1);
+        for (const c of chosen) {
+          c.level += 1;
+          const def = data.cards.get(c.cardId)!;
+          const skill = c.level > data.balance.upgrade.statLevels ? (c.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
+          out.push(`카드 강화: ${def.name} +${c.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`);
         }
         break;
       }

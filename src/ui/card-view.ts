@@ -19,7 +19,7 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
       title: opts.disabled ?? def.flavor ?? '',
     },
     h('div', { class: 'card-cost' }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), card.cost.neigong + card.cost.mana === 0 ? h('span', { class: 'pip-zero' }, '0') : null),
-    h('div', { class: 'card-name' }, def.name, card.upgraded ? '+' : ''),
+    h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
     h('div', { class: 'card-owner' }, owner?.name ?? (def.owner === 'status' ? '상태' : '공용'), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
     h('div', { class: 'card-text' }, cardText(data, inst)),
     def.flavor ? h('div', { class: 'card-flavor' }, def.flavor) : null,

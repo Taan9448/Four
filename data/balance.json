@@ -24,6 +24,7 @@
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,
   "party": { "max": 3, "reviveHp": 1 },
+  "upgrade": { "maxLevel": 5, "statLevels": 3 },
   "rewards": {
     "cardChoices": 3,
     "rarityWeights": {
