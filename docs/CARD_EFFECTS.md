@@ -46,7 +46,7 @@
   "name": "벽운단하",
   "owner": "haun",                      // 캐릭터 id | common | status
   "type": "attack",                     // attack | skill | power | status
-  "rarity": "rare",                     // starter | common | uncommon | rare | special
+  "rarity": "epic",                     // common(일반) | uncommon(고급) | rare(희귀) | epic(영웅) | legendary(전설) | special(상태·저주)
   "pool": "story",                      // starter | reward(전투 보상 후보) | story(이벤트로만) | status
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
@@ -55,10 +55,17 @@
   "upgrade": { "effects": [ { "op": "damage", "amount": 24 }, { "op": "rift", "amount": 3 } ] },  // 바뀌는 필드만
   "anim": "attack",                     // 선택: 카드 주인이 재생할 애니메이션
   "fx": "fx_slash_blue",                // 선택: 대상 위에 겹칠 이펙트 에셋 id
+  "castLine": { "speaker": "haun", "face": "resolve", "text": "운하검 제일식, 벽운단하(劈雲斷河)." },  // 영웅·전설 필수: 컷인 대사(face: neutral | resolve | surprise)
   "text": "...",                        // 선택: 없으면 효과에서 자동 생성(src/engine/text.ts)
   "flavor": "운하검 제일식, 벽운단하(劈雲斷河). 구름을 쪼개고 강을 끊는다."
 }
 ```
+
+**등급 규칙**(`data:check`가 검사)
+- 시작 카드(`pool: starter`)는 모두 일반. 보상 풀에는 일반이 없다.
+- 전설은 스토리로만 얻는다(`pool: story`).
+- 영웅·전설은 `castLine`이 있어야 한다. 쓸 때마다 화면이 어두워지고, 화자의 반신 그림(`<화자>_stand`의 표정 프레임)과 대사가 나온 뒤 스킬이 나간다(약 1.5초, 클릭하면 건너뜀).
+- 전투 보상 후보는 노드 유형별 등급 가중치(`balance.rewards.rarityWeights`)로 등급을 먼저 뽑고, 그 등급에서 카드를 고른다.
 
 ## 4. 상태(`data/statuses.json`)
 

@@ -105,13 +105,20 @@ export type Cost = z.infer<typeof Cost>;
 export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable']);
 export type Keyword = z.infer<typeof Keyword>;
 
+export const Rarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'special']);
+export type Rarity = z.infer<typeof Rarity>;
+/** 반신 그림 표정: 기본·결의·놀람(에셋 <캐릭터>_stand의 프레임 1·2·3) */
+export const Face = z.enum(['neutral', 'resolve', 'surprise']);
+export type Face = z.infer<typeof Face>;
+
 export const CardDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
     owner: z.string(),
     type: z.enum(['attack', 'skill', 'power', 'status']),
-    rarity: z.enum(['starter', 'common', 'uncommon', 'rare', 'special']),
+    /** 등급: 일반·고급·희귀·영웅·전설(+ 상태·저주용 special). 영웅·전설은 castLine 필수 */
+    rarity: Rarity,
     pool: z.enum(['starter', 'reward', 'story', 'status']),
     cost: Cost,
     target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
@@ -122,6 +129,8 @@ export const CardDef = z
     /** 연출: 카드 주인이 재생할 애니메이션(기본 attack/skill)과 대상 위에 겹칠 이펙트 에셋 id */
     anim: z.enum(['attack', 'skill']).optional(),
     fx: z.string().optional(),
+    /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
+    castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
     upgrade: z
       .object({ cost: Cost.optional(), effects: z.array(Effect).optional(), text: z.string().optional() })
       .strict()
@@ -244,7 +253,13 @@ export const Balance = z
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),
     incorporealMultiplier: z.number(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
-    rewards: z.object({ cardChoices: z.number().int().positive() }).strict(),
+    rewards: z
+      .object({
+        cardChoices: z.number().int().positive(),
+        /** 보상 카드 등급 가중치(노드 유형별). 일반은 시작 카드, 전설은 스토리로만 얻는다 */
+        rarityWeights: z.record(z.enum(['battle', 'elite', 'boss']), z.partialRecord(Rarity, z.number().min(0))),
+      })
+      .strict(),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z

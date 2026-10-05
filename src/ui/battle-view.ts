@@ -3,6 +3,7 @@ import { canPlay, describeIntent, endTurn, needsTarget, playCard } from '../engi
 import type { GameData } from '../engine/data';
 import { resolveCard, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, shake, sleep, toast } from '../render/fx';
+import { loadPortrait } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { SpritePlayer } from '../render/sprite-player';
 import { cardView } from './card-view';
@@ -274,9 +275,12 @@ export class BattleView {
         case 'turn':
           if (ev.turn > 1) toast(this.toasts, `${ev.turn}턴`, 'info');
           break;
-        case 'card':
+        case 'card': {
           this.lastCard = ev.cardId;
+          const line = resolveCard(this.data, ev.cardId).def.castLine;
+          if (line) await this.cutIn(ev.cardId, line);
           break;
+        }
         case 'attack':
           await this.playAttack(ev.sourceUid, ev.targetUids);
           break;
@@ -400,6 +404,36 @@ export class BattleView {
     this.fxLayer.appendChild(canvas);
     await new SpritePlayer(canvas).play(fxId);
     canvas.remove();
+  }
+
+  /** 영웅·전설 카드 컷인: 화면이 어두워지고 반신 그림과 대사가 나온 뒤 스킬이 나간다. 매번 재생, 클릭하면 건너뜀 */
+  private async cutIn(cardId: string, line: { speaker: string; face: 'neutral' | 'resolve' | 'surprise'; text: string }): Promise<void> {
+    const def = resolveCard(this.data, cardId).def;
+    const who = this.data.characters.get(line.speaker);
+    const img = await loadPortrait(line.speaker, line.face);
+    const portrait = img
+      ? h('img', { class: 'cutin-portrait', src: img.src, alt: who?.name ?? line.speaker })
+      : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who?.color ?? '#888'}` }, who?.name ?? line.speaker);
+    const overlay = h(
+      'div',
+      { class: `cutin cutin-${def.rarity}`, style: `--owner:${who?.color ?? '#888'}` },
+      h('div', { class: 'cutin-band' }),
+      portrait,
+      h('div', { class: 'cutin-text' }, h('div', { class: 'cutin-card' }, def.name), h('div', { class: 'cutin-line' }, `"${line.text}"`)),
+    );
+    this.root.appendChild(overlay);
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        overlay.removeEventListener('click', done);
+        resolve();
+      };
+      const timer = setTimeout(done, 1500);
+      overlay.addEventListener('click', done);
+    });
+    overlay.classList.add('out');
+    await sleep(180);
+    overlay.remove();
   }
 
   private showResult(): void {

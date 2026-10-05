@@ -1,40 +1,40 @@
 [
   {
-    "id": "elia_fireball", "name": "불덩이", "owner": "elia", "type": "attack", "rarity": "starter", "pool": "starter",
+    "id": "elia_fireball", "name": "불덩이", "owner": "elia", "type": "attack", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 0, "mana": 2 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 9 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 13 } ] },
     "flavor": "그녀가 손을 뻗자 허공에서 불덩이가 생겨나 짐승 하나를 집어삼켰다."
   },
   {
-    "id": "elia_ice_wall", "name": "얼음 벽", "owner": "elia", "type": "skill", "rarity": "starter", "pool": "starter",
+    "id": "elia_ice_wall", "name": "얼음 벽", "owner": "elia", "type": "skill", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "ally",
     "effects": [ { "op": "block", "amount": 7, "target": "ally" } ],
     "upgrade": { "effects": [ { "op": "block", "amount": 10, "target": "ally" } ] },
     "flavor": "독장이 방장을 노릴 때, 그녀의 얼음 벽이 그 사이에 솟았다."
   },
   {
-    "id": "elia_mana_gift", "name": "마나 양도", "owner": "elia", "type": "skill", "rarity": "starter", "pool": "starter",
+    "id": "elia_mana_gift", "name": "마나 양도", "owner": "elia", "type": "skill", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "self",
     "effects": [ { "op": "gain_mana", "amount": 3 }, { "op": "draw", "amount": 1 } ],
     "flavor": "그녀는 남은 마나를 모두 짜내 하운에게 던졌다."
   },
   {
-    "id": "elia_freeze", "name": "발 얼리기", "owner": "elia", "type": "skill", "rarity": "common", "pool": "reward",
+    "id": "elia_freeze", "name": "발 얼리기", "owner": "elia", "type": "skill", "rarity": "uncommon", "pool": "reward",
     "cost": { "neigong": 0, "mana": 2 }, "target": "enemy",
     "effects": [ { "op": "apply_status", "status": "bind", "stacks": 1 } ],
     "upgrade": { "cost": { "neigong": 0, "mana": 1 } },
     "flavor": "엘리아는 남은 마나를 모두 짜내 마왕의 발을 얼려 붙들었다."
   },
   {
-    "id": "elia_mend", "name": "상처 막기", "owner": "elia", "type": "skill", "rarity": "common", "pool": "reward",
+    "id": "elia_mend", "name": "상처 막기", "owner": "elia", "type": "skill", "rarity": "uncommon", "pool": "reward",
     "cost": { "neigong": 0, "mana": 2 }, "target": "ally",
     "effects": [ { "op": "heal", "amount": 7, "target": "ally" } ],
     "upgrade": { "effects": [ { "op": "heal", "amount": 10, "target": "ally" } ] },
     "flavor": "엘리아는 남은 마나를 쪼개고 또 쪼개어 동료들의 상처를 막았다."
   },
   {
-    "id": "elia_firestorm", "name": "화염 폭풍", "owner": "elia", "type": "attack", "rarity": "uncommon", "pool": "reward",
+    "id": "elia_firestorm", "name": "화염 폭풍", "owner": "elia", "type": "attack", "rarity": "rare", "pool": "reward",
     "cost": { "neigong": 0, "mana": 4 }, "target": "all_enemies",
     "effects": [ { "op": "damage", "amount": 8 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 11 } ] },
