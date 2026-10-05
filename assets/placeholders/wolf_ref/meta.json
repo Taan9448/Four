@@ -1,8 +1,8 @@
 {
   "id": "wolf_ref",
   "type": "character-ref",
-  "frameW": 64,
-  "frameH": 64,
+  "frameW": 80,
+  "frameH": 80,
   "track": "pixel",
   "pixelScale": 8,
   "gridDetected": true,

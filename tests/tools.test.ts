@@ -31,16 +31,18 @@ async function prepare(id: string, opts: { skipCells?: number[]; extraCells?: nu
 }
 
 /** 8px 블록으로 그린 사각 인물(외곽선 + 채움) 5칸 시트. top·rows는 칸 안 블록 줄 */
-async function blockFigureSheet(top: number, rows: number) {
-  const W = 1536, H = 1024, B = 8, cols = 3;
+async function blockFigureSheet(top: number, rows: number, B = 8) {
+  const W = 1536, H = 1024, cols = 3, half = Math.floor(48 / B);
   const buf = Buffer.alloc(W * H * 4);
   const put = (x: number, y: number, [r, g, b]: number[]) => { const i = (y * W + x) * 4; buf[i] = r; buf[i + 1] = g; buf[i + 2] = b; buf[i + 3] = 255; };
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) put(x, y, [255, 0, 255]);
   for (let n = 0; n < 5; n++) {
     const cx = (n % cols) * 512, cy = Math.floor(n / cols) * 512;
-    for (let by = top; by < top + rows; by++) for (let bx = 26; bx < 38; bx++) {
-      const edge = by === top || by === top + rows - 1 || bx === 26 || bx === 37;
-      const c = edge ? [0x1d, 0x24, 0x33] : [0x3d, 0x44, 0x59];
+    const mid = Math.floor(512 / B / 2);
+    for (let by = top; by < top + rows; by++) for (let bx = mid - half; bx < mid + half; bx++) {
+      const edge = by === top || by === top + rows - 1 || bx === mid - half || bx === mid + half - 1;
+      // 안쪽은 바둑판 무늬: 블록 경계마다 색이 바뀌어야 블록 크기를 하나로 감지한다
+      const c = edge ? [0x1d, 0x24, 0x33] : (bx + by) % 2 ? [0x3d, 0x44, 0x59] : [0x5d, 0x64, 0x78];
       for (let y = 0; y < B; y++) for (let x = 0; x < B; x++) put(cx + bx * B + x, cy + by * B + y, c);
     }
   }
@@ -55,7 +57,7 @@ describe('자르기 → 검증', () => {
     expect(existsSync(join(p.sprites('fixture_attack'), '_contact.png'))).toBe(true);
     expect(existsSync(join(p.sprites('fixture_attack'), '_preview.gif'))).toBe(true);
     const meta = JSON.parse(readFileSync(join(p.sprites('fixture_attack'), 'meta.json'), 'utf8'));
-    expect(meta).toMatchObject({ frameW: 64, frameH: 64, pixelScale: 8, nativeSize: [64, 64], frames: 5, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
+    expect(meta).toMatchObject({ frameW: 80, frameH: 80, pixelScale: 8, nativeSize: [64, 64], frames: 5, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
     expect(meta.gridPurity).toBeGreaterThan(0.95);
   });
 
@@ -93,14 +95,14 @@ describe('자르기 → 검증', () => {
     expect(meta.sourceSize).toEqual([1881, 1254]);
     expect(meta.resizedFrom).toBeNull();
     expect(meta.pixelScale).toBeCloseTo(8 * (1881 / 1536), 0);
-    expect(meta.frameW).toBe(64);
+    expect(meta.frameW).toBe(80);
     expect(meta.gridPurity).toBeGreaterThan(0.85);
     const r = await validateAsset('fixture_attack', { root, previews: false });
     expect(r.errors).toEqual([]);
     expect(r.warnings.some((w) => w.includes('블록 크기를 감지'))).toBe(true);
   });
 
-  it('모델이 더 굵은 블록(낮은 해상도)으로 그려도 원래 해상도 그대로 64 프레임에 담는다', async () => {
+  it('모델이 더 굵은 블록(낮은 해상도)으로 그려도 원래 해상도 그대로 80 프레임에 담는다', async () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
@@ -111,14 +113,26 @@ describe('자르기 → 검증', () => {
     expect(meta.nativeSize[0]).toBeGreaterThanOrEqual(46);
     expect(meta.nativeSize[0]).toBeLessThanOrEqual(50);
     expect(meta.fit).toBe('pad');
-    expect(meta.frameW).toBe(64);
+    expect(meta.frameW).toBe(80);
   });
 
-  it('인물이 칸을 꽉 채워도 경계에 닿지 않게 시트 전체를 같은 비율로 줄인다(PR #10)', async () => {
+  it('인물이 칸을 꽉 채워도(PR #10) 80 프레임에 줄이지 않고 담는다', async () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
     writeFileSync(p.source('fixture_attack'), await blockFigureSheet(0, 64));
+    const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    expect(meta.fit).toBe('pad');
+    const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect(r.errors).toEqual([]);
+  });
+
+  it('모델이 더 잘게(칸당 80px 넘게) 그려 프레임에 안 들어가면 시트 전체를 같은 비율로 줄인다', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    // 블록 6px → 칸당 약 85px, 인물 84줄
+    writeFileSync(p.source('fixture_attack'), await blockFigureSheet(0, 84, 6));
     const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
     expect(meta.fit).toBe('downscale');
     const r = await validateAsset('fixture_attack', { root, previews: false });
@@ -126,7 +140,21 @@ describe('자르기 → 검증', () => {
     expect(r.warnings.some((w) => w.includes('시트 전체를 줄였다'))).toBe(true);
   });
 
-  it('캐릭터는 칸 안 어디에 그렸든 발(가장 낮은 줄)을 기준선 줄 58에 맞춘다', async () => {
+  it('명세가 바뀐 뒤 다시 자르지 않은 프레임은 art 브랜치에선 실패, 그 밖에선 경고', async () => {
+    const { p } = await prepare('fixture_attack');
+    const metaPath = join(p.sprites('fixture_attack'), 'meta.json');
+    const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
+    meta.frameW = 64;
+    meta.frameH = 64;
+    writeFileSync(metaPath, JSON.stringify(meta));
+    const strict = await validateAsset('fixture_attack', { root, previews: false });
+    expect(strict.errors.some((e) => e.includes('재실행 필요'))).toBe(true);
+    const lenient = await validateAsset('fixture_attack', { root, previews: false, staleOk: true });
+    expect(lenient.errors).toEqual([]);
+    expect(lenient.warnings.some((w) => w.includes('재실행 필요'))).toBe(true);
+  });
+
+  it('캐릭터는 칸 안 어디에 그렸든 발(가장 낮은 줄)을 기준선 줄 72에 맞춘다', async () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
@@ -138,7 +166,7 @@ describe('자르기 → 검증', () => {
     for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
       if (data[(y * info.width + x) * 4 + 3] > 0) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
     }
-    expect(maxY + 1).toBe(58);
+    expect(maxY + 1).toBe(72);
     expect(maxY - minY + 1).toBe(40);
   });
 
@@ -172,10 +200,10 @@ describe('자르기 → 검증', () => {
     expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
   });
 
-  it('프레임은 논리 해상도(64×64)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
+  it('프레임은 게임 프레임 크기(80×80)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
     const { p } = await prepare('fixture_attack');
     const frame = join(p.sprites('fixture_attack'), 'frame_01.png');
-    expect(await sharp(frame).metadata()).toMatchObject({ width: 64, height: 64 });
+    expect(await sharp(frame).metadata()).toMatchObject({ width: 80, height: 80 });
     const { data, info } = await sharp(frame).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] > 128) {

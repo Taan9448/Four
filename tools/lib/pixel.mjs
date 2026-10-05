@@ -56,7 +56,7 @@ export function detectGrid(keyed, spec) {
   const cellW = W / spec.grid[0];
   const nominal = (spec.pixel_scale * W) / spec.canvas[0];
   // 칸당 해상도가 목표의 2배(예: 128px)를 넘는 주기는 픽셀 블록이 아니라 흐림·노이즈로 본다
-  const minP = Math.max(3, cellW / (spec.logical[0] * 2));
+  const minP = Math.max(3, cellW / (spec.draw[0] * 2));
   const maxP = Math.max(minP + 1, cellW / 12);
   const gx = bestPeriod(thin(xs), minP, maxP);
   const gy = bestPeriod(thin(ys), minP, maxP);

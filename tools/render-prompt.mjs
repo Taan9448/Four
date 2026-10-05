@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 명세 → 완성 이미지 생성 프롬프트(영어). 전투는 32px 픽셀 아트, 이야기(카드·초상화·스토리 CG·설정화)는 애니메이션 채색 일러스트. 이슈 본문과 Codex 작업에 그대로 쓰인다.
+// 명세 → 완성 이미지 생성 프롬프트(영어). 전투는 64px 그림 격자의 픽셀 아트, 이야기(카드·초상화·스토리 CG·설정화)는 애니메이션 채색 일러스트. 이슈 본문과 Codex 작업에 그대로 쓰인다.
 // 사용: npm run assets:prompt -- <id> [--out file]
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -10,10 +10,10 @@ export { loadStyleData as loadPromptData };
 
 const rulesFor = (spec) =>
   'Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.\n' +
-  `Nothing crosses a cell boundary; keep at least ${Math.max(2, Math.floor(spec.logical[1] * PADDING))} sprite pixels of empty space inside every cell edge.`;
+  `Nothing crosses a cell boundary; keep at least ${Math.max(2, Math.floor(spec.draw[1] * PADDING))} sprite pixels of empty space inside every cell edge.`;
 
 function pixelGrid(spec, what) {
-  const [lw, lh] = spec.logical;
+  const [lw, lh] = spec.draw;
   const s = spec.pixel_scale;
   return (
     `PIXEL GRID: ${what} is a ${lw}x${lh} pixel-art sprite scaled up exactly ${s}x. ` +
@@ -32,7 +32,7 @@ export function renderPrompt(spec, style) {
   const [W, H] = spec.canvas;
   const [cols, rows] = spec.grid;
   const [cw, ch] = spec.cell;
-  const [lw, lh] = spec.logical;
+  const [lw, lh] = spec.draw;
   const key = CHROMA[spec.chroma];
   const subject = spec.character ? style.subjects?.[spec.character] : null;
   if (spec.character && !subject) throw new Error(`ART_STYLE.md prompt-data에 subjects.${spec.character}가 없다`);
