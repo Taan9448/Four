@@ -11,7 +11,7 @@
 
 ```bash
 npm ci             # Node.js 22.12 이상(Vitest 5 요구 사항)
-npm run dev        # http://localhost:5173  (?seed=ABCD 로 같은 지도 재현, ?sandbox 로 바로 전투)
+npm run dev        # http://localhost:5173  (?seed=ABCD 로 같은 지도 재현, ?sandbox 로 바로 전투, ?sandbox=kyle,born 처럼 동료 지정)
 npm test           # 엔진·경로·데이터·에셋 도구 테스트
 npm run build      # dist/ → GitHub Pages
 ```

@@ -1,0 +1,13 @@
+id: kyle_idle
+type: character-anim
+character: kyle
+summary: 카일 대기 4프레임
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+frame_notes:
+  1: ready knight stance, sword held forward in both hands, weight on the back foot
+  2: shoulders rise slightly, tabard sways
+  3: rolls the shoulders, sword tip lifts a little
+  4: settles back, light grin, tabard settling
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#3a6ea5' }

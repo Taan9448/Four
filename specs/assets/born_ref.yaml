@@ -1,0 +1,9 @@
+id: born_ref
+type: character-ref
+character: born
+summary: 보른 기준 시트(3/4 정면 + 오른쪽 측면) — 사람형 키의 약 70%
+facing: right
+frame_notes:
+  1: full body, three-quarter front view, short and broad dwarf about 70 percent of a human's height, round iron shield on the left arm, big axe resting on the right shoulder, stern face
+  2: full body, side view facing right, same size, shield raised slightly in front, axe held low behind
+placeholder: { shape: humanoid, color: '#8a5a3b', accent: '#8a90a3' }

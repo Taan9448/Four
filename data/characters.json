@@ -15,17 +15,17 @@
   },
   {
     "id": "kyle", "name": "카일 로웬", "title": "몰락 가문의 기사", "role": "fighter", "maxHp": 52, "color": "#d9b44a",
-    "sprites": {},
-    "starterDeck": [],
+    "sprites": { "idle": "kyle_idle", "attack": "kyle_attack", "hit": "kyle_hit" },
+    "starterDeck": ["kyle_strike", "kyle_strike", "kyle_guard", "kyle_guard", "kyle_left_blade"],
     "joinsAt": "s1_story_companions",
-    "description": "입이 가볍고 검은 무거운 기사. 전투가 시작되면 언제나 하운의 왼편에서 가장 먼저 검을 뽑는다. (1차 프로토타입: 카드 미구현)"
+    "description": "입이 가볍고 검은 무거운 기사. 전투가 시작되면 언제나 하운의 왼편에서 가장 먼저 검을 뽑는다. 선천 카드와 약점 공격으로 판을 연다."
   },
   {
     "id": "born", "name": "보른", "title": "드워프 도끼전사", "role": "fighter", "maxHp": 70, "color": "#8a5a3b",
-    "sprites": {},
-    "starterDeck": [],
+    "sprites": { "idle": "born_idle", "attack": "born_attack", "hit": "born_hit" },
+    "starterDeck": ["born_shield", "born_shield", "born_knee", "born_knee", "born_cleave"],
     "joinsAt": "s1_story_companions",
-    "description": "말수가 적은 일행의 방패. \"같이 가.\" (1차 프로토타입: 카드 미구현)"
+    "description": "말수가 적은 일행의 방패. \"같이 가.\" 아군 방어와 도발로 일행을 지킨다."
   },
   {
     "id": "wang", "name": "왕일검", "title": "청운문 전대 대사형", "role": "support", "maxHp": 1, "color": "#c9a46a",

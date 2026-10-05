@@ -1,0 +1,51 @@
+[
+  {
+    "id": "kyle_strike", "name": "기사의 일격", "owner": "kyle", "type": "attack", "rarity": "starter", "pool": "starter",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
+    "effects": [ { "op": "damage", "amount": 7 } ],
+    "upgrade": { "effects": [ { "op": "damage", "amount": 10 } ] },
+    "flavor": "엘하임의 기사검술은 무겁고 곧았다."
+  },
+  {
+    "id": "kyle_guard", "name": "검으로 막기", "owner": "kyle", "type": "skill", "rarity": "starter", "pool": "starter",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "self",
+    "effects": [ { "op": "block", "amount": 5 } ],
+    "upgrade": { "effects": [ { "op": "block", "amount": 8 } ] },
+    "flavor": "카일이 새로 벼린 검의 손잡이를 고쳐 쥐었다."
+  },
+  {
+    "id": "kyle_left_blade", "name": "왼편의 검", "owner": "kyle", "type": "attack", "rarity": "starter", "pool": "starter",
+    "cost": { "neigong": 0, "mana": 0 }, "target": "enemy", "keywords": ["innate"],
+    "effects": [ { "op": "damage", "amount": 4 } ],
+    "upgrade": { "effects": [ { "op": "damage", "amount": 4 }, { "op": "draw", "amount": 1 } ] },
+    "flavor": "그러나 전투가 시작되면, 그는 언제나 하운의 왼편에서 가장 먼저 검을 뽑았다."
+  },
+  {
+    "id": "kyle_ankle", "name": "발목 찌르기", "owner": "kyle", "type": "attack", "rarity": "common", "pool": "reward",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
+    "effects": [ { "op": "damage", "amount": 4 }, { "op": "apply_status", "status": "vulnerable", "stacks": 2 } ],
+    "upgrade": { "effects": [ { "op": "damage", "amount": 6 }, { "op": "apply_status", "status": "vulnerable", "stacks": 2 } ] },
+    "flavor": "카일이 거인의 발목에 검을 박아 넣었다."
+  },
+  {
+    "id": "kyle_dumplings", "name": "만두 한 접시", "owner": "kyle", "type": "skill", "rarity": "common", "pool": "reward",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "all_allies", "keywords": ["exhaust"],
+    "effects": [ { "op": "heal", "amount": 4, "target": "all_allies" } ],
+    "upgrade": { "effects": [ { "op": "heal", "amount": 6, "target": "all_allies" } ] },
+    "flavor": "\"엘하임의 그 어떤 왕궁 연회에도 이런 건 없었어.\" 그는 객잔마다 만두를 서른 개씩 시켜 먹었다."
+  },
+  {
+    "id": "kyle_fun", "name": "그래서 재밌는 거지", "owner": "kyle", "type": "skill", "rarity": "uncommon", "pool": "reward",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "self", "keywords": ["exhaust"],
+    "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "draw", "amount": 1 } ],
+    "upgrade": { "effects": [ { "op": "apply_status", "status": "strength", "stacks": 3, "target": "self" }, { "op": "draw", "amount": 1 } ] },
+    "flavor": "\"숫자로는 안 되겠군.\" 카일이 계단 위를 올려다보며 말했다. 그러고는 씩 웃었다."
+  },
+  {
+    "id": "kyle_wing_cut", "name": "날개 베기", "owner": "kyle", "type": "attack", "rarity": "rare", "pool": "reward",
+    "cost": { "neigong": 2, "mana": 0 }, "target": "enemy",
+    "effects": [ { "op": "damage", "amount": 18 }, { "op": "apply_status", "status": "weak", "stacks": 2 }, { "op": "damage", "amount": 3, "target": "self" } ],
+    "upgrade": { "effects": [ { "op": "damage", "amount": 24 }, { "op": "apply_status", "status": "weak", "stacks": 2 }, { "op": "damage", "amount": 3, "target": "self" } ] },
+    "flavor": "카일의 검이 마왕의 날개 하나를 베었으나 그 대가로 왼팔이 부러졌다."
+  }
+]

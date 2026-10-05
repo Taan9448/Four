@@ -28,16 +28,16 @@ export class App {
   constructor(private root: HTMLElement) {
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed');
-    if (params.has('sandbox')) this.sandbox(seed ?? 'SANDBOX');
+    if (params.has('sandbox')) this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean));
     else if (seed) this.start(seed, params.has('wang'));
     else this.title();
   }
 
-  /** ?sandbox — 지도 없이 바로 전투(하운+엘리아 vs 그림자늑대 2마리, 융합 카드·왕일검 지원 포함). 연출 확인용 */
-  private sandbox(seed: string): void {
+  /** ?sandbox[=kyle,born] — 지도 없이 바로 전투(하운+동료(기본 엘리아) vs 그림자늑대 2마리, 융합 카드·왕일검 지원 포함). 연출 확인용 */
+  private sandbox(seed: string, mates: string[]): void {
     const run = createRun(data, seed, { supportActive: true });
     applyRunOps(data, run, [
-      { op: 'join_party', member: 'elia' },
+      ...mates.map((member) => ({ op: 'join_party' as const, member })),
       { op: 'gain_card', card: 'haun_byeogun', count: 2 },
       { op: 'gain_card', card: 'haun_cloud_form' },
     ]);
