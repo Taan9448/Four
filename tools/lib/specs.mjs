@@ -6,15 +6,39 @@ import { parse } from 'yaml';
 
 export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
-/** 유형별 시트 규격. docs/ASSET_PIPELINE.md 9절과 같아야 한다. */
-export const TYPE_DEFAULTS = {
-  'character-anim': { canvas: [1536, 1024], grid: [4, 2], chroma: 'magenta', blend: 'normal' },
-  'character-ref': { canvas: [1536, 1024], grid: [2, 1], chroma: 'magenta', blend: 'normal', frames: 2, fps: 1, loop: false },
-  fx: { canvas: [1024, 1024], grid: [4, 4], chroma: 'black', blend: 'lighter' },
-  'card-art': { canvas: [1024, 1536], grid: [1, 1], chroma: 'none', blend: 'normal', frames: 1, fps: 1, loop: false },
-  background: { canvas: [1536, 1024], grid: [1, 1], chroma: 'none', blend: 'normal', frames: 1, fps: 1, loop: false },
-  portrait: { canvas: [1024, 1024], grid: [1, 1], chroma: 'none', blend: 'normal', frames: 1, fps: 1, loop: false },
+/**
+ * 32px 픽셀 아트 시트 규격. docs/ASSET_PIPELINE.md 2절과 같아야 한다.
+ * 이미지 모델은 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 칸마다 논리 해상도(logical)로 줄인다.
+ *   small: 32×32 스프라이트(캐릭터·일반 적·이펙트), large: 64×64(보스·큰 이펙트)
+ */
+const SHEETS = {
+  'anim-small': { canvas: [1024, 1024], grid: [4, 4], logical: [32, 32] }, // 칸 256 = 8배
+  'anim-large': { canvas: [1536, 1024], grid: [3, 2], logical: [64, 64] }, // 칸 512 = 8배
+  'ref-small': { canvas: [1024, 1024], grid: [2, 2], logical: [32, 32] }, // 칸 512 = 16배
+  'ref-large': { canvas: [1024, 1024], grid: [2, 2], logical: [64, 64] }, // 칸 512 = 8배
+  'card-art': { canvas: [1024, 1536], grid: [1, 1], logical: [64, 96] }, // 16배
+  background: { canvas: [1536, 1024], grid: [1, 1], logical: [192, 128] }, // 8배
+  portrait: { canvas: [1024, 1024], grid: [1, 1], logical: [64, 64] }, // 16배
 };
+
+export function typeDefaults(type, size = 'small') {
+  const one = { frames: 1, fps: 1, loop: false };
+  switch (type) {
+    case 'character-anim':
+      return { ...SHEETS[`anim-${size}`], chroma: 'magenta', blend: 'normal', max_colors: 16 };
+    case 'character-ref':
+      return { ...SHEETS[`ref-${size}`], chroma: 'magenta', blend: 'normal', max_colors: 16, frames: 2, fps: 1, loop: false };
+    case 'fx':
+      // 검정 배경은 자를 때 투명으로 바뀌므로 게임에서는 일반 합성으로 겹친다
+      return { ...SHEETS[`anim-${size}`], chroma: 'black', blend: 'normal', max_colors: 12 };
+    case 'card-art':
+    case 'background':
+    case 'portrait':
+      return { ...SHEETS[type], chroma: 'none', blend: 'normal', max_colors: 32, ...one };
+    default:
+      return null;
+  }
+}
 
 /** 표준 애니메이션 세트. bbox: 바운딩 박스 높이 허용 편차(null이면 검사 안 함) */
 export const ANIM_DEFAULTS = {
@@ -32,7 +56,13 @@ export const CHROMA = {
   none: null,
 };
 
+/** 칸 안쪽 여백 비율(32px 기준 약 2.5px) */
 export const PADDING = 0.08;
+
+/** 하위 호환·문서용: 유형별 기본 규격(small) */
+export const TYPE_DEFAULTS = Object.fromEntries(
+  ['character-anim', 'character-ref', 'fx', 'card-art', 'background', 'portrait'].map((t) => [t, typeDefaults(t)]),
+);
 
 export const paths = (root = ROOT) => ({
   specs: join(root, 'specs/assets'),
@@ -70,22 +100,31 @@ export function loadSpec(id, root = ROOT) {
 export function normalizeSpec(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('명세가 비어 있다');
   const type = raw.type;
-  const td = TYPE_DEFAULTS[type];
+  const size = raw.size ?? 'small';
+  if (!['small', 'large'].includes(size)) throw new Error(`${raw.id}: size는 small 또는 large`);
+  const td = typeDefaults(type, size);
   if (!td) throw new Error(`${raw.id}: 알 수 없는 type "${type}"`);
   const anim = raw.anim ?? (type === 'character-anim' ? String(raw.id).split('_').pop() : null);
   const ad = type === 'character-anim' ? ANIM_DEFAULTS[anim] ?? {} : {};
   const canvas = raw.canvas ?? td.canvas;
   const grid = raw.grid ?? td.grid;
   const cell = raw.cell ?? [canvas[0] / grid[0], canvas[1] / grid[1]];
+  const logical = raw.logical ?? td.logical;
   const fxDefaults = type === 'fx' ? { fps: 15, loop: false } : {};
   const frames = raw.frames ?? td.frames ?? ad.frames;
   return {
     ...raw,
     type,
     anim,
+    size,
     canvas,
     grid,
     cell,
+    logical,
+    /** 논리 픽셀 1개가 시트에서 차지하는 크기(px) */
+    pixel_scale: cell[0] / logical[0],
+    palette: raw.palette ?? 'master',
+    max_colors: raw.max_colors ?? td.max_colors,
     chroma: raw.chroma ?? td.chroma,
     chroma_tolerance: raw.chroma_tolerance ?? 90,
     blend: raw.blend ?? td.blend,
@@ -110,6 +149,12 @@ export function checkSpecShape(spec, root = ROOT) {
   if (spec.cell[0] * cols !== cw || spec.cell[1] * rows !== ch) {
     errors.push(`cell×grid(${spec.cell[0] * cols}×${spec.cell[1] * rows})가 canvas(${cw}×${ch})와 다르다`);
   }
+  const sx = spec.cell[0] / spec.logical[0];
+  const sy = spec.cell[1] / spec.logical[1];
+  if (!Number.isInteger(sx) || sx !== sy) {
+    errors.push(`칸(${spec.cell.join('×')})이 논리 해상도(${spec.logical.join('×')})의 같은 정수배가 아니다`);
+  }
+  if (!['master', 'free'].includes(spec.palette)) errors.push('palette는 master 또는 free');
   if (!Number.isInteger(spec.frames) || spec.frames < 1) errors.push('frames가 없다');
   if (spec.frames > cols * rows) errors.push(`frames(${spec.frames})가 칸 수(${cols * rows})보다 많다`);
   if (!(spec.chroma in CHROMA)) errors.push(`알 수 없는 chroma "${spec.chroma}"`);

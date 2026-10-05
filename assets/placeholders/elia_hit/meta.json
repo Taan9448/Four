@@ -1,8 +1,9 @@
 {
   "id": "elia_hit",
   "type": "character-anim",
-  "frameW": 384,
-  "frameH": 512,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 8,
   "frames": 3,
   "fps": 12,
   "loop": false,
@@ -15,7 +16,8 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "3c424cfd622c42e6",
+  "sourceHash": "5d3e0de7b81ba55b",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }

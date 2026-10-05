@@ -104,7 +104,6 @@ export class BattleView {
     const charDef = c.side === 'party' ? this.data.characters.get(c.defId) : undefined;
     const player = new SpritePlayer(canvas, {
       fallbackColor: charDef?.color ?? '#5a4a5a',
-      fallbackLabel: c.name,
       fallbackShape: enemyDef?.tier === 'boss' ? 'boss' : 'humanoid',
     });
     if (enemyDef?.tint) canvas.style.filter = enemyDef.tint;

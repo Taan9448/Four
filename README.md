@@ -25,7 +25,7 @@ npm run build      # dist/ → GitHub Pages
 - 왕일검 비전투 지원 규칙 4개(디버그 토글)
 - 카드 17장(하운 10, 엘리아 6, 상태 1) — 전부 JSON 데이터
 - 에셋 파이프라인: 명세 → 임시 시트 → 자르기 → 검증 → manifest 자동 교체, 폴더 소유권 CI
-- 그래픽은 모두 임시 시트(`assets/placeholders/`)
+- 그래픽: **32×32 픽셀 아트**(`docs/ART_STYLE.md`). 지금은 모두 임시 시트(`assets/placeholders/`)
 
 ## 문서
 

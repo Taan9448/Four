@@ -8,7 +8,7 @@
     "flavor": "늑대를 닮았으나 몸집이 송아지만 했고, 등줄기를 따라 검은 불꽃이 일렁였다."
   },
   {
-    "id": "shadow_wolf_alpha", "name": "그림자늑대 우두머리", "maxHp": 52, "sprite": "wolf", "tint": "saturate(1.6) brightness(0.8)", "scale": 1.25, "tier": "elite", "pattern": "cycle",
+    "id": "shadow_wolf_alpha", "name": "그림자늑대 우두머리", "maxHp": 52, "sprite": "wolf", "tint": "saturate(1.6) brightness(0.8)", "scale": 1.2, "tier": "elite", "pattern": "cycle",
     "moves": [
       { "id": "rend", "name": "찢기", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 5, "times": 2 } ] },
       { "id": "pack_howl", "name": "무리의 울음", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies" } ] },
@@ -23,7 +23,7 @@
     ]
   },
   {
-    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": null, "scale": 1.5, "tier": "boss", "pattern": "cycle",
+    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": null, "scale": 2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "flame_wave", "name": "화염 파도", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
       { "id": "magma_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 15 } ] },

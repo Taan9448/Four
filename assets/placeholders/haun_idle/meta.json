@@ -1,8 +1,9 @@
 {
   "id": "haun_idle",
   "type": "character-anim",
-  "frameW": 384,
-  "frameH": 512,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 8,
   "frames": 4,
   "fps": 6,
   "loop": true,
@@ -15,7 +16,8 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 4,
-  "sourceHash": "f2646b5c18482829",
+  "sourceHash": "c78c748b16db4f6b",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }

@@ -8,8 +8,9 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, cellRect, extract, isContentFn, keyOut, keyResidual, loadRaw, prepareSheet } from './lib/image.mjs';
+import { bbox, cellRect, countColors, extract, isContentFn, keyOut, keyResidual, loadRaw, pixelize, prepareSheet } from './lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
+import { paletteFor } from './lib/style.mjs';
 
 // gifenc는 CommonJS라 실행 환경(node/vitest)에 따라 default 아래에 있을 수 있다
 const gifenc = gifencModule.GIFEncoder ? gifencModule : gifencModule.default;
@@ -20,7 +21,7 @@ const { GIFEncoder, quantize, applyPalette } = gifenc;
  * @param {{ src: string, outDir: string, previews?: boolean, root?: string }} opts
  * @returns {Promise<{ errors: string[], warnings: string[] }>}
  */
-export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT }) {
+export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT, styleRoot = ROOT }) {
   const errors = [...checkSpecShape(spec, root).map((e) => `명세: ${e}`)];
   const warnings = [];
   if (!existsSync(src)) return { errors: [...errors, `원본 시트 없음: ${src}`], warnings };
@@ -36,7 +37,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
   const fallback = meta.fallbackLevel ?? 1;
   const expectFrames = fallback === 2 ? 3 : fallback === 3 ? meta.frames : spec.frames;
-  for (const [k, v] of [['id', spec.id], ['frameW', spec.cell[0]], ['frameH', spec.cell[1]], ['fps', spec.fps], ['loop', spec.loop]]) {
+  for (const [k, v] of [['id', spec.id], ['frameW', spec.logical[0]], ['frameH', spec.logical[1]], ['fps', spec.fps], ['loop', spec.loop]]) {
     if (meta[k] !== v) errors.push(`meta.${k}(${meta[k]})이(가) 명세(${v})와 다르다`);
   }
   if (meta.frames !== expectFrames) errors.push(`meta.frames(${meta.frames})가 기대값(${expectFrames})과 다르다`);
@@ -55,38 +56,67 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     }
   }
 
-  // 4) 프레임 파일 검사
+  // 4) 픽셀 격자 일치도: 블록 안이 한 색으로 채워졌는지(흐림·안티에일리어싱·격자 어긋남 감지)
+  const palette = paletteFor(spec, styleRoot);
+  const frameCells = fallback === 2 ? [1, 2, 3] : fallback === 3 ? [] : Array.from({ length: spec.frames }, (_, i) => i + 1);
+  if (frameCells.length) {
+    let sum = 0;
+    for (const n of frameCells) sum += pixelize(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), spec, palette).purity;
+    const purity = sum / frameCells.length;
+    const msg = `픽셀 격자 일치도 ${(purity * 100).toFixed(0)}% — ${spec.pixel_scale}px 블록에 맞춰 그리지 않았다(흐림·안티에일리어싱·격자 어긋남)`;
+    if (purity < 0.5) errors.push(msg);
+    else if (purity < 0.75) warnings.push(msg);
+  }
+
+  // 5) 프레임 파일 검사
   const files = existsSync(outDir) ? readdirSync(outDir).filter((f) => /^frame_\d+\.png$/.test(f)).sort() : [];
   if (files.length !== meta.frames) errors.push(`프레임 파일 ${files.length}장, meta.frames ${meta.frames}`);
   const frames = [];
   for (const f of files) frames.push(await loadRaw(join(outDir, f)));
 
   const heights = [];
+  const frameContent = (d, i) => d[i + 3] > 32;
+  const paletteSet = palette ? new Set(palette.map(([r, g, b]) => (r << 16) | (g << 8) | b)) : null;
   const checkEdges = !['card-art', 'background', 'portrait'].includes(spec.type);
   frames.forEach((img, i) => {
     const n = i + 1;
+    if (img.width !== spec.logical[0] || img.height !== spec.logical[1]) {
+      errors.push(`프레임 ${n}: 크기 ${img.width}×${img.height} ≠ ${spec.logical.join('×')}`);
+      return;
+    }
+    const colors = countColors(img);
+    if (colors > spec.max_colors) warnings.push(`프레임 ${n}: ${colors}색(권장 ${spec.max_colors}색 이하)`);
+    if (paletteSet) {
+      for (let p = 0; p < img.data.length; p += 4) {
+        if (img.data[p + 3] < 128) continue;
+        if (!paletteSet.has((img.data[p] << 16) | (img.data[p + 1] << 8) | img.data[p + 2])) {
+          errors.push(`프레임 ${n}: 마스터 팔레트 밖의 색`);
+          break;
+        }
+      }
+    }
     const residual = keyResidual(img, spec);
     if (residual > 0.005) errors.push(`프레임 ${n}: 키 색 잔여 픽셀 ${(residual * 100).toFixed(1)}%`);
-    const box = bbox(img, isContent);
+    const box = bbox(img, frameContent);
     if (!box) return;
     heights.push(box.h);
     if (checkEdges) {
       if (box.minX === 0 || box.minY === 0 || box.maxX === img.width - 1 || box.maxY === img.height - 1) {
         errors.push(`프레임 ${n}: 그림이 칸 경계에 닿았다`);
       } else {
-        const px = img.width * PADDING;
-        const py = img.height * PADDING;
-        if (box.minX < px || box.minY < py || box.maxX > img.width - px || box.maxY > img.height - py) {
-          warnings.push(`프레임 ${n}: 8% 여백 침범`);
+        const px = Math.floor(img.width * PADDING);
+        const py = Math.floor(img.height * PADDING);
+        if (box.minX < px || box.minY < py || box.maxX > img.width - 1 - px || box.maxY > img.height - 1 - py) {
+          warnings.push(`프레임 ${n}: 여백 ${px}px 침범`);
         }
       }
     }
   });
 
-  // 5) 바운딩 박스 높이 편차(대체 단계 1에서만)
+  // 6) 바운딩 박스 높이 편차(대체 단계 1에서만). 1px 흔들림은 허용
   if (spec.bbox_tolerance != null && fallback === 1 && heights.length > 1) {
     const max = Math.max(...heights);
-    const dev = (max - Math.min(...heights)) / max;
+    const dev = Math.max(0, max - Math.min(...heights) - 1) / max;
     if (dev > spec.bbox_tolerance) {
       errors.push(`프레임 간 높이 편차 ${(dev * 100).toFixed(0)}% > 허용 ${(spec.bbox_tolerance * 100).toFixed(0)}%`);
     }
@@ -99,14 +129,15 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
 }
 
 async function writePreviews(spec, meta, frames, outDir) {
-  const scale = Math.min(1, 256 / spec.cell[1]);
-  const w = Math.round(spec.cell[0] * scale);
-  const h = Math.round(spec.cell[1] * scale);
+  // 픽셀 아트는 정수배·최근접으로 확대해 보여 준다
+  const scale = Math.max(1, Math.floor(160 / spec.logical[1]));
+  const w = spec.logical[0] * scale;
+  const h = spec.logical[1] * scale;
   const dark = spec.chroma === 'black';
   const label = 22;
 
   const tile = async (img) =>
-    sharp(img.data, { raw: { width: img.width, height: img.height, channels: 4 } }).resize(w, h).png().toBuffer();
+    sharp(img.data, { raw: { width: img.width, height: img.height, channels: 4 } }).resize(w, h, { kernel: 'nearest' }).png().toBuffer();
   const checker = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><pattern id="c" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="${dark ? '#000' : '#cfcfcf'}"/>${dark ? '' : '<rect width="8" height="8" fill="#efefef"/><rect x="8" y="8" width="8" height="8" fill="#efefef"/>'}</pattern></defs><rect width="${w}" height="${h}" fill="url(#c)"/></svg>`,
   );
@@ -132,7 +163,7 @@ async function writePreviews(spec, meta, frames, outDir) {
   const bg = dark ? [0, 0, 0] : [96, 96, 104];
   for (const img of frames) {
     const { data } = await sharp(img.data, { raw: { width: img.width, height: img.height, channels: 4 } })
-      .resize(w, h)
+      .resize(w, h, { kernel: 'nearest' })
       .flatten({ background: { r: bg[0], g: bg[1], b: bg[2] } })
       .ensureAlpha()
       .raw()

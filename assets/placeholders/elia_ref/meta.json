@@ -1,8 +1,9 @@
 {
   "id": "elia_ref",
   "type": "character-ref",
-  "frameW": 768,
-  "frameH": 1024,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 16,
   "frames": 2,
   "fps": 1,
   "loop": false,
@@ -15,7 +16,8 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "e204e1a369952f27",
+  "sourceHash": "afe31020a225c04c",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }
