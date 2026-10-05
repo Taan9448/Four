@@ -128,7 +128,7 @@ CI(`tools/check-ownership.mjs`): `art/*` 브랜치는 `assets/source/**`·`asset
 3. **Codex — 제작.** AGENTS.md 순서: 생성 → `assets:slice` → `assets:validate` → 콘택트 시트 확인 → 아트 PR(`codex`, `Closes #N`).
 4. **CI — 자동 검증**(`validate.yml`): 소유권 검사, 타입 검사·데이터 검사·테스트, 에셋 검증, 빌드.
 5. **Claude — 검토.** `_contact.png`·`_preview.gif` 확인. 문제가 있으면 "몇 번째 프레임이 무엇이 틀렸는지" PR 댓글 + `needs-fix`. 통과면 "아트 승인" 댓글.
-6. **사람 — 머지.**
+6. **Claude — 머지.** "아트 승인" + CI 통과면 스쿼시 머지(초안 해제·`needs-fix` 제거 포함)하고 사람에게 알린다.
 7. **Claude — 확인.** 게임에서 자동 교체 확인 → 이슈에 `integrated`. 이 에셋을 기다리던 이슈의 `blocked`를 푼다. 이벤트 프레임 타이밍 조정 같은 코드 변경이 필요할 때만 `feat/<id>-integrate`.
 
 ## 9. 미리보기
