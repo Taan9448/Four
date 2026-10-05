@@ -1,8 +1,8 @@
 {
   "id": "haun_ref",
   "type": "character-ref",
-  "frameW": 64,
-  "frameH": 64,
+  "frameW": 80,
+  "frameH": 80,
   "track": "pixel",
   "pixelScale": 8.711,
   "gridDetected": true,
@@ -10,7 +10,7 @@
     72,
     72
   ],
-  "fit": "downscale",
+  "fit": "pad",
   "frames": 2,
   "fps": 1,
   "loop": false,
