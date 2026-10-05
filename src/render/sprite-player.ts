@@ -9,9 +9,8 @@ export interface PlayOptions {
 }
 
 export interface PlayerOptions {
-  /** 에셋이 없을 때 그릴 임시 실루엣의 색과 이름 */
+  /** 에셋이 없을 때 그릴 임시 실루엣의 색 */
   fallbackColor?: string;
-  fallbackLabel?: string;
   /** 에셋이 없을 때 실루엣 모양 */
   fallbackShape?: 'humanoid' | 'beast' | 'boss';
   facing?: 'left' | 'right';
@@ -42,6 +41,8 @@ export class SpritePlayer {
       this.canvas.width = meta.frameW;
       this.canvas.height = meta.frameH;
     }
+    // 픽셀 아트: 보간 없이 그린다(캔버스 크기를 바꾸면 컨텍스트 설정이 초기화되므로 매번 지정)
+    this.ctx.imageSmoothingEnabled = false;
     const loop = options.loop ?? meta.loop;
     const total = meta.fallbackLevel === 2 ? (meta.virtualFrames ?? meta.frames) : meta.frames;
     const frameMs = 1000 / meta.fps;
@@ -90,7 +91,7 @@ export class SpritePlayer {
       ctx.globalAlpha = 1 - f;
       ctx.drawImage(images[a], 0, 0);
       ctx.globalAlpha = f;
-      ctx.drawImage(images[a + 1], (1 - f) * 6 * (meta.facing === 'left' ? -1 : 1), 0);
+      ctx.drawImage(images[a + 1], Math.round(1 - f) * (meta.facing === 'left' ? -1 : 1), 0);
       ctx.globalAlpha = 1;
       return;
     }
@@ -99,43 +100,43 @@ export class SpritePlayer {
     ctx.drawImage(images[Math.min(images.length, n) - 1], 0, 0);
   }
 
-  /** 에셋이 아예 없을 때: 이름이 적힌 실루엣을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
+  /** 에셋이 아예 없을 때: 32×32 픽셀 실루엣을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
   private playFallback(token: number, options: PlayOptions): Promise<void> {
-    const w = 384, h = 512;
+    const w = 32, h = 32;
     this.canvas.width = w;
     this.canvas.height = h;
     const { ctx } = this;
+    ctx.imageSmoothingEnabled = false;
     const color = this.opts.fallbackColor ?? '#666';
     const shape = this.opts.fallbackShape ?? 'humanoid';
     const draw = (bob: number) => {
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = color;
-      const feet = h * 0.9;
+      ctx.fillStyle = '#1d2433';
+      const feet = 29;
+      const box = (x: number, y: number, bw: number, bh: number) => {
+        ctx.fillStyle = '#1d2433';
+        ctx.fillRect(x - 1, y - 1 + bob, bw + 2, bh + 2);
+      };
+      const fill = (x: number, y: number, bw: number, bh: number) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y + bob, bw, bh);
+      };
       if (shape === 'beast') {
-        ctx.beginPath();
-        ctx.ellipse(w / 2, feet - 90 + bob, 120, 45, 0, 0, Math.PI * 2);
-        ctx.fill();
+        box(7, feet - 10, 18, 6); box(21, feet - 13, 6, 5);
+        fill(7, feet - 10, 18, 6); fill(21, feet - 13, 6, 5);
+        fill(9, feet - 4, 2, 4); fill(21, feet - 4, 2, 4);
       } else {
-        const bh = shape === 'boss' ? h * 0.78 : h * 0.6;
-        ctx.beginPath();
-        ctx.roundRect(w / 2 - bh * 0.16, feet - bh + bob, bh * 0.32, bh, 40);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(w / 2, feet - bh - 10 + bob, bh * 0.12, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      if (this.opts.fallbackLabel) {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 34px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.opts.fallbackLabel, w / 2, feet - 20);
+        const tall = shape === 'boss' ? 26 : 22;
+        const top = feet - tall;
+        box(13, top, 6, 6); box(11, top + 6, 10, tall - 12); box(12, feet - 6, 8, 6);
+        fill(13, top, 6, 6); fill(11, top + 6, 10, tall - 12); fill(12, feet - 6, 3, 6); fill(17, feet - 6, 3, 6);
       }
     };
     if (options.loop) {
       const start = performance.now();
       const tick = (now: number) => {
         if (token !== this.token) return;
-        draw(Math.sin((now - start) / 400) * 4);
+        draw(Math.floor((now - start) / 500) % 2 === 0 ? 0 : -1);
         this.raf = requestAnimationFrame(tick);
       };
       this.raf = requestAnimationFrame(tick);

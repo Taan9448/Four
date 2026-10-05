@@ -8,14 +8,16 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { bbox, cellRect, extract, fileHash, isContentFn, keyOut, prepareSheet, toPng } from './lib/image.mjs';
+import { bbox, cellRect, extract, fileHash, isContentFn, keyOut, pixelize, prepareSheet, toPng } from './lib/image.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
+import { paletteFor } from './lib/style.mjs';
 
 /**
  * @param {object} spec 정규화된 명세
- * @param {{ src: string, outDir: string, fallback?: number, placeholder?: boolean }} opts
+ * @param {{ src: string, outDir: string, fallback?: number, placeholder?: boolean, styleRoot?: string }} opts
+ * 칸마다 키 색을 지우고, 논리 해상도(spec.logical)로 줄여 마스터 팔레트에 맞춘 frame_XX.png를 만든다.
  */
-export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder = false }) {
+export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder = false, styleRoot = ROOT }) {
   if (!existsSync(src)) throw new Error(`시트 없음: ${src}`);
   const sheet = await prepareSheet(src, spec);
   if (sheet.error) throw new Error(sheet.error);
@@ -33,16 +35,21 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     }
   } else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
 
+  const palette = paletteFor(spec, styleRoot);
+  let puritySum = 0;
   for (const [i, n] of frameCells.entries()) {
-    const img = keyOut(extract(sheet.raw, cellRect(spec, n)), spec);
+    const { img, purity } = pixelize(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), spec, palette);
+    puritySum += purity;
     writeFileSync(join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`), await toPng(img));
   }
 
   const meta = {
     id: spec.id,
     type: spec.type,
-    frameW: spec.cell[0],
-    frameH: spec.cell[1],
+    frameW: spec.logical[0],
+    frameH: spec.logical[1],
+    /** 시트에서 논리 픽셀 1개의 크기 */
+    pixelScale: spec.pixel_scale,
     frames: frameCells.length,
     fps: spec.fps,
     loop: spec.loop,
@@ -56,6 +63,8 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     sourceHash: fileHash(src),
     placeholder,
     resizedFrom: sheet.resized ? sheet.original : null,
+    /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
+    gridPurity: Number((puritySum / frameCells.length).toFixed(3)),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;

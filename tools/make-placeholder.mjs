@@ -8,7 +8,9 @@ import { dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import { sliceSheet } from './slice-sheet.mjs';
+import { cellRect, extract, keyOut, loadRaw, pixelize, upscale } from './lib/image.mjs';
 import { CHROMA, listSpecIds, loadSpec, paths, ROOT } from './lib/specs.mjs';
+import { paletteFor } from './lib/style.mjs';
 
 const deg = (d) => (d * Math.PI) / 180;
 
@@ -23,7 +25,7 @@ function shade(hex, amount) {
 function humanoid(w, h, spec, pose, front = false) {
   const color = pose.tint ? shade(spec.placeholder?.color ?? '#5577aa', 0.35) : spec.placeholder?.color ?? '#5577aa';
   const accent = spec.placeholder?.accent ?? '#3fa9f5';
-  const H = h * 0.6;
+  const H = h * 0.74;
   const feetY = h * spec.baseline;
   const cx = w / 2;
   const r = H * 0.09;
@@ -176,9 +178,26 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${parts.join('')}</svg>`;
 }
 
-export async function renderSheet(spec, opts) {
-  // 키 색이 안티에일리어싱으로 섞이지 않도록 배경은 SVG 안에서 칠하고, PNG는 불투명으로 만든다
-  return sharp(Buffer.from(sheetSvg(spec, opts))).flatten({ background: CHROMA[spec.chroma]?.hex ?? '#000000' }).png().toBuffer();
+/**
+ * 임시 시트를 "확대된 픽셀 아트"로 만든다: 벡터 실루엣을 그린 뒤 칸마다 논리 해상도로 줄이고(팔레트 적용)
+ * 다시 정수배로 키워 키 색 배경에 붙인다. Codex가 납품할 시트와 같은 형태라 파이프라인 시험이 된다.
+ */
+export async function renderSheet(spec, opts = {}) {
+  const bg = CHROMA[spec.chroma]?.hex ?? '#000000';
+  const vector = await loadRaw(await sharp(Buffer.from(sheetSvg(spec, opts))).flatten({ background: bg }).png().toBuffer());
+  const palette = paletteFor(spec, opts.styleRoot ?? ROOT);
+  const composites = [];
+  for (let n = 1; n <= spec.grid[0] * spec.grid[1]; n++) {
+    const rect = cellRect(spec, n);
+    const { img } = pixelize(keyOut(extract(vector, rect), spec), spec, palette);
+    const big = upscale(img, spec.pixel_scale);
+    composites.push({ input: big.data, raw: { width: big.width, height: big.height, channels: 4 }, left: rect.x, top: rect.y });
+  }
+  return sharp({ create: { width: spec.canvas[0], height: spec.canvas[1], channels: 4, background: bg } })
+    .composite(composites)
+    .flatten({ background: bg })
+    .png()
+    .toBuffer();
 }
 
 export async function makePlaceholder(id, { root = ROOT } = {}) {

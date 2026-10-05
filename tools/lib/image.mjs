@@ -120,5 +120,84 @@ export function keyResidual(img, spec) {
   return opaque ? residual / opaque : 0;
 }
 
+/** 사람 눈에 가까운 RGB 거리(redmean) */
+function colorDist(r1, g1, b1, r2, g2, b2) {
+  const rm = (r1 + r2) / 2;
+  const dr = r1 - r2, dg = g1 - g2, db = b1 - b2;
+  return (2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db;
+}
+
+export function nearestColor(palette, r, g, b) {
+  let best = palette[0], bestD = Infinity;
+  for (const c of palette) {
+    const d = colorDist(r, g, b, c[0], c[1], c[2]);
+    if (d < bestD) { bestD = d; best = c; }
+  }
+  return best;
+}
+
+/**
+ * 확대된 픽셀 아트 칸(키 제거 후)을 논리 해상도로 줄인다.
+ * 블록(pixel_scale × pixel_scale)마다 그림 픽셀이 절반 이상이면 불투명, 색은 블록 안에서 가장 많은 색(4비트 묶음 평균),
+ * 그다음 팔레트에서 가장 가까운 색으로 맞춘다. 반투명은 남기지 않는다.
+ * @returns {{ img, purity: number }} purity: 불투명 블록에서 최빈색이 차지한 평균 비율(격자에 잘 맞을수록 1)
+ */
+export function pixelize(cell, spec, palette) {
+  const s = spec.pixel_scale;
+  const [lw, lh] = spec.logical;
+  const isContent = isContentFn(spec);
+  const out = Buffer.alloc(lw * lh * 4);
+  let puritySum = 0, opaqueBlocks = 0;
+  for (let ly = 0; ly < lh; ly++) {
+    for (let lx = 0; lx < lw; lx++) {
+      const buckets = new Map();
+      let content = 0;
+      for (let y = ly * s; y < (ly + 1) * s; y++) {
+        for (let x = lx * s; x < (lx + 1) * s; x++) {
+          const i = (y * cell.width + x) * 4;
+          if (!isContent(cell.data, i)) continue;
+          content++;
+          const r = cell.data[i], g = cell.data[i + 1], b = cell.data[i + 2];
+          const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+          const e = buckets.get(key);
+          if (e) { e.n++; e.r += r; e.g += g; e.b += b; } else buckets.set(key, { n: 1, r, g, b });
+        }
+      }
+      const o = (ly * lw + lx) * 4;
+      if (content < (s * s) / 2) continue; // 투명
+      let best = null;
+      for (const e of buckets.values()) if (!best || e.n > best.n) best = e;
+      let rgb = [Math.round(best.r / best.n), Math.round(best.g / best.n), Math.round(best.b / best.n)];
+      if (palette) rgb = nearestColor(palette, ...rgb);
+      out[o] = rgb[0]; out[o + 1] = rgb[1]; out[o + 2] = rgb[2]; out[o + 3] = 255;
+      puritySum += best.n / content;
+      opaqueBlocks++;
+    }
+  }
+  return { img: { data: out, width: lw, height: lh }, purity: opaqueBlocks ? puritySum / opaqueBlocks : 1 };
+}
+
+/** 논리 해상도 이미지를 정수배로 확대(최근접) */
+export function upscale(img, s) {
+  const w = img.width * s, h = img.height * s;
+  const out = Buffer.alloc(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const si = (Math.floor(y / s) * img.width + Math.floor(x / s)) * 4;
+      img.data.copy(out, (y * w + x) * 4, si, si + 4);
+    }
+  }
+  return { data: out, width: w, height: h };
+}
+
+export function countColors(img) {
+  const set = new Set();
+  for (let i = 0; i < img.data.length; i += 4) {
+    if (img.data[i + 3] < 128) continue;
+    set.add((img.data[i] << 16) | (img.data[i + 1] << 8) | img.data[i + 2]);
+  }
+  return set.size;
+}
+
 export const toPng = (img) =>
   sharp(img.data, { raw: { width: img.width, height: img.height, channels: 4 } }).png().toBuffer();

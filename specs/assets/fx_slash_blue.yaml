@@ -7,9 +7,9 @@ events: { impact: 4 }
 frame_notes:
   1: a thin blue line of light appears at the upper left
   2: the line extends into a sharp crescent, bright white core
-  3: the crescent sweeps downward, widening, blue glow around it
-  4: full vertical cleaving arc at maximum brightness, cloud-like wisps split around it
-  5: arc begins to thin, sparks of blue light scatter
+  3: the crescent sweeps downward, widening, with a darker blue outer band
+  4: full vertical cleaving arc at maximum brightness, small cloud-like pixel wisps split around it
+  5: arc begins to thin, single-block blue sparks scatter
   6: arc fades to a faint trail, sparks drifting
   7: only a few motes and a hairline afterimage remain
   8: last faint motes vanish

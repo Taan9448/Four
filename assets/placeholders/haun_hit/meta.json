@@ -1,8 +1,9 @@
 {
   "id": "haun_hit",
   "type": "character-anim",
-  "frameW": 384,
-  "frameH": 512,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 8,
   "frames": 3,
   "fps": 12,
   "loop": false,
@@ -15,7 +16,8 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "cd2ce33ba150671c",
+  "sourceHash": "0f8aac7f400c9d2d",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }

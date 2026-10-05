@@ -18,7 +18,7 @@ let root: string;
 beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'cg-assets-'));
   mkdirSync(join(root, 'specs/assets'), { recursive: true });
-  for (const f of ['fixture_attack.yaml', 'fixture_purple.yaml']) copyFileSync(join(FIXTURES, f), join(root, 'specs/assets', f));
+  for (const f of ['fixture_attack.yaml']) copyFileSync(join(FIXTURES, f), join(root, 'specs/assets', f));
 });
 
 async function prepare(id: string, opts: { skipCells?: number[]; extraCells?: number[] } = {}, fallback = 1) {
@@ -38,7 +38,8 @@ describe('자르기 → 검증', () => {
     expect(existsSync(join(p.sprites('fixture_attack'), '_contact.png'))).toBe(true);
     expect(existsSync(join(p.sprites('fixture_attack'), '_preview.gif'))).toBe(true);
     const meta = JSON.parse(readFileSync(join(p.sprites('fixture_attack'), 'meta.json'), 'utf8'));
-    expect(meta).toMatchObject({ frames: 6, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
+    expect(meta).toMatchObject({ frameW: 32, frameH: 32, pixelScale: 8, frames: 6, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
+    expect(meta.gridPurity).toBeGreaterThan(0.95);
   });
 
   it('프레임 수가 모자란 시트는 실패한다', async () => {
@@ -58,7 +59,7 @@ describe('자르기 → 검증', () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
-    const square = await sharp(await renderSheet(spec)).resize(1024, 1024, { fit: 'fill' }).png().toBuffer();
+    const square = await sharp(await renderSheet(spec)).resize(1536, 1024, { fit: 'fill' }).png().toBuffer();
     writeFileSync(p.source('fixture_attack'), square);
     await expect(sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') })).rejects.toThrow(/비율/);
     const r = await validateSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack'), root, previews: false });
@@ -69,9 +70,9 @@ describe('자르기 → 검증', () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
-    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).resize(1152, 768).png().toBuffer());
+    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).resize(768, 768, { kernel: 'nearest' }).png().toBuffer());
     const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
-    expect(meta.resizedFrom).toEqual([1152, 768]);
+    expect(meta.resizedFrom).toEqual([768, 768]);
     const r = await validateAsset('fixture_attack', { root, previews: false });
     expect(r.errors).toEqual([]);
     expect(r.warnings.some((w) => w.includes('리사이즈'))).toBe(true);
@@ -87,10 +88,30 @@ describe('자르기 → 검증', () => {
     expect(r.errors.some((e) => e.startsWith('meta.fps'))).toBe(true);
   });
 
-  it('마젠타 계열 색이 남으면 키 색 잔여로 실패한다', async () => {
-    await prepare('fixture_purple');
-    const r = await validateAsset('fixture_purple', { root, previews: false });
-    expect(r.errors.some((e) => e.includes('키 색 잔여'))).toBe(true);
+  it('흐릿하거나 격자에 맞지 않는 시트는 픽셀 격자 일치도로 걸린다', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).blur(6).png().toBuffer());
+    await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
+  });
+
+  it('프레임은 논리 해상도(32×32)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
+    const { p } = await prepare('fixture_attack');
+    const frame = join(p.sprites('fixture_attack'), 'frame_01.png');
+    expect(await sharp(frame).metadata()).toMatchObject({ width: 32, height: 32 });
+    const { data, info } = await sharp(frame).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] > 128) {
+        data[i] = 123; data[i + 1] = 45; data[i + 2] = 67; // 팔레트에 없는 색
+        break;
+      }
+    }
+    writeFileSync(frame, await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer());
+    const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect(r.errors).toContain('프레임 1: 마스터 팔레트 밖의 색');
   });
 
   it('대체 단계 2: 키 포즈 3장만 있으면 통과하고 meta에 기록된다', async () => {
@@ -106,11 +127,13 @@ describe('자르기 → 검증', () => {
     const p = paths(root);
     mkdirSync(p.placeholders('fixture_attack'), { recursive: true });
     writeFileSync(join(p.placeholders('fixture_attack'), 'meta.json'), '{"placeholder":true}');
-    mkdirSync(p.placeholders('fixture_purple'), { recursive: true });
-    writeFileSync(join(p.placeholders('fixture_purple'), 'meta.json'), '{"placeholder":true}');
+    copyFileSync(join(FIXTURES, 'fixture_attack.yaml'), join(root, 'specs/assets', 'fixture_other.yaml'));
+    writeFileSync(join(root, 'specs/assets', 'fixture_other.yaml'), readFileSync(join(root, 'specs/assets', 'fixture_other.yaml'), 'utf8').replace('id: fixture_attack', 'id: fixture_other'));
+    mkdirSync(p.placeholders('fixture_other'), { recursive: true });
+    writeFileSync(join(p.placeholders('fixture_other'), 'meta.json'), '{"placeholder":true}');
     const m = buildManifest(root);
     expect(m.assets.fixture_attack.source).toBe('sprites');
-    expect(m.assets.fixture_purple.source).toBe('placeholders');
+    expect(m.assets.fixture_other.source).toBe('placeholders');
   });
 });
 
@@ -130,14 +153,16 @@ describe('저장소의 실제 명세와 임시 시트', () => {
 
   it('완성 프롬프트에 캔버스·격자·프레임 메모·빈 칸·키 색이 들어간다', () => {
     const text = promptFor('haun_attack');
-    expect(text).toContain('Canvas: 1536x1024 px. Grid: 4 columns x 2 rows.');
+    expect(text).toContain('Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.');
+    expect(text).toContain('32x32 pixel-art sprite scaled up exactly 8x');
+    expect(text).toContain('#1d2433');
     expect(text).toContain('Cell 4: downward cut');
-    expect(text).toContain('Cells 7 to 8 are empty magenta.');
+    expect(text).toContain('Cells 7 to 16 are completely empty magenta.');
     expect(text).toContain('#FF00FF');
     expect(text).toContain('Match the attached reference sheet');
     const fx = promptFor('fx_slash_blue');
     expect(fx).toContain('#000000');
-    expect(fx).toContain('additive blending');
+    expect(fx).toContain('glowing visual effect');
     expect(fx).not.toContain('no soft glow');
   });
 });

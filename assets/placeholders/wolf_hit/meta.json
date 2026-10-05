@@ -1,8 +1,9 @@
 {
   "id": "wolf_hit",
   "type": "character-anim",
-  "frameW": 384,
-  "frameH": 512,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 8,
   "frames": 3,
   "fps": 12,
   "loop": false,
@@ -15,7 +16,8 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "d5040b86e2faf7f3",
+  "sourceHash": "97761b9a6099359d",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }

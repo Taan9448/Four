@@ -9,5 +9,5 @@ frame_notes:
   1: guard stance, sword held low in the right hand, knees slightly bent, inhaling
   2: same stance, chest slightly raised, short breath in
   3: same stance, chest at highest point, short breath held
-  4: same stance, long breath out, shoulders relaxed, a faint warm glow at the lower belly
+  4: same stance, long breath out, shoulders relaxed, one warm gold pixel at the lower belly
 placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

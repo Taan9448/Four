@@ -1,8 +1,9 @@
 {
   "id": "wolf_attack",
   "type": "character-anim",
-  "frameW": 384,
-  "frameH": 512,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 8,
   "frames": 6,
   "fps": 12,
   "loop": false,
@@ -17,7 +18,8 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "5e9bf598b68e9ac1",
+  "sourceHash": "86cd906298a8c503",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }

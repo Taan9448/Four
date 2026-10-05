@@ -1,8 +1,9 @@
 {
   "id": "wolf_ref",
   "type": "character-ref",
-  "frameW": 768,
-  "frameH": 1024,
+  "frameW": 32,
+  "frameH": 32,
+  "pixelScale": 16,
   "frames": 2,
   "fps": 1,
   "loop": false,
@@ -15,7 +16,8 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "f57fcbcebfa0d297",
+  "sourceHash": "309dcb8d9c75a5ec",
   "placeholder": true,
-  "resizedFrom": null
+  "resizedFrom": null,
+  "gridPurity": 1
 }
