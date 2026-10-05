@@ -5,7 +5,7 @@
 
 - 코드·데이터·문서: Claude Code (`CLAUDE.md`)
 - 그래픽 에셋: OpenAI Codex (`AGENTS.md`)
-- 사람: 에셋 이슈를 Codex에 넘기고 PR을 머지
+- 사람: 에셋 이슈를 Codex에 넘기고 결과 확인(PR 머지는 Claude Code)
 
 ## 실행
 
