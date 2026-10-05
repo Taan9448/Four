@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 32x32 pixel-art sprite scaled up exactly 16x. Draw ONLY with solid square blocks of exactly 16x16 px aligned to a 16 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Jin Haun, a lean young East Asian man; worn grey-brown hemp robe, white cloth strips wrapped around both hands, black hair tied back, a plain woodcutting axe with a brown wooden handle and a simple iron axe head.
+Fallback level 3: this is ONE separated-parts sheet of the SAME character, with no assembled full-body figure. All four parts share exactly the same 16x16 pixel blocks and the same character design.
+The assembled character would be about 24 logical pixels tall. Draw each separate part horizontally centered in its own cell with generous flat magenta empty space around it. Keep the parts at the SAME intended assembly scale, do not enlarge small parts to fill a cell.
+Style: crisp 32x32 pixel art in the style of a 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Parts:
+Cell 1: separated head only, facing right in strict side view, black tied hair and lean young East Asian face, ONE eye pixel, approximately 5 to 6 logical pixels tall, no neck or body
+Cell 2: separated torso, robe, hips, legs and shoes as ONE body part, facing right, NO head, NO arms, NO weapon, worn grey-brown hemp robe with simple brown belt, approximately 18 logical pixels tall
+Cell 3: separated arms only, both arms and hands wrapped in white cloth, relaxed holding posture, two isolated arm pieces in this cell, approximately 8 logical pixels long, no torso or weapon
+Cell 4: separated practical woodcutting axe only, brown wooden handle and plain iron axe head, no hand, no sword, no glow, one logical pixel wide shaft and simple three by three logical pixel axe head.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 2 sprite pixels of empty space inside every cell edge.
+Fix: Final fallback level 3, ONLY the four separated parts above. The user explicitly replaced the early-story weapon with a woodcutting axe. All parts must be constructed from perfectly solid square blocks EXACTLY 16x16 px. DO NOT subdivide any square. No tiny pixel textures, no fine strands or folds. Huge coarse simple blocks on the exact global 64x64 logical grid; each cell is 32x32 logical pixels. A head only about FIVE blocks tall, body about EIGHTEEN blocks tall, each arm about EIGHT blocks long and TWO wide, axe handle about TEN blocks long by ONE block wide. Each used block is exactly one flat RGB color. At most 10 colors from the palette. Simple chunky shapes, one-full-block dark navy outline, only one highlight and one shadow color per material. No background decorations, no grid, no labels. Keep two logical pixels empty at every cell edge. Preserve the exact 1024x1024 canvas.

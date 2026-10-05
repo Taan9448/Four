@@ -1,0 +1,27 @@
+{
+  "id": "haun_ref",
+  "type": "character-ref",
+  "frameW": 32,
+  "frameH": 32,
+  "track": "pixel",
+  "pixelScale": 16,
+  "frames": 4,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 3,
+  "virtualFrames": 2,
+  "sourceHash": "b632dbd2d57b545f",
+  "placeholder": false,
+  "resizedFrom": [
+    1254,
+    1254
+  ],
+  "gridPurity": 0.445
+}
