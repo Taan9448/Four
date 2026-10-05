@@ -26,7 +26,7 @@ export function assetStatus(root = ROOT) {
   });
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const rows = assetStatus();
   if (process.argv.includes('--json')) {
     console.log(JSON.stringify(rows, null, 2));

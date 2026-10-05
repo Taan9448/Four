@@ -1,0 +1,7 @@
+# 일러스트 갈래 테스트용 명세(tests/tools.test.ts). 실제 게임 에셋이 아니다.
+id: fixture_card
+type: card-art
+character: haun
+summary: 일러스트 갈래 테스트
+frame_notes:
+  1: Haun splitting firewood at dawn

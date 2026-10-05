@@ -23,7 +23,7 @@ export function buildManifest(root = ROOT) {
   return { generatedBy: 'tools/build-manifest.mjs', assets };
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const manifest = buildManifest();
   writeFileSync(paths().manifest, JSON.stringify(manifest, null, 2) + '\n');
   const list = Object.values(manifest.assets);

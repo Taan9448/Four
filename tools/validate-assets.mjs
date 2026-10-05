@@ -57,8 +57,9 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   }
 
   // 4) 픽셀 격자 일치도: 블록 안이 한 색으로 채워졌는지(흐림·안티에일리어싱·격자 어긋남 감지)
-  const palette = paletteFor(spec, styleRoot);
-  const frameCells = fallback === 2 ? [1, 2, 3] : fallback === 3 ? [] : Array.from({ length: spec.frames }, (_, i) => i + 1);
+  const illustration = spec.track === 'illustration';
+  const palette = illustration ? null : paletteFor(spec, styleRoot);
+  const frameCells = illustration ? [] : fallback === 2 ? [1, 2, 3] : fallback === 3 ? [] : Array.from({ length: spec.frames }, (_, i) => i + 1);
   if (frameCells.length) {
     let sum = 0;
     for (const n of frameCells) sum += pixelize(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), spec, palette).purity;
@@ -84,6 +85,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       errors.push(`프레임 ${n}: 크기 ${img.width}×${img.height} ≠ ${spec.logical.join('×')}`);
       return;
     }
+    if (illustration) return; // 일러스트: 크기만 검사
     const colors = countColors(img);
     if (colors > spec.max_colors) warnings.push(`프레임 ${n}: ${colors}색(권장 ${spec.max_colors}색 이하)`);
     if (paletteSet) {
@@ -219,7 +221,7 @@ async function main() {
   process.exit(failed ? 1 : 0);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
     console.error(`✖ ${e.message}`);
     process.exit(1);

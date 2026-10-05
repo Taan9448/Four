@@ -25,7 +25,7 @@ export function checkOwnership(branch, files) {
   return errors;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const args = process.argv.slice(2);
   const get = (name) => {
     const i = args.indexOf(name);

@@ -11,6 +11,7 @@ import { pathToFileURL } from 'node:url';
 import { bbox, cellRect, extract, fileHash, isContentFn, keyOut, pixelize, prepareSheet, toPng } from './lib/image.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
+import sharp from 'sharp';
 
 /**
  * @param {object} spec 정규화된 명세
@@ -35,12 +36,23 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     }
   } else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
 
-  const palette = paletteFor(spec, styleRoot);
+  const illustration = spec.track === 'illustration';
+  const palette = illustration ? null : paletteFor(spec, styleRoot);
   let puritySum = 0;
   for (const [i, n] of frameCells.entries()) {
-    const { img, purity } = pixelize(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), spec, palette);
+    const file = join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`);
+    const cell = keyOut(extract(sheet.raw, cellRect(spec, n)), spec);
+    if (illustration) {
+      // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
+      await sharp(cell.data, { raw: { width: cell.width, height: cell.height, channels: 4 } })
+        .resize(spec.logical[0], spec.logical[1], { fit: 'fill', kernel: 'lanczos3' })
+        .png()
+        .toFile(file);
+      continue;
+    }
+    const { img, purity } = pixelize(cell, spec, palette);
     puritySum += purity;
-    writeFileSync(join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`), await toPng(img));
+    writeFileSync(file, await toPng(img));
   }
 
   const meta = {
@@ -49,7 +61,8 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     frameW: spec.logical[0],
     frameH: spec.logical[1],
     /** 시트에서 논리 픽셀 1개의 크기 */
-    pixelScale: spec.pixel_scale,
+    track: spec.track,
+    pixelScale: illustration ? null : spec.pixel_scale,
     frames: frameCells.length,
     fps: spec.fps,
     loop: spec.loop,
@@ -64,7 +77,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     placeholder,
     resizedFrom: sheet.resized ? sheet.original : null,
     /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
-    gridPurity: Number((puritySum / frameCells.length).toFixed(3)),
+    gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;
@@ -92,7 +105,7 @@ async function main() {
   console.log(`✔ ${id}: 프레임 ${meta.frames}장 → ${meta.placeholder ? 'assets/placeholders' : 'assets/sprites'}/${id}/ (대체 단계 ${meta.fallbackLevel}${meta.resizedFrom ? `, ${meta.resizedFrom.join('×')}에서 리사이즈` : ''})`);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
     console.error(`✖ ${e.message}`);
     process.exit(1);
