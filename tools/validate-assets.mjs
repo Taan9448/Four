@@ -73,10 +73,10 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     else if (purity < 0.5) errors.push(msg);
     else if (purity < 0.65) warnings.push(msg);
     const [T, TH] = spec.logical;
-    for (const f of analyzed) {
-      if (f.fit === 'downscale') warnings.push(`칸 ${f.n}: 모델이 그린 해상도 ${f.native.join('×')}가 목표 ${T}×${TH}보다 커서 줄였다(디테일 손실)`);
-      if (f.fit === 'upscale') warnings.push(`칸 ${f.n}: 모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
-    }
+    // 배율은 시트 공통이라 한 번만 알린다
+    const f = analyzed[0];
+    if (f.fit === 'downscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}의 그림이 여백 포함 목표 ${T}×${TH}에 들어가지 않아 시트 전체를 줄였다(디테일 손실) — 인물이 칸을 꽉 채웠다`);
+    if (f.fit === 'upscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
   }
 
   // 5) 프레임 파일 검사

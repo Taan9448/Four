@@ -46,7 +46,9 @@ export function renderPrompt(spec, style) {
   const bodyHeight = Math.round(lh * 0.75);
   const feetRow = Math.round(spec.baseline * lh);
   const placement =
-    `In sprite pixels: the character is about ${bodyHeight} px tall, the lowest pixel of the feet is on row ${feetRow} of ${lh} (counting from 1 at the top), horizontally centered.\n`;
+    `In sprite pixels: the character is about ${bodyHeight} px tall, the lowest pixel of the feet is on row ${feetRow} of ${lh} (counting from 1 at the top), horizontally centered.\n` +
+    // 모델은 픽셀 수보다 칸 대비 비율을 더 잘 지킨다(PR #10: 48px 요청에 칸을 꽉 채움)
+    `Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/${Math.round(lh / (feetRow - bodyHeight))} of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.\n`;
 
   switch (spec.type) {
     case 'character-anim':
