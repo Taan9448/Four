@@ -10,7 +10,7 @@
     72,
     72
   ],
-  "fit": "pad",
+  "fit": "downscale",
   "frames": 2,
   "fps": 1,
   "loop": false,
