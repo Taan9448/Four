@@ -97,6 +97,10 @@ button { font: inherit; }
 .res label { color: var(--ink-dim); font-size: 0.85rem; }
 .res b { font-variant-numeric: tabular-nums; min-width: 2.5em; }
 .res-piles { margin-left: auto; color: var(--ink-dim); font-size: 0.8rem; }
+.res-survive b { color: var(--danger); }
+.battle-intro { margin: 0 0 8px; color: var(--ink-dim); font-size: 0.9rem; line-height: 1.6; }
+.stage-clear .outro { font-size: 1.02rem; }
+.stage-clear .next-stage { color: var(--ink-dim); }
 .pips { display: inline-flex; gap: 3px; }
 .pip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
 .pip-neigong { background: var(--neigong); box-shadow: 0 0 6px rgba(242, 169, 59, 0.6); }

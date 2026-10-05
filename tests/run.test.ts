@@ -16,7 +16,7 @@ import { data } from './helpers';
 
 describe('런 진행', () => {
   it('하운 혼자 시작하고, 1층 스토리에서 동료가 합류한다(출전 최대 3명)', () => {
-    const run = createRun(data, 'RUN1');
+    const run = createRun(data, 'RUN1', { stageId: 's1' });
     expect(run.roster.map((r) => r.id)).toEqual(['haun']);
     const [first] = availableNodes(run);
     const enc = enterNode(data, run, first.id);
@@ -29,7 +29,7 @@ describe('런 진행', () => {
   });
 
   it('편성 규칙: 하운 필수, 최대 3명, 합류한 전투원만', () => {
-    const run = createRun(data, 'RUN2');
+    const run = createRun(data, 'RUN2', { stageId: 's1' });
     expect(() => setParty(data, run, ['haun', 'elia'])).toThrow();
     const enc = enterNode(data, run, availableNodes(run)[0].id);
     applyChoice(data, run, enc.module, 0);
@@ -40,7 +40,7 @@ describe('런 진행', () => {
   });
 
   it('전투 노드에서 출전 멤버로 전투가 만들어지고, 결과가 런에 반영된다', () => {
-    const run = createRun(data, 'RUN3');
+    const run = createRun(data, 'RUN3', { stageId: 's1' });
     const enc0 = enterNode(data, run, availableNodes(run)[0].id);
     applyChoice(data, run, enc0.module, 0);
     setParty(data, run, ['haun', 'elia']);
@@ -65,7 +65,7 @@ describe('런 진행', () => {
   });
 
   it('보상 카드 후보는 출전 멤버의 보상 풀에서, 시드로 결정된다', () => {
-    const run = createRun(data, 'RUN4');
+    const run = createRun(data, 'RUN4', { stageId: 's1' });
     const a = rewardOptions(data, run, 'f2n0');
     expect(a).toEqual(rewardOptions(data, run, 'f2n0'));
     expect(a.every((id) => data.cards.get(id)!.owner === 'haun')).toBe(true);
@@ -74,8 +74,8 @@ describe('런 진행', () => {
 
   it('왕일검 지원이 켜지면 휴식 노드에 토납 수련이 추가된다', () => {
     const rest = data.modules.get('s1_rest_campfire')!;
-    const off = createRun(data, 'RUN5');
-    const on = createRun(data, 'RUN5', { supportActive: true });
+    const off = createRun(data, 'RUN5', { stageId: 's1' });
+    const on = createRun(data, 'RUN5', { stageId: 's1', supportActive: true });
     expect(choicesFor(data, off, rest).length).toBe(2);
     expect(choicesFor(data, on, rest).map((c) => c.label)).toContain('[왕일검] 토납 수련');
   });

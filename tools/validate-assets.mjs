@@ -236,7 +236,10 @@ async function main() {
     }
   }
   // art/* 브랜치(Codex)는 옛 규격 프레임을 다시 잘라야 통과. 그 밖의 브랜치는 sprites를 고칠 수 없으니 경고만
-  const staleOk = !currentBranch().startsWith('art/');
+  const artBranch = currentBranch().startsWith('art/');
+  const staleOk = !artBranch;
+  // 콘택트 시트·GIF는 art 브랜치에서만 새로 쓴다(다른 브랜치가 sprites를 건드려 소유권 검사에 걸리지 않게). 임시 시트는 늘 쓴다
+  const previewsFor = (t) => t.placeholder || artBranch;
   let failed = 0;
   for (const t of targets) {
     const where = t.placeholder ? '임시' : '납품';
@@ -245,7 +248,7 @@ async function main() {
       console.log(`✖ ${t.id} [명세]\n${t.shapeErrors.map((e) => `   - ${e}`).join('\n')}`);
       continue;
     }
-    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder, staleOk });
+    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder, staleOk, previews: previewsFor(t) });
     if (errors.length) failed++;
     console.log(`${errors.length ? '✖' : '✔'} ${t.id} [${where}]`);
     for (const e of errors) console.log(`   - 오류: ${e}`);

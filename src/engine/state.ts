@@ -55,7 +55,8 @@ export type BattleEvent =
   | { type: 'skip'; uid: string }
   | { type: 'enemy_action'; uid: string; moveName: string }
   | { type: 'dead_draw'; cardId: string }
-  | { type: 'result'; result: 'victory' | 'defeat' };
+  | { type: 'result'; result: 'victory' | 'defeat' }
+  | { type: 'survived'; turns: number };
 
 export interface BattleState {
   data: GameData;
@@ -74,6 +75,10 @@ export interface BattleState {
   events: BattleEvent[];
   log: string[];
   result: 'victory' | 'defeat' | null;
+  /** 이 턴 수를 버티면 승리(이길 수 없는 전투). null이면 일반 전투 */
+  surviveTurns: number | null;
+  /** 버티기로 끝난 전투 */
+  survived: boolean;
   supportRules: SupportRule[];
   supportUsed: string[];
   flags: string[];

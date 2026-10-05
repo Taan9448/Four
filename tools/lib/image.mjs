@@ -132,7 +132,50 @@ function colorDist(r1, g1, b1, r2, g2, b2) {
   return (2 + rm / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rm) / 256) * db * db;
 }
 
+/** sRGB → OKLab [L, a, b] */
+export function oklab(r, g, b) {
+  const lin = (c) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const [R, G, B] = [lin(r), lin(g), lin(b)];
+  const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B);
+  const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B);
+  const s = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+
+/** 무채색에 가까운 원본 색의 기준(OKLab 채도) */
+const NEUTRAL_SOURCE = 0.02;
+const grayFamilyCache = new WeakMap();
+/**
+ * 팔레트의 회색 계열: 무채색(채도 < 0.015)이거나, 채도가 낮고(< 0.045) 따뜻하지 않은(OKLab b ≤ 0.005) 색.
+ * 마스터 팔레트에서는 #0b0b10·#1d2433·#2b2b3a·#3d4459·#5d6478·#8a90a3·#c2c6d1·#f1efe6
+ */
+function grayFamily(palette) {
+  let fam = grayFamilyCache.get(palette);
+  if (!fam) {
+    fam = palette.filter(([r, g, b]) => {
+      const [, A, B] = oklab(r, g, b);
+      const c = Math.hypot(A, B);
+      return c < 0.015 || (c < 0.045 && B <= 0.005);
+    });
+    grayFamilyCache.set(palette, fam);
+  }
+  return fam;
+}
+
+/**
+ * 팔레트에서 가장 가까운 색(redmean). 무채색에 가까운 원본(숯빛 겉옷 같은 중간 회색)은 회색 계열 안에서만 고른다.
+ * 팔레트에 그 밝기의 중립 회색이 없으면 살짝 따뜻한 회색이 갈색으로 붙어 옷에 갈색 얼룩이 생기기 때문(haun_attack).
+ */
 export function nearestColor(palette, r, g, b) {
+  const [, A, B] = oklab(r, g, b);
+  if (Math.hypot(A, B) < NEUTRAL_SOURCE) {
+    const fam = grayFamily(palette);
+    if (fam.length) palette = fam;
+  }
   let best = palette[0], bestD = Infinity;
   for (const c of palette) {
     const d = colorDist(r, g, b, c[0], c[1], c[2]);

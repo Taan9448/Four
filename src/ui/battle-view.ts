@@ -15,6 +15,8 @@ export interface BattleContext {
   scar: number;
   supportActive: boolean;
   bonusText?: string;
+  /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
+  introText?: string;
 }
 
 interface Unit {
@@ -82,6 +84,7 @@ export class BattleView {
       'section',
       { class: 'screen battle' },
       h('header', { class: 'topbar' }, h('div', { class: 'title' }, this.ctx.title), h('div', { class: 'sub' }, this.ctx.subtitle), h('div', { class: 'seed' }, `시드 ${this.ctx.seed}`)),
+      this.ctx.introText ? h('p', { class: 'battle-intro' }, this.ctx.introText) : null,
       this.resEl,
       this.field,
       h('div', { class: 'controls' }, this.handEl, h('div', { class: 'control-side' }, this.endBtn, this.logEl)),
@@ -103,8 +106,8 @@ export class BattleView {
     const enemyDef = c.side === 'enemy' ? this.data.enemies.get(c.defId) : undefined;
     const charDef = c.side === 'party' ? this.data.characters.get(c.defId) : undefined;
     const player = new SpritePlayer(canvas, {
-      fallbackColor: charDef?.color ?? '#5a4a5a',
-      fallbackShape: enemyDef?.tier === 'boss' ? 'boss' : 'humanoid',
+      fallbackColor: charDef?.color ?? enemyDef?.color ?? '#5a4a5a',
+      fallbackShape: enemyDef?.silhouette ?? (enemyDef?.tier === 'boss' ? 'boss' : 'humanoid'),
     });
     if (enemyDef?.tint) canvas.style.filter = enemyDef.tint;
     const hp = h('div', { class: 'hp-fill' });
@@ -180,6 +183,9 @@ export class BattleView {
       h('div', { class: 'res res-mana', title: `마나: 세계마다 차는 양이 다른 유한 자원 (${s.world})` }, h('label', {}, '마나'), h('div', { class: 'bar' }, h('div', { class: 'bar-fill mana-fill', style: `width:${(s.mana / bal.mana.max) * 100}%` })), h('b', {}, `${s.mana}/${bal.mana.max}`)),
       h('div', { class: `res res-rift${s.rift >= bal.rift.echoThreshold ? ' hot' : ''}`, title: `균열: ${bal.rift.echoThreshold} 이상이면 틈의 잔향, ${bal.rift.max}이면 폭주` }, h('label', {}, '균열'), h('div', { class: 'bar' }, h('div', { class: 'bar-fill rift-fill', style: `width:${(s.rift / bal.rift.max) * 100}%` })), h('b', {}, `${s.rift}/${bal.rift.max}`)),
       ...(breath ? [breath] : []),
+      ...(s.surviveTurns !== null
+        ? [h('div', { class: 'res res-survive', title: '이길 수 없는 전투: 이 턴 수를 버티면 끝난다' }, h('label', {}, '버티기'), h('b', {}, `${Math.min(s.turn, s.surviveTurns)}/${s.surviveTurns}턴`))]
+        : []),
       h('div', { class: 'res res-piles' }, `턴 ${s.turn} · 뽑을 ${s.draw.length} · 버림 ${s.discard.length} · 소멸 ${s.exhaust.length} · 상흔 ${this.ctx.scar}`),
     );
     this.rift.update(s.rift);
@@ -401,7 +407,13 @@ export class BattleView {
     const overlay = h(
       'div',
       { class: `result-overlay ${win ? 'win' : 'lose'}` },
-      h('div', { class: 'result-box' }, h('h2', {}, win ? '승리' : '패배'), h('p', {}, win ? '결을 따라, 날을 얹었다.' : '하운이 쓰러졌다.'), h('button', { class: 'btn btn-primary', onclick: () => this.finish() }, '계속')),
+      h(
+        'div',
+        { class: 'result-box' },
+        h('h2', {}, this.state.survived ? '버텼다' : win ? '승리' : '패배'),
+        h('p', {}, this.state.survived ? `${this.state.turn}턴을 버텼다.` : win ? '결을 따라, 날을 얹었다.' : '하운이 쓰러졌다.'),
+        h('button', { class: 'btn btn-primary', onclick: () => this.finish() }, '계속'),
+      ),
     );
     this.root.appendChild(overlay);
   }

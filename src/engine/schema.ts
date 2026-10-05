@@ -177,6 +177,10 @@ export const EnemyDef = z
     sprite: z.string().nullable().default(null),
     tint: z.string().optional(),
     scale: z.number().positive().default(1),
+    /** 그림이 없을 때 실루엣 모양(생략하면 보스는 boss, 나머지는 humanoid) */
+    silhouette: z.enum(['humanoid', 'beast', 'boss', 'object']).optional(),
+    /** 그림이 없을 때 실루엣 색 */
+    color: z.string().optional(),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     pattern: z.enum(['cycle', 'random']),
@@ -241,6 +245,8 @@ export const Balance = z
     incorporealMultiplier: z.number(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
     rewards: z.object({ cardChoices: z.number().int().positive() }).strict(),
+    /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
+    stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
@@ -295,6 +301,10 @@ export const ModuleDef = z
         choices: z.array(Choice).optional(),
         /** 전투 시작 시 조건부 보너스(예: 특정 동료 출전) */
         bonus: z.object({ condition: Condition, text: z.string(), effects: z.array(Effect) }).strict().optional(),
+        /** 이 턴 수를 버티면 승리하는 전투(이길 수 없는 전투) */
+        surviveTurns: z.number().int().positive().optional(),
+        /** 보스 모듈: 스테이지를 마친 뒤 보여 줄 장면 글 */
+        outro: z.string().optional(),
       })
       .strict(),
   })
