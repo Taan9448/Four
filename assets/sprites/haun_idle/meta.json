@@ -1,0 +1,34 @@
+{
+  "id": "haun_idle",
+  "type": "character-anim",
+  "frameW": 80,
+  "frameH": 80,
+  "track": "pixel",
+  "pixelScale": 6.81,
+  "gridDetected": true,
+  "nativeSize": [
+    75,
+    75
+  ],
+  "fit": "pad",
+  "frames": 4,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 4,
+  "sourceHash": "c487859de5ad608d",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.635
+}
