@@ -156,7 +156,7 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
   const key = CHROMA[spec.chroma];
   const parts = [];
   if (key) parts.push(`<rect width="${W}" height="${H}" fill="${key.hex}"/>`);
-  if (['card-art', 'background', 'portrait'].includes(spec.type)) {
+  if (spec.track === 'illustration' || spec.type === 'background') {
     parts.push(illustration(W, H, spec));
   } else {
     const poses = spec.type === 'character-ref' ? [{ arm: 25, weapon: 30 }, { arm: 25, weapon: 30 }] : posesFor(spec);
@@ -184,6 +184,10 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
  */
 export async function renderSheet(spec, opts = {}) {
   const bg = CHROMA[spec.chroma]?.hex ?? '#000000';
+  if (spec.track === 'illustration') {
+    // 일러스트 임시 그림: 벡터 그대로(픽셀화하지 않음)
+    return sharp(Buffer.from(sheetSvg(spec, opts))).flatten({ background: bg }).png().toBuffer();
+  }
   const vector = await loadRaw(await sharp(Buffer.from(sheetSvg(spec, opts))).flatten({ background: bg }).png().toBuffer());
   const palette = paletteFor(spec, opts.styleRoot ?? ROOT);
   const composites = [];
@@ -222,7 +226,7 @@ async function main() {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
     console.error(`✖ ${e.message}`);
     process.exit(1);

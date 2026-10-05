@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { buildManifest } from '../tools/build-manifest.mjs';
 import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
-import { promptFor } from '../tools/render-prompt.mjs';
+import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -18,7 +18,7 @@ let root: string;
 beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'cg-assets-'));
   mkdirSync(join(root, 'specs/assets'), { recursive: true });
-  for (const f of ['fixture_attack.yaml']) copyFileSync(join(FIXTURES, f), join(root, 'specs/assets', f));
+  for (const f of ['fixture_attack.yaml', 'fixture_card.yaml']) copyFileSync(join(FIXTURES, f), join(root, 'specs/assets', f));
 });
 
 async function prepare(id: string, opts: { skipCells?: number[]; extraCells?: number[] } = {}, fallback = 1) {
@@ -120,6 +120,18 @@ describe('자르기 → 검증', () => {
     expect(meta).toMatchObject({ frames: 3, fallbackLevel: 2, virtualFrames: 6 });
     const r = await validateAsset('fixture_attack', { root, previews: false });
     expect(r.errors).toEqual([]);
+  });
+
+  it('일러스트 갈래(card-art)는 픽셀화하지 않고 출력 크기로만 줄인다', async () => {
+    const { p } = await prepare('fixture_card');
+    const meta = JSON.parse(readFileSync(join(p.sprites('fixture_card'), 'meta.json'), 'utf8'));
+    expect(meta).toMatchObject({ track: 'illustration', frameW: 512, frameH: 768, frames: 1, pixelScale: null });
+    expect(await sharp(join(p.sprites('fixture_card'), 'frame_01.png')).metadata()).toMatchObject({ width: 512, height: 768 });
+    const r = await validateAsset('fixture_card', { root, previews: false });
+    expect(r.errors).toEqual([]);
+    const prompt = renderPrompt(loadSpec('fixture_card', root), loadPromptData());
+    expect(prompt).toContain('hand-drawn 2D animated feature film look');
+    expect(prompt).not.toContain('PIXEL GRID');
   });
 
   it('manifest는 실제 스프라이트를 임시 시트보다 우선한다', async () => {

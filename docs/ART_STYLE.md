@@ -1,19 +1,31 @@
 # ART_STYLE — 화풍·팔레트·캐릭터 외형
 
-> **확정 화풍: 32px 픽셀 아트** (사용자 결정, 2026-10-05)
-> 세부 표현(외곽선 두께, 명암 단계, 얼굴 표현)은 첫 에셋 `haun_ref`로 시험합니다. 그 결과를 보고 이 문서를 다듬습니다.
+> **확정 화풍: 두 갈래** (사용자 결정, 2026-10-05)
+> - **전투 = 32px 픽셀 아트**: 캐릭터·적·이펙트·전투 배경
+> - **이야기 = 선이 살아 있는 애니메이션 채색 일러스트**: 카드 일러스트·인물 초상화·스토리 장면(CG)·캐릭터 설정화
+>
+> 픽셀 쪽 세부(외곽선·명암·얼굴)는 첫 에셋 `haun_ref`로 시험합니다. 일러스트 캐릭터 설정화는 픽셀 작업 결과를 본 뒤 만들고, 필요하면 픽셀 쪽을 일부 고칩니다.
 
 이 문서는 Claude가 관리합니다. Codex는 읽기만 합니다. 이미지 프롬프트와 자르기 도구의 팔레트는 맨 아래 `prompt-data` 블록에서
 도구(`tools/render-prompt.mjs`, `tools/slice-sheet.mjs`)가 자동으로 가져갑니다. 스타일을 바꾸려면 그 블록을 고칩니다.
 
-## 1. 원칙
+## 0. 두 갈래 한눈에
 
-- **논리 해상도:** 캐릭터·일반 적·이펙트는 **32×32**, 보스·큰 이펙트는 **64×64**. 카드 일러스트 64×96, 전투 배경 192×128, 초상화 64×64.
+| 갈래 | 그림 | 형태 | 게임에서 |
+|---|---|---|---|
+| 전투(pixel) | character-anim, character-ref, fx, background | 확대된 픽셀 아트 시트 → 32×32 등으로 축소 | 전투 필드 |
+| 이야기(illustration) | card-art, portrait, story-cg, character-sheet | 일러스트 한 장 → 출력 크기로만 축소 | 카드, 대화, 스토리 장면, 설정 기준 |
+
+두 갈래를 잇는 규칙: **같은 색 코드(3절)**, **같은 캐릭터 외형(4절)**. 같은 인물이 두 그림에서 다른 사람처럼 보이면 안 됩니다.
+
+## 1. 전투 — 픽셀 아트 원칙
+
+- **논리 해상도:** 캐릭터·일반 적·이펙트는 **32×32**, 보스·큰 이펙트는 **64×64**, 전투 배경 192×128.
 - **게임에서는 정수배로만 확대**하고(기본 5배), 보간 없이(nearest neighbor) 표시합니다.
 - **제작 방식:** 이미지 모델은 "확대된 픽셀 아트"(논리 픽셀 1개 = 8×8 또는 16×16 블록)를 그리고, 자르기 도구가 블록마다 가장 많은 색을 골라 논리 해상도로 줄인 뒤 마스터 팔레트로 색을 맞춥니다.
 - **금지:** 안티에일리어싱, 흐림, 그라데이션, 반투명, 디더링 노이즈, 블록보다 작은 디테일.
 
-## 2. 스프라이트 표현
+## 2. 전투 — 스프라이트 표현
 
 | 항목 | 기준 |
 |---|---|
@@ -31,7 +43,29 @@
 - 엘하임: 은빛·청색·초록, 청은빛 마나 이펙트
 - 마왕성·틈: 흑요석·검붉은색, 보랏빛 번개(초록 키 사용)
 
-## 3. 색 코드(UI와 이펙트 공통)
+## 2-1. 이야기 — 애니메이션 채색 일러스트
+
+손으로 그린 극장판 2D 애니메이션 같은 가볍고 따뜻한 그림. 선이 살아 있고 채색은 단순하게.
+
+| 항목 | 기준 |
+|---|---|
+| 선 | 손으로 그린 듯한 깔끔한 선, 굵기에 약간의 강약. 윤곽선은 짙은 갈색·남색 계열(검정 일색 금지) |
+| 인물 채색 | 셀 채색: 기본색 + 그림자 1단계 + 작은 하이라이트. 과한 광택·질감 없음 |
+| 배경 | 수채화처럼 부드럽게 칠한 배경, 자연광, 하늘·숲·산의 디테일은 풍부하게 |
+| 분위기 | 밝고 공기감 있는 색. 무림은 소나무·기와·안개, 엘하임은 은빛 숲과 두 개의 달 |
+| 얼굴 | 큰 눈 과장 없이 자연스러운 비율, 표정이 읽히게 |
+| 금지 | 사진 같은 질감, 두꺼운 유화 붓질, 3D 렌더 느낌, 글자·로고·서명 |
+
+| 유형 | 캔버스 | 게임 출력 | 용도 |
+|---|---|---|---|
+| card-art | 1024×1536 | 512×768 | 카드 일러스트(주인공·초식·장면) |
+| portrait | 1024×1024 | 512×512 | 대화·왕일검 지원 표시. 표정별로 따로 |
+| story-cg | 1536×1024 | 1152×768 | 스토리 노드 장면(밀담, 재회, 결전 등) |
+| character-sheet | 1536×1024 | 1536×1024 | 캐릭터 설정화(정면·3/4·측면 + 표정). 다른 그림의 참조용 |
+
+이미지 생성 프롬프트에는 **특정 스튜디오·작가 이름을 쓰지 않고** 화풍의 특징(선, 채색, 배경, 빛)으로 설명합니다. 이름을 쓰면 생성기가 거부하거나 결과가 흔들릴 수 있습니다.
+
+## 3. 색 코드(UI·이펙트·일러스트 공통)
 
 | 의미 | 색 | 근거 |
 |---|---|---|
@@ -42,6 +76,7 @@
 | 마기 | 검붉은 `#5a1020` | "무겁고 끈적한 것" |
 
 크로마키 색(마젠타 `#FF00FF`, 초록 `#00FF00`)과 비슷한 색은 해당 키를 쓰는 캐릭터에 쓰지 않습니다. 마스터 팔레트에는 두 색이 없습니다.
+일러스트는 마스터 팔레트에 묶이지 않지만, 인물의 옷·머리 색과 위 색 코드는 픽셀 쪽과 같은 색감으로 맞춥니다.
 
 ## 4. 캐릭터 외형(원작 근거)
 
@@ -62,7 +97,8 @@
 
 ## 5. 프롬프트·팔레트 데이터
 
-도구가 이 블록을 읽습니다. 영어로 씁니다. `palette`는 마스터 팔레트(32색)로, 자르기 도구가 모든 픽셀을 이 중 가장 가까운 색으로 맞춥니다.
+도구가 이 블록을 읽습니다. 영어로 씁니다. `palette`는 전투(픽셀) 마스터 팔레트(32색)로, 자르기 도구가 모든 픽셀을 이 중 가장 가까운 색으로 맞춥니다.
+`illustration_style`은 이야기 갈래(card-art, portrait, story-cg, character-sheet) 프롬프트에 들어갑니다.
 
 <!-- prompt-data -->
 ```yaml
@@ -75,8 +111,11 @@ fx_style: >-
   increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke,
   no gradients, no blur, no anti-aliasing
 illustration_style: >-
-  detailed pixel art illustration, 16-bit era game key art, East Asian wuxia mood with ink-wash
-  inspired limited colors, clean stepped shading, no anti-aliasing, no gradients, no blur
+  hand-drawn 2D animated feature film look; clean, lively hand-inked line art with gentle line weight
+  variation and warm dark-brown outlines; simple cel shading with one shadow tone and small highlights;
+  light, airy, natural colors; softly painted watercolor-like backgrounds with rich natural detail and
+  warm daylight; gentle, nostalgic atmosphere; East Asian wuxia world blended with a European fantasy
+  forest; not photorealistic, not 3D, no heavy oil-paint texture
 palette:
   - '#0b0b10'
   - '#1d2433'

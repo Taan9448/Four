@@ -7,34 +7,45 @@ import { parse } from 'yaml';
 export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
 /**
- * 32px 픽셀 아트 시트 규격. docs/ASSET_PIPELINE.md 2절과 같아야 한다.
- * 이미지 모델은 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 칸마다 논리 해상도(logical)로 줄인다.
- *   small: 32×32 스프라이트(캐릭터·일반 적·이펙트), large: 64×64(보스·큰 이펙트)
+ * 시트 규격. docs/ASSET_PIPELINE.md 2절과 같아야 한다. 그림은 두 갈래(track)로 나뉜다.
+ *  - pixel(전투): 이미지 모델이 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 칸마다 논리 해상도(logical)로 줄인다.
+ *      small: 32×32 스프라이트(캐릭터·일반 적·이펙트), large: 64×64(보스·큰 이펙트)
+ *  - illustration(이야기): 선이 살아 있는 애니메이션 채색 일러스트 한 장. 픽셀화하지 않고 output 크기로만 줄인다.
  */
 const SHEETS = {
   'anim-small': { canvas: [1024, 1024], grid: [4, 4], logical: [32, 32] }, // 칸 256 = 8배
   'anim-large': { canvas: [1536, 1024], grid: [3, 2], logical: [64, 64] }, // 칸 512 = 8배
   'ref-small': { canvas: [1024, 1024], grid: [2, 2], logical: [32, 32] }, // 칸 512 = 16배
   'ref-large': { canvas: [1024, 1024], grid: [2, 2], logical: [64, 64] }, // 칸 512 = 8배
-  'card-art': { canvas: [1024, 1536], grid: [1, 1], logical: [64, 96] }, // 16배
-  background: { canvas: [1536, 1024], grid: [1, 1], logical: [192, 128] }, // 8배
-  portrait: { canvas: [1024, 1024], grid: [1, 1], logical: [64, 64] }, // 16배
+  background: { canvas: [1536, 1024], grid: [1, 1], logical: [192, 128] }, // 8배(전투 배경은 픽셀)
 };
+
+/** 일러스트 유형: 캔버스와 게임에서 쓸 출력 크기 */
+const ILLUSTRATIONS = {
+  'card-art': { canvas: [1024, 1536], output: [512, 768] },
+  portrait: { canvas: [1024, 1024], output: [512, 512] },
+  'story-cg': { canvas: [1536, 1024], output: [1152, 768] },
+  'character-sheet': { canvas: [1536, 1024], output: [1536, 1024] },
+};
+
+export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
 
 export function typeDefaults(type, size = 'small') {
   const one = { frames: 1, fps: 1, loop: false };
+  if (type in ILLUSTRATIONS) {
+    const { canvas, output } = ILLUSTRATIONS[type];
+    return { canvas, grid: [1, 1], logical: output, track: 'illustration', chroma: 'none', blend: 'normal', max_colors: null, ...one };
+  }
   switch (type) {
     case 'character-anim':
-      return { ...SHEETS[`anim-${size}`], chroma: 'magenta', blend: 'normal', max_colors: 16 };
+      return { ...SHEETS[`anim-${size}`], track: 'pixel', chroma: 'magenta', blend: 'normal', max_colors: 16 };
     case 'character-ref':
-      return { ...SHEETS[`ref-${size}`], chroma: 'magenta', blend: 'normal', max_colors: 16, frames: 2, fps: 1, loop: false };
+      return { ...SHEETS[`ref-${size}`], track: 'pixel', chroma: 'magenta', blend: 'normal', max_colors: 16, frames: 2, fps: 1, loop: false };
     case 'fx':
       // 검정 배경은 자를 때 투명으로 바뀌므로 게임에서는 일반 합성으로 겹친다
-      return { ...SHEETS[`anim-${size}`], chroma: 'black', blend: 'normal', max_colors: 12 };
-    case 'card-art':
+      return { ...SHEETS[`anim-${size}`], track: 'pixel', chroma: 'black', blend: 'normal', max_colors: 12 };
     case 'background':
-    case 'portrait':
-      return { ...SHEETS[type], chroma: 'none', blend: 'normal', max_colors: 32, ...one };
+      return { ...SHEETS[type], track: 'pixel', chroma: 'none', blend: 'normal', max_colors: 32, ...one };
     default:
       return null;
   }
@@ -61,7 +72,7 @@ export const PADDING = 0.08;
 
 /** 하위 호환·문서용: 유형별 기본 규격(small) */
 export const TYPE_DEFAULTS = Object.fromEntries(
-  ['character-anim', 'character-ref', 'fx', 'card-art', 'background', 'portrait'].map((t) => [t, typeDefaults(t)]),
+  ['character-anim', 'character-ref', 'fx', 'background', ...ILLUSTRATION_TYPES].map((t) => [t, typeDefaults(t)]),
 );
 
 export const paths = (root = ROOT) => ({
@@ -120,8 +131,10 @@ export function normalizeSpec(raw) {
     canvas,
     grid,
     cell,
+    /** pixel: 논리 해상도 / illustration: 게임용 출력 크기 */
     logical,
-    /** 논리 픽셀 1개가 시트에서 차지하는 크기(px) */
+    track: td.track,
+    /** 논리 픽셀 1개가 시트에서 차지하는 크기(px). 일러스트는 축소 비율 */
     pixel_scale: cell[0] / logical[0],
     palette: raw.palette ?? 'master',
     max_colors: raw.max_colors ?? td.max_colors,
@@ -151,7 +164,7 @@ export function checkSpecShape(spec, root = ROOT) {
   }
   const sx = spec.cell[0] / spec.logical[0];
   const sy = spec.cell[1] / spec.logical[1];
-  if (!Number.isInteger(sx) || sx !== sy) {
+  if (spec.track === 'pixel' && (!Number.isInteger(sx) || sx !== sy)) {
     errors.push(`칸(${spec.cell.join('×')})이 논리 해상도(${spec.logical.join('×')})의 같은 정수배가 아니다`);
   }
   if (!['master', 'free'].includes(spec.palette)) errors.push('palette는 master 또는 free');
