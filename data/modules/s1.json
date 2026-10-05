@@ -1,0 +1,106 @@
+[
+  {
+    "id": "s1_story_companions", "stage": "s1", "type": "story", "name": "두 개의 달", "once": true,
+    "content": {
+      "text": "눈을 떴을 때, 하늘에는 달이 두 개 떠 있었다. 숲 저편의 비명을 따라가자 그림자늑대에 둘러싸인 세 사람이 보였다. 나뭇가지 하나로 늑대의 목을 꿰뚫은 뒤, 은발의 여인이 이마에 손가락을 댔다. \"이제 들려요? 저는 엘리아예요. 이쪽은 카일, 저쪽은 보른.\"",
+      "choices": [
+        { "label": "\"같이 가겠습니다.\"", "result": "엘리아·카일·보른이 합류했다. 출전은 최대 3명이며, 하운은 항상 출전한다.",
+          "effects": [ { "op": "join_party", "member": "elia" }, { "op": "join_party", "member": "kyle" }, { "op": "join_party", "member": "born" }, { "op": "set_flag", "flag": "met_companions" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_story_unha_sword", "stage": "s1", "type": "story", "name": "운하검의 탄생", "once": true,
+    "content": {
+      "text": "마나는 강물이고, 내공은 물레방아였다. 담장 너머로 훔쳐 들은 청운십팔식의 구령 위에 카일의 기사검술을 얹고, 장작의 결을 읽던 눈으로 다시 쪼갰다. 구름과 강. 하운은 그것을 운하검(雲河劍)이라 불렀다.",
+      "choices": [
+        { "label": "운하검 제일식을 새긴다", "result": "벽운단하(融合)를 얻었다. 쓸 때마다 균열이 쌓인다.",
+          "effects": [ { "op": "gain_card", "card": "haun_byeogun" }, { "op": "set_flag", "flag": "unha_sword" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_boss_ignis", "stage": "s1", "type": "boss", "name": "화산 협곡 — 화염군주 이그니스",
+    "content": { "text": "협곡 마을이 불타고 있다. 화염군주 이그니스가 돌아본다.", "enemies": ["ignis"] }
+  },
+  {
+    "id": "s1_battle_wolves_pair", "stage": "s1", "type": "battle", "name": "그림자늑대 두 마리", "weight": 3,
+    "content": { "text": "검은 불꽃이 일렁이는 늑대 두 마리가 길을 막는다.", "enemies": ["shadow_wolf", "shadow_wolf"] }
+  },
+  {
+    "id": "s1_battle_wolf_pack", "stage": "s1", "type": "battle", "name": "그림자늑대 무리", "weight": 2,
+    "conditions": { "floorRange": [3, 9] },
+    "content": { "text": "낮은 으르렁거림이 사방에서 들린다.", "enemies": ["shadow_wolf", "shadow_wolf", "shadow_wolf"],
+      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 왼편에서 가장 먼저 검을 뽑는다. (하운 방어 +6)", "effects": [ { "op": "block", "amount": 6, "target": "self" } ] } }
+  },
+  {
+    "id": "s1_battle_salamanders", "stage": "s1", "type": "battle", "name": "협곡 입구의 도롱뇽", "weight": 2,
+    "conditions": { "floorRange": [5, 9] },
+    "content": { "text": "바위 틈에서 불붙은 도롱뇽들이 기어 나온다. 협곡이 가깝다.", "enemies": ["fire_salamander", "fire_salamander"] }
+  },
+  {
+    "id": "s1_elite_alpha", "stage": "s1", "type": "elite", "name": "그림자늑대 우두머리", "weight": 1,
+    "content": { "text": "다른 늑대보다 한 배 반은 큰 우두머리가 무리를 이끈다.", "enemies": ["shadow_wolf_alpha", "shadow_wolf"] }
+  },
+  {
+    "id": "s1_event_light_motes", "stage": "s1", "type": "event", "name": "빛 알갱이의 숲", "weight": 2,
+    "content": {
+      "text": "반딧불 같은 빛 알갱이들이 보이지 않는 강물처럼 한 방향으로 흐른다.",
+      "choices": [
+        { "label": "손을 뻗어 흐름에 담근다", "result": "마나가 손끝으로 빨려 들어온다. (런 마나 +3)", "effects": [ { "op": "gain_run_mana", "amount": 3 } ] },
+        { "label": "흐름 곁에서 숨을 고른다", "result": "출전 동료 전원 체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_event_campfire", "stage": "s1", "type": "event", "name": "모닥불의 마나 수업", "weight": 3, "once": true,
+    "content": {
+      "text": "\"눈을 감아요. 그리고 숨을 쉬어요.\" 엘리아가 말했다. 그러나 하운이 숨 쉬는 방식은 엘리아가 가르쳐 준 것과 달랐다.",
+      "choices": [
+        { "label": "두 흐름을 맞물려 본다", "result": "물레방아를 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_waterwheel" } ] },
+        { "label": "왕 노인의 숨을 떠올린다", "result": "청운호흡을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_breath" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_event_border_rumor", "stage": "s1", "type": "event", "name": "국경 마을의 소문", "weight": 2,
+    "content": {
+      "text": "마왕 바르가스의 군세가 대륙의 삼분의 일을 삼켰다는 소문. 마을 사람들이 도움을 청한다.",
+      "choices": [
+        { "label": "마을의 일을 돕는다", "result": "고마움의 표시로 엘리아의 오래된 주문서를 받았다.", "effects": [ { "op": "gain_card", "card": "elia_mend" } ] },
+        { "label": "길을 서두른다", "result": "출전 동료 전원 체력 4 회복", "effects": [ { "op": "heal_party", "amount": 4 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_event_kyle_sword", "stage": "s1", "type": "event", "name": "카일의 검술", "weight": 2, "once": true,
+    "conditions": { "flag": "met_companions" },
+    "content": {
+      "text": "\"엘하임의 기사검술은 무겁고 곧아.\" 카일이 낡은 검 한 자루를 던져 준다. 도끼 대신 쥔 검은 낯설지만, 결은 똑같이 보였다.",
+      "choices": [
+        { "label": "검을 받는다", "result": "청운십팔식을 얻고, 장작 패기 하나를 덜어 냈다.", "effects": [ { "op": "gain_card", "card": "haun_cloud_form" }, { "op": "remove_card", "filter": { "pool": "starter", "owner": "haun" } } ] },
+        { "label": "도끼를 고집한다", "result": "장작 패기 1장을 강화했다.", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_rest_campfire", "stage": "s1", "type": "rest", "name": "모닥불", "weight": 1,
+    "content": {
+      "text": "모닥불 앞, 두 개의 달이 기운다.",
+      "choices": [
+        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
+        { "label": "수련한다", "result": "카드 1장을 강화했다.", "effects": [ { "op": "upgrade_card", "count": 1 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s1_inn_border", "stage": "s1", "type": "inn", "name": "국경 마을 여관", "weight": 1,
+    "content": {
+      "text": "작은 여관의 주인이 이방인의 옷차림을 흘끔거린다.",
+      "choices": [
+        { "label": "하룻밤 묵는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [ { "op": "heal_party", "ratio": 0.4 } ] },
+        { "label": "짐을 정리한다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } } ] }
+      ]
+    }
+  }
+]

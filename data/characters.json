@@ -1,0 +1,37 @@
+[
+  {
+    "id": "haun", "name": "진하운", "title": "청운문 잡역 제자", "role": "fighter", "maxHp": 60, "color": "#3a6ea5",
+    "sprites": { "idle": "haun_idle", "attack": "haun_attack", "hit": "haun_hit" },
+    "starterDeck": ["haun_chop", "haun_chop", "haun_chop", "haun_chop", "haun_step", "haun_step", "haun_step", "haun_read_grain"],
+    "joinsAt": "s0",
+    "description": "장작의 결을 읽던 눈으로 검의 길을 보는 주인공. 내공과 마나를 섞는 운하검을 쓴다."
+  },
+  {
+    "id": "elia", "name": "엘리아", "title": "하프엘프 마법사", "role": "fighter", "maxHp": 42, "color": "#9fb7d9",
+    "sprites": { "idle": "elia_idle", "attack": "elia_attack", "hit": "elia_hit" },
+    "starterDeck": ["elia_fireball", "elia_fireball", "elia_ice_wall", "elia_ice_wall", "elia_mana_gift"],
+    "joinsAt": "s1_story_companions",
+    "description": "하운에게 마나를 처음 가르친 동료. 화염과 얼음 방어막, 회복을 맡는다."
+  },
+  {
+    "id": "kyle", "name": "카일 로웬", "title": "몰락 가문의 기사", "role": "fighter", "maxHp": 52, "color": "#d9b44a",
+    "sprites": {},
+    "starterDeck": [],
+    "joinsAt": "s1_story_companions",
+    "description": "입이 가볍고 검은 무거운 기사. 전투가 시작되면 언제나 하운의 왼편에서 가장 먼저 검을 뽑는다. (1차 프로토타입: 카드 미구현)"
+  },
+  {
+    "id": "born", "name": "보른", "title": "드워프 도끼전사", "role": "fighter", "maxHp": 70, "color": "#8a5a3b",
+    "sprites": {},
+    "starterDeck": [],
+    "joinsAt": "s1_story_companions",
+    "description": "말수가 적은 일행의 방패. \"같이 가.\" (1차 프로토타입: 카드 미구현)"
+  },
+  {
+    "id": "wang", "name": "왕일검", "title": "청운문 전대 대사형", "role": "support", "maxHp": 1, "color": "#c9a46a",
+    "sprites": { "portrait": "wang_portrait" },
+    "starterDeck": [],
+    "joinsAt": "s3_story_reunion",
+    "description": "주방 노인으로 숨어 지내던 청운문의 진짜 검. 전투에 직접 나서지 않고 청운호흡의 박자로 일행을 돕는다."
+  }
+]

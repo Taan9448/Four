@@ -1,0 +1,346 @@
+// 전투 진행: 생성 → 플레이어 턴(카드 사용) → 턴 종료 → 적 턴 → 다음 턴.
+import type { GameData } from './data';
+import type { Effect, World } from './schema';
+import type { Rng } from './rng';
+import {
+  addStatus,
+  changeRift,
+  checkCondition,
+  dealDamage,
+  drawCards,
+  fireSupport,
+  hasSkipTurn,
+  loseHp,
+  newCard,
+  previewDamage,
+  runEffects,
+  setResult,
+} from './effects';
+import {
+  alive,
+  isFusion,
+  resolveCard,
+  type BattleState,
+  type CardInstance,
+  type Combatant,
+  type EnemyState,
+  type Intent,
+} from './state';
+
+export interface PartySlot {
+  id: string;
+  hp: number;
+  maxHp: number;
+}
+
+export interface BattleSetup {
+  world: World;
+  party: PartySlot[];
+  enemies: string[];
+  deck: CardInstance[];
+  /** 전투 시작 전 마나(무림·틈처럼 이월하는 세계에서 쓰임) */
+  mana: number;
+  rng: Rng;
+  /** 왕일검 지원 규칙 활성 여부 */
+  supportActive: boolean;
+  flags?: string[];
+  scar?: number;
+  /** 모듈 보너스 등 전투 시작 효과 */
+  startEffects?: Effect[];
+}
+
+export function createBattle(data: GameData, setup: BattleSetup): BattleState {
+  const bal = data.balance;
+  if (setup.party.length === 0 || setup.party.length > bal.party.max) {
+    throw new Error(`출전 인원은 1~${bal.party.max}명이어야 한다`);
+  }
+  if (!setup.party.some((p) => p.id === 'haun')) throw new Error('하운은 항상 출전한다');
+
+  const party: Combatant[] = setup.party.map((p, i) => {
+    const def = data.characters.get(p.id);
+    if (!def || def.role !== 'fighter') throw new Error(`출전할 수 없는 캐릭터: ${p.id}`);
+    return { uid: `p${i}`, defId: p.id, name: def.name, side: 'party', hp: p.hp, maxHp: p.maxHp, block: 0, statuses: {}, downed: p.hp <= 0 };
+  });
+  const enemies: EnemyState[] = setup.enemies.map((id, i) => {
+    const def = data.enemies.get(id);
+    if (!def) throw new Error(`알 수 없는 적: ${id}`);
+    const statuses: Record<string, number> = {};
+    for (const t of def.traits) statuses[t.status] = t.stacks;
+    return {
+      uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: def.maxHp, maxHp: def.maxHp, block: 0,
+      statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null,
+    };
+  });
+
+  const worldMana = bal.mana.worlds[setup.world];
+  const state: BattleState = {
+    data,
+    rng: setup.rng,
+    world: setup.world,
+    turn: 0,
+    neigong: 0,
+    mana: worldMana.battleStart === 'full' ? bal.mana.max : Math.min(bal.mana.max, setup.mana),
+    rift: 0,
+    party,
+    enemies,
+    draw: [],
+    hand: [],
+    discard: [],
+    exhaust: [],
+    events: [],
+    log: [],
+    result: null,
+    supportRules: setup.supportActive ? data.support : [],
+    supportUsed: [],
+    flags: setup.flags ?? [],
+    scar: setup.scar ?? 0,
+    uidCounter: 0,
+  };
+
+  // 출전 멤버의 카드만 덱에 들어간다(공용 카드는 항상)
+  const members = new Set(setup.party.map((p) => p.id));
+  const deck = setup.deck.filter((c) => {
+    const owner = data.cards.get(c.cardId)?.owner;
+    return owner === undefined || !data.characters.has(owner) || members.has(owner);
+  });
+  state.draw = state.rng.shuffle(deck.map((c) => ({ ...c })));
+  // 선천(innate) 카드는 맨 위로
+  state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
+
+  fireSupport(state, 'battleStart', {});
+  if (setup.startEffects?.length) {
+    runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });
+  }
+  startPlayerTurn(state);
+  return state;
+}
+
+function startPlayerTurn(state: BattleState): void {
+  const bal = state.data.balance;
+  state.turn += 1;
+  state.events.push({ type: 'turn', turn: state.turn });
+  state.neigong = bal.neigongPerTurn;
+  if (state.turn > 1) {
+    const per = bal.mana.worlds[state.world].perTurn;
+    state.mana = Math.max(0, Math.min(bal.mana.max, state.mana + per));
+  }
+  for (const p of state.party) p.block = 0;
+  applyTurnStartStatuses(state, state.party);
+  if (state.result) return;
+  drawCards(state, bal.handSize);
+  fireSupport(state, 'turnStart', {});
+  rollIntents(state);
+}
+
+function applyTurnStartStatuses(state: BattleState, list: Combatant[]): void {
+  for (const c of alive(list)) {
+    for (const [id, stacks] of Object.entries(c.statuses)) {
+      const per = state.data.statuses.get(id)?.modifiers.turnStartDamagePerStack;
+      if (per && stacks > 0) loseHp(state, c, per * stacks);
+    }
+  }
+}
+
+function decayStatuses(state: BattleState, list: Combatant[], when: 'ownTurnEnd' | 'roundEnd'): void {
+  for (const c of list) {
+    for (const [id, stacks] of Object.entries(c.statuses)) {
+      const def = state.data.statuses.get(id);
+      if (!def || def.decay === 0 || def.decayAt !== when) continue;
+      const next = stacks - def.decay;
+      if (next <= 0) delete c.statuses[id];
+      else c.statuses[id] = next;
+    }
+  }
+}
+
+// ───────────────────────── 적 의도 ─────────────────────────
+
+function pickTarget(state: BattleState, targeting: string): Combatant | null {
+  const pool = alive(state.party);
+  if (pool.length === 0) return null;
+  switch (targeting) {
+    case 'lowest_hp':
+      return [...pool].sort((a, b) => a.hp - b.hp)[0];
+    case 'highest_hp':
+      return [...pool].sort((a, b) => b.hp - a.hp)[0];
+    case 'haun':
+      return pool.find((p) => p.defId === 'haun') ?? pool[0];
+    default:
+      return state.rng.pick(pool);
+  }
+}
+
+function rollIntents(state: BattleState): void {
+  for (const enemy of alive(state.enemies)) {
+    const def = state.data.enemies.get(enemy.defId)!;
+    let move = def.moves[0];
+    if (def.pattern === 'cycle') {
+      move = def.moves[enemy.moveCursor % def.moves.length];
+      enemy.moveCursor += 1;
+    } else {
+      // 같은 행동을 세 번 연속 하지 않는다
+      const banned = enemy.lastMoves.length >= 2 && enemy.lastMoves[0] === enemy.lastMoves[1] ? enemy.lastMoves[0] : null;
+      const options = def.moves.filter((m) => m.id !== banned);
+      move = state.rng.weighted(options, (m) => m.weight) ?? def.moves[0];
+    }
+    enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
+    const targetsParty = move.effects.some(
+      (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
+    );
+    const target = targetsParty ? pickTarget(state, move.targeting) : null;
+    enemy.intent = { moveId: move.id, name: move.name, kind: move.intent, targetUid: target?.uid ?? null };
+  }
+}
+
+export interface IntentView {
+  intent: Intent;
+  /** 공격이면 1회 예상 피해와 횟수 */
+  damage?: { perHit: number; times: number; all: boolean };
+}
+
+export function describeIntent(state: BattleState, enemy: EnemyState): IntentView | null {
+  if (!enemy.intent) return null;
+  const def = state.data.enemies.get(enemy.defId)!;
+  const move = def.moves.find((m) => m.id === enemy.intent!.moveId)!;
+  const dmg = move.effects.find((e) => e.op === 'damage');
+  if (!dmg) return { intent: enemy.intent };
+  return {
+    intent: enemy.intent,
+    damage: { perHit: previewDamage(state, enemy, dmg.amount ?? 0), times: dmg.times ?? 1, all: dmg.target === 'all_enemies' },
+  };
+}
+
+// ───────────────────────── 카드 사용 ─────────────────────────
+
+export type PlayCheck = { ok: true } | { ok: false; reason: string };
+
+export function cardOwner(state: BattleState, inst: CardInstance): Combatant | undefined {
+  const owner = state.data.cards.get(inst.cardId)?.owner;
+  const member = state.party.find((p) => p.defId === owner);
+  if (member) return member;
+  // 공용 카드는 하운이 쓴다. 출전하지 않은 동료의 카드는 주인이 없다.
+  return owner && state.data.characters.has(owner) ? undefined : state.party.find((p) => p.defId === 'haun');
+}
+
+export function needsTarget(state: BattleState, inst: CardInstance): 'enemy' | 'ally' | null {
+  const t = resolveCard(state.data, inst).def.target;
+  return t === 'enemy' ? 'enemy' : t === 'ally' ? 'ally' : null;
+}
+
+export function canPlay(state: BattleState, handIndex: number): PlayCheck {
+  if (state.result) return { ok: false, reason: '전투가 끝났다' };
+  const inst = state.hand[handIndex];
+  if (!inst) return { ok: false, reason: '카드 없음' };
+  const card = resolveCard(state.data, inst);
+  if (card.keywords.includes('unplayable')) return { ok: false, reason: '사용할 수 없는 카드' };
+  const owner = cardOwner(state, inst);
+  if (!owner || owner.downed) return { ok: false, reason: '카드 주인이 쓰러졌다' };
+  if (hasSkipTurn(state, owner)) return { ok: false, reason: `${owner.name}이(가) 움직일 수 없다` };
+  if (state.neigong < card.cost.neigong) return { ok: false, reason: '내공 부족' };
+  if (state.mana < card.cost.mana) return { ok: false, reason: '마나 부족' };
+  return { ok: true };
+}
+
+export function playCard(state: BattleState, handIndex: number, targetUid?: string): PlayCheck {
+  const check = canPlay(state, handIndex);
+  if (!check.ok) return check;
+  const inst = state.hand[handIndex];
+  const card = resolveCard(state.data, inst);
+  const need = needsTarget(state, inst);
+  if (need === 'enemy' && !alive(state.enemies).some((e) => e.uid === targetUid)) {
+    return { ok: false, reason: '대상을 골라야 한다' };
+  }
+  if (need === 'ally' && !alive(state.party).some((p) => p.uid === targetUid)) {
+    return { ok: false, reason: '아군 대상을 골라야 한다' };
+  }
+  const owner = cardOwner(state, inst)!;
+  state.neigong -= card.cost.neigong;
+  state.mana -= card.cost.mana;
+  state.hand.splice(handIndex, 1);
+  state.events.push({ type: 'card', cardId: inst.cardId, sourceUid: owner.uid });
+  state.log.push(`${owner.name}: ${card.def.name}${isFusion(card) ? ' [융합]' : ''}`);
+  runEffects(state, card.effects, { source: owner, card, chosenUid: targetUid });
+  if (card.keywords.includes('exhaust')) state.exhaust.push(inst);
+  else state.discard.push(inst);
+  return { ok: true };
+}
+
+// ───────────────────────── 턴 종료와 적 턴 ─────────────────────────
+
+export function endTurn(state: BattleState): void {
+  if (state.result) return;
+  const bal = state.data.balance;
+  // 손패 정리(유지 카드 제외)
+  const keep: CardInstance[] = [];
+  for (const c of state.hand) {
+    if (resolveCard(state.data, c).keywords.includes('retain')) keep.push(c);
+    else state.discard.push(c);
+  }
+  state.hand = keep;
+  decayStatuses(state, state.party, 'ownTurnEnd');
+
+  // 균열: 세계별 감쇠 뒤, 임계치 이상이면 틈의 잔향
+  const decay = bal.rift.decay[state.world];
+  if (decay > 0 && state.rift > 0) changeRift(state, -decay);
+  if (state.rift >= bal.rift.echoThreshold) {
+    state.discard.push(newCard(state, bal.rift.echoCard));
+    state.events.push({ type: 'echo' });
+    state.log.push('틈의 잔향이 덱에 섞였다.');
+  }
+
+  enemyTurn(state);
+  if (state.result) return;
+  decayStatuses(state, state.enemies, 'ownTurnEnd');
+  decayStatuses(state, [...state.party, ...state.enemies], 'roundEnd');
+  startPlayerTurn(state);
+}
+
+function enemyTurn(state: BattleState): void {
+  for (const e of state.enemies) e.block = 0;
+  applyTurnStartStatuses(state, state.enemies);
+  for (const enemy of state.enemies) {
+    if (state.result) return;
+    if (enemy.downed || !enemy.intent) continue;
+    if (hasSkipTurn(state, enemy)) {
+      state.events.push({ type: 'skip', uid: enemy.uid });
+      state.log.push(`${enemy.name}은(는) 움직이지 못한다.`);
+      continue;
+    }
+    const def = state.data.enemies.get(enemy.defId)!;
+    const move = def.moves.find((m) => m.id === enemy.intent!.moveId)!;
+    // 도발한 동료가 있으면 그쪽으로, 원래 대상이 쓰러졌으면 다시 고른다
+    let targetUid = enemy.intent.targetUid ?? undefined;
+    const taunter = alive(state.party).find((p) => (p.statuses.taunt ?? 0) > 0);
+    if (targetUid && taunter) targetUid = taunter.uid;
+    if (targetUid && state.party.find((p) => p.uid === targetUid)?.downed) {
+      targetUid = pickTarget(state, move.targeting)?.uid;
+    }
+    state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
+    state.log.push(`${enemy.name}: ${move.name}`);
+    runEffects(state, move.effects, { source: enemy, chosenUid: targetUid });
+  }
+  if (!state.result && alive(state.party).length === 0) setResult(state, 'defeat');
+}
+
+// ───────────────────────── 결과 ─────────────────────────
+
+export interface BattleOutcome {
+  result: 'victory' | 'defeat';
+  party: { id: string; hp: number }[];
+  mana: number;
+  scarGain: number;
+}
+
+export function battleOutcome(state: BattleState): BattleOutcome | null {
+  if (!state.result) return null;
+  const bal = state.data.balance;
+  return {
+    result: state.result,
+    party: state.party.map((p) => ({ id: p.defId, hp: p.downed ? bal.party.reviveHp : p.hp })),
+    mana: state.mana,
+    scarGain: Math.floor(state.rift * bal.rift.scarRatio),
+  };
+}
+
+/** 테스트·디버그용: 엔진 내부 도우미를 다시 내보낸다 */
+export const _internal = { addStatus, dealDamage, changeRift, checkCondition, drawCards };

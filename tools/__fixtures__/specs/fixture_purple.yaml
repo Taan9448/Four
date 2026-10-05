@@ -1,0 +1,9 @@
+# 키 색 잔여 검사용: 캐릭터 색이 마젠타 계열(#6e006e)이라 잔여 픽셀로 잡혀야 한다.
+id: fixture_purple
+type: character-anim
+character: haun
+summary: 키 색 잔여 테스트
+reference: assets/source/fx_ref.png
+anim: idle
+frame_notes: { 1: a, 2: b, 3: c, 4: d }
+placeholder: { shape: humanoid, color: '#6e006e', accent: '#3fa9f5', weapon: false }

@@ -1,0 +1,18 @@
+id: haun_attack
+type: character-anim
+character: haun
+summary: 진하운 기본 베기 6프레임(장작을 패듯 내리치기)
+depends_on: [haun_ref]
+reference: assets/source/haun_ref.png
+facing: right
+events: { hit: 4 }
+# 3번 프레임에서 칼을 머리 위로 들어 바운딩 박스가 높아지므로 허용 편차를 완화한다(기본 20%)
+bbox_tolerance: 0.35
+frame_notes:
+  1: sword held low at right hip, knees bent, weight back
+  2: steps forward, sword rising behind the head
+  3: sword at peak overhead, body coiled
+  4: downward cut like splitting firewood, blade blurred with a thin blue streak
+  5: follow-through, sword tip near the ground
+  6: recovering to guard stance
+placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

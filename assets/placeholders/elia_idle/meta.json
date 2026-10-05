@@ -1,0 +1,21 @@
+{
+  "id": "elia_idle",
+  "type": "character-anim",
+  "frameW": 384,
+  "frameH": 512,
+  "frames": 4,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 4,
+  "sourceHash": "31072c467c0fc8d9",
+  "placeholder": true,
+  "resizedFrom": null
+}

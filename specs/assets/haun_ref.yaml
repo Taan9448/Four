@@ -1,0 +1,9 @@
+id: haun_ref
+type: character-ref
+character: haun
+summary: 진하운 기준 시트(3/4 정면 + 오른쪽 측면) — 화풍 시험을 겸함
+facing: right
+frame_notes:
+  1: full body, three-quarter front view, relaxed standing pose, sword sheathed at the left hip, hands wrapped in cloth strips
+  2: full body, side view facing right, same outfit and proportions, standing guard with the sword held low
+placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

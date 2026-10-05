@@ -1,0 +1,16 @@
+id: elia_attack
+type: character-anim
+character: elia
+summary: 엘리아 불덩이 시전 6프레임
+depends_on: [elia_ref]
+reference: assets/source/elia_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: draws the right hand back, motes of light streaming into the palm
+  2: a small flame forms in the palm
+  3: flame grows into a fireball, body leaning back
+  4: thrusts the hand forward, fireball released to the right
+  5: arm extended, sparks trailing
+  6: lowers the hand, returning to idle
+placeholder: { shape: humanoid, color: '#8fa7c9', accent: '#ff9a3c', weapon: false }

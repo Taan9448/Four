@@ -1,0 +1,23 @@
+{
+  "id": "fx_slash_blue",
+  "type": "fx",
+  "frameW": 256,
+  "frameH": 256,
+  "frames": 8,
+  "fps": 15,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 4
+  },
+  "blend": "lighter",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 8,
+  "sourceHash": "eb4479b1afe20380",
+  "placeholder": true,
+  "resizedFrom": null
+}

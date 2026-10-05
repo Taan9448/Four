@@ -1,0 +1,126 @@
+// `npm run data:check` — data/ 폴더의 스키마와 상호 참조를 검사한다.
+import { readdirSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { loadGameData } from '../src/engine/data';
+import { BATTLE_OPS, RUN_OPS, type Effect } from '../src/engine/schema';
+
+const data = loadGameData();
+const battleOps = new Set<string>(BATTLE_OPS);
+const runOps = new Set<string>(RUN_OPS);
+const specIds = new Set(
+  readdirSync(new URL('../specs/assets/', import.meta.url))
+    .filter((f) => f.endsWith('.yaml') && !f.startsWith('_'))
+    .map((f) => f.replace(/\.yaml$/, '')),
+);
+
+function checkEffects(label: string, effects: Effect[], allowed: Set<string>): string[] {
+  const errors: string[] = [];
+  for (const e of effects) {
+    if (!allowed.has(e.op)) errors.push(`${label}: 이 자리에서 쓸 수 없는 동작 ${e.op}`);
+    if (e.status && !data.statuses.has(e.status)) errors.push(`${label}: 알 수 없는 상태 ${e.status}`);
+    if (e.condition?.targetHasStatus && !data.statuses.has(e.condition.targetHasStatus)) {
+      errors.push(`${label}: 조건의 알 수 없는 상태 ${e.condition.targetHasStatus}`);
+    }
+    if (e.card && !data.cards.has(e.card)) errors.push(`${label}: 알 수 없는 카드 ${e.card}`);
+    if (e.member && !data.characters.has(e.member)) errors.push(`${label}: 알 수 없는 캐릭터 ${e.member}`);
+    if (e.op === 'apply_status' && !e.status) errors.push(`${label}: apply_status에 status 없음`);
+  }
+  return errors;
+}
+
+describe('데이터 검사', () => {
+  it('스키마를 통과한다(로드 성공)', () => {
+    expect(data.cards.size).toBeGreaterThan(0);
+  });
+
+  it('카드: 전투 동작만, 주인·상태·카드 참조가 유효하다', () => {
+    const errors: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.owner !== 'status' && c.owner !== 'common' && !data.characters.has(c.owner)) errors.push(`${c.id}: 알 수 없는 주인 ${c.owner}`);
+      errors.push(...checkEffects(c.id, c.effects, battleOps));
+      if (c.upgrade?.effects) errors.push(...checkEffects(`${c.id}+`, c.upgrade.effects, battleOps));
+      const fusion = c.keywords.includes('fusion');
+      const both = c.cost.neigong > 0 && c.cost.mana > 0;
+      if (fusion !== both) errors.push(`${c.id}: 융합 키워드와 비용(내공+마나)이 맞지 않는다`);
+      if (fusion && c.owner !== 'haun') errors.push(`${c.id}: 융합(내공+마나 동시 소모)은 하운 전용이다`);
+      if (fusion && !c.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) > 0)) errors.push(`${c.id}: 융합 카드는 균열을 올려야 한다`);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('캐릭터: 시작 덱 카드가 존재하고 주인이 맞다', () => {
+    const errors: string[] = [];
+    for (const ch of data.characters.values()) {
+      for (const id of ch.starterDeck) {
+        const card = data.cards.get(id);
+        if (!card) errors.push(`${ch.id}: 없는 카드 ${id}`);
+        else if (card.owner !== ch.id) errors.push(`${ch.id}: 남의 카드 ${id}`);
+      }
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('적: 행동 효과가 유효하다', () => {
+    const errors: string[] = [];
+    for (const en of data.enemies.values()) {
+      for (const m of en.moves) errors.push(...checkEffects(`${en.id}.${m.id}`, m.effects, battleOps));
+      for (const t of en.traits) if (!data.statuses.has(t.status)) errors.push(`${en.id}: 알 수 없는 특성 ${t.status}`);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('스테이지·모듈: 고정 노드와 보스, 적, 선택지가 유효하다', () => {
+    const errors: string[] = [];
+    for (const st of data.stages) {
+      if (st.playable && !st.boss) errors.push(`${st.id}: 플레이 가능한 스테이지에 보스가 없다`);
+      if (st.boss && data.modules.get(st.boss)?.type !== 'boss') errors.push(`${st.id}: 보스 모듈 ${st.boss}이(가) boss 유형이 아니다`);
+      for (const p of st.pinned) {
+        const m = data.modules.get(p.module);
+        if (!m) errors.push(`${st.id}: 없는 고정 모듈 ${p.module}`);
+        else if (m.stage !== st.id) errors.push(`${p.module}: 다른 스테이지 모듈`);
+        if (p.floor > st.floors) errors.push(`${p.module}: 층 범위 밖`);
+      }
+    }
+    for (const m of data.modules.values()) {
+      if (!data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
+      const battle = ['battle', 'elite', 'boss'].includes(m.type);
+      if (battle && !m.content.enemies?.length) errors.push(`${m.id}: 전투 모듈에 적이 없다`);
+      if (!battle && !m.content.choices?.length) errors.push(`${m.id}: 선택지가 없다`);
+      for (const id of m.content.enemies ?? []) if (!data.enemies.has(id)) errors.push(`${m.id}: 없는 적 ${id}`);
+      for (const [i, c] of (m.content.choices ?? []).entries()) errors.push(...checkEffects(`${m.id}#${i}`, c.effects, runOps));
+      if (m.content.bonus) errors.push(...checkEffects(`${m.id}.bonus`, m.content.bonus.effects, battleOps));
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('지원 규칙: 휴식 선택지는 런 동작, 나머지는 전투 동작만 쓴다', () => {
+    const errors: string[] = [];
+    for (const r of data.support) {
+      errors.push(...checkEffects(r.id, r.effects, r.trigger === 'restOption' ? runOps : battleOps));
+      if (!data.characters.has(r.source)) errors.push(`${r.id}: 알 수 없는 출처 ${r.source}`);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('스프라이트: 캐릭터·적이 참조하는 에셋은 명세가 있다', () => {
+    const missing: string[] = [];
+    for (const ch of data.characters.values()) {
+      for (const id of Object.values(ch.sprites)) if (id !== 'wang_portrait' && !specIds.has(id)) missing.push(`${ch.id}: ${id}`);
+    }
+    for (const en of data.enemies.values()) {
+      if (en.sprite && !specIds.has(`${en.sprite}_idle`)) missing.push(`${en.id}: ${en.sprite}_idle`);
+    }
+    for (const c of data.cards.values()) {
+      if (c.fx && !specIds.has(c.fx)) missing.push(`${c.id}: fx ${c.fx}`);
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it('balance: 세계별 마나·균열 규칙이 모든 세계에 정의돼 있다', () => {
+    for (const w of ['murim', 'elheim', 'nocturna', 'rift'] as const) {
+      expect(data.balance.mana.worlds[w]).toBeDefined();
+      expect(data.balance.rift.decay[w]).toBeDefined();
+    }
+    expect(data.cards.has(data.balance.rift.echoCard)).toBe(true);
+  });
+});

@@ -1,0 +1,271 @@
+// 런(한 번의 플레이) 상태: 파티 편성, 덱, 런 마나, 상흔, 플래그, 지도 진행.
+import type { GameData } from './data';
+import type { Effect, ModuleDef } from './schema';
+import { createRng } from './rng';
+import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
+import type { BattleOutcome, BattleSetup } from './battle';
+import type { CardInstance } from './state';
+
+export interface RosterEntry {
+  id: string;
+  hp: number;
+  maxHp: number;
+}
+
+export interface RunState {
+  seed: string;
+  stageId: string;
+  map: StageMap;
+  position: string | null;
+  visited: string[];
+  roster: RosterEntry[];
+  selected: string[];
+  deck: CardInstance[];
+  mana: number;
+  scar: number;
+  flags: string[];
+  usedModules: string[];
+  supportActive: boolean;
+  status: 'map' | 'complete' | 'defeat';
+  counter: number;
+}
+
+export interface RunOptions {
+  stageId?: string;
+  /** 왕일검 지원(원래 S3 합류). 프로토타입 디버그 토글용 */
+  supportActive?: boolean;
+}
+
+export function createRun(data: GameData, seed: string, opts: RunOptions = {}): RunState {
+  const stageId = opts.stageId ?? 's1';
+  const haun = data.characters.get('haun')!;
+  const run: RunState = {
+    seed,
+    stageId,
+    map: { stageId, floors: [] },
+    position: null,
+    visited: [],
+    roster: [{ id: 'haun', hp: haun.maxHp, maxHp: haun.maxHp }],
+    selected: ['haun'],
+    deck: [],
+    mana: data.balance.mana.max,
+    scar: 0,
+    flags: [],
+    usedModules: [],
+    supportActive: opts.supportActive ?? false,
+    status: 'map',
+    counter: 0,
+  };
+  for (const cardId of haun.starterDeck) addCard(run, cardId);
+  run.map = generateStageMap(data, stageId, createRng(seed).fork(`map:${stageId}`), {
+    scar: run.scar,
+    flags: run.flags,
+    roster: run.roster.map((r) => r.id),
+    usedModules: run.usedModules,
+  });
+  return run;
+}
+
+export function addCard(run: RunState, cardId: string, upgraded = false): CardInstance {
+  run.counter += 1;
+  const card = { uid: `c${run.counter}`, cardId, upgraded };
+  run.deck.push(card);
+  return card;
+}
+
+export function availableNodes(run: RunState): MapNode[] {
+  if (run.status !== 'map') return [];
+  if (!run.position) return run.map.floors[0];
+  const here = findNode(run.map, run.position)!;
+  return here.next.map((id) => findNode(run.map, id)!);
+}
+
+export interface Encounter {
+  node: MapNode;
+  module: ModuleDef;
+}
+
+export function enterNode(data: GameData, run: RunState, nodeId: string): Encounter {
+  const node = availableNodes(run).find((n) => n.id === nodeId);
+  if (!node) throw new Error(`지금 갈 수 없는 노드: ${nodeId}`);
+  const module = data.modules.get(node.moduleId)!;
+  run.position = node.id;
+  run.visited.push(node.id);
+  if (module.once && !run.usedModules.includes(module.id)) run.usedModules.push(module.id);
+  return { node, module };
+}
+
+export function isBattle(enc: Encounter): boolean {
+  return ['battle', 'elite', 'boss'].includes(enc.node.type);
+}
+
+export function stageWorld(data: GameData, run: RunState) {
+  return data.stages.find((s) => s.id === run.stageId)!.world;
+}
+
+export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): BattleSetup {
+  const bonus = enc.module.content.bonus;
+  const startEffects =
+    bonus && (!bonus.condition.partyHas || run.selected.includes(bonus.condition.partyHas)) ? bonus.effects : [];
+  return {
+    world: stageWorld(data, run),
+    party: run.selected.map((id) => {
+      const r = run.roster.find((x) => x.id === id)!;
+      return { id, hp: r.hp, maxHp: r.maxHp };
+    }),
+    enemies: enc.module.content.enemies ?? [],
+    deck: run.deck,
+    mana: run.mana,
+    rng: createRng(run.seed).fork(`battle:${run.stageId}:${enc.node.id}`),
+    supportActive: run.supportActive,
+    flags: run.flags,
+    scar: run.scar,
+    startEffects,
+  };
+}
+
+export function applyBattleOutcome(run: RunState, enc: Encounter, outcome: BattleOutcome): void {
+  for (const p of outcome.party) {
+    const r = run.roster.find((x) => x.id === p.id);
+    if (r) r.hp = Math.max(0, Math.min(r.maxHp, p.hp));
+  }
+  run.mana = outcome.mana;
+  run.scar += outcome.scarGain;
+  if (outcome.result === 'defeat') run.status = 'defeat';
+  else if (enc.node.type === 'boss') run.status = 'complete';
+}
+
+export function rewardOptions(data: GameData, run: RunState, nodeId: string): string[] {
+  const owners = new Set(run.selected);
+  const pool = [...data.cards.values()].filter(
+    (c) => c.pool === 'reward' && (owners.has(c.owner) || !data.characters.has(c.owner)),
+  );
+  const rng = createRng(run.seed).fork(`reward:${run.stageId}:${nodeId}`);
+  return rng.shuffle([...pool]).slice(0, data.balance.rewards.cardChoices).map((c) => c.id);
+}
+
+// ───────────────────────── 파티 편성 ─────────────────────────
+
+export function setParty(data: GameData, run: RunState, ids: string[]): void {
+  const unique = [...new Set(ids)];
+  if (!unique.includes('haun')) throw new Error('하운은 항상 출전한다');
+  if (unique.length > data.balance.party.max) throw new Error(`출전은 최대 ${data.balance.party.max}명`);
+  for (const id of unique) {
+    if (!run.roster.some((r) => r.id === id)) throw new Error(`합류하지 않은 동료: ${id}`);
+    if (data.characters.get(id)?.role !== 'fighter') throw new Error(`전투에 나설 수 없는 캐릭터: ${id}`);
+  }
+  run.selected = unique;
+}
+
+// ───────────────────────── 이벤트·휴식 선택지 ─────────────────────────
+
+export interface ChoiceView {
+  label: string;
+  effects: Effect[];
+  result?: string;
+  source: 'module' | 'support';
+}
+
+export function choicesFor(data: GameData, run: RunState, module: ModuleDef): ChoiceView[] {
+  const list: ChoiceView[] = (module.content.choices ?? [])
+    .filter((c) => !c.condition?.partyHas || run.selected.includes(c.condition.partyHas))
+    .filter((c) => !c.condition?.flag || run.flags.includes(c.condition.flag))
+    .map((c) => ({ label: c.label, effects: c.effects, result: c.result, source: 'module' as const }));
+  if (module.type === 'rest' && run.supportActive) {
+    for (const rule of data.support.filter((r) => r.trigger === 'restOption')) {
+      list.push({ label: `[왕일검] ${rule.name}`, effects: rule.effects, result: rule.description, source: 'support' });
+    }
+  }
+  return list;
+}
+
+export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number): string[] {
+  const choice = choicesFor(data, run, module)[index];
+  if (!choice) throw new Error('없는 선택지');
+  return applyRunOps(data, run, choice.effects);
+}
+
+function matchesFilter(data: GameData, card: CardInstance, filter: Effect['filter']): boolean {
+  const def = data.cards.get(card.cardId)!;
+  if (!filter) return true;
+  if (filter.pool !== undefined && def.pool !== filter.pool) return false;
+  if (filter.owner !== undefined && def.owner !== filter.owner) return false;
+  if (filter.costNeigongGte !== undefined && def.cost.neigong < filter.costNeigongGte) return false;
+  return true;
+}
+
+/** 런 단위 동작 해석. 결과 메시지 목록을 돌려준다. */
+export function applyRunOps(data: GameData, run: RunState, effects: Effect[]): string[] {
+  const out: string[] = [];
+  for (const e of effects) {
+    run.counter += 1;
+    const rng = createRng(run.seed).fork(`ops:${run.stageId}:${run.position}:${run.counter}`);
+    switch (e.op) {
+      case 'gain_card': {
+        const def = data.cards.get(e.card ?? '');
+        if (!def) throw new Error(`gain_card: 알 수 없는 카드 ${e.card}`);
+        for (let i = 0; i < (e.count ?? 1); i++) addCard(run, def.id);
+        out.push(`카드 획득: ${def.name}`);
+        break;
+      }
+      case 'remove_card': {
+        const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
+        if (pool.length) {
+          const c = rng.pick(pool);
+          run.deck = run.deck.filter((x) => x.uid !== c.uid);
+          out.push(`카드 제거: ${data.cards.get(c.cardId)!.name}`);
+        }
+        break;
+      }
+      case 'upgrade_card': {
+        const pool = run.deck.filter((c) => !c.upgraded && data.cards.get(c.cardId)!.upgrade && matchesFilter(data, c, e.filter));
+        for (const c of rng.shuffle([...pool]).slice(0, e.count ?? 1)) {
+          c.upgraded = true;
+          out.push(`카드 강화: ${data.cards.get(c.cardId)!.name}+`);
+        }
+        break;
+      }
+      case 'heal_party':
+        for (const r of run.roster.filter((x) => run.selected.includes(x.id))) {
+          const amount = e.ratio !== undefined ? Math.floor(r.maxHp * e.ratio) : (e.amount ?? 0);
+          r.hp = Math.min(r.maxHp, r.hp + amount);
+        }
+        out.push('출전 동료 회복');
+        break;
+      case 'gain_run_mana':
+        run.mana = Math.max(0, Math.min(data.balance.mana.max, run.mana + (e.amount ?? 0)));
+        out.push(`마나 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
+        break;
+      case 'scar':
+        run.scar = Math.max(0, run.scar + (e.amount ?? 0));
+        out.push(`상흔 ${e.amount}`);
+        break;
+      case 'set_flag':
+        if (e.flag && !run.flags.includes(e.flag)) run.flags.push(e.flag);
+        break;
+      case 'join_party': {
+        const def = data.characters.get(e.member ?? '');
+        if (!def) throw new Error(`join_party: 알 수 없는 캐릭터 ${e.member}`);
+        if (run.roster.some((r) => r.id === def.id)) break;
+        if (def.role === 'support') {
+          run.supportActive = true;
+          if (!run.flags.includes(`support:${def.id}`)) run.flags.push(`support:${def.id}`);
+        } else {
+          run.roster.push({ id: def.id, hp: def.maxHp, maxHp: def.maxHp });
+          for (const cardId of def.starterDeck) addCard(run, cardId);
+          if (run.selected.length < data.balance.party.max) run.selected.push(def.id);
+        }
+        out.push(`${def.name} 합류`);
+        break;
+      }
+      case 'leave_party':
+        run.roster = run.roster.filter((r) => r.id !== e.member);
+        run.selected = run.selected.filter((id) => id !== e.member);
+        out.push(`${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈`);
+        break;
+      default:
+        throw new Error(`전투 동작 "${e.op}"은 런 단위에서 쓸 수 없다`);
+    }
+  }
+  return out;
+}

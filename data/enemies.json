@@ -1,0 +1,58 @@
+[
+  {
+    "id": "shadow_wolf", "name": "그림자늑대", "maxHp": 22, "sprite": "wolf", "pattern": "random",
+    "moves": [
+      { "id": "bite", "name": "물어뜯기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 6 } ] },
+      { "id": "howl", "name": "검은 불꽃 울음", "intent": "buff", "weight": 1, "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 4, "target": "self" } ] }
+    ],
+    "flavor": "늑대를 닮았으나 몸집이 송아지만 했고, 등줄기를 따라 검은 불꽃이 일렁였다."
+  },
+  {
+    "id": "shadow_wolf_alpha", "name": "그림자늑대 우두머리", "maxHp": 52, "sprite": "wolf", "tint": "saturate(1.6) brightness(0.8)", "scale": 1.25, "tier": "elite", "pattern": "cycle",
+    "moves": [
+      { "id": "rend", "name": "찢기", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 5, "times": 2 } ] },
+      { "id": "pack_howl", "name": "무리의 울음", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies" } ] },
+      { "id": "black_flame", "name": "검은 불꽃", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 9 }, { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ]
+  },
+  {
+    "id": "fire_salamander", "name": "협곡 화염 도롱뇽", "maxHp": 18, "sprite": null, "tint": "hue-rotate(-20deg)", "pattern": "cycle",
+    "moves": [
+      { "id": "spit", "name": "불침", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 5 } ] },
+      { "id": "scorch", "name": "그을리기", "intent": "debuff", "targeting": "random", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }
+    ]
+  },
+  {
+    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": null, "scale": 1.5, "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "flame_wave", "name": "화염 파도", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
+      { "id": "magma_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 15 } ] },
+      { "id": "burning_aura", "name": "타오르는 기운", "intent": "buff", "effects": [ { "op": "block", "amount": 14, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" } ] }
+    ],
+    "flavor": "마왕의 사천왕 중 하나. 협곡 마을을 불태우고 있었다."
+  },
+  {
+    "id": "kwak_dojin", "name": "곽도진", "maxHp": 160, "sprite": null, "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "cloud_sword", "name": "청운십팔식 쾌검", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 6, "times": 3 } ] },
+      { "id": "unhae_master", "name": "운해귀종", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 22 } ] }
+    ],
+    "flavor": "S4 보스 자리. 1차 작업에서는 '도진아' 지원 규칙 테스트용으로만 쓴다."
+  },
+  {
+    "id": "mordecai", "name": "지옥왕 모르데카이", "maxHp": 200, "sprite": null, "tier": "boss", "pattern": "cycle",
+    "traits": [ { "status": "flow_eater", "stacks": 1 }, { "status": "knot", "stacks": 1 } ],
+    "moves": [
+      { "id": "stitched_arm", "name": "꿰맨 팔", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 12 } ] }
+    ],
+    "flavor": "S5 보스 자리. 1차 작업에서는 흐름 포식·매듭 테스트용으로만 쓴다."
+  },
+  {
+    "id": "shadow_wraith", "name": "그림자 망령", "maxHp": 30, "sprite": null, "pattern": "cycle",
+    "traits": [ { "status": "incorporeal", "stacks": 1 } ],
+    "moves": [
+      { "id": "wither", "name": "시들게 하기", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 7 } ] }
+    ],
+    "flavor": "S4~S5 틈 괴물. 1차 작업에서는 무형 테스트용으로만 쓴다."
+  }
+]
