@@ -152,6 +152,8 @@ export function normalizeSpec(raw) {
     loop: raw.loop ?? td.loop ?? fxDefaults.loop ?? ad.loop ?? false,
     events: raw.events ?? (type === 'fx' && frames ? { impact: Math.ceil(frames / 2) } : ad.events ?? {}),
     baseline: raw.baseline ?? 0.9,
+    /** 캐릭터: 시트 행마다 가장 낮은 줄을 기준선에 맞춘다(행마다 기준선이 어긋나는 모델 버릇 보정). 공중 동작이면 false */
+    row_align: raw.row_align ?? true,
     facing: raw.facing ?? 'right',
     bbox_tolerance: raw.bbox_tolerance !== undefined ? raw.bbox_tolerance : type === 'character-anim' ? ad.bbox ?? 0.2 : null,
     depends_on: raw.depends_on ?? [],
