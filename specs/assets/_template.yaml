@@ -2,7 +2,7 @@
 # 프레임 번호는 모든 파일에서 1부터 센다.
 id: example_attack            # 파일 이름과 같아야 한다
 type: character-anim          # character-anim | character-ref | fx | card-art | background | portrait
-size: small                   # small = 32×32 스프라이트(기본) | large = 64×64(보스·큰 이펙트)
+size: small                   # small = 64×64 스프라이트(기본) | large = 128×128(보스)
 character: example            # docs/ART_STYLE.md의 subjects 키
 summary: 한 줄 요약(이슈 제목에 쓰임)
 depends_on: [example_ref]     # 이 에셋보다 먼저 머지돼야 하는 에셋
@@ -11,7 +11,7 @@ reference: assets/source/example_ref.png   # 생성 때 첨부할 기준 시트
 # palette: master             # master(ART_STYLE.md 마스터 팔레트로 색 맞춤, 기본) | free
 # max_colors: 16              # 스프라이트 하나의 권장 최대 색 수
 chroma: magenta               # magenta | green | black | none (생략하면 type 기본값)
-frames: 6                     # 생략하면 애니메이션 기본값(idle 4, attack 6, skill 8, hit 3, death 6)
+frames: 6                     # 생략하면 애니메이션 기본값(idle 4, attack 6, skill 6, hit 3, death 6). 최대 6(3×2 격자)
 fps: 12
 loop: false
 facing: right                 # 아군 right, 적 left

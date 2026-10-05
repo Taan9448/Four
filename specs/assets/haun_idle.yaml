@@ -6,8 +6,8 @@ depends_on: [haun_ref]
 reference: assets/source/haun_ref.png
 facing: right
 frame_notes:
-  1: guard stance, sword held low in the right hand, knees slightly bent, inhaling
+  1: relaxed ready stance, axe held low in the right hand, knees slightly bent, inhaling
   2: same stance, chest slightly raised, short breath in
   3: same stance, chest at highest point, short breath held
-  4: same stance, long breath out, shoulders relaxed, one warm gold pixel at the lower belly
-placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }
+  4: same stance, long breath out, shoulders relaxed, hair and long outer robe settling, one warm gold pixel at the lower belly
+placeholder: { shape: humanoid, color: '#3d4459', accent: '#4fb4ff' }

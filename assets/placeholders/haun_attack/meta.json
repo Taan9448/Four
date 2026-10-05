@@ -1,9 +1,16 @@
 {
   "id": "haun_attack",
   "type": "character-anim",
-  "frameW": 32,
-  "frameH": 32,
+  "frameW": 64,
+  "frameH": 64,
+  "track": "pixel",
   "pixelScale": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
   "frames": 6,
   "fps": 12,
   "loop": false,
@@ -18,8 +25,12 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "5c5c39d84c874cd6",
+  "sourceHash": "9a47226fe211528c",
   "placeholder": true,
   "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
   "gridPurity": 1
 }

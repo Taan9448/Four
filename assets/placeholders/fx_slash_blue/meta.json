@@ -1,10 +1,17 @@
 {
   "id": "fx_slash_blue",
   "type": "fx",
-  "frameW": 32,
-  "frameH": 32,
+  "frameW": 64,
+  "frameH": 64,
+  "track": "pixel",
   "pixelScale": 8,
-  "frames": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
+  "frames": 6,
   "fps": 15,
   "loop": false,
   "anchor": [
@@ -12,14 +19,18 @@
     0.9
   ],
   "events": {
-    "impact": 4
+    "impact": 3
   },
   "blend": "normal",
   "facing": "right",
   "fallbackLevel": 1,
-  "virtualFrames": 8,
-  "sourceHash": "b54da2eebfb04050",
+  "virtualFrames": 6,
+  "sourceHash": "5dff57b1059f9ea8",
   "placeholder": true,
   "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
   "gridPurity": 1
 }

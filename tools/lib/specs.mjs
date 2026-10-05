@@ -8,16 +8,17 @@ export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
 /**
  * 시트 규격. docs/ASSET_PIPELINE.md 2절과 같아야 한다. 그림은 두 갈래(track)로 나뉜다.
- *  - pixel(전투): 이미지 모델이 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 칸마다 논리 해상도(logical)로 줄인다.
- *      small: 32×32 스프라이트(캐릭터·일반 적·이펙트), large: 64×64(보스·큰 이펙트)
+ *  - pixel(전투): 이미지 모델이 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 그림의 실제 블록 크기를
+ *      자동 감지해 논리 해상도(logical)로 줄인다. 모든 캐릭터 칸은 512px로 같게 해 모델이 그리는 해상도를 고르게 한다.
+ *      small: 64×64 스프라이트(캐릭터·일반 적·이펙트), large: 128×128(보스)
  *  - illustration(이야기): 선이 살아 있는 애니메이션 채색 일러스트 한 장. 픽셀화하지 않고 output 크기로만 줄인다.
  */
 const SHEETS = {
-  'anim-small': { canvas: [1024, 1024], grid: [4, 4], logical: [32, 32] }, // 칸 256 = 8배
-  'anim-large': { canvas: [1536, 1024], grid: [3, 2], logical: [64, 64] }, // 칸 512 = 8배
-  'ref-small': { canvas: [1024, 1024], grid: [2, 2], logical: [32, 32] }, // 칸 512 = 16배
-  'ref-large': { canvas: [1024, 1024], grid: [2, 2], logical: [64, 64] }, // 칸 512 = 8배
-  background: { canvas: [1536, 1024], grid: [1, 1], logical: [192, 128] }, // 8배(전투 배경은 픽셀)
+  'anim-small': { canvas: [1536, 1024], grid: [3, 2], logical: [64, 64] }, // 칸 512 = 8배, 최대 6프레임
+  'anim-large': { canvas: [1536, 1024], grid: [3, 2], logical: [128, 128] }, // 칸 512 = 4배
+  'ref-small': { canvas: [1024, 1024], grid: [2, 2], logical: [64, 64] }, // 칸 512 = 8배
+  'ref-large': { canvas: [1024, 1024], grid: [2, 2], logical: [128, 128] }, // 칸 512 = 4배
+  background: { canvas: [1536, 1024], grid: [1, 1], logical: [384, 256] }, // 4배(전투 배경은 픽셀)
 };
 
 /** 일러스트 유형: 캔버스와 게임에서 쓸 출력 크기 */
@@ -55,7 +56,7 @@ export function typeDefaults(type, size = 'small') {
 export const ANIM_DEFAULTS = {
   idle: { frames: 4, fps: 6, loop: true, events: {}, bbox: 0.08 },
   attack: { frames: 6, fps: 12, loop: false, events: { hit: 4 }, bbox: 0.2 },
-  skill: { frames: 8, fps: 12, loop: false, events: { cast: 5 }, bbox: 0.25 },
+  skill: { frames: 6, fps: 12, loop: false, events: { cast: 4 }, bbox: 0.25 },
   hit: { frames: 3, fps: 12, loop: false, events: {}, bbox: 0.15 },
   death: { frames: 6, fps: 10, loop: false, events: {}, bbox: null },
 };
@@ -67,7 +68,7 @@ export const CHROMA = {
   none: null,
 };
 
-/** 칸 안쪽 여백 비율(32px 기준 약 2.5px) */
+/** 칸 안쪽 여백 비율(64px 기준 약 5px) */
 export const PADDING = 0.08;
 
 /** 하위 호환·문서용: 유형별 기본 규격(small) */

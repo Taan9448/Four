@@ -38,44 +38,63 @@ describe('자르기 → 검증', () => {
     expect(existsSync(join(p.sprites('fixture_attack'), '_contact.png'))).toBe(true);
     expect(existsSync(join(p.sprites('fixture_attack'), '_preview.gif'))).toBe(true);
     const meta = JSON.parse(readFileSync(join(p.sprites('fixture_attack'), 'meta.json'), 'utf8'));
-    expect(meta).toMatchObject({ frameW: 32, frameH: 32, pixelScale: 8, frames: 6, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
+    expect(meta).toMatchObject({ frameW: 64, frameH: 64, pixelScale: 8, nativeSize: [64, 64], frames: 5, fps: 12, loop: false, events: { hit: 4 }, anchor: [0.5, 0.9], fallbackLevel: 1 });
     expect(meta.gridPurity).toBeGreaterThan(0.95);
   });
 
   it('프레임 수가 모자란 시트는 실패한다', async () => {
-    await prepare('fixture_attack', { skipCells: [5, 6] });
+    await prepare('fixture_attack', { skipCells: [4, 5] });
     const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect(r.errors).toContain('4번 칸이 비어 있다(프레임 수 부족)');
     expect(r.errors).toContain('5번 칸이 비어 있다(프레임 수 부족)');
-    expect(r.errors).toContain('6번 칸이 비어 있다(프레임 수 부족)');
   });
 
   it('빈 칸이어야 할 곳에 그림이 있으면 실패한다', async () => {
-    await prepare('fixture_attack', { extraCells: [7] });
+    await prepare('fixture_attack', { extraCells: [6] });
     const r = await validateAsset('fixture_attack', { root, previews: false });
-    expect(r.errors).toContain('7번 칸에 그림이 있다(빈 칸이어야 함)');
+    expect(r.errors).toContain('6번 칸에 그림이 있다(빈 칸이어야 함)');
   });
 
   it('비율이 다른 시트는 자르지도, 통과하지도 못한다(왜곡 리사이즈 금지)', async () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
-    const square = await sharp(await renderSheet(spec)).resize(1536, 1024, { fit: 'fill' }).png().toBuffer();
+    const square = await sharp(await renderSheet(spec)).resize(1024, 1024, { fit: 'fill' }).png().toBuffer();
     writeFileSync(p.source('fixture_attack'), square);
     await expect(sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') })).rejects.toThrow(/비율/);
     const r = await validateSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack'), root, previews: false });
     expect(r.errors.some((e) => e.includes('비율'))).toBe(true);
   });
 
-  it('비율이 같으면 규정 크기로 리사이즈해 통과(경고만)', async () => {
+  it('크기가 정수배가 아니어도(예: 1254px처럼) 블록 크기를 감지해 원본 그대로 자른다', async () => {
+    // PR #10 상황 재현: 모델이 규정과 다른 크기로 그리면 블록이 8px이 아닌 소수 크기가 된다
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
-    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).resize(768, 768, { kernel: 'nearest' }).png().toBuffer());
+    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).resize(1881, 1254, { kernel: 'nearest' }).png().toBuffer());
     const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
-    expect(meta.resizedFrom).toEqual([768, 768]);
+    expect(meta.sourceSize).toEqual([1881, 1254]);
+    expect(meta.resizedFrom).toBeNull();
+    expect(meta.pixelScale).toBeCloseTo(8 * (1881 / 1536), 0);
+    expect(meta.frameW).toBe(64);
+    expect(meta.gridPurity).toBeGreaterThan(0.85);
     const r = await validateAsset('fixture_attack', { root, previews: false });
     expect(r.errors).toEqual([]);
-    expect(r.warnings.some((w) => w.includes('리사이즈'))).toBe(true);
+    expect(r.warnings.some((w) => w.includes('블록 크기를 감지'))).toBe(true);
+  });
+
+  it('모델이 더 굵은 블록(낮은 해상도)으로 그려도 원래 해상도 그대로 64 프레임에 담는다', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    // 64px 대신 48px 해상도(블록 약 10.7px)로 그린 시트를 흉내: 칸당 48px로 줄였다가 최근접으로 다시 키운다
+    const small = await sharp(await renderSheet(spec)).resize(144, 96, { kernel: 'nearest' }).png().toBuffer();
+    writeFileSync(p.source('fixture_attack'), await sharp(small).resize(1536, 1024, { kernel: 'nearest' }).png().toBuffer());
+    const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    expect(meta.nativeSize[0]).toBeGreaterThanOrEqual(46);
+    expect(meta.nativeSize[0]).toBeLessThanOrEqual(50);
+    expect(meta.fit).toBe('pad');
+    expect(meta.frameW).toBe(64);
   });
 
   it('meta.json이 명세와 다르면 실패한다', async () => {
@@ -98,10 +117,20 @@ describe('자르기 → 검증', () => {
     expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
   });
 
-  it('프레임은 논리 해상도(32×32)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
+  it('대체 단계 3(파츠)에서도 격자 일치도를 검사한다(PR #10에서 발견된 누락)', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).blur(6).png().toBuffer());
+    await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack'), fallback: 3 });
+    const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
+  });
+
+  it('프레임은 논리 해상도(64×64)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
     const { p } = await prepare('fixture_attack');
     const frame = join(p.sprites('fixture_attack'), 'frame_01.png');
-    expect(await sharp(frame).metadata()).toMatchObject({ width: 32, height: 32 });
+    expect(await sharp(frame).metadata()).toMatchObject({ width: 64, height: 64 });
     const { data, info } = await sharp(frame).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] > 128) {
@@ -115,9 +144,9 @@ describe('자르기 → 검증', () => {
   });
 
   it('대체 단계 2: 키 포즈 3장만 있으면 통과하고 meta에 기록된다', async () => {
-    const { p } = await prepare('fixture_attack', { skipCells: [4, 5, 6] }, 2);
+    const { p } = await prepare('fixture_attack', { skipCells: [4, 5] }, 2);
     const meta = JSON.parse(readFileSync(join(p.sprites('fixture_attack'), 'meta.json'), 'utf8'));
-    expect(meta).toMatchObject({ frames: 3, fallbackLevel: 2, virtualFrames: 6 });
+    expect(meta).toMatchObject({ frames: 3, fallbackLevel: 2, virtualFrames: 5 });
     const r = await validateAsset('fixture_attack', { root, previews: false });
     expect(r.errors).toEqual([]);
   });
@@ -165,12 +194,13 @@ describe('저장소의 실제 명세와 임시 시트', () => {
 
   it('완성 프롬프트에 캔버스·격자·프레임 메모·빈 칸·키 색이 들어간다', () => {
     const text = promptFor('haun_attack');
-    expect(text).toContain('Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.');
-    expect(text).toContain('32x32 pixel-art sprite scaled up exactly 8x');
+    expect(text).toContain('Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.');
+    expect(text).toContain('64x64 pixel-art sprite scaled up exactly 8x');
+    expect(text).toContain('SAME size on ONE straight grid');
+    expect(text).toContain('axe');
     expect(text).toContain('#1d2433');
-    expect(text).toContain('Cell 4: downward cut');
-    expect(text).toContain('Cells 7 to 16 are completely empty magenta.');
-    expect(text).toContain('#FF00FF');
+    expect(text).toContain('Cell 4: downward chop');
+        expect(text).toContain('#FF00FF');
     expect(text).toContain('Match the attached reference sheet');
     const fx = promptFor('fx_slash_blue');
     expect(fx).toContain('#000000');

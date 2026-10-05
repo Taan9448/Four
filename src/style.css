@@ -15,8 +15,8 @@
   --danger: #ff6b6b;
   --paper: #efe7d6;
   --paper-ink: #2a2620;
-  /* 32px 스프라이트를 5배로(정수배여야 픽셀이 고르게 보인다) */
-  --unit-h: 160px;
+  /* 64px 스프라이트를 3배로(정수배여야 픽셀이 고르게 보인다) */
+  --unit-h: 192px;
   font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Apple SD Gothic Neo', serif;
 }
 
@@ -206,5 +206,5 @@ button { font: inherit; }
 .preview { display: grid; grid-template-columns: 240px 1fr; gap: 16px; }
 .preview select { width: 100%; }
 .preview-stage { background: repeating-conic-gradient(#2a2e38 0 25%, #222630 0 50%) 0 0 / 24px 24px; border-radius: 12px; display: grid; place-items: center; min-height: 420px; }
-.preview-stage canvas { width: 320px; height: 320px; image-rendering: pixelated; }
+.preview-stage canvas { width: 384px; height: 384px; image-rendering: pixelated; }
 .preview-meta { font-family: ui-monospace, monospace; font-size: 0.8rem; white-space: pre-wrap; color: var(--ink-dim); }

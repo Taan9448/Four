@@ -1,10 +1,12 @@
 # 검증기 테스트용 명세(tests/tools.test.ts). 실제 게임 에셋이 아니다.
+# 5프레임이라 3×2 격자의 6번 칸은 비어 있어야 한다(빈 칸 침범 테스트용).
 id: fixture_attack
 type: character-anim
 character: haun
-summary: 검증기 테스트용 사람형 공격 6프레임
+summary: 검증기 테스트용 사람형 공격 5프레임
 reference: assets/source/fx_ref.png
 facing: right
+frames: 5
 events: { hit: 4 }
 frame_notes:
   1: one
@@ -12,5 +14,4 @@ frame_notes:
   3: three
   4: four
   5: five
-  6: six
 placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

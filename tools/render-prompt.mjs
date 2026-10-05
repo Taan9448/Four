@@ -3,14 +3,14 @@
 // 사용: npm run assets:prompt -- <id> [--out file]
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { CHROMA, loadSpec, ROOT } from './lib/specs.mjs';
+import { CHROMA, loadSpec, PADDING, ROOT } from './lib/specs.mjs';
 import { loadStyleData } from './lib/style.mjs';
 
 export { loadStyleData as loadPromptData };
 
-const RULES =
+const rulesFor = (spec) =>
   'Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.\n' +
-  'Nothing crosses a cell boundary; keep at least 2 sprite pixels of empty space inside every cell edge.';
+  `Nothing crosses a cell boundary; keep at least ${Math.max(2, Math.floor(spec.logical[1] * PADDING))} sprite pixels of empty space inside every cell edge.`;
 
 function pixelGrid(spec, what) {
   const [lw, lh] = spec.logical;
@@ -18,7 +18,8 @@ function pixelGrid(spec, what) {
   return (
     `PIXEL GRID: ${what} is a ${lw}x${lh} pixel-art sprite scaled up exactly ${s}x. ` +
     `Draw ONLY with solid square blocks of exactly ${s}x${s} px aligned to a ${s} px grid that starts at the cell's top-left corner. ` +
-    `No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block.\n`
+    `No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. ` +
+    `Every block in the whole image must be the SAME size on ONE straight grid.\n`
   );
 }
 
@@ -59,7 +60,7 @@ export function renderPrompt(spec, style) {
         `Style: ${style.sprite_style}.\n` +
         paletteLine(spec, style) +
         `Never use ${key.name} or similar hues on the character.\n` +
-        `Frames:\n${frameLines}\n${empty}${RULES}`
+        `Frames:\n${frameLines}\n${empty}${rulesFor(spec)}`
       );
     case 'character-ref':
       return (
@@ -74,7 +75,7 @@ export function renderPrompt(spec, style) {
         `Never use ${key.name} or similar hues on the character.\n` +
         `Cell 1: ${notes(1) || 'full body, three-quarter front view, neutral standing pose'}\n` +
         `Cell 2: ${notes(2) || `full body, side view facing ${spec.facing}, same pose`}\n` +
-        `${empty}${RULES}`
+        `${empty}${rulesFor(spec)}`
       );
     case 'fx':
       return (
@@ -84,7 +85,7 @@ export function renderPrompt(spec, style) {
         `Subject: a glowing visual effect only; no character, no ground, no background elements.\n` +
         `Style: ${style.fx_style ?? style.sprite_style}.\n` +
         paletteLine(spec, style) +
-        `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are completely black.\n` : ''}${RULES}`
+        `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are completely black.\n` : ''}${rulesFor(spec)}`
       );
     case 'background':
       return (

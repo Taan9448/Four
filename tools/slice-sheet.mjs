@@ -8,7 +8,8 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { bbox, cellRect, extract, fileHash, isContentFn, keyOut, pixelize, prepareSheet, toPng } from './lib/image.mjs';
+import { cellRect, extract, fileHash, keyOut, prepareSheet, toPng } from './lib/image.mjs';
+import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
 import sharp from 'sharp';
@@ -26,33 +27,36 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
   for (const f of readdirSync(outDir)) if (/^frame_\d+\.png$/.test(f)) rmSync(join(outDir, f));
 
   const cells = spec.grid[0] * spec.grid[1];
+  const illustration = spec.track === 'illustration';
+  const keyedSheet = illustration ? null : keyOut(sheet.raw, spec);
   let frameCells;
   if (fallback === 2) frameCells = [1, 2, 3];
   else if (fallback === 3) {
-    const isContent = isContentFn(spec);
     frameCells = [];
-    for (let n = 1; n <= cells; n++) {
-      if (bbox(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), isContent)) frameCells.push(n);
-    }
+    for (let n = 1; n <= cells; n++) if (cellHasContent(keyedSheet, spec, n)) frameCells.push(n);
   } else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
 
-  const illustration = spec.track === 'illustration';
-  const palette = illustration ? null : paletteFor(spec, styleRoot);
-  let puritySum = 0;
-  for (const [i, n] of frameCells.entries()) {
-    const file = join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`);
-    const cell = keyOut(extract(sheet.raw, cellRect(spec, n)), spec);
-    if (illustration) {
+  const fileOf = (i) => join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`);
+  let grid = null, puritySum = 0, natives = [], fits = new Set();
+  if (illustration) {
+    for (const [i, n] of frameCells.entries()) {
       // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
+      const cell = extract(sheet.raw, cellRect(spec, n, sheet.raw));
       await sharp(cell.data, { raw: { width: cell.width, height: cell.height, channels: 4 } })
         .resize(spec.logical[0], spec.logical[1], { fit: 'fill', kernel: 'lanczos3' })
         .png()
-        .toFile(file);
-      continue;
+        .toFile(fileOf(i));
     }
-    const { img, purity } = pixelize(cell, spec, palette);
-    puritySum += purity;
-    writeFileSync(file, await toPng(img));
+  } else {
+    // 픽셀: 실제 블록 크기를 감지해 칸마다 샘플링하고 목표 프레임(spec.logical)에 맞춘다
+    const result = processPixelSheet(sheet.raw, spec, paletteFor(spec, styleRoot), frameCells);
+    grid = result.grid;
+    for (const [i, f] of result.frames.entries()) {
+      puritySum += f.purity;
+      natives.push(f.native);
+      fits.add(f.fit);
+      writeFileSync(fileOf(i), await toPng(f.img));
+    }
   }
 
   const meta = {
@@ -60,9 +64,13 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     type: spec.type,
     frameW: spec.logical[0],
     frameH: spec.logical[1],
-    /** 시트에서 논리 픽셀 1개의 크기 */
     track: spec.track,
-    pixelScale: illustration ? null : spec.pixel_scale,
+    /** 감지한 블록 크기(원본 px) — 규정은 pixelScale이지만 모델이 그린 실제 크기를 쓴다 */
+    pixelScale: illustration ? null : Number(grid.block.toFixed(3)),
+    gridDetected: illustration ? null : grid.detected,
+    /** 모델이 그린 원래 해상도(칸당 논리 픽셀)와 목표 프레임에 맞춘 방법 */
+    nativeSize: illustration ? null : natives[0] ?? null,
+    fit: illustration ? null : [...fits].join(','),
     frames: frameCells.length,
     fps: spec.fps,
     loop: spec.loop,
@@ -76,6 +84,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     sourceHash: fileHash(src),
     placeholder,
     resizedFrom: sheet.resized ? sheet.original : null,
+    sourceSize: sheet.original,
     /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
     gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
   };
@@ -102,7 +111,8 @@ async function main() {
   const fallback = fi >= 0 ? Number(args[fi + 1]) : 1;
   if (![1, 2, 3].includes(fallback)) throw new Error('--fallback은 2 또는 3');
   const meta = await sliceAsset(id, { fallback, placeholder: args.includes('--placeholder') });
-  console.log(`✔ ${id}: 프레임 ${meta.frames}장 → ${meta.placeholder ? 'assets/placeholders' : 'assets/sprites'}/${id}/ (대체 단계 ${meta.fallbackLevel}${meta.resizedFrom ? `, ${meta.resizedFrom.join('×')}에서 리사이즈` : ''})`);
+  const pixelInfo = meta.track === 'pixel' ? `, 블록 ${meta.pixelScale}px · 원래 해상도 ${meta.nativeSize?.join('×')} → ${meta.frameW}×${meta.frameH}(${meta.fit}) · 격자 일치도 ${Math.round(meta.gridPurity * 100)}%` : '';
+  console.log(`✔ ${id}: 프레임 ${meta.frames}장 → ${meta.placeholder ? 'assets/placeholders' : 'assets/sprites'}/${id}/ (대체 단계 ${meta.fallbackLevel}${pixelInfo})`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

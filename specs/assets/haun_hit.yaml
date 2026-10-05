@@ -7,6 +7,6 @@ reference: assets/source/haun_ref.png
 facing: right
 frame_notes:
   1: struck in the chest, upper body snapping backward, eyes shut
-  2: staggering back one step, sword arm flung out
-  3: regaining footing, leaning slightly back, sword raised defensively
-placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }
+  2: staggering back one step, axe arm flung out, long hair whipping
+  3: regaining footing, leaning slightly back, axe raised defensively
+placeholder: { shape: humanoid, color: '#3d4459', accent: '#4fb4ff' }

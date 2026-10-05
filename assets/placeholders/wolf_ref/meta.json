@@ -1,9 +1,16 @@
 {
   "id": "wolf_ref",
   "type": "character-ref",
-  "frameW": 32,
-  "frameH": 32,
-  "pixelScale": 16,
+  "frameW": 64,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
   "frames": 2,
   "fps": 1,
   "loop": false,
@@ -16,8 +23,12 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "309dcb8d9c75a5ec",
+  "sourceHash": "daf367f33605b969",
   "placeholder": true,
   "resizedFrom": null,
+  "sourceSize": [
+    1024,
+    1024
+  ],
   "gridPurity": 1
 }

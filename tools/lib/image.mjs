@@ -27,16 +27,21 @@ export async function prepareSheet(path, spec) {
     return { raw: null, resized: false, original, error: `시트 비율 ${meta.width}×${meta.height}이(가) 규정 ${cw}×${ch}와 다르다(왜곡 리사이즈 금지)` };
   }
   if (meta.width === cw && meta.height === ch) return { raw: await loadRaw(path), resized: false, original };
+  // 픽셀 갈래: 정수배가 아닌 리사이즈는 픽셀 격자를 망가뜨리므로 원본 그대로 쓴다(블록 크기는 자동 감지)
+  if (spec.track === 'pixel') return { raw: await loadRaw(path), resized: false, offSize: true, original };
   const buf = await sharp(path).resize(cw, ch, { fit: 'fill', kernel: 'lanczos3' }).png().toBuffer();
   return { raw: await loadRaw(buf), resized: true, original };
 }
 
-/** 칸 번호(1부터)의 좌표 */
-export function cellRect(spec, n) {
-  const [cols] = spec.grid;
-  const [w, h] = spec.cell;
+/** 칸 번호(1부터)의 좌표. raw를 주면 실제 이미지 크기에 비례해 계산한다 */
+export function cellRect(spec, n, raw) {
+  const [cols, rows] = spec.grid;
+  const w = (raw ? raw.width : spec.canvas[0]) / cols;
+  const h = (raw ? raw.height : spec.canvas[1]) / rows;
   const i = n - 1;
-  return { x: (i % cols) * w, y: Math.floor(i / cols) * h, w, h };
+  const x = Math.round((i % cols) * w);
+  const y = Math.round(Math.floor(i / cols) * h);
+  return { x, y, w: Math.round(((i % cols) + 1) * w) - x, h: Math.round((Math.floor(i / cols) + 1) * h) - y };
 }
 
 export function extract(raw, { x, y, w, h }) {
