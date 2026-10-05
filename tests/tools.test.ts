@@ -30,6 +30,23 @@ async function prepare(id: string, opts: { skipCells?: number[]; extraCells?: nu
   return { spec, p };
 }
 
+/** 8px 블록으로 그린 사각 인물(외곽선 + 채움) 5칸 시트. top·rows는 칸 안 블록 줄 */
+async function blockFigureSheet(top: number, rows: number) {
+  const W = 1536, H = 1024, B = 8, cols = 3;
+  const buf = Buffer.alloc(W * H * 4);
+  const put = (x: number, y: number, [r, g, b]: number[]) => { const i = (y * W + x) * 4; buf[i] = r; buf[i + 1] = g; buf[i + 2] = b; buf[i + 3] = 255; };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) put(x, y, [255, 0, 255]);
+  for (let n = 0; n < 5; n++) {
+    const cx = (n % cols) * 512, cy = Math.floor(n / cols) * 512;
+    for (let by = top; by < top + rows; by++) for (let bx = 26; bx < 38; bx++) {
+      const edge = by === top || by === top + rows - 1 || bx === 26 || bx === 37;
+      const c = edge ? [0x1d, 0x24, 0x33] : [0x3d, 0x44, 0x59];
+      for (let y = 0; y < B; y++) for (let x = 0; x < B; x++) put(cx + bx * B + x, cy + by * B + y, c);
+    }
+  }
+  return sharp(buf, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer();
+}
+
 describe('자르기 → 검증', () => {
   it('규격대로 그린 시트는 통과하고, 콘택트 시트와 미리보기 GIF를 남긴다', async () => {
     const { p } = await prepare('fixture_attack');
@@ -95,6 +112,34 @@ describe('자르기 → 검증', () => {
     expect(meta.nativeSize[0]).toBeLessThanOrEqual(50);
     expect(meta.fit).toBe('pad');
     expect(meta.frameW).toBe(64);
+  });
+
+  it('인물이 칸을 꽉 채워도 경계에 닿지 않게 시트 전체를 같은 비율로 줄인다(PR #10)', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('fixture_attack'), await blockFigureSheet(0, 64));
+    const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    expect(meta.fit).toBe('downscale');
+    const r = await validateAsset('fixture_attack', { root, previews: false });
+    expect(r.errors).toEqual([]);
+    expect(r.warnings.some((w) => w.includes('시트 전체를 줄였다'))).toBe(true);
+  });
+
+  it('캐릭터는 칸 안 어디에 그렸든 발(가장 낮은 줄)을 기준선 줄 58에 맞춘다', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('fixture_attack'), await blockFigureSheet(2, 40));
+    const meta = await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    expect(meta.fit).toBe('pad');
+    const { data, info } = await sharp(join(p.sprites('fixture_attack'), 'frame_01.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let minY = Infinity, maxY = -1;
+    for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
+      if (data[(y * info.width + x) * 4 + 3] > 0) { minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+    }
+    expect(maxY + 1).toBe(58);
+    expect(maxY - minY + 1).toBe(40);
   });
 
   it('meta.json이 명세와 다르면 실패한다', async () => {
