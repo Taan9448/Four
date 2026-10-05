@@ -1,67 +1,71 @@
 [
   {
-    "id": "haun_chop", "name": "장작 패기", "owner": "haun", "type": "attack", "rarity": "starter", "pool": "starter",
+    "id": "haun_chop", "name": "장작 패기", "owner": "haun", "type": "attack", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 6 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 9 } ] },
     "flavor": "탁. 탁. 탁. 청운산의 새벽은 늘 도끼 소리로 시작했다."
   },
   {
-    "id": "haun_step", "name": "발 디딤", "owner": "haun", "type": "skill", "rarity": "starter", "pool": "starter",
+    "id": "haun_step", "name": "발 디딤", "owner": "haun", "type": "skill", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "self",
     "effects": [ { "op": "block", "amount": 5 } ],
     "upgrade": { "effects": [ { "op": "block", "amount": 8 } ] },
     "flavor": "구령에 맞춰 발 디딤을 바꾸었다. 오 년 동안 하루도 빠짐없이."
   },
   {
-    "id": "haun_read_grain", "name": "결 읽기", "owner": "haun", "type": "skill", "rarity": "starter", "pool": "starter",
+    "id": "haun_read_grain", "name": "결 읽기", "owner": "haun", "type": "skill", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "reveal_grain", "stacks": 2 }, { "op": "draw", "amount": 1 } ],
     "upgrade": { "effects": [ { "op": "reveal_grain", "stacks": 3 }, { "op": "draw", "amount": 1 } ] },
     "flavor": "결을 따라 기운이 흐르는 길이 보였고, 그 길에 날을 얹으면 나무는 스스로 몸을 열었다."
   },
   {
-    "id": "haun_breath", "name": "청운호흡", "owner": "haun", "type": "skill", "rarity": "common", "pool": "reward",
+    "id": "haun_breath", "name": "청운호흡", "owner": "haun", "type": "skill", "rarity": "uncommon", "pool": "reward",
     "cost": { "neigong": 0, "mana": 0 }, "target": "self", "keywords": ["exhaust"],
     "effects": [ { "op": "gain_neigong", "amount": 2 } ],
     "upgrade": { "effects": [ { "op": "gain_neigong", "amount": 2 }, { "op": "draw", "amount": 1 } ] },
     "flavor": "세 번 짧게 들이쉬고, 길게 한 번 머금고, 아랫배 깊은 곳으로 천천히."
   },
   {
-    "id": "haun_cloud_form", "name": "청운십팔식", "owner": "haun", "type": "attack", "rarity": "common", "pool": "reward",
+    "id": "haun_cloud_form", "name": "청운십팔식", "owner": "haun", "type": "attack", "rarity": "uncommon", "pool": "reward",
     "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 4, "times": 2 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 5, "times": 2 } ] },
     "flavor": "담장 너머로 구령만 들었던 청운문의 입문 검법."
   },
   {
-    "id": "haun_waterwheel", "name": "물레방아", "owner": "haun", "type": "skill", "rarity": "uncommon", "pool": "reward",
+    "id": "haun_waterwheel", "name": "물레방아", "owner": "haun", "type": "skill", "rarity": "rare", "pool": "reward",
     "cost": { "neigong": 1, "mana": 0 }, "target": "self",
     "effects": [ { "op": "block", "amount": 4 }, { "op": "gain_mana", "amount": 2 } ],
     "upgrade": { "effects": [ { "op": "block", "amount": 6 }, { "op": "gain_mana", "amount": 2 } ] },
     "flavor": "마나는 강물이고, 내공은 물레방아였다."
   },
   {
-    "id": "haun_byeogun", "fx": "fx_slash_blue", "name": "벽운단하", "owner": "haun", "type": "attack", "rarity": "rare", "pool": "story",
+    "id": "haun_byeogun", "fx": "fx_slash_blue", "name": "벽운단하", "owner": "haun", "type": "attack", "rarity": "epic", "pool": "story",
+    "castLine": { "speaker": "haun", "face": "resolve", "text": "운하검 제일식, 벽운단하(劈雲斷河)." },
     "cost": { "neigong": 1, "mana": 2 }, "target": "enemy", "keywords": ["fusion"],
     "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 24 }, { "op": "rift", "amount": 3 } ] },
     "flavor": "운하검 제일식, 벽운단하(劈雲斷河). 구름을 쪼개고 강을 끊는다."
   },
   {
-    "id": "haun_cheonoe", "fx": "fx_slash_blue", "name": "천외귀운", "owner": "haun", "type": "attack", "rarity": "rare", "pool": "story",
+    "id": "haun_cheonoe", "fx": "fx_slash_blue", "name": "천외귀운", "owner": "haun", "type": "attack", "rarity": "legendary", "pool": "story",
+    "castLine": { "speaker": "haun", "face": "resolve", "text": "운하검 최종식, 천외귀운(天外歸雲)." },
     "cost": { "neigong": 2, "mana": 4 }, "target": "all_enemies", "keywords": ["fusion", "exhaust"],
     "effects": [ { "op": "damage", "amount": 30 }, { "op": "rift", "amount": 6 } ],
     "flavor": "운하검 최종식, 천외귀운(天外歸雲). 하늘 밖의 구름이 제자리로 돌아간다."
   },
   {
-    "id": "haun_unhae", "name": "운해귀종", "owner": "haun", "type": "attack", "rarity": "rare", "pool": "story",
+    "id": "haun_unhae", "name": "운해귀종", "owner": "haun", "type": "attack", "rarity": "legendary", "pool": "story",
+    "castLine": { "speaker": "haun", "face": "resolve", "text": "운해귀종(雲海歸宗). 구름바다가 근원으로 돌아간다." },
     "cost": { "neigong": 2, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 14 }, { "op": "damage", "amount": 8, "condition": { "targetHasStatus": "grain" } } ],
     "flavor": "청운십팔식의 마지막 식. 느렸고, 단순했고, 정확했다."
   },
   {
-    "id": "haun_place_blade", "name": "날 얹기", "owner": "haun", "type": "attack", "rarity": "special", "pool": "story",
+    "id": "haun_place_blade", "name": "날 얹기", "owner": "haun", "type": "attack", "rarity": "legendary", "pool": "story",
+    "castLine": { "speaker": "haun", "face": "neutral", "text": "세상에서 가장 단단한 장작도, 갈라질 자리는 하나다." },
     "cost": { "neigong": 0, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 3 }, { "op": "damage", "amount": 40, "condition": { "targetHasStatus": "knot_exposed" } } ],
     "flavor": "힘으로 쪼개려 하지 마라. 나무는 원래 갈라질 자리를 가지고 있다."

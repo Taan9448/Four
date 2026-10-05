@@ -72,6 +72,30 @@ describe('런 진행', () => {
     expect(a.length).toBe(3);
   });
 
+  it('보상 등급은 노드 유형별 가중치를 따른다: 일반·전설은 나오지 않고, 엘리트·보스일수록 높은 등급이 잦다', () => {
+    const run = createRun(data, 'RARITY', { stageId: 's1' });
+    run.roster.push({ id: 'elia', hp: 42, maxHp: 42 }, { id: 'kyle', hp: 52, maxHp: 52 });
+    run.selected = ['haun', 'elia', 'kyle'];
+    const tally = (type: 'battle' | 'elite' | 'boss') => {
+      const node = run.map.floors.flat().find((n) => n.type === type)!;
+      const counts: Record<string, number> = {};
+      for (let i = 0; i < 300; i++) {
+        run.seed = `R${i}`;
+        for (const id of rewardOptions(data, run, node.id)) {
+          const r = data.cards.get(id)!.rarity;
+          counts[r] = (counts[r] ?? 0) + 1;
+        }
+      }
+      return counts;
+    };
+    const battle = tally('battle');
+    const boss = tally('boss');
+    expect(battle.common ?? 0).toBe(0);
+    expect(battle.legendary ?? 0).toBe(0);
+    expect(boss.uncommon ?? 0).toBe(0);
+    expect((boss.epic ?? 0) / 900).toBeGreaterThan((battle.epic ?? 0) / 900);
+  });
+
   it('왕일검 지원이 켜지면 휴식 노드에 토납 수련이 추가된다', () => {
     const rest = data.modules.get('s1_rest_campfire')!;
     const off = createRun(data, 'RUN5', { stageId: 's1' });

@@ -1,41 +1,42 @@
 [
   {
-    "id": "born_shield", "name": "방패 막기", "owner": "born", "type": "skill", "rarity": "starter", "pool": "starter",
+    "id": "born_shield", "name": "방패 막기", "owner": "born", "type": "skill", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "ally",
     "effects": [ { "op": "block", "amount": 7, "target": "ally" } ],
     "upgrade": { "effects": [ { "op": "block", "amount": 10, "target": "ally" } ] },
     "flavor": "보른이 방패로 일행을 막다 갑옷째 날아갔다."
   },
   {
-    "id": "born_knee", "name": "무릎 내리찍기", "owner": "born", "type": "attack", "rarity": "starter", "pool": "starter",
+    "id": "born_knee", "name": "무릎 내리찍기", "owner": "born", "type": "attack", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 1, "mana": 0 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 6 }, { "op": "apply_status", "status": "weak", "stacks": 1 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 8 }, { "op": "apply_status", "status": "weak", "stacks": 2 } ] },
     "flavor": "보른이 도끼로 거인의 무릎을 내리찍었다."
   },
   {
-    "id": "born_cleave", "name": "드워프의 도끼", "owner": "born", "type": "attack", "rarity": "starter", "pool": "starter",
+    "id": "born_cleave", "name": "드워프의 도끼", "owner": "born", "type": "attack", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 2, "mana": 0 }, "target": "all_enemies",
     "effects": [ { "op": "damage", "amount": 6 } ],
     "upgrade": { "effects": [ { "op": "damage", "amount": 9 } ] },
     "flavor": "보른이 그 맨 앞에서 도끼를 휘둘렀다. 드워프의 도끼와 소림의 곤봉이 나란히 대열을 짓이겼다."
   },
   {
-    "id": "born_whetstone", "name": "도끼 손질", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward",
+    "id": "born_whetstone", "name": "도끼 손질", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward",
     "cost": { "neigong": 1, "mana": 0 }, "target": "self",
     "effects": [ { "op": "apply_status", "status": "strength", "stacks": 1, "target": "self" }, { "op": "block", "amount": 4 } ],
     "upgrade": { "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 4 } ] },
     "flavor": "모닥불 앞에 나란히 앉아 몇 시진이고 아무 말 없이 도끼를 손질했다."
   },
   {
-    "id": "born_together", "name": "같이 가", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward",
+    "id": "born_together", "name": "같이 가", "owner": "born", "type": "skill", "rarity": "rare", "pool": "reward",
     "cost": { "neigong": 2, "mana": 0 }, "target": "all_allies",
     "effects": [ { "op": "block", "amount": 6, "target": "all_allies" } ],
     "upgrade": { "effects": [ { "op": "block", "amount": 9, "target": "all_allies" } ] },
     "flavor": "\"이번만큼은—\" \"같이 가.\" 보른이 말을 잘랐다."
   },
   {
-    "id": "born_go_first", "name": "먼저 가", "owner": "born", "type": "skill", "rarity": "rare", "pool": "reward",
+    "id": "born_go_first", "name": "먼저 가", "owner": "born", "type": "skill", "rarity": "epic", "pool": "reward",
+    "castLine": { "speaker": "born", "face": "resolve", "text": "먼저 가." },
     "cost": { "neigong": 2, "mana": 0 }, "target": "self",
     "effects": [ { "op": "taunt", "target": "self" }, { "op": "block", "amount": 15 } ],
     "upgrade": { "effects": [ { "op": "taunt", "target": "self" }, { "op": "block", "amount": 20 } ] },

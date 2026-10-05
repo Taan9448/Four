@@ -172,13 +172,28 @@ export function applyBattleOutcome(run: RunState, enc: Encounter, outcome: Battl
   else if (enc.node.type === 'boss') run.status = 'stage_clear';
 }
 
+/**
+ * 전투 보상 카드 후보. 출전 멤버(와 공용)의 보상 풀에서, 노드 유형별 등급 가중치(balance.rewards.rarityWeights)로
+ * 등급을 먼저 뽑고 그 등급에서 카드를 고른다. 같은 카드는 한 번만. 시드로 결정된다.
+ */
 export function rewardOptions(data: GameData, run: RunState, nodeId: string): string[] {
   const owners = new Set(run.selected);
   const pool = [...data.cards.values()].filter(
     (c) => c.pool === 'reward' && (owners.has(c.owner) || !data.characters.has(c.owner)),
   );
+  const nodeType = findNode(run.map, nodeId)?.type;
+  const weights = data.balance.rewards.rarityWeights[nodeType === 'elite' || nodeType === 'boss' ? nodeType : 'battle'];
   const rng = createRng(run.seed).fork(`reward:${run.stageId}:${nodeId}`);
-  return rng.shuffle([...pool]).slice(0, data.balance.rewards.cardChoices).map((c) => c.id);
+  const left = rng.shuffle([...pool]);
+  const picked: string[] = [];
+  while (picked.length < data.balance.rewards.cardChoices && left.length) {
+    const tiers = (Object.entries(weights) as [string, number][]).filter(([r, w]) => w > 0 && left.some((c) => c.rarity === r));
+    // 가중치 있는 등급이 바닥나면 남은 카드에서 아무거나
+    const tier = tiers.length ? rng.weighted(tiers, ([, w]) => w)![0] : left[0].rarity;
+    const i = left.findIndex((c) => c.rarity === tier);
+    picked.push(left.splice(i, 1)[0].id);
+  }
+  return picked;
 }
 
 // ───────────────────────── 파티 편성 ─────────────────────────
