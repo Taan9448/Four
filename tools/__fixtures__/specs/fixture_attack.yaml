@@ -1,0 +1,16 @@
+# 검증기 테스트용 명세(tests/tools.test.ts). 실제 게임 에셋이 아니다.
+id: fixture_attack
+type: character-anim
+character: haun
+summary: 검증기 테스트용 사람형 공격 6프레임
+reference: assets/source/fx_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: one
+  2: two
+  3: three
+  4: four
+  5: five
+  6: six
+placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

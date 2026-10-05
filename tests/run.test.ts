@@ -1,0 +1,86 @@
+import { describe, expect, it } from 'vitest';
+import { battleOutcome, createBattle, playCard } from '../src/engine/battle';
+import {
+  applyBattleOutcome,
+  applyChoice,
+  availableNodes,
+  battleSetupFor,
+  choicesFor,
+  createRun,
+  enterNode,
+  isBattle,
+  rewardOptions,
+  setParty,
+} from '../src/engine/run';
+import { data } from './helpers';
+
+describe('런 진행', () => {
+  it('하운 혼자 시작하고, 1층 스토리에서 동료가 합류한다(출전 최대 3명)', () => {
+    const run = createRun(data, 'RUN1');
+    expect(run.roster.map((r) => r.id)).toEqual(['haun']);
+    const [first] = availableNodes(run);
+    const enc = enterNode(data, run, first.id);
+    expect(enc.module.id).toBe('s1_story_companions');
+    applyChoice(data, run, enc.module, 0);
+    expect(run.roster.map((r) => r.id)).toEqual(['haun', 'elia', 'kyle', 'born']);
+    expect(run.selected).toEqual(['haun', 'elia', 'kyle']);
+    expect(run.deck.some((c) => c.cardId === 'elia_fireball')).toBe(true);
+    expect(run.flags).toContain('met_companions');
+  });
+
+  it('편성 규칙: 하운 필수, 최대 3명, 합류한 전투원만', () => {
+    const run = createRun(data, 'RUN2');
+    expect(() => setParty(data, run, ['haun', 'elia'])).toThrow();
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    applyChoice(data, run, enc.module, 0);
+    setParty(data, run, ['haun', 'elia']);
+    expect(run.selected).toEqual(['haun', 'elia']);
+    expect(() => setParty(data, run, ['elia', 'kyle'])).toThrow();
+    expect(() => setParty(data, run, ['haun', 'elia', 'kyle', 'born'])).toThrow();
+  });
+
+  it('전투 노드에서 출전 멤버로 전투가 만들어지고, 결과가 런에 반영된다', () => {
+    const run = createRun(data, 'RUN3');
+    const enc0 = enterNode(data, run, availableNodes(run)[0].id);
+    applyChoice(data, run, enc0.module, 0);
+    setParty(data, run, ['haun', 'elia']);
+    // 시드 RUN3의 2층에는 그림자늑대 전투가 있다
+    const node = availableNodes(run).find((n) => n.type === 'battle')!;
+    const enc = enterNode(data, run, node.id);
+    expect(isBattle(enc)).toBe(true);
+    expect(enc.module.content.enemies).toEqual(['shadow_wolf', 'shadow_wolf']);
+    const state = createBattle(data, battleSetupFor(data, run, enc));
+    expect(state.party.map((p) => p.defId)).toEqual(['haun', 'elia']);
+    for (const e of state.enemies) e.hp = 1;
+    state.rift = 4;
+    while (!state.result) {
+      const i = state.hand.findIndex((c) => ['haun_chop', 'elia_fireball'].includes(c.cardId));
+      if (i < 0) break;
+      playCard(state, i, state.enemies.find((e) => !e.downed)!.uid);
+    }
+    expect(state.result).toBe('victory');
+    applyBattleOutcome(run, enc, battleOutcome(state)!);
+    expect(run.scar).toBe(2);
+    expect(run.status).toBe('map');
+  });
+
+  it('보상 카드 후보는 출전 멤버의 보상 풀에서, 시드로 결정된다', () => {
+    const run = createRun(data, 'RUN4');
+    const a = rewardOptions(data, run, 'f2n0');
+    expect(a).toEqual(rewardOptions(data, run, 'f2n0'));
+    expect(a.every((id) => data.cards.get(id)!.owner === 'haun')).toBe(true);
+    expect(a.length).toBe(3);
+  });
+
+  it('왕일검 지원이 켜지면 휴식 노드에 토납 수련이 추가된다', () => {
+    const rest = data.modules.get('s1_rest_campfire')!;
+    const off = createRun(data, 'RUN5');
+    const on = createRun(data, 'RUN5', { supportActive: true });
+    expect(choicesFor(data, off, rest).length).toBe(2);
+    expect(choicesFor(data, on, rest).map((c) => c.label)).toContain('[왕일검] 토납 수련');
+  });
+
+  it('같은 시드면 같은 지도로 시작한다', () => {
+    expect(JSON.stringify(createRun(data, 'SAME').map)).toBe(JSON.stringify(createRun(data, 'SAME').map));
+  });
+});

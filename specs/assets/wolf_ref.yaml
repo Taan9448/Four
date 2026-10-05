@@ -1,0 +1,9 @@
+id: wolf_ref
+type: character-ref
+character: shadow_wolf
+summary: 그림자늑대 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: full body, three-quarter front view, calf-sized wolf standing alert, black flames flickering along the spine
+  2: full body, side view facing left, same proportions, low prowling stance
+placeholder: { shape: beast, color: '#2b2b3a', accent: '#ffb347' }

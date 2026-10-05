@@ -1,0 +1,13 @@
+id: elia_idle
+type: character-anim
+character: elia
+summary: 엘리아 대기 4프레임
+depends_on: [elia_ref]
+reference: assets/source/elia_ref.png
+facing: right
+frame_notes:
+  1: standing calmly, right hand open at waist height, tiny motes of light drifting around the fingers
+  2: hair and robe sway slightly, motes rise
+  3: hand lifts a little, motes gather into the palm
+  4: hand lowers, motes scatter softly
+placeholder: { shape: humanoid, color: '#8fa7c9', accent: '#ff9a3c', weapon: false }

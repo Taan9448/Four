@@ -1,0 +1,34 @@
+{
+  "neigongPerTurn": 3,
+  "handSize": 5,
+  "maxHand": 10,
+  "mana": {
+    "max": 10,
+    "restGain": 3,
+    "worlds": {
+      "elheim":   { "battleStart": "full",  "perTurn": 2 },
+      "nocturna": { "battleStart": "full",  "perTurn": 1 },
+      "murim":    { "battleStart": "carry", "perTurn": 0 },
+      "rift":     { "battleStart": "carry", "perTurn": -1 }
+    }
+  },
+  "rift": {
+    "max": 10,
+    "decay": { "elheim": 2, "nocturna": 1, "murim": 0, "rift": 0 },
+    "echoThreshold": 5,
+    "echoCard": "status_rift_echo",
+    "surgeDamage": 5,
+    "surgeResetTo": 5,
+    "scarRatio": 0.5
+  },
+  "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
+  "incorporealMultiplier": 0.5,
+  "party": { "max": 3, "reviveHp": 1 },
+  "rewards": { "cardChoices": 3 },
+  "route": {
+    "nodesPerFloor": [2, 3],
+    "eliteMinFloor": 3,
+    "extraEdgeChance": 0.35,
+    "scarWeightPerPoint": 0.15
+  }
+}

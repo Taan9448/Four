@@ -1,0 +1,37 @@
+{
+  "name": "cheonoe-gwihwan",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "천외귀환 — 무협×판타지 턴제 덱빌딩 카드 게임",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "predev": "node tools/build-manifest.mjs",
+    "dev": "vite",
+    "prebuild": "node tools/build-manifest.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "node tools/build-manifest.mjs && tsc --noEmit",
+    "test": "node tools/build-manifest.mjs && vitest run",
+    "data:check": "vitest run tests/data.test.ts",
+    "assets:slice": "node tools/slice-sheet.mjs",
+    "assets:validate": "node tools/validate-assets.mjs",
+    "assets:placeholder": "node tools/make-placeholder.mjs",
+    "assets:prompt": "node tools/render-prompt.mjs",
+    "assets:status": "node tools/asset-status.mjs",
+    "assets:manifest": "node tools/build-manifest.mjs",
+    "check:ownership": "node tools/check-ownership.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "gifenc": "^1.0.3",
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  }
+}

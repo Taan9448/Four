@@ -1,0 +1,13 @@
+id: haun_idle
+type: character-anim
+character: haun
+summary: 진하운 대기(호흡) 4프레임
+depends_on: [haun_ref]
+reference: assets/source/haun_ref.png
+facing: right
+frame_notes:
+  1: guard stance, sword held low in the right hand, knees slightly bent, inhaling
+  2: same stance, chest slightly raised, short breath in
+  3: same stance, chest at highest point, short breath held
+  4: same stance, long breath out, shoulders relaxed, a faint warm glow at the lower belly
+placeholder: { shape: humanoid, color: '#7d6f5e', accent: '#3fa9f5' }

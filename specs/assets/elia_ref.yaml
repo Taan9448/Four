@@ -1,0 +1,9 @@
+id: elia_ref
+type: character-ref
+character: elia
+summary: 엘리아 기준 시트(3/4 정면 + 오른쪽 측면)
+facing: right
+frame_notes:
+  1: full body, three-quarter front view, standing with one hand raised and a small flame floating above the palm
+  2: full body, side view facing right, same outfit, both hands lowered, robe hem settled
+placeholder: { shape: humanoid, color: '#8fa7c9', accent: '#ff9a3c', weapon: false }

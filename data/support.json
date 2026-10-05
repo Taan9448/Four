@@ -1,0 +1,26 @@
+[
+  {
+    "id": "wang_breath", "source": "wang", "name": "청운호흡 박자",
+    "description": "세 번 짧게, 한 번 길게. 4턴마다 턴 시작에 '긴 숨'으로 내공 +1, 카드 1장을 뽑는다.",
+    "trigger": "turnStart", "condition": { "turnMod": [4, 0] },
+    "effects": [ { "op": "gain_neigong", "amount": 1 }, { "op": "draw", "amount": 1 } ]
+  },
+  {
+    "id": "wang_firewood", "source": "wang", "name": "장작의 결",
+    "description": "전투당 1회, 균열이 7 이상이 되는 순간 균열 -3. \"어디를 잘못 쳤는지 아는 사람은 도끼를 쥔 사람뿐이다.\"",
+    "trigger": "riftChanged", "condition": { "riftGte": 7 }, "oncePerBattle": true,
+    "effects": [ { "op": "rift", "amount": -3 } ]
+  },
+  {
+    "id": "wang_dojin", "source": "wang", "name": "도진아",
+    "description": "곽도진의 체력이 처음으로 절반 이하가 되면, 사형의 목소리에 곽도진이 1턴 동안 굳는다.",
+    "trigger": "enemyDamaged", "condition": { "enemyId": "kwak_dojin", "hpRatioLte": 0.5 }, "oncePerBattle": true,
+    "effects": [ { "op": "apply_status", "status": "stun", "stacks": 1, "target": "trigger_enemy" } ]
+  },
+  {
+    "id": "wang_training", "source": "wang", "name": "토납 수련",
+    "description": "휴식 노드의 추가 선택지. 내공을 쓰는 카드 2장을 강화한다.",
+    "trigger": "restOption",
+    "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "costNeigongGte": 1 } } ]
+  }
+]

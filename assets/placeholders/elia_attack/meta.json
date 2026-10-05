@@ -1,0 +1,23 @@
+{
+  "id": "elia_attack",
+  "type": "character-anim",
+  "frameW": 384,
+  "frameH": 512,
+  "frames": 6,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "hit": 4
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "2ab8902dddd1f949",
+  "placeholder": true,
+  "resizedFrom": null
+}
