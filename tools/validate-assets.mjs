@@ -3,6 +3,7 @@
 // 사용: npm run assets:validate -- [id ...] [--placeholder] [--all]
 //  - id 없이 실행하거나 --all: 명세 모양 검사 + 납품된 스프라이트와 임시 시트 전부
 //  - 통과하면 _contact.png(번호 붙은 콘택트 시트)와 _preview.gif를 결과 폴더에 남긴다.
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -19,10 +20,11 @@ const { GIFEncoder, quantize, applyPalette } = gifenc;
 
 /**
  * @param {object} spec 정규화된 명세
- * @param {{ src: string, outDir: string, previews?: boolean, root?: string }} opts
- * @returns {Promise<{ errors: string[], warnings: string[] }>}
+ * @param {{ src: string, outDir: string, previews?: boolean, root?: string, staleOk?: boolean }} opts
+ *   staleOk: 명세가 바뀐 뒤 아직 다시 자르지 않은 프레임을 경고로만 둔다(art/* 밖의 브랜치. 그 브랜치는 sprites를 고칠 수 없다)
+ * @returns {Promise<{ errors: string[], warnings: string[], stale?: boolean }>}
  */
-export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT, styleRoot = ROOT }) {
+export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT, styleRoot = ROOT, staleOk = false }) {
   const errors = [...checkSpecShape(spec, root).map((e) => `명세: ${e}`)];
   const warnings = [];
   if (!existsSync(src)) return { errors: [...errors, `원본 시트 없음: ${src}`], warnings };
@@ -39,7 +41,13 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
   const fallback = meta.fallbackLevel ?? 1;
   const expectFrames = fallback === 2 ? 3 : fallback === 3 ? meta.frames : spec.frames;
-  for (const [k, v] of [['id', spec.id], ['frameW', spec.logical[0]], ['frameH', spec.logical[1]], ['fps', spec.fps], ['loop', spec.loop]]) {
+  // 명세가 바뀐 뒤(예: 프레임 64→80) 아직 다시 자르지 않은 프레임: 원본 검사(1~4)만 하고 프레임 파일 검사는 건너뛴다
+  const stale = meta.frameW !== spec.logical[0] || meta.frameH !== spec.logical[1];
+  if (stale) {
+    const msg = `옛 규격 ${meta.frameW}×${meta.frameH}로 자른 프레임(명세 ${spec.logical.join('×')}) — art 브랜치에서 assets:slice -- ${spec.id} 재실행 필요`;
+    (staleOk ? warnings : errors).push(msg);
+  }
+  for (const [k, v] of [['id', spec.id], ['fps', spec.fps], ['loop', spec.loop]]) {
     if (meta[k] !== v) errors.push(`meta.${k}(${meta[k]})이(가) 명세(${v})와 다르다`);
   }
   if (meta.frames !== expectFrames) errors.push(`meta.frames(${meta.frames})가 기대값(${expectFrames})과 다르다`);
@@ -78,6 +86,8 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     if (f.fit === 'downscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}의 그림이 여백 포함 목표 ${T}×${TH}에 들어가지 않아 시트 전체를 줄였다(디테일 손실) — 인물이 칸을 꽉 채웠다`);
     if (f.fit === 'upscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
   }
+
+  if (stale) return { errors, warnings, stale };
 
   // 5) 프레임 파일 검사
   const files = existsSync(outDir) ? readdirSync(outDir).filter((f) => /^frame_\d+\.png$/.test(f)).sort() : [];
@@ -187,7 +197,7 @@ async function writePreviews(spec, meta, frames, outDir) {
   writeFileSync(join(outDir, '_preview.gif'), gif.bytes());
 }
 
-export async function validateAsset(id, { root = ROOT, placeholder = false, previews = true } = {}) {
+export async function validateAsset(id, { root = ROOT, placeholder = false, previews = true, staleOk = false } = {}) {
   const spec = loadSpec(id, root);
   const p = paths(root);
   return validateSheet(spec, {
@@ -195,7 +205,19 @@ export async function validateAsset(id, { root = ROOT, placeholder = false, prev
     outDir: placeholder ? p.placeholders(id) : p.sprites(id),
     previews,
     root,
+    staleOk,
   });
+}
+
+/** 지금 검사하는 브랜치(CI는 PR 머리 브랜치) */
+function currentBranch() {
+  if (process.env.GITHUB_HEAD_REF) return process.env.GITHUB_HEAD_REF;
+  if (process.env.GITHUB_REF_NAME) return process.env.GITHUB_REF_NAME;
+  try {
+    return execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
+  } catch {
+    return '';
+  }
 }
 
 async function main() {
@@ -213,6 +235,8 @@ async function main() {
       if (existsSync(p.placeholderSheet(id))) targets.push({ id, placeholder: true });
     }
   }
+  // art/* 브랜치(Codex)는 옛 규격 프레임을 다시 잘라야 통과. 그 밖의 브랜치는 sprites를 고칠 수 없으니 경고만
+  const staleOk = !currentBranch().startsWith('art/');
   let failed = 0;
   for (const t of targets) {
     const where = t.placeholder ? '임시' : '납품';
@@ -221,7 +245,7 @@ async function main() {
       console.log(`✖ ${t.id} [명세]\n${t.shapeErrors.map((e) => `   - ${e}`).join('\n')}`);
       continue;
     }
-    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder });
+    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder, staleOk });
     if (errors.length) failed++;
     console.log(`${errors.length ? '✖' : '✔'} ${t.id} [${where}]`);
     for (const e of errors) console.log(`   - 오류: ${e}`);

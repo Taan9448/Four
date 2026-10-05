@@ -101,18 +101,19 @@ export class SpritePlayer {
     ctx.drawImage(images[Math.min(images.length, n) - 1], 0, 0);
   }
 
-  /** 에셋이 아예 없을 때: 64×64 프레임에 픽셀 실루엣(32 격자를 2배로)을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
+  /** 에셋이 아예 없을 때: 80×80 프레임에 픽셀 실루엣(40 격자를 2배로, 32 격자 도형을 가운데·발 기준선 36에)을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
   private playFallback(token: number, options: PlayOptions): Promise<void> {
-    const w = 32, h = 32;
+    const w = 40, h = 40;
     this.canvas.width = w * 2;
     this.canvas.height = h * 2;
     const { ctx } = this;
     ctx.imageSmoothingEnabled = false;
-    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    // 도형 좌표는 32 격자(발 29) 기준: 가로 +4, 세로 +7 옮겨 40 격자의 가운데·발 36에 둔다
+    ctx.setTransform(2, 0, 0, 2, 8, 14);
     const color = this.opts.fallbackColor ?? '#666';
     const shape = this.opts.fallbackShape ?? 'humanoid';
     const draw = (bob: number) => {
-      ctx.clearRect(0, 0, w, h);
+      ctx.clearRect(-4, -7, w, h);
       ctx.fillStyle = '#1d2433';
       const feet = 29;
       const box = (x: number, y: number, bw: number, bh: number) => {

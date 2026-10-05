@@ -1,8 +1,8 @@
 {
   "id": "haun_idle",
   "type": "character-anim",
-  "frameW": 64,
-  "frameH": 64,
+  "frameW": 80,
+  "frameH": 80,
   "track": "pixel",
   "pixelScale": 8,
   "gridDetected": true,

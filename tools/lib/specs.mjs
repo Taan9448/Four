@@ -9,16 +9,18 @@ export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 /**
  * 시트 규격. docs/ASSET_PIPELINE.md 2절과 같아야 한다. 그림은 두 갈래(track)로 나뉜다.
  *  - pixel(전투): 이미지 모델이 큰 캔버스에 "확대된 픽셀 아트"를 그리고, 자르기 도구가 그림의 실제 블록 크기를
- *      자동 감지해 논리 해상도(logical)로 줄인다. 모든 캐릭터 칸은 512px로 같게 해 모델이 그리는 해상도를 고르게 한다.
- *      small: 64×64 스프라이트(캐릭터·일반 적·이펙트), large: 128×128(보스)
+ *      자동 감지해 원래 해상도로 되돌린 뒤 게임 프레임(logical)에 담는다. 모든 캐릭터 칸은 512px로 같게 해 모델이 그리는 해상도를 고르게 한다.
+ *      draw: 모델에게 요청하는 칸당 그림 격자(정수배), logical: 게임 프레임. 프레임이 그림 격자보다 커서
+ *      도끼를 치켜드는 동작이나 칸을 꽉 채운 그림도 줄이지 않고 담는다.
+ *      small: 그림 64 → 프레임 80(캐릭터·일반 적·이펙트), large: 그림 128 → 프레임 160(보스)
  *  - illustration(이야기): 선이 살아 있는 애니메이션 채색 일러스트 한 장. 픽셀화하지 않고 output 크기로만 줄인다.
  */
 const SHEETS = {
-  'anim-small': { canvas: [1536, 1024], grid: [3, 2], logical: [64, 64] }, // 칸 512 = 8배, 최대 6프레임
-  'anim-large': { canvas: [1536, 1024], grid: [3, 2], logical: [128, 128] }, // 칸 512 = 4배
-  'ref-small': { canvas: [1024, 1024], grid: [2, 2], logical: [64, 64] }, // 칸 512 = 8배
-  'ref-large': { canvas: [1024, 1024], grid: [2, 2], logical: [128, 128] }, // 칸 512 = 4배
-  background: { canvas: [1536, 1024], grid: [1, 1], logical: [384, 256] }, // 4배(전투 배경은 픽셀)
+  'anim-small': { canvas: [1536, 1024], grid: [3, 2], draw: [64, 64], logical: [80, 80] }, // 칸 512 = 8배, 최대 6프레임
+  'anim-large': { canvas: [1536, 1024], grid: [3, 2], draw: [128, 128], logical: [160, 160] }, // 칸 512 = 4배
+  'ref-small': { canvas: [1024, 1024], grid: [2, 2], draw: [64, 64], logical: [80, 80] }, // 칸 512 = 8배
+  'ref-large': { canvas: [1024, 1024], grid: [2, 2], draw: [128, 128], logical: [160, 160] }, // 칸 512 = 4배
+  background: { canvas: [1536, 1024], grid: [1, 1], draw: [384, 256], logical: [384, 256] }, // 4배(전투 배경은 픽셀)
 };
 
 /** 일러스트 유형: 캔버스와 게임에서 쓸 출력 크기 */
@@ -122,6 +124,7 @@ export function normalizeSpec(raw) {
   const grid = raw.grid ?? td.grid;
   const cell = raw.cell ?? [canvas[0] / grid[0], canvas[1] / grid[1]];
   const logical = raw.logical ?? td.logical;
+  const draw = raw.draw ?? td.draw ?? logical;
   const fxDefaults = type === 'fx' ? { fps: 15, loop: false } : {};
   const frames = raw.frames ?? td.frames ?? ad.frames;
   return {
@@ -132,11 +135,13 @@ export function normalizeSpec(raw) {
     canvas,
     grid,
     cell,
-    /** pixel: 논리 해상도 / illustration: 게임용 출력 크기 */
+    /** pixel: 게임 프레임 크기 / illustration: 게임용 출력 크기 */
     logical,
+    /** pixel: 모델에게 요청하는 칸당 그림 격자(프롬프트·임시 시트·감지 기준) */
+    draw,
     track: td.track,
-    /** 논리 픽셀 1개가 시트에서 차지하는 크기(px). 일러스트는 축소 비율 */
-    pixel_scale: cell[0] / logical[0],
+    /** 그림 픽셀 1개가 시트에서 차지하는 크기(px). 일러스트는 축소 비율 */
+    pixel_scale: cell[0] / draw[0],
     palette: raw.palette ?? 'master',
     max_colors: raw.max_colors ?? td.max_colors,
     chroma: raw.chroma ?? td.chroma,
@@ -163,10 +168,13 @@ export function checkSpecShape(spec, root = ROOT) {
   if (spec.cell[0] * cols !== cw || spec.cell[1] * rows !== ch) {
     errors.push(`cell×grid(${spec.cell[0] * cols}×${spec.cell[1] * rows})가 canvas(${cw}×${ch})와 다르다`);
   }
-  const sx = spec.cell[0] / spec.logical[0];
-  const sy = spec.cell[1] / spec.logical[1];
+  const sx = spec.cell[0] / spec.draw[0];
+  const sy = spec.cell[1] / spec.draw[1];
   if (spec.track === 'pixel' && (!Number.isInteger(sx) || sx !== sy)) {
-    errors.push(`칸(${spec.cell.join('×')})이 논리 해상도(${spec.logical.join('×')})의 같은 정수배가 아니다`);
+    errors.push(`칸(${spec.cell.join('×')})이 그림 격자(${spec.draw.join('×')})의 같은 정수배가 아니다`);
+  }
+  if (spec.track === 'pixel' && (spec.logical[0] < spec.draw[0] || spec.logical[1] < spec.draw[1])) {
+    errors.push(`프레임(${spec.logical.join('×')})이 그림 격자(${spec.draw.join('×')})보다 작다`);
   }
   if (!['master', 'free'].includes(spec.palette)) errors.push('palette는 master 또는 free');
   if (!Number.isInteger(spec.frames) || spec.frames < 1) errors.push('frames가 없다');

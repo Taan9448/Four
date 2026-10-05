@@ -149,7 +149,7 @@ export function nearestColor(palette, r, g, b) {
  */
 export function pixelize(cell, spec, palette) {
   const s = spec.pixel_scale;
-  const [lw, lh] = spec.logical;
+  const [lw, lh] = spec.draw;
   const isContent = isContentFn(spec);
   const out = Buffer.alloc(lw * lh * 4);
   let puritySum = 0, opaqueBlocks = 0;
