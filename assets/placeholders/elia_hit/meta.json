@@ -1,9 +1,16 @@
 {
   "id": "elia_hit",
   "type": "character-anim",
-  "frameW": 32,
-  "frameH": 32,
+  "frameW": 64,
+  "frameH": 64,
+  "track": "pixel",
   "pixelScale": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
   "frames": 3,
   "fps": 12,
   "loop": false,
@@ -16,8 +23,12 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "5d3e0de7b81ba55b",
+  "sourceHash": "c1218f6a214ba61a",
   "placeholder": true,
   "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
   "gridPurity": 1
 }

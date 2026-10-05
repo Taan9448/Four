@@ -1,9 +1,16 @@
 {
   "id": "wolf_idle",
   "type": "character-anim",
-  "frameW": 32,
-  "frameH": 32,
+  "frameW": 64,
+  "frameH": 64,
+  "track": "pixel",
   "pixelScale": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
   "frames": 4,
   "fps": 6,
   "loop": true,
@@ -16,8 +23,12 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 4,
-  "sourceHash": "cb0b0347369936ec",
+  "sourceHash": "43e37b8322271d43",
   "placeholder": true,
   "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
   "gridPurity": 1
 }

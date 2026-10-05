@@ -43,6 +43,7 @@ export class SpritePlayer {
     }
     // 픽셀 아트: 보간 없이 그린다(캔버스 크기를 바꾸면 컨텍스트 설정이 초기화되므로 매번 지정)
     this.ctx.imageSmoothingEnabled = false;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0); // 대체 실루엣의 2배 변환이 남지 않게
     const loop = options.loop ?? meta.loop;
     const total = meta.fallbackLevel === 2 ? (meta.virtualFrames ?? meta.frames) : meta.frames;
     const frameMs = 1000 / meta.fps;
@@ -100,13 +101,14 @@ export class SpritePlayer {
     ctx.drawImage(images[Math.min(images.length, n) - 1], 0, 0);
   }
 
-  /** 에셋이 아예 없을 때: 32×32 픽셀 실루엣을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
+  /** 에셋이 아예 없을 때: 64×64 프레임에 픽셀 실루엣(32 격자를 2배로)을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
   private playFallback(token: number, options: PlayOptions): Promise<void> {
     const w = 32, h = 32;
-    this.canvas.width = w;
-    this.canvas.height = h;
+    this.canvas.width = w * 2;
+    this.canvas.height = h * 2;
     const { ctx } = this;
     ctx.imageSmoothingEnabled = false;
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
     const color = this.opts.fallbackColor ?? '#666';
     const shape = this.opts.fallbackShape ?? 'humanoid';
     const draw = (bob: number) => {

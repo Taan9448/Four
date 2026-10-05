@@ -8,7 +8,8 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, cellRect, countColors, extract, isContentFn, keyOut, keyResidual, loadRaw, pixelize, prepareSheet } from './lib/image.mjs';
+import { bbox, countColors, keyOut, keyResidual, loadRaw, prepareSheet } from './lib/image.mjs';
+import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
 
@@ -30,6 +31,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const sheet = await prepareSheet(src, spec);
   if (sheet.error) return { errors: [...errors, sheet.error], warnings };
   if (sheet.resized) warnings.push(`시트 크기 ${sheet.original.join('×')} → ${spec.canvas.join('×')}로 리사이즈해 검사`);
+  if (sheet.offSize) warnings.push(`시트 크기 ${sheet.original.join('×')}(규정 ${spec.canvas.join('×')}) — 리사이즈 없이 블록 크기를 감지해 처리`);
 
   // 2) meta.json
   const metaPath = join(outDir, 'meta.json');
@@ -44,29 +46,37 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   if (JSON.stringify(meta.events) !== JSON.stringify(spec.events)) errors.push('meta.events가 명세와 다르다');
 
   // 3) 칸별 내용: 1~frames는 그림이 있고, 그 뒤는 비어 있어야 한다
-  const isContent = isContentFn(spec);
+  const illustration = spec.track === 'illustration';
+  const keyed = keyOut(sheet.raw, spec);
   const cells = spec.grid[0] * spec.grid[1];
-  const minPixels = spec.cell[0] * spec.cell[1] * 0.005;
   if (fallback !== 3) {
     for (let n = 1; n <= cells; n++) {
-      const box = bbox(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), isContent);
-      const filled = !!box && box.count >= minPixels;
+      const filled = cellHasContent(keyed, spec, n);
       if (n <= expectFrames && !filled) errors.push(`${n}번 칸이 비어 있다(프레임 수 부족)`);
-      if (n > expectFrames && box && box.count >= minPixels) errors.push(`${n}번 칸에 그림이 있다(빈 칸이어야 함)`);
+      if (n > expectFrames && filled) errors.push(`${n}번 칸에 그림이 있다(빈 칸이어야 함)`);
     }
   }
 
-  // 4) 픽셀 격자 일치도: 블록 안이 한 색으로 채워졌는지(흐림·안티에일리어싱·격자 어긋남 감지)
-  const illustration = spec.track === 'illustration';
+  // 4) 픽셀 격자: 블록 크기를 감지하고, 블록 안이 한 색으로 채워졌는지(흐림·안티에일리어싱·격자 어긋남) 잰다
   const palette = illustration ? null : paletteFor(spec, styleRoot);
-  const frameCells = illustration ? [] : fallback === 2 ? [1, 2, 3] : fallback === 3 ? [] : Array.from({ length: spec.frames }, (_, i) => i + 1);
+  let frameCells = [];
+  if (!illustration) {
+    if (fallback === 2) frameCells = [1, 2, 3];
+    else if (fallback === 3) for (let n = 1; n <= cells; n++) { if (cellHasContent(keyed, spec, n)) frameCells.push(n); }
+    else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
+  }
   if (frameCells.length) {
-    let sum = 0;
-    for (const n of frameCells) sum += pixelize(keyOut(extract(sheet.raw, cellRect(spec, n)), spec), spec, palette).purity;
-    const purity = sum / frameCells.length;
-    const msg = `픽셀 격자 일치도 ${(purity * 100).toFixed(0)}% — ${spec.pixel_scale}px 블록에 맞춰 그리지 않았다(흐림·안티에일리어싱·격자 어긋남)`;
-    if (purity < 0.5) errors.push(msg);
-    else if (purity < 0.75) warnings.push(msg);
+    const { grid, frames: analyzed } = processPixelSheet(sheet.raw, spec, palette, frameCells);
+    const purity = analyzed.reduce((a, f) => a + f.purity, 0) / analyzed.length;
+    const msg = `픽셀 격자 일치도 ${(purity * 100).toFixed(0)}% (감지한 블록 ${grid.block.toFixed(1)}px) — 블록이 고르지 않거나 흐리다(안티에일리어싱·격자 어긋남)`;
+    if (!grid.detected) errors.push(`픽셀 격자 일치도: 고른 블록 격자를 찾지 못했다(격자 점수 ${(grid.score * 100).toFixed(0)}%) — 흐리거나 픽셀 아트가 아닌 그림`);
+    else if (purity < 0.5) errors.push(msg);
+    else if (purity < 0.65) warnings.push(msg);
+    const [T, TH] = spec.logical;
+    for (const f of analyzed) {
+      if (f.fit === 'downscale') warnings.push(`칸 ${f.n}: 모델이 그린 해상도 ${f.native.join('×')}가 목표 ${T}×${TH}보다 커서 줄였다(디테일 손실)`);
+      if (f.fit === 'upscale') warnings.push(`칸 ${f.n}: 모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
+    }
   }
 
   // 5) 프레임 파일 검사
