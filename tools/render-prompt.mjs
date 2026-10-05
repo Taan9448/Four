@@ -49,6 +49,11 @@ export function renderPrompt(spec, style) {
     `In sprite pixels: the character is about ${bodyHeight} px tall, the lowest pixel of the feet is on row ${feetRow} of ${lh} (counting from 1 at the top), horizontally centered.\n` +
     // 모델은 픽셀 수보다 칸 대비 비율을 더 잘 지킨다(PR #10: 48px 요청에 칸을 꽉 채움)
     `Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/${Math.round(lh / (feetRow - bodyHeight))} of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.\n`;
+  // 애니메이션은 크기를 숫자가 아니라 기준 시트에 맞춘다(숫자와 첨부 그림이 다르면 모델이 그림을 따른다: haun_ref 키 약 63px)
+  const animPlacement =
+    `Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. ` +
+    `The lowest pixel of the feet stays on the same row in every cell, horizontally centered. ` +
+    `Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.\n`;
 
   switch (spec.type) {
     case 'character-anim':
@@ -58,7 +63,7 @@ export function renderPrompt(spec, style) {
         `Background: flat solid ${key.name} ${key.hex} in every cell. No floor, no cast shadow, no vignette.\n` +
         `Subject: ${subject}. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.\n` +
         `The SAME character in every cell, at the SAME scale. Side view, facing ${spec.facing}.\n` +
-        placement +
+        (spec.reference ? animPlacement : placement) +
         `Style: ${style.sprite_style}.\n` +
         paletteLine(spec, style) +
         `Never use ${key.name} or similar hues on the character.\n` +

@@ -10,8 +10,8 @@ events: { hit: 4 }
 bbox_tolerance: 0.35
 frame_notes:
   1: axe held low at the right hip with both hands, knees bent, weight back
-  2: steps forward, axe rising behind the head, outer robe swinging
-  3: axe at peak overhead, body coiled
+  2: steps forward, axe rising behind the shoulder, outer robe swinging
+  3: axe at its peak raised behind the head, the axe head about level with the top of the head (not far above it), body coiled
   4: downward chop exactly like splitting firewood, a 1-pixel blue streak trailing the axe head
   5: follow-through, axe head near the ground, hair swept forward
   6: recovering to a ready stance
