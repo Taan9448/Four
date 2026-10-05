@@ -52,7 +52,12 @@
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
   "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
-  "upgrade": { "effects": [ { "op": "damage", "amount": 24 }, { "op": "rift", "amount": 3 } ] },  // 바뀌는 필드만
+  "upgrade": {                          // 강화 +1~+5(상태 카드 제외 필수)
+    "growth": [4, 0],                   //   +1~+3: 단계마다 effects[i]의 amount(없으면 stacks)에 더할 값. 효과 수와 같아야 한다
+    "plus4": { "name": "구름을 쪼개다", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 2 } ] },
+    "plus5": { "name": "강을 끊다", "effects": [ { "op": "rift", "amount": -2 } ] }
+    //   특수 스킬 필드: name, effects(뒤에 덧붙음), addKeywords, removeKeywords, cost(비용 교체)
+  },
   "anim": "attack",                     // 선택: 카드 주인이 재생할 애니메이션
   "fx": "fx_slash_blue",                // 선택: 대상 위에 겹칠 이펙트 에셋 id
   "castLine": { "speaker": "haun", "face": "resolve", "text": "운하검 제일식, 벽운단하(劈雲斷河)." },  // 영웅·전설 필수: 컷인 대사(face: neutral | resolve | surprise)
@@ -60,6 +65,12 @@
   "flavor": "운하검 제일식, 벽운단하(劈雲斷河). 구름을 쪼개고 강을 끊는다."
 }
 ```
+
+**강화 규칙**
+- 카드 한 장마다 단계 0~5(`balance.upgrade.maxLevel`). `upgrade_card` 동작 한 번에 +1.
+- +1~+3(`balance.upgrade.statLevels`): `growth`만큼 수치가 오른다. 비용·키워드·효과 수는 그대로.
+- +4·+5: `plus4`, `plus5` 특수 스킬이 차례로 붙는다. 카드 문구에 `★이름: 설명` 줄로 보인다.
+- 휴식의 수련(`upgrade_card` + `"choose": true`)은 사람이 강화할 카드를 고른다(강화 뒤 모습으로 미리 보기). 이벤트의 강화는 무작위.
 
 **등급 규칙**(`data:check`가 검사)
 - 시작 카드(`pool: starter`)는 모두 일반. 보상 풀에는 일반이 없다.

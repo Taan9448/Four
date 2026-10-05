@@ -38,7 +38,7 @@ describe('데이터 검사', () => {
     for (const c of data.cards.values()) {
       if (c.owner !== 'status' && c.owner !== 'common' && !data.characters.has(c.owner)) errors.push(`${c.id}: 알 수 없는 주인 ${c.owner}`);
       errors.push(...checkEffects(c.id, c.effects, battleOps));
-      if (c.upgrade?.effects) errors.push(...checkEffects(`${c.id}+`, c.upgrade.effects, battleOps));
+      if (c.upgrade) for (const sk of [c.upgrade.plus4, c.upgrade.plus5]) errors.push(...checkEffects(`${c.id} ${sk.name}`, sk.effects, battleOps));
       const fusion = c.keywords.includes('fusion');
       const both = c.cost.neigong > 0 && c.cost.mana > 0;
       if (fusion !== both) errors.push(`${c.id}: 융합 키워드와 비용(내공+마나)이 맞지 않는다`);
@@ -124,6 +124,28 @@ describe('데이터 검사', () => {
       if (c.rarity === 'common' && c.pool === 'reward') bad.push(`${c.id}: 보상 풀에 일반 등급`);
       if ((c.rarity === 'epic' || c.rarity === 'legendary') && !c.castLine) bad.push(`${c.id}: 영웅·전설은 castLine 필요`);
       if (c.castLine && !data.characters.has(c.castLine.speaker)) bad.push(`${c.id}: castLine 화자 ${c.castLine.speaker}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('카드 강화: 상태 카드 외 모두 강화가 있고, growth는 효과 수와 같으며 수치 있는 효과만 오른다', () => {
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.type === 'status') {
+        if (c.upgrade) bad.push(`${c.id}: 상태 카드는 강화 없음`);
+        continue;
+      }
+      if (!c.upgrade) {
+        bad.push(`${c.id}: 강화 없음`);
+        continue;
+      }
+      const { growth } = c.upgrade;
+      if (growth.length !== c.effects.length) bad.push(`${c.id}: growth ${growth.length}개 ≠ 효과 ${c.effects.length}개`);
+      growth.forEach((g, i) => {
+        const e = c.effects[i];
+        if (g && e && e.amount === undefined && e.stacks === undefined) bad.push(`${c.id}: ${i}번 효과는 수치가 없다`);
+      });
+      if (!growth.some((g) => g > 0)) bad.push(`${c.id}: +1~+3에 오르는 수치가 없다`);
     }
     expect(bad).toEqual([]);
   });

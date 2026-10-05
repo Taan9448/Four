@@ -277,9 +277,9 @@ export function changeRift(state: BattleState, delta: number): void {
 
 // ───────────────────────── 카드 더미 ─────────────────────────
 
-export function newCard(state: BattleState, cardId: string, upgraded = false): CardInstance {
+export function newCard(state: BattleState, cardId: string, level = 0): CardInstance {
   state.uidCounter += 1;
-  return { uid: `b${state.uidCounter}`, cardId, upgraded };
+  return { uid: `b${state.uidCounter}`, cardId, level };
 }
 
 function ownerOf(state: BattleState, cardId: string): Combatant | undefined {

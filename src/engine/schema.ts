@@ -93,6 +93,8 @@ export const Effect = z
       .partial()
       .strict()
       .optional(),
+    /** upgrade_card: 사람이 강화할 카드를 고른다(휴식 노드의 수련) */
+    choose: z.boolean().optional(),
     condition: Condition.optional(),
     scale: Scale.optional(),
   })
@@ -110,6 +112,17 @@ export type Rarity = z.infer<typeof Rarity>;
 /** 반신 그림 표정: 기본·결의·놀람(에셋 <캐릭터>_stand의 프레임 1·2·3) */
 export const Face = z.enum(['neutral', 'resolve', 'surprise']);
 export type Face = z.infer<typeof Face>;
+
+const UpgradeSkill = z
+  .object({
+    name: z.string(),
+    effects: z.array(Effect).default([]),
+    addKeywords: z.array(Keyword).default([]),
+    removeKeywords: z.array(Keyword).default([]),
+    cost: Cost.optional(),
+  })
+  .strict();
+export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
 
 export const CardDef = z
   .object({
@@ -131,8 +144,12 @@ export const CardDef = z
     fx: z.string().optional(),
     /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
+    /**
+     * 강화(+1~+5). +1~+3: growth[i]만큼 effects[i]의 수치(amount, 없으면 stacks)가 단계마다 오른다.
+     * +4·+5: 이름 붙은 특수 스킬이 붙는다(효과 추가·키워드 추가/제거·비용 변경). 상태·저주 카드는 강화하지 않는다
+     */
     upgrade: z
-      .object({ cost: Cost.optional(), effects: z.array(Effect).optional(), text: z.string().optional() })
+      .object({ growth: z.array(z.number()), plus4: UpgradeSkill, plus5: UpgradeSkill })
       .strict()
       .optional(),
   })
@@ -253,6 +270,8 @@ export const Balance = z
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),
     incorporealMultiplier: z.number(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
+    /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
+    upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
     rewards: z
       .object({
         cardChoices: z.number().int().positive(),

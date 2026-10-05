@@ -96,6 +96,16 @@ describe('런 진행', () => {
     expect((boss.epic ?? 0) / 900).toBeGreaterThan((battle.epic ?? 0) / 900);
   });
 
+  it('휴식의 수련은 사람이 고른 카드를 한 단계 강화하고, +5를 넘지 않는다', () => {
+    const run = createRun(data, 'UPG', { stageId: 's1' });
+    const rest = data.modules.get('s1_rest_campfire')!;
+    const train = choicesFor(data, run, rest).findIndex((c) => c.label === '수련한다');
+    const target = run.deck.find((c) => c.cardId === 'haun_read_grain')!;
+    for (let i = 0; i < 7; i++) applyChoice(data, run, rest, train, target.uid);
+    expect(target.level).toBe(5);
+    expect(run.deck.filter((c) => c.uid !== target.uid).every((c) => c.level === 0)).toBe(true);
+  });
+
   it('왕일검 지원이 켜지면 휴식 노드에 토납 수련이 추가된다', () => {
     const rest = data.modules.get('s1_rest_campfire')!;
     const off = createRun(data, 'RUN5', { stageId: 's1' });

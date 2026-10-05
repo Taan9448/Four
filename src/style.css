@@ -198,6 +198,8 @@ button { font: inherit; }
 .rarity-epic { border-color: #8e5bd0; box-shadow: 0 0 10px rgba(142, 91, 208, 0.45); }
 .rarity-legendary { border-color: #f2a93b; box-shadow: 0 0 12px rgba(242, 169, 59, 0.6); background: linear-gradient(165deg, #fbf3e0 60%, #f6dca6); }
 .card-rarity { float: right; font-weight: 700; }
+.card-level { color: #2d5d93; }
+.card-level-skill { color: #b8741a; }
 .rarity-uncommon .card-rarity { color: #3f7d2b; }
 .rarity-rare .card-rarity { color: #2d5d93; }
 .rarity-epic .card-rarity { color: #7240b5; }
@@ -220,7 +222,7 @@ button { font: inherit; }
 .pip-zero { font-size: 0.75rem; font-weight: 700; color: #8a7d64; }
 .card-name { font-weight: 800; font-size: 1rem; }
 .card-owner { font-size: 0.7rem; color: #8a7d64; }
-.card-text { font-size: 0.8rem; line-height: 1.4; flex: 1; }
+.card-text { font-size: 0.8rem; line-height: 1.4; flex: 1; white-space: pre-line; }
 .card-flavor { font-size: 0.65rem; color: #8a7d64; font-style: italic; line-height: 1.35; max-height: 3.6em; overflow: hidden; }
 
 /* 알림·결과 */

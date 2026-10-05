@@ -1,5 +1,5 @@
 // 전투 상태 타입과 작은 도우미.
-import type { CardDef, Cost, Effect, Keyword, SupportRule, World } from './schema';
+import type { CardDef, Cost, Effect, Keyword, SupportRule, UpgradeSkill, World } from './schema';
 import type { GameData } from './data';
 import type { Rng } from './rng';
 
@@ -35,7 +35,8 @@ export interface EnemyState extends Combatant {
 export interface CardInstance {
   uid: string;
   cardId: string;
-  upgraded: boolean;
+  /** 강화 단계 0~5 */
+  level: number;
 }
 
 export type BattleEvent =
@@ -91,22 +92,36 @@ export interface ResolvedCard {
   cost: Cost;
   effects: Effect[];
   keywords: Keyword[];
-  upgraded: boolean;
+  /** 강화 단계 0~5 */
+  level: number;
+  /** 성장 적용된 기본 효과(특수 스킬 효과 제외) — 카드 문구용 */
+  baseEffects: Effect[];
+  /** 열린 특수 스킬(+4, +5) */
+  skills: UpgradeSkill[];
 }
 
+/** 강화 단계를 반영한 카드. +1~+3은 수치 성장, +4·+5는 특수 스킬 */
 export function resolveCard(data: GameData, inst: CardInstance | string): ResolvedCard {
   const cardId = typeof inst === 'string' ? inst : inst.cardId;
-  const upgraded = typeof inst === 'string' ? false : inst.upgraded;
   const def = data.cards.get(cardId);
   if (!def) throw new Error(`알 수 없는 카드: ${cardId}`);
-  const up = upgraded ? def.upgrade : undefined;
-  return {
-    def,
-    cost: up?.cost ?? def.cost,
-    effects: up?.effects ?? def.effects,
-    keywords: def.keywords,
-    upgraded,
-  };
+  const up = def.upgrade;
+  const level = up ? Math.min(typeof inst === 'string' ? 0 : inst.level, data.balance.upgrade.maxLevel) : 0;
+  const steps = Math.min(level, data.balance.upgrade.statLevels);
+  const baseEffects = def.effects.map((e, i) => {
+    const g = (up?.growth[i] ?? 0) * steps;
+    if (!g) return e;
+    return e.amount !== undefined ? { ...e, amount: e.amount + g } : { ...e, stacks: (e.stacks ?? 0) + g };
+  });
+  const skills = up ? [up.plus4, up.plus5].slice(0, Math.max(0, level - data.balance.upgrade.statLevels)) : [];
+  let cost = def.cost;
+  let keywords = [...def.keywords];
+  for (const sk of skills) {
+    if (sk.cost) cost = sk.cost;
+    keywords = keywords.filter((k) => !sk.removeKeywords.includes(k));
+    for (const k of sk.addKeywords) if (!keywords.includes(k)) keywords.push(k);
+  }
+  return { def, cost, effects: [...baseEffects, ...skills.flatMap((s) => s.effects)], keywords, level, baseEffects, skills };
 }
 
 export function isFusion(card: ResolvedCard): boolean {

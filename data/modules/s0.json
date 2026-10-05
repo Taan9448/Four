@@ -12,7 +12,7 @@
     "content": {
       "text": "\"하운아, 또 맨손이냐.\" 주방의 왕 노인이 혀를 차며 낡은 천 조각을 던졌다. \"감아라. 손이 망가지면 너는 평생 도끼질밖에 못 한다.\"",
       "choices": [
-        { "label": "천을 손에 감는다", "result": "장작 패기 1장을 강화했다.", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
+        { "label": "천을 손에 감는다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
         { "label": "\"괜찮습니다, 할아버지.\"", "result": "웃으며 천을 품에 넣었다. 체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] }
       ]
     }
@@ -43,7 +43,7 @@
       "text": "아궁이 열두 개에 불이 붙었다. 왕 노인은 아무 말 없이 하운의 도끼질을 지켜보다 주방으로 돌아갔다.",
       "choices": [
         { "label": "아궁이 곁에서 쉰다", "result": "체력 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "도끼질을 다듬는다", "result": "카드 1장을 강화했다.", "effects": [ { "op": "upgrade_card", "count": 1 } ] }
+        { "label": "도끼질을 다듬는다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
       ]
     }
   },
@@ -64,7 +64,7 @@
       "text": "땔감을 구하러 수천 번 들락거린 숲이다. 어느 바위 아래가 비었는지 그는 알았다.",
       "choices": [
         { "label": "바위 아래에서 숨을 고른다", "result": "체력 12 회복", "effects": [ { "op": "heal_party", "amount": 12 } ] },
-        { "label": "숨을 죽이고 발 디딤을 고친다", "result": "발 디딤 1장을 강화했다.", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] }
+        { "label": "숨을 죽이고 발 디딤을 고친다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] }
       ]
     }
   },
@@ -74,7 +74,7 @@
     "content": {
       "text": "어느 비탈이 미끄러운지 그는 알았다. 나무 꼭대기를 밟고 날아오는 학창의의 그림자가 달빛 아래 너울거린다.",
       "choices": [
-        { "label": "비탈을 미끄러져 내려간다", "result": "가시덤불에 긁혔지만 거리를 벌렸다. 체력 4 잃고 결 읽기 1장 강화", "effects": [ { "op": "heal_party", "amount": -4 }, { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
+        { "label": "비탈을 미끄러져 내려간다", "result": "가시덤불에 긁혔지만 거리를 벌렸다. 체력 4 잃고 하운의 기본 카드 1장 강화(+1)", "effects": [ { "op": "heal_party", "amount": -4 }, { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
         { "label": "비탈을 돌아간다", "result": "체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
       ]
     }

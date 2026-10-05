@@ -127,7 +127,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
 
   const deckCounts = new Map<string, number>();
   for (const c of run.deck) {
-    const key = `${data.cards.get(c.cardId)!.name}${c.upgraded ? '+' : ''}`;
+    const key = `${data.cards.get(c.cardId)!.name}${c.level ? ` +${c.level}` : ''}`;
     deckCounts.set(key, (deckCounts.get(key) ?? 0) + 1);
   }
 
