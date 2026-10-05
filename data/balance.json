@@ -25,6 +25,7 @@
   "incorporealMultiplier": 0.5,
   "party": { "max": 3, "reviveHp": 1 },
   "rewards": { "cardChoices": 3 },
+  "stage": { "healOnEnter": 1 },
   "route": {
     "nodesPerFloor": [2, 3],
     "eliteMinFloor": 3,

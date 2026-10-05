@@ -47,6 +47,8 @@ export interface BattleSetup {
   scar?: number;
   /** 모듈 보너스 등 전투 시작 효과 */
   startEffects?: Effect[];
+  /** 이 턴 수를 버티면 승리(모듈 content.surviveTurns) */
+  surviveTurns?: number;
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
@@ -90,6 +92,8 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     events: [],
     log: [],
     result: null,
+    surviveTurns: setup.surviveTurns ?? null,
+    survived: false,
     supportRules: setup.supportActive ? data.support : [],
     supportUsed: [],
     flags: setup.flags ?? [],
@@ -290,6 +294,14 @@ export function endTurn(state: BattleState): void {
 
   enemyTurn(state);
   if (state.result) return;
+  // 버티기 전투: 정한 턴의 적 행동까지 견디면 승리
+  if (state.surviveTurns !== null && state.turn >= state.surviveTurns) {
+    state.survived = true;
+    state.events.push({ type: 'survived', turns: state.turn });
+    state.log.push(`${state.turn}턴을 버텼다.`);
+    setResult(state, 'victory');
+    return;
+  }
   decayStatuses(state, state.enemies, 'ownTurnEnd');
   decayStatuses(state, [...state.party, ...state.enemies], 'roundEnd');
   startPlayerTurn(state);
@@ -326,6 +338,8 @@ function enemyTurn(state: BattleState): void {
 
 export interface BattleOutcome {
   result: 'victory' | 'defeat';
+  /** 버티기로 끝났다 */
+  survived: boolean;
   party: { id: string; hp: number }[];
   mana: number;
   scarGain: number;
@@ -336,6 +350,7 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
   const bal = state.data.balance;
   return {
     result: state.result,
+    survived: state.survived,
     party: state.party.map((p) => ({ id: p.defId, hp: p.downed ? bal.party.reviveHp : p.hp })),
     mana: state.mana,
     scarGain: Math.floor(state.rift * bal.rift.scarRatio),

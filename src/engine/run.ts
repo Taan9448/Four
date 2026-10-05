@@ -26,7 +26,8 @@ export interface RunState {
   flags: string[];
   usedModules: string[];
   supportActive: boolean;
-  status: 'map' | 'complete' | 'defeat';
+  /** map: 지도 / stage_clear: 보스를 넘고 다음 스테이지 대기 / complete: 캠페인(구현된 범위) 끝 / defeat */
+  status: 'map' | 'stage_clear' | 'complete' | 'defeat';
   counter: number;
 }
 
@@ -36,8 +37,13 @@ export interface RunOptions {
   supportActive?: boolean;
 }
 
+/** 원작 순서(order)로 플레이 가능한 스테이지 */
+export function playableStages(data: GameData) {
+  return data.stages.filter((s) => s.playable).sort((a, b) => a.order - b.order);
+}
+
 export function createRun(data: GameData, seed: string, opts: RunOptions = {}): RunState {
-  const stageId = opts.stageId ?? 's1';
+  const stageId = opts.stageId ?? playableStages(data)[0].id;
   const haun = data.characters.get('haun')!;
   const run: RunState = {
     seed,
@@ -57,13 +63,43 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     counter: 0,
   };
   for (const cardId of haun.starterDeck) addCard(run, cardId);
-  run.map = generateStageMap(data, stageId, createRng(seed).fork(`map:${stageId}`), {
+  run.map = buildMap(data, run);
+  return run;
+}
+
+function buildMap(data: GameData, run: RunState): StageMap {
+  return generateStageMap(data, run.stageId, createRng(run.seed).fork(`map:${run.stageId}`), {
     scar: run.scar,
     flags: run.flags,
     roster: run.roster.map((r) => r.id),
     usedModules: run.usedModules,
   });
-  return run;
+}
+
+/** 보스를 넘은 뒤 다음 스테이지(원작 순서로 다음 playable). 없으면 null */
+export function nextStage(data: GameData, run: RunState) {
+  const cur = data.stages.find((s) => s.id === run.stageId)!;
+  return playableStages(data).find((s) => s.order > cur.order) ?? null;
+}
+
+/**
+ * 다음 스테이지로 넘어간다: 덱·동료·상흔·플래그는 이어지고, 지도는 새로, 체력은 balance.stage.healOnEnter만큼 회복.
+ * 다음 스테이지가 없으면 캠페인(구현된 범위)을 마친다. 넘어갔으면 true
+ */
+export function advanceStage(data: GameData, run: RunState): boolean {
+  if (run.status !== 'stage_clear') throw new Error('보스를 넘은 뒤에만 다음 스테이지로 간다');
+  const next = nextStage(data, run);
+  if (!next) {
+    run.status = 'complete';
+    return false;
+  }
+  run.stageId = next.id;
+  run.position = null;
+  run.visited = [];
+  for (const r of run.roster) r.hp = Math.min(r.maxHp, r.hp + Math.floor(r.maxHp * data.balance.stage.healOnEnter));
+  run.map = buildMap(data, run);
+  run.status = 'map';
+  return true;
 }
 
 export function addCard(run: RunState, cardId: string, upgraded = false): CardInstance {
@@ -114,6 +150,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       return { id, hp: r.hp, maxHp: r.maxHp };
     }),
     enemies: enc.module.content.enemies ?? [],
+    surviveTurns: enc.module.content.surviveTurns,
     deck: run.deck,
     mana: run.mana,
     rng: createRng(run.seed).fork(`battle:${run.stageId}:${enc.node.id}`),
@@ -132,7 +169,7 @@ export function applyBattleOutcome(run: RunState, enc: Encounter, outcome: Battl
   run.mana = outcome.mana;
   run.scar += outcome.scarGain;
   if (outcome.result === 'defeat') run.status = 'defeat';
-  else if (enc.node.type === 'boss') run.status = 'complete';
+  else if (enc.node.type === 'boss') run.status = 'stage_clear';
 }
 
 export function rewardOptions(data: GameData, run: RunState, nodeId: string): string[] {
@@ -228,7 +265,8 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[]): s
       case 'heal_party':
         for (const r of run.roster.filter((x) => run.selected.includes(x.id))) {
           const amount = e.ratio !== undefined ? Math.floor(r.maxHp * e.ratio) : (e.amount ?? 0);
-          r.hp = Math.min(r.maxHp, r.hp + amount);
+          // 음수면 체력 손실(이벤트로는 쓰러지지 않는다: 최소 1)
+          r.hp = Math.max(Math.min(r.hp, 1), Math.min(r.maxHp, r.hp + amount));
         }
         out.push('출전 동료 회복');
         break;
