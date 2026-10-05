@@ -138,6 +138,7 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     const fx = promptFor('fx_slash_blue');
     expect(fx).toContain('#000000');
     expect(fx).toContain('additive blending');
+    expect(fx).not.toContain('no soft glow');
   });
 });
 

@@ -61,7 +61,7 @@ export function renderPrompt(spec, style) {
         header +
         `Background: flat solid black #000000 in every cell.\n` +
         `Subject: a light-emitting effect drawn for additive blending; no character, no ground, no background elements.\n` +
-        `Style: ${style.sprite_style}; glowing light, crisp core.\n` +
+        `Style: ${style.fx_style ?? style.sprite_style}.\n` +
         `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are empty black.\n` : ''}${RULES}`
       );
     default:

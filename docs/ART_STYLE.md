@@ -65,6 +65,10 @@ sprite_style: >-
   2D game sprite, flat cel shading with 2-3 tone steps, clean dark navy (#1d2433) outline whose
   thickness varies slightly like an ink brush stroke, no gradients, no texture, no soft glow on the body,
   readable silhouette at half size, soft key light from the upper left
+fx_style: >-
+  2D game visual effect of pure light on black, crisp white-hot core fading to a saturated colored edge,
+  clean sweeping shapes whose edges taper like an ink brush stroke, a few sharp sparks, no smoke,
+  no realistic particles, no lens flare
 illustration_style: >-
   East Asian ink wash painting with light watercolor tints (sumuk damchae), expressive brush lines,
   generous empty space, subtle hanji paper texture
