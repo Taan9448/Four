@@ -1,11 +1,17 @@
 {
   "id": "haun_ref",
   "type": "character-ref",
-  "frameW": 32,
-  "frameH": 32,
+  "frameW": 64,
+  "frameH": 64,
   "track": "pixel",
-  "pixelScale": 16,
-  "frames": 4,
+  "pixelScale": 8.711,
+  "gridDetected": true,
+  "nativeSize": [
+    72,
+    72
+  ],
+  "fit": "pad",
+  "frames": 2,
   "fps": 1,
   "loop": false,
   "anchor": [
@@ -15,13 +21,14 @@
   "events": {},
   "blend": "normal",
   "facing": "right",
-  "fallbackLevel": 3,
+  "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "b632dbd2d57b545f",
+  "sourceHash": "37be77c715e541e3",
   "placeholder": false,
-  "resizedFrom": [
+  "resizedFrom": null,
+  "sourceSize": [
     1254,
     1254
   ],
-  "gridPurity": 0.445
+  "gridPurity": 0.762
 }
