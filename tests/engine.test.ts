@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { battleOutcome, canPlay, endTurn, playCard } from '../src/engine/battle';
 import { cardText } from '../src/engine/text';
+import { createRng } from '../src/engine/rng';
 import { battle, cards, data, give } from './helpers';
 
 const wolf = (s: ReturnType<typeof battle>) => s.enemies[0];
@@ -200,6 +201,41 @@ describe('파티', () => {
     playCard(s, give(s, 'elia_ice_wall'), s.party[0].uid);
     expect(s.party[0].block).toBe(7);
     expect(s.party[1].block).toBe(0);
+  });
+
+  it('왼편의 검(선천)은 첫 손패에 반드시 들어온다', () => {
+    const party = [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }];
+    const filler = Array.from({ length: 12 }, () => 'haun_chop');
+    for (const seed of ['a', 'b', 'c', 'd']) {
+      const s = battle({ party, deck: cards(...filler, 'kyle_left_blade'), rng: createRng(seed) });
+      expect(s.hand.map((c) => c.cardId)).toContain('kyle_left_blade');
+    }
+  });
+
+  it('날개 베기는 적에게 큰 피해와 약화, 카일 자신은 대가로 피해를 입는다', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }], enemies: ['shadow_wolf_alpha'] });
+    const before = wolf(s).hp;
+    playCard(s, give(s, 'kyle_wing_cut'), wolf(s).uid);
+    expect(before - wolf(s).hp).toBe(18);
+    expect(wolf(s).statuses.weak).toBe(2);
+    expect(s.party[1].hp).toBe(49);
+    expect(s.party[0].hp).toBe(60);
+  });
+
+  it('먼저 가: 보른이 도발하면 다른 동료를 노리던 공격이 보른에게 간다', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'born', hp: 70, maxHp: 70 }] });
+    s.enemies[0].intent = { moveId: 'bite', name: '물어뜯기', kind: 'attack', targetUid: s.party[0].uid };
+    playCard(s, give(s, 'born_go_first'));
+    expect(s.party[1].block).toBe(15);
+    endTurn(s);
+    expect(s.party[0].hp).toBe(60);
+    expect(s.party[1].block).toBeLessThan(15);
+  });
+
+  it('같이 가: 출전한 아군 전원에게 방어', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'born', hp: 70, maxHp: 70 }] });
+    playCard(s, give(s, 'born_together'));
+    expect(s.party.map((p) => p.block)).toEqual([6, 6]);
   });
 
   it('빙결된 적은 행동하지 못한다', () => {

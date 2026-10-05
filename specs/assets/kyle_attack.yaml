@@ -1,0 +1,16 @@
+id: kyle_attack
+type: character-anim
+character: kyle
+summary: 카일 기사의 일격 6프레임(무겁고 곧은 내려베기)
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: sword held at the right shoulder, knees bent, weight back
+  2: big step forward, sword raised beside the head
+  3: body leaning in, sword at its peak beside the head (not far above it)
+  4: heavy straight downward cut to the right, a 1-pixel white streak trailing the blade
+  5: follow-through, sword low in front, tabard swinging forward
+  6: recovering to the ready stance
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#3a6ea5' }

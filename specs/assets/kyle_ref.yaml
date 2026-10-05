@@ -1,0 +1,9 @@
+id: kyle_ref
+type: character-ref
+character: kyle
+summary: 카일 기준 시트(3/4 정면 + 오른쪽 측면)
+facing: right
+frame_notes:
+  1: full body, three-quarter front view, confident upright stance with a light grin, long sword held point-down in front with both hands on the hilt
+  2: full body, side view facing right, same armor and tabard, sword held ready at the right side
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#3a6ea5' }
