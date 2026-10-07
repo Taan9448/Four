@@ -28,6 +28,10 @@
     "forcedTypes": { "10": "rest" },
     "typeWeights": { "battle": 50, "event": 22, "elite": 14, "rest": 14 },
     "boss": "s4_boss_blood_hall", "summary": "구천 계단의 연속전과 정파 연합의 진법. 곽도진과 사무결의 2인 보스, 붉은 거인으로 변한 사무결." },
-  { "id": "s5", "order": 5, "name": "세계의 틈", "chapters": "9~10장", "world": "rift", "floors": 9, "playable": false,
-    "boss": null, "summary": "흐름이 없는 곳. 보른과 카일이 차례로 남고, 하운과 엘리아가 지옥왕 모르데카이의 매듭을 끊은 뒤 틈을 꿰맨다." }
+  { "id": "s5", "order": 5, "name": "세계의 틈", "chapters": "9~10장", "world": "rift", "floors": 9, "playable": true,
+    "pinned": [ { "floor": 1, "module": "s5_story_into_rift" }, { "floor": 7, "module": "s5_story_born_stays" }, { "floor": 8, "module": "s5_story_kyle_stays" } ],
+    "forcedTypes": { "9": "rest" },
+    "typeWeights": { "battle": 45, "event": 25, "elite": 12, "rest": 18 },
+    "boss": "s5_boss_mordecai",
+    "endingScene": "s5_scene_epilogue", "summary": "흐름이 없는 곳. 보른과 카일이 차례로 남고, 하운과 엘리아가 지옥왕 모르데카이의 매듭을 끊은 뒤 틈을 꿰맨다." }
 ]

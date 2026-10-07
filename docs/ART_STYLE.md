@@ -95,6 +95,7 @@
 | shadow_wolf | 그림자늑대 | 숯빛 늑대, 등줄기의 검은 불꽃, 호박색 눈 | magenta | small |
 | ignis | 화염군주 이그니스 | 용암과 불꽃의 거구 | magenta | large |
 | vargas | 마왕 바르가스 | 찢어진 박쥐 날개, 일곱 뿔, 텅 빈 눈 | green | large |
+| mordecai | 지옥왕 모르데카이 | 수많은 흐름을 꿰매 붙인 몸, 가슴의 푸른 심장, 빛나는 꿰맨 자국 | magenta | large |
 | rift_beasts | 틈 괴물 | 머리 셋 달린 불비늘 개, 그림자 망령, 뼈 거인 | green | small/large |
 | mordecai | 지옥왕 모르데카이 | 꿰매 붙인 몸, 가슴의 푸른 심장, 실밥이 모인 매듭 | green | large |
 
@@ -175,6 +176,10 @@ subjects:
   sa_mugyeol: >-
     a man in a deep black bamboo hat (satgat) pulled low over his face, only a pale jaw visible, a thin
     cruel smile, black layered robes, long blood-red fingernails
+  mordecai: >-
+    Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together
+    from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings
+    and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest
   vargas: >-
     Vargas, the Demon King of Nocturna; towering gaunt figure, seven black horns curving back from the skull,
     torn leathery bat wings, hollow empty eye sockets glowing faint green, a tattered black royal mantle

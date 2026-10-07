@@ -1,0 +1,118 @@
+[
+  {
+    "id": "s5_story_into_rift", "stage": "s5", "type": "story", "name": "갈라지는 하늘", "once": true,
+    "content": {
+      "scene": "s5_scene_crack",
+      "text": "틈 속에는 위도 아래도 없었다. 부서진 세계의 조각들이 떠 있었고, 아무것도 흐르지 않았다. 단전의 고리가 돌 때마다 무언가가 그 기운을 갉아먹었다. \"이곳이 흐름을 먹어요.\" 엘리아가 이를 악물었다. \"오래 버틸 수 없어요.\"",
+      "choices": [
+        { "label": "숨을 쉰다. 세 번 짧게, 한 번 길게", "result": "왕일검의 숨이 고리를 지킨다. (출전 동료 전원 최대 체력의 20% 회복)",
+          "effects": [ { "op": "heal_party", "ratio": 0.2 }, { "op": "set_flag", "flag": "into_rift" } ] },
+        { "label": "남은 마나를 아껴 둔다", "result": "흐름을 숨긴다. (런 마나 +4)",
+          "effects": [ { "op": "gain_run_mana", "amount": 4 }, { "op": "set_flag", "flag": "into_rift" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_story_born_stays", "stage": "s5", "type": "story", "name": "먼저 가", "once": true,
+    "content": {
+      "scene": "s5_scene_born_stays",
+      "text": "무너진 성벽 다리 위로 뼈의 거인 다섯이 기어오른다. 보른이 도끼를 땅에 박는다.",
+      "choices": [
+        { "label": "\"…조금 늦게, 같이 가.\"", "result": "보른이 다리에 남았다. 이제부터 보른은 출전하지 않는다.",
+          "effects": [ { "op": "leave_party", "member": "born" }, { "op": "set_flag", "flag": "born_stays" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_story_kyle_stays", "stage": "s5", "type": "story", "name": "멋있는 장면 하나 더", "once": true,
+    "content": {
+      "scene": "s5_scene_kyle_stays",
+      "text": "다리 끝, 그림자 망령의 무리가 뒤를 따라온다. 카일이 새 검을 고쳐 쥐며 씩 웃는다.",
+      "choices": [
+        { "label": "\"고향 술집에서 기다릴게.\"", "result": "카일이 남았다. 하운과 엘리아, 둘만이 틈의 심장으로 향한다.",
+          "effects": [ { "op": "leave_party", "member": "kyle" }, { "op": "set_flag", "flag": "kyle_stays" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_boss_mordecai", "stage": "s5", "type": "boss", "name": "틈의 심장 — 지옥왕 모르데카이",
+    "content": {
+      "scene": "s5_scene_mordecai",
+      "outroScene": "s5_scene_sealing",
+      "text": "흐름을 쓴 공격은 먹힌다. 결을 읽어 매듭을 드러내고, 힘을 싣지 않고 날을 얹어라.",
+      "enemies": ["mordecai"],
+      "bonus": { "condition": {}, "text": "\"너는 그 자리를 찾아서, 날을 얹기만 하면 된다.\" (날 얹기를 손에 들고, 두 장이 더미에 섞인다)",
+        "effects": [ { "op": "add_card", "card": "haun_place_blade", "to": "hand" }, { "op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2 } ] },
+      "clearEffects": [ { "op": "set_flag", "flag": "rift_sealed" } ]
+    }
+  },
+  {
+    "id": "s5_battle_hounds", "stage": "s5", "type": "battle", "name": "불비늘 삼두견", "weight": 3,
+    "conditions": { "floorRange": [2, 6] },
+    "content": { "text": "떠다니는 세계의 조각을 밟고 불타는 비늘의 짐승들이 몰려든다.", "enemies": ["fire_scale_hound", "fire_scale_hound"],
+      "bonus": { "condition": { "partyHas": "born" }, "text": "보른의 도끼가 비늘을 쪼갠다. (적 전원 취약 1)", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies" } ] } }
+  },
+  {
+    "id": "s5_battle_wraiths", "stage": "s5", "type": "battle", "name": "그림자 망령", "weight": 3,
+    "content": { "text": "장력이 그림자를 그냥 통과한다. 마나가 깃든 검만이 저것들을 벤다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"],
+      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일의 검이 망령을 가른다. (하운 방어 +8)", "effects": [ { "op": "block", "amount": 8, "target": "self" } ] } }
+  },
+  {
+    "id": "s5_battle_swarm", "stage": "s5", "type": "battle", "name": "틈의 무리", "weight": 2,
+    "conditions": { "floorRange": [3, 9] },
+    "content": { "text": "무림에서 본 것의 수십 배. 짐승과 망령이 함께 몰려온다.", "enemies": ["fire_scale_hound", "shadow_wraith", "fire_scale_hound"] }
+  },
+  {
+    "id": "s5_elite_bone_giant", "stage": "s5", "type": "elite", "name": "뼈 거인", "weight": 1, "once": true,
+    "content": { "text": "뼈로 이루어진 거인이 세계의 조각을 밟고 일어선다. 키가 천마봉 혈전의 지붕에 닿는다.", "enemies": ["bone_giant", "shadow_wraith"],
+      "bonus": { "condition": { "partyHas": "born" }, "text": "보른의 도끼가 거인의 정강이를 부순다. (적 전원 약화 1)", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" } ] } }
+  },
+  {
+    "id": "s5_elite_hound_alpha", "stage": "s5", "type": "elite", "name": "삼두견 우두머리", "weight": 1, "once": true,
+    "content": { "text": "가장 큰 삼두견이 무리를 이끈다. 비늘마다 불꽃이 인다.", "enemies": ["fire_scale_alpha", "fire_scale_hound"],
+      "bonus": { "condition": { "partyHas": "elia" }, "text": "엘리아가 남은 마나를 쪼개 얼음 벽을 세운다. (하운 방어 +10)", "effects": [ { "op": "block", "amount": 10, "target": "self" } ] } }
+  },
+  {
+    "id": "s5_event_fragments", "stage": "s5", "type": "event", "name": "떠다니는 세계의 조각", "weight": 3,
+    "content": {
+      "text": "기와지붕의 반쪽, 은빛 잎사귀가 달린 나뭇가지, 이름조차 알 수 없는 세계의 탑 꼭대기. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다.",
+      "choices": [
+        { "label": "기와지붕 아래서 숨을 고른다", "result": "출전 동료 전원 체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] },
+        { "label": "은빛 잎사귀를 쥔다", "result": "엘하임의 흐름이 희미하게 남아 있다. (런 마나 +3)", "effects": [ { "op": "gain_run_mana", "amount": 3 } ] },
+        { "label": "탑 꼭대기에서 길을 살핀다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_event_hungry_gaze", "stage": "s5", "type": "event", "name": "굶주린 시선", "weight": 2, "tags": ["scar"],
+    "conditions": { "floorRange": [3, 9] },
+    "content": {
+      "text": "틈의 가장 깊은 곳에서 무언가가 보고 있다. 눈은 보이지 않는다. 그러나 굶주린 시선이 느껴진다.",
+      "choices": [
+        { "label": "고리를 멈추고 흐름을 숨긴다", "result": "시선이 일행을 놓쳤다. 장작의 결을 읽던 눈이 깨어난다. (결 읽기를 얻었다)", "effects": [ { "op": "gain_card", "card": "haun_read_grain" } ] },
+        { "label": "운하검으로 길을 연다", "result": "시선이 일행을 쫓는다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "haun" } }, { "op": "scar", "amount": 1 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_event_elia_mend", "stage": "s5", "type": "event", "name": "쪼개고 또 쪼갠 마나", "weight": 2, "once": true,
+    "conditions": { "partyHas": "elia" },
+    "content": {
+      "text": "엘리아가 남은 마나를 쪼개고 또 쪼개어 동료들의 상처를 막는다. 얼굴이 종잇장처럼 하얗다.",
+      "choices": [
+        { "label": "상처를 맡긴다", "result": "출전 동료 전원 최대 체력의 25% 회복", "effects": [ { "op": "heal_party", "ratio": 0.25 } ] },
+        { "label": "마나를 아끼라고 한다", "result": "엘리아가 고개를 끄덕인다. (엘리아의 카드 1장 강화 +1)", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "elia" } } ] }
+      ]
+    }
+  },
+  {
+    "id": "s5_rest_wall", "stage": "s5", "type": "rest", "name": "무너진 성벽 조각", "weight": 1,
+    "content": {
+      "text": "시간조차 흐르지 않는 곳. 무너진 성벽 조각 위에서 잠시 숨을 고른다.",
+      "choices": [
+        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
+        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
+      ]
+    }
+  }
+]
