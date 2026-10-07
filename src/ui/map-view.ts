@@ -118,12 +118,16 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     h('p', { class: 'hint' }, '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.'),
   );
 
-  const support = h(
-    'label',
-    { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다. 1차 프로토타입에서는 디버그로 켤 수 있습니다.' },
-    h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
-    ' 왕일검 지원(디버그)',
-  );
+  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 디버그 토글
+  const wangJoined = run.flags.includes('support:wang');
+  const support = wangJoined
+    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, '왕일검 — 청운호흡으로 일행을 돕는다')
+    : h(
+        'label',
+        { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다. 그 전에는 디버그로 켤 수 있습니다.' },
+        h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
+        ' 왕일검 지원(디버그)',
+      );
 
   const deckCounts = new Map<string, number>();
   for (const c of run.deck) {

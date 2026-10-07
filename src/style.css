@@ -102,6 +102,7 @@ button { font: inherit; }
 .stage-clear .outro { font-size: 1.02rem; }
 .stage-clear .next-stage { color: var(--ink-dim); }
 .stage-clear .clear-gains { list-style: none; padding: 0; margin: 0.5rem 0; color: var(--gold, #e6c36a); }
+.stage-clear .scar-reveal { color: #c9a0ff; }
 .pips { display: inline-flex; gap: 3px; }
 .pip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
 .pip-neigong { background: var(--neigong); box-shadow: 0 0 6px rgba(242, 169, 59, 0.6); }

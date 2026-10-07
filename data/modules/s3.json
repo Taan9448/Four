@@ -1,0 +1,148 @@
+[
+  {
+    "id": "s3_story_unggok", "stage": "s3", "type": "battle", "name": "운곡촌의 교세", "once": true,
+    "content": {
+      "scene": "s3_scene_inverted",
+      "text": "장터에서 교세를 걷던 마교도들이 돌아본다. 하운이 장작을 팔러 다니던 마을이다.",
+      "enemies": ["tax_collector", "blood_cultist", "tax_collector"],
+      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 하운의 왼편에서 가장 먼저 검을 뽑는다. (하운 방어 +6)", "effects": [ { "op": "block", "amount": 6, "target": "self" } ] }
+    }
+  },
+  {
+    "id": "s3_story_reunion", "stage": "s3", "type": "story", "name": "폐사찰의 재회", "once": true,
+    "content": {
+      "scene": "s3_scene_reunion",
+      "text": "폐사찰 지하, 정파의 잔당들 한가운데 왕 노인이 서 있다. 아니, 청운문의 전대 대사형 왕일검(王一劍)이.",
+      "choices": [
+        { "label": "\"그 씨앗이 이제 싹을 틔울 때인 것 같습니다.\"", "result": "왕일검이 일행을 돕는다(전투 밖 지원). 청운십팔식의 마지막 식, 운해귀종을 배웠다.",
+          "effects": [ { "op": "join_party", "member": "wang" }, { "op": "gain_card", "card": "haun_unhae" }, { "op": "set_flag", "flag": "reunion" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_boss_branch_lord", "stage": "s3", "type": "boss", "name": "낙안봉 — 섬서 분타주",
+    "content": {
+      "outroScene": "s3_scene_sky_crack",
+      "text": "화산 낙안봉 아래, 마교의 섬서 분타. 성벽 위에서 장로급 고수가 혈적문이 새겨진 장포를 펄럭인다.",
+      "enemies": ["branch_lord", "blood_cultist"],
+      "clearEffects": [ { "op": "set_flag", "flag": "sky_crack" } ]
+    }
+  },
+  {
+    "id": "s3_battle_cultists", "stage": "s3", "type": "battle", "name": "혈교도", "weight": 3,
+    "conditions": { "floorRange": [2, 7] },
+    "content": { "text": "검붉은 무복 둘이 길을 막는다. 가슴의 혈적문이 젖은 듯 번들거린다.", "enemies": ["blood_cultist", "blood_cultist"] }
+  },
+  {
+    "id": "s3_battle_patrol", "stage": "s3", "type": "battle", "name": "교세 순찰", "weight": 2,
+    "conditions": { "floorRange": [2, 8] },
+    "content": { "text": "마을마다 교세를 걷으러 다니는 순찰대. 하운을 알아보지 못한다.", "enemies": ["tax_collector", "blood_cultist", "tax_collector"] }
+  },
+  {
+    "id": "s3_battle_guardians", "stage": "s3", "type": "battle", "name": "마교 호법", "weight": 2,
+    "conditions": { "floorRange": [5, 11] },
+    "content": { "text": "호법 둘이 혈마장을 겨눈다. 손바닥이 피처럼 붉다.", "enemies": ["cult_guardian", "cult_guardian"] }
+  },
+  {
+    "id": "s3_battle_branch_gate", "stage": "s3", "type": "battle", "name": "분타 외곽", "weight": 2,
+    "conditions": { "floorRange": [7, 11] },
+    "content": { "text": "낙안봉이 가깝다. 분타의 외곽 초소.", "enemies": ["blood_cultist", "cult_guardian", "blood_cultist"],
+      "bonus": { "condition": { "partyHas": "born" }, "text": "보른이 초소 문을 도끼로 쪼갠다. (적 전원 취약 1)", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies" } ] } }
+  },
+  {
+    "id": "s3_elite_wudang_blockade", "stage": "s3", "type": "elite", "name": "무당 봉쇄진", "weight": 1, "once": true,
+    "content": { "text": "삼 년 동안 봉쇄된 무당산 진무관. 봉쇄진을 지키는 마교의 호법 셋.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"],
+      "bonus": { "condition": { "partyHas": "elia" }, "text": "엘리아가 얇은 마나를 끌어모아 진의 한 귀퉁이를 태운다. (호법 전원 약화 1)", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" } ] } }
+  },
+  {
+    "id": "s3_elite_elder", "stage": "s3", "type": "elite", "name": "마교 장로", "weight": 1, "once": true,
+    "content": { "text": "백발을 핏빛 끈으로 묶은 노인. 혈천강기가 그의 주위를 맴돈다.", "enemies": ["cult_elder"],
+      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 왼편에서 가장 먼저 검을 뽑는다. (하운 방어 +8)", "effects": [ { "op": "block", "amount": 8, "target": "self" } ] } }
+  },
+  {
+    "id": "s3_event_jinmu_gate", "stage": "s3", "type": "event", "name": "진무관의 문", "weight": 2, "once": true,
+    "conditions": { "floorRange": [4, 11] },
+    "content": {
+      "scene": "s3_scene_wudang",
+      "text": "진무관의 문이 열리고, 피골이 상접한 무당의 도사들이 햇빛 아래로 걸어 나온다.",
+      "choices": [
+        { "label": "도사들을 부축한다", "result": "노도사가 태극의 원리를 일러 주었다. 고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] },
+        { "label": "길을 서두른다", "result": "무당의 단약을 받았다. 출전 동료 전원 체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_event_shaolin_ashes", "stage": "s3", "type": "event", "name": "소림의 잿더미", "weight": 2, "once": true,
+    "conditions": { "partyHas": "born" },
+    "content": {
+      "text": "불탄 소림사의 잿더미. 살아남은 무승들이 묵언 수행 중이다. 보른이 그 곁에 말없이 앉아 도끼를 손질하기 시작한다.",
+      "choices": [
+        { "label": "몇 시진이고 함께 앉아 있는다", "result": "말이 없는 드워프와 묵언 중인 승려들. 도끼 손질을 얻었다.", "effects": [ { "op": "gain_card", "card": "born_whetstone" } ] },
+        { "label": "무승들에게 길을 묻는다", "result": "보른의 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "born" } } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_event_dumplings", "stage": "s3", "type": "event", "name": "객잔의 만두", "weight": 2, "once": true,
+    "conditions": { "partyHas": "kyle" },
+    "content": {
+      "text": "\"엘하임의 그 어떤 왕궁 연회에도 이런 건 없었어.\" 카일이 만두를 서른 개째 시킨다.",
+      "choices": [
+        { "label": "같이 먹는다", "result": "만두 한 접시를 얻었다.", "effects": [ { "op": "gain_card", "card": "kyle_dumplings" } ] },
+        { "label": "그만 먹으라고 말린다", "result": "카일이 시무룩하다. 출전 동료 전원 체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_event_plum_sword", "stage": "s3", "type": "event", "name": "매화검수", "weight": 2, "once": true,
+    "conditions": { "floorRange": [5, 11] },
+    "content": {
+      "text": "화산파의 여제자들에게 서역의 기사도를 늘어놓던 카일이, 매화검에 엉덩이를 찔렸다.",
+      "choices": [
+        { "label": "대신 사과한다", "result": "매화검수가 웃으며 검로 하나를 보여 주었다. 하운의 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } } ] },
+        { "label": "비무를 청한다", "result": "화산의 검은 빨랐다. (출전 동료 전원 체력 -4, 런 마나 +3)", "effects": [ { "op": "heal_party", "amount": -4 }, { "op": "gain_run_mana", "amount": 3 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_event_rumor", "stage": "s3", "type": "event", "name": "바람보다 빠른 소문", "weight": 2,
+    "content": {
+      "text": "푸른 검을 든 청년과 은발의 요녀, 금발의 서역 무사, 도끼를 든 난쟁이. 청년이 검을 휘두르면 하늘이 갈라진다는 소문. 잔당들이 하나둘 일행에 합류한다.",
+      "choices": [
+        { "label": "잔당들을 받아들인다", "result": "짐을 나눠 졌다. 기본 카드 1장을 덱에서 뺐다.", "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } } ] },
+        { "label": "마을 사람들에게 길을 묻는다", "result": "출전 동료 전원 체력 5 회복", "effects": [ { "op": "heal_party", "amount": 5 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_event_sky_line", "stage": "s3", "type": "event", "name": "하늘의 금", "weight": 2, "tags": ["scar"],
+    "conditions": { "floorRange": [6, 11] },
+    "content": {
+      "text": "밤하늘, 별과 별 사이에 가는 검은 금이 보인다. 엘리아가 말없이 그것을 올려다본다.",
+      "choices": [
+        { "label": "운하검을 더 깊이 판다", "result": "금이 조금 더 벌어진 것 같다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "haun" } }, { "op": "scar", "amount": 1 } ] },
+        { "label": "검을 거두고 숨만 고른다", "result": "왕일검이 등을 두드린다. (런 마나 +2)", "effects": [ { "op": "gain_run_mana", "amount": 2 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_rest_temple", "stage": "s3", "type": "rest", "name": "폐사찰의 등잔불", "weight": 1,
+    "content": {
+      "text": "희미한 등잔불 아래 잔당들이 상처를 싸맨다.",
+      "choices": [
+        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
+        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
+      ]
+    }
+  },
+  {
+    "id": "s3_inn_gaekjan", "stage": "s3", "type": "inn", "name": "길가의 객잔", "weight": 1,
+    "content": {
+      "text": "늙은 객잔 주인이 문을 반쯤 열고 낯선 일행을 살핀다. 마교도가 아니라는 걸 알자 문을 활짝 연다.",
+      "choices": [
+        { "label": "하룻밤 묵는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [ { "op": "heal_party", "ratio": 0.4 } ] },
+        { "label": "짐을 정리한다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } } ] }
+      ]
+    }
+  }
+]

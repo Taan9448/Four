@@ -142,5 +142,49 @@
       { "id": "kings_hand", "name": "마왕의 손", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 20 } ] }
     ],
     "flavor": "찢어진 박쥐 날개, 일곱 개의 뿔, 텅 빈 눈. \"이방인이로군. 이 세계의 마나가 아닌 것이 섞여 있어.\""
+  },
+  {
+    "id": "tax_collector", "name": "교세 걷는 마교도", "maxHp": 18, "sprite": null, "color": "#7a2a2a", "pattern": "random",
+    "moves": [
+      { "id": "kick_stall", "name": "좌판 걷어차기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 5 } ] },
+      { "id": "demand_tax", "name": "\"교세를 내라.\"", "intent": "debuff", "targeting": "haun", "weight": 1, "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "검붉은 무복, 가슴에 핏방울 모양의 혈적문. 상인들의 좌판을 걷어차며 교세를 걷는다."
+  },
+  {
+    "id": "blood_cultist", "name": "혈교도", "maxHp": 30, "sprite": null, "color": "#8a1f2a", "pattern": "random",
+    "moves": [
+      { "id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 8 } ] },
+      { "id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 5, "target": "self" } ] }
+    ],
+    "flavor": "천마신교의 말단. 마기(魔氣)가 무겁고 끈적하게 몸에 감겨 있다."
+  },
+  {
+    "id": "cult_guardian", "name": "마교 호법", "maxHp": 40, "sprite": null, "color": "#5a1a24", "pattern": "cycle",
+    "moves": [
+      { "id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 10 } ] },
+      { "id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [ { "op": "block", "amount": 7, "target": "all_allies" } ] },
+      { "id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 6 }, { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }
+    ],
+    "flavor": "손바닥이 피처럼 붉다. 셋이 서면 진이 되고, 진은 삼 년 동안 무당을 가뒀다."
+  },
+  {
+    "id": "cult_elder", "name": "마교 장로", "maxHp": 115, "sprite": null, "color": "#c8c0b8", "scale": 1.2, "tier": "elite", "pattern": "cycle",
+    "moves": [
+      { "id": "blood_heaven_qi", "name": "혈천강기", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
+      { "id": "vampiric_art", "name": "흡혈마공", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 12 }, { "op": "heal", "amount": 8, "target": "self" } ] },
+      { "id": "blood_drop", "name": "혈적", "intent": "debuff", "targeting": "random", "effects": [ { "op": "apply_status", "status": "poison", "stacks": 3 }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" } ] }
+    ],
+    "flavor": "백발을 핏빛 끈으로 묶은 노인. 혈천강기가 그의 주위를 맴돈다."
+  },
+  {
+    "id": "branch_lord", "name": "섬서 분타주", "maxHp": 210, "sprite": null, "color": "#6a0f1a", "scale": 1.6, "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "branch_command", "name": "분타의 호령", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies" }, { "op": "block", "amount": 14, "target": "self" } ] },
+      { "id": "great_blood_qi", "name": "혈천강기·대", "intent": "attack", "effects": [ { "op": "damage", "amount": 9, "target": "all_enemies" } ] },
+      { "id": "nakan_strike", "name": "낙안 일격", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 18 } ] },
+      { "id": "essence_drain", "name": "혈마흡정", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 10 }, { "op": "heal", "amount": 12, "target": "self" }, { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "마교의 장로급 고수. 화산 낙안봉 아래에 분타를 세우고 섬서를 다스린다."
   }
 ]
