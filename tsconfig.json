@@ -15,5 +15,5 @@
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "tools/balance", "vitest.balance.config.ts"]
 }

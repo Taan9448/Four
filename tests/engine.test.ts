@@ -134,9 +134,10 @@ describe('결 읽기와 특수 상태', () => {
   it('흐름 포식: 흐름을 쓴 카드의 피해를 먹고, 매듭이 드러나면 날 얹기가 통한다', () => {
     const s = battle({ world: 'rift', enemies: ['mordecai'] });
     const m = s.enemies[0];
+    const base = data.enemies.get('mordecai')!.maxHp;
     playCard(s, give(s, 'haun_chop'), m.uid);
-    expect(m.hp).toBe(206);
-    expect(m.maxHp).toBe(206);
+    expect(m.hp).toBe(base + 6);
+    expect(m.maxHp).toBe(base + 6);
     s.neigong = 10;
     playCard(s, give(s, 'haun_read_grain'), m.uid);
     expect(m.statuses.knot_exposed).toBeUndefined();
@@ -310,7 +311,7 @@ describe('왕일검 지원 규칙', () => {
   it('도진아: 곽도진의 체력이 절반 이하가 되면 1턴 기절', () => {
     const s = battle({ supportActive: true, enemies: ['kwak_dojin'] });
     const kwak = s.enemies[0];
-    kwak.hp = 85;
+    kwak.hp = Math.floor(kwak.maxHp / 2) + 5; // 장작 패기(6) 한 번이면 절반 이하
     playCard(s, give(s, 'haun_chop'), kwak.uid);
     expect(kwak.statuses.stun).toBe(1);
     const hp = s.party[0].hp;

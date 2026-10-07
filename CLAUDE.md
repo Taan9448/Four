@@ -15,6 +15,8 @@ npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
+npm run balance             # 자동 플레이 봇 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s4)
+npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s4:s4_boss_blood_hall)
 npm run build               # dist/
 npm run assets:placeholder -- <id> | --all
 npm run assets:prompt -- <id>
@@ -37,7 +39,8 @@ npm run assets:status
 
 ## 구조
 - `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), save(저장 직렬화), text(카드 문구)
+- `src/sim/` — bot(자동 플레이 봇: 밸런스 측정용, 엔진만 씀)
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview
 - `src/ui/` — app(화면 흐름), map-view, battle-view, choice-view, card-view, scene-view, deck-view, overlay(창), settings, storage(localStorage)
 - `data/` — balance, statuses, characters, enemies, stages, support, cards/, modules/
-- `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세)
+- `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세), `balance/`(봇 실행·기록, vitest로 돈다)
