@@ -1,0 +1,36 @@
+{
+  "id": "fx_hit_grain",
+  "type": "fx",
+  "frameW": 80,
+  "frameH": 80,
+  "track": "pixel",
+  "pixelScale": 8.385,
+  "gridDetected": true,
+  "nativeSize": [
+    61,
+    61
+  ],
+  "fit": "pad",
+  "frames": 5,
+  "fps": 15,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 3
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 5,
+  "sourceHash": "38f115d82aa982f4",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.641
+}
