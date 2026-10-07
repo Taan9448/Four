@@ -65,7 +65,8 @@ export function keyOut(cell, spec) {
   if (!key || spec.chroma === 'black') return cell;
   const tol = spec.chroma_tolerance;
   const soft = tol * 2.2;
-  const innerDespill = spec.chroma === 'magenta' && spec.track === 'illustration';
+  // 안쪽 픽셀의 마젠타 기운 제거: 일러스트는 전부, 픽셀은 뚜렷한 것만(팔레트의 보라 #4b3a6b는 기운 17이라 남는다)
+  const innerSpillMin = spec.chroma !== 'magenta' ? Infinity : spec.track === 'illustration' ? 0 : 30;
   const out = Buffer.from(cell.data);
   for (let i = 0; i < out.length; i += 4) {
     const r = out[i], g = out[i + 1], b = out[i + 2];
@@ -81,10 +82,10 @@ export function keyOut(cell, spec) {
         const spill = g - Math.max(r, b);
         if (spill > 0) out[i + 1] = g - spill;
       }
-    } else if (innerDespill && out[i + 3] > 0) {
+    } else if (out[i + 3] > 0) {
       // 빨강·파랑이 모두 초록보다 높으면(보라~분홍 기운) 그만큼 뺀다. 빨강(파랑 낮음)·피부(초록 높음)는 그대로
       const spill = Math.min(r, b) - g;
-      if (spill > 0) { out[i] = r - spill; out[i + 2] = b - spill; }
+      if (spill > innerSpillMin) { out[i] = r - spill; out[i + 2] = b - spill; }
     }
   }
   return { data: out, width: cell.width, height: cell.height };
