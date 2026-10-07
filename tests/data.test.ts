@@ -65,6 +65,11 @@ describe('데이터 검사', () => {
     for (const en of data.enemies.values()) {
       for (const m of en.moves) errors.push(...checkEffects(`${en.id}.${m.id}`, m.effects, battleOps));
       for (const t of en.traits) if (!data.statuses.has(t.status)) errors.push(`${en.id}: 알 수 없는 특성 ${t.status}`);
+      if (en.transform) {
+        if (!data.enemies.has(en.transform.into)) errors.push(`${en.id}: 변신 대상 없음 ${en.transform.into}`);
+        else if (data.enemies.get(en.transform.into)!.transform) errors.push(`${en.id}: 변신한 모습이 다시 변신한다`);
+        errors.push(...checkEffects(`${en.id}.transform`, en.transform.partyEffects, battleOps));
+      }
     }
     expect(errors).toEqual([]);
   });

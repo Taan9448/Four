@@ -232,6 +232,20 @@ export const EnemyDef = z
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     pattern: z.enum(['cycle', 'random']),
     moves: z.array(MoveDef).min(1),
+    /**
+     * 변신(보스 2단계). downed: 쓰러질 자리에서 대신 변신 / lastStanding: 다른 적이 모두 쓰러져 혼자 남으면 변신.
+     * into의 적 정의로 바뀌고 체력은 가득, 상태는 into의 traits로 다시 시작한다. 변신한 차례에는 행동하지 않는다.
+     * partyEffects: 변신 순간 하운을 출처로 아군 쪽에 일어나는 일(원작 연출: 동료의 도움 등)
+     */
+    transform: z
+      .object({
+        triggers: z.array(z.enum(['downed', 'lastStanding'])).min(1),
+        into: z.string(),
+        text: z.string(),
+        partyEffects: z.array(Effect).default([]),
+      })
+      .strict()
+      .optional(),
     flavor: z.string().optional(),
   })
   .strict();
