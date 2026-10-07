@@ -1,0 +1,11 @@
+Create ONE PNG character portrait sheet for a visual novel, 1536x1024 px.
+Grid: 3 columns x 1 row. Each cell is exactly 512x1024 px. Cell numbers start at 1 from the left.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. No scenery, no floor, no shadow, no glow, no gradient behind the character.
+Subject: Elia, a half-elf mage woman; long silver hair, pointed ears, slate-blue hooded robe with silver trim. Match the attached character design sheet or reference image if one is attached.
+Framing: the SAME character in all 3 cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. Only the facial expression and a small change of hands or shoulders differ between cells.
+Cell 1: neutral expression — soft faint smile, warm attentive eyes, hands lightly together at the waist
+Cell 2: resolute expression — brows drawn, firm lips, one palm raised with a small flame of light floating above it
+Cell 3: surprised expression — eyes wide, a hand raised to the mouth, silver hair lifting slightly
+Style: hand-drawn 2D animated feature film look; clean, lively hand-inked line art with gentle line weight variation and warm dark-brown outlines; simple cel shading with one shadow tone and small highlights; light, airy, natural colors; softly painted watercolor-like backgrounds with rich natural detail and warm daylight; gentle, nostalgic atmosphere; East Asian wuxia world blended with a European fantasy forest; not photorealistic, not 3D, no heavy oil-paint texture. Crisp clean outline around the whole silhouette so it separates cleanly from the background.
+Never use magenta, pink or purple on the character.
+Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.
