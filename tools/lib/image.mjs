@@ -134,6 +134,20 @@ export function keyResidual(img, spec) {
   return opaque ? residual / opaque : 0;
 }
 
+/**
+ * 불투명 픽셀 중 마젠타 기운(빨강·파랑이 모두 초록보다 확연히 높음)이 남은 비율.
+ * 마젠타 키 일러스트는 keyOut이 이 기운을 걷어 내므로, 남아 있으면 옛 도구로 자른 것이다.
+ */
+export function magentaCast(img) {
+  let opaque = 0, cast = 0;
+  for (let i = 0; i < img.data.length; i += 4) {
+    if (img.data[i + 3] < 128) continue;
+    opaque++;
+    if (Math.min(img.data[i], img.data[i + 2]) - img.data[i + 1] > 24) cast++;
+  }
+  return opaque ? cast / opaque : 0;
+}
+
 /** 사람 눈에 가까운 RGB 거리(redmean) */
 function colorDist(r1, g1, b1, r2, g2, b2) {
   const rm = (r1 + r2) / 2;
