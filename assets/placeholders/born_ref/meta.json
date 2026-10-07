@@ -1,14 +1,14 @@
 {
   "id": "born_ref",
   "type": "character-ref",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 2,
@@ -23,7 +23,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "565679ad116a238a",
+  "sourceHash": "8c5fc8dc3a94f2b0",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

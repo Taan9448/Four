@@ -1,14 +1,14 @@
 {
   "id": "haun_hit",
   "type": "character-anim",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 3,
@@ -23,7 +23,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "470f3d7d63b3ab51",
+  "sourceHash": "89004d7adce04472",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

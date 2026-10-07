@@ -306,7 +306,7 @@ describe('저장소의 실제 명세와 임시 시트', () => {
   it('완성 프롬프트에 캔버스·격자·프레임 메모·빈 칸·키 색이 들어간다', () => {
     const text = promptFor('haun_attack');
     expect(text).toContain('Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.');
-    expect(text).toContain('64x64 pixel-art sprite scaled up exactly 8x');
+    expect(text).toContain('128x128 pixel-art sprite scaled up exactly 4x');
     expect(text).toContain('SAME size on ONE straight grid');
     expect(text).toContain('axe');
     expect(text).toContain('#1d2433');
