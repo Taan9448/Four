@@ -1,0 +1,18 @@
+id: sa_mugyeol_attack
+type: character-anim
+size: large
+character: sa_mugyeol
+chroma: green
+summary: 사무결 천마혈공 장력 6프레임
+depends_on: [sa_mugyeol_ref]
+reference: assets/source/sa_mugyeol_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the right palm back to the hip, red mist gathering"
+  2: "steps forward to the left, the palm glowing dark crimson"
+  3: "pushes the palm forward, a crimson ripple forming in front of it"
+  4: "palm at full extension to the left, a wide wave of blood-red force bursting from it"
+  5: "the red wave breaks into sparks, robes flaring"
+  6: "returns to standing, hands lowered"
+placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

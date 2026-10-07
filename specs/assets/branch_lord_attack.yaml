@@ -1,0 +1,18 @@
+id: branch_lord_attack
+type: character-anim
+size: large
+character: branch_lord
+chroma: green
+summary: 섬서 분타주 낙안 일격 6프레임
+depends_on: [branch_lord_ref]
+reference: assets/source/branch_lord_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "crouches into a low stance, right fist drawn back, red qi swirling"
+  2: "red qi gathers into a glowing sphere around the fist"
+  3: "drives forward to the left, fist leading"
+  4: "the fist strike lands at full reach to the left, a burst of blood-red force"
+  5: "the force dissipates, robe flaring"
+  6: "returns to the wide stance"
+placeholder: { shape: humanoid, color: '#6a0f1a', accent: '#ff3b3b' }

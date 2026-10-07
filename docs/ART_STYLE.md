@@ -91,11 +91,12 @@
 | born | 보른 | 작고 다부진 드워프(사람형 키의 약 70%), 갈색 땋은 수염, 큰 도끼, 둥근 방패 | magenta | small |
 | wang | 왕일검 | 굽은 등, 지팡이, 흰 머리, 주방 노인 차림(초상화만) | none | portrait |
 | kwak_dojin | 곽도진 | 백발 도인, 흰 학창의, 송문고검 | magenta | large |
-| sa_mugyeol | 사무결 | 검은 삿갓, 창백한 얼굴, 붉은 눈, 핏빛 손톱. 2페이즈 붉은 거인 | green | large |
+| sa_mugyeol | 사무결 | 검은 삿갓, 창백한 얼굴, 붉은 눈, 핏빛 손톱 | green | large |
+| sa_mugyeol_giant | 붉은 거인 사무결 | 사무결의 2페이즈. 엉긴 핏빛 내공의 거구, 안에서 빛나는 갈라진 붉은 피부, 머리에 남은 깨진 삿갓 조각, 긴 붉은 손톱, 피어오르는 피안개 | green | large |
+| branch_lord | 섬서 분타주 | 다부진 중년 마교 고수, 정수리 상투의 민머리, 짙은 검은 수염, 검은 단을 댄 짙은 진홍 교복, 넓은 가죽 띠, 두꺼운 팔 보호대, 핏빛 기운이 서린 맨손 | green | large |
 | shadow_wolf | 그림자늑대 | 숯빛 늑대, 등줄기의 검은 불꽃, 호박색 눈 | magenta | small |
-| ignis | 화염군주 이그니스 | 용암과 불꽃의 거구 | magenta | large |
-| vargas | 마왕 바르가스 | 찢어진 박쥐 날개, 일곱 뿔, 텅 빈 눈 | green | large |
-| mordecai | 지옥왕 모르데카이 | 수많은 흐름을 꿰매 붙인 몸, 가슴의 푸른 심장, 빛나는 꿰맨 자국 | magenta | large |
+| ignis | 화염군주 이그니스 | 용암과 불꽃의 거구: 갈라진 검은 현무암 피부와 빛나는 주황 용암 틈, 머리의 불꽃 왕관, 용암 주먹 | magenta | large |
+| vargas | 마왕 바르가스 | 찢어진 박쥐 날개, 일곱 뿔, 텅 빈 눈(초록빛) | magenta | large |
 | rift_beasts | 틈 괴물 | 머리 셋 달린 불비늘 개, 그림자 망령, 뼈 거인 | green | small/large |
 | mordecai | 지옥왕 모르데카이 | 꿰매 붙인 몸, 가슴의 푸른 심장, 실밥이 모인 매듭 | green | large |
 
@@ -184,6 +185,18 @@ subjects:
     Vargas, the Demon King of Nocturna; towering gaunt figure, seven black horns curving back from the skull,
     torn leathery bat wings, hollow empty eye sockets glowing faint green, a tattered black royal mantle
     over dark obsidian armor, long clawed fingers
+  sa_mugyeol_giant: >-
+    the Red Giant, Sa Mugyeol transformed by the Heavenly Demon blood art; a hulking blood-red giant of
+    congealed martial qi, cracked crimson skin glowing from within, shards of a shattered black bamboo hat
+    still on the head, long blood-red claws, blood mist steaming from the shoulders
+  ignis: >-
+    Ignis, the Flame Lord, one of the Demon King's Four Heavenly Kings; a hulking humanoid of molten rock,
+    cracked black basalt skin with glowing orange lava seams, a crown of living flames on the head, burning
+    yellow eyes, heavy fists of magma
+  branch_lord: >-
+    the Shaanxi Branch Lord of the Heavenly Demon Cult; a burly middle-aged martial arts elder, shaved head
+    with a small topknot, thick black beard, a dark crimson cult robe with black trim, a wide leather belt,
+    heavy black forearm guards, bare hands wreathed in blood-red qi
   shadow_wolf: >-
     a shadow wolf; charcoal-black fur, black flames along its spine, amber eyes, lean and hungry
 ```

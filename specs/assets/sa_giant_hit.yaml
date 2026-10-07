@@ -1,0 +1,14 @@
+id: sa_giant_hit
+type: character-anim
+size: large
+character: sa_mugyeol_giant
+chroma: green
+summary: 붉은 거인 사무결 피격 3프레임
+depends_on: [sa_giant_ref]
+reference: assets/source/sa_giant_ref.png
+facing: left
+frame_notes:
+  1: "struck, the huge body rocks back, red sparks spraying from the cracks"
+  2: "staggers, one hand on the ground"
+  3: "rises again, mouth open in a silent roar, the glow returning"
+placeholder: { shape: humanoid, color: '#a01020', accent: '#ff5a3a' }

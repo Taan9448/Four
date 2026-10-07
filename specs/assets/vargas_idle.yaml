@@ -1,0 +1,15 @@
+id: vargas_idle
+type: character-anim
+size: large
+character: vargas
+chroma: magenta
+summary: 마왕 바르가스 대기 4프레임
+depends_on: [vargas_ref]
+reference: assets/source/vargas_ref.png
+facing: left
+frame_notes:
+  1: "looming stance facing left, wings half folded"
+  2: "wings lift slightly, the mantle stirs"
+  3: "head tilts, the green glow in the eye sockets brightens"
+  4: "wings settle back"
+placeholder: { shape: humanoid, color: '#2a2a34', accent: '#7dff9a' }

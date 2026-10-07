@@ -1,0 +1,18 @@
+id: ignis_attack
+type: character-anim
+size: large
+character: ignis
+chroma: magenta
+summary: 화염군주 이그니스 용암 주먹 6프레임
+depends_on: [ignis_ref]
+reference: assets/source/ignis_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "pulls a molten fist back, flames gathering around it"
+  2: "the fist glows white-hot, steps forward"
+  3: "punches forward to the left, a trail of fire behind the fist"
+  4: "the magma fist lands at full reach to the left, a burst of flame"
+  5: "flames scatter into embers"
+  6: "returns to the standing stance"
+placeholder: { shape: humanoid, color: '#2a1a14', accent: '#ff8a1e' }

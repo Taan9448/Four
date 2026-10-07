@@ -1,0 +1,13 @@
+id: fx_claw
+type: fx
+summary: 할퀴기 — 붉은 세 줄 할퀸 자국 5프레임
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "three short thin red lines start at the upper right of the cell"
+  2: "the three parallel diagonal slashes stretch from upper right to lower left, white cores"
+  3: "all three slashes at full length and brightness, a few red droplets of light"
+  4: "the slashes thin out in the same place"
+  5: "faint red afterimages of the three slashes remain"
+placeholder: { accent: '#ff5a5a' }

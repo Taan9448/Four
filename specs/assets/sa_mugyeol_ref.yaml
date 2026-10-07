@@ -1,0 +1,11 @@
+id: sa_mugyeol_ref
+type: character-ref
+size: large
+character: sa_mugyeol
+chroma: green
+summary: 사무결 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a tall man in a deep black bamboo hat pulled low over the face, only a pale jaw and a thin cruel smile visible, black layered robes, long blood-red fingernails, hands loose at his sides"
+  2: "full body, side view facing left, same proportions, one clawed hand slightly raised"
+placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

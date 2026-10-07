@@ -1,0 +1,12 @@
+id: fx_block
+type: fx
+summary: 막힘(방어) — 푸른 방패 빛 4프레임
+frames: 4
+fps: 15
+events: { impact: 2 }
+frame_notes:
+  1: "a pale blue rounded shield shape of light appears in the center, thin and faint"
+  2: "the shield flashes bright, a white ring along its rim"
+  3: "small cracks of light run across the shield, a few blue sparks bounce off"
+  4: "the shield fades, sparks drifting down"
+placeholder: { accent: '#8fd3ff' }
