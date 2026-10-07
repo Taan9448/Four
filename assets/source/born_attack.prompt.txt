@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Born, a short stocky dwarf warrior; braided brown beard, a big two-handed axe and a round iron shield. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing right.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp 64x64 pixel art in the style of a 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: shield forward, axe drawn back behind the shoulder with both hands
+Cell 2: steps forward, axe swinging up beside the head
+Cell 3: axe at its peak beside the head (not far above it), body coiled
+Cell 4: chops low and hard to the right at knee height, a 1-pixel white streak trailing the axe head
+Cell 5: follow-through, axe head near the ground, beard swinging forward
+Cell 6: recovering, shield raised again
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+
+Fix: STRICT RIGHT SIDE PROFILE in all6, only ONE eye. Match exact reference38-block body height, not40+: hair top local y=176, boot bottoms y=480, same304px head-to-foot body. Keep same head/torso/leg dimensions in everypose. For cells1-3 axe rises BESIDE the face ON THE LEFT at shoulder level, NEVER above crown: axe-head TOP must be y=160 orLOWER, next to/back of head, with both elbows bent at chest height. Do NOT extend arms overhead. This keeps all pose bounding boxes close in height. Cell4 chops rightLOWat kneeheight, white1blocktrail;5followthroughaxehead nearground;6recover shieldraised. CRITICAL cell4 axe head and entire white trail end before x=464, never cross its512px boundary; trail occupies ONLY x360..464. All cells have40px empty rightmargin. Axehead and boots end at/beforey480. Shieldstrap onleftforearm, same double-bit axe, green clothes/creamfur/navycape/ironshield/brown braidedbeard withsilverrings. Same brown shortboots and shortstockylegs. No extraeffects outside cell.
