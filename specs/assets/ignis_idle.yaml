@@ -1,0 +1,15 @@
+id: ignis_idle
+type: character-anim
+size: large
+character: ignis
+chroma: magenta
+summary: 화염군주 이그니스 대기 4프레임
+depends_on: [ignis_ref]
+reference: assets/source/ignis_ref.png
+facing: left
+frame_notes:
+  1: "stands facing left, the flame crown flickering"
+  2: "lava seams pulse brighter"
+  3: "the flames on the head flare up"
+  4: "dims back, embers drifting"
+placeholder: { shape: humanoid, color: '#2a1a14', accent: '#ff8a1e' }

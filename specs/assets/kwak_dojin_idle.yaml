@@ -1,0 +1,15 @@
+id: kwak_dojin_idle
+type: character-anim
+size: large
+character: kwak_dojin
+chroma: magenta
+summary: 곽도진 대기 4프레임
+depends_on: [kwak_dojin_ref]
+reference: assets/source/kwak_dojin_ref.png
+facing: left
+frame_notes:
+  1: "upright stance facing left, sword lowered at his side, sleeves still"
+  2: "slow breath, beard and sleeves stir slightly as if in a mountain breeze"
+  3: "sword tip lifts a little, cold eyes fixed ahead"
+  4: "settles back, sword lowered again"
+placeholder: { shape: humanoid, color: '#e0cfae', accent: '#9fd3ff' }

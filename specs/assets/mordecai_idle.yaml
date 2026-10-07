@@ -1,0 +1,15 @@
+id: mordecai_idle
+type: character-anim
+size: large
+character: mordecai
+chroma: green
+summary: 지옥왕 모르데카이 대기 4프레임
+depends_on: [mordecai_ref]
+reference: assets/source/mordecai_ref.png
+facing: left
+frame_notes:
+  1: "looming stance facing left, the blue heart pulsing"
+  2: "the stitched seams glow, faint faces shifting under the surface"
+  3: "the blue heart dims"
+  4: "the body sways slightly, seams fading back"
+placeholder: { shape: humanoid, color: '#1a1020', accent: '#4fb4ff' }

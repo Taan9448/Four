@@ -1,0 +1,13 @@
+id: fx_hit_grain
+type: fx
+summary: 결 노출 — 나뭇결처럼 갈라지는 푸른 빛 5프레임
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a thin vertical hairline of blue light appears in the center, like the grain of wood"
+  2: "the line splits open along its length into a narrow glowing blue crack with a white core"
+  3: "the crack at full length and brightness, small blue splinters flying out sideways"
+  4: "the crack narrows, splinters drifting"
+  5: "a faint blue afterimage of the crack in the same place"
+placeholder: { accent: '#4fb4ff' }

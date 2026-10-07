@@ -1,0 +1,18 @@
+id: vargas_attack
+type: character-anim
+size: large
+character: vargas
+chroma: magenta
+summary: 마왕 바르가스 마왕의 손 6프레임
+depends_on: [vargas_ref]
+reference: assets/source/vargas_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the clawed right hand, wings spreading"
+  2: "dark green energy gathers around the claws"
+  3: "lunges forward to the left, wings fully spread"
+  4: "the claw strike lands at full reach to the left, a green-black slash trail"
+  5: "wings beat once, the slash trail fading"
+  6: "folds the wings back, returns to the looming stance"
+placeholder: { shape: humanoid, color: '#2a2a34', accent: '#7dff9a' }

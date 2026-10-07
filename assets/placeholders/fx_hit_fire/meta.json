@@ -1,0 +1,36 @@
+{
+  "id": "fx_hit_fire",
+  "type": "fx",
+  "frameW": 80,
+  "frameH": 80,
+  "track": "pixel",
+  "pixelScale": 8,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "pad",
+  "frames": 5,
+  "fps": 15,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 3
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 5,
+  "sourceHash": "0d5188efddf9d1e0",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1
+}

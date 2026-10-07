@@ -1,0 +1,18 @@
+id: sa_giant_attack
+type: character-anim
+size: large
+character: sa_mugyeol_giant
+chroma: green
+summary: 붉은 거인 사무결 거인의 주먹 6프레임
+depends_on: [sa_giant_ref]
+reference: assets/source/sa_giant_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "rears back, the right fist raised high"
+  2: "the fist rises above the head, cracks glowing brighter"
+  3: "swings the fist down and forward to the left"
+  4: "the fist smashes down at full reach to the left, a burst of red shockwave"
+  5: "the shockwave fades, the giant hunched over the fist"
+  6: "pulls back into the hunched stance"
+placeholder: { shape: humanoid, color: '#a01020', accent: '#ff5a3a' }

@@ -1,0 +1,13 @@
+id: fx_hit_fire
+type: fx
+summary: 불 — 주황 불꽃 폭발 5프레임
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small orange ember in the center of the cell"
+  2: "it puffs into a round burst of orange and yellow flame"
+  3: "the flame burst at full size, licking upward, bright yellow core"
+  4: "the flames break into rising tongues and embers"
+  5: "a few embers and a wisp of dark smoke rising"
+placeholder: { accent: '#ff8a1e' }

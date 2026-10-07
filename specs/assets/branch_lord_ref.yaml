@@ -1,0 +1,11 @@
+id: branch_lord_ref
+type: character-ref
+size: large
+character: branch_lord
+chroma: green
+summary: 섬서 분타주 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a burly middle-aged martial arts elder, shaved head with a small topknot, thick black beard, dark crimson cult robe with black trim, wide leather belt, heavy black forearm guards, bare hands wreathed in blood-red qi"
+  2: "full body, side view facing left, same proportions, a wide low stance, fists ready"
+placeholder: { shape: humanoid, color: '#6a0f1a', accent: '#ff3b3b' }
