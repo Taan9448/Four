@@ -9,7 +9,7 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
-import { keyOut, nearestColor } from '../tools/lib/image.mjs';
+import { keyOut, magentaCast, nearestColor } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -359,6 +359,12 @@ describe('키 색 번짐 제거(keyOut)', () => {
     expect([...out.data.subarray(4, 8)]).toEqual([150, 20, 20, 255]); // 빨강은 빨강
     expect([...out.data.subarray(8, 12)]).toEqual([230, 200, 190, 255]); // 피부 그대로
     expect(out.data[15]).toBe(0); // 키 색은 투명
+  });
+
+  it('magentaCast: 남은 마젠타 기운 비율(검증기가 옛 도구로 자른 일러스트를 잡는다)', () => {
+    const img = px([90, 40, 100, 255], [40, 40, 50, 255], [160, 20, 30, 255], [255, 0, 255, 0]);
+    expect(magentaCast(img)).toBeCloseTo(1 / 3); // 투명 픽셀은 세지 않는다
+    expect(magentaCast(keyOut(img, { ...base, track: 'illustration' }))).toBe(0);
   });
 
   it('픽셀 트랙: 안쪽 픽셀은 건드리지 않는다(팔레트 스냅이 맡는다)', () => {
