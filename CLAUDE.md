@@ -36,8 +36,8 @@ npm run assets:status
 9. **작업을 끝내면** 무엇을 바꿨는지와 사람이 해야 할 일을 짧게 보고한다.
 
 ## 구조
-- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), text(카드 문구)
+- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), save(저장 직렬화), text(카드 문구)
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview
-- `src/ui/` — app(화면 흐름), map-view, battle-view, choice-view, card-view
+- `src/ui/` — app(화면 흐름), map-view, battle-view, choice-view, card-view, scene-view, deck-view, overlay(창), settings, storage(localStorage)
 - `data/` — balance, statuses, characters, enemies, stages, support, cards/, modules/
 - `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세)

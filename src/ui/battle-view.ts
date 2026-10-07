@@ -8,7 +8,10 @@ import { loadPortrait } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { SpritePlayer } from '../render/sprite-player';
 import { cardView } from './card-view';
+import { openDeck } from './deck-view';
 import { clear, h } from './dom';
+import { confirmDialog, openOverlay } from './overlay';
+import { settings, settingsForm } from './settings';
 
 export interface BattleContext {
   title: string;
@@ -19,6 +22,8 @@ export interface BattleContext {
   bonusText?: string;
   /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
   introText?: string;
+  /** 메뉴의 "타이틀로"(abandon=false: 저장은 이 전투 직전 지도에 남는다) / "런 포기"(abandon=true). 없으면 메뉴에 안 나온다 */
+  onQuit?: (abandon: boolean) => void;
 }
 
 interface Unit {
@@ -85,7 +90,14 @@ export class BattleView {
     return h(
       'section',
       { class: 'screen battle' },
-      h('header', { class: 'topbar' }, h('div', { class: 'title' }, this.ctx.title), h('div', { class: 'sub' }, this.ctx.subtitle), h('div', { class: 'seed' }, `시드 ${this.ctx.seed}`)),
+      h(
+        'header',
+        { class: 'topbar' },
+        h('div', { class: 'title' }, this.ctx.title),
+        h('div', { class: 'sub' }, this.ctx.subtitle),
+        h('div', { class: 'seed' }, `시드 ${this.ctx.seed}`),
+        h('div', { class: 'topbar-actions' }, h('button', { class: 'btn btn-small', onclick: () => this.showPiles() }, '덱'), h('button', { class: 'btn btn-small', 'aria-label': '메뉴', onclick: () => this.showMenu() }, '⚙')),
+      ),
       this.ctx.introText ? h('p', { class: 'battle-intro' }, this.ctx.introText) : null,
       this.resEl,
       this.field,
@@ -216,6 +228,7 @@ export class BattleView {
   // ───────────────────────── 입력 ─────────────────────────
 
   private onKey = (e: KeyboardEvent) => {
+    if (document.querySelector('.overlay')) return; // 창이 떠 있으면 전투 단축키를 받지 않는다
     if (e.key === 'Escape') {
       this.selected = null;
       this.refresh();
@@ -279,7 +292,7 @@ export class BattleView {
         case 'card': {
           this.lastCard = ev.cardId;
           const line = resolveCard(this.data, ev.cardId).def.castLine;
-          if (line) await this.cutIn(ev.cardId, line);
+          if (line && settings.cutIn) await this.cutIn(ev.cardId, line);
           break;
         }
         case 'attack':
@@ -297,21 +310,21 @@ export class BattleView {
             if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then(() => this.idle(u));
           }
           this.refresh();
-          await sleep(140);
+          await this.wait(140);
           break;
         }
         case 'block': {
           const u = this.units.get(ev.targetUid);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount} 방어`, 'block');
           this.refresh();
-          await sleep(100);
+          await this.wait(100);
           break;
         }
         case 'heal': {
           const u = this.units.get(ev.targetUid);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount}`, 'heal');
           this.refresh();
-          await sleep(100);
+          await this.wait(100);
           break;
         }
         case 'status': {
@@ -324,20 +337,20 @@ export class BattleView {
           this.rift.update(ev.value);
           this.refresh();
           if (ev.delta > 0) flash(this.field, 'blue');
-          await sleep(80);
+          await this.wait(80);
           break;
         case 'surge':
           toast(this.toasts, '균열 폭주! 하늘이 갈라진다', 'danger');
           shake(this.field, true);
           flash(this.field, 'red');
-          await sleep(350);
+          await this.wait(350);
           break;
         case 'echo':
           toast(this.toasts, '틈의 잔향이 덱에 섞였다', 'danger');
           break;
         case 'support':
           toast(this.toasts, `왕일검 — ${ev.name}`, 'support');
-          await sleep(250);
+          await this.wait(250);
           break;
         case 'dead_draw':
           toast(this.toasts, `쓰러진 동료의 카드(${this.data.cards.get(ev.cardId)?.name})가 버려졌다`, 'info');
@@ -349,7 +362,7 @@ export class BattleView {
             u.player.stop();
             u.el.classList.add('down');
           }
-          await sleep(200);
+          await this.wait(200);
           break;
         }
         case 'transform': {
@@ -364,26 +377,83 @@ export class BattleView {
             flash(this.field, 'red');
             this.refresh();
           }
-          await sleep(600);
+          await this.wait(600);
           break;
         }
         case 'skip': {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, '움직이지 못함', 'status');
-          await sleep(250);
+          await this.wait(250);
           break;
         }
         case 'enemy_action': {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, ev.moveName, 'status');
           this.lastCard = null;
-          await sleep(200);
+          await this.wait(200);
           break;
         }
         case 'result':
           break;
       }
     }
+  }
+
+  /** 전투 연출 대기(설정의 전투 속도 배율) */
+  private wait(ms: number): Promise<void> {
+    return sleep(ms * settings.speed);
+  }
+
+  private showPiles(): void {
+    const s = this.state;
+    openDeck(this.data, '이번 전투의 카드', [
+      { label: '손패', cards: s.hand },
+      { label: '뽑을 더미', cards: s.draw, hint: ' — 순서는 감춤' },
+      { label: '버린 더미', cards: s.discard },
+      { label: '소멸', cards: s.exhaust },
+    ]);
+  }
+
+  private showMenu(): void {
+    const quit = this.ctx.onQuit;
+    const leave = (abandon: boolean) => {
+      menu.close();
+      this.finish(false);
+      quit!(abandon);
+    };
+    const menu = openOverlay(
+      '메뉴',
+      h(
+        'div',
+        { class: 'menu' },
+        settingsForm(),
+        quit
+          ? h(
+              'div',
+              { class: 'menu-actions' },
+              h(
+                'button',
+                {
+                  class: 'btn',
+                  title: '진행은 이 전투에 들어오기 직전의 지도에서 이어집니다',
+                  onclick: () => leave(false),
+                },
+                '타이틀로',
+              ),
+              h(
+                'button',
+                {
+                  class: 'btn btn-danger',
+                  onclick: async () => {
+                    if (await confirmDialog('런 포기', '지금 런을 끝내고 저장을 지웁니다. 되돌릴 수 없습니다.', '포기')) leave(true);
+                  },
+                },
+                '런 포기',
+              ),
+            )
+          : null,
+      ),
+    );
   }
 
   private idle(u: Unit): void {
@@ -404,7 +474,7 @@ export class BattleView {
       this.idle(u);
     });
     if (card?.fx) for (const t of targetUids) void this.playFx(card.fx, t);
-    await Promise.race([hit, sleep(900)]);
+    await Promise.race([hit, this.wait(900)]);
   }
 
   private async playFx(fxId: string, targetUid: string): Promise<void> {
@@ -444,11 +514,11 @@ export class BattleView {
         overlay.removeEventListener('click', done);
         resolve();
       };
-      const timer = setTimeout(done, 1500);
+      const timer = setTimeout(done, 1500 * settings.speed);
       overlay.addEventListener('click', done);
     });
     overlay.classList.add('out');
-    await sleep(180);
+    await this.wait(180);
     overlay.remove();
   }
 
@@ -468,10 +538,11 @@ export class BattleView {
     this.root.appendChild(overlay);
   }
 
-  private finish(): void {
+  /** report=false: 결과를 넘기지 않고 화면만 정리(메뉴에서 나갈 때) */
+  private finish(report = true): void {
     document.removeEventListener('keydown', this.onKey);
     for (const u of this.units.values()) u.player.stop();
-    this.onFinish(this.state);
+    if (report) this.onFinish(this.state);
   }
 }
 

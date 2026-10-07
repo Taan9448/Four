@@ -28,7 +28,10 @@ export interface MapViewHandlers {
   onToggleSupport: (on: boolean) => void;
   /** 편성이 바뀌어 다시 그려야 할 때 */
   onRefresh: () => void;
-  onRestart: () => void;
+  onShowDeck: () => void;
+  onSettings: () => void;
+  /** 타이틀로(런은 저장돼 있어 "이어하기"로 돌아온다) */
+  onTitle: () => void;
 }
 
 export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers): HTMLElement {
@@ -129,12 +132,6 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ' 왕일검 지원(디버그)',
       );
 
-  const deckCounts = new Map<string, number>();
-  for (const c of run.deck) {
-    const key = `${data.cards.get(c.cardId)!.name}${c.level ? ` +${c.level}` : ''}`;
-    deckCounts.set(key, (deckCounts.get(key) ?? 0) + 1);
-  }
-
   return h(
     'section',
     { class: 'screen map-screen' },
@@ -155,9 +152,14 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h('p', { class: 'stage-summary' }, stage.summary),
         partyBox,
         support,
-        h('details', { class: 'deck-box' }, h('summary', {}, `덱 ${run.deck.length}장`), h('ul', {}, [...deckCounts].map(([k, n]) => h('li', {}, `${k} ×${n}`)))),
         h('div', { class: 'legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, `${NODE_ICON[k]} ${v}`))),
-        h('button', { class: 'btn', onclick: handlers.onRestart }, '새 런'),
+        h(
+          'div',
+          { class: 'map-actions' },
+          h('button', { class: 'btn', onclick: handlers.onShowDeck }, `덱 보기 (${run.deck.length})`),
+          h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
+          h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
+        ),
       ),
     ),
   );
