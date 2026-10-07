@@ -103,6 +103,8 @@ button { font: inherit; }
 .stage-clear .next-stage { color: var(--ink-dim); }
 .stage-clear .clear-gains { list-style: none; padding: 0; margin: 0.5rem 0; color: var(--gold, #e6c36a); }
 .stage-clear .scar-reveal { color: #c9a0ff; }
+.end-screen.finale h1 { font-size: 2.4rem; letter-spacing: 0.2em; }
+.end-screen.finale .finale-sub { color: var(--ink-dim); margin-top: -0.5rem; }
 .pips { display: inline-flex; gap: 3px; }
 .pip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
 .pip-neigong { background: var(--neigong); box-shadow: 0 0 6px rgba(242, 169, 59, 0.6); }

@@ -357,11 +357,17 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push(`${def.name} 합류`);
         break;
       }
-      case 'leave_party':
+      case 'leave_party': {
         run.roster = run.roster.filter((r) => r.id !== e.member);
         run.selected = run.selected.filter((id) => id !== e.member);
+        // 빈자리는 남은 동료로 채운다(S5: 보른·카일이 남으면 하운+엘리아)
+        for (const r of run.roster) {
+          if (run.selected.length >= data.balance.party.max) break;
+          if (!run.selected.includes(r.id) && data.characters.get(r.id)?.role === 'fighter') run.selected.push(r.id);
+        }
         out.push(`${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈`);
         break;
+      }
       default:
         throw new Error(`전투 동작 "${e.op}"은 런 단위에서 쓸 수 없다`);
     }
