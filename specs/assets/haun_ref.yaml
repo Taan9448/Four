@@ -1,7 +1,7 @@
 id: haun_ref
 type: character-ref
 character: haun
-summary: 진하운 기준 시트(3/4 정면 + 오른쪽 측면) — 화풍 시험을 겸함
+summary: 진하운 기준 시트(3/4 정면 + 오른쪽 측면) — 128 격자로 다시 그림
 facing: right
 frame_notes:
   1: full body, three-quarter front view, calm upright standing pose, long black hair falling past the shoulders, the woodcutting axe hanging low in the right hand

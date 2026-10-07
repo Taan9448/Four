@@ -1,14 +1,14 @@
 {
   "id": "wolf_hit",
   "type": "character-anim",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 3,
@@ -23,7 +23,7 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "c0a8894b83342419",
+  "sourceHash": "d00b34ba3081204c",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [
