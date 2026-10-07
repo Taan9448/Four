@@ -14,10 +14,10 @@
     "id": "s0_scene_secret_talk", "world": "murim",
     "lines": [
       { "text": "관운각에 불이 켜져 있었다. 정자 안에는 두 사람이 마주 앉아 있었다." },
-      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "무림맹의 정예는 다음 달 보름, 북해빙궁 토벌을 위해 북으로 떠나오. 그 사이 중원에 남는 것은 노인과 아이들뿐." },
+      { "speaker": "kwak_dojin", "face": "resolve", "name": "장문인 곽도진", "text": "무림맹의 정예는 다음 달 보름, 북해빙궁 토벌을 위해 북으로 떠나오. 그 사이 중원에 남는 것은 노인과 아이들뿐." },
       { "speaker": "sa_mugyeol", "name": "삿갓의 사내", "side": "left", "text": "그리고 그대는, 무림맹주의 자리를 얻는다." },
-      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "face": "resolve", "text": "맹주는 허울이오. 내가 원하는 것은 천하요." },
-      { "speaker": "sa_mugyeol", "name": "삿갓의 사내", "side": "left", "face": "resolve", "text": "좋소. 천마신교는 약속을 지키오. 그대가 문을 열면, 우리는 들어간다." },
+      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "맹주는 허울이오. 내가 원하는 것은 천하요." },
+      { "speaker": "sa_mugyeol", "name": "삿갓의 사내", "side": "left", "text": "좋소. 천마신교는 약속을 지키오. 그대가 문을 열면, 우리는 들어간다." },
       { "text": "뒷걸음질 치던 하운의 발끝에, 아까 두고 온 숯 바구니가 걸렸다. 덜그럭." },
       { "speaker": "kwak_dojin", "name": "장문인 곽도진", "face": "surprise", "text": "누구냐." }
     ]
@@ -26,9 +26,9 @@
     "id": "s0_scene_cliff", "world": "murim",
     "lines": [
       { "text": "결국 숲이 끝났다. 천 길 낭떠러지, 귀곡애(鬼哭崖). 곽도진이 소리 없이 내려섰다." },
-      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "오 년이었던가. 네가 문파의 밥을 먹은 것이. 그 밥값을 오늘 치르거라." },
+      { "speaker": "kwak_dojin", "face": "resolve", "name": "장문인 곽도진", "text": "오 년이었던가. 네가 문파의 밥을 먹은 것이. 그 밥값을 오늘 치르거라." },
       { "speaker": "haun", "face": "resolve", "text": "장문인께서… 어찌. 산문의 현판에 쓰신 글은 다 거짓이었습니까." },
-      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "face": "resolve", "text": "구름은 하늘로 오르기 위해 산을 밟는 법이다." }
+      { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "구름은 하늘로 오르기 위해 산을 밟는 법이다." }
     ]
   },
   {

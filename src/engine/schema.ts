@@ -137,7 +137,8 @@ export const SceneLine = z
     speaker: z.string().optional(),
     name: z.string().optional(),
     side: z.enum(['left', 'right']).optional(),
-    face: Face.default('neutral'),
+    /** 생략하면 그 인물의 직전 표정을 유지한다(장면 첫 등장은 기본). src/engine/scene.ts */
+    face: Face.optional(),
     text: z.string(),
   })
   .strict();

@@ -255,13 +255,18 @@ button { font: inherit; }
 .scene-screen { position: fixed; inset: 0; z-index: 40; overflow: hidden; cursor: pointer; user-select: none; background: radial-gradient(ellipse at 50% 30%, #2a3348 0%, #12151d 70%); }
 .scene-screen.world-murim { background: radial-gradient(ellipse at 50% 25%, #3a3428 0%, #15130f 72%); }
 .scene-screen.world-elheim { background: radial-gradient(ellipse at 50% 25%, #23384a 0%, #0f1720 72%); }
-.vn-slot { position: absolute; bottom: 0; width: min(42vw, 520px); height: 88vh; display: flex; align-items: flex-end; justify-content: center; transition: filter 0.2s, opacity 0.2s, transform 0.2s; }
+.vn-slot { position: absolute; bottom: 0; width: min(42vw, 520px); height: 88vh; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); align-items: end; justify-items: center; transition: filter 0.35s, opacity 0.35s, transform 0.35s; }
+/* 표정이 바뀔 때 새 그림을 같은 칸에 겹친다 */
+.vn-slot > * { grid-area: 1 / 1; }
+.vn-portrait.vn-face-in { animation: vn-face 0.45s ease-in-out; }
+@keyframes vn-face { from { opacity: 0; } to { opacity: 1; } }
 .vn-left { left: 3%; }
 .vn-right { right: 3%; }
 .vn-slot.dim { filter: brightness(0.45) saturate(0.6); transform: scale(0.97); }
 .vn-portrait { max-height: 100%; max-width: 100%; object-fit: contain; animation: vn-fade 0.25s ease-out; }
 .vn-fallback { display: grid; place-items: center; width: 70%; height: 72%; border-radius: 18px 18px 0 0; background: var(--owner); color: #0b0b10; font-size: 1.4rem; font-weight: 800; }
-.vn-right .vn-portrait:not(.vn-fallback) { transform: scaleX(-1); }
+/* 좌우 반전은 transform이 아닌 scale로: 등장 애니메이션(transform)이 반전을 덮어써 그림이 뒤집혔다 돌아오지 않게 */
+.vn-right .vn-portrait:not(.vn-fallback) { scale: -1 1; }
 .vn-box { position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); width: min(92vw, 980px); min-height: 150px; padding: 18px 26px 26px; border-radius: 14px; background: rgba(12, 14, 20, 0.86); border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
 .vn-box.vn-in .vn-text { animation: vn-fade 0.22s ease-out; }
 .vn-name { display: inline-block; margin-bottom: 8px; padding: 2px 12px; border-radius: 6px; background: color-mix(in srgb, var(--owner, #888) 70%, #0b0b10); color: #fff; font-weight: 800; }

@@ -2,6 +2,7 @@
 import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
+import { fastFaceChanges } from '../src/engine/scene';
 import { BATTLE_OPS, RUN_OPS, type Effect } from '../src/engine/schema';
 
 const data = loadGameData();
@@ -172,6 +173,11 @@ describe('데이터 검사', () => {
       if (!data.characters.has(sp) && !data.speakers.has(sp)) bad.push(`화자 ${sp}: characters·speakers에 없음`);
       if (!specIds.has(`${sp}_stand`)) bad.push(`화자 ${sp}: 반신 그림 명세 ${sp}_stand 없음`);
     }
+    expect(bad).toEqual([]);
+  });
+
+  it('장면 표정: 한 인물의 표정은 바뀐 뒤 3줄 안에 다시 바뀌지 않는다(표정이 확확 바뀌지 않게)', () => {
+    const bad = [...data.scenes.values()].flatMap((sc) => fastFaceChanges(sc));
     expect(bad).toEqual([]);
   });
 
