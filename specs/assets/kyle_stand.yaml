@@ -1,0 +1,9 @@
+id: kyle_stand
+type: character-standing
+character: kyle
+summary: 카일 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — easy confident grin, one hand resting on the sword pommel at the hip"
+  2: "resolute expression — a fierce grin, sword hilt gripped in both hands in front of the chest"
+  3: "surprised expression — eyebrows shot up, mouth open, leaning back with one hand raised"
+placeholder: { color: '#c2c6d1', accent: '#f2c8a0' }

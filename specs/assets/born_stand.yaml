@@ -1,0 +1,9 @@
+id: born_stand
+type: character-standing
+character: born
+summary: 보른 반신 그림(기본·결의·놀람) — 드워프, 칸 안에서 다른 인물보다 키가 작게
+frame_notes:
+  1: "neutral expression — stern unreadable face, arms crossed over the braided beard; noticeably shorter so more empty space is left above the head"
+  2: "resolute expression — eyes narrowed under heavy brows, round shield raised to the chin, axe on the shoulder"
+  3: "surprised expression — bushy brows raised, eyes wide, beard braids bouncing"
+placeholder: { color: '#8a5a3b', accent: '#e0cfae' }

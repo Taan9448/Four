@@ -2,6 +2,7 @@
   {
     "id": "s1_story_companions", "stage": "s1", "type": "story", "name": "두 개의 달", "once": true,
     "content": {
+      "scene": "s1_scene_two_moons",
       "text": "눈을 떴을 때, 하늘에는 달이 두 개 떠 있었다. 숲 저편의 비명을 따라가자 그림자늑대에 둘러싸인 세 사람이 보였다. 나뭇가지 하나로 늑대의 목을 꿰뚫은 뒤, 은발의 여인이 이마에 손가락을 댔다. \"이제 들려요? 저는 엘리아예요. 이쪽은 카일, 저쪽은 보른.\"",
       "choices": [
         { "label": "\"같이 가겠습니다.\"", "result": "엘리아·카일·보른이 합류했다. 출전은 최대 3명이며, 하운은 항상 출전한다.",
@@ -12,6 +13,7 @@
   {
     "id": "s1_story_unha_sword", "stage": "s1", "type": "story", "name": "운하검의 탄생", "once": true,
     "content": {
+      "scene": "s1_scene_unha_sword",
       "text": "마나는 강물이고, 내공은 물레방아였다. 담장 너머로 훔쳐 들은 청운십팔식의 구령 위에 카일의 기사검술을 얹고, 장작의 결을 읽던 눈으로 다시 쪼갰다. 구름과 강. 하운은 그것을 운하검(雲河劍)이라 불렀다.",
       "choices": [
         { "label": "운하검 제일식을 새긴다", "result": "벽운단하(融合)를 얻었다. 쓸 때마다 균열이 쌓인다.",
@@ -21,7 +23,7 @@
   },
   {
     "id": "s1_boss_ignis", "stage": "s1", "type": "boss", "name": "화산 협곡 — 화염군주 이그니스",
-    "content": { "text": "협곡 마을이 불타고 있다. 화염군주 이그니스가 돌아본다.", "enemies": ["ignis"] }
+    "content": { "outroScene": "s1_scene_ignis_after", "text": "협곡 마을이 불타고 있다. 화염군주 이그니스가 돌아본다.", "enemies": ["ignis"] }
   },
   {
     "id": "s1_battle_wolves_pair", "stage": "s1", "type": "battle", "name": "그림자늑대 두 마리", "weight": 3,

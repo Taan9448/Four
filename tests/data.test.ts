@@ -150,6 +150,21 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
+  it('장면: 모듈이 부르는 장면이 있고, 화자는 캐릭터·speakers이며 반신 그림 명세(<화자>_stand)가 있다', () => {
+    const bad: string[] = [];
+    for (const m of data.modules.values()) {
+      for (const id of [m.content.scene, m.content.outroScene]) if (id && !data.scenes.has(id)) bad.push(`${m.id}: 없는 장면 ${id}`);
+    }
+    const speakers = new Set<string>();
+    for (const sc of data.scenes.values()) for (const l of sc.lines) if (l.speaker) speakers.add(l.speaker);
+    for (const c of data.cards.values()) if (c.castLine) speakers.add(c.castLine.speaker);
+    for (const sp of speakers) {
+      if (!data.characters.has(sp) && !data.speakers.has(sp)) bad.push(`화자 ${sp}: characters·speakers에 없음`);
+      if (!specIds.has(`${sp}_stand`)) bad.push(`화자 ${sp}: 반신 그림 명세 ${sp}_stand 없음`);
+    }
+    expect(bad).toEqual([]);
+  });
+
   it('balance: 세계별 마나·균열 규칙이 모든 세계에 정의돼 있다', () => {
     for (const w of ['murim', 'elheim', 'nocturna', 'rift'] as const) {
       expect(data.balance.mana.worlds[w]).toBeDefined();

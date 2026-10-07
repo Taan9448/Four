@@ -256,6 +256,20 @@ describe('자르기 → 검증', () => {
     expect(prompt).not.toContain('PIXEL GRID');
   });
 
+  it('반신 그림(character-standing)은 마젠타 배경을 지운 512×1024 표정 3장으로 자른다', async () => {
+    const spec = loadSpec('haun_stand');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('haun_stand'), await renderSheet(spec));
+    const meta = await sliceSheet(spec, { src: p.source('haun_stand'), outDir: p.sprites('haun_stand') });
+    expect(meta).toMatchObject({ frames: 3, frameW: 512, frameH: 1024, track: 'illustration' });
+    const { data, info } = await sharp(join(p.sprites('haun_stand'), 'frame_02.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect([info.width, info.height]).toEqual([512, 1024]);
+    expect(data[3]).toBe(0); // 왼쪽 위 구석(배경)은 투명
+    const mid = ((info.height / 2) * info.width + info.width / 2) * 4;
+    expect(data[mid + 3]).toBe(255); // 몸통은 불투명
+  });
+
   it('manifest는 실제 스프라이트를 임시 시트보다 우선한다', async () => {
     await prepare('fixture_attack');
     const p = paths(root);

@@ -42,7 +42,9 @@
     "choices": [ { "label": "...", "result": "...", "effects": [ /* 런 단위 동작 */ ] } ],  // 이벤트형
     "bonus": { "condition": { "partyHas": "kyle" }, "text": "...", "effects": [ /* 전투 동작 */ ] },
     "surviveTurns": 3,                 // 전투형: 이 턴 수를 버티면 승리(이길 수 없는 전투)
-    "outro": "..."                     // 보스형: 스테이지를 마친 뒤 보여 줄 장면 글
+    "outro": "...",                    // 보스형: 스테이지를 마친 뒤 보여 줄 장면 글(outroScene이 있으면 생략)
+    "scene": "s0_scene_secret_talk",   // 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes)
+    "outroScene": "s0_scene_stone_gate" // 보스형: 이긴 뒤 재생할 장면
   }
 }
 ```
@@ -62,3 +64,21 @@ filter: `{ pool, owner, costNeigongGte }`. 무작위 선택은 `시드 + 스테�
 | S5 | — | 떠다니는 세계의 조각, 불비늘 삼두견, 그림자 망령, 뼈 거인, 먼저 가★ |
 
 ★ = 고정 스토리 노드
+
+## 5. 비주얼 노벨 장면(`data/scenes/<stage>.json`)
+
+```jsonc
+{
+  "id": "s0_scene_cliff",
+  "world": "murim",                                  // 배경 톤(murim | elheim | nocturna | rift)
+  "lines": [
+    { "text": "결국 숲이 끝났다." },                   // 화자 없음 = 내레이션
+    { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "그 밥값을 오늘 치르거라." },
+    { "speaker": "haun", "face": "resolve", "text": "산문의 현판에 쓰신 글은 다 거짓이었습니까." }
+  ]
+}
+```
+
+- `speaker`: 캐릭터(`data/characters.json`) 또는 장면 전용 화자(`data/speakers.json`). 반신 그림 에셋은 `<speaker>_stand`(표정 프레임 1 기본·2 결의·3 놀람)
+- `side`: 생략하면 하운은 왼쪽, 나머지는 오른쪽. `name`: 이 줄에서만 쓸 표시 이름(정체를 숨긴 인물 등). `face`: neutral | resolve | surprise
+- `data:check`가 장면 참조, 화자, 반신 그림 명세를 검사한다.

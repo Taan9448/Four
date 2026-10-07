@@ -29,6 +29,8 @@ const ILLUSTRATIONS = {
   portrait: { canvas: [1024, 1024], output: [512, 512] },
   'story-cg': { canvas: [1536, 1024], output: [1152, 768] },
   'character-sheet': { canvas: [1536, 1024], output: [1536, 1024] },
+  // 비주얼 노벨·컷인용 반신 그림: 한 시트에 표정 3장(기본·결의·놀람), 배경은 키 색으로 지워 투명하게
+  'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
 };
 
 export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
@@ -36,8 +38,8 @@ export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
 export function typeDefaults(type, size = 'small') {
   const one = { frames: 1, fps: 1, loop: false };
   if (type in ILLUSTRATIONS) {
-    const { canvas, output } = ILLUSTRATIONS[type];
-    return { canvas, grid: [1, 1], logical: output, track: 'illustration', chroma: 'none', blend: 'normal', max_colors: null, ...one };
+    const { canvas, output, grid = [1, 1], frames = 1, chroma = 'none' } = ILLUSTRATIONS[type];
+    return { canvas, grid, logical: output, track: 'illustration', chroma, blend: 'normal', max_colors: null, ...one, frames };
   }
   switch (type) {
     case 'character-anim':

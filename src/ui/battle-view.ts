@@ -3,6 +3,7 @@ import { canPlay, describeIntent, endTurn, needsTarget, playCard } from '../engi
 import type { GameData } from '../engine/data';
 import { resolveCard, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, shake, sleep, toast } from '../render/fx';
+import { speakerInfo } from '../engine/text';
 import { loadPortrait } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { SpritePlayer } from '../render/sprite-player';
@@ -409,14 +410,14 @@ export class BattleView {
   /** 영웅·전설 카드 컷인: 화면이 어두워지고 반신 그림과 대사가 나온 뒤 스킬이 나간다. 매번 재생, 클릭하면 건너뜀 */
   private async cutIn(cardId: string, line: { speaker: string; face: 'neutral' | 'resolve' | 'surprise'; text: string }): Promise<void> {
     const def = resolveCard(this.data, cardId).def;
-    const who = this.data.characters.get(line.speaker);
+    const who = speakerInfo(this.data, line.speaker);
     const img = await loadPortrait(line.speaker, line.face);
     const portrait = img
-      ? h('img', { class: 'cutin-portrait', src: img.src, alt: who?.name ?? line.speaker })
-      : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who?.color ?? '#888'}` }, who?.name ?? line.speaker);
+      ? h('img', { class: 'cutin-portrait', src: img.src, alt: who.name })
+      : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who.color}` }, who.name);
     const overlay = h(
       'div',
-      { class: `cutin cutin-${def.rarity}`, style: `--owner:${who?.color ?? '#888'}` },
+      { class: `cutin cutin-${def.rarity}`, style: `--owner:${who.color}` },
       h('div', { class: 'cutin-band' }),
       portrait,
       h('div', { class: 'cutin-text' }, h('div', { class: 'cutin-card' }, def.name), h('div', { class: 'cutin-line' }, `"${line.text}"`)),
