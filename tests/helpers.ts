@@ -6,7 +6,7 @@ import type { BattleState, CardInstance } from '../src/engine/state';
 export const data = gameData();
 
 export function cards(...ids: string[]): CardInstance[] {
-  return ids.map((cardId, i) => ({ uid: `t${i}`, cardId, upgraded: false }));
+  return ids.map((cardId, i) => ({ uid: `t${i}`, cardId, level: 0 }));
 }
 
 export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
@@ -24,7 +24,7 @@ export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
 
 /** 손패에 특정 카드를 강제로 넣는다(테스트용) */
 export function give(state: BattleState, cardId: string): number {
-  state.hand.push({ uid: `g${state.hand.length}-${cardId}`, cardId, upgraded: false });
+  state.hand.push({ uid: `g${state.hand.length}-${cardId}`, cardId, level: 0 });
   return state.hand.length - 1;
 }
 

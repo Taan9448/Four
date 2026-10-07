@@ -29,6 +29,8 @@ const ILLUSTRATIONS = {
   portrait: { canvas: [1024, 1024], output: [512, 512] },
   'story-cg': { canvas: [1536, 1024], output: [1152, 768] },
   'character-sheet': { canvas: [1536, 1024], output: [1536, 1024] },
+  // 비주얼 노벨·컷인용 반신 그림: 한 시트에 표정 3장(기본·결의·놀람), 배경은 키 색으로 지워 투명하게
+  'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
 };
 
 export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
@@ -36,8 +38,8 @@ export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
 export function typeDefaults(type, size = 'small') {
   const one = { frames: 1, fps: 1, loop: false };
   if (type in ILLUSTRATIONS) {
-    const { canvas, output } = ILLUSTRATIONS[type];
-    return { canvas, grid: [1, 1], logical: output, track: 'illustration', chroma: 'none', blend: 'normal', max_colors: null, ...one };
+    const { canvas, output, grid = [1, 1], frames = 1, chroma = 'none' } = ILLUSTRATIONS[type];
+    return { canvas, grid, logical: output, track: 'illustration', chroma, blend: 'normal', max_colors: null, ...one, frames };
   }
   switch (type) {
     case 'character-anim':
@@ -152,6 +154,8 @@ export function normalizeSpec(raw) {
     loop: raw.loop ?? td.loop ?? fxDefaults.loop ?? ad.loop ?? false,
     events: raw.events ?? (type === 'fx' && frames ? { impact: Math.ceil(frames / 2) } : ad.events ?? {}),
     baseline: raw.baseline ?? 0.9,
+    /** 캐릭터: 시트 행마다 가장 낮은 줄을 기준선에 맞춘다(행마다 기준선이 어긋나는 모델 버릇 보정). 공중 동작이면 false */
+    row_align: raw.row_align ?? true,
     facing: raw.facing ?? 'right',
     bbox_tolerance: raw.bbox_tolerance !== undefined ? raw.bbox_tolerance : type === 'character-anim' ? ad.bbox ?? 0.2 : null,
     depends_on: raw.depends_on ?? [],

@@ -93,6 +93,8 @@ export const Effect = z
       .partial()
       .strict()
       .optional(),
+    /** upgrade_card: 사람이 강화할 카드를 고른다(휴식 노드의 수련) */
+    choose: z.boolean().optional(),
     condition: Condition.optional(),
     scale: Scale.optional(),
   })
@@ -105,13 +107,52 @@ export type Cost = z.infer<typeof Cost>;
 export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable']);
 export type Keyword = z.infer<typeof Keyword>;
 
+export const Rarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'special']);
+export type Rarity = z.infer<typeof Rarity>;
+/** 반신 그림 표정: 기본·결의·놀람(에셋 <캐릭터>_stand의 프레임 1·2·3) */
+export const Face = z.enum(['neutral', 'resolve', 'surprise']);
+export type Face = z.infer<typeof Face>;
+
+const UpgradeSkill = z
+  .object({
+    name: z.string(),
+    effects: z.array(Effect).default([]),
+    addKeywords: z.array(Keyword).default([]),
+    removeKeywords: z.array(Keyword).default([]),
+    cost: Cost.optional(),
+  })
+  .strict();
+export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
+
+/** 장면에만 나오는 화자(동료가 아닌 인물). 반신 그림 에셋은 <id>_stand */
+export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string() }).strict();
+export type SpeakerDef = z.infer<typeof SpeakerDef>;
+
+/**
+ * 비주얼 노벨 장면: 좌우에 반신 그림, 아래 대화창. speaker가 없으면 내레이션.
+ * side 생략: 하운은 왼쪽, 나머지는 오른쪽. name: 이 줄에서만 쓸 표시 이름(예: 정체를 숨긴 인물)
+ */
+export const SceneLine = z
+  .object({
+    speaker: z.string().optional(),
+    name: z.string().optional(),
+    side: z.enum(['left', 'right']).optional(),
+    face: Face.default('neutral'),
+    text: z.string(),
+  })
+  .strict();
+export type SceneLine = z.infer<typeof SceneLine>;
+export const SceneDef = z.object({ id: z.string(), world: World.optional(), lines: z.array(SceneLine).min(1) }).strict();
+export type SceneDef = z.infer<typeof SceneDef>;
+
 export const CardDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
     owner: z.string(),
     type: z.enum(['attack', 'skill', 'power', 'status']),
-    rarity: z.enum(['starter', 'common', 'uncommon', 'rare', 'special']),
+    /** 등급: 일반·고급·희귀·영웅·전설(+ 상태·저주용 special). 영웅·전설은 castLine 필수 */
+    rarity: Rarity,
     pool: z.enum(['starter', 'reward', 'story', 'status']),
     cost: Cost,
     target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
@@ -122,8 +163,14 @@ export const CardDef = z
     /** 연출: 카드 주인이 재생할 애니메이션(기본 attack/skill)과 대상 위에 겹칠 이펙트 에셋 id */
     anim: z.enum(['attack', 'skill']).optional(),
     fx: z.string().optional(),
+    /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
+    castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
+    /**
+     * 강화(+1~+5). +1~+3: growth[i]만큼 effects[i]의 수치(amount, 없으면 stacks)가 단계마다 오른다.
+     * +4·+5: 이름 붙은 특수 스킬이 붙는다(효과 추가·키워드 추가/제거·비용 변경). 상태·저주 카드는 강화하지 않는다
+     */
     upgrade: z
-      .object({ cost: Cost.optional(), effects: z.array(Effect).optional(), text: z.string().optional() })
+      .object({ growth: z.array(z.number()), plus4: UpgradeSkill, plus5: UpgradeSkill })
       .strict()
       .optional(),
   })
@@ -177,6 +224,10 @@ export const EnemyDef = z
     sprite: z.string().nullable().default(null),
     tint: z.string().optional(),
     scale: z.number().positive().default(1),
+    /** 그림이 없을 때 실루엣 모양(생략하면 보스는 boss, 나머지는 humanoid) */
+    silhouette: z.enum(['humanoid', 'beast', 'boss', 'object']).optional(),
+    /** 그림이 없을 때 실루엣 색 */
+    color: z.string().optional(),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     pattern: z.enum(['cycle', 'random']),
@@ -240,7 +291,17 @@ export const Balance = z
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),
     incorporealMultiplier: z.number(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
-    rewards: z.object({ cardChoices: z.number().int().positive() }).strict(),
+    /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
+    upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
+    rewards: z
+      .object({
+        cardChoices: z.number().int().positive(),
+        /** 보상 카드 등급 가중치(노드 유형별). 일반은 시작 카드, 전설은 스토리로만 얻는다 */
+        rarityWeights: z.record(z.enum(['battle', 'elite', 'boss']), z.partialRecord(Rarity, z.number().min(0))),
+      })
+      .strict(),
+    /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
+    stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
@@ -295,6 +356,14 @@ export const ModuleDef = z
         choices: z.array(Choice).optional(),
         /** 전투 시작 시 조건부 보너스(예: 특정 동료 출전) */
         bonus: z.object({ condition: Condition, text: z.string(), effects: z.array(Effect) }).strict().optional(),
+        /** 이 턴 수를 버티면 승리하는 전투(이길 수 없는 전투) */
+        surviveTurns: z.number().int().positive().optional(),
+        /** 보스 모듈: 스테이지를 마친 뒤 보여 줄 장면 글 */
+        outro: z.string().optional(),
+        /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
+        scene: z.string().optional(),
+        /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */
+        outroScene: z.string().optional(),
       })
       .strict(),
   })

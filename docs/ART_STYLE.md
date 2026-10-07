@@ -16,7 +16,7 @@
 | 갈래 | 그림 | 형태 | 게임에서 |
 |---|---|---|---|
 | 전투(pixel) | character-anim, character-ref, fx, background | 확대된 픽셀 아트 시트(칸당 64 격자) → 블록 크기 자동 감지 → 80×80 프레임 | 전투 필드 |
-| 이야기(illustration) | card-art, portrait, story-cg, character-sheet | 일러스트 한 장 → 출력 크기로만 축소 | 카드, 대화, 스토리 장면, 설정 기준 |
+| 이야기(illustration) | card-art, portrait, story-cg, character-sheet, character-standing | 일러스트 한 장 → 출력 크기로만 축소(반신 그림은 배경을 지워 투명) | 카드, 대화, 스토리 장면, 설정 기준 |
 
 두 갈래를 잇는 규칙: **같은 색 코드(3절)**, **같은 캐릭터 외형(4절)**. 같은 인물이 두 그림에서 다른 사람처럼 보이면 안 됩니다.
 
@@ -64,6 +64,7 @@
 | portrait | 1024×1024 | 512×512 | 대화·왕일검 지원 표시. 표정별로 따로 |
 | story-cg | 1536×1024 | 1152×768 | 스토리 노드 장면(밀담, 재회, 결전 등) |
 | character-sheet | 1536×1024 | 1536×1024 | 캐릭터 설정화(정면·3/4·측면 + 표정). 다른 그림의 참조용 |
+| character-standing | 1536×1024(3칸) | 512×1024 ×3 | 비주얼 노벨 장면·영웅/전설 컷인용 반신 그림. 칸1 기본·칸2 결의·칸3 놀람, 같은 크기·위치, 마젠타 배경은 지워 투명 |
 
 이미지 생성 프롬프트에는 **특정 스튜디오·작가 이름을 쓰지 않고** 화풍의 특징(선, 채색, 배경, 빛)으로 설명합니다. 이름을 쓰면 생성기가 거부하거나 결과가 흔들릴 수 있습니다.
 
@@ -100,7 +101,7 @@
 ## 5. 프롬프트·팔레트 데이터
 
 도구가 이 블록을 읽습니다. 영어로 씁니다. `palette`는 전투(픽셀) 마스터 팔레트(32색)로, 자르기 도구가 모든 픽셀을 이 중 가장 가까운 색으로 맞춥니다.
-`illustration_style`은 이야기 갈래(card-art, portrait, story-cg, character-sheet) 프롬프트에 들어갑니다.
+`illustration_style`은 이야기 갈래(card-art, portrait, story-cg, character-sheet, character-standing) 프롬프트에 들어갑니다.
 
 <!-- prompt-data -->
 ```yaml
@@ -164,6 +165,16 @@ subjects:
     Kyle Rowen, a blond young knight; silver plate armor over a blue tabard, long straight sword
   born: >-
     Born, a short stocky dwarf warrior; braided brown beard, a big two-handed axe and a round iron shield
+  wang: >-
+    Old Wang, the stooped kitchen elder of the Cheongun sect; thin white hair tied back, deep wrinkles,
+    gentle hazy eyes hiding a sharp glint, a worn grey-brown cook's robe with rolled sleeves and an apron,
+    a simple wooden walking stick
+  kwak_dojin: >-
+    Kwak Dojin, the white-haired Taoist head of the Cheongun sect; long white hair and beard, calm cold
+    eyes, a flowing white crane-pattern Taoist robe (hakchangui), an elegant pine-patterned straight sword
+  sa_mugyeol: >-
+    a man in a deep black bamboo hat (satgat) pulled low over his face, only a pale jaw visible, a thin
+    cruel smile, black layered robes, long blood-red fingernails
   shadow_wolf: >-
     a shadow wolf; charcoal-black fur, black flames along its spine, amber eyes, lean and hungry
 ```

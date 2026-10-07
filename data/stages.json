@@ -1,6 +1,10 @@
 [
-  { "id": "s0", "order": 0, "name": "청운산", "chapters": "1~2장", "world": "murim", "floors": 4, "playable": false,
-    "boss": null, "summary": "프롤로그·튜토리얼. 장작 패기로 결 읽기를 배우고, 관운각 밀담을 엿들은 뒤 귀곡애에서 곽도진에게 쫓긴다(이길 수 없는 전투, N턴 생존 시 석문 연출)." },
+  { "id": "s0", "order": 0, "name": "청운산", "chapters": "1~2장", "world": "murim", "floors": 4, "playable": true,
+    "pinned": [ { "floor": 1, "module": "s0_tutorial_woodpile" }, { "floor": 3, "module": "s0_story_secret_talk" } ],
+    "forcedTypes": { "4": "event" },
+    "typeWeights": { "battle": 35, "event": 40, "rest": 25 },
+    "boss": "s0_boss_ghost_cliff",
+    "summary": "프롤로그·튜토리얼. 장작 패기로 결 읽기를 배우고, 관운각 밀담을 엿들은 뒤 귀곡애에서 곽도진에게 쫓긴다(이길 수 없는 전투, 3턴을 버티면 석문 연출 뒤 S1로)." },
   { "id": "s1", "order": 1, "name": "엘하임 숲 → 화산 협곡", "chapters": "3~4장", "world": "elheim", "floors": 9, "playable": true,
     "pinned": [ { "floor": 1, "module": "s1_story_companions" }, { "floor": 7, "module": "s1_story_unha_sword" } ],
     "forcedTypes": { "9": "rest" },

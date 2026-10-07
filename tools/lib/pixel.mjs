@@ -147,8 +147,11 @@ const EDGE = 1;
  * - 캐릭터: 모든 칸에서 가장 낮은 그림 줄(발)을 기준선 줄에 맞춘다. 그 외(fx 등): 칸 기준선 ↔ 프레임 기준선
  * - 가로는 칸 가운데 ↔ 프레임 가운데(움직임 보존), 가장자리에 닿으면 안쪽으로 민다(crop)
  * - 여백 1px을 두고도 들어가지 않으면 시트 전체를 같은 비율로 줄인다(downscale)
+ * - 캐릭터는 시트의 줄(행)마다 가장 낮은 그림 줄을 같은 기준선에 맞춘다. 이미지 모델은 행마다 기준선을 조금씩
+ *   다르게 그리기 쉽다(haun_attack: 2행이 3~4px 높아 발이 뜀). 의도적으로 공중에 뜬 행이 있으면 명세에 row_align: false
+ * @param {number[]} [rows] 프레임마다 시트에서의 행 번호(0부터). 없으면 모두 같은 행
  */
-export function fitFrames(natives, spec) {
+export function fitFrames(natives, spec, rows = natives.map(() => 0)) {
   const [T, TH] = spec.logical;
   const grounded = spec.type === 'character-ref' || spec.type === 'character-anim';
   let imgs = natives;
@@ -173,13 +176,23 @@ export function fitFrames(natives, spec) {
     u = union(boxes);
     fit = 'downscale';
   }
-  // 세로 위치는 시트 공통
-  let oy;
-  if (grounded && u) oy = Math.round(spec.baseline * TH) - 1 - u.maxY;
-  else oy = Math.round(spec.baseline * TH - spec.baseline * Math.max(...imgs.map((i) => i.height)));
-  if (u) oy = Math.min(Math.max(oy, EDGE - u.minY), TH - 1 - EDGE - u.maxY);
+  // 세로 위치: 시트 공통(캐릭터는 시트 행마다 가장 낮은 줄을 기준선에)
+  const ground = Math.round(spec.baseline * TH) - 1;
+  const perRow = grounded && spec.row_align !== false;
+  const offsetFor = (list) => {
+    const g = union(list);
+    let o;
+    if (grounded && g) o = ground - g.maxY;
+    else o = Math.round(spec.baseline * TH - spec.baseline * Math.max(...imgs.map((i) => i.height)));
+    if (g) o = Math.min(Math.max(o, EDGE - g.minY), TH - 1 - EDGE - g.maxY);
+    return o;
+  };
+  const sheetOy = offsetFor(boxes);
+  const rowOy = new Map();
+  if (perRow) for (const r of new Set(rows)) rowOy.set(r, offsetFor(boxes.filter((_, i) => rows[i] === r)));
   return imgs.map((img, i) => {
     const box = boxes[i];
+    const oy = perRow ? rowOy.get(rows[i]) : sheetOy;
     let ox = Math.round((T - img.width) / 2);
     if (box) ox = Math.min(Math.max(ox, EDGE - box.minX), T - 1 - EDGE - box.maxX);
     const out = Buffer.alloc(T * TH * 4);
@@ -196,7 +209,7 @@ export function processPixelSheet(raw, spec, palette, cells) {
   const keyed = keyOut(raw, spec);
   const grid = detectGrid(keyed, spec);
   const sampled = cells.map((n) => sampleCell(keyed, cellRect(spec, n, raw), grid, spec, palette));
-  const fitted = fitFrames(sampled.map((s) => s.img), spec);
+  const fitted = fitFrames(sampled.map((s) => s.img), spec, cells.map((n) => Math.floor((n - 1) / spec.grid[0])));
   const frames = cells.map((n, i) => ({ n, img: fitted[i].img, purity: sampled[i].purity, native: fitted[i].native, fit: fitted[i].fit }));
   return { grid, frames, keyed };
 }
