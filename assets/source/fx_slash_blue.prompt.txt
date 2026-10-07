@@ -7,12 +7,12 @@ Subject: a glowing visual effect only; no character, no ground, no background el
 Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
 Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
 Frames:
-Cell 1: a thin blue line of light appears at the upper left
-Cell 2: the line extends into a sharp crescent sweeping downward, bright white core, darker blue outer band
-Cell 3: full vertical cleaving arc at maximum brightness, small cloud-like pixel wisps split around it
-Cell 4: arc begins to thin, single-block blue sparks scatter
-Cell 5: arc fades to a faint trail, sparks drifting
-Cell 6: only a few motes and a hairline afterimage remain
+Cell 1: a thin short blue line of light appears at the top center of the cell, the start of the arc
+Cell 2: the line grows downward into a sharp crescent that bulges toward the RIGHT like a ")" bracket, bright white core, darker blue outer band, its top end at the top center
+Cell 3: the full ")" crescent from top center to bottom center at maximum brightness, the same right-bulging curve as cell 2, small cloud-like pixel wisps split around it
+Cell 4: the same ")" crescent in the same place begins to thin, single-block blue sparks scatter
+Cell 5: the same ")" crescent fades to a faint trail in the same place, sparks drifting
+Cell 6: only a few motes and a hairline ")" afterimage remain in the same place
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
-Fix: The first image failed regular pixel-grid detection. Render a deliberately COARSE pixel effect: the whole canvas is exactly 192x128 logical square pixels enlarged 8x by nearest-neighbor. EVERY visible square has one completely flat color, each edge lies on global multiples of 8px in both axes. All six cells must share this exact straight lattice and block size. Do not draw soft light, tiny specks, mixed-color blocks, gradients, glow or blurry halos. Use exactly four opaque light colors: white #f1efe6, pale-blue #8fd3ff, bright-blue #4fb4ff, dark-blue #1f3f73 on pure black #000000. The arc is built from hard stepped color bands. Keep at least 8 logical pixels of black margin on every edge, especially the brightest third frame and its split wisps. Six distinct stages: thin line, crescent build, peak vertical arc, thinning arc, faint trail, sparse final motes. No character.
+Fix: The previous sheet's first cell was judged empty because the start line was too tiny. In cell 1 draw a clearly visible narrow blue-white vertical start segment at the top center, about 2 logical pixels wide and 18 logical pixels long, beginning at least 7 logical pixels below the top; never just a speck. Keep all stages on the SAME right-bulging ')' crescent path at the SAME position. Cells 2-6 start at the same top-center point and reach the same bottom-center point as they develop and fade, never mirror or shift the crescent. Draw ONLY coarse identical perfectly flat-color SQUARE BLOCKS on ONE straight global pixel grid. No gradients, soft glow, multicolor blocks or sub-block detail. Use just #f1efe6, #8fd3ff, #4fb4ff, #1f3f73 on pure black #000000. Every effect, spark and wisp stays at least 7 logical pixels inside all four cell edges. The brightest third frame has a crisp white core and small stepped wisps, all within the margins.
