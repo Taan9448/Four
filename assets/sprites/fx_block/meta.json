@@ -1,0 +1,36 @@
+{
+  "id": "fx_block",
+  "type": "fx",
+  "frameW": 80,
+  "frameH": 80,
+  "track": "pixel",
+  "pixelScale": 10.69,
+  "gridDetected": true,
+  "nativeSize": [
+    48,
+    48
+  ],
+  "fit": "pad",
+  "frames": 4,
+  "fps": 15,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 4,
+  "sourceHash": "a243773481869ae6",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.515
+}
