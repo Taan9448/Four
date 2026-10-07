@@ -84,4 +84,5 @@ filter: `{ pool, owner, costNeigongGte }`. 무작위 선택은 `시드 + 스테�
 
 - `speaker`: 캐릭터(`data/characters.json`) 또는 장면 전용 화자(`data/speakers.json`). 반신 그림 에셋은 `<speaker>_stand`(표정 프레임 1 기본·2 결의·3 놀람)
 - `side`: 생략하면 하운은 왼쪽, 나머지는 오른쪽. `name`: 이 줄에서만 쓸 표시 이름(정체를 숨긴 인물 등). `face`: neutral | resolve | surprise
+- **표정 규칙:** `face`를 생략하면 그 인물의 직전 표정을 유지한다(장면에 처음 나올 때는 neutral). 기본 표정으로 돌아가려면 `"face": "neutral"`을 적는다. 한 인물의 표정은 바뀐 뒤(또는 처음 나온 뒤) **장면 줄 수로 3줄이 지나야** 다시 바꿀 수 있다(`src/engine/scene.ts` `FACE_HOLD_LINES`, `data:check`가 검사). 감정이 빨리 바뀌어야 하면 대사를 두 줄로 끊거나 내레이션을 한 줄 넣는다. 화면에서는 같은 인물의 표정이 0.45초 동안 교차 페이드로 바뀐다.
 - `data:check`가 장면 참조, 화자, 반신 그림 명세를 검사한다.

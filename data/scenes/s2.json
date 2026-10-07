@@ -18,7 +18,8 @@
       { "speaker": "kyle", "text": "살아서 돌아가면, 고향 술집에서 이 이야기를 백 번은 우려먹을 거야." },
       { "speaker": "born", "text": "돌아가면." },
       { "text": "옥좌 위의 그림자가 일어섰다. 찢어진 박쥐 날개, 일곱 개의 뿔, 그리고 텅 빈 눈." },
-      { "speaker": "vargas", "side": "right", "text": "이방인이로군. 이 세계의 마나가 아닌 것이 섞여 있어. 너는 어디서 왔느냐, 작은 것." },
+      { "speaker": "vargas", "side": "right", "text": "이방인이로군. 이 세계의 마나가 아닌 것이 섞여 있어." },
+      { "speaker": "vargas", "side": "right", "text": "너는 어디서 왔느냐, 작은 것." },
       { "speaker": "haun", "text": "장작 패던 곳에서." },
       { "speaker": "vargas", "side": "right", "face": "resolve", "text": "……" },
       { "speaker": "elia", "face": "resolve", "text": "하운, 지금!" }
