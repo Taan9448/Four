@@ -21,9 +21,13 @@ import {
 } from '../engine/run';
 import { BattleView } from './battle-view';
 import { choiceView, rewardView } from './choice-view';
+import { openDeck } from './deck-view';
 import { h } from './dom';
 import { mapView } from './map-view';
+import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
+import { applySettings, settingsForm } from './settings';
+import { clearRun, loadRun, saveRun } from './storage';
 
 const data = gameData();
 
@@ -31,8 +35,11 @@ export class App {
   private run: RunState | null = null;
   /** 보스를 이긴 뒤 clearEffects 결과(스테이지 끝 화면에 보여 준다) */
   private clearMessages: string[] = [];
+  /** 이 런을 브라우저에 저장하는가(샌드박스는 저장하지 않는다) */
+  private persist = true;
 
   constructor(private root: HTMLElement) {
+    applySettings();
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed');
     if (params.has('sandbox'))
@@ -49,6 +56,7 @@ export class App {
     const module = data.modules.get(moduleId);
     if (!module?.content.enemies?.length) throw new Error(`sandbox: 전투 모듈이 아니다: ${moduleId}`);
     const run = createRun(data, seed, { stageId: module.stage, supportActive: true });
+    this.persist = false;
     applyRunOps(data, run, [
       ...mates.map((member) => ({ op: 'join_party' as const, member })),
       { op: 'gain_card', card: 'haun_byeogun', count: 2 },
@@ -65,24 +73,55 @@ export class App {
   }
 
   private title(): void {
+    const saved = loadRun(data);
     const seedInput = h('input', { class: 'seed-input', value: randomSeed(), maxlength: 24, 'aria-label': '시드' }) as HTMLInputElement;
     const wang = h('input', { type: 'checkbox' }) as HTMLInputElement;
+    const startNew = async () => {
+      if (saved && !(await confirmDialog('새로 시작', '저장된 런을 지우고 새 런을 시작합니다.', '새로 시작'))) return;
+      clearRun();
+      this.start(seedInput.value.trim() || randomSeed(), wang.checked);
+    };
+    let resume: HTMLElement | null = null;
+    if (saved) {
+      const run = saved.run;
+      const stage = data.stages.find((st) => st.id === run.stageId)!;
+      const floor = run.map.floors.flat().find((n) => n.id === run.position)?.floor ?? 0;
+      const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
+      resume = h(
+        'div',
+        { class: 'resume' },
+        h('button', { class: 'btn btn-primary btn-large', onclick: () => this.resume(run) }, '이어하기'),
+        h('p', { class: 'hint' }, `${stage.name} · ${where} · 덱 ${run.deck.length}장 · 상흔 ${run.scar} · 시드 ${run.seed}`),
+      );
+    }
     this.show(
       h(
         'section',
         { class: 'screen title-screen' },
         h('h1', {}, '천외귀환', h('small', {}, '天外歸還 — 세계의 틈')),
         h('p', { class: 'tagline' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
+        resume,
         h(
           'div',
           { class: 'title-form' },
-          h('label', {}, '시드 ', seedInput, h('button', { class: 'btn', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
+          h('label', {}, '시드 ', seedInput, h('button', { class: 'btn', 'aria-label': '시드 바꾸기', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
           h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
-          h('button', { class: 'btn btn-primary', onclick: () => this.start(seedInput.value.trim() || randomSeed(), wang.checked) }, '시작 — S0 청운산'),
+          h('button', { class: `btn${saved ? '' : ' btn-primary btn-large'}`, onclick: startNew }, saved ? '새로 시작' : '시작 — S0 청운산'),
+          h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정'),
         ),
-        h('p', { class: 'hint' }, `플레이 가능: ${playableStages(data).map((st) => st.name).join(' → ')}. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.`),
+        h('p', { class: 'hint' }, `플레이 가능: ${playableStages(data).map((st) => st.name).join(' → ')}. 같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다. 그래픽은 일부 임시 그림입니다.`),
       ),
     );
+  }
+
+  private resume(run: RunState): void {
+    this.run = run;
+    this.persist = true;
+    this.map();
+  }
+
+  private openSettings(): void {
+    openOverlay('설정', settingsForm());
   }
 
   /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
@@ -90,17 +129,19 @@ export class App {
     this.run = stageId
       ? createRunAt(data, seed, stageId, { supportActive: support })
       : createRun(data, seed, { supportActive: support });
-    const url = new URL(location.href);
-    url.searchParams.set('seed', seed);
-    if (!stageId) url.searchParams.delete('stage');
-    if (support) url.searchParams.set('wang', '1');
-    else url.searchParams.delete('wang');
-    history.replaceState(null, '', url);
+    this.persist = true;
+    // 주소창의 ?seed=…(디버그 시작)를 지운다: 새로고침하면 타이틀의 "이어하기"로 돌아온다
+    if (location.search) history.replaceState(null, '', location.pathname);
     this.map();
   }
 
   private map(): void {
     const run = this.run!;
+    // 자동 저장: 지도(또는 스테이지 끝)에 설 때마다. 노드에 들어간 뒤 새로고침하면 그 노드 직전 지도에서 이어진다
+    if (this.persist) {
+      if (run.status === 'map' || run.status === 'stage_clear') saveRun(run);
+      else clearRun();
+    }
     if (run.status === 'stage_clear') {
       // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
       const stage = data.stages.find((s) => s.id === run.stageId)!;
@@ -121,7 +162,9 @@ export class App {
           this.map();
         },
         onRefresh: () => this.map(),
-        onRestart: () => this.title(),
+        onShowDeck: () => openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]),
+        onSettings: () => this.openSettings(),
+        onTitle: () => this.title(),
       }),
     );
   }
@@ -161,6 +204,10 @@ export class App {
         supportActive: run.supportActive,
         bonusText: bonus,
         introText: enc.module.content.text,
+        onQuit: (abandon) => {
+          if (abandon && this.persist) clearRun();
+          this.title();
+        },
       },
       (final) => {
         this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
