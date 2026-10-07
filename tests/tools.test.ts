@@ -200,14 +200,18 @@ describe('자르기 → 검증', () => {
     expect(r.errors.some((e) => e.startsWith('meta.fps'))).toBe(true);
   });
 
-  it('흐릿하거나 격자에 맞지 않는 시트는 픽셀 격자 일치도로 걸린다', async () => {
+  // 흐린 시트는 격자 감지가 실패한다 → 막지는 않고 "눈 확인 필요" 경고(일치도로는 일러스트와 가를 수 없다, 2026-10-07)
+  const flagged = (r: { errors: string[]; warnings: string[] }) =>
+    [...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도') || e.includes('눈 확인 필요'));
+
+  it('흐릿하거나 격자에 맞지 않는 시트는 경고(눈 확인 필요) 또는 일치도로 걸린다', async () => {
     const spec = loadSpec('fixture_attack', root);
     const p = paths(root);
     mkdirSync(join(root, 'assets/source'), { recursive: true });
     writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).blur(6).png().toBuffer());
     await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
     const r = await validateAsset('fixture_attack', { root, previews: false });
-    expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
+    expect(flagged(r)).toBe(true);
   });
 
   it('대체 단계 3(파츠)에서도 격자 일치도를 검사한다(PR #10에서 발견된 누락)', async () => {
@@ -217,7 +221,7 @@ describe('자르기 → 검증', () => {
     writeFileSync(p.source('fixture_attack'), await sharp(await renderSheet(spec)).blur(6).png().toBuffer());
     await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack'), fallback: 3 });
     const r = await validateAsset('fixture_attack', { root, previews: false });
-    expect([...r.errors, ...r.warnings].some((e) => e.includes('픽셀 격자 일치도'))).toBe(true);
+    expect(flagged(r)).toBe(true);
   });
 
   it('프레임은 게임 프레임 크기(80×80)이고 마스터 팔레트 밖의 색이 있으면 실패한다', async () => {
@@ -367,9 +371,10 @@ describe('키 색 번짐 제거(keyOut)', () => {
     expect(magentaCast(keyOut(img, { ...base, track: 'illustration' }))).toBe(0);
   });
 
-  it('픽셀 트랙: 안쪽 픽셀은 건드리지 않는다(팔레트 스냅이 맡는다)', () => {
-    const out = keyOut(px([90, 40, 100, 255]), { ...base, track: 'pixel' });
-    expect([...out.data]).toEqual([90, 40, 100, 255]);
+  it('픽셀 트랙: 뚜렷한 마젠타 기운만 걷어 내고, 팔레트의 보라(#4b3a6b)는 그대로 둔다', () => {
+    const out = keyOut(px([90, 40, 100, 255], [0x4b, 0x3a, 0x6b, 255]), { ...base, track: 'pixel' });
+    expect([...out.data.subarray(0, 4)]).toEqual([40, 40, 50, 255]); // 늑대 불꽃 끝의 붉은 점이 되던 픽셀
+    expect([...out.data.subarray(4, 8)]).toEqual([0x4b, 0x3a, 0x6b, 255]);
   });
 });
 
