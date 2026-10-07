@@ -9,5 +9,5 @@ frame_notes:
   1: relaxed ready stance, axe held low in the right hand, knees slightly bent, inhaling
   2: same stance, chest slightly raised, short breath in
   3: same stance, chest at highest point, short breath held
-  4: same stance, long breath out, shoulders relaxed, hair and long outer robe settling, a small warm gold glow (about 3x3 sprite pixels) on the lower belly
+  4: same stance, long breath out, shoulders relaxed, hair and long outer robe settling, a small warm gold glow (about 6x6 sprite pixels) on the lower belly
 placeholder: { shape: humanoid, color: '#3d4459', accent: '#4fb4ff' }

@@ -1,14 +1,14 @@
 {
   "id": "haun_ref",
   "type": "character-ref",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 2,
@@ -23,7 +23,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 2,
-  "sourceHash": "6bd71c3e1c540354",
+  "sourceHash": "c195e98b84affcd0",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

@@ -12,7 +12,7 @@ export const ROOT = fileURLToPath(new URL('../..', import.meta.url));
  *      자동 감지해 원래 해상도로 되돌린 뒤 게임 프레임(logical)에 담는다. 모든 캐릭터 칸은 512px로 같게 해 모델이 그리는 해상도를 고르게 한다.
  *      draw: 모델에게 요청하는 칸당 그림 격자(정수배), logical: 게임 프레임. 프레임이 그림 격자보다 커서
  *      도끼를 치켜드는 동작이나 칸을 꽉 채운 그림도 줄이지 않고 담는다.
- *      small: 그림 64 → 프레임 80(캐릭터·일반 적·이펙트), large: 그림 128 → 프레임 160(보스)
+ *      large(기본): 그림 128 → 프레임 160(캐릭터·적·보스·이펙트 모두, 2026-10-07), small: 그림 64 → 프레임 80(옛 규격)
  *  - illustration(이야기): 선이 살아 있는 애니메이션 채색 일러스트 한 장. 픽셀화하지 않고 output 크기로만 줄인다.
  */
 const SHEETS = {
@@ -35,7 +35,7 @@ const ILLUSTRATIONS = {
 
 export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
 
-export function typeDefaults(type, size = 'small') {
+export function typeDefaults(type, size = 'large') {
   const one = { frames: 1, fps: 1, loop: false };
   if (type in ILLUSTRATIONS) {
     const { canvas, output, grid = [1, 1], frames = 1, chroma = 'none' } = ILLUSTRATIONS[type];
@@ -116,7 +116,8 @@ export function loadSpec(id, root = ROOT) {
 export function normalizeSpec(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('명세가 비어 있다');
   const type = raw.type;
-  const size = raw.size ?? 'small';
+  // 2026-10-07: 전투 픽셀 아트는 모두 128 격자(large)가 기본. small(64 → 80)은 옛 규격으로만 남긴다
+  const size = raw.size ?? 'large';
   if (!['small', 'large'].includes(size)) throw new Error(`${raw.id}: size는 small 또는 large`);
   const td = typeDefaults(type, size);
   if (!td) throw new Error(`${raw.id}: 알 수 없는 type "${type}"`);

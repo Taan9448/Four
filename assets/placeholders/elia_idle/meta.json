@@ -1,14 +1,14 @@
 {
   "id": "elia_idle",
   "type": "character-anim",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 4,
@@ -23,7 +23,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 4,
-  "sourceHash": "5c07d1b77c116a5e",
+  "sourceHash": "66826f5e15aa22b5",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

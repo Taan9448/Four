@@ -1,14 +1,14 @@
 {
   "id": "fx_claw",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 5,
@@ -25,7 +25,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 5,
-  "sourceHash": "e656c9df882105fc",
+  "sourceHash": "e54cb1f93c642a62",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

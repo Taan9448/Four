@@ -1,14 +1,14 @@
 {
   "id": "fx_slash_blue",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 6,
@@ -25,7 +25,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "5dff57b1059f9ea8",
+  "sourceHash": "dcc0e8da21f325ad",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [

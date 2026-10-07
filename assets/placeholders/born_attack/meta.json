@@ -1,14 +1,14 @@
 {
   "id": "born_attack",
   "type": "character-anim",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": true,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 6,
@@ -25,7 +25,7 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "dcec220edc9d03f6",
+  "sourceHash": "060cdaa54ced1ee5",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [
