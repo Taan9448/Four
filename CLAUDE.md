@@ -11,7 +11,7 @@
 ## 명령
 ```bash
 npm ci
-npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX, ?sandbox
+npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>]
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사

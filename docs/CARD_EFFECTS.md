@@ -101,3 +101,9 @@
 
 `moves[]`의 `effects`는 카드와 같은 기본 동작을 쓴다. `pattern: cycle`(순서대로) 또는 `random`(가중치, 같은 행동 3연속 금지).
 `targeting`: random | lowest_hp | highest_hp | haun. `sprite`가 있으면 `<sprite>_idle / _attack / _hit` 에셋을 쓰고, 없으면 실루엣으로 대신한다.
+
+**변신(보스 2단계)** — `transform: { triggers, into, text, partyEffects }`
+- `triggers`: `downed`(쓰러질 자리에서 대신 변신) / `lastStanding`(다른 적이 모두 쓰러져 혼자 남으면 변신). 둘 다 줄 수 있다.
+- `into`의 적 정의로 바뀌고 체력은 가득 찬다. 상태는 `into.traits`로 다시 시작하고, 변신한 차례에는 행동하지 않는다. 변신한 모습은 다시 변신하지 않는다(데이터 검사).
+- `partyEffects`: 변신 순간 하운을 출처로 일어나는 전투 동작(원작 연출: 엘리아의 마나 `gain_mana`, `add_card … to: hand`).
+- 예: 사무결 → 붉은 거인 사무결(S4 혈전). 전투 이벤트 `transform`으로 화면에서 같은 자리에 새 모습으로 다시 그린다.
