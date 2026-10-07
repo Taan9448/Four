@@ -6,6 +6,8 @@ import {
   CharacterDef,
   EnemyDef,
   ModuleDef,
+  SceneDef,
+  SpeakerDef,
   StageDef,
   StatusDef,
   SupportRule,
@@ -16,9 +18,11 @@ import charactersJson from '../../data/characters.json';
 import enemiesJson from '../../data/enemies.json';
 import stagesJson from '../../data/stages.json';
 import supportJson from '../../data/support.json';
+import speakersJson from '../../data/speakers.json';
 
 const cardFiles = import.meta.glob('../../data/cards/*.json', { eager: true, import: 'default' });
 const moduleFiles = import.meta.glob('../../data/modules/*.json', { eager: true, import: 'default' });
+const sceneFiles = import.meta.glob('../../data/scenes/*.json', { eager: true, import: 'default' });
 
 export interface GameData {
   balance: Balance;
@@ -29,6 +33,8 @@ export interface GameData {
   stages: StageDef[];
   modules: Map<string, ModuleDef>;
   support: SupportRule[];
+  speakers: Map<string, SpeakerDef>;
+  scenes: Map<string, SceneDef>;
 }
 
 function byId<T extends { id: string }>(items: T[], label: string): Map<string, T> {
@@ -55,6 +61,7 @@ export function loadGameData(): GameData {
   const modules = Object.entries(moduleFiles).flatMap(([path, json]) =>
     parse(z.array(ModuleDef), json, path),
   );
+  const scenes = Object.entries(sceneFiles).flatMap(([path, json]) => parse(z.array(SceneDef), json, path));
   return {
     balance: parse(Balance, balanceJson, 'data/balance.json'),
     cards: byId(cards, 'cards'),
@@ -64,6 +71,8 @@ export function loadGameData(): GameData {
     stages: parse(z.array(StageDef), stagesJson, 'data/stages.json').sort((a, b) => a.order - b.order),
     modules: byId(modules, 'modules'),
     support: parse(z.array(SupportRule), supportJson, 'data/support.json'),
+    speakers: byId(parse(z.array(SpeakerDef), speakersJson, 'data/speakers.json'), 'speakers'),
+    scenes: byId(scenes, 'scenes'),
   };
 }
 

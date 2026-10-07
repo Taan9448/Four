@@ -1,0 +1,31 @@
+{
+  "id": "haun_stand",
+  "type": "character-standing",
+  "frameW": 512,
+  "frameH": 1024,
+  "track": "illustration",
+  "pixelScale": null,
+  "gridDetected": null,
+  "nativeSize": null,
+  "fit": null,
+  "frames": 3,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 3,
+  "sourceHash": "27aa1bf55402d5fd",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": null
+}

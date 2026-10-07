@@ -54,5 +54,29 @@
       { "id": "wither", "name": "시들게 하기", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 7 } ] }
     ],
     "flavor": "S4~S5 틈 괴물. 1차 작업에서는 무형 테스트용으로만 쓴다."
+  },
+  {
+    "id": "oak_stump", "name": "참나무 둥치", "maxHp": 26, "sprite": null, "silhouette": "object", "color": "#6e5440", "pattern": "cycle",
+    "moves": [
+      { "id": "stand", "name": "묵묵히 서 있다", "intent": "defend", "effects": [ { "op": "block", "amount": 5, "target": "self" } ] }
+    ],
+    "flavor": "굵은 참나무 둥치도 한 번에 쩍 갈라졌다. 결을 따라 기운이 흐르는 길이 보였다."
+  },
+  {
+    "id": "inner_disciple", "name": "내원 사형", "maxHp": 24, "sprite": null, "color": "#8a90a3", "pattern": "random",
+    "moves": [
+      { "id": "kick", "name": "발길질", "intent": "attack", "targeting": "haun", "weight": 3, "effects": [ { "op": "damage", "amount": 5 } ] },
+      { "id": "sneer", "name": "\"야, 잡역.\"", "intent": "debuff", "targeting": "haun", "weight": 1, "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "공양이 늦어지면 내원 사형들의 발길질이 날아온다는 것을 그는 오 년 동안 몸으로 배웠다."
+  },
+  {
+    "id": "kwak_dojin_cliff", "name": "장문인 곽도진", "maxHp": 300, "sprite": null, "color": "#e0cfae", "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "sword_qi", "name": "검기", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 7 } ] },
+      { "id": "cloud_quick", "name": "청운십팔식 쾌검", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 4, "times": 3 } ] },
+      { "id": "unhae_gwijong", "name": "운해귀종(雲海歸宗)", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 20 } ] }
+    ],
+    "flavor": "청운문의 장문인. 절정을 넘어 화경을 바라본다는 고수. 지금의 하운으로는 이길 수 없다."
   }
 ]

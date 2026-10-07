@@ -1,14 +1,14 @@
 id: fx_slash_blue
 type: fx
-summary: 운하검 벽운단하 — 푸른 세로 베기 이펙트 6프레임
+summary: 운하검 벽운단하 — 푸른 세로 베기 이펙트 6프레임(모든 칸에서 같은 ")" 모양 초승달, 같은 자리)
 frames: 6
 fps: 15
 events: { impact: 3 }
 frame_notes:
-  1: a thin blue line of light appears at the upper left
-  2: the line extends into a sharp crescent sweeping downward, bright white core, darker blue outer band
-  3: full vertical cleaving arc at maximum brightness, small cloud-like pixel wisps split around it
-  4: arc begins to thin, single-block blue sparks scatter
-  5: arc fades to a faint trail, sparks drifting
-  6: only a few motes and a hairline afterimage remain
+  1: a thin short blue line of light appears at the top center of the cell, the start of the arc
+  2: the line grows downward into a sharp crescent that bulges toward the RIGHT like a ")" bracket, bright white core, darker blue outer band, its top end at the top center
+  3: the full ")" crescent from top center to bottom center at maximum brightness, the same right-bulging curve as cell 2, small cloud-like pixel wisps split around it
+  4: the same ")" crescent in the same place begins to thin, single-block blue sparks scatter
+  5: the same ")" crescent fades to a faint trail in the same place, sparks drifting
+  6: only a few motes and a hairline ")" afterimage remain in the same place
 placeholder: { accent: '#4fb4ff' }

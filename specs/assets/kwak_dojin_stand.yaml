@@ -1,0 +1,9 @@
+id: kwak_dojin_stand
+type: character-standing
+character: kwak_dojin
+summary: 장문인 곽도진 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — serene benevolent Taoist calm, hands folded in the long sleeves"
+  2: "resolute expression — cold merciless eyes, the pine-patterned sword drawn and held upright before the face"
+  3: "surprised expression — a flicker of shock, one eyebrow lifted, lips pressed thin"
+placeholder: { color: '#f1efe6', accent: '#e0cfae' }

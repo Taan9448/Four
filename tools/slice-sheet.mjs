@@ -28,7 +28,8 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
 
   const cells = spec.grid[0] * spec.grid[1];
   const illustration = spec.track === 'illustration';
-  const keyedSheet = illustration ? null : keyOut(sheet.raw, spec);
+  // 키 색이 있는 일러스트(반신 그림)도 배경을 지운다
+  const keyedSheet = illustration && spec.chroma === 'none' ? null : keyOut(sheet.raw, spec);
   let frameCells;
   if (fallback === 2) frameCells = [1, 2, 3];
   else if (fallback === 3) {
@@ -41,7 +42,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
   if (illustration) {
     for (const [i, n] of frameCells.entries()) {
       // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
-      const cell = extract(sheet.raw, cellRect(spec, n, sheet.raw));
+      const cell = extract(keyedSheet ?? sheet.raw, cellRect(spec, n, sheet.raw));
       await sharp(cell.data, { raw: { width: cell.width, height: cell.height, channels: 4 } })
         .resize(spec.logical[0], spec.logical[1], { fit: 'fill', kernel: 'lanczos3' })
         .png()

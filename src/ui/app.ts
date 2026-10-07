@@ -5,12 +5,14 @@ import { randomSeed } from '../engine/rng';
 import type { MapNode } from '../engine/route';
 import {
   addCard,
+  advanceStage,
   applyBattleOutcome,
   applyRunOps,
   battleSetupFor,
   createRun,
   enterNode,
   isBattle,
+  nextStage,
   rewardOptions,
   type Encounter,
   type RunState,
@@ -19,6 +21,7 @@ import { BattleView } from './battle-view';
 import { choiceView, rewardView } from './choice-view';
 import { h } from './dom';
 import { mapView } from './map-view';
+import { sceneView } from './scene-view';
 
 const data = gameData();
 
@@ -35,7 +38,7 @@ export class App {
 
   /** ?sandbox[=kyle,born] — 지도 없이 바로 전투(하운+동료(기본 엘리아) vs 그림자늑대 2마리, 융합 카드·왕일검 지원 포함). 연출 확인용 */
   private sandbox(seed: string, mates: string[]): void {
-    const run = createRun(data, seed, { supportActive: true });
+    const run = createRun(data, seed, { stageId: 's1', supportActive: true });
     applyRunOps(data, run, [
       ...mates.map((member) => ({ op: 'join_party' as const, member })),
       { op: 'gain_card', card: 'haun_byeogun', count: 2 },
@@ -65,9 +68,9 @@ export class App {
           { class: 'title-form' },
           h('label', {}, '시드 ', seedInput, h('button', { class: 'btn', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
           h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
-          h('button', { class: 'btn btn-primary', onclick: () => this.start(seedInput.value.trim() || randomSeed(), wang.checked) }, '시작 — S1 엘하임 숲'),
+          h('button', { class: 'btn btn-primary', onclick: () => this.start(seedInput.value.trim() || randomSeed(), wang.checked) }, '시작 — S0 청운산'),
         ),
-        h('p', { class: 'hint' }, '1차 프로토타입: S1 한 스테이지. 같은 시드면 같은 지도가 나옵니다. 그래픽은 모두 임시 시트입니다.'),
+        h('p', { class: 'hint' }, '1차 프로토타입: S0 청운산(프롤로그) → S1 엘하임 숲. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.'),
       ),
     );
   }
@@ -84,6 +87,12 @@ export class App {
 
   private map(): void {
     const run = this.run!;
+    if (run.status === 'stage_clear') {
+      // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
+      const stage = data.stages.find((s) => s.id === run.stageId)!;
+      const outroScene = data.modules.get(stage.boss ?? '')?.content.outroScene;
+      return this.playScene(outroScene, () => this.stageClear());
+    }
     if (run.status === 'complete') return this.end(true);
     if (run.status === 'defeat') return this.end(false);
     this.show(
@@ -102,8 +111,19 @@ export class App {
   private enter(node: MapNode): void {
     const run = this.run!;
     const enc = enterNode(data, run, node.id);
-    if (isBattle(enc)) this.battle(enc);
-    else this.show(choiceView(data, run, enc.module, () => this.map()));
+    const go = () => {
+      if (isBattle(enc)) this.battle(enc);
+      else this.show(choiceView(data, run, enc.module, () => this.map()));
+    };
+    // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
+    this.playScene(enc.module.content.scene, go);
+  }
+
+  /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then */
+  private playScene(id: string | undefined, then: () => void): void {
+    const scene = id ? data.scenes.get(id) : undefined;
+    if (!scene) return then();
+    this.show(sceneView(data, scene, then));
   }
 
   private battle(enc: Encounter): void {
@@ -122,6 +142,7 @@ export class App {
         scar: run.scar,
         supportActive: run.supportActive,
         bonusText: bonus,
+        introText: enc.module.content.text,
       },
       (final) => {
         applyBattleOutcome(run, enc, battleOutcome(final)!);
@@ -135,6 +156,36 @@ export class App {
       },
     );
     this.show(view.root);
+  }
+
+  /** 보스를 넘은 뒤: 보스 모듈의 장면 글(outro)을 보여 주고 다음 스테이지로 */
+  private stageClear(): void {
+    const run = this.run!;
+    const stage = data.stages.find((s) => s.id === run.stageId)!;
+    const boss = data.modules.get(stage.boss ?? '');
+    // 끝 장면을 이미 보여 줬으면 장면 글은 생략
+    const outro = boss?.content.outroScene ? undefined : boss?.content.outro;
+    const next = nextStage(data, run);
+    this.show(
+      h(
+        'section',
+        { class: 'screen end-screen stage-clear win' },
+        h('h1', {}, `${stage.name} — 끝`),
+        outro ? h('p', { class: 'outro' }, outro) : null,
+        next ? h('p', { class: 'next-stage' }, `다음: ${next.name} (${next.chapters})`) : null,
+        h(
+          'button',
+          {
+            class: 'btn btn-primary',
+            onclick: () => {
+              advanceStage(data, run);
+              this.map();
+            },
+          },
+          next ? '계속' : '마치기',
+        ),
+      ),
+    );
   }
 
   private end(win: boolean): void {

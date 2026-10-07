@@ -9,7 +9,9 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
+import { nearestColor } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
+import { loadStyleData } from '../tools/lib/style.mjs';
 import { validateAsset, validateSheet } from '../tools/validate-assets.mjs';
 
 const FIXTURES = join(ROOT, 'tools/__fixtures__/specs');
@@ -31,7 +33,7 @@ async function prepare(id: string, opts: { skipCells?: number[]; extraCells?: nu
 }
 
 /** 8px 블록으로 그린 사각 인물(외곽선 + 채움) 5칸 시트. top·rows는 칸 안 블록 줄 */
-async function blockFigureSheet(top: number, rows: number, B = 8) {
+async function blockFigureSheet(top: number, rows: number, B = 8, topFor: (n: number) => number = () => top) {
   const W = 1536, H = 1024, cols = 3, half = Math.floor(48 / B);
   const buf = Buffer.alloc(W * H * 4);
   const put = (x: number, y: number, [r, g, b]: number[]) => { const i = (y * W + x) * 4; buf[i] = r; buf[i + 1] = g; buf[i + 2] = b; buf[i + 3] = 255; };
@@ -39,8 +41,9 @@ async function blockFigureSheet(top: number, rows: number, B = 8) {
   for (let n = 0; n < 5; n++) {
     const cx = (n % cols) * 512, cy = Math.floor(n / cols) * 512;
     const mid = Math.floor(512 / B / 2);
-    for (let by = top; by < top + rows; by++) for (let bx = mid - half; bx < mid + half; bx++) {
-      const edge = by === top || by === top + rows - 1 || bx === mid - half || bx === mid + half - 1;
+    const t = topFor(n + 1);
+    for (let by = t; by < t + rows; by++) for (let bx = mid - half; bx < mid + half; bx++) {
+      const edge = by === t || by === t + rows - 1 || bx === mid - half || bx === mid + half - 1;
       // 안쪽은 바둑판 무늬: 블록 경계마다 색이 바뀌어야 블록 크기를 하나로 감지한다
       const c = edge ? [0x1d, 0x24, 0x33] : (bx + by) % 2 ? [0x3d, 0x44, 0x59] : [0x5d, 0x64, 0x78];
       for (let y = 0; y < B; y++) for (let x = 0; x < B; x++) put(cx + bx * B + x, cy + by * B + y, c);
@@ -140,6 +143,23 @@ describe('자르기 → 검증', () => {
     expect(r.warnings.some((w) => w.includes('시트 전체를 줄였다'))).toBe(true);
   });
 
+  it('시트 2행을 더 높게 그려도(모델의 행별 기준선 어긋남) 모든 프레임의 발이 같은 줄에 온다', async () => {
+    const spec = loadSpec('fixture_attack', root);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    // 1행(칸 1~3)은 블록 줄 10부터, 2행(칸 4~5)은 4블록 높게
+    writeFileSync(p.source('fixture_attack'), await blockFigureSheet(10, 40, 8, (n) => (n <= 3 ? 10 : 6)));
+    await sliceSheet(spec, { src: p.source('fixture_attack'), outDir: p.sprites('fixture_attack') });
+    const feet = [];
+    for (let n = 1; n <= 5; n++) {
+      const { data, info } = await sharp(join(p.sprites('fixture_attack'), `frame_0${n}.png`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      let maxY = -1;
+      for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) if (data[(y * info.width + x) * 4 + 3] > 0) maxY = y;
+      feet.push(maxY + 1);
+    }
+    expect(feet).toEqual([72, 72, 72, 72, 72]);
+  });
+
   it('명세가 바뀐 뒤 다시 자르지 않은 프레임은 art 브랜치에선 실패, 그 밖에선 경고', async () => {
     const { p } = await prepare('fixture_attack');
     const metaPath = join(p.sprites('fixture_attack'), 'meta.json');
@@ -236,6 +256,20 @@ describe('자르기 → 검증', () => {
     expect(prompt).not.toContain('PIXEL GRID');
   });
 
+  it('반신 그림(character-standing)은 마젠타 배경을 지운 512×1024 표정 3장으로 자른다', async () => {
+    const spec = loadSpec('haun_stand');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source('haun_stand'), await renderSheet(spec));
+    const meta = await sliceSheet(spec, { src: p.source('haun_stand'), outDir: p.sprites('haun_stand') });
+    expect(meta).toMatchObject({ frames: 3, frameW: 512, frameH: 1024, track: 'illustration' });
+    const { data, info } = await sharp(join(p.sprites('haun_stand'), 'frame_02.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect([info.width, info.height]).toEqual([512, 1024]);
+    expect(data[3]).toBe(0); // 왼쪽 위 구석(배경)은 투명
+    const mid = ((info.height / 2) * info.width + info.width / 2) * 4;
+    expect(data[mid + 3]).toBe(255); // 몸통은 불투명
+  });
+
   it('manifest는 실제 스프라이트를 임시 시트보다 우선한다', async () => {
     await prepare('fixture_attack');
     const p = paths(root);
@@ -279,6 +313,19 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(fx).toContain('#000000');
     expect(fx).toContain('glowing visual effect');
     expect(fx).not.toContain('no soft glow');
+  });
+});
+
+describe('팔레트 맞춤', () => {
+  const palette = (loadStyleData() as { palette: string[] }).palette.map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+  const hex = (c: number[]) => `#${c.map((x) => x.toString(16).padStart(2, '0')).join('')}`;
+  it('무채색에 가까운 회색(숯빛 겉옷)은 갈색이 아니라 회색 계열로 붙는다', () => {
+    expect(hex(nearestColor(palette, 64, 56, 56))).toBe('#2b2b3a');
+    expect(hex(nearestColor(palette, 40, 32, 32))).toBe('#1d2433');
+  });
+  it('채도가 있는 색(나무 손잡이·피부)은 그대로 가장 가까운 색', () => {
+    expect(hex(nearestColor(palette, 110, 84, 64))).toBe('#6e5440');
+    expect(hex(nearestColor(palette, 242, 200, 160))).toBe('#f2c8a0');
   });
 });
 
