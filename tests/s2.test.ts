@@ -76,7 +76,7 @@ describe('S2 마왕성 노크투르나', () => {
     expect(run.deck.some((c) => c.cardId === 'haun_cheonoe')).toBe(false);
   });
 
-  it('S2를 끝까지 진행하면 바르가스를 이긴 뒤 천외귀운을 영구로 얻고 캠페인(구현 범위)이 끝난다', () => {
+  it('S2를 끝까지 진행하면 바르가스를 이긴 뒤 천외귀운을 영구로 얻는다', () => {
     const run = s2Run('S2-RUN');
     const win = (): BattleOutcome => ({
       result: 'victory',

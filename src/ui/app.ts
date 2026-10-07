@@ -13,6 +13,7 @@ import {
   createRunAt,
   enterNode,
   isBattle,
+  playableStages,
   nextStage,
   rewardOptions,
   type Encounter,
@@ -79,7 +80,7 @@ export class App {
           h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
           h('button', { class: 'btn btn-primary', onclick: () => this.start(seedInput.value.trim() || randomSeed(), wang.checked) }, '시작 — S0 청운산'),
         ),
-        h('p', { class: 'hint' }, '1차 프로토타입: S0 청운산(프롤로그) → S1 엘하임 숲 → S2 마왕성. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.'),
+        h('p', { class: 'hint' }, `플레이 가능: ${playableStages(data).map((st) => st.name).join(' → ')}. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.`),
       ),
     );
   }
@@ -186,6 +187,7 @@ export class App {
         h('h1', {}, `${stage.name} — 끝`),
         outro ? h('p', { class: 'outro' }, outro) : null,
         this.clearMessages.length ? h('ul', { class: 'clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
+        run.scar > 0 ? h('p', { class: 'scar-reveal' }, `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.`) : null,
         next ? h('p', { class: 'next-stage' }, `다음: ${next.name} (${next.chapters})`) : null,
         h(
           'button',
