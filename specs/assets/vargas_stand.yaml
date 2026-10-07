@@ -1,0 +1,9 @@
+id: vargas_stand
+type: character-standing
+character: vargas
+summary: 마왕 바르가스 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — cold disdainful calm on the throne, head slightly tilted, wings folded like a torn cloak"
+  2: "resolute expression — wings spread wide, green light flaring in the hollow eyes, one clawed hand raised"
+  3: "surprised expression — a crack of disbelief, the hollow eyes widened, a thin black line splitting across the chest"
+placeholder: { color: '#1e1a22', accent: '#3a5a3a' }

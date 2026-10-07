@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, countColors, keyOut, keyResidual, loadRaw, prepareSheet } from './lib/image.mjs';
+import { bbox, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -20,11 +20,12 @@ const { GIFEncoder, quantize, applyPalette } = gifenc;
 
 /**
  * @param {object} spec 정규화된 명세
- * @param {{ src: string, outDir: string, previews?: boolean, root?: string, staleOk?: boolean }} opts
+ * @param {{ src: string, outDir: string, previews?: boolean, root?: string, staleOk?: boolean, placeholder?: boolean }} opts
+ *   placeholder: 임시 그림(도구가 그린 것)이면 일러스트 마젠타 기운 검사를 건너뛴다
  *   staleOk: 명세가 바뀐 뒤 아직 다시 자르지 않은 프레임을 경고로만 둔다(art/* 밖의 브랜치. 그 브랜치는 sprites를 고칠 수 없다)
  * @returns {Promise<{ errors: string[], warnings: string[], stale?: boolean }>}
  */
-export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT, styleRoot = ROOT, staleOk = false }) {
+export async function validateSheet(spec, { src, outDir, previews = true, root = ROOT, styleRoot = ROOT, staleOk = false, placeholder = false }) {
   const errors = [...checkSpecShape(spec, root).map((e) => `명세: ${e}`)];
   const warnings = [];
   if (!existsSync(src)) return { errors: [...errors, `원본 시트 없음: ${src}`], warnings };
@@ -110,6 +111,13 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       if (spec.chroma !== 'none') {
         const residual = keyResidual(img, spec);
         if (residual > 0.005) errors.push(`프레임 ${n}: 키 색 잔여 픽셀 ${(residual * 100).toFixed(1)}%`);
+        // 임시 그림은 도구가 그린 것이라 건너뛴다
+        if (spec.chroma === 'magenta' && !placeholder) {
+          const cast = magentaCast(img);
+          if (cast > 0.0005) {
+            errors.push(`프레임 ${n}: 마젠타 기운 픽셀 ${(cast * 100).toFixed(2)}% — main을 받아 assets:slice로 다시 자르세요`);
+          }
+        }
       }
       return;
     }
@@ -213,6 +221,7 @@ export async function validateAsset(id, { root = ROOT, placeholder = false, prev
     previews,
     root,
     staleOk,
+    placeholder,
   });
 }
 
