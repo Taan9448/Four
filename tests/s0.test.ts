@@ -12,6 +12,7 @@ import {
   createRun,
   enterNode,
   isBattle,
+  playableStages,
 } from '../src/engine/run';
 import { battle, data } from './helpers';
 
@@ -84,7 +85,8 @@ describe('S0 청운산', () => {
   });
 
   it('마지막 플레이 가능 스테이지를 넘으면 캠페인(구현 범위)이 끝난다', () => {
-    const run = createRun(data, 'END', { stageId: 's1' });
+    const last = playableStages(data).at(-1)!;
+    const run = createRun(data, 'END', { stageId: last.id });
     run.status = 'stage_clear';
     expect(advanceStage(data, run)).toBe(false);
     expect(run.status).toBe('complete');
