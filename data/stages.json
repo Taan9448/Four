@@ -23,8 +23,11 @@
     "typeWeights": { "battle": 42, "event": 25, "elite": 12, "rest": 12, "inn": 9 },
     "boss": "s3_boss_branch_lord",
     "summary": "뒤집힌 무림. 운곡촌에서 교세를 걷는 마교도를 베고, 폐사찰에서 왕일검과 재회한다. 무당·소림·화산을 거쳐 섬서 분타주를 쓰러뜨린 밤, 사라지지 않는 하늘의 금을 본다." },
-  { "id": "s4", "order": 4, "name": "천마봉", "chapters": "8장", "world": "murim", "floors": 10, "playable": false,
-    "boss": null, "summary": "구천 계단의 연속전과 정파 연합의 진법. 곽도진과 사무결의 2인 보스, 붉은 거인으로 변한 사무결." },
+  { "id": "s4", "order": 4, "name": "천마봉", "chapters": "8장", "world": "murim", "floors": 10, "playable": true,
+    "pinned": [ { "floor": 1, "module": "s4_story_nine_stairs" } ],
+    "forcedTypes": { "10": "rest" },
+    "typeWeights": { "battle": 50, "event": 22, "elite": 14, "rest": 14 },
+    "boss": "s4_boss_blood_hall", "summary": "구천 계단의 연속전과 정파 연합의 진법. 곽도진과 사무결의 2인 보스, 붉은 거인으로 변한 사무결." },
   { "id": "s5", "order": 5, "name": "세계의 틈", "chapters": "9~10장", "world": "rift", "floors": 9, "playable": false,
     "boss": null, "summary": "흐름이 없는 곳. 보른과 카일이 차례로 남고, 하운과 엘리아가 지옥왕 모르데카이의 매듭을 끊은 뒤 틈을 꿰맨다." }
 ]

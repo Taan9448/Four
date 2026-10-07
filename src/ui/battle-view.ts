@@ -352,6 +352,21 @@ export class BattleView {
           await sleep(200);
           break;
         }
+        case 'transform': {
+          // 보스 2단계: 같은 자리에서 새 모습(실루엣·크기·이름)으로 다시 만든다
+          const old = this.units.get(ev.uid);
+          if (old) {
+            old.player.stop();
+            const fresh = this.makeUnit(old.c);
+            old.el.replaceWith(fresh.el);
+            toast(this.toasts, `${ev.from} — ${ev.text}`, 'danger');
+            shake(this.field, true);
+            flash(this.field, 'red');
+            this.refresh();
+          }
+          await sleep(600);
+          break;
+        }
         case 'skip': {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, '움직이지 못함', 'status');
