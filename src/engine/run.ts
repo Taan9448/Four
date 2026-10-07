@@ -67,6 +67,29 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
   return run;
 }
 
+/**
+ * 디버그·확인용: 앞 스테이지를 건너뛰고 stageId에서 시작한다. 앞 스테이지들의 고정 스토리 노드(첫 선택지)와
+ * 보스 clearEffects를 순서대로 적용해 동료·플래그·스토리 카드를 원작 흐름대로 맞춘다.
+ */
+export function createRunAt(data: GameData, seed: string, stageId: string, opts: RunOptions = {}): RunState {
+  const target = data.stages.find((s) => s.id === stageId);
+  if (!target?.playable) throw new Error(`플레이할 수 없는 스테이지: ${stageId}`);
+  const run = createRun(data, seed, { ...opts, stageId });
+  for (const st of playableStages(data).filter((s) => s.order < target.order)) {
+    for (const p of [...st.pinned].sort((a, b) => a.floor - b.floor)) {
+      const mod = data.modules.get(p.module)!;
+      const choice = mod.content.choices?.find((c) => !c.condition);
+      if (choice) applyRunOps(data, run, choice.effects);
+      if (mod.once) run.usedModules.push(mod.id);
+    }
+    const boss = st.boss ? data.modules.get(st.boss) : undefined;
+    if (boss?.content.clearEffects) applyRunOps(data, run, boss.content.clearEffects);
+  }
+  run.selected = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').slice(0, data.balance.party.max).map((r) => r.id);
+  run.map = buildMap(data, run);
+  return run;
+}
+
 function buildMap(data: GameData, run: RunState): StageMap {
   return generateStageMap(data, run.stageId, createRng(run.seed).fork(`map:${run.stageId}`), {
     scar: run.scar,
@@ -161,15 +184,21 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
   };
 }
 
-export function applyBattleOutcome(run: RunState, enc: Encounter, outcome: BattleOutcome): void {
+/** 전투 결과를 런에 반영한다. 보스를 이기면 clearEffects를 적용하고 그 결과 메시지를 돌려준다 */
+export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter, outcome: BattleOutcome): string[] {
   for (const p of outcome.party) {
     const r = run.roster.find((x) => x.id === p.id);
     if (r) r.hp = Math.max(0, Math.min(r.maxHp, p.hp));
   }
   run.mana = outcome.mana;
   run.scar += outcome.scarGain;
-  if (outcome.result === 'defeat') run.status = 'defeat';
-  else if (enc.node.type === 'boss') run.status = 'stage_clear';
+  if (outcome.result === 'defeat') {
+    run.status = 'defeat';
+    return [];
+  }
+  if (enc.node.type !== 'boss') return [];
+  run.status = 'stage_clear';
+  return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
 }
 
 /**

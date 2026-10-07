@@ -10,6 +10,7 @@ import {
   applyRunOps,
   battleSetupFor,
   createRun,
+  createRunAt,
   enterNode,
   isBattle,
   nextStage,
@@ -27,26 +28,34 @@ const data = gameData();
 
 export class App {
   private run: RunState | null = null;
+  /** 보스를 이긴 뒤 clearEffects 결과(스테이지 끝 화면에 보여 준다) */
+  private clearMessages: string[] = [];
 
   constructor(private root: HTMLElement) {
     const params = new URLSearchParams(location.search);
     const seed = params.get('seed');
-    if (params.has('sandbox')) this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean));
-    else if (seed) this.start(seed, params.has('wang'));
+    if (params.has('sandbox'))
+      this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean), params.get('module') ?? undefined);
+    else if (seed) this.start(seed, params.has('wang'), params.get('stage') ?? undefined);
     else this.title();
   }
 
-  /** ?sandbox[=kyle,born] — 지도 없이 바로 전투(하운+동료(기본 엘리아) vs 그림자늑대 2마리, 융합 카드·왕일검 지원 포함). 연출 확인용 */
-  private sandbox(seed: string, mates: string[]): void {
-    const run = createRun(data, seed, { stageId: 's1', supportActive: true });
+  /**
+   * ?sandbox[=kyle,born][&module=s2_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
+   * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
+   */
+  private sandbox(seed: string, mates: string[], moduleId = 's1_battle_wolves_pair'): void {
+    const module = data.modules.get(moduleId);
+    if (!module?.content.enemies?.length) throw new Error(`sandbox: 전투 모듈이 아니다: ${moduleId}`);
+    const run = createRun(data, seed, { stageId: module.stage, supportActive: true });
     applyRunOps(data, run, [
       ...mates.map((member) => ({ op: 'join_party' as const, member })),
       { op: 'gain_card', card: 'haun_byeogun', count: 2 },
       { op: 'gain_card', card: 'haun_cloud_form' },
     ]);
     this.run = run;
-    const node = { id: 'sandbox', floor: 0, index: 0, type: 'battle' as const, moduleId: 's1_battle_wolves_pair', next: [] };
-    this.battle({ node, module: data.modules.get('s1_battle_wolves_pair')! });
+    const node = { id: 'sandbox', floor: 0, index: 0, type: module.type, moduleId, next: [] };
+    this.playScene(module.content.scene, () => this.battle({ node, module }));
   }
 
   private show(el: HTMLElement): void {
@@ -70,15 +79,19 @@ export class App {
           h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
           h('button', { class: 'btn btn-primary', onclick: () => this.start(seedInput.value.trim() || randomSeed(), wang.checked) }, '시작 — S0 청운산'),
         ),
-        h('p', { class: 'hint' }, '1차 프로토타입: S0 청운산(프롤로그) → S1 엘하임 숲. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.'),
+        h('p', { class: 'hint' }, '1차 프로토타입: S0 청운산(프롤로그) → S1 엘하임 숲 → S2 마왕성. 같은 시드면 같은 지도가 나옵니다. 그래픽은 대부분 임시 그림입니다.'),
       ),
     );
   }
 
-  private start(seed: string, support: boolean): void {
-    this.run = createRun(data, seed, { supportActive: support });
+  /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
+  private start(seed: string, support: boolean, stageId?: string): void {
+    this.run = stageId
+      ? createRunAt(data, seed, stageId, { supportActive: support })
+      : createRun(data, seed, { supportActive: support });
     const url = new URL(location.href);
     url.searchParams.set('seed', seed);
+    if (!stageId) url.searchParams.delete('stage');
     if (support) url.searchParams.set('wang', '1');
     else url.searchParams.delete('wang');
     history.replaceState(null, '', url);
@@ -145,7 +158,7 @@ export class App {
         introText: enc.module.content.text,
       },
       (final) => {
-        applyBattleOutcome(run, enc, battleOutcome(final)!);
+        this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
         if (run.status !== 'map') return this.map();
         this.show(
           rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
@@ -172,12 +185,14 @@ export class App {
         { class: 'screen end-screen stage-clear win' },
         h('h1', {}, `${stage.name} — 끝`),
         outro ? h('p', { class: 'outro' }, outro) : null,
+        this.clearMessages.length ? h('ul', { class: 'clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
         next ? h('p', { class: 'next-stage' }, `다음: ${next.name} (${next.chapters})`) : null,
         h(
           'button',
           {
             class: 'btn btn-primary',
             onclick: () => {
+              this.clearMessages = [];
               advanceStage(data, run);
               this.map();
             },
@@ -190,17 +205,16 @@ export class App {
 
   private end(win: boolean): void {
     const run = this.run!;
+    const last = data.stages.find((s) => s.id === run.stageId)!;
     this.show(
       h(
         'section',
         { class: `screen end-screen ${win ? 'win' : 'lose'}` },
-        h('h1', {}, win ? '화염군주를 베었다' : '여기까지'),
+        h('h1', {}, win ? `${last.name}까지` : '여기까지'),
         h(
           'p',
           {},
-          win
-            ? '푸른 검광이 협곡을 세로로 갈랐다. 그 자리의 허공에, 머리카락보다 가는 검은 금이 그어졌다가 사라졌다. (S1 클리어 — 다음 스테이지는 이후 작업)'
-            : '하운이 쓰러졌다.',
+          win ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)` : '하운이 쓰러졌다.',
         ),
         h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
         h('button', { class: 'btn btn-primary', onclick: () => this.title() }, '새 런'),
