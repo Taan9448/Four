@@ -1,0 +1,34 @@
+{
+  "id": "kwak_dojin_ref",
+  "type": "character-ref",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 4.898,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    128
+  ],
+  "fit": "pad",
+  "frames": 2,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "left",
+  "fallbackLevel": 1,
+  "virtualFrames": 2,
+  "sourceHash": "7802f3c5eb7ff60f",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1254,
+    1254
+  ],
+  "gridPurity": 0.448
+}

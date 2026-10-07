@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Red Giant, Sa Mugyeol transformed by the Heavenly Demon blood art; a hulking blood-red giant of congealed martial qi, cracked crimson skin glowing from within, shards of a shattered black bamboo hat still on the head, long blood-red claws, blood mist steaming from the shoulders.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp 64x64 pixel art in the style of a 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Cell 1: full body, three-quarter front view, a hulking blood-red giant, cracked crimson skin glowing from within, shards of a shattered black bamboo hat on the head, long red claws, blood mist rising from the shoulders
+Cell 2: full body, side view facing left, same proportions, hunched forward, huge fists hanging low
+Cells 3 to 4 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Correct excessive width and edge crowding in the previous attempt. On a 1024px sheet each top cell spans512px. Cell1 ALL figure, claws, hat, particles and robe must fit strictly in x=60..450,y=70..460; cell2 ALL must fit x=572..962,y=70..460. If output canvas differs, use these proportional limits. Narrow the robe and blood-mist curls, bring hands closer to hips. Both humanoids must be about96 logical pixels tall, with feet on115, and visibly have a wide green margin on ALL sides. Upper mist may never extend above hat. Figure consists of exactly4px solid square blocks, <=16 palette colors, flat dark outlines. Keep transformed blood-red skin and glowing cracks, SHATTERED bamboo hat pieces, huge hanging clawed hands, hunched left-side profile cell2. Show compact angular dark-red mist. Bottom half completely empty.

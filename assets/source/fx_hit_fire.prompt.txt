@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Frames:
+Cell 1: a small orange ember in the center of the cell
+Cell 2: it puffs into a round burst of orange and yellow flame
+Cell 3: the flame burst at full size, licking upward, bright yellow core
+Cell 4: the flames break into rising tongues and embers
+Cell 5: a few embers and a wisp of dark smoke rising
+Cells 6 to 6 are completely black.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Final alignment correction. On1536x1024 sheet the BRIGHT IGNITION CORE must be at absolute canvas coordinates Cell1(256,256), Cell2(768,256), Cell3(1280,256), Cell4(256,768), Cell5(768,768). All five bright-core points are at the identical LOCAL coordinate(256,256). DO NOT place core at y300,350,or bottom of cell. Make cell3 brightest yellow core at y256 with flame tongues RISING ABOVE it towardsy120; its bottom never belowy340. Cell4 keep a tiny center ember at(256,768), broken flames drift ABOVE it. Cell5 keep center ember at(768,768), compact darkgray angular smoke ABOVE it y650..740. Use short compactflames whose brightness center staysfixed, same scale/position through entire animation. Other sparks sparse andsmall. Pureblackcell6.8pxblocks masterpalette<=12no blur. Required frame5smoke wins overgenericno-smoke style.
