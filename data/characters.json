@@ -1,6 +1,6 @@
 [
   {
-    "id": "haun", "name": "진하운", "title": "청운문 잡역 제자", "role": "fighter", "maxHp": 60, "color": "#3a6ea5",
+    "id": "haun", "name": "진하운", "title": "청운문 잡역 제자", "role": "fighter", "maxHp": 70, "color": "#3a6ea5",
     "sprites": { "idle": "haun_idle", "attack": "haun_attack", "hit": "haun_hit" },
     "starterDeck": ["haun_chop", "haun_chop", "haun_chop", "haun_chop", "haun_step", "haun_step", "haun_step", "haun_read_grain"],
     "joinsAt": "s0",

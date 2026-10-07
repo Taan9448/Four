@@ -11,6 +11,8 @@ export interface Rng {
   shuffle<T>(items: T[]): T[];
   /** 라벨로 독립된 하위 수열을 만든다. 부모 수열의 진행과 무관하다. */
   fork(label: string): Rng;
+  /** 지금 위치에서 같은 수열을 이어 가는 독립 사본(자동 플레이 봇이 전투를 미리 시험할 때) */
+  clone(): Rng;
   readonly seed: string;
 }
 
@@ -27,7 +29,11 @@ function hashString(str: string): number {
 }
 
 export function createRng(seed: string): Rng {
-  let a = hashString(seed);
+  return makeRng(seed, hashString(seed));
+}
+
+function makeRng(seed: string, state: number): Rng {
+  let a = state;
   const next = (): number => {
     // mulberry32
     a = (a + 0x6d2b79f5) | 0;
@@ -65,6 +71,9 @@ export function createRng(seed: string): Rng {
     },
     fork(label) {
       return createRng(`${seed}::${label}`);
+    },
+    clone() {
+      return makeRng(seed, a);
     },
   };
   return rng;
