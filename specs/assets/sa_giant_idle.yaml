@@ -1,0 +1,15 @@
+id: sa_giant_idle
+type: character-anim
+size: large
+character: sa_mugyeol_giant
+chroma: green
+summary: 붉은 거인 사무결 대기 4프레임
+depends_on: [sa_giant_ref]
+reference: assets/source/sa_giant_ref.png
+facing: left
+frame_notes:
+  1: "hunched stance facing left, huge fists low"
+  2: "chest heaves, blood mist rises from the shoulders"
+  3: "claws flex, the cracks in the skin glow brighter"
+  4: "settles, the glow dims"
+placeholder: { shape: humanoid, color: '#a01020', accent: '#ff5a3a' }

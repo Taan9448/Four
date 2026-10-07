@@ -1,0 +1,11 @@
+id: vargas_ref
+type: character-ref
+size: large
+character: vargas
+chroma: magenta
+summary: 마왕 바르가스 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a towering gaunt demon king, seven black horns curving back from the skull, torn leathery bat wings half spread, hollow eye sockets glowing faint green, a tattered black royal mantle over obsidian armor, long clawed fingers"
+  2: "full body, side view facing left, same proportions, wings folded behind, one clawed hand forward"
+placeholder: { shape: humanoid, color: '#2a2a34', accent: '#7dff9a' }

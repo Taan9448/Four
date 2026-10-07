@@ -1,0 +1,15 @@
+id: branch_lord_idle
+type: character-anim
+size: large
+character: branch_lord
+chroma: green
+summary: 섬서 분타주 대기 4프레임
+depends_on: [branch_lord_ref]
+reference: assets/source/branch_lord_ref.png
+facing: left
+frame_notes:
+  1: "wide stance facing left, hands clasped at the belt"
+  2: "breathes in, blood-red qi curling around the forearms"
+  3: "the qi flares, robe sleeves stirring"
+  4: "breathes out, the qi settles"
+placeholder: { shape: humanoid, color: '#6a0f1a', accent: '#ff3b3b' }

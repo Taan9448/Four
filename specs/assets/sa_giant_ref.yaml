@@ -1,0 +1,11 @@
+id: sa_giant_ref
+type: character-ref
+size: large
+character: sa_mugyeol_giant
+chroma: green
+summary: 붉은 거인 사무결 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a hulking blood-red giant, cracked crimson skin glowing from within, shards of a shattered black bamboo hat on the head, long red claws, blood mist rising from the shoulders"
+  2: "full body, side view facing left, same proportions, hunched forward, huge fists hanging low"
+placeholder: { shape: humanoid, color: '#a01020', accent: '#ff5a3a' }

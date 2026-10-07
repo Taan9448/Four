@@ -1,0 +1,14 @@
+id: mordecai_hit
+type: character-anim
+size: large
+character: mordecai
+chroma: green
+summary: 지옥왕 모르데카이 피격 3프레임
+depends_on: [mordecai_ref]
+reference: assets/source/mordecai_ref.png
+facing: left
+frame_notes:
+  1: "struck, the stitches flare and a few threads snap loose"
+  2: "the body bends, the blue heart flickering"
+  3: "recovers, the seams pulling tight again"
+placeholder: { shape: humanoid, color: '#1a1020', accent: '#4fb4ff' }

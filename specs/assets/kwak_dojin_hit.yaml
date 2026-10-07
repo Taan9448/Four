@@ -1,0 +1,14 @@
+id: kwak_dojin_hit
+type: character-anim
+size: large
+character: kwak_dojin
+chroma: magenta
+summary: 곽도진 피격 3프레임
+depends_on: [kwak_dojin_ref]
+reference: assets/source/kwak_dojin_ref.png
+facing: left
+frame_notes:
+  1: "struck, body jerks back, white hair and sleeves thrown backward"
+  2: "staggers half a step, sword arm out wide for balance"
+  3: "recovers, cold expression, sword raised again"
+placeholder: { shape: humanoid, color: '#e0cfae', accent: '#9fd3ff' }

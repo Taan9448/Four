@@ -1,0 +1,13 @@
+id: fx_hit_strike
+type: fx
+summary: 물리 타격 — 흰빛 충격 별 5프레임
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small bright white-yellow dot appears in the center of the cell"
+  2: "it bursts into a jagged four-pointed impact star, white core, pale yellow rim"
+  3: "the star at full size with short radiating lines, brightest"
+  4: "the star breaks into a few square sparks flying outward"
+  5: "only two or three faint sparks remain near the edges"
+placeholder: { accent: '#fff2c0' }

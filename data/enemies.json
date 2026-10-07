@@ -23,7 +23,7 @@
     ]
   },
   {
-    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": null, "scale": 2, "tier": "boss", "pattern": "cycle",
+    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": "ignis", "scale": 2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "flame_wave", "name": "화염 파도", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
       { "id": "magma_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 15 } ] },
@@ -32,7 +32,7 @@
     "flavor": "마왕의 사천왕 중 하나. 협곡 마을을 불태우고 있었다."
   },
   {
-    "id": "kwak_dojin", "name": "천하맹주 곽도진", "maxHp": 100, "sprite": null, "color": "#e0cfae", "scale": 1.3, "tier": "boss", "pattern": "cycle",
+    "id": "kwak_dojin", "name": "천하맹주 곽도진", "maxHp": 100, "sprite": "kwak_dojin", "color": "#e0cfae", "scale": 1.3, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "cloud_sword", "name": "청운십팔식 쾌검", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 5, "times": 3 } ] },
       { "id": "death_point", "name": "송문고검 — 사혈", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 10 }, { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] },
@@ -41,7 +41,7 @@
     "flavor": "현허진인 곽도진. 천하맹주가 되어 마교 교주와 중원의 하늘을 반으로 나눴다. 사형의 목소리에 단 한 번 흔들린다(왕일검 '도진아')."
   },
   {
-    "id": "sa_mugyeol", "name": "혈천마 사무결", "maxHp": 95, "sprite": null, "color": "#5a1020", "scale": 1.2, "tier": "boss", "pattern": "cycle",
+    "id": "sa_mugyeol", "name": "혈천마 사무결", "maxHp": 95, "sprite": "sa_mugyeol", "color": "#5a1020", "scale": 1.2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "blood_palm_wave", "name": "천마혈공 — 핏빛 장력", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 11 } ] },
       { "id": "silk_storm", "name": "붉은 비단", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
@@ -56,7 +56,7 @@
     "flavor": "천마신교 교주. 삿갓을 벗은 얼굴은 생각보다 젊었고, 그 젊음이 오히려 섬뜩했다."
   },
   {
-    "id": "sa_mugyeol_giant", "name": "붉은 거인 사무결", "maxHp": 110, "sprite": null, "color": "#a01020", "scale": 2.2, "tier": "boss", "pattern": "cycle",
+    "id": "sa_mugyeol_giant", "name": "붉은 거인 사무결", "maxHp": 110, "sprite": "sa_giant", "color": "#a01020", "scale": 2.2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "blood_sea", "name": "혈해", "intent": "attack", "effects": [ { "op": "damage", "amount": 9, "target": "all_enemies" } ] },
       { "id": "giant_fist", "name": "거인의 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 16 } ] },
@@ -65,7 +65,7 @@
     "flavor": "천마봉 아래에서 죽어 간 수천의 피가 교주에게로 빨려 올라갔다."
   },
   {
-    "id": "mordecai", "name": "지옥왕 모르데카이", "maxHp": 230, "sprite": null, "color": "#3a1030", "scale": 2.2, "tier": "boss", "pattern": "cycle",
+    "id": "mordecai", "name": "지옥왕 모르데카이", "maxHp": 230, "sprite": "mordecai", "color": "#3a1030", "scale": 2.2, "tier": "boss", "pattern": "cycle",
     "traits": [ { "status": "flow_eater", "stacks": 1 }, { "status": "knot", "stacks": 1 } ],
     "moves": [
       { "id": "stitched_arm", "name": "꿰맨 팔", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 12 } ] },
@@ -100,7 +100,7 @@
     "flavor": "공양이 늦어지면 내원 사형들의 발길질이 날아온다는 것을 그는 오 년 동안 몸으로 배웠다."
   },
   {
-    "id": "kwak_dojin_cliff", "name": "장문인 곽도진", "maxHp": 300, "sprite": null, "color": "#e0cfae", "tier": "boss", "pattern": "cycle",
+    "id": "kwak_dojin_cliff", "name": "장문인 곽도진", "maxHp": 300, "sprite": "kwak_dojin", "color": "#e0cfae", "scale": 1.3, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "sword_qi", "name": "검기", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 7 } ] },
       { "id": "cloud_quick", "name": "청운십팔식 쾌검", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 4, "times": 3 } ] },
@@ -162,7 +162,7 @@
     "flavor": "마왕의 사천왕. 그림자 속에서는 칼끝만 보인다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
   },
   {
-    "id": "vargas", "name": "마왕 바르가스", "maxHp": 190, "sprite": null, "color": "#3a5a3a", "scale": 2, "tier": "boss", "pattern": "cycle",
+    "id": "vargas", "name": "마왕 바르가스", "maxHp": 190, "sprite": "vargas", "color": "#3a5a3a", "scale": 2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "void_gaze", "name": "텅 빈 눈", "intent": "debuff", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" }, { "op": "block", "amount": 12, "target": "self" } ] },
       { "id": "torn_wings", "name": "찢어진 날개", "intent": "attack", "effects": [ { "op": "damage", "amount": 8, "target": "all_enemies" } ] },
@@ -207,7 +207,7 @@
     "flavor": "백발을 핏빛 끈으로 묶은 노인. 혈천강기가 그의 주위를 맴돈다."
   },
   {
-    "id": "branch_lord", "name": "섬서 분타주", "maxHp": 165, "sprite": null, "color": "#6a0f1a", "scale": 1.6, "tier": "boss", "pattern": "cycle",
+    "id": "branch_lord", "name": "섬서 분타주", "maxHp": 165, "sprite": "branch_lord", "color": "#6a0f1a", "scale": 1.6, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "branch_command", "name": "분타의 호령", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies" }, { "op": "block", "amount": 14, "target": "self" } ] },
       { "id": "great_blood_qi", "name": "혈천강기·대", "intent": "attack", "effects": [ { "op": "damage", "amount": 9, "target": "all_enemies" } ] },

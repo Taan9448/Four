@@ -1,0 +1,18 @@
+id: kwak_dojin_attack
+type: character-anim
+size: large
+character: kwak_dojin
+chroma: magenta
+summary: 곽도진 쾌검 찌르기 6프레임
+depends_on: [kwak_dojin_ref]
+reference: assets/source/kwak_dojin_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the sword back across his body, weight on the back foot"
+  2: "steps forward to the left, sword rising, white robe flaring"
+  3: "lunges, a thin pale-blue line of sword light streaks ahead of the blade"
+  4: "the thrust lands at full extension to the left, sword arm straight, the sword light at its brightest"
+  5: "the blade sweeps through, sleeves trailing behind"
+  6: "returns to the upright stance, sword lowered"
+placeholder: { shape: humanoid, color: '#e0cfae', accent: '#9fd3ff' }

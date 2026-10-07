@@ -1,0 +1,14 @@
+id: vargas_hit
+type: character-anim
+size: large
+character: vargas
+chroma: magenta
+summary: 마왕 바르가스 피격 3프레임
+depends_on: [vargas_ref]
+reference: assets/source/vargas_ref.png
+facing: left
+frame_notes:
+  1: "struck, head thrown back, the torn wings flinching open"
+  2: "recoils, mantle whipping, one hand raised"
+  3: "recovers, hollow eyes glowing"
+placeholder: { shape: humanoid, color: '#2a2a34', accent: '#7dff9a' }

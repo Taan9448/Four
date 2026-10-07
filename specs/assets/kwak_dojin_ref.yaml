@@ -1,0 +1,11 @@
+id: kwak_dojin_ref
+type: character-ref
+size: large
+character: kwak_dojin
+chroma: magenta
+summary: 곽도진 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, an upright white-haired Taoist master with calm cold eyes, long white hair and beard, a flowing white crane-pattern Taoist robe, a pine-patterned straight sword held point-down at his side"
+  2: "full body, side view facing left, same proportions, the sword held low and ready in the right hand, wide sleeves hanging"
+placeholder: { shape: humanoid, color: '#e0cfae', accent: '#9fd3ff' }

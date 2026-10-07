@@ -1,0 +1,18 @@
+id: mordecai_attack
+type: character-anim
+size: large
+character: mordecai
+chroma: green
+summary: 지옥왕 모르데카이 꿰맨 팔 6프레임
+depends_on: [mordecai_ref]
+reference: assets/source/mordecai_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws back the dark qi arm, seams glowing"
+  2: "the arm stretches unnaturally long, stitches straining"
+  3: "lashes forward to the left"
+  4: "the stitched arm strikes at full reach to the left, a burst of pale light"
+  5: "the arm recoils, threads of light trailing"
+  6: "returns to the looming stance"
+placeholder: { shape: humanoid, color: '#1a1020', accent: '#4fb4ff' }
