@@ -77,6 +77,7 @@ describe('데이터 검사', () => {
   it('스테이지·모듈: 고정 노드와 보스, 적, 선택지가 유효하다', () => {
     const errors: string[] = [];
     for (const st of data.stages) {
+      if (st.endingScene && !data.scenes.has(st.endingScene)) errors.push(`${st.id}: 없는 엔딩 장면 ${st.endingScene}`);
       if (st.playable && !st.boss) errors.push(`${st.id}: 플레이 가능한 스테이지에 보스가 없다`);
       if (st.boss && data.modules.get(st.boss)?.type !== 'boss') errors.push(`${st.id}: 보스 모듈 ${st.boss}이(가) boss 유형이 아니다`);
       for (const p of st.pinned) {

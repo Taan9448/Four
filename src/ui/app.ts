@@ -107,7 +107,11 @@ export class App {
       const outroScene = data.modules.get(stage.boss ?? '')?.content.outroScene;
       return this.playScene(outroScene, () => this.stageClear());
     }
-    if (run.status === 'complete') return this.end(true);
+    if (run.status === 'complete') {
+      // 캠페인의 끝: 에필로그 장면 → 엔딩 화면
+      const last = data.stages.find((s) => s.id === run.stageId)!;
+      return this.playScene(last.endingScene, () => this.end(true));
+    }
     if (run.status === 'defeat') return this.end(false);
     this.show(
       mapView(data, run, {
@@ -199,7 +203,7 @@ export class App {
               this.map();
             },
           },
-          next ? '계속' : '마치기',
+          next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
         ),
       ),
     );
@@ -208,15 +212,22 @@ export class App {
   private end(win: boolean): void {
     const run = this.run!;
     const last = data.stages.find((s) => s.id === run.stageId)!;
+    // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
+    const finale = win && !!last.endingScene;
     this.show(
       h(
         'section',
-        { class: `screen end-screen ${win ? 'win' : 'lose'}` },
-        h('h1', {}, win ? `${last.name}까지` : '여기까지'),
+        { class: `screen end-screen ${win ? 'win' : 'lose'}${finale ? ' finale' : ''}` },
+        h('h1', {}, finale ? '천외귀환' : win ? `${last.name}까지` : '여기까지'),
+        finale ? h('p', { class: 'finale-sub' }, '天外歸還 — 세계의 틈 · 완') : null,
         h(
           'p',
           {},
-          win ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)` : '하운이 쓰러졌다.',
+          finale
+            ? '세계의 틈이 닫혔다. 천마봉 위에는 바느질 자국처럼 가지런한 흉터, 청운봉선(靑雲縫線)이 남았다.'
+            : win
+              ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)`
+              : '하운이 쓰러졌다.',
         ),
         h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
         h('button', { class: 'btn btn-primary', onclick: () => this.title() }, '새 런'),

@@ -344,6 +344,8 @@ export const StageDef = z
     forcedTypes: z.record(z.string(), NodeType).default({}),
     typeWeights: z.partialRecord(NodeType, z.number()).default({}),
     boss: z.string().nullable(),
+    /** 이 스테이지가 캠페인의 끝이면, 마치기 뒤 엔딩 화면 전에 재생할 장면(에필로그) */
+    endingScene: z.string().optional(),
     summary: z.string(),
   })
   .strict();

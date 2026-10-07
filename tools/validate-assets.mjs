@@ -78,7 +78,10 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     const { grid, frames: analyzed } = processPixelSheet(sheet.raw, spec, palette, frameCells);
     const purity = analyzed.reduce((a, f) => a + f.purity, 0) / analyzed.length;
     const msg = `픽셀 격자 일치도 ${(purity * 100).toFixed(0)}% (감지한 블록 ${grid.block.toFixed(1)}px) — 블록이 고르지 않거나 흐리다(안티에일리어싱·격자 어긋남)`;
-    if (!grid.detected) errors.push(`픽셀 격자 일치도: 고른 블록 격자를 찾지 못했다(격자 점수 ${(grid.score * 100).toFixed(0)}%) — 흐리거나 픽셀 아트가 아닌 그림`);
+    // 격자를 못 찾으면 명세 배율(pixel_scale)로 샘플링해 64 격자에 맞춘다. 이미지 모델은 블록 크기를 조금씩 다르게
+    // 그리기 쉬워 감지가 실패해도 결과는 쓸 만하다. 다만 이때 일치도는 픽셀 아트와 일러스트를 가르지 못하므로(둘 다 35~50%)
+    // 오류로 막지 않고 경고로 남긴다 — 검토자가 콘택트 시트를 눈으로 보고 승인한다(CLAUDE.md 규칙 5)
+    if (!grid.detected) warnings.push(`고른 블록 격자를 찾지 못해(격자 점수 ${(grid.score * 100).toFixed(0)}%) 명세 배율 ${grid.block.toFixed(1)}px로 맞춰 잘랐다 — 콘택트 시트로 눈 확인 필요`);
     else if (purity < 0.5) errors.push(msg);
     else if (purity < 0.65) warnings.push(msg);
     const [T, TH] = spec.logical;
