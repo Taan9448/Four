@@ -78,5 +78,113 @@
       { "id": "unhae_gwijong", "name": "운해귀종(雲海歸宗)", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 20 } ] }
     ],
     "flavor": "청운문의 장문인. 절정을 넘어 화경을 바라본다는 고수. 지금의 하운으로는 이길 수 없다."
+  },
+  {
+    "id": "obsidian_guard", "name": "흑요석 경비병", "maxHp": 38, "sprite": null, "color": "#2b2735", "pattern": "cycle",
+    "moves": [
+      { "id": "halberd", "name": "미늘창 내려찍기", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 9 } ] },
+      { "id": "shield_wall", "name": "흑요석 방패", "intent": "defend", "effects": [ { "op": "block", "amount": 10, "target": "self" } ] }
+    ],
+    "flavor": "성문을 지키는 검은 갑주. 투구 안쪽이 비어 있다."
+  },
+  {
+    "id": "void_bat", "name": "공허 박쥐", "maxHp": 16, "sprite": null, "color": "#3d2a52", "pattern": "random",
+    "moves": [
+      { "id": "swoop", "name": "급강하", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [ { "op": "damage", "amount": 4, "times": 2 } ] },
+      { "id": "screech", "name": "찢는 울음", "intent": "debuff", "targeting": "random", "weight": 1, "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "회랑 천장에 거꾸로 매달린 박쥐 떼. 날개 끝이 허공을 갉아먹은 듯 흐릿하다."
+  },
+  {
+    "id": "corridor_knight", "name": "회랑의 타락 기사", "maxHp": 46, "sprite": null, "color": "#4a3a3a", "pattern": "cycle",
+    "moves": [
+      { "id": "black_oath", "name": "검은 맹세", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 6, "target": "self" } ] },
+      { "id": "fallen_cut", "name": "타락한 베기", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 11 } ] },
+      { "id": "crush", "name": "짓밟기", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 6 }, { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }
+    ],
+    "flavor": "엘하임의 기사였던 자. 카일이 그 문장을 알아보고 입을 다물었다."
+  },
+  {
+    "id": "ice_queen", "name": "빙결의 여왕", "maxHp": 90, "sprite": null, "color": "#a8d4ea", "scale": 1.3, "tier": "elite", "pattern": "cycle",
+    "moves": [
+      { "id": "frost_lance", "name": "서리 창", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 8 }, { "op": "apply_status", "status": "bind", "stacks": 1 } ] },
+      { "id": "blizzard", "name": "눈보라", "intent": "attack", "effects": [ { "op": "damage", "amount": 5, "target": "all_enemies" } ] },
+      { "id": "ice_mirror", "name": "얼음 거울", "intent": "defend", "effects": [ { "op": "block", "amount": 16, "target": "self" } ] }
+    ],
+    "flavor": "마왕의 사천왕. 그가 지나간 회랑에는 서리가 꽃처럼 핀다."
+  },
+  {
+    "id": "earth_giant", "name": "대지의 거인", "maxHp": 120, "sprite": null, "color": "#7a6248", "scale": 1.5, "tier": "elite", "pattern": "cycle",
+    "moves": [
+      { "id": "quake", "name": "지진", "intent": "attack", "effects": [ { "op": "damage", "amount": 6, "target": "all_enemies" } ] },
+      { "id": "stone_skin", "name": "바위 살갗", "intent": "defend", "effects": [ { "op": "block", "amount": 20, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 1, "target": "self" } ] },
+      { "id": "boulder", "name": "바위 던지기", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 16 }, { "op": "apply_status", "status": "stun", "stacks": 1 } ] }
+    ],
+    "flavor": "마왕의 사천왕. 한 걸음마다 성이 흔들린다."
+  },
+  {
+    "id": "shadow_assassin", "name": "그림자 암살자", "maxHp": 72, "sprite": null, "color": "#1d1a24", "tier": "elite", "pattern": "cycle",
+    "traits": [ { "status": "incorporeal", "stacks": 1 } ],
+    "moves": [
+      { "id": "venom_blade", "name": "독 묻은 단검", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 5, "times": 2 }, { "op": "apply_status", "status": "poison", "stacks": 3 } ] },
+      { "id": "vanish", "name": "그림자 숨기", "intent": "defend", "effects": [ { "op": "block", "amount": 12, "target": "self" } ] },
+      { "id": "backstab", "name": "등 뒤에서", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 14 } ] }
+    ],
+    "flavor": "마왕의 사천왕. 그림자 속에서는 칼끝만 보인다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
+  },
+  {
+    "id": "vargas", "name": "마왕 바르가스", "maxHp": 240, "sprite": null, "color": "#3a5a3a", "scale": 2, "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "void_gaze", "name": "텅 빈 눈", "intent": "debuff", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" }, { "op": "block", "amount": 12, "target": "self" } ] },
+      { "id": "torn_wings", "name": "찢어진 날개", "intent": "attack", "effects": [ { "op": "damage", "amount": 8, "target": "all_enemies" } ] },
+      { "id": "seven_horns", "name": "일곱 뿔", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 4, "times": 4 } ] },
+      { "id": "dark_mana", "name": "검은 마나", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 3, "target": "self" }, { "op": "block", "amount": 18, "target": "self" } ] },
+      { "id": "kings_hand", "name": "마왕의 손", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 20 } ] }
+    ],
+    "flavor": "찢어진 박쥐 날개, 일곱 개의 뿔, 텅 빈 눈. \"이방인이로군. 이 세계의 마나가 아닌 것이 섞여 있어.\""
+  },
+  {
+    "id": "tax_collector", "name": "교세 걷는 마교도", "maxHp": 18, "sprite": null, "color": "#7a2a2a", "pattern": "random",
+    "moves": [
+      { "id": "kick_stall", "name": "좌판 걷어차기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 5 } ] },
+      { "id": "demand_tax", "name": "\"교세를 내라.\"", "intent": "debuff", "targeting": "haun", "weight": 1, "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "검붉은 무복, 가슴에 핏방울 모양의 혈적문. 상인들의 좌판을 걷어차며 교세를 걷는다."
+  },
+  {
+    "id": "blood_cultist", "name": "혈교도", "maxHp": 30, "sprite": null, "color": "#8a1f2a", "pattern": "random",
+    "moves": [
+      { "id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 8 } ] },
+      { "id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 5, "target": "self" } ] }
+    ],
+    "flavor": "천마신교의 말단. 마기(魔氣)가 무겁고 끈적하게 몸에 감겨 있다."
+  },
+  {
+    "id": "cult_guardian", "name": "마교 호법", "maxHp": 40, "sprite": null, "color": "#5a1a24", "pattern": "cycle",
+    "moves": [
+      { "id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 10 } ] },
+      { "id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [ { "op": "block", "amount": 7, "target": "all_allies" } ] },
+      { "id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 6 }, { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }
+    ],
+    "flavor": "손바닥이 피처럼 붉다. 셋이 서면 진이 되고, 진은 삼 년 동안 무당을 가뒀다."
+  },
+  {
+    "id": "cult_elder", "name": "마교 장로", "maxHp": 115, "sprite": null, "color": "#c8c0b8", "scale": 1.2, "tier": "elite", "pattern": "cycle",
+    "moves": [
+      { "id": "blood_heaven_qi", "name": "혈천강기", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
+      { "id": "vampiric_art", "name": "흡혈마공", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 12 }, { "op": "heal", "amount": 8, "target": "self" } ] },
+      { "id": "blood_drop", "name": "혈적", "intent": "debuff", "targeting": "random", "effects": [ { "op": "apply_status", "status": "poison", "stacks": 3 }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" } ] }
+    ],
+    "flavor": "백발을 핏빛 끈으로 묶은 노인. 혈천강기가 그의 주위를 맴돈다."
+  },
+  {
+    "id": "branch_lord", "name": "섬서 분타주", "maxHp": 210, "sprite": null, "color": "#6a0f1a", "scale": 1.6, "tier": "boss", "pattern": "cycle",
+    "moves": [
+      { "id": "branch_command", "name": "분타의 호령", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies" }, { "op": "block", "amount": 14, "target": "self" } ] },
+      { "id": "great_blood_qi", "name": "혈천강기·대", "intent": "attack", "effects": [ { "op": "damage", "amount": 9, "target": "all_enemies" } ] },
+      { "id": "nakan_strike", "name": "낙안 일격", "intent": "attack", "targeting": "haun", "effects": [ { "op": "damage", "amount": 18 } ] },
+      { "id": "essence_drain", "name": "혈마흡정", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 10 }, { "op": "heal", "amount": 12, "target": "self" }, { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
+    ],
+    "flavor": "마교의 장로급 고수. 화산 낙안봉 아래에 분타를 세우고 섬서를 다스린다."
   }
 ]
