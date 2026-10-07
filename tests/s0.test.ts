@@ -67,7 +67,7 @@ describe('S0 청운산', () => {
         const setup = battleSetupFor(data, run, enc);
         if (enc.node.type === 'boss') expect(setup.surviveTurns).toBe(3);
         createBattle(data, setup);
-        applyBattleOutcome(run, enc, win(20));
+        applyBattleOutcome(data, run, enc, win(20));
       } else {
         applyChoice(data, run, enc.module, 0);
       }

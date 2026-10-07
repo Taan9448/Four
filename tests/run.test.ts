@@ -59,7 +59,7 @@ describe('런 진행', () => {
       playCard(state, i, state.enemies.find((e) => !e.downed)!.uid);
     }
     expect(state.result).toBe('victory');
-    applyBattleOutcome(run, enc, battleOutcome(state)!);
+    applyBattleOutcome(data, run, enc, battleOutcome(state)!);
     expect(run.scar).toBe(2);
     expect(run.status).toBe('map');
   });

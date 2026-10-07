@@ -161,15 +161,21 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
   };
 }
 
-export function applyBattleOutcome(run: RunState, enc: Encounter, outcome: BattleOutcome): void {
+/** 전투 결과를 런에 반영한다. 보스를 이기면 clearEffects를 적용하고 그 결과 메시지를 돌려준다 */
+export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter, outcome: BattleOutcome): string[] {
   for (const p of outcome.party) {
     const r = run.roster.find((x) => x.id === p.id);
     if (r) r.hp = Math.max(0, Math.min(r.maxHp, p.hp));
   }
   run.mana = outcome.mana;
   run.scar += outcome.scarGain;
-  if (outcome.result === 'defeat') run.status = 'defeat';
-  else if (enc.node.type === 'boss') run.status = 'stage_clear';
+  if (outcome.result === 'defeat') {
+    run.status = 'defeat';
+    return [];
+  }
+  if (enc.node.type !== 'boss') return [];
+  run.status = 'stage_clear';
+  return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
 }
 
 /**

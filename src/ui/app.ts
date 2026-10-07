@@ -145,7 +145,7 @@ export class App {
         introText: enc.module.content.text,
       },
       (final) => {
-        applyBattleOutcome(run, enc, battleOutcome(final)!);
+        applyBattleOutcome(data, run, enc, battleOutcome(final)!);
         if (run.status !== 'map') return this.map();
         this.show(
           rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {

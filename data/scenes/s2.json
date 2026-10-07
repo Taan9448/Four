@@ -1,0 +1,40 @@
+[
+  {
+    "id": "s2_scene_castle", "world": "nocturna",
+    "lines": [
+      { "text": "마왕성 노크투르나. 검은 첨탑 일곱 개가 구름을 찌르고 서 있었다. 성 아래의 땅에는 풀 한 포기 나지 않았다." },
+      { "speaker": "elia", "face": "resolve", "text": "사천왕 중 셋이 아직 성 안에 있어요. 빙결의 여왕, 대지의 거인, 그림자 암살자." },
+      { "speaker": "kyle", "text": "이그니스를 반으로 가른 친구가 있는데 무슨 걱정이야." },
+      { "speaker": "born", "text": "방심하지 마." },
+      { "speaker": "elia", "text": "하운, 마왕을 쓰러뜨리면 당신은 돌아갈 수 있을 거예요. 전설이 맞다면, 마왕의 심장 안에 '공허의 열쇠'가 있어요." },
+      { "speaker": "haun", "face": "resolve", "text": "…가겠습니다." }
+    ]
+  },
+  {
+    "id": "s2_scene_throne", "world": "nocturna",
+    "lines": [
+      { "text": "칠 층 회랑의 끝. 사천왕의 마지막 하나가 쓰러진 자리에서, 거대한 문이 저절로 열렸다." },
+      { "speaker": "kyle", "text": "마지막이군." },
+      { "speaker": "kyle", "text": "살아서 돌아가면, 고향 술집에서 이 이야기를 백 번은 우려먹을 거야." },
+      { "speaker": "born", "text": "돌아가면." },
+      { "text": "옥좌 위의 그림자가 일어섰다. 찢어진 박쥐 날개, 일곱 개의 뿔, 그리고 텅 빈 눈." },
+      { "speaker": "vargas", "side": "right", "text": "이방인이로군. 이 세계의 마나가 아닌 것이 섞여 있어. 너는 어디서 왔느냐, 작은 것." },
+      { "speaker": "haun", "text": "장작 패던 곳에서." },
+      { "speaker": "vargas", "side": "right", "face": "resolve", "text": "……" },
+      { "speaker": "elia", "face": "resolve", "text": "하운, 지금!" }
+    ]
+  },
+  {
+    "id": "s2_scene_void_key", "world": "nocturna",
+    "lines": [
+      { "text": "운하검 최종식, 천외귀운(天外歸雲). 하늘 밖의 구름이 제자리로 돌아가듯, 검이 마왕의 몸 안을 흐르는 모든 결을 한꺼번에 지나갔다." },
+      { "speaker": "vargas", "side": "right", "face": "surprise", "text": "흐름을 섞는 자여…" },
+      { "speaker": "vargas", "side": "right", "face": "surprise", "text": "네가 연 문은, 네가 닫아야 할 것이다." },
+      { "text": "마왕의 몸이 재가 되어 무너졌다. 재 속에서 손바닥만 한 검은 돌이 굴러 나왔다. 빛을 빨아들이는 돌. 공허의 열쇠였다." },
+      { "speaker": "kyle", "face": "surprise", "text": "…진짜 해냈어." },
+      { "speaker": "elia", "text": "그 열쇠라면, 처음 당신이 넘어온 문을 다시 열 수 있을 거예요." },
+      { "text": "하운은 대답 대신 허공을 보았다. 검을 거둔 자리에, 머리카락보다 가는 검은 금이 남아 있었다. 이번에는 사라지지 않았다." },
+      { "speaker": "born", "face": "resolve", "text": "같이 가." }
+    ]
+  }
+]

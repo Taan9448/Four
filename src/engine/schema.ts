@@ -364,6 +364,8 @@ export const ModuleDef = z
         scene: z.string().optional(),
         /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */
         outroScene: z.string().optional(),
+        /** 보스 모듈: 이기면 런에 적용할 동작(gain_card 등 런 단위 op). 스테이지 끝 화면에 결과를 보여 준다 */
+        clearEffects: z.array(Effect).optional(),
       })
       .strict(),
   })
