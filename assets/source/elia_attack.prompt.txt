@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Elia, a half-elf mage woman; long silver hair, pointed ears, slate-blue hooded robe with silver trim. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing right.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp 64x64 pixel art in the style of a 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: draws the right hand back, motes of light streaming into the palm
+Cell 2: a small flame forms in the palm
+Cell 3: flame grows into a fireball, body leaning back
+Cell 4: thrusts the hand forward, fireball released to the right
+Cell 5: arm extended, sparks trailing
+Cell 6: lowers the hand, returning to idle
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+
+Fix: Keep the corrected SIX casting poses from the second attached sheet, but make Elia's BODY 56 logical pixels high exactly, matching the first attached reference. The current attack body is only54-55; increase the body uniformly by two logical pixels WITHOUT increasing the fireball or changing the robe design. Each512px cell: hood top at local y=32, boot bottom at y=480, same448px total BODY height in all six cells. Foot baseline and body scale identical across both rows. Keep body upright; change arms only, very small shoulder movements, no crouching or stretching. All six are the same strict RIGHT profile. Same silver long hair, blue hood/robe, cream sleeves and inner robe, silver trim, brown belt, boots, exact reference colors. Cell4 emits a small fireball already separated from the palm, entirely inside local x=424..472; nothing crosses cells. Frame1 motes drawn into rear hand,2 tiny flame,3 gathered fireball beside shoulder,4 RIGHT-hand thrust and released small fireball,5 empty extended hand with few sparks,6 hand down. Body height must not shrink to fit arm movements. Crisp 8x8 square blocks and flat palette colors, pure magenta background.
