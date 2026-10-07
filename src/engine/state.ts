@@ -53,6 +53,7 @@ export type BattleEvent =
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
+  | { type: 'transform'; uid: string; from: string; into: string; text: string }
   | { type: 'skip'; uid: string }
   | { type: 'enemy_action'; uid: string; moveName: string }
   | { type: 'dead_draw'; cardId: string }

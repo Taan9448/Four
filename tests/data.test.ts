@@ -65,6 +65,11 @@ describe('데이터 검사', () => {
     for (const en of data.enemies.values()) {
       for (const m of en.moves) errors.push(...checkEffects(`${en.id}.${m.id}`, m.effects, battleOps));
       for (const t of en.traits) if (!data.statuses.has(t.status)) errors.push(`${en.id}: 알 수 없는 특성 ${t.status}`);
+      if (en.transform) {
+        if (!data.enemies.has(en.transform.into)) errors.push(`${en.id}: 변신 대상 없음 ${en.transform.into}`);
+        else if (data.enemies.get(en.transform.into)!.transform) errors.push(`${en.id}: 변신한 모습이 다시 변신한다`);
+        errors.push(...checkEffects(`${en.id}.transform`, en.transform.partyEffects, battleOps));
+      }
     }
     expect(errors).toEqual([]);
   });
@@ -89,6 +94,10 @@ describe('데이터 검사', () => {
       for (const id of m.content.enemies ?? []) if (!data.enemies.has(id)) errors.push(`${m.id}: 없는 적 ${id}`);
       for (const [i, c] of (m.content.choices ?? []).entries()) errors.push(...checkEffects(`${m.id}#${i}`, c.effects, runOps));
       if (m.content.bonus) errors.push(...checkEffects(`${m.id}.bonus`, m.content.bonus.effects, battleOps));
+      if (m.content.clearEffects) {
+        if (m.type !== 'boss') errors.push(`${m.id}: clearEffects는 보스 모듈만`);
+        errors.push(...checkEffects(`${m.id}.clearEffects`, m.content.clearEffects, runOps));
+      }
     }
     expect(errors).toEqual([]);
   });

@@ -175,6 +175,10 @@ subjects:
   sa_mugyeol: >-
     a man in a deep black bamboo hat (satgat) pulled low over his face, only a pale jaw visible, a thin
     cruel smile, black layered robes, long blood-red fingernails
+  vargas: >-
+    Vargas, the Demon King of Nocturna; towering gaunt figure, seven black horns curving back from the skull,
+    torn leathery bat wings, hollow empty eye sockets glowing faint green, a tattered black royal mantle
+    over dark obsidian armor, long clawed fingers
   shadow_wolf: >-
     a shadow wolf; charcoal-black fur, black flames along its spine, amber eyes, lean and hungry
 ```

@@ -8,6 +8,7 @@ import {
   type BattleState,
   type CardInstance,
   type Combatant,
+  type EnemyState,
   type ResolvedCard,
 } from './state';
 
@@ -239,6 +240,10 @@ export function loseHp(state: BattleState, target: Combatant, amount: number): v
 }
 
 function knockOut(state: BattleState, target: Combatant): void {
+  if (target.side === 'enemy' && hasTransform(state, target, 'downed')) {
+    transformEnemy(state, target as EnemyState);
+    return;
+  }
   target.downed = true;
   target.block = 0;
   if (target.side === 'party') {
@@ -248,8 +253,35 @@ function knockOut(state: BattleState, target: Combatant): void {
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
+    const left = alive(state.enemies);
+    if (left.length === 1 && hasTransform(state, left[0], 'lastStanding')) transformEnemy(state, left[0] as EnemyState);
     if (alive(state.enemies).length === 0) setResult(state, 'victory');
   }
+}
+
+function hasTransform(state: BattleState, c: Combatant, trigger: 'downed' | 'lastStanding'): boolean {
+  return !!state.data.enemies.get(c.defId)?.transform?.triggers.includes(trigger);
+}
+
+/** 보스 2단계: 적 정의를 into로 바꾸고 체력을 채운다. 이번 차례에는 행동하지 않는다 */
+function transformEnemy(state: BattleState, enemy: EnemyState): void {
+  const t = state.data.enemies.get(enemy.defId)!.transform!;
+  const into = state.data.enemies.get(t.into)!;
+  const from = enemy.name;
+  enemy.defId = into.id;
+  enemy.name = into.name;
+  enemy.maxHp = into.maxHp;
+  enemy.hp = into.maxHp;
+  enemy.block = 0;
+  enemy.downed = false;
+  enemy.statuses = Object.fromEntries(into.traits.map((tr) => [tr.status, tr.stacks]));
+  enemy.moveCursor = 0;
+  enemy.lastMoves = [];
+  enemy.intent = null;
+  state.events.push({ type: 'transform', uid: enemy.uid, from, into: into.id, text: t.text });
+  state.log.push(`${from} → ${into.name}: ${t.text}`);
+  const haun = alive(state.party).find((p) => p.defId === 'haun');
+  if (t.partyEffects.length && haun) runEffects(state, t.partyEffects, { source: haun });
 }
 
 export function setResult(state: BattleState, result: 'victory' | 'defeat'): void {
