@@ -89,7 +89,7 @@
     "id": "s2_event_black_line", "stage": "s2", "type": "event", "name": "허공의 검은 금", "weight": 2, "once": true,
     "conditions": { "flag": "unha_sword" },
     "content": {
-      "text": "회랑 끝 허공에, 머리카락보다 가는 검은 금이 다시 보였다. 협곡에서 본 것과 같았다. 이번에는 사라지지 않고 잠시 머물렀다.",
+      "text": "회랑 끝 허공에, 머리카락보다 가는 검은 금이 다시 보였다. 협곡에서 본 것과 같았다. 이번에는 숨 한 번보다 조금 더 오래 머물렀다.",
       "choices": [
         { "label": "금을 들여다본다", "result": "두 흐름이 엉킨 자리. 운하검이 한 걸음 깊어졌다. (하운의 카드 2장 강화 +1)", "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "haun" } }, { "op": "scar", "amount": 1 } ] },
         { "label": "엘리아에게 묻는다", "result": "\"…아마 잘못 본 거예요.\" 엘리아는 눈을 피했다. (런 마나 +2)", "effects": [ { "op": "gain_run_mana", "amount": 2 } ] }

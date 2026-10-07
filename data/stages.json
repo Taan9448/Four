@@ -16,7 +16,7 @@
     "forcedTypes": { "10": "rest" },
     "typeWeights": { "battle": 45, "event": 22, "elite": 15, "rest": 18 },
     "boss": "s2_boss_vargas",
-    "summary": "사천왕의 남은 셋(빙결의 여왕·대지의 거인·그림자 암살자)과 마왕 바르가스. 옥좌의 방에서 천외귀운을 처음 쓰고 공허의 열쇠를 얻는다. 검은 금은 이번에는 사라지지 않는다." },
+    "summary": "사천왕의 남은 셋(빙결의 여왕·대지의 거인·그림자 암살자)과 마왕 바르가스. 옥좌의 방에서 천외귀운을 처음 쓰고 공허의 열쇠를 얻는다. 허공의 검은 금은 협곡에서보다 조금 더 오래 남는다. 한 달 뒤, 네 사람은 함께 석문을 넘는다." },
   { "id": "s3", "order": 3, "name": "혈로", "chapters": "6~7장", "world": "murim", "floors": 11, "playable": false,
     "boss": null, "summary": "뒤집힌 무림. 운곡촌에서 교세를 걷는 마교도를 베고, 폐사찰에서 왕일검과 재회한다. 무당·소림·화산을 거쳐 섬서 분타주를 쓰러뜨린 밤, 사라지지 않는 하늘의 금을 본다." },
   { "id": "s4", "order": 4, "name": "천마봉", "chapters": "8장", "world": "murim", "floors": 10, "playable": false,
