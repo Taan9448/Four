@@ -1,7 +1,7 @@
 // 이벤트·휴식·여관·스토리 노드의 선택지 화면과 전투 보상 화면.
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, choicesFor, type RunState } from '../engine/run';
+import { applyChoice, choiceNeedsPick, choicesFor, upgradeCandidates, type RunState } from '../engine/run';
 import { cardView } from './card-view';
 import { h } from './dom';
 
@@ -30,12 +30,44 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                 'button',
                 {
                   class: `btn choice${c.source === 'support' ? ' choice-support' : ''}`,
-                  onclick: () => render(applyChoice(data, run, module, i), c.result),
+                  onclick: () => {
+                    const pick = choiceNeedsPick(c);
+                    if (pick) return pickUpgrade(pick.filter, i, c.result);
+                    render(applyChoice(data, run, module, i), c.result);
+                  },
                 },
                 c.label,
               ),
             ),
           ),
+    );
+  };
+  // 수련: 강화할 카드를 고른다. 카드는 강화 뒤 모습(+1)으로 보여 준다
+  const pickUpgrade = (filter: Parameters<typeof upgradeCandidates>[2], index: number, resultText?: string) => {
+    // 같은 카드·같은 단계는 한 장만 보여 준다(어느 것을 골라도 결과가 같다)
+    const seen = new Set<string>();
+    const list = upgradeCandidates(data, run, filter).filter((c) => {
+      const key = `${c.cardId}:${c.level}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    box.replaceChildren(
+      h('div', { class: 'choice-kind' }, '수련'),
+      h('h2', {}, '강화할 카드'),
+      h('p', { class: 'choice-text' }, '+1~+3은 수치가 오르고, +4·+5에는 특수 스킬(★)이 붙는다. 강화 뒤 모습으로 보여 준다.'),
+      list.length
+        ? h(
+            'div',
+            { class: 'reward-cards upgrade-cards' },
+            list.map((c) => {
+              const el = cardView(data, { ...c, level: c.level + 1 });
+              el.addEventListener('click', () => render(applyChoice(data, run, module, index, c.uid), resultText));
+              return el;
+            }),
+          )
+        : h('p', {}, '더 강화할 수 있는 카드가 없다.'),
+      h('button', { class: 'btn', onclick: () => render() }, '돌아가기'),
     );
   };
   render();

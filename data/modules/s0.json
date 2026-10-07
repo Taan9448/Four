@@ -1,0 +1,106 @@
+[
+  {
+    "id": "s0_tutorial_woodpile", "stage": "s0", "type": "battle", "name": "장작 패는 아이", "once": true,
+    "content": {
+      "scene": "s0_scene_dawn",
+      "text": "청운산의 새벽은 늘 도끼 소리로 시작했다. 탁. 탁. 탁. 해가 뜨기 전까지 주방 아궁이 열두 개를 채울 장작을 마련해야 한다. — 결 읽기로 둥치에 결을 드러낸 뒤 장작 패기를 얹으면, 방어를 무시하고 더 깊이 들어간다.",
+      "enemies": ["oak_stump"]
+    }
+  },
+  {
+    "id": "s0_event_wang_cloth", "stage": "s0", "type": "event", "name": "왕 노인의 천 조각", "once": true,
+    "conditions": { "floorRange": [2, 2] },
+    "content": {
+      "text": "\"하운아, 또 맨손이냐.\" 주방의 왕 노인이 혀를 차며 낡은 천 조각을 던졌다. \"감아라. 손이 망가지면 너는 평생 도끼질밖에 못 한다.\"",
+      "choices": [
+        { "label": "천을 손에 감는다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
+        { "label": "\"괜찮습니다, 할아버지.\"", "result": "웃으며 천을 품에 넣었다. 체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_event_wall_chant", "stage": "s0", "type": "event", "name": "담장 너머의 구령", "once": true,
+    "conditions": { "floorRange": [2, 2] },
+    "content": {
+      "text": "연무장 담장 너머로 내원 제자들의 구령이 들려온다. 청운문의 입문 검법, 청운십팔식(靑雲十八式). 그 구령에 맞춰 도끼를 내리치는 각도를 바꾸고, 발 디딤을 바꾸고, 숨 쉬는 박자를 바꾸었다.",
+      "choices": [
+        { "label": "구령에 맞춰 도끼를 내리친다", "result": "청운십팔식을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_cloud_form" } ] },
+        { "label": "숨 쉬는 박자를 바꾼다", "result": "청운호흡을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_breath" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_battle_inner_disciple", "stage": "s0", "type": "battle", "name": "내원 사형들의 발길질", "weight": 2,
+    "conditions": { "floorRange": [2, 2] },
+    "content": {
+      "text": "아침 공양이 늦었다. 내원 사형 둘이 후원으로 들이닥친다.",
+      "enemies": ["inner_disciple", "inner_disciple"]
+    }
+  },
+  {
+    "id": "s0_rest_kitchen", "stage": "s0", "type": "rest", "name": "주방 아궁이", "weight": 1,
+    "conditions": { "floorRange": [2, 2] },
+    "content": {
+      "text": "아궁이 열두 개에 불이 붙었다. 왕 노인은 아무 말 없이 하운의 도끼질을 지켜보다 주방으로 돌아갔다.",
+      "choices": [
+        { "label": "아궁이 곁에서 쉰다", "result": "체력 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
+        { "label": "도끼질을 다듬는다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_story_secret_talk", "stage": "s0", "type": "story", "name": "관운각 밀담", "once": true,
+    "content": {
+      "scene": "s0_scene_secret_talk",
+      "text": "\"야, 잡역. 관운각에 등유를 채워 놓고, 해 진 뒤엔 얼씬도 하지 마라.\" 일을 마치고 내려가던 하운은 기둥 옆에 두고 온 숯 바구니를 떠올렸다. 잠깐이면 된다. 그 잠깐이, 그의 인생을 통째로 바꾸었다. 정자 안에는 장문인 곽도진과 검은 삿갓의 사내가 마주 앉아 있었다. \"그대가 문을 열면, 우리는 들어간다.\" 천마신교. 뒷걸음질 치던 하운의 발끝에 숯 바구니가 걸렸다. 덜그럭.",
+      "choices": [
+        { "label": "달린다", "result": "\"누구냐.\" 등 뒤에서 바람이 찢어지는 소리가 났다. 검기였다.",
+          "effects": [ { "op": "set_flag", "flag": "overheard_pact" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_event_forest_rock", "stage": "s0", "type": "event", "name": "빈 바위 아래", "once": true,
+    "conditions": { "floorRange": [4, 4] },
+    "content": {
+      "text": "땔감을 구하러 수천 번 들락거린 숲이다. 어느 바위 아래가 비었는지 그는 알았다.",
+      "choices": [
+        { "label": "바위 아래에서 숨을 고른다", "result": "체력 12 회복", "effects": [ { "op": "heal_party", "amount": 12 } ] },
+        { "label": "숨을 죽이고 발 디딤을 고친다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_event_forest_slope", "stage": "s0", "type": "event", "name": "미끄러운 비탈", "once": true,
+    "conditions": { "floorRange": [4, 4] },
+    "content": {
+      "text": "어느 비탈이 미끄러운지 그는 알았다. 나무 꼭대기를 밟고 날아오는 학창의의 그림자가 달빛 아래 너울거린다.",
+      "choices": [
+        { "label": "비탈을 미끄러져 내려간다", "result": "가시덤불에 긁혔지만 거리를 벌렸다. 체력 4 잃고 하운의 기본 카드 1장 강화(+1)", "effects": [ { "op": "heal_party", "amount": -4 }, { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
+        { "label": "비탈을 돌아간다", "result": "체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_event_forest_thicket", "stage": "s0", "type": "event", "name": "사람 키를 넘는 덤불", "once": true,
+    "conditions": { "floorRange": [4, 4] },
+    "content": {
+      "text": "어느 덤불이 사람 키를 넘는지 그는 알았다. 그는 짐승처럼 숲을 꿰뚫었다. 그러나 상대는 청운문의 장문인이었다.",
+      "choices": [
+        { "label": "덤불 속으로 몸을 던진다", "result": "체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] },
+        { "label": "장작 패던 숨을 떠올린다", "result": "청운호흡을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_breath" } ] }
+      ]
+    }
+  },
+  {
+    "id": "s0_boss_ghost_cliff", "stage": "s0", "type": "boss", "name": "귀곡애(鬼哭崖)",
+    "content": {
+      "scene": "s0_scene_cliff",
+      "outroScene": "s0_scene_stone_gate",
+      "text": "숲이 끝났다. 천 길 낭떠러지, 귀곡애. 곽도진이 소리 없이 내려섰다. \"그 밥값을 오늘 치르거라.\" — 이길 수 없다. 3턴을 버텨라. 마지막 초식의 결을 읽어라.",
+      "enemies": ["kwak_dojin_cliff"],
+      "surviveTurns": 3,
+      "outro": "검이 움직였다. 청운십팔식의 마지막 식, 운해귀종. 그 순간 하운은 그것을 보았다. 검이 지나갈 길, 기운이 흐르는 결. 장작의 결을 읽듯이. 그는 몸을 비틀었다. 검은 그의 심장 대신 옆구리를 깊게 갈랐고, 그 반동으로 몸이 절벽 너머로 기울었다. 떨어지는 동안 하운은 암벽 중턱에서 희미하게 빛나는 오래된 석문을 보았다. 피에 젖은 손바닥이 손바닥 모양의 홈에 닿았다. 세상이 하얗게 타올랐다."
+    }
+  }
+]

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { battleOutcome, canPlay, endTurn, playCard } from '../src/engine/battle';
+import { resolveCard } from '../src/engine/state';
 import { cardText } from '../src/engine/text';
 import { createRng } from '../src/engine/rng';
 import { battle, cards, data, give } from './helpers';
@@ -236,6 +237,29 @@ describe('파티', () => {
     const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'born', hp: 70, maxHp: 70 }] });
     playCard(s, give(s, 'born_together'));
     expect(s.party.map((p) => p.block)).toEqual([6, 6]);
+  });
+
+  it('카드 강화: +1~+3은 수치만, +4·+5는 특수 스킬이 붙는다', () => {
+    const at = (level: number) => resolveCard(data, { uid: 'x', cardId: 'haun_chop', level });
+    expect(at(0).effects).toEqual([{ op: 'damage', amount: 6 }]);
+    expect(at(3).effects).toEqual([{ op: 'damage', amount: 15 }]);
+    expect(at(3).skills).toEqual([]);
+    expect(at(4).skills.map((s) => s.name)).toEqual(['결 따라 패기']);
+    expect(at(5).effects.map((e) => e.op)).toEqual(['damage', 'reveal_grain', 'damage']);
+    expect(at(9).level).toBe(5);
+    expect(cardText(data, { uid: 'x', cardId: 'haun_chop', level: 5 })).toBe('피해 15\n★결 따라 패기: 결 노출 1\n★두 번째 도끼질: 피해 6');
+    // 키워드·비용 변화
+    expect(resolveCard(data, { uid: 'y', cardId: 'haun_breath', level: 5 }).keywords).not.toContain('exhaust');
+    expect(resolveCard(data, { uid: 'z', cardId: 'haun_read_grain', level: 4 }).cost).toEqual({ neigong: 0, mana: 0 });
+  });
+
+  it('강화된 카드를 쓰면 성장한 수치와 특수 스킬이 그대로 적용된다', () => {
+    const s = battle({ enemies: ['shadow_wolf_alpha'] });
+    s.hand.push({ uid: 'up5', cardId: 'haun_chop', level: 5 });
+    const before = wolf(s).hp;
+    playCard(s, s.hand.length - 1, wolf(s).uid);
+    // 15 + 결 노출 1 → 두 번째 도끼질 6 ×1.5(결) = 9
+    expect(before - wolf(s).hp).toBe(15 + 9);
   });
 
   it('빙결된 적은 행동하지 못한다', () => {

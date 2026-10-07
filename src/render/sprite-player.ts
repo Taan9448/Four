@@ -12,7 +12,7 @@ export interface PlayerOptions {
   /** 에셋이 없을 때 그릴 임시 실루엣의 색 */
   fallbackColor?: string;
   /** 에셋이 없을 때 실루엣 모양 */
-  fallbackShape?: 'humanoid' | 'beast' | 'boss';
+  fallbackShape?: 'humanoid' | 'beast' | 'boss' | 'object';
   facing?: 'left' | 'right';
 }
 
@@ -124,7 +124,14 @@ export class SpritePlayer {
         ctx.fillStyle = color;
         ctx.fillRect(x, y + bob, bw, bh);
       };
-      if (shape === 'beast') {
+      if (shape === 'object') {
+        // 장작더미·둥치 같은 사물: 낮고 넓은 덩어리
+        box(9, feet - 9, 14, 9);
+        fill(9, feet - 9, 14, 9);
+        ctx.fillStyle = '#1d2433';
+        ctx.fillRect(12, feet - 7 + bob, 8, 1);
+        ctx.fillRect(13, feet - 4 + bob, 6, 1);
+      } else if (shape === 'beast') {
         box(7, feet - 10, 18, 6); box(21, feet - 13, 6, 5);
         fill(7, feet - 10, 18, 6); fill(21, feet - 13, 6, 5);
         fill(9, feet - 4, 2, 4); fill(21, feet - 4, 2, 4);

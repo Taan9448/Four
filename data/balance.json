@@ -24,7 +24,16 @@
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,
   "party": { "max": 3, "reviveHp": 1 },
-  "rewards": { "cardChoices": 3 },
+  "upgrade": { "maxLevel": 5, "statLevels": 3 },
+  "rewards": {
+    "cardChoices": 3,
+    "rarityWeights": {
+      "battle": { "uncommon": 62, "rare": 30, "epic": 8 },
+      "elite":  { "uncommon": 35, "rare": 45, "epic": 20 },
+      "boss":   { "rare": 50, "epic": 50 }
+    }
+  },
+  "stage": { "healOnEnter": 1 },
   "route": {
     "nodesPerFloor": [2, 3],
     "eliteMinFloor": 3,

@@ -38,7 +38,7 @@ describe('데이터 검사', () => {
     for (const c of data.cards.values()) {
       if (c.owner !== 'status' && c.owner !== 'common' && !data.characters.has(c.owner)) errors.push(`${c.id}: 알 수 없는 주인 ${c.owner}`);
       errors.push(...checkEffects(c.id, c.effects, battleOps));
-      if (c.upgrade?.effects) errors.push(...checkEffects(`${c.id}+`, c.upgrade.effects, battleOps));
+      if (c.upgrade) for (const sk of [c.upgrade.plus4, c.upgrade.plus5]) errors.push(...checkEffects(`${c.id} ${sk.name}`, sk.effects, battleOps));
       const fusion = c.keywords.includes('fusion');
       const both = c.cost.neigong > 0 && c.cost.mana > 0;
       if (fusion !== both) errors.push(`${c.id}: 융합 키워드와 비용(내공+마나)이 맞지 않는다`);
@@ -114,6 +114,55 @@ describe('데이터 검사', () => {
       if (c.fx && !specIds.has(c.fx)) missing.push(`${c.id}: fx ${c.fx}`);
     }
     expect(missing).toEqual([]);
+  });
+
+  it('카드 등급: 시작 카드는 일반, 전설은 스토리로만, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.pool === 'starter' && c.rarity !== 'common') bad.push(`${c.id}: 시작 카드는 common`);
+      if (c.rarity === 'legendary' && c.pool !== 'story') bad.push(`${c.id}: 전설은 story 풀`);
+      if (c.rarity === 'common' && c.pool === 'reward') bad.push(`${c.id}: 보상 풀에 일반 등급`);
+      if ((c.rarity === 'epic' || c.rarity === 'legendary') && !c.castLine) bad.push(`${c.id}: 영웅·전설은 castLine 필요`);
+      if (c.castLine && !data.characters.has(c.castLine.speaker)) bad.push(`${c.id}: castLine 화자 ${c.castLine.speaker}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('카드 강화: 상태 카드 외 모두 강화가 있고, growth는 효과 수와 같으며 수치 있는 효과만 오른다', () => {
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.type === 'status') {
+        if (c.upgrade) bad.push(`${c.id}: 상태 카드는 강화 없음`);
+        continue;
+      }
+      if (!c.upgrade) {
+        bad.push(`${c.id}: 강화 없음`);
+        continue;
+      }
+      const { growth } = c.upgrade;
+      if (growth.length !== c.effects.length) bad.push(`${c.id}: growth ${growth.length}개 ≠ 효과 ${c.effects.length}개`);
+      growth.forEach((g, i) => {
+        const e = c.effects[i];
+        if (g && e && e.amount === undefined && e.stacks === undefined) bad.push(`${c.id}: ${i}번 효과는 수치가 없다`);
+      });
+      if (!growth.some((g) => g > 0)) bad.push(`${c.id}: +1~+3에 오르는 수치가 없다`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('장면: 모듈이 부르는 장면이 있고, 화자는 캐릭터·speakers이며 반신 그림 명세(<화자>_stand)가 있다', () => {
+    const bad: string[] = [];
+    for (const m of data.modules.values()) {
+      for (const id of [m.content.scene, m.content.outroScene]) if (id && !data.scenes.has(id)) bad.push(`${m.id}: 없는 장면 ${id}`);
+    }
+    const speakers = new Set<string>();
+    for (const sc of data.scenes.values()) for (const l of sc.lines) if (l.speaker) speakers.add(l.speaker);
+    for (const c of data.cards.values()) if (c.castLine) speakers.add(c.castLine.speaker);
+    for (const sp of speakers) {
+      if (!data.characters.has(sp) && !data.speakers.has(sp)) bad.push(`화자 ${sp}: characters·speakers에 없음`);
+      if (!specIds.has(`${sp}_stand`)) bad.push(`화자 ${sp}: 반신 그림 명세 ${sp}_stand 없음`);
+    }
+    expect(bad).toEqual([]);
   });
 
   it('balance: 세계별 마나·균열 규칙이 모든 세계에 정의돼 있다', () => {

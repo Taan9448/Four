@@ -135,6 +135,21 @@ function fxCell(w, h, spec, t) {
     <path d="M${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1}" stroke="#ffffff" stroke-opacity="${(fade * 0.8).toFixed(2)}" stroke-width="${(width / 3).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
 }
 
+/** 반신 그림 임시: 머리·어깨 실루엣. face 0 기본 / 1 결의(눈썹 내림) / 2 놀람(입 벌림) */
+function standing(w, h, spec, face) {
+  const color = spec.placeholder?.color ?? '#3d4a63';
+  const accent = spec.placeholder?.accent ?? '#e0cfae';
+  const cx = w / 2, hy = h * 0.2, hr = w * 0.17;
+  const brow = face === 1 ? `<path d="M${cx - hr * 0.6} ${hy - hr * 0.2} L${cx - hr * 0.15} ${hy - hr * 0.05} M${cx + hr * 0.6} ${hy - hr * 0.2} L${cx + hr * 0.15} ${hy - hr * 0.05}" stroke="#1d2433" stroke-width="10"/>` : '';
+  const mouth = face === 2
+    ? `<ellipse cx="${cx}" cy="${hy + hr * 0.5}" rx="${hr * 0.15}" ry="${hr * 0.22}" fill="#1d2433"/>`
+    : `<path d="M${cx - hr * 0.25} ${hy + hr * 0.5} L${cx + hr * 0.25} ${hy + hr * 0.5}" stroke="#1d2433" stroke-width="8"/>`;
+  return `<path d="M${w * 0.08} ${h} Q${w * 0.1} ${h * 0.34} ${cx} ${h * 0.27} Q${w * 0.9} ${h * 0.34} ${w * 0.92} ${h} Z" fill="${color}" stroke="#1d2433" stroke-width="8"/>
+    <circle cx="${cx}" cy="${hy}" r="${hr}" fill="${accent}" stroke="#1d2433" stroke-width="8"/>
+    <circle cx="${cx - hr * 0.35}" cy="${hy + hr * 0.1}" r="${face === 2 ? 11 : 8}" fill="#1d2433"/>
+    <circle cx="${cx + hr * 0.35}" cy="${hy + hr * 0.1}" r="${face === 2 ? 11 : 8}" fill="#1d2433"/>${brow}${mouth}`;
+}
+
 function illustration(w, h, spec) {
   const color = spec.placeholder?.color ?? '#3d4a63';
   return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(color, 0.3)}"/><stop offset="1" stop-color="${shade(color, -0.2)}"/></linearGradient></defs>
@@ -156,7 +171,12 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
   const key = CHROMA[spec.chroma];
   const parts = [];
   if (key) parts.push(`<rect width="${W}" height="${H}" fill="${key.hex}"/>`);
-  if (spec.track === 'illustration' || spec.type === 'background') {
+  if (spec.type === 'character-standing') {
+    for (let n = 1; n <= cols * rows; n++) {
+      if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
+      parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${standing(w, h, spec, n - 1)}</g>`);
+    }
+  } else if (spec.track === 'illustration' || spec.type === 'background') {
     parts.push(illustration(W, H, spec));
   } else {
     const poses = spec.type === 'character-ref' ? [{ arm: 25, weapon: 30 }, { arm: 25, weapon: 30 }] : posesFor(spec);

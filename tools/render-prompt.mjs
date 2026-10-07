@@ -114,6 +114,20 @@ export function renderPrompt(spec, style) {
         `Keep the outfit colors consistent with: ${style.palette_hint ?? 'the color notes in the subject description'}.\n` +
         'Rules: no text, no labels, no arrows, no color swatches, no signature, no watermark.'
       );
+    case 'character-standing':
+      return (
+        `Create ONE PNG character portrait sheet for a visual novel, ${W}x${H} px.\n` +
+        `Grid: ${cols} columns x ${rows} row. Each cell is exactly ${cw}x${ch} px. Cell numbers start at 1 from the left.\n` +
+        `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. No scenery, no floor, no shadow, no glow, no gradient behind the character.\n` +
+        `Subject: ${subject}. Match the attached character design sheet or reference image if one is attached.\n` +
+        `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
+        `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. ` +
+        `Only the facial expression and a small change of hands or shoulders differ between cells.\n` +
+        `${frameLines}\n` +
+        `Style: ${style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
+        `Never use ${key.name}, pink or purple on the character.\n` +
+        'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
+      );
     default:
       // card-art, portrait, story-cg: 이야기 갈래(일러스트)
       return (
