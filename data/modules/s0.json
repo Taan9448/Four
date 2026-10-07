@@ -2,6 +2,7 @@
   {
     "id": "s0_tutorial_woodpile", "stage": "s0", "type": "battle", "name": "장작 패는 아이", "once": true,
     "content": {
+      "scene": "s0_scene_dawn",
       "text": "청운산의 새벽은 늘 도끼 소리로 시작했다. 탁. 탁. 탁. 해가 뜨기 전까지 주방 아궁이 열두 개를 채울 장작을 마련해야 한다. — 결 읽기로 둥치에 결을 드러낸 뒤 장작 패기를 얹으면, 방어를 무시하고 더 깊이 들어간다.",
       "enemies": ["oak_stump"]
     }
@@ -50,6 +51,7 @@
   {
     "id": "s0_story_secret_talk", "stage": "s0", "type": "story", "name": "관운각 밀담", "once": true,
     "content": {
+      "scene": "s0_scene_secret_talk",
       "text": "\"야, 잡역. 관운각에 등유를 채워 놓고, 해 진 뒤엔 얼씬도 하지 마라.\" 일을 마치고 내려가던 하운은 기둥 옆에 두고 온 숯 바구니를 떠올렸다. 잠깐이면 된다. 그 잠깐이, 그의 인생을 통째로 바꾸었다. 정자 안에는 장문인 곽도진과 검은 삿갓의 사내가 마주 앉아 있었다. \"그대가 문을 열면, 우리는 들어간다.\" 천마신교. 뒷걸음질 치던 하운의 발끝에 숯 바구니가 걸렸다. 덜그럭.",
       "choices": [
         { "label": "달린다", "result": "\"누구냐.\" 등 뒤에서 바람이 찢어지는 소리가 났다. 검기였다.",
@@ -93,6 +95,8 @@
   {
     "id": "s0_boss_ghost_cliff", "stage": "s0", "type": "boss", "name": "귀곡애(鬼哭崖)",
     "content": {
+      "scene": "s0_scene_cliff",
+      "outroScene": "s0_scene_stone_gate",
       "text": "숲이 끝났다. 천 길 낭떠러지, 귀곡애. 곽도진이 소리 없이 내려섰다. \"그 밥값을 오늘 치르거라.\" — 이길 수 없다. 3턴을 버텨라. 마지막 초식의 결을 읽어라.",
       "enemies": ["kwak_dojin_cliff"],
       "surviveTurns": 3,

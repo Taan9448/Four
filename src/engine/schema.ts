@@ -124,6 +124,27 @@ const UpgradeSkill = z
   .strict();
 export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
 
+/** 장면에만 나오는 화자(동료가 아닌 인물). 반신 그림 에셋은 <id>_stand */
+export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string() }).strict();
+export type SpeakerDef = z.infer<typeof SpeakerDef>;
+
+/**
+ * 비주얼 노벨 장면: 좌우에 반신 그림, 아래 대화창. speaker가 없으면 내레이션.
+ * side 생략: 하운은 왼쪽, 나머지는 오른쪽. name: 이 줄에서만 쓸 표시 이름(예: 정체를 숨긴 인물)
+ */
+export const SceneLine = z
+  .object({
+    speaker: z.string().optional(),
+    name: z.string().optional(),
+    side: z.enum(['left', 'right']).optional(),
+    face: Face.default('neutral'),
+    text: z.string(),
+  })
+  .strict();
+export type SceneLine = z.infer<typeof SceneLine>;
+export const SceneDef = z.object({ id: z.string(), world: World.optional(), lines: z.array(SceneLine).min(1) }).strict();
+export type SceneDef = z.infer<typeof SceneDef>;
+
 export const CardDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
@@ -339,6 +360,10 @@ export const ModuleDef = z
         surviveTurns: z.number().int().positive().optional(),
         /** 보스 모듈: 스테이지를 마친 뒤 보여 줄 장면 글 */
         outro: z.string().optional(),
+        /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
+        scene: z.string().optional(),
+        /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */
+        outroScene: z.string().optional(),
       })
       .strict(),
   })

@@ -21,6 +21,7 @@ import { BattleView } from './battle-view';
 import { choiceView, rewardView } from './choice-view';
 import { h } from './dom';
 import { mapView } from './map-view';
+import { sceneView } from './scene-view';
 
 const data = gameData();
 
@@ -86,7 +87,12 @@ export class App {
 
   private map(): void {
     const run = this.run!;
-    if (run.status === 'stage_clear') return this.stageClear();
+    if (run.status === 'stage_clear') {
+      // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
+      const stage = data.stages.find((s) => s.id === run.stageId)!;
+      const outroScene = data.modules.get(stage.boss ?? '')?.content.outroScene;
+      return this.playScene(outroScene, () => this.stageClear());
+    }
     if (run.status === 'complete') return this.end(true);
     if (run.status === 'defeat') return this.end(false);
     this.show(
@@ -105,8 +111,19 @@ export class App {
   private enter(node: MapNode): void {
     const run = this.run!;
     const enc = enterNode(data, run, node.id);
-    if (isBattle(enc)) this.battle(enc);
-    else this.show(choiceView(data, run, enc.module, () => this.map()));
+    const go = () => {
+      if (isBattle(enc)) this.battle(enc);
+      else this.show(choiceView(data, run, enc.module, () => this.map()));
+    };
+    // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
+    this.playScene(enc.module.content.scene, go);
+  }
+
+  /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then */
+  private playScene(id: string | undefined, then: () => void): void {
+    const scene = id ? data.scenes.get(id) : undefined;
+    if (!scene) return then();
+    this.show(sceneView(data, scene, then));
   }
 
   private battle(enc: Encounter): void {
@@ -145,7 +162,9 @@ export class App {
   private stageClear(): void {
     const run = this.run!;
     const stage = data.stages.find((s) => s.id === run.stageId)!;
-    const outro = data.modules.get(stage.boss ?? '')?.content.outro;
+    const boss = data.modules.get(stage.boss ?? '');
+    // 끝 장면을 이미 보여 줬으면 장면 글은 생략
+    const outro = boss?.content.outroScene ? undefined : boss?.content.outro;
     const next = nextStage(data, run);
     this.show(
       h(

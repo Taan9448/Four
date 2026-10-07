@@ -79,3 +79,9 @@ export function cardText(data: GameData, inst: CardInstance | string): string {
   const head = [...(kw.length ? [`[${kw.join('·')}]`] : []), parts.join('. ')].join(' ');
   return [head, ...card.skills.map((s) => skillText(data, s, card.def.target))].join('\n');
 }
+
+/** 장면·컷인의 화자 이름과 색: 캐릭터(동료·왕일검) 또는 data/speakers.json */
+export function speakerInfo(data: GameData, id: string): { name: string; color: string } {
+  const c = data.characters.get(id) ?? data.speakers.get(id);
+  return { name: c?.name ?? id, color: c?.color ?? '#888888' };
+}

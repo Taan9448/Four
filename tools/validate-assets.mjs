@@ -105,7 +105,14 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       errors.push(`프레임 ${n}: 크기 ${img.width}×${img.height} ≠ ${spec.logical.join('×')}`);
       return;
     }
-    if (illustration) return; // 일러스트: 크기만 검사
+    if (illustration) {
+      // 일러스트: 크기만 검사. 키 색으로 배경을 지우는 유형(반신 그림)은 남은 키 색도 본다
+      if (spec.chroma !== 'none') {
+        const residual = keyResidual(img, spec);
+        if (residual > 0.005) errors.push(`프레임 ${n}: 키 색 잔여 픽셀 ${(residual * 100).toFixed(1)}%`);
+      }
+      return;
+    }
     const colors = countColors(img);
     if (colors > spec.max_colors) warnings.push(`프레임 ${n}: ${colors}색(권장 ${spec.max_colors}색 이하)`);
     if (paletteSet) {
