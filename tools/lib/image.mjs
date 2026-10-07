@@ -55,12 +55,17 @@ export function extract(raw, { x, y, w, h }) {
 
 const dist = (r, g, b, key) => Math.hypot(r - key[0], g - key[1], b - key[2]);
 
-/** 크로마키 제거 + 가장자리 색 번짐 제거(despill). chroma가 black/none이면 그대로 둔다. */
+/**
+ * 크로마키 제거 + 가장자리 색 번짐 제거(despill). chroma가 black/none이면 그대로 둔다.
+ * 일러스트(반신 그림)는 키 색이 짜임·머리카락 틈으로 스며 불투명한 안쪽 픽셀에도 남는다.
+ * 마젠타 키를 쓰는 인물에는 마젠타 계열 색을 쓰지 않으므로(ART_STYLE) 안쪽 픽셀의 마젠타 기운도 걷어 낸다.
+ */
 export function keyOut(cell, spec) {
   const key = CHROMA[spec.chroma];
   if (!key || spec.chroma === 'black') return cell;
   const tol = spec.chroma_tolerance;
   const soft = tol * 2.2;
+  const innerDespill = spec.chroma === 'magenta' && spec.track === 'illustration';
   const out = Buffer.from(cell.data);
   for (let i = 0; i < out.length; i += 4) {
     const r = out[i], g = out[i + 1], b = out[i + 2];
@@ -76,6 +81,10 @@ export function keyOut(cell, spec) {
         const spill = g - Math.max(r, b);
         if (spill > 0) out[i + 1] = g - spill;
       }
+    } else if (innerDespill && out[i + 3] > 0) {
+      // 빨강·파랑이 모두 초록보다 높으면(보라~분홍 기운) 그만큼 뺀다. 빨강(파랑 낮음)·피부(초록 높음)는 그대로
+      const spill = Math.min(r, b) - g;
+      if (spill > 0) { out[i] = r - spill; out[i + 2] = b - spill; }
     }
   }
   return { data: out, width: cell.width, height: cell.height };
@@ -123,6 +132,20 @@ export function keyResidual(img, spec) {
     if (keyLike(spec.chroma, img.data[i], img.data[i + 1], img.data[i + 2])) residual++;
   }
   return opaque ? residual / opaque : 0;
+}
+
+/**
+ * 불투명 픽셀 중 마젠타 기운(빨강·파랑이 모두 초록보다 확연히 높음)이 남은 비율.
+ * 마젠타 키 일러스트는 keyOut이 이 기운을 걷어 내므로, 남아 있으면 옛 도구로 자른 것이다.
+ */
+export function magentaCast(img) {
+  let opaque = 0, cast = 0;
+  for (let i = 0; i < img.data.length; i += 4) {
+    if (img.data[i + 3] < 128) continue;
+    opaque++;
+    if (Math.min(img.data[i], img.data[i + 2]) - img.data[i + 1] > 24) cast++;
+  }
+  return opaque ? cast / opaque : 0;
 }
 
 /** 사람 눈에 가까운 RGB 거리(redmean) */
