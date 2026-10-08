@@ -42,12 +42,12 @@ describe('저장·이어하기', () => {
     expect(deserializeRun(data, JSON.stringify(badStage))).toBeNull();
   });
 
-  it('끝난 런(패배·완결)은 이어 갈 수 없다', () => {
+  it('진 런은 이어 갈 수 없고, 마친 런(완결)은 클리어 지도로 남는다', () => {
     const run = createRun(data, 'SAVE4');
     run.status = 'defeat';
     expect(deserializeRun(data, serializeRun(run))).toBeNull();
     run.status = 'complete';
-    expect(deserializeRun(data, serializeRun(run))).toBeNull();
+    expect(deserializeRun(data, serializeRun(run))).not.toBeNull();
     run.status = 'stage_clear';
     expect(deserializeRun(data, serializeRun(run))).not.toBeNull();
   });

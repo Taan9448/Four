@@ -49,14 +49,21 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   run.potions ??= Array.from({ length: data.balance.economy.potionSlots }, () => null);
   run.shop ??= null;
   run.shopRemovals ??= 0;
+  // 난이도·다시 하기 도입(2026-10-08) 전 저장: 보통, 하드코어 아님
+  run.difficulty ??= 'normal';
+  run.hardcore ??= false;
+  run.fallen ??= [];
+  run.replays ??= {};
+  run.replayOf ??= null;
   return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
 }
 
 function isValidRun(data: GameData, run: RunState): boolean {
   if (typeof run.seed !== 'string' || typeof run.counter !== 'number') return false;
   if (!['map', 'stage_clear', 'complete', 'defeat'].includes(run.status)) return false;
-  // 끝난 런은 이어 갈 것이 없다
-  if (run.status === 'complete' || run.status === 'defeat') return false;
+  // 진 런은 이어 갈 것이 없다. 캠페인을 마친 런(complete)은 남겨 두고 스테이지 다시 하기에 쓴다(2026-10-08)
+  if (run.status === 'defeat') return false;
+  if (run.replayOf && (run.replayOf.status !== 'complete' || !isValidRun(data, run.replayOf))) return false;
   const stage = data.stages.find((s) => s.id === run.stageId);
   if (!stage?.playable || run.map?.stageId !== run.stageId || !Array.isArray(run.map.floors)) return false;
   const nodes = run.map.floors.flat();

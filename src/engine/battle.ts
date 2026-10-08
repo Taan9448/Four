@@ -546,6 +546,8 @@ export interface BattleOutcome {
   scarGain: number;
   /** 남은 물약 칸(없으면 런의 물약을 그대로 둔다) */
   potions?: (string | null)[];
+  /** 전투가 끝날 때 쓰러져 있던 아군 id(하드코어: 돌아오지 않는다) */
+  downed?: string[];
 }
 
 export function battleOutcome(state: BattleState): BattleOutcome | null {
@@ -558,6 +560,7 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
     mana: state.mana,
     scarGain: Math.floor(state.rift * bal.rift.scarRatio),
     potions: [...state.potions],
+    downed: state.party.filter((p) => p.downed).map((p) => p.defId),
   };
 }
 

@@ -11,7 +11,7 @@
     "starterDeck": ["haun_chop", "haun_chop", "haun_chop", "haun_chop", "haun_step", "haun_step", "haun_step", "haun_read_grain"],
     "joinsAt": "s0",
     "description": "장작의 결을 읽던 눈으로 검의 길을 보는 주인공. S0은 벌목 도끼, S1 대장간부터 보른이 사 준 못생긴 검. 내공과 마나를 섞는 운하검을 쓴다.",
-    "outfits": [{"flag": "ugly_sword", "sprites": {"idle": "haun_sword_idle", "attack": "haun_sword_attack", "hit": "haun_sword_hit"}}],
+    "outfits": [{"flag": "ugly_sword", "sprites": {"idle": "haun_sword_idle", "attack": "haun_sword_attack", "hit": "haun_sword_hit", "stand": "haun_sword_stand"}}],
     "crit": 0.1,
     "hpPerLevel": 4
   },

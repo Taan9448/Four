@@ -28,6 +28,7 @@ import {
   rewardOptions,
   setParty,
   upgradeCandidates,
+  type RunOptions,
   type RunState,
 } from '../engine/run';
 import type { CardDef } from '../engine/schema';
@@ -312,8 +313,8 @@ export interface RunReport {
 const partyHp = (s: BattleState) => s.party.reduce((a, p) => a + Math.max(0, p.downed ? 0 : p.hp), 0);
 
 /** 시드 하나로 S0부터(startStage면 그 스테이지부터, createRunAt) 끝(또는 패배)까지 둔다 */
-export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT_BOT, startStage?: string): RunReport {
-  const run = startStage ? createRunAt(data, seed, startStage) : createRun(data, seed);
+export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT_BOT, startStage?: string, mode: RunOptions = {}): RunReport {
+  const run = startStage ? createRunAt(data, seed, startStage, mode) : createRun(data, seed, mode);
   const battles: BattleRecord[] = [];
   const stageEntry: RunReport['stageEntry'] = [];
   let floor = 0;

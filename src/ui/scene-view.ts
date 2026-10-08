@@ -4,7 +4,7 @@ import type { GameData } from '../engine/data';
 import { sceneFaces } from '../engine/scene';
 import type { Face, SceneDef, SceneLine } from '../engine/schema';
 import { speakerInfo } from '../engine/text';
-import { loadPortrait } from '../render/portrait';
+import { loadPortrait, standingFor } from '../render/portrait';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 
@@ -20,7 +20,7 @@ interface Slot {
 }
 
 /** background: 장면 뒤 배경 에셋 id(장면의 background가 우선). 실제 그림이 있을 때만 어둡게 깐다 */
-export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, opts: { background?: string } = {}): HTMLElement {
+export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, opts: { background?: string; flags?: readonly string[] } = {}): HTMLElement {
   const bgUrl = frameUrl(scene.background ?? opts.background, 1, { realOnly: true });
   const slots: Record<Side, Slot> = {
     left: { el: h('div', { class: 'vn-slot vn-left' }), speaker: null, face: null },
@@ -46,7 +46,7 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
     slot.speaker = speaker;
     slot.face = face;
     const info = speakerInfo(data, speaker);
-    const img = await loadPortrait(speaker, face);
+    const img = await loadPortrait(speaker, face, standingFor(data, speaker, opts.flags));
     if (slot.speaker !== speaker || slot.face !== face) return; // 그 사이 다른 줄로 넘어감
     const el = img
       ? h('img', { class: 'vn-portrait', src: img.src, alt: info.name })

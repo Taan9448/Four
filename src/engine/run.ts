@@ -42,7 +42,17 @@ export interface RunState {
   potions: (string | null)[];
   shop: ShopState | null;
   shopRemovals: number;
+  /** 난이도(2026-10-08): 보통·어려움, 하드코어(쓰러진 동료는 돌아오지 않는다)와 그렇게 잃은 동료 */
+  difficulty: Difficulty;
+  hardcore: boolean;
+  fallen: string[];
+  /** 캠페인을 마친 런에서 스테이지마다 다시 해서 이긴 횟수 */
+  replays: Record<string, number>;
+  /** 스테이지 다시 하기 중이면 돌아갈 클리어한 런(결과는 그 런에 남기지 않는다. 이긴 횟수만) */
+  replayOf: RunState | null;
 }
+
+export type Difficulty = 'normal' | 'hard';
 
 /** 상점 진열: 노드마다 한 번 정해지고, 산 것은 sold */
 export interface ShopState {
@@ -65,6 +75,8 @@ export interface LevelUp {
 
 export interface RunOptions {
   stageId?: string;
+  difficulty?: Difficulty;
+  hardcore?: boolean;
   /** 왕일검 지원(원래 S3 합류). 프로토타입 디버그 토글용 */
   supportActive?: boolean;
 }
@@ -100,6 +112,11 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     potions: Array.from({ length: data.balance.economy.potionSlots }, () => null),
     shop: null,
     shopRemovals: 0,
+    difficulty: opts.difficulty ?? 'normal',
+    hardcore: opts.hardcore ?? false,
+    fallen: [],
+    replays: {},
+    replayOf: null,
   };
   for (const cardId of haun.starterDeck) addCard(run, cardId);
   run.map = buildMap(data, run);
@@ -141,6 +158,38 @@ function buildMap(data: GameData, run: RunState): StageMap {
     roster: run.roster.map((r) => r.id),
     usedModules: run.usedModules,
   });
+}
+
+/**
+ * 스테이지 다시 하기(2026-10-08): 캠페인을 마친 런(hub)의 마지막 파티·덱·유물·물약·골드·레벨 그대로 stageId를 처음부터.
+ * 다시 하는 런은 hub를 replayOf로 품고, 끝나면(이기든 지든) hub로 돌아간다. 다시 한 결과는 hub에 남기지 않는다(이긴 횟수만)
+ */
+export function startReplay(data: GameData, hub: RunState, stageId: string): RunState {
+  if (hub.status !== 'complete') throw new Error('캠페인을 마친 런에서만 다시 할 수 있다');
+  const stage = playableStages(data).find((s) => s.id === stageId);
+  if (!stage) throw new Error(`다시 할 수 없는 스테이지: ${stageId}`);
+  const run: RunState = structuredClone({ ...hub, replayOf: null });
+  run.replayOf = structuredClone({ ...hub, replayOf: null });
+  run.stageId = stageId;
+  run.status = 'map';
+  run.position = null;
+  run.visited = [];
+  run.shop = null;
+  run.levelLog = [];
+  run.pendingUpgrades = [];
+  for (const r of run.roster) r.hp = r.maxHp;
+  // 같은 시드라도 다시 할 때마다 다른 지도가 나오게 시드에 횟수를 붙인다
+  run.seed = `${hub.seed}~${stageId}~${(hub.replays[stageId] ?? 0) + 1}`;
+  run.map = buildMap(data, run);
+  return run;
+}
+
+/** 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올린다 */
+export function finishReplay(run: RunState): RunState {
+  const hub = run.replayOf;
+  if (!hub) throw new Error('다시 하는 중이 아니다');
+  if (run.status === 'stage_clear' || run.status === 'complete') hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
+  return hub;
 }
 
 /** 보스를 넘은 뒤 다음 스테이지(원작 순서로 다음 playable). 없으면 null */
@@ -236,8 +285,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
-    enemyHpScale: stage.enemyHpScale,
-    enemyDmgScale: stage.enemyDmgScale,
+    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? data.balance.difficulty.hard.enemyHpMul : 1),
+    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? data.balance.difficulty.hard.enemyDmgMul : 1),
     relics: run.relics,
     potions: run.potions,
   };
@@ -256,8 +305,19 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     run.status = 'defeat';
     return [];
   }
+  // 하드코어: 전투가 끝날 때 쓰러져 있던 동료는 일행을 떠난다(하운은 쓰러지면 이미 패배)
+  const out: string[] = [];
+  if (run.hardcore) {
+    for (const id of outcome.downed ?? []) {
+      if (id === 'haun' || !run.roster.some((r) => r.id === id)) continue;
+      run.roster = run.roster.filter((r) => r.id !== id);
+      run.selected = run.selected.filter((x) => x !== id);
+      if (!run.fallen.includes(id)) run.fallen.push(id);
+      out.push(`${data.characters.get(id)?.name ?? id} — 쓰러진 채 일어나지 못했다(하드코어)`);
+    }
+  }
   awardBattleXp(data, run, enc.node.type);
-  const out = applyRunOps(data, run, enc.module.content.clearEffects ?? []);
+  out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
   out.push(...fireRunRelics(data, run, 'victory'));
   if (enc.node.type === 'boss') run.status = 'stage_clear';
   return out;
@@ -507,6 +567,11 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         const def = data.characters.get(e.member ?? '');
         if (!def) throw new Error(`join_party: 알 수 없는 캐릭터 ${e.member}`);
         if (run.roster.some((r) => r.id === def.id)) break;
+        // 하드코어로 잃은 동료는 다시 합류하지 않는다
+        if (run.fallen.includes(def.id)) {
+          out.push(`${def.name}의 자리는 비어 있다`);
+          break;
+        }
         if (def.role === 'support') {
           run.supportActive = true;
           if (!run.flags.includes(`support:${def.id}`)) run.flags.push(`support:${def.id}`);

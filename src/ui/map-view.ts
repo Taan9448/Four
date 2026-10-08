@@ -91,7 +91,8 @@ export function placeName(stage: Stage, run: RunState): string {
 }
 
 /** 위: 여정 띠. 지나온 곳과 지금만 보이고, 들어서 보지 않은 지역은 안개, 틈은 '하늘의 금' 사건 뒤에 나타난다 */
-function journeyBand(data: GameData, run: RunState): HTMLElement {
+/** onStage: 클리어 지도처럼 장소를 눌러 고를 때(지나온 곳만) */
+export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: string) => void): HTMLElement {
   const stages = playableStages(data).filter((st) => st.journey);
   const cur = data.stages.find((s) => s.id === run.stageId)!;
   const reached = stages.filter((st) => st.order <= cur.order);
@@ -135,6 +136,14 @@ function journeyBand(data: GameData, run: RunState): HTMLElement {
     .map((st) => {
       const j = st.journey!;
       const here = st.id === cur.id;
+      if (onStage)
+        return h(
+          'button',
+          { class: 'stop done pick', style: `left:${j.x}%;top:${j.y}%`, onclick: () => onStage(st.id), ...tipAttrs(placeName(st, run), '눌러서 다시 하기') },
+          h('i', {}),
+          placeName(st, run),
+          run.replays[st.id] ? h('small', { class: 'replays' }, `×${run.replays[st.id]}`) : null,
+        );
       return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), placeName(st, run));
     })
     .concat(
@@ -356,6 +365,15 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           'div',
           { class: 'box stage-box' },
           h('h2', {}, placeName(stage, run)),
+          run.replayOf || run.difficulty === 'hard' || run.hardcore
+            ? h(
+                'div',
+                { class: 'mode-badges' },
+                run.replayOf ? h('span', { class: 'mode-badge replay', ...tipAttrs('다시 하기', '마지막에 클리어한 파티로 이 스테이지만. 결과는 저장에 남지 않는다.') }, '다시 하기') : null,
+                run.difficulty === 'hard' ? h('span', { class: 'mode-badge hard' }, '어려움') : null,
+                run.hardcore ? h('span', { class: 'mode-badge hardcore', ...tipAttrs('하드코어', `쓰러진 동료는 돌아오지 않는다.${run.fallen.length ? `\n잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}` : ''}`) }, '하드코어') : null,
+              )
+            : null,
           h('p', { class: 'stage-summary' }, stage.teaser ?? ''),
           h(
             'div',

@@ -7,7 +7,7 @@ import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
-import { loadPortrait } from '../render/portrait';
+import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, spriteSource } from '../render/assets';
 import { SpritePlayer } from '../render/sprite-player';
@@ -875,7 +875,7 @@ export class BattleView {
   private async cutIn(cardId: string, line: { speaker: string; face: 'neutral' | 'resolve' | 'surprise'; text: string }): Promise<void> {
     const def = resolveCard(this.data, cardId).def;
     const who = speakerInfo(this.data, line.speaker);
-    const img = await loadPortrait(line.speaker, line.face);
+    const img = await loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags));
     const portrait = img
       ? h('img', { class: 'cutin-portrait', src: img.src, alt: who.name })
       : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who.color}` }, who.name);
