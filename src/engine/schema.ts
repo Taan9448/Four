@@ -158,8 +158,12 @@ export const SceneLine = z
     text: z.string(),
     /** 이 줄부터 화면 전체에 깔 장면 일러스트(story-cg 에셋 id). "none"이면 걷는다. 실제 그림이 들어오기 전에는 무시한다 */
     cg: z.string().optional(),
-    /** 이 줄에서 한 번 일어나는 화면 연출: flash 하얗게 번쩍임, shake 흔들림, fade 어둡게 잠겼다 밝아짐 */
-    effect: z.enum(['flash', 'shake', 'fade']).optional(),
+    /**
+     * 이 줄에서 한 번 일어나는 화면 연출: flash 하얗게 번쩍임, shake 흔들림, fade 어둡게 잠겼다 밝아짐,
+     * glow 푸른 빛이 가운데서 번져 나감(천외귀운), rift 검은 틈이 그어지며 붉게 번쩍임,
+     * title 대사창 대신 화면 가운데 큰 붓글씨 제목 카드(장면 전환·기술 이름)
+     */
+    effect: z.enum(['flash', 'shake', 'fade', 'glow', 'rift', 'title']).optional(),
   })
   .strict();
 export type SceneLine = z.infer<typeof SceneLine>;

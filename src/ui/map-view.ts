@@ -177,6 +177,10 @@ function journeyBanner(data: GameData, run: RunState): HTMLElement | null {
   const region = cur.journey?.region;
   const first = stages.find((st) => st.journey!.region === region);
   if (region === 'elheim' && first?.id === cur.id) return h('div', { class: 'banner' }, '석문 너머 — 달이 둘 뜨는 낯선 세계');
+  // 엘하임을 지나 무림으로 돌아온 첫 스테이지(S6)
+  const lastElheim = Math.max(...stages.filter((st) => st.journey!.region === 'elheim').map((st) => st.order));
+  const returnStage = stages.find((st) => st.journey!.region === 'murim' && st.order > lastElheim);
+  if (returnStage?.id === cur.id) return h('div', { class: 'banner banner-return' }, '석문을 넘어 — 삼 년 만의 무림, 하늘에 달이 하나');
   return null;
 }
 

@@ -52,7 +52,9 @@
 }
 ```
 
-**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`, `remove_card`(filter), `upgrade_card`(count, filter), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다).
+**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`, `remove_card`(filter), `upgrade_card`(count, filter), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic), `gain_potion`(potion: 빈 칸이 없으면 두고 온다).
+
+**상점 노드(`shop`, 2026-10-08):** 스테이지마다 정해진 층(`forcedTypes`, S1·S2~S7은 보스 앞 휴식 바로 앞, S8은 5층) 전체가 상점이다(S0·S9는 없음). 모듈은 `content.text`(상인 소개)만 있고 선택지가 없으며, 진열은 `src/engine/economy.ts`가 노드마다 시드로 정해 `run.shop`에 남긴다. 상점·휴식은 두 번 잇따르지 않는다.
 
 **스테이지 `endingScene`**(`data/stages.json`): 캠페인의 마지막 스테이지에 둔다. 보스를 넘고 "마치기"를 누르면 이 장면(에필로그)을 재생한 뒤 엔딩 화면("천외귀환 — 완")을 보여 준다.
 filter: `{ pool, owner, costNeigongGte }`. 무작위 선택은 `시드 + 스테이지 + 노드 + 순번` 라벨의 RNG로 결정된다.

@@ -32,6 +32,7 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
   const logEl = h('div', { class: 'vn-log hidden' });
   // 장면 일러스트(CG): 실제 그림이 있을 때만 화면 전체에 깔고, 그동안 반신 그림은 숨긴다
   const cgEl = h('div', { class: 'vn-cg' });
+  const titleEl = h('div', { class: 'vn-title' });
   let index = -1;
   let finished = false;
 
@@ -78,9 +79,17 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
       root.classList.toggle('has-cg', !!url);
     }
     if (line.effect) {
-      root.classList.remove('vn-flash', 'vn-shake', 'vn-fade');
+      root.classList.remove('vn-flash', 'vn-shake', 'vn-fade', 'vn-glow', 'vn-rift');
       void root.offsetWidth;
-      root.classList.add(`vn-${line.effect}`);
+      if (line.effect !== 'title') root.classList.add(`vn-${line.effect}`);
+    }
+    // 제목 카드: 대사창을 숨기고 화면 가운데 큰 글씨로(다음 줄에서 걷힌다)
+    root.classList.toggle('vn-titling', line.effect === 'title');
+    titleEl.textContent = line.effect === 'title' ? line.text : '';
+    if (line.effect === 'title') {
+      titleEl.classList.remove('in');
+      void titleEl.offsetWidth;
+      titleEl.classList.add('in');
     }
     if (line.speaker) void showPortrait(slots[side], line.speaker, faces[index] ?? 'neutral');
     for (const s of ['left', 'right'] as Side[]) slots[s].el.classList.toggle('dim', !line.speaker || s !== side);
@@ -112,9 +121,11 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
     { class: `screen scene-screen world-${scene.world ?? 'murim'}${bgUrl ? ' has-bg' : ''}`, onclick: () => next() },
     h('div', { class: 'vn-bg', style: bgUrl ? `background-image:url("${bgUrl}")` : '' }),
     cgEl,
+    h('div', { class: 'vn-rift-line' }),
     slots.left.el,
     slots.right.el,
     box,
+    titleEl,
     h(
       'div',
       { class: 'vn-controls' },
