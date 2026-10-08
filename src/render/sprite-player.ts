@@ -2,6 +2,7 @@
 // 프레임 번호는 1부터. 이벤트(예: hit: 4)는 그 프레임에 들어서는 순간 한 번 발생한다.
 // 대체 단계 2(키 포즈 3장)는 virtualFrames 길이로 키 포즈 사이를 이동·크로스페이드로 보간한다.
 import { loadSprite, type SpriteAsset } from './assets';
+import { fxNow } from './fx';
 
 export interface PlayOptions {
   loop?: boolean;
@@ -49,11 +50,12 @@ export class SpritePlayer {
     const frameMs = 1000 / meta.fps;
 
     return new Promise<void>((resolve) => {
-      const start = performance.now();
+      // 연출 시계(fxNow): 타격 멈춤 동안 프레임이 멈춘다
+      const start = fxNow();
       let lastFrame = 0;
-      const tick = (now: number) => {
+      const tick = () => {
         if (token !== this.token) return resolve();
-        const elapsed = now - start;
+        const elapsed = fxNow() - start;
         let n = Math.floor(elapsed / frameMs) + 1; // 1부터
         if (loop) n = ((n - 1) % total) + 1;
         if (n > total) {
@@ -143,10 +145,10 @@ export class SpritePlayer {
       }
     };
     if (options.loop) {
-      const start = performance.now();
-      const tick = (now: number) => {
+      const start = fxNow();
+      const tick = () => {
         if (token !== this.token) return;
-        draw(Math.floor((now - start) / 500) % 2 === 0 ? 0 : -1);
+        draw(Math.floor((fxNow() - start) / 500) % 2 === 0 ? 0 : -1);
         this.raf = requestAnimationFrame(tick);
       };
       this.raf = requestAnimationFrame(tick);

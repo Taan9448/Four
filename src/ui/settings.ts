@@ -2,14 +2,15 @@
 import { h } from './dom';
 import { readSettings, writeSettings } from './storage';
 import { resetTours } from './tour';
+import { setShakeScale } from '../render/fx';
 
 export interface Settings {
   /** 전투 연출 대기 시간 배율(1 보통, 작을수록 빠름) */
   speed: number;
   /** 영웅·전설 카드 컷인 */
   cutIn: boolean;
-  /** 피격·폭주 때 화면 흔들림 */
-  shake: boolean;
+  /** 피격·폭주 때 화면 흔들림 세기(0 끄기 · 0.5 약하게 · 1 보통) */
+  shake: number;
 }
 
 export const SPEEDS: { value: number; label: string }[] = [
@@ -18,7 +19,19 @@ export const SPEEDS: { value: number; label: string }[] = [
   { value: 0.35, label: '아주 빠름' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, shake: true };
+export const SHAKES: { value: number; label: string }[] = [
+  { value: 0, label: '끄기' },
+  { value: 0.5, label: '약하게' },
+  { value: 1, label: '보통' },
+];
+
+const DEFAULTS: Settings = { speed: 1, cutIn: true, shake: 1 };
+
+/** 예전 설정(켜기/끄기)도 읽는다 */
+function readShake(v: unknown): number {
+  if (typeof v === 'boolean') return v ? 1 : 0;
+  return SHAKES.some((s) => s.value === v) ? (v as number) : DEFAULTS.shake;
+}
 
 function load(): Settings {
   try {
@@ -26,7 +39,7 @@ function load(): Settings {
     return {
       speed: SPEEDS.some((s) => s.value === raw.speed) ? raw.speed! : DEFAULTS.speed,
       cutIn: typeof raw.cutIn === 'boolean' ? raw.cutIn : DEFAULTS.cutIn,
-      shake: typeof raw.shake === 'boolean' ? raw.shake : DEFAULTS.shake,
+      shake: readShake(raw.shake),
     };
   } catch {
     return { ...DEFAULTS };
@@ -35,9 +48,9 @@ function load(): Settings {
 
 export const settings: Settings = load();
 
-/** 문서 전체에 걸리는 설정(흔들림 끄기 → CSS 클래스) */
+/** 화면 전체에 걸리는 설정(흔들림 세기 → 연출 모듈) */
 export function applySettings(): void {
-  document.documentElement.classList.toggle('no-shake', !settings.shake);
+  setShakeScale(settings.shake);
 }
 
 function update(patch: Partial<Settings>): void {
@@ -48,19 +61,20 @@ function update(patch: Partial<Settings>): void {
 
 /** 설정 항목(오버레이 안에 넣는다) */
 export function settingsForm(): HTMLElement {
-  const speedGroup = h(
-    'div',
-    { class: 'setting-options', role: 'radiogroup', 'aria-label': '전투 속도' },
-    SPEEDS.map((s) =>
-      h(
-        'label',
-        { class: 'setting-option' },
-        h('input', { type: 'radio', name: 'speed', checked: settings.speed === s.value, onchange: () => update({ speed: s.value }) }),
-        ` ${s.label}`,
+  const radios = (key: 'speed' | 'shake', label: string, options: { value: number; label: string }[]) =>
+    h(
+      'div',
+      { class: 'setting-options', role: 'radiogroup', 'aria-label': label },
+      options.map((o) =>
+        h(
+          'label',
+          { class: 'setting-option' },
+          h('input', { type: 'radio', name: key, checked: settings[key] === o.value, onchange: () => update({ [key]: o.value }) }),
+          ` ${o.label}`,
+        ),
       ),
-    ),
-  );
-  const toggle = (key: 'cutIn' | 'shake', label: string, hint: string) =>
+    );
+  const toggle = (key: 'cutIn', label: string, hint: string) =>
     h(
       'label',
       { class: 'setting-row setting-toggle' },
@@ -70,9 +84,9 @@ export function settingsForm(): HTMLElement {
   return h(
     'div',
     { class: 'settings-form' },
-    h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), speedGroup),
+    h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), radios('speed', '전투 속도', SPEEDS)),
     toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
-    toggle('shake', '화면 흔들림', '끄면 피격·폭주 때 흔들리지 않는다'),
+    h('div', { class: 'setting-row' }, h('span', {}, '화면 흔들림', h('small', {}, '피격·폭주 때 흔들리는 세기')), radios('shake', '화면 흔들림', SHAKES)),
     h(
       'div',
       { class: 'setting-row' },

@@ -411,6 +411,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .float-heal { color: var(--heal); }
 .float-status { color: #e6d39a; font-size: 0.95rem; }
 .float-absorb { color: #c07cff; }
+.float-heavy { color: #fff; font-size: 2rem; }
 .float-critical { color: #ffd36b; font-size: 2.3rem; text-shadow: 0 0 10px rgba(255, 190, 60, 0.8), 0 2px 4px #000; }
 .float-weak { color: #9fe0ff; font-size: 1.05rem; margin-top: -26px; }
 .float-resist { color: #b9b4a8; font-size: 0.95rem; margin-top: -26px; }
@@ -423,12 +424,12 @@ h1, h2, h3 { font-family: var(--f-head); }
 .status-chip .el-mark { width: 18px; height: 18px; border: 0; }
 .dmg-preview small.cr { color: #ffd36b; }
 .st-short { display: none; }
-@keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -60px) scale(1); } }
+@keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 10% { opacity: 1; transform: translate(-50%, -4px) scale(1.4); } 22% { transform: translate(-50%, -8px) scale(1); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -64px) scale(0.95); } }
 
-.fx-shake { animation: shake 0.26s; }
-.fx-shake-strong { animation: shake-strong 0.42s; }
-@keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
-@keyframes shake-strong { 15% { transform: translate(-10px, 3px); } 30% { transform: translate(9px, -4px); } 45% { transform: translate(-7px, 2px); } 60% { transform: translate(5px, -2px); } 80% { transform: translate(-2px, 1px); } }
+/* 타격 멈춤: 전투 장면의 CSS 애니메이션을 잠깐 세운다(떠오르는 숫자는 그대로) */
+.hitstop .b-scene *:not(.float-text) { animation-play-state: paused !important; }
+/* 날아가는 카드(복제본) */
+.card-ghost { position: fixed; pointer-events: none; z-index: 900; transition: none; will-change: transform, opacity; }
 .fx-flash-white .sprite-wrap, .fx-flash-blue .sprite-wrap { animation: flash-w 0.22s; }
 .fx-flash-blue .sprite-wrap { animation-name: flash-b; }
 @keyframes flash-w { 30% { filter: brightness(3) saturate(0); } }
@@ -620,7 +621,6 @@ h1, h2, h3 { font-family: var(--f-head); }
 .deck-count { position: absolute; right: -6px; top: -8px; background: var(--neigong); color: #1a1208; font-weight: 800; border-radius: 10px; padding: 0 7px; font-size: 0.85rem; }
 
 /* 설정: 화면 흔들림 끄기 */
-.no-shake .fx-shake, .no-shake .fx-shake-strong { animation: none; }
 
 /* 휴대폰(세로): 전투 장면을 세로로 쌓는다(위 HUD → 유닛 → 손패 → 자원·턴 종료) */
 @media (max-width: 600px) {
