@@ -45,7 +45,8 @@ export class App {
     const params = new URLSearchParams(location.search);
     initDebug(params);
     const seed = params.get('seed');
-    if (params.has('sandbox'))
+    if (params.has('screen')) this.screen(params.get('screen') || 'reward', params.get('module') ?? undefined, params.get('stage') ?? 's2');
+    else if (params.has('sandbox'))
       this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean), params.get('module') ?? undefined);
     else if (seed) this.start(seed, params.has('wang'), params.get('stage') ?? undefined);
     else this.title();
@@ -67,12 +68,57 @@ export class App {
     ]);
     this.run = run;
     const node = { id: 'sandbox', floor: 0, index: 0, type: module.type, moduleId, next: [] };
-    this.playScene(module.content.scene, () => this.battle({ node, module }));
+    this.playScene(module.content.scene, () => this.battle({ node, module }), module.content.background);
+  }
+
+  /**
+   * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck
+   */
+  private screen(name: string, id: string | undefined, stageId: string): void {
+    const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
+    this.persist = false;
+    this.run = run;
+    const first = run.map.floors[0][0];
+    switch (name) {
+      case 'choice': {
+        const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'rest')!;
+        return this.show(this.backdrop(choiceView(data, run, module, () => this.map())));
+      }
+      case 'scene':
+        return this.playScene(id ?? [...data.scenes.keys()][0], () => this.map());
+      case 'clear':
+        run.status = 'stage_clear';
+        return this.stageClear();
+      case 'win':
+      case 'lose':
+        return this.end(name === 'win');
+      case 'deck':
+        this.map();
+        return openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]);
+      default:
+        return this.show(this.backdrop(rewardView(data, rewardOptions(data, run, first.id), () => this.map())));
+    }
   }
 
   private show(el: HTMLElement): void {
     this.root.replaceChildren(el);
     window.scrollTo(0, 0);
+  }
+
+  /**
+   * 지도 밖 화면(선택지·보상·스테이지 끝·엔딩)의 뒷배경: 지금 스테이지의 전투 배경을 어둡게 깐다(GAME_DESIGN 13절).
+   * art로 다른 그림(시작 화면 그림 등)을 줄 수 있고, 실제 그림이 없으면 세계별 색 바탕
+   */
+  private backdrop(el: HTMLElement, art?: string): HTMLElement {
+    const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
+    const url = frameUrl(art ?? stage?.background, 1, { realOnly: true });
+    el.classList.add('backdrop', `world-${stage?.world ?? 'murim'}`);
+    if (url) {
+      el.classList.add('has-art');
+      el.style.setProperty('--backdrop', `url("${url}")`);
+    }
+    return el;
   }
 
   /** 시작 화면(GAME_DESIGN 13절): 세계관 그림 한 장 위 가운데에 제목과 메뉴. 시드·디버그는 접힌 "시작 옵션" 안에 */
@@ -198,17 +244,18 @@ export class App {
     const enc = enterNode(data, run, node.id);
     const go = () => {
       if (isBattle(enc)) this.battle(enc);
-      else this.show(choiceView(data, run, enc.module, () => this.map()));
+      else this.show(this.backdrop(choiceView(data, run, enc.module, () => this.map()), enc.module.content.background));
     };
     // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
-    this.playScene(enc.module.content.scene, go);
+    this.playScene(enc.module.content.scene, go, enc.module.content.background);
   }
 
-  /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then */
-  private playScene(id: string | undefined, then: () => void): void {
+  /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then. 배경은 background(모듈 배경) → 지금 스테이지의 전투 배경 */
+  private playScene(id: string | undefined, then: () => void, background?: string): void {
     const scene = id ? data.scenes.get(id) : undefined;
     if (!scene) return then();
-    this.show(sceneView(data, scene, then));
+    const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
+    this.show(sceneView(data, scene, then, { background: background ?? stage?.background }));
   }
 
   private battle(enc: Encounter): void {
@@ -238,13 +285,19 @@ export class App {
         this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
         if (run.status !== 'map') return this.map();
         // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
-        this.playScene(enc.module.content.outroScene, () =>
-          this.show(
-            rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
-              if (cardId) addCard(run, cardId);
-              this.map();
-            }),
-          ),
+        this.playScene(
+          enc.module.content.outroScene,
+          () =>
+            this.show(
+              this.backdrop(
+                rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
+                  if (cardId) addCard(run, cardId);
+                  this.map();
+                }),
+                enc.module.content.background,
+              ),
+            ),
+          enc.module.content.background,
         );
       },
     );
@@ -260,31 +313,39 @@ export class App {
     const outro = boss?.content.outroScene ? undefined : boss?.content.outro;
     const next = nextStage(data, run);
     this.show(
-      h(
-        'section',
-        { class: 'screen end-screen stage-clear win' },
-        h('h1', {}, `${stage.name} — 끝`),
-        outro ? h('p', { class: 'outro' }, outro) : null,
-        this.clearMessages.length ? h('ul', { class: 'clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
-        run.scar > 0
-          ? h(
-              'p',
-              { class: 'scar-reveal' },
-              // '하늘의 금'을 보기 전에는 그 말을 쓰지 않는다(GAME_DESIGN 14절)
-              run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`,
-            )
-          : null,
+      this.backdrop(
         h(
-          'button',
-          {
-            class: 'btn btn-primary',
-            onclick: () => {
-              this.clearMessages = [];
-              advanceStage(data, run);
-              this.map();
-            },
-          },
-          next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
+          'section',
+          { class: 'screen end-screen stage-clear win' },
+          h(
+            'div',
+            { class: 'end-box' },
+            h('div', { class: 'end-kicker' }, stage.chapters),
+            h('h1', {}, stage.name),
+            h('div', { class: 'end-sub' }, '— 끝 —'),
+            outro ? h('p', { class: 'outro' }, outro) : null,
+            this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
+            run.scar > 0
+              ? h(
+                  'p',
+                  { class: 'scar-reveal' },
+                  // '하늘의 금'을 보기 전에는 그 말을 쓰지 않는다(GAME_DESIGN 14절)
+                  run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`,
+                )
+              : null,
+            h(
+              'button',
+              {
+                class: 'btn btn-primary btn-large',
+                onclick: () => {
+                  this.clearMessages = [];
+                  advanceStage(data, run);
+                  this.map();
+                },
+              },
+              next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
+            ),
+          ),
         ),
       ),
     );
@@ -296,22 +357,30 @@ export class App {
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;
     this.show(
-      h(
-        'section',
-        { class: `screen end-screen ${win ? 'win' : 'lose'}${finale ? ' finale' : ''}` },
-        h('h1', {}, finale ? '천외귀환' : win ? `${last.name}까지` : '여기까지'),
-        finale ? h('p', { class: 'finale-sub' }, '天外歸還 — 세계의 틈 · 완') : null,
+      this.backdrop(
         h(
-          'p',
-          {},
-          finale
-            ? '세계의 틈이 닫혔다. 천마봉 위에는 바느질 자국처럼 가지런한 흉터, 청운봉선(靑雲縫線)이 남았다.'
-            : win
-              ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)`
-              : '하운이 쓰러졌다.',
+          'section',
+          { class: `screen end-screen ${win ? 'win' : 'lose'}${finale ? ' finale' : ''}` },
+          h(
+            'div',
+            { class: 'end-box' },
+            h('h1', {}, finale ? '천외귀환' : win ? `${last.name}까지` : '여기까지'),
+            finale ? h('p', { class: 'end-sub' }, '天外歸還 — 세계의 틈 · 완') : null,
+            h(
+              'p',
+              { class: 'outro' },
+              finale
+                ? '세계의 틈이 닫혔다. 천마봉 위에는 바느질 자국처럼 가지런한 흉터, 청운봉선(靑雲縫線)이 남았다.'
+                : win
+                  ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)`
+                  : '하운이 쓰러졌다.',
+            ),
+            h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
+            h('button', { class: 'btn btn-primary btn-large', onclick: () => this.title() }, '새 런'),
+          ),
         ),
-        h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
-        h('button', { class: 'btn btn-primary', onclick: () => this.title() }, '새 런'),
+        // 이야기의 끝은 시작 화면의 세계관 그림 위에서
+        finale ? 'title_world' : undefined,
       ),
     );
   }

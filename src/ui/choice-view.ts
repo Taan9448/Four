@@ -6,20 +6,48 @@ import { cardView } from './card-view';
 import { h } from './dom';
 
 const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', story: '이야기' };
+/** 판 머리의 붉은 낙관(지도 노드와 같은 한자) */
+const TYPE_SEAL: Record<string, string> = { event: '事', rest: '休', inn: '宿', story: '史' };
+
+/** 판 머리: 낙관 + 갈래 + 제목 */
+function panelHead(seal: string, kind: string, title: string): HTMLElement {
+  return h('header', { class: 'panel-head' }, h('span', { class: 'seal' }, seal), h('div', {}, h('div', { class: 'choice-kind' }, kind), h('h2', {}, title)));
+}
+
+/** 휴식·여관에서 쉴지 고를 때 보는 일행 체력(출전 중인 동료만) */
+function partyStrip(data: GameData, run: RunState): HTMLElement {
+  return h(
+    'div',
+    { class: 'party-strip' },
+    run.roster
+      .filter((r) => run.selected.includes(r.id))
+      .map((r) => {
+        const def = data.characters.get(r.id);
+        return h(
+          'div',
+          { class: 'ps-member', style: `--owner:${def?.color ?? '#888'}` },
+          h('span', { class: 'ps-name' }, def?.name ?? r.id),
+          h('div', { class: 'ps-hp' }, h('i', { style: `width:${Math.round((r.hp / r.maxHp) * 100)}%` })),
+          h('small', {}, `${r.hp} / ${r.maxHp}`),
+        );
+      }),
+  );
+}
 
 export function choiceView(data: GameData, run: RunState, module: ModuleDef, onDone: () => void): HTMLElement {
-  const box = h('div', { class: 'choice-box' });
+  const box = h('div', { class: 'choice-box panel' });
   const render = (result?: string[], resultText?: string) => {
     box.replaceChildren(
-      h('div', { class: 'choice-kind' }, TYPE_LABEL[module.type] ?? module.type),
-      h('h2', {}, module.name),
+      panelHead(TYPE_SEAL[module.type] ?? '事', TYPE_LABEL[module.type] ?? module.type, module.name),
       h('p', { class: 'choice-text' }, module.content.text ?? ''),
+      module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : '',
       result
         ? h(
             'div',
             { class: 'choice-result' },
-            resultText ? h('p', {}, resultText) : null,
-            h('ul', {}, result.map((r) => h('li', {}, r))),
+            resultText ? h('p', { class: 'result-text' }, resultText) : null,
+            result.length ? h('ul', { class: 'gains' }, result.map((r) => h('li', {}, r))) : null,
+            module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : null,
             h('button', { class: 'btn btn-primary', onclick: onDone }, '지도로'),
           )
         : h(
@@ -36,7 +64,8 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                     render(applyChoice(data, run, module, i), c.result);
                   },
                 },
-                c.label,
+                h('span', { class: 'choice-mark' }, '▸'),
+                h('span', {}, c.label),
               ),
             ),
           ),
@@ -53,8 +82,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
       return true;
     });
     box.replaceChildren(
-      h('div', { class: 'choice-kind' }, '수련'),
-      h('h2', {}, '강화할 카드'),
+      panelHead('練', '수련', '강화할 카드'),
       h('p', { class: 'choice-text' }, '+1~+3은 수치가 오르고, +4·+5에는 특수 스킬(★)이 붙는다. 강화 뒤 모습으로 보여 준다.'),
       list.length
         ? h(
@@ -71,18 +99,18 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
     );
   };
   render();
-  return h('section', { class: `screen choice-screen choice-${module.type}` }, box);
+  return h('section', { class: `screen choice-screen backdrop choice-${module.type}` }, box);
 }
 
 export function rewardView(data: GameData, options: string[], onPick: (cardId: string | null) => void): HTMLElement {
   return h(
     'section',
-    { class: 'screen reward-screen' },
+    { class: 'screen reward-screen backdrop' },
     h(
       'div',
-      { class: 'choice-box' },
-      h('h2', {}, '전리품'),
-      h('p', {}, '카드 한 장을 덱에 더한다.'),
+      { class: 'choice-box panel reward-box' },
+      panelHead('賞', '전투 승리', '전리품'),
+      h('p', { class: 'choice-text' }, '카드 한 장을 골라 덱에 더한다. 마음에 드는 카드가 없으면 넘어간다.'),
       h(
         'div',
         { class: 'reward-cards' },
@@ -92,7 +120,7 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
           return el;
         }),
       ),
-      h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기'),
+      h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기')),
     ),
   );
 }

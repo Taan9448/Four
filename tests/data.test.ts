@@ -219,6 +219,12 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
+  it('장면 배경: background는 전투 배경·장면 일러스트·화면 그림 명세가 있는 에셋이다', () => {
+    const ok = new Set(['background', 'story-cg', 'key-art']);
+    const bad = [...data.scenes.values()].filter((sc) => sc.background && !ok.has(specTypes.get(sc.background) ?? '')).map((sc) => `${sc.id}: ${sc.background}`);
+    expect(bad).toEqual([]);
+  });
+
   it('장면 표정: 한 인물의 표정은 바뀐 뒤 3줄 안에 다시 바뀌지 않는다(표정이 확확 바뀌지 않게)', () => {
     const bad = [...data.scenes.values()].flatMap((sc) => fastFaceChanges(sc));
     expect(bad).toEqual([]);
