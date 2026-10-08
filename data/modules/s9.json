@@ -166,7 +166,7 @@
     "name": "떠다니는 조각들",
     "weight": 3,
     "conditions": {"floorRange": [3, 9]},
-    "content": {"text": "청운산 전각과 똑같은 기와지붕의 반쪽. 흑요석 첨탑의 꼭대기. 거대한 나선형 조개껍데기. 별처럼 빛나는 모래가 담긴 그릇. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다. 삼천 년 동안.", "choices": [{"label": "기와지붕 아래서 숨을 고른다", "effects": [{"op": "heal_party", "amount": 8}], "result": "청운산의 지붕. 잠깐, 고향 냄새가 났다. (출전 동료 전원 체력 8 회복)"}, {"label": "별처럼 빛나는 모래를 들여다본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "모래알 하나하나에 결이 있었다. (고른 카드 1장 강화 +1)"}, {"label": "무거운 것을 조각 위에 내려놓는다", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}], "result": "흐르지 않는 곳에서는 가벼울수록 오래 간다. (기본 카드 1장 제거)"}]}
+    "content": {"text": "청운산 전각과 똑같은 기와지붕의 반쪽. 흑요석 첨탑의 꼭대기. 거대한 나선형 조개껍데기. 별처럼 빛나는 모래가 담긴 그릇. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다. 삼천 년 동안.", "choices": [{"label": "기와지붕 아래서 숨을 고른다", "effects": [{"op": "heal_party", "amount": 8}], "result": "청운산의 지붕. 잠깐, 고향 냄새가 났다. (출전 동료 전원 체력 8 회복)"}, {"label": "별처럼 빛나는 모래를 들여다본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "모래알 하나하나에 결이 있었다. (고른 카드 1장 강화 +1)"}, {"label": "무거운 것을 조각 위에 내려놓는다", "effects": [{"op": "upgrade_card", "count": 1}], "result": "흐르지 않는 곳에서는 가벼울수록 오래 간다. (카드 1장 강화)"}]}
   },
   {
     "id": "s9_event_hungry_gaze",

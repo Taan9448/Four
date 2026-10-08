@@ -150,7 +150,7 @@
     "name": "꺼진 대장간",
     "weight": 2,
     "conditions": {"floorRange": [2, 7]},
-    "content": {"text": "갱도 옆으로 드워프의 대장간이 이어진다. 삼천 년 동안 불이 꺼진 적 없다던 화로마다, 이 년 동안 식은 재만 쌓여 있었다.", "choices": [{"label": "식은 모루에서 날을 세운다", "condition": {"partyHas": "born"}, "result": "보른이 모루 위에 숫돌을 올렸다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "무거운 짐을 덜어 놓고 간다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "갱도 옆으로 드워프의 대장간이 이어진다. 삼천 년 동안 불이 꺼진 적 없다던 화로마다, 이 년 동안 식은 재만 쌓여 있었다.", "choices": [{"label": "식은 모루에서 날을 세운다", "condition": {"partyHas": "born"}, "result": "보른이 모루 위에 숫돌을 올렸다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "무거운 짐을 덜어 놓고 간다", "result": "몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s4_event_silver_branch",

@@ -43,12 +43,13 @@
   },
   "party": { "max": 3, "reviveHp": 1 },
   "upgrade": { "maxLevel": 5, "statLevels": 3 },
+  "loadout": { "perCharacter": 8, "common": 8, "presets": 3, "maxedGold": 25 },
   "rewards": {
     "cardChoices": 3,
     "rarityWeights": {
-      "battle": { "uncommon": 62, "rare": 30, "epic": 8 },
-      "elite":  { "uncommon": 35, "rare": 45, "epic": 20 },
-      "boss":   { "rare": 50, "epic": 50 }
+      "battle": { "common": 12, "uncommon": 55, "rare": 26, "epic": 7 },
+      "elite":  { "uncommon": 33, "rare": 42, "epic": 20, "legendary": 5 },
+      "boss":   { "rare": 45, "epic": 43, "legendary": 12 }
     }
   },
   "economy": {
@@ -67,11 +68,11 @@
       "cards": 5,
       "relics": 2,
       "potions": 3,
-      "cardPrice": { "uncommon": 45, "rare": 70, "epic": 110 },
+      "cardPrice": { "common": 30, "uncommon": 45, "rare": 70, "epic": 110, "legendary": 160 },
       "relicPrice": { "common": 110, "uncommon": 150, "rare": 200 },
       "potionPrice": { "common": 30, "uncommon": 45, "rare": 65 },
-      "removePrice": 50,
-      "removeStep": 25,
+      "swapPrice": 50,
+      "swapStep": 25,
       "upgradePrice": 60,
       "jitter": 0.1
     }

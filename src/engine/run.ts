@@ -5,6 +5,7 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
+import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, upgradeOwned, type Loadout } from './collection';
 
 export interface RosterEntry {
   id: string;
@@ -23,7 +24,18 @@ export interface RunState {
   visited: string[];
   roster: RosterEntry[];
   selected: string[];
+  /** 이번 스테이지의 덱: 편성 + 필수 카드 + 이번 스테이지에 얻은 카드(GAME_DESIGN 9-1). 스테이지를 시작할 때 다시 만든다 */
   deck: CardInstance[];
+  /** 보유 카드: 카드 id → 강화 단계(같은 카드는 한 장) */
+  collection: Record<string, number>;
+  /** 편성: 주인(동료 id·'common') → 카드 id */
+  loadout: Loadout;
+  /** 편성 저장 칸(balance.loadout.presets개, 빈 칸 null) */
+  presets: (Loadout | null)[];
+  /** 스테이지를 시작하기 전 편성 화면을 띄워야 한다 */
+  needsLoadout: boolean;
+  /** 이번 스테이지에 얻은 카드(편성 칸 수와 상관없이 이 스테이지 동안 덱에) */
+  stageGains: string[];
   mana: number;
   scar: number;
   flags: string[];
@@ -36,12 +48,12 @@ export interface RunState {
   pendingUpgrades: string[];
   /** 아직 화면에 보여 주지 않은 레벨업 소식 */
   levelLog: LevelUp[];
-  /** 경제(2026-10-08): 골드, 가진 유물, 물약 칸(빈 칸 null), 지금 들른 상점의 진열(나가면 그대로 남아 다시 들어와도 같다), 상점에서 카드를 지운 횟수 */
+  /** 경제(2026-10-08): 골드, 가진 유물, 물약 칸(빈 칸 null), 지금 들른 상점의 진열(나가면 그대로 남아 다시 들어와도 같다), 상점에서 카드를 바꾼 횟수 */
   gold: number;
   relics: string[];
   potions: (string | null)[];
   shop: ShopState | null;
-  shopRemovals: number;
+  shopSwaps: number;
   /** 난이도(2026-10-08): 보통·어려움, 하드코어(쓰러진 동료는 돌아오지 않는다)와 그렇게 잃은 동료 */
   difficulty: Difficulty;
   hardcore: boolean;
@@ -60,8 +72,8 @@ export interface ShopState {
   cards: { cardId: string; price: number; sold: boolean }[];
   relics: { relicId: string; price: number; sold: boolean }[];
   potions: { potionId: string; price: number; sold: boolean }[];
-  /** 이 상점에서 카드 지우기·강화를 이미 썼다(상점마다 한 번) */
-  removeUsed: boolean;
+  /** 이 상점에서 카드 바꾸기·강화를 이미 썼다(상점마다 한 번) */
+  swapUsed: boolean;
   upgradeUsed: boolean;
 }
 
@@ -98,6 +110,11 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     roster: [{ id: 'haun', hp: haun.maxHp, maxHp: haun.maxHp, level: 1, xp: 0 }],
     selected: ['haun'],
     deck: [],
+    collection: {},
+    loadout: {},
+    presets: Array.from({ length: data.balance.loadout.presets }, () => null),
+    needsLoadout: true,
+    stageGains: [],
     mana: data.balance.mana.max,
     scar: 0,
     flags: [],
@@ -111,14 +128,17 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     relics: [],
     potions: Array.from({ length: data.balance.economy.potionSlots }, () => null),
     shop: null,
-    shopRemovals: 0,
+    shopSwaps: 0,
     difficulty: opts.difficulty ?? 'normal',
     hardcore: opts.hardcore ?? false,
     fallen: [],
     replays: {},
     replayOf: null,
   };
-  for (const cardId of haun.starterDeck) addCard(run, cardId);
+  // 하운과 공용의 시작 카드(각 10장)를 받고, 첫 스테이지 편성으로
+  grantStarters(data, run, 'haun');
+  grantStarters(data, run, COMMON);
+  beginStageLoadout(data, run);
   run.map = buildMap(data, run);
   return run;
 }
@@ -147,6 +167,7 @@ export function createRunAt(data: GameData, seed: string, stageId: string, opts:
   }
   run.levelLog = [];
   run.selected = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').slice(0, data.balance.party.max).map((r) => r.id);
+  beginStageLoadout(data, run);
   run.map = buildMap(data, run);
   return run;
 }
@@ -180,15 +201,22 @@ export function startReplay(data: GameData, hub: RunState, stageId: string): Run
   for (const r of run.roster) r.hp = r.maxHp;
   // 같은 시드라도 다시 할 때마다 다른 지도가 나오게 시드에 횟수를 붙인다
   run.seed = `${hub.seed}~${stageId}~${(hub.replays[stageId] ?? 0) + 1}`;
+  beginStageLoadout(data, run);
   run.map = buildMap(data, run);
   return run;
 }
 
-/** 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올린다 */
+/**
+ * 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올린다.
+ * 보유 카드(얻은 카드·강화)와 편성 저장 칸은 이기든 지든 hub에 남긴다(GAME_DESIGN 9-1)
+ */
 export function finishReplay(run: RunState): RunState {
   const hub = run.replayOf;
   if (!hub) throw new Error('다시 하는 중이 아니다');
   if (run.status === 'stage_clear' || run.status === 'complete') hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
+  hub.collection = structuredClone(run.collection);
+  hub.presets = structuredClone(run.presets);
+  hub.loadout = structuredClone(run.loadout);
   return hub;
 }
 
@@ -213,16 +241,15 @@ export function advanceStage(data: GameData, run: RunState): boolean {
   run.position = null;
   run.visited = [];
   for (const r of run.roster) r.hp = Math.min(r.maxHp, r.hp + Math.floor(r.maxHp * data.balance.stage.healOnEnter));
+  beginStageLoadout(data, run);
   run.map = buildMap(data, run);
   run.status = 'map';
   return true;
 }
 
-export function addCard(run: RunState, cardId: string, level = 0): CardInstance {
-  run.counter += 1;
-  const card = { uid: `c${run.counter}`, cardId, level };
-  run.deck.push(card);
-  return card;
+/** 카드를 얻는다(보상 고르기 등): 보유 목록에 영구로, 이번 스테이지 덱에도. 이미 있으면 강화(GAME_DESIGN 9-1). 결과 문구 */
+export function addCard(data: GameData, run: RunState, cardId: string): string {
+  return acquireCard(data, run, cardId);
 }
 
 export function availableNodes(run: RunState): MapNode[] {
@@ -364,7 +391,7 @@ export function gainPotion(data: GameData, run: RunState, id: string): boolean {
 export function rewardOptions(data: GameData, run: RunState, nodeId: string): string[] {
   const owners = new Set(run.selected);
   const pool = [...data.cards.values()].filter(
-    (c) => c.pool === 'reward' && (owners.has(c.owner) || !data.characters.has(c.owner)),
+    (c) => c.pool === 'reward' && !c.essential && (owners.has(c.owner) || !data.characters.has(c.owner)),
   );
   const nodeType = findNode(run.map, nodeId)?.type;
   const weights = data.balance.rewards.rarityWeights[nodeType === 'elite' || nodeType === 'boss' ? nodeType : 'battle'];
@@ -438,7 +465,7 @@ export function applyLevelUpgrade(data: GameData, run: RunState, uid: string | n
   if (!pool.length) return [];
   run.counter += 1;
   const card = (uid && pool.find((c) => c.uid === uid)) || createRng(run.seed).fork(`levelup:${run.counter}`).pick(pool);
-  card.level += 1;
+  upgradeOwned(data, run, card.cardId);
   const def = data.cards.get(card.cardId)!;
   const skill = card.level > data.balance.upgrade.statLevels ? (card.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
   return [`카드 강화: ${def.name} +${card.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`];
@@ -519,11 +546,11 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       case 'gain_card': {
         const def = data.cards.get(e.card ?? '');
         if (!def) throw new Error(`gain_card: 알 수 없는 카드 ${e.card}`);
-        for (let i = 0; i < (e.count ?? 1); i++) addCard(run, def.id);
-        out.push(`카드 획득: ${def.name}`);
+        for (let i = 0; i < (e.count ?? 1); i++) out.push(acquireCard(data, run, def.id));
         break;
       }
       case 'remove_card': {
+        // 이번 스테이지 덱에서만 뺀다(보유 카드는 그대로, GAME_DESIGN 9-1)
         const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
         if (pool.length) {
           const c = rng.pick(pool);
@@ -537,7 +564,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         const pool = upgradeCandidates(data, run, e.filter);
         const chosen = e.choose && opts.pick ? pool.filter((c) => c.uid === opts.pick) : rng.shuffle([...pool]).slice(0, e.count ?? 1);
         for (const c of chosen) {
-          c.level += 1;
+          upgradeOwned(data, run, c.cardId);
           const def = data.cards.get(c.cardId)!;
           const skill = c.level > data.balance.upgrade.statLevels ? (c.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
           out.push(`카드 강화: ${def.name} +${c.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`);
@@ -580,7 +607,8 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
           const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
           run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
-          for (const cardId of def.starterDeck) addCard(run, cardId);
+          // 시작 카드 10장을 받고 추천 편성으로 바로 덱에(GAME_DESIGN 9-1)
+          joinMidStage(data, run, def.id);
           if (run.selected.length < data.balance.party.max) run.selected.push(def.id);
         }
         out.push(`${def.name} 합류`);

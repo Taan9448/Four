@@ -8,6 +8,7 @@ import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
 import { inventoryBox } from './items';
+import { starterCards } from '../engine/collection';
 import { deckGroupsView } from './deck-view';
 import { openOverlay } from './overlay';
 import { loadPortrait, standingFor } from '../render/portrait';
@@ -355,7 +356,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     fighters.map((r) => {
       const def = data.characters.get(r.id)!;
       const checked = run.selected.includes(r.id);
-      const noCards = def.starterDeck.length === 0;
+      const noCards = starterCards(data, r.id).length === 0;
       return h(
         'label',
         { class: `member${checked ? ' on' : ''}`, 'data-member': r.id, style: `--owner:${def.color}`, title: def.description },

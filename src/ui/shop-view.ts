@@ -1,7 +1,7 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyUpgrade, openShop, removableCards, removePrice, type BuyResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
 import type { CardInstance } from '../engine/state';
@@ -47,7 +47,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
   const price = (n: number, sold: boolean) => h('span', { class: `price${!sold && run.gold < n ? ' short' : ''}` }, sold ? '팔림' : h('span', {}, h('i', { class: 'coin' }), String(n)));
 
   const render = () => {
-    const removeCost = removePrice(data, run);
+    const swapCost = swapPrice(data, run);
     const upCost = data.balance.economy.shop.upgradePrice;
     box.replaceChildren(
       h(
@@ -118,18 +118,24 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           h('h3', { class: 'shop-h' }, '손질(상점마다 한 번)'),
           h(
             'div',
-            { class: `shop-line${shop.removeUsed ? ' sold' : ''}` },
-            h('span', { class: 'service-glyph' }, '削'),
-            h('div', { class: 'shop-desc' }, h('b', {}, '카드 지우기'), h('small', {}, '덱에서 카드 한 장을 뺀다. 쓸 때마다 값이 오른다.')),
-            price(removeCost, shop.removeUsed),
-            shop.removeUsed
+            { class: `shop-line${shop.swapUsed ? ' sold' : ''}` },
+            h('span', { class: 'service-glyph' }, '換'),
+            h('div', { class: 'shop-desc' }, h('b', {}, '카드 바꾸기'), h('small', {}, '보유 카드 한 장을 같은 주인의 다른 카드(아직 없는 것 우선)로 바꾼다. 편성에 있었으면 그 자리에 들어간다. 쓸 때마다 값이 오른다.')),
+            price(swapCost, shop.swapUsed),
+            shop.swapUsed
               ? null
               : h(
                   'button',
                   {
                     class: 'btn btn-small',
-                    disabled: run.gold < removeCost || removableCards(data, run).length === 0,
-                    onclick: () => pickCard(data, `지울 카드 고르기 — ${removeCost}골드`, removableCards(data, run), (uid) => result(buyRemove(data, run, uid))),
+                    disabled: run.gold < swapCost || swappable(data, run).length === 0,
+                    onclick: () =>
+                      pickCard(
+                        data,
+                        `바꿀 카드 고르기 — ${swapCost}골드`,
+                        swappable(data, run).map((id) => ({ uid: id, cardId: id, level: run.collection[id] ?? 0 })),
+                        (id) => result(buySwap(data, run, id)),
+                      ),
                   },
                   '고르기',
                 ),
@@ -138,7 +144,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
             'div',
             { class: `shop-line${shop.upgradeUsed ? ' sold' : ''}` },
             h('span', { class: 'service-glyph' }, '鍛'),
-            h('div', { class: 'shop-desc' }, h('b', {}, '카드 강화'), h('small', {}, '덱의 카드 한 장을 강화한다(+1).')),
+            h('div', { class: 'shop-desc' }, h('b', {}, '카드 강화'), h('small', {}, '이번 덱의 카드 한 장을 강화한다(+1, 보유 카드에 남는다).')),
             price(upCost, shop.upgradeUsed),
             shop.upgradeUsed
               ? null

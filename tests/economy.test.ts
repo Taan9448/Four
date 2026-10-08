@@ -1,7 +1,7 @@
 // 경제(2026-10-08): 전리품·상점·유물 trigger·물약
 import { describe, expect, it } from 'vitest';
 import { battleOutcome, usePotion } from '../src/engine/battle';
-import { buyCard, buyPotion, buyRemove, buyUpgrade, claimLoot, openShop, removePrice, rollLoot } from '../src/engine/economy';
+import { buyCard, buyPotion, buySwap, buyUpgrade, claimLoot, openShop, rollLoot, swapPrice } from '../src/engine/economy';
 import { _internal } from '../src/engine/battle';
 import { applyBattleOutcome, applyChoice, choicesFor, createRun, createRunAt, gainRelic, type Encounter } from '../src/engine/run';
 import type { MapNode } from '../src/engine/route';
@@ -59,28 +59,36 @@ describe('상점', () => {
     const run = createRunAt(data, 'SHOP', 's2');
     const shop = openShop(data, run, 'n7-0');
     run.gold = shop.cards[0].price;
-    const deck = run.deck.length;
+    const id = shop.cards[0].cardId;
+    const owned = run.collection[id];
     expect(buyCard(data, run, 0).ok).toBe(true);
     expect(run.gold).toBe(0);
-    expect(run.deck).toHaveLength(deck + 1);
+    // 산 카드는 보유 목록에 영구로(이미 있으면 강화), 이번 스테이지 덱에도
+    expect(run.collection[id]).toBe(owned === undefined ? 0 : Math.min(owned + 1, data.balance.upgrade.maxLevel));
+    expect(run.deck.some((c) => c.cardId === id)).toBe(true);
     expect(buyCard(data, run, 0).ok).toBe(false); // 팔림
     expect(buyCard(data, run, 1).ok).toBe(false); // 골드 없음
   });
 
-  it('카드 지우기는 상점마다 한 번, 쓸 때마다 값이 오른다. 강화는 +1', () => {
+  it('카드 바꾸기는 상점마다 한 번, 쓸 때마다 값이 오른다. 편성 자리에 새 카드가 들어가고 덱 크기는 그대로. 강화는 +1(보유 카드에도)', () => {
     const run = createRunAt(data, 'SHOP', 's2');
     openShop(data, run, 'n7-0');
     run.gold = 1000;
-    const before = removePrice(data, run);
-    const uid = run.deck[0].uid;
-    expect(buyRemove(data, run, uid).ok).toBe(true);
-    expect(run.deck.some((c) => c.uid === uid)).toBe(false);
-    expect(removePrice(data, run)).toBe(before + data.balance.economy.shop.removeStep);
-    expect(buyRemove(data, run, run.deck[0].uid).ok).toBe(false);
-    const target = run.deck.find((c) => data.cards.get(c.cardId)!.upgrade)!;
+    const before = swapPrice(data, run);
+    const from = run.loadout.haun[0];
+    const deck = run.deck.length;
+    expect(buySwap(data, run, from).ok).toBe(true);
+    expect(run.collection[from]).toBeUndefined();
+    expect(run.loadout.haun).not.toContain(from);
+    expect(run.loadout.haun).toHaveLength(data.balance.loadout.perCharacter);
+    expect(run.deck).toHaveLength(deck);
+    expect(swapPrice(data, run)).toBe(before + data.balance.economy.shop.swapStep);
+    expect(buySwap(data, run, run.loadout.haun[1]).ok).toBe(false);
+    const target = run.deck.find((c) => data.cards.get(c.cardId)!.upgrade && c.level < 5)!;
     const level = target.level;
     expect(buyUpgrade(data, run, target.uid).ok).toBe(true);
     expect(target.level).toBe(level + 1);
+    expect(run.collection[target.cardId]).toBe(level + 1);
   });
 
   it('물약은 빈 칸이 있어야 산다', () => {
@@ -146,7 +154,7 @@ describe('저장', () => {
   it('경제 전의 저장은 시작 골드·빈 유물·빈 물약 칸으로 채운다', () => {
     const run = createRun(data, 'OLD');
     const old = JSON.parse(serializeRun(run));
-    for (const k of ['gold', 'relics', 'potions', 'shop', 'shopRemovals']) delete old.run[k];
+    for (const k of ['gold', 'relics', 'potions', 'shop', 'shopSwaps']) delete old.run[k];
     const loaded = deserializeRun(data, JSON.stringify(old))!;
     expect(loaded.run.gold).toBe(data.balance.economy.startGold);
     expect(loaded.run.relics).toEqual([]);

@@ -1031,3 +1031,37 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 
 /* 두루마리 종이 결(ui_parchment, Codex 그림): 지역 지도 위에 곱하기로 */
 .scroll-paper { position: absolute; inset: 0; z-index: 0; border-radius: 4px; background-size: cover; background-position: center; mix-blend-mode: multiply; opacity: 0.9; pointer-events: none; }
+
+/* 편성(2026-10-08, GAME_DESIGN 9-1) */
+.loadout-screen { display: flex; flex-direction: column; gap: 10px; min-height: calc(100vh - 20px); }
+.loadout-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex-wrap: wrap; }
+.loadout-title h2 { margin: 0; font-family: var(--f-brush); font-weight: 400; font-size: 1.8rem; letter-spacing: 0.06em; }
+.loadout-title small { color: var(--ink-dim); }
+.loadout-tabs .codex-tab.done { border-color: rgba(125, 220, 138, 0.6); }
+.loadout-tabs .codex-tab.done small { color: var(--heal); }
+.loadout-tabs .rest-tag { margin-left: 6px; font-style: normal; font-size: 0.7rem; color: #e6c36a; }
+.loadout-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 10px; min-height: 0; }
+.loadout-main { padding: 14px 18px; text-align: left; overflow-y: auto; }
+.loadout-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.loadout-bar b { font-size: 1.05rem; }
+.loadout-bar small { color: var(--ink-dim); flex: 1; }
+.loadout-card { position: relative; cursor: pointer; }
+.loadout-card .card { cursor: pointer; }
+.loadout-card.on .card { box-shadow: 0 0 0 3px #e2b45c, 0 10px 22px rgba(0, 0, 0, 0.6); }
+.loadout-card.full .card { opacity: 0.45; filter: saturate(0.5); }
+.loadout-check { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #e2b45c; color: #1a1408; font-weight: 800; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+.loadout-new { position: absolute; top: -8px; left: -8px; padding: 1px 6px; border-radius: 8px; background: #1f6fa8; color: #e6f6ff; font-size: 0.72rem; font-weight: 700; }
+.loadout-side { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.loadout-side h3 { margin: 0 0 8px; font-size: 0.95rem; }
+.loadout-essentials { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.loadout-essentials .chip { padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(226, 180, 92, 0.5); background: rgba(16, 13, 10, 0.6); font-size: 0.8rem; }
+.loadout-essentials .chip.new { border-color: #8fd3ff; }
+.preset { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.preset small { color: var(--ink-dim); font-size: 0.72rem; }
+.preset-actions { grid-column: 1 / -1; display: flex; gap: 6px; }
+.loadout-actions { display: flex; flex-direction: column; gap: 8px; }
+.loadout-problems { margin: 0; padding-left: 18px; color: var(--danger); font-size: 0.8rem; text-align: left; }
+.choice-loadout { border-color: #8fd3ff; }
+.codex-own { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 8px; background: rgba(16, 13, 10, 0.85); border: 1px solid var(--line); color: var(--ink-dim); font-size: 0.7rem; white-space: nowrap; }
+.codex-own.on { border-color: #e2b45c; color: #e6c36a; }
+@media (max-width: 900px) { .loadout-body { grid-template-columns: minmax(0, 1fr); } }

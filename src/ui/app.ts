@@ -40,6 +40,8 @@ import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import { clearRun, lastSlot, listSlots, readCodex, readProfile, recordClear, saveRun, SLOT_COUNT, updateCodex } from './storage';
 import { hubView } from './hub-view';
+import { loadoutView } from './loadout-view';
+import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
 import { noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, type Codex } from '../engine/codex';
 
@@ -102,7 +104,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭)
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭) · loadout
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
@@ -131,7 +133,10 @@ export class App {
       }
       case 'deck':
         this.map();
-        return openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]);
+        return this.showCards();
+      case 'loadout':
+        run.needsLoadout = true;
+        return this.loadout();
       case 'shop': {
         const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'shop');
         if (!module) return this.map();
@@ -187,6 +192,7 @@ export class App {
           },
         },
         tab,
+        from ? this.run?.collection : undefined,
       ),
     );
   }
@@ -382,6 +388,8 @@ export class App {
       if (run.levelLog.length) sfx('levelup');
       return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
     }
+    // 스테이지를 시작하기 전 편성(GAME_DESIGN 9-1): 다 채워야 출발한다
+    if (run.status === 'map' && run.needsLoadout) return this.loadout();
     if (run.status === 'stage_clear') {
       // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
       const stage = data.stages.find((s) => s.id === run.stageId)!;
@@ -415,7 +423,7 @@ export class App {
           this.map();
         },
         onRefresh: () => this.map(),
-        onShowDeck: () => openDeck(data, `보유 카드 ${run.deck.length}장`, [{ label: '보유 카드', cards: run.deck }]),
+        onShowDeck: () => this.showCards(),
         onSettings: () => this.openSettings(),
         onCodex: () => this.codex('cards', () => this.map()),
         onTitle: () => this.title(),
@@ -431,7 +439,16 @@ export class App {
     const go = () => {
       if (isBattle(enc)) this.battle(enc);
       else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background));
-      else this.show(this.backdrop(choiceView(data, run, enc.module, () => this.map()), enc.module.content.background));
+      else {
+        const showChoice = (): void =>
+          this.show(
+            this.backdrop(
+              choiceView(data, run, enc.module, () => this.map(), enc.module.type === 'inn' ? { onEditLoadout: () => this.loadout(showChoice) } : {}),
+              enc.module.content.background,
+            ),
+          );
+        showChoice();
+      }
     };
     // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
     this.playScene(enc.module.content.scene, go, enc.module.content.background);
@@ -494,7 +511,7 @@ export class App {
                   data,
                   this.rewardSeen(rewardOptions(data, run, enc.node.id)),
                   (cardId) => {
-                    if (cardId) addCard(run, cardId);
+                    if (cardId) addCard(data, run, cardId);
                     this.map();
                   },
                   { run, shown },
@@ -507,6 +524,43 @@ export class App {
       },
     );
     this.show(view.root);
+  }
+
+  /** 보유 카드 보기: 이번 스테이지 덱 + 주인별 보유 카드(강화 단계 그대로) */
+  private showCards(): void {
+    const run = this.run!;
+    const owned = (owner: string) =>
+      Object.entries(run.collection)
+        .filter(([id]) => {
+          const d = data.cards.get(id);
+          return d && (data.characters.has(d.owner) ? d.owner : COMMON) === owner;
+        })
+        .map(([cardId, level]) => ({ uid: `own_${cardId}`, cardId, level }));
+    const name = (o: string) => (o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o));
+    openDeck(data, `보유 카드 ${Object.keys(run.collection).length}장`, [
+      { label: '이번 스테이지 덱', cards: run.deck },
+      ...loadoutOwners(data, run).map((o) => ({ label: `보유 — ${name(o)}`, cards: owned(o) })),
+    ]);
+  }
+
+  /** 편성 화면. inn: 여관에서 바꾸기(돌아갈 곳) */
+  private loadout(inn?: () => void): void {
+    const run = this.run!;
+    const stage = data.stages.find((st) => st.id === run.stageId)!;
+    this.show(
+      this.backdrop(
+        loadoutView(data, run, inn ? `${placeName(stage, run)} — 여관에서 편성 바꾸기` : `${placeName(stage, run)} — 출발 전`, {
+          onConfirm: (lo) => {
+            setLoadout(data, run, lo);
+            if (this.persist) saveRun(this.slot, run);
+            if (inn) inn();
+            else this.map();
+          },
+          onCancel: inn,
+          onShowCollection: () => this.showCards(),
+        }),
+      ),
+    );
   }
 
   /** 보상으로 본 카드도 도감에 */
@@ -527,7 +581,7 @@ export class App {
           this.run = startReplay(data, run, stageId);
           this.map();
         },
-        onShowDeck: () => openDeck(data, `보유 카드 ${run.deck.length}장`, [{ label: '보유 카드', cards: run.deck }]),
+        onShowDeck: () => this.showCards(),
         onCodex: () => this.codex('cards', () => this.hub()),
         onTitle: () => this.title(),
       }),

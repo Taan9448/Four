@@ -5,7 +5,8 @@
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
-import { buyCard, buyPotion, buyRelic, buyRemove, claimLoot, openShop, removableCards, removePrice, rollLoot } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buySwap, claimLoot, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
 export { cloneBattle };
 import type { GameData } from '../engine/data';
@@ -39,15 +40,13 @@ import { alive, type BattleState, type CardInstance } from '../engine/state';
 export interface BotOptions {
   /** 이 값보다 낮은 보상 카드는 받지 않는다(덱이 묽어지지 않게). 일반 2·고급 4·희귀 6·영웅 9 */
   minRewardValue: number;
-  /** 덱이 이 장수 이상이면 영웅 미만 보상은 받지 않는다 */
-  deckSoftCap: number;
   /** 적의 힘 1당 그 적의 남은 체력을 이만큼 더 무겁게 친다(오래 끌수록 세지는 적을 먼저) */
   strengthWeight: number;
   /** 다음 턴 하운에게 들어올 예상 피해 1당 감점 */
   threatWeight: number;
 }
 
-export const DEFAULT_BOT: BotOptions = { minRewardValue: 6, deckSoftCap: 25, strengthWeight: 0, threatWeight: 1 };
+export const DEFAULT_BOT: BotOptions = { minRewardValue: 6, strengthWeight: 0, threatWeight: 1 };
 
 // ───────────────────────── 전투 ─────────────────────────
 
@@ -223,16 +222,14 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   const best = [...options].sort((a, b) => score(b) - score(a))[0];
   if (!best) return undefined;
   const value = cardValue(data.cards.get(best)!);
+  // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 값이 기준 이상이면 늘 가진다
   if (value < opts.minRewardValue) return undefined;
-  if (run.deck.length >= opts.deckSoftCap && value < RARITY_VALUE.epic) return undefined;
   return best;
 }
 
-/** 상점: 기본 카드 지우기 → 유물(비싼 등급부터) → 값진 카드 → 물약 순으로, 살 수 있는 만큼 */
+/** 상점: 유물(비싼 등급부터) → 값진 카드 → 물약 → 남으면 편성에 없는 가장 약한 카드 바꾸기 */
 function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOptions): void {
   const shop = openShop(data, run, nodeId);
-  const starter = removableCards(data, run).filter((c) => data.cards.get(c.cardId)!.pool === 'starter' && c.level === 0);
-  if (starter.length && run.deck.length > 12 && run.gold >= removePrice(data, run)) buyRemove(data, run, starter[0].uid);
   const order = ['rare', 'uncommon', 'common'];
   shop.relics
     .map((r, i) => ({ ...r, i, rank: order.indexOf(data.relics.get(r.relicId)!.rarity) }))
@@ -240,9 +237,14 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     .forEach((r) => !r.sold && run.gold >= r.price && buyRelic(data, run, r.i));
   shop.cards.forEach((c, i) => {
     if (c.sold || run.gold < c.price) return;
-    if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, RARITY_VALUE.rare) && run.deck.length < opts.deckSoftCap) buyCard(data, run, i);
+    if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, RARITY_VALUE.rare)) buyCard(data, run, i);
   });
   shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
+  const inLoadout = new Set(Object.values(run.loadout).flat());
+  const weakest = swappable(data, run)
+    .filter((id) => !inLoadout.has(id))
+    .sort((a, b) => cardValue(data.cards.get(a)!) - cardValue(data.cards.get(b)!))[0];
+  if (weakest && run.gold >= swapPrice(data, run) + 60) buySwap(data, run, weakest);
 }
 
 /** 출전: 하운 + 체력이 많은 동료(카드가 있는 전투원) */
@@ -251,7 +253,7 @@ function decideParty(data: GameData, run: RunState): void {
     .filter((r) => r.id !== 'haun')
     .filter((r) => {
       const def = data.characters.get(r.id)!;
-      return def.role === 'fighter' && def.starterDeck.length > 0;
+      return def.role === 'fighter' && starterCards(data, r.id).length > 0;
     })
     .sort((a, b) => b.hp / b.maxHp - a.hp / a.maxHp);
   setParty(data, run, ['haun', ...mates.slice(0, data.balance.party.max - 1).map((r) => r.id)]);
@@ -325,6 +327,8 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
       advanceStage(data, run);
       continue;
     }
+    // 스테이지 시작 편성: 추천 편성 그대로(GAME_DESIGN 9-1)
+    if (run.needsLoadout) setLoadout(data, run, recommendLoadout(data, run, run.loadout));
     if (entered !== run.stageId) {
       entered = run.stageId;
       const haun = run.roster.find((r) => r.id === 'haun')!;
@@ -367,8 +371,13 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
       run.levelLog = [];
       if (run.status === 'map') {
         const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
-        if (card) addCard(run, card);
+        if (card) addCard(data, run, card);
       }
+    } else if (enc.module.type === 'inn' && run.stageGains.length) {
+      // 여관: 이번 스테이지에 얻은 카드까지 넣어 추천 편성으로 다시 짠 뒤 선택지
+      setLoadout(data, run, recommendLoadout(data, run));
+      const d = decideChoice(data, run, enc);
+      if (d) applyChoice(data, run, enc.module, d.index, d.pick);
     } else if (enc.module.type === 'shop') {
       shopTurn(data, run, enc.node.id, opts);
     } else {

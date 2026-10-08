@@ -73,7 +73,8 @@
 ```
 
 **강화 규칙**
-- 카드 한 장마다 단계 0~5(`balance.upgrade.maxLevel`). `upgrade_card` 동작 한 번에 +1.
+- 보유 카드 종류마다 단계 0~5(`balance.upgrade.maxLevel`, GAME_DESIGN 9-1 — 같은 카드는 한 장만 가진다). `upgrade_card` 동작 한 번에 +1. 가진 카드를 또 얻어도 +1.
+- `essential: true`: 보스를 깨는 열쇠 카드. 가지고 있으면 편성과 상관없이 늘 덱에 들어간다(이야기 카드만).
 - +1~+3(`balance.upgrade.statLevels`): `growth`만큼 수치가 오른다. 비용·키워드·효과 수는 그대로.
 - +4·+5: `plus4`, `plus5` 특수 스킬이 차례로 붙는다. 카드 문구에 `★이름: 설명` 줄로 보인다.
 - 휴식의 수련(`upgrade_card` + `"choose": true`)은 사람이 강화할 카드를 고른다(강화 뒤 모습으로 미리 보기). 이벤트의 강화는 무작위.

@@ -202,6 +202,8 @@ export const CardDef = z
     seal: z.string().length(1).optional(),
     /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
+    /** 필수 카드(GAME_DESIGN 9-1): 보스를 깨는 열쇠. 가지고 있으면 편성과 상관없이 늘 덱에 들어간다 */
+    essential: z.boolean().optional(),
     /**
      * 강화(+1~+5). +1~+3: growth[i]만큼 effects[i]의 수치(amount, 없으면 stacks)가 단계마다 오른다.
      * +4·+5: 이름 붙은 특수 스킬이 붙는다(효과 추가·키워드 추가/제거·비용 변경). 상태·저주 카드는 강화하지 않는다
@@ -314,7 +316,6 @@ export const CharacterDef = z
     maxHp: z.number().int().positive(),
     color: z.string(),
     sprites: z.record(z.string(), z.string()).default({}),
-    starterDeck: z.array(z.string()).default([]),
     /** 복장: 런 플래그가 서면 sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 예: 하운 '못생긴 검' */
     outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
     /** 전투 화면의 스프라이트 배율(그림마다 프레임 안 키가 달라 동료끼리 키를 맞출 때). 기본 1 */
@@ -444,10 +445,19 @@ export const Balance = z
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
     /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
     upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
+    /** 편성(GAME_DESIGN 9-1): 동료마다·공용 칸 수(정확히 채워야 출발), 저장 칸 수, 최대 강화 카드를 또 얻었을 때의 골드 */
+    loadout: z
+      .object({
+        perCharacter: z.number().int().positive(),
+        common: z.number().int().positive(),
+        presets: z.number().int().min(0),
+        maxedGold: z.number().int().min(0),
+      })
+      .strict(),
     rewards: z
       .object({
         cardChoices: z.number().int().positive(),
-        /** 보상 카드 등급 가중치(노드 유형별). 일반은 시작 카드, 전설은 스토리로만 얻는다 */
+        /** 보상 카드 등급 가중치(노드 유형별) */
         rarityWeights: z.record(z.enum(['battle', 'elite', 'boss']), z.partialRecord(Rarity, z.number().min(0))),
       })
       .strict(),
@@ -479,8 +489,9 @@ export const Balance = z
             cardPrice: z.partialRecord(Rarity, z.number().int().positive()),
             relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
             potionPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
-            removePrice: z.number().int().positive(),
-            removeStep: z.number().int().min(0),
+            /** 카드 바꾸기(보유 카드 한 장 → 같은 주인의 다른 카드) 가격. 한 번 쓸 때마다 swapStep씩 비싸진다 */
+            swapPrice: z.number().int().positive(),
+            swapStep: z.number().int().min(0),
             upgradePrice: z.number().int().positive(),
             jitter: z.number().min(0).max(0.5),
           })
