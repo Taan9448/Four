@@ -1,8 +1,8 @@
 {
   "id": "fx_block",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 10.69,
   "gridDetected": true,
@@ -10,7 +10,7 @@
     48,
     48
   ],
-  "fit": "pad",
+  "fit": "upscale",
   "frames": 4,
   "fps": 15,
   "loop": false,

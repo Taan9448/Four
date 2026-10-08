@@ -1,0 +1,20 @@
+id: icons_status
+type: icon-sheet
+summary: 상태 이상 아이콘 12종(약화·취약·힘·빙결·기절·독·결 노출·도발·무형·흐름 포식·매듭·매듭 노출)
+# 칸 번호 = data/statuses.json의 icon. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 12
+baseline: 0.5
+frame_notes:
+  1: "weak — a cracked, drooping sword blade, dull grey with a faint purple tint"
+  2: "vulnerable — a shattered round shield split into pieces, with a red crack"
+  3: "strength — a clenched fist with a small orange flame rising from the knuckles"
+  4: "frozen — an ice crystal block with sharp pale-blue facets and a white highlight"
+  5: "stunned — three small yellow stars circling above a tilted dizzy swirl"
+  6: "poison — a dripping green droplet with a tiny skull-like bubble inside"
+  7: "exposed grain — a blue split wood log showing glowing blue grain lines along the split"
+  8: "taunt — a raised round shield with a bold red exclamation spark above it"
+  9: "incorporeal — a pale translucent ghostly wisp, drawn with light grey and blue, no face"
+  10: "flow eater — a dark violet open maw swallowing a small gold orb and a small blue orb"
+  11: "knot — a tight tangle of dark threads tied into a single knot"
+  12: "exposed knot — the same knot glowing bright blue in the center, cut by a thin white slash"
+placeholder: { color: '#c2c6d1', accent: '#8a4a4a' }

@@ -1,8 +1,8 @@
 {
   "id": "fx_hit_fire",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 12.527,
   "gridDetected": true,
@@ -10,7 +10,7 @@
     41,
     41
   ],
-  "fit": "pad",
+  "fit": "upscale",
   "frames": 5,
   "fps": 15,
   "loop": false,

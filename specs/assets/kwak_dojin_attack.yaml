@@ -8,6 +8,7 @@ depends_on: [kwak_dojin_ref]
 reference: assets/source/kwak_dojin_ref.png
 facing: left
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 쾌검 찌르기: 낮게 웅크린 칸1과 검을 치켜든 칸2의 높이 차(2026-10-08 검토)
 frame_notes:
   1: "draws the sword back across his body, weight on the back foot"
   2: "steps forward to the left, sword rising, white robe flaring"

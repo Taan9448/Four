@@ -1,6 +1,6 @@
 [
   {
-    "id": "shadow_wolf", "name": "그림자늑대", "maxHp": 22, "sprite": "wolf", "pattern": "random",
+    "id": "shadow_wolf", "name": "그림자늑대", "hitFx": "fx_claw", "maxHp": 22, "sprite": "wolf", "pattern": "random",
     "moves": [
       { "id": "bite", "name": "물어뜯기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 6 } ] },
       { "id": "howl", "name": "검은 불꽃 울음", "intent": "buff", "weight": 1, "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 4, "target": "self" } ] }
@@ -8,7 +8,7 @@
     "flavor": "늑대를 닮았으나 몸집이 송아지만 했고, 등줄기를 따라 검은 불꽃이 일렁였다."
   },
   {
-    "id": "shadow_wolf_alpha", "name": "그림자늑대 우두머리", "maxHp": 52, "sprite": "wolf", "tint": "saturate(1.6) brightness(0.8)", "scale": 1.2, "tier": "elite", "pattern": "cycle",
+    "id": "shadow_wolf_alpha", "name": "그림자늑대 우두머리", "hitFx": "fx_claw", "maxHp": 52, "sprite": "wolf", "tint": "saturate(1.6) brightness(0.8)", "scale": 1.2, "tier": "elite", "pattern": "cycle",
     "moves": [
       { "id": "rend", "name": "찢기", "intent": "attack", "targeting": "lowest_hp", "effects": [ { "op": "damage", "amount": 5, "times": 2 } ] },
       { "id": "pack_howl", "name": "무리의 울음", "intent": "buff", "effects": [ { "op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies" } ] },
@@ -16,14 +16,14 @@
     ]
   },
   {
-    "id": "fire_salamander", "name": "협곡 화염 도롱뇽", "maxHp": 18, "sprite": null, "tint": "hue-rotate(-20deg)", "pattern": "cycle",
+    "id": "fire_salamander", "name": "협곡 화염 도롱뇽", "hitFx": "fx_hit_fire", "maxHp": 18, "sprite": null, "tint": "hue-rotate(-20deg)", "pattern": "cycle",
     "moves": [
       { "id": "spit", "name": "불침", "intent": "attack", "targeting": "random", "effects": [ { "op": "damage", "amount": 5 } ] },
       { "id": "scorch", "name": "그을리기", "intent": "debuff", "targeting": "random", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }
     ]
   },
   {
-    "id": "ignis", "name": "화염군주 이그니스", "maxHp": 120, "sprite": "ignis", "scale": 2, "tier": "boss", "pattern": "cycle",
+    "id": "ignis", "name": "화염군주 이그니스", "hitFx": "fx_hit_fire", "maxHp": 120, "sprite": "ignis", "scale": 2, "tier": "boss", "pattern": "cycle",
     "moves": [
       { "id": "flame_wave", "name": "화염 파도", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
       { "id": "magma_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [ { "op": "damage", "amount": 15 } ] },
@@ -117,7 +117,7 @@
     "flavor": "성문을 지키는 검은 갑주. 투구 안쪽이 비어 있다."
   },
   {
-    "id": "void_bat", "name": "공허 박쥐", "maxHp": 16, "sprite": null, "color": "#3d2a52", "pattern": "random",
+    "id": "void_bat", "name": "공허 박쥐", "hitFx": "fx_claw", "maxHp": 16, "sprite": null, "color": "#3d2a52", "pattern": "random",
     "moves": [
       { "id": "swoop", "name": "급강하", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [ { "op": "damage", "amount": 4, "times": 2 } ] },
       { "id": "screech", "name": "찢는 울음", "intent": "debuff", "targeting": "random", "weight": 1, "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }
@@ -234,7 +234,7 @@
     "flavor": "소림의 방장을 노리던 독장. 엘리아의 얼음 벽이 그 사이에 솟았다."
   },
   {
-    "id": "fire_scale_hound", "name": "불비늘 삼두견", "maxHp": 34, "sprite": null, "color": "#a0401a", "pattern": "random",
+    "id": "fire_scale_hound", "name": "불비늘 삼두견", "hitFx": "fx_claw", "maxHp": 34, "sprite": null, "color": "#a0401a", "pattern": "random",
     "moves": [
       { "id": "three_bites", "name": "세 머리 물기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [ { "op": "damage", "amount": 4, "times": 3 } ] },
       { "id": "burning_scales", "name": "불타는 비늘", "intent": "defend", "weight": 1, "effects": [ { "op": "block", "amount": 10, "target": "self" } ] }
@@ -242,7 +242,7 @@
     "flavor": "개를 닮은 짐승. 털 대신 불타는 비늘이 덮여 있고, 머리가 셋이다. 검이 비늘에 튕겨 나간다."
   },
   {
-    "id": "fire_scale_alpha", "name": "삼두견 우두머리", "maxHp": 96, "sprite": null, "color": "#c0501a", "scale": 1.4, "tier": "elite", "pattern": "cycle",
+    "id": "fire_scale_alpha", "name": "삼두견 우두머리", "hitFx": "fx_claw", "maxHp": 96, "sprite": null, "color": "#c0501a", "scale": 1.4, "tier": "elite", "pattern": "cycle",
     "moves": [
       { "id": "pack_flame", "name": "세 머리의 불꽃", "intent": "attack", "effects": [ { "op": "damage", "amount": 7, "target": "all_enemies" } ] },
       { "id": "scale_wall", "name": "비늘 벽", "intent": "defend", "effects": [ { "op": "block", "amount": 18, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" } ] },

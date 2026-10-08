@@ -164,6 +164,10 @@ export const CardDef = z
     /** 연출: 카드 주인이 재생할 애니메이션(기본 attack/skill)과 대상 위에 겹칠 이펙트 에셋 id */
     anim: z.enum(['attack', 'skill']).optional(),
     fx: z.string().optional(),
+    /** 피해를 줄 때 맞은 자리에 겹칠 피격 이펙트(생략하면 fx가 없을 때 fx_hit_strike) */
+    hitFx: z.string().optional(),
+    /** 무공 카드 오른쪽 아래 낙관 글자(한 글자). 생략하면 카드 유형으로 정한다 */
+    seal: z.string().length(1).optional(),
     /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
     /**
@@ -184,6 +188,10 @@ export const StatusDef = z
     name: z.string(),
     kind: z.enum(['buff', 'debuff', 'trait']),
     description: z.string(),
+    /** 아이콘 그림이 없을 때 표시할 한 글자(한자) */
+    glyph: z.string().length(1),
+    /** 상태 아이콘 시트(icons_status)의 프레임 번호(1부터) */
+    icon: z.number().int().positive().optional(),
     /** 턴마다 줄어드는 스택 수. 0이면 줄지 않는다. */
     decay: z.number().int().min(0),
     /** ownTurnEnd: 그 편의 턴 종료 때 감소 / roundEnd: 적 턴 종료(라운드 종료) 때 감소 */
@@ -229,6 +237,8 @@ export const EnemyDef = z
     silhouette: z.enum(['humanoid', 'beast', 'boss', 'object']).optional(),
     /** 그림이 없을 때 실루엣 색 */
     color: z.string().optional(),
+    /** 이 적의 공격이 맞은 자리에 겹칠 피격 이펙트(생략하면 fx_hit_strike) */
+    hitFx: z.string().optional(),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     pattern: z.enum(['cycle', 'random']),
@@ -348,6 +358,25 @@ export const StageDef = z
     /** 이 스테이지가 캠페인의 끝이면, 마치기 뒤 엔딩 화면 전에 재생할 장면(에필로그) */
     endingScene: z.string().optional(),
     summary: z.string(),
+    /** 전투 배경 에셋 id(모듈의 background가 우선) */
+    background: z.string().optional(),
+    /** 지도 화면의 지역 지도 그림 에셋 id */
+    mapArt: z.string().optional(),
+    /** 지도 위쪽 여정 띠에서 이 스테이지의 자리(띠 그림 기준 %)·이름·지역. 지역은 처음 들어설 때 안개가 걷힌다(GAME_DESIGN 14절) */
+    journey: z
+      .object({
+        label: z.string(),
+        x: z.number().min(0).max(100),
+        y: z.number().min(0).max(100),
+        region: z.enum(['murim', 'elheim', 'rift']),
+        /** 이 플래그가 서기 전(이름을 아직 모를 때) 쓰는 이름. 예: S1은 엘리아가 '엘하임'이라고 알려 주기 전까지 "낯선 숲" */
+        unknownLabel: z.string().optional(),
+        knownFlag: z.string().optional(),
+      })
+      .strict()
+      .optional(),
+    /** 지도에 보여 줄 도입 글: 도착한 하운이 아는 만큼만(summary는 설계용, 화면에 내지 않는다) */
+    teaser: z.string().optional(),
   })
   .strict();
 export type StageDef = z.infer<typeof StageDef>;
@@ -377,6 +406,8 @@ export const ModuleDef = z
         surviveTurns: z.number().int().positive().optional(),
         /** 보스 모듈: 스테이지를 마친 뒤 보여 줄 장면 글 */
         outro: z.string().optional(),
+        /** 전투 배경 에셋 id(생략하면 스테이지 배경) */
+        background: z.string().optional(),
         /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
         scene: z.string().optional(),
         /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */
