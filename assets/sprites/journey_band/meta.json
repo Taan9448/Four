@@ -1,0 +1,31 @@
+{
+  "id": "journey_band",
+  "type": "key-art",
+  "frameW": 1536,
+  "frameH": 1024,
+  "track": "illustration",
+  "pixelScale": null,
+  "gridDetected": null,
+  "nativeSize": null,
+  "fit": null,
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "45b4e8cd79277686",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": null
+}
