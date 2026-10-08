@@ -228,6 +228,12 @@ export async function validateAsset(id, { root = ROOT, placeholder = false, prev
   });
 }
 
+/** art/<이슈번호>-<id> 브랜치가 맡은 에셋 id(형식이 다르면 null) */
+export function artBranchAsset(branch) {
+  const m = /^art\/\d+-(.+)$/.exec(branch);
+  return m ? m[1] : null;
+}
+
 /** 지금 검사하는 브랜치(CI는 PR 머리 브랜치) */
 function currentBranch() {
   if (process.env.GITHUB_HEAD_REF) return process.env.GITHUB_HEAD_REF;
@@ -254,9 +260,12 @@ async function main() {
       if (existsSync(p.placeholderSheet(id))) targets.push({ id, placeholder: true });
     }
   }
-  // art/* 브랜치(Codex)는 옛 규격 프레임을 다시 잘라야 통과. 그 밖의 브랜치는 sprites를 고칠 수 없으니 경고만
-  const artBranch = currentBranch().startsWith('art/');
-  const staleOk = !artBranch;
+  // 옛 규격 프레임: art/<이슈>-<id> 브랜치는 **그 브랜치의 에셋**만 다시 잘라야 통과. 다른 에셋까지 실패로 두면
+  // 아직 다시 그리지 않은 에셋(예: 하운) 하나 때문에 모든 아트 PR의 CI가 막힌다. 그 밖의 브랜치는 sprites를 고칠 수 없으니 경고만
+  const branch = currentBranch();
+  const artBranch = branch.startsWith('art/');
+  const branchAsset = artBranchAsset(branch);
+  const staleOkFor = (id) => !(artBranch && id === branchAsset);
   // 콘택트 시트·GIF는 art 브랜치에서만 새로 쓴다(다른 브랜치가 sprites를 건드려 소유권 검사에 걸리지 않게). 임시 시트는 늘 쓴다
   const previewsFor = (t) => t.placeholder || artBranch;
   let failed = 0;
@@ -267,7 +276,7 @@ async function main() {
       console.log(`✖ ${t.id} [명세]\n${t.shapeErrors.map((e) => `   - ${e}`).join('\n')}`);
       continue;
     }
-    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder, staleOk, previews: previewsFor(t) });
+    const { errors, warnings } = await validateAsset(t.id, { placeholder: t.placeholder, staleOk: staleOkFor(t.id), previews: previewsFor(t) });
     if (errors.length) failed++;
     console.log(`${errors.length ? '✖' : '✔'} ${t.id} [${where}]`);
     for (const e of errors) console.log(`   - 오류: ${e}`);
