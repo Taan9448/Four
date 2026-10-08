@@ -117,3 +117,13 @@ function lightToAlpha(img: HTMLImageElement): HTMLCanvasElement {
   ctx.putImageData(data, 0, 0);
   return c;
 }
+
+/**
+ * 프레임 한 장의 URL(CSS 배경·img용). realOnly면 Codex가 납품한 실제 그림만(임시 시트는 null).
+ * 화면 그림(전투 배경·지도·시작 화면·아이콘)은 실제 그림이 들어온 것만 쓰고, 그 전에는 CSS가 대신한다.
+ */
+export function frameUrl(id: string | null | undefined, frame = 1, { realOnly = false } = {}): string | null {
+  const entry = id ? entries[id] : undefined;
+  if (!entry || (realOnly && entry.source !== 'sprites') || frame < 1 || frame > entry.meta.frames) return null;
+  return frameUrls[`../../${entry.dir}/frame_${String(frame).padStart(2, '0')}.png`] ?? null;
+}

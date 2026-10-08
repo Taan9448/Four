@@ -175,6 +175,12 @@ export function previewDamage(state: BattleState, source: Combatant, base: numbe
   return Math.max(0, Math.floor((base + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul')));
 }
 
+/** 받을 피해 예고용: 대상의 받는 피해 보정(취약 등)까지 넣은 1회 피해. dealDamage와 같은 순서로 계산한다 */
+export function previewDamageOn(state: BattleState, source: Combatant, target: Combatant, base: number): number {
+  const dmg = (base + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul') * statusModifier(state, target, 'damageTakenMul');
+  return Math.max(0, Math.floor(dmg));
+}
+
 // ───────────────────────── 피해·균열 ─────────────────────────
 
 export function dealDamage(
