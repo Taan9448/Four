@@ -78,7 +78,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"scene": "s7_scene_wudang_knot", "text": "세 바위의 안개가 스무 장 허공에서 엉켜 있다. 셋이 서 있는 한 내공만으로는 닿지 않는다(호법 전원 무형). 하나가 쓰러지면 진이 무너진다. 손에 마나 한 바가지 — 푸른 검광.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "startEffects": [{"op": "apply_status", "status": "incorporeal", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "haun_blue_edge", "to": "hand"}], "bonus": {"condition": {"flag": "wudang_supply"}, "text": "보급로가 끊긴 지 한 달. 호법 셋도, 진의 마기도 굶주렸다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"scene": "s7_scene_wudang_knot", "outroScene": "s7_scene_first_crack", "text": "세 바위의 안개가 스무 장 허공에서 엉켜 있다. 셋이 서 있는 한 내공만으로는 닿지 않는다(호법 전원 무형). 하나가 쓰러지면 진이 무너진다. 손에 마나 한 바가지 — 푸른 검광.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "startEffects": [{"op": "apply_status", "status": "incorporeal", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "haun_blue_edge", "to": "hand"}], "bonus": {"condition": {"flag": "wudang_supply"}, "text": "보급로가 끊긴 지 한 달. 호법 셋도, 진의 마기도 굶주렸다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s7_elite_poison_hand",
@@ -88,7 +88,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"scene": "s7_scene_tower_forest", "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 6, 취약 1)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "clearEffects": [{"op": "gain_card", "card": "born_together"}], "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 6, 취약 1)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s7_elite_branch_guard",
@@ -120,24 +120,14 @@
     "content": {"text": "붉은 수실을 뜯어낸 청운문의 제자 백오십이 새벽 연무장에 모였다. 그들이 하운을 본다. 담장 너머로 오 년 동안 구령을 듣던 잡역을.", "choices": [{"label": "청운십팔식을 함께 짚는다", "result": "구름은 무겁지 않다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "먼저 장작을 패게 한다", "result": "나무는 원래 갈라질 자리를 가지고 있다. 기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
   },
   {
-    "id": "s7_event_jinmu_gate",
+    "id": "s7_event_shield_wall",
     "stage": "s7",
     "type": "event",
-    "name": "진무관의 문",
-    "once": true,
-    "weight": 3,
-    "conditions": {"floorRange": [4, 8]},
-    "content": {"scene": "s7_scene_first_crack", "text": "진무관의 문이 열렸다. 무당의 도사 백오십이 청운맹에 합류했다. 하늘의 금은 스물여섯 번의 숨 뒤에 아물었다.", "choices": [{"label": "도사들을 부축한다", "result": "현무진인이 태극의 원리를 일러 주었다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "지붕 위에서 숨을 고른다", "result": "세 번 짧게, 한 번 길게. 출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
-  },
-  {
-    "id": "s7_event_hyegak",
-    "stage": "s7",
-    "type": "event",
-    "name": "작은 형제",
+    "name": "방패벽 삼백",
     "once": true,
     "weight": 2,
-    "conditions": {"floorRange": [5, 9], "partyHas": "born"},
-    "content": {"text": "탑림의 싸움이 끝난 밤, 혜각이 보른에게 처음으로 입을 열었다. 삼 년 만의 첫 말이었다고, 다른 무승들이 나중에 말해 주었다. \"고맙소, 작은 형제여.\"", "choices": [{"label": "\"같이 가.\"", "result": "보른은 고개를 끄덕였다. 소림의 무승 이백이 청운맹에 합류했다. 보른의 '같이 가'를 얻었다.", "effects": [{"op": "gain_card", "card": "born_together"}]}, {"label": "말없이 망치를 손질한다", "result": "묵언의 무승과 말수 적은 드워프. 보른의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}]}
+    "conditions": {"floorRange": [3, 8]},
+    "content": {"text": "석 달 전 백이었던 방패벽이 삼백이 되었다. 계곡의 농부들, 청운산에서 투항한 혈위대까지. 무공을 아는 자와 모르는 자가 섞여 방패를 맞물리고 창을 내민다. \"벽이 무너지지 않는 한, 아무도 죽지 않아.\"", "choices": [{"label": "카일과 함께 줄을 세운다", "condition": {"partyHas": "kyle"}, "result": "방패·창·받침·메움, 네 줄. 카일의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "투항한 혈위대에게 창을 쥐여 준다", "result": "붉은 수실을 뗀 자리에 나무 방패가 들렸다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}, {"label": "훈련장의 횃불 곁에서 쉰다", "result": "출전 동료 전원 최대 체력의 25% 회복", "effects": [{"op": "heal_party", "ratio": 0.25}]}]}
   },
   {
     "id": "s7_event_sects",
@@ -167,7 +157,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [6, 9], "partyHas": "elia"},
-    "content": {"scene": "s7_scene_wall_count", "text": "연무장 담장 위. 천하일통에 난 금은 열 개쯤. 하늘에는 하나.", "choices": [{"label": "같은 박자로 숨을 쉰다", "result": "다섯 번. 열두 번. 스물여섯 번. 둘이서 세던 숨. 엘리아의 '숨 세기'를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_count"}]}, {"label": "대답 대신 남쪽을 본다", "result": "엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+    "content": {"scene": "s7_scene_wall_count", "text": "연무장 담장 위. 천하일통에 난 금은 열 개쯤.", "choices": [{"label": "같은 박자로 숨을 쉰다", "result": "한 번. 다섯 번. 열두 번. 둘이서 세던 숨. 엘리아의 '숨 세기'를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_count"}]}, {"label": "대답 대신 남쪽을 본다", "result": "엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
   },
   {
     "id": "s7_event_children",
@@ -205,7 +195,7 @@
     "name": "도관의 샘",
     "weight": 1,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"text": "봉쇄가 풀린 무당산 도관의 샘. 도사들이 약초 달이는 냄새가 난다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+    "content": {"text": "무당산 아래 작은 도관의 샘. 늙은 도사가 약초를 달이며 낯선 일행에게 물을 떠 준다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   },
   {
     "id": "s7_rest_camp",

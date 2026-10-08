@@ -5,7 +5,7 @@
     "type": "elite",
     "name": "그림자의 밤",
     "once": true,
-    "content": {"scene": "s5_scene_shadow_night", "background": "bg_kazdum", "text": "옛 왕의 망루. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다 — 들보 위의 검은 수정.", "enemies": ["shadow_assassin", "black_crystal"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보여. 칼이 오는 길은 하나야.\" 카일이 눈을 감고 단검의 결을 따라간다. (검은 수정 결 노출 2·취약 1)", "effects": [{"op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}]}}
+    "content": {"scene": "s5_scene_shadow_night", "background": "bg_kazdum", "text": "옛 왕의 망루. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다 — 들보 위의 검은 수정.", "enemies": ["shadow_assassin", "black_crystal"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보여. 칼이 오는 길은 하나야.\" 카일이 눈을 감고 단검의 결을 따라간다. (검은 수정 결 노출 2·취약 1)", "effects": [{"op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}]}, "outroScene": "s5_scene_shadow_night_after"}
   },
   {
     "id": "s5_story_border_crack",

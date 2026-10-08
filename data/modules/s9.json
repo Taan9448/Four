@@ -52,7 +52,7 @@
     "stage": "s9",
     "type": "boss",
     "name": "틈의 심장",
-    "content": {"scene": "s9_scene_mordecai", "outroScene": "s9_scene_sealing", "text": "흐름을 실은 공격은 먹힌다. 숨까지 멈춰 흐르지 않는 자가 되고, 결을 읽어 매듭을 드러내고, 힘을 싣지 않고 날을 얹어라.", "enemies": ["mordecai"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_stop_ring", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2}], "clearEffects": [{"op": "set_flag", "flag": "rift_sealed"}]}
+    "content": {"scene": "s9_scene_mordecai", "outroScene": "s9_scene_sealing", "text": "흐름을 실은 공격은 먹힌다. 숨까지 멈춰 흐르지 않는 자가 되고, 결을 읽어 매듭을 드러내고, 힘을 싣지 않고 날을 얹어라.", "enemies": ["mordecai"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_stop_ring", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 3}], "clearEffects": [{"op": "set_flag", "flag": "rift_sealed"}]}
   },
   {
     "id": "s9_battle_hounds",
