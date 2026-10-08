@@ -1,0 +1,198 @@
+[
+ {
+  "id": "test_wolf",
+  "name": "그림자늑대",
+  "hitFx": "fx_claw",
+  "maxHp": 22,
+  "sprite": null,
+  "pattern": "random",
+  "moves": [
+   {
+    "id": "bite",
+    "name": "물어뜯기",
+    "intent": "attack",
+    "targeting": "random",
+    "weight": 3,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 6
+     }
+    ]
+   },
+   {
+    "id": "howl",
+    "name": "검은 불꽃 울음",
+    "intent": "buff",
+    "weight": 1,
+    "effects": [
+     {
+      "op": "apply_status",
+      "status": "strength",
+      "stacks": 2,
+      "target": "self"
+     },
+     {
+      "op": "block",
+      "amount": 4,
+      "target": "self"
+     }
+    ]
+   }
+  ],
+  "flavor": "늑대를 닮았으나 몸집이 송아지만 했고, 등줄기를 따라 검은 불꽃이 일렁였다."
+ },
+ {
+  "id": "test_wolf_alpha",
+  "name": "그림자늑대 우두머리",
+  "hitFx": "fx_claw",
+  "maxHp": 52,
+  "sprite": null,
+  "tint": "saturate(1.6) brightness(0.8)",
+  "scale": 1.2,
+  "tier": "elite",
+  "pattern": "cycle",
+  "moves": [
+   {
+    "id": "rend",
+    "name": "찢기",
+    "intent": "attack",
+    "targeting": "lowest_hp",
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 5,
+      "times": 2
+     }
+    ]
+   },
+   {
+    "id": "pack_howl",
+    "name": "무리의 울음",
+    "intent": "buff",
+    "effects": [
+     {
+      "op": "apply_status",
+      "status": "strength",
+      "stacks": 2,
+      "target": "all_allies"
+     }
+    ]
+   },
+   {
+    "id": "black_flame",
+    "name": "검은 불꽃",
+    "intent": "attack",
+    "targeting": "haun",
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 9
+     },
+     {
+      "op": "apply_status",
+      "status": "weak",
+      "stacks": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "test_ignis",
+  "name": "화염군주 이그니스",
+  "hitFx": "fx_hit_fire",
+  "maxHp": 120,
+  "sprite": null,
+  "scale": 2,
+  "tier": "boss",
+  "pattern": "cycle",
+  "moves": [
+   {
+    "id": "flame_wave",
+    "name": "화염 파도",
+    "intent": "attack",
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 7,
+      "target": "all_enemies"
+     }
+    ]
+   },
+   {
+    "id": "magma_fist",
+    "name": "용암 주먹",
+    "intent": "attack",
+    "targeting": "highest_hp",
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 15
+     }
+    ]
+   },
+   {
+    "id": "burning_aura",
+    "name": "타오르는 기운",
+    "intent": "buff",
+    "effects": [
+     {
+      "op": "block",
+      "amount": 14,
+      "target": "self"
+     },
+     {
+      "op": "apply_status",
+      "status": "strength",
+      "stacks": 2,
+      "target": "self"
+     }
+    ]
+   }
+  ],
+  "flavor": "마왕의 사천왕 중 하나. 협곡 마을을 불태우고 있었다."
+ },
+ {
+  "id": "test_wraith",
+  "name": "그림자 망령",
+  "maxHp": 30,
+  "sprite": null,
+  "color": "#2a2633",
+  "pattern": "cycle",
+  "traits": [
+   {
+    "status": "incorporeal",
+    "stacks": 1
+   }
+  ],
+  "moves": [
+   {
+    "id": "wither",
+    "name": "시들게 하기",
+    "intent": "attack",
+    "targeting": "random",
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 7
+     }
+    ]
+   },
+   {
+    "id": "gnaw_flow",
+    "name": "흐름 갉아먹기",
+    "intent": "debuff",
+    "targeting": "random",
+    "effects": [
+     {
+      "op": "apply_status",
+      "status": "weak",
+      "stacks": 1
+     }
+    ]
+   }
+  ],
+  "flavor": "사람의 형상을 한 그림자. 스치고 지나간 자리의 풀은 순식간에 말라 재가 된다. 장력은 그냥 통과한다."
+ }
+]

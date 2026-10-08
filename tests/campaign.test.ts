@@ -12,6 +12,7 @@ import {
   battleSetupFor,
   createRunAt,
   playableStages,
+  setParty,
   type Encounter,
 } from '../src/engine/run';
 import { alive, type BattleState } from '../src/engine/state';
@@ -124,7 +125,9 @@ describe('원작 보스 기믹', () => {
   });
 
   it('S4 고르몬: 산이 메운다 — 두린의 망치가 끊는다', () => {
-    const s = bossBattle('s4');
+    const run = createRunAt(data, 'GORMON', 's4');
+    setParty(data, run, ['haun', 'born', 'kyle']);
+    const s = createBattle(data, battleSetupFor(data, run, bossEnc('s4')));
     const g = s.enemies.find((e) => e.defId === 'gormon')!;
     expect(g.statuses.mountain_regen).toBeGreaterThan(0);
     s.neigong = 5;

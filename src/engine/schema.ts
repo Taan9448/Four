@@ -431,9 +431,9 @@ export const ModuleDef = z
         mana: WorldMana.optional(),
         /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
         scene: z.string().optional(),
-        /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */
+        /** 전투 모듈: 이긴 뒤 재생할 장면(보스는 스테이지 끝 화면 전에, 일반·엘리트는 보상 전에) */
         outroScene: z.string().optional(),
-        /** 보스 모듈: 이기면 런에 적용할 동작(gain_card 등 런 단위 op). 스테이지 끝 화면에 결과를 보여 준다 */
+        /** 전투 모듈: 이기면 런에 적용할 동작(gain_card·set_flag 등 런 단위 op). 보스는 스테이지 끝 화면에 결과를 보여 준다 */
         clearEffects: z.array(Effect).optional(),
       })
       .strict(),

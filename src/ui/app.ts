@@ -7,6 +7,7 @@ import {
   addCard,
   advanceStage,
   applyBattleOutcome,
+  bonusActive,
   applyRunOps,
   battleSetupFor,
   createRun,
@@ -208,7 +209,7 @@ export class App {
     const setup = battleSetupFor(data, run, enc);
     const state = createBattle(data, setup);
     const stage = data.stages.find((s) => s.id === run.stageId)!;
-    const bonus = setup.startEffects?.length ? enc.module.content.bonus?.text : undefined;
+    const bonus = bonusActive(run, enc.module) ? enc.module.content.bonus?.text : undefined;
     const view = new BattleView(
       data,
       state,
@@ -229,11 +230,14 @@ export class App {
       (final) => {
         this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
         if (run.status !== 'map') return this.map();
-        this.show(
-          rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
-            if (cardId) addCard(run, cardId);
-            this.map();
-          }),
+        // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
+        this.playScene(enc.module.content.outroScene, () =>
+          this.show(
+            rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
+              if (cardId) addCard(run, cardId);
+              this.map();
+            }),
+          ),
         );
       },
     );

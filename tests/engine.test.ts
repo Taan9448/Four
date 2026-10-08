@@ -59,7 +59,7 @@ describe('효과 해석기와 자원', () => {
 
 describe('균열', () => {
   it('융합 카드를 쓰면 균열이 오른다', () => {
-    const s = battle({ enemies: ['ignis'] });
+    const s = battle({ enemies: ['test_ignis'] });
     const i = give(s, 'haun_byeogun');
     playCard(s, i, s.enemies[0].uid);
     expect(s.rift).toBe(3);
@@ -67,7 +67,7 @@ describe('균열', () => {
 
   it('세계별로 턴 종료 감쇠가 다르다(엘하임 -2, 마왕성 -1, 무림 0)', () => {
     for (const [world, expected] of [['elheim', 4], ['nocturna', 5], ['murim', 6], ['rift', 6]] as const) {
-      const s = battle({ world, enemies: ['ignis'] });
+      const s = battle({ world, enemies: ['test_ignis'] });
       s.rift = 6;
       s.enemies[0].intent = null; // 적 행동 없음
       endTurn(s);
@@ -76,7 +76,7 @@ describe('균열', () => {
   });
 
   it('감쇠 뒤에도 임계치 이상이면 틈의 잔향이 덱에 들어간다', () => {
-    const s = battle({ world: 'murim', enemies: ['ignis'] });
+    const s = battle({ world: 'murim', enemies: ['test_ignis'] });
     s.rift = 5;
     s.enemies[0].intent = null;
     endTurn(s);
@@ -88,7 +88,7 @@ describe('균열', () => {
 
   it('균열이 최대치에 이르면 폭주: 파티 전원 피해, 균열은 초기화값으로', () => {
     const s = battle({
-      enemies: ['ignis'],
+      enemies: ['test_ignis'],
       party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'elia', hp: 42, maxHp: 42 }],
     });
     s.rift = 8;
@@ -112,7 +112,7 @@ describe('균열', () => {
 
 describe('결 읽기와 특수 상태', () => {
   it('결 노출은 1스택을 소모해 피해 +50%, 방어 무시', () => {
-    const s = battle({ enemies: ['ignis'] });
+    const s = battle({ enemies: ['test_ignis'] });
     const boss = s.enemies[0];
     boss.block = 20;
     playCard(s, give(s, 'haun_read_grain'), boss.uid);
@@ -124,7 +124,7 @@ describe('결 읽기와 특수 상태', () => {
   });
 
   it('무형: 내공만 쓰는 공격은 절반', () => {
-    const s = battle({ enemies: ['shadow_wraith'] });
+    const s = battle({ enemies: ['test_wraith'] });
     const w = s.enemies[0];
     playCard(s, give(s, 'haun_chop'), w.uid);
     expect(w.hp).toBe(30 - 3);
@@ -216,7 +216,7 @@ describe('파티', () => {
   });
 
   it('날개 베기는 적에게 큰 피해와 약화, 카일 자신은 대가로 피해를 입는다', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }], enemies: ['shadow_wolf_alpha'] });
+    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }], enemies: ['test_wolf_alpha'] });
     const before = wolf(s).hp;
     playCard(s, give(s, 'kyle_wing_cut'), wolf(s).uid);
     expect(before - wolf(s).hp).toBe(18);
@@ -256,7 +256,7 @@ describe('파티', () => {
   });
 
   it('강화된 카드를 쓰면 성장한 수치와 특수 스킬이 그대로 적용된다', () => {
-    const s = battle({ enemies: ['shadow_wolf_alpha'] });
+    const s = battle({ enemies: ['test_wolf_alpha'] });
     s.hand.push({ uid: 'up5', cardId: 'haun_chop', level: 5 });
     const before = wolf(s).hp;
     playCard(s, s.hand.length - 1, wolf(s).uid);
@@ -277,7 +277,7 @@ describe('파티', () => {
 
 describe('왕일검 지원 규칙', () => {
   it('청운호흡 박자: 4턴마다 내공 +1, 카드 1장 추가', () => {
-    const s = battle({ supportActive: true, enemies: ['ignis'], deck: cards(...Array(14).fill('haun_chop')) });
+    const s = battle({ supportActive: true, enemies: ['test_ignis'], deck: cards(...Array(14).fill('haun_chop')) });
     s.party[0].hp = 9999;
     s.party[0].maxHp = 9999;
     const handSizes: number[] = [];
@@ -292,14 +292,14 @@ describe('왕일검 지원 규칙', () => {
   });
 
   it('지원이 꺼져 있으면 아무 일도 없다', () => {
-    const s = battle({ supportActive: false, enemies: ['ignis'] });
+    const s = battle({ supportActive: false, enemies: ['test_ignis'] });
     for (let t = 1; t < 4; t++) endTurn(s);
     expect(s.turn).toBe(4);
     expect(s.neigong).toBe(3);
   });
 
   it('부스러기 쓸어 담기: 전투당 1회, 균열 7 이상이 되면 -3', () => {
-    const s = battle({ supportActive: true, enemies: ['ignis'] });
+    const s = battle({ supportActive: true, enemies: ['test_ignis'] });
     s.rift = 5;
     playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);
     expect(s.rift).toBe(5);
@@ -325,7 +325,7 @@ describe('왕일검 지원 규칙', () => {
 describe('결정성', () => {
   it('같은 시드와 같은 입력이면 같은 전투가 된다', () => {
     const run = () => {
-      const s = battle({ enemies: ['shadow_wolf', 'shadow_wolf'] });
+      const s = battle({ enemies: ['test_wolf', 'test_wolf'] });
       for (let t = 0; t < 5 && !s.result; t++) {
         const i = s.hand.findIndex((c) => c.cardId === 'haun_chop');
         const target = s.enemies.find((e) => !e.downed);
@@ -350,7 +350,7 @@ describe('받을 피해 예고', () => {
   };
 
   it('노리는 아군에게 피해를 더하고 지금 방어를 뺀다', () => {
-    const s = battle({ party, enemies: ['shadow_wolf', 'shadow_wolf'] });
+    const s = battle({ party, enemies: ['test_wolf', 'test_wolf'] });
     const [haun, elia] = s.party;
     aim(s, 0, 'bite', haun.uid);
     aim(s, 1, 'bite', haun.uid);
@@ -365,7 +365,7 @@ describe('받을 피해 예고', () => {
   });
 
   it('힘·취약·도발·움직이지 못함·쓰러짐을 반영한다', () => {
-    const s = battle({ party, enemies: ['shadow_wolf', 'shadow_wolf'] });
+    const s = battle({ party, enemies: ['test_wolf', 'test_wolf'] });
     const [haun, elia] = s.party;
     aim(s, 0, 'bite', haun.uid);
     aim(s, 1, 'bite', elia.uid);
@@ -393,7 +393,7 @@ describe('받을 피해 예고', () => {
   });
 
   it('전체 공격은 살아 있는 아군 모두에게', () => {
-    const s = battle({ party, enemies: ['ignis'] });
+    const s = battle({ party, enemies: ['test_ignis'] });
     aim(s, 0, 'flame_wave', null);
     const m = incomingDamage(s);
     const per = 7 + (s.enemies[0].statuses.strength ?? 0);
