@@ -185,7 +185,7 @@
     "world": "rift",
     "floors": 10,
     "enemyHpScale": 1.0,
-    "enemyDmgScale": 1.18,
+    "enemyDmgScale": 1.12,
     "playable": true,
     "background": "bg_rift",
     "mapArt": "map_s9",
