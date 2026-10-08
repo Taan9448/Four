@@ -95,6 +95,10 @@ export interface BattleState {
   uidCounter: number;
   /** 적 최대 체력 배율(스테이지 enemyHpScale, 변신한 모습에도) */
   enemyHpScale?: number;
+  /** 적 공격 피해 배율(스테이지 enemyDmgScale). 의도·받을 피해 예고에도 같이 걸린다 */
+  enemyDmgScale?: number;
+  /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
+  critRng?: Rng;
   /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
   noCrit?: boolean;
 }

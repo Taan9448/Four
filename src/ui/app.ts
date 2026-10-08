@@ -31,9 +31,18 @@ import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
-import { clearRun, loadRun, saveRun } from './storage';
+import { clearRun, lastSlot, listSlots, saveRun, SLOT_COUNT } from './storage';
 
 const data = gameData();
+
+/** 저장 칸 한 줄 요약: 장소 · 층 · 하운 레벨 */
+function slotSummary(run: RunState): string {
+  const stage = data.stages.find((st) => st.id === run.stageId)!;
+  const floor = run.map.floors.flat().find((n) => n.id === run.position)?.floor ?? 0;
+  const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
+  const haun = run.roster.find((r) => r.id === 'haun');
+  return `${placeName(stage, run)} · ${where}${haun ? ` · Lv ${haun.level}` : ''}`;
+}
 
 /** 스테이지 끝 화면 머리의 세계 이름 */
 const WORLD_LABEL: Record<string, string> = { murim: '武林 · 무림', elheim: '엘하임', nocturna: '마왕성', rift: '세계의 틈' };
@@ -44,6 +53,11 @@ export class App {
   private clearMessages: string[] = [];
   /** 이 런을 브라우저에 저장하는가(샌드박스는 저장하지 않는다) */
   private persist = true;
+  /** 지금 런을 저장하는 칸(1~3) */
+  private slot = 1;
+  /** 시작 옵션: 고른 시드(없으면 무작위)와 디버그 왕일검 지원 */
+  private seedChoice: string | null = null;
+  private wangChoice = false;
 
   constructor(private root: HTMLElement) {
     applySettings();
@@ -133,29 +147,13 @@ export class App {
     return el;
   }
 
-  /** 시작 화면(GAME_DESIGN 13절): 세계관 그림 한 장 위 가운데에 제목과 메뉴. 시드·디버그는 접힌 "시작 옵션" 안에 */
+  /**
+   * 시작 화면(GAME_DESIGN 13절): 세계관 그림 한 장 위 가운데에 제목과 메뉴.
+   * 메뉴 버튼은 모두 같은 크기(이어하기 · 새로 시작 · 불러오기 · 시작 옵션 · 설정). 저장은 3칸
+   */
   private title(): void {
-    const saved = loadRun(data);
-    const seedInput = h('input', { class: 'seed-input', value: randomSeed(), maxlength: 24, 'aria-label': '시드' }) as HTMLInputElement;
-    const wang = h('input', { type: 'checkbox' }) as HTMLInputElement;
-    const startNew = async () => {
-      if (saved && !(await confirmDialog('새로 시작', '저장된 런을 지우고 새 런을 시작합니다.', '새로 시작'))) return;
-      clearRun();
-      this.start(seedInput.value.trim() || randomSeed(), wang.checked);
-    };
-    let resume: HTMLElement | null = null;
-    if (saved) {
-      const run = saved.run;
-      const stage = data.stages.find((st) => st.id === run.stageId)!;
-      const floor = run.map.floors.flat().find((n) => n.id === run.position)?.floor ?? 0;
-      const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
-      resume = h(
-        'button',
-        { class: 'btn btn-primary', title: `상흔 ${run.scar} · 시드 ${run.seed}`, onclick: () => this.resume(run) },
-        '이어하기',
-        h('small', {}, `${placeName(stage, run)} · ${where} · 덱 ${run.deck.length}장`),
-      );
-    }
+    const last = lastSlot(data);
+    const anySaved = listSlots(data).some((x) => x.saved);
     const url = frameUrl('title_world', 1, { realOnly: true });
     this.show(
       h(
@@ -170,18 +168,18 @@ export class App {
           h(
             'div',
             { class: 'title-menu' },
-            resume,
-            h('button', { class: `btn${saved ? '' : ' btn-primary'}`, onclick: startNew }, saved ? '새로 시작' : '시작하기', saved ? null : h('small', {}, 'S0 청운산부터')),
-            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정'),
-          ),
-          h(
-            'details',
-            { class: 'title-options' },
-            h('summary', {}, '시작 옵션'),
-            h('label', {}, '시드 ', seedInput, h('button', { class: 'btn btn-small', 'aria-label': '시드 바꾸기', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
-            // 디버그 옵션은 ?debug에서만(합류 전 동료 이름·스테이지 목록을 미리 보여 주지 않는다, GAME_DESIGN 14절)
-            isDebug() ? h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)') : null,
-            h('p', { class: 'hint' }, '같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다.'),
+            last
+              ? h(
+                  'button',
+                  { class: 'btn btn-primary', title: `저장 ${last.slot} · 시드 ${last.saved.run.seed}`, onclick: () => this.resume(last.saved.run, last.slot) },
+                  '이어하기',
+                  h('small', {}, `저장 ${last.slot} · ${slotSummary(last.saved.run)}`),
+                )
+              : null,
+            h('button', { class: `btn${last ? '' : ' btn-primary'}`, onclick: () => this.openSlots('new') }, '새로 시작', h('small', {}, '빈 칸이나 고른 칸에서')),
+            anySaved ? h('button', { class: 'btn', onclick: () => this.openSlots('load') }, '불러오기', h('small', {}, `저장 ${SLOT_COUNT}칸`)) : null,
+            h('button', { class: 'btn', onclick: () => this.openStartOptions() }, '시작 옵션', h('small', {}, this.seedChoice ? `시드 ${this.seedChoice}` : '시드 무작위')),
+            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '속도 · 연출 · 안내')),
           ),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
@@ -189,8 +187,93 @@ export class App {
     );
   }
 
-  private resume(run: RunState): void {
+  /** 시작 옵션: 시드(같은 시드면 같은 지도), 디버그 옵션은 ?debug에서만(GAME_DESIGN 14절) */
+  private openStartOptions(): void {
+    const seedInput = h('input', { class: 'seed-input', value: this.seedChoice ?? '', placeholder: '비우면 무작위', maxlength: 24, 'aria-label': '시드' }) as HTMLInputElement;
+    const wang = h('input', { type: 'checkbox', checked: this.wangChoice }) as HTMLInputElement;
+    const ov = openOverlay(
+      '시작 옵션',
+      h(
+        'div',
+        { class: 'start-options' },
+        h('label', {}, '시드 ', seedInput, h('button', { class: 'btn btn-small', 'aria-label': '무작위 시드', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
+        isDebug() ? h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)') : null,
+        h('p', { class: 'hint' }, '같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 고른 칸에 자동 저장됩니다.'),
+        h('div', { class: 'confirm-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ov.close() }, '확인')),
+      ),
+      {
+        onClose: () => {
+          this.seedChoice = seedInput.value.trim() || null;
+          this.wangChoice = wang.checked;
+          this.title();
+        },
+      },
+    );
+  }
+
+  /** 저장 칸 고르기. new: 그 칸에 새 런(차 있으면 덮어쓰기 확인) / load: 그 칸을 이어하기·지우기 */
+  private openSlots(mode: 'new' | 'load'): void {
+    const body = h('div', { class: 'slots' });
+    // 런을 시작·이어 가며 닫으면 그대로, 그냥 닫으면 시작 화면을 다시 그린다(지운 칸 반영)
+    let leaving = false;
+    const ov = openOverlay(mode === 'new' ? '새로 시작 — 저장할 칸' : '불러오기', body, { onClose: () => !leaving && this.title() });
+    const go = (fn: () => void) => {
+      leaving = true;
+      ov.close();
+      fn();
+    };
+    const render = () => {
+      body.replaceChildren(
+        ...listSlots(data).map(({ slot, saved }) => {
+          const run = saved?.run;
+          const info = run
+            ? h('div', { class: 'slot-info' }, h('b', {}, slotSummary(run)), h('small', {}, `${new Date(saved!.savedAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · 덱 ${run.deck.length}장 · 상흔 ${run.scar}`))
+            : h('div', { class: 'slot-info empty' }, h('b', {}, '빈 칸'));
+          const actions =
+            mode === 'new'
+              ? [
+                  h(
+                    'button',
+                    {
+                      class: `btn btn-small${run ? ' btn-danger' : ' btn-primary'}`,
+                      onclick: async () => {
+                        if (run && !(await confirmDialog('새로 시작', `저장 ${slot}의 런을 지우고 새 런을 시작합니다.`, '덮어쓰기'))) return;
+                        go(() => {
+                          clearRun(slot);
+                          this.start(this.seedChoice ?? randomSeed(), this.wangChoice, undefined, slot);
+                        });
+                      },
+                    },
+                    run ? '덮어쓰고 시작' : '여기서 시작',
+                  ),
+                ]
+              : run
+                ? [
+                    h('button', { class: 'btn btn-small btn-primary', onclick: () => go(() => this.resume(run, slot)) }, '이어하기'),
+                    h(
+                      'button',
+                      {
+                        class: 'btn btn-small',
+                        onclick: async () => {
+                          if (!(await confirmDialog('저장 지우기', `저장 ${slot}을(를) 지웁니다. 되돌릴 수 없습니다.`, '지우기'))) return;
+                          clearRun(slot);
+                          render();
+                        },
+                      },
+                      '지우기',
+                    ),
+                  ]
+                : [];
+          return h('div', { class: `slot${run ? '' : ' is-empty'}` }, h('span', { class: 'slot-no' }, String(slot)), info, h('div', { class: 'slot-actions' }, ...actions));
+        }),
+      );
+    };
+    render();
+  }
+
+  private resume(run: RunState, slot: number): void {
     this.run = run;
+    this.slot = slot;
     this.persist = true;
     this.map();
   }
@@ -200,7 +283,8 @@ export class App {
   }
 
   /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
-  private start(seed: string, support: boolean, stageId?: string): void {
+  private start(seed: string, support: boolean, stageId?: string, slot = this.slot): void {
+    this.slot = slot;
     this.run = stageId
       ? createRunAt(data, seed, stageId, { supportActive: support })
       : createRun(data, seed, { supportActive: support });
@@ -214,8 +298,8 @@ export class App {
     const run = this.run!;
     // 자동 저장: 지도(또는 스테이지 끝)에 설 때마다. 노드에 들어간 뒤 새로고침하면 그 노드 직전 지도에서 이어진다
     if (this.persist) {
-      if (run.status === 'map' || run.status === 'stage_clear') saveRun(run);
-      else clearRun();
+      if (run.status === 'map' || run.status === 'stage_clear') saveRun(this.slot, run);
+      else clearRun(this.slot);
     }
     // 레벨업 소식·고를 강화가 남았으면 먼저(전투 뒤 지도로 가기 전, 보스 뒤에는 스테이지 끝 화면 전에)
     if (run.levelLog.length || run.pendingUpgrades.length) return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
@@ -291,7 +375,7 @@ export class App {
         introText: enc.module.content.text,
         background: enc.module.content.background ?? stage.background,
         onQuit: (abandon) => {
-          if (abandon && this.persist) clearRun();
+          if (abandon && this.persist) clearRun(this.slot);
           this.title();
         },
       },

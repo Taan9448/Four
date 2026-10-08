@@ -55,7 +55,12 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
   let v = s.result === 'victory' ? 5000 : 0;
   // 하운이 쓰러지면 패배이므로 하운의 체력을 두 배로 친다
   for (const p of s.party) v += p.downed ? -120 : p.hp * (p.defId === 'haun' ? 2 : 1);
-  for (const e of alive(s.enemies)) v -= e.hp * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
+  // 변신이 남은 적(뼈 거인·셀리아스 등)은 다음 모습의 체력까지 친다. 안 그러면 처치하면 체력이 '늘어나' 보여 봇이 마무리를 미룬다
+  const phaseHp = (e: (typeof s.enemies)[number]) => {
+    const into = data.enemies.get(data.enemies.get(e.defId)?.transform?.into ?? '');
+    return into ? Math.round(into.maxHp * (s.enemyHpScale ?? 1)) : 0;
+  };
+  for (const e of alive(s.enemies)) v -= (e.hp + phaseHp(e)) * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
   if (opts.threatWeight && !s.result) {
     const haun = s.party.find((p) => p.defId === 'haun');
     for (const e of alive(s.enemies)) {
