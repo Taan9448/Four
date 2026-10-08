@@ -1,0 +1,16 @@
+id: fx_rift_tear
+type: fx
+summary: 균열이 커질 때 — 허공이 찢어지는 검은 틈 6프레임(전투 화면 위 가운데)
+chroma: magenta
+frames: 6
+fps: 12
+events: { impact: 4 }
+frame_notes:
+  1: "a single hairline crack appears in empty air, like glass under stress: a thin jagged line of pure void black (#0b0b10) with a faint deep red rim"
+  2: "the crack runs outward in both directions and branches into two or three smaller jagged forks; tiny red embers leak from its edges"
+  3: "the crack splits open into a narrow torn fissure of absolute void black, its torn edges glowing hot red to orange, a few sharp shards of the surrounding air peeling away and floating"
+  4: "the fissure at its widest, edges blazing red-orange, a short burst of red light and sparks shooting out of the void, the shards spinning away"
+  5: "the burst fades; the fissure stays open, its red edges pulsing dimmer, sparks drifting down"
+  6: "the fissure narrows into a still, jagged black scar with a thin dull-red rim, a few last embers"
+style: "crisp pixel-art effect: a jagged crack of void black (#0b0b10) whose torn edges glow in 2-3 steps of dark red, red and orange (#5a1020, #a02634, #ff3b3b, #ff8a5c); a few single-block embers and dark shards; no white core, no smoke, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ff3b3b' }

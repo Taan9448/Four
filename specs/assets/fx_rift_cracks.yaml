@@ -1,0 +1,17 @@
+id: fx_rift_cracks
+type: fx
+summary: 균열 단계 — 하늘에 걸린 검은 금 6단계(균열 수치에 따라 한 장씩, 애니메이션 아님)
+chroma: magenta
+frames: 6
+fps: 1
+loop: false
+events: {}
+frame_notes:
+  1: "level 1 of 6: one short thin jagged crack of void black hanging in the air, a faint dark-red rim, nothing else"
+  2: "level 2 of 6: the same crack, a little longer, with one small branch; the red rim slightly brighter"
+  3: "level 3 of 6: the same crack grown into a longer jagged fissure with two branches, a slight gap of absolute black inside, red rim glowing"
+  4: "level 4 of 6: a wide jagged fissure of void black with several branches, red-orange glowing edges, a few small dark shards floating beside it"
+  5: "level 5 of 6: a large torn opening in the air, deep void black inside with faint red sparks deep within, edges glowing red-orange, shards drifting around it"
+  6: "level 6 of 6: the largest tear, a gaping jagged wound in the air with blazing red-orange edges, red light flickering inside the void, many shards and embers around it"
+style: "crisp pixel-art effect: a jagged crack of void black (#0b0b10) whose torn edges glow in 2-3 steps of dark red, red and orange (#5a1020, #a02634, #ff3b3b, #ff8a5c); a few single-block embers and dark shards; no white core, no smoke, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ff3b3b' }

@@ -126,7 +126,8 @@ function fxCell(w, h, spec, t) {
   const R = w * 0.33;
   const a0 = deg(-140);
   const a1 = a0 + deg(220) * Math.min(1, p * 1.4);
-  const fade = p > 0.6 ? 1 - (p - 0.6) / 0.5 : 1;
+  // 마지막 칸도 키 색(마젠타 등)과 섞여 지워지지 않을 만큼은 남긴다
+  const fade = Math.max(0.5, p > 0.6 ? 1 - (p - 0.6) / 0.5 : 1);
   const x0 = cx + Math.cos(a0) * R, y0 = cy + Math.sin(a0) * R;
   const x1 = cx + Math.cos(a1) * R, y1 = cy + Math.sin(a1) * R;
   const large = a1 - a0 > Math.PI ? 1 : 0;

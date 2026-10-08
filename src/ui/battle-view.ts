@@ -466,6 +466,7 @@ export class BattleView {
           break;
         case 'surge':
           toast(this.toasts, '균열 폭주! 하늘이 갈라진다', 'danger');
+          void this.rift.surge();
           shake(this.field, true);
           flash(this.field, 'red');
           await this.wait(350);
