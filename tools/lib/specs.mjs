@@ -21,6 +21,8 @@ const SHEETS = {
   'ref-small': { canvas: [1024, 1024], grid: [2, 2], draw: [64, 64], logical: [80, 80] }, // 칸 512 = 8배
   'ref-large': { canvas: [1024, 1024], grid: [2, 2], draw: [128, 128], logical: [160, 160] }, // 칸 512 = 4배
   background: { canvas: [1536, 1024], grid: [1, 1], draw: [384, 256], logical: [384, 256] }, // 4배(전투 배경은 픽셀)
+  // 아이콘 시트: 4×4칸에 아이콘 하나씩(최대 16), 칸 256 = 64 격자 × 4배. 화면에서는 24~32px로 줄여 쓴다
+  'icon-sheet': { canvas: [1024, 1024], grid: [4, 4], draw: [64, 64], logical: [64, 64] },
 };
 
 /** 일러스트 유형: 캔버스와 게임에서 쓸 출력 크기 */
@@ -29,6 +31,9 @@ const ILLUSTRATIONS = {
   portrait: { canvas: [1024, 1024], output: [512, 512] },
   'story-cg': { canvas: [1536, 1024], output: [1152, 768] },
   'character-sheet': { canvas: [1536, 1024], output: [1536, 1024] },
+  // 화면 그림(2026-10-08): 시작 화면·여정 띠(가로 한 장, 줄이지 않음)와 지역 지도(세로 두루마리)
+  'key-art': { canvas: [1536, 1024], output: [1536, 1024] },
+  'map-art': { canvas: [1024, 1536], output: [768, 1152] },
   // 비주얼 노벨·컷인용 반신 그림: 한 시트에 표정 3장(기본·결의·놀람), 배경은 키 색으로 지워 투명하게
   'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
 };
@@ -51,6 +56,8 @@ export function typeDefaults(type, size = 'large') {
       return { ...SHEETS[`anim-${size}`], track: 'pixel', chroma: 'black', blend: 'normal', max_colors: 12 };
     case 'background':
       return { ...SHEETS[type], track: 'pixel', chroma: 'none', blend: 'normal', max_colors: 32, ...one };
+    case 'icon-sheet':
+      return { ...SHEETS[type], track: 'pixel', chroma: 'magenta', blend: 'normal', max_colors: 12, fps: 1, loop: false };
     default:
       return null;
   }
@@ -77,7 +84,7 @@ export const PADDING = 0.08;
 
 /** 하위 호환·문서용: 유형별 기본 규격(small) */
 export const TYPE_DEFAULTS = Object.fromEntries(
-  ['character-anim', 'character-ref', 'fx', 'background', ...ILLUSTRATION_TYPES].map((t) => [t, typeDefaults(t)]),
+  ['character-anim', 'character-ref', 'fx', 'background', 'icon-sheet', ...ILLUSTRATION_TYPES].map((t) => [t, typeDefaults(t)]),
 );
 
 export const paths = (root = ROOT) => ({

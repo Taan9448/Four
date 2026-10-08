@@ -1,6 +1,6 @@
 [
   {
-    "id": "elia_fireball", "name": "불덩이", "owner": "elia", "type": "attack", "rarity": "common", "pool": "starter",
+    "id": "elia_fireball", "name": "불덩이", "hitFx": "fx_hit_fire", "owner": "elia", "type": "attack", "rarity": "common", "pool": "starter",
     "cost": { "neigong": 0, "mana": 2 }, "target": "enemy",
     "effects": [ { "op": "damage", "amount": 9 } ],
     "upgrade": { "growth": [3], "plus4": { "name": "타오르는 낙인", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1 } ] }, "plus5": { "name": "흩어지는 불티", "effects": [ { "op": "damage", "amount": 4, "target": "all_enemies" } ] } },
@@ -35,7 +35,7 @@
     "flavor": "엘리아는 남은 마나를 쪼개고 또 쪼개어 동료들의 상처를 막았다."
   },
   {
-    "id": "elia_firestorm", "name": "화염 폭풍", "owner": "elia", "type": "attack", "rarity": "rare", "pool": "reward",
+    "id": "elia_firestorm", "name": "화염 폭풍", "hitFx": "fx_hit_fire", "owner": "elia", "type": "attack", "rarity": "rare", "pool": "reward",
     "cost": { "neigong": 0, "mana": 4 }, "target": "all_enemies",
     "effects": [ { "op": "damage", "amount": 8 } ],
     "upgrade": { "growth": [2], "plus4": { "name": "불의 장막", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1 } ] }, "plus5": { "name": "두 번째 파도", "effects": [ { "op": "damage", "amount": 6 } ] } },

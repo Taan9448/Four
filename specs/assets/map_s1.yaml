@@ -1,0 +1,11 @@
+id: map_s1
+type: map-art
+summary: 지역 지도 — 엘하임 숲 → 화산 협곡(S1)
+frame_notes:
+  1: >-
+    A foreign fantasy land drawn by a wuxia traveler. Bottom: a silver-leafed forest with tall slender trees and a small stone circle where the travelers arrive. Middle: a border village with pointed roofs on one edge and a wolf den in rocks on the other, a winding river. Top: a volcanic canyon with jagged cliffs, a little vermilion wash for lava and smoke, and a small burning village.
+framing: >-
+  A vertical regional map painted from above at a slight bird-eye angle. The bottom of the picture is where the journey starts and the top is the final destination. Draw terrain and landmarks only, small and light. Keep the central 70% of the width fairly open and pale (plain paper with faint terrain texture), because the game draws the route, node markers and a small character on top; put denser landmarks near the left and right edges and at the very top and bottom. No roads or paths drawn as lines.
+style: >-
+  traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
+placeholder: { color: '#d9cba8' }

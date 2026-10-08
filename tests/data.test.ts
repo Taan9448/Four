@@ -3,6 +3,7 @@ import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
 import { fastFaceChanges } from '../src/engine/scene';
+import { playableStages } from '../src/engine/run';
 import { BATTLE_OPS, RUN_OPS, type Effect } from '../src/engine/schema';
 
 const data = loadGameData();
@@ -123,8 +124,28 @@ describe('데이터 검사', () => {
     }
     for (const c of data.cards.values()) {
       if (c.fx && !specIds.has(c.fx)) missing.push(`${c.id}: fx ${c.fx}`);
+      if (c.hitFx && !specIds.has(c.hitFx)) missing.push(`${c.id}: hitFx ${c.hitFx}`);
+    }
+    for (const en of data.enemies.values()) if (en.hitFx && !specIds.has(en.hitFx)) missing.push(`${en.id}: hitFx ${en.hitFx}`);
+    for (const st of data.stages) {
+      for (const id of [st.background, st.mapArt]) if (id && !specIds.has(id)) missing.push(`${st.id}: ${id}`);
+    }
+    for (const m of data.modules.values()) {
+      if (m.content.background && !specIds.has(m.content.background)) missing.push(`${m.id}: ${m.content.background}`);
     }
     expect(missing).toEqual([]);
+  });
+
+  it('화면 그림: 플레이 가능한 스테이지는 전투 배경·지역 지도·여정 띠 자리가 있고, 상태 아이콘 번호는 겹치지 않는다', () => {
+    const bad: string[] = [];
+    for (const st of playableStages(data)) {
+      if (!st.background) bad.push(`${st.id}: background 없음`);
+      if (!st.mapArt) bad.push(`${st.id}: mapArt 없음`);
+      if (!st.journey) bad.push(`${st.id}: journey 없음`);
+    }
+    const icons = [...data.statuses.values()].map((s) => s.icon).filter((n) => n !== undefined);
+    if (new Set(icons).size !== icons.length) bad.push('상태 아이콘 번호 중복');
+    expect(bad).toEqual([]);
   });
 
   it('카드 등급: 시작 카드는 일반, 전설은 스토리로만, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {

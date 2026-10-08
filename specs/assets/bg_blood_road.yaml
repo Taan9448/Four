@@ -1,0 +1,10 @@
+id: bg_blood_road
+type: background
+summary: 전투 배경 — 혈로(S3, 마교에 짓밟힌 무림의 길)
+frame_notes:
+  1: >-
+    A mountain road in the wuxia world after the demonic cult took over. On the left edge a broken wooden village gate with a torn
+    cult banner of dark red cloth; on the right edge a leaning dead tree and a toppled stone marker. In the distance a ruined temple
+    roof on a hill under an overcast dusk sky with a faint reddish haze. The ground is a dirt road with wheel ruts and fallen leaves.
+    Dull browns and greys with dark red accents.
+placeholder: { color: '#3a2620' }
