@@ -88,7 +88,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "clearEffects": [{"op": "gain_card", "card": "born_together"}], "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 6, 취약 1)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 6, 취약 1)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "gain_card", "card": "born_together"}]}
   },
   {
     "id": "s7_elite_branch_guard",

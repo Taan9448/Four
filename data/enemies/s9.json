@@ -70,13 +70,13 @@
   {
     "id": "torn_border",
     "name": "찢긴 경계",
-    "maxHp": 60,
+    "maxHp": 45,
     "sprite": null,
     "silhouette": "object",
     "color": "#6a2a5a",
     "tier": "boss",
     "pattern": "cycle",
-    "hpPerScar": 4,
+    "hpPerScar": 1,
     "traits": [{"status": "seam", "stacks": 1}],
     "moves": [{"id": "loose_flow", "name": "풀려난 흐름이 긁는다", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}, {"id": "widen", "name": "경계가 벌어진다", "intent": "special", "targeting": "random", "effects": [{"op": "rift", "amount": 1}, {"op": "damage", "amount": 3, "target": "all_enemies"}]}],
     "flavor": "풀려난 흐름이 갈 곳을 잃고 소용돌이치며 경계의 찢어진 가장자리를 긁는다. 상처라서 흐름을 받지 못한다. 그 세계의 결로, 그 세계의 실로 꿰매야 한다. 갈라진 자리가 많을수록 땀도 많다."

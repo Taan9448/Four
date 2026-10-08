@@ -98,7 +98,7 @@ describe('데이터 검사', () => {
       for (const [i, c] of (m.content.choices ?? []).entries()) errors.push(...checkEffects(`${m.id}#${i}`, c.effects, runOps));
       if (m.content.bonus) errors.push(...checkEffects(`${m.id}.bonus`, m.content.bonus.effects, battleOps));
       if (m.content.clearEffects) {
-        if (m.type !== 'boss') errors.push(`${m.id}: clearEffects는 보스 모듈만`);
+        if (!['battle', 'elite', 'boss'].includes(m.type)) errors.push(`${m.id}: clearEffects는 전투형 모듈만`);
         errors.push(...checkEffects(`${m.id}.clearEffects`, m.content.clearEffects, runOps));
       }
     }

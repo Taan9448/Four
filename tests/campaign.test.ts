@@ -165,15 +165,17 @@ describe('원작 보스 기믹', () => {
     expect(s.result).toBeNull();
   });
 
-  it('S9 모르데카이 → 마지막 한 땀: 고리 멈추기·날 얹기가 손에, 쓰러지면 찢긴 경계로 바뀌고 실이 손에 들어온다', () => {
+  it('S9 모르데카이 → 마지막 한 땀: 고리 멈추기가 손에(쓰면 날 얹기), 쓰러지면 찢긴 경계로 바뀌고 실이 손에 들어온다', () => {
     const run = createRunAt(data, 'END', 's9');
     applyRunOps(data, run, [{ op: 'set_flag', flag: 'arden_ice' }, { op: 'leave_party', member: 'born' }, { op: 'leave_party', member: 'kyle' }]);
     expect(run.selected).toEqual(['haun', 'elia']);
     const s = createBattle(data, battleSetupFor(data, run, bossEnc('s9')));
     expect(s.mana).toBe(0);
-    expect(s.hand.some((c) => c.cardId === 'haun_stop_ring')).toBe(true);
-    expect(s.hand.some((c) => c.cardId === 'haun_place_blade')).toBe(true);
     const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    // 고리 멈추기: 숨까지 멈춰 흐르지 않는 자가 되고, 결을 드러내고, 날을 얹을 자리가 손에 들어온다
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_stop_ring'), m.uid);
+    expect(s.party[0].statuses.still).toBe(1);
+    expect(s.hand.some((c) => c.cardId === 'haun_place_blade')).toBe(true);
     m.hp = 1;
     m.statuses = {};
     m.block = 0;

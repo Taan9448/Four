@@ -232,9 +232,10 @@
     "cost": {"neigong": 0, "mana": 0},
     "target": "enemy",
     "castLine": {"speaker": "haun", "face": "neutral", "text": "…숨도, 멈춘다."},
-    "effects": [{"op": "gain_neigong", "amount": -10}, {"op": "apply_status", "status": "still", "stacks": 1, "target": "self"}, {"op": "reveal_grain", "stacks": 3}],
-    "upgrade": {"growth": [0, 0, 1], "plus4": {"name": "냄새가 사라졌다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "흐르지 않는 자", "addKeywords": ["retain"]}},
-    "flavor": "청운검선: 그것을 베려 하지 마라. 아무것도 싣지 마라. 하운은 청운호흡까지 멈췄다."
+    "effects": [{"op": "gain_neigong", "amount": -10}, {"op": "apply_status", "status": "still", "stacks": 1, "target": "self"}, {"op": "reveal_grain", "stacks": 3}, {"op": "add_card", "card": "haun_place_blade", "to": "hand"}],
+    "upgrade": {"growth": [0, 0, 1, 0], "plus4": {"name": "냄새가 사라졌다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "흐르지 않는 자", "effects": [{"op": "block", "amount": 6, "target": "self"}]}},
+    "flavor": "청운검선: 그것을 베려 하지 마라. 아무것도 싣지 마라. 하운은 청운호흡까지 멈췄다.",
+    "keywords": []
   },
   {
     "id": "haun_thread",
