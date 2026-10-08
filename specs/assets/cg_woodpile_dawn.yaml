@@ -1,0 +1,10 @@
+id: cg_woodpile_dawn
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 후원 장작더미 — 해 뜨기 전 백 번째 도끼질(S0 시작, 1권 1장)
+frame_notes:
+  1: >-
+    Before dawn in the back courtyard of the Cheongun sect on Cheongun Mountain: a tall woodpile of split firewood stacked against a low plastered wall with grey tile coping; beyond the wall the dark ridges of the seven peaks stand like a folding screen, the first pale light just behind them, wisps of mist in the valleys; at one side the roofline of the kitchen with a warm glow at its door and a thin line of smoke. In the center Jin Haun, seventeen, in his grey servant outfit, strips of old cloth wrapped around his blistered hands, brings his woodcutting axe down on a gnarled oak stump with three knots standing on a chopping block; chips fly, split logs lie around his feet, his breath shows faintly in the cold air. Quiet cold blue-grey dawn light. He carries his plain woodcutting axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3d4459' }

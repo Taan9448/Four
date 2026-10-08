@@ -1,0 +1,9 @@
+id: cg_nocturna
+type: story-cg
+summary: 장면 일러스트 — 마왕성 노크투르나 — 얼음 바다 위 흑요석 성채(S5, 2권 11장)
+frame_notes:
+  1: >-
+    Late spring on the half-melted northern ice sea: broken floes and black water, and rising from them a fortress of obsidian, each of its spires coiled with purple lightning, under a sky of nothing but swirling black storm clouds. Driven into every wall are black iron wedges, each twisting the air around it, so that the whole castle shimmers and warps like heat haze — the border of the world worn thin. Seen from far across the ice field. No figures; ominous and grand.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#4b3a6b' }

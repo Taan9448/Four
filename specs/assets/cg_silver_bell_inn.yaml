@@ -1,0 +1,9 @@
+id: cg_silver_bell_inn
+type: story-cg
+summary: 장면 일러스트 — 하일론 — 은종 여관 창밖의 검은 구름(S1, 1권 8장)
+frame_notes:
+  1: >-
+    Seen through the open wooden window of an upstairs room at the Silver Bell inn in Hailon, the border village at the eastern end of the continent of Elheim: grey slate roofs of stone houses, a bell tower with a silver bell beside a two-storey stone guild house, the edge of the silver forest with huge silver-grey trees to one side, fields beyond. Far away on the northern horizon hangs a band of black cloud that does not drift like rain clouds but stretches from one end of the horizon to the other like a wall. On the windowsill a wooden bowl of potato stew with a round flat iron spoon. Warm light over the village, ominous darkness at the horizon. No people.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3d4459' }

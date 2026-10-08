@@ -1,0 +1,9 @@
+id: cg_ice_palace
+type: story-cg
+summary: 장면 일러스트 — 얼음 궁전 — 호수에 갇힌 왕도와 남쪽 성문(S3, 2권 6장)
+frame_notes:
+  1: >-
+    The old royal capital Ardenheim, encased whole in its risen lake: a vast transparent wall of ice holds the city walls, towers, roofs and banners — blue banners with a white snowflake frozen mid-flutter. Inside the clear ice, people stand frozen in place: soldiers with spears, merchants pulling handcarts, children playing in a square, someone holding a child close. Before the south gate stand seven knights made entirely of ice — ice armor and ice bodies — their shields bearing a white snowflake over a silver sword on a blue field; the one in the middle has opened eyes with no pupils, only frozen blue light. Beautiful and horrible, cold blue-white light under a grey sky.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1f3f73' }

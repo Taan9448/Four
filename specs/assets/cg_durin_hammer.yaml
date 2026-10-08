@@ -1,0 +1,9 @@
+id: cg_durin_hammer
+type: story-cg
+summary: 장면 일러스트 — 두린의 망치 — 손잡이에 새긴 마지막 글(S4, 2권 7장)
+frame_notes:
+  1: >-
+    Close-up of Durin's war hammer lifted in a pair of broad, scarred dwarf hands: a heavy plain iron head worn smooth by years of work, a long thick wooden handle darkened with use, and along the handle a line of dwarven runes carved by hand. One thick fingertip slowly traces the runes. Behind, out of focus, the end of a red braided beard and the dim cavern of crushed empty armor. Warm lamplight on the iron, deep shadows.
+framing: >-
+  A close-up story illustration of an object for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the object in the upper three quarters. Wide 3:2 frame, strong readable silhouette, dramatic light, no text.
+placeholder: { color: '#4a3426' }

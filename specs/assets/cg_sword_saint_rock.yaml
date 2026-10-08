@@ -1,0 +1,9 @@
+id: cg_sword_saint_rock
+type: story-cg
+summary: 장면 일러스트 — 청운검선의 바위 — 칼끝으로 새긴 구름과 부러진 검(S9, 4권 6장)
+frame_notes:
+  1: >-
+    Close-up in the red-black rift: a huge grey rock from the Ghost Valley Cliff of Cheongun Mountain, fallen in a hundred years ago, floating where the path of black wedges bends. On its face, carved with a sword tip long ago, a single small cloud emblem — the same as on the frame of the stone gate — and below it eighteen short carved lines and deeper lines of carved writing. From a crack at the foot of the rock gleams half of a broken sword blade, untouched by rust, its steel patterned like pine-wood grain. Behind the rock, faint old cloud-shaped marks glow along a narrow path leading away. Dim, solemn light.
+framing: >-
+  A close-up story illustration of an object for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the object in the upper three quarters. Wide 3:2 frame, strong readable silhouette, dramatic light, no text.
+placeholder: { color: '#3d4459' }

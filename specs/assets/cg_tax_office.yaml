@@ -1,0 +1,10 @@
+id: cg_tax_office
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 운곡 교세소 — 천하일통의 장터(S6 시작, 3권 1장)
+frame_notes:
+  1: >-
+    The market square of Ungok village at the southern foot of Cheongun Mountain, three years later: at the end of the market, by a willow, a two-storey building of dark red stone with a signboard plaque over its door, and on the wall beside it a posted proclamation. The market is grey and joyless — few stalls, people with lowered heads who do not look at each other, no children running. In the middle of the square, seen small and from a little behind, Jin Haun in his grey servant outfit stands alone with a load of firewood on his back, and nobody recognizes him. He carries the plain, narrow, completely unadorned 'ugly sword' with a crude plain grip, in a plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3d4459' }

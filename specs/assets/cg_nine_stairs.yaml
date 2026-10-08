@@ -1,0 +1,9 @@
+id: cg_nine_stairs
+type: story-cg
+summary: 장면 일러스트 — 구천 계단 — 그믐밤의 천마봉(S8, 3권 13장)
+frame_notes:
+  1: >-
+    A moonless night in the Hundred Thousand Mountains: the Heavenly Demon Peak, a black crag, with a single stone stairway winding nine times around its waist up to the Blood Hall at the summit. Torches burn on every turn of the stairs, thousands of tiny points of fire. At the summit a blood-red light shoots up from the Blood Hall into the black sky as the ritual begins. At the foot of the stairs waits an army of three thousand with shields, under a banner of a white cloud on a blue field. Vast and dark, points of fire against black.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b2b3a' }

@@ -1,0 +1,10 @@
+id: cg_sealing
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 마지막 한 땀 — 부러진 검으로 꿰매는 경계(S9, 4권 10장)
+frame_notes:
+  1: >-
+    Inside the red-black rift, released currents of silver and blue swirl around the torn edge of the world's border, ragged like ripped cloth with darkness behind it. Jin Haun, pale and worn in his ragged grey servant outfit, sews the tear shut using the broken half of an ancient sword patterned like pine grain as a needle — its broken tip sharp as a needle point — drawing through it a thread of faint warm light pulled from his own lower belly. Beside him the silver-haired half-elf woman in a grey cloak holds a palm-sized piece of ice in both hands and breathes on it; from it flows a silver thread that she feeds onto his needle. Neat stitches already close part of the tear. His own plain, narrow, unadorned sword stays sheathed in the plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b2b3a' }
