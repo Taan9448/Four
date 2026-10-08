@@ -216,5 +216,6 @@
     "type": "boss",
     "name": "보름의 연무장",
     "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장. 보름달 아래 혈위대가 줄지어 섰다. 조명각의 검에 청운의 내공과 마교의 마기가 엉켜 있다. 그가 무릎을 꿇으면 혈위대도 무기를 내린다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "주춧돌이 갈라진 산문으로 방패벽이 걸어 들어온다. \"전진!\" 쿵. (혈위대 전원 약화 1, 아군 전원 방어 5)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 5, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
-  }
+  },
+  {"id": "s6_shop", "stage": "s6", "type": "shop", "name": "운곡 전장(錢莊)", "weight": 1, "content": {"text": "교세소 뒷골목의 낡은 전장. 주인은 하운의 얼굴을 알아보는 듯했지만 아무 말 없이 주판알만 튕겼다."}}
 ]

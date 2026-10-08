@@ -54,6 +54,8 @@ export type BattleEvent =
   | { type: 'neigong_max'; value: number }
   | { type: 'echo' }
   | { type: 'support'; ruleId: string; name: string }
+  | { type: 'relic'; relicId: string; name: string }
+  | { type: 'potion'; potionId: string; name: string }
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
   | { type: 'transform'; uid: string; from: string; into: string; text: string }
@@ -90,6 +92,10 @@ export interface BattleState {
   survived: boolean;
   supportRules: SupportRule[];
   supportUsed: string[];
+  /** 가진 유물 id(전투 안 trigger: battleStart·turnStart·enemyDowned) */
+  relics: string[];
+  /** 물약 칸(빈 칸은 null). 쓰면 비고, 전투 결과로 런에 돌려준다 */
+  potions: (string | null)[];
   flags: string[];
   scar: number;
   uidCounter: number;

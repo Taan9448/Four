@@ -1,0 +1,16 @@
+id: icons_relics_b
+type: icon-sheet
+summary: 유물 아이콘 17~24(희귀·보스) — 칸 n = 유물 icon n+16
+# 칸 번호 = data의 icon. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 8
+baseline: 0.5
+frame_notes:
+  1: "sword saint ink — a black ink stick with a tiny carved cloud on its side and a drop of ink"
+  2: "cloud incense — an incense stick in a small holder, white smoke curling into a cloud shape"
+  3: "obsidian shard — a jagged black obsidian shard with a cold blue-violet gleam on one edge"
+  4: "moon pendant — a pendant of two small moons, one white and one pale blue, on a thin chain"
+  5: "demon beads — a loop of dark red prayer beads with one larger black bead"
+  6: "rift compass — a round bronze compass whose needle is a thin black crack with red edges"
+  7: "golden plaque — a broken fragment of a gold-framed wooden plaque, the writing worn blank"
+  8: "ghost valley root — a gnarled silver tree root twisting into a loop"
+placeholder: { color: '#d0463a', accent: '#4a120c' }

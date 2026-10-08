@@ -35,6 +35,10 @@ export const RUN_OPS = [
   'set_flag',
   'join_party',
   'leave_party',
+  'gain_gold',
+  'gain_max_hp',
+  'gain_relic',
+  'gain_potion',
 ] as const;
 
 export const Target = z.enum([
@@ -96,6 +100,9 @@ export const Effect = z
     count: z.number().int().positive().optional(),
     member: z.string().optional(),
     flag: z.string().optional(),
+    /** gain_relic·gain_potion: 얻을 유물·물약 id */
+    relic: z.string().optional(),
+    potion: z.string().optional(),
     filter: z
       .object({ pool: z.string(), owner: z.string(), costNeigongGte: z.number() })
       .partial()
@@ -332,6 +339,49 @@ export const SupportRule = z
   .strict();
 export type SupportRule = z.infer<typeof SupportRule>;
 
+/**
+ * 유물(2026-10-08): 가지고 있으면 늘 효과가 있다. trigger마다 effects가 일어난다.
+ * 전투 안: battleStart(전투 시작) · turnStart(아군 차례 시작) · enemyDowned(적이 쓰러질 때) — 하운을 출처로 하는 전투 동작.
+ * 전투 밖: pickup(얻는 순간 한 번) · victory(이긴 전투 뒤) · rest(휴식 노드에서 고른 뒤) — 런 단위 동작.
+ * shop: 상점에 나오는가(보스 유물은 보스 보상으로만)
+ */
+export const RelicDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    rarity: z.enum(['common', 'uncommon', 'rare', 'boss']),
+    /** 아이콘 그림이 없을 때 표시할 한 글자 */
+    glyph: z.string().length(1),
+    /** 유물 아이콘 시트(icons_relics)의 프레임 번호(1부터) */
+    icon: z.number().int().positive().optional(),
+    description: z.string(),
+    flavor: z.string().optional(),
+    trigger: z.enum(['battleStart', 'turnStart', 'enemyDowned', 'pickup', 'victory', 'rest']),
+    condition: Condition.default({}),
+    oncePerBattle: z.boolean().default(false),
+    effects: z.array(Effect).min(1),
+    shop: z.boolean().default(true),
+  })
+  .strict();
+export type RelicDef = z.infer<typeof RelicDef>;
+
+/** 물약(2026-10-08): 전투 중 아무 때나 비용 없이 쓰는 소모품. target: 고르는 대상(none이면 바로) */
+export const PotionDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    rarity: z.enum(['common', 'uncommon', 'rare']),
+    glyph: z.string().length(1),
+    icon: z.number().int().positive().optional(),
+    description: z.string(),
+    target: z.enum(['none', 'enemy', 'ally']),
+    effects: z.array(Effect).min(1),
+  })
+  .strict();
+export type PotionDef = z.infer<typeof PotionDef>;
+
+const Range = z.tuple([z.number().int().min(0), z.number().int().min(0)]);
+
 /** 전투 마나 규칙. battleStart: full 가득 / carry 런 마나 이월 / 숫자 그 값으로 시작 */
 export const WorldMana = z
   .object({ battleStart: z.union([z.enum(['full', 'carry']), z.number().int().min(0)]), perTurn: z.number().int() })
@@ -397,6 +447,42 @@ export const Balance = z
         rarityWeights: z.record(z.enum(['battle', 'elite', 'boss']), z.partialRecord(Rarity, z.number().min(0))),
       })
       .strict(),
+    /**
+     * 경제(2026-10-08): 이긴 전투의 골드(노드 유형별 범위), 물약 칸 수와 떨어질 확률, 엘리트·보스 유물 등급 가중치,
+     * 상점 진열 수와 가격(등급별, ±jitter 비율로 흔든다), 카드 지우기(한 번 쓸 때마다 removeStep씩 비싸진다)·강화 가격
+     */
+    economy: z
+      .object({
+        startGold: z.number().int().min(0),
+        /** 중간 스테이지에서 시작할 때(createRunAt) 앞 스테이지당 주는 골드 */
+        debugGoldPerStage: z.number().int().min(0),
+        gold: z.object({ battle: Range, elite: Range, boss: Range }).strict(),
+        potionSlots: z.number().int().positive(),
+        potionDrop: z.object({ battle: z.number(), elite: z.number(), boss: z.number() }).strict(),
+        potionWeights: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
+        relicWeights: z
+          .object({
+            elite: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
+            shop: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
+          })
+          .strict(),
+        bossRelicChoices: z.number().int().positive(),
+        shop: z
+          .object({
+            cards: z.number().int().min(0),
+            relics: z.number().int().min(0),
+            potions: z.number().int().min(0),
+            cardPrice: z.partialRecord(Rarity, z.number().int().positive()),
+            relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
+            potionPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
+            removePrice: z.number().int().positive(),
+            removeStep: z.number().int().min(0),
+            upgradePrice: z.number().int().positive(),
+            jitter: z.number().min(0).max(0.5),
+          })
+          .strict(),
+      })
+      .strict(),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z
@@ -413,7 +499,7 @@ export const Balance = z
   .strict();
 export type Balance = z.infer<typeof Balance>;
 
-export const NodeType = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'story', 'boss']);
+export const NodeType = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'shop', 'story', 'boss']);
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z

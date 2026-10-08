@@ -1,0 +1,21 @@
+id: icons_potions
+type: icon-sheet
+summary: 물약 아이콘 13종
+# 칸 번호 = data의 icon. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 13
+baseline: 0.5
+frame_notes:
+  1: "wound salve — a small round lidded jar of green ointment"
+  2: "iron skin pill — a single golden pill on a tiny grey stone dish"
+  3: "fire flask — a round glass flask filled with swirling orange fire"
+  4: "frost flask — a round glass flask filled with pale blue frost and tiny ice shards"
+  5: "weakness powder — a small paper packet spilling grey-violet powder"
+  6: "clear tea — a small clay cup of clear pale green tea"
+  7: "neigong pill — a red-gold pill with a faint warm glow"
+  8: "mana draught — a tall slim bottle of glowing light-blue liquid with a cork"
+  9: "strength tonic — a dark brown gourd bottle with a red cord"
+  10: "seal ash — a small bowl of pale ash with a faint red ember mark"
+  11: "breaking powder — a small paper packet spilling dark red powder with a crack symbol shape"
+  12: "great return pill — a large golden pill with a soft white halo"
+  13: "thunder talisman — a yellow paper talisman crackling with a small blue-white lightning bolt"
+placeholder: { color: '#9fb4c8', accent: '#3a4a5a' }

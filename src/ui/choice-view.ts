@@ -4,10 +4,13 @@ import type { ModuleDef } from '../engine/schema';
 import { applyChoice, applyLevelUpgrade, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
 import { cardView } from './card-view';
 import { h } from './dom';
+import { gainRelic } from '../engine/run';
+import { swapPotion, type Loot } from '../engine/economy';
+import { potionChip, relicChip } from './items';
 
-const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', story: '이야기' };
+const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', shop: '상점', story: '이야기' };
 /** 판 머리의 붉은 낙관(지도 노드와 같은 한자) */
-const TYPE_SEAL: Record<string, string> = { event: '事', rest: '休', inn: '宿', story: '史' };
+const TYPE_SEAL: Record<string, string> = { event: '事', rest: '休', inn: '宿', shop: '市', story: '史' };
 
 /** 판 머리: 낙관 + 갈래 + 제목 */
 function panelHead(seal: string, kind: string, title: string): HTMLElement {
@@ -102,7 +105,53 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
   return h('section', { class: `screen choice-screen backdrop choice-${module.type}` }, box);
 }
 
-export function rewardView(data: GameData, options: string[], onPick: (cardId: string | null) => void): HTMLElement {
+/** 받은 전리품 정보(받은 직후의 런 상태와 함께 그린다) */
+export interface LootShown {
+  loot: Loot;
+  /** 칸이 가득해 못 넣은 물약 */
+  potionLeft: string | null;
+}
+
+/**
+ * 전리품 줄: 골드·유물·물약. 물약 칸이 가득하면 바꿔 넣을 칸을 누르거나 두고 간다
+ */
+function lootLine(data: GameData, run: RunState, shown: LootShown): HTMLElement {
+  const wrap = h('div', { class: 'loot' });
+  const render = () => {
+    const { loot } = shown;
+    const items: (HTMLElement | null)[] = [
+      h('span', { class: 'loot-item' }, h('span', { class: 'gold-chip' }, h('i', {}), `+${loot.gold}`), h('small', {}, `골드 (지금 ${run.gold})`)),
+      loot.relic ? h('span', { class: 'loot-item' }, relicChip(data, loot.relic), h('small', {}, data.relics.get(loot.relic)!.name)) : null,
+      loot.potion && !shown.potionLeft ? h('span', { class: 'loot-item' }, potionChip(data, loot.potion), h('small', {}, data.potions.get(loot.potion)!.name)) : null,
+    ];
+    const swap = shown.potionLeft
+      ? h(
+          'div',
+          { class: 'loot-swap' },
+          h('span', {}, '물약 칸이 가득하다: '),
+          potionChip(data, shown.potionLeft),
+          h('b', {}, data.potions.get(shown.potionLeft)!.name),
+          h('span', {}, ' — 버릴 칸을 누르면 바꿔 넣는다'),
+          run.potions.map((p, i) =>
+            potionChip(data, p, {
+              extra: 'swap-slot',
+              onClick: () => {
+                swapPotion(run, i, shown.potionLeft!);
+                shown.potionLeft = null;
+                render();
+              },
+            }),
+          ),
+          h('button', { class: 'btn btn-small', onclick: () => ((shown.potionLeft = null), (shown.loot = { ...shown.loot, potion: null }), render()) }, '두고 간다'),
+        )
+      : null;
+    wrap.replaceChildren(h('div', { class: 'loot-items' }, items), swap ?? '');
+  };
+  render();
+  return wrap;
+}
+
+export function rewardView(data: GameData, options: string[], onPick: (cardId: string | null) => void, loot?: { run: RunState; shown: LootShown }): HTMLElement {
   return h(
     'section',
     { class: 'screen reward-screen backdrop' },
@@ -110,6 +159,7 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
       'div',
       { class: 'choice-box panel reward-box' },
       panelHead('賞', '전투 승리', '전리품'),
+      loot ? lootLine(data, loot.run, loot.shown) : null,
       h('p', { class: 'choice-text' }, '카드 한 장을 골라 덱에 더한다. 마음에 드는 카드가 없으면 넘어간다.'),
       h(
         'div',
@@ -121,6 +171,44 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
         }),
       ),
       h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기')),
+    ),
+  );
+}
+
+/** 보스 전리품: 골드·물약을 받고, 유물 후보 중 하나를 고른다 */
+export function bossLootView(data: GameData, run: RunState, shown: LootShown, onDone: () => void): HTMLElement {
+  const choices = shown.loot.relicChoices;
+  return h(
+    'section',
+    { class: 'screen reward-screen backdrop' },
+    h(
+      'div',
+      { class: 'choice-box panel reward-box' },
+      panelHead('寶', '보스 격파', '전리품'),
+      lootLine(data, run, shown),
+      choices.length ? h('p', { class: 'choice-text' }, '유물 하나를 고른다.') : null,
+      h(
+        'div',
+        { class: 'relic-choices' },
+        choices.map((id) => {
+          const def = data.relics.get(id)!;
+          return h(
+            'button',
+            {
+              class: `relic-choice rarity-${def.rarity}`,
+              onclick: () => {
+                gainRelic(data, run, id);
+                onDone();
+              },
+            },
+            relicChip(data, id, 'big'),
+            h('b', {}, def.name),
+            h('span', {}, def.description),
+            def.flavor ? h('small', {}, def.flavor) : null,
+          );
+        }),
+      ),
+      h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: onDone }, choices.length ? '고르지 않고 넘어가기' : '계속')),
     ),
   );
 }

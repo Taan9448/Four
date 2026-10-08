@@ -60,6 +60,6 @@ describe('경로 생성기', () => {
   it('노드 유형이 고르게 섞인다', () => {
     const types = new Set<string>();
     for (let i = 0; i < 20; i++) gen(`mix-${i}`).floors.flat().forEach((n) => types.add(n.type));
-    expect([...types].sort()).toEqual(['battle', 'boss', 'elite', 'event', 'inn', 'rest', 'story']);
+    expect([...types].sort()).toEqual(['battle', 'boss', 'elite', 'event', 'inn', 'rest', 'shop', 'story']);
   });
 });

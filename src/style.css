@@ -759,3 +759,73 @@ h1, h2, h3 { font-family: var(--f-head); }
 .tour-count { margin-right: auto; font-size: 0.75rem; color: #c9a24a; letter-spacing: 0.1em; }
 .tour-skip { background: none; border: 0; color: var(--ink-dim); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.pop, .tour-bubble.pop { animation: none; } }
+
+/* ───────── 경제(2026-10-08): 골드·유물·물약·상점·전리품 ───────── */
+.gold-chip { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: #f2d48f; font-variant-numeric: tabular-nums; }
+.gold-chip i, .price .coin { display: inline-block; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe7a3, #c08a22 70%); box-shadow: inset 0 0 0 1.5px #8a5a10, 0 0 4px rgba(242, 169, 59, 0.5); }
+.gold-chip i::after, .price .coin::after { content: ''; display: block; width: 4px; height: 4px; margin: 4.5px auto 0; background: #8a5a10; }
+/* 유물: 금테 두른 둥근 패에 한 글자 */
+.relic-chip { --rc: #c9a24a; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-family: var(--f-brush); font-size: 0.92rem; color: #f6ead0; background: radial-gradient(circle at 35% 30%, #4a3a26, #1d150c); border: 2px solid var(--rc); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 0, 0, 0.6); cursor: help; flex: 0 0 auto; }
+.relic-chip.rarity-uncommon { --rc: #6aa8d8; }
+.relic-chip.rarity-rare { --rc: #e2b45c; box-shadow: 0 0 8px rgba(226, 180, 92, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.relic-chip.rarity-boss { --rc: #d0463a; background: radial-gradient(circle at 35% 30%, #5a1a14, #1d0806); box-shadow: 0 0 8px rgba(208, 70, 58, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.relic-chip.big { width: 48px; height: 48px; font-size: 1.6rem; border-width: 3px; }
+.relic-chip.fired { animation: relic-fire 0.7s ease-out; }
+@keyframes relic-fire { 0% { transform: scale(1); } 30% { transform: scale(1.35); box-shadow: 0 0 16px 4px rgba(242, 212, 143, 0.85); } 100% { transform: scale(1); } }
+/* 물약: 호리병 모양(아래가 둥근 병) */
+.potion-chip { --pc: #9fb4c8; position: relative; display: inline-grid; place-items: center; width: 26px; height: 30px; padding: 0; border-radius: 9px 9px 13px 13px; border: 2px solid var(--pc); background: radial-gradient(circle at 40% 65%, color-mix(in srgb, var(--pc) 45%, #10141c), #10141c 75%); color: #f2f6ff; font-family: var(--f-brush); font-size: 0.85rem; cursor: help; flex: 0 0 auto; }
+.potion-chip::before { content: ''; position: absolute; top: -6px; left: 50%; width: 8px; height: 5px; transform: translateX(-50%); border-radius: 2px 2px 0 0; background: #8a6a3a; }
+button.potion-chip { cursor: pointer; }
+button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px color-mix(in srgb, var(--pc) 70%, transparent); }
+.potion-chip.rarity-uncommon { --pc: #6aa8d8; }
+.potion-chip.rarity-rare { --pc: #e2b45c; }
+.potion-chip.empty { border-style: dashed; border-color: rgba(200, 205, 215, 0.3); background: transparent; }
+.potion-chip.empty::before { background: rgba(138, 106, 58, 0.35); }
+.potion-chip.selected { box-shadow: 0 0 0 3px var(--mana), 0 0 12px var(--mana); }
+.potion-chip.swap-slot { cursor: pointer; }
+.potion-chip.swap-slot:hover { border-color: #ff8a7a; }
+/* 지도 오른쪽 칸 */
+.inventory .inv-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.potion-bar, .relic-bar, .b-relics, .b-potions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.potion-bar { padding-top: 6px; }
+.inventory .relic-bar { margin-top: 8px; }
+.inventory .hint { margin: 6px 0 0; }
+/* 전투 HUD: 장소 칩 아래 유물 줄, 자원 구슬 위 물약 칸 */
+.b-hud-left { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 0; }
+.b-relics { padding: 3px 6px; border-radius: 16px; background: rgba(10, 12, 16, 0.55); }
+.b-relics .relic-chip { width: 22px; height: 22px; font-size: 0.8rem; }
+.b-items { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.b-potions { padding: 6px 8px 3px; border-radius: 16px; background: rgba(10, 12, 16, 0.55); }
+/* 상점 */
+.shop-box { max-width: 1040px; text-align: left; }
+.shop-box .panel-head { position: relative; }
+.shop-purse { margin-left: auto; font-size: 1.1rem; }
+.shop-h { margin: 14px 0 8px; font-size: 0.95rem; color: #e2b45c; letter-spacing: 0.08em; }
+.shop-cards { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.shop-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.shop-item.sold, .shop-line.sold { opacity: 0.4; filter: saturate(0.3); }
+.shop-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.shop-line { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed rgba(201, 162, 74, 0.2); }
+.shop-desc { display: flex; flex-direction: column; min-width: 0; }
+.shop-desc small { color: var(--ink-dim); font-size: 0.74rem; line-height: 1.35; }
+.price { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: #f2d48f; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price.short { color: #ff8a7a; }
+.service-glyph { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 4px; border: 2px solid #8a6a1e; color: #e2b45c; font-family: var(--f-brush); }
+.shop-potions-own { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--ink-dim); }
+.pick-grid { max-height: 70vh; overflow-y: auto; }
+.pick-grid .card { cursor: pointer; }
+.pick-grid .card:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px #e2b45c, 0 10px 20px rgba(0, 0, 0, 0.5); }
+@media (max-width: 900px) { .shop-row { grid-template-columns: minmax(0, 1fr); } }
+/* 전리품 */
+.loot { margin: 4px 0 10px; }
+.loot-items { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 8px 12px; border-left: 3px solid #c9a24a; background: rgba(201, 162, 74, 0.08); }
+.loot-item { display: inline-flex; align-items: center; gap: 6px; }
+.loot-item small { color: #f2d48f; font-size: 0.85rem; }
+.loot-swap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; padding: 8px 12px; border: 1px dashed rgba(255, 138, 122, 0.5); border-radius: 6px; font-size: 0.85rem; }
+.relic-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 10px 0; }
+.relic-choice { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 12px; text-align: center; color: var(--ink); background: linear-gradient(rgba(30, 24, 18, 0.9), rgba(14, 12, 10, 0.92)); border: 1px solid rgba(201, 162, 74, 0.5); border-radius: 6px; cursor: pointer; font: inherit; }
+.relic-choice:hover { border-color: #e2b45c; box-shadow: 0 0 14px rgba(226, 180, 92, 0.35); transform: translateY(-3px); }
+.relic-choice span { font-size: 0.85rem; line-height: 1.45; }
+.relic-choice small { font-size: 0.72rem; font-style: italic; color: var(--ink-dim); }
+.relic-chip .item-icon, .potion-chip .item-icon { display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: inherit; background: none; font: inherit; color: inherit; }
+.item-icon.has-art img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }

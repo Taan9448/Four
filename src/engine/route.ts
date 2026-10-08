@@ -150,10 +150,14 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
       const forced = stage.forcedTypes[String(f)];
       const parentRest = parentsOf(node).some((p) => p.type === 'rest');
       const nextForcedRest = stage.forcedTypes[String(f + 1)] === 'rest';
+      // 상점도 휴식처럼 두 번 잇따르지 않는다(보스 앞 정해진 상점 바로 앞에도 두지 않는다)
+      const parentShop = parentsOf(node).some((p) => p.type === 'shop');
+      const nextForcedShop = stage.forcedTypes[String(f + 1)] === 'shop';
       let candidates = (Object.entries(stage.typeWeights) as [NodeType, number][]).filter(([type, w]) => {
         if (w <= 0 || type === 'story' || type === 'boss') return false;
         if (type === 'elite' && f < route.eliteMinFloor) return false;
         if (type === 'rest' && (parentRest || nextForcedRest)) return false;
+        if (type === 'shop' && (parentShop || nextForcedShop)) return false;
         if (calmFull && isCalm(type)) return false;
         return true;
       });

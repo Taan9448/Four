@@ -9,7 +9,7 @@ const INTENT_FRAME: Record<string, number> = { attack: 1, defend: 2, buff: 3, de
 const INTENT_GLYPH: Record<string, string> = { attack: '攻', defend: '守', buff: '強', debuff: '咒', special: '奇', block: '盾' };
 export const INTENT_LABEL: Record<string, string> = { attack: '공격', defend: '방어', buff: '강화', debuff: '약화', special: '특수' };
 
-function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: string): HTMLElement {
+export function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: string): HTMLElement {
   const url = frame ? frameUrl(sheet, frame, { realOnly: true }) : null;
   return url
     ? h('span', { class: `icon ${cls} has-art` }, h('img', { src: url, alt: '', draggable: 'false' }))

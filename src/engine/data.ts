@@ -6,6 +6,8 @@ import {
   CharacterDef,
   EnemyDef,
   ModuleDef,
+  PotionDef,
+  RelicDef,
   SceneDef,
   SpeakerDef,
   StageDef,
@@ -18,6 +20,8 @@ import charactersJson from '../../data/characters.json';
 import stagesJson from '../../data/stages.json';
 import supportJson from '../../data/support.json';
 import speakersJson from '../../data/speakers.json';
+import relicsJson from '../../data/relics.json';
+import potionsJson from '../../data/potions.json';
 
 const cardFiles = import.meta.glob('../../data/cards/*.json', { eager: true, import: 'default' });
 const moduleFiles = import.meta.glob('../../data/modules/*.json', { eager: true, import: 'default' });
@@ -35,6 +39,8 @@ export interface GameData {
   support: SupportRule[];
   speakers: Map<string, SpeakerDef>;
   scenes: Map<string, SceneDef>;
+  relics: Map<string, RelicDef>;
+  potions: Map<string, PotionDef>;
 }
 
 function byId<T extends { id: string }>(items: T[], label: string): Map<string, T> {
@@ -74,6 +80,8 @@ export function loadGameData(): GameData {
     support: parse(z.array(SupportRule), supportJson, 'data/support.json'),
     speakers: byId(parse(z.array(SpeakerDef), speakersJson, 'data/speakers.json'), 'speakers'),
     scenes: byId(scenes, 'scenes'),
+    relics: byId(parse(z.array(RelicDef), relicsJson, 'data/relics.json'), 'relics'),
+    potions: byId(parse(z.array(PotionDef), potionsJson, 'data/potions.json'), 'potions'),
   };
 }
 

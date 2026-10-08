@@ -30,7 +30,7 @@
     "journey": {"label": "은빛 숲", "x": 60, "y": 66, "region": "elheim", "unknownLabel": "낯선 숲", "knownFlag": "met_companions"},
     "teaser": "눈을 뜨니 낯선 숲이다. 은빛 잎사귀, 처음 보는 나무, 그리고 하늘에 뜬 두 개의 달. 여기는 어디인가.",
     "pinned": [{"floor": 1, "module": "s1_story_two_moons"}, {"floor": 2, "module": "s1_story_silver_bell"}, {"floor": 3, "module": "s1_story_strangers_sword"}, {"floor": 7, "module": "s1_story_first_snow"}],
-    "forcedTypes": {"9": "rest"},
+    "forcedTypes": {"8": "shop", "9": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 12, "rest": 8, "inn": 7},
     "boss": "s1_boss_veilak",
     "summary": "두 개의 달 아래 엘리아·카일·보른을 구하고 하일론 은종 여관에서 동행한다. 못생긴 검, 광석거미, 지붕 위 마나 수업. 첫눈의 개울가에서 첫 푸른 검광(엘리아만 금을 본다). 실바렌을 포위한 그림자 군단장 베일락을 베고 하운도 금을 본다. 실리엔의 은빛 씨앗."
@@ -50,7 +50,7 @@
     "journey": {"label": "화산 협곡", "x": 70, "y": 74, "region": "elheim"},
     "teaser": "은빛 숲을 떠난 지 보름. 화산재로 붉게 물든 서쪽 평원 너머, 사천왕 화염군주가 있다는 협곡으로 간다.",
     "pinned": [{"floor": 1, "module": "s2_story_red_plain"}],
-    "forcedTypes": {"8": "rest"},
+    "forcedTypes": {"7": "shop", "8": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 14, "rest": 8},
     "boss": "s2_boss_ignis",
     "summary": "벨칸 피난민과 토마의 약속. 사슬의 마을, 화로 서른두 개, 쐐기를 두드리는 노예들. 협곡의 마나를 쥔 이그니스를 흐름에 올라타 벽운단하로 가른다(다섯 숨). 한스가 카일의 붉은 검을 벼린다."
@@ -71,7 +71,7 @@
     "mana": {"battleStart": 4, "perTurn": 1},
     "teaser": "북쪽으로 넉 달. 카일의 고향 아르덴은 십 년째 얼어 있다. 이곳에서는 마나마저 얼어붙어 느리게 흐른다.",
     "pinned": [{"floor": 1, "module": "s3_story_frozen_field"}, {"floor": 6, "module": "s3_elite_rowen_knights"}],
-    "forcedTypes": {"8": "rest"},
+    "forcedTypes": {"7": "shop", "8": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 12, "rest": 8},
     "boss": "s3_boss_celias",
     "summary": "얼어붙은 들판과 아르덴의 마지막 기사들. 남쪽 성문에서 카일이 얼음 기사가 된 아버지를 혼자 벤다. 셀리아스의 심장이 갇힌 리나 왕녀의 얼음에 카일이 손을 대고 하운이 날을 얹는다(일곱 숨). 카일 서임."
@@ -92,7 +92,7 @@
     "mana": {"battleStart": "full", "perTurn": 1},
     "teaser": "회색 산맥 한가운데, 숨 쉬지 않는 산. 보른의 고향 카즈둠이다.",
     "pinned": [{"floor": 1, "module": "s4_story_grandfather_mountain"}, {"floor": 5, "module": "s4_story_five_thousand"}],
-    "forcedTypes": {"8": "rest"},
+    "forcedTypes": {"7": "shop", "8": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 12, "rest": 8},
     "boss": "s4_boss_gormon",
     "summary": "두린의 문과 갱도의 벽 문자, 오천의 무덤과 두린의 망치. 산과 하나가 된 고르몬을 보른의 망치와 하운의 검이 동시에 친다(아홉 숨, 카일도 본다)."
@@ -112,7 +112,7 @@
     "journey": {"label": "노크투르나", "x": 93, "y": 30, "region": "elheim"},
     "teaser": "카즈둠의 겨울이 지나면 원정이다. 얼음 바다 위 흑요석 성채, 마왕의 성으로.",
     "pinned": [{"floor": 1, "module": "s5_story_shadow_night"}, {"floor": 2, "module": "s5_story_border_crack"}, {"floor": 3, "module": "s5_story_sewer"}],
-    "forcedTypes": {"10": "rest"},
+    "forcedTypes": {"9": "shop", "10": "rest"},
     "typeWeights": {"battle": 55, "event": 16, "elite": 15, "rest": 8},
     "boss": "s5_boss_vargas",
     "summary": "그림자의 밤(그림자 암살자, 쐐기 계획), 경계의 금(고백과 석판, '세계의 틈'), 장작 패기 원정. 하수로와 일곱 회랑의 잔당. 쐐기 박힌 잠든 문 앞의 바르가스를 돌려보내는 천외귀운으로 꿰뚫는다(열두 숨). 공허의 열쇠, 작별, 귀환."
@@ -132,7 +132,7 @@
     "journey": {"label": "운곡촌", "x": 18, "y": 72, "region": "murim"},
     "teaser": "삼 년 만의 무림. 장작을 지고 운곡촌 장터에 들어섰지만, 아무도 하운을 알아보지 못한다. 산문의 현판이 바뀌어 있었다.",
     "pinned": [{"floor": 1, "module": "s6_story_return"}, {"floor": 2, "module": "s6_battle_ambush"}, {"floor": 3, "module": "s6_story_old_temple"}],
-    "forcedTypes": {"10": "rest"},
+    "forcedTypes": {"9": "shop", "10": "rest"},
     "typeWeights": {"battle": 52, "event": 18, "elite": 13, "rest": 7, "inn": 6},
     "boss": "s6_boss_full_moon",
     "summary": "청운귀의 밤(아무도 죽이지 않는다), 혈위대 함정, 폐사찰의 다리 없는 왕일검(지원 시작, 동료 셋이 청운호흡을 배운다), 계곡의 요새, 첫 토벌의 흑풍대주. 보름의 연무장에서 조명각의 채찍을 잡고 석두를 데려온다."
@@ -152,7 +152,7 @@
     "journey": {"label": "낙안봉", "x": 31, "y": 50, "region": "murim"},
     "teaser": "옛 청운 깃발이 다시 걸렸다. 청운맹은 무당과 소림을 거쳐 화산으로 간다. 낙안봉에서 아이들의 피를 받는다는 소식이 들려왔다.",
     "pinned": [{"floor": 1, "module": "s7_story_alliance"}],
-    "forcedTypes": {"10": "rest"},
+    "forcedTypes": {"9": "shop", "10": "rest"},
     "typeWeights": {"battle": 52, "event": 18, "elite": 14, "rest": 7, "inn": 5},
     "boss": "s7_boss_blood_hand",
     "summary": "무당 혈마삼재진을 마나 한 바가지로 가르고 무림의 첫 금(스물여섯 숨). 소림 탑림의 독수마군. 낙안봉에서 아이들을 구하고 혈수마군을 천외귀운으로 쓰러뜨린 밤, 아물지 않는 금."
@@ -172,7 +172,7 @@
     "journey": {"label": "천마봉", "x": 22, "y": 28, "region": "murim"},
     "teaser": "스무 날 뒤 그믐 축시. 십만대산 천마봉, 구천 계단 위의 혈전으로.",
     "pinned": [{"floor": 1, "module": "s8_story_returning_sword"}, {"floor": 2, "module": "s8_story_nine_stairs"}, {"floor": 7, "module": "s8_story_broken_stair"}],
-    "forcedTypes": {"9": "rest"},
+    "forcedTypes": {"5": "shop", "9": "rest"},
     "typeWeights": {"battle": 58, "event": 14, "elite": 15, "rest": 7},
     "boss": "s8_boss_blood_hall",
     "summary": "왕일검의 목검과 운해귀종. 구천 계단, 일곱째 굽이에서 엘리아의 마지막 마나로 놓은 다리. 혈전: 곽도진의 최후, 붉은 거인이 된 사무결을 카일의 검과 틈 밖에서 끌어온 흐름의 천외귀운으로 꿰뚫는다. 하늘이 갈라진다."

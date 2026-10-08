@@ -7,10 +7,11 @@ import { h } from './dom';
 import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
+import { inventoryBox } from './items';
 
 /** 노드 표식: 두루마리 위의 한자 */
-const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', boss: '王' };
-const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', boss: '보스' };
+const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
+const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', shop: '상점', boss: '보스' };
 
 /** 세계의 틈이 나타나는 사건: S7 낙안봉을 넘은 밤의 아물지 않는 금 */
 const RIFT_FLAG = 'sky_crack';
@@ -360,6 +361,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             h('span', {}, h('b', {}, run.deck.length), '덱'),
           ),
         ),
+        inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
         support,
         h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),

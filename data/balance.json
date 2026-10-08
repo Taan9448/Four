@@ -51,6 +51,31 @@
       "boss":   { "rare": 50, "epic": 50 }
     }
   },
+  "economy": {
+    "startGold": 30,
+    "debugGoldPerStage": 80,
+    "gold": { "battle": [10, 16], "elite": [25, 35], "boss": [55, 75] },
+    "potionSlots": 3,
+    "potionDrop": { "battle": 0.35, "elite": 0.6, "boss": 1 },
+    "potionWeights": { "common": 60, "uncommon": 30, "rare": 10 },
+    "relicWeights": {
+      "elite": { "common": 50, "uncommon": 35, "rare": 15 },
+      "shop": { "common": 45, "uncommon": 40, "rare": 15 }
+    },
+    "bossRelicChoices": 3,
+    "shop": {
+      "cards": 5,
+      "relics": 2,
+      "potions": 3,
+      "cardPrice": { "uncommon": 45, "rare": 70, "epic": 110 },
+      "relicPrice": { "common": 110, "uncommon": 150, "rare": 200 },
+      "potionPrice": { "common": 30, "uncommon": 45, "rare": 65 },
+      "removePrice": 50,
+      "removeStep": 25,
+      "upgradePrice": 60,
+      "jitter": 0.1
+    }
+  },
   "stage": { "healOnEnter": 1 },
   "route": {
     "nodesPerFloor": [2, 3],

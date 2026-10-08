@@ -243,5 +243,6 @@
     "type": "boss",
     "name": "실바렌 — 그림자 군단장",
     "content": {"scene": "s1_scene_silvaren", "outroScene": "s1_scene_silver_child", "background": "bg_silvaren", "text": "\"인간. 아니. 인간의 냄새가 아니다. 이 세계의 냄새가 아니다. 너는 무엇이냐.\" \"장작 패는 사람입니다.\" — 죽은 숲: 마나 0에서 시작해 차례마다 2씩 돌아온다. 군단장은 검은 구름 아래에서 연기가 다시 뭉친다(받는 피해 감소). 결계가 살아나면 걷힌다. 군단장이 쓰러지면 빈 갑옷도 무너진다.", "enemies": ["empty_armor", "veilak", "empty_armor"], "mana": {"battleStart": 0, "perTurn": 2}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 죽은 숲의 땅에 도끼를 내리찍었다. 언 땅이 결을 따라 쩍 갈라졌다. \"길이다.\" (적 전체 피해 6)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}, "clearEffects": [{"op": "set_flag", "flag": "silien_seed"}]}
-  }
+  },
+  {"id": "s1_shop", "stage": "s1", "type": "shop", "name": "은빛 숲 행상", "weight": 1, "content": {"text": "은빛 숲 가장자리에 덮개 친 수레가 서 있다. 귀가 뾰족한 행상이 하운의 옷차림을 위아래로 훑었다. \"이 숲에선 처음 보는 차림이군. 동전만 진짜면 상관없지.\""}}
 ]

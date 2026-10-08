@@ -43,6 +43,12 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   }
   run.pendingUpgrades ??= [];
   run.levelLog ??= [];
+  // 경제 도입(2026-10-08) 전 저장: 시작 골드, 유물·물약 없음
+  run.gold ??= data.balance.economy.startGold;
+  run.relics ??= [];
+  run.potions ??= Array.from({ length: data.balance.economy.potionSlots }, () => null);
+  run.shop ??= null;
+  run.shopRemovals ??= 0;
   return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
 }
 
@@ -63,5 +69,7 @@ function isValidRun(data: GameData, run: RunState): boolean {
   if (!run.selected.includes('haun') || !run.selected.every((id) => rosterIds.has(id))) return false;
   if (!run.deck.every((c) => data.cards.has(c.cardId) && typeof c.uid === 'string')) return false;
   if (!run.usedModules.every((id) => data.modules.has(id))) return false;
+  if (!run.relics.every((id) => data.relics.has(id))) return false;
+  if (!run.potions.every((id) => id === null || data.potions.has(id))) return false;
   return Array.isArray(run.flags);
 }
