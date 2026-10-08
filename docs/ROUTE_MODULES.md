@@ -52,7 +52,7 @@
 }
 ```
 
-**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`, `remove_card`(filter), `upgrade_card`(count, filter), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic), `gain_potion`(potion: 빈 칸이 없으면 두고 온다).
+**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`(보유 카드에 영구로 + 이번 스테이지 덱, 이미 있으면 강화 — GAME_DESIGN 9-1), `remove_card`(filter: 이번 스테이지 덱에서만 뺀다. 덱을 얇게 하지 않는 원칙이라 지금 데이터는 쓰지 않는다), `upgrade_card`(count, filter: 보유 카드의 강화 단계가 오른다), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic), `gain_potion`(potion: 빈 칸이 없으면 두고 온다).
 
 **상점 노드(`shop`, 2026-10-08):** 스테이지마다 정해진 층(`forcedTypes`, S1·S2~S7은 보스 앞 휴식 바로 앞, S8은 5층) 전체가 상점이다(S0·S9는 없음). 모듈은 `content.text`(상인 소개)만 있고 선택지가 없으며, 진열은 `src/engine/economy.ts`가 노드마다 시드로 정해 `run.shop`에 남긴다. 상점·휴식은 두 번 잇따르지 않는다.
 

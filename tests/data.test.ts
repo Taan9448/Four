@@ -57,15 +57,17 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
-  it('캐릭터: 시작 덱 카드가 존재하고 주인이 맞다', () => {
+  it('보유·편성(9-1): 싸우는 동료와 공용의 시작 카드가 편성 칸보다 많고, 필수 카드는 이야기로만 얻는다', () => {
     const errors: string[] = [];
+    const starters = (owner: string) => [...data.cards.values()].filter((c) => c.pool === 'starter' && (data.characters.has(c.owner) ? c.owner : 'common') === owner);
     for (const ch of data.characters.values()) {
-      for (const id of ch.starterDeck) {
-        const card = data.cards.get(id);
-        if (!card) errors.push(`${ch.id}: 없는 카드 ${id}`);
-        else if (card.owner !== ch.id) errors.push(`${ch.id}: 남의 카드 ${id}`);
-      }
+      if (ch.role !== 'fighter') continue;
+      const n = starters(ch.id).length;
+      if (n < data.balance.loadout.perCharacter) errors.push(`${ch.id}: 시작 카드 ${n}장 < 편성 ${data.balance.loadout.perCharacter}장`);
     }
+    const common = starters('common').length;
+    if (common < data.balance.loadout.common) errors.push(`공용: 시작 카드 ${common}장 < 편성 ${data.balance.loadout.common}장`);
+    for (const c of data.cards.values()) if (c.essential && c.pool !== 'story') errors.push(`${c.id}: 필수 카드는 이야기 카드여야 한다`);
     expect(errors).toEqual([]);
   });
 
@@ -158,12 +160,10 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
-  it('카드 등급: 시작 카드는 일반, 전설은 스토리로만, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {
+  it('카드 등급(9-1): 시작 카드는 일반·고급, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {
     const bad: string[] = [];
     for (const c of data.cards.values()) {
-      if (c.pool === 'starter' && c.rarity !== 'common') bad.push(`${c.id}: 시작 카드는 common`);
-      if (c.rarity === 'legendary' && c.pool !== 'story') bad.push(`${c.id}: 전설은 story 풀`);
-      if (c.rarity === 'common' && c.pool === 'reward') bad.push(`${c.id}: 보상 풀에 일반 등급`);
+      if (c.pool === 'starter' && c.rarity !== 'common' && c.rarity !== 'uncommon') bad.push(`${c.id}: 시작 카드는 일반·고급`);
       if ((c.rarity === 'epic' || c.rarity === 'legendary') && !c.castLine) bad.push(`${c.id}: 영웅·전설은 castLine 필요`);
       if (c.castLine && !data.characters.has(c.castLine.speaker)) bad.push(`${c.id}: castLine 화자 ${c.castLine.speaker}`);
     }

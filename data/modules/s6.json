@@ -114,7 +114,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "하운은 매일 새벽 장작을 팬다. 장터에서 '장작 도령'을 외쳤던 아이가 친구를 데려오고, 열흘째에는 청년 스물이 장작더미 앞에 모였다. \"가르쳐 주세요. 장작 패는 거.\"", "choices": [{"label": "\"나무는 원래 갈라질 자리를 가지고 있습니다.\"", "result": "그 자리를 찾아서 날을 얹기만 하면 된다. 한 달 뒤, 셋이 옹이를 피해 도끼를 내리쳤다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "도끼를 내려놓고 숨부터 가르친다", "result": "힘으로 쪼개려 하지 마십시오. 쓸데없는 힘을 덜었다. 기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "하운은 매일 새벽 장작을 팬다. 장터에서 '장작 도령'을 외쳤던 아이가 친구를 데려오고, 열흘째에는 청년 스물이 장작더미 앞에 모였다. \"가르쳐 주세요. 장작 패는 거.\"", "choices": [{"label": "\"나무는 원래 갈라질 자리를 가지고 있습니다.\"", "result": "그 자리를 찾아서 날을 얹기만 하면 된다. 한 달 뒤, 셋이 옹이를 피해 도끼를 내리쳤다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "도끼를 내려놓고 숨부터 가르친다", "result": "힘으로 쪼개려 하지 마십시오. 쓸데없는 힘을 덜었다. 몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_event_third_article",
@@ -208,7 +208,7 @@
     "name": "마 씨의 가마솥",
     "weight": 1,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "불탄 객잔 터의 주인이던 마 씨가 계곡에 가마솥을 걸었다. 국 냄새가 계곡 입구까지 퍼진다.", "choices": [{"label": "한 그릇 얻어먹는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "불탄 객잔 터의 주인이던 마 씨가 계곡에 가마솥을 걸었다. 국 냄새가 계곡 입구까지 퍼진다.", "choices": [{"label": "한 그릇 얻어먹는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_boss_full_moon",

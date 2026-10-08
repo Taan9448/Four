@@ -2,6 +2,7 @@
 // 브라우저 저장소(localStorage)는 UI가 맡는다. 여기는 순수 함수만.
 import type { GameData } from './data';
 import type { RunState } from './run';
+import { collectionFromDeck, grantStarters, loadoutOwners, recommendLoadout } from './collection';
 
 // 2: 10스테이지 개편(2026-10-08) — 스테이지 id의 뜻이 바뀌어 옛 저장은 버린다
 export const SAVE_VERSION = 2;
@@ -36,6 +37,13 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   }
   if (!file || file.version !== SAVE_VERSION || !file.run) return null;
   const run = file.run;
+  migrate(data, run);
+  if (run.replayOf) migrate(data, run.replayOf);
+  return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
+}
+
+/** 옛 저장을 지금 형식으로 채운다(없는 칸만) */
+function migrate(data: GameData, run: RunState): void {
   // 레벨 도입(2026-10-08) 전 저장: 레벨 1, 남은 강화·소식 없음으로 채운다
   for (const r of run.roster ?? []) {
     r.level ??= 1;
@@ -48,14 +56,27 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   run.relics ??= [];
   run.potions ??= Array.from({ length: data.balance.economy.potionSlots }, () => null);
   run.shop ??= null;
-  run.shopRemovals ??= 0;
+  run.shopSwaps ??= 0;
+  if (run.shop) run.shop.swapUsed ??= false;
   // 난이도·다시 하기 도입(2026-10-08) 전 저장: 보통, 하드코어 아님
   run.difficulty ??= 'normal';
   run.hardcore ??= false;
   run.fallen ??= [];
   run.replays ??= {};
   run.replayOf ??= null;
-  return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
+  // 보유 카드·편성 도입(2026-10-08, GAME_DESIGN 9-1) 전 저장: 지금 덱을 보유 목록으로, 시작 카드를 받고, 추천 편성.
+  // 이번 스테이지는 지금 덱 그대로 이어 가고 다음 스테이지부터 편성한다
+  if (!run.collection) {
+    run.collection = collectionFromDeck((run.deck ?? []).filter((c) => data.cards.has(c.cardId)));
+    for (const owner of loadoutOwners(data, run)) grantStarters(data, run, owner);
+    run.loadout = recommendLoadout(data, run);
+    run.needsLoadout = false;
+  }
+  run.loadout ??= {};
+  run.presets ??= Array.from({ length: data.balance.loadout.presets }, () => null);
+  run.needsLoadout ??= false;
+  run.stageGains ??= [];
+  for (const id of Object.keys(run.collection)) if (!data.cards.has(id)) delete run.collection[id];
 }
 
 function isValidRun(data: GameData, run: RunState): boolean {

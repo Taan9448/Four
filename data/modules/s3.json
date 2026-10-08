@@ -161,7 +161,7 @@
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [7, 7]},
-    "content": {"text": "서고에는 책을 펼친 학자가 얼음 속에 멈춰 있다. 십 년 전 그 밤, 그는 어느 줄을 읽고 있었을까. 얼음 너머로 책장의 글자가 희미하게 비친다.", "choices": [{"label": "엘리아가 얼음 너머의 책장을 읽는다", "condition": {"partyHas": "elia"}, "result": "엘리아가 얼음에 손바닥을 대고 한참 글자를 따라갔다. 마나를 덜 쓰는 주문 하나를 고쳐 외웠다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}, {"label": "무거운 것을 내려놓는다", "result": "얼음 바닥에 짐 하나를 내려놓았다. (기본 카드 1장을 덱에서 뺐다)", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "서고에는 책을 펼친 학자가 얼음 속에 멈춰 있다. 십 년 전 그 밤, 그는 어느 줄을 읽고 있었을까. 얼음 너머로 책장의 글자가 희미하게 비친다.", "choices": [{"label": "엘리아가 얼음 너머의 책장을 읽는다", "condition": {"partyHas": "elia"}, "result": "엘리아가 얼음에 손바닥을 대고 한참 글자를 따라갔다. 마나를 덜 쓰는 주문 하나를 고쳐 외웠다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}, {"label": "무거운 것을 내려놓는다", "result": "얼음 바닥에 짐 하나를 내려놓았다. (몸이 가벼워졌다 — 카드 1장이 강화됐다)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s3_rest_snow_cave",

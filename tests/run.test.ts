@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { battleOutcome, createBattle, playCard } from '../src/engine/battle';
+import { battleOutcome, canPlay, createBattle, endTurn, playCard } from '../src/engine/battle';
 import {
   applyBattleOutcome,
   applyChoice,
@@ -56,8 +56,12 @@ describe('런 진행', () => {
     for (const e of state.enemies) e.hp = 1;
     state.rift = 4;
     while (!state.result) {
-      const i = state.hand.findIndex((c) => ['haun_chop', 'elia_fireball'].includes(c.cardId));
-      if (i < 0) break;
+      // 편성에 따라 손패가 다르다: 쓸 수 있는 공격 카드 아무거나
+      const i = state.hand.findIndex((c, k) => data.cards.get(c.cardId)!.type === 'attack' && data.cards.get(c.cardId)!.target === 'enemy' && canPlay(state, k).ok);
+      if (i < 0) {
+        endTurn(state);
+        continue;
+      }
       playCard(state, i, state.enemies.find((e) => !e.downed)!.uid);
     }
     expect(state.result).toBe('victory');
@@ -70,11 +74,12 @@ describe('런 진행', () => {
     const run = createRun(data, 'RUN4', { stageId: 's1' });
     const a = rewardOptions(data, run, 'f2n0');
     expect(a).toEqual(rewardOptions(data, run, 'f2n0'));
-    expect(a.every((id) => data.cards.get(id)!.owner === 'haun')).toBe(true);
+    // 출전한 동료(하운)의 카드 + 공용 카드
+    expect(a.every((id) => ['haun', 'common'].includes(data.cards.get(id)!.owner))).toBe(true);
     expect(a.length).toBe(3);
   });
 
-  it('보상 등급은 노드 유형별 가중치를 따른다: 일반·전설은 나오지 않고, 엘리트·보스일수록 높은 등급이 잦다', () => {
+  it('보상 등급은 노드 유형별 가중치를 따른다: 일반 전투에는 전설이, 보스에는 일반·고급이 나오지 않고, 보스일수록 높은 등급이 잦다', () => {
     const run = createRun(data, 'RARITY', { stageId: 's1' });
     run.roster.push({ id: 'elia', hp: 42, maxHp: 42, level: 1, xp: 0 }, { id: 'kyle', hp: 52, maxHp: 52, level: 1, xp: 0 });
     run.selected = ['haun', 'elia', 'kyle'];
@@ -92,9 +97,9 @@ describe('런 진행', () => {
     };
     const battle = tally('battle');
     const boss = tally('boss');
-    expect(battle.common ?? 0).toBe(0);
     expect(battle.legendary ?? 0).toBe(0);
     expect(boss.uncommon ?? 0).toBe(0);
+    expect(boss.common ?? 0).toBe(0);
     expect((boss.epic ?? 0) / 900).toBeGreaterThan((battle.epic ?? 0) / 900);
   });
 

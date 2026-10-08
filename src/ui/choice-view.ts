@@ -38,7 +38,8 @@ function partyStrip(data: GameData, run: RunState): HTMLElement {
   );
 }
 
-export function choiceView(data: GameData, run: RunState, module: ModuleDef, onDone: () => void): HTMLElement {
+/** opts.onEditLoadout: 여관에서 편성 바꾸기(GAME_DESIGN 9-1) */
+export function choiceView(data: GameData, run: RunState, module: ModuleDef, onDone: () => void, opts: { onEditLoadout?: () => void } = {}): HTMLElement {
   const box = h('div', { class: 'choice-box panel' });
   const render = (result?: string[], resultText?: string) => {
     box.replaceChildren(
@@ -72,6 +73,15 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                 h('span', {}, c.label),
               ),
             ),
+            // 여관: 편성 바꾸기(선택지와 따로, 고르기 전에)
+            opts.onEditLoadout
+              ? h(
+                  'button',
+                  { class: 'btn choice choice-loadout', onclick: opts.onEditLoadout },
+                  h('span', { class: 'choice-mark' }, '編'),
+                  h('span', {}, '편성 바꾸기 — 여관에서만, 이번 스테이지에 얻은 카드는 그대로'),
+                )
+              : null,
           ),
     );
   };

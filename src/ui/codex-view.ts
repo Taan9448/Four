@@ -87,6 +87,7 @@ function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: n
       h(
         'div',
         { class: 'zoom-right' },
+        e.lore ? h('p', { class: 'zoom-text zoom-lore' }, e.lore) : null,
         facts([
           ['등급', TIER_LABEL[e.tier]],
           ['만남 · 이김', `${rec.seen} · ${rec.defeated}`],
@@ -122,7 +123,12 @@ function openPerson(data: GameData, id: string): void {
     faces.append(box);
     void loadPortrait(id, face).then((img) => img && box.replaceChildren(h('img', { src: img.src, alt: '' })));
   });
-  openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h('div', { class: 'zoom-right' }, ch ? h('div', { class: 'zoom-kind' }, ch.title) : null, ch ? h('p', { class: 'zoom-text' }, ch.description) : null)), { wide: true });
+  openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h(
+        'div',
+        { class: 'zoom-right' },
+        ch ? h('div', { class: 'zoom-kind' }, ch.title) : null,
+        ch?.lore || sp?.lore || ch?.description ? h('p', { class: 'zoom-text zoom-lore' }, ch?.lore ?? sp?.lore ?? ch?.description ?? '') : null,
+      )), { wide: true });
 }
 
 const TIER_LABEL: Record<string, string> = { normal: '일반', elite: '정예', boss: '보스' };
@@ -153,7 +159,7 @@ function section(title: string, note: string | null, ...body: (HTMLElement | HTM
   return h('section', { class: 'codex-section' }, h('h3', {}, title, note ? h('small', {}, note) : null), ...body);
 }
 
-function cardsTab(data: GameData, codex: Codex): HTMLElement {
+function cardsTab(data: GameData, codex: Codex, owned?: Record<string, number>): HTMLElement {
   const cards = codexCards(data);
   const order = [...data.characters.keys(), 'common'];
   const rank = (owner: string) => (order.includes(owner) ? order.indexOf(owner) : order.length);
@@ -165,6 +171,13 @@ function cardsTab(data: GameData, codex: Codex): HTMLElement {
           'div',
           { class: 'deck-card codex-card zoomable', title: '눌러서 크게 보기', onclick: () => openCard(data, def, codex.cards[def.id]) },
           cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: codex.cards[def.id] }),
+          owned
+            ? h(
+                'span',
+                { class: `codex-own${owned[def.id] !== undefined ? ' on' : ''}` },
+                owned[def.id] !== undefined ? `보유${owned[def.id] ? ` +${owned[def.id]}` : ''}` : '미보유',
+              )
+            : null,
         )
       : h('div', { class: `codex-card unknown rarity-${def.rarity}` }, h('span', {}, '?'));
   return h(
@@ -174,9 +187,10 @@ function cardsTab(data: GameData, codex: Codex): HTMLElement {
       const list = cards.filter((c) => c.owner === owner).sort((a, b) => rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity) || a.name.localeCompare(b.name, 'ko'));
       const seen = list.filter((c) => c.id in codex.cards).length;
       const name = data.characters.get(owner)?.name ?? '공용';
-      return section(name, `${seen} / ${list.length}`, h('div', { class: 'deck-cards' }, list.map(tile)));
+      const have = owned ? list.filter((c) => owned[c.id] !== undefined).length : null;
+      return section(name, `${seen} / ${list.length}${have !== null ? ` · 이 저장에 보유 ${have}` : ''}`, h('div', { class: 'deck-cards' }, list.map(tile)));
     }),
-    h('p', { class: 'hint' }, '덱에 들어오거나 보상으로 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.'),
+    h('p', { class: 'hint' }, `가지거나 보상·상점에서 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.${owned ? ' 아래 표시는 지금 저장의 보유 여부와 강화 단계.' : ''}`),
   );
 }
 
@@ -345,7 +359,8 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
   );
 }
 
-export function codexView(data: GameData, codex: Codex, profile: Profile, handlers: CodexHandlers, start: CodexTab = 'cards'): HTMLElement {
+/** owned: 지금 런의 보유 카드(지도에서 열었을 때) — 카드 칸에 보유 여부·강화 단계 */
+export function codexView(data: GameData, codex: Codex, profile: Profile, handlers: CodexHandlers, start: CodexTab = 'cards', owned?: Record<string, number>): HTMLElement {
   installTooltips();
   const prog = codexProgress(data, codex);
   const seen = prog.reduce((a, p) => a + p.seen, 0);
@@ -356,7 +371,7 @@ export function codexView(data: GameData, codex: Codex, profile: Profile, handle
     for (const b of tabs.children) b.classList.toggle('on', (b as HTMLElement).dataset.tab === tab);
     const content =
       tab === 'cards'
-        ? cardsTab(data, codex)
+        ? cardsTab(data, codex, owned)
         : tab === 'enemies'
           ? enemiesTab(data, codex)
           : tab === 'items'

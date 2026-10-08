@@ -141,7 +141,8 @@ const UpgradeSkill = z
 export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
 
 /** 장면에만 나오는 화자(동료가 아닌 인물). 반신 그림 에셋은 <id>_stand */
-export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string() }).strict();
+/** lore: 도감의 인물 설명(처음 만난 때 하운이 아는 만큼, GAME_DESIGN 14절) */
+export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string(), lore: z.string().optional() }).strict();
 export type SpeakerDef = z.infer<typeof SpeakerDef>;
 
 /**
@@ -202,6 +203,8 @@ export const CardDef = z
     seal: z.string().length(1).optional(),
     /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
+    /** 필수 카드(GAME_DESIGN 9-1): 보스를 깨는 열쇠. 가지고 있으면 편성과 상관없이 늘 덱에 들어간다 */
+    essential: z.boolean().optional(),
     /**
      * 강화(+1~+5). +1~+3: growth[i]만큼 effects[i]의 수치(amount, 없으면 stacks)가 단계마다 오른다.
      * +4·+5: 이름 붙은 특수 스킬이 붙는다(효과 추가·키워드 추가/제거·비용 변경). 상태·저주 카드는 강화하지 않는다
@@ -273,6 +276,8 @@ export const EnemyDef = z
     color: z.string().optional(),
     /** 이 적의 공격이 맞은 자리에 겹칠 피격 이펙트(생략하면 fx_hit_strike) */
     hitFx: z.string().optional(),
+    /** 도감 설명(만나서 아는 만큼 — 이기기 전에도 보인다, GAME_DESIGN 14절) */
+    lore: z.string().optional(),
     /** 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계': 꿰맬 자리가 많아진다) */
     hpPerScar: z.number().int().min(0).optional(),
     /** 이 적이 쓰러질 때 일어나는 일(적을 출처로 하는 전투 동작). 예: 군단장이 쓰러지면 졸개가 무너진다 */
@@ -314,7 +319,6 @@ export const CharacterDef = z
     maxHp: z.number().int().positive(),
     color: z.string(),
     sprites: z.record(z.string(), z.string()).default({}),
-    starterDeck: z.array(z.string()).default([]),
     /** 복장: 런 플래그가 서면 sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 예: 하운 '못생긴 검' */
     outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
     /** 전투 화면의 스프라이트 배율(그림마다 프레임 안 키가 달라 동료끼리 키를 맞출 때). 기본 1 */
@@ -325,6 +329,8 @@ export const CharacterDef = z
     hpPerLevel: z.number().int().min(0).default(4),
     joinsAt: z.string(),
     description: z.string(),
+    /** 도감의 긴 소개(합류했을 때 아는 만큼) */
+    lore: z.string().optional(),
   })
   .strict();
 export type CharacterDef = z.infer<typeof CharacterDef>;
@@ -444,10 +450,19 @@ export const Balance = z
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
     /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
     upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
+    /** 편성(GAME_DESIGN 9-1): 동료마다·공용 칸 수(정확히 채워야 출발), 저장 칸 수, 최대 강화 카드를 또 얻었을 때의 골드 */
+    loadout: z
+      .object({
+        perCharacter: z.number().int().positive(),
+        common: z.number().int().positive(),
+        presets: z.number().int().min(0),
+        maxedGold: z.number().int().min(0),
+      })
+      .strict(),
     rewards: z
       .object({
         cardChoices: z.number().int().positive(),
-        /** 보상 카드 등급 가중치(노드 유형별). 일반은 시작 카드, 전설은 스토리로만 얻는다 */
+        /** 보상 카드 등급 가중치(노드 유형별) */
         rarityWeights: z.record(z.enum(['battle', 'elite', 'boss']), z.partialRecord(Rarity, z.number().min(0))),
       })
       .strict(),
@@ -479,8 +494,9 @@ export const Balance = z
             cardPrice: z.partialRecord(Rarity, z.number().int().positive()),
             relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
             potionPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
-            removePrice: z.number().int().positive(),
-            removeStep: z.number().int().min(0),
+            /** 카드 바꾸기(보유 카드 한 장 → 같은 주인의 다른 카드) 가격. 한 번 쓸 때마다 swapStep씩 비싸진다 */
+            swapPrice: z.number().int().positive(),
+            swapStep: z.number().int().min(0),
             upgradePrice: z.number().int().positive(),
             jitter: z.number().min(0).max(0.5),
           })

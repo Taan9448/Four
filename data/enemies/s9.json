@@ -56,7 +56,7 @@
   {
     "id": "mordecai",
     "name": "지옥왕 모르데카이",
-    "maxHp": 162,
+    "maxHp": 156,
     "sprite": "mordecai",
     "color": "#3a1030",
     "scale": 2.2,
@@ -70,7 +70,7 @@
   {
     "id": "torn_border",
     "name": "찢긴 경계",
-    "maxHp": 45,
+    "maxHp": 38,
     "sprite": null,
     "silhouette": "object",
     "color": "#6a2a5a",

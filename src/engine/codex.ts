@@ -59,6 +59,7 @@ export function parseCodex(data: GameData, text: string | null): Codex {
 /** 런이 지금 가진 것(덱·유물·물약·동료)과 상점에 놓인 것을 적는다. 다시 하는 런은 원래 런도 */
 export function noteRun(codex: Codex, run: RunState): Codex {
   for (const c of run.deck) codex.cards[c.cardId] = Math.max(codex.cards[c.cardId] ?? 0, c.level);
+  for (const [id, lv] of Object.entries(run.collection ?? {})) codex.cards[id] = Math.max(codex.cards[id] ?? 0, lv);
   for (const id of run.relics) addTo(codex.relics, id);
   for (const id of run.potions) if (id) addTo(codex.potions, id);
   for (const r of run.roster) addTo(codex.people, r.id);

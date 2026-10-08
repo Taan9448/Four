@@ -5,7 +5,7 @@
     "type": "story",
     "name": "청운맹",
     "once": true,
-    "content": {"scene": "s7_scene_alliance", "text": "청운산 연무장 한가운데에 푸른 바탕에 흰 구름의 깃발이 걸렸다. 핏빛 덧칠이 없는 옛 청운의 깃발.", "choices": [{"label": "깃발 아래 선다", "result": "옛 청운의 깃발이 연무장 위에서 펄럭였다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "수실을 뜯은 제자들과 장작을 팬다", "result": "기둥이 아니라 장작으로. 짐을 나눠 졌다. 기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}, {"label": "왕일검의 수레 의자를 민다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
+    "content": {"scene": "s7_scene_alliance", "text": "청운산 연무장 한가운데에 푸른 바탕에 흰 구름의 깃발이 걸렸다. 핏빛 덧칠이 없는 옛 청운의 깃발.", "choices": [{"label": "깃발 아래 선다", "result": "옛 청운의 깃발이 연무장 위에서 펄럭였다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "수실을 뜯은 제자들과 장작을 팬다", "result": "기둥이 아니라 장작으로. 짐을 나눠 졌다. 몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}, {"label": "왕일검의 수레 의자를 민다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
   },
   {
     "id": "s7_battle_supply_cart",
@@ -117,7 +117,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [2, 6]},
-    "content": {"text": "붉은 수실을 뜯어낸 청운문의 제자 백오십이 새벽 연무장에 모였다. 그들이 하운을 본다. 담장 너머로 오 년 동안 구령을 듣던 잡역을.", "choices": [{"label": "청운십팔식을 함께 짚는다", "result": "구름은 무겁지 않다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "먼저 장작을 패게 한다", "result": "나무는 원래 갈라질 자리를 가지고 있다. 기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "붉은 수실을 뜯어낸 청운문의 제자 백오십이 새벽 연무장에 모였다. 그들이 하운을 본다. 담장 너머로 오 년 동안 구령을 듣던 잡역을.", "choices": [{"label": "청운십팔식을 함께 짚는다", "result": "구름은 무겁지 않다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "먼저 장작을 패게 한다", "result": "나무는 원래 갈라질 자리를 가지고 있다. 몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s7_event_shield_wall",
@@ -137,7 +137,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "그 뒤로는 빨랐다. 종남산의 생존자 마흔이 산에서 내려왔다. 아미의 비구니 서른이 찾아왔다. 점창의 검객 스물. 개방의 방주가 직접 연무장에 와서 하운의 손을 잡았다.", "choices": [{"label": "점창의 검객들과 검을 맞춰 본다", "result": "카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2}]}, {"label": "개방 방주의 손을 잡는다", "result": "소식은 거지들의 발로 흐른다. 짐을 나눠 졌다. 기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "그 뒤로는 빨랐다. 종남산의 생존자 마흔이 산에서 내려왔다. 아미의 비구니 서른이 찾아왔다. 점창의 검객 스물. 개방의 방주가 직접 연무장에 와서 하운의 손을 잡았다.", "choices": [{"label": "점창의 검객들과 검을 맞춰 본다", "result": "카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2}]}, {"label": "개방 방주의 손을 잡는다", "result": "소식은 거지들의 발로 흐른다. 짐을 나눠 졌다. 몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s7_event_wonpyeong",
@@ -212,7 +212,7 @@
     "name": "거지들의 객잔",
     "weight": 1,
     "conditions": {"floorRange": [2, 9]},
-    "content": {"text": "개방의 거지들이 드나드는 길가 객잔. 장터의 소문이 이곳을 거쳐 간다.", "choices": [{"label": "하룻밤 묵는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+    "content": {"text": "개방의 거지들이 드나드는 길가 객잔. 장터의 소문이 이곳을 거쳐 간다.", "choices": [{"label": "하룻밤 묵는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s7_boss_blood_hand",
