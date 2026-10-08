@@ -1,0 +1,13 @@
+id: haun_sword_idle
+type: character-anim
+character: haun_sword
+summary: 진하운(못생긴 검) 대기 4프레임
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frame_notes:
+  1: "relaxed ready stance, sword held low in the right hand with the point down, knees slightly bent, inhaling"
+  2: "same stance, chest slightly raised, short breath in"
+  3: "same stance, chest at highest point, short breath held"
+  4: "same stance, long breath out, shoulders relaxed, hair and jacket hem settling, a small warm gold glow (about 6x6 sprite pixels) on the lower belly"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

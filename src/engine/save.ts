@@ -3,7 +3,8 @@
 import type { GameData } from './data';
 import type { RunState } from './run';
 
-export const SAVE_VERSION = 1;
+// 2: 10스테이지 개편(2026-10-08) — 스테이지 id의 뜻이 바뀌어 옛 저장은 버린다
+export const SAVE_VERSION = 2;
 
 interface SaveFile {
   version: number;

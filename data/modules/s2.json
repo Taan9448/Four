@@ -1,130 +1,194 @@
 [
   {
-    "id": "s2_story_castle_gate", "stage": "s2", "type": "story", "name": "마왕성 노크투르나", "once": true,
-    "content": {
-      "scene": "s2_scene_castle",
-      "text": "검은 첨탑이 일곱 개, 구름을 찌르고 서 있었다. 성문 위에서 박쥐 떼가 일제히 날아올랐다. 카일이 검을 고쳐 쥐었고, 보른이 방패를 들어 올렸다.",
-      "choices": [
-        { "label": "정면으로 성문을 부순다", "result": "보른이 앞장서고 카일이 뒤를 받친다. 하운의 카드 1장을 강화했다(+1).",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } }, { "op": "set_flag", "flag": "nocturna" } ] },
-        { "label": "엘리아의 마나 장벽 뒤로 숨어 든다", "result": "성벽 틈의 마나를 모았다. (런 마나 +3)",
-          "effects": [ { "op": "gain_run_mana", "amount": 3 }, { "op": "set_flag", "flag": "nocturna" } ] }
-      ]
-    }
+    "id": "s2_story_red_plain",
+    "stage": "s2",
+    "type": "story",
+    "name": "붉은 평원",
+    "once": true,
+    "content": {"scene": "s2_scene_red_plain", "text": "서쪽으로 가는 길은 온통 붉었다. 녹슨 쇠의 붉음, 마른 피의 붉음. 피난민 행렬이 동쪽으로 멀어진다. 붉은 먼지가 일었다가 가라앉았다.", "choices": [{"label": "\"구할게.\"", "result": "토마가 고개를 끄덕이고 수레를 향해 달려갔다. 하운은 그 약속을 지고 서쪽으로 걷는다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "heal_party", "amount": 6}]}, {"label": "카일과 새벽 대련을 한 번 더 한다", "condition": {"partyHas": "kyle"}, "result": "\"오늘은 결이 보일 거야!\" 서른 합째, 카일의 목검이 다시 하운이 힘을 넘기는 이음매를 노리고 들어왔다. (카일의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아와 숨을 맞춘다", "condition": {"partyHas": "elia"}, "result": "세 번 짧게, 한 번 길게. 엘리아가 그 박자에 맞춰, 조용히, 같이 숨을 쉬었다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
   },
   {
-    "id": "s2_boss_vargas", "stage": "s2", "type": "boss", "name": "옥좌의 방 — 마왕 바르가스",
-    "content": {
-      "scene": "s2_scene_throne",
-      "outroScene": "s2_scene_void_key",
-      "text": "옥좌 위의 그림자가 일어선다. 찢어진 박쥐 날개, 일곱 개의 뿔, 텅 빈 눈.",
-      "enemies": ["vargas"],
-      "bonus": { "condition": {}, "text": "\"하운, 지금!\" 바르가스의 흐름이 엉킨 자리가 보인다. (천외귀운을 손에 든다)",
-        "effects": [ { "op": "add_card", "card": "haun_cheonoe", "to": "hand" } ] },
-      "clearEffects": [ { "op": "gain_card", "card": "haun_cheonoe" }, { "op": "set_flag", "flag": "void_key" } ]
-    }
+    "id": "s2_boss_ignis",
+    "stage": "s2",
+    "type": "boss",
+    "name": "큰 화로 — 화염군주 이그니스",
+    "content": {"scene": "s2_scene_ignis", "outroScene": "s2_scene_five_breaths", "text": "협곡의 가장 안쪽, 흰 불길의 큰 화로. 모든 사슬이 그 화로로 모여든다. 협곡의 마나는 모두 이그니스가 쥐고 있다. 하운의 고리가 돌아도 끌려오는 마나가 없다.", "enemies": ["ignis"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_ride_flow", "to": "hand"}], "bonus": {"condition": {"partyHas": "born", "flag": "s2_born_inside"}, "text": "쾅! 사슬에 묶인 채 들어온 보른이 사슬이 박힌 바위째 뽑아 끌고 와 큰 화로를 친다. \"화로의 결. 내가 찾는다.\" 드워프들이 하나둘 망치를 든다. (이그니스 약화 2, 취약 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "gain_card", "card": "haun_byeogun"}, {"op": "gain_card", "card": "kyle_red_sword"}, {"op": "set_flag", "flag": "byeogun"}, {"op": "set_flag", "flag": "red_sword"}]}
   },
   {
-    "id": "s2_battle_gate_guards", "stage": "s2", "type": "battle", "name": "흑요석 경비병", "weight": 3,
-    "conditions": { "floorRange": [2, 5] },
-    "content": { "text": "성문 안뜰. 검은 갑주 둘이 미늘창을 겨눈다. 투구 안이 비어 있다.", "enemies": ["obsidian_guard", "obsidian_guard"] }
+    "id": "s2_battle_collared_wolves",
+    "stage": "s2",
+    "type": "battle",
+    "name": "목줄 찬 늑대",
+    "weight": 3,
+    "conditions": {"floorRange": [2, 4]},
+    "content": {"text": "벨칸의 화로에서 벼린 쇠 목줄을 찬 그림자늑대 둘이 붉은 풀밭을 가로지른다. 피난민 행렬이 지나온 쪽이다.", "enemies": ["shadow_wolf", "shadow_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"물줄기를 따라.\" 카일이 늑대의 힘이 꺾이는 자리를 노린다. 결이 있다는 것은 이제 안다. (늑대 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s2_battle_bats", "stage": "s2", "type": "battle", "name": "공허 박쥐 떼", "weight": 3,
-    "content": { "text": "회랑 천장이 일제히 날개를 편다.", "enemies": ["void_bat", "void_bat", "void_bat"],
-      "bonus": { "condition": { "partyHas": "elia" }, "text": "엘리아가 횃불처럼 불꽃을 띄운다. (박쥐 전원 약화 1)",
-        "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" } ] } }
+    "id": "s2_battle_ash_patrol",
+    "stage": "s2",
+    "type": "battle",
+    "name": "재 속의 순찰",
+    "weight": 3,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "붉은 재를 뒤집어쓴 빈 갑옷 둘이 평원을 순찰한다. 투구 안의 붉은 불빛이 이쪽을 향했다. 창끝이 따라왔다.", "enemies": ["empty_armor", "empty_armor"]}
   },
   {
-    "id": "s2_battle_corridor", "stage": "s2", "type": "battle", "name": "칠 층 회랑", "weight": 3,
-    "conditions": { "floorRange": [3, 10] },
-    "content": { "text": "끝이 보이지 않는 회랑. 타락한 기사가 박쥐를 거느리고 길을 막는다.", "enemies": ["corridor_knight", "void_bat"],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 기사의 문장을 알아본다. \"그 맹세, 내가 끊어 주지.\" (하운 방어 +6)",
-        "effects": [ { "op": "block", "amount": 6, "target": "self" } ] } }
+    "id": "s2_battle_runaway_hunt",
+    "stage": "s2",
+    "type": "battle",
+    "name": "도망자 사냥",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "빈 갑옷 하나가 목줄 찬 그림자늑대를 풀어 놓는다. 화로에서 달아난 누군가를 쫓던 길이다. 바닥에 끊어진 사슬 한 토막이 떨어져 있다.", "enemies": ["empty_armor", "shadow_wolf"]}
   },
   {
-    "id": "s2_battle_knights", "stage": "s2", "type": "battle", "name": "검은 맹세의 기사들", "weight": 2,
-    "conditions": { "floorRange": [6, 10] },
-    "content": { "text": "옥좌로 가는 마지막 계단. 기사 둘과 경비병 하나.", "enemies": ["corridor_knight", "obsidian_guard", "corridor_knight"] }
+    "id": "s2_battle_ore_road",
+    "stage": "s2",
+    "type": "battle",
+    "name": "광석 수레 길",
+    "weight": 3,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "마을 위쪽 광산에서 협곡 화로로 이어진 수레 길. 흑철 원석을 끄는 빈 갑옷 곁에서 화로의 불씨 하나가 사람의 형상으로 일어선다.", "enemies": ["empty_armor", "fire_spirit"]}
   },
   {
-    "id": "s2_elite_ice_queen", "stage": "s2", "type": "elite", "name": "사천왕 — 빙결의 여왕", "weight": 1, "once": true,
-    "content": { "text": "회랑에 서리가 꽃처럼 피어 있다. 얼음 옥좌 위의 여왕이 손가락 하나를 든다.", "enemies": ["ice_queen"],
-      "bonus": { "condition": { "partyHas": "elia" }, "text": "엘리아의 불꽃이 얼음 거울을 녹인다. (빙결의 여왕 취약 2)",
-        "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 2, "target": "all_enemies" } ] } }
+    "id": "s2_battle_fire_spirits",
+    "stage": "s2",
+    "type": "battle",
+    "name": "화로의 불씨",
+    "weight": 3,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "꺼지지 않는 화로에서 불길 두 덩이가 떨어져 나와 일어선다. 발밑의 굳은 용암이 다시 붉어진다.", "enemies": ["fire_spirit", "fire_spirit"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 굳은 용암 바닥의 결을 따라 도끼를 찍는다. 바위가 쩍 갈라지며 불길이 흩어진다. (불의 정령 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s2_elite_earth_giant", "stage": "s2", "type": "elite", "name": "사천왕 — 대지의 거인", "weight": 1, "once": true,
-    "content": { "text": "바닥이 꺼지고, 성의 기둥만 한 팔이 솟는다.", "enemies": ["earth_giant"],
-      "bonus": { "condition": { "partyHas": "born" }, "text": "보른의 도끼가 거인의 무릎을 찍는다. \"먼저 가.\" (대지의 거인 약화 2)",
-        "effects": [ { "op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies" } ] } }
+    "id": "s2_battle_forge_watch",
+    "stage": "s2",
+    "type": "battle",
+    "name": "협곡 감시대",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 7]},
+    "content": {"text": "화로와 화로 사이를 지키는 빈 갑옷 셋. 협곡에는 이런 것이 백쯤 있다. 그들은 사람을 죽이지 않는다. 사슬을 채워 화로로 끌고 갈 뿐이다.", "enemies": ["empty_armor", "empty_armor", "empty_armor"]}
   },
   {
-    "id": "s2_elite_shadow_assassin", "stage": "s2", "type": "elite", "name": "사천왕 — 그림자 암살자", "weight": 1, "once": true,
-    "content": { "text": "횃불이 하나씩 꺼진다. 어둠 속에서 칼끝만 보인다.", "enemies": ["shadow_assassin"],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 왼편 그림자를 벤다. \"거기!\" (그림자 암살자 결 노출 2)",
-        "effects": [ { "op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies" } ] } }
+    "id": "s2_battle_forge_row",
+    "stage": "s2",
+    "type": "battle",
+    "name": "화로 사이",
+    "weight": 2,
+    "conditions": {"floorRange": [6, 7]},
+    "content": {"text": "쾅, 쾅, 쾅. 망치 소리 사이로 불의 정령 둘이 빈 갑옷 곁을 맴돈다. 노예들은 고개를 들지 않는다.", "enemies": ["fire_spirit", "empty_armor", "fire_spirit"]}
   },
   {
-    "id": "s2_event_prisoners", "stage": "s2", "type": "event", "name": "지하 감옥", "weight": 2, "once": true,
-    "content": {
-      "text": "녹슨 철창 너머에 국경 마을 사람들이 갇혀 있다. 마왕의 군세가 끌고 온 이들이다.",
-      "choices": [
-        { "label": "철창을 쪼갠다", "result": "자물쇠에도 결이 있었다. 풀려난 사람들이 고맙다며 낡은 주문서를 건넸다.", "effects": [ { "op": "gain_card", "card": "elia_firestorm" } ] },
-        { "label": "돌아올 때 구하겠다고 약속한다", "result": "출전 동료 전원 체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
-      ]
-    }
+    "id": "s2_elite_chain_overseer",
+    "stage": "s2",
+    "type": "elite",
+    "name": "사슬 감독관",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "쇠기둥과 쇠기둥을 잇는 굵은 사슬 끝에, 다른 갑옷보다 머리 하나 큰 빈 갑옷이 서 있다. 그 손의 사슬이 큰 화로 쪽으로 이어져 있다.", "enemies": ["chain_overseer", "empty_armor"]}
   },
   {
-    "id": "s2_event_black_spring", "stage": "s2", "type": "event", "name": "검은 마나의 샘", "weight": 2, "tags": ["scar"],
-    "content": {
-      "text": "성 한가운데서 검은 마나가 솟는다. 엘하임의 강물과는 냄새가 다르다.",
-      "choices": [
-        { "label": "검은 마나를 떠 마신다", "result": "마나가 차오르지만, 몸 안의 고리가 삐걱거린다. (런 마나 +5, 상흔 +1)", "effects": [ { "op": "gain_run_mana", "amount": 5 }, { "op": "scar", "amount": 1 } ] },
-        { "label": "샘을 지나친다", "result": "엘리아가 고개를 끄덕인다. \"잘했어요.\" (출전 동료 전원 체력 4 회복)", "effects": [ { "op": "heal_party", "amount": 4 } ] }
-      ]
-    }
+    "id": "s2_elite_furnace_chain",
+    "stage": "s2",
+    "type": "elite",
+    "name": "화로의 사슬",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 7]},
+    "content": {"text": "화로 앞에서 망치를 두드리는 사람들의 발목 사슬이 감독관의 손으로 모여든다. 사슬을 하나 끊으면 큰 화로가 알아챌 것이다. 그리고 사슬에 묶인 사람에게 불이 흘러 들어간다.", "enemies": ["fire_spirit", "chain_overseer"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 사슬이 아니라, 사슬이 박힌 바닥의 바위를 결을 따라 내리친다. 쇠기둥이 바위째 뽑혀 나온다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s2_event_black_line", "stage": "s2", "type": "event", "name": "허공의 검은 금", "weight": 2, "once": true,
-    "conditions": { "flag": "unha_sword" },
-    "content": {
-      "text": "회랑 끝 허공에, 머리카락보다 가는 검은 금이 다시 보였다. 협곡에서 본 것과 같았다. 이번에는 숨 한 번보다 조금 더 오래 머물렀다.",
-      "choices": [
-        { "label": "금을 들여다본다", "result": "두 흐름이 엉킨 자리. 운하검이 한 걸음 깊어졌다. (하운의 카드 2장 강화 +1)", "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "haun" } }, { "op": "scar", "amount": 1 } ] },
-        { "label": "엘리아에게 묻는다", "result": "\"…아마 잘못 본 거예요.\" 엘리아는 눈을 피했다. (런 마나 +2)", "effects": [ { "op": "gain_run_mana", "amount": 2 } ] }
-      ]
-    }
+    "id": "s2_event_chain_village",
+    "stage": "s2",
+    "type": "event",
+    "name": "사슬의 마을",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [2, 4]},
+    "content": {"text": "벨칸은 협곡의 입구에 매달린 마을이었다. 집집마다 굴뚝이 있었지만 연기는 나지 않았다. 마을은 비어 있었다. 이그니스는 마을을 불태우지 않았다. 대신 대장장이들을 사슬로 묶었다. 길마다 바닥에 박힌 쇠말뚝에 끊어진 사슬이 매달려 있다.", "choices": [{"label": "녹슨 모루가 나뒹구는 대장간을 뒤진다", "result": "숫돌 하나가 남아 있었다. 못생긴 검의 날을 세웠다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "끊어진 사슬을 쥔 보른 곁에 선다", "condition": {"partyHas": "born"}, "result": "보른은 아무 말도 하지 않았다. 그날 밤 그는 모닥불 앞에서 몇 시진이고 도끼를 손질했다. 도끼 손질을 얻었다.", "effects": [{"op": "gain_card", "card": "born_whetstone"}]}, {"label": "문짝 떨어진 집에서 하룻밤 쉰다", "result": "출전 동료 전원 최대 체력의 20% 회복", "effects": [{"op": "heal_party", "ratio": 0.2}]}]}
   },
   {
-    "id": "s2_event_armory", "stage": "s2", "type": "event", "name": "무너진 무기고", "weight": 2,
-    "content": {
-      "text": "부서진 창과 녹슨 방패가 산처럼 쌓여 있다. 보른이 그중 하나를 집어 들고 무게를 가늠한다.",
-      "choices": [
-        { "label": "보른에게 날을 세워 달라고 한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] },
-        { "label": "쓸 만한 것만 챙긴다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } } ] }
-      ]
-    }
+    "id": "s2_event_refugee_cart",
+    "stage": "s2",
+    "type": "event",
+    "name": "처진 수레",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [2, 3]},
+    "content": {"text": "행렬에서 처진 수레 한 대. 갈비뼈가 드러난 소가 붉은 풀밭에 주저앉았다. 수레 위에는 붉은 재에 덮인 아이 둘과 노인 하나. 화로에서 쫓겨난 사람들이다. 쓸모가 없다고.", "choices": [{"label": "평원 토끼를 구워 함께 먹는다", "result": "아이들의 얼굴에서 눈만 하얗게 빛났다. 노인이 처음으로 웃었다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}, {"label": "짐을 덜어 수레에 실어 하일론으로 보낸다", "result": "하일론으로 가면 길드의 보호를 받을 수 있을 것이다. 짐이 가벼워졌다. (기본 카드 1장을 덱에서 뺐다)", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
   },
   {
-    "id": "s2_event_kyle_crest", "stage": "s2", "type": "event", "name": "기사단의 문장", "weight": 1, "once": true,
-    "conditions": { "partyHas": "kyle" },
-    "content": {
-      "text": "회랑 벽에 엘하임 기사단의 문장이 거꾸로 걸려 있다. 카일이 그 앞에서 오래 서 있었다.",
-      "choices": [
-        { "label": "카일의 곁에 선다", "result": "\"…가자. 돌아가서 이야기할 거리가 하나 늘었군.\" 날개 베기를 얻었다.", "effects": [ { "op": "gain_card", "card": "kyle_wing_cut" } ] },
-        { "label": "문장을 바로 걸어 둔다", "result": "출전 동료 전원 체력 5 회복", "effects": [ { "op": "heal_party", "amount": 5 } ] }
-      ]
-    }
+    "id": "s2_event_ash_wind",
+    "stage": "s2",
+    "type": "event",
+    "name": "화산재 바람",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "바람이 협곡에서 이쪽으로 분다. 풀잎을 손으로 쓸면 손바닥에 붉은 가루가 묻어난다. 밤이 되면 지평선의 연기 아래가 희미하게 붉게 빛났다. 땅속에서 불이 숨을 쉬는 것처럼.", "choices": [{"label": "바람을 등지고 걷는다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}, {"label": "붉은 가루가 흘러가는 길을 읽는다", "result": "바람에도 결이 있었다. 협곡이 숨을 쉬는 쪽이 보였다. (카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
-    "id": "s2_rest_watchtower", "stage": "s2", "type": "rest", "name": "무너진 망루", "weight": 1,
-    "content": {
-      "text": "부서진 망루에서 두 개의 달이 보인다. 옥좌까지 얼마 남지 않았다.",
-      "choices": [
-        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s2_event_ore_cart",
+    "stage": "s2",
+    "type": "event",
+    "name": "광석 수레",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"text": "협곡을 내려다보는 절벽 위 바위틈. 화로 앞 노예들의 발목 사슬은 모두 큰 화로와 이어져 있다. 사슬을 하나 끊으면 묶인 사람에게 불이 흘러 들어간다. \"안으로 들어가야 한다.\" 보른이 말했다.", "choices": [{"label": "\"내가 들어간다.\" 보른이 먼저 걸어 내려간다", "condition": {"partyHas": "born"}, "result": "보른은 도끼를 바닥에 던지고 양손을 들었다. 빈 갑옷이 그의 발목에 사슬을 채웠다. 그는 한 번도 뒤를 돌아보지 않았다. \"우리 사람들이 저기 있다.\" (이그니스와 싸울 때 보른이 큰 화로를 친다)", "effects": [{"op": "set_flag", "flag": "s2_born_inside"}]}, {"label": "광석 수레 바닥, 흑철 원석 사이에 몸을 묻는다", "result": "무겁고, 날카롭고, 뜨거웠다. 옷이 그을렸다. 광석 틈으로 화로들이 지나갔다. 덜컹, 덜컹. (출전 동료 전원 체력 5 손실, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -5}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 신호를 정한다 — \"푸른빛이 보이면.\"", "condition": {"partyHas": "elia"}, "result": "하운이 검을 반쯤 뽑아 보였다. 엘리아는 절벽 위에 남아, 신호가 오면 협곡 반대편 끝에서 큰불을 일으키기로 했다. 불기둥을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_firestorm"}]}]}
+  },
+  {
+    "id": "s2_event_furnaces",
+    "stage": "s2",
+    "type": "event",
+    "name": "화로 서른두 개",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"text": "절벽 사이의 바닥은 검게 굳은 용암이었고, 그 위로 거대한 화로들이 줄지어 서 있었다. 망치 소리가 협곡 벽에 부딪혀 끝없이 메아리쳤다. 쾅, 쾅, 쾅. 쉬지 않고. 밤낮없이.", "choices": [{"label": "카일과 함께 센다", "condition": {"partyHas": "kyle"}, "result": "\"화로가 서른둘. 화로마다 사람이 열에서 스물. 감시하는 놈들은 빈 갑옷이 백쯤. 그리고 저기.\" 협곡 가장 안쪽, 흰 불길의 큰 화로와 절벽을 깎은 빈 옥좌. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아가 마나의 흐름을 읽는다", "condition": {"partyHas": "elia"}, "result": "\"마법 사슬이에요. 모든 사슬이 큰 화로와 이어져 있어요. 협곡 더 깊은 곳에서 무언가 큰 마나가 꿈틀거려요.\" 엘리아가 실바렌에서 어머니와 펼쳤던 결계를 손끝으로 되짚었다. 초록 결계를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_green_ward"}]}, {"label": "바위틈에 엎드려 밤을 기다린다", "result": "출전 동료 전원 체력 6 회복", "effects": [{"op": "heal_party", "amount": 6}]}]}
+  },
+  {
+    "id": "s2_event_hans_anvil",
+    "stage": "s2",
+    "type": "event",
+    "name": "한스의 모루",
+    "weight": 4,
+    "once": true,
+    "tags": ["scar"],
+    "conditions": {"floorRange": [6, 7]},
+    "content": {"scene": "s2_scene_hans_anvil", "text": "가장 큰 모루 앞의 사내가 망치를 내리칠 때마다 쇠를 들여다본다. 아주 짧게, 그러나 정확히. 그가 두드리는 것은 사람 팔뚝만 한 검은 쐐기였다. 몸통에 물결처럼 흐르는 문자가 새겨지고 있다.", "choices": [{"label": "쐐기의 표면을 손가락으로 쓸어 본다", "result": "엉켜 있었다. 쇠의 결 위로, 결을 잃은 마나가 반대 방향으로 감겨 소용돌이쳤다. 그가 검을 내리친 자리의 허공에 검은 금이 그어질 때 손끝에 남던 감각과 똑같았다. 손가락이 떨렸다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "\"토마도 그렇게 말했습니다.\"", "condition": {"flag": "promise_toma"}, "result": "한스의 입가가 아주 조금 올라갔다. 이 년 만에 처음 웃는 것처럼 어색한 웃음이었다. 그가 망치 소리에 섞어 검 다루는 법 하나를 일러 주었다. (고른 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "망치 소리에 묻혀 물러난다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}]}
+  },
+  {
+    "id": "s2_event_old_dwarf",
+    "stage": "s2",
+    "type": "event",
+    "name": "늙은 드워프",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [6, 7], "partyHas": "born"},
+    "content": {"text": "화로의 불길이 가장 뜨거운 자리. 수염이 하얗게 세고 한쪽 눈이 먼 늙은 드워프가 망치를 쥔 채 떨고 있다. 망치 소리 사이로 드워프의 말이 들린다. 하운은 알아듣지 못했다. 그러나 그 이름만은 알아들었다. 두린.", "choices": [{"label": "보른이 고개를 든다", "condition": {"partyHas": "born"}, "result": "늙은 드워프의 멀지 않은 한쪽 눈에서 눈물이 흘렀다. 눈물은 화로의 열기에 금세 말라 버렸다. 그가 쥐고 있던 대장장이의 망치를 보른의 손에 쥐여 주었다. (보른의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "망치 소리에 숨을 맞춘다", "result": "세 번 짧게, 한 번 길게. 쾅, 쾅, 쾅. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}]}
+  },
+  {
+    "id": "s2_rest_red_camp",
+    "stage": "s2",
+    "type": "rest",
+    "name": "붉은 평원의 야영",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 4]},
+    "content": {"text": "그날 밤, 하운은 꿈을 꾸었다. 청운산 산문 앞. 현판이 걸려 있어야 할 자리에 핏빛 천이 펄럭였다. 연무장에서 불길이 치솟았다. '형. 살아 있으면 빨리 와.' 눈을 뜨자 두 개의 달이 하늘 한가운데 떠 있었다. 모닥불은 숯만 남아 붉게 빛났다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "\"꿈은 꿈일 뿐이에요.\"", "condition": {"partyHas": "elia"}, "result": "엘리아가 모닥불을 돌아 옆에 앉아, 담요 한 자락을 어깨에 덮어 주었다. \"그래도 무서웠죠.\" 하운은 그 온기에 기대어 숨을 쉬었다. (출전 동료 전원 최대 체력의 35% 회복)", "effects": [{"op": "heal_party", "ratio": 0.35}]}]}
+  },
+  {
+    "id": "s2_rest_cliff",
+    "stage": "s2",
+    "type": "rest",
+    "name": "절벽 위 바위틈",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 7]},
+    "content": {"text": "협곡을 내려다보는 절벽 위 바위틈. 망치 소리가 협곡 벽에 부딪혀 끝없이 메아리친다. 화로의 불빛이 절벽을 붉게 물들인다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  },
+  {
+    "id": "s2_rest_cold_forge",
+    "stage": "s2",
+    "type": "rest",
+    "name": "버려진 대장간",
+    "weight": 1,
+    "content": {"text": "벨칸 사람들이 버리고 간 대장간. 식은 화덕 곁에서 숨을 고른다. 협곡의 망치 소리가 멀리서 들린다. 쾅, 쾅, 쾅.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   }
 ]

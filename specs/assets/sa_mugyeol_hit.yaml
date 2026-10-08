@@ -3,12 +3,12 @@ type: character-anim
 size: large
 character: sa_mugyeol
 chroma: green
-summary: 사무결 피격 3프레임
+summary: 사무결(혈전) 피격 3프레임 — 원작 외형으로 다시 그림
 depends_on: [sa_mugyeol_ref]
 reference: assets/source/sa_mugyeol_ref.png
 facing: left
 frame_notes:
-  1: "struck, the hat jolts, body bending back"
+  1: "struck, body bending back, the young face twisting"
   2: "stumbles back a step, robes whipping"
   3: "straightens up, the thin smile returning"
 placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

@@ -1,0 +1,11 @@
+id: map_s8
+type: map-art
+summary: 지역 지도 — 천마봉(S8, 3권 12~14장)
+frame_notes:
+  1: >-
+    The Hundred Thousand Mountains of the cult. Far left: a small courtyard with sand (where the old master taught the returning sword). Along the bottom: an allied army camp at the foot of the mountain. Along the top: the Heavenly Demon Peak, a single very tall sharp peak, with a stone stairway winding around its waist nine times; between the seventh and eighth turn the stairway is broken off over a void. Far right: at the summit, the Blood Hall with red silk and two thrones (a little vermilion).
+framing: >-
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
+style: >-
+  traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
+placeholder: { color: '#d6c7a0' }

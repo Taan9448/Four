@@ -1,0 +1,12 @@
+id: born_hammer_hit
+type: character-anim
+character: born_hammer
+summary: 보른(두린의 망치) 피격 3프레임
+depends_on: [born_hammer_ref]
+reference: assets/source/born_hammer_ref.png
+facing: right
+frame_notes:
+  1: "blow lands on his shoulder, he grunts but holds"
+  2: "slides back a step, hammer haft braced"
+  3: "straightens, stern glare forward"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

@@ -162,10 +162,20 @@ export function stageWorld(data: GameData, run: RunState) {
   return data.stages.find((s) => s.id === run.stageId)!.world;
 }
 
+/** 모듈의 전투 보너스가 이번 편성·플래그로 켜지는가(condition: partyHas·flag) */
+export function bonusActive(run: RunState, module: ModuleDef): boolean {
+  const bonus = module.content.bonus;
+  return (
+    !!bonus &&
+    (!bonus.condition.partyHas || run.selected.includes(bonus.condition.partyHas)) &&
+    (!bonus.condition.flag || run.flags.includes(bonus.condition.flag))
+  );
+}
+
 export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): BattleSetup {
-  const bonus = enc.module.content.bonus;
-  const startEffects =
-    bonus && (!bonus.condition.partyHas || run.selected.includes(bonus.condition.partyHas)) ? bonus.effects : [];
+  const { bonus, startEffects: always = [], mana } = enc.module.content;
+  const bonusOn = bonusActive(run, enc.module);
+  const stage = data.stages.find((s) => s.id === run.stageId)!;
   return {
     world: stageWorld(data, run),
     party: run.selected.map((id) => {
@@ -180,11 +190,12 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     supportActive: run.supportActive,
     flags: run.flags,
     scar: run.scar,
-    startEffects,
+    startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
+    manaRule: mana ?? stage.mana,
   };
 }
 
-/** 전투 결과를 런에 반영한다. 보스를 이기면 clearEffects를 적용하고 그 결과 메시지를 돌려준다 */
+/** 전투 결과를 런에 반영한다. 이기면 모듈의 clearEffects(보스가 아니어도)를 적용하고 그 결과 메시지를 돌려준다 */
 export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter, outcome: BattleOutcome): string[] {
   for (const p of outcome.party) {
     const r = run.roster.find((x) => x.id === p.id);
@@ -196,7 +207,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     run.status = 'defeat';
     return [];
   }
-  if (enc.node.type !== 'boss') return [];
+  if (enc.node.type !== 'boss') return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
   run.status = 'stage_clear';
   return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
 }

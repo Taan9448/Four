@@ -1,9 +1,9 @@
 id: born_ref
 type: character-ref
 character: born
-summary: 보른 기준 시트(3/4 정면 + 오른쪽 측면) — 사람형 키의 약 70%
+summary: 보른(도끼) 기준 시트(3/4 정면 + 오른쪽 측면) — 원작 외형으로 다시 그림
 facing: right
 frame_notes:
-  1: full body, three-quarter front view, short and broad dwarf about 70 percent of a human's height, round iron shield on the left arm, big axe resting on the right shoulder, stern face
-  2: full body, side view facing right, same size, shield raised slightly in front, axe held low behind
-placeholder: { shape: humanoid, color: '#8a5a3b', accent: '#8a90a3' }
+  1: "full body, three-quarter front view, short and broad dwarf about 70 percent of a human height, red beard covering half the face braided into three braids, the huge two-handed axe resting on the right shoulder, no shield, stern face"
+  2: "full body, side view facing right, same size, axe held low across the body in both hands"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

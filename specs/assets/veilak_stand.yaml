@@ -1,0 +1,9 @@
+id: veilak_stand
+type: character-standing
+character: veilak
+summary: 베일락 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a smoke knight, the empty helmet with two red lights"
+  2: "resolute expression — the smoke greatsword raised, the red lights flaring"
+  3: "surprised expression — the smoke body tearing apart from the chest"
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

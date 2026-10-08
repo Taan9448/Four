@@ -1,0 +1,12 @@
+id: haun_sword_hit
+type: character-anim
+character: haun_sword
+summary: 진하운(못생긴 검) 피격 3프레임
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frame_notes:
+  1: "struck in the chest, upper body snapping backward, eyes shut"
+  2: "staggering back one step, sword arm flung out, long hair whipping"
+  3: "regaining footing, sword raised defensively before the chest"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

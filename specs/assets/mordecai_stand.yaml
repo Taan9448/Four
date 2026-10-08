@@ -1,9 +1,9 @@
 id: mordecai_stand
 type: character-standing
 character: mordecai
-summary: 지옥왕 모르데카이 반신 그림(기본·결의·놀람)
+summary: 지옥왕 모르데카이 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
 frame_notes:
-  1: "neutral expression — a towering stitched-together shape, many faint faces and limbs sewn into one body, a calm hungry tilt of the head"
-  2: "resolute expression — the stitched arms spread wide, the blue heart in the chest pulsing brighter, mouths opening across the body"
-  3: "surprised expression — the stitches beneath the blue heart loosening, threads of light unraveling from the chest"
+  1: "neutral expression — a towering stitched-together shape, the wedge spine rising behind, a calm hungry tilt of the head"
+  2: "resolute expression — the stitched arms spread wide, the blue-black heart in the chest pulsing brighter"
+  3: "surprised expression — the stitches beneath the heart loosening, threads of light unraveling from the chest"
 placeholder: { color: '#1a1020', accent: '#9a3a7a' }

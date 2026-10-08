@@ -15,16 +15,19 @@ import {
 import { data } from './helpers';
 
 describe('런 진행', () => {
-  it('하운 혼자 시작하고, 1층 스토리에서 동료가 합류한다(출전 최대 3명)', () => {
+  it('하운 혼자 시작하고, 1층 스토리에서 동료가 합류한다(출전 최대 3명). 엘하임이라는 이름은 2층 여관에서', () => {
     const run = createRun(data, 'RUN1', { stageId: 's1' });
     expect(run.roster.map((r) => r.id)).toEqual(['haun']);
     const [first] = availableNodes(run);
     const enc = enterNode(data, run, first.id);
-    expect(enc.module.id).toBe('s1_story_companions');
+    expect(enc.module.id).toBe('s1_story_two_moons');
     applyChoice(data, run, enc.module, 0);
     expect(run.roster.map((r) => r.id)).toEqual(['haun', 'elia', 'kyle', 'born']);
     expect(run.selected).toEqual(['haun', 'elia', 'kyle']);
     expect(run.deck.some((c) => c.cardId === 'elia_fireball')).toBe(true);
+    const enc2 = enterNode(data, run, availableNodes(run)[0].id);
+    expect(enc2.module.id).toBe('s1_story_silver_bell');
+    applyChoice(data, run, enc2.module, 0);
     expect(run.flags).toContain('met_companions');
   });
 
@@ -44,11 +47,10 @@ describe('런 진행', () => {
     const enc0 = enterNode(data, run, availableNodes(run)[0].id);
     applyChoice(data, run, enc0.module, 0);
     setParty(data, run, ['haun', 'elia']);
-    // 시드 RUN3의 2층에는 그림자늑대 전투가 있다
-    const node = availableNodes(run).find((n) => n.type === 'battle')!;
-    const enc = enterNode(data, run, node.id);
+    // 전투 모듈 하나를 직접 고른다(2·3층은 고정 이야기 노드)
+    const module = [...data.modules.values()].find((m) => m.stage === 's1' && m.type === 'battle' && m.content.enemies?.every((e) => e === 'shadow_wolf'))!;
+    const enc = { node: { id: 'f4n0', floor: 4, index: 0, type: 'battle' as const, moduleId: module.id, next: [] }, module };
     expect(isBattle(enc)).toBe(true);
-    expect(enc.module.content.enemies).toEqual(['shadow_wolf', 'shadow_wolf']);
     const state = createBattle(data, battleSetupFor(data, run, enc));
     expect(state.party.map((p) => p.defId)).toEqual(['haun', 'elia']);
     for (const e of state.enemies) e.hp = 1;

@@ -4,12 +4,11 @@
   "maxHand": 10,
   "mana": {
     "max": 10,
-    "restGain": 3,
     "worlds": {
       "elheim":   { "battleStart": "full",  "perTurn": 2 },
       "nocturna": { "battleStart": "full",  "perTurn": 1 },
       "murim":    { "battleStart": "carry", "perTurn": 0 },
-      "rift":     { "battleStart": "carry", "perTurn": -1 }
+      "rift":     { "battleStart": 0,       "perTurn": 0 }
     }
   },
   "rift": {

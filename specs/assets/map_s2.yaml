@@ -1,11 +1,11 @@
 id: map_s2
 type: map-art
-summary: 지역 지도 — 마왕성 노크투르나(S2)
+summary: 지역 지도 — 화산 협곡(S2, 2권 1~4장)
 frame_notes:
   1: >-
-    The demon king's castle Nocturna seen as a floor plan and elevation mixed in ink. Far left: the outer castle gate and a bridge over a dark moat. Along the top and bottom edges: long corridors, a frozen hall, a collapsed earth hall, small towers. Far right: the throne room under the tallest black spire.
+    The western lands of Elheim. Far left: a plain stained red with volcanic ash, a line of refugees as tiny marks. Along the bottom: the chained village of Belkan, stone houses stacked like stairs at the canyon mouth with many chimneys and broken chains hanging from iron posts. Along the top: an ore-cart track along the cliff to a mine. Far right: a volcanic canyon of hardened lava with thirty-two stone furnaces in a row and a great furnace of white fire beside a throne carved into the cliff (a little orange and vermilion).
 framing: >-
   A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
-placeholder: { color: '#d4c6a2' }
+placeholder: { color: '#d6c7a0' }

@@ -1,16 +1,16 @@
 id: born_attack
 type: character-anim
 character: born
-summary: 보른 무릎 내리찍기 6프레임
+summary: 보른(도끼) 결 따라 내리찍기 6프레임 — 원작 외형으로 다시 그림
 depends_on: [born_ref]
 reference: assets/source/born_ref.png
 facing: right
 events: { hit: 4 }
 frame_notes:
-  1: shield forward, axe drawn back behind the shoulder with both hands
-  2: steps forward, axe swinging up beside the head
-  3: axe at its peak beside the head (not far above it), body coiled
-  4: chops low and hard to the right at knee height, a 1-pixel white streak trailing the axe head
-  5: follow-through, axe head near the ground, beard swinging forward
-  6: recovering, shield raised again
-placeholder: { shape: humanoid, color: '#8a5a3b', accent: '#8a90a3' }
+  1: "axe drawn back behind the shoulder with both hands"
+  2: "steps forward, axe swinging up beside the head"
+  3: "axe at its peak beside the head (not far above it), body coiled"
+  4: "chops low and hard to the right along the grain of the stone, a 1-pixel white streak trailing the axe head"
+  5: "follow-through, axe head near the ground, beard braids swinging forward"
+  6: "recovering, axe back on the shoulder"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

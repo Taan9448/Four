@@ -1,0 +1,9 @@
+id: lina_stand
+type: character-standing
+character: lina
+summary: 리나 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — calm strong smile, golden hair braided up, sky-blue eyes"
+  2: "resolute expression — chin lifted, a silver gauntlet raised, commanding"
+  3: "surprised expression — eyes wide, lips parted, a hand reaching forward"
+placeholder: { color: '#e8d27a', accent: '#8fd3ff' }

@@ -1,0 +1,17 @@
+id: haun_sword_attack
+type: character-anim
+character: haun_sword
+summary: 진하운(못생긴 검) 결 따라 베기 6프레임
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+events: { hit: 4 }
+bbox_tolerance: 0.3
+frame_notes:
+  1: "sword drawn back low at the right side, weight on the back foot, eyes on the target"
+  2: "steps forward, the blade rising in a smooth arc"
+  3: "blade at the top of the arc beside the head (not far above it), body coiled"
+  4: "a single clean diagonal cut to the right, the blade simply laid along the grain, a 2-pixel blue streak trailing the edge"
+  5: "follow-through, blade low, hair swept forward"
+  6: "recovering to the ready stance, point lowered"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

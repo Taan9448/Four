@@ -1,11 +1,11 @@
 id: map_s5
 type: map-art
-summary: 지역 지도 — 세계의 틈(S5)
+summary: 지역 지도 — 노크투르나(S5, 2권 9~13장)
 frame_notes:
   1: >-
-    The rift between worlds drawn as an unsettling ink map: the paper itself looks torn and stitched in places. Far left: a torn opening in the sky where the travelers step in. Along the top and bottom edges: floating fragments of both worlds (a piece of a tiled wuxia roof, a piece of a gothic arch, broken stairs), thin black cracks across the paper. Far right: a dark knot of stitched threads where everything converges.
+    The frozen north. Far left: a dwarf watchtower and the winter halls of Kazdum with a stone library. Along the bottom: an allied army camp on an ice field with many small tents and banners of Arden, Silvaren, Belkan and Kazdum. Along the top: a half-melted ice sea with floating ice, an old sewer entrance at the foot of the cliffs. Far right: Nocturna, an obsidian fortress on the ice sea with spires and faint purple lightning, black wedges driven into its walls.
 framing: >-
   A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
-placeholder: { color: '#cfc3a6' }
+placeholder: { color: '#d6c7a0' }

@@ -1,9 +1,9 @@
 id: sa_mugyeol_stand
 type: character-standing
 character: sa_mugyeol
-summary: 삿갓의 사내(사무결) 반신 그림(기본·결의·놀람)
+summary: 사무결(혈전) 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
 frame_notes:
-  1: "neutral expression — bamboo hat low, only a pale jaw and a thin smile visible, a teacup in red-nailed fingers"
-  2: "resolute expression — head tilted up so one red eye glints under the hat brim, blood-red nails spread like claws"
-  3: "surprised expression — the smile gone, jaw tight, the hat brim turned sharply toward the viewer"
-placeholder: { color: '#0b0b10', accent: '#c2c6d1' }
+  1: "neutral expression — young pale face, a thin cruel smile, red eyes half-lidded, red silk at the collar"
+  2: "resolute expression — red eyes wide and gleaming, blood-red nails spread like claws"
+  3: "surprised expression — the smile gone, a crack of age showing for an instant at the eyes"
+placeholder: { color: '#1a1418', accent: '#c0102a' }

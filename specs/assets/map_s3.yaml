@@ -1,9 +1,9 @@
 id: map_s3
 type: map-art
-summary: 지역 지도 — 혈로(S3, 뒤집힌 무림)
+summary: 지역 지도 — 아르덴(S3, 2권 5~6장)
 frame_notes:
   1: >-
-    The wuxia world overrun by the demonic cult. Far left: Unggok village with small houses and a well. Along the top and bottom edges: a ruined temple on a hill, the mountains of the Wudang, Shaolin and Mount Hua sects as small distant landmarks, a river ferry. Far right: the Shaanxi branch fortress of the cult with dark walls and red banners (a little vermilion).
+    The frozen kingdom of Arden in the north-west of Elheim, ten years under ice. Far left: frozen barley fields and farmhouses with smoke frozen in mid-air. Along the bottom: a cave hideout of the last knights, a frozen lake. Along the top: snowy hills and a road lined with frozen trees. Far right: the royal city of Ardenheim and an ice palace that rose out of the lake, with a tall tower with no roof; a south gate guarded by ice knights. Pale blue and white tints.
 framing: >-
   A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-

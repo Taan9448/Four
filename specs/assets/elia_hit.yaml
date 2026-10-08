@@ -1,12 +1,12 @@
 id: elia_hit
 type: character-anim
 character: elia
-summary: 엘리아 피격 3프레임
+summary: 엘리아 피격 3프레임 — 원작 외형으로 다시 그림
 depends_on: [elia_ref]
 reference: assets/source/elia_ref.png
 facing: right
 frame_notes:
-  1: struck, head turned away, hair whipping
-  2: stumbling back, one arm raised to shield the face
-  3: steadying, a thin crack-like shimmer of a broken barrier fading
-placeholder: { shape: humanoid, color: '#8fa7c9', accent: '#ff9a3c', weapon: false }
+  1: "struck, head turned away, hair and hood whipping"
+  2: "stumbling back, the staff raised across the face"
+  3: "steadying, a thin crack-like shimmer of a broken barrier fading"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#8fd3ff' }

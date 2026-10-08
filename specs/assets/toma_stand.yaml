@@ -1,0 +1,9 @@
+id: toma_stand
+type: character-standing
+character: toma
+summary: 토마 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a stubborn little face smudged with red ash"
+  2: "resolute expression — chin up, fists clenched, trying to look brave"
+  3: "surprised expression — eyes huge, mouth open"
+placeholder: { color: '#d08a5a', accent: '#ff8a5c' }

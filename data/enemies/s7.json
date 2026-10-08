@@ -1,0 +1,64 @@
+[
+  {
+    "id": "blood_cultist",
+    "name": "혈교도",
+    "maxHp": 32,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#8a1f2a",
+    "pattern": "random",
+    "moves": [{"id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 5, "target": "self"}]}],
+    "flavor": "천마신교의 말단. 검붉은 무복, 가슴에 핏방울 모양의 혈적문. 마기가 무겁고 끈적하게 몸에 감겨 있다."
+  },
+  {
+    "id": "cult_guardian",
+    "name": "마교 호법",
+    "maxHp": 36,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#5a1a24",
+    "pattern": "cycle",
+    "deathEffects": [{"op": "remove_status", "status": "incorporeal", "target": "all_allies"}],
+    "moves": [{"id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [{"op": "block", "amount": 7, "target": "all_allies"}]}, {"id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
+    "flavor": "손바닥이 피처럼 붉다. 셋이 서면 진이 되고, 진은 삼 년 동안 무당을 가뒀다. 하나가 쓰러지면 진의 매듭이 풀린다."
+  },
+  {
+    "id": "poison_hand",
+    "name": "독수마군",
+    "maxHp": 100,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#2a5a5a",
+    "scale": 1.2,
+    "tier": "elite",
+    "pattern": "cycle",
+    "moves": [{"id": "venom_nail", "name": "검푸른 독 손톱", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "poison", "stacks": 3}]}, {"id": "draw_venom", "name": "독기 끌어올리기", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 10, "target": "self"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "self"}]}, {"id": "myriad_venom", "name": "만독수", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "all_enemies"}]}],
+    "flavor": "소림의 잿더미를 감시하던 분타의 장로. 검푸른 독을 바른 손톱. 독은 손톱 끝에서 손목의 경맥으로 이어져 흐른다 — 끌어올릴수록 제 경맥에도 고인다."
+  },
+  {
+    "id": "branch_elite",
+    "name": "분타 정예",
+    "maxHp": 42,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#6a1a20",
+    "pattern": "random",
+    "moves": [{"id": "elite_blade", "name": "혈도", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 10}]}, {"id": "elite_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "weight": 1, "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "elite_guard", "name": "호위", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "all_allies"}]}],
+    "flavor": "낙안봉 꼭대기의 섬서 분타를 지키는 정예. 성채의 계단을 메운다."
+  },
+  {
+    "id": "hyeolsu",
+    "name": "혈수마군",
+    "maxHp": 185,
+    "sprite": "branch_lord",
+    "silhouette": "boss",
+    "color": "#8a1a1a",
+    "scale": 1.6,
+    "tier": "boss",
+    "pattern": "cycle",
+    "traits": [{"status": "blood_cover", "stacks": 1}],
+    "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
+    "moves": [{"id": "blood_palm_force", "name": "핏빛 장력", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "heavenly_blood_art", "name": "천마혈공", "intent": "buff", "effects": [{"op": "block", "amount": 15, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, {"id": "noisy_first", "name": "\"시끄러운 것부터\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 16}]}, {"id": "childrens_blood", "name": "아이들의 피", "intent": "special", "effects": [{"op": "heal", "amount": 18, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "flavor": "섬서 분타주이자 교주의 오른팔. 큰 키, 넓은 어깨, 팔꿈치까지 핏빛인 두 손. 천마혈공의 피가 결을 덮어 결 읽기가 통하지 않는다. 아이들에게서 받은 피를 마신다. 그가 쓰러지면 분타가 무기를 내려놓는다."
+  }
+]

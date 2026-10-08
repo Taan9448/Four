@@ -1,5 +1,5 @@
 // 전투 상태 타입과 작은 도우미.
-import type { CardDef, Cost, Effect, Keyword, SupportRule, UpgradeSkill, World } from './schema';
+import type { CardDef, CharacterDef, Cost, Effect, Keyword, SupportRule, UpgradeSkill, World, WorldMana } from './schema';
 import type { GameData } from './data';
 import type { Rng } from './rng';
 
@@ -49,6 +49,7 @@ export type BattleEvent =
   | { type: 'status'; targetUid: string; status: string; stacks: number }
   | { type: 'rift'; value: number; delta: number }
   | { type: 'surge' }
+  | { type: 'neigong_max'; value: number }
   | { type: 'echo' }
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'downed'; uid: string }
@@ -66,6 +67,10 @@ export interface BattleState {
   world: World;
   turn: number;
   neigong: number;
+  /** 턴마다 다시 차는 내공(balance.neigongPerTurn에서 시작, 내공의 실이 줄인다) */
+  neigongMax: number;
+  /** 이 전투의 마나 규칙(세계 → 스테이지 → 모듈 순으로 덮어쓴 것) */
+  manaRule: WorldMana;
   mana: number;
   rift: number;
   party: Combatant[];
@@ -139,4 +144,11 @@ export function findCombatant(state: BattleState, uid: string): Combatant | unde
 
 export function statusName(state: BattleState, id: string): string {
   return state.data.statuses.get(id)?.name ?? id;
+}
+
+/** 복장: 런 플래그에 맞는 스프라이트 세트(뒤에 적힌 복장이 우선, 빠진 키는 기본 sprites) */
+export function spritesFor(def: CharacterDef, flags: readonly string[]): Record<string, string> {
+  let sprites = { ...def.sprites };
+  for (const o of def.outfits) if (flags.includes(o.flag)) sprites = { ...sprites, ...o.sprites };
+  return sprites;
 }

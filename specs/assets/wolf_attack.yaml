@@ -1,16 +1,16 @@
 id: wolf_attack
 type: character-anim
 character: shadow_wolf
-summary: 그림자늑대 물어뜯기 6프레임
+summary: 그림자늑대 물어뜯기 6프레임 — 원작 외형으로 다시 그림
 depends_on: [wolf_ref]
 reference: assets/source/wolf_ref.png
 facing: left
 events: { hit: 4 }
 frame_notes:
-  1: crouches low, weight on the hind legs
-  2: coils back further, jaws opening
-  3: springs forward to the left, body stretched
-  4: bite lands, jaws snapping shut at full extension
-  5: lands, head still forward
-  6: steps back into prowling stance
-placeholder: { shape: beast, color: '#2b2b3a', accent: '#ffb347' }
+  1: "crouches low, smoke gathering at the hind legs"
+  2: "coils back further, jaws of smoke opening"
+  3: "springs forward to the left, body stretched into a streak of smoke"
+  4: "bite lands, jaws snapping shut at full extension"
+  5: "lands, smoke trailing behind"
+  6: "steps back into prowling stance"
+placeholder: { shape: beast, color: '#1d2433', accent: '#ff3b3b' }

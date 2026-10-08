@@ -1,0 +1,9 @@
+id: ignis_stand
+type: character-standing
+character: ignis
+summary: 화염군주 이그니스 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a faceless body of white flame, two white-hot eye holes, black lava veins"
+  2: "resolute expression — the flames roaring higher, one burning hand raised"
+  3: "surprised expression — the white flame split from crown to chest, the lava veins going dark"
+placeholder: { color: '#f1efe6', accent: '#0b0b10' }

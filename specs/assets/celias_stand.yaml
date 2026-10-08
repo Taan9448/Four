@@ -1,0 +1,9 @@
+id: celias_stand
+type: character-standing
+character: celias
+summary: 셀리아스 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a calm sculpted expressionless face of ice, icicle hair"
+  2: "resolute expression — a cold faint smile, ice spears forming around her"
+  3: "surprised expression — cracks spreading across the ice face"
+placeholder: { color: '#bfe0f0', accent: '#dff4ff' }

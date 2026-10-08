@@ -1,13 +1,13 @@
 id: born_idle
 type: character-anim
 character: born
-summary: 보른 대기 4프레임
+summary: 보른(도끼) 대기 4프레임 — 원작 외형으로 다시 그림
 depends_on: [born_ref]
 reference: assets/source/born_ref.png
 facing: right
 frame_notes:
-  1: planted wide stance, shield in front, axe on the shoulder
-  2: slow breath in, chest and beard rise slightly
-  3: breath held, shield steady
-  4: breath out, shoulders settle, beard braids swaying
-placeholder: { shape: humanoid, color: '#8a5a3b', accent: '#8a90a3' }
+  1: "planted wide stance, axe on the shoulder"
+  2: "slow breath in, chest and red beard braids rise slightly"
+  3: "breath held, axe steady"
+  4: "breath out, shoulders settle, beard braids swaying"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

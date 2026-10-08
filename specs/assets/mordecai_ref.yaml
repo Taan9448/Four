@@ -3,9 +3,9 @@ type: character-ref
 size: large
 character: mordecai
 chroma: green
-summary: 지옥왕 모르데카이 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+summary: 지옥왕 모르데카이 기준 시트(3/4 정면 + 왼쪽 측면) — 원작 외형으로 다시 그림
 facing: left
 frame_notes:
-  1: "full body, three-quarter front view, a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces, wings and horns sewn into it with glowing seams, a pulsing blue heart in the middle of the chest"
-  2: "full body, side view facing left, same proportions, hunched forward, the dark qi arm hanging long"
+  1: "full body, three-quarter front view, a towering shapeless body stitched together from stolen flows, a great spine of hundreds of black iron wedges bound together rising from the back, one arm of flowing pale silver mana and one of coiled dark qi rings, legs, wings and horns of unknown worlds sewn on with glowing seams, a heart of tangled blue and black light in the chest"
+  2: "full body, side view facing left, same proportions, hunched forward so the wedge spine shows clearly, the dark qi arm hanging long"
 placeholder: { shape: humanoid, color: '#1a1020', accent: '#4fb4ff' }

@@ -1,13 +1,13 @@
 id: haun_idle
 type: character-anim
 character: haun
-summary: 진하운 대기(호흡) 4프레임
+summary: 진하운(도끼) 대기 4프레임 — 원작 외형으로 다시 그림
 depends_on: [haun_ref]
 reference: assets/source/haun_ref.png
 facing: right
 frame_notes:
-  1: relaxed ready stance, axe held low in the right hand, knees slightly bent, inhaling
-  2: same stance, chest slightly raised, short breath in
-  3: same stance, chest at highest point, short breath held
-  4: same stance, long breath out, shoulders relaxed, hair and long outer robe settling, a small warm gold glow (about 6x6 sprite pixels) on the lower belly
-placeholder: { shape: humanoid, color: '#3d4459', accent: '#4fb4ff' }
+  1: "relaxed ready stance, axe held low in the right hand, knees slightly bent, inhaling"
+  2: "same stance, chest slightly raised, short breath in"
+  3: "same stance, chest at highest point, short breath held"
+  4: "same stance, long breath out, shoulders relaxed, hair and grey jacket hem settling, a small warm gold glow (about 6x6 sprite pixels) on the lower belly"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }
