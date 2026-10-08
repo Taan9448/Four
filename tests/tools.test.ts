@@ -12,7 +12,7 @@ import { sliceSheet } from '../tools/slice-sheet.mjs';
 import { keyOut, magentaCast, nearestColor } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
-import { validateAsset, validateSheet } from '../tools/validate-assets.mjs';
+import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
 
 const FIXTURES = join(ROOT, 'tools/__fixtures__/specs');
 let root: string;
@@ -360,6 +360,12 @@ describe('폴더 소유권 검사', () => {
     expect(checkOwnership('feat/battle', ['src/main.ts', 'assets/placeholders/x/meta.json'])).toEqual([]);
     expect(checkOwnership('claude/setup', ['assets/source/haun_ref.png']).length).toBe(1);
     expect(checkOwnership('feat/x', ['assets/sprites/haun_ref/meta.json']).length).toBe(1);
+  });
+
+  it('옛 규격 프레임 검사는 art 브랜치가 맡은 에셋에만 실패로 건다(브랜치 이름에서 id)', () => {
+    expect(artBranchAsset('art/99-kwak_dojin_attack')).toBe('kwak_dojin_attack');
+    expect(artBranchAsset('art/122-reslice_128')).toBe('reslice_128');
+    expect(artBranchAsset('feat/ui')).toBeNull();
   });
 
   it('manifest.json은 누구도 커밋할 수 없고, art 브랜치 이름은 형식을 지켜야 한다', () => {
