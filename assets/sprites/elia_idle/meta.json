@@ -1,14 +1,14 @@
 {
   "id": "elia_idle",
   "type": "character-anim",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 8,
+  "pixelScale": 4,
   "gridDetected": false,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 4,
@@ -30,5 +30,5 @@
     1536,
     1024
   ],
-  "gridPurity": 0.422
+  "gridPurity": 0.582
 }

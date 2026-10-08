@@ -1,0 +1,9 @@
+id: bg_heavenly_peak
+type: background
+summary: 전투 배경 — 천마봉(S4, 구천 계단 위의 혈전)
+frame_notes:
+  1: >-
+    The summit of the Heavenly Demon Peak, high above the clouds. On the left and right edges, steep stone stairs and carved rock
+    pillars of an ancient cult sanctuary; in the far distance a sea of clouds and other sharp peaks under a dark crimson twilight
+    sky. The ground is a wide flat stone terrace with worn engraved tiles. Stone greys, cloud white and deep crimson sky.
+placeholder: { color: '#3a2a30' }
