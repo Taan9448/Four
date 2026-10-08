@@ -46,7 +46,14 @@ export function affinityChip(data: GameData, kind: 'weak' | 'resist', element: s
     kind === 'weak'
       ? `${name} 피해를 ${Math.round((el.weakMultiplier - 1) * 100)}% 더 받는다.`
       : `${name} 피해를 ${Math.round((1 - el.resistMultiplier) * 100)}% 덜 받고, ${name} 상태가 붙지 않는다.`;
-  const chip = h('span', { class: `status-chip chip-${kind}` }, elementMark(element), h('span', { class: 'st-name' }, kind === 'weak' ? `약점 ${name}` : `내성 ${name}`));
+  // 휴대폰은 이름을 숨기므로 한 글자(약·내)를 따로 둔다
+  const chip = h(
+    'span',
+    { class: `status-chip chip-${kind}` },
+    h('span', { class: 'st-short' }, kind === 'weak' ? '약' : '내'),
+    elementMark(element),
+    h('span', { class: 'st-name' }, kind === 'weak' ? `약점 ${name}` : `내성 ${name}`),
+  );
   Object.entries(tipAttrs(kind === 'weak' ? `약점 — ${name}` : `내성 — ${name}`, body, kind === 'weak' ? 'debuff' : 'buff')).forEach(([k, v]) => v && chip.setAttribute(k, v));
   return chip;
 }

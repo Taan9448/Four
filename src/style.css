@@ -413,6 +413,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .chip-resist { background: rgba(40, 40, 44, 0.92); border-color: #8a8a90; color: #d0cec8; }
 .status-chip .el-mark { width: 18px; height: 18px; border: 0; }
 .dmg-preview small.cr { color: #ffd36b; }
+.st-short { display: none; }
 @keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -60px) scale(1); } }
 
 .fx-shake { animation: shake 0.26s; }
@@ -660,6 +661,7 @@ h1, h2, h3 { font-family: var(--f-head); }
   .statuses { min-height: 20px; gap: 2px; width: max(100%, 90px); }
   .status-chip { font-size: 0.56rem; padding: 0 4px 0 1px; }
   .status-chip .st-name { display: none; }
+  .status-chip .st-short { display: inline; padding-left: 2px; font-weight: 700; }
   .status-chip .icon { width: 15px; height: 15px; font-size: 0.6rem; }
   .dmg-preview b { font-size: 1.05rem; }
   .dmg-preview small { font-size: 0.52rem; }
