@@ -1,5 +1,5 @@
 {
-  "id": "haun_hit",
+  "id": "mordecai_hit",
   "type": "character-anim",
   "frameW": 160,
   "frameH": 160,
@@ -20,15 +20,15 @@
   ],
   "events": {},
   "blend": "normal",
-  "facing": "right",
+  "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "3dfdb60af8d3a902",
+  "sourceHash": "6e279742f229afe0",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.689
+  "gridPurity": 0.513
 }

@@ -1,5 +1,5 @@
 {
-  "id": "haun_hit",
+  "id": "kwak_dojin_idle",
   "type": "character-anim",
   "frameW": 160,
   "frameH": 160,
@@ -11,24 +11,24 @@
     128
   ],
   "fit": "pad",
-  "frames": 3,
-  "fps": 12,
-  "loop": false,
+  "frames": 4,
+  "fps": 6,
+  "loop": true,
   "anchor": [
     0.5,
     0.9
   ],
   "events": {},
   "blend": "normal",
-  "facing": "right",
+  "facing": "left",
   "fallbackLevel": 1,
-  "virtualFrames": 3,
-  "sourceHash": "3dfdb60af8d3a902",
+  "virtualFrames": 4,
+  "sourceHash": "6e3429d54e3d24ae",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.689
+  "gridPurity": 0.566
 }
