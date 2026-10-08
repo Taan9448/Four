@@ -1,0 +1,9 @@
+id: bg_nocturna
+type: background
+summary: 전투 배경 — 마왕성 노크투르나(S2, 흑요석 회랑)
+frame_notes:
+  1: >-
+    Inside the demon king's castle Nocturna: a long obsidian hall. Tall black-glass pillars with faint violet edge light stand at the
+    left and right edges; between them in the distance a row of narrow gothic windows showing a dark violet sky, and torn dark-red
+    banners. The floor is polished black stone tiles with a faint reflection. Black, deep violet and dark crimson, cold and heavy.
+placeholder: { color: '#1d1a24' }

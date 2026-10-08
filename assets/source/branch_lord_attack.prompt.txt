@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Shaanxi Branch Lord of the Heavenly Demon Cult; a burly middle-aged martial arts elder, shaved head with a small topknot, thick black beard, a dark crimson cult robe with black trim, a wide leather belt, heavy black forearm guards, bare hands wreathed in blood-red qi. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: crouches into a low stance, right fist drawn back, red qi swirling
+Cell 2: red qi gathers into a glowing sphere around the fist
+Cell 3: drives forward to the left, fist leading
+Cell 4: the fist strike lands at full reach to the left, a burst of blood-red force
+Cell 5: the force dissipates, robe flaring
+Cell 6: returns to the wide stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: The six sprites must each occupy a narrow compact square, max100 logical pixels total width INCLUDING fists, feet, clothes and red energy. Leave at least14 logical pixels of uninterrupted green on left and right. Tuck trailing robe against the hip and shorten the back-foot stance, preserving head/body scale; compact bent punching arm instead of a wide lunge. All content in cell4 strictly inside x56..456, cell5 x568..968, cell6 x1080..1480; same gutters for top row. ALL heads left profile matching reference side view, same bald head/topknot/beard/guards. Neutral height107 logical pixels; low poses only mild knee bend, same actual head/torso size in all6. Cell4 full extension with a SMALL blood-red impact splash close to knuckles. No large arcs, no trailing horizontal fire, no neighboring-cell pixels. Fixed foot baseline; cell6 returns upright left-facing wide stance.
