@@ -4,7 +4,7 @@ import { critChance, hasSkipTurn } from '../engine/effects';
 import { ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
-import { flash, floatOver, shake, sleep, toast } from '../render/fx';
+import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
@@ -67,6 +67,12 @@ export class BattleView {
   private hovered: number | null = null;
   private busy = false;
   private lastCard: string | null = null;
+  /** 손패 카드 요소(uid별). 손패를 떠난 카드를 더미로 날려 보내고, 새로 들어온 카드를 뽑을 더미에서 끌어오는 데 쓴다 */
+  private handEls = new Map<string, HTMLElement>();
+  /** 이미 따로 날려 보낸 카드(낸 카드·턴 끝에 버린 카드): 손패에서 사라져도 다시 날리지 않는다 */
+  private flown = new Set<string>();
+  /** 적 턴 연출 동안은 손패를 다시 그리지 않는다(다음 턴 손패는 연출이 끝난 뒤 뽑아 온다) */
+  private handFrozen = false;
 
   constructor(
     private data: GameData,
@@ -287,24 +293,7 @@ export class BattleView {
       ),
     );
 
-    // 손패: 부채꼴(가운데가 가장 높고 바깥으로 기운다)
-    clear(this.handEl);
-    const n = s.hand.length;
-    const mid = (n - 1) / 2;
-    const step = n > 1 ? Math.min(5, 36 / (n - 1)) : 0;
-    this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
-    s.hand.forEach((inst, i) => {
-      const check = canPlay(s, i);
-      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i });
-      const off = i - mid;
-      el.style.setProperty('--rot', `${off * step}deg`);
-      el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
-      el.style.zIndex = String(10 + i);
-      el.addEventListener('click', () => this.onCardClick(i));
-      el.addEventListener('mouseenter', () => this.setHover(i));
-      el.addEventListener('mouseleave', () => this.setHover(null));
-      this.handEl.appendChild(el);
-    });
+    if (!this.handFrozen) this.renderHand();
 
     // 대상 표시
     if (this.selected !== null && !s.hand[this.selected]) this.selected = null;
@@ -321,6 +310,103 @@ export class BattleView {
     this.turnEl.textContent = `${s.turn}턴`;
     this.endBtn.disabled = this.busy || !!s.result;
     pruneTooltip();
+  }
+
+  /** 더미 칩의 숫자 자리(뽑을·버림·소멸) — 카드가 날아가고 오는 곳 */
+  private pileRect(which: 'draw' | 'discard' | 'exhaust'): DOMRect {
+    const marks = this.pilesEl.querySelectorAll('i');
+    const el = marks[{ draw: 0, discard: 1, exhaust: 2 }[which]] ?? this.pilesEl;
+    return el.getBoundingClientRect();
+  }
+
+  /**
+   * 손패: 부채꼴(가운데가 가장 높고 바깥으로 기운다).
+   * 손패를 떠난 카드는 마지막 자리에서 버림·소멸 더미로 날아가고, 새로 들어온 카드는 뽑을 더미에서 차례로 날아온다.
+   */
+  private renderHand(): void {
+    const s = this.state;
+    const now = new Set(s.hand.map((c) => c.uid));
+    const leaving: { el: HTMLElement; rect: DOMRect; to: 'draw' | 'discard' | 'exhaust' }[] = [];
+    for (const [uid, el] of this.handEls) {
+      if (now.has(uid)) continue;
+      if (this.flown.delete(uid) || !el.isConnected) continue;
+      const to = s.exhaust.some((c) => c.uid === uid) ? 'exhaust' : s.discard.some((c) => c.uid === uid) ? 'discard' : 'draw';
+      leaving.push({ el, rect: el.getBoundingClientRect(), to });
+    }
+    const first = this.handEls.size === 0;
+    const prev = this.handEls;
+    this.handEls = new Map();
+    clear(this.handEl);
+    const n = s.hand.length;
+    const mid = (n - 1) / 2;
+    const step = n > 1 ? Math.min(5, 36 / (n - 1)) : 0;
+    this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
+    s.hand.forEach((inst, i) => {
+      const check = canPlay(s, i);
+      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i });
+      const off = i - mid;
+      el.style.setProperty('--rot', `${off * step}deg`);
+      el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
+      el.style.zIndex = String(10 + i);
+      el.addEventListener('click', () => this.onCardClick(i));
+      el.addEventListener('mouseenter', () => this.setHover(i));
+      el.addEventListener('mouseleave', () => this.setHover(null));
+      this.handEl.appendChild(el);
+      this.handEls.set(inst.uid, el);
+    });
+
+    const ms = 260 * Math.max(0.6, settings.speed);
+    for (const x of leaving) void flyClone(x.el, this.pileRect(x.to), { ms, scale: 0.25 }, x.rect);
+    const arriving = s.hand.filter((c) => !prev.has(c.uid)).map((c) => this.handEls.get(c.uid)!);
+    if (!arriving.length) return;
+    // 처음 그릴 때는 아직 화면에 붙기 전이라 한 박자 뒤에
+    const run = () => {
+      const from = this.pileRect('draw');
+      arriving.forEach((el, k) => flyIn(el, from, k * 70 * settings.speed, ms));
+    };
+    if (first || !this.handEl.isConnected) requestAnimationFrame(run);
+    else run();
+  }
+
+  /** 카드가 날아갈 자리: 고른 대상 → 공격이면 적 진영 → 그 밖에는 카드 주인(없으면 우리 진영) */
+  private flyTarget(handIndex: number, targetUid?: string): DOMRect | null {
+    const s = this.state;
+    const inst = s.hand[handIndex];
+    if (!inst) return null;
+    const wrap = (uid: string | undefined) => (uid ? this.units.get(uid)?.el.querySelector<HTMLElement>('.sprite-wrap')?.getBoundingClientRect() : undefined);
+    const t = wrap(targetUid);
+    if (t) return t;
+    if (resolveCard(this.data, inst.cardId).def.type === 'attack') return this.field.querySelector<HTMLElement>('.side-enemy')?.getBoundingClientRect() ?? null;
+    return wrap(cardOwner(s, inst)?.uid) ?? this.field.querySelector<HTMLElement>('.side-party')?.getBoundingClientRect() ?? null;
+  }
+
+  /** 낸 카드를 대상 쪽으로 날린다(원본은 감추고, 손패에서 빠질 때 다시 날리지 않게 표시) */
+  private async flyPlayed(handIndex: number, targetUid?: string): Promise<void> {
+    const inst = this.state.hand[handIndex];
+    const el = inst ? this.handEls.get(inst.uid) : undefined;
+    const to = this.flyTarget(handIndex, targetUid);
+    if (!inst || !el || !to) return;
+    this.flown.add(inst.uid);
+    el.style.visibility = 'hidden';
+    await flyClone(el, to, { ms: 320 * Math.max(0.6, settings.speed), scale: 0.4 });
+  }
+
+  /** 턴 종료: 남길(유지) 카드를 뺀 손패를 버린 더미로 차례로 날린다 */
+  private async flyDiscardHand(): Promise<void> {
+    const to = this.pileRect('discard');
+    const ms = 220 * Math.max(0.6, settings.speed);
+    const flights = this.state.hand
+      .filter((c) => !resolveCard(this.data, c.cardId).keywords.includes('retain'))
+      .map((c, k) => {
+        const el = this.handEls.get(c.uid);
+        if (!el) return Promise.resolve();
+        this.flown.add(c.uid);
+        const p = flyClone(el, to, { ms, scale: 0.25, delay: k * 40 });
+        // 복제본이 뜬 다음 원본을 감춘다
+        requestAnimationFrame(() => (el.style.visibility = 'hidden'));
+        return p;
+      });
+    await Promise.all(flights);
   }
 
   /** 적 머리 위: 의도 아이콘 · 행동 이름 · 피해 · 노리는 아군 */
@@ -424,13 +510,13 @@ export class BattleView {
     // 바로 쓰는 카드: 고른 카드를 풀어 둔다(손패가 줄면 고른 칸이 다른 카드·빈 칸을 가리키게 된다)
     if (!need) {
       this.selected = null;
-      return void this.act(() => playCard(this.state, i));
+      return void this.act(() => playCard(this.state, i), () => this.flyPlayed(i));
     }
     // 대상이 하나뿐이면 바로 사용
     const pool = (need === 'enemy' ? this.state.enemies : this.state.party).filter((c) => !c.downed);
     if (pool.length === 1) {
       this.selected = null;
-      return void this.act(() => playCard(this.state, i, pool[0].uid));
+      return void this.act(() => playCard(this.state, i, pool[0].uid), () => this.flyPlayed(i, pool[0].uid));
     }
     this.selected = i;
     this.refresh();
@@ -442,23 +528,36 @@ export class BattleView {
     const need = needsTarget(this.state, this.state.hand[i]);
     if ((need === 'enemy' && c.side !== 'enemy') || (need === 'ally' && c.side !== 'party') || c.downed) return;
     this.selected = null;
-    void this.act(() => playCard(this.state, i, c.uid));
+    void this.act(() => playCard(this.state, i, c.uid), () => this.flyPlayed(i, c.uid));
   }
 
   private onEndTurn(): void {
     if (this.busy || this.state.result) return;
     this.selected = null;
-    void this.act(() => endTurn(this.state));
+    void this.act(
+      () => endTurn(this.state),
+      () => this.flyDiscardHand(),
+      true,
+    );
   }
 
-  private async act(fn: () => unknown): Promise<void> {
+  /**
+   * 행동 하나: 먼저 카드 연출(before: 낸 카드·버리는 손패가 날아감) → 엔진 실행 → 이벤트 연출.
+   * freezeHand: 적 턴처럼 연출이 끝난 뒤에야 손패를 다시 그린다(새 손패는 그때 뽑아 온다)
+   */
+  private async act(fn: () => unknown, before?: () => Promise<void>, freezeHand = false): Promise<void> {
     this.busy = true;
     this.hovered = null;
-    this.refresh();
+    this.endBtn.disabled = true;
+    this.renderPreview();
+    if (before) await before();
+    this.handFrozen = freezeHand;
+    // 여기서 다시 그리지 않는다: 낸 카드가 손패에 잠깐 되살아나거나, 피해가 연출보다 먼저 보이지 않게(연출이 이벤트마다 다시 그린다)
     const r = fn() as { ok?: boolean; reason?: string } | undefined;
     if (r && r.ok === false && r.reason) toast(this.toasts, r.reason, 'danger');
     await this.animate(this.state.events.splice(0));
     this.busy = false;
+    this.handFrozen = false;
     this.refresh();
     if (this.state.result) this.showResult();
   }
@@ -466,7 +565,7 @@ export class BattleView {
   // ───────────────────────── 연출 ─────────────────────────
 
   private async animate(events: BattleEvent[]): Promise<void> {
-    for (const ev of events) {
+    for (const [idx, ev] of events.entries()) {
       switch (ev.type) {
         case 'turn':
           if (ev.turn > 1) toast(this.toasts, `${ev.turn}턴`, 'info');
@@ -486,18 +585,30 @@ export class BattleView {
           if (ev.absorbed) floatOver(this.fxLayer, u.el, `흡수 +${ev.amount}`, 'absorb');
           else {
             // 치명타는 금빛 큰 숫자, 결은 푸른 숫자. 약점·내성은 작은 글자를 하나 더
-            floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : 'damage');
+            const heavy = ev.amount >= 15;
+            floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : heavy ? 'heavy' : 'damage');
             if (ev.weak) floatOver(this.fxLayer, u.el, '약점!', 'weak');
             else if (ev.resisted) floatOver(this.fxLayer, u.el, '내성', 'resist');
             if (ev.blocked) floatOver(this.fxLayer, u.el, `막음 ${ev.blocked}`, 'block');
-            shake(u.el, ev.amount >= 15 || !!ev.crit);
-            flash(u.el, ev.grain ? 'blue' : 'white');
+            // 이 피해로 쓰러지는가(엔진은 피해 바로 뒤에 쓰러짐 이벤트를 남긴다)
+            const kill = events.slice(idx + 1, idx + 4).some((e) => (e.type === 'downed' || e.type === 'death') && e.uid === ev.targetUid);
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);
             if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then(() => this.idle(u));
+            flash(u.el, ev.grain ? 'blue' : 'white');
+            this.refresh();
+            if (ev.amount > 0) {
+              // 세기: 피해가 클수록, 치명타·처치면 가장 세게. 맞은 쪽은 공격 반대편으로 밀린다
+              const power = ev.crit || kill ? 1 : Math.min(0.85, 0.25 + ev.amount / 28);
+              const dir = u.c.side === 'enemy' ? 1 : -1;
+              shake(u.el, power, dir);
+              if (ev.crit || kill || ev.amount >= 20) shake(this.field, power * 0.45, dir);
+              // 타격 멈춤: 보통 55ms, 큰 피해 90ms, 치명타·처치 120ms(빠른 속도면 줄인다)
+              await hitStop((ev.crit || kill ? 120 : heavy ? 90 : 55) * Math.max(0.5, settings.speed));
+            }
           }
-          this.refresh();
-          await this.wait(140);
+          if (ev.absorbed) this.refresh();
+          await this.wait(110);
           break;
         }
         case 'block': {
@@ -529,7 +640,7 @@ export class BattleView {
         case 'surge':
           toast(this.toasts, '균열 폭주! 하늘이 갈라진다', 'danger');
           void this.rift.surge();
-          shake(this.field, true);
+          shake(this.field, 1);
           flash(this.field, 'red');
           await this.wait(350);
           break;
@@ -561,7 +672,7 @@ export class BattleView {
             const fresh = this.makeUnit(old.c);
             old.el.replaceWith(fresh.el);
             toast(this.toasts, `${ev.from} — ${ev.text}`, 'danger');
-            shake(this.field, true);
+            shake(this.field, 0.8);
             flash(this.field, 'red');
             this.refresh();
           }
