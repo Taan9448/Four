@@ -19,7 +19,9 @@ interface Slot {
   face: Face | null;
 }
 
-export function sceneView(data: GameData, scene: SceneDef, onDone: () => void): HTMLElement {
+/** background: 장면 뒤 배경 에셋 id(장면의 background가 우선). 실제 그림이 있을 때만 어둡게 깐다 */
+export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, opts: { background?: string } = {}): HTMLElement {
+  const bgUrl = frameUrl(scene.background ?? opts.background, 1, { realOnly: true });
   const slots: Record<Side, Slot> = {
     left: { el: h('div', { class: 'vn-slot vn-left' }), speaker: null, face: null },
     right: { el: h('div', { class: 'vn-slot vn-right' }), speaker: null, face: null },
@@ -107,7 +109,8 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void): 
   };
   const root = h(
     'section',
-    { class: `screen scene-screen world-${scene.world ?? 'murim'}`, onclick: () => next() },
+    { class: `screen scene-screen world-${scene.world ?? 'murim'}${bgUrl ? ' has-bg' : ''}`, onclick: () => next() },
+    h('div', { class: 'vn-bg', style: bgUrl ? `background-image:url("${bgUrl}")` : '' }),
     cgEl,
     slots.left.el,
     slots.right.el,

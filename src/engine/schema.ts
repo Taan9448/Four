@@ -150,7 +150,15 @@ export const SceneLine = z
   })
   .strict();
 export type SceneLine = z.infer<typeof SceneLine>;
-export const SceneDef = z.object({ id: z.string(), world: World.optional(), lines: z.array(SceneLine).min(1) }).strict();
+export const SceneDef = z
+  .object({
+    id: z.string(),
+    world: World.optional(),
+    /** 장면 뒤에 깔 배경 에셋 id(없으면 지금 스테이지의 전투 배경). 실제 그림이 있을 때만 쓴다 */
+    background: z.string().optional(),
+    lines: z.array(SceneLine).min(1),
+  })
+  .strict();
 export type SceneDef = z.infer<typeof SceneDef>;
 
 export const CardDef = z
