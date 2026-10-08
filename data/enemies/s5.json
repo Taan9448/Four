@@ -75,14 +75,14 @@
   {
     "id": "vargas",
     "name": "마왕 바르가스",
-    "maxHp": 190,
+    "maxHp": 218,
     "sprite": "vargas",
     "silhouette": "boss",
     "color": "#3a3446",
     "scale": 2,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 13}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 16}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
+    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 21}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 25}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
     "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
     "flavor": "사람의 세 배인 키, 찢어진 박쥐 날개, 왕관처럼 솟은 비틀린 뿔 일곱, 바닥이 보이지 않는 텅 빈 우물 같은 눈. 삼천 년 전 문을 닫은 고대인. 숨결 하나에 바닥과 갑옷이 녹는다."
   }
