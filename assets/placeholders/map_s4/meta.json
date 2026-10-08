@@ -1,0 +1,31 @@
+{
+  "id": "map_s4",
+  "type": "map-art",
+  "frameW": 768,
+  "frameH": 1152,
+  "track": "illustration",
+  "pixelScale": null,
+  "gridDetected": null,
+  "nativeSize": null,
+  "fit": null,
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "a4ae9bee2c5d0f97",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1024,
+    1536
+  ],
+  "gridPurity": null
+}
