@@ -57,10 +57,11 @@ describe('캠페인 구조', () => {
     expect(s2.flags).toEqual(expect.arrayContaining(['met_companions', 'ugly_sword', 'silien_seed']));
     const s3 = at('s3');
     expect(s3.flags).toEqual(expect.arrayContaining(['byeogun', 'red_sword']));
-    expect(s3.deck.map((c) => c.cardId)).toEqual(expect.arrayContaining(['haun_byeogun', 'kyle_red_sword']));
+    // 이야기 카드는 보유 카드로(편성에서 고른다, GAME_DESIGN 9-1)
+    expect(Object.keys(s3.collection)).toEqual(expect.arrayContaining(['haun_byeogun', 'kyle_red_sword']));
     const s5 = at('s5');
     expect(s5.flags).toEqual(expect.arrayContaining(['kyle_knight', 'durin_hammer']));
-    expect(s5.deck.map((c) => c.cardId)).toContain('born_durin_hammer');
+    expect(s5.collection.born_durin_hammer).toBeDefined();
     const s6 = at('s6');
     expect(s6.flags).toEqual(expect.arrayContaining(['rift_known', 'void_key', 'cheonoe']));
     expect(s6.deck.map((c) => c.cardId)).toContain('haun_cheonoe');

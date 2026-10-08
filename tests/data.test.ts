@@ -160,12 +160,10 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
-  it('카드 등급: 시작 카드는 일반, 전설은 스토리로만, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {
+  it('카드 등급(9-1): 시작 카드는 일반·고급, 영웅·전설은 대사(castLine)가 있고 화자가 캐릭터다', () => {
     const bad: string[] = [];
     for (const c of data.cards.values()) {
-      if (c.pool === 'starter' && c.rarity !== 'common') bad.push(`${c.id}: 시작 카드는 common`);
-      if (c.rarity === 'legendary' && c.pool !== 'story') bad.push(`${c.id}: 전설은 story 풀`);
-      if (c.rarity === 'common' && c.pool === 'reward') bad.push(`${c.id}: 보상 풀에 일반 등급`);
+      if (c.pool === 'starter' && c.rarity !== 'common' && c.rarity !== 'uncommon') bad.push(`${c.id}: 시작 카드는 일반·고급`);
       if ((c.rarity === 'epic' || c.rarity === 'legendary') && !c.castLine) bad.push(`${c.id}: 영웅·전설은 castLine 필요`);
       if (c.castLine && !data.characters.has(c.castLine.speaker)) bad.push(`${c.id}: castLine 화자 ${c.castLine.speaker}`);
     }
