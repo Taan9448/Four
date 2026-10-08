@@ -98,7 +98,16 @@ h1, h2, h3 { font-family: var(--f-head); }
 .journey { position: relative; aspect-ratio: 6 / 1; width: 100%; background-size: 100% auto; background-position: center; overflow: hidden; }
 /* 그림이 오기 전: 왼쪽 무림(따뜻한 먹빛) · 오른쪽 엘하임(청은빛) */
 .journey:not(.has-art) { background: radial-gradient(ellipse at 15% 40%, rgba(242, 169, 59, 0.12), transparent 40%), radial-gradient(circle at 70% 22%, rgba(223, 244, 255, 0.35) 0 9px, transparent 10px), radial-gradient(circle at 76% 30%, rgba(143, 211, 255, 0.4) 0 5px, transparent 6px), linear-gradient(90deg, #2a2722 0%, #1d1e22 44%, #141a24 56%, #10203a 100%); }
-.journey:not(.has-art)::before { content: ''; position: absolute; inset: auto 0 0; height: 45%; background: radial-gradient(ellipse at 12% 100%, #36302a 0 30%, transparent 31%), radial-gradient(ellipse at 30% 100%, #2c2824 0 26%, transparent 27%), radial-gradient(ellipse at 47% 110%, #1b1b1e 0 18%, transparent 19%), radial-gradient(ellipse at 68% 100%, #1a2a24 0 28%, transparent 29%), radial-gradient(ellipse at 90% 100%, #1c2030 0 26%, transparent 27%); }
+.journey:not(.has-art):not(.has-tiles)::before { content: ''; position: absolute; inset: auto 0 0; height: 45%; background: radial-gradient(ellipse at 12% 100%, #36302a 0 30%, transparent 31%), radial-gradient(ellipse at 30% 100%, #2c2824 0 26%, transparent 27%), radial-gradient(ellipse at 47% 110%, #1b1b1e 0 18%, transparent 19%), radial-gradient(ellipse at 68% 100%, #1a2a24 0 28%, transparent 29%), radial-gradient(ellipse at 90% 100%, #1c2030 0 26%, transparent 27%); }
+.journey.has-tiles { background: radial-gradient(ellipse at 50% 50%, rgba(255, 250, 235, 0.25), transparent 70%), radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e4d6b6, #d6c59f); }
+/* 지역 지도 그림을 장소 자리에 번지듯 깐 조각(여정 띠 그림이 오기 전) */
+.journey-tile { position: absolute; width: 19%; aspect-ratio: 3 / 2; transform: translate(-50%, -50%); background-size: 100% 100%; opacity: 0.95; -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 100%); pointer-events: none; }
+.journey.has-tiles .stop { color: #2a1f14; text-shadow: 0 0 3px rgba(246, 236, 212, 0.95), 0 0 6px rgba(246, 236, 212, 0.9); }
+.journey.has-tiles .stop.here { color: #1f4f78; }
+.journey.has-tiles .journey-fog { background: linear-gradient(90deg, rgba(214, 197, 159, 0) 0, rgba(218, 202, 166, 0.95) 7%, #d8c7a2 30%), radial-gradient(ellipse at 60% 50%, rgba(255, 255, 255, 0.35), transparent 60%); }
+.journey.has-tiles .journey-fog span { color: rgba(60, 45, 30, 0.3); }
+.journey.has-tiles .gate { color: rgba(42, 31, 20, 0.8); text-shadow: 0 0 4px rgba(246, 236, 212, 0.9); }
+.journey.has-tiles .tag { color: rgba(42, 31, 20, 0.75); text-shadow: 0 0 4px rgba(246, 236, 212, 0.9); }
 .journey .tag { position: absolute; top: 8px; z-index: 1; font-family: var(--f-brush); font-size: 0.9rem; letter-spacing: 0.3em; color: rgba(235, 230, 218, 0.72); text-shadow: 0 1px 3px #000; }
 .journey .tag-l { left: 14px; }
 .journey .tag-r { right: 14px; }
@@ -142,17 +151,27 @@ h1, h2, h3 { font-family: var(--f-head); }
 .map-lines line { stroke: rgba(43, 36, 26, 0.35); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
 .map-lines line.open { stroke: #1f5f8a; stroke-dasharray: none; stroke-width: 2.5; }
 .map-lines line.walked { stroke: #2b241a; stroke-dasharray: none; stroke-width: 3; }
-.node { position: absolute; z-index: 1; transform: translate(-50%, -50%); width: 32px; height: 32px; padding: 0; display: grid; place-items: center; font-family: var(--f-brush); font-size: 1rem; color: var(--paper-ink); border: 2px solid var(--paper-ink); border-radius: 3px; background: rgba(240, 230, 205, 0.94); cursor: default; }
-.node.done { opacity: 0.5; }
-.node.open { border-color: #1f5f8a; color: #1f5f8a; cursor: pointer; animation: node-pulse 1.6s infinite; }
-.node.open:hover { background: #fff8ea; }
-.node.here { box-shadow: 0 0 0 4px rgba(242, 169, 59, 0.45); opacity: 1; }
-.node.node-story { border-radius: 50%; }
-.node.node-elite { border-color: #6a2a20; }
-.node.node-boss { width: 44px; height: 44px; font-size: 1.25rem; background: #a8281e; color: #f6ead0; border-color: #4a120c; }
-.node.node-boss.open { border-color: #ffd58a; color: #fff; }
+/* 노드: 두루마리 위에 찍힌 낙관(인장). 전투는 붉은 테두리 인장(주문), 엘리트는 붉은 바탕 인장(백문), 보스는 큰 이중 테 인장,
+   이야기·사건·휴식·여관은 먹으로 그린 둥근 표식. 갈 수 있는 곳은 금빛으로 숨쉬고, 지나온 곳은 먹이 바랜다 */
+.node { --seal: #a8281e; --seal-ink: #a8281e; --seal-bg: rgba(246, 236, 212, 0.96); position: absolute; z-index: 1; transform: translate(-50%, -50%) rotate(var(--tilt, 0deg)); width: 34px; height: 34px; padding: 0; display: grid; place-items: center; font-family: var(--f-brush); font-size: 1.05rem; line-height: 1; color: var(--seal-ink); border: 2px solid var(--seal); border-radius: 4px; background: var(--seal-bg); box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 1px 2px rgba(60, 35, 15, 0.35); cursor: default; transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s, filter 0.3s; }
+.node .node-glyph { display: block; transform: translateY(1px); text-shadow: 0 0 1px color-mix(in srgb, var(--seal-ink) 40%, transparent); }
+/* 인장의 번진 먹: 테두리 안쪽이 조금 거칠게 */
+.node::after { content: ''; position: absolute; inset: 2px; border-radius: inherit; pointer-events: none; background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.25), transparent 40%), radial-gradient(rgba(120, 30, 20, 0.08) 1px, transparent 1.4px) 0 0 / 4px 4px; }
+.node.node-elite { --seal: #7a1a12; --seal-bg: #a8281e; --seal-ink: #f6ead0; }
+.node.node-boss { --seal: #4a120c; --seal-bg: #8f1f16; --seal-ink: #fbe7c0; width: 48px; height: 48px; font-size: 1.4rem; border-width: 3px; box-shadow: inset 0 0 0 3px #8f1f16, inset 0 0 0 4px #e2b45c, 0 2px 6px rgba(60, 20, 10, 0.5); }
+/* 둥근 먹 표식 */
+.node.node-story, .node.node-event, .node.node-rest, .node.node-inn, .node.node-shop { border-radius: 50%; }
+.node.node-story { --seal: #2c3a52; --seal-ink: #2c3a52; }
+.node.node-event { --seal: #2a2722; --seal-ink: #2a2722; }
+.node.node-rest { --seal: #2f5a3a; --seal-ink: #2f5a3a; }
+.node.node-inn { --seal: #6b4a2a; --seal-ink: #6b4a2a; }
+.node.node-shop { --seal: #8a6a1e; --seal-ink: #7a5a12; }
+.node.done { opacity: 0.45; filter: saturate(0.4); }
+.node.open { opacity: 1; cursor: pointer; animation: node-pulse 1.6s infinite; }
+.node.open:hover { transform: translate(-50%, -50%) rotate(0deg) scale(1.15); z-index: 4; }
+.node.here { opacity: 1; filter: none; box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 4px rgba(226, 180, 92, 0.55); }
 .node:disabled { cursor: default; }
-@keyframes node-pulse { 50% { box-shadow: 0 0 0 6px rgba(31, 95, 138, 0.22); } }
+@keyframes node-pulse { 0%, 100% { box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 0 rgba(226, 180, 92, 0.7); } 50% { box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 7px rgba(226, 180, 92, 0); } }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(143, 211, 255, 0.05); } }
 .here-mark { position: absolute; z-index: 3; width: 56px; transform: translate(-50%, -92%); image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)); }
 .side-panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow-y: auto; }
@@ -200,8 +219,10 @@ h1, h2, h3 { font-family: var(--f-head); }
 .party-box.guide-pulse { animation: guide-pulse 1.2s ease-in-out 4; box-shadow: 0 0 0 2px var(--mana); }
 @keyframes guide-pulse { 50% { box-shadow: 0 0 0 3px var(--mana), 0 0 18px rgba(143, 211, 255, 0.6); } }
 .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.legend { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; color: var(--ink-dim); font-size: 0.78rem; }
-.legend b { font-family: var(--f-brush); color: var(--ink); font-weight: 400; margin-right: 4px; }
+.legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 5px 8px; color: var(--ink-dim); font-size: 0.78rem; }
+.legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend .node.mini { position: relative; transform: none; width: 20px; height: 20px; font-size: 0.72rem; font-weight: 400; flex: 0 0 auto; animation: none; }
+.legend .node.node-boss.mini { width: 20px; height: 20px; font-size: 0.72rem; border-width: 2px; }
 .side-panel .legend { margin-top: auto; }
 .side-panel .seed { margin: 0; font-family: ui-monospace, monospace; font-size: 0.75rem; }
 
@@ -639,10 +660,10 @@ h1, h2, h3 { font-family: var(--f-head); }
   .stop { font-size: 0.6rem; }
   .gate { font-size: 0.6rem; }
   .journey-area .banner { font-size: 0.7rem; white-space: normal; width: 90%; text-align: center; }
-  .node { width: 26px; height: 26px; font-size: 0.85rem; }
-  .node.node-boss { width: 36px; height: 36px; font-size: 1rem; }
+  .node { width: 28px; height: 28px; font-size: 0.9rem; }
+  .node.node-boss { width: 38px; height: 38px; font-size: 1.1rem; }
   .here-mark { width: 40px; }
-  .legend { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .legend { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); }
 
   .b-scene { height: auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding: 8px 6px 10px; }
   .b-hud { position: static; }

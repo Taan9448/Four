@@ -301,7 +301,8 @@ describe('저장소의 실제 명세와 임시 시트', () => {
       const r = await validateAsset(id, { placeholder: true, previews: false });
       expect(r.errors, id).toEqual([]);
     }
-  });
+    // 명세가 200개 가까이라 느린 기계에서는 30초를 넘긴다
+  }, 120_000);
 
   it('완성 프롬프트에 캔버스·격자·프레임 메모·빈 칸·키 색이 들어간다', () => {
     const text = promptFor('haun_attack');
