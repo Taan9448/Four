@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Cell 1: full body, three-quarter front view, a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces, wings and horns sewn into it with glowing seams, a pulsing blue heart in the middle of the chest
+Cell 2: full body, side view facing left, same proportions, hunched forward, the dark qi arm hanging long
+Cells 3 to 4 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: EDIT THE ATTACHED SHEET: replace each oversized character with a MINIATURE version at75% of its current width AND height. Keep the whole canvas unchanged and square. Translate the miniature figures upward so their lowest hem is at45% of the WHOLE IMAGE HEIGHT. Both COMPLETE horns, wings, hands, tendrils and hems must end ABOVE the horizontal halfway line. This is a SIZE AND PLACEMENT repair only; preserve every design feature of the attached original. Show a CLEAR WIDE GREEN STRIP between the hems and the halfway line. The whole BOTTOM HALF MUST BE UNIFORMLY GREEN, without a single character pixel. Character1stays inupperleftquadrant; character2staysinupperrightquadrant facingLEFT. Same128grid totalheight~96logicalpx, hem115, margins10logicalpx. Do NOT leave them at the original huge size. Make them visually and unmistakably SMALLER.

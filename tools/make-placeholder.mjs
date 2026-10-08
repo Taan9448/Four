@@ -150,6 +150,20 @@ function standing(w, h, spec, face) {
     <circle cx="${cx + hr * 0.35}" cy="${hy + hr * 0.1}" r="${face === 2 ? 11 : 8}" fill="#1d2433"/>${brow}${mouth}`;
 }
 
+/** 아이콘 임시 그림: 칸마다 모양이 다른 단순한 기호(번호를 알아보게) */
+function iconCell(w, h, spec, n) {
+  const color = spec.placeholder?.color ?? '#c2c6d1';
+  const accent = spec.placeholder?.accent ?? '#f2a93b';
+  const cx = w / 2, cy = h / 2, r = w * 0.3;
+  const sides = 3 + ((n - 1) % 5);
+  const pts = Array.from({ length: sides }, (_, i) => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / sides;
+    return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+  }).join(' ');
+  return `<polygon points="${pts}" fill="${color}" stroke="#1d2433" stroke-width="12"/>
+    <circle cx="${cx}" cy="${cy}" r="${r * 0.3 + (n % 3) * 6}" fill="${accent}" stroke="#1d2433" stroke-width="8"/>`;
+}
+
 function illustration(w, h, spec) {
   const color = spec.placeholder?.color ?? '#3d4a63';
   return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(color, 0.3)}"/><stop offset="1" stop-color="${shade(color, -0.2)}"/></linearGradient></defs>
@@ -175,6 +189,11 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
     for (let n = 1; n <= cols * rows; n++) {
       if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
       parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${standing(w, h, spec, n - 1)}</g>`);
+    }
+  } else if (spec.type === 'icon-sheet') {
+    for (let n = 1; n <= cols * rows; n++) {
+      if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
+      parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${iconCell(w, h, spec, n)}</g>`);
     }
   } else if (spec.track === 'illustration' || spec.type === 'background') {
     parts.push(illustration(W, H, spec));

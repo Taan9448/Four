@@ -41,6 +41,6 @@ npm run assets:status
 - `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), save(저장 직렬화), text(카드 문구)
 - `src/sim/` — bot(자동 플레이 봇: 밸런스 측정용, 엔진만 씀)
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview
-- `src/ui/` — app(화면 흐름), map-view, battle-view, choice-view, card-view, scene-view, deck-view, overlay(창), settings, storage(localStorage)
+- `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage)
 - `data/` — balance, statuses, characters, enemies, stages, support, cards/, modules/
 - `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세), `balance/`(봇 실행·기록, vitest로 돈다)
