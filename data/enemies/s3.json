@@ -2,13 +2,13 @@
   {
     "id": "ice_wolf",
     "name": "얼음 늑대",
-    "maxHp": 30,
+    "maxHp": 34,
     "sprite": null,
     "silhouette": "beast",
     "color": "#bfe4f2",
     "hitFx": "fx_claw",
     "pattern": "cycle",
-    "moves": [{"id": "glide", "name": "소리 없이 미끄러진다", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 6, "element": "ice"}]}, {"id": "frost_mane", "name": "서리 갈기", "intent": "defend", "effects": [{"op": "block", "amount": 9, "target": "self"}]}, {"id": "ice_fangs", "name": "얼음 이빨", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 4, "times": 2}]}],
+    "moves": [{"id": "glide", "name": "소리 없이 미끄러진다", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "element": "ice"}]}, {"id": "frost_mane", "name": "서리 갈기", "intent": "defend", "effects": [{"op": "block", "amount": 9, "target": "self"}]}, {"id": "ice_fangs", "name": "얼음 이빨", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 5, "times": 2}]}],
     "flavor": "투명한 얼음 몸 안에 푸른 마나가 핏줄처럼 얼어붙어 있다. 육각형 수천 개가 한 점에 모이는 곳을 찌르면 그물 전체가 동시에 무너진다. 붉은 검이 닿으면 녹아 터진다.",
     "weak": ["fire"],
     "resist": ["ice"]
@@ -16,12 +16,12 @@
   {
     "id": "ice_knight",
     "name": "얼음 기사",
-    "maxHp": 34,
+    "maxHp": 40,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#9cc8de",
     "pattern": "cycle",
-    "moves": [{"id": "ice_blade", "name": "얼음 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 9, "element": "ice"}]}, {"id": "ice_shield", "name": "얼음 방패", "intent": "defend", "effects": [{"op": "block", "amount": 10, "target": "self"}]}, {"id": "frozen_strike", "name": "얼어붙은 일격", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 6, "element": "ice"}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
+    "moves": [{"id": "ice_blade", "name": "얼음 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10, "element": "ice"}]}, {"id": "ice_shield", "name": "얼음 방패", "intent": "defend", "effects": [{"op": "block", "amount": 10, "target": "self"}]}, {"id": "frozen_strike", "name": "얼어붙은 일격", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "element": "ice"}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
     "flavor": "얼음으로 된 갑옷. 아니, 갑옷 안의 몸까지 얼음이다. 셀리아스는 얼어붙은 자들을 부린다. 투명한 얼음 속에 눈을 감은 얼굴이 비친다.",
     "weak": ["fire"],
     "resist": ["ice"]
@@ -29,14 +29,14 @@
   {
     "id": "ice_gatekeeper",
     "name": "얼음 궁전의 문지기",
-    "maxHp": 75,
+    "maxHp": 85,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#8ab4cc",
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gate_spear", "name": "문지기의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 12}]}, {"id": "ice_rampart", "name": "얼음 성벽", "intent": "defend", "effects": [{"op": "block", "amount": 14, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "frost_breath", "name": "얼어붙은 숨", "intent": "attack", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies", "element": "ice"}, {"op": "gain_mana", "amount": -2}]}, {"id": "stopped_night", "name": "그날 밤에 멈춘 검", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
+    "moves": [{"id": "gate_spear", "name": "문지기의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 13}]}, {"id": "ice_rampart", "name": "얼음 성벽", "intent": "defend", "effects": [{"op": "block", "amount": 14, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "frost_breath", "name": "얼어붙은 숨", "intent": "attack", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies", "element": "ice"}, {"op": "gain_mana", "amount": -2}]}, {"id": "stopped_night", "name": "그날 밤에 멈춘 검", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
     "flavor": "십 년 전 그 밤, 성문을 지키다 쓰러진 아르덴의 기사. 지금은 얼음 궁전의 문지기다. 가렛 경의 기사들은 탑에 세 번 닿았고, 세 번 다 돌아오지 못한 기사가 더 많았다.",
     "weak": ["fire"],
     "resist": ["ice"]
@@ -44,12 +44,12 @@
   {
     "id": "rowen_ice_brother",
     "name": "로웬가의 얼음 기사",
-    "maxHp": 28,
+    "maxHp": 32,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#a6cfe2",
     "pattern": "cycle",
-    "moves": [{"id": "brother_blade", "name": "형의 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7}]}, {"id": "side_by_side", "name": "나란히 서기", "intent": "defend", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}],
+    "moves": [{"id": "brother_blade", "name": "형의 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 8}]}, {"id": "side_by_side", "name": "나란히 서기", "intent": "defend", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}],
     "flavor": "카일보다 조금 큰 체구. 카일과 같은 눈썹. 방패에는 푸른 바탕에 흰 눈송이, 그 아래 은빛 검 하나.",
     "weak": ["fire"],
     "resist": ["ice"]
@@ -57,7 +57,7 @@
   {
     "id": "rowen_ice_knight",
     "name": "에드릭 로웬",
-    "maxHp": 70,
+    "maxHp": 80,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#7fb6d6",
@@ -72,7 +72,7 @@
   {
     "id": "celias",
     "name": "빙결의 여왕 셀리아스",
-    "maxHp": 132,
+    "maxHp": 145,
     "sprite": null,
     "silhouette": "boss",
     "color": "#bfe0f0",
@@ -80,7 +80,7 @@
     "tier": "boss",
     "traits": [{"status": "frozen_heart", "stacks": 1}],
     "pattern": "cycle",
-    "moves": [{"id": "freeze_room", "name": "방이 얼어붙는다", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}, {"id": "ice_lances", "name": "얼음 창 수십 개", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies", "element": "ice"}]}, {"id": "most_beautiful", "name": "가장 아름다운 순간에", "intent": "debuff", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 14}, {"op": "apply_status", "status": "bind", "stacks": 1}]}, {"id": "snow_whirl", "name": "눈송이 소용돌이", "intent": "buff", "effects": [{"op": "block", "amount": 15, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "freeze_room", "name": "방이 얼어붙는다", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}, {"id": "ice_lances", "name": "얼음 창 수십 개", "intent": "attack", "effects": [{"op": "damage", "amount": 12, "target": "all_enemies", "element": "ice"}]}, {"id": "most_beautiful", "name": "가장 아름다운 순간에", "intent": "debuff", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 14}, {"op": "apply_status", "status": "bind", "stacks": 1}]}, {"id": "snow_whirl", "name": "눈송이 소용돌이", "intent": "buff", "effects": [{"op": "block", "amount": 15, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "transform": {"triggers": ["partnerDowned"], "partner": "princess_ice", "into": "celias_shattered", "text": "쩡. 유리잔이 부딪히는 것 같은 맑은 소리. 왕녀의 얼음에 간 금이 왕녀의 몸을 피해 얼음의 결을 따라 퍼지더니, 수십만 개의 육각형 그물을 타고 셀리아스에게로 이어졌다.", "partyEffects": [{"op": "gain_mana", "amount": 5}]},
     "flavor": "사천왕, 옛 아르덴을 다스리는 여왕. 눈송이가 모여 빚어진 얼음 여인. 키는 사람의 두 배, 머리카락은 고드름처럼 늘어졌다. 죽이지 않는다. 멈추게 할 뿐이다. 심장은 몸 안에 있지 않다.",
     "weak": ["fire"],
@@ -101,7 +101,7 @@
   {
     "id": "celias_shattered",
     "name": "부서지는 셀리아스",
-    "maxHp": 90,
+    "maxHp": 100,
     "sprite": null,
     "silhouette": "boss",
     "color": "#e4f2fa",

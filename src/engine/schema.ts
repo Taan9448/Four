@@ -385,6 +385,8 @@ export const Balance = z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
         eliteMinFloor: z.number().int(),
+        /** 어느 길로 가도 무작위 전투 없는 노드(사건·휴식·여관)가 이만큼을 넘어 이어지지 않는다(고정 이야기 노드는 세지 않는다) */
+        maxCalmRun: z.number().int().positive(),
         extraEdgeChance: z.number(),
         scarWeightPerPoint: z.number(),
       })
