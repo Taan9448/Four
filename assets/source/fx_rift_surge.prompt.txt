@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. Never use magenta, pink or purple in the effect.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art effect: a jagged crack of void black (#0b0b10) whose torn edges glow in 2-3 steps of dark red, red and orange (#5a1020, #a02634, #ff3b3b, #ff8a5c); a few single-block embers and dark shards; no white core, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Frames:
+Cell 1: a large jagged fissure of void black with glowing red edges trembles, its edges flickering
+Cell 2: the fissure suddenly bulges outward, cracks racing across the air in every direction from it
+Cell 3: the fissure bursts: a violent flash of red light pours out of the void in a jagged starburst, black shards blasting outward
+Cell 4: the red burst at full spread, shards and embers flying toward the frame edges
+Cell 5: the light recedes into the fissure, leaving red embers and dark shards falling
+Cell 6: a few embers and a faint red glow around a smaller, still black scar
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Pixel-grid validation failed at 48% purity. Draw ONLY solid square blocks of exactly 4x4 px, every block on the SAME single straight grid, aligned from each cell's top-left corner. Hard flat colors only, no smooth or rounded edges, no antialiasing, no interpolation, no texture, no partial blocks. Use only these six effect colors: #0b0b10, #1d2433, #5a1020, #a02634, #ff3b3b, #ff8a5c, plus flat magenta #FF00FF background. No yellow, cream, white or grey highlights. Keep all embers, shards and burst spikes at least 40px from every 512px cell edge. The shape is a black torn fissure whose red light expands at frames 3 and 4 and fades at 5 and 6; preserve black interiors in all six cells.
