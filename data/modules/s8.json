@@ -200,5 +200,6 @@
     "weight": 1,
     "conditions": {"floorRange": [3, 8]},
     "content": {"text": "방패 오백이 맞물린 그늘. 쿵. 쿵. 창끝 너머로 화살이 꽂히는 소리가 이어진다. 벽이 무너지지 않는 한, 아무도 죽지 않는다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
-  }
+  },
+  {"id": "s8_shop", "stage": "s8", "type": "shop", "name": "구천 계단 아래 객잔", "weight": 1, "content": {"text": "천마봉으로 오르는 마지막 객잔. 손님은 없고, 주인은 이미 짐을 반쯤 꾸려 두었다. \"올라갈 거면 지금 다 사 가시오.\""}}
 ]

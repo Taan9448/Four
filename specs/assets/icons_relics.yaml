@@ -1,0 +1,24 @@
+id: icons_relics
+type: icon-sheet
+summary: 유물 아이콘 1~16(일반·고급)
+# 칸 번호 = data의 icon. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "woodcutter whetstone — a flat grey whetstone with a thin wet streak and a tiny axe-blade glint"
+  2: "silver bell — a small silver hand bell with a pale blue ring of light around its rim"
+  3: "herb pouch — a small cloth pouch tied with string, green mugwort leaves poking out of the top"
+  4: "iron bracer — a dark iron forearm guard with three rivets and a leather strap"
+  5: "cloud tea — a small celadon tea cup with a curl of white mist rising from it"
+  6: "red thread — a small spool wound with bright red thread, one loose end curling away"
+  7: "elf fletching — three slender silver-white feathers bound together with green thread"
+  8: "traveler coin — a string of square-holed bronze coins tied in a bundle"
+  9: "frost crystal — a pale blue ice crystal shard with sharp facets and a white glint"
+  10: "ember charm — a paper talisman with an orange ember glowing at its center, edges slightly scorched"
+  11: "grain tablet — a small wooden tablet showing clear dark wood-grain lines like a palm"
+  12: "blood oath — a red knotted cord tied around a small dark blade"
+  13: "seal talisman — a yellow paper seal talisman with a red stamp mark (no readable letters)"
+  14: "smith hammer shard — a broken chunk of a smith hammer head, still glowing faintly orange at the break"
+  15: "dwarf anvil — a small dark iron anvil fragment with a bright worn striking face"
+  16: "silver leaf — a single silver leaf with faint glowing veins"
+placeholder: { color: '#c9a24a', accent: '#6a4a20' }

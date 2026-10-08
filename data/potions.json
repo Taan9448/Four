@@ -1,0 +1,15 @@
+[
+  { "id": "wound_salve", "icon": 1, "name": "금창약", "rarity": "common", "glyph": "膏", "target": "ally", "effects": [{ "op": "heal", "target": "ally", "amount": 15 }], "description": "아군 하나의 체력 +15." },
+  { "id": "iron_skin_pill", "icon": 2, "name": "금강환", "rarity": "common", "glyph": "丸", "target": "ally", "effects": [{ "op": "block", "target": "ally", "amount": 12 }], "description": "아군 하나에게 방어 +12." },
+  { "id": "fire_flask", "icon": 3, "name": "화염병", "rarity": "common", "glyph": "火", "target": "enemy", "effects": [{ "op": "damage", "target": "enemy", "amount": 12, "element": "fire" }], "description": "적 하나에게 화염 피해 12(화상)." },
+  { "id": "frost_flask", "icon": 4, "name": "서리병", "rarity": "common", "glyph": "冰", "target": "enemy", "effects": [{ "op": "damage", "target": "enemy", "amount": 8, "element": "ice" }, { "op": "apply_status", "target": "enemy", "status": "chill", "stacks": 1 }], "description": "적 하나에게 냉기 피해 8, 냉기 1 추가." },
+  { "id": "weakness_powder", "icon": 5, "name": "약화 가루", "rarity": "common", "glyph": "粉", "target": "none", "effects": [{ "op": "apply_status", "target": "all_enemies", "status": "weak", "stacks": 2 }], "description": "적 모두에게 약화 2." },
+  { "id": "clear_tea", "icon": 6, "name": "맑은 차", "rarity": "common", "glyph": "飮", "target": "none", "effects": [{ "op": "draw", "amount": 3 }], "description": "카드 3장을 뽑는다." },
+  { "id": "neigong_pill", "icon": 7, "name": "소환단", "rarity": "uncommon", "glyph": "丹", "target": "none", "effects": [{ "op": "gain_neigong", "amount": 2 }], "description": "내공 +2." },
+  { "id": "mana_draught", "icon": 8, "name": "마나 물약", "rarity": "uncommon", "glyph": "瓶", "target": "none", "effects": [{ "op": "gain_mana", "amount": 4 }], "description": "마나 +4." },
+  { "id": "strength_tonic", "icon": 9, "name": "대력환", "rarity": "uncommon", "glyph": "剛", "target": "none", "effects": [{ "op": "apply_status", "target": "all_allies", "status": "strength", "stacks": 2 }], "description": "이번 전투 동안 아군 모두 힘 +2." },
+  { "id": "seal_ash", "icon": 10, "name": "봉인의 재", "rarity": "uncommon", "glyph": "灰", "target": "none", "effects": [{ "op": "rift", "amount": -3 }], "description": "균열 -3." },
+  { "id": "breaking_powder", "icon": 11, "name": "파진분", "rarity": "uncommon", "glyph": "破", "target": "enemy", "effects": [{ "op": "apply_status", "target": "enemy", "status": "vulnerable", "stacks": 2 }], "description": "적 하나에게 취약 2." },
+  { "id": "great_return_pill", "icon": 12, "name": "대환단", "rarity": "rare", "glyph": "還", "target": "ally", "effects": [{ "op": "heal", "target": "ally", "amount": 30 }], "description": "아군 하나의 체력 +30." },
+  { "id": "thunder_talisman", "icon": 13, "name": "뇌정부", "rarity": "rare", "glyph": "雷", "target": "none", "effects": [{ "op": "damage", "target": "all_enemies", "amount": 10 }], "description": "적 모두에게 피해 10." }
+]

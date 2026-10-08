@@ -36,6 +36,23 @@ export interface RunState {
   pendingUpgrades: string[];
   /** 아직 화면에 보여 주지 않은 레벨업 소식 */
   levelLog: LevelUp[];
+  /** 경제(2026-10-08): 골드, 가진 유물, 물약 칸(빈 칸 null), 지금 들른 상점의 진열(나가면 그대로 남아 다시 들어와도 같다), 상점에서 카드를 지운 횟수 */
+  gold: number;
+  relics: string[];
+  potions: (string | null)[];
+  shop: ShopState | null;
+  shopRemovals: number;
+}
+
+/** 상점 진열: 노드마다 한 번 정해지고, 산 것은 sold */
+export interface ShopState {
+  nodeId: string;
+  cards: { cardId: string; price: number; sold: boolean }[];
+  relics: { relicId: string; price: number; sold: boolean }[];
+  potions: { potionId: string; price: number; sold: boolean }[];
+  /** 이 상점에서 카드 지우기·강화를 이미 썼다(상점마다 한 번) */
+  removeUsed: boolean;
+  upgradeUsed: boolean;
 }
 
 export interface LevelUp {
@@ -78,6 +95,11 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     counter: 0,
     pendingUpgrades: [],
     levelLog: [],
+    gold: data.balance.economy.startGold,
+    relics: [],
+    potions: Array.from({ length: data.balance.economy.potionSlots }, () => null),
+    shop: null,
+    shopRemovals: 0,
   };
   for (const cardId of haun.starterDeck) addCard(run, cardId);
   run.map = buildMap(data, run);
@@ -103,6 +125,7 @@ export function createRunAt(data: GameData, seed: string, stageId: string, opts:
     if (boss?.content.clearEffects) applyRunOps(data, run, boss.content.clearEffects);
     // 앞 스테이지에서 쌓였을 경험치(대략). 강화는 무작위로 바로 적용
     for (const r of run.roster) if (data.characters.get(r.id)?.role === 'fighter') gainXp(data, run, r.id, data.balance.leveling.debugXpPerStage);
+    run.gold += data.balance.economy.debugGoldPerStage;
     while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
   }
   run.levelLog = [];
@@ -215,6 +238,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     manaRule: mana ?? stage.mana,
     enemyHpScale: stage.enemyHpScale,
     enemyDmgScale: stage.enemyDmgScale,
+    relics: run.relics,
+    potions: run.potions,
   };
 }
 
@@ -226,14 +251,50 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
   }
   run.mana = outcome.mana;
   run.scar += outcome.scarGain;
+  if (outcome.potions) run.potions = [...outcome.potions];
   if (outcome.result === 'defeat') {
     run.status = 'defeat';
     return [];
   }
   awardBattleXp(data, run, enc.node.type);
-  if (enc.node.type !== 'boss') return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
-  run.status = 'stage_clear';
-  return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
+  const out = applyRunOps(data, run, enc.module.content.clearEffects ?? []);
+  out.push(...fireRunRelics(data, run, 'victory'));
+  if (enc.node.type === 'boss') run.status = 'stage_clear';
+  return out;
+}
+
+// ───────────────────────── 유물·물약(런) ─────────────────────────
+
+/** 전투 밖 trigger(victory·rest)의 유물 효과를 런에 적용한다 */
+export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' | 'rest'): string[] {
+  const out: string[] = [];
+  for (const id of run.relics) {
+    const relic = data.relics.get(id);
+    if (relic?.trigger !== trigger) continue;
+    const msgs = applyRunOps(data, run, relic.effects);
+    if (msgs.length) out.push(`${relic.name}: ${msgs.join(', ')}`);
+  }
+  return out;
+}
+
+/** 유물을 얻는다(이미 있으면 무시). 얻는 순간(pickup) 효과를 적용한다 */
+export function gainRelic(data: GameData, run: RunState, id: string): string[] {
+  const relic = data.relics.get(id);
+  if (!relic) throw new Error(`알 수 없는 유물: ${id}`);
+  if (run.relics.includes(id)) return [];
+  run.relics.push(id);
+  const out = [`유물 획득: ${relic.name}`];
+  if (relic.trigger === 'pickup') out.push(...applyRunOps(data, run, relic.effects));
+  return out;
+}
+
+/** 물약을 빈 칸에 넣는다. 칸이 가득이면 false */
+export function gainPotion(data: GameData, run: RunState, id: string): boolean {
+  if (!data.potions.has(id)) throw new Error(`알 수 없는 물약: ${id}`);
+  const i = run.potions.indexOf(null);
+  if (i < 0) return false;
+  run.potions[i] = id;
+  return true;
 }
 
 /**
@@ -358,11 +419,13 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
   return list;
 }
 
-/** pick: 선택지에 고르는 강화(upgrade_card choose)가 있으면 사람이 고른 카드 uid */
+/** pick: 선택지에 고르는 강화(upgrade_card choose)가 있으면 사람이 고른 카드 uid. 휴식 노드면 rest 유물이 뒤따른다 */
 export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number, pick?: string): string[] {
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
-  return applyRunOps(data, run, choice.effects, { pick });
+  const out = applyRunOps(data, run, choice.effects, { pick });
+  if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
+  return out;
 }
 
 /** 선택지가 강화할 카드를 사람에게 고르게 하는가 */
@@ -467,6 +530,27 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           if (!run.selected.includes(r.id) && data.characters.get(r.id)?.role === 'fighter') run.selected.push(r.id);
         }
         out.push(`${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈`);
+        break;
+      }
+      case 'gain_gold':
+        run.gold = Math.max(0, run.gold + (e.amount ?? 0));
+        out.push(`골드 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
+        break;
+      case 'gain_max_hp':
+        // 전투에 나서는 동료 모두(합류한 동료 전부)의 최대 체력과 체력
+        for (const r of run.roster.filter((x) => data.characters.get(x.id)?.role === 'fighter')) {
+          r.maxHp = Math.max(1, r.maxHp + (e.amount ?? 0));
+          r.hp = Math.max(1, Math.min(r.maxHp, r.hp + (e.amount ?? 0)));
+        }
+        out.push(`동료 모두 최대 체력 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
+        break;
+      case 'gain_relic':
+        out.push(...gainRelic(data, run, e.relic ?? ''));
+        break;
+      case 'gain_potion': {
+        const def = data.potions.get(e.potion ?? '');
+        if (!def) throw new Error(`gain_potion: 알 수 없는 물약 ${e.potion}`);
+        out.push(gainPotion(data, run, def.id) ? `물약 획득: ${def.name}` : `물약 칸이 가득해 ${def.name}을(를) 두고 왔다`);
         break;
       }
       default:

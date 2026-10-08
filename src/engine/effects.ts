@@ -365,6 +365,7 @@ function knockOut(state: BattleState, target: Combatant): void {
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
+    fireRelics(state, 'enemyDowned');
     const def = state.data.enemies.get(target.defId);
     if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });
     // 짝이 쓰러지면 변신(사무결 ← 곽도진, 셀리아스 ← 왕녀의 얼음)
@@ -578,7 +579,25 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
   }
 }
 
-// ───────────────────────── 지원 규칙 ─────────────────────────
+// ───────────────────────── 지원 규칙·유물 ─────────────────────────
+
+/** 가진 유물 중 trigger가 맞는 것의 효과를 하운을 출처로 일으킨다(전투 안 trigger만) */
+export function fireRelics(state: BattleState, trigger: 'battleStart' | 'turnStart' | 'enemyDowned'): void {
+  if (!state.relics.length || state.result) return;
+  const haun = state.party.find((p) => p.defId === 'haun' && !p.downed) ?? state.party.find((p) => !p.downed);
+  for (const id of state.relics) {
+    const relic = state.data.relics.get(id);
+    if (!relic || relic.trigger !== trigger) continue;
+    const key = `relic:${id}`;
+    if (relic.oncePerBattle && state.supportUsed.includes(key)) continue;
+    const ctx: EffectContext = { source: haun ?? null };
+    if (!checkCondition(state, relic.condition, ctx)) continue;
+    if (relic.oncePerBattle) state.supportUsed.push(key);
+    state.events.push({ type: 'relic', relicId: id, name: relic.name });
+    runEffects(state, relic.effects, ctx);
+    if (state.result) return;
+  }
+}
 
 export function fireSupport(
   state: BattleState,

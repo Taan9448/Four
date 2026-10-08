@@ -4,7 +4,8 @@
 //       가장 좋아지는 수를 고른다. 어떤 수도 턴 종료보다 낫지 않으면 턴을 끝낸다(한 수 앞 탐색).
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
-import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard } from '../engine/battle';
+import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
+import { buyCard, buyPotion, buyRelic, buyRemove, claimLoot, openShop, removableCards, removePrice, rollLoot } from '../engine/economy';
 
 export { cloneBattle };
 import type { GameData } from '../engine/data';
@@ -12,6 +13,7 @@ import type { MapNode } from '../engine/route';
 import {
   addCard,
   advanceStage,
+  gainRelic,
   applyBattleOutcome,
   applyLevelUpgrade,
   applyChoice,
@@ -98,6 +100,8 @@ function scoreAfterEndTurn(s: BattleState, opts: BotOptions): number {
 
 /** 카드를 쓰는 것 자체에 주는 작은 가산점(뽑기·내공 회복처럼 이번 턴 안에서만 값이 나는 카드도 쓰게) */
 const PLAY_BIAS = 0.5;
+/** 물약을 쓰는 값(아껴 둔다: 이만큼 나아질 때만 쓴다) */
+const POTION_COST = 18;
 
 /** 한 턴: 나아지는 수가 없을 때까지 카드를 쓰고 턴을 끝낸다 */
 export function playTurn(s: BattleState, opts: BotOptions = DEFAULT_BOT): void {
@@ -122,6 +126,29 @@ export function playTurn(s: BattleState, opts: BotOptions = DEFAULT_BOT): void {
         }
       }
     });
+    // 물약: 이번 수로 크게 나아질 때만(위험하거나 마무리할 때)
+    let potion: { slot: number; t?: string } | null = null;
+    s.potions.forEach((id, slot) => {
+      if (!id) return;
+      const need = potionTarget(s, slot);
+      const targets = need === 'enemy' ? alive(s.enemies).map((e) => e.uid) : need === 'ally' ? alive(s.party).map((p) => p.uid) : [undefined];
+      for (const t of targets) {
+        const c = cloneBattle(s);
+        c.noCrit = true;
+        if (!usePotion(c, slot, t).ok) continue;
+        const v = scoreAfterEndTurn(c, opts) - POTION_COST;
+        if (v > bestV) {
+          bestV = v;
+          potion = { slot, t };
+          best = null;
+        }
+      }
+    });
+    if (potion) {
+      const { slot, t } = potion as { slot: number; t?: string };
+      usePotion(s, slot, t);
+      continue;
+    }
     if (!best) break;
     const { i, t } = best as { i: number; t?: string };
     playCard(s, i, t);
@@ -200,6 +227,23 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   return best;
 }
 
+/** 상점: 기본 카드 지우기 → 유물(비싼 등급부터) → 값진 카드 → 물약 순으로, 살 수 있는 만큼 */
+function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOptions): void {
+  const shop = openShop(data, run, nodeId);
+  const starter = removableCards(data, run).filter((c) => data.cards.get(c.cardId)!.pool === 'starter' && c.level === 0);
+  if (starter.length && run.deck.length > 12 && run.gold >= removePrice(data, run)) buyRemove(data, run, starter[0].uid);
+  const order = ['rare', 'uncommon', 'common'];
+  shop.relics
+    .map((r, i) => ({ ...r, i, rank: order.indexOf(data.relics.get(r.relicId)!.rarity) }))
+    .sort((a, b) => a.rank - b.rank)
+    .forEach((r) => !r.sold && run.gold >= r.price && buyRelic(data, run, r.i));
+  shop.cards.forEach((c, i) => {
+    if (c.sold || run.gold < c.price) return;
+    if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, RARITY_VALUE.rare) && run.deck.length < opts.deckSoftCap) buyCard(data, run, i);
+  });
+  shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
+}
+
 /** 출전: 하운 + 체력이 많은 동료(카드가 있는 전투원) */
 function decideParty(data: GameData, run: RunState): void {
   const mates = run.roster
@@ -223,6 +267,8 @@ function decideNode(run: RunState, nodes: MapNode[]): MapNode {
         return 2 + (1 - hp) * 10;
       case 'event':
         return 4;
+      case 'shop':
+        return 4.5;
       case 'battle':
         return hp > 0.5 ? 5 : 2;
       case 'elite':
@@ -309,6 +355,12 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
         rift: state.rift,
       });
       applyBattleOutcome(data, run, enc, outcome);
+      if (outcome.result === 'victory') {
+        // 전리품: 칸이 가득한 물약은 두고 가고, 보스 유물은 첫 후보(보스 유물이 앞에 온다)
+        const loot = rollLoot(data, run, enc.node);
+        claimLoot(data, run, loot);
+        if (loot.relicChoices.length) gainRelic(data, run, loot.relicChoices[0]);
+      }
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
       while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
       run.levelLog = [];
@@ -316,6 +368,8 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
         const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
         if (card) addCard(run, card);
       }
+    } else if (enc.module.type === 'shop') {
+      shopTurn(data, run, enc.node.id, opts);
     } else {
       const d = decideChoice(data, run, enc);
       if (d) applyChoice(data, run, enc.module, d.index, d.pick);

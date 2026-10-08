@@ -8,6 +8,7 @@ import {
   checkCondition,
   dealDamage,
   drawCards,
+  fireRelics,
   fireSupport,
   hasSkipTurn,
   loseHp,
@@ -58,6 +59,10 @@ export interface BattleSetup {
   enemyHpScale?: number;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale) */
   enemyDmgScale?: number;
+  /** 가진 유물 id */
+  relics?: string[];
+  /** 물약 칸(빈 칸 null) */
+  potions?: (string | null)[];
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
@@ -110,6 +115,8 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     survived: false,
     supportRules: setup.supportActive ? data.support : [],
     supportUsed: [],
+    relics: setup.relics ?? [],
+    potions: [...(setup.potions ?? [])],
     flags: setup.flags ?? [],
     scar: setup.scar ?? 0,
     uidCounter: 0,
@@ -129,6 +136,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.critRng = setup.rng.fork('crit');
   state.enemyDmgScale = setup.enemyDmgScale ?? 1;
   fireSupport(state, 'battleStart', {});
+  fireRelics(state, 'battleStart');
   if (setup.startEffects?.length) {
     runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });
   }
@@ -145,11 +153,14 @@ function startPlayerTurn(state: BattleState): void {
     const per = state.manaRule.perTurn;
     state.mana = Math.max(0, Math.min(bal.mana.max, state.mana + per));
   }
-  for (const p of state.party) p.block = 0;
+  // 첫 차례에는 전투 시작 때 얻은 방어(유물·모듈 보너스)를 지우지 않는다
+  if (state.turn > 1) for (const p of state.party) p.block = 0;
   applyTurnStartStatuses(state, state.party);
   if (state.result) return;
   drawCards(state, bal.handSize);
   fireSupport(state, 'turnStart', {});
+  fireRelics(state, 'turnStart');
+  if (state.result) return;
   rollIntents(state);
 }
 
@@ -382,6 +393,7 @@ export function cloneBattle(s: BattleState): BattleState {
     events: [],
     log: [],
     supportUsed: [...s.supportUsed],
+    potions: [...s.potions],
     flags: [...s.flags],
   };
 }
@@ -422,6 +434,30 @@ export function previewCard(state: BattleState, handIndex: number, targetUid?: s
     v.kills = !!before && !before.downed && !![...c.party, ...c.enemies].find((u) => u.uid === uid)?.downed;
   }
   return out;
+}
+
+// ───────────────────────── 물약 ─────────────────────────
+
+/** 물약이 대상을 고르는가 */
+export function potionTarget(state: BattleState, slot: number): 'enemy' | 'ally' | null {
+  const def = state.data.potions.get(state.potions[slot] ?? '');
+  return def && def.target !== 'none' ? def.target : null;
+}
+
+/** 물약 쓰기: 비용 없이 아무 때나(내 차례). 하운을 출처로 효과를 일으키고 칸을 비운다 */
+export function usePotion(state: BattleState, slot: number, targetUid?: string): PlayCheck {
+  if (state.result) return { ok: false, reason: '전투가 끝났다' };
+  const id = state.potions[slot];
+  const def = id ? state.data.potions.get(id) : undefined;
+  if (!def) return { ok: false, reason: '빈 칸' };
+  if (def.target === 'enemy' && !alive(state.enemies).some((e) => e.uid === targetUid)) return { ok: false, reason: '대상을 골라야 한다' };
+  if (def.target === 'ally' && !alive(state.party).some((p) => p.uid === targetUid)) return { ok: false, reason: '아군 대상을 골라야 한다' };
+  const haun = state.party.find((p) => p.defId === 'haun')!;
+  state.potions[slot] = null;
+  state.events.push({ type: 'potion', potionId: def.id, name: def.name });
+  state.log.push(`물약: ${def.name}`);
+  runEffects(state, def.effects, { source: haun, chosenUid: targetUid });
+  return { ok: true };
 }
 
 // ───────────────────────── 턴 종료와 적 턴 ─────────────────────────
@@ -508,6 +544,8 @@ export interface BattleOutcome {
   party: { id: string; hp: number }[];
   mana: number;
   scarGain: number;
+  /** 남은 물약 칸(없으면 런의 물약을 그대로 둔다) */
+  potions?: (string | null)[];
 }
 
 export function battleOutcome(state: BattleState): BattleOutcome | null {
@@ -519,6 +557,7 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
     party: state.party.map((p) => ({ id: p.defId, hp: p.downed ? bal.party.reviveHp : p.hp })),
     mana: state.mana,
     scarGain: Math.floor(state.rift * bal.rift.scarRatio),
+    potions: [...state.potions],
   };
 }
 

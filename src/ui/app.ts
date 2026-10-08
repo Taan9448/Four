@@ -23,7 +23,9 @@ import {
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { BattleView } from './battle-view';
-import { choiceView, levelUpView, rewardView } from './choice-view';
+import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
+import { claimLoot, rollLoot } from '../engine/economy';
+import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
 import { initDebug, isDebug } from './debug';
@@ -92,7 +94,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
@@ -122,8 +124,24 @@ export class App {
       case 'deck':
         this.map();
         return openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]);
-      default:
-        return this.show(this.backdrop(rewardView(data, rewardOptions(data, run, first.id), () => this.map())));
+      case 'shop': {
+        const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'shop');
+        if (!module) return this.map();
+        run.gold = 300;
+        return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map())));
+      }
+      case 'bossloot': {
+        const loot = rollLoot(data, run, { ...first, type: 'boss' });
+        return this.show(this.backdrop(bossLootView(data, run, { loot, potionLeft: claimLoot(data, run, loot).potionLeft }, () => this.map())));
+      }
+      default: {
+        // 전리품(엘리트: 유물 포함) + 카드 보상. 물약 칸을 채워 두어 바꿔 넣기도 보인다
+        run.potions = run.potions.map(() => 'fire_flask');
+        const loot = rollLoot(data, run, { ...first, type: 'elite' });
+        const shown: LootShown = { loot: { ...loot, potion: loot.potion ?? 'wound_salve' }, potionLeft: null };
+        shown.potionLeft = claimLoot(data, run, shown.loot).potionLeft;
+        return this.show(this.backdrop(rewardView(data, rewardOptions(data, run, first.id), () => this.map(), { run, shown })));
+      }
     }
   }
 
@@ -342,6 +360,7 @@ export class App {
     const enc = enterNode(data, run, node.id);
     const go = () => {
       if (isBattle(enc)) this.battle(enc);
+      else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background));
       else this.show(this.backdrop(choiceView(data, run, enc.module, () => this.map()), enc.module.content.background));
     };
     // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
@@ -381,17 +400,26 @@ export class App {
       },
       (final) => {
         this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
-        if (run.status !== 'map') return this.map();
+        if (run.status === 'defeat') return this.map();
+        // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다
+        const loot = rollLoot(data, run, enc.node);
+        const shown: LootShown = { loot, potionLeft: claimLoot(data, run, loot).potionLeft };
+        if (run.status !== 'map') return this.show(this.backdrop(bossLootView(data, run, shown, () => this.map()), enc.module.content.background));
         // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
         this.playScene(
           enc.module.content.outroScene,
           () =>
             this.show(
               this.backdrop(
-                rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
-                  if (cardId) addCard(run, cardId);
-                  this.map();
-                }),
+                rewardView(
+                  data,
+                  rewardOptions(data, run, enc.node.id),
+                  (cardId) => {
+                    if (cardId) addCard(run, cardId);
+                    this.map();
+                  },
+                  { run, shown },
+                ),
                 enc.module.content.background,
               ),
             ),

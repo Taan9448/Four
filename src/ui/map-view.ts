@@ -7,10 +7,11 @@ import { h } from './dom';
 import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
+import { inventoryBox } from './items';
 
 /** 노드 표식: 두루마리 위의 한자 */
-const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', boss: '王' };
-const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', boss: '보스' };
+const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
+const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', shop: '상점', boss: '보스' };
 
 /** 세계의 틈이 나타나는 사건: S7 낙안봉을 넘은 밤의 아물지 않는 금 */
 const RIFT_FLAG = 'sky_crack';
@@ -176,6 +177,10 @@ function journeyBanner(data: GameData, run: RunState): HTMLElement | null {
   const region = cur.journey?.region;
   const first = stages.find((st) => st.journey!.region === region);
   if (region === 'elheim' && first?.id === cur.id) return h('div', { class: 'banner' }, '석문 너머 — 달이 둘 뜨는 낯선 세계');
+  // 엘하임을 지나 무림으로 돌아온 첫 스테이지(S6)
+  const lastElheim = Math.max(...stages.filter((st) => st.journey!.region === 'elheim').map((st) => st.order));
+  const returnStage = stages.find((st) => st.journey!.region === 'murim' && st.order > lastElheim);
+  if (returnStage?.id === cur.id) return h('div', { class: 'banner banner-return' }, '석문을 넘어 — 삼 년 만의 무림, 하늘에 달이 하나');
   return null;
 }
 
@@ -360,6 +365,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             h('span', {}, h('b', {}, run.deck.length), '덱'),
           ),
         ),
+        inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
         support,
         h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),

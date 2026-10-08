@@ -188,5 +188,6 @@
     "name": "식지 않은 모닥불",
     "weight": 1,
     "content": {"text": "가렛 경의 기사들이 남겨 두고 간 모닥불 자리. 숯 아래에 아직 온기가 있다. 숨을 고른다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
-  }
+  },
+  {"id": "s3_shop", "stage": "s3", "type": "shop", "name": "얼어붙은 장터", "weight": 1, "content": {"text": "남쪽 성문 아래, 얼음 위에 모피를 깔고 앉은 상인들이 입김을 뿜으며 손을 비빈다. 녹지 않는 물건만 판다고 했다."}}
 ]

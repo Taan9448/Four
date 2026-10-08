@@ -1,5 +1,6 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
-import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, previewCard, type CardPreviewHit, type IncomingView } from '../engine/battle';
+import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
+import { potionChip, relicChip } from './items';
 import { critChance, hasSkipTurn } from '../engine/effects';
 import { ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
@@ -63,6 +64,10 @@ export class BattleView {
   private endBtn!: HTMLButtonElement;
   private rift: RiftOverlay;
   private selected: number | null = null;
+  /** 대상을 고르는 중인 물약 칸 */
+  private potionSel: number | null = null;
+  private relicEl!: HTMLElement;
+  private potionEl!: HTMLElement;
   /** 마우스를 올린 손패 카드(피해 미리보기) */
   private hovered: number | null = null;
   private busy = false;
@@ -138,6 +143,8 @@ export class BattleView {
     this.logEl = h('div', { class: 'log', 'aria-live': 'polite' });
     this.pilesEl = h('button', { class: 'chip piles', onclick: () => this.showPiles() });
     this.riftEl = h('div', { class: 'b-rift' });
+    this.relicEl = h('div', { class: 'b-relics' }, this.state.relics.map((id) => relicChip(this.data, id)));
+    this.potionEl = h('div', { class: 'b-potions' });
     this.turnEl = h('span', { class: 'turn' });
     this.endBtn = h('button', { class: 'btn btn-primary btn-endturn', onclick: () => this.onEndTurn() }, '턴 종료') as HTMLButtonElement;
 
@@ -155,7 +162,12 @@ export class BattleView {
       h(
         'header',
         { class: 'b-hud' },
-        h('div', { class: 'chip b-stage' }, h('b', {}, this.ctx.title), h('span', {}, this.ctx.subtitle)),
+        h(
+          'div',
+          { class: 'b-hud-left' },
+          h('div', { class: 'chip b-stage' }, h('b', {}, this.ctx.title), h('span', {}, this.ctx.subtitle)),
+          h('div', { class: 'b-items' }, this.potionEl, this.state.relics.length ? this.relicEl : null),
+        ),
         h(
           'div',
           { class: 'b-hud-right' },
@@ -277,6 +289,11 @@ export class BattleView {
         )
       : null;
     const worldName: Record<string, string> = { murim: '무림: 이월, 회복 없음', elheim: '엘하임: 시작에 가득, 턴마다 +2', nocturna: '마왕성', rift: '틈: 턴마다 줄어든다' };
+    // 물약 칸: 누르면 쓴다(대상을 고르는 물약은 누른 뒤 대상을 누른다)
+    clear(this.potionEl);
+    s.potions.forEach((id, i) =>
+      this.potionEl.appendChild(potionChip(this.data, id, { onClick: id && !this.busy && !s.result ? () => this.onPotion(i) : undefined, extra: this.potionSel === i ? 'selected' : '' })),
+    );
     this.resEl.append(
       breath ?? '',
       h(
@@ -297,7 +314,7 @@ export class BattleView {
 
     // 대상 표시
     if (this.selected !== null && !s.hand[this.selected]) this.selected = null;
-    const need = this.selected !== null ? needsTarget(s, s.hand[this.selected]) : null;
+    const need = this.potionSel !== null ? potionTarget(s, this.potionSel) : this.selected !== null ? needsTarget(s, s.hand[this.selected]) : null;
     for (const u of this.units.values()) {
       const ok = !u.c.downed && ((need === 'enemy' && u.c.side === 'enemy') || (need === 'ally' && u.c.side === 'party'));
       u.el.classList.toggle('targetable', ok);
@@ -491,12 +508,14 @@ export class BattleView {
     if (document.querySelector('.overlay, .tour')) return; // 창·안내가 떠 있으면 전투 단축키를 받지 않는다
     if (e.key === 'Escape') {
       this.selected = null;
+      this.potionSel = null;
       this.refresh();
     } else if (e.key === 'e' || e.key === 'E') this.onEndTurn();
   };
 
   private onCardClick(i: number): void {
     if (this.busy || this.state.result) return;
+    this.potionSel = null;
     if (this.selected === i) {
       this.selected = null;
       return this.refresh();
@@ -522,8 +541,35 @@ export class BattleView {
     this.refresh();
   }
 
+  /** 물약: 대상이 필요 없으면 바로, 있으면 고르는 상태로(같은 칸을 다시 누르면 취소) */
+  private onPotion(slot: number): void {
+    if (this.busy || this.state.result) return;
+    if (this.potionSel === slot) {
+      this.potionSel = null;
+      return this.refresh();
+    }
+    this.selected = null;
+    const need = potionTarget(this.state, slot);
+    if (!need) {
+      this.potionSel = null;
+      return void this.act(() => usePotion(this.state, slot));
+    }
+    const pool = (need === 'enemy' ? this.state.enemies : this.state.party).filter((c) => !c.downed);
+    if (pool.length === 1) return void this.act(() => usePotion(this.state, slot, pool[0].uid));
+    this.potionSel = slot;
+    this.refresh();
+  }
+
   private onUnitClick(c: Combatant): void {
-    if (this.busy || this.selected === null) return;
+    if (this.busy) return;
+    if (this.potionSel !== null) {
+      const slot = this.potionSel;
+      const need = potionTarget(this.state, slot);
+      if ((need === 'enemy' && c.side !== 'enemy') || (need === 'ally' && c.side !== 'party') || c.downed) return;
+      this.potionSel = null;
+      return void this.act(() => usePotion(this.state, slot, c.uid));
+    }
+    if (this.selected === null) return;
     const i = this.selected;
     const need = needsTarget(this.state, this.state.hand[i]);
     if ((need === 'enemy' && c.side !== 'enemy') || (need === 'ally' && c.side !== 'party') || c.downed) return;
@@ -534,6 +580,7 @@ export class BattleView {
   private onEndTurn(): void {
     if (this.busy || this.state.result) return;
     this.selected = null;
+    this.potionSel = null;
     void this.act(
       () => endTurn(this.state),
       () => this.flyDiscardHand(),
@@ -650,6 +697,23 @@ export class BattleView {
         case 'support':
           toast(this.toasts, `왕일검 — ${ev.name}`, 'support');
           await this.wait(250);
+          break;
+        case 'relic': {
+          // 유물이 일하면 그 표식이 번쩍인다
+          const chip = this.relicEl.querySelector<HTMLElement>(`[data-relic="${ev.relicId}"]`);
+          if (chip) {
+            chip.classList.remove('fired');
+            void chip.offsetWidth;
+            chip.classList.add('fired');
+          }
+          this.refresh();
+          await this.wait(120);
+          break;
+        }
+        case 'potion':
+          toast(this.toasts, `물약 — ${ev.name}`, 'support');
+          this.refresh();
+          await this.wait(150);
           break;
         case 'dead_draw':
           toast(this.toasts, `쓰러진 동료의 카드(${this.data.cards.get(ev.cardId)?.name})가 버려졌다`, 'info');

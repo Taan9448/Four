@@ -220,5 +220,6 @@
     "type": "boss",
     "name": "낙안봉",
     "content": {"scene": "s7_scene_nakan", "outroScene": "s7_scene_unhealed", "text": "분타의 지하 통로. 등 뒤에 아이 서른. 혈수마군의 피가 결을 덮어 결 노출이 붙지 않는다(피의 덮개). 천외귀운만이 덮개를 벗긴다 — 마나를 물동이째 쏟아야 한다.", "enemies": ["branch_elite", "hyeolsu", "branch_elite"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 아이들을 감싸 안고, 마나를 아끼며 숨을 센다. (아군 전원 방어 6)", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "sky_crack"}, {"op": "scar", "amount": 1}]}
-  }
+  },
+  {"id": "s7_shop", "stage": "s7", "type": "shop", "name": "강나루 약방", "weight": 1, "content": {"text": "나룻배가 닿는 곳마다 약방 깃발이 섰다. 늙은 약사가 말린 약재를 저울에 달며 하운의 낯빛을 살폈다."}}
 ]

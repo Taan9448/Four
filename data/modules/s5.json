@@ -224,5 +224,6 @@
     "name": "마지막 장작 앞",
     "weight": 0.5,
     "content": {"text": "문 너머에서 무언가가 기다리고 있다. 하운의 아랫배가 웅크렸다. 지금까지 느껴 본 어떤 것보다도 깊이. 세 번 짧게, 한 번 길게.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
-  }
+  },
+  {"id": "s5_shop", "stage": "s5", "type": "shop", "name": "연합군 보급소", "weight": 1, "content": {"text": "연합군 진영 한가운데 천막. 보급관이 장부를 넘기며 말했다. \"용병이라도 값만 치르면 내준다. 성채 앞에서 죽지만 마라.\""}}
 ]
