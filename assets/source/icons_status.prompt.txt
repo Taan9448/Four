@@ -1,0 +1,26 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: weak — a cracked, drooping sword blade, dull grey with a faint purple tint
+Cell 2: vulnerable — a shattered round shield split into pieces, with a red crack
+Cell 3: strength — a clenched fist with a small orange flame rising from the knuckles
+Cell 4: frozen — an ice crystal block with sharp pale-blue facets and a white highlight
+Cell 5: stunned — three small yellow stars circling above a tilted dizzy swirl
+Cell 6: poison — a dripping green droplet with a tiny skull-like bubble inside
+Cell 7: exposed grain — a blue split wood log showing glowing blue grain lines along the split
+Cell 8: taunt — a raised round shield with a bold red exclamation spark above it
+Cell 9: incorporeal — a pale translucent ghostly wisp, drawn with light grey and blue, no face
+Cell 10: flow eater — a dark violet open maw swallowing a small gold orb and a small blue orb
+Cell 11: knot — a tight tangle of dark threads tied into a single knot
+Cell 12: exposed knot — the same knot glowing bright blue in the center, cut by a thin white slash
+Cells 13 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: The previous icon sheet filled too much of each cell. Recompose the entire sheet with visibly MORE empty magenta space. Reduce every attached icon to 75 percent of its previous width and height while preserving its symbol and colors. Center the COMPLETE shape including all sparks in each cell, within the middle three quarters of the cell; keep the outer one eighth on EACH side completely magenta. The drop tip, exclamation mark and knot loops must also have this margin. Make all symbols the same apparent size, clean simplified solid squares, at most 12 flat colors. Exact 4 columns by 4 rows, with 12 icons and entire fourth row empty. No new symbols, no labels, no grid.
