@@ -81,7 +81,7 @@
 | `sfx/potion.ogg` | bottle.wav(RPG Sound Pack) · artisticdude | https://opengameart.org/content/rpg-sound-pack | CC0 |
 | `sfx/surge.ogg` | Energy Drain(PowerDrain) · qubodup(앞 2.2초) | https://opengameart.org/content/energy-drain | CC0 |
 | `sfx/levelup.ogg` | Level Up.mp3(7 Assorted Sound Effects) · Joth(앞 3.2초) | https://opengameart.org/content/7-assorted-sound-effects-menu-level-up | CC0 |
-| `sfx/victory.ogg` | Medieval: Victory Theme · RandomMind(첫 악절 6.3초) | https://opengameart.org/content/medieval-victory-theme | CC0 |
+| `sfx/victory.ogg` | Medieval: Victory Theme · RandomMind(앞 3.2초, 끝 1초 페이드아웃 — 전투 뒤 장소 곡과 겹치지 않게) | https://opengameart.org/content/medieval-victory-theme | CC0 |
 | `sfx/defeat.ogg` | Medieval: Defeat Theme · RandomMind(앞 8.6초) | https://opengameart.org/content/medieval-defeat-theme | CC0 |
 
 합성 소리 그대로인 효과음: `status`, `rift`, `relic`, `down`, `transform` — 짧고 자주 나거나(`status`, `rift`, `relic`) 쓰러지는 몸·보스 변신에 맞는 CC0 소리를 찾지 못해 남겨 두었다.
