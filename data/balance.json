@@ -55,7 +55,7 @@
   "route": {
     "nodesPerFloor": [2, 3],
     "eliteMinFloor": 3,
-    "maxCalmRun": 3,
+    "maxCalmRun": 2,
     "extraEdgeChance": 0.35,
     "scarWeightPerPoint": 0.15
   }

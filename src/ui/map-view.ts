@@ -144,9 +144,20 @@ function journeyBand(data: GameData, run: RunState): HTMLElement {
           h('div', { class: 'stop event', style: `left:${st.journey!.x}%;top:${st.journey!.y}%`, ...tipAttrs('하늘의 금', '두 세계 사이에 생긴 금. 그 너머는 아무도 모른다.') }, h('i', {}), '?'),
         ),
     );
+  // 여정 띠 그림(journey_band)이 오기 전: 들어온 지역 지도 그림을 장소 자리에 번지듯 깔아 한 장의 큰 지도처럼 보이게 한다
+  const bandArt = art('journey_band');
+  const tiles = bandArt
+    ? null
+    : stages
+        .filter((st) => st.journey!.region !== 'rift' || rift)
+        .map((st) => {
+          const url = frameUrl(st.mapArt, 1, { realOnly: true });
+          return url ? h('div', { class: 'journey-tile', style: `left:${st.journey!.x}%;top:${st.journey!.y}%;background-image:url("${url}")` }) : null;
+        });
   return h(
     'div',
-    { class: `journey${art('journey_band') ? ' has-art' : ''}`, style: art('journey_band') },
+    { class: `journey${bandArt ? ' has-art' : tiles?.some(Boolean) ? ' has-tiles' : ''}`, style: bandArt },
+    tiles,
     crack,
     regionParts.map((p) => p.fog),
     regionParts.map((p) => p.tag),
@@ -243,13 +254,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       'button',
       {
         class: `node node-${n.type}${visited ? ' done' : ''}${open ? ' open' : ''}${run.position === n.id ? ' here' : ''}`,
-        style: `left:${p.x}%;top:${p.y}%`,
+        style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
         disabled: !open,
         'aria-label': `${n.floor}층 ${NODE_LABEL[n.type]}`,
         onclick: () => handlers.onEnter(n),
         ...tipAttrs(`${n.floor}층 · ${NODE_LABEL[n.type]}`, [known ? mod?.name ?? '' : '', open ? '갈 수 있다' : visited ? '지나온 곳' : ''].filter(Boolean).join('\n')),
       },
-      NODE_GLYPH[n.type],
+      h('span', { class: 'node-glyph' }, NODE_GLYPH[n.type]),
     );
   });
 
@@ -351,7 +362,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
         partyBox,
         support,
-        h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', {}, NODE_GLYPH[k]), v))),
+        h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),
         h(
           'div',
           { class: 'map-actions' },
