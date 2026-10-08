@@ -100,9 +100,39 @@ export function renderPrompt(spec, style) {
         pixelGrid(spec, 'The whole image') +
         `(${lw}x${lh} sprite pixels in total.)\n` +
         `Scene: ${notes(1) || spec.summary || ''}\n` +
-        `Style: ${style.sprite_style}; a battle backdrop that stays calm behind characters.\n` +
+        // 전투 화면 배치(GAME_DESIGN 13절): 인물은 아래쪽 땅 위, 맨 아래는 손패에 가려지고 위 가운데에는 균열 게이지가 온다
+        'Layout: a side-view battle stage seen straight from the front, no characters or creatures. A flat, open, walkable ground band runs across the whole width ' +
+        'with the ground line (where feet stand) at about 62% of the image height. The bottom 30% is plain, dark ground (the card hand covers it). ' +
+        'The upper part is open sky or distant scenery with no strong detail in the top center. Keep the middle third of the width free of tall objects; ' +
+        'put trees, pillars or rocks only near the left and right edges.\n' +
+        `Style: ${style.sprite_style}; a battle backdrop that stays calm and slightly darker than the characters in front of it, with low contrast in the far background.\n` +
         paletteLine(spec, style) +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border.'
+      );
+    case 'icon-sheet':
+      return (
+        `Create ONE PNG pixel-art icon sheet.\n` +
+        `Canvas: ${W}x${H} px. Grid: ${cols} columns x ${rows} rows.\n` +
+        `Each cell is exactly ${cw}x${ch} px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.\n` +
+        pixelGrid(spec, 'Every cell') +
+        `Background: flat solid ${key.name} ${key.hex} in every cell.\n` +
+        `Subject: one game status icon per cell, a single bold symbol centered in the cell, about ${Math.round(lw * 0.75)}x${Math.round(lh * 0.75)} sprite pixels, readable when shown at 28x28 px on screen. ` +
+        'All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.\n' +
+        `Style: ${style.sprite_style.replace(/\d+x\d+ pixel art/, `${lw}x${lh} pixel art`)}.\n` +
+        paletteLine(spec, style) +
+        `Never use ${key.name} or similar hues in the icons.\n` +
+        `Icons:\n${frameLines}\n${empty}${rulesFor(spec)}`
+      );
+    case 'key-art':
+    case 'map-art':
+      // 화면 그림: 시작 화면·여정 띠·지역 지도. 화풍은 명세의 style로 바꿀 수 있다(지역 지도 = 먹 그림)
+      return (
+        `Create ONE illustration, ${W}x${H} px, full-bleed.\n` +
+        `Scene: ${notes(1) || spec.summary || ''}\n` +
+        (spec.framing ? `Composition: ${spec.framing}\n` : '') +
+        'No people, no characters, no creatures in the picture.\n' +
+        `Style: ${spec.style ?? style.illustration_style}.\n` +
+        'Rules: no text, no letters, no numbers, no labels, no map legend, no compass rose, no signature, no watermark, no frame or border.'
       );
     case 'character-sheet':
       return (

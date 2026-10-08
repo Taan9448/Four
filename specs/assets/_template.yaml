@@ -1,7 +1,7 @@
 # 에셋 명세 템플릿. 복사해서 <id>.yaml로 저장한다. 이 파일은 Claude만 쓴다(Codex는 수정 금지).
 # 프레임 번호는 모든 파일에서 1부터 센다.
 id: example_attack            # 파일 이름과 같아야 한다
-type: character-anim          # character-anim | character-ref | fx | card-art | background | portrait
+type: character-anim          # character-anim | character-ref | fx | background | icon-sheet | card-art | portrait | story-cg | key-art | map-art
 size: small                   # small = 64 격자로 그려 80×80 프레임(기본) | large = 128 → 160(보스)
 character: example            # docs/ART_STYLE.md의 subjects 키
 summary: 한 줄 요약(이슈 제목에 쓰임)
