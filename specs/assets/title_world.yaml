@@ -1,0 +1,14 @@
+id: title_world
+type: key-art
+summary: 시작 화면 — 하늘의 틈을 사이에 둔 두 세계(인물 없음)
+frame_notes:
+  1: >-
+    One panoramic landscape that shows two worlds facing each other across a crack in the sky. Left half: the wuxia martial world
+    at dawn — layered misty mountains, a sect gate with grey-tiled roofs on a cliff, pine trees, warm gold and ink-blue tones.
+    Right half: the fantasy world Elheim at night — a silver forest under two moons (one large pale silver, one small blue) and the
+    distant spires of a dark castle, cool silver and blue tones. In the center the sky itself is split by a tall, thin, jagged black
+    crack from top to bottom, glowing faintly red inside, where the two skies meet.
+framing: >-
+  The center of the picture (the middle third of the width and the middle half of the height) is calm and slightly darker, with
+  no strong detail, because the game title and menu buttons sit there. The crack runs behind that area, thin and quiet.
+placeholder: { color: '#2a3348' }

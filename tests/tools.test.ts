@@ -318,6 +318,21 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(fx).toContain('glowing visual effect');
     expect(fx).not.toContain('no soft glow');
   });
+
+  it('화면 그림(2026-10-08): 아이콘 시트·지역 지도·여정 띠·전투 배경 프롬프트', () => {
+    const icons = promptFor('icons_status');
+    expect(icons).toContain('Grid: 4 columns x 4 rows');
+    expect(icons).toContain('64x64 pixel-art sprite scaled up exactly 4x');
+    expect(icons).toContain('Cells 13 to 16 are completely empty magenta');
+    expect(icons).not.toContain('128x128');
+    const map = promptFor('map_s1');
+    expect(map).toContain('1024x1536');
+    expect(map).toContain('ink-wash map');
+    expect(map).toContain('Composition:');
+    expect(map).not.toContain('animated feature film');
+    expect(promptFor('journey_band')).toContain('Do not draw any crack');
+    expect(promptFor('bg_rift')).toContain('ground line (where feet stand) at about 62%');
+  });
 });
 
 describe('팔레트 맞춤', () => {
