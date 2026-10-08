@@ -1,0 +1,14 @@
+id: icons_intent
+type: icon-sheet
+summary: 적 의도·방어 아이콘 6종(공격·방어·강화·약화·특수·방어 수치)
+# 칸 번호는 src/ui/icons.ts의 INTENT_FRAME과 같다
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: "attack — a single curved sword slash, steel blade with a red edge"
+  2: "defend — a round wooden shield with a steel rim, seen from the front"
+  3: "buff — a bold upward arrow made of orange-gold flame"
+  4: "debuff — a downward arrow made of dark violet smoke"
+  5: "special — a four-pointed star with a small swirl, silver and blue"
+  6: "block value — a simple steel-blue kite shield, flat front view, with an empty center (the game writes the number on it)"
+placeholder: { color: '#5d6478', accent: '#8fd3ff' }

@@ -1,0 +1,10 @@
+id: bg_elheim_forest
+type: background
+summary: 전투 배경 — 엘하임 숲(S1, 은빛 잎 숲과 두 개의 달)
+frame_notes:
+  1: >-
+    The Elheim forest at night under two moons, one large and pale silver and one small and blue, high in the left and right sky.
+    Tall slender trees with silver-green leaves frame the left and right edges; between them a soft clearing with distant tree
+    silhouettes in cool blue. The ground is a mossy forest floor with a few roots, ferns and faint glowing blue motes near the ground.
+    Silver, blue and deep green tones, cool and calm.
+placeholder: { color: '#23384a' }
