@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { battleOutcome, canPlay, endTurn, playCard } from '../src/engine/battle';
+import { battleOutcome, canPlay, endTurn, incomingDamage, playCard } from '../src/engine/battle';
 import { resolveCard } from '../src/engine/state';
 import { cardText } from '../src/engine/text';
 import { createRng } from '../src/engine/rng';
@@ -334,5 +334,68 @@ describe('결정성', () => {
       return JSON.stringify({ log: s.log, hp: s.party[0].hp });
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('받을 피해 예고', () => {
+  const party = [
+    { id: 'haun', hp: 60, maxHp: 60 },
+    { id: 'elia', hp: 10, maxHp: 42 },
+  ];
+  const aim = (s: ReturnType<typeof battle>, i: number, moveId: string, targetUid: string | null) => {
+    const e = s.enemies[i];
+    const move = data.enemies.get(e.defId)!.moves.find((m) => m.id === moveId)!;
+    e.intent = { moveId, name: move.name, kind: move.intent, targetUid };
+  };
+
+  it('노리는 아군에게 피해를 더하고 지금 방어를 뺀다', () => {
+    const s = battle({ party, enemies: ['shadow_wolf', 'shadow_wolf'] });
+    const [haun, elia] = s.party;
+    aim(s, 0, 'bite', haun.uid);
+    aim(s, 1, 'bite', haun.uid);
+    haun.block = 5;
+    const v = incomingDamage(s).get(haun.uid)!;
+    expect(v.raw).toBe(12);
+    expect(v.blocked).toBe(5);
+    expect(v.hpLoss).toBe(7);
+    expect(v.lethal).toBe(false);
+    expect(v.hits).toHaveLength(2);
+    expect(incomingDamage(s).has(elia.uid)).toBe(false);
+  });
+
+  it('힘·취약·도발·움직이지 못함·쓰러짐을 반영한다', () => {
+    const s = battle({ party, enemies: ['shadow_wolf', 'shadow_wolf'] });
+    const [haun, elia] = s.party;
+    aim(s, 0, 'bite', haun.uid);
+    aim(s, 1, 'bite', elia.uid);
+    s.enemies[0].statuses.strength = 2;
+    elia.statuses.vulnerable = 1;
+    let m = incomingDamage(s);
+    expect(m.get(haun.uid)!.raw).toBe(8);
+    expect(m.get(elia.uid)!.raw).toBe(9);
+    expect(m.get(elia.uid)!.lethal).toBe(false);
+    elia.hp = 9;
+    expect(incomingDamage(s).get(elia.uid)!.lethal).toBe(true);
+
+    s.enemies[1].statuses.stun = 1;
+    expect(incomingDamage(s).has(elia.uid)).toBe(false);
+    delete s.enemies[1].statuses.stun;
+
+    haun.statuses.taunt = 1;
+    m = incomingDamage(s);
+    expect(m.get(haun.uid)!.raw).toBe(8 + 6);
+    expect(m.has(elia.uid)).toBe(false);
+    delete haun.statuses.taunt;
+
+    s.enemies[0].downed = true;
+    expect(incomingDamage(s).has(haun.uid)).toBe(false);
+  });
+
+  it('전체 공격은 살아 있는 아군 모두에게', () => {
+    const s = battle({ party, enemies: ['ignis'] });
+    aim(s, 0, 'flame_wave', null);
+    const m = incomingDamage(s);
+    const per = 7 + (s.enemies[0].statuses.strength ?? 0);
+    for (const p of s.party) expect(m.get(p.uid)!.raw).toBe(per);
   });
 });

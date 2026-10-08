@@ -13,17 +13,18 @@ import {
   createRunAt,
   enterNode,
   isBattle,
-  playableStages,
   nextStage,
   rewardOptions,
   type Encounter,
   type RunState,
 } from '../engine/run';
+import { frameUrl } from '../render/assets';
 import { BattleView } from './battle-view';
 import { choiceView, rewardView } from './choice-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
-import { mapView } from './map-view';
+import { initDebug, isDebug } from './debug';
+import { mapView, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
@@ -41,6 +42,7 @@ export class App {
   constructor(private root: HTMLElement) {
     applySettings();
     const params = new URLSearchParams(location.search);
+    initDebug(params);
     const seed = params.get('seed');
     if (params.has('sandbox'))
       this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean), params.get('module') ?? undefined);
@@ -72,6 +74,7 @@ export class App {
     window.scrollTo(0, 0);
   }
 
+  /** 시작 화면(GAME_DESIGN 13절): 세계관 그림 한 장 위 가운데에 제목과 메뉴. 시드·디버그는 접힌 "시작 옵션" 안에 */
   private title(): void {
     const saved = loadRun(data);
     const seedInput = h('input', { class: 'seed-input', value: randomSeed(), maxlength: 24, 'aria-label': '시드' }) as HTMLInputElement;
@@ -88,28 +91,41 @@ export class App {
       const floor = run.map.floors.flat().find((n) => n.id === run.position)?.floor ?? 0;
       const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
       resume = h(
-        'div',
-        { class: 'resume' },
-        h('button', { class: 'btn btn-primary btn-large', onclick: () => this.resume(run) }, '이어하기'),
-        h('p', { class: 'hint' }, `${stage.name} · ${where} · 덱 ${run.deck.length}장 · 상흔 ${run.scar} · 시드 ${run.seed}`),
+        'button',
+        { class: 'btn btn-primary', title: `상흔 ${run.scar} · 시드 ${run.seed}`, onclick: () => this.resume(run) },
+        '이어하기',
+        h('small', {}, `${placeName(stage, run)} · ${where} · 덱 ${run.deck.length}장`),
       );
     }
+    const url = frameUrl('title_world', 1, { realOnly: true });
     this.show(
       h(
         'section',
-        { class: 'screen title-screen' },
-        h('h1', {}, '천외귀환', h('small', {}, '天外歸還 — 세계의 틈')),
-        h('p', { class: 'tagline' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
-        resume,
+        { class: `screen title-screen${url ? ' has-art' : ''}` },
+        h('div', { class: 'title-bg', style: url ? `background-image:url("${url}")` : '' }),
         h(
           'div',
-          { class: 'title-form' },
-          h('label', {}, '시드 ', seedInput, h('button', { class: 'btn', 'aria-label': '시드 바꾸기', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
-          h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
-          h('button', { class: `btn${saved ? '' : ' btn-primary btn-large'}`, onclick: startNew }, saved ? '새로 시작' : '시작 — S0 청운산'),
-          h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정'),
+          { class: 'title-center' },
+          h('h1', {}, '천외귀환'),
+          h('div', { class: 'title-sub' }, '天外歸還 · 세계의 틈'),
+          h(
+            'div',
+            { class: 'title-menu' },
+            resume,
+            h('button', { class: `btn${saved ? '' : ' btn-primary'}`, onclick: startNew }, saved ? '새로 시작' : '시작하기', saved ? null : h('small', {}, 'S0 청운산부터')),
+            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정'),
+          ),
+          h(
+            'details',
+            { class: 'title-options' },
+            h('summary', {}, '시작 옵션'),
+            h('label', {}, '시드 ', seedInput, h('button', { class: 'btn btn-small', 'aria-label': '시드 바꾸기', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
+            // 디버그 옵션은 ?debug에서만(합류 전 동료 이름·스테이지 목록을 미리 보여 주지 않는다, GAME_DESIGN 14절)
+            isDebug() ? h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)') : null,
+            h('p', { class: 'hint' }, '같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다.'),
+          ),
         ),
-        h('p', { class: 'hint' }, `플레이 가능: ${playableStages(data).map((st) => st.name).join(' → ')}. 같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다. 그래픽은 일부 임시 그림입니다.`),
+        h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
       ),
     );
   }
@@ -198,12 +214,13 @@ export class App {
       state,
       {
         title: enc.module.name,
-        subtitle: `${stage.name} · ${enc.node.floor}층`,
+        subtitle: `${placeName(stage, run)} · ${enc.node.floor}층`,
         seed: run.seed,
         scar: run.scar,
         supportActive: run.supportActive,
         bonusText: bonus,
         introText: enc.module.content.text,
+        background: enc.module.content.background ?? stage.background,
         onQuit: (abandon) => {
           if (abandon && this.persist) clearRun();
           this.title();
@@ -238,8 +255,14 @@ export class App {
         h('h1', {}, `${stage.name} — 끝`),
         outro ? h('p', { class: 'outro' }, outro) : null,
         this.clearMessages.length ? h('ul', { class: 'clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
-        run.scar > 0 ? h('p', { class: 'scar-reveal' }, `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.`) : null,
-        next ? h('p', { class: 'next-stage' }, `다음: ${next.name} (${next.chapters})`) : null,
+        run.scar > 0
+          ? h(
+              'p',
+              { class: 'scar-reveal' },
+              // '하늘의 금'을 보기 전에는 그 말을 쓰지 않는다(GAME_DESIGN 14절)
+              run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`,
+            )
+          : null,
         h(
           'button',
           {
