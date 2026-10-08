@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: draws back the dark qi arm, seams glowing
+Cell 2: the arm stretches unnaturally long, stitches straining
+Cell 3: lashes forward to the left
+Cell 4: the stitched arm strikes at full reach to the left, a burst of pale light
+Cell 5: the arm recoils, threads of light trailing
+Cell 6: returns to the looming stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: MUST respect the3x2 layout. The long arm and robe must NEVER cross ANY cell edge. Previous attempt still crossed cell2 LEFT into cell1 and cell4 RIGHT into cell5. Use compact crouch-free poses at SAME84px BODY height, y124..460 local. Fold ALL rear wings, silver arm and robe/tentacle tails against the torso to make the BODY narrower during the strike, without making it shorter. Keep body entirely at local x240..430, extended dark arm only at local x90..300, and a SMALL pale impact burst only at local x60..140,y220..300 in CELL4. FULL bounds x40..472 in eachcell, with PUREGREEN empty40px margins and52px below. Curl the dark arm so stretched length is visible in S-shaped curves INSIDE the cell. Only extend LEFT, restore left-facing reference side-view in cell6. Every cell has ONE complete SAME character, zero stray fragments from neighboring cells.
