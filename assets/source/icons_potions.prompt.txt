@@ -1,0 +1,26 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: wound salve — a small round lidded jar of green ointment
+Cell 2: iron skin pill — a single golden pill on a tiny grey stone dish
+Cell 3: fire flask — a round glass flask filled with swirling orange fire
+Cell 4: frost flask — a round glass flask filled with pale blue frost and tiny ice shards
+Cell 5: weakness powder — a small paper packet spilling grey-violet powder
+Cell 6: clear tea — a small clay cup of clear pale green tea
+Cell 7: neigong pill — a red-gold pill with a faint warm glow
+Cell 8: mana draught — a tall slim bottle of glowing light-blue liquid with a cork
+Cell 9: strength tonic — a dark brown gourd bottle with a red cord
+Cell 10: seal ash — a small bowl of pale ash with a faint red ember mark
+Cell 11: breaking powder — a small paper packet spilling dark red powder with a crack symbol shape
+Cell 12: great return pill — a large golden pill with a soft white halo
+Cell 13: thunder talisman — a yellow paper talisman crackling with a small blue-white lightning bolt
+Cells 14 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
