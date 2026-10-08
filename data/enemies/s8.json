@@ -26,40 +26,40 @@
   {
     "id": "kwak_dojin",
     "name": "천하맹주 곽도진",
-    "maxHp": 100,
+    "maxHp": 115,
     "sprite": "kwak_dojin",
     "color": "#e0cfae",
     "scale": 1.3,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "qingfeng", "name": "제3식 청풍불면", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 5, "times": 3}]}, {"id": "blood_wave", "name": "운해귀종 — 피의 파도", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 14}]}, {"id": "forbid_drinking", "name": "피를 마시는 것은 허락하지 않소", "intent": "special", "targeting": "random", "effects": [{"op": "remove_status", "status": "strength", "target": "all_allies"}, {"op": "block", "amount": 8, "target": "self"}]}],
+    "moves": [{"id": "qingfeng", "name": "제3식 청풍불면", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 6, "times": 3}]}, {"id": "blood_wave", "name": "운해귀종 — 피의 파도", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 17}]}, {"id": "forbid_drinking", "name": "피를 마시는 것은 허락하지 않소", "intent": "special", "targeting": "random", "effects": [{"op": "remove_status", "status": "strength", "target": "all_allies"}, {"op": "block", "amount": 8, "target": "self"}]}],
     "flavor": "현허진인 곽도진. 학창의와 송문고검. 바닥의 피가 그의 운해귀종을 따라 붉은 파도로 일어선다. 사형의 목소리에 단 한 번, 검이 굳는다."
   },
   {
     "id": "sa_mugyeol",
     "name": "교주 사무결",
-    "maxHp": 95,
+    "maxHp": 105,
     "sprite": "sa_mugyeol",
     "color": "#5a1020",
     "scale": 1.2,
     "tier": "boss",
     "pattern": "cycle",
     "traits": [{"status": "blood_veil", "stacks": 1}, {"status": "blood_cover", "stacks": 1}],
-    "moves": [{"id": "cheonma_palm", "name": "천마혈공 — 핏빛 장력", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 11}]}, {"id": "taste_beyond", "name": "하늘 밖의 맛", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 5}, {"op": "heal", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, {"id": "red_silk", "name": "붉은 비단", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}],
+    "moves": [{"id": "cheonma_palm", "name": "천마혈공 — 핏빛 장력", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 13}]}, {"id": "taste_beyond", "name": "하늘 밖의 맛", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 6}, {"op": "heal", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, {"id": "red_silk", "name": "붉은 비단", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}],
     "transform": {"triggers": ["partnerDowned", "downed"], "partner": "kwak_dojin", "into": "sa_mugyeol_giant", "text": "곽도진의 피가 바닥의 홈을 따라 오른쪽 옥좌로 흘렀다. \"고맙다, 이방인. 천하맹주의 피. 이것으로 의식이 완성된다.\" 혈전의 천장을 뚫고 붉은 거인이 솟았다. \"하운!\" 카일이 이그니스의 심장으로 벼린 검을 내민다. \"기사의 검은 지키라고 있는 거니까.\" 엘리아가 마나 없는 손으로 그 비틀린 결을 풀고, 하운은 일곱째 굽이의 금 너머에서 흐름을 억지로 끌어온다. '끌어와라. 더. 더.'", "partyEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}, {"op": "gain_mana", "amount": 10}, {"op": "rift", "amount": 4}]},
     "flavor": "천마신교 교주. 삿갓을 벗은 얼굴은 젊고, 눈은 피를 머금은 듯 붉다. 육십 년 동안 피로 젊음을 샀다. 천마혈공 — 피가 결을 덮는다. 곽도진이 서 있는 동안에는 앞에 나서지 않는다."
   },
   {
     "id": "sa_mugyeol_giant",
     "name": "붉은 거인",
-    "maxHp": 110,
+    "maxHp": 126,
     "sprite": "sa_giant",
     "color": "#a01020",
     "scale": 2.2,
     "tier": "boss",
     "pattern": "cycle",
     "traits": [{"status": "blood_cover", "stacks": 1}],
-    "moves": [{"id": "blood_sea", "name": "천하의 피", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "seize", "name": "붙잡는 손", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 15}]}, {"id": "blood_fills", "name": "상처를 피가 메운다", "intent": "buff", "targeting": "random", "effects": [{"op": "heal", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 3, "target": "self"}]}],
+    "moves": [{"id": "blood_sea", "name": "천하의 피", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "seize", "name": "붙잡는 손", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 18}]}, {"id": "blood_fills", "name": "상처를 피가 메운다", "intent": "buff", "targeting": "random", "effects": [{"op": "heal", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 3, "target": "self"}]}],
     "flavor": "온몸이 피로 이루어진 거인. 가슴에서 핏빛 심장이 뛴다. 카일이 발목을 그으면 피가 메웠다. 보른의 망치가 무릎을 부수면 피가 메웠다. 상처가 날 때마다 거인은 더 커졌다."
   }
 ]

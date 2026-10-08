@@ -62,7 +62,7 @@
   {
     "id": "veilak",
     "name": "그림자 군단장 베일락",
-    "maxHp": 120,
+    "maxHp": 138,
     "sprite": null,
     "silhouette": "boss",
     "color": "#3a3a48",
@@ -70,7 +70,7 @@
     "tier": "boss",
     "traits": [{"status": "dead_forest", "stacks": 1}],
     "pattern": "cycle",
-    "moves": [{"id": "strike_barrier", "name": "결계 내려치기", "intent": "attack", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}, {"id": "not_this_world", "name": "이 세계의 냄새가 아니다", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 12}]}, {"id": "green_light", "name": "초록빛에 막힌 대검", "intent": "attack", "effects": [{"op": "damage", "amount": 8}, {"op": "remove_status", "status": "dead_forest", "target": "self", "condition": {"targetHasStatus": "dead_forest"}}]}, {"id": "smoke_horse", "name": "연기의 말", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 9}]}],
+    "moves": [{"id": "strike_barrier", "name": "결계 내려치기", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}, {"id": "not_this_world", "name": "이 세계의 냄새가 아니다", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 16}]}, {"id": "green_light", "name": "초록빛에 막힌 대검", "intent": "attack", "effects": [{"op": "damage", "amount": 10}, {"op": "remove_status", "status": "dead_forest", "target": "self", "condition": {"targetHasStatus": "dead_forest"}}]}, {"id": "smoke_horse", "name": "연기의 말", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 12}]}],
     "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
     "flavor": "말도 기사도 모두 검은 연기로 빚어졌다. 사람 두 배의 키, 연기의 대검, 투구 안쪽의 붉은 불빛. 수십 개의 목소리가 겹친 음성. 연기가 아무리 흩어지고 뭉쳐도, 가슴의 매듭만은 그 자리에 있었다."
   }

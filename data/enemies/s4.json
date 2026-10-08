@@ -40,7 +40,7 @@
   {
     "id": "gormon",
     "name": "대지의 거인 고르몬",
-    "maxHp": 160,
+    "maxHp": 184,
     "sprite": null,
     "silhouette": "boss",
     "color": "#5b4a3f",
@@ -48,7 +48,7 @@
     "tier": "boss",
     "traits": [{"status": "mountain_regen", "stacks": 2}],
     "pattern": "cycle",
-    "moves": [{"id": "laugh", "name": "웃음에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "wall", "name": "밀려오는 벽", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 13}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "fist", "name": "주먹을 쥐듯이", "intent": "buff", "effects": [{"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "fingers", "name": "바위 손가락", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "times": 2}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "laugh", "name": "웃음에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "wall", "name": "밀려오는 벽", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 18}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "fist", "name": "주먹을 쥐듯이", "intent": "buff", "effects": [{"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "fingers", "name": "바위 손가락", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 9, "times": 2}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "flavor": "산과 하나가 된 바위 거인. 용암처럼 붉게 타는 두 눈, 산사태 같은 목소리. 베면 산이 메우고, 동굴은 주먹을 쥐듯 오므라든다. \"보았느냐. 산은 상처를 입지 않는다.\""
   }
 ]

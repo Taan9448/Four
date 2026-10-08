@@ -49,7 +49,7 @@
   {
     "id": "hyeolsu",
     "name": "혈수마군",
-    "maxHp": 185,
+    "maxHp": 166,
     "sprite": "branch_lord",
     "silhouette": "boss",
     "color": "#8a1a1a",
@@ -58,7 +58,7 @@
     "pattern": "cycle",
     "traits": [{"status": "blood_cover", "stacks": 1}],
     "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
-    "moves": [{"id": "blood_palm_force", "name": "핏빛 장력", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "heavenly_blood_art", "name": "천마혈공", "intent": "buff", "effects": [{"op": "block", "amount": 15, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, {"id": "noisy_first", "name": "\"시끄러운 것부터\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 16}]}, {"id": "childrens_blood", "name": "아이들의 피", "intent": "special", "effects": [{"op": "heal", "amount": 18, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "blood_palm_force", "name": "핏빛 장력", "intent": "attack", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}, {"id": "heavenly_blood_art", "name": "천마혈공", "intent": "buff", "effects": [{"op": "block", "amount": 15, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, {"id": "noisy_first", "name": "\"시끄러운 것부터\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 14}]}, {"id": "childrens_blood", "name": "아이들의 피", "intent": "special", "effects": [{"op": "heal", "amount": 18, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "flavor": "섬서 분타주이자 교주의 오른팔. 큰 키, 넓은 어깨, 팔꿈치까지 핏빛인 두 손. 천마혈공의 피가 결을 덮어 결 읽기가 통하지 않는다. 아이들에게서 받은 피를 마신다. 그가 쓰러지면 분타가 무기를 내려놓는다."
   }
 ]
