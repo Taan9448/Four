@@ -23,7 +23,7 @@
   },
   {
     "id": "s1_boss_ignis", "stage": "s1", "type": "boss", "name": "화산 협곡 — 화염군주 이그니스",
-    "content": { "outroScene": "s1_scene_ignis_after", "text": "협곡 마을이 불타고 있다. 화염군주 이그니스가 돌아본다.", "enemies": ["ignis"] }
+    "content": { "background": "bg_volcano_canyon", "outroScene": "s1_scene_ignis_after", "text": "협곡 마을이 불타고 있다. 화염군주 이그니스가 돌아본다.", "enemies": ["ignis"] }
   },
   {
     "id": "s1_battle_wolves_pair", "stage": "s1", "type": "battle", "name": "그림자늑대 두 마리", "weight": 3,

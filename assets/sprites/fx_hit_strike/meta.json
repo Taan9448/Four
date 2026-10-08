@@ -1,8 +1,8 @@
 {
   "id": "fx_hit_strike",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 14.18,
   "gridDetected": true,

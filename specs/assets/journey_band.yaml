@@ -1,0 +1,17 @@
+id: journey_band
+type: key-art
+summary: 지도 여정 띠 — 두 세계를 잇는 원작의 여정(틈 없음, 가로로 잘라 씀)
+frame_notes:
+  1: >-
+    A wide panoramic travel landscape, painted like an illustrated world map seen at a low angle, connecting two worlds. Left half
+    is the wuxia martial world (warm ink-wash greys, pine green, misty blue): far left, a mountain sect with grey-tiled roofs on
+    Cheongun Mountain; upper left, one very tall sharp crimson-tinted peak (the Heavenly Demon Peak); left of center, a dirt road
+    through a ravaged village and a ruined temple. In the center, a narrow stone gate in a sheer cliff wall (the Ghost Valley gate)
+    is the only passage between the worlds. Right half is the fantasy world Elheim (silver, blue, green): right of center, a silver
+    forest under two small moons; upper right, a volcanic canyon with a faint orange glow; far right, a dark castle with black
+    spires. The sky above the center gate is open, plain and empty.
+framing: >-
+  The game crops this picture to a wide strip: only the middle part from 37% to 63% of the image height is shown, the top and bottom
+  are cut off. Put every place listed above inside that middle strip, spread across the full width; keep the top and bottom thirds
+  as simple sky and ground. Do not draw any crack or tear in the sky (the game draws it later as an event). The left half and the right half must each read as a complete scene on its own, because the game first shows only the left half and covers the right half with mist until the story reaches it.
+placeholder: { color: '#2b2b3a' }

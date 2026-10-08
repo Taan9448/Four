@@ -1,0 +1,11 @@
+id: map_s3
+type: map-art
+summary: 지역 지도 — 혈로(S3, 뒤집힌 무림)
+frame_notes:
+  1: >-
+    The wuxia world overrun by the demonic cult. Far left: Unggok village with small houses and a well. Along the top and bottom edges: a ruined temple on a hill, the mountains of the Wudang, Shaolin and Mount Hua sects as small distant landmarks, a river ferry. Far right: the Shaanxi branch fortress of the cult with dark walls and red banners (a little vermilion).
+framing: >-
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
+style: >-
+  traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
+placeholder: { color: '#d6c7a0' }
