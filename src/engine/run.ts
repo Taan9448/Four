@@ -214,6 +214,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
     enemyHpScale: stage.enemyHpScale,
+    enemyDmgScale: stage.enemyDmgScale,
   };
 }
 

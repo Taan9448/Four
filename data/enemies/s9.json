@@ -27,7 +27,7 @@
   {
     "id": "bone_giant",
     "name": "뼈 거인",
-    "maxHp": 44,
+    "maxHp": 55,
     "sprite": null,
     "silhouette": "boss",
     "color": "#d8d0bc",
@@ -42,7 +42,7 @@
   {
     "id": "bone_giant_risen",
     "name": "다시 일어선 뼈 거인",
-    "maxHp": 32,
+    "maxHp": 40,
     "sprite": null,
     "silhouette": "boss",
     "color": "#b8ae98",

@@ -194,12 +194,17 @@ export function hasSkipTurn(state: BattleState, c: Combatant): boolean {
 
 /** 의도 표시용: 공격 1회의 예상 피해(대상 보정 제외) */
 export function previewDamage(state: BattleState, source: Combatant, base: number): number {
-  return Math.max(0, Math.floor((base + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul')));
+  return Math.max(0, Math.floor((enemyBase(state, source, base) + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul')));
+}
+
+/** 적의 피해 기본값에 스테이지 공격력 배율(enemyDmgScale)을 건다(반올림). 아군은 그대로 */
+function enemyBase(state: BattleState, source: Combatant | null, base: number): number {
+  return source?.side === 'enemy' && state.enemyDmgScale && state.enemyDmgScale !== 1 ? Math.round(base * state.enemyDmgScale) : base;
 }
 
 /** 받을 피해 예고용: 대상의 받는 피해 보정(취약 등)까지 넣은 1회 피해. dealDamage와 같은 순서로 계산한다 */
 export function previewDamageOn(state: BattleState, source: Combatant, target: Combatant, base: number): number {
-  const dmg = (base + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul') * statusModifier(state, target, 'damageTakenMul');
+  const dmg = (enemyBase(state, source, base) + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul') * statusModifier(state, target, 'damageTakenMul');
   return Math.max(0, Math.floor(dmg));
 }
 
@@ -215,7 +220,7 @@ export function dealDamage(
 ): void {
   if (target.downed) return;
   const bal = state.data.balance;
-  let dmg = base;
+  let dmg = enemyBase(state, source, base);
   if (source) {
     dmg += strengthBonus(state, source);
     dmg *= statusModifier(state, source, 'damageDealtMul');

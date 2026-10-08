@@ -56,6 +56,8 @@ export interface BattleSetup {
   manaRule?: WorldMana;
   /** 적 최대 체력 배율(스테이지 enemyHpScale) */
   enemyHpScale?: number;
+  /** 적 공격 피해 배율(스테이지 enemyDmgScale) */
+  enemyDmgScale?: number;
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
@@ -124,6 +126,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
 
   state.enemyHpScale = setup.enemyHpScale ?? 1;
+  state.enemyDmgScale = setup.enemyDmgScale ?? 1;
   fireSupport(state, 'battleStart', {});
   if (setup.startEffects?.length) {
     runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });

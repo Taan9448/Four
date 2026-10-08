@@ -426,6 +426,8 @@ export const StageDef = z
     floors: z.number().int().positive(),
     /** 이 스테이지 적의 최대 체력 배율(레벨 성장에 맞춘다, 기본 1) */
     enemyHpScale: z.number().positive().default(1),
+    /** 이 스테이지 적의 공격 피해 배율(기본 1). 의도·받을 피해 예고에도 걸린다 */
+    enemyDmgScale: z.number().positive().default(1),
     playable: z.boolean(),
     pinned: z.array(z.object({ floor: z.number().int().positive(), module: z.string() }).strict()).default([]),
     forcedTypes: z.record(z.string(), NodeType).default({}),

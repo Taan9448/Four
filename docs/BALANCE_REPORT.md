@@ -1,12 +1,12 @@
 # 밸런스 보고서 — 자동 플레이 봇
 
-`npm run balance`가 만든다(손으로 고치지 않는다). 시드 300개(B0001~), 봇 `src/sim/bot.ts`. 계산 36.9초.
+`npm run balance`가 만든다(손으로 고치지 않는다). 시드 300개(B0001~), 봇 `src/sim/bot.ts`. 계산 37.4초.
 봇은 한 수 앞만 보는 탐욕 봇이라 사람보다 약하다. 절대 승률보다 **스테이지·전투 사이의 상대적인 어려움**을 본다. 목표는 `docs/GAME_DESIGN.md` 12절.
 
 ## 요약
 
-- 완주(에필로그까지): **170/300 (57%)**
-- 평균 덱 49.2장 · 평균 상흔 25.7
+- 완주(에필로그까지): **181/300 (60%)**
+- 평균 덱 48.2장 · 평균 상흔 26.7
 
 ## 스테이지별
 
@@ -17,11 +17,11 @@
 | 화산 협곡 (s2) | 300 | 286 | 95% | 14 | 100% | 27.4 | 3.1 |
 | 아르덴 (s3) | 286 | 286 | 100% | 0 | 100% | 30.5 | 4.4 |
 | 카즈둠 (s4) | 286 | 282 | 99% | 4 | 100% | 32.2 | 5.8 |
-| 노크투르나 (s5) | 282 | 281 | 100% | 1 | 100% | 34.1 | 6.5 |
-| 운곡촌 (s6) | 281 | 281 | 100% | 0 | 100% | 37.2 | 7.5 |
-| 낙안봉 (s7) | 281 | 280 | 100% | 1 | 100% | 43.7 | 8.3 |
-| 천마봉 (s8) | 280 | 255 | 91% | 25 | 100% | 45.6 | 9.1 |
-| 세계의 틈 (s9) | 255 | 170 | 67% | 85 | 100% | 48.9 | 9.9 |
+| 노크투르나 (s5) | 282 | 276 | 98% | 6 | 100% | 34.1 | 6.5 |
+| 운곡촌 (s6) | 276 | 257 | 93% | 19 | 100% | 37.1 | 7.5 |
+| 낙안봉 (s7) | 257 | 235 | 91% | 22 | 100% | 43.8 | 8.3 |
+| 천마봉 (s8) | 235 | 224 | 95% | 11 | 100% | 45.7 | 9.1 |
+| 세계의 틈 (s9) | 224 | 181 | 81% | 43 | 100% | 49.0 | 9.9 |
 
 ## 전투별
 
@@ -73,55 +73,55 @@
 | 묻히지 않은 갑옷들 `s4_elite_unburied` | elite | 47 | 0 | 4.1 | 86.4 | 8% | 3% | 0.7 |
 | 용암 핏줄의 골렘 `s4_elite_vein_golem` | elite | 111 | 0 | 5.9 | 86.8 | 11% | 10% | 0.6 |
 | 산의 심장 — 고르몬 `s4_boss_gormon` | boss | 286 | **4 (1%)** | 10.7 | 90.2 | 40% | 41% | 0.4 |
-| 회랑의 빈 갑옷 `s5_battle_armor_wolves` | battle | 153 | 0 | 5.3 | 87.9 | 8% | 3% | 1.1 |
-| 첫째 회랑 — 불의 정령 `s5_battle_first_corridor` | battle | 93 | 0 | 3.2 | 90.5 | 6% | 4% | 0.9 |
-| 넷째 회랑 — 그림자들 `s5_battle_fourth_corridor` | battle | 186 | **1 (1%)** | 8.5 | 85.3 | 16% | 3% | 1.4 |
-| 둘째 회랑 — 얼음 기사 `s5_battle_second_corridor` | battle | 141 | 0 | 3.7 | 89.1 | 5% | 3% | 0.9 |
-| 하수로의 그림자늑대 `s5_battle_sewer_wolves` | battle | 57 | 0 | 3.9 | 88.4 | 4% | 1% | 1.1 |
-| 여섯째 회랑의 잔당 `s5_battle_sixth_corridor` | battle | 123 | 0 | 3.8 | 85.7 | 6% | 5% | 0.9 |
-| 셋째 회랑 — 바위 골렘 `s5_battle_third_corridor` | battle | 127 | 0 | 3.1 | 85.1 | 3% | 2% | 0.9 |
-| 회랑의 수문장 `s5_elite_corridor_warden` | elite | 184 | 0 | 7.2 | 90.5 | 18% | 15% | 1.2 |
-| 다섯째 회랑 `s5_elite_fifth_corridor` | elite | 141 | 0 | 6.6 | 87.8 | 12% | 5% | 1.0 |
-| 일곱째 회랑의 쐐기 문 `s5_elite_seventh_door` | elite | 76 | 0 | 4.7 | 87.5 | 6% | 3% | 1.4 |
-| 그림자의 밤 `s5_story_shadow_night` | elite | 282 | 0 | 2.1 | 92.1 | 1% | 0% | 0.5 |
-| 왕좌의 방 — 마왕 바르가스 `s5_boss_vargas` | boss | 281 | 0 | 12.2 | 93.9 | 43% | 48% | 1.5 |
-| 혈위대 함정 `s6_battle_ambush` | battle | 281 | 0 | 3.6 | 96.0 | 6% | 4% | 4.6 |
-| 흑풍대 척후 `s6_battle_black_wind` | battle | 143 | 0 | 4.0 | 93.9 | 4% | 2% | 1.5 |
-| 청운산 아래 `s6_battle_mountain_gate` | battle | 84 | 0 | 4.8 | 93.9 | 6% | 4% | 1.6 |
-| 교세 순찰 `s6_battle_patrol` | battle | 146 | 0 | 3.3 | 95.5 | 2% | 1% | 1.1 |
-| 교세 수레 길 `s6_battle_tax_cart` | battle | 167 | 0 | 3.5 | 95.7 | 3% | 1% | 1.5 |
-| 마을을 벌주러 `s6_battle_village_raid` | battle | 209 | 0 | 4.4 | 94.3 | 5% | 3% | 1.7 |
-| 벽을 넘는 자들 `s6_battle_wall_climb` | battle | 96 | 0 | 4.8 | 93.9 | 8% | 5% | 1.6 |
-| 첫 토벌 `s6_elite_black_wind_captain` | elite | 74 | 0 | 7.1 | 95.4 | 7% | 10% | 2.9 |
-| 혈위대 이백 `s6_elite_guard_two_hundred` | elite | 209 | 0 | 4.9 | 94.8 | 6% | 4% | 2.6 |
-| 보름의 연무장 `s6_boss_full_moon` | boss | 281 | 0 | 12.1 | 97.7 | 31% | 41% | 3.9 |
-| 흑풍대 잔당 `s7_battle_black_wind_remnant` | battle | 224 | 0 | 4.8 | 96.4 | 8% | 5% | 1.2 |
-| 수실을 떼지 않은 자들 `s7_battle_holdouts` | battle | 175 | 0 | 4.8 | 95.3 | 7% | 5% | 1.4 |
-| 진무관 초소 `s7_battle_jinmu_watch` | battle | 153 | 0 | 4.2 | 96.8 | 6% | 3% | 1.7 |
-| 낙안봉 골짜기 `s7_battle_nakan_valley` | battle | 179 | 0 | 5.7 | 93.9 | 5% | 3% | 2.2 |
-| 분타 외곽 초소 `s7_battle_outpost` | battle | 202 | 0 | 4.8 | 94.0 | 4% | 3% | 1.3 |
-| 보급 수레 호위 `s7_battle_supply_cart` | battle | 156 | 0 | 4.0 | 97.7 | 5% | 2% | 1.4 |
-| 탑림의 혈교도 `s7_battle_tower_cultists` | battle | 125 | 0 | 5.2 | 95.2 | 8% | 5% | 1.3 |
-| 분타의 정예 `s7_elite_branch_guard` | elite | 121 | 0 | 6.3 | 93.5 | 9% | 5% | 2.7 |
-| 탑림의 독수마군 `s7_elite_poison_hand` | elite | 97 | 0 | 8.0 | 96.0 | 23% | 13% | 3.6 |
-| 혈마삼재진 `s7_elite_three_talents` | elite | 116 | 0 | 7.1 | 96.6 | 14% | 5% | 3.5 |
-| 낙안봉 `s7_boss_blood_hand` | boss | 281 | **1 (0%)** | 18.1 | 100.9 | 38% | 23% | 4.9 |
-| 화살 비 `s8_battle_arrow_rain` | battle | 122 | 0 | 5.4 | 96.8 | 12% | 6% | 1.2 |
-| 여덟째 굽이 `s8_battle_eighth_turn` | battle | 59 | 0 | 6.8 | 96.9 | 10% | 5% | 0.4 |
-| 첫 굽이의 물결 `s8_battle_first_wave` | battle | 181 | 0 | 4.8 | 100.1 | 9% | 5% | 1.2 |
-| 호법의 굽이 `s8_battle_guardians` | battle | 96 | 0 | 4.2 | 95.4 | 4% | 2% | 1.2 |
-| 태극검진의 왼편 `s8_battle_taiji` | battle | 172 | 0 | 4.2 | 97.2 | 4% | 2% | 0.8 |
-| 금강진의 오른편 `s8_battle_vajra` | battle | 194 | 0 | 3.8 | 99.4 | 4% | 3% | 1.0 |
-| 장로와 궁수 `s8_elite_elder_archers` | elite | 97 | 0 | 7.5 | 98.1 | 9% | 4% | 2.2 |
-| 여섯째 굽이의 장로 `s8_elite_elder_descends` | elite | 135 | 0 | 5.7 | 101.3 | 11% | 6% | 2.5 |
-| 호법 셋의 진 `s8_elite_guardian_trio` | elite | 112 | 0 | 5.7 | 97.2 | 8% | 5% | 1.3 |
-| 혈전 `s8_boss_blood_hall` | boss | 280 | **25 (9%)** | 20.2 | 103.9 | 52% | 74% | 5.3 |
-| 유리 탑의 잔해 `s9_battle_glass_tower` | battle | 61 | 0 | 8.6 | 105.0 | 17% | 7% | 1.7 |
-| 거꾸로 매달린 숲 `s9_battle_hanging_forest` | battle | 33 | 0 | 6.4 | 103.2 | 6% | 1% | 0.6 |
-| 불비늘 삼두견 `s9_battle_hounds` | battle | 203 | 0 | 3.9 | 99.8 | 10% | 5% | 1.4 |
-| 일곱째 조각 `s9_battle_seventh_fragment` | battle | 20 | 0 | 5.0 | 105.4 | 21% | 4% | 1.0 |
-| 그림자 망령 `s9_battle_wraiths` | battle | 212 | **5 (2%)** | 10.0 | 99.5 | 25% | 22% | 3.0 |
-| 뼈 거인 `s9_elite_bone_giant` | elite | 103 | **28 (27%)** | 40.5 | 105.4 | 57% | 71% | 0.6 |
-| 굶주린 무리 `s9_elite_hungry_pack` | elite | 102 | 0 | 5.2 | 104.9 | 16% | 8% | 1.5 |
-| 틈의 심장 `s9_boss_mordecai` | boss | 222 | **52 (23%)** | 19.5 | 99.0 | 35% | 48% | 0.9 |
+| 회랑의 빈 갑옷 `s5_battle_armor_wolves` | battle | 153 | 0 | 6.0 | 84.6 | 12% | 5% | 1.2 |
+| 첫째 회랑 — 불의 정령 `s5_battle_first_corridor` | battle | 93 | 0 | 3.6 | 89.3 | 8% | 5% | 0.9 |
+| 넷째 회랑 — 그림자들 `s5_battle_fourth_corridor` | battle | 184 | 0 | 10.1 | 82.8 | 22% | 8% | 1.9 |
+| 둘째 회랑 — 얼음 기사 `s5_battle_second_corridor` | battle | 138 | 0 | 4.3 | 87.7 | 8% | 5% | 1.0 |
+| 하수로의 그림자늑대 `s5_battle_sewer_wolves` | battle | 58 | 0 | 4.3 | 86.8 | 6% | 2% | 1.4 |
+| 여섯째 회랑의 잔당 `s5_battle_sixth_corridor` | battle | 124 | 0 | 4.3 | 82.4 | 7% | 6% | 0.7 |
+| 셋째 회랑 — 바위 골렘 `s5_battle_third_corridor` | battle | 124 | 0 | 3.5 | 81.3 | 4% | 3% | 0.9 |
+| 회랑의 수문장 `s5_elite_corridor_warden` | elite | 185 | 0 | 8.2 | 88.7 | 26% | 24% | 1.2 |
+| 다섯째 회랑 `s5_elite_fifth_corridor` | elite | 135 | 0 | 7.6 | 86.2 | 16% | 7% | 1.0 |
+| 일곱째 회랑의 쐐기 문 `s5_elite_seventh_door` | elite | 75 | 0 | 5.3 | 83.4 | 7% | 4% | 1.3 |
+| 그림자의 밤 `s5_story_shadow_night` | elite | 282 | 0 | 2.3 | 92.1 | 2% | 0% | 0.7 |
+| 왕좌의 방 — 마왕 바르가스 `s5_boss_vargas` | boss | 282 | **6 (2%)** | 13.5 | 91.1 | 59% | 74% | 1.5 |
+| 혈위대 함정 `s6_battle_ambush` | battle | 276 | 0 | 4.2 | 96.0 | 9% | 7% | 5.4 |
+| 흑풍대 척후 `s6_battle_black_wind` | battle | 143 | 0 | 4.6 | 91.7 | 6% | 4% | 1.5 |
+| 청운산 아래 `s6_battle_mountain_gate` | battle | 80 | 0 | 5.7 | 91.3 | 9% | 7% | 1.8 |
+| 교세 순찰 `s6_battle_patrol` | battle | 141 | 0 | 3.8 | 94.6 | 3% | 2% | 2.2 |
+| 교세 수레 길 `s6_battle_tax_cart` | battle | 168 | 0 | 4.0 | 94.5 | 5% | 3% | 1.8 |
+| 마을을 벌주러 `s6_battle_village_raid` | battle | 205 | 0 | 5.2 | 92.9 | 7% | 4% | 2.3 |
+| 벽을 넘는 자들 `s6_battle_wall_climb` | battle | 93 | 0 | 5.8 | 91.8 | 14% | 9% | 2.3 |
+| 첫 토벌 `s6_elite_black_wind_captain` | elite | 68 | 0 | 8.2 | 93.5 | 11% | 18% | 3.3 |
+| 혈위대 이백 `s6_elite_guard_two_hundred` | elite | 204 | 0 | 5.6 | 93.1 | 8% | 7% | 2.8 |
+| 보름의 연무장 `s6_boss_full_moon` | boss | 276 | **19 (7%)** | 14.0 | 97.4 | 48% | 70% | 4.3 |
+| 흑풍대 잔당 `s7_battle_black_wind_remnant` | battle | 213 | 0 | 5.5 | 93.5 | 12% | 8% | 1.9 |
+| 수실을 떼지 않은 자들 `s7_battle_holdouts` | battle | 156 | 0 | 5.3 | 93.4 | 10% | 7% | 2.0 |
+| 진무관 초소 `s7_battle_jinmu_watch` | battle | 141 | 0 | 4.9 | 95.0 | 7% | 4% | 1.9 |
+| 낙안봉 골짜기 `s7_battle_nakan_valley` | battle | 162 | **3 (2%)** | 6.5 | 89.3 | 8% | 7% | 2.5 |
+| 분타 외곽 초소 `s7_battle_outpost` | battle | 177 | 0 | 5.4 | 91.8 | 6% | 3% | 1.7 |
+| 보급 수레 호위 `s7_battle_supply_cart` | battle | 139 | 0 | 4.4 | 97.5 | 7% | 4% | 1.6 |
+| 탑림의 혈교도 `s7_battle_tower_cultists` | battle | 112 | 0 | 6.1 | 92.0 | 11% | 7% | 2.2 |
+| 분타의 정예 `s7_elite_branch_guard` | elite | 107 | **1 (1%)** | 7.0 | 90.3 | 15% | 12% | 2.7 |
+| 탑림의 독수마군 `s7_elite_poison_hand` | elite | 87 | 0 | 8.9 | 94.9 | 29% | 17% | 3.4 |
+| 혈마삼재진 `s7_elite_three_talents` | elite | 107 | 0 | 7.9 | 95.0 | 20% | 9% | 3.9 |
+| 낙안봉 `s7_boss_blood_hand` | boss | 253 | **18 (7%)** | 21.8 | 99.8 | 51% | 44% | 4.8 |
+| 화살 비 `s8_battle_arrow_rain` | battle | 111 | 0 | 6.4 | 92.7 | 18% | 10% | 1.2 |
+| 여덟째 굽이 `s8_battle_eighth_turn` | battle | 48 | 0 | 7.3 | 90.7 | 13% | 6% | 0.6 |
+| 첫 굽이의 물결 `s8_battle_first_wave` | battle | 154 | 0 | 5.1 | 99.3 | 13% | 9% | 2.0 |
+| 호법의 굽이 `s8_battle_guardians` | battle | 75 | 0 | 5.1 | 91.2 | 5% | 3% | 1.0 |
+| 태극검진의 왼편 `s8_battle_taiji` | battle | 148 | 0 | 4.3 | 93.2 | 6% | 3% | 1.0 |
+| 금강진의 오른편 `s8_battle_vajra` | battle | 163 | 0 | 4.3 | 97.9 | 6% | 5% | 1.1 |
+| 장로와 궁수 `s8_elite_elder_archers` | elite | 76 | 0 | 8.3 | 95.7 | 14% | 5% | 2.5 |
+| 여섯째 굽이의 장로 `s8_elite_elder_descends` | elite | 117 | 0 | 6.4 | 100.3 | 16% | 7% | 2.9 |
+| 호법 셋의 진 `s8_elite_guardian_trio` | elite | 92 | 0 | 6.8 | 96.9 | 12% | 7% | 1.9 |
+| 혈전 `s8_boss_blood_hall` | boss | 235 | **11 (5%)** | 19.3 | 102.5 | 63% | 92% | 5.4 |
+| 유리 탑의 잔해 `s9_battle_glass_tower` | battle | 51 | 0 | 8.5 | 105.9 | 22% | 10% | 1.9 |
+| 거꾸로 매달린 숲 `s9_battle_hanging_forest` | battle | 28 | 0 | 6.1 | 105.7 | 8% | 5% | 0.6 |
+| 불비늘 삼두견 `s9_battle_hounds` | battle | 188 | 0 | 4.0 | 103.0 | 11% | 6% | 1.4 |
+| 일곱째 조각 `s9_battle_seventh_fragment` | battle | 17 | 0 | 4.9 | 105.5 | 23% | 3% | 1.8 |
+| 그림자 망령 `s9_battle_wraiths` | battle | 204 | **9 (4%)** | 9.5 | 103.3 | 33% | 32% | 3.2 |
+| 뼈 거인 `s9_elite_bone_giant` | elite | 89 | 0 | 6.1 | 105.4 | 9% | 10% | 1.0 |
+| 굶주린 무리 `s9_elite_hungry_pack` | elite | 95 | 0 | 5.4 | 105.4 | 19% | 7% | 1.3 |
+| 틈의 심장 `s9_boss_mordecai` | boss | 215 | **34 (16%)** | 15.0 | 99.8 | 31% | 39% | 0.8 |
 
