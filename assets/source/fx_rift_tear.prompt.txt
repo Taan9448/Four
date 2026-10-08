@@ -1,0 +1,17 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. Never use magenta, pink or purple in the effect.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art effect: a jagged crack of void black (#0b0b10) whose torn edges glow in 2-3 steps of dark red, red and orange (#5a1020, #a02634, #ff3b3b, #ff8a5c); a few single-block embers and dark shards; no white core, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Frames:
+Cell 1: a single hairline crack appears in empty air, like glass under stress: a thin jagged line of pure void black (#0b0b10) with a faint deep red rim
+Cell 2: the crack runs outward in both directions and branches into two or three smaller jagged forks; tiny red embers leak from its edges
+Cell 3: the crack splits open into a narrow torn fissure of absolute void black, its torn edges glowing hot red to orange, a few sharp shards of the surrounding air peeling away and floating
+Cell 4: the fissure at its widest, edges blazing red-orange, a short burst of red light and sparks shooting out of the void, the shards spinning away
+Cell 5: the burst fades; the fissure stays open, its red edges pulsing dimmer, sparks drifting down
+Cell 6: the fissure narrows into a still, jagged black scar with a thin dull-red rim, a few last embers
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
