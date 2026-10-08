@@ -194,5 +194,59 @@
    }
   ],
   "flavor": "사람의 형상을 한 그림자. 스치고 지나간 자리의 풀은 순식간에 말라 재가 된다. 장력은 그냥 통과한다."
- }
+ },
+{
+  "id": "test_ember",
+  "name": "시험용 불티",
+  "maxHp": 60,
+  "sprite": null,
+  "pattern": "cycle",
+  "weak": [
+    "ice"
+  ],
+  "resist": [
+    "fire"
+  ],
+  "moves": [
+    {
+      "id": "spark",
+      "name": "불티",
+      "intent": "attack",
+      "targeting": "haun",
+      "effects": [
+        {
+          "op": "damage",
+          "amount": 4,
+          "element": "fire"
+        }
+      ]
+    }
+  ]
+},
+{
+  "id": "test_ember_boss",
+  "name": "시험용 불의 왕",
+  "maxHp": 200,
+  "sprite": null,
+  "tier": "boss",
+  "pattern": "cycle",
+  "weak": [
+    "ice"
+  ],
+  "moves": [
+    {
+      "id": "spark",
+      "name": "불티",
+      "intent": "attack",
+      "targeting": "haun",
+      "effects": [
+        {
+          "op": "damage",
+          "amount": 4,
+          "element": "fire"
+        }
+      ]
+    }
+  ]
+}
 ]

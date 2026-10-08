@@ -3,6 +3,9 @@ import type { GameData } from './data';
 import type { Effect, UpgradeSkill } from './schema';
 import { resolveCard, type CardInstance } from './state';
 
+/** 속성 이름(카드 문구·의도·약점 표시) */
+export const ELEMENT_LABEL: Record<string, string> = { fire: '화염', ice: '냉기' };
+
 const TARGET_LABEL: Record<string, string> = {
   self: '자신',
   ally: '아군 1명',
@@ -29,8 +32,13 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
   const pre = condText(data, e);
   const times = e.times && e.times > 1 ? ` ×${e.times}` : '';
   switch (e.op) {
-    case 'damage':
-      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}에게 ` : ''}피해 ${n}${times}`;
+    case 'damage': {
+      // 속성 피해: "화염 피해 9(화상 1)" — 실리는 상태는 balance.elements
+      const el = e.element ? data.balance.elements[e.element] : undefined;
+      const elName = e.element ? ELEMENT_LABEL[e.element] : '';
+      const rider = el ? `(${data.statuses.get(el.status)?.name ?? el.status} ${el.stacks})` : '';
+      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}에게 ` : ''}${elName ? `${elName} ` : ''}피해 ${n}${times}${rider}`;
+    }
     case 'block':
       return `${pre}${tgt && tgt !== '자신' ? `${tgt}에게 ` : ''}방어 ${n}`;
     case 'heal':

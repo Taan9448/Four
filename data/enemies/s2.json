@@ -2,26 +2,52 @@
   {
     "id": "fire_spirit",
     "name": "불의 정령",
-    "maxHp": 26,
+    "maxHp": 30,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#f2a03a",
     "hitFx": "fx_hit_fire",
     "pattern": "cycle",
-    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 2}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 4, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7}]}],
-    "flavor": "협곡의 화로에서 불길 한 덩이가 떨어져 나와 사람의 형상으로 일어섰다. 화로가 꺼지지 않는 한 불씨는 다시 일어선다."
+    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 2, "element": "fire"}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 8, "element": "fire"}]}],
+    "flavor": "협곡의 화로에서 불길 한 덩이가 떨어져 나와 사람의 형상으로 일어섰다. 화로가 꺼지지 않는 한 불씨는 다시 일어선다.",
+    "weak": ["ice"],
+    "resist": ["fire"]
+  },
+  {
+    "id": "collared_wolf",
+    "name": "목줄 찬 그림자늑대",
+    "maxHp": 32,
+    "sprite": "wolf",
+    "silhouette": "beast",
+    "color": "#2a2630",
+    "hitFx": "fx_claw",
+    "traits": [{"status": "incorporeal", "stacks": 1}],
+    "pattern": "random",
+    "moves": [{"id": "bite", "name": "물어뜯기", "intent": "attack", "weight": 3, "effects": [{"op": "damage", "amount": 8}]}, {"id": "leap", "name": "공중으로 뛰어오른다", "intent": "attack", "targeting": "lowest_hp", "weight": 1, "effects": [{"op": "damage", "amount": 11}]}, {"id": "howl", "name": "뼈를 울리는 으르렁거림", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 4, "target": "self"}]}, {"id": "hot_collar", "name": "달군 목줄 끌기", "intent": "attack", "targeting": "random", "weight": 1, "effects": [{"op": "damage", "amount": 6, "element": "fire"}]}],
+    "flavor": "이그니스의 감시대가 달군 쇠 목줄을 채운 그림자늑대. 목줄이 닿은 자리마다 털 대신 연기가 탄다."
+  },
+  {
+    "id": "ash_armor",
+    "name": "재 묻은 빈 갑옷",
+    "maxHp": 34,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#2e2e38",
+    "pattern": "cycle",
+    "moves": [{"id": "thrust", "name": "창 찌르기", "intent": "attack", "effects": [{"op": "damage", "amount": 9}]}, {"id": "thrust2", "name": "같은 박자의 창", "intent": "attack", "effects": [{"op": "damage", "amount": 9}]}, {"id": "fill_rank", "name": "빈자리를 메운다", "intent": "defend", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}]}, {"id": "ember_thrust", "name": "불씨 찌르기", "intent": "attack", "targeting": "random", "weight": 1, "effects": [{"op": "damage", "amount": 6, "element": "fire"}]}],
+    "flavor": "화로 곁을 지키는 빈 갑옷. 갑옷 틈마다 재가 쌓였고, 창끝은 늘 불씨로 달아 있다."
   },
   {
     "id": "chain_overseer",
     "name": "사슬 감독관",
-    "maxHp": 65,
+    "maxHp": 80,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#5a4442",
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "shackle", "name": "사슬 채우기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies"}]}, {"id": "overseer_spear", "name": "감독관의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 12}]}, {"id": "call_armor", "name": "감시대를 부른다", "intent": "buff", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}],
+    "moves": [{"id": "shackle", "name": "사슬 채우기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies", "element": "fire"}]}, {"id": "overseer_spear", "name": "감독관의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 14}]}, {"id": "call_armor", "name": "감시대를 부른다", "intent": "buff", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}],
     "flavor": "다른 빈 갑옷보다 머리 하나 큰 갑옷. 손에 쥔 굵은 사슬이 쇠기둥을 지나 큰 화로까지 거미줄처럼 이어져 있다. 사슬을 하나 끊으면 큰 화로가 알아챈다."
   },
   {
@@ -35,7 +61,9 @@
     "hitFx": "fx_hit_fire",
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "flame_hand", "name": "불길의 손", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 23}]}, {"id": "canyon_fire", "name": "협곡의 불은 내 것이다", "intent": "special", "effects": [{"op": "gain_mana", "amount": -5}, {"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "flame_whip", "name": "불길의 채찍", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 13}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "melt", "name": "벨칸의 쇠를 녹이다", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "weak", "stacks": 2}]}],
-    "flavor": "사천왕 화염군주. 사람 세 배 키의 흰 불길에 검은 용암이 핏줄처럼 흐르고, 얼굴 대신 가장 뜨거운 흰 불 구멍 두 개가 뚫려 있다. 이그니스는 마을을 불태우지 않았다. 대신 대장장이들을 사슬로 묶었다."
+    "moves": [{"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies", "element": "fire"}]}, {"id": "flame_hand", "name": "불길의 손", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 23, "element": "fire"}]}, {"id": "canyon_fire", "name": "협곡의 불은 내 것이다", "intent": "special", "effects": [{"op": "gain_mana", "amount": -5}, {"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "flame_whip", "name": "불길의 채찍", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 13, "element": "fire"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "melt", "name": "벨칸의 쇠를 녹이다", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 8, "element": "fire"}, {"op": "apply_status", "status": "weak", "stacks": 2}]}],
+    "flavor": "사천왕 화염군주. 사람 세 배 키의 흰 불길에 검은 용암이 핏줄처럼 흐르고, 얼굴 대신 가장 뜨거운 흰 불 구멍 두 개가 뚫려 있다. 이그니스는 마을을 불태우지 않았다. 대신 대장장이들을 사슬로 묶었다.",
+    "weak": ["ice"],
+    "resist": ["fire"]
   }
 ]

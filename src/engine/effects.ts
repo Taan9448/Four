@@ -1,6 +1,6 @@
 // 효과 해석기. 카드·적 행동·지원 규칙의 효과는 모두 여기서 기본 동작의 조합으로만 해석된다.
 // 카드별 개별 코드는 두지 않는다. 기본 동작 목록은 docs/CARD_EFFECTS.md 참고.
-import { BATTLE_OPS, type Condition, type Effect, type SupportRule } from './schema';
+import { BATTLE_OPS, type Condition, type Effect, type Element, type SupportRule } from './schema';
 import {
   alive,
   findCombatant,
@@ -145,6 +145,17 @@ export function addStatus(state: BattleState, target: Combatant, status: string,
   else target.statuses[status] = next;
   state.events.push({ type: 'status', targetUid: target.uid, status, stacks });
   if (stacks > 0) state.log.push(`${target.name}: ${statusName(state, status)} ${stacks > 0 ? '+' : ''}${stacks}`);
+  // 냉기: 임계치(보스는 더 높다)에 이르면 얼어붙는다 — 냉기를 비우고 빙결 1
+  if (stacks > 0 && state.data.statuses.get(status)?.special === 'chill') {
+    const el = state.data.balance.elements;
+    const boss = target.side === 'enemy' && state.data.enemies.get(target.defId)?.tier === 'boss';
+    if ((target.statuses[status] ?? 0) >= (boss ? el.bossFreezeAt : el.freezeAt)) {
+      delete target.statuses[status];
+      state.events.push({ type: 'status', targetUid: target.uid, status, stacks: 0 });
+      state.log.push(`${target.name}이(가) 얼어붙었다.`);
+      addStatus(state, target, el.freezeStatus, 1);
+    }
+  }
   // 매듭: 결 노출이 임계치에 이르면 매듭이 드러난다
   if (
     status === 'grain' &&
@@ -200,6 +211,7 @@ export function dealDamage(
   target: Combatant,
   base: number,
   ctx: EffectContext,
+  element?: Element,
 ): void {
   if (target.downed) return;
   const bal = state.data.balance;
@@ -231,6 +243,19 @@ export function dealDamage(
     if (target.statuses.grain <= 0) delete target.statuses.grain;
     dmg *= 1 + bal.grain.damageBonus;
   }
+  // 속성: 약점이면 더, 내성이면 덜 들어간다
+  const affinity = elementAffinity(state, target, element);
+  if (affinity === 'weak') dmg *= bal.elements.weakMultiplier;
+  else if (affinity === 'resist') dmg *= bal.elements.resistMultiplier;
+  // 치명타: 아군 카드의 피해 한 번마다 굴린다(미리보기 복제·수치 시험에서는 굴리지 않는다)
+  let crit = false;
+  if (source?.side === 'party' && card && !state.noCrit) {
+    const chance = critChance(state, source);
+    if (chance > 0 && state.rng.next() < chance) {
+      crit = true;
+      dmg *= bal.crit.multiplier;
+    }
+  }
   dmg *= statusModifier(state, target, 'damageTakenMul');
   dmg = Math.max(0, Math.floor(dmg));
 
@@ -250,8 +275,23 @@ export function dealDamage(
   }
   const hpLoss = dmg - blocked;
   target.hp = Math.max(0, target.hp - hpLoss);
-  state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: hpLoss, blocked, grain, absorbed: false });
-  state.log.push(`${source?.name ?? '?'} → ${target.name} 피해 ${hpLoss}${blocked ? ` (방어 ${blocked})` : ''}${grain ? ' [결]' : ''}`);
+  state.events.push({
+    type: 'damage',
+    sourceUid: source?.uid ?? null,
+    targetUid: target.uid,
+    amount: hpLoss,
+    blocked,
+    grain,
+    absorbed: false,
+    crit,
+    element,
+    weak: affinity === 'weak',
+    resisted: affinity === 'resist',
+  });
+  state.log.push(
+    `${source?.name ?? '?'} → ${target.name} 피해 ${hpLoss}${blocked ? ` (방어 ${blocked})` : ''}${grain ? ' [결]' : ''}${crit ? ' [치명]' : ''}${affinity === 'weak' ? ' [약점]' : affinity === 'resist' ? ' [내성]' : ''}`,
+  );
+  if (hpLoss > 0 || blocked > 0) applyElement(state, target, element);
   if (target.hp <= 0) {
     knockOut(state, target);
     // 벤 짐승의 기운이 금으로 빨려 올라간다
@@ -263,6 +303,37 @@ export function dealDamage(
   if (target.side === 'enemy' && !target.downed) {
     fireSupport(state, 'enemyDamaged', { triggerUid: target.uid });
   }
+}
+
+/** 대상의 속성 상성: 적 정의의 weak·resist(아군은 없음) */
+export function elementAffinity(state: BattleState, target: Combatant, element: Element | undefined): 'weak' | 'resist' | null {
+  if (!element || target.side !== 'enemy') return null;
+  const def = state.data.enemies.get(target.defId);
+  if (def?.resist.includes(element)) return 'resist';
+  if (def?.weak.includes(element)) return 'weak';
+  return null;
+}
+
+/** 치명타 확률: 캐릭터의 crit, 없으면 balance.crit.chance */
+export function critChance(state: BattleState, c: Combatant): number {
+  if (c.side !== 'party') return 0;
+  return state.data.characters.get(c.defId)?.crit ?? state.data.balance.crit.chance;
+}
+
+/**
+ * 속성 상태 붙이기: 화염 → 화상, 냉기 → 냉기(쌓이면 빙결). 내성이 있으면 붙지 않는다.
+ * 상극: 화염은 냉기를 녹이고, 냉기는 화상을 끈다
+ */
+function applyElement(state: BattleState, target: Combatant, element: Element | undefined): void {
+  if (!element || target.downed || elementAffinity(state, target, element) === 'resist') return;
+  const el = state.data.balance.elements;
+  const opposite = el[element === 'fire' ? 'ice' : 'fire'].status;
+  if ((target.statuses[opposite] ?? 0) > 0) {
+    delete target.statuses[opposite];
+    state.events.push({ type: 'status', targetUid: target.uid, status: opposite, stacks: 0 });
+    state.log.push(`${target.name}: ${element === 'fire' ? '냉기가 녹았다' : '불이 꺼졌다'}.`);
+  }
+  addStatus(state, target, el[element].status, el[element].stacks);
 }
 
 export function loseHp(state: BattleState, target: Combatant, amount: number): void {
@@ -451,7 +522,7 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       case 'damage':
         for (let i = 0; i < (effect.times ?? 1); i++) {
           if (target.downed || state.result) break;
-          dealDamage(state, ctx.source, target, amount, ctx);
+          dealDamage(state, ctx.source, target, amount, ctx, effect.element);
         }
         break;
       case 'block':

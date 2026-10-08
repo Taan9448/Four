@@ -76,10 +76,16 @@ export const Scale = z
   .strict();
 export type Scale = z.infer<typeof Scale>;
 
+/** 속성(2026-10-08): 피해에 실려 상태를 붙이고(화염 → 화상, 냉기 → 냉기), 적의 약점·내성에 따라 피해가 달라진다 */
+export const Element = z.enum(['fire', 'ice']);
+export type Element = z.infer<typeof Element>;
+
 export const Effect = z
   .object({
     op: z.enum([...BATTLE_OPS, ...RUN_OPS]),
     amount: z.number().optional(),
+    /** damage: 이 피해의 속성(balance.elements) */
+    element: Element.optional(),
     ratio: z.number().optional(),
     times: z.number().int().positive().optional(),
     target: Target.optional(),
@@ -224,7 +230,7 @@ export const StatusDef = z
       .default({}),
     /** 엔진이 직접 처리하는 메커니즘(카드 개별 코드가 아님) */
     special: z
-      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam'])
+      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'chill'])
       .optional(),
   })
   .strict();
@@ -262,6 +268,9 @@ export const EnemyDef = z
     deathEffects: z.array(Effect).default([]),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
+    /** 속성 약점(받는 피해 × elements.weakMultiplier) · 내성(× resistMultiplier, 그 속성 상태가 붙지 않는다) */
+    weak: z.array(Element).default([]),
+    resist: z.array(Element).default([]),
     pattern: z.enum(['cycle', 'random']),
     moves: z.array(MoveDef).min(1),
     /**
@@ -299,6 +308,8 @@ export const CharacterDef = z
     outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
     /** 전투 화면의 스프라이트 배율(그림마다 프레임 안 키가 달라 동료끼리 키를 맞출 때). 기본 1 */
     scale: z.number().positive().default(1),
+    /** 치명타 확률(0~1). 없으면 balance.crit.chance */
+    crit: z.number().min(0).max(1).optional(),
     joinsAt: z.string(),
     description: z.string(),
   })
@@ -344,6 +355,20 @@ export const Balance = z
       .strict(),
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),
     incorporealMultiplier: z.number(),
+    /** 속성: 실리는 상태와 스택, 약점·내성 배율, 냉기가 몇 스택이면 얼어붙는가(보스는 bossFreezeAt) */
+    elements: z
+      .object({
+        fire: z.object({ status: z.string(), stacks: z.number().int().positive() }).strict(),
+        ice: z.object({ status: z.string(), stacks: z.number().int().positive() }).strict(),
+        weakMultiplier: z.number(),
+        resistMultiplier: z.number(),
+        freezeAt: z.number().int().positive(),
+        bossFreezeAt: z.number().int().positive(),
+        freezeStatus: z.string(),
+      })
+      .strict(),
+    /** 치명타: 아군 카드의 피해 한 번마다 굴린다(캐릭터의 crit이 확률을 덮어쓴다) */
+    crit: z.object({ chance: z.number().min(0).max(1), multiplier: z.number() }).strict(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
     /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
     upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),

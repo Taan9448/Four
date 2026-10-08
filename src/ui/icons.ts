@@ -31,6 +31,26 @@ export function statusChip(data: GameData, id: string, stacks: number): HTMLElem
   return el;
 }
 
+/** 속성 표시: 화염 炎(붉은 주황) · 냉기 冷(하늘색) */
+const ELEMENT_GLYPH: Record<string, string> = { fire: '炎', ice: '冷' };
+const ELEMENT_NAME: Record<string, string> = { fire: '화염', ice: '냉기' };
+export function elementMark(element: string): HTMLElement {
+  return h('span', { class: `el-mark el-${element}`, title: ELEMENT_NAME[element] ?? element }, ELEMENT_GLYPH[element] ?? '?');
+}
+
+/** 적 정의의 약점·내성 이름표: "약점 냉기" / "내성 화염" */
+export function affinityChip(data: GameData, kind: 'weak' | 'resist', element: string): HTMLElement {
+  const el = data.balance.elements;
+  const name = ELEMENT_NAME[element] ?? element;
+  const body =
+    kind === 'weak'
+      ? `${name} 피해를 ${Math.round((el.weakMultiplier - 1) * 100)}% 더 받는다.`
+      : `${name} 피해를 ${Math.round((1 - el.resistMultiplier) * 100)}% 덜 받고, ${name} 상태가 붙지 않는다.`;
+  const chip = h('span', { class: `status-chip chip-${kind}` }, elementMark(element), h('span', { class: 'st-name' }, kind === 'weak' ? `약점 ${name}` : `내성 ${name}`));
+  Object.entries(tipAttrs(kind === 'weak' ? `약점 — ${name}` : `내성 — ${name}`, body, kind === 'weak' ? 'debuff' : 'buff')).forEach(([k, v]) => v && chip.setAttribute(k, v));
+  return chip;
+}
+
 export function intentIcon(kind: string): HTMLElement {
   return iconEl('icons_intent', INTENT_FRAME[kind], INTENT_GLYPH[kind] ?? '?', `intent-icon intent-${kind}`);
 }

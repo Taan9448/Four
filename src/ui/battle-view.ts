@@ -1,6 +1,7 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
-import { canPlay, describeIntent, endTurn, incomingDamage, needsTarget, playCard, previewCard, type CardPreviewHit, type IncomingView } from '../engine/battle';
-import { hasSkipTurn } from '../engine/effects';
+import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, previewCard, type CardPreviewHit, type IncomingView } from '../engine/battle';
+import { critChance, hasSkipTurn } from '../engine/effects';
+import { ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, shake, sleep, toast } from '../render/fx';
@@ -12,10 +13,11 @@ import { SpritePlayer } from '../render/sprite-player';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { INTENT_LABEL, intentIcon, statusChip } from './icons';
+import { affinityChip, elementMark, INTENT_LABEL, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
+import { runTour, tourSeen } from './tour';
 
 export interface BattleContext {
   title: string;
@@ -77,8 +79,46 @@ export class BattleView {
     this.root = this.build();
     this.refresh();
     if (ctx.bonusText) setTimeout(() => toast(this.toasts, ctx.bonusText!, 'support'), 300);
+    this.startTours();
     // 시작 시 남은 이벤트(지원 규칙 등)는 기록만
     void this.animate(this.state.events.splice(0));
+  }
+
+  /**
+   * 처음 하는 전투에서 화면 요소를 하나씩 짚는 안내(투어). 기본 안내를 본 뒤, 속성 약점·내성이 있는 적을 처음 만나면 속성 안내.
+   * 브라우저에 기억해 한 번씩만(설정의 '안내 다시 보기'로 초기화)
+   */
+  private startTours(): void {
+    const bal = this.data.balance;
+    const hasAffinity = this.state.enemies.some((e) => {
+      const d = this.data.enemies.get(e.defId);
+      return !!d && (d.weak.length > 0 || d.resist.length > 0);
+    });
+    const elements = () => {
+      if (!hasAffinity) return;
+      runTour(
+        [
+          { target: '.unit-enemy .chip-weak, .unit-enemy .chip-resist', title: '속성 — 약점과 내성', text: `적 이름 아래 이름표. 약점 속성의 공격은 ${Math.round((bal.elements.weakMultiplier - 1) * 100)}% 더 들어가고, 내성 속성은 ${Math.round((1 - bal.elements.resistMultiplier) * 100)}% 덜 들어가며 상태도 붙지 않는다.` },
+          { target: '.unit-enemy .intent', title: '속성 공격', text: `의도 옆 炎은 화염, 冷은 냉기 공격.\n화염에 맞으면 화상(차례 시작마다 피해), 냉기에 맞으면 냉기가 쌓이고 ${bal.elements.freezeAt}이 되면(보스는 ${bal.elements.bossFreezeAt}) 얼어붙어 한 차례 쉰다.` },
+          { target: '.hand', title: '상극과 치명타', text: '화염은 냉기를 녹이고, 냉기는 화상을 끈다. 불의 정령에게는 냉기 카드(엘리아의 서리 바늘·서리바람)를.\n아군의 공격은 가끔 치명타(1.5배)가 터진다. 확률은 피해 미리보기에 적힌다.' },
+        ],
+        { id: 'battle-elements', once: true },
+      );
+    };
+    if (tourSeen('battle-basics')) return elements();
+    runTour(
+      [
+        { target: '.hand', title: '손패', text: '카드를 눌러 쓴다. 카드 왼쪽 위의 금빛 점은 내공, 푸른 마름모는 마나 비용. 대상을 고르는 카드는 누른 뒤 적을 누른다.' },
+        { target: '.orb.neigong', title: '내공', text: '매 턴 다시 차는 기본 비용.' },
+        { target: '.orb.mana', title: '마나', text: '세계마다 차는 양이 다른 비용. 엘하임은 넉넉하고, 무림에서는 거의 차지 않는다.' },
+        { target: '.unit-enemy .intent', title: '적의 의도', text: '적이 다음 차례에 할 행동. 피해 숫자와 노리는 아군이 보인다.' },
+        { target: '.incoming', title: '받을 피해', text: '이대로 턴을 끝내면 이 아군이 받을 피해. 방어 카드를 쓰면 바로 줄어든다. 붉게 맥박치면 쓰러질 피해.' },
+        { target: '.hand .card', title: '줄 피해 미리보기', text: '카드에 마우스를 올리거나 고르면, 맞을 적 위에 들어갈 피해가 뜬다. 힘·약화·취약·방어·약점이 모두 계산된 값이다.' },
+        { target: '.b-rift', title: '균열', text: '내공과 마나를 함께 쓰는 융합 카드를 쓰면 쌓인다. 너무 쌓이면 틈의 잔향이 덱에 섞이고, 가득 차면 폭주한다.' },
+        { target: '.btn-endturn', title: '턴 종료', text: '쓸 카드를 다 썼으면 턴을 끝낸다(단축키 E). 그다음 적이 움직인다.' },
+      ],
+      { id: 'battle-basics', once: true, onDone: elements },
+    );
   }
 
   // ───────────────────────── 구성 ─────────────────────────
@@ -196,6 +236,12 @@ export class BattleView {
       u.el.classList.toggle('down', c.downed);
       clear(u.statuses);
       for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusChip(this.data, id, n));
+      // 적의 속성 약점·내성(정의에서 온다, 상태가 아님)
+      const edef = c.side === 'enemy' ? this.data.enemies.get(c.defId) : undefined;
+      if (edef && !c.downed) {
+        for (const el of edef.weak) u.statuses.appendChild(affinityChip(this.data, 'weak', el));
+        for (const el of edef.resist) u.statuses.appendChild(affinityChip(this.data, 'resist', el));
+      }
       clear(u.intent);
       if (c.side === 'enemy') this.renderIntent(u, c as EnemyState);
       else this.renderIncoming(u, c.downed ? undefined : incoming.get(c.uid));
@@ -287,9 +333,10 @@ export class BattleView {
     const dmg = d ? `${d.perHit}${d.times > 1 ? `×${d.times}` : ''}` : '';
     const skip = hasSkipTurn(s, enemy);
     u.intent.classList.toggle('skipped', skip);
-    u.intent.append(intentIcon(view.intent.kind), h('span', {}, view.intent.name), dmg ? h('b', {}, dmg) : '', d?.all ? h('span', { class: 'intent-target' }, '전체') : target ? h('span', { class: 'intent-target' }, `→ ${target.name}`) : '');
+    u.intent.append(intentIcon(view.intent.kind), h('span', {}, view.intent.name), dmg ? h('b', {}, dmg) : '', d?.element ? elementMark(d.element) : '', d?.all ? h('span', { class: 'intent-target' }, '전체') : target ? h('span', { class: 'intent-target' }, `→ ${target.name}`) : '');
     const body = [
       `${INTENT_LABEL[view.intent.kind] ?? ''}${d ? ` · 1회 ${d.perHit}${d.times > 1 ? ` × ${d.times}회` : ''}${d.all ? ' · 아군 전체' : ''}` : ''}`,
+      d?.element ? `${ELEMENT_LABEL[d.element]} 공격: 맞으면 ${this.data.statuses.get(this.data.balance.elements[d.element].status)?.name} ${this.data.balance.elements[d.element].stacks}` : '',
       target && !d?.all ? `노리는 대상: ${target.name}` : '',
       skip ? '움직이지 못해 이번 차례에는 행동하지 않는다.' : '',
     ].filter(Boolean);
@@ -328,6 +375,9 @@ export class BattleView {
     const i = this.selected ?? this.hovered;
     if (i === null || this.busy || s.result || !s.hand[i]) return;
     const need = needsTarget(s, s.hand[i]);
+    // 치명타는 미리보기에 넣지 않고(운을 미리 보이지 않게) 확률만 적는다
+    const owner = cardOwner(s, s.hand[i]);
+    const crit = owner ? critChance(s, owner) : 0;
     const show = (uid: string, v: CardPreviewHit | undefined) => {
       const u = this.units.get(uid);
       if (!u || !v || u.c.downed) return;
@@ -337,6 +387,7 @@ export class BattleView {
         v.hits > 1 ? h('small', {}, `${v.hits}회`) : '',
         v.blocked > 0 ? h('small', { class: 'blk' }, `방어 ${v.blocked}`) : '',
         v.kills ? h('small', { class: 'ko' }, '처치') : '',
+        crit > 0 && v.hpLoss > 0 && u.c.side === 'enemy' ? h('small', { class: 'cr' }, `치명 ${Math.round(crit * 100)}%`) : '',
       );
     };
     if (need === 'enemy') {
@@ -426,9 +477,12 @@ export class BattleView {
           if (!u) break;
           if (ev.absorbed) floatOver(this.fxLayer, u.el, `흡수 +${ev.amount}`, 'absorb');
           else {
-            floatOver(this.fxLayer, u.el, ev.grain ? `${ev.amount}!` : String(ev.amount), ev.grain ? 'crit' : 'damage');
+            // 치명타는 금빛 큰 숫자, 결은 푸른 숫자. 약점·내성은 작은 글자를 하나 더
+            floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : 'damage');
+            if (ev.weak) floatOver(this.fxLayer, u.el, '약점!', 'weak');
+            else if (ev.resisted) floatOver(this.fxLayer, u.el, '내성', 'resist');
             if (ev.blocked) floatOver(this.fxLayer, u.el, `막음 ${ev.blocked}`, 'block');
-            shake(u.el, ev.amount >= 15);
+            shake(u.el, ev.amount >= 15 || !!ev.crit);
             flash(u.el, ev.grain ? 'blue' : 'white');
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);

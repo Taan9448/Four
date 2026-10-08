@@ -9,8 +9,8 @@
     "pool": "starter",
     "cost": {"neigong": 0, "mana": 2},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 9}],
-    "upgrade": {"growth": [3], "plus4": {"name": "타오르는 낙인", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "흩어지는 불티", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies"}]}},
+    "effects": [{"op": "damage", "amount": 9, "element": "fire"}],
+    "upgrade": {"growth": [3], "plus4": {"name": "타오르는 낙인", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "흩어지는 불티", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies", "element": "fire"}]}},
     "flavor": "지팡이 끝 푸른 돌로 빛 알갱이가 빨려 들더니, 불덩이가 되어 짐승 하나를 집어삼켰다."
   },
   {
@@ -75,8 +75,8 @@
     "pool": "reward",
     "cost": {"neigong": 0, "mana": 4},
     "target": "all_enemies",
-    "effects": [{"op": "damage", "amount": 8}],
-    "upgrade": {"growth": [2], "plus4": {"name": "불의 장막", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "두 번째 파도", "effects": [{"op": "damage", "amount": 6}]}},
+    "effects": [{"op": "damage", "amount": 8, "element": "fire"}],
+    "upgrade": {"growth": [2], "plus4": {"name": "불의 장막", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "두 번째 파도", "effects": [{"op": "damage", "amount": 6, "element": "fire"}]}},
     "flavor": "촛불이라고 했는데요. 엘리아의 불기둥이 협곡의 벽을 핥고 올라갔다."
   },
   {
@@ -106,6 +106,34 @@
     "effects": [{"op": "gain_mana", "amount": 4}, {"op": "block", "amount": 4, "target": "all_allies"}],
     "upgrade": {"growth": [1, 2], "plus4": {"name": "얼지 않은 마나", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "너의 숲", "removeKeywords": ["exhaust"]}},
     "flavor": "너의 세계가 어디든, 이 씨앗이 자라는 곳이 네 숲이다. 은빛 나무가 얼어붙은 마나를 다시 흐르게 했다."
+  },
+  {
+    "id": "elia_frost_needle",
+    "name": "서리 바늘",
+    "hitFx": "fx_hit_grain",
+    "owner": "elia",
+    "type": "attack",
+    "rarity": "uncommon",
+    "pool": "reward",
+    "cost": {"neigong": 0, "mana": 1},
+    "target": "enemy",
+    "effects": [{"op": "damage", "amount": 3, "times": 2, "element": "ice"}],
+    "upgrade": {"growth": [1], "plus4": {"name": "얼어붙는 끝", "effects": [{"op": "damage", "amount": 3, "element": "ice"}]}, "plus5": {"name": "빠른 영창", "cost": {"neigong": 0, "mana": 0}}},
+    "flavor": "불만 쓰는 줄 알았지? 엘리아가 지팡이를 돌리자 푸른 돌 끝에서 서리가 바늘처럼 뻗었다."
+  },
+  {
+    "id": "elia_frost_wind",
+    "name": "서리바람",
+    "hitFx": "fx_hit_grain",
+    "owner": "elia",
+    "type": "attack",
+    "rarity": "rare",
+    "pool": "reward",
+    "cost": {"neigong": 0, "mana": 3},
+    "target": "all_enemies",
+    "effects": [{"op": "damage", "amount": 5, "element": "ice"}],
+    "upgrade": {"growth": [2], "plus4": {"name": "얼음 막", "effects": [{"op": "block", "amount": 5, "target": "all_allies"}]}, "plus5": {"name": "두 번째 바람", "effects": [{"op": "damage", "amount": 4, "element": "ice"}]}},
+    "flavor": "협곡의 열기 속으로 차가운 바람이 한 줄기 불었다. 불티가 그 자리에서 하얗게 식었다."
   },
   {
     "id": "elia_fog_herb",
@@ -170,7 +198,7 @@
     "target": "enemy",
     "keywords": ["thread", "exhaust"],
     "castLine": {"speaker": "elia", "face": "resolve", "text": "엘하임의 경계는, 엘하임의 실로."},
-    "effects": [{"op": "damage", "amount": 20}],
+    "effects": [{"op": "damage", "amount": 20, "element": "ice"}],
     "upgrade": {"growth": [5], "plus4": {"name": "멈춘 마나", "effects": [{"op": "heal", "amount": 4, "target": "all_allies"}]}, "plus5": {"name": "숨의 온기", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "멈춘 마나는 먹히지 않는다. 엘리아가 숨의 온기로 아르덴의 얼음을 녹이자 은빛 실이 풀려 나왔다."
   },

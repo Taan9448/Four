@@ -85,6 +85,7 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
 function scoreAfterEndTurn(s: BattleState, opts: BotOptions): number {
   if (s.result) return scoreBattle(s, opts);
   const c = cloneBattle(s);
+  c.noCrit = true; // 미리 시험할 때 치명타 운을 엿보지 않는다
   endTurn(c);
   return scoreBattle(c, opts);
 }
@@ -106,6 +107,7 @@ export function playTurn(s: BattleState, opts: BotOptions = DEFAULT_BOT): void {
       const targets = need === 'enemy' ? alive(s.enemies).map((e) => e.uid) : need === 'ally' ? alive(s.party).map((p) => p.uid) : [undefined];
       for (const t of targets) {
         const c = cloneBattle(s);
+        c.noCrit = true;
         if (!playCard(c, i, t).ok) continue;
         const v = scoreAfterEndTurn(c, opts) + PLAY_BIAS;
         if (v > bestV) {
