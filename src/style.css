@@ -931,3 +931,9 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
   .codex-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .codex-items { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* 소리 크기 막대(설정) */
+.setting-volume { flex-wrap: nowrap; }
+.setting-volume > span { flex: 0 0 170px; }
+.setting-volume input[type='range'] { flex: 1 1 auto; min-width: 0; accent-color: #e2b45c; }
+.setting-volume output { width: 2.4em; text-align: right; color: var(--ink-dim); font-variant-numeric: tabular-nums; }

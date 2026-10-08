@@ -1,4 +1,5 @@
 // 이벤트·휴식·여관·스토리 노드의 선택지 화면과 전투 보상 화면.
+import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
 import { applyChoice, applyLevelUpgrade, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
@@ -119,6 +120,7 @@ export interface LootShown {
  */
 function lootLine(data: GameData, run: RunState, shown: LootShown): HTMLElement {
   const wrap = h('div', { class: 'loot' });
+  if (shown.loot.gold > 0) sfx('coin');
   const render = () => {
     const { loot } = shown;
     const items: (HTMLElement | null)[] = [

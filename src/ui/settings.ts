@@ -1,8 +1,9 @@
-// 설정: 전투 속도, 컷인, 화면 흔들림. 브라우저에 저장하고 화면 전체에 바로 적용한다.
+// 설정: 전투 속도, 컷인, 화면 흔들림, 소리 크기. 브라우저에 저장하고 화면 전체에 바로 적용한다.
 import { h } from './dom';
 import { readSettings, writeSettings } from './storage';
 import { resetTours } from './tour';
 import { setShakeScale } from '../render/fx';
+import { setVolumes } from '../render/audio';
 
 export interface Settings {
   /** 전투 연출 대기 시간 배율(1 보통, 작을수록 빠름) */
@@ -11,6 +12,10 @@ export interface Settings {
   cutIn: boolean;
   /** 피격·폭주 때 화면 흔들림 세기(0 끄기 · 0.5 약하게 · 1 보통) */
   shake: number;
+  /** 소리 크기 0~1: 전체 · 배경음악 · 효과음 */
+  master: number;
+  bgm: number;
+  sfx: number;
 }
 
 export const SPEEDS: { value: number; label: string }[] = [
@@ -25,7 +30,9 @@ export const SHAKES: { value: number; label: string }[] = [
   { value: 1, label: '보통' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, shake: 1 };
+const DEFAULTS: Settings = { speed: 1, cutIn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8 };
+
+const volume = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : d);
 
 /** 예전 설정(켜기/끄기)도 읽는다 */
 function readShake(v: unknown): number {
@@ -40,6 +47,9 @@ function load(): Settings {
       speed: SPEEDS.some((s) => s.value === raw.speed) ? raw.speed! : DEFAULTS.speed,
       cutIn: typeof raw.cutIn === 'boolean' ? raw.cutIn : DEFAULTS.cutIn,
       shake: readShake(raw.shake),
+      master: volume(raw.master, DEFAULTS.master),
+      bgm: volume(raw.bgm, DEFAULTS.bgm),
+      sfx: volume(raw.sfx, DEFAULTS.sfx),
     };
   } catch {
     return { ...DEFAULTS };
@@ -48,9 +58,10 @@ function load(): Settings {
 
 export const settings: Settings = load();
 
-/** 화면 전체에 걸리는 설정(흔들림 세기 → 연출 모듈) */
+/** 화면 전체에 걸리는 설정(흔들림 세기 → 연출 모듈, 소리 크기 → 소리 모듈) */
 export function applySettings(): void {
   setShakeScale(settings.shake);
+  setVolumes(settings);
 }
 
 function update(patch: Partial<Settings>): void {
@@ -81,9 +92,33 @@ export function settingsForm(): HTMLElement {
       h('input', { type: 'checkbox', checked: settings[key], onchange: (e: Event) => update({ [key]: (e.target as HTMLInputElement).checked }) }),
       h('span', {}, label, h('small', {}, hint)),
     );
+  const slider = (key: 'master' | 'bgm' | 'sfx', label: string, hint: string) => {
+    const out = h('output', {}, `${Math.round(settings[key] * 100)}`);
+    return h(
+      'label',
+      { class: 'setting-row setting-volume' },
+      h('span', {}, label, h('small', {}, hint)),
+      h('input', {
+        type: 'range',
+        min: 0,
+        max: 100,
+        step: 5,
+        value: Math.round(settings[key] * 100),
+        oninput: (e: Event) => {
+          const v = Number((e.target as HTMLInputElement).value) / 100;
+          out.textContent = String(Math.round(v * 100));
+          update({ [key]: v });
+        },
+      }),
+      out,
+    );
+  };
   return h(
     'div',
     { class: 'settings-form' },
+    slider('master', '소리', '전체 크기(0이면 끔)'),
+    slider('bgm', '배경음악', '장소·전투마다 바뀌는 곡'),
+    slider('sfx', '효과음', '타격·카드·버튼 소리'),
     h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), radios('speed', '전투 속도', SPEEDS)),
     toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
     h('div', { class: 'setting-row' }, h('span', {}, '화면 흔들림', h('small', {}, '피격·폭주 때 흔들리는 세기')), radios('shake', '화면 흔들림', SHAKES)),
