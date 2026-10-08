@@ -16,6 +16,8 @@ export interface Combatant {
   statuses: Record<string, number>;
   /** 아군: 쓰러짐 / 적: 처치됨 */
   downed: boolean;
+  /** 아군 레벨(치명타 확률에 더해진다). 적은 없음 */
+  level?: number;
 }
 
 export interface Intent {
@@ -91,6 +93,8 @@ export interface BattleState {
   flags: string[];
   scar: number;
   uidCounter: number;
+  /** 적 최대 체력 배율(스테이지 enemyHpScale, 변신한 모습에도) */
+  enemyHpScale?: number;
   /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
   noCrit?: boolean;
 }

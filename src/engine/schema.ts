@@ -310,6 +310,8 @@ export const CharacterDef = z
     scale: z.number().positive().default(1),
     /** 치명타 확률(0~1). 없으면 balance.crit.chance */
     crit: z.number().min(0).max(1).optional(),
+    /** 레벨이 오를 때마다 늘어나는 최대 체력(balance.leveling) */
+    hpPerLevel: z.number().int().min(0).default(4),
     joinsAt: z.string(),
     description: z.string(),
   })
@@ -369,6 +371,22 @@ export const Balance = z
       .strict(),
     /** 치명타: 아군 카드의 피해 한 번마다 굴린다(캐릭터의 crit이 확률을 덮어쓴다) */
     crit: z.object({ chance: z.number().min(0).max(1), multiplier: z.number() }).strict(),
+    /**
+     * 레벨(2026-10-08): 이긴 전투마다 동료별 경험치(출전 xp, 쉬는 동료는 restShare 비율).
+     * 레벨마다 최대 체력 +characters[].hpPerLevel(그만큼 회복)·치명타 +critPerLevel, upgradeEvery 레벨마다 그 동료의 카드 1장 강화(고른다).
+     * toNext[i] = 레벨 i+1 → i+2에 필요한 경험치. 동료는 하운 레벨 -1로 합류한다. debugXpPerStage: 중간 스테이지에서 시작할 때 앞 스테이지당 주는 경험치
+     */
+    leveling: z
+      .object({
+        maxLevel: z.number().int().positive(),
+        xp: z.object({ battle: z.number().int(), elite: z.number().int(), boss: z.number().int() }).strict(),
+        restShare: z.number().min(0).max(1),
+        toNext: z.array(z.number().int().positive()),
+        critPerLevel: z.number().min(0),
+        upgradeEvery: z.number().int().positive(),
+        debugXpPerStage: z.number().int().min(0),
+      })
+      .strict(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
     /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
     upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
@@ -385,7 +403,7 @@ export const Balance = z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
         eliteMinFloor: z.number().int(),
-        /** 어느 길로 가도 무작위 전투 없는 노드(사건·휴식·여관)가 이만큼을 넘어 이어지지 않는다(고정 이야기 노드는 세지 않는다) */
+        /** 어느 길로 가도 전투 없는 노드(사건·휴식·여관·이야기)가 이만큼을 넘어 이어지지 않는다(고정 노드끼리 붙은 곳은 예외) */
         maxCalmRun: z.number().int().positive(),
         extraEdgeChance: z.number(),
         scarWeightPerPoint: z.number(),
@@ -406,6 +424,8 @@ export const StageDef = z
     chapters: z.string(),
     world: World,
     floors: z.number().int().positive(),
+    /** 이 스테이지 적의 최대 체력 배율(레벨 성장에 맞춘다, 기본 1) */
+    enemyHpScale: z.number().positive().default(1),
     playable: z.boolean(),
     pinned: z.array(z.object({ floor: z.number().int().positive(), module: z.string() }).strict()).default([]),
     forcedTypes: z.record(z.string(), NodeType).default({}),

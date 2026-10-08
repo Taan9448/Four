@@ -13,6 +13,8 @@ import {
   createRun,
   createRunAt,
   enterNode,
+  gainXp,
+  xpToNext,
   isBattle,
   nextStage,
   rewardOptions,
@@ -21,7 +23,7 @@ import {
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { BattleView } from './battle-view';
-import { choiceView, rewardView } from './choice-view';
+import { choiceView, levelUpView, rewardView } from './choice-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
 import { initDebug, isDebug } from './debug';
@@ -76,7 +78,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
@@ -96,6 +98,13 @@ export class App {
       case 'win':
       case 'lose':
         return this.end(name === 'win');
+      case 'levelup': {
+        // 하운이 3레벨(강화 고르기)까지, 동료 한 명도 한 레벨
+        gainXp(data, run, 'haun', 2 * (xpToNext(data, run.roster[0].level) ?? 0));
+        const mate = run.roster.find((r) => r.id !== 'haun');
+        if (mate) gainXp(data, run, mate.id, xpToNext(data, mate.level) ?? 0);
+        return this.map();
+      }
       case 'deck':
         this.map();
         return openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]);
@@ -208,6 +217,8 @@ export class App {
       if (run.status === 'map' || run.status === 'stage_clear') saveRun(run);
       else clearRun();
     }
+    // 레벨업 소식·고를 강화가 남았으면 먼저(전투 뒤 지도로 가기 전, 보스 뒤에는 스테이지 끝 화면 전에)
+    if (run.levelLog.length || run.pendingUpgrades.length) return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
     if (run.status === 'stage_clear') {
       // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
       const stage = data.stages.find((s) => s.id === run.stageId)!;

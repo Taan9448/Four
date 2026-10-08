@@ -1,7 +1,7 @@
 // 지도 화면(GAME_DESIGN 13절): 위 = 두 세계를 잇는 여정 띠, 아래 = 지금 스테이지의 두루마리 지역 지도 + 편성·요약.
 import type { GameData } from '../engine/data';
 import { findNode, type MapNode } from '../engine/route';
-import { availableNodes, playableStages, setParty, type RunState } from '../engine/run';
+import { availableNodes, playableStages, setParty, xpToNext, type RunState } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { isDebug } from './debug';
@@ -291,7 +291,9 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         }),
         h('span', { class: 'member-name' }, def.name),
         r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
+        h('span', { class: 'member-lv', title: xpToNext(data, r.level) === null ? '최대 레벨' : `경험치 ${r.xp} / ${xpToNext(data, r.level)}` }, `Lv ${r.level}`),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
+        h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),
         noCards ? h('span', { class: 'member-note' }, '카드 미구현') : null,
       );
     }),

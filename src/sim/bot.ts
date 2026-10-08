@@ -13,6 +13,7 @@ import {
   addCard,
   advanceStage,
   applyBattleOutcome,
+  applyLevelUpgrade,
   applyChoice,
   availableNodes,
   battleSetupFor,
@@ -252,7 +253,7 @@ export interface RunReport {
   floor: number;
   battles: BattleRecord[];
   /** 스테이지에 들어설 때 하운 체력 비율 */
-  stageEntry: { stageId: string; haunRatio: number; deck: number }[];
+  stageEntry: { stageId: string; haunRatio: number; deck: number; haunLevel: number }[];
   deckSize: number;
   scar: number;
 }
@@ -275,7 +276,7 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
     if (entered !== run.stageId) {
       entered = run.stageId;
       const haun = run.roster.find((r) => r.id === 'haun')!;
-      stageEntry.push({ stageId: run.stageId, haunRatio: haun.hp / haun.maxHp, deck: run.deck.length });
+      stageEntry.push({ stageId: run.stageId, haunRatio: haun.hp / haun.maxHp, deck: run.deck.length, haunLevel: haun.level });
     }
     decideParty(data, run);
     const nodes = availableNodes(run);
@@ -303,6 +304,9 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
         rift: state.rift,
       });
       applyBattleOutcome(data, run, enc, outcome);
+      // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
+      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
+      run.levelLog = [];
       if (run.status === 'map') {
         const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
         if (card) addCard(run, card);

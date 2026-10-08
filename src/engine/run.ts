@@ -10,6 +10,9 @@ export interface RosterEntry {
   id: string;
   hp: number;
   maxHp: number;
+  /** 레벨(1부터)과 지금 레벨에서 쌓인 경험치 */
+  level: number;
+  xp: number;
 }
 
 export interface RunState {
@@ -29,6 +32,18 @@ export interface RunState {
   /** map: 지도 / stage_clear: 보스를 넘고 다음 스테이지 대기 / complete: 캠페인(구현된 범위) 끝 / defeat */
   status: 'map' | 'stage_clear' | 'complete' | 'defeat';
   counter: number;
+  /** 레벨업으로 고를 카드 강화가 남은 동료 id(하나에 1장). 지도로 돌아가기 전에 고른다 */
+  pendingUpgrades: string[];
+  /** 아직 화면에 보여 주지 않은 레벨업 소식 */
+  levelLog: LevelUp[];
+}
+
+export interface LevelUp {
+  id: string;
+  name: string;
+  from: number;
+  to: number;
+  hpGain: number;
 }
 
 export interface RunOptions {
@@ -51,7 +66,7 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     map: { stageId, floors: [] },
     position: null,
     visited: [],
-    roster: [{ id: 'haun', hp: haun.maxHp, maxHp: haun.maxHp }],
+    roster: [{ id: 'haun', hp: haun.maxHp, maxHp: haun.maxHp, level: 1, xp: 0 }],
     selected: ['haun'],
     deck: [],
     mana: data.balance.mana.max,
@@ -61,6 +76,8 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     supportActive: opts.supportActive ?? false,
     status: 'map',
     counter: 0,
+    pendingUpgrades: [],
+    levelLog: [],
   };
   for (const cardId of haun.starterDeck) addCard(run, cardId);
   run.map = buildMap(data, run);
@@ -84,7 +101,11 @@ export function createRunAt(data: GameData, seed: string, stageId: string, opts:
     }
     const boss = st.boss ? data.modules.get(st.boss) : undefined;
     if (boss?.content.clearEffects) applyRunOps(data, run, boss.content.clearEffects);
+    // 앞 스테이지에서 쌓였을 경험치(대략). 강화는 무작위로 바로 적용
+    for (const r of run.roster) if (data.characters.get(r.id)?.role === 'fighter') gainXp(data, run, r.id, data.balance.leveling.debugXpPerStage);
+    while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
   }
+  run.levelLog = [];
   run.selected = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').slice(0, data.balance.party.max).map((r) => r.id);
   run.map = buildMap(data, run);
   return run;
@@ -180,7 +201,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     world: stageWorld(data, run),
     party: run.selected.map((id) => {
       const r = run.roster.find((x) => x.id === id)!;
-      return { id, hp: r.hp, maxHp: r.maxHp };
+      return { id, hp: r.hp, maxHp: r.maxHp, level: r.level };
     }),
     enemies: enc.module.content.enemies ?? [],
     surviveTurns: enc.module.content.surviveTurns,
@@ -192,6 +213,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
+    enemyHpScale: stage.enemyHpScale,
   };
 }
 
@@ -207,6 +229,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     run.status = 'defeat';
     return [];
   }
+  awardBattleXp(data, run, enc.node.type);
   if (enc.node.type !== 'boss') return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
   run.status = 'stage_clear';
   return applyRunOps(data, run, enc.module.content.clearEffects ?? []);
@@ -234,6 +257,69 @@ export function rewardOptions(data: GameData, run: RunState, nodeId: string): st
     picked.push(left.splice(i, 1)[0].id);
   }
   return picked;
+}
+
+// ───────────────────────── 레벨 ─────────────────────────
+
+/** 다음 레벨까지 필요한 경험치(최대 레벨이면 null) */
+export function xpToNext(data: GameData, level: number): number | null {
+  const lv = data.balance.leveling;
+  return level >= lv.maxLevel ? null : lv.toNext[level - 1] ?? lv.toNext[lv.toNext.length - 1];
+}
+
+/**
+ * 경험치를 더하고 레벨을 올린다. 레벨마다 최대 체력 +hpPerLevel(그만큼 회복), upgradeEvery 레벨마다 고를 강화 1장.
+ * 레벨업 소식은 run.levelLog에 쌓인다
+ */
+export function gainXp(data: GameData, run: RunState, id: string, amount: number): void {
+  const r = run.roster.find((x) => x.id === id);
+  const def = data.characters.get(id);
+  if (!r || !def || amount <= 0) return;
+  const lv = data.balance.leveling;
+  r.xp += amount;
+  const from = r.level;
+  let need = xpToNext(data, r.level);
+  while (need !== null && r.xp >= need) {
+    r.xp -= need;
+    r.level += 1;
+    r.maxHp += def.hpPerLevel;
+    r.hp = Math.min(r.maxHp, r.hp + def.hpPerLevel);
+    if (r.level % lv.upgradeEvery === 0) run.pendingUpgrades.push(id);
+    need = xpToNext(data, r.level);
+  }
+  if (need === null) r.xp = 0;
+  if (r.level > from) run.levelLog.push({ id, name: def.name, from, to: r.level, hpGain: def.hpPerLevel * (r.level - from) });
+}
+
+/** 이긴 전투의 경험치: 출전한 동료는 전부, 쉬는 동료는 restShare만큼(내림) */
+export function awardBattleXp(data: GameData, run: RunState, nodeType: string): void {
+  const lv = data.balance.leveling;
+  const base = nodeType === 'boss' ? lv.xp.boss : nodeType === 'elite' ? lv.xp.elite : lv.xp.battle;
+  for (const r of run.roster) {
+    if (data.characters.get(r.id)?.role !== 'fighter') continue;
+    gainXp(data, run, r.id, run.selected.includes(r.id) ? base : Math.floor(base * lv.restShare));
+  }
+}
+
+/** 레벨업 강화 후보: 그 동료의 카드 중 강화할 수 있는 것 */
+export function levelUpgradeCandidates(data: GameData, run: RunState, member: string): CardInstance[] {
+  return upgradeCandidates(data, run, { owner: member });
+}
+
+/**
+ * 남은 레벨업 강화 하나를 처리한다. uid가 있으면 그 카드, null이면 무작위(봇·중간 시작). 후보가 없으면 건너뛴다
+ */
+export function applyLevelUpgrade(data: GameData, run: RunState, uid: string | null): string[] {
+  const member = run.pendingUpgrades.shift();
+  if (!member) return [];
+  const pool = levelUpgradeCandidates(data, run, member);
+  if (!pool.length) return [];
+  run.counter += 1;
+  const card = (uid && pool.find((c) => c.uid === uid)) || createRng(run.seed).fork(`levelup:${run.counter}`).pick(pool);
+  card.level += 1;
+  const def = data.cards.get(card.cardId)!;
+  const skill = card.level > data.balance.upgrade.statLevels ? (card.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
+  return [`카드 강화: ${def.name} +${card.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`];
 }
 
 // ───────────────────────── 파티 편성 ─────────────────────────
@@ -361,7 +447,10 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           run.supportActive = true;
           if (!run.flags.includes(`support:${def.id}`)) run.flags.push(`support:${def.id}`);
         } else {
-          run.roster.push({ id: def.id, hp: def.maxHp, maxHp: def.maxHp });
+          // 동료는 하운 레벨 -1로 합류한다(늦게 온 동료가 너무 뒤처지지 않게)
+          const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
+          const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
+          run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
           for (const cardId of def.starterDeck) addCard(run, cardId);
           if (run.selected.length < data.balance.party.max) run.selected.push(def.id);
         }

@@ -168,6 +168,22 @@ h1, h2, h3 { font-family: var(--f-head); }
 .member-hp { margin-left: auto; color: var(--ink-dim); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 .member-note { font-size: 0.7rem; color: var(--danger); }
 .party-box .hint { margin: 6px 0 0; font-size: 0.75rem; }
+.member { position: relative; overflow: hidden; }
+.member-lv { font-size: 0.72rem; color: #e6c36a; font-variant-numeric: tabular-nums; margin-left: 4px; }
+.member-xp { position: absolute; left: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, #c9a24a, #ffd36b); opacity: 0.85; }
+.unit-lv { color: #e6c36a; font-size: 0.85em; }
+/* 레벨업 화면 */
+.lv-list { list-style: none; margin: 8px 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.lv-row { display: grid; grid-template-columns: minmax(80px, auto) auto 1fr; align-items: baseline; gap: 12px; padding: 8px 12px; border-left: 3px solid var(--owner); background: rgba(201, 162, 74, 0.08); animation: lv-in 0.5s ease-out both; }
+.lv-row:nth-child(2) { animation-delay: 0.15s; }
+.lv-row:nth-child(3) { animation-delay: 0.3s; }
+.lv-row:nth-child(4) { animation-delay: 0.45s; }
+@keyframes lv-in { from { opacity: 0; transform: translateX(-12px); } }
+.lv-name { font-weight: 700; }
+.lv-step { font-family: var(--f-head); font-size: 1.1rem; }
+.lv-step b { color: #ffd36b; font-size: 1.35rem; }
+.lv-step i { font-style: normal; color: #c9a24a; }
+.lv-gain { color: #cfe9d5; font-size: 0.85rem; }
 .member-tag { font-size: 0.66rem; padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-dim); }
 .member-tag.rest { border-color: #8a6a3a; color: #e6c36a; }
 .member input:disabled + .member-name { opacity: 0.85; }

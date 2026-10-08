@@ -31,8 +31,8 @@ export interface RouteContext {
 const nodeId = (floor: number, index: number) => `f${floor}n${index}`;
 
 /**
- * 전투가 없는 노드(사건·휴식·여관·이야기). 무작위로 생긴 이런 노드가 길게 이어지면 그냥 넘어가는 구간이 된다(2026-10-08 S3 리뷰).
- * 고정 이야기 노드(원작 장면)는 연속을 세지도 끊지도 않는다
+ * 전투가 없는 노드(사건·휴식·여관·이야기). 이런 노드가 길게 이어지면 그냥 넘어가는 구간이 된다(2026-10-08 S3·S4 리뷰).
+ * 고정 이야기 노드도 센다(원작 장면이 몰린 곳은 고정 노드끼리라 검사에서 뺀다)
  */
 export const isCalm = (type: NodeType) => type !== 'battle' && type !== 'elite' && type !== 'boss';
 
@@ -118,7 +118,7 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
 
   // 3) 노드 유형과 모듈 배정(층 순서대로, 부모 유형을 보고 제약 확인)
   const parentsOf = (node: MapNode) => floors[node.floor - 2]?.filter((p) => p.next.includes(node.id)) ?? [];
-  // 이 노드까지 이어진 '전투 없는 노드'의 가장 긴 연속(어느 부모 길로 와도).
+  // 이 노드까지 이어진 '전투 없는 노드'(고정 이야기 포함)의 가장 긴 연속(어느 부모 길로 와도).
   // 바로 뒤에 고정된 이야기 노드나 정해진 휴식(보스 앞 등)이 있으면 그것까지 센다 — 그쪽은 바꿀 수 없으니 앞을 전투로 당긴다
   const calmRun = new Map<string, number>();
   const pinnedType = (g: number) => data.modules.get(pinnedByFloor.get(g) ?? '')?.type ?? stage.forcedTypes[String(g)];
@@ -126,7 +126,6 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
     let n = 0;
     for (let g = f + 1; g <= stage.floors; g++) {
       const t = pinnedType(g);
-      if (t === 'story') continue; // 고정 이야기는 지나간다
       if (!t || !isCalm(t)) break;
       n += 1;
     }
@@ -143,8 +142,7 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
         node.type = mod.type;
         node.moduleId = mod.id;
         used.add(mod.id);
-        // 고정 이야기 노드는 원작 장면이라 연속을 세지도 끊지도 않는다(지나간다)
-        calmRun.set(node.id, node.type === 'story' ? runBefore : isCalm(node.type) ? runBefore + 1 : 0);
+        calmRun.set(node.id, isCalm(node.type) ? runBefore + 1 : 0);
         continue;
       }
       // 전투 없는 노드를 더 놓으면 연속 한도를 넘는가(뒤에 붙은 고정 이야기 노드까지)
@@ -230,7 +228,7 @@ export function validateMap(data: GameData, map: StageMap): string[] {
     for (const n of floor) {
       const parents = (map.floors[n.floor - 2] ?? []).filter((p) => p.next.includes(n.id));
       const before = Math.max(0, ...parents.map((p) => run.get(p.id) ?? 0));
-      const r = n.type === 'story' && pinnedFloors.has(n.floor) ? before : isCalm(n.type) ? before + 1 : 0;
+      const r = isCalm(n.type) ? before + 1 : 0;
       run.set(n.id, r);
       if (r > data.balance.route.maxCalmRun && !pinnedFloors.has(n.floor) && !stage.forcedTypes[String(n.floor)]) errors.push(`${n.id}: 전투 없는 노드 ${r}연속`);
     }

@@ -42,15 +42,15 @@ it('밸런스: 봇 런', () => {
 
   lines.push('## 스테이지별');
   lines.push('');
-  lines.push('| 스테이지 | 도달 | 통과 | 통과율 | 여기서 패배 | 들어설 때 하운 체력 | 들어설 때 덱 |');
-  lines.push('|---|---:|---:|---:|---:|---:|---:|');
+  lines.push('| 스테이지 | 도달 | 통과 | 통과율 | 여기서 패배 | 들어설 때 하운 체력 | 들어설 때 덱 | 들어설 때 하운 레벨 |');
+  lines.push('|---|---:|---:|---:|---:|---:|---:|---:|');
   for (const st of stages) {
     if (START && st.order < stages.find((x) => x.id === START)!.order) continue;
     const reached = runs.filter((r) => r.stageEntry.some((e) => e.stageId === st.id));
     const died = runs.filter((r) => r.result === 'defeat' && r.stageId === st.id).length;
     const entry = reached.map((r) => r.stageEntry.find((e) => e.stageId === st.id)!);
     lines.push(
-      `| ${st.name} (${st.id}) | ${reached.length} | ${reached.length - died} | ${pct(reached.length - died, reached.length)} | ${died} | ${pct(avg(entry.map((e) => e.haunRatio)) * 100, 100)} | ${f1(avg(entry.map((e) => e.deck)))} |`,
+      `| ${st.name} (${st.id}) | ${reached.length} | ${reached.length - died} | ${pct(reached.length - died, reached.length)} | ${died} | ${pct(avg(entry.map((e) => e.haunRatio)) * 100, 100)} | ${f1(avg(entry.map((e) => e.deck)))} | ${f1(avg(entry.map((e) => e.haunLevel)))} |`,
     );
   }
   lines.push('');
