@@ -1,0 +1,10 @@
+id: bg_rift
+type: background
+summary: 전투 배경 — 세계의 틈(S5, 흐름이 없는 곳)
+frame_notes:
+  1: >-
+    The rift between two worlds, a place where nothing flows. A black void sky split by thin jagged cracks that glow faint red from
+    inside; floating broken fragments of both worlds drift at the left and right edges (a piece of a grey-tiled wuxia roof on the left,
+    a piece of a gothic stone arch on the right). The ground is a floating slab of pale dead stone with fine cracks. Mostly black,
+    cold grey and very dark blue, with small faint red lights in the cracks.
+placeholder: { color: '#14141c' }
