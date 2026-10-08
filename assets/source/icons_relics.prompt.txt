@@ -1,0 +1,28 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: woodcutter whetstone — a flat grey whetstone with a thin wet streak and a tiny axe-blade glint
+Cell 2: silver bell — a small silver hand bell with a pale blue ring of light around its rim
+Cell 3: herb pouch — a small cloth pouch tied with string, green mugwort leaves poking out of the top
+Cell 4: iron bracer — a dark iron forearm guard with three rivets and a leather strap
+Cell 5: cloud tea — a small celadon tea cup with a curl of white mist rising from it
+Cell 6: red thread — a small spool wound with bright red thread, one loose end curling away
+Cell 7: elf fletching — three slender silver-white feathers bound together with green thread
+Cell 8: traveler coin — a string of square-holed bronze coins tied in a bundle
+Cell 9: frost crystal — a pale blue ice crystal shard with sharp facets and a white glint
+Cell 10: ember charm — a paper talisman with an orange ember glowing at its center, edges slightly scorched
+Cell 11: grain tablet — a small wooden tablet showing clear dark wood-grain lines like a palm
+Cell 12: blood oath — a red knotted cord tied around a small dark blade
+Cell 13: seal talisman — a yellow paper seal talisman with a red stamp mark (no readable letters)
+Cell 14: smith hammer shard — a broken chunk of a smith hammer head, still glowing faintly orange at the break
+Cell 15: dwarf anvil — a small dark iron anvil fragment with a bright worn striking face
+Cell 16: silver leaf — a single silver leaf with faint glowing veins
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
