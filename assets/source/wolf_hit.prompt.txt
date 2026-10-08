@@ -1,19 +1,18 @@
 Create ONE PNG pixel-art sprite sheet.
 Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
 Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
-PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
 Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
-Subject: a shadow wolf; charcoal-black fur, black flames along its spine, amber eyes, lean and hungry. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+Subject: a shadow wolf the size of a calf; instead of fur, a body of wavering black smoke, black flames along its spine, no eyes — only two red dots where the eyes should be. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
 The SAME character in every cell, at the SAME scale. Side view, facing left.
 Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
-Style: crisp 64x64 pixel art in the style of a 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
 Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
 Never use magenta or similar hues on the character.
 Frames:
-Cell 1: struck, head jerked back, flames on the back blown out sideways
-Cell 2: recoiling, hind legs skidding
-Cell 3: recovering, snarling, flames flickering back
+Cell 1: struck, the smoke body tears apart at the hit point, flames blown sideways
+Cell 2: recoiling, smoke swirling back together
+Cell 3: recovering, snarling, the two red dots relit
 Cells 4 to 6 are completely empty magenta.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
-Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
-Fix: Make the pixel blocks much coarser and simpler. Every block is exactly 8x8 canvas pixels, flat solid color, on the SAME continuous global square grid across all 3 cells. Strip away every small fur speckle, single-pixel stroke and soft edge; render the wolf from large solid square clusters, one square amber eye and square ivory teeth. No detail smaller than an 8x8 square. Align all cell patterns with x=8*n,y=8*n. The entire wolf, including sideways flames and tail, is fully contained between local x=48..464 and y=80..464, leaving large empty margins; feet remain on sprite row 58. Reduce upward head/flame lift in Cell 1 so total silhouette height differs by at most 3 logical pixels from Cells 2 and 3. Keep the same wolf scale and LEFT-facing side profile from the reference. Cell 1 jerks the head back while black flames bend to the right; Cell 2 skids on the hind paws; Cell 3 returns into the low snarl with ivory fangs, not orange teeth. Keep every pixel of the bottom row plain magenta.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
