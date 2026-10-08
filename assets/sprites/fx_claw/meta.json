@@ -1,8 +1,8 @@
 {
   "id": "fx_claw",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 12.927,
   "gridDetected": true,

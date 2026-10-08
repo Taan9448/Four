@@ -8,6 +8,7 @@ depends_on: [sa_giant_ref]
 reference: assets/source/sa_giant_ref.png
 facing: left
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 거인의 주먹: 주먹을 치켜든 칸1·2와 내려찍은 칸4의 높이 차(2026-10-08 검토)
 frame_notes:
   1: "rears back, the right fist raised high"
   2: "the fist rises above the head, cracks glowing brighter"
