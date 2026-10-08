@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: attack — a single curved sword slash, steel blade with a red edge
+Cell 2: defend — a round wooden shield with a steel rim, seen from the front
+Cell 3: buff — a bold upward arrow made of orange-gold flame
+Cell 4: debuff — a downward arrow made of dark violet smoke
+Cell 5: special — a four-pointed star with a small swirl, silver and blue
+Cell 6: block value — a simple steel-blue kite shield, flat front view, with an empty center (the game writes the number on it)
+Cells 7 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: There is a REAL layout overflow: the lower tip of the upward flame arrow in cell3 crosses into cell7. Recompose all six icons with visibly larger blank space. Reduce every existing intent symbol to 75 percent of its previous width and height, including all detached sparks. In a 1024 square sheet, top row icon centers must be at (128,128),(384,128),(640,128),(896,128). Second row centers are (128,384),(384,384), with the other two cells completely empty. In each cell keep the outer one eighth of its width and height empty magenta on ALL sides. Complete icons may occupy only the middle three quarters. Keep this exact layout if the canvas is generated at a larger size: proportions must remain exact. Only six compact symbols, no downward drift or overflow. Keep the star+swirl and plain blank kite-shield face; no written number.
