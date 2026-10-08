@@ -1,14 +1,14 @@
 {
   "id": "kyle_ref",
   "type": "character-ref",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
-  "pixelScale": 9.797,
+  "pixelScale": 4.898,
   "gridDetected": false,
   "nativeSize": [
-    64,
-    64
+    128,
+    128
   ],
   "fit": "pad",
   "frames": 2,
@@ -30,5 +30,5 @@
     1254,
     1254
   ],
-  "gridPurity": 0.503
+  "gridPurity": 0.608
 }

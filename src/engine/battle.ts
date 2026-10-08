@@ -13,6 +13,7 @@ import {
   loseHp,
   newCard,
   previewDamage,
+  previewDamageOn,
   runEffects,
   setResult,
 } from './effects';
@@ -212,6 +213,67 @@ export function describeIntent(state: BattleState, enemy: EnemyState): IntentVie
     intent: enemy.intent,
     damage: { perHit: previewDamage(state, enemy, dmg.amount ?? 0), times: dmg.times ?? 1, all: dmg.target === 'all_enemies' },
   };
+}
+
+export interface IncomingHit {
+  enemyName: string;
+  moveName: string;
+  perHit: number;
+  times: number;
+}
+
+/** 아군 한 명이 이번 적 턴에 받을 피해 예고 */
+export interface IncomingView {
+  /** 방어 전 피해 합 */
+  raw: number;
+  /** 지금 방어로 막을 양 */
+  blocked: number;
+  /** 체력에서 깎일 양 */
+  hpLoss: number;
+  /** 이대로면 쓰러진다 */
+  lethal: boolean;
+  hits: IncomingHit[];
+}
+
+/**
+ * 받을 피해 예고: 적 의도(대상은 의도를 정할 때 이미 골랐다)를 따라 아군마다 이번 적 턴의 피해를 더하고 지금 방어를 뺀다.
+ * 도발·움직이지 못함·전체 공격·힘·약화·취약을 반영한다. 적 행동 중에 바뀌는 것(다른 적의 버프, 쓰러진 대상의 재선택)은 넣지 않는다.
+ */
+export function incomingDamage(state: BattleState): Map<string, IncomingView> {
+  const out = new Map<string, IncomingView>();
+  const party = alive(state.party);
+  const taunter = party.find((p) => (p.statuses.taunt ?? 0) > 0);
+  for (const enemy of alive(state.enemies)) {
+    if (!enemy.intent || hasSkipTurn(state, enemy)) continue;
+    const move = state.data.enemies.get(enemy.defId)!.moves.find((m) => m.id === enemy.intent!.moveId);
+    if (!move) continue;
+    for (const e of move.effects) {
+      if (e.op !== 'damage') continue;
+      const target = e.target ?? 'enemy';
+      let targets: Combatant[] = [];
+      if (target === 'all_enemies') targets = party;
+      else if (target === 'enemy') {
+        const uid = taunter && enemy.intent.targetUid ? taunter.uid : enemy.intent.targetUid;
+        const t = party.find((p) => p.uid === uid);
+        if (t) targets = [t];
+      }
+      const times = e.times ?? 1;
+      for (const t of targets) {
+        const perHit = previewDamageOn(state, enemy, t, e.amount ?? 0);
+        const v = out.get(t.uid) ?? { raw: 0, blocked: 0, hpLoss: 0, lethal: false, hits: [] };
+        v.raw += perHit * times;
+        v.hits.push({ enemyName: enemy.name, moveName: move.name, perHit, times });
+        out.set(t.uid, v);
+      }
+    }
+  }
+  for (const [uid, v] of out) {
+    const t = party.find((p) => p.uid === uid)!;
+    v.blocked = Math.min(t.block, v.raw);
+    v.hpLoss = v.raw - v.blocked;
+    v.lethal = v.hpLoss >= t.hp;
+  }
+  return out;
 }
 
 // ───────────────────────── 카드 사용 ─────────────────────────
