@@ -1,8 +1,8 @@
 {
   "id": "fx_slash_blue",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 9.715,
   "gridDetected": true,
@@ -10,7 +10,7 @@
     53,
     52
   ],
-  "fit": "pad",
+  "fit": "upscale",
   "frames": 6,
   "fps": 15,
   "loop": false,
