@@ -1,0 +1,10 @@
+id: bg_cheongun
+type: background
+summary: 전투 배경 — 청운산(S0, 무림의 산문과 소나무)
+frame_notes:
+  1: >-
+    Cheongun Mountain, a quiet mountain martial-arts sect in a wuxia world at dusk. In the far distance, layered blue-grey ink-like
+    mountain ridges with drifting mist; on the left edge a gnarled old pine on a rock and a stack of split firewood; on the right edge
+    the corner of a grey-tiled sect hall roof and a stone lantern. The ground is a packed-earth courtyard with a few flat stone slabs
+    and scattered wood chips. Muted greys, ink blues and warm brown, a little gold in the evening sky.
+placeholder: { color: '#3d4459' }
