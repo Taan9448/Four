@@ -17,7 +17,7 @@ export function flash(el: HTMLElement, color: 'white' | 'red' | 'blue' = 'white'
   restartAnimation(el, `fx-flash-${color}`, 220);
 }
 
-export type FloatKind = 'damage' | 'crit' | 'block' | 'heal' | 'status' | 'absorb' | 'rift';
+export type FloatKind = 'damage' | 'crit' | 'critical' | 'weak' | 'resist' | 'block' | 'heal' | 'status' | 'absorb' | 'rift';
 
 /** layer 기준 좌표(x, y)에 숫자/글자를 띄운다 */
 export function floatText(layer: HTMLElement, x: number, y: number, text: string, kind: FloatKind): void {

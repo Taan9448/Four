@@ -1,5 +1,5 @@
 // 전투 상태 타입과 작은 도우미.
-import type { CardDef, CharacterDef, Cost, Effect, Keyword, SupportRule, UpgradeSkill, World, WorldMana } from './schema';
+import type { CardDef, CharacterDef, Cost, Effect, Element, Keyword, SupportRule, UpgradeSkill, World, WorldMana } from './schema';
 import type { GameData } from './data';
 import type { Rng } from './rng';
 
@@ -43,7 +43,7 @@ export type BattleEvent =
   | { type: 'turn'; turn: number }
   | { type: 'card'; cardId: string; sourceUid: string | null }
   | { type: 'attack'; sourceUid: string; targetUids: string[] }
-  | { type: 'damage'; sourceUid: string | null; targetUid: string; amount: number; blocked: number; grain: boolean; absorbed: boolean }
+  | { type: 'damage'; sourceUid: string | null; targetUid: string; amount: number; blocked: number; grain: boolean; absorbed: boolean; crit?: boolean; element?: Element; weak?: boolean; resisted?: boolean }
   | { type: 'block'; targetUid: string; amount: number }
   | { type: 'heal'; targetUid: string; amount: number }
   | { type: 'status'; targetUid: string; status: string; stacks: number }
@@ -91,6 +91,8 @@ export interface BattleState {
   flags: string[];
   scar: number;
   uidCounter: number;
+  /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
+  noCrit?: boolean;
 }
 
 export interface ResolvedCard {

@@ -1,6 +1,6 @@
 // 전투 진행: 생성 → 플레이어 턴(카드 사용) → 턴 종료 → 적 턴 → 다음 턴.
 import type { GameData } from './data';
-import type { Effect, World, WorldMana } from './schema';
+import type { Effect, Element, World, WorldMana } from './schema';
 import type { Rng } from './rng';
 import {
   addStatus,
@@ -224,8 +224,8 @@ function rollIntents(state: BattleState): void {
 
 export interface IntentView {
   intent: Intent;
-  /** 공격이면 1회 예상 피해와 횟수 */
-  damage?: { perHit: number; times: number; all: boolean };
+  /** 공격이면 1회 예상 피해와 횟수, 속성 */
+  damage?: { perHit: number; times: number; all: boolean; element?: Element };
 }
 
 export function describeIntent(state: BattleState, enemy: EnemyState): IntentView | null {
@@ -236,7 +236,7 @@ export function describeIntent(state: BattleState, enemy: EnemyState): IntentVie
   if (!dmg) return { intent: enemy.intent };
   return {
     intent: enemy.intent,
-    damage: { perHit: previewDamage(state, enemy, dmg.amount ?? 0), times: dmg.times ?? 1, all: dmg.target === 'all_enemies' },
+    damage: { perHit: previewDamage(state, enemy, dmg.amount ?? 0), times: dmg.times ?? 1, all: dmg.target === 'all_enemies', element: dmg.element },
   };
 }
 
@@ -397,6 +397,7 @@ export function previewCard(state: BattleState, handIndex: number, targetUid?: s
   const out = new Map<string, CardPreviewHit>();
   if (!canPlay(state, handIndex).ok) return out;
   const c = cloneBattle(state);
+  c.noCrit = true; // 치명타는 굴리지 않는다(확률은 화면에 따로 보인다)
   if (!playCard(c, handIndex, targetUid).ok) return out;
   for (const ev of c.events) {
     if (ev.type !== 'damage' || ev.absorbed) continue;

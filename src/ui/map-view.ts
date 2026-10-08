@@ -5,7 +5,7 @@ import { availableNodes, playableStages, setParty, type RunState } from '../engi
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { isDebug } from './debug';
-import { openOverlay } from './overlay';
+import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
 
 /** 노드 표식: 두루마리 위의 한자 */
@@ -39,27 +39,33 @@ export interface MapViewHandlers {
 
 /**
  * 출전 편성 안내(동료가 처음 합류했을 때·자리가 가득 찼을 때 한 번씩, 그 뒤엔 출전 칸의 버튼으로).
- * 쉬는 동료는 이름으로 짚어 준다
+ * 팝업 한 장 대신 지도 위의 실제 칸을 하나씩 비추며 짚어 준다(투어)
  */
 export function openPartyGuide(data: GameData, run: RunState): void {
   const max = data.balance.party.max;
-  const resting = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter' && !run.selected.includes(r.id)).map((r) => data.characters.get(r.id)!.name);
-  const body = h(
-    'div',
-    { class: 'guide' },
-    h('p', { class: 'guide-lead' }, '동료가 합류했습니다. 전투에 누구를 데려갈지는 지도 오른쪽 <출전> 칸에서 고릅니다.'),
-    h(
-      'ol',
-      {},
-      h('li', {}, h('b', {}, '체크로 고른다 — '), `이름 옆 칸을 눌러 넣고 뺀다. 하운은 항상 출전하고, 하운을 포함해 최대 ${max}명.`),
-      h('li', {}, h('b', {}, '덱도 함께 바뀐다 — '), '출전한 동료의 카드만 전투 덱에 들어간다. 쉬는 동료의 카드는 그 전투에서만 빠지고 덱에서 사라지지는 않는다.'),
-      h('li', {}, h('b', {}, '자리가 가득 찼을 때 — '), '쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푼다.'),
-      h('li', {}, h('b', {}, '언제든 바꿀 수 있다 — '), '지도에 서 있을 때면 언제든. 전투·이벤트 안에서는 바꿀 수 없다.'),
-      h('li', {}, h('b', {}, '체력은 이어진다 — '), '동료마다 체력이 따로 남는다. 다친 동료는 쉬게 하고 성한 동료를 데려가도 된다.'),
-    ),
-    resting.length ? h('p', { class: 'guide-note' }, `지금 쉬는 동료: ${resting.join(', ')}`) : null,
+  const name = (id: string) => data.characters.get(id)?.name ?? id;
+  const mates = run.selected.filter((id) => id !== 'haun');
+  const resting = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter' && !run.selected.includes(r.id)).map((r) => r.id);
+  const steps: TourStep[] = [
+    { target: '.party-box', title: '동료가 합류했다', text: `전투에 누구를 데려갈지는 이 <출전> 칸에서 고른다. 지금 ${run.selected.length}명 출전 중, 최대 ${max}명.` },
+    {
+      target: mates.length ? `.member[data-member="${mates[mates.length - 1]}"]` : '.member',
+      title: '체크로 넣고 뺀다',
+      text: `이름 옆 칸을 누르면 출전과 휴식이 바뀐다. 하운은 언제나 출전하고(고정), 하운을 포함해 ${max}명까지.`,
+    },
+  ];
+  if (resting.length)
+    steps.push({
+      target: `.member[data-member="${resting[0]}"]`,
+      title: `${resting.map(name).join(', ')} — 쉬는 중`,
+      text: '자리가 가득 차면 쉬는 동료의 칸은 잠긴다. 데려가려면 먼저 출전 중인 동료 한 명의 체크를 풀고, 그다음 이 칸을 누른다.',
+    });
+  steps.push(
+    { target: '.member-hp', title: '체력은 동료마다 따로', text: '전투가 끝나도 체력은 이어진다. 다친 동료는 쉬게 하고 성한 동료를 데려가도 된다.' },
+    { target: '.map-actions .btn-primary', title: '덱도 함께 바뀐다', text: '출전한 동료의 카드만 전투 덱에 들어간다. 쉬는 동료의 카드는 그 전투에서만 빠질 뿐, 덱에서 사라지지 않는다.' },
+    { target: '.node.open', title: '언제든 바꿀 수 있다', text: '편성은 지도에 서 있을 때면 언제든 바꿀 수 있다(전투·이벤트 안에서는 안 된다). 준비가 되면 갈 곳을 고른다.' },
   );
-  openOverlay('출전 편성', body);
+  runTour(steps);
 }
 
 /** 표시용 흔들림: 노드 id로 정해지는 -1~1(같은 지도는 늘 같은 모양. 엔진 난수와 무관) */
@@ -266,7 +272,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       const noCards = def.starterDeck.length === 0;
       return h(
         'label',
-        { class: `member${checked ? ' on' : ''}`, style: `--owner:${def.color}`, title: def.description },
+        { class: `member${checked ? ' on' : ''}`, 'data-member': r.id, style: `--owner:${def.color}`, title: def.description },
         h('input', {
           type: 'checkbox',
           checked,

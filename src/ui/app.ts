@@ -33,6 +33,9 @@ import { clearRun, loadRun, saveRun } from './storage';
 
 const data = gameData();
 
+/** 스테이지 끝 화면 머리의 세계 이름 */
+const WORLD_LABEL: Record<string, string> = { murim: '武林 · 무림', elheim: '엘하임', nocturna: '마왕성', rift: '세계의 틈' };
+
 export class App {
   private run: RunState | null = null;
   /** 보스를 이긴 뒤 clearEffects 결과(스테이지 끝 화면에 보여 준다) */
@@ -320,7 +323,8 @@ export class App {
           h(
             'div',
             { class: 'end-box' },
-            h('div', { class: 'end-kicker' }, stage.chapters),
+            // 책 권·장 표시는 쓰지 않는다(2026-10-08 사용자 결정). 세계 이름만
+            h('div', { class: 'end-kicker' }, WORLD_LABEL[stage.world] ?? ''),
             h('h1', {}, stage.name),
             h('div', { class: 'end-sub' }, '— 끝 —'),
             outro ? h('p', { class: 'outro' }, outro) : null,
@@ -372,7 +376,7 @@ export class App {
               finale
                 ? '세계의 틈이 닫혔다. 천마봉 위에는 바느질 자국처럼 가지런한 흉터, 청운봉선(靑雲縫線)이 남았다.'
                 : win
-                  ? `지금 만들어진 이야기는 여기까지다. (${last.chapters} — 다음 스테이지는 이후 작업)`
+                  ? '지금 만들어진 이야기는 여기까지다. 다음 이야기는 이후 작업.'
                   : '하운이 쓰러졌다.',
             ),
             h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),

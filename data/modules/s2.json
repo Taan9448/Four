@@ -21,7 +21,7 @@
     "name": "목줄 찬 늑대",
     "weight": 3,
     "conditions": {"floorRange": [2, 4]},
-    "content": {"text": "벨칸의 화로에서 벼린 쇠 목줄을 찬 그림자늑대 둘이 붉은 풀밭을 가로지른다. 피난민 행렬이 지나온 쪽이다.", "enemies": ["shadow_wolf", "shadow_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"물줄기를 따라.\" 카일이 늑대의 힘이 꺾이는 자리를 노린다. 결이 있다는 것은 이제 안다. (늑대 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "벨칸의 화로에서 벼린 쇠 목줄을 찬 그림자늑대 둘이 붉은 풀밭을 가로지른다. 피난민 행렬이 지나온 쪽이다.", "enemies": ["collared_wolf", "collared_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"물줄기를 따라.\" 카일이 늑대의 힘이 꺾이는 자리를 노린다. 결이 있다는 것은 이제 안다. (늑대 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s2_battle_ash_patrol",
@@ -30,7 +30,7 @@
     "name": "재 속의 순찰",
     "weight": 3,
     "conditions": {"floorRange": [2, 5]},
-    "content": {"text": "붉은 재를 뒤집어쓴 빈 갑옷 둘이 평원을 순찰한다. 투구 안의 붉은 불빛이 이쪽을 향했다. 창끝이 따라왔다.", "enemies": ["empty_armor", "empty_armor"]}
+    "content": {"text": "붉은 재를 뒤집어쓴 빈 갑옷 둘이 평원을 순찰한다. 투구 안의 붉은 불빛이 이쪽을 향했다. 창끝이 따라왔다.", "enemies": ["ash_armor", "ash_armor"]}
   },
   {
     "id": "s2_battle_runaway_hunt",
@@ -39,7 +39,7 @@
     "name": "도망자 사냥",
     "weight": 2,
     "conditions": {"floorRange": [3, 5]},
-    "content": {"text": "빈 갑옷 하나가 목줄 찬 그림자늑대를 풀어 놓는다. 화로에서 달아난 누군가를 쫓던 길이다. 바닥에 끊어진 사슬 한 토막이 떨어져 있다.", "enemies": ["empty_armor", "shadow_wolf"]}
+    "content": {"text": "빈 갑옷 하나가 목줄 찬 그림자늑대를 풀어 놓는다. 화로에서 달아난 누군가를 쫓던 길이다. 바닥에 끊어진 사슬 한 토막이 떨어져 있다.", "enemies": ["ash_armor", "collared_wolf"]}
   },
   {
     "id": "s2_battle_ore_road",
@@ -48,7 +48,7 @@
     "name": "광석 수레 길",
     "weight": 3,
     "conditions": {"floorRange": [4, 7]},
-    "content": {"text": "마을 위쪽 광산에서 협곡 화로로 이어진 수레 길. 흑철 원석을 끄는 빈 갑옷 곁에서 화로의 불씨 하나가 사람의 형상으로 일어선다.", "enemies": ["empty_armor", "fire_spirit"]}
+    "content": {"text": "마을 위쪽 광산에서 협곡 화로로 이어진 수레 길. 흑철 원석을 끄는 빈 갑옷 곁에서 화로의 불씨 하나가 사람의 형상으로 일어선다.", "enemies": ["ash_armor", "fire_spirit"]}
   },
   {
     "id": "s2_battle_fire_spirits",
@@ -66,7 +66,7 @@
     "name": "협곡 감시대",
     "weight": 2,
     "conditions": {"floorRange": [5, 7]},
-    "content": {"text": "화로와 화로 사이를 지키는 빈 갑옷 셋. 협곡에는 이런 것이 백쯤 있다. 그들은 사람을 죽이지 않는다. 사슬을 채워 화로로 끌고 갈 뿐이다.", "enemies": ["empty_armor", "empty_armor", "empty_armor"]}
+    "content": {"text": "화로와 화로 사이를 지키는 빈 갑옷 셋. 협곡에는 이런 것이 백쯤 있다. 그들은 사람을 죽이지 않는다. 사슬을 채워 화로로 끌고 갈 뿐이다.", "enemies": ["ash_armor", "ash_armor", "ash_armor"]}
   },
   {
     "id": "s2_battle_forge_row",
@@ -75,7 +75,7 @@
     "name": "화로 사이",
     "weight": 2,
     "conditions": {"floorRange": [6, 7]},
-    "content": {"text": "쾅, 쾅, 쾅. 망치 소리 사이로 불의 정령 둘이 빈 갑옷 곁을 맴돈다. 노예들은 고개를 들지 않는다.", "enemies": ["fire_spirit", "empty_armor", "fire_spirit"]}
+    "content": {"text": "쾅, 쾅, 쾅. 망치 소리 사이로 불의 정령 둘이 빈 갑옷 곁을 맴돈다. 노예들은 고개를 들지 않는다.", "enemies": ["fire_spirit", "ash_armor", "fire_spirit"]}
   },
   {
     "id": "s2_elite_chain_overseer",
@@ -84,7 +84,7 @@
     "name": "사슬 감독관",
     "weight": 2,
     "conditions": {"floorRange": [3, 5]},
-    "content": {"text": "쇠기둥과 쇠기둥을 잇는 굵은 사슬 끝에, 다른 갑옷보다 머리 하나 큰 빈 갑옷이 서 있다. 그 손의 사슬이 큰 화로 쪽으로 이어져 있다.", "enemies": ["chain_overseer", "empty_armor"]}
+    "content": {"text": "쇠기둥과 쇠기둥을 잇는 굵은 사슬 끝에, 다른 갑옷보다 머리 하나 큰 빈 갑옷이 서 있다. 그 손의 사슬이 큰 화로 쪽으로 이어져 있다.", "enemies": ["chain_overseer", "ash_armor"]}
   },
   {
     "id": "s2_elite_furnace_chain",

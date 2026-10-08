@@ -1,6 +1,7 @@
 // 설정: 전투 속도, 컷인, 화면 흔들림. 브라우저에 저장하고 화면 전체에 바로 적용한다.
 import { h } from './dom';
 import { readSettings, writeSettings } from './storage';
+import { resetTours } from './tour';
 
 export interface Settings {
   /** 전투 연출 대기 시간 배율(1 보통, 작을수록 빠름) */
@@ -72,5 +73,21 @@ export function settingsForm(): HTMLElement {
     h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), speedGroup),
     toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
     toggle('shake', '화면 흔들림', '끄면 피격·폭주 때 흔들리지 않는다'),
+    h(
+      'div',
+      { class: 'setting-row' },
+      h('span', {}, '안내 다시 보기', h('small', {}, '전투 기본·속성 안내를 다음 전투에서 다시 띄운다')),
+      h(
+        'button',
+        {
+          class: 'btn btn-small',
+          onclick: (e: Event) => {
+            resetTours();
+            (e.target as HTMLButtonElement).textContent = '다시 띄웁니다';
+          },
+        },
+        '초기화',
+      ),
+    ),
   );
 }

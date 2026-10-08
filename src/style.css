@@ -174,11 +174,6 @@ h1, h2, h3 { font-family: var(--f-head); }
 .guide-link { margin-top: 6px; }
 .party-box.guide-pulse { animation: guide-pulse 1.2s ease-in-out 4; box-shadow: 0 0 0 2px var(--mana); }
 @keyframes guide-pulse { 50% { box-shadow: 0 0 0 3px var(--mana), 0 0 18px rgba(143, 211, 255, 0.6); } }
-.guide { max-width: 520px; line-height: 1.6; }
-.guide-lead { margin-top: 0; }
-.guide ol { padding-left: 1.2em; margin: 0.5em 0; }
-.guide li { margin-bottom: 0.35em; }
-.guide-note { color: #e6c36a; margin-bottom: 0; }
 .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .legend { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; color: var(--ink-dim); font-size: 0.78rem; }
 .legend b { font-family: var(--f-brush); color: var(--ink); font-weight: 400; margin-right: 4px; }
@@ -391,6 +386,17 @@ h1, h2, h3 { font-family: var(--f-head); }
 .float-heal { color: var(--heal); }
 .float-status { color: #e6d39a; font-size: 0.95rem; }
 .float-absorb { color: #c07cff; }
+.float-critical { color: #ffd36b; font-size: 2.3rem; text-shadow: 0 0 10px rgba(255, 190, 60, 0.8), 0 2px 4px #000; }
+.float-weak { color: #9fe0ff; font-size: 1.05rem; margin-top: -26px; }
+.float-resist { color: #b9b4a8; font-size: 0.95rem; margin-top: -26px; }
+/* 속성 표시(의도·약점 이름표) */
+.el-mark { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-family: var(--f-brush); font-size: 0.72rem; line-height: 1; border: 1.5px solid; }
+.el-fire { color: #ffb070; border-color: #ff7a3c; background: rgba(90, 24, 8, 0.85); }
+.el-ice { color: #bfe9ff; border-color: #7cc8f2; background: rgba(12, 36, 60, 0.85); }
+.chip-weak { background: rgba(10, 40, 60, 0.92); border-color: #7cc8f2; color: #d4f0ff; }
+.chip-resist { background: rgba(40, 40, 44, 0.92); border-color: #8a8a90; color: #d0cec8; }
+.status-chip .el-mark { width: 18px; height: 18px; border: 0; }
+.dmg-preview small.cr { color: #ffd36b; }
 @keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -60px) scale(1); } }
 
 .fx-shake { animation: shake 0.26s; }
@@ -685,3 +691,23 @@ h1, h2, h3 { font-family: var(--f-head); }
   .vn-controls .btn { padding: 4px 8px; font-size: 0.8rem; }
   .vn-log { inset: 6vh 4vw 30vh; }
 }
+
+/* 단계별 안내(투어): 어두운 막에 스포트라이트 구멍 + 맥박치는 금빛 고리 + 옻칠 말풍선. 단계가 바뀌면 구멍이 미끄러져 간다 */
+.tour { position: fixed; inset: 0; z-index: 90; cursor: pointer; animation: tour-in 0.25s ease-out; }
+.tour.out { animation: tour-out 0.2s ease-in forwards; }
+@keyframes tour-in { from { opacity: 0; } }
+@keyframes tour-out { to { opacity: 0; } }
+.tour-spot { position: fixed; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(4, 6, 10, 0.72); pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tour-ring { position: fixed; border-radius: 10px; border: 2px solid #f2c45a; pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tour-ring.pop { animation: tour-ring 1.4s 0.45s ease-out infinite; }
+@keyframes tour-ring { 0% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0.7); } 70% { box-shadow: 0 0 0 14px rgba(242, 196, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0); } }
+.tour.no-target .tour-ring { display: none; }
+.tour-bubble { position: fixed; padding: 14px 16px 12px; cursor: default; background: linear-gradient(#17151a, #0e0d11); color: var(--ink); border: 1px solid #c9a24a; border-radius: 4px; box-shadow: inset 0 0 0 4px #0e0d11, inset 0 0 0 5px rgba(168, 40, 30, 0.6), 0 12px 40px rgba(0, 0, 0, 0.7); transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tour-bubble.pop { animation: tour-pop 0.4s ease-out; }
+@keyframes tour-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } }
+.tour-title { font-family: var(--f-brush); font-size: 1.15rem; color: #f4ecd8; margin-bottom: 4px; }
+.tour-text { font-size: 0.9rem; line-height: 1.7; color: #ddd6c6; white-space: pre-line; }
+.tour-actions { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.tour-count { margin-right: auto; font-size: 0.75rem; color: #c9a24a; letter-spacing: 0.1em; }
+.tour-skip { background: none; border: 0; color: var(--ink-dim); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.pop, .tour-bubble.pop { animation: none; } }

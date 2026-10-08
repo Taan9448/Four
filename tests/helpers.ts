@@ -14,8 +14,9 @@ export function cards(...ids: string[]): CardInstance[] {
   return ids.map((cardId, i) => ({ uid: `t${i}`, cardId, level: 0 }));
 }
 
+/** 시험용 전투. 치명타는 기본으로 끈다(수치를 정확히 보려고). 치명타 시험은 state.noCrit = false */
 export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
-  return createBattle(data, {
+  const s = createBattle(data, {
     world: 'elheim',
     party: [{ id: 'haun', hp: 60, maxHp: 60 }],
     enemies: ['test_wolf'],
@@ -25,6 +26,8 @@ export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
     supportActive: false,
     ...overrides,
   });
+  s.noCrit = true;
+  return s;
 }
 
 /** 손패에 특정 카드를 강제로 넣는다(테스트용) */

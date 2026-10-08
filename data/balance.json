@@ -22,6 +22,16 @@
   },
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,
+  "elements": {
+    "fire": { "status": "burn", "stacks": 1 },
+    "ice":  { "status": "chill", "stacks": 1 },
+    "weakMultiplier": 1.5,
+    "resistMultiplier": 0.5,
+    "freezeAt": 3,
+    "bossFreezeAt": 5,
+    "freezeStatus": "bind"
+  },
+  "crit": { "chance": 0.08, "multiplier": 1.5 },
   "party": { "max": 3, "reviveHp": 1 },
   "upgrade": { "maxLevel": 5, "statLevels": 3 },
   "rewards": {
@@ -36,6 +46,7 @@
   "route": {
     "nodesPerFloor": [2, 3],
     "eliteMinFloor": 3,
+    "maxCalmRun": 2,
     "extraEdgeChance": 0.35,
     "scarWeightPerPoint": 0.15
   }

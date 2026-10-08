@@ -60,7 +60,7 @@
     "type": "battle",
     "name": "불비늘 삼두견",
     "weight": 3,
-    "conditions": {"floorRange": [3, 6]},
+    "conditions": {"floorRange": [3, 9]},
     "content": {"text": "떠다니는 조각을 밟고 불타는 비늘의 짐승들이 달려온다. 중원에 쏟아진 것들보다 크고, 더 굶주렸다. 내공을 실어 베면 이곳이 그 내공을 먹는다. 결만 보고, 날만 얹어라.", "enemies": ["fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 망치가 짐승의 다리를 친다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
@@ -78,7 +78,7 @@
     "type": "battle",
     "name": "그림자 망령",
     "weight": 3,
-    "conditions": {"floorRange": [3, 6]},
+    "conditions": {"floorRange": [3, 9]},
     "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 8)", "effects": [{"op": "damage", "amount": 8, "target": "random_enemy"}]}}
   },
   {

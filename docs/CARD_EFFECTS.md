@@ -32,17 +32,17 @@
 
 ## 2. 피해 계산 순서
 
-1. 기본값 + 공격자 힘(스택당 +1)
-2. × 공격자 약화(0.75)
 0. 꿰맬 자리(`seam`): 실(`thread`) 키워드 카드가 아니면 피해 0으로 끝
 1. 기본값 + 공격자 힘(스택당 +1)
 2. × 공격자 약화(0.75)
 3. 틈의 굶주림(`hungry`): 카드 비용 내공이 2 이상이면 × 0.5
 4. 무형: 비용이 내공만이면 × 0.5
 5. 결 노출: 아군 공격이면 1스택 소모, × 1.5, 방어 무시
+5a. 속성(`damage`의 `element`: fire | ice): 적의 `weak`이면 × `elements.weakMultiplier`(1.5), `resist`면 × `resistMultiplier`(0.5)
+5b. 치명타: 아군 **카드**의 피해 한 번마다 시드 RNG로 굴린다. 확률은 `characters[].crit`(없으면 `balance.crit.chance`), 배율 `balance.crit.multiplier`(1.5). 피해 미리보기 복제·시험(`state.noCrit`)에서는 굴리지 않는다
 6. × 대상 취약(1.5)·받는 피해 보정(얼음 속 심장 0.2 등) → 내림
 7. 흐름 포식: 내공·마나 비용이 있는 카드면 피해 대신 그만큼 최대 HP·HP 증가
-8. 방어로 흡수 → HP 감소 → 0이면 쓰러짐/처치(처치 효과 → 짝 변신 → 혼자 남음 변신 → 승리 검사). 굶주린 적을 3의 카드로 쓰러뜨렸으면 균열 +1
+8. 방어로 흡수 → HP 감소 → 맞았으면(방어로 막혔어도) 속성 상태를 붙인다(9) → 0이면 쓰러짐/처치(처치 효과 → 짝 변신 → 혼자 남음 변신 → 승리 검사). 굶주린 적을 3의 카드로 쓰러뜨렸으면 균열 +1
 
 ## 3. 카드 JSON(`data/cards/<owner>.json`)
 
@@ -84,6 +84,11 @@
 - 영웅·전설은 `castLine`이 있어야 한다. 쓸 때마다 화면이 어두워지고, 화자의 반신 그림(`<화자>_stand`의 표정 프레임)과 대사가 나온 뒤 스킬이 나간다(약 1.5초, 클릭하면 건너뜀).
 - 전투 보상 후보는 노드 유형별 등급 가중치(`balance.rewards.rarityWeights`)로 등급을 먼저 뽑고, 그 등급에서 카드를 고른다.
 
+9. **속성 상태**(`balance.elements`): 화염 → 화상(`burn`) 1, 냉기 → 냉기(`chill`) 1. 대상이 그 속성에 내성이면 붙지 않는다.
+   상극: 화염은 대상의 냉기를 녹이고(지운다), 냉기는 화상을 끈다. 냉기가 `freezeAt`(3, 보스는 `bossFreezeAt` 5)에 이르면 냉기를 비우고 `freezeStatus`(빙결) 1.
+
+카드 문구는 속성 피해를 "화염 피해 9(화상 1)"처럼 자동으로 쓴다. 적 의도 옆에는 炎(화염)·冷(냉기) 표시, 적 이름 아래에는 '약점 냉기'·'내성 화염' 이름표가 붙는다.
+
 ## 4. 상태(`data/statuses.json`)
 
 | id | 이름 | 감소 | 효과 |
@@ -103,11 +108,13 @@
 | hungry | 틈의 굶주림 | 특성 | 내공 2 이상 카드 피해 ×0.5, 그 카드로 처치하면 균열 +1 |
 | still | 흐르지 않는 자 | 라운드 끝 -1 | 적이 이 아군을 노리지 못한다(special `unseen`). 다른 아군이 없으면 헛손질 |
 | seam | 꿰맬 자리 | 특성 | 실(thread) 카드의 피해만 받는다 |
+| burn | 화상 | 자기 턴 끝 -1 | 턴 시작마다 스택×2 HP 손실. 냉기 공격에 꺼진다 |
+| chill | 냉기 | 없음 | special `chill`: 3스택(보스 5)이면 빙결 1로 바뀐다. 화염 공격에 녹는다 |
 | mountain_regen | 산이 메운다 | 없음 | 차례 시작마다 스택×4 회복(`turnStartDamagePerStack` 음수 = 회복) |
 | frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
-`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam)은 엔진이 메커니즘으로 처리한다.
+`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, chill)은 엔진이 메커니즘으로 처리한다.
 
 ## 5. 적 JSON(`data/enemies/<stage>.json`)
 
@@ -116,6 +123,7 @@
 `moves[]`의 `effects`는 카드와 같은 기본 동작을 쓴다. `pattern: cycle`(순서대로) 또는 `random`(가중치, 같은 행동 3연속 금지).
 `targeting`: random | lowest_hp | highest_hp | haun. `sprite`가 있으면 `<sprite>_idle / _attack / _hit` 에셋을 쓰고, 없으면 실루엣으로 대신한다.
 
+- `weak` / `resist`: 속성 약점·내성 배열(fire | ice). 예: 불의 정령·이그니스 `weak: ["ice"], resist: ["fire"]`, 아르덴의 얼음 적 `weak: ["fire"], resist: ["ice"]`.
 - `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
 - `deathEffects`: 이 적이 쓰러질 때 그 적을 출처로 일어나는 전투 동작. 예: 베일락 `[{ "op": "damage", "amount": 999, "target": "all_allies" }]`(졸개가 무너진다), 쐐기 `[{ "op": "rift", "amount": -2 }]`.
 
