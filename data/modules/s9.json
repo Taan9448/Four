@@ -1,0 +1,217 @@
+[
+  {
+    "id": "s9_story_second_line",
+    "stage": "s9",
+    "type": "story",
+    "name": "바랜 둘째 줄",
+    "once": true,
+    "content": {"scene": "s9_scene_second_line", "text": "천마봉의 정상. 머리 위로 하늘의 상처가 거대한 아가리처럼 벌어져 있다. 그 안에서 굶주린 바람이 불어온다. 우우웅. 이번에는 넷 모두가 들었다.", "choices": [{"label": "숨을 쉰다. 세 번 짧게, 한 번 길게", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"costNeigongGte": 1}}, {"op": "set_flag", "flag": "second_line"}], "result": "카일이, 보른이, 엘리아가 같은 박자로 숨을 쉬었다. 네 사람은 틈 속으로 뛰어들었다. (내공을 쓰는 카드 2장 강화 +1)"}, {"label": "\"내가 남긴 구름이 길이 되고, 마지막 초식이 바늘이 되리라.\"", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}, {"op": "set_flag", "flag": "second_line"}], "result": "하운은 바랜 둘째 줄을 한 번 더 읊었다. 그리고 뛰어내렸다. (고른 카드 1장 강화 +1)"}]}
+  },
+  {
+    "id": "s9_story_no_flow",
+    "stage": "s9",
+    "type": "story",
+    "name": "흐름이 없는 곳",
+    "once": true,
+    "content": {"scene": "s9_scene_no_flow", "text": "이곳은 흐르는 것을 먹는다. 마나든, 내공이든, 생명이든. 그러나 닫힌 고리는 가장자리만 먹힌다. 빌리지 않으니, 빼앗기지도 않는다.", "choices": [{"label": "\"청운호흡!\"", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "gain_card", "card": "haun_breath"}], "result": "세 번 짧게, 한 번 길게. 네 개의 작은 고리가 같은 박자로 돌았다. 남아 있던 강물 한 줌은 틈이 먹었다. (청운호흡을 얻었다)"}, {"label": "엘리아의 등에 손을 얹는다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "heal_party", "ratio": 0.3}], "result": "콩알만 한 따뜻함이, 아주 천천히, 한 바퀴를 돌았다. 그리고 또 한 바퀴. (출전 동료 전원 최대 체력의 30% 회복)"}]}
+  },
+  {
+    "id": "s9_story_frozen_fragment",
+    "stage": "s9",
+    "type": "story",
+    "name": "얼어붙은 조각",
+    "once": true,
+    "content": {"scene": "s9_scene_frozen_fragment", "text": "쐐기의 길이 갈라지는 자리. 집채만 한 아르덴의 얼음 속에, 성문으로 달려가던 기사와 아이가 멈춰 있다. 멈춘 마나는 먹히지 않는다.", "choices": [{"label": "엘리아가 얼음 조각을 품에 넣는다", "effects": [{"op": "set_flag", "flag": "arden_ice"}, {"op": "heal_party", "ratio": 0.2}], "result": "\"언젠가 필요할 거예요.\" 바늘이 있으면, 실이 필요하다. (아르덴의 얼음 조각. 출전 동료 전원 최대 체력의 20% 회복)"}, {"label": "카일 곁에서 칼의 길을 따라간다", "condition": {"partyHas": "kyle"}, "effects": [{"op": "set_flag", "flag": "arden_ice"}, {"op": "gain_card", "card": "kyle_eyes_closed"}], "result": "\"오. 이것도 되네.\" 단검이 왔던 길로, 거꾸로. (아르덴의 얼음 조각. 눈을 감고를 얻었다)"}, {"label": "보른이 옆 돌에 표식을 새긴다", "condition": {"partyHas": "born"}, "effects": [{"op": "set_flag", "flag": "arden_ice"}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}], "result": "'카일. 여기 아버지 계신다. 돌아올 때 인사해라.' 카일은 보른의 어깨를 세게 쳤다. 아무 말 없이. (아르덴의 얼음 조각. 보른의 카드 2장 강화 +1)"}]}
+  },
+  {
+    "id": "s9_story_sword_saint_rock",
+    "stage": "s9",
+    "type": "story",
+    "name": "청운검선의 바위",
+    "once": true,
+    "content": {"scene": "s9_scene_sword_saint_rock", "text": "바위 아래쪽 틈에서 꺼낸 부러진 검. 소나무 결 무늬. 녹이 슬지 않았다. 이곳에는 녹을 슬게 할 흐름조차 없었으니까. 마지막 초식이 바늘이 되리라.", "choices": [{"label": "부러진 첫 송문고검을 품에 넣는다", "effects": [{"op": "set_flag", "flag": "needle"}, {"op": "upgrade_card", "count": 1, "choose": true, "filter": {"owner": "haun"}}], "result": "백 년 전, 같은 산에서 같은 것을 보던 사람의 검. (바늘. 하운의 카드 1장 골라 강화 +1)"}, {"label": "청운십팔식의 구령을 소리 내어 읽는다", "effects": [{"op": "set_flag", "flag": "needle"}, {"op": "gain_card", "card": "haun_cloud_form"}], "result": "제일식, 청운출수. 제이식, 운중학립. 제삼식, 청풍불면. 오 년 동안 담장 너머로 듣던 구령이었다. (바늘. 청운십팔식을 얻었다)"}, {"label": "\"제 고리는 팔 년짜리입니다.\"", "effects": [{"op": "set_flag", "flag": "needle"}, {"op": "heal_party", "ratio": 0.3}], "result": "하운은 걸으면서 한 사람씩 손을 얹었다. 조금씩. 자기 고리를 깎아서. (바늘. 출전 동료 전원 최대 체력의 30% 회복)"}]}
+  },
+  {
+    "id": "s9_story_born_stays",
+    "stage": "s9",
+    "type": "story",
+    "name": "다음 갱도",
+    "once": true,
+    "content": {"scene": "s9_scene_born_stays", "text": "떨어져 온 낙안봉 성벽 위. 뼈의 거인 다섯이 양 끝을 막았다. 보른이 형의 망치로 성벽을 결대로 갈라 놓는다. \"먼저 가.\"", "choices": [{"label": "검끝으로 새긴다. '보른. 여기서 구름 따라와라. 기다린다.'", "effects": [{"op": "leave_party", "member": "born"}, {"op": "set_flag", "flag": "born_stays"}], "result": "등 뒤에서 망치 소리가 울렸다. 쾅. 쾅. 쾅. 보른이 성벽에 남았다. 이제부터 보른은 출전하지 않는다."}]}
+  },
+  {
+    "id": "s9_story_kyle_stays",
+    "stage": "s9",
+    "type": "story",
+    "name": "그림자 다리",
+    "once": true,
+    "content": {"scene": "s9_scene_kyle_stays", "text": "굳은 그림자로 된 다리가 일어나 망령 수백이 되었다. 카일이 눈송이 목걸이에 입을 맞추고, 눈을 감는다. \"가!\"", "choices": [{"label": "엘리아의 손을 잡고 달린다", "effects": [{"op": "leave_party", "member": "kyle"}, {"op": "set_flag", "flag": "kyle_stays"}], "result": "쨍. 쨍. 쨍. 칼들이 하나씩 온 길로 되돌아갔다. 카일이 다리에 남았다. 하운과 엘리아, 둘만이 남은 길을 간다."}]}
+  },
+  {
+    "id": "s9_boss_mordecai",
+    "stage": "s9",
+    "type": "boss",
+    "name": "틈의 심장",
+    "content": {"scene": "s9_scene_mordecai", "outroScene": "s9_scene_sealing", "text": "흐름을 실은 공격은 먹힌다. 숨까지 멈춰 흐르지 않는 자가 되고, 결을 읽어 매듭을 드러내고, 힘을 싣지 않고 날을 얹어라.", "enemies": ["mordecai"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_stop_ring", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "hand"}, {"op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2}], "clearEffects": [{"op": "set_flag", "flag": "rift_sealed"}]}
+  },
+  {
+    "id": "s9_battle_hounds",
+    "stage": "s9",
+    "type": "battle",
+    "name": "불비늘 삼두견",
+    "weight": 3,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "떠다니는 조각을 밟고 불타는 비늘의 짐승들이 달려온다. 중원에 쏟아진 것들보다 크고, 더 굶주렸다. 내공을 실어 베면 이곳이 그 내공을 먹는다. 결만 보고, 날만 얹어라.", "enemies": ["fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 망치가 짐승의 다리를 친다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_battle_seventh_fragment",
+    "stage": "s9",
+    "type": "battle",
+    "name": "일곱째 조각",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "일곱 번째 조각에서 짐승들이 나타났다. 머리가 셋인. 하운은 검을 뽑았다. 그리고 멈췄다. 내공을 실어 베면 이곳이 그 내공을 먹는다. 결만 보고, 날만 얹어라.", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "elia"}, "text": "\"결만 봐야 해요. 힘을 실으면 먹혀요.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_battle_wraiths",
+    "stage": "s9",
+    "type": "battle",
+    "name": "그림자 망령",
+    "weight": 3,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 8)", "effects": [{"op": "damage", "amount": 8, "target": "random_enemy"}]}}
+  },
+  {
+    "id": "s9_battle_glass_tower",
+    "stage": "s9",
+    "type": "battle",
+    "name": "유리 탑의 잔해",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "유리처럼 투명한 탑의 잔해. 그 투명한 벽에 그림자가 비치고, 그림자 사이로 불비늘이 번득인다.", "enemies": ["shadow_wraith", "fire_scale_hound", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 숨을 세며 외친다. \"왼쪽! 셋! 위에서 둘!\" (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_battle_hanging_forest",
+    "stage": "s9",
+    "type": "battle",
+    "name": "거꾸로 매달린 숲",
+    "weight": 2,
+    "conditions": {"floorRange": [6, 6]},
+    "content": {"text": "구름과 구름 사이가 멀다. 구름이 새겨지지 않은 조각, 거꾸로 매달린 숲의 그늘에서 짐승이 기다리고 있었다.", "enemies": ["fire_scale_hound", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"flag": "needle"}, "text": "청운검선의 칼자국을 따라 결이 보인다. (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_elite_bone_giant",
+    "stage": "s9",
+    "type": "elite",
+    "name": "뼈 거인",
+    "weight": 1,
+    "once": true,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "뼈로 이루어진 거인이 세계의 조각을 밟고 일어선다. 뼈 사이로 검붉은 기운이 흐른다. 부서져도 다시 일어선다.", "enemies": ["bone_giant"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 결을 보고 거인의 정강이를 친다. 내공을 싣지 않고. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_elite_hungry_pack",
+    "stage": "s9",
+    "type": "elite",
+    "name": "굶주린 무리",
+    "weight": 1,
+    "once": true,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "불비늘 삼두견 무리가 조각을 건너뛰며 둘러싼다. 머리 셋이 하나의 목으로 모이는 이음매. 장작 패기다.", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일은 목을, 보른은 다리를, 엘리아는 눈을. \"결국 다 장작 패기야.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s9_event_toma_wedge",
+    "stage": "s9",
+    "type": "event",
+    "name": "토마의 표식",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "세 번째 조각, 부서진 돌기둥에 박힌 쐐기. 뭉툭한 끝, 아무도 들여다보지 않는 자리에 칼끝으로 새긴 아이 이름의 첫 글자가 있었다. \"…한스 씨.\"", "choices": [{"label": "결을 따라 뽑아 품에 넣는다", "effects": [{"op": "set_flag", "flag": "toma_wedge"}, {"op": "upgrade_card", "count": 1, "choose": true}], "result": "\"한스 씨께 돌려드려야죠. 토마가 아버지가 여기 있었다는 걸 알 수 있게.\" \"그래. 그러려면 살아서 돌아가야겠네.\" (고른 카드 1장 강화 +1)"}, {"label": "쐐기의 엉킨 결을 읽는다", "effects": [{"op": "gain_card", "card": "haun_read_grain"}], "result": "쐐기에서 결을 잃은 마나가 빠져나가 깊은 곳으로 빨려 들어갔다. 무언가가 저 깊은 곳에서 이걸 먹으려고 끌어당기고 있다. (결 읽기를 얻었다)"}]}
+  },
+  {
+    "id": "s9_event_born_marks",
+    "stage": "s9",
+    "type": "event",
+    "name": "보른의 표식",
+    "weight": 3,
+    "once": true,
+    "conditions": {"partyHas": "born", "floorRange": [3, 6]},
+    "content": {"text": "보른이 쐐기 옆에 망치 끝으로 무언가를 새긴다. 톡, 톡, 톡. 드워프 문자가 아니라 이 세계의 글자. 서툴지만 알아볼 수 있는. \"들어가는 길은 쐐기가 알려 준다. 나오는 길은 아무도 안 알려 준다. 그래서 내가 새긴다.\"", "choices": [{"label": "'하운. 여기서 왼쪽 위. 붉은 돌.'", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "하운은 그 서툰 글자를 오래 보았다. 그리고 목이 메었다. (하운의 카드 2장 강화 +1)"}, {"label": "'엘리아. 숨 쉬어라.'", "condition": {"partyHas": "elia"}, "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}], "result": "엘리아가 웃으며 숨을 쉬었다. 세 번 짧게, 한 번 길게. (엘리아의 카드 2장 강화 +1)"}, {"label": "'카일. 이 조각 흔들린다. 뛰지 마라.'", "condition": {"partyHas": "kyle"}, "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}], "result": "\"글자는 언제 배웠어?\" \"석두한테.\" (카일의 카드 2장 강화 +1)"}]}
+  },
+  {
+    "id": "s9_event_wedge_road",
+    "stage": "s9",
+    "type": "event",
+    "name": "쐐기의 길",
+    "weight": 2,
+    "tags": ["scar"],
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "쐐기는 떠다니는 조각마다 박혀 있었다. 모두 같은 방향을 가리킨다. 뾰족한 끝을 틈의 깊은 곳으로. 먹이가 가는 길은 입으로 간다. 정면으로.", "choices": [{"label": "쐐기를 따라 정면으로 서두른다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "숨소리가 가까워졌다. 우우웅. 굶주린 것이 일행을 알아챘다. (하운의 카드 2장 강화 +1, 상흔 +1)"}, {"label": "조각에서 조각으로, 내공을 아끼며 건너뛴다", "effects": [{"op": "heal_party", "ratio": 0.15}], "result": "닫힌 고리의 가장자리가 조금만 깎였다. (출전 동료 전원 최대 체력의 15% 회복)"}]}
+  },
+  {
+    "id": "s9_event_share_ring",
+    "stage": "s9",
+    "type": "event",
+    "name": "고리 나누기",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [3, 9]},
+    "content": {"text": "셋의 고리가 깎여 나간다. 엘리아의 콩알만 한 고리는 이제 좁쌀만 했다. 하운이 그녀의 등에 손을 얹는다. 닫힌 고리와 닫힌 고리 사이로, 손바닥과 등을 맞댄 그 짧은 길로만. \"…당신 것도 깎이잖아요.\"", "choices": [{"label": "\"제 고리는 팔 년짜리입니다.\"", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "조금 나눠도 괜찮다고, 하운이 웃었다. (출전 동료 전원 최대 체력의 30% 회복)"}, {"label": "각자의 숨으로 버티자고 한다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"costNeigongGte": 1}}], "result": "세 번 짧게, 한 번 길게. 바깥으로 새지 않게, 안에서만. (내공을 쓰는 카드 2장 강화 +1)"}]}
+  },
+  {
+    "id": "s9_event_fragments",
+    "stage": "s9",
+    "type": "event",
+    "name": "떠다니는 조각들",
+    "weight": 3,
+    "conditions": {"floorRange": [3, 9]},
+    "content": {"text": "청운산 전각과 똑같은 기와지붕의 반쪽. 흑요석 첨탑의 꼭대기. 거대한 나선형 조개껍데기. 별처럼 빛나는 모래가 담긴 그릇. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다. 삼천 년 동안.", "choices": [{"label": "기와지붕 아래서 숨을 고른다", "effects": [{"op": "heal_party", "amount": 8}], "result": "청운산의 지붕. 잠깐, 고향 냄새가 났다. (출전 동료 전원 체력 8 회복)"}, {"label": "별처럼 빛나는 모래를 들여다본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "모래알 하나하나에 결이 있었다. (고른 카드 1장 강화 +1)"}, {"label": "무거운 것을 조각 위에 내려놓는다", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}], "result": "흐르지 않는 곳에서는 가벼울수록 오래 간다. (기본 카드 1장 제거)"}]}
+  },
+  {
+    "id": "s9_event_hungry_gaze",
+    "stage": "s9",
+    "type": "event",
+    "name": "굶주린 시선",
+    "weight": 2,
+    "tags": ["scar"],
+    "conditions": {"floorRange": [6, 9]},
+    "content": {"text": "틈의 가장 깊은 곳에서 무언가가 보고 있다. 눈은 보이지 않는다. 그러나 굶주린 시선이 느껴진다. 흐르는 것의 냄새를 찾는.", "choices": [{"label": "숨을 죽이고 흐름을 숨긴다", "effects": [{"op": "heal_party", "amount": 6}], "result": "시선이 일행을 놓쳤다. 흐르지 않는 자는 볼 수 없다. (출전 동료 전원 체력 6 회복)"}, {"label": "힘을 실어 길을 연다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "시선이 일행을 쫓는다. 베면 먹는다. (하운의 카드 2장 강화 +1, 상흔 +1)"}]}
+  },
+  {
+    "id": "s9_event_cloud_road",
+    "stage": "s9",
+    "type": "event",
+    "name": "구름의 길",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [6, 6]},
+    "content": {"text": "조각마다 새겨진 구름. 백 년 된 칼자국. 깊고, 단순하고, 정확했다. 결을 따라 새긴. 구름이 있는 조각에는 짐승이 없었다.", "choices": [{"label": "구름을 손가락으로 쓸어 본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "청운검선은 결을 보는 사람이었다. 하운처럼. (고른 카드 1장 강화 +1)"}, {"label": "짐승이 없는 조각에서 숨을 고른다", "effects": [{"op": "heal_party", "ratio": 0.25}], "result": "그것의 눈에 띄지 않는 길. (출전 동료 전원 최대 체력의 25% 회복)"}]}
+  },
+  {
+    "id": "s9_event_near_breath",
+    "stage": "s9",
+    "type": "event",
+    "name": "가까워지는 숨소리",
+    "weight": 3,
+    "conditions": {"floorRange": [9, 9]},
+    "content": {"text": "구름의 길이 아래로 이어진다. 우우웅. 숨소리는 이제 소리가 아니라 바람이었다. 검붉은 어둠이 그 숨에 맞춰 밀려왔다가 빨려 들어간다. 거대한 허파 속을 걷는 것 같다.", "choices": [{"label": "엘리아의 손을 꽉 쥔다", "effects": [{"op": "heal_party", "ratio": 0.25}], "result": "좁쌀만 한 고리가 아직 돌고 있다. (출전 동료 전원 최대 체력의 25% 회복)"}, {"label": "품 안의 부러진 검을 쥐어 본다", "condition": {"flag": "needle"}, "effects": [{"op": "upgrade_card", "count": 1, "choose": true, "filter": {"owner": "haun"}}], "result": "마지막 초식이 바늘이 되리라. (하운의 카드 1장 골라 강화 +1)"}]}
+  },
+  {
+    "id": "s9_rest_tile_roof",
+    "stage": "s9",
+    "type": "rest",
+    "name": "청운산의 기와지붕",
+    "weight": 1,
+    "content": {"text": "떠다니는 조각 가운데 청운산의 기와지붕 반쪽. 하운이 그 위에 엘리아를 눕혔다. 자기 고리의 마지막 남은 두께에서 한 줌을 떼어 그녀의 등으로 흘려보낸다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s9_rest_red_stone",
+    "stage": "s9",
+    "type": "rest",
+    "name": "혈전의 붉은 돌",
+    "weight": 1,
+    "conditions": {"floorRange": [3, 6]},
+    "content": {"text": "함께 떨어져 온 천마봉 혈전의 붉은 돌. 넷이 둘러앉아 서로의 숨소리를 듣는다. 세 번 짧게, 한 번 길게. 네 개의 작은 고리가 돈다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
+  }
+]

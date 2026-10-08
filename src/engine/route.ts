@@ -186,8 +186,10 @@ export function validateMap(data: GameData, map: StageMap): string[] {
     const floor = map.floors[pin.floor - 1];
     if (floor.length !== 1 || floor[0].moduleId !== pin.module) errors.push(`${pin.floor}층 고정 노드(${pin.module}) 누락`);
   }
+  const pinnedFloors = new Set(stage.pinned.map((p) => p.floor));
   for (const n of all) {
-    if (n.type === 'elite' && n.floor < data.balance.route.eliteMinFloor) errors.push(`${n.id}: 너무 이른 엘리트`);
+    // 고정 노드(원작의 정해진 전투, 예: S5 1층 그림자의 밤)는 이른 엘리트 제한을 받지 않는다
+    if (n.type === 'elite' && n.floor < data.balance.route.eliteMinFloor && !pinnedFloors.has(n.floor)) errors.push(`${n.id}: 너무 이른 엘리트`);
     if (n.type === 'rest' && n.next.some((x) => byId.get(x)?.type === 'rest')) errors.push(`${n.id}: 휴식 연속`);
     if (n.floor <= stage.floors && !n.moduleId) errors.push(`${n.id}: 모듈 없음`);
     for (const x of n.next) {
