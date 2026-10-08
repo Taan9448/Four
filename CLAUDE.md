@@ -12,7 +12,7 @@
 ```bash
 npm ci
 npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>]
-                            # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub[&module=<id>] (화면 하나만 띄우기)
+                            # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex[&module=<id>] (화면 하나만 띄우기)
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
@@ -39,9 +39,9 @@ npm run assets:status
 9. **작업을 끝내면** 무엇을 바꿨는지와 사람이 해야 할 일을 짧게 보고한다.
 
 ## 구조
-- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), save(저장 직렬화), text(카드 문구)
+- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), economy(골드·상점·전리품), codex(도감 기록), save(저장 직렬화), text(카드 문구)
 - `src/sim/` — bot(자동 플레이 봇: 밸런스 측정용, 엔진만 씀)
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview
-- `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage)
+- `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, hub-view(클리어 지도), shop-view, codex-view(도감), overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage)
 - `data/` — balance, statuses, characters, stages, support, speakers, cards/, enemies/(스테이지별), modules/, scenes/
 - `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세), `balance/`(봇 실행·기록, vitest로 돈다)
