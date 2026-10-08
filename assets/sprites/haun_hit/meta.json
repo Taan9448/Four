@@ -23,12 +23,12 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 3,
-  "sourceHash": "3dfdb60af8d3a902",
+  "sourceHash": "0a670c52c94520c8",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.689
+  "gridPurity": 0.709
 }
