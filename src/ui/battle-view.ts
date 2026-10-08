@@ -11,6 +11,7 @@ import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, spriteSource } from '../render/assets';
 import { SpritePlayer } from '../render/sprite-player';
+import { sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
@@ -615,10 +616,14 @@ export class BattleView {
     for (const [idx, ev] of events.entries()) {
       switch (ev.type) {
         case 'turn':
-          if (ev.turn > 1) toast(this.toasts, `${ev.turn}턴`, 'info');
+          if (ev.turn > 1) {
+            toast(this.toasts, `${ev.turn}턴`, 'info');
+            sfx('turn');
+          }
           break;
         case 'card': {
           this.lastCard = ev.cardId;
+          sfx('card');
           const line = resolveCard(this.data, ev.cardId).def.castLine;
           if (line && settings.cutIn) await this.cutIn(ev.cardId, line);
           break;
@@ -631,6 +636,8 @@ export class BattleView {
           if (!u) break;
           if (ev.absorbed) floatOver(this.fxLayer, u.el, `흡수 +${ev.amount}`, 'absorb');
           else {
+            // 소리: 맞은 쪽 자리(적 오른쪽, 일행 왼쪽)에서. 막혀서 0이면 막는 소리
+            const pan = u.c.side === 'enemy' ? 0.35 : -0.35;
             // 치명타는 금빛 큰 숫자, 결은 푸른 숫자. 약점·내성은 작은 글자를 하나 더
             const heavy = ev.amount >= 15;
             floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : heavy ? 'heavy' : 'damage');
@@ -639,6 +646,8 @@ export class BattleView {
             if (ev.blocked) floatOver(this.fxLayer, u.el, `막음 ${ev.blocked}`, 'block');
             // 이 피해로 쓰러지는가(엔진은 피해 바로 뒤에 쓰러짐 이벤트를 남긴다)
             const kill = events.slice(idx + 1, idx + 4).some((e) => (e.type === 'downed' || e.type === 'death') && e.uid === ev.targetUid);
+            sfx(ev.amount <= 0 ? 'block' : ev.crit || kill ? 'crit' : ev.amount >= 15 ? 'hit_heavy' : 'hit', { pan });
+            if (ev.amount > 0 && (ev.element === 'fire' || ev.element === 'ice')) sfx(ev.element, { pan, volume: 0.7 });
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);
             if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then(() => this.idle(u));
@@ -661,6 +670,7 @@ export class BattleView {
         case 'block': {
           const u = this.units.get(ev.targetUid);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount} 방어`, 'block');
+          sfx('block', { volume: 0.6 });
           this.refresh();
           await this.wait(100);
           break;
@@ -668,25 +678,33 @@ export class BattleView {
         case 'heal': {
           const u = this.units.get(ev.targetUid);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount}`, 'heal');
+          sfx('heal');
           this.refresh();
           await this.wait(100);
           break;
         }
         case 'status': {
           const u = this.units.get(ev.targetUid);
-          if (u && ev.stacks > 0) floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
+          if (u && ev.stacks > 0) {
+            floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
+            sfx('status', { volume: 0.6 });
+          }
           if (ev.status === 'knot_exposed' && ev.stacks > 0) toast(this.toasts, '매듭이 드러났다 — 날 얹기!', 'support');
           break;
         }
         case 'rift':
           this.rift.update(ev.value);
           this.refresh();
-          if (ev.delta > 0) flash(this.field, 'blue');
+          if (ev.delta > 0) {
+            flash(this.field, 'blue');
+            sfx('rift', { volume: 0.7 });
+          }
           await this.wait(80);
           break;
         case 'surge':
           toast(this.toasts, '균열 폭주! 하늘이 갈라진다', 'danger');
           void this.rift.surge();
+          sfx('surge');
           shake(this.field, 1);
           flash(this.field, 'red');
           await this.wait(350);
@@ -700,6 +718,7 @@ export class BattleView {
           break;
         case 'relic': {
           // 유물이 일하면 그 표식이 번쩍인다
+          sfx('relic');
           const chip = this.relicEl.querySelector<HTMLElement>(`[data-relic="${ev.relicId}"]`);
           if (chip) {
             chip.classList.remove('fired');
@@ -712,6 +731,7 @@ export class BattleView {
         }
         case 'potion':
           toast(this.toasts, `물약 — ${ev.name}`, 'support');
+          sfx('potion');
           this.refresh();
           await this.wait(150);
           break;
@@ -724,6 +744,7 @@ export class BattleView {
           if (u) {
             u.player.stop();
             u.el.classList.add('down');
+            sfx('down', { pan: u.c.side === 'enemy' ? 0.35 : -0.35 });
           }
           await this.wait(200);
           break;
@@ -736,6 +757,7 @@ export class BattleView {
             const fresh = this.makeUnit(old.c);
             old.el.replaceWith(fresh.el);
             toast(this.toasts, `${ev.from} — ${ev.text}`, 'danger');
+            sfx('transform');
             shake(this.field, 0.8);
             flash(this.field, 'red');
             this.refresh();
@@ -757,6 +779,7 @@ export class BattleView {
           break;
         }
         case 'result':
+          sfx(ev.result === 'victory' ? 'victory' : 'defeat');
           break;
       }
     }

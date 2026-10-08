@@ -1,5 +1,6 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
+import { sfx } from '../render/audio';
 import { buyCard, buyPotion, buyRelic, buyRemove, buyUpgrade, openShop, removableCards, removePrice, type BuyResult } from '../engine/economy';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
@@ -40,6 +41,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
   const box = h('div', { class: 'choice-box panel shop-box' });
   const result = (r: BuyResult) => {
     toast(toasts, r.ok ? r.message : r.reason, r.ok ? 'support' : 'danger');
+    if (r.ok) sfx('coin');
     render();
   };
   const price = (n: number, sold: boolean) => h('span', { class: `price${!sold && run.gold < n ? ' short' : ''}` }, sold ? '팔림' : h('span', {}, h('i', { class: 'coin' }), String(n)));

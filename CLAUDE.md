@@ -41,7 +41,7 @@ npm run assets:status
 ## 구조
 - `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), economy(골드·상점·전리품), codex(도감 기록), save(저장 직렬화), text(카드 문구)
 - `src/sim/` — bot(자동 플레이 봇: 밸런스 측정용, 엔진만 씀)
-- `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview
+- `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview, portrait(반신 그림), audio(합성 효과음·배경음악), music(곡 악보)
 - `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, hub-view(클리어 지도), shop-view, codex-view(도감), overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage)
 - `data/` — balance, statuses, characters, stages, support, speakers, cards/, enemies/(스테이지별), modules/, scenes/
 - `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세), `balance/`(봇 실행·기록, vitest로 돈다)

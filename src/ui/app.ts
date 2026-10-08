@@ -25,6 +25,8 @@ import {
   type RunState,
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
+import { initAudio, playBgm, sfx } from '../render/audio';
+import { moodFor } from '../render/music';
 import { BattleView } from './battle-view';
 import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
 import { claimLoot, rollLoot } from '../engine/economy';
@@ -68,6 +70,7 @@ export class App {
 
   constructor(private root: HTMLElement) {
     applySettings();
+    initAudio();
     const params = new URLSearchParams(location.search);
     initDebug(params);
     const seed = params.get('seed');
@@ -168,6 +171,7 @@ export class App {
 
   /** 도감 화면. 본 장면을 다시 보면 끝나고 같은 탭으로 돌아온다 */
   private codex(tab: CodexTab = 'cards'): void {
+    playBgm('title');
     this.show(
       codexView(
         data,
@@ -213,6 +217,7 @@ export class App {
     const last = lastSlot(data);
     const anySaved = listSlots(data).some((x) => x.saved);
     const url = frameUrl('title_world', 1, { realOnly: true });
+    playBgm('title');
     this.show(
       h(
         'section',
@@ -237,7 +242,7 @@ export class App {
             h('button', { class: `btn${last ? '' : ' btn-primary'}`, onclick: () => this.openSlots('new') }, '새로 시작', h('small', {}, '빈 칸이나 고른 칸에서')),
             anySaved ? h('button', { class: 'btn', onclick: () => this.openSlots('load') }, '불러오기', h('small', {}, `저장 ${SLOT_COUNT}칸`)) : null,
             h('button', { class: 'btn', onclick: () => this.codex() }, '도감', h('small', {}, '본 카드 · 적 · 장면')),
-            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '속도 · 연출 · 안내')),
+            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '소리 · 속도 · 연출')),
           ),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
@@ -371,7 +376,10 @@ export class App {
     }
     this.note((c) => noteRun(c, run));
     // 레벨업 소식·고를 강화가 남았으면 먼저(전투 뒤 지도로 가기 전, 보스 뒤에는 스테이지 끝 화면 전에)
-    if (run.levelLog.length || run.pendingUpgrades.length) return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
+    if (run.levelLog.length || run.pendingUpgrades.length) {
+      if (run.levelLog.length) sfx('levelup');
+      return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
+    }
     if (run.status === 'stage_clear') {
       // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
       const stage = data.stages.find((s) => s.id === run.stageId)!;
@@ -391,6 +399,7 @@ export class App {
       return this.playScene(last.endingScene, () => this.end(true));
     }
     if (run.status === 'defeat') return this.end(false);
+    playBgm(moodFor(data.stages.find((s) => s.id === run.stageId)?.world));
     // 출전 편성 안내: 동료가 처음 합류했을 때, 자리가 처음 가득 찼을 때 한 번씩(런 플래그로 기억)
     const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').length;
     const guide = (flag: string, when: boolean) => when && !run.flags.includes(flag) && (run.flags.push(flag), true);
@@ -431,6 +440,7 @@ export class App {
     if (!scene) return then();
     this.note((c) => noteScene(data, c, scene.id));
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
+    playBgm(moodFor(scene.world ?? stage?.world));
     this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
@@ -440,6 +450,7 @@ export class App {
     const state = createBattle(data, setup);
     this.note((c) => noteEnemiesSeen(c, state.enemies.map((e) => e.defId)));
     const stage = data.stages.find((s) => s.id === run.stageId)!;
+    playBgm(moodFor(stage.world, enc.module.type === 'boss' ? 'boss' : 'battle'));
     const bonus = bonusActive(run, enc.module) ? enc.module.content.bonus?.text : undefined;
     const view = new BattleView(
       data,
@@ -460,6 +471,8 @@ export class App {
       },
       (final) => {
         const outcome = battleOutcome(final)!;
+        // 전투가 끝나면 장소의 곡으로(지면 엔딩 화면이 멈춘다)
+        playBgm(outcome.result === 'victory' ? moodFor(stage.world) : null);
         this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory'));
         this.clearMessages = applyBattleOutcome(data, run, enc, outcome);
         if (run.status === 'defeat') return this.map();
@@ -502,6 +515,7 @@ export class App {
   /** 클리어 지도: 마친 런의 여정 띠에서 스테이지를 골라 마지막 파티로 다시 한다(GAME_DESIGN 2절) */
   private hub(): void {
     const run = this.run!;
+    playBgm('title');
     this.show(
       hubView(data, run, {
         onReplay: async (stageId) => {
@@ -568,6 +582,7 @@ export class App {
 
   private end(win: boolean): void {
     const run = this.run!;
+    playBgm(win ? 'title' : null);
     const last = data.stages.find((s) => s.id === run.stageId)!;
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;
