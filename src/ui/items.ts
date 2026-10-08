@@ -3,6 +3,7 @@ import type { GameData } from '../engine/data';
 import { h } from './dom';
 import { tipAttrs } from './tooltip';
 import { iconEl } from './icons';
+import { openOverlay } from './overlay';
 
 /** 유물 아이콘: 1~16은 icons_relics, 17~은 icons_relics_b의 (icon-16)칸 */
 const relicIcon = (icon: number | undefined, glyph: string) =>
@@ -45,11 +46,56 @@ export function goldChip(gold: number): HTMLElement {
   return h('span', { class: 'gold-chip', ...tipAttrs(`골드 ${gold}`, '전투에서 얻고 상점에서 쓴다.') }, h('i', {}), String(gold));
 }
 
-/** 지도 오른쪽 칸: 골드 · 물약 칸 · 유물 */
+/** 보유 장비 창: 골드 · 물약 · 유물을 이름·효과와 함께 크게 */
+export function openInventory(data: GameData, gold: number, potions: (string | null)[], relics: string[]): void {
+  const row = (chip: HTMLElement, name: string, kind: string, text: string, flavor?: string) =>
+    h('div', { class: 'gear-row' }, chip, h('div', {}, h('b', {}, name, h('small', {}, kind)), h('p', {}, text), flavor ? h('p', { class: 'gear-flavor' }, flavor) : null));
+  openOverlay(
+    '보유 장비',
+    h(
+      'div',
+      { class: 'gear' },
+      h('div', { class: 'gear-gold' }, goldChip(gold), h('span', {}, '전투에서 얻고 상점에서 쓴다.')),
+      h('h3', {}, `물약 (${potions.filter(Boolean).length}/${potions.length})`),
+      potions.some(Boolean)
+        ? h(
+            'div',
+            { class: 'gear-list' },
+            potions.map((id) => {
+              const def = id ? data.potions.get(id) : undefined;
+              return def ? row(potionChip(data, id, { extra: 'big' }), def.name, `${POTION_RARITY[def.rarity]} 물약`, def.description) : null;
+            }),
+          )
+        : h('p', { class: 'hint' }, '물약 없음 — 전투 보상이나 상점에서 얻는다. 전투 중에 비용 없이 쓴다.'),
+      h('h3', {}, `유물 (${relics.length})`),
+      relics.length
+        ? h(
+            'div',
+            { class: 'gear-list' },
+            relics.map((id) => {
+              const def = data.relics.get(id);
+              return def ? row(relicChip(data, id, 'big'), def.name, `${RELIC_RARITY[def.rarity]} 유물`, def.description, def.flavor) : null;
+            }),
+          )
+        : h('p', { class: 'hint' }, '유물 없음 — 엘리트·보스를 이기거나 상점에서 산다.'),
+    ),
+    { wide: true },
+  );
+}
+
+/** 지도 오른쪽 칸: 골드 · 물약 칸 · 유물. 누르면 보유 장비 창 */
 export function inventoryBox(data: GameData, gold: number, potions: (string | null)[], relics: string[]): HTMLElement {
   return h(
     'div',
-    { class: 'box inventory' },
+    {
+      class: 'box inventory clickable',
+      role: 'button',
+      tabindex: 0,
+      title: '눌러서 보유 장비 보기',
+      onclick: () => openInventory(data, gold, potions, relics),
+      onkeydown: (e: Event) => (e as KeyboardEvent).key === 'Enter' && openInventory(data, gold, potions, relics),
+    },
+    h('h3', { class: 'inv-title' }, '보유 장비', h('small', {}, '눌러서 보기')),
     h('div', { class: 'inv-row' }, goldChip(gold), h('span', { class: 'potion-bar' }, potions.map((p) => potionChip(data, p)))),
     relics.length ? h('div', { class: 'relic-bar' }, relics.map((id) => relicChip(data, id))) : h('p', { class: 'hint' }, '유물 없음 — 엘리트·보스를 이기거나 상점에서 산다.'),
   );

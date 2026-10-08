@@ -8,6 +8,9 @@ import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
 import { inventoryBox } from './items';
+import { deckGroupsView } from './deck-view';
+import { openOverlay } from './overlay';
+import { loadPortrait, standingFor } from '../render/portrait';
 
 /** 노드 표식: 두루마리 위의 한자 */
 const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
@@ -32,6 +35,8 @@ export interface MapViewHandlers {
   onRefresh: () => void;
   onShowDeck: () => void;
   onSettings: () => void;
+  /** 도감(돌아오면 지도) */
+  onCodex: () => void;
   /** 타이틀로(런은 저장돼 있어 "이어하기"로 돌아온다) */
   onTitle: () => void;
   /** 출전 칸을 반짝여 눈에 띄게(동료가 막 합류했을 때) */
@@ -90,6 +95,48 @@ export function placeName(stage: Stage, run: RunState): string {
   return j.unknownLabel && j.knownFlag && !run.flags.includes(j.knownFlag) ? j.unknownLabel : j.label;
 }
 
+/** 동료 자세히: 반신 그림 · 소개 · 레벨·체력·경험치 · 이 동료의 보유 카드 */
+export function openMemberInfo(data: GameData, run: RunState, id: string): void {
+  const def = data.characters.get(id);
+  const r = run.roster.find((x) => x.id === id);
+  if (!def || !r) return;
+  const next = xpToNext(data, r.level);
+  const pic = h('div', { class: 'member-pic', style: `--owner:${def.color}` }, h('span', {}, def.name.slice(0, 1)));
+  void loadPortrait(id, 'neutral', standingFor(data, id, run.flags)).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: def.name })));
+  const cards = run.deck.filter((c) => data.cards.get(c.cardId)?.owner === id);
+  const stat = (label: string, value: string) => h('div', {}, h('dt', {}, label), h('dd', {}, value));
+  openOverlay(
+    def.name,
+    h(
+      'div',
+      { class: 'member-detail' },
+      h(
+        'div',
+        { class: 'member-head' },
+        pic,
+        h(
+          'div',
+          { class: 'member-facts' },
+          h('div', { class: 'member-title' }, def.title),
+          h(
+            'dl',
+            {},
+            stat('레벨', `Lv ${r.level}`),
+            stat('체력', `${r.hp} / ${r.maxHp}`),
+            stat('경험치', next === null ? '최대 레벨' : `${r.xp} / ${next}`),
+            stat('출전', id === 'haun' ? '항상' : run.selected.includes(id) ? '출전 중' : '쉼'),
+            stat('치명타', `${Math.round((def.crit ?? data.balance.crit.chance) * 100)}%`),
+          ),
+          h('p', { class: 'member-desc' }, def.description),
+        ),
+      ),
+      h('h3', {}, `${def.name}의 카드 (${cards.length})`),
+      cards.length ? deckGroupsView(data, [{ label: def.name, cards }]) : h('p', { class: 'hint' }, '보유 카드에 이 동료의 카드가 없다.'),
+    ),
+    { wide: true },
+  );
+}
+
 /** 위: 여정 띠. 지나온 곳과 지금만 보이고, 들어서 보지 않은 지역은 안개, 틈은 '하늘의 금' 사건 뒤에 나타난다 */
 /** onStage: 클리어 지도처럼 장소를 눌러 고를 때(지나온 곳만) */
 export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: string) => void): HTMLElement {
@@ -141,17 +188,17 @@ export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: s
           'button',
           { class: 'stop done pick', style: `left:${j.x}%;top:${j.y}%`, onclick: () => onStage(st.id), ...tipAttrs(placeName(st, run), '눌러서 다시 하기') },
           h('i', {}),
-          placeName(st, run),
+          h('span', { class: 'stop-name' }, placeName(st, run)),
           run.replays[st.id] ? h('small', { class: 'replays' }, `×${run.replays[st.id]}`) : null,
         );
-      return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), placeName(st, run));
+      return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), h('span', { class: 'stop-name' }, placeName(st, run)));
     })
     .concat(
       // 틈의 심장: '하늘의 금' 뒤부터 사건 표시로(아직 들어서지 않았을 때)
       stages
         .filter((st) => st.journey!.region === 'rift' && rift && st.order > cur.order)
         .map((st) =>
-          h('div', { class: 'stop event', style: `left:${st.journey!.x}%;top:${st.journey!.y}%`, ...tipAttrs('하늘의 금', '두 세계 사이에 생긴 금. 그 너머는 아무도 모른다.') }, h('i', {}), '?'),
+          h('div', { class: 'stop event', style: `left:${st.journey!.x}%;top:${st.journey!.y}%`, ...tipAttrs('하늘의 금', '두 세계 사이에 생긴 금. 그 너머는 아무도 모른다.') }, h('i', {}), h('span', { class: 'stop-name' }, '?')),
         ),
     );
   // 여정 띠 그림(journey_band)이 오기 전: 들어온 지역 지도 그림을 장소 자리에 번지듯 깔아 한 장의 큰 지도처럼 보이게 한다
@@ -264,6 +311,20 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     const open = avail.has(n.id);
     // 들어가 본 노드만 이름이 보인다(보스 이름·이야기 제목은 가서 안다, GAME_DESIGN 14절)
     const known = visited;
+    // 종류는 지나온 곳과 지금 갈 수 있는 곳만. 그 너머는 모양·색까지 감춘 ? 표식(2026-10-08 사용자 결정)
+    const seen = visited || open;
+    if (!seen)
+      return h(
+        'button',
+        {
+          class: 'node node-unknown',
+          style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
+          disabled: true,
+          'aria-label': `${n.floor}층 알 수 없는 곳`,
+          ...tipAttrs(`${n.floor}층 · ?`, '아직 가 보지 않은 곳. 가까이 가야 무엇이 있는지 안다.'),
+        },
+        h('span', { class: 'node-glyph' }, '?'),
+      );
     return h(
       'button',
       {
@@ -320,6 +381,21 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),
         noCards ? h('span', { class: 'member-note' }, '카드 미구현') : null,
+        h(
+          'button',
+          {
+            class: 'member-info',
+            title: `${def.name} 자세히`,
+            'aria-label': `${def.name} 자세히`,
+            // 줄(label)을 눌러도 출전이 바뀌지 않게
+            onclick: (e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openMemberInfo(data, run, r.id);
+            },
+          },
+          'i',
+        ),
       );
     }),
     h(
@@ -347,7 +423,15 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
   const journeyWrap = h('div', { class: 'journey-wrap' }, journeyBand(data, run));
-  const scrollWrap = h('div', { class: 'scroll-wrap' }, h('div', { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) }, svg, nodes, hereMark));
+  const scrollWrap = h('div', { class: 'scroll-wrap' }, h(
+      'div',
+      { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) },
+      // 종이 결(ui_parchment): 지역 지도 위에 곱하기로 겹쳐 두루마리 종이 느낌을 낸다(그림이 들어오면)
+      art('ui_parchment') ? h('div', { class: 'scroll-paper', style: art('ui_parchment') }) : null,
+      svg,
+      nodes,
+      hereMark,
+    ));
   scrollToHere(journeyWrap, '.stop.here');
   scrollToHere(scrollWrap, '.here-mark');
   return h(
@@ -390,7 +474,9 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h(
           'div',
           { class: 'map-actions' },
-          h('button', { class: 'btn btn-primary', onclick: handlers.onShowDeck }, `덱 보기 (${run.deck.length})`),
+          // 보유 카드 · 도감은 한 줄씩, 설정 · 타이틀로는 반 줄씩
+          h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
+          h('button', { class: 'btn wide', onclick: handlers.onCodex }, '도감'),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
         ),

@@ -9,6 +9,7 @@ import { installTooltips } from './tooltip';
 export interface HubHandlers {
   onReplay: (stageId: string) => void;
   onShowDeck: () => void;
+  onCodex: () => void;
   onTitle: () => void;
 }
 
@@ -53,7 +54,13 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
           run.fallen.length ? h('p', { class: 'hint' }, `잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}`) : null,
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
-        h('div', { class: 'map-actions' }, h('button', { class: 'btn btn-primary', onclick: handlers.onShowDeck }, `덱 보기 (${run.deck.length})`), h('button', { class: 'btn', onclick: handlers.onTitle }, '타이틀로')),
+        h(
+          'div',
+          { class: 'map-actions' },
+          h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
+          h('button', { class: 'btn', onclick: handlers.onCodex }, '도감'),
+          h('button', { class: 'btn', onclick: handlers.onTitle }, '타이틀로'),
+        ),
       ),
     ),
   );

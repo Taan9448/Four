@@ -1,0 +1,17 @@
+id: ui_parchment
+type: key-art
+summary: 지도 두루마리 종이 결 — 스테이지 지도 위에 곱하기로 겹치는 오래된 한지·양피지 질감(그림·글씨 없음)
+frame_notes:
+  1: >-
+    A single sheet of old hand-made paper seen flat and straight from above, filling the whole picture: warm cream-beige East Asian
+    hanji / parchment with clearly visible long soft plant fibers and tiny flecks, irregular pale tea-colored water stains and faint
+    foxing spots scattered unevenly, soft horizontal creases and gentle waviness from being rolled up as a handscroll for years,
+    a few faint fold lines, slightly rubbed and thinner patches, and edges that grow a little darker, browner and more worn toward
+    all four sides (as if handled and slightly scorched by age). The middle stays light and clean enough to draw on.
+framing: >-
+  Even, flat, soft daylight with no strong shadows and no perspective, so the texture can be laid over a map. Fill the frame edge to edge
+  with paper only. Absolutely nothing drawn on the paper: no mountains, no ink drawings, no map, no lines, no seals, no text.
+style: >-
+  photographic-quality but painterly texture of aged hand-made paper, natural warm beige and light brown tones only, fine fibrous detail,
+  subtle and realistic, no saturated colors, no hard digital gradients
+placeholder: { color: '#e4d6b6' }
