@@ -142,6 +142,9 @@ describe('데이터 검사', () => {
       if (!st.background) bad.push(`${st.id}: background 없음`);
       if (!st.mapArt) bad.push(`${st.id}: mapArt 없음`);
       if (!st.journey) bad.push(`${st.id}: journey 없음`);
+      // 정보 공개 원칙(GAME_DESIGN 14절): 지도에는 줄거리(summary) 대신 도착했을 때 아는 만큼의 도입 글
+      if (!st.teaser) bad.push(`${st.id}: teaser 없음`);
+      if (st.journey?.unknownLabel && !st.journey.knownFlag) bad.push(`${st.id}: unknownLabel에는 knownFlag가 필요`);
     }
     const icons = [...data.statuses.values()].map((s) => s.icon).filter((n) => n !== undefined);
     if (new Set(icons).size !== icons.length) bad.push('상태 아이콘 번호 중복');

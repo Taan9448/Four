@@ -3,9 +3,9 @@ type: map-art
 summary: 지역 지도 — 마왕성 노크투르나(S2)
 frame_notes:
   1: >-
-    The demon king's castle Nocturna seen as a floor plan and elevation mixed in ink. Bottom: the outer castle gate and a bridge over a dark moat. Middle: long corridors, a frozen hall on one side and a collapsed earth hall on the other, small towers. Top: the throne room under the tallest black spire.
+    The demon king's castle Nocturna seen as a floor plan and elevation mixed in ink. Far left: the outer castle gate and a bridge over a dark moat. Along the top and bottom edges: long corridors, a frozen hall, a collapsed earth hall, small towers. Far right: the throne room under the tallest black spire.
 framing: >-
-  A vertical regional map painted from above at a slight bird-eye angle. The bottom of the picture is where the journey starts and the top is the final destination. Draw terrain and landmarks only, small and light. Keep the central 70% of the width fairly open and pale (plain paper with faint terrain texture), because the game draws the route, node markers and a small character on top; put denser landmarks near the left and right edges and at the very top and bottom. No roads or paths drawn as lines.
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
 placeholder: { color: '#d4c6a2' }

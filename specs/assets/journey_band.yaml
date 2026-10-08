@@ -11,7 +11,7 @@ frame_notes:
     forest under two small moons; upper right, a volcanic canyon with a faint orange glow; far right, a dark castle with black
     spires. The sky above the center gate is open, plain and empty.
 framing: >-
-  The game crops this picture to a wide strip: only the middle part from 31% to 69% of the image height is shown, the top and bottom
+  The game crops this picture to a wide strip: only the middle part from 37% to 63% of the image height is shown, the top and bottom
   are cut off. Put every place listed above inside that middle strip, spread across the full width; keep the top and bottom thirds
-  as simple sky and ground. Do not draw any crack or tear in the sky (the game draws it later as an event).
+  as simple sky and ground. Do not draw any crack or tear in the sky (the game draws it later as an event). The left half and the right half must each read as a complete scene on its own, because the game first shows only the left half and covers the right half with mist until the story reaches it.
 placeholder: { color: '#2b2b3a' }

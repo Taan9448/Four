@@ -362,8 +362,21 @@ export const StageDef = z
     background: z.string().optional(),
     /** 지도 화면의 지역 지도 그림 에셋 id */
     mapArt: z.string().optional(),
-    /** 지도 위쪽 여정 띠에서 이 스테이지의 자리(띠 그림 기준 %)와 이름 */
-    journey: z.object({ label: z.string(), x: z.number().min(0).max(100), y: z.number().min(0).max(100) }).strict().optional(),
+    /** 지도 위쪽 여정 띠에서 이 스테이지의 자리(띠 그림 기준 %)·이름·지역. 지역은 처음 들어설 때 안개가 걷힌다(GAME_DESIGN 14절) */
+    journey: z
+      .object({
+        label: z.string(),
+        x: z.number().min(0).max(100),
+        y: z.number().min(0).max(100),
+        region: z.enum(['murim', 'elheim', 'rift']),
+        /** 이 플래그가 서기 전(이름을 아직 모를 때) 쓰는 이름. 예: S1은 엘리아가 '엘하임'이라고 알려 주기 전까지 "낯선 숲" */
+        unknownLabel: z.string().optional(),
+        knownFlag: z.string().optional(),
+      })
+      .strict()
+      .optional(),
+    /** 지도에 보여 줄 도입 글: 도착한 하운이 아는 만큼만(summary는 설계용, 화면에 내지 않는다) */
+    teaser: z.string().optional(),
   })
   .strict();
 export type StageDef = z.infer<typeof StageDef>;

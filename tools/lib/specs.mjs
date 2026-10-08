@@ -33,7 +33,7 @@ const ILLUSTRATIONS = {
   'character-sheet': { canvas: [1536, 1024], output: [1536, 1024] },
   // 화면 그림(2026-10-08): 시작 화면·여정 띠(가로 한 장, 줄이지 않음)와 지역 지도(세로 두루마리)
   'key-art': { canvas: [1536, 1024], output: [1536, 1024] },
-  'map-art': { canvas: [1024, 1536], output: [768, 1152] },
+  'map-art': { canvas: [1536, 1024], output: [1152, 768] }, // 가로(2026-10-08 세로 → 가로): 왼쪽 = 출발, 오른쪽 = 보스
   // 비주얼 노벨·컷인용 반신 그림: 한 시트에 표정 3장(기본·결의·놀람), 배경은 키 색으로 지워 투명하게
   'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
 };

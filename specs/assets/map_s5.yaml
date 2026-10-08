@@ -3,9 +3,9 @@ type: map-art
 summary: 지역 지도 — 세계의 틈(S5)
 frame_notes:
   1: >-
-    The rift between worlds drawn as an unsettling ink map: the paper itself looks torn and stitched in places. Bottom: a torn opening in the sky where the travelers step in. Middle: floating fragments of both worlds (a piece of a tiled wuxia roof, a piece of a gothic arch, broken stairs) drifting along the edges, thin black cracks across the paper. Top: a dark knot of stitched threads where everything converges.
+    The rift between worlds drawn as an unsettling ink map: the paper itself looks torn and stitched in places. Far left: a torn opening in the sky where the travelers step in. Along the top and bottom edges: floating fragments of both worlds (a piece of a tiled wuxia roof, a piece of a gothic arch, broken stairs), thin black cracks across the paper. Far right: a dark knot of stitched threads where everything converges.
 framing: >-
-  A vertical regional map painted from above at a slight bird-eye angle. The bottom of the picture is where the journey starts and the top is the final destination. Draw terrain and landmarks only, small and light. Keep the central 70% of the width fairly open and pale (plain paper with faint terrain texture), because the game draws the route, node markers and a small character on top; put denser landmarks near the left and right edges and at the very top and bottom. No roads or paths drawn as lines.
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
 placeholder: { color: '#cfc3a6' }

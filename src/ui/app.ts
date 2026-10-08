@@ -13,7 +13,6 @@ import {
   createRunAt,
   enterNode,
   isBattle,
-  playableStages,
   nextStage,
   rewardOptions,
   type Encounter,
@@ -24,7 +23,8 @@ import { BattleView } from './battle-view';
 import { choiceView, rewardView } from './choice-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
-import { mapView } from './map-view';
+import { initDebug, isDebug } from './debug';
+import { mapView, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
@@ -42,6 +42,7 @@ export class App {
   constructor(private root: HTMLElement) {
     applySettings();
     const params = new URLSearchParams(location.search);
+    initDebug(params);
     const seed = params.get('seed');
     if (params.has('sandbox'))
       this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean), params.get('module') ?? undefined);
@@ -93,7 +94,7 @@ export class App {
         'button',
         { class: 'btn btn-primary', title: `상흔 ${run.scar} · 시드 ${run.seed}`, onclick: () => this.resume(run) },
         '이어하기',
-        h('small', {}, `${stage.name} · ${where} · 덱 ${run.deck.length}장`),
+        h('small', {}, `${placeName(stage, run)} · ${where} · 덱 ${run.deck.length}장`),
       );
     }
     const url = frameUrl('title_world', 1, { realOnly: true });
@@ -119,8 +120,9 @@ export class App {
             { class: 'title-options' },
             h('summary', {}, '시작 옵션'),
             h('label', {}, '시드 ', seedInput, h('button', { class: 'btn btn-small', 'aria-label': '시드 바꾸기', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
-            h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)'),
-            h('p', { class: 'hint' }, `같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다. 플레이 가능: ${playableStages(data).map((st) => st.name).join(' → ')}.`),
+            // 디버그 옵션은 ?debug에서만(합류 전 동료 이름·스테이지 목록을 미리 보여 주지 않는다, GAME_DESIGN 14절)
+            isDebug() ? h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)') : null,
+            h('p', { class: 'hint' }, '같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 자동 저장됩니다.'),
           ),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
@@ -212,7 +214,7 @@ export class App {
       state,
       {
         title: enc.module.name,
-        subtitle: `${stage.name} · ${enc.node.floor}층`,
+        subtitle: `${placeName(stage, run)} · ${enc.node.floor}층`,
         seed: run.seed,
         scar: run.scar,
         supportActive: run.supportActive,
@@ -253,8 +255,14 @@ export class App {
         h('h1', {}, `${stage.name} — 끝`),
         outro ? h('p', { class: 'outro' }, outro) : null,
         this.clearMessages.length ? h('ul', { class: 'clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
-        run.scar > 0 ? h('p', { class: 'scar-reveal' }, `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.`) : null,
-        next ? h('p', { class: 'next-stage' }, `다음: ${next.name} (${next.chapters})`) : null,
+        run.scar > 0
+          ? h(
+              'p',
+              { class: 'scar-reveal' },
+              // '하늘의 금'을 보기 전에는 그 말을 쓰지 않는다(GAME_DESIGN 14절)
+              run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`,
+            )
+          : null,
         h(
           'button',
           {
