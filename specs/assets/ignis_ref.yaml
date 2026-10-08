@@ -3,9 +3,9 @@ type: character-ref
 size: large
 character: ignis
 chroma: magenta
-summary: 화염군주 이그니스 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+summary: 화염군주 이그니스 기준 시트(3/4 정면 + 왼쪽 측면) — 원작 외형으로 다시 그림
 facing: left
 frame_notes:
-  1: "full body, three-quarter front view, a hulking humanoid of molten rock, cracked black basalt skin with glowing orange lava seams, a crown of living flames on the head, burning yellow eyes, heavy fists of magma"
-  2: "full body, side view facing left, same proportions, fists clenched, flames streaming back from the head"
-placeholder: { shape: humanoid, color: '#2a1a14', accent: '#ff8a1e' }
+  1: "full body, three-quarter front view, a humanoid made of fire three times a man height, a body of white flame with black lava running through it like veins, a crown of flames, no face, only two holes of the hottest white fire for eyes"
+  2: "full body, side view facing left, same proportions, one burning hand raised, flames streaming back from the crown"
+placeholder: { shape: humanoid, color: '#f1efe6', accent: '#0b0b10' }

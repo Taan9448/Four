@@ -1,13 +1,13 @@
 id: wolf_idle
 type: character-anim
 character: shadow_wolf
-summary: 그림자늑대 대기 4프레임
+summary: 그림자늑대 대기 4프레임 — 원작 외형으로 다시 그림
 depends_on: [wolf_ref]
 reference: assets/source/wolf_ref.png
 facing: left
 frame_notes:
-  1: low prowling stance facing left, head lowered, growling
-  2: shoulders rise slightly, black flames on the back flare
-  3: head lifts a little, eyes glowing
-  4: settles back down, flames shrink
-placeholder: { shape: beast, color: '#2b2b3a', accent: '#ffb347' }
+  1: "low prowling stance facing left, head lowered, smoke body wavering"
+  2: "shoulders rise slightly, the black flames on the back flare"
+  3: "head lifts a little, the two red dots glow brighter"
+  4: "settles back down, flames and smoke shrink"
+placeholder: { shape: beast, color: '#1d2433', accent: '#ff3b3b' }

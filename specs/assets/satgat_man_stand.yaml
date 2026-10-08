@@ -1,0 +1,9 @@
+id: satgat_man_stand
+type: character-standing
+character: satgat_man
+summary: 삿갓의 사내 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — bamboo hat low, only a pale jaw and a thin smile visible, a teacup in red-nailed fingers"
+  2: "resolute expression — head tilted up slightly but the eyes still hidden in the hat shadow, blood-red nails spread like claws"
+  3: "surprised expression — the smile gone, jaw tight, the hat brim turned sharply toward the viewer"
+placeholder: { color: '#0b0b10', accent: '#c2c6d1' }

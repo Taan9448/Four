@@ -1,0 +1,9 @@
+id: ma_stand
+type: character-standing
+character: ma
+summary: 마 씨 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a nervous friendly smile, wiping hands on the apron"
+  2: "resolute expression — chins set, sleeves rolled, a burn-scarred arm"
+  3: "surprised expression — eyes wide, both chins trembling"
+placeholder: { color: '#b08a5a', accent: '#e0cfae' }

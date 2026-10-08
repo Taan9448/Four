@@ -6,8 +6,8 @@
     "effects": [ { "op": "gain_neigong", "amount": 1 }, { "op": "draw", "amount": 1 } ]
   },
   {
-    "id": "wang_firewood", "source": "wang", "name": "장작의 결",
-    "description": "전투당 1회, 균열이 7 이상이 되는 순간 균열 -3. \"어디를 잘못 쳤는지 아는 사람은 도끼를 쥔 사람뿐이다.\"",
+    "id": "wang_firewood", "source": "wang", "name": "부스러기 쓸어 담기",
+    "description": "전투당 1회, 균열이 7 이상이 되는 순간 균열 -3. \"저 하늘의 금은 제가 낸 부스러기입니다.\" \"제가가 아니라, 우리가예요.\"",
     "trigger": "riftChanged", "condition": { "riftGte": 7 }, "oncePerBattle": true,
     "effects": [ { "op": "rift", "amount": -3 } ]
   },

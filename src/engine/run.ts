@@ -163,9 +163,12 @@ export function stageWorld(data: GameData, run: RunState) {
 }
 
 export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): BattleSetup {
-  const bonus = enc.module.content.bonus;
-  const startEffects =
-    bonus && (!bonus.condition.partyHas || run.selected.includes(bonus.condition.partyHas)) ? bonus.effects : [];
+  const { bonus, startEffects: always = [], mana } = enc.module.content;
+  const bonusOn =
+    !!bonus &&
+    (!bonus.condition.partyHas || run.selected.includes(bonus.condition.partyHas)) &&
+    (!bonus.condition.flag || run.flags.includes(bonus.condition.flag));
+  const stage = data.stages.find((s) => s.id === run.stageId)!;
   return {
     world: stageWorld(data, run),
     party: run.selected.map((id) => {
@@ -180,7 +183,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     supportActive: run.supportActive,
     flags: run.flags,
     scar: run.scar,
-    startEffects,
+    startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
+    manaRule: mana ?? stage.mana,
   };
 }
 

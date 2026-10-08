@@ -1,5 +1,5 @@
 // npm run balance:trace — 봇이 전투 하나를 어떻게 두는지 턴마다 적는다(밸런스 원인 찾기용).
-// 환경 변수: TRACE=<스테이지>:<모듈 id>(기본 s4:s4_boss_blood_hall), TRACE_SEED(기본 T1), TRACE_OUT(파일 경로, 없으면 화면)
+// 환경 변수: TRACE=<스테이지>:<모듈 id>(기본 s8:s8_boss_blood_hall), TRACE_SEED(기본 T1), TRACE_OUT(파일 경로, 없으면 화면)
 // 그 스테이지 시작 상태(createRunAt: 앞 스테이지의 스토리 카드·동료만, 보상·강화 없음)에서 바로 그 전투를 둔다.
 import { appendFileSync, writeFileSync } from 'node:fs';
 import { it } from 'vitest';
@@ -14,7 +14,7 @@ const log = (line: string) => (OUT ? appendFileSync(OUT, line + '\n') : process.
 it('봇 전투 기록', () => {
   if (OUT) writeFileSync(OUT, '');
   const data = gameData();
-  const [stage, moduleId] = (process.env.TRACE ?? 's4:s4_boss_blood_hall').split(':');
+  const [stage, moduleId] = (process.env.TRACE ?? 's8:s8_boss_blood_hall').split(':');
   const run = createRunAt(data, process.env.TRACE_SEED ?? 'T1', stage);
   const module = data.modules.get(moduleId);
   if (!module?.content.enemies?.length) throw new Error(`전투 모듈이 아니다: ${moduleId}`);

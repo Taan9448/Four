@@ -1,9 +1,9 @@
 id: wang_stand
 type: character-standing
 character: wang
-summary: 왕 노인(왕일검) 반신 그림(기본·결의·놀람)
+summary: 왕일검(S6~) 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
 frame_notes:
-  1: "neutral expression — kind hazy smile, slightly stooped, both hands on the walking stick"
-  2: "resolute expression — the hazy eyes suddenly clear and sharp as a blade, back straightened, a hidden master's presence"
-  3: "surprised expression — eyes wide, mouth open in an O, wrinkles deepened"
+  1: "neutral expression — kind hazy smile, seated in the wheeled wooden chair, the blanket flat over his lap below the knees, hands resting on the armrests"
+  2: "resolute expression — the hazy eyes suddenly clear and sharp as a blade, leaning forward in the chair, a wooden practice sword across his lap"
+  3: "surprised expression — eyes wide, mouth open, wrinkles deepened, gripping the chair"
 placeholder: { color: '#6e5440', accent: '#e0cfae' }

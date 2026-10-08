@@ -3,7 +3,7 @@ type: character-anim
 size: large
 character: mordecai
 chroma: green
-summary: 지옥왕 모르데카이 꿰맨 팔 6프레임
+summary: 지옥왕 모르데카이 꿰맨 팔 6프레임 — 원작 외형으로 다시 그림
 depends_on: [mordecai_ref]
 reference: assets/source/mordecai_ref.png
 facing: left

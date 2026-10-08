@@ -1,9 +1,9 @@
 id: haun_ref
 type: character-ref
 character: haun
-summary: 진하운 기준 시트(3/4 정면 + 오른쪽 측면) — 128 격자로 다시 그림
+summary: 진하운(도끼) 기준 시트(3/4 정면 + 오른쪽 측면) — 원작 외형으로 다시 그림
 facing: right
 frame_notes:
-  1: full body, three-quarter front view, calm upright standing pose, long black hair falling past the shoulders, the woodcutting axe hanging low in the right hand
-  2: full body, side view facing right, same outfit and proportions, standing ready with the axe held low at the side
-placeholder: { shape: humanoid, color: '#3d4459', accent: '#4fb4ff' }
+  1: "full body, three-quarter front view, calm upright standing pose, long black hair falling past the shoulders, the plain grey servant outfit of the sect tied with a cord sash, cloth wrapped around the hands, the woodcutting axe hanging low in the right hand"
+  2: "full body, side view facing right, same grey outfit and proportions, standing ready with the axe held low at the side"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

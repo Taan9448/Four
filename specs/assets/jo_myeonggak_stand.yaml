@@ -1,0 +1,9 @@
+id: jo_myeonggak_stand
+type: character-standing
+character: jo_myeonggak
+summary: 조명각 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — narrow cold face, upturned eye corners, a contemptuous look"
+  2: "resolute expression — teeth set, an iron-hooked whip coiled in hand, a dark haze of demonic qi"
+  3: "surprised expression — eyes wide, face pale, the arrogance gone"
+placeholder: { color: '#f1efe6', accent: '#8aa0c8' }

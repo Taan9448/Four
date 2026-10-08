@@ -3,12 +3,12 @@ type: character-anim
 size: large
 character: branch_lord
 chroma: green
-summary: 섬서 분타주 피격 3프레임
+summary: 혈수마군 피격 3프레임 — 원작 외형으로 다시 그림
 depends_on: [branch_lord_ref]
 reference: assets/source/branch_lord_ref.png
 facing: left
 frame_notes:
-  1: "struck, the head snaps back, beard flying"
-  2: "staggers back, one forearm guard raised"
+  1: "struck, the head snaps back"
+  2: "staggers back, a blood-red forearm raised"
   3: "plants the feet again, scowling"
 placeholder: { shape: humanoid, color: '#6a0f1a', accent: '#ff3b3b' }

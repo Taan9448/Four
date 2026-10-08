@@ -1,0 +1,11 @@
+id: map_s6
+type: map-art
+summary: 지역 지도 — 운곡촌(S6, 3권 1~8장)
+frame_notes:
+  1: >-
+    The wuxia world three years later, now under the cult. Far left: Ungok village market with a willow, a burnt inn site, and a dark red two-storey tax office. Along the bottom: a two-forked valley behind the village with a dry-stone wall and water channels (a hidden stronghold), a ruined temple deep in the mountains with a collapsed main hall. Along the top: the back mountain forest. Far right: the Cheongun sect on its mountain, its gate plaque changed, a sand training yard on the ridge (a little vermilion for cult banners).
+framing: >-
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
+style: >-
+  traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
+placeholder: { color: '#d6c7a0' }

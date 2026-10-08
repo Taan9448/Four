@@ -1,0 +1,9 @@
+id: hans_stand
+type: character-standing
+character: hans
+summary: 한스 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — gruff tired face, soot on the cheeks"
+  2: "resolute expression — hammer raised over the shoulder, jaw set"
+  3: "surprised expression — brows up, burnt beard twitching"
+placeholder: { color: '#a0603a', accent: '#f2a93b' }

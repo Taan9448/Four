@@ -19,6 +19,7 @@ function condText(data: GameData, e: Effect): string {
   if (c.targetHasStatus) return `대상이 ${data.statuses.get(c.targetHasStatus)?.name ?? c.targetHasStatus} 상태면 `;
   if (c.riftGte !== undefined) return `균열 ${c.riftGte} 이상이면 `;
   if (c.partyHas) return `${data.characters.get(c.partyHas)?.name ?? c.partyHas} 출전 시 `;
+  if (c.flag) return '';
   return '조건부: ';
 }
 
@@ -35,7 +36,11 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
     case 'heal':
       return `${pre}${tgt && tgt !== '자신' ? `${tgt} ` : ''}체력 ${n} 회복`;
     case 'gain_neigong':
-      return `${pre}내공 +${n}`;
+      return n <= -10 ? `${pre}내공을 모두 비운다` : `${pre}내공 ${n >= 0 ? '+' : ''}${n}`;
+    case 'neigong_max':
+      return `${pre}이번 전투에서 턴마다 차는 내공 ${n >= 0 ? '+' : ''}${n}`;
+    case 'dispel':
+      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}의 ` : ''}강화와 방어를 걷어 낸다`;
     case 'gain_mana':
       return `${pre}마나 ${n >= 0 ? '+' : ''}${n}`;
     case 'draw':
@@ -45,7 +50,7 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
     case 'apply_status':
       return `${pre}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ?? 1} 부여`;
     case 'remove_status':
-      return `${pre}${data.statuses.get(e.status ?? '')?.name ?? e.status} 제거`;
+      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}의 ` : ''}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ? `${e.stacks} ` : ''}제거`;
     case 'rift':
       return `${pre}균열 ${n >= 0 ? '+' : ''}${n}`;
     case 'reveal_grain':
@@ -59,7 +64,7 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
   }
 }
 
-const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가' };
+const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실' };
 
 /** 특수 스킬(+4·+5) 한 줄: 추가 효과·키워드 변화·비용 변화 */
 export function skillText(data: GameData, skill: UpgradeSkill, cardTarget?: string): string {
@@ -75,7 +80,7 @@ export function cardText(data: GameData, inst: CardInstance | string): string {
   const card = resolveCard(data, inst);
   if (card.level === 0 && card.def.text) return card.def.text;
   const parts = card.baseEffects.map((e) => describeEffect(data, e, card.def.target));
-  const kw = (['fusion', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
+  const kw = (['fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
   const head = [...(kw.length ? [`[${kw.join('·')}]`] : []), parts.join('. ')].join(' ');
   return [head, ...card.skills.map((s) => skillText(data, s, card.def.target))].join('\n');
 }

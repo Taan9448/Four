@@ -1,0 +1,13 @@
+id: born_hammer_idle
+type: character-anim
+character: born_hammer
+summary: 보른(두린의 망치) 대기 4프레임
+depends_on: [born_hammer_ref]
+reference: assets/source/born_hammer_ref.png
+facing: right
+frame_notes:
+  1: "planted wide stance, hammer head resting on the ground"
+  2: "slow breath in, chest and beard braids rise"
+  3: "breath held, both hands on the haft"
+  4: "breath out, shoulders settle"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

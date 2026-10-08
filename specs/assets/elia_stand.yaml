@@ -1,9 +1,9 @@
 id: elia_stand
 type: character-standing
 character: elia
-summary: 엘리아 반신 그림(기본·결의·놀람)
+summary: 엘리아 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
 frame_notes:
-  1: "neutral expression — soft faint smile, warm attentive eyes, hands lightly together at the waist"
-  2: "resolute expression — brows drawn, firm lips, one palm raised with a small flame of light floating above it"
-  3: "surprised expression — eyes wide, a hand raised to the mouth, silver hair lifting slightly"
-placeholder: { color: '#8fa7c9', accent: '#f1efe6' }
+  1: "neutral expression — soft faint smile, warm attentive eyes, the grey hood pulled over her ears, the staff resting against the shoulder"
+  2: "resolute expression — brows drawn, firm lips, the blue stone on the staff glowing beside her face"
+  3: "surprised expression — eyes wide, a hand raised to the mouth, the hood slipping back from her pointed ears"
+placeholder: { color: '#8a90a3', accent: '#8fd3ff' }

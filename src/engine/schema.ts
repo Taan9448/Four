@@ -20,6 +20,8 @@ export const BATTLE_OPS = [
   'reveal_grain',
   'taunt',
   'add_card',
+  'dispel',
+  'neigong_max',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -104,7 +106,8 @@ export type Effect = z.infer<typeof Effect>;
 export const Cost = z.object({ neigong: z.number().int().min(0), mana: z.number().int().min(0) }).strict();
 export type Cost = z.infer<typeof Cost>;
 
-export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable']);
+/** thread: 실 카드. '꿰맬 자리'(seam) 상태의 적은 이 키워드 카드의 피해만 받는다 */
+export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable', 'thread']);
 export type Keyword = z.infer<typeof Keyword>;
 
 export const Rarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'special']);
@@ -208,7 +211,9 @@ export const StatusDef = z
       .strict()
       .default({}),
     /** 엔진이 직접 처리하는 메커니즘(카드 개별 코드가 아님) */
-    special: z.enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed']).optional(),
+    special: z
+      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam'])
+      .optional(),
   })
   .strict();
 export type StatusDef = z.infer<typeof StatusDef>;
@@ -239,18 +244,24 @@ export const EnemyDef = z
     color: z.string().optional(),
     /** 이 적의 공격이 맞은 자리에 겹칠 피격 이펙트(생략하면 fx_hit_strike) */
     hitFx: z.string().optional(),
+    /** 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계': 꿰맬 자리가 많아진다) */
+    hpPerScar: z.number().int().min(0).optional(),
+    /** 이 적이 쓰러질 때 일어나는 일(적을 출처로 하는 전투 동작). 예: 군단장이 쓰러지면 졸개가 무너진다 */
+    deathEffects: z.array(Effect).default([]),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     pattern: z.enum(['cycle', 'random']),
     moves: z.array(MoveDef).min(1),
     /**
-     * 변신(보스 2단계). downed: 쓰러질 자리에서 대신 변신 / lastStanding: 다른 적이 모두 쓰러져 혼자 남으면 변신.
+     * 변신(보스 2단계). downed: 쓰러질 자리에서 대신 변신 / lastStanding: 다른 적이 모두 쓰러져 혼자 남으면 변신 /
+     * partnerDowned: partner로 지정한 적이 쓰러지면 변신(사무결 ← 곽도진의 피, 셀리아스 ← 왕녀의 얼음).
      * into의 적 정의로 바뀌고 체력은 가득, 상태는 into의 traits로 다시 시작한다. 변신한 차례에는 행동하지 않는다.
      * partyEffects: 변신 순간 하운을 출처로 아군 쪽에 일어나는 일(원작 연출: 동료의 도움 등)
      */
     transform: z
       .object({
-        triggers: z.array(z.enum(['downed', 'lastStanding'])).min(1),
+        triggers: z.array(z.enum(['downed', 'lastStanding', 'partnerDowned'])).min(1),
+        partner: z.string().optional(),
         into: z.string(),
         text: z.string(),
         partyEffects: z.array(Effect).default([]),
@@ -272,6 +283,8 @@ export const CharacterDef = z
     color: z.string(),
     sprites: z.record(z.string(), z.string()).default({}),
     starterDeck: z.array(z.string()).default([]),
+    /** 복장: 런 플래그가 서면 sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 예: 하운 '못생긴 검' */
+    outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
     joinsAt: z.string(),
     description: z.string(),
   })
@@ -292,16 +305,18 @@ export const SupportRule = z
   .strict();
 export type SupportRule = z.infer<typeof SupportRule>;
 
-const WorldMana = z
-  .object({ battleStart: z.enum(['full', 'carry']), perTurn: z.number().int() })
+/** 전투 마나 규칙. battleStart: full 가득 / carry 런 마나 이월 / 숫자 그 값으로 시작 */
+export const WorldMana = z
+  .object({ battleStart: z.union([z.enum(['full', 'carry']), z.number().int().min(0)]), perTurn: z.number().int() })
   .strict();
+export type WorldMana = z.infer<typeof WorldMana>;
 
 export const Balance = z
   .object({
     neigongPerTurn: z.number().int().positive(),
     handSize: z.number().int().positive(),
     maxHand: z.number().int().positive(),
-    mana: z.object({ max: z.number().int().positive(), restGain: z.number().int(), worlds: z.record(World, WorldMana) }).strict(),
+    mana: z.object({ max: z.number().int().positive(), worlds: z.record(World, WorldMana) }).strict(),
     rift: z
       .object({
         max: z.number().int().positive(),
@@ -362,6 +377,8 @@ export const StageDef = z
     background: z.string().optional(),
     /** 지도 화면의 지역 지도 그림 에셋 id */
     mapArt: z.string().optional(),
+    /** 이 스테이지 전투의 마나 규칙(생략하면 세계 기본값 balance.mana.worlds). 예: 아르덴의 얼어붙은 마나 */
+    mana: WorldMana.optional(),
     /** 지도 위쪽 여정 띠에서 이 스테이지의 자리(띠 그림 기준 %)·이름·지역. 지역은 처음 들어설 때 안개가 걷힌다(GAME_DESIGN 14절) */
     journey: z
       .object({
@@ -400,7 +417,9 @@ export const ModuleDef = z
         text: z.string().optional(),
         enemies: z.array(z.string()).optional(),
         choices: z.array(Choice).optional(),
-        /** 전투 시작 시 조건부 보너스(예: 특정 동료 출전) */
+        /** 전투 시작 때 언제나 일어나는 일(예: 보스전 시작 손패에 원작의 결정적 카드) */
+        startEffects: z.array(Effect).optional(),
+        /** 전투 시작 시 조건부 보너스(예: 특정 동료 출전). condition은 partyHas·flag를 본다 */
         bonus: z.object({ condition: Condition, text: z.string(), effects: z.array(Effect) }).strict().optional(),
         /** 이 턴 수를 버티면 승리하는 전투(이길 수 없는 전투) */
         surviveTurns: z.number().int().positive().optional(),
@@ -408,6 +427,8 @@ export const ModuleDef = z
         outro: z.string().optional(),
         /** 전투 배경 에셋 id(생략하면 스테이지 배경) */
         background: z.string().optional(),
+        /** 이 전투의 마나 규칙(스테이지·세계 규칙보다 우선). 예: 이그니스의 협곡 장악 */
+        mana: WorldMana.optional(),
         /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
         scene: z.string().optional(),
         /** 보스 모듈: 이긴 뒤(스테이지 끝 화면 전에) 재생할 장면 */

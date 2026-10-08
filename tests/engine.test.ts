@@ -31,7 +31,7 @@ describe('효과 해석기와 자원', () => {
     expect(playCard(s, i).ok).toBe(false);
   });
 
-  it('엘하임은 전투 시작 시 마나가 가득 차고 턴마다 +2, 무림은 이월하고 회복 없음', () => {
+  it('엘하임은 전투 시작 시 마나가 가득 차고 턴마다 +2, 무림은 이월하고 회복 없음, 틈은 마나가 없다', () => {
     const e = battle({ world: 'elheim', mana: 0 });
     expect(e.mana).toBe(10);
     e.mana = 3;
@@ -44,8 +44,9 @@ describe('효과 해석기와 자원', () => {
     expect(m.mana).toBe(4);
 
     const r = battle({ world: 'rift', mana: 4 });
+    expect(r.mana).toBe(0);
     endTurn(r);
-    expect(r.mana).toBe(3);
+    expect(r.mana).toBe(0);
   });
 
   it('카드 문구를 효과로부터 만든다', () => {
@@ -297,7 +298,7 @@ describe('왕일검 지원 규칙', () => {
     expect(s.neigong).toBe(3);
   });
 
-  it('장작의 결: 전투당 1회, 균열 7 이상이 되면 -3', () => {
+  it('부스러기 쓸어 담기: 전투당 1회, 균열 7 이상이 되면 -3', () => {
     const s = battle({ supportActive: true, enemies: ['ignis'] });
     s.rift = 5;
     playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);

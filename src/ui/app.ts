@@ -51,7 +51,7 @@ export class App {
   }
 
   /**
-   * ?sandbox[=kyle,born][&module=s2_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
+   * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
    * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
    */
   private sandbox(seed: string, mates: string[], moduleId = 's1_battle_wolves_pair'): void {

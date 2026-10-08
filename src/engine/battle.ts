@@ -1,6 +1,6 @@
 // 전투 진행: 생성 → 플레이어 턴(카드 사용) → 턴 종료 → 적 턴 → 다음 턴.
 import type { GameData } from './data';
-import type { Effect, World } from './schema';
+import type { Effect, World, WorldMana } from './schema';
 import type { Rng } from './rng';
 import {
   addStatus,
@@ -50,6 +50,8 @@ export interface BattleSetup {
   startEffects?: Effect[];
   /** 이 턴 수를 버티면 승리(모듈 content.surviveTurns) */
   surviveTurns?: number;
+  /** 마나 규칙 덮어쓰기(스테이지 mana → 모듈 content.mana). 생략하면 세계 기본값 */
+  manaRule?: WorldMana;
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
@@ -69,20 +71,25 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     if (!def) throw new Error(`알 수 없는 적: ${id}`);
     const statuses: Record<string, number> = {};
     for (const t of def.traits) statuses[t.status] = t.stacks;
+    const maxHp = def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0);
     return {
-      uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: def.maxHp, maxHp: def.maxHp, block: 0,
+      uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
       statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null,
     };
   });
 
-  const worldMana = bal.mana.worlds[setup.world];
+  const worldMana = setup.manaRule ?? bal.mana.worlds[setup.world];
+  const startMana =
+    worldMana.battleStart === 'full' ? bal.mana.max : worldMana.battleStart === 'carry' ? setup.mana : worldMana.battleStart;
   const state: BattleState = {
     data,
     rng: setup.rng,
     world: setup.world,
     turn: 0,
     neigong: 0,
-    mana: worldMana.battleStart === 'full' ? bal.mana.max : Math.min(bal.mana.max, setup.mana),
+    neigongMax: bal.neigongPerTurn,
+    manaRule: worldMana,
+    mana: Math.max(0, Math.min(bal.mana.max, startMana)),
     rift: 0,
     party,
     enemies,
@@ -124,9 +131,9 @@ function startPlayerTurn(state: BattleState): void {
   const bal = state.data.balance;
   state.turn += 1;
   state.events.push({ type: 'turn', turn: state.turn });
-  state.neigong = bal.neigongPerTurn;
+  state.neigong = state.neigongMax;
   if (state.turn > 1) {
-    const per = bal.mana.worlds[state.world].perTurn;
+    const per = state.manaRule.perTurn;
     state.mana = Math.max(0, Math.min(bal.mana.max, state.mana + per));
   }
   for (const p of state.party) p.block = 0;
@@ -141,7 +148,16 @@ function applyTurnStartStatuses(state: BattleState, list: Combatant[]): void {
   for (const c of alive(list)) {
     for (const [id, stacks] of Object.entries(c.statuses)) {
       const per = state.data.statuses.get(id)?.modifiers.turnStartDamagePerStack;
-      if (per && stacks > 0) loseHp(state, c, per * stacks);
+      if (!per || stacks <= 0) continue;
+      // 음수면 회복(고르몬: 산이 메운다)
+      if (per > 0) loseHp(state, c, per * stacks);
+      else {
+        const healed = Math.min(c.maxHp - c.hp, -per * stacks);
+        if (healed > 0) {
+          c.hp += healed;
+          state.events.push({ type: 'heal', targetUid: c.uid, amount: healed });
+        }
+      }
     }
   }
 }
@@ -160,8 +176,17 @@ function decayStatuses(state: BattleState, list: Combatant[], when: 'ownTurnEnd'
 
 // ───────────────────────── 적 의도 ─────────────────────────
 
+/** 적이 노릴 수 있는 아군: 흐르지 않는 자(고리 멈추기)는 빠진다 */
+function targetable(state: BattleState): Combatant[] {
+  return alive(state.party).filter((p) => !isUnseen(state, p));
+}
+
+function isUnseen(state: BattleState, c: Combatant): boolean {
+  return Object.entries(c.statuses).some(([id, n]) => n > 0 && state.data.statuses.get(id)?.special === 'unseen');
+}
+
 function pickTarget(state: BattleState, targeting: string): Combatant | null {
-  const pool = alive(state.party);
+  const pool = targetable(state);
   if (pool.length === 0) return null;
   switch (targeting) {
     case 'lowest_hp':
@@ -255,7 +280,7 @@ export function incomingDamage(state: BattleState): Map<string, IncomingView> {
       else if (target === 'enemy') {
         const uid = taunter && enemy.intent.targetUid ? taunter.uid : enemy.intent.targetUid;
         const t = party.find((p) => p.uid === uid);
-        if (t) targets = [t];
+        if (t && !isUnseen(state, t)) targets = [t];
       }
       const times = e.times ?? 1;
       for (const t of targets) {
@@ -386,8 +411,18 @@ function enemyTurn(state: BattleState): void {
     let targetUid = enemy.intent.targetUid ?? undefined;
     const taunter = alive(state.party).find((p) => (p.statuses.taunt ?? 0) > 0);
     if (targetUid && taunter) targetUid = taunter.uid;
-    if (targetUid && state.party.find((p) => p.uid === targetUid)?.downed) {
-      targetUid = pickTarget(state, move.targeting)?.uid;
+    const intended = targetUid ? state.party.find((p) => p.uid === targetUid) : undefined;
+    if (intended?.downed) targetUid = pickTarget(state, move.targeting)?.uid;
+    else if (intended && isUnseen(state, intended)) {
+      // 흐르지 않는 자: 냄새를 놓친다. 다른 아군이 있으면 그쪽으로, 없으면 헛손질
+      const other = pickTarget(state, move.targeting);
+      if (!other) {
+        state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
+        state.events.push({ type: 'skip', uid: enemy.uid });
+        state.log.push(`${enemy.name}: ${move.name} — 하운을 놓쳤다.`);
+        continue;
+      }
+      targetUid = other.uid;
     }
     state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
     state.log.push(`${enemy.name}: ${move.name}`);

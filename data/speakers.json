@@ -2,5 +2,20 @@
   { "id": "kwak_dojin", "name": "곽도진", "color": "#e0cfae" },
   { "id": "sa_mugyeol", "name": "사무결", "color": "#5a1020" },
   { "id": "vargas", "name": "바르가스", "color": "#7fbf7f" },
-  { "id": "mordecai", "name": "모르데카이", "color": "#9a3a7a" }
+  { "id": "mordecai", "name": "모르데카이", "color": "#9a3a7a" },
+  { "id": "seokdu", "name": "석두", "color": "#c8b08a" },
+  { "id": "jo_myeonggak", "name": "조명각", "color": "#8aa0c8" },
+  { "id": "ma", "name": "마 씨", "color": "#b08a5a" },
+  { "id": "silien", "name": "실리엔", "color": "#cfe0d0" },
+  { "id": "hans", "name": "한스", "color": "#a0603a" },
+  { "id": "toma", "name": "토마", "color": "#d08a5a" },
+  { "id": "lina", "name": "리나", "color": "#e8d27a" },
+  { "id": "veilak", "name": "베일락", "color": "#4a4a5a" },
+  { "id": "ignis", "name": "이그니스", "color": "#f0e8d0" },
+  { "id": "celias", "name": "셀리아스", "color": "#bfe0f0" },
+  { "id": "gormon", "name": "고르몬", "color": "#7a5a4a" },
+  { "id": "shadow_assassin", "name": "그림자 암살자", "color": "#2a2a3a" },
+  { "id": "hyeolsu", "name": "혈수마군", "color": "#8a1a1a" },
+  { "id": "satgat_man", "name": "삿갓의 사내", "color": "#2b2b3a" },
+  { "id": "wang_cook", "name": "왕 노인", "color": "#c9a46a" }
 ]
