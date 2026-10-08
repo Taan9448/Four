@@ -36,8 +36,10 @@ import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
-import { clearRun, lastSlot, listSlots, readProfile, recordClear, saveRun, SLOT_COUNT } from './storage';
+import { clearRun, lastSlot, listSlots, readCodex, readProfile, recordClear, saveRun, SLOT_COUNT, updateCodex } from './storage';
 import { hubView } from './hub-view';
+import { codexView, type CodexTab } from './codex-view';
+import { noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, type Codex } from '../engine/codex';
 
 const data = gameData();
 
@@ -97,7 +99,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭)
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
@@ -142,6 +144,8 @@ export class App {
         this.run = done;
         return this.hub();
       }
+      case 'codex':
+        return this.codex((id as CodexTab | undefined) ?? 'cards');
       case 'bossloot': {
         const loot = rollLoot(data, run, { ...first, type: 'boss' });
         return this.show(this.backdrop(bossLootView(data, run, { loot, potionLeft: claimLoot(data, run, loot).potionLeft }, () => this.map())));
@@ -155,6 +159,30 @@ export class App {
         return this.show(this.backdrop(rewardView(data, rewardOptions(data, run, first.id), () => this.map(), { run, shown })));
       }
     }
+  }
+
+  /** 도감에 적는다(저장하는 런만: 샌드박스·화면 확인은 적지 않는다) */
+  private note(fn: (codex: Codex) => void): void {
+    if (this.persist) updateCodex(data, fn);
+  }
+
+  /** 도감 화면. 본 장면을 다시 보면 끝나고 같은 탭으로 돌아온다 */
+  private codex(tab: CodexTab = 'cards'): void {
+    this.show(
+      codexView(
+        data,
+        readCodex(data),
+        readProfile(),
+        {
+          onBack: () => this.title(),
+          onPlayScene: (id, back) => {
+            const scene = data.scenes.get(id);
+            if (scene) this.show(sceneView(data, scene, () => this.codex(back), { background: data.stages.find((st) => id.startsWith(`${st.id}_`))?.background }));
+          },
+        },
+        tab,
+      ),
+    );
   }
 
   private show(el: HTMLElement): void {
@@ -208,6 +236,7 @@ export class App {
               : null,
             h('button', { class: `btn${last ? '' : ' btn-primary'}`, onclick: () => this.openSlots('new') }, '새로 시작', h('small', {}, '빈 칸이나 고른 칸에서')),
             anySaved ? h('button', { class: 'btn', onclick: () => this.openSlots('load') }, '불러오기', h('small', {}, `저장 ${SLOT_COUNT}칸`)) : null,
+            h('button', { class: 'btn', onclick: () => this.codex() }, '도감', h('small', {}, '본 카드 · 적 · 장면')),
             h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '속도 · 연출 · 안내')),
           ),
         ),
@@ -325,6 +354,7 @@ export class App {
       ? createRunAt(data, seed, stageId, { supportActive: support, ...mode })
       : createRun(data, seed, { supportActive: support, ...mode });
     this.persist = true;
+    this.note((c) => (c.stats.runs += 1));
     // 주소창의 ?seed=…(디버그 시작)를 지운다: 새로고침하면 타이틀의 "이어하기"로 돌아온다
     if (location.search) history.replaceState(null, '', location.pathname);
     this.map();
@@ -339,6 +369,7 @@ export class App {
       else if (run.replayOf) saveRun(this.slot, run.replayOf);
       else clearRun(this.slot);
     }
+    this.note((c) => noteRun(c, run));
     // 레벨업 소식·고를 강화가 남았으면 먼저(전투 뒤 지도로 가기 전, 보스 뒤에는 스테이지 끝 화면 전에)
     if (run.levelLog.length || run.pendingUpgrades.length) return this.show(this.backdrop(levelUpView(data, run, () => this.map())));
     if (run.status === 'stage_clear') {
@@ -398,6 +429,7 @@ export class App {
   private playScene(id: string | undefined, then: () => void, background?: string): void {
     const scene = id ? data.scenes.get(id) : undefined;
     if (!scene) return then();
+    this.note((c) => noteScene(data, c, scene.id));
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
@@ -406,6 +438,7 @@ export class App {
     const run = this.run!;
     const setup = battleSetupFor(data, run, enc);
     const state = createBattle(data, setup);
+    this.note((c) => noteEnemiesSeen(c, state.enemies.map((e) => e.defId)));
     const stage = data.stages.find((s) => s.id === run.stageId)!;
     const bonus = bonusActive(run, enc.module) ? enc.module.content.bonus?.text : undefined;
     const view = new BattleView(
@@ -426,11 +459,14 @@ export class App {
         },
       },
       (final) => {
-        this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
+        const outcome = battleOutcome(final)!;
+        this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory'));
+        this.clearMessages = applyBattleOutcome(data, run, enc, outcome);
         if (run.status === 'defeat') return this.map();
         // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다
         const loot = rollLoot(data, run, enc.node);
         const shown: LootShown = { loot, potionLeft: claimLoot(data, run, loot).potionLeft, notes: run.status === 'map' ? this.clearMessages : [] };
+        this.note((c) => noteItem(noteRun(c, run), 'potions', loot.potion));
         if (run.status !== 'map') return this.show(this.backdrop(bossLootView(data, run, shown, () => this.map()), enc.module.content.background));
         // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
         this.playScene(
@@ -440,7 +476,7 @@ export class App {
               this.backdrop(
                 rewardView(
                   data,
-                  rewardOptions(data, run, enc.node.id),
+                  this.rewardSeen(rewardOptions(data, run, enc.node.id)),
                   (cardId) => {
                     if (cardId) addCard(run, cardId);
                     this.map();
@@ -455,6 +491,12 @@ export class App {
       },
     );
     this.show(view.root);
+  }
+
+  /** 보상으로 본 카드도 도감에 */
+  private rewardSeen(options: string[]): string[] {
+    this.note((c) => options.forEach((id) => noteCard(c, id)));
+    return options;
   }
 
   /** 클리어 지도: 마친 런의 여정 띠에서 스테이지를 골라 마지막 파티로 다시 한다(GAME_DESIGN 2절) */

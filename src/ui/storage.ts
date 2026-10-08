@@ -3,6 +3,7 @@
 import type { GameData } from '../engine/data';
 import type { RunState } from '../engine/run';
 import { deserializeRun, serializeRun, type LoadedRun } from '../engine/save';
+import { noteRun, parseCodex, type Codex } from '../engine/codex';
 
 /** 저장 칸 수(2026-10-08: 1칸 → 3칸). 칸마다 키가 따로이고, 옛 단일 저장(cheonoe.run)은 1번 칸으로 옮긴다 */
 export const SLOT_COUNT = 3;
@@ -91,4 +92,25 @@ export function recordClear(run: Pick<RunState, 'difficulty' | 'hardcore'>): Pro
   if (run.hardcore) p.hardcoreClears += 1;
   writeStore(PROFILE_KEY, JSON.stringify(p));
   return p;
+}
+
+// ───────── 도감(저장 칸과 상관없이 하나): src/engine/codex.ts ─────────
+const CODEX_KEY = 'cheonoe.codex';
+
+/** 도감을 읽는다. 아직 없으면(도감이 생기기 전 플레이) 저장 칸의 런으로 처음 채운다 */
+export function readCodex(data: GameData): Codex {
+  const text = readStore(CODEX_KEY);
+  const codex = parseCodex(data, text);
+  if (text === null) {
+    for (const { saved } of listSlots(data)) if (saved) noteRun(codex, saved.run);
+    writeStore(CODEX_KEY, JSON.stringify(codex));
+  }
+  return codex;
+}
+
+/** 읽고 → 고치고 → 쓴다 */
+export function updateCodex(data: GameData, fn: (codex: Codex) => void): void {
+  const codex = readCodex(data);
+  fn(codex);
+  writeStore(CODEX_KEY, JSON.stringify(codex));
 }
