@@ -1,0 +1,16 @@
+id: fx_rift_surge
+type: fx
+summary: 균열 폭주 — 틈이 터지며 붉은 빛이 쏟아지는 6프레임(균열이 최대일 때)
+chroma: magenta
+frames: 6
+fps: 12
+events: { impact: 3 }
+frame_notes:
+  1: "a large jagged fissure of void black with glowing red edges trembles, its edges flickering"
+  2: "the fissure suddenly bulges outward, cracks racing across the air in every direction from it"
+  3: "the fissure bursts: a violent flash of red light pours out of the void in a jagged starburst, black shards blasting outward"
+  4: "the red burst at full spread, shards and embers flying toward the frame edges"
+  5: "the light recedes into the fissure, leaving red embers and dark shards falling"
+  6: "a few embers and a faint red glow around a smaller, still black scar"
+style: "crisp pixel-art effect: a jagged crack of void black (#0b0b10) whose torn edges glow in 2-3 steps of dark red, red and orange (#5a1020, #a02634, #ff3b3b, #ff8a5c); a few single-block embers and dark shards; no white core, no smoke, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ff3b3b' }

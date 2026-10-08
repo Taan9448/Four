@@ -88,11 +88,14 @@ export function renderPrompt(spec, style) {
       return (
         header +
         pixelGrid(spec, 'Every cell') +
-        `Background: flat solid black #000000 in every cell.\n` +
+        // 기본은 검정 배경(자를 때 투명). 검은 것이 주인공인 이펙트(균열의 검은 틈)는 명세의 chroma(마젠타)로 깐다
+        (key && key.name !== 'black'
+          ? `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. Never use ${key.name}, pink or purple in the effect.\n`
+          : `Background: flat solid black #000000 in every cell.\n`) +
         `Subject: a glowing visual effect only; no character, no ground, no background elements.\n` +
-        `Style: ${style.fx_style ?? style.sprite_style}.\n` +
+        `Style: ${spec.style ?? (style.fx_style ?? style.sprite_style).replace(key && key.name !== 'black' ? ' on black' : '\u0000', '')}.\n` +
         paletteLine(spec, style) +
-        `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are completely black.\n` : ''}${rulesFor(spec)}`
+        `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are completely ${key && key.name !== 'black' ? key.name : 'black'}.\n` : ''}${rulesFor(spec)}`
       );
     case 'background':
       return (
