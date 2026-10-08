@@ -1,7 +1,7 @@
 # 소리 파일 자리(assets/audio)
 
-지금 게임의 배경음악과 효과음은 모두 브라우저에서 합성한 소리다. 합성하는 코드는 `src/render/audio.ts`, 곡의 악보는 `src/render/music.ts`에 있다.
-이 폴더에 아래 이름으로 파일을 넣으면, 그 곡이나 소리만 합성 대신 그 파일로 바뀐다. 다른 코드는 고치지 않아도 된다.
+배경음악 7곡 전부와 효과음 16개는 opengameart.org의 CC0 음원 파일이다(아래 '출처' 표). 파일이 없는 효과음 5개(`status`, `rift`, `relic`, `down`, `transform`)는 브라우저에서 합성한 소리를 그대로 쓴다. 합성하는 코드는 `src/render/audio.ts`, 곡의 악보는 `src/render/music.ts`에 있다.
+이 폴더에 아래 이름으로 파일을 넣으면, 그 곡이나 소리만 합성 대신 그 파일로 바뀐다. 다른 코드는 고치지 않아도 된다. 파일을 지우면 다시 합성 소리로 돌아간다.
 
 - 파일 형식: `.ogg`, `.mp3`, `.wav`
 - 배경음악은 반복해서 튼다. 끝과 처음이 자연스럽게 이어지게 자른다.
@@ -48,6 +48,40 @@
 
 ## 출처
 
-| 파일 | 출처 | 라이선스 |
-|---|---|---|
-| (없음 — 모두 합성) | | |
+모두 opengameart.org에서 받았고, 각 페이지의 License 칸이 CC0(퍼블릭 도메인)인 것만 골랐다. 2026-10-08에 확인했다. (freepd.com은 2025년에 문을 닫아 쓰지 못했다.)
+받은 원본은 ffmpeg로 손질했다: 배경음악은 Vorbis 96kbps 스테레오, 통합 음량 −18 LUFS로 맞췄다. 효과음은 Vorbis 모노로, 앞뒤 무음을 자르고 끝을 짧게 페이드아웃한 뒤 최대 음량을 약 −3 dBFS(버튼 `click`은 −9 dBFS)로 맞췄다.
+
+### 배경음악
+
+| 파일 | 곡 · 지은이 | 출처 | 라이선스 |
+|---|---|---|---|
+| `bgm/title.ogg` | JRPG Theme [Loop Ready] · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/jrpg-trailer-theme | CC0 |
+| `bgm/murim.ogg` | Hot Springs Town · Kistol | https://opengameart.org/content/hot-springs-town | CC0 |
+| `bgm/elheim.ogg` | Forest Whisper Theme · Cleyton Kauffman | https://opengameart.org/content/forest-whisper-theme | CC0 |
+| `bgm/nocturna.ogg` | Ancient Evil Awakens(JRPG Music Pack #3 [Evil]) · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/jrpg-pack-3-evil | CC0 |
+| `bgm/rift.ogg` | Whispers From Beyond(JRPG Music Pack #3 [Evil]) · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/jrpg-pack-3-evil | CC0 |
+| `bgm/battle.ogg` | Battle Theme A · cynicmusic | https://opengameart.org/content/battle-theme-a | CC0 — 앞 0.35초 페이드인과 끝 잔향을 잘라 반복이 끊기지 않게 했다 |
+| `bgm/boss.ogg` | Epic Boss Battle [Seamlessly Looping] · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/boss-battle-music | CC0 |
+
+### 효과음
+
+| 파일 | 원본 · 지은이 | 출처 | 라이선스 |
+|---|---|---|---|
+| `sfx/click.ogg` | click3.wav(UI SFX Set) · Kenney | https://opengameart.org/content/51-ui-sound-effects-buttons-switches-and-clicks | CC0 |
+| `sfx/card.ogg` | card-place-2.ogg(Casino Audio) · Kenney | https://opengameart.org/content/54-casino-sound-effects-cards-dice-chips | CC0 |
+| `sfx/turn.ogg` | card-fan-1.ogg(Casino Audio) · Kenney | https://opengameart.org/content/54-casino-sound-effects-cards-dice-chips | CC0 |
+| `sfx/hit.ogg` | qubodupPunch03 · qubodup | https://opengameart.org/content/punch | CC0 |
+| `sfx/hit_heavy.ogg` | qubodupPunch02 · qubodup + bfh1_hit_02 · rubberduck(두 소리를 겹침) | https://opengameart.org/content/punch · https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx | CC0 |
+| `sfx/crit.ogg` | qubodupPunch05 + qubodupImpactMetal · qubodup(두 소리를 겹침) | https://opengameart.org/content/punch · https://opengameart.org/content/impact | CC0 |
+| `sfx/block.ogg` | bfh1_metal_hit_02 · rubberduck | https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx | CC0 |
+| `sfx/fire.ogg` | Catching fire(flame) · themightyglider | https://opengameart.org/content/catching-fire | CC0 |
+| `sfx/ice.ogg` | ice.wav(Ice spells) · bart | https://opengameart.org/content/ice-spells | CC0 |
+| `sfx/heal.ogg` | health_restore.wav · Spring Spring(앞 2.2초) | https://opengameart.org/content/magic-words-healing-sound-effect | CC0 |
+| `sfx/coin.ogg` | handleCoins.ogg(RPG sounds) · Kenney | https://opengameart.org/content/50-rpg-sound-effects | CC0 |
+| `sfx/potion.ogg` | bottle.wav(RPG Sound Pack) · artisticdude | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/surge.ogg` | Energy Drain(PowerDrain) · qubodup(앞 2.2초) | https://opengameart.org/content/energy-drain | CC0 |
+| `sfx/levelup.ogg` | Level Up.mp3(7 Assorted Sound Effects) · Joth(앞 3.2초) | https://opengameart.org/content/7-assorted-sound-effects-menu-level-up | CC0 |
+| `sfx/victory.ogg` | Medieval: Victory Theme · RandomMind(앞 3.2초, 끝 1초 페이드아웃 — 전투 뒤 장소 곡과 겹치지 않게) | https://opengameart.org/content/medieval-victory-theme | CC0 |
+| `sfx/defeat.ogg` | Medieval: Defeat Theme · RandomMind(앞 8.6초) | https://opengameart.org/content/medieval-defeat-theme | CC0 |
+
+합성 소리 그대로인 효과음: `status`, `rift`, `relic`, `down`, `transform` — 짧고 자주 나거나(`status`, `rift`, `relic`) 쓰러지는 몸·보스 변신에 맞는 CC0 소리를 찾지 못해 남겨 두었다.
