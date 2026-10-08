@@ -1,0 +1,9 @@
+id: cg_durin_rest
+type: story-cg
+summary: 장면 일러스트 — 산의 심장 — 오천의 무덤 위에 앉은 두린(S4, 2권 7장)
+frame_notes:
+  1: >-
+    A cavern so high its ceiling vanishes into darkness, deep inside the Grandfather Mountain of Khazdum: among collapsed rock heaps lie hundreds upon thousands of crushed, dented empty black armors. At the very top of the rubble, right under the collapsed ceiling, sits one small figure — the remains of a dwarf, nothing left but bones under a ragged cloak, seated as if resting after finishing his last job, a war hammer laid across his knees. A thin light from the glowing blue stone of a staff falls on him from below. At the foot of the rubble a short, broad dwarf with a red beard in three braids, a big two-handed axe on his back, walks up toward him alone. Dust, silence, deep stone browns and a cold blue light.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2a1d16' }

@@ -1,0 +1,9 @@
+id: cg_gormon_wakes
+type: story-cg
+summary: 장면 일러스트 — 고르몬 — 바위벽에서 솟아오른 대지의 거인(S4, 2권 7장)
+frame_notes:
+  1: >-
+    The far wall of the vast cavern is moving: it is not a wall but a hand of rock, each finger as big as a man's body, and behind it an arm, a shoulder and a head rise out of the stone — Gormon, the Earth Giant, fused with the mountain itself, his body the cavern's own grey-black rock, with roots of red lava running from him into the walls, ceiling and floor like tree roots. His two eyes open, burning red like lava. Rocks crumble from the ceiling. On the floor before him lie thousands of crushed empty armors under the rubble. Huge, slow, crushing.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b2b3a' }

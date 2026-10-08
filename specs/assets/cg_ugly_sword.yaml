@@ -1,0 +1,9 @@
+id: cg_ugly_sword
+type: story-cg
+summary: 장면 일러스트 — 못생긴 검 — 대장간 구석의 장식 없는 검(S1, 1권 9장)
+frame_notes:
+  1: >-
+    Inside the dwarven smithy at the north end of Hailon: a forge glowing orange in the background, an anvil, hammers and tongs hanging on the stone wall, and racks of showy swords with jewelled hilts and engraved, patterned blades catching the firelight. In the foreground corner, leaning alone against the wall, a single plain sword — narrower and thinner than all the others, completely unadorned, with a crude plain grip; its straight blade is clean and flawless, and the fine lines of steel folded thousands of times run in one unbroken straight stream from grip to tip. A plain black scabbard leans beside it. Warm firelight, the plain sword quietly the best thing in the room.
+framing: >-
+  A close-up story illustration of an object for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the object in the upper three quarters. Wide 3:2 frame, strong readable silhouette, dramatic light, no text.
+placeholder: { color: '#4a3426' }

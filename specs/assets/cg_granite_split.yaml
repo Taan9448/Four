@@ -1,0 +1,10 @@
+id: cg_granite_split
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 첫눈 — 화강암과 언덕을 가른 푸른 선(S1, 1권 12장)
+frame_notes:
+  1: >-
+    The day of the first snow at a creek outside Hailon: a granite boulder as big as a house has been split cleanly into two halves, one half sliding into the dark creek water; across the creek a low snowy hill bears a single perfectly straight line cut through the snow, continuing the stroke. Jin Haun, in his grey servant outfit mended at the side, stands at the end of a downward stroke, his narrow sword glowing a faint pale blue like the dawn sky, a thin blue line of light fading in the air. Behind him, smaller: a blond knight in silver plate staring open-mouthed, a short broad dwarf with a red beard in three braids and a huge axe, and a silver-haired half-elf woman in a grey hooded cloak with a long wooden staff tipped with a blue stone, who looks not at Haun but at a hair-thin black crack hanging in the empty air where the blade passed. Snowflakes and faint motes of light drift. He carries the plain, narrow, completely unadorned 'ugly sword' with a crude plain grip, in a plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3d4459' }

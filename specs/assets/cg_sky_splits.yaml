@@ -1,0 +1,10 @@
+id: cg_sky_splits
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 갈라지는 하늘 — 천마봉 위의 금(S8 끝, 3권 14장)
+frame_notes:
+  1: >-
+    The summit of the Heavenly Demon Peak just after the final battle: the broken Blood Hall with its walls collapsed, two empty thrones side by side, blood spilled through the channels in the floor. Above, the night sky itself is splitting open along a long black crack, jagged like a broken porcelain bowl, a red-black darkness beyond it. In the foreground Jin Haun, worn out in his grey servant outfit, kneels leaning on his sword with its point in the floor, looking up; beside him a silver-haired woman in a grey cloak stares at the sky. Far below on the nine-turn stairs, torches of cheering troops who have not noticed yet. Ominous and vast. He carries the plain, narrow, completely unadorned 'ugly sword' with a crude plain grip, in a plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1d2433' }

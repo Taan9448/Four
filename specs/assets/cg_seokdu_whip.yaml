@@ -1,0 +1,10 @@
+id: cg_seokdu_whip
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 보름의 연무장 — 채찍을 잡은 손(S6, 3권 8장)
+frame_notes:
+  1: >-
+    Full-moon night in the Cheongun sect's training yard of deep river sand, torches burning, two hundred guards in white robes with red tassels on their sleeves standing in rows. On a raised platform a narrow-faced young man in a white robe, with sharply upturned eyes and dark circles under them and a faint reddish haze around him, has lashed out with an iron-hooked whip. Below him a huge young man with door-wide shoulders gone thin, his back and arms covered with layered whip marks, stands in chains and refuses to kneel. A hand's breadth from his back the whip has stopped: Jin Haun, in his grey servant outfit, has caught it with his bare hand, the iron hooks biting into his calloused palm, blood running down his wrist. He carries the plain, narrow, completely unadorned 'ugly sword' with a crude plain grip, in a plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b2b3a' }

@@ -1,0 +1,10 @@
+id: cg_green_bridge
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 초록빛 다리 — 끊어진 일곱째 굽이(S8, 3권 13장)
+frame_notes:
+  1: >-
+    Between the seventh and eighth turns of the Nine-Heaven Stairs the stairway has collapsed, leaving a gap of ten jang over a black abyss. On a rock of the seventh turn a silver-haired half-elf woman in a grey hooded cloak holds up a long wooden staff tipped with a blue stone, blood running from her nose; from its tip green light spreads like vines and forms a bridge of green light across the gap, like the elven barrier of Silvaren. Jin Haun in his grey servant outfit runs across the swaying bridge through a rain of arrows toward three cult elders standing on the far cliff edge with hundreds of archers behind them. Torchlight, green glow, black night. He carries the plain, narrow, completely unadorned 'ugly sword' with a crude plain grip, in a plain black scabbard at his hip; he does NOT carry an axe.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2f5a3a' }

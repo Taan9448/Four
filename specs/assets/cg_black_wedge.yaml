@@ -1,0 +1,9 @@
+id: cg_black_wedge
+type: story-cg
+summary: 장면 일러스트 — 벨칸의 쐐기 — 모루 위의 검은 쐐기(S2, 2권 2장)
+frame_notes:
+  1: >-
+    Close-up on a blackened anvil in a forge of the volcanic canyon: a black iron wedge as long as a man's forearm lies on it, one end blunt and the other end sharpened to a needle point; along its body run freshly carved flowing wave-like letters, the same script as on the ancient stone gates, glinting faintly cold against the orange heat. The metal looks subtly wrong, its grain twisted two ways at once. A broad, scarred, soot-blackened hand grips a heavy hammer above it, an iron chain running from a cuff on the wrist off the frame toward a great furnace; sparks fly, and in the shadow behind lies a stack of identical wedges. Orange furnace light, black soot, a cold glint.
+framing: >-
+  A close-up story illustration of an object for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the object in the upper three quarters. Wide 3:2 frame, strong readable silhouette, dramatic light, no text.
+placeholder: { color: '#2a1d16' }

@@ -1,0 +1,31 @@
+{
+  "id": "cg_nine_stairs",
+  "type": "story-cg",
+  "frameW": 1152,
+  "frameH": 768,
+  "track": "illustration",
+  "pixelScale": null,
+  "gridDetected": null,
+  "nativeSize": null,
+  "fit": null,
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "004e4eadefec4f8e",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": null
+}

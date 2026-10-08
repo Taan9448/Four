@@ -1,0 +1,9 @@
+id: cg_old_temple
+type: story-cg
+summary: 장면 일러스트 — 폐사찰 지하 장경각 — 수레 의자의 노인(S6, 3권 3장)
+frame_notes:
+  1: >-
+    Deep in the mountains, under the collapsed main hall of an abandoned Buddhist temple: the old sutra library, a low stone chamber of tall shelves of bound scriptures and scroll racks, lit by a few oil lamps. About thirty ragged people who hid from the demonic cult sit among the shelves. In the middle stands a plain wooden chair with cart wheels, and in it an old man with a back bent like a sickle, thin white hair tied back, deep wrinkles and hazy eyes with a sharp glint; the worn blanket over his lap hangs flat below the knees — he has no legs. He lifts one hand toward the entrance as if trying to stand. Dust in the lamplight, warm and sad.
+framing: >-
+  A cinematic establishing story illustration of a place for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep the key landmarks and any figures in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#4a3426' }
