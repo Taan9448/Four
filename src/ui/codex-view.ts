@@ -2,7 +2,7 @@
 // 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 기록
 import { codexCards, codexPeople, codexProgress, type Codex } from '../engine/codex';
 import type { GameData } from '../engine/data';
-import type { CardDef } from '../engine/schema';
+import type { CardDef, EnemyDef } from '../engine/schema';
 import { frameUrl } from '../render/assets';
 import { loadPortrait } from '../render/portrait';
 import { cardView } from './card-view';
@@ -10,6 +10,7 @@ import { h } from './dom';
 import { potionChip, relicChip } from './items';
 import type { Profile } from './storage';
 import { installTooltips } from './tooltip';
+import { openOverlay } from './overlay';
 
 export interface CodexHandlers {
   onBack: () => void;
@@ -26,6 +27,103 @@ const TABS: { id: CodexTab; label: string }[] = [
   { id: 'scenes', label: '장면' },
   { id: 'stats', label: '기록' },
 ];
+
+// ───────── 눌러서 크게 보기(2026-10-08) ─────────
+const TYPE_LABEL: Record<string, string> = { attack: '공격', skill: '기술', power: '심법', status: '상태' };
+const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설', special: '특수', boss: '보스' };
+const INTENT_LABEL: Record<string, string> = { attack: '공격', defend: '방어', buff: '강화', debuff: '약화', special: '특수' };
+
+const facts = (rows: [string, string][]) => h('dl', { class: 'zoom-facts' }, rows.filter(([, v]) => v).flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)]));
+
+/** 카드: 크게 + 본 적 있는 강화 단계(0~최고)를 골라 볼 수 있다 */
+function openCard(data: GameData, def: CardDef, best: number): void {
+  const big = h('div', { class: 'zoom-card' });
+  const levels = h('div', { class: 'zoom-levels' });
+  const owner = data.characters.get(def.owner)?.name ?? (def.owner === 'common' ? '공용' : def.owner);
+  const show = (lv: number) => {
+    big.replaceChildren(cardView(data, { uid: `zoom_${def.id}`, cardId: def.id, level: lv }));
+    for (const b of levels.children) b.classList.toggle('on', Number((b as HTMLElement).dataset.lv) === lv);
+  };
+  if (best > 0) for (let lv = 0; lv <= best; lv++) levels.append(h('button', { class: 'btn btn-small', 'data-lv': lv, onclick: () => show(lv) }, lv ? `+${lv}` : '기본'));
+  openOverlay(
+    def.name,
+    h(
+      'div',
+      { class: 'zoom' },
+      h('div', { class: 'zoom-left' }, big, levels),
+      h(
+        'div',
+        { class: 'zoom-right' },
+        facts([
+          ['주인', owner],
+          ['등급', RARITY_LABEL[def.rarity] ?? def.rarity],
+          ['종류', TYPE_LABEL[def.type] ?? def.type],
+          ['본 최고 강화', best ? `+${best}` : '기본'],
+        ]),
+        def.flavor ? h('p', { class: 'zoom-flavor' }, def.flavor) : null,
+        def.castLine ? h('p', { class: 'zoom-line' }, `${data.speakers.get(def.castLine.speaker)?.name ?? data.characters.get(def.castLine.speaker)?.name ?? ''} — “${def.castLine.text}”`) : null,
+      ),
+    ),
+    { wide: true },
+  );
+  show(best);
+}
+
+/** 적: 만나기만 했으면 그림과 이름, 이겼으면 체력·약점·특성·기술까지 */
+function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: number }): void {
+  const url = e.sprite ? frameUrl(`${e.sprite}_idle`, 1, { realOnly: true }) : null;
+  const known = rec.defeated > 0;
+  const list = (xs: string[]) => xs.map((x) => ELEMENT_LABEL[x] ?? x).join(' · ');
+  openOverlay(
+    e.name,
+    h(
+      'div',
+      { class: 'zoom' },
+      h(
+        'div',
+        { class: 'zoom-left' },
+        h('div', { class: `zoom-pic${known ? '' : ' dim'}`, style: e.color ? `--sil:${e.color}` : '' }, url ? h('img', { src: url, alt: e.name }) : h('span', {}, e.name.slice(0, 1))),
+      ),
+      h(
+        'div',
+        { class: 'zoom-right' },
+        facts([
+          ['등급', TIER_LABEL[e.tier]],
+          ['만남 · 이김', `${rec.seen} · ${rec.defeated}`],
+          ['체력', known ? String(e.maxHp) : '?'],
+          ['약점', known ? list(e.weak) : ''],
+          ['내성', known ? list(e.resist) : ''],
+          ['특성', known ? e.traits.map((t) => `${data.statuses.get(t.status)?.name ?? t.status} ${t.stacks}`).join(' · ') : ''],
+        ]),
+        known
+          ? h('div', { class: 'zoom-moves' }, h('h4', {}, '쓰는 기술'), h('ul', {}, e.moves.map((m) => h('li', {}, h('b', {}, m.name), h('small', {}, INTENT_LABEL[m.intent] ?? m.intent)))))
+          : h('p', { class: 'hint' }, '한 번 이기면 체력·약점·쓰는 기술을 알게 된다.'),
+      ),
+    ),
+    { wide: true },
+  );
+}
+
+function openItem(chip: HTMLElement, name: string, kind: string, text: string, flavor?: string): void {
+  openOverlay(
+    name,
+    h('div', { class: 'zoom' }, h('div', { class: 'zoom-left zoom-item' }, chip), h('div', { class: 'zoom-right' }, h('div', { class: 'zoom-kind' }, kind), h('p', { class: 'zoom-text' }, text), flavor ? h('p', { class: 'zoom-flavor' }, flavor) : null)),
+  );
+}
+
+/** 인물: 반신 그림 세 표정(기본·결의·놀람)과 소개 */
+function openPerson(data: GameData, id: string): void {
+  const ch = data.characters.get(id);
+  const sp = data.speakers.get(id);
+  const name = ch?.name ?? sp?.name ?? id;
+  const faces = h('div', { class: 'zoom-faces' });
+  (['neutral', 'resolve', 'surprise'] as const).forEach((face) => {
+    const box = h('div', { class: 'zoom-face', style: `--who:${ch?.color ?? sp?.color ?? '#888'}` }, h('span', {}, name.slice(0, 1)));
+    faces.append(box);
+    void loadPortrait(id, face).then((img) => img && box.replaceChildren(h('img', { src: img.src, alt: '' })));
+  });
+  openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h('div', { class: 'zoom-right' }, ch ? h('div', { class: 'zoom-kind' }, ch.title) : null, ch ? h('p', { class: 'zoom-text' }, ch.description) : null)), { wide: true });
+}
 
 const TIER_LABEL: Record<string, string> = { normal: '일반', elite: '정예', boss: '보스' };
 const ELEMENT_LABEL: Record<string, string> = { fire: '화염', ice: '냉기' };
@@ -63,7 +161,11 @@ function cardsTab(data: GameData, codex: Codex): HTMLElement {
   const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'special'];
   const tile = (def: CardDef) =>
     def.id in codex.cards
-      ? h('div', { class: 'deck-card codex-card' }, cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: codex.cards[def.id] }))
+      ? h(
+          'div',
+          { class: 'deck-card codex-card zoomable', title: '눌러서 크게 보기', onclick: () => openCard(data, def, codex.cards[def.id]) },
+          cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: codex.cards[def.id] }),
+        )
       : h('div', { class: `codex-card unknown rarity-${def.rarity}` }, h('span', {}, '?'));
   return h(
     'div',
@@ -105,7 +207,7 @@ function enemiesTab(data: GameData, codex: Codex): HTMLElement {
             ].filter(Boolean);
             return h(
               'div',
-              { class: `codex-enemy tier-${e.tier}${rec.defeated ? ' defeated' : ''}` },
+              { class: `codex-enemy zoomable tier-${e.tier}${rec.defeated ? ' defeated' : ''}`, title: '눌러서 자세히', onclick: () => openEnemy(data, e, rec) },
               h(
                 'div',
                 { class: 'codex-pic', style: e.color ? `--sil:${e.color}` : '' },
@@ -124,7 +226,8 @@ function enemiesTab(data: GameData, codex: Codex): HTMLElement {
 }
 
 function itemsTab(data: GameData, codex: Codex): HTMLElement {
-  const row = (chip: HTMLElement, name: string, text: string) => h('div', { class: 'codex-item' }, chip, h('div', {}, h('b', {}, name), h('small', {}, text)));
+  const row = (chip: HTMLElement, name: string, text: string, open: () => void) =>
+    h('div', { class: 'codex-item zoomable', title: '눌러서 크게 보기', onclick: open }, chip, h('div', {}, h('b', {}, name), h('small', {}, text)));
   const unknown = () => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???')));
   const relics = [...data.relics.values()];
   const potions = [...data.potions.values()];
@@ -134,12 +237,18 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
     section(
       '유물',
       `${codex.relics.length} / ${relics.length}`,
-      h('div', { class: 'codex-items' }, relics.map((r) => (codex.relics.includes(r.id) ? row(relicChip(data, r.id), r.name, r.description) : unknown()))),
+      h('div', { class: 'codex-items' }, relics.map((r) =>
+          codex.relics.includes(r.id)
+            ? row(relicChip(data, r.id), r.name, r.description, () => openItem(relicChip(data, r.id, 'huge'), r.name, `${RARITY_LABEL[r.rarity]} 유물`, r.description, r.flavor))
+            : unknown(),
+        )),
     ),
     section(
       '물약',
       `${codex.potions.length} / ${potions.length}`,
-      h('div', { class: 'codex-items' }, potions.map((p) => (codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description) : unknown()))),
+      h('div', { class: 'codex-items' }, potions.map((p) =>
+          codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description, () => openItem(potionChip(data, p.id, { extra: 'huge' }), p.name, `${RARITY_LABEL[p.rarity]} 물약`, p.description)) : unknown(),
+        )),
     ),
   );
 }
@@ -158,7 +267,7 @@ function peopleTab(data: GameData, codex: Codex): HTMLElement {
         const sp = data.speakers.get(id);
         const pic = h('div', { class: 'codex-portrait', style: `--who:${ch?.color ?? sp?.color ?? '#888'}` }, h('span', {}, (ch?.name ?? sp?.name ?? id).slice(0, 1)));
         void loadPortrait(id).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: '' })));
-        return h('div', { class: 'codex-person' }, pic, h('b', {}, ch?.name ?? sp?.name ?? id), ch ? h('small', {}, ch.title) : null);
+        return h('div', { class: 'codex-person zoomable', title: '눌러서 크게 보기', onclick: () => openPerson(data, id) }, pic, h('b', {}, ch?.name ?? sp?.name ?? id), ch ? h('small', {}, ch.title) : null);
       }),
     ),
   );
@@ -196,7 +305,13 @@ function scenesTab(data: GameData, codex: Codex, onPlay: (id: string) => void): 
         ? h(
             'div',
             { class: 'codex-gallery' },
-            gallery.map((g) => h('a', { href: g.url!, target: '_blank', rel: 'noopener' }, h('img', { src: g.url!, alt: g.id, loading: 'lazy' }))),
+            gallery.map((g) =>
+              h(
+                'button',
+                { class: 'codex-cg zoomable', title: '눌러서 크게 보기', onclick: () => openOverlay('장면 그림', h('img', { class: 'zoom-cg', src: g.url!, alt: g.id }), { wide: true }) },
+                h('img', { src: g.url!, alt: g.id, loading: 'lazy' }),
+              ),
+            ),
           )
         : h('p', { class: 'hint' }, '본 장면의 그림이 여기에 모인다.'),
     ),

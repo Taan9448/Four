@@ -169,19 +169,21 @@ export class App {
     if (this.persist) updateCodex(data, fn);
   }
 
-  /** 도감 화면. 본 장면을 다시 보면 끝나고 같은 탭으로 돌아온다 */
-  private codex(tab: CodexTab = 'cards'): void {
-    playBgm('title');
+  /** 도감 화면. 본 장면을 다시 보면 끝나고 같은 탭으로 돌아온다. back: 돌아갈 화면(기본 시작 화면, 지도에서 열면 지도) */
+  private codex(tab: CodexTab = 'cards', from?: () => void): void {
+    // 시작 화면에서 열면 시작 화면의 곡, 지도에서 열면 그 장소의 곡을 그대로
+    if (!from) playBgm('title');
+    const back = from ?? (() => this.title());
     this.show(
       codexView(
         data,
         readCodex(data),
         readProfile(),
         {
-          onBack: () => this.title(),
-          onPlayScene: (id, back) => {
+          onBack: () => back(),
+          onPlayScene: (id, tabBack) => {
             const scene = data.scenes.get(id);
-            if (scene) this.show(sceneView(data, scene, () => this.codex(back), { background: data.stages.find((st) => id.startsWith(`${st.id}_`))?.background }));
+            if (scene) this.show(sceneView(data, scene, () => this.codex(tabBack, from), { background: data.stages.find((st) => id.startsWith(`${st.id}_`))?.background }));
           },
         },
         tab,
@@ -413,8 +415,9 @@ export class App {
           this.map();
         },
         onRefresh: () => this.map(),
-        onShowDeck: () => openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]),
+        onShowDeck: () => openDeck(data, `보유 카드 ${run.deck.length}장`, [{ label: '보유 카드', cards: run.deck }]),
         onSettings: () => this.openSettings(),
+        onCodex: () => this.codex('cards', () => this.map()),
         onTitle: () => this.title(),
         highlightParty: firstMate || overFull,
       }),
@@ -524,7 +527,8 @@ export class App {
           this.run = startReplay(data, run, stageId);
           this.map();
         },
-        onShowDeck: () => openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]),
+        onShowDeck: () => openDeck(data, `보유 카드 ${run.deck.length}장`, [{ label: '보유 카드', cards: run.deck }]),
+        onCodex: () => this.codex('cards', () => this.hub()),
         onTitle: () => this.title(),
       }),
     );
