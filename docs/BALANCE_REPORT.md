@@ -1,6 +1,6 @@
 # 밸런스 보고서 — 자동 플레이 봇
 
-`npm run balance`가 만든다(손으로 고치지 않는다). 시드 300개(B0001~), 봇 `src/sim/bot.ts`. 계산 29.9초.
+`npm run balance`가 만든다(손으로 고치지 않는다). 시드 300개(B0001~), 봇 `src/sim/bot.ts`. 계산 29.2초.
 봇은 한 수 앞만 보는 탐욕 봇이라 사람보다 약하다. 절대 승률보다 **스테이지·전투 사이의 상대적인 어려움**을 본다. 목표는 `docs/GAME_DESIGN.md` 12절.
 
 ## 요약
@@ -32,7 +32,7 @@
 | 도끼 잡아먹는 놈들 `s0_battle_axe_eaters` | battle | 131 | 0 | 4.2 | 70.0 | 0% | 0% | 0.0 |
 | 밤의 철목인 `s0_battle_iron_dummy` | battle | 57 | 0 | 2.8 | 70.0 | 0% | 0% | 0.0 |
 | 장작 패는 아이 `s0_tutorial_woodpile` | battle | 300 | 0 | 2.1 | 70.0 | 0% | 0% | 0.0 |
-| 귀곡애(鬼哭崖) `s0_boss_ghost_cliff` | boss | 300 | 0 | 3.0 | 70.0 | 9% | 9% | 0.0 |
+| 귀곡애(鬼哭崖) `s0_boss_ghost_cliff` | boss | 300 | 0 | 5.0 | 70.0 | 18% | 18% | 0.0 |
 | 상단 호위 `s1_battle_caravan` | battle | 56 | 0 | 5.1 | 68.9 | 9% | 2% | 0.0 |
 | 죽어 가는 숲 `s1_battle_dead_forest` | battle | 35 | 0 | 3.9 | 69.6 | 4% | 1% | 0.5 |
 | 고블린 무리 소탕 `s1_battle_goblins` | battle | 124 | 0 | 3.7 | 69.4 | 6% | 1% | 0.0 |

@@ -1,5 +1,5 @@
 // `npm run data:check` — data/ 폴더의 스키마와 상호 참조를 검사한다.
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
 import { fastFaceChanges } from '../src/engine/scene';
@@ -13,6 +13,13 @@ const specIds = new Set(
   readdirSync(new URL('../specs/assets/', import.meta.url))
     .filter((f) => f.endsWith('.yaml') && !f.startsWith('_'))
     .map((f) => f.replace(/\.yaml$/, '')),
+);
+/** 명세 id → type(장면 일러스트 검사용) */
+const specTypes = new Map(
+  [...specIds].map((id) => {
+    const text = readFileSync(new URL(`../specs/assets/${id}.yaml`, import.meta.url), 'utf8');
+    return [id, text.match(/^type:\s*(\S+)/m)?.[1] ?? ''] as const;
+  }),
 );
 
 function checkEffects(label: string, effects: Effect[], allowed: Set<string>): string[] {
@@ -196,6 +203,18 @@ describe('데이터 검사', () => {
     for (const sp of speakers) {
       if (!data.characters.has(sp) && !data.speakers.has(sp)) bad.push(`화자 ${sp}: characters·speakers에 없음`);
       if (!specIds.has(`${sp}_stand`)) bad.push(`화자 ${sp}: 반신 그림 명세 ${sp}_stand 없음`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('장면 일러스트: cg는 story-cg 명세가 있는 에셋이다("none"은 걷기)', () => {
+    const bad: string[] = [];
+    for (const sc of data.scenes.values()) {
+      for (const l of sc.lines) {
+        if (!l.cg || l.cg === 'none') continue;
+        const spec = specTypes.get(l.cg);
+        if (spec !== 'story-cg') bad.push(`${sc.id}: cg ${l.cg}(${spec ?? '명세 없음'})`);
+      }
     }
     expect(bad).toEqual([]);
   });

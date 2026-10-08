@@ -1,0 +1,10 @@
+id: cg_stone_gate
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 석문 — 피 묻은 손이 닿는 순간(S0 끝, 1권 6장)
+frame_notes:
+  1: >-
+    Halfway down the sheer cliff face, in a shadowed crevice the moonlight does not reach, an ancient stone gate twice a man's height, half covered in moss, its doors carved with unknown flowing wave-like letters that glow faint blue; in the center a hollow in the shape of a human palm; in one corner of the door frame a single small cloud emblem carved long ago with a sword tip. Falling past it, Jin Haun's blood-soaked right hand reaches out and touches the palm hollow — at that instant the letters flare and white light begins to pour out of the seam. He carries no axe (it was left behind); his hands are empty except where stated.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1f3f73' }

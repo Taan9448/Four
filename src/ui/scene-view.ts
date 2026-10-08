@@ -5,6 +5,7 @@ import { sceneFaces } from '../engine/scene';
 import type { Face, SceneDef, SceneLine } from '../engine/schema';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait } from '../render/portrait';
+import { frameUrl } from '../render/assets';
 import { h } from './dom';
 
 type Side = 'left' | 'right';
@@ -27,6 +28,8 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void): 
   const textEl = h('div', { class: 'vn-text' });
   const box = h('div', { class: 'vn-box' }, nameEl, textEl, h('div', { class: 'vn-next' }, '▼'));
   const logEl = h('div', { class: 'vn-log hidden' });
+  // 장면 일러스트(CG): 실제 그림이 있을 때만 화면 전체에 깔고, 그동안 반신 그림은 숨긴다
+  const cgEl = h('div', { class: 'vn-cg' });
   let index = -1;
   let finished = false;
 
@@ -66,6 +69,17 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void): 
     if (index >= scene.lines.length) return finish();
     const line = scene.lines[index];
     const side = sideOf(line);
+    if (line.cg !== undefined) {
+      // "none"이거나 아직 실제 그림이 없으면 걷고 반신 그림으로 돌아간다
+      const url = line.cg === 'none' ? null : frameUrl(line.cg, 1, { realOnly: true });
+      if (url) cgEl.style.backgroundImage = `url(${url})`;
+      root.classList.toggle('has-cg', !!url);
+    }
+    if (line.effect) {
+      root.classList.remove('vn-flash', 'vn-shake', 'vn-fade');
+      void root.offsetWidth;
+      root.classList.add(`vn-${line.effect}`);
+    }
     if (line.speaker) void showPortrait(slots[side], line.speaker, faces[index] ?? 'neutral');
     for (const s of ['left', 'right'] as Side[]) slots[s].el.classList.toggle('dim', !line.speaker || s !== side);
     nameEl.textContent = nameOf(line);
@@ -94,6 +108,7 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void): 
   const root = h(
     'section',
     { class: `screen scene-screen world-${scene.world ?? 'murim'}`, onclick: () => next() },
+    cgEl,
     slots.left.el,
     slots.right.el,
     box,

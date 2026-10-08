@@ -1,0 +1,10 @@
+id: cg_cliff_unhae
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 귀곡애 — 소리 없는 운해귀종(S0 끝, 1권 6장)
+frame_notes:
+  1: >-
+    Night at the edge of the Ghost Valley Cliff (Gwigok-ae): a bare rock ledge, beyond it a thousand-fathom drop and a sea of clouds silvered by the moon. On the left the white-haired sect leader Kwak Dojin in a flowing white crane-pattern Taoist robe strikes without a sound, his pine-grain sword passing like a ripple of water that will return to where it started; a faint wave-shaped trail of light follows the blade. On the right Jin Haun, blood on his torn left earlobe, heels at the very edge of the cliff, twists his body toward a hair-thin gap in that wave — he can see the path of the blade before the blade. A small pebble falls into the clouds. Cold silver moonlight, wind lifting hair and robes. He carries no axe (it was left behind); his hands are empty except where stated.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1d2433' }

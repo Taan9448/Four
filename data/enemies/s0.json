@@ -41,7 +41,7 @@
     "scale": 1.3,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "sword_qi", "name": "검기(劍氣)", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 7}]}, {"id": "pine_cut", "name": "소나무 베기", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "unhae_gwijong", "name": "운해귀종(雲海歸宗)", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 20}]}],
+    "moves": [{"id": "sword_qi", "name": "검기(劍氣)", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 9}]}, {"id": "white_crane", "name": "학창의 그림자 — 나무 끝을 밟고", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 5, "times": 2}]}, {"id": "pine_cut", "name": "소나무 베기", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "wild_grass", "name": "\"들풀은 들풀이다\" — 검을 고쳐 쥔다", "intent": "buff", "targeting": "haun", "effects": [{"op": "apply_status", "status": "strength", "stacks": 3, "target": "self"}, {"op": "block", "amount": 20, "target": "self"}]}, {"id": "unhae_gwijong", "name": "운해귀종(雲海歸宗)", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 22}]}],
     "flavor": "청운문 장문인 현허진인. 열 걸음 밖에서 날린 검기가 바위에 손가락 두 마디 깊이의 자국을 새겼다. 나무 꼭대기의 가지 끝을 밟고 소리 없이 날아왔다. 지금의 하운으로는 이길 수 없다."
   }
 ]

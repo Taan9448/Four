@@ -1,0 +1,10 @@
+id: cg_branch_knot
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 나뭇가지 하나 — 그림자늑대의 매듭(S1 시작, 1권 7장)
+frame_notes:
+  1: >-
+    A small clearing in the silver forest under two moons. Shadow wolves the size of calves, bodies of wavering black smoke with black flames along their spines and two red dots for eyes, circle three travelers: a silver-haired half-elf woman in a grey hooded cloak raising a long wooden staff tipped with a glowing blue stone, a blond knight in silver plate armor, and a short broad dwarf with a red beard in three braids holding a huge axe. In the foreground Jin Haun, in a torn grey servant outfit with a bleeding side, thrusts a plain fallen tree branch into the back of a leaping wolf's neck, exactly where all the black threads of smoke meet in one knot — the wolf is coming apart like an unraveled skein. He carries no axe (it was left behind); his hands are empty except where stated.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1d2433' }

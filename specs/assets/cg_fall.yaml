@@ -1,0 +1,10 @@
+id: cg_fall
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 추락 — 구름바다로(S0 끝, 1권 6장)
+frame_notes:
+  1: >-
+    Jin Haun falling backward from the Ghost Valley Cliff into a sea of moonlit clouds, seen from above and slightly to the side: his body turning in the air, a deep wound in his side with drops of blood scattering upward, his long black hair whipping, the moon spinning in the sky. High above at the cliff edge, a small white figure in a crane robe looks down. The towering dark cliff face fills one side of the frame, rushing past. He carries no axe (it was left behind); his hands are empty except where stated.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b2b3a' }

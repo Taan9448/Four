@@ -1,0 +1,10 @@
+id: cg_two_moons
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 두 개의 달 — 낯선 숲에서 눈을 뜨다(S1 시작, 1권 7장)
+frame_notes:
+  1: >-
+    Night in a silver forest of another world: gigantic trees with smooth silver-grey bark, each trunk as wide as a thatched house, palm-sized silver leaves glittering; countless soft motes of light drift slowly in one direction like petals on an invisible river. Jin Haun lies on soft moss at the lower left, just opening his eyes, one hand pressed to the half-healed wound in his side, staring up at two moons — a large cold silver moon and a smaller pale blue moon below it, like a mother and child — among unfamiliar stars. Behind him a dormant stone gate, its letters grey and lifeless, held between the roots of two great trees. He carries no axe (it was left behind); his hands are empty except where stated.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#23384a' }
