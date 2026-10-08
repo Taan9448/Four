@@ -16,16 +16,18 @@ function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: st
     : h('span', { class: `icon ${cls}` }, glyph);
 }
 
-/** 체력 막대 아래의 상태 아이콘(스택은 귀퉁이 숫자, 마우스를 올리면 설명) */
-export function statusIcon(data: GameData, id: string, stacks: number): HTMLElement {
+/**
+ * 유닛 아래 상태 표시: 진한 바탕의 이름표(아이콘 + 이름 + 스택). 해로운 상태는 붉은 바탕, 이로운 상태는 초록, 특성은 보라.
+ * 배경 그림 위에서도 읽히도록 아이콘만 두지 않는다
+ */
+export function statusChip(data: GameData, id: string, stacks: number): HTMLElement {
   const def = data.statuses.get(id);
   const kind = def?.kind ?? 'buff';
-  const el = iconEl('icons_status', def?.icon, def?.glyph ?? '?', `status-icon status-${kind}`);
+  const el = h('span', { class: `status-chip chip-${kind}` }, iconEl('icons_status', def?.icon, def?.glyph ?? '?', `status-icon status-${kind}`), h('span', { class: 'st-name' }, def?.name ?? id), stacks > 1 || (stacks === 1 && kind !== 'trait') ? h('b', {}, stacks) : '');
   const kindLabel = kind === 'debuff' ? '해로운 상태' : kind === 'trait' ? '특성' : '이로운 상태';
   Object.entries(tipAttrs(`${def?.name ?? id}${stacks > 1 ? ` ${stacks}` : ''}`, `${def?.description ?? ''}\n${kindLabel}${def && def.decay > 0 ? ' · 턴마다 줄어든다' : ''}`, kind)).forEach(
     ([k, v]) => v && el.setAttribute(k, v),
   );
-  if (stacks > 1) el.appendChild(h('small', { class: 'stack' }, stacks));
   return el;
 }
 

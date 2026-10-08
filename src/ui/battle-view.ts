@@ -1,5 +1,5 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
-import { canPlay, describeIntent, endTurn, incomingDamage, needsTarget, playCard, type IncomingView } from '../engine/battle';
+import { canPlay, describeIntent, endTurn, incomingDamage, needsTarget, playCard, previewCard, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { hasSkipTurn } from '../engine/effects';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
@@ -12,7 +12,7 @@ import { SpritePlayer } from '../render/sprite-player';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { INTENT_LABEL, intentIcon, statusIcon } from './icons';
+import { INTENT_LABEL, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
@@ -42,6 +42,8 @@ interface Unit {
   statuses: HTMLElement;
   /** 적: 의도 / 아군: 받을 피해 예고 */
   intent: HTMLElement;
+  /** 고른(또는 마우스를 올린) 카드를 쓰면 이 유닛에 들어갈 피해 */
+  preview: HTMLElement;
 }
 
 export class BattleView {
@@ -59,6 +61,8 @@ export class BattleView {
   private endBtn!: HTMLButtonElement;
   private rift: RiftOverlay;
   private selected: number | null = null;
+  /** 마우스를 올린 손패 카드(피해 미리보기) */
+  private hovered: number | null = null;
   private busy = false;
   private lastCard: string | null = null;
 
@@ -106,7 +110,6 @@ export class BattleView {
         'header',
         { class: 'b-hud' },
         h('div', { class: 'chip b-stage' }, h('b', {}, this.ctx.title), h('span', {}, this.ctx.subtitle)),
-        this.riftEl,
         h(
           'div',
           { class: 'b-hud-right' },
@@ -115,7 +118,8 @@ export class BattleView {
           h('button', { class: 'btn btn-small', 'aria-label': '메뉴', onclick: () => this.showMenu() }, '⚙'),
         ),
       ),
-      this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
+      // 가운데 위: 이야기 글 → 그 아래 균열 게이지(잘 보이게 크게)
+      h('div', { class: 'b-center' }, this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null, this.riftEl),
       this.logEl,
       h('div', { class: 'units' }, partyEl, enemyEl),
       h('div', { class: 'shade' }),
@@ -154,22 +158,23 @@ export class BattleView {
     const hpText = h('div', { class: 'hp-text' });
     const block = h('div', { class: 'block-badge' });
     const statuses = h('div', { class: 'statuses' });
+    const preview = h('div', { class: 'dmg-preview' });
     // 적: 의도 / 아군: 받을 피해 예고. 둘 다 머리 위
     const intent = h('div', { class: c.side === 'enemy' ? 'intent chip' : 'incoming' });
     const el = h(
       'div',
       {
         class: `unit unit-${c.side}${enemyDef?.tier === 'boss' ? ' unit-boss' : ''}`,
-        style: `--scale:${enemyDef?.scale ?? 1}`,
+        style: `--scale:${enemyDef?.scale ?? charDef?.scale ?? 1}`,
         onclick: () => this.onUnitClick(c),
       },
       intent,
-      h('div', { class: 'sprite-wrap' }, canvas),
+      h('div', { class: 'sprite-wrap' }, canvas, preview),
       h('div', { class: 'unit-name' }, c.name),
       h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar' }, hp, hpText)),
       statuses,
     );
-    const unit: Unit = { c, el, player, hp, hpText, block, statuses, intent };
+    const unit: Unit = { c, el, player, hp, hpText, block, statuses, intent, preview };
     this.units.set(c.uid, unit);
     void player.play(this.spriteFor(c, 'idle'), { loop: true });
     return unit;
@@ -190,7 +195,7 @@ export class BattleView {
       if (c.block > 0) Object.entries(tipAttrs(`방어 ${c.block}`, '받는 피해를 먼저 막는다. 자기 턴이 시작되면 사라진다.')).forEach(([k, v]) => v && u.block.setAttribute(k, v));
       u.el.classList.toggle('down', c.downed);
       clear(u.statuses);
-      for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusIcon(this.data, id, n));
+      for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusChip(this.data, id, n));
       clear(u.intent);
       if (c.side === 'enemy') this.renderIntent(u, c as EnemyState);
       else this.renderIncoming(u, c.downed ? undefined : incoming.get(c.uid));
@@ -206,6 +211,7 @@ export class BattleView {
       h('span', {}, `균열 ${s.rift} / ${bal.rift.max}`),
       s.surviveTurns !== null ? h('span', { class: 'survive' }, `버티기 ${Math.min(s.turn, s.surviveTurns)} / ${s.surviveTurns}턴`) : '',
     );
+    this.riftEl.querySelector('span')!.replaceChildren('균열 ', h('b', {}, s.rift), ` / ${bal.rift.max}`, hot ? h('em', {}, ' 잔향') : '');
     this.pilesEl.replaceChildren('뽑을', h('i', {}, s.draw.length), '버림', h('i', {}, s.discard.length), '소멸', h('i', {}, s.exhaust.length));
     this.pilesEl.title = '이번 전투의 카드 더미 보기';
 
@@ -249,6 +255,8 @@ export class BattleView {
       el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
       el.style.zIndex = String(10 + i);
       el.addEventListener('click', () => this.onCardClick(i));
+      el.addEventListener('mouseenter', () => this.setHover(i));
+      el.addEventListener('mouseleave', () => this.setHover(null));
       this.handEl.appendChild(el);
     });
 
@@ -258,6 +266,8 @@ export class BattleView {
       const ok = !u.c.downed && ((need === 'enemy' && u.c.side === 'enemy') || (need === 'ally' && u.c.side === 'party'));
       u.el.classList.toggle('targetable', ok);
     }
+
+    this.renderPreview();
 
     clear(this.logEl);
     for (const line of s.log.slice(-5)) this.logEl.appendChild(h('div', {}, line));
@@ -296,6 +306,45 @@ export class BattleView {
     if (v.blocked > 0) lines.push(`방어로 ${v.blocked} 막음`);
     if (v.lethal) lines.push('이대로면 쓰러진다');
     Object.entries(tipAttrs(`받을 피해 ${v.hpLoss}`, lines.join('\n'), 'attack')).forEach(([k, v2]) => v2 !== undefined && u.intent.setAttribute(k, v2));
+  }
+
+  private setHover(i: number | null): void {
+    if (this.hovered === i) return;
+    this.hovered = i;
+    this.renderPreview();
+  }
+
+  /**
+   * 피해 미리보기: 고른 카드(없으면 마우스를 올린 카드)를 썼을 때 들어갈 피해를 유닛 위에 보인다.
+   * 엔진이 복제 상태로 실제로 써 보고 계산하므로 힘·약화·취약·결 노출·방어가 모두 반영된다.
+   * 대상을 고르는 카드는 적마다 "그 적을 노렸을 때"의 값.
+   */
+  private renderPreview(): void {
+    for (const u of this.units.values()) {
+      clear(u.preview);
+      u.preview.className = 'dmg-preview';
+    }
+    const s = this.state;
+    const i = this.selected ?? this.hovered;
+    if (i === null || this.busy || s.result || !s.hand[i]) return;
+    const need = needsTarget(s, s.hand[i]);
+    const show = (uid: string, v: CardPreviewHit | undefined) => {
+      const u = this.units.get(uid);
+      if (!u || !v || u.c.downed) return;
+      u.preview.className = `dmg-preview on${v.kills ? ' kill' : ''}${v.hpLoss === 0 ? ' blocked' : ''}`;
+      u.preview.append(
+        h('b', {}, v.hpLoss > 0 ? `−${v.hpLoss}` : '0'),
+        v.hits > 1 ? h('small', {}, `${v.hits}회`) : '',
+        v.blocked > 0 ? h('small', { class: 'blk' }, `방어 ${v.blocked}`) : '',
+        v.kills ? h('small', { class: 'ko' }, '처치') : '',
+      );
+    };
+    if (need === 'enemy') {
+      for (const e of s.enemies) if (!e.downed) show(e.uid, previewCard(s, i, e.uid).get(e.uid));
+      return;
+    }
+    const ally = need === 'ally' ? s.party.find((p) => !p.downed)?.uid : undefined;
+    for (const [uid, v] of previewCard(s, i, ally)) show(uid, v);
   }
 
   // ───────────────────────── 입력 ─────────────────────────
@@ -345,6 +394,7 @@ export class BattleView {
 
   private async act(fn: () => unknown): Promise<void> {
     this.busy = true;
+    this.hovered = null;
     this.refresh();
     const r = fn() as { ok?: boolean; reason?: string } | undefined;
     if (r && r.ok === false && r.reason) toast(this.toasts, r.reason, 'danger');

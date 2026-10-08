@@ -25,7 +25,7 @@ import { choiceView, rewardView } from './choice-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
 import { initDebug, isDebug } from './debug';
-import { mapView, placeName } from './map-view';
+import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
@@ -55,7 +55,7 @@ export class App {
    * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
    * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
    */
-  private sandbox(seed: string, mates: string[], moduleId = 's1_battle_wolves_pair'): void {
+  private sandbox(seed: string, mates: string[], moduleId = 's1_battle_shadow_wolves'): void {
     const module = data.modules.get(moduleId);
     if (!module?.content.enemies?.length) throw new Error(`sandbox: 전투 모듈이 아니다: ${moduleId}`);
     const run = createRun(data, seed, { stageId: module.stage, supportActive: true });
@@ -171,6 +171,11 @@ export class App {
       return this.playScene(last.endingScene, () => this.end(true));
     }
     if (run.status === 'defeat') return this.end(false);
+    // 출전 편성 안내: 동료가 처음 합류했을 때, 자리가 처음 가득 찼을 때 한 번씩(런 플래그로 기억)
+    const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').length;
+    const guide = (flag: string, when: boolean) => when && !run.flags.includes(flag) && (run.flags.push(flag), true);
+    const firstMate = guide('ui:party_guide', fighters >= 2);
+    const overFull = guide('ui:party_full', fighters > data.balance.party.max);
     this.show(
       mapView(data, run, {
         onEnter: (node) => this.enter(node),
@@ -182,8 +187,10 @@ export class App {
         onShowDeck: () => openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]),
         onSettings: () => this.openSettings(),
         onTitle: () => this.title(),
+        highlightParty: firstMate || overFull,
       }),
     );
+    if (firstMate || overFull) openPartyGuide(data, run);
   }
 
   private enter(node: MapNode): void {

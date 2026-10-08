@@ -289,6 +289,8 @@ export const CharacterDef = z
     starterDeck: z.array(z.string()).default([]),
     /** 복장: 런 플래그가 서면 sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 예: 하운 '못생긴 검' */
     outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
+    /** 전투 화면의 스프라이트 배율(그림마다 프레임 안 키가 달라 동료끼리 키를 맞출 때). 기본 1 */
+    scale: z.number().positive().default(1),
     joinsAt: z.string(),
     description: z.string(),
   })

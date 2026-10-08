@@ -5,6 +5,7 @@ import { availableNodes, playableStages, setParty, type RunState } from '../engi
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { isDebug } from './debug';
+import { openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 
 /** 노드 표식: 두루마리 위의 한자 */
@@ -32,6 +33,33 @@ export interface MapViewHandlers {
   onSettings: () => void;
   /** 타이틀로(런은 저장돼 있어 "이어하기"로 돌아온다) */
   onTitle: () => void;
+  /** 출전 칸을 반짝여 눈에 띄게(동료가 막 합류했을 때) */
+  highlightParty?: boolean;
+}
+
+/**
+ * 출전 편성 안내(동료가 처음 합류했을 때·자리가 가득 찼을 때 한 번씩, 그 뒤엔 출전 칸의 버튼으로).
+ * 쉬는 동료는 이름으로 짚어 준다
+ */
+export function openPartyGuide(data: GameData, run: RunState): void {
+  const max = data.balance.party.max;
+  const resting = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter' && !run.selected.includes(r.id)).map((r) => data.characters.get(r.id)!.name);
+  const body = h(
+    'div',
+    { class: 'guide' },
+    h('p', { class: 'guide-lead' }, '동료가 합류했습니다. 전투에 누구를 데려갈지는 지도 오른쪽 <출전> 칸에서 고릅니다.'),
+    h(
+      'ol',
+      {},
+      h('li', {}, h('b', {}, '체크로 고른다 — '), `이름 옆 칸을 눌러 넣고 뺀다. 하운은 항상 출전하고, 하운을 포함해 최대 ${max}명.`),
+      h('li', {}, h('b', {}, '덱도 함께 바뀐다 — '), '출전한 동료의 카드만 전투 덱에 들어간다. 쉬는 동료의 카드는 그 전투에서만 빠지고 덱에서 사라지지는 않는다.'),
+      h('li', {}, h('b', {}, '자리가 가득 찼을 때 — '), '쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푼다.'),
+      h('li', {}, h('b', {}, '언제든 바꿀 수 있다 — '), '지도에 서 있을 때면 언제든. 전투·이벤트 안에서는 바꿀 수 없다.'),
+      h('li', {}, h('b', {}, '체력은 이어진다 — '), '동료마다 체력이 따로 남는다. 다친 동료는 쉬게 하고 성한 동료를 데려가도 된다.'),
+    ),
+    resting.length ? h('p', { class: 'guide-note' }, `지금 쉬는 동료: ${resting.join(', ')}`) : null,
+  );
+  openOverlay('출전 편성', body);
 }
 
 /** 표시용 흔들림: 노드 id로 정해지는 -1~1(같은 지도는 늘 같은 모양. 엔진 난수와 무관) */
@@ -227,9 +255,10 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
 
   // 파티 편성(하운 고정, 최대 3명)
   const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
+  const full = run.selected.length >= data.balance.party.max;
   const partyBox = h(
     'div',
-    { class: 'box party-box' },
+    { class: `box party-box${handlers.highlightParty ? ' guide-pulse' : ''}` },
     h('h3', {}, `출전 (${run.selected.length}/${data.balance.party.max})`),
     fighters.map((r) => {
       const def = data.characters.get(r.id)!;
@@ -241,7 +270,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h('input', {
           type: 'checkbox',
           checked,
-          disabled: r.id === 'haun',
+          // 자리가 가득 차면 쉬는 동료는 먼저 한 명을 빼야 고를 수 있다
+          disabled: r.id === 'haun' || (!checked && full),
           onchange: (e: Event) => {
             const on = (e.target as HTMLInputElement).checked;
             const next = on ? [...run.selected, r.id] : run.selected.filter((x) => x !== r.id);
@@ -254,11 +284,19 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           },
         }),
         h('span', { class: 'member-name' }, def.name),
+        r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         noCards ? h('span', { class: 'member-note' }, '카드 미구현') : null,
       );
     }),
-    h('p', { class: 'hint' }, '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.'),
+    h(
+      'p',
+      { class: 'hint' },
+      fighters.length > data.balance.party.max && full
+        ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.`
+        : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
+    ),
+    fighters.length > 1 ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );
 
   // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)

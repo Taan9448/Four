@@ -4,7 +4,9 @@
 //       가장 좋아지는 수를 고른다. 어떤 수도 턴 종료보다 낫지 않으면 턴을 끝낸다(한 수 앞 탐색).
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
-import { battleOutcome, canPlay, createBattle, describeIntent, endTurn, needsTarget, playCard } from '../engine/battle';
+import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard } from '../engine/battle';
+
+export { cloneBattle };
 import type { GameData } from '../engine/data';
 import type { MapNode } from '../engine/route';
 import {
@@ -26,7 +28,7 @@ import {
   type RunState,
 } from '../engine/run';
 import type { CardDef } from '../engine/schema';
-import { alive, type BattleState, type CardInstance, type Combatant } from '../engine/state';
+import { alive, type BattleState, type CardInstance } from '../engine/state';
 
 // ───────────────────────── 설정 ─────────────────────────
 
@@ -44,26 +46,6 @@ export interface BotOptions {
 export const DEFAULT_BOT: BotOptions = { minRewardValue: 6, deckSoftCap: 25, strengthWeight: 0, threatWeight: 1 };
 
 // ───────────────────────── 전투 ─────────────────────────
-
-/** 전투 상태 복제(데이터·지원 규칙은 공유, RNG는 같은 위치에서 이어지는 사본) */
-export function cloneBattle(s: BattleState): BattleState {
-  const unit = <T extends Combatant>(c: T): T => ({ ...c, statuses: { ...c.statuses } });
-  const cards = (list: CardInstance[]) => list.map((c) => ({ ...c }));
-  return {
-    ...s,
-    rng: s.rng.clone(),
-    party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], intent: e.intent ? { ...e.intent } : null })),
-    draw: cards(s.draw),
-    hand: cards(s.hand),
-    discard: cards(s.discard),
-    exhaust: cards(s.exhaust),
-    events: [],
-    log: [],
-    supportUsed: [...s.supportUsed],
-    flags: [...s.flags],
-  };
-}
 
 /** 전투 상태 점수(클수록 좋다). 턴을 끝낸 뒤(다음 턴 시작)나 전투가 끝난 상태에서 잰다 */
 export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): number {
