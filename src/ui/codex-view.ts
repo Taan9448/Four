@@ -87,6 +87,7 @@ function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: n
       h(
         'div',
         { class: 'zoom-right' },
+        e.lore ? h('p', { class: 'zoom-text zoom-lore' }, e.lore) : null,
         facts([
           ['등급', TIER_LABEL[e.tier]],
           ['만남 · 이김', `${rec.seen} · ${rec.defeated}`],
@@ -122,7 +123,12 @@ function openPerson(data: GameData, id: string): void {
     faces.append(box);
     void loadPortrait(id, face).then((img) => img && box.replaceChildren(h('img', { src: img.src, alt: '' })));
   });
-  openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h('div', { class: 'zoom-right' }, ch ? h('div', { class: 'zoom-kind' }, ch.title) : null, ch ? h('p', { class: 'zoom-text' }, ch.description) : null)), { wide: true });
+  openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h(
+        'div',
+        { class: 'zoom-right' },
+        ch ? h('div', { class: 'zoom-kind' }, ch.title) : null,
+        ch?.lore || sp?.lore || ch?.description ? h('p', { class: 'zoom-text zoom-lore' }, ch?.lore ?? sp?.lore ?? ch?.description ?? '') : null,
+      )), { wide: true });
 }
 
 const TIER_LABEL: Record<string, string> = { normal: '일반', elite: '정예', boss: '보스' };

@@ -312,17 +312,17 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     const open = avail.has(n.id);
     // 들어가 본 노드만 이름이 보인다(보스 이름·이야기 제목은 가서 안다, GAME_DESIGN 14절)
     const known = visited;
-    // 종류는 지나온 곳과 지금 갈 수 있는 곳만. 그 너머는 모양·색까지 감춘 ? 표식(2026-10-08 사용자 결정)
-    const seen = visited || open;
-    if (!seen)
+    // 종류는 지나온 곳만. 갈 수 있는 갈림길도 들어가 봐야 안다 — 모양·색까지 감춘 ? 표식(2026-10-08 사용자 결정)
+    if (!visited)
       return h(
         'button',
         {
-          class: 'node node-unknown',
+          class: `node node-unknown${open ? ' open' : ''}`,
           style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
-          disabled: true,
-          'aria-label': `${n.floor}층 알 수 없는 곳`,
-          ...tipAttrs(`${n.floor}층 · ?`, '아직 가 보지 않은 곳. 가까이 가야 무엇이 있는지 안다.'),
+          disabled: !open,
+          'aria-label': `${n.floor}층 알 수 없는 곳${open ? ' — 갈 수 있다' : ''}`,
+          onclick: () => handlers.onEnter(n),
+          ...tipAttrs(`${n.floor}층 · ?`, open ? '갈 수 있다. 무엇이 기다리는지는 들어가 봐야 안다.' : '아직 가 보지 않은 곳.'),
         },
         h('span', { class: 'node-glyph' }, '?'),
       );
