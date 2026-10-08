@@ -141,7 +141,8 @@ const UpgradeSkill = z
 export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
 
 /** 장면에만 나오는 화자(동료가 아닌 인물). 반신 그림 에셋은 <id>_stand */
-export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string() }).strict();
+/** lore: 도감의 인물 설명(처음 만난 때 하운이 아는 만큼, GAME_DESIGN 14절) */
+export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string(), lore: z.string().optional() }).strict();
 export type SpeakerDef = z.infer<typeof SpeakerDef>;
 
 /**
@@ -275,6 +276,8 @@ export const EnemyDef = z
     color: z.string().optional(),
     /** 이 적의 공격이 맞은 자리에 겹칠 피격 이펙트(생략하면 fx_hit_strike) */
     hitFx: z.string().optional(),
+    /** 도감 설명(만나서 아는 만큼 — 이기기 전에도 보인다, GAME_DESIGN 14절) */
+    lore: z.string().optional(),
     /** 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계': 꿰맬 자리가 많아진다) */
     hpPerScar: z.number().int().min(0).optional(),
     /** 이 적이 쓰러질 때 일어나는 일(적을 출처로 하는 전투 동작). 예: 군단장이 쓰러지면 졸개가 무너진다 */
@@ -326,6 +329,8 @@ export const CharacterDef = z
     hpPerLevel: z.number().int().min(0).default(4),
     joinsAt: z.string(),
     description: z.string(),
+    /** 도감의 긴 소개(합류했을 때 아는 만큼) */
+    lore: z.string().optional(),
   })
   .strict();
 export type CharacterDef = z.infer<typeof CharacterDef>;
