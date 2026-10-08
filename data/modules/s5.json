@@ -1,0 +1,228 @@
+[
+  {
+    "id": "s5_story_shadow_night",
+    "stage": "s5",
+    "type": "elite",
+    "name": "그림자의 밤",
+    "once": true,
+    "content": {"scene": "s5_scene_shadow_night", "background": "bg_kazdum", "text": "옛 왕의 망루. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다 — 들보 위의 검은 수정.", "enemies": ["shadow_assassin", "black_crystal"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보여. 칼이 오는 길은 하나야.\" 카일이 눈을 감고 단검의 결을 따라간다. (검은 수정 결 노출 2·취약 1)", "effects": [{"op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}]}}
+  },
+  {
+    "id": "s5_story_border_crack",
+    "stage": "s5",
+    "type": "story",
+    "name": "경계의 금",
+    "once": true,
+    "content": {"scene": "s5_scene_border_crack", "text": "카즈둠의 겨울. 왕궁의 작은 방에서 하운이 금의 모든 것을 털어놓고, 엘리아가 서고의 석판을 읽는다.", "choices": [{"label": "\"이제부터는 넷이서 세자.\"", "result": "넷이 함께 숨을 세기로 했다. 숨 세기를 얻었다.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "gain_card", "card": "elia_count"}]}, {"label": "\"제가 낸 금은 제가 쓸어 담겠습니다.\"", "result": "\"혼자 쓸어 담지 마요.\" 엘리아의 손이 하운의 손등 위에 얹혔다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "겨울 내내 엘리아에게 차를 가져다준다", "condition": {"partyHas": "elia"}, "result": "\"말 안 해도 돼요. 숨 쉬는 거 들리니까.\" 엘리아의 카드 1장을 강화했다(+1). 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}, {"op": "heal_party", "ratio": 0.2}]}]}
+  },
+  {
+    "id": "s5_story_sewer",
+    "stage": "s5",
+    "type": "story",
+    "name": "북쪽 하수로",
+    "once": true,
+    "content": {"scene": "s5_scene_sewer", "text": "연합군 삼천이 정면에서 하루를 버티는 사이, 넷은 그롬이 알려 준 북쪽 하수로로 숨어든다.", "choices": [{"label": "보른을 따라 하수로로 들어간다", "result": "보른이 무너진 곳마다 바위의 결을 읽어 길을 열었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "리나의 나팔 소리를 등 뒤에 두고 간다", "condition": {"partyHas": "kyle"}, "result": "길게, 짧게, 길게. 카일이 붉은 검을 고쳐 쥐었다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 지팡이 빛으로 어둠을 밝힌다", "condition": {"partyHas": "elia"}, "result": "엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+  },
+  {
+    "id": "s5_boss_vargas",
+    "stage": "s5",
+    "type": "boss",
+    "name": "왕좌의 방 — 마왕 바르가스",
+    "content": {"scene": "s5_scene_throne", "outroScene": "s5_scene_void_key", "text": "깨진 창가의 마왕, 쐐기 수백 개가 박힌 잠든 문. 방의 엉킨 마나가 모두 마왕에게로 빨려 든다.", "enemies": ["wedge", "vargas", "wedge"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 망치가 쐐기가 박힌 돌의 결을 친다. 쐐기가 반쯤 튀어나왔다. (쐐기 전원 피해 14)", "effects": [{"op": "damage", "amount": 14, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}, "clearEffects": [{"op": "gain_card", "card": "haun_cheonoe"}, {"op": "set_flag", "flag": "void_key"}, {"op": "set_flag", "flag": "cheonoe"}, {"op": "gain_run_mana", "amount": 10}]}
+  },
+  {
+    "id": "s5_battle_sewer_wolves",
+    "stage": "s5",
+    "type": "battle",
+    "name": "하수로의 그림자늑대",
+    "weight": 2,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"text": "썩은 물 냄새 사이로 연기 같은 털이 일렁인다. 성벽의 마왕군에서 떨어져 나온 그림자늑대들이다.", "enemies": ["shadow_wolf", "shadow_wolf"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 무너진 바위의 결을 쳐서 늑대들의 길을 막는다. (하운 방어 +6)", "effects": [{"op": "block", "amount": 6, "target": "self"}]}}
+  },
+  {
+    "id": "s5_battle_first_corridor",
+    "stage": "s5",
+    "type": "battle",
+    "name": "첫째 회랑 — 불의 정령",
+    "weight": 3,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"text": "첫 번째 회랑에는 불의 정령들이 있었다. 이그니스의 잔당.", "enemies": ["fire_spirit", "fire_spirit"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 검이 이그니스의 불을 삼킨다. (적 전원 약화 1·취약 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s5_battle_second_corridor",
+    "stage": "s5",
+    "type": "battle",
+    "name": "둘째 회랑 — 얼음 기사",
+    "weight": 3,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "두 번째 회랑에는 얼음 기사들이 있었다. 셀리아스의 잔당.", "enemies": ["ice_knight", "ice_knight"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 실리엔이 보낸 은빛 씨앗 하나를 깨운다. 은빛 나무에 얼음 기사들이 녹아내린다. (적 전원 취약 2)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 2, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s5_battle_third_corridor",
+    "stage": "s5",
+    "type": "battle",
+    "name": "셋째 회랑 — 바위 골렘",
+    "weight": 3,
+    "conditions": {"floorRange": [5, 8]},
+    "content": {"text": "세 번째 회랑에는 바위 골렘들이 있었다. 고르몬의 잔당.", "enemies": ["rock_golem", "rock_golem"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른이 형의 망치로 골렘들의 결을 하나씩 깨뜨린다. 산의 소리를 들은 자의 망치로. (적 전원 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s5_battle_fourth_corridor",
+    "stage": "s5",
+    "type": "battle",
+    "name": "넷째 회랑 — 그림자들",
+    "weight": 3,
+    "conditions": {"floorRange": [5, 9]},
+    "content": {"text": "네 번째 회랑에는 그림자들이 있었다. 그림자에는 결이 없다. 칼날만 실체다.", "enemies": ["shadow_fragment", "shadow_fragment", "shadow_fragment"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 그림자를 보지 않고, 칼의 결만 따라간다. (적 전원 결 노출 1, 하운 방어 +5)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 5, "target": "self"}]}}
+  },
+  {
+    "id": "s5_battle_armor_wolves",
+    "stage": "s5",
+    "type": "battle",
+    "name": "회랑의 빈 갑옷",
+    "weight": 2,
+    "conditions": {"floorRange": [4, 9]},
+    "content": {"text": "빈 갑옷 하나가 그림자늑대 둘을 끌고 회랑을 돈다. 투구 안에 붉은 불빛.", "enemies": ["shadow_wolf", "empty_armor", "shadow_wolf"]}
+  },
+  {
+    "id": "s5_battle_sixth_corridor",
+    "stage": "s5",
+    "type": "battle",
+    "name": "여섯째 회랑의 잔당",
+    "weight": 2,
+    "conditions": {"floorRange": [6, 9]},
+    "content": {"text": "다섯 번째, 여섯 번째 회랑. 사천왕이 다스리던 군세의 잔당이 뒤섞여 있다. 넷은 서로의 등을 맡겼다.", "enemies": ["fire_spirit", "rock_golem"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 앞을 막아선다. 하운이 마지막 장작을 위해 힘을 아낄 수 있도록. (하운 방어 +8)", "effects": [{"op": "block", "amount": 8, "target": "self"}]}}
+  },
+  {
+    "id": "s5_elite_fifth_corridor",
+    "stage": "s5",
+    "type": "elite",
+    "name": "다섯째 회랑",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 9]},
+    "content": {"text": "불의 정령, 얼음 기사, 그림자. 세 사천왕의 잔당이 한 회랑을 함께 지킨다. 회랑마다 수문장이 있을 거라던 그롬의 말대로.", "enemies": ["fire_spirit", "ice_knight", "shadow_fragment"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "붉은 검이 불을 삼키고 얼음을 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s5_elite_corridor_warden",
+    "stage": "s5",
+    "type": "elite",
+    "name": "회랑의 수문장",
+    "weight": 2,
+    "conditions": {"floorRange": [4, 8]},
+    "content": {"text": "용암 핏줄의 골렘이 회랑을 막고 서 있다. 그 그림자 속에서 또 하나의 그림자가 일어선다.", "enemies": ["vein_golem", "shadow_fragment"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "산의 소리를 들은 자의 망치. 보른이 골렘의 결을 짚는다. (적 전원 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
+  },
+  {
+    "id": "s5_elite_seventh_door",
+    "stage": "s5",
+    "type": "elite",
+    "name": "일곱째 회랑의 쐐기 문",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [7, 9]},
+    "content": {"text": "일곱 번째 회랑은 비어 있었다. 수문장도, 마물도 없었다. 다만 회랑의 끝에 흑요석의 문 하나. 문틀에 박힌 검은 쐐기마다 엉킨 결이 허공을 갉아먹는다.", "enemies": ["wedge", "obsidian_door", "wedge"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "\"나중에. 지금은 장작.\" 보른의 망치가 쐐기의 결이 아니라 쐐기가 박힌 돌의 결을 친다. (쐐기 전원 피해 14)", "effects": [{"op": "damage", "amount": 14, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}}
+  },
+  {
+    "id": "s5_event_sewer_collapse",
+    "stage": "s5",
+    "type": "event",
+    "name": "무너진 하수로",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"text": "하수로는 길고 구불구불했다. 앞이 바위 더미로 막혀 있다. 삼천 년 전 고대 드워프들이 쌓은 돌이다.", "choices": [{"label": "보른이 바위의 결을 읽는다", "condition": {"partyHas": "born"}, "result": "돌은 같다. 결이 있다. 바위가 결을 따라 비켜났다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "썩은 물을 헤치고 돌아간다", "result": "길었지만, 쉬어 갈 틈도 있었다. 출전 동료 전원 체력 6 회복.", "effects": [{"op": "heal_party", "amount": 6}]}]}
+  },
+  {
+    "id": "s5_event_lina_horn",
+    "stage": "s5",
+    "type": "event",
+    "name": "길게, 짧게, 길게",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "두꺼운 흑요석 벽 너머로 뿔나팔 소리가 희미하게 들린다. 길게, 짧게, 길게. 연합군이 아직 성문 앞에서 버티고 있다.", "choices": [{"label": "카일이 벽에 손을 댄다", "condition": {"partyHas": "kyle"}, "result": "\"십 년을 얼음 속에서 버텼대. 하루쯤이야.\" 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "나팔 소리를 등에 지고 걸음을 서두른다", "result": "무작위 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+  },
+  {
+    "id": "s5_event_wedged_wall",
+    "stage": "s5",
+    "type": "event",
+    "name": "쐐기 박힌 벽",
+    "weight": 2,
+    "tags": ["scar"],
+    "conditions": {"floorRange": [4, 9]},
+    "content": {"text": "회랑의 벽에 검은 쐐기가 박혀 있다. 엉킨 결이 비틀리며 허공을 갉아먹는다. 그 자리만 공기가 아지랑이처럼 일그러져 있다. 경계가 얇다.", "choices": [{"label": "엉킨 결을 들여다본다", "result": "쇠의 결과 결 잃은 마나가 반대로 꼬여 있었다. 하운의 카드 2장을 강화했다(+1). 상흔 +1.", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "보른이 쐐기가 박힌 돌의 결을 친다", "condition": {"partyHas": "born"}, "result": "쐐기가 튀어나왔다. 뭉툭한 끝에 한스의 표식이 있었다. 출전 동료 전원 체력 5 회복.", "effects": [{"op": "heal_party", "amount": 5}]}, {"label": "손대지 않고 지나간다", "result": "출전 동료 전원 체력 3 회복.", "effects": [{"op": "heal_party", "amount": 3}]}]}
+  },
+  {
+    "id": "s5_event_silver_seeds",
+    "stage": "s5",
+    "type": "event",
+    "name": "실리엔의 씨앗 한 자루",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [4, 8], "partyHas": "elia"},
+    "content": {"text": "엘리아가 품의 자루를 열어 본다. 탈리온이 실바렌에서 가져온, 실리엔이 보낸 은빛 씨앗 한 자루.", "choices": [{"label": "하나를 깨워 상처를 돌본다", "result": "씨앗이 은빛 가지를 틔웠다. 얼지 않은 마나가 흘렀다. 출전 동료 전원 최대 체력의 30% 회복.", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "마지막 하나까지 아껴 둔다", "result": "\"마지막 하나는… 꼭 필요할 때.\" 초록 결계를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_green_ward"}]}]}
+  },
+  {
+    "id": "s5_event_back_to_back",
+    "stage": "s5",
+    "type": "event",
+    "name": "서로의 등을 맡기고",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 9]},
+    "content": {"text": "넷은 서로의 등을 맡겼다. 하운은 거의 검을 쓰지 않았다. 셋이 그를 지켰다. 그가 마지막 장작을 위해 힘을 아낄 수 있도록.", "choices": [{"label": "검을 아끼고 숨을 고른다", "result": "세 번 짧게, 한 번 길게. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "셋의 상처를 살핀다", "result": "출전 동료 전원 체력 8 회복.", "effects": [{"op": "heal_party", "amount": 8}]}]}
+  },
+  {
+    "id": "s5_event_ancient_stones",
+    "stage": "s5",
+    "type": "event",
+    "name": "고대 드워프의 돌",
+    "weight": 1,
+    "once": true,
+    "conditions": {"floorRange": [4, 9], "partyHas": "born"},
+    "content": {"text": "흑요석 아래로 오래된 돌벽이 드러나 있다. 삼천 년 전, 이 성이 드워프들의 요새였을 때의 돌. 보른이 손바닥을 대고 한참 서 있었다.", "choices": [{"label": "보른 곁에서 함께 귀를 기울인다", "result": "산의 소리를 들은 자. 동생에게 길을 남긴 자. 난쟁이 벽을 얻었다.", "effects": [{"op": "gain_card", "card": "born_dwarf_wall"}]}, {"label": "돌의 결을 따라 지름길을 찾는다", "result": "무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 4 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -4}]}]}
+  },
+  {
+    "id": "s5_event_kyle_question",
+    "stage": "s5",
+    "type": "event",
+    "name": "하나만 물어봐도 돼?",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [6, 9], "partyHas": "kyle"},
+    "content": {"text": "카일이 숨을 고르며 말했다. \"마왕을 쓰러뜨리면 공허의 열쇠가 나온다잖아. 그거로 너 집에 갈 수 있고. 그런데 집에 가면, 그 금은 어떻게 돼? 네 세계에서도 생겨?\"", "choices": [{"label": "\"그럴 수 있다면 좋겠습니다.\"", "result": "\"그럼 거기선 그 검을 안 쓰면 되겠네.\" 카일이 간단하게 말했다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "보른이 망치를 든다", "condition": {"partyHas": "born"}, "result": "\"나중에. 지금은 장작.\" 카일이 웃었다. 엘리아가 웃었다. 하운도 웃었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "heal_party", "ratio": 0.2}]}]}
+  },
+  {
+    "id": "s5_event_broken_window",
+    "stage": "s5",
+    "type": "event",
+    "name": "창밖의 전장",
+    "weight": 1,
+    "conditions": {"floorRange": [6, 9]},
+    "content": {"text": "깨진 창 너머로 얼음 들판이 내려다보인다. 불과 연기, 깃발과 함성. 아르덴의 기사들이 선두에, 드워프들이 그 뒤에, 엘프의 화살이 하늘을 덮었다.", "choices": [{"label": "오래 보지 않는다", "result": "하루를 버틴다고 했다. 무작위 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}, {"label": "카일이 붉은 검을 들어 신호를 보낸다", "condition": {"partyHas": "kyle"}, "result": "멀리서 나팔이 답했다. 길게, 짧게, 길게. 전진!을 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_forward"}]}]}
+  },
+  {
+    "id": "s5_rest_sewer_ledge",
+    "stage": "s5",
+    "type": "rest",
+    "name": "하수로의 마른 턱",
+    "weight": 2,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "썩은 물 위로 마른 돌턱 하나. 엘리아의 지팡이 빛을 낮추고 잠시 숨을 고른다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  },
+  {
+    "id": "s5_rest_empty_corridor",
+    "stage": "s5",
+    "type": "rest",
+    "name": "빈 회랑",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 9]},
+    "content": {"text": "수문장이 쓰러진 회랑. 보른이 망치를 내려놓고, 카일이 붉은 검의 날을 살핀다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  },
+  {
+    "id": "s5_rest_last_breath",
+    "stage": "s5",
+    "type": "rest",
+    "name": "마지막 장작 앞",
+    "weight": 0.5,
+    "content": {"text": "문 너머에서 무언가가 기다리고 있다. 하운의 아랫배가 웅크렸다. 지금까지 느껴 본 어떤 것보다도 깊이. 세 번 짧게, 한 번 길게.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  }
+]

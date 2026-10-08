@@ -1,208 +1,192 @@
 [
   {
-    "id": "s3_story_frozen_field", "stage": "s3", "type": "story", "name": "얼어붙은 들판", "once": true,
-    "content": {
-      "scene": "s3_scene_frozen_field",
-      "text": "얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다. 굴뚝 연기까지 얼어 있었다. 기사들의 은신처, 모닥불 너머로 카일이 고개를 들었다.",
-      "choices": [
-        { "label": "\"가렛 경. 얼음 궁전으로 가는 길을 알려 주세요.\"", "result": "\"맹세했거든요. 왕녀님의 기사가 되겠다고. 그리고 친구들이 하나도 빠짐없이 살아서 돌아오게 하겠다고.\" 카일의 눈에 무언가가 단단해져 있었다. 장작의 가장 단단한 옹이처럼. (출전 동료 전원 최대 체력의 20% 회복)",
-          "effects": [ { "op": "heal_party", "ratio": 0.2 } ] },
-        { "label": "카일 곁에 말없이 앉는다", "condition": { "partyHas": "kyle" }, "result": "하운은 아무 말도 하지 않았다. 보른이 카일의 다른 쪽 옆에 앉았다. 엘리아가 카일의 등 뒤에 섰다. 모닥불이 탁탁 튀었다. (카일의 카드 2장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "kyle" } } ] },
-        { "label": "엘리아의 손끝 불꽃을 지켜본다", "condition": { "partyHas": "elia" }, "result": "손가락 한 마디만 한 불꽃이 커졌다가, 곧 다시 작아졌다. 엘리아는 얼어붙은 마나를 조금씩 끌어오는 법을 다시 익혔다. (엘리아의 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "elia" } } ] }
-      ]
-    }
+    "id": "s3_story_frozen_field",
+    "stage": "s3",
+    "type": "story",
+    "name": "얼어붙은 들판",
+    "once": true,
+    "content": {"scene": "s3_scene_frozen_field", "text": "얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다. 굴뚝 연기까지 얼어 있었다. 기사들의 은신처, 모닥불 너머로 카일이 고개를 들었다.", "choices": [{"label": "\"가렛 경. 얼음 궁전으로 가는 길을 알려 주세요.\"", "result": "\"맹세했거든요. 왕녀님의 기사가 되겠다고. 그리고 친구들이 하나도 빠짐없이 살아서 돌아오게 하겠다고.\" 카일의 눈에 무언가가 단단해져 있었다. 장작의 가장 단단한 옹이처럼. (출전 동료 전원 최대 체력의 20% 회복)", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "카일 곁에 말없이 앉는다", "condition": {"partyHas": "kyle"}, "result": "하운은 아무 말도 하지 않았다. 보른이 카일의 다른 쪽 옆에 앉았다. 엘리아가 카일의 등 뒤에 섰다. 모닥불이 탁탁 튀었다. (카일의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 손끝 불꽃을 지켜본다", "condition": {"partyHas": "elia"}, "result": "손가락 한 마디만 한 불꽃이 커졌다가, 곧 다시 작아졌다. 엘리아는 얼어붙은 마나를 조금씩 끌어오는 법을 다시 익혔다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
   },
   {
-    "id": "s3_elite_rowen_knights", "stage": "s3", "type": "elite", "name": "남쪽 성문", "once": true,
-    "content": {
-      "scene": "s3_scene_south_gate",
-      "text": "얼음으로 된 성문 앞에 일곱 개의 형체가 서 있다. 방패에는 푸른 바탕에 흰 눈송이, 그 아래 은빛 검 하나. 로웬 가문의 문장이다.",
-      "enemies": [ "rowen_ice_brother", "rowen_ice_knight", "rowen_ice_brother" ],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "\"로웬의 일은 로웬이 끝내야죠.\" 카일이 붉은 검을 뽑는다. 힘이 어디서 시작해서, 어디로 가는지. 물줄기를 따라. (얼음 기사 전원 결 노출 3, 붉은 검을 손에 든다)",
-        "effects": [ { "op": "reveal_grain", "stacks": 3, "target": "all_enemies" }, { "op": "add_card", "card": "kyle_red_sword", "to": "hand" } ] }
-    }
+    "id": "s3_elite_rowen_knights",
+    "stage": "s3",
+    "type": "elite",
+    "name": "남쪽 성문",
+    "once": true,
+    "conditions": {"floorRange": [6, 6]},
+    "content": {"scene": "s3_scene_south_gate", "text": "얼음으로 된 성문 앞에 일곱 개의 형체가 서 있다. 방패에는 푸른 바탕에 흰 눈송이, 그 아래 은빛 검 하나. 로웬 가문의 문장이다.", "enemies": ["rowen_ice_brother", "rowen_ice_knight", "rowen_ice_brother"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"로웬의 일은 로웬이 끝내야죠.\" 카일이 붉은 검을 뽑는다. 힘이 어디서 시작해서, 어디로 가는지. 물줄기를 따라. (얼음 기사 전원 결 노출 3, 붉은 검을 손에 든다)", "effects": [{"op": "reveal_grain", "stacks": 3, "target": "all_enemies"}, {"op": "add_card", "card": "kyle_red_sword", "to": "hand"}]}}
   },
   {
-    "id": "s3_boss_celias", "stage": "s3", "type": "boss", "name": "얼음 궁전의 탑 — 빙결의 여왕 셀리아스",
-    "content": {
-      "scene": "s3_scene_tower", "outroScene": "s3_scene_thaw",
-      "text": "천장이 없는 탑 꼭대기. 얼음 옥좌 뒤, 얼음 속의 왕녀가 손을 뻗고 있다. 셀리아스의 얼음 몸을 이루는 모든 육각형이 이어지는 단 하나의 점은, 그 얼음 안에 있다.",
-      "enemies": [ "celias", "princess_ice" ],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 검을 내려놓고 맨손을 뻗는다. \"왕녀님. 카일이에요. 노 젓다가 맨날 빠지던.\" (손 내밀기를 손에 든다)",
-        "effects": [ { "op": "add_card", "card": "kyle_hand_out", "to": "hand" } ] },
-      "clearEffects": [ { "op": "set_flag", "flag": "kyle_knight" } ]
-    }
+    "id": "s3_boss_celias",
+    "stage": "s3",
+    "type": "boss",
+    "name": "얼음 궁전의 탑 — 빙결의 여왕 셀리아스",
+    "content": {"scene": "s3_scene_tower", "outroScene": "s3_scene_thaw", "text": "천장이 없는 탑 꼭대기. 얼음 옥좌 뒤, 얼음 속의 왕녀가 손을 뻗고 있다. 셀리아스의 얼음 몸을 이루는 모든 육각형이 이어지는 단 하나의 점은, 그 얼음 안에 있다.", "enemies": ["celias", "princess_ice"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 검을 내려놓고 맨손을 뻗는다. \"왕녀님. 카일이에요. 노 젓다가 맨날 빠지던.\" (손 내밀기를 손에 든다)", "effects": [{"op": "add_card", "card": "kyle_hand_out", "to": "hand"}]}, "clearEffects": [{"op": "set_flag", "flag": "kyle_knight"}]}
   },
   {
-    "id": "s3_battle_ice_wolves", "stage": "s3", "type": "battle", "name": "얼음 늑대", "weight": 3,
-    "conditions": { "floorRange": [2, 4] },
-    "content": {
-      "text": "눈보라 속에서 늑대들이 나타났다. 그림자늑대가 아니었다. 투명한 얼음 몸 안에 푸른 마나가 핏줄처럼 얼어붙어 있다. 소리 없이, 미끄러지듯 달려온다.",
-      "enemies": [ "ice_wolf", "ice_wolf" ],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일의 붉은 검이 닿는 순간 얼음이 녹아 터졌다. \"이거 좋다! 한스 아저씨 고마워요!\" (늑대 전원 취약 1)",
-        "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies" } ] }
-    }
+    "id": "s3_battle_ice_wolves",
+    "stage": "s3",
+    "type": "battle",
+    "name": "얼음 늑대",
+    "weight": 3,
+    "conditions": {"floorRange": [2, 4]},
+    "content": {"text": "눈보라 속에서 늑대들이 나타났다. 그림자늑대가 아니었다. 투명한 얼음 몸 안에 푸른 마나가 핏줄처럼 얼어붙어 있다. 소리 없이, 미끄러지듯 달려온다.", "enemies": ["ice_wolf", "ice_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일의 붉은 검이 닿는 순간 얼음이 녹아 터졌다. \"이거 좋다! 한스 아저씨 고마워요!\" (늑대 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s3_battle_wolf_storm", "stage": "s3", "type": "battle", "name": "눈보라의 무리", "weight": 3,
-    "conditions": { "floorRange": [3, 7] },
-    "content": { "text": "스무 마리가 넘는 무리의 한 갈래. 하운은 늑대의 결을 본다. 육각형 수천 개가 이어지는 그물의 한가운데, 모든 육각형이 한 점에 모이는 곳.", "enemies": [ "ice_wolf", "ice_wolf", "ice_wolf" ] }
+    "id": "s3_battle_wolf_storm",
+    "stage": "s3",
+    "type": "battle",
+    "name": "눈보라의 무리",
+    "weight": 3,
+    "conditions": {"floorRange": [3, 7]},
+    "content": {"text": "스무 마리가 넘는 무리의 한 갈래. 하운은 늑대의 결을 본다. 육각형 수천 개가 이어지는 그물의 한가운데, 모든 육각형이 한 점에 모이는 곳.", "enemies": ["ice_wolf", "ice_wolf", "ice_wolf"]}
   },
   {
-    "id": "s3_battle_frozen_road", "stage": "s3", "type": "battle", "name": "얼어붙은 길목", "weight": 2,
-    "conditions": { "floorRange": [2, 5] },
-    "content": { "text": "얼음 속의 농가 앞, 얼음 기사 하나가 늑대를 부린다. 셀리아스는 얼어붙은 자들을 부린다고 했다.", "enemies": [ "ice_knight", "ice_wolf" ] }
+    "id": "s3_battle_frozen_road",
+    "stage": "s3",
+    "type": "battle",
+    "name": "얼어붙은 길목",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "얼음 속의 농가 앞, 얼음 기사 하나가 늑대를 부린다. 셀리아스는 얼어붙은 자들을 부린다고 했다.", "enemies": ["ice_knight", "ice_wolf"]}
   },
   {
-    "id": "s3_battle_ice_knights", "stage": "s3", "type": "battle", "name": "얼음 기사 둘", "weight": 2,
-    "conditions": { "floorRange": [4, 7] },
-    "content": { "text": "얼음으로 된 갑옷. 아니, 갑옷 안의 몸까지 얼음이다. 투명한 얼음 속에 눈을 감은 얼굴이 비친다.", "enemies": [ "ice_knight", "ice_knight" ] }
+    "id": "s3_battle_ice_knights",
+    "stage": "s3",
+    "type": "battle",
+    "name": "얼음 기사 둘",
+    "weight": 2,
+    "conditions": {"floorRange": [4, 7]},
+    "content": {"text": "얼음으로 된 갑옷. 아니, 갑옷 안의 몸까지 얼음이다. 투명한 얼음 속에 눈을 감은 얼굴이 비친다.", "enemies": ["ice_knight", "ice_knight"]}
   },
   {
-    "id": "s3_battle_lake_wall", "stage": "s3", "type": "battle", "name": "호수의 벽", "weight": 2,
-    "conditions": { "floorRange": [5, 7] },
-    "content": { "text": "호수가 통째로 솟아올라 성을 덮은 투명한 벽 아래. 깃발은 바람에 펄럭이던 모양 그대로 멈춰 있다. 얼음 기사 둘이 늑대 하나를 데리고 벽 앞을 지킨다.", "enemies": [ "ice_knight", "ice_wolf", "ice_knight" ] }
+    "id": "s3_battle_lake_wall",
+    "stage": "s3",
+    "type": "battle",
+    "name": "호수의 벽",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 7]},
+    "content": {"text": "호수가 통째로 솟아올라 성을 덮은 투명한 벽 아래. 깃발은 바람에 펄럭이던 모양 그대로 멈춰 있다. 얼음 기사 둘이 늑대 하나를 데리고 벽 앞을 지킨다.", "enemies": ["ice_knight", "ice_wolf", "ice_knight"]}
   },
   {
-    "id": "s3_battle_palace_hall", "stage": "s3", "type": "battle", "name": "얼음 궁전의 복도", "weight": 3,
-    "conditions": { "floorRange": [7, 7] },
-    "content": { "text": "복도도, 계단도, 방들도 모두 얼음이다. 그 얼음 속에 십 년 전의 성이 멈춰 있다. 얼음 기사 하나와 늑대 둘이 소리 없이 다가온다.", "enemies": [ "ice_wolf", "ice_knight", "ice_wolf" ] }
+    "id": "s3_battle_palace_hall",
+    "stage": "s3",
+    "type": "battle",
+    "name": "얼음 궁전의 복도",
+    "weight": 3,
+    "conditions": {"floorRange": [7, 7]},
+    "content": {"text": "복도도, 계단도, 방들도 모두 얼음이다. 그 얼음 속에 십 년 전의 성이 멈춰 있다. 얼음 기사 하나와 늑대 둘이 소리 없이 다가온다.", "enemies": ["ice_wolf", "ice_knight", "ice_wolf"]}
   },
   {
-    "id": "s3_elite_gatekeeper", "stage": "s3", "type": "elite", "name": "얼음 궁전의 문지기", "weight": 2,
-    "conditions": { "floorRange": [3, 7] },
-    "content": { "text": "그날 밤 성문을 지키다 쓰러진 기사들이 지금은 얼음 궁전의 문지기가 되어 있다. 아르덴의 문장이 새겨진 방패에 서리가 꽃처럼 피어 있다.", "enemies": [ "ice_gatekeeper", "ice_wolf" ] }
+    "id": "s3_elite_gatekeeper",
+    "stage": "s3",
+    "type": "elite",
+    "name": "얼음 궁전의 문지기",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 7]},
+    "content": {"text": "그날 밤 성문을 지키다 쓰러진 기사들이 지금은 얼음 궁전의 문지기가 되어 있다. 아르덴의 문장이 새겨진 방패에 서리가 꽃처럼 피어 있다.", "enemies": ["ice_gatekeeper", "ice_wolf"]}
   },
   {
-    "id": "s3_elite_wolf_pack", "stage": "s3", "type": "elite", "name": "스무 마리의 늑대", "weight": 1,
-    "conditions": { "floorRange": [3, 5] },
-    "content": {
-      "text": "눈보라가 갈라지며 얼음 늑대가 사방에서 미끄러져 온다. 하나가 깨지면, 그물 전체가 무너진다. 늑대들도 그렇다.",
-      "enemies": [ "ice_wolf", "ice_wolf", "ice_wolf", "ice_wolf" ],
-      "bonus": { "condition": { "partyHas": "born" }, "text": "보른의 새 도끼가 늑대 둘을 한꺼번에 박살 낸다. 그롬이 두린의 도끼와 같은 모양으로 벼린 도끼다. (늑대 전원 약화 1)",
-        "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" } ] }
-    }
+    "id": "s3_elite_wolf_pack",
+    "stage": "s3",
+    "type": "elite",
+    "name": "스무 마리의 늑대",
+    "weight": 1,
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "눈보라가 갈라지며 얼음 늑대가 사방에서 미끄러져 온다. 하나가 깨지면, 그물 전체가 무너진다. 늑대들도 그렇다.", "enemies": ["ice_wolf", "ice_wolf", "ice_wolf", "ice_wolf"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 새 도끼가 늑대 둘을 한꺼번에 박살 낸다. 그롬이 두린의 도끼와 같은 모양으로 벼린 도끼다. (늑대 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s3_event_hideout_fire", "stage": "s3", "type": "event", "name": "은신처의 모닥불", "weight": 3, "once": true,
-    "conditions": { "floorRange": [2, 5] },
-    "content": {
-      "text": "얼어붙은 산비탈의 동굴. 아르덴의 마지막 기사들이 십 년 동안 얼음 땅에 숨어 셀리아스와 싸워 왔다. 처음에는 이백이었다. 지금은 열다섯. 바깥에서 눈보라가 울었다.",
-      "choices": [
-        { "label": "기사들과 모닥불을 나눈다", "result": "출전 동료 전원 최대 체력의 25% 회복", "effects": [ { "op": "heal_party", "ratio": 0.25 } ] },
-        { "label": "가렛 경이 카일의 얼굴을 오래 들여다본다", "condition": { "partyHas": "kyle" }, "result": "\"네 아버지와 똑같구나. 눈썹이. 웃을 때 입꼬리가.\" 노기사가 카일의 붉은 검을 받아 들고 날을 살폈다. (카일의 이야기 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "pool": "story", "owner": "kyle" } } ] },
-        { "label": "보른이 기사들 곁에서 도끼를 손질한다", "condition": { "partyHas": "born" }, "result": "보른은 낡은 갑옷 위에 털가죽을 덧댄 기사들 곁에 앉아, 몇 시진이고 아무 말 없이 도끼를 손질했다. 도끼 손질을 얻었다.",
-          "effects": [ { "op": "gain_card", "card": "born_whetstone" } ] }
-      ]
-    }
+    "id": "s3_event_hideout_fire",
+    "stage": "s3",
+    "type": "event",
+    "name": "은신처의 모닥불",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "얼어붙은 산비탈의 동굴. 아르덴의 마지막 기사들이 십 년 동안 얼음 땅에 숨어 셀리아스와 싸워 왔다. 처음에는 이백이었다. 지금은 열다섯. 바깥에서 눈보라가 울었다.", "choices": [{"label": "기사들과 모닥불을 나눈다", "result": "출전 동료 전원 최대 체력의 25% 회복", "effects": [{"op": "heal_party", "ratio": 0.25}]}, {"label": "가렛 경이 카일의 얼굴을 오래 들여다본다", "condition": {"partyHas": "kyle"}, "result": "\"네 아버지와 똑같구나. 눈썹이. 웃을 때 입꼬리가.\" 노기사가 카일의 붉은 검을 받아 들고 날을 살폈다. (카일의 이야기 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"pool": "story", "owner": "kyle"}}]}, {"label": "보른이 기사들 곁에서 도끼를 손질한다", "condition": {"partyHas": "born"}, "result": "보른은 낡은 갑옷 위에 털가죽을 덧댄 기사들 곁에 앉아, 몇 시진이고 아무 말 없이 도끼를 손질했다. 도끼 손질을 얻었다.", "effects": [{"op": "gain_card", "card": "born_whetstone"}]}]}
   },
   {
-    "id": "s3_event_silver_seed", "stage": "s3", "type": "event", "name": "은빛 씨앗", "weight": 3, "once": true,
-    "conditions": { "floorRange": [2, 5], "flag": "silien_seed", "partyHas": "elia" },
-    "content": {
-      "text": "엘리아가 품에서 은빛 씨앗을 꺼내 손바닥에 올렸다. 실리엔이 떠나는 날 쥐여 준 것. 언제든 돌아올 곳이 있다는 뜻의. 얼어붙은 공기 속에서도 씨앗은 희미하게 따뜻했다.",
-      "choices": [
-        { "label": "씨앗에 귀를 기울인다", "condition": { "partyHas": "elia" }, "result": "엘리아의 입술에서 엘프의 말이 흘러나왔다. 실바렌의 결계 앞에서 어머니와 손을 맞잡고 노래하던 그 목소리. 씨앗이 아주 조금 움직였다. 은빛 나무를 얻었다.",
-          "effects": [ { "op": "gain_card", "card": "elia_silver_tree" } ] },
-        { "label": "다시 품에 넣어 둔다", "result": "\"아직은 아니에요.\" 엘리아가 씨앗을 품에 넣었다. (출전 동료 전원 체력 6 회복)", "effects": [ { "op": "heal_party", "amount": 6 } ] }
-      ]
-    }
+    "id": "s3_event_silver_seed",
+    "stage": "s3",
+    "type": "event",
+    "name": "은빛 씨앗",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [2, 5], "flag": "silien_seed", "partyHas": "elia"},
+    "content": {"text": "엘리아가 품에서 은빛 씨앗을 꺼내 손바닥에 올렸다. 실리엔이 떠나는 날 쥐여 준 것. 언제든 돌아올 곳이 있다는 뜻의. 얼어붙은 공기 속에서도 씨앗은 희미하게 따뜻했다.", "choices": [{"label": "씨앗에 귀를 기울인다", "condition": {"partyHas": "elia"}, "result": "엘리아의 입술에서 엘프의 말이 흘러나왔다. 실바렌의 결계 앞에서 어머니와 손을 맞잡고 노래하던 그 목소리. 씨앗이 아주 조금 움직였다. 은빛 나무를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_silver_tree"}]}, {"label": "다시 품에 넣어 둔다", "result": "\"아직은 아니에요.\" 엘리아가 씨앗을 품에 넣었다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}]}
   },
   {
-    "id": "s3_event_frozen_farm", "stage": "s3", "type": "event", "name": "얼음 속의 농가", "weight": 2,
-    "conditions": { "floorRange": [2, 5] },
-    "content": {
-      "text": "들판 전체가 거울처럼 매끄러운 얼음으로 덮여 있고, 그 아래로 풀과 나무와 집들이 그대로 갇혀 있다. 얼음 속의 농가는 굴뚝에서 연기가 피어오르는 모양 그대로 멈춰 있다.",
-      "choices": [
-        { "label": "얼음의 결을 손가락으로 쓸어 본다", "result": "아주 작은 육각형들이 끝없이 이어진 결. 벌집처럼, 눈송이처럼. 너무 촘촘해서, 한 곳이 깨지면 모든 곳이 함께 깨질 것 같았다. (하운의 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } } ] },
-        { "label": "처마 밑에서 눈보라를 피한다", "result": "출전 동료 전원 체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
-      ]
-    }
+    "id": "s3_event_frozen_farm",
+    "stage": "s3",
+    "type": "event",
+    "name": "얼음 속의 농가",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "들판 전체가 거울처럼 매끄러운 얼음으로 덮여 있고, 그 아래로 풀과 나무와 집들이 그대로 갇혀 있다. 얼음 속의 농가는 굴뚝에서 연기가 피어오르는 모양 그대로 멈춰 있다.", "choices": [{"label": "얼음의 결을 손가락으로 쓸어 본다", "result": "아주 작은 육각형들이 끝없이 이어진 결. 벌집처럼, 눈송이처럼. 너무 촘촘해서, 한 곳이 깨지면 모든 곳이 함께 깨질 것 같았다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "처마 밑에서 눈보라를 피한다", "result": "출전 동료 전원 체력 6 회복", "effects": [{"op": "heal_party", "amount": 6}]}]}
   },
   {
-    "id": "s3_event_horn", "stage": "s3", "type": "event", "name": "눈보라 속의 나팔", "weight": 2,
-    "conditions": { "floorRange": [2, 5] },
-    "content": {
-      "text": "눈보라 너머에서 뿔나팔이 운다. 세 번. 길게, 짧게, 길게. 가렛 경의 기사들이 얼음 늑대를 몰아내고 있다.",
-      "choices": [
-        { "label": "나팔 소리를 따라 기사들과 합류한다", "result": "기사들이 털가죽 한 장씩을 나눠 주었다. (출전 동료 전원 최대 체력의 20% 회복)", "effects": [ { "op": "heal_party", "ratio": 0.2 } ] },
-        { "label": "카일이 나팔로 답한다", "condition": { "partyHas": "kyle" }, "result": "길게, 짧게, 길게. 십 년 만에 부는 아르덴 기사단의 나팔. 카일이 씩 웃었다. \"그럼 강해지면 되겠네.\" 그래서 재밌는 거지를 얻었다.",
-          "effects": [ { "op": "gain_card", "card": "kyle_fun" } ] }
-      ]
-    }
+    "id": "s3_event_horn",
+    "stage": "s3",
+    "type": "event",
+    "name": "눈보라 속의 나팔",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "눈보라 너머에서 뿔나팔이 운다. 세 번. 길게, 짧게, 길게. 가렛 경의 기사들이 얼음 늑대를 몰아내고 있다.", "choices": [{"label": "나팔 소리를 따라 기사들과 합류한다", "result": "기사들이 털가죽 한 장씩을 나눠 주었다. (출전 동료 전원 최대 체력의 20% 회복)", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "카일이 나팔로 답한다", "condition": {"partyHas": "kyle"}, "result": "길게, 짧게, 길게. 십 년 만에 부는 아르덴 기사단의 나팔. 카일이 씩 웃었다. \"그럼 강해지면 되겠네.\" 그래서 재밌는 거지를 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_fun"}]}]}
   },
   {
-    "id": "s3_event_warm_hand", "stage": "s3", "type": "event", "name": "탑의 계단", "weight": 3, "once": true,
-    "conditions": { "floorRange": [7, 7] },
-    "content": {
-      "text": "탑의 계단은 끝이 없었다. 위로 올라갈수록 추워졌다. 엘리아의 손끝에 피운 불꽃이 점점 작아져, 마지막에는 겨우 반딧불만 했다. 그녀의 입술이 파랗게 질렸다.",
-      "choices": [
-        { "label": "엘리아의 손을 잡고 내공을 흘려보낸다", "condition": { "partyHas": "elia" }, "result": "아랫배의 고리를 돌려, 따뜻한 내공을 그녀의 손으로 흘려보냈다. 엘리아가 놀라 그를 보았다가, 손을 빼지 않았다. (엘리아의 카드 2장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "elia" } } ] },
-        { "label": "숨을 고르며 한 계단씩 오른다", "result": "세 번 짧게, 한 번 길게. (출전 동료 전원 체력 5 회복)", "effects": [ { "op": "heal_party", "amount": 5 } ] }
-      ]
-    }
+    "id": "s3_event_warm_hand",
+    "stage": "s3",
+    "type": "event",
+    "name": "탑의 계단",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [7, 7]},
+    "content": {"text": "탑의 계단은 끝이 없었다. 위로 올라갈수록 추워졌다. 엘리아의 손끝에 피운 불꽃이 점점 작아져, 마지막에는 겨우 반딧불만 했다. 그녀의 입술이 파랗게 질렸다.", "choices": [{"label": "엘리아의 손을 잡고 내공을 흘려보낸다", "condition": {"partyHas": "elia"}, "result": "아랫배의 고리를 돌려, 따뜻한 내공을 그녀의 손으로 흘려보냈다. 엘리아가 놀라 그를 보았다가, 손을 빼지 않았다. (엘리아의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}]}, {"label": "숨을 고르며 한 계단씩 오른다", "result": "세 번 짧게, 한 번 길게. (출전 동료 전원 체력 5 회복)", "effects": [{"op": "heal_party", "amount": 5}]}]}
   },
   {
-    "id": "s3_event_frozen_banquet", "stage": "s3", "type": "event", "name": "얼어붙은 연회장", "weight": 2, "once": true,
-    "conditions": { "floorRange": [7, 7] },
-    "content": {
-      "text": "연회장에는 잔을 든 귀족들이, 부엌에는 냄비를 젓는 요리사들이 얼음 속에 멈춰 있다. 하운은 그 사이를 걸으며 청운산을 생각했다. 연무장의 제자들, 주방의 잡역들. 그들도 지금 어딘가에서 이렇게 멈춰 있을까.",
-      "choices": [
-        { "label": "얼음 속 얼굴들을 하나하나 본다", "condition": { "partyHas": "kyle" }, "result": "엘리아가 입을 막았다. 보른이 고개를 돌렸다. 카일은 고개를 돌리지 않았다. 마치 그 얼굴들을 모두 기억하려는 것처럼. (카일의 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "kyle" } } ] },
-        { "label": "청운산의 부엌을 떠올린다", "result": "솥을 닦고 장작을 패던 손. 그 손이 지금 검을 쥐고 있다. (하운의 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } } ] },
-        { "label": "조용히 지나간다", "result": "출전 동료 전원 체력 5 회복", "effects": [ { "op": "heal_party", "amount": 5 } ] }
-      ]
-    }
+    "id": "s3_event_frozen_banquet",
+    "stage": "s3",
+    "type": "event",
+    "name": "얼어붙은 연회장",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [7, 7]},
+    "content": {"text": "연회장에는 잔을 든 귀족들이, 부엌에는 냄비를 젓는 요리사들이 얼음 속에 멈춰 있다. 하운은 그 사이를 걸으며 청운산을 생각했다. 연무장의 제자들, 주방의 잡역들. 그들도 지금 어딘가에서 이렇게 멈춰 있을까.", "choices": [{"label": "얼음 속 얼굴들을 하나하나 본다", "condition": {"partyHas": "kyle"}, "result": "엘리아가 입을 막았다. 보른이 고개를 돌렸다. 카일은 고개를 돌리지 않았다. 마치 그 얼굴들을 모두 기억하려는 것처럼. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "청운산의 부엌을 떠올린다", "result": "솥을 닦고 장작을 패던 손. 그 손이 지금 검을 쥐고 있다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "조용히 지나간다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}]}
   },
   {
-    "id": "s3_event_frozen_library", "stage": "s3", "type": "event", "name": "얼어붙은 서고", "weight": 2, "once": true,
-    "conditions": { "floorRange": [7, 7] },
-    "content": {
-      "text": "서고에는 책을 펼친 학자가 얼음 속에 멈춰 있다. 십 년 전 그 밤, 그는 어느 줄을 읽고 있었을까. 얼음 너머로 책장의 글자가 희미하게 비친다.",
-      "choices": [
-        { "label": "엘리아가 얼음 너머의 책장을 읽는다", "condition": { "partyHas": "elia" }, "result": "엘리아가 얼음에 손바닥을 대고 한참 글자를 따라갔다. 마나를 덜 쓰는 주문 하나를 고쳐 외웠다. (엘리아의 카드 1장 강화 +1)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "elia" } } ] },
-        { "label": "무거운 것을 내려놓는다", "result": "얼음 바닥에 짐 하나를 내려놓았다. (기본 카드 1장을 덱에서 뺐다)", "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } } ] }
-      ]
-    }
+    "id": "s3_event_frozen_library",
+    "stage": "s3",
+    "type": "event",
+    "name": "얼어붙은 서고",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [7, 7]},
+    "content": {"text": "서고에는 책을 펼친 학자가 얼음 속에 멈춰 있다. 십 년 전 그 밤, 그는 어느 줄을 읽고 있었을까. 얼음 너머로 책장의 글자가 희미하게 비친다.", "choices": [{"label": "엘리아가 얼음 너머의 책장을 읽는다", "condition": {"partyHas": "elia"}, "result": "엘리아가 얼음에 손바닥을 대고 한참 글자를 따라갔다. 마나를 덜 쓰는 주문 하나를 고쳐 외웠다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}, {"label": "무거운 것을 내려놓는다", "result": "얼음 바닥에 짐 하나를 내려놓았다. (기본 카드 1장을 덱에서 뺐다)", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
   },
   {
-    "id": "s3_rest_snow_cave", "stage": "s3", "type": "rest", "name": "눈 덮인 동굴", "weight": 2,
-    "conditions": { "floorRange": [2, 5] },
-    "content": {
-      "text": "얼어붙은 산비탈의 작은 동굴. 모닥불을 피우자 얼음벽에 불빛이 일렁인다. 바깥에서 눈보라가 운다.",
-      "choices": [
-        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s3_rest_snow_cave",
+    "stage": "s3",
+    "type": "rest",
+    "name": "눈 덮인 동굴",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "얼어붙은 산비탈의 작은 동굴. 모닥불을 피우자 얼음벽에 불빛이 일렁인다. 바깥에서 눈보라가 운다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   },
   {
-    "id": "s3_rest_frozen_mill", "stage": "s3", "type": "rest", "name": "얼어붙은 물레방아", "weight": 1,
-    "conditions": { "floorRange": [3, 5] },
-    "content": {
-      "text": "얼음 속에 멈춘 물레방아. 강물이 얼어 바퀴가 돌지 않는다. 하운은 아랫배의 고리를 생각했다. 강물이 얼어 있으면 물레방아는 헛돈다.",
-      "choices": [
-        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s3_rest_frozen_mill",
+    "stage": "s3",
+    "type": "rest",
+    "name": "얼어붙은 물레방아",
+    "weight": 1,
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "얼음 속에 멈춘 물레방아. 강물이 얼어 바퀴가 돌지 않는다. 하운은 아랫배의 고리를 생각했다. 강물이 얼어 있으면 물레방아는 헛돈다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   },
   {
-    "id": "s3_rest_embers", "stage": "s3", "type": "rest", "name": "식지 않은 모닥불", "weight": 1,
-    "content": {
-      "text": "가렛 경의 기사들이 남겨 두고 간 모닥불 자리. 숯 아래에 아직 온기가 있다. 숨을 고른다.",
-      "choices": [
-        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s3_rest_embers",
+    "stage": "s3",
+    "type": "rest",
+    "name": "식지 않은 모닥불",
+    "weight": 1,
+    "content": {"text": "가렛 경의 기사들이 남겨 두고 간 모닥불 자리. 숯 아래에 아직 온기가 있다. 숨을 고른다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   }
 ]
