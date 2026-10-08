@@ -1,0 +1,11 @@
+id: haun_sword_ref
+type: character-ref
+character: haun_sword
+summary: 진하운(못생긴 검) 기준 시트(3/4 정면 + 오른쪽 측면)
+depends_on: [haun_ref]
+reference: assets/source/haun_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose, the same grey servant outfit mended at the side, the narrow unadorned sword held low in the right hand, a plain black scabbard at the left hip"
+  2: "full body, side view facing right, same outfit and proportions, standing ready with the sword point lowered toward the ground"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

@@ -1,37 +1,64 @@
 [
   {
-    "id": "haun", "name": "진하운", "title": "청운문 잡역 제자", "role": "fighter", "maxHp": 70, "color": "#3a6ea5",
-    "sprites": { "idle": "haun_idle", "attack": "haun_attack", "hit": "haun_hit" },
+    "id": "haun",
+    "name": "진하운",
+    "title": "청운문 잡역 제자",
+    "role": "fighter",
+    "maxHp": 70,
+    "color": "#3a6ea5",
+    "sprites": {"idle": "haun_idle", "attack": "haun_attack", "hit": "haun_hit"},
     "starterDeck": ["haun_chop", "haun_chop", "haun_chop", "haun_chop", "haun_step", "haun_step", "haun_step", "haun_read_grain"],
     "joinsAt": "s0",
-    "description": "장작의 결을 읽던 눈으로 검의 길을 보는 주인공. 내공과 마나를 섞는 운하검을 쓴다."
+    "description": "장작의 결을 읽던 눈으로 검의 길을 보는 주인공. S0은 벌목 도끼, S1 대장간부터 보른이 사 준 못생긴 검. 내공과 마나를 섞는 운하검을 쓴다.",
+    "outfits": [{"flag": "ugly_sword", "sprites": {"idle": "haun_sword_idle", "attack": "haun_sword_attack", "hit": "haun_sword_hit"}}]
   },
   {
-    "id": "elia", "name": "엘리아", "title": "하프엘프 마법사", "role": "fighter", "maxHp": 42, "color": "#9fb7d9",
-    "sprites": { "idle": "elia_idle", "attack": "elia_attack", "hit": "elia_hit" },
+    "id": "elia",
+    "name": "엘리아",
+    "title": "하프엘프 마법사",
+    "role": "fighter",
+    "maxHp": 42,
+    "color": "#9fb7d9",
+    "sprites": {"idle": "elia_idle", "attack": "elia_attack", "hit": "elia_hit"},
     "starterDeck": ["elia_fireball", "elia_fireball", "elia_ice_wall", "elia_ice_wall", "elia_mana_gift"],
-    "joinsAt": "s1_story_companions",
-    "description": "하운에게 마나를 처음 가르친 동료. 화염과 얼음 방어막, 회복을 맡는다."
+    "joinsAt": "s1_story_two_moons",
+    "description": "하운에게 말과 마나를 처음 준 하프엘프 마법사. 엘하임에서는 불·결계·치유·은빛 씨앗, 마나가 마른 무림에서는 약초와 의술로 일행을 돕는다."
   },
   {
-    "id": "kyle", "name": "카일 로웬", "title": "몰락 가문의 기사", "role": "fighter", "maxHp": 52, "color": "#d9b44a",
-    "sprites": { "idle": "kyle_idle", "attack": "kyle_attack", "hit": "kyle_hit" },
+    "id": "kyle",
+    "name": "카일 로웬",
+    "title": "로웬 가문의 마지막 기사",
+    "role": "fighter",
+    "maxHp": 52,
+    "color": "#d9b44a",
+    "sprites": {"idle": "kyle_idle", "attack": "kyle_attack", "hit": "kyle_hit"},
     "starterDeck": ["kyle_strike", "kyle_strike", "kyle_guard", "kyle_guard", "kyle_left_blade"],
-    "joinsAt": "s1_story_companions",
-    "description": "입이 가볍고 검은 무거운 기사. 전투가 시작되면 언제나 하운의 왼편에서 가장 먼저 검을 뽑는다. 선천 카드와 약점 공격으로 판을 연다."
+    "joinsAt": "s1_story_two_moons",
+    "description": "입이 가볍고 검은 무거운 아르덴의 기사. 전투가 시작되면 언제나 하운의 왼편에서 가장 먼저 검을 뽑는다. S2부터 이그니스의 심장으로 벼린 붉은 검."
   },
   {
-    "id": "born", "name": "보른", "title": "드워프 도끼전사", "role": "fighter", "maxHp": 70, "color": "#8a5a3b",
-    "sprites": { "idle": "born_idle", "attack": "born_attack", "hit": "born_hit" },
+    "id": "born",
+    "name": "보른",
+    "title": "카즈둠의 드워프",
+    "role": "fighter",
+    "maxHp": 70,
+    "color": "#8a5a3b",
+    "sprites": {"idle": "born_idle", "attack": "born_attack", "hit": "born_hit"},
     "starterDeck": ["born_shield", "born_shield", "born_knee", "born_knee", "born_cleave"],
-    "joinsAt": "s1_story_companions",
-    "description": "말수가 적은 일행의 방패. \"같이 가.\" 아군 방어와 도발로 일행을 지킨다."
+    "joinsAt": "s1_story_two_moons",
+    "description": "말수가 적은 드워프. 돌과 산의 결을 읽고 몸으로 일행을 막는다. \"같이 가.\" S4부터 형 두린의 망치.",
+    "outfits": [{"flag": "durin_hammer", "sprites": {"idle": "born_hammer_idle", "attack": "born_hammer_attack", "hit": "born_hammer_hit"}}]
   },
   {
-    "id": "wang", "name": "왕일검", "title": "청운문 전대 대사형", "role": "support", "maxHp": 1, "color": "#c9a46a",
-    "sprites": { "portrait": "wang_portrait" },
+    "id": "wang",
+    "name": "왕일검",
+    "title": "청운문 전대 대사형",
+    "role": "support",
+    "maxHp": 1,
+    "color": "#c9a46a",
+    "sprites": {"portrait": "wang_portrait"},
     "starterDeck": [],
-    "joinsAt": "s3_story_reunion",
-    "description": "주방 노인으로 숨어 지내던 청운문의 진짜 검. 전투에 직접 나서지 않고 청운호흡의 박자로 일행을 돕는다."
+    "joinsAt": "s6_story_old_temple",
+    "description": "주방 노인으로 숨어 지내던 청운문 전대 대사형. 다리를 잃어 바퀴 의자에 앉았다. 전투에 나서지 않고 청운호흡의 박자로 일행을 돕는다."
   }
 ]

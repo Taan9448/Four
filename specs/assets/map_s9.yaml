@@ -1,0 +1,11 @@
+id: map_s9
+type: map-art
+summary: 지역 지도 — 세계의 틈(S9, 4권)
+frame_notes:
+  1: >-
+    The rift between worlds, still drawn on hanji like a map of nowhere. Far left: the broken summit of the Heavenly Demon Peak where four people leap in. Across the map: drifting fragments of many worlds — half a grey-tiled roof, a branch with silver leaves, an obsidian spire tip, an upside-down forest, a huge spiral shell, a block of ice with a gate frozen inside, a grey boulder with a cloud carved on it, a broken fortress wall like a bridge, a bridge of solid shadow. A line of black wedges points deeper on the bottom edge; faint carved clouds wind along the top edge. Far right: the Heart of the Rift (just a dark knot of ink with a spine of wedges). Mostly grey and black ink with dark red-brown washes.
+framing: >-
+  A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
+style: >-
+  traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
+placeholder: { color: '#d6c7a0' }

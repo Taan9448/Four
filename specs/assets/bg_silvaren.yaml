@@ -1,0 +1,7 @@
+id: bg_silvaren
+type: background
+summary: 전투 배경 — 실바렌(S1 보스, 1권 13~14장)
+frame_notes:
+  1: >-
+    The elven village of Silvaren at night under the black cloud: on the left and right edges two giant silver trees with houses and vine bridges high in their branches, a faint green barrier dome flickering between them, cracked in places. The forest floor below is dead and grey where the black cloud has killed the mana, a few silver leaves still glowing. In the far distance a wall of black smoke and the tiny red lights of an army. Dark blue-grey and dead grey with pale silver and soft green accents.
+placeholder: { color: '#1d2433' }

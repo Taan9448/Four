@@ -1,0 +1,16 @@
+id: born_hammer_attack
+type: character-anim
+character: born_hammer
+summary: 보른(두린의 망치) 두린의 망치 6프레임
+depends_on: [born_hammer_ref]
+reference: assets/source/born_hammer_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: "hammer drawn back behind the shoulder with both hands"
+  2: "steps forward, hammer swinging up"
+  3: "hammer at its peak beside the head (not far above it), body coiled"
+  4: "a heavy blow down to the right on the seam of the stone, a burst of grey dust"
+  5: "follow-through, hammer head on the ground, beard swinging forward"
+  6: "recovering, hammer resting again"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

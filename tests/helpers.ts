@@ -1,9 +1,14 @@
 import { createBattle, type BattleSetup } from '../src/engine/battle';
 import { gameData } from '../src/engine/data';
 import { createRng } from '../src/engine/rng';
+import { EnemyDef } from '../src/engine/schema';
 import type { BattleState, CardInstance } from '../src/engine/state';
+import fixtureEnemies from './fixtures-enemies.json';
 
 export const data = gameData();
+
+// 엔진 테스트용 적: 게임 데이터의 수치가 바뀌어도 엔진 규칙 테스트가 흔들리지 않게 고정 수치로 따로 둔다
+for (const e of fixtureEnemies) if (!data.enemies.has(e.id)) data.enemies.set(e.id, EnemyDef.parse(e));
 
 export function cards(...ids: string[]): CardInstance[] {
   return ids.map((cardId, i) => ({ uid: `t${i}`, cardId, level: 0 }));
@@ -13,7 +18,7 @@ export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
   return createBattle(data, {
     world: 'elheim',
     party: [{ id: 'haun', hp: 60, maxHp: 60 }],
-    enemies: ['shadow_wolf'],
+    enemies: ['test_wolf'],
     deck: cards('haun_chop', 'haun_chop', 'haun_step', 'haun_step', 'haun_read_grain'),
     mana: 10,
     rng: createRng('test'),

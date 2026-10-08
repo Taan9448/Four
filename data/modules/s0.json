@@ -1,106 +1,157 @@
 [
   {
-    "id": "s0_tutorial_woodpile", "stage": "s0", "type": "battle", "name": "장작 패는 아이", "once": true,
-    "content": {
-      "scene": "s0_scene_dawn",
-      "text": "청운산의 새벽은 늘 도끼 소리로 시작했다. 탁. 탁. 탁. 해가 뜨기 전까지 주방 아궁이 열두 개를 채울 장작을 마련해야 한다. — 결 읽기로 둥치에 결을 드러낸 뒤 장작 패기를 얹으면, 방어를 무시하고 더 깊이 들어간다.",
-      "enemies": ["oak_stump"]
-    }
+    "id": "s0_tutorial_woodpile",
+    "stage": "s0",
+    "type": "battle",
+    "name": "장작 패는 아이",
+    "once": true,
+    "content": {"scene": "s0_scene_dawn", "text": "하운은 숨을 들이쉬었다. 세 번 짧게, 한 번 길게. — 결 읽기로 둥치에 결을 드러낸 뒤 장작 패기를 얹으면, 방어를 무시하고 더 깊이 들어간다.", "enemies": ["oak_stump"]}
   },
   {
-    "id": "s0_event_wang_cloth", "stage": "s0", "type": "event", "name": "왕 노인의 천 조각", "once": true,
-    "conditions": { "floorRange": [2, 2] },
-    "content": {
-      "text": "\"하운아, 또 맨손이냐.\" 주방의 왕 노인이 혀를 차며 낡은 천 조각을 던졌다. \"감아라. 손이 망가지면 너는 평생 도끼질밖에 못 한다.\"",
-      "choices": [
-        { "label": "천을 손에 감는다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
-        { "label": "\"괜찮습니다, 할아버지.\"", "result": "웃으며 천을 품에 넣었다. 체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] }
-      ]
-    }
+    "id": "s0_story_deungun",
+    "stage": "s0",
+    "type": "story",
+    "name": "등운시 — 철목인",
+    "once": true,
+    "content": {"scene": "s0_scene_deungun", "text": "\"약속해라.\" 노인의 목소리가 너무 무거워서, 하운은 이유를 묻지 못했다. 어깨 위에 남은 장문인의 손 무게도 쉽게 사라지지 않았다.", "choices": [{"label": "\"…약속할게요.\"", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}, {"op": "set_flag", "flag": "promise_wang"}], "result": "하운은 그날부터 사람들 앞에서 결을 보이지 않았다. 하운의 기본 카드 1장을 강화했다(+1)."}, {"label": "장문인의 말을 떠올린다", "effects": [{"op": "heal_party", "amount": 10}, {"op": "set_flag", "flag": "promise_wang"}], "result": "\"계속 장작을 패거라. 너의 결이 어디까지 자라는지, 나는 보고 싶구나.\" 가슴 속에 뜨거운 것이 차올랐다. 체력 10 회복"}]}
   },
   {
-    "id": "s0_event_wall_chant", "stage": "s0", "type": "event", "name": "담장 너머의 구령", "once": true,
-    "conditions": { "floorRange": [2, 2] },
-    "content": {
-      "text": "연무장 담장 너머로 내원 제자들의 구령이 들려온다. 청운문의 입문 검법, 청운십팔식(靑雲十八式). 그 구령에 맞춰 도끼를 내리치는 각도를 바꾸고, 발 디딤을 바꾸고, 숨 쉬는 박자를 바꾸었다.",
-      "choices": [
-        { "label": "구령에 맞춰 도끼를 내리친다", "result": "청운십팔식을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_cloud_form" } ] },
-        { "label": "숨 쉬는 박자를 바꾼다", "result": "청운호흡을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_breath" } ] }
-      ]
-    }
+    "id": "s0_battle_axe_eaters",
+    "stage": "s0",
+    "type": "battle",
+    "name": "도끼 잡아먹는 놈들",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "모탕 앞에 옹이 박힌 참나무 둥치가 둘. 다른 잡역들은 쐐기를 박고 망치로 두들겨 한 식경은 씨름해야 하는 종류였다.", "enemies": ["knotted_stump", "oak_stump"]}
   },
   {
-    "id": "s0_battle_inner_disciple", "stage": "s0", "type": "battle", "name": "내원 사형들의 발길질", "weight": 2,
-    "conditions": { "floorRange": [2, 2] },
-    "content": {
-      "text": "아침 공양이 늦었다. 내원 사형 둘이 후원으로 들이닥친다.",
-      "enemies": ["inner_disciple", "inner_disciple"]
-    }
+    "id": "s0_battle_iron_dummy",
+    "stage": "s0",
+    "type": "battle",
+    "name": "밤의 철목인",
+    "weight": 1,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "등운시가 끝난 밤, 너럭바위 끝에는 시험에 쓰지 않은 철목인 하나가 남아 있었다. 아무도 없었다. 사람들 앞이 아니었다. 하운은 도끼를 쥐었다.", "enemies": ["iron_dummy"]}
   },
   {
-    "id": "s0_rest_kitchen", "stage": "s0", "type": "rest", "name": "주방 아궁이", "weight": 1,
-    "conditions": { "floorRange": [2, 2] },
-    "content": {
-      "text": "아궁이 열두 개에 불이 붙었다. 왕 노인은 아무 말 없이 하운의 도끼질을 지켜보다 주방으로 돌아갔다.",
-      "choices": [
-        { "label": "아궁이 곁에서 쉰다", "result": "체력 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "도끼질을 다듬는다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s0_event_soup_bowl",
+    "stage": "s0",
+    "type": "event",
+    "name": "국 한 그릇",
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "청운당 아침 공양. 국통을 든 하운의 국자가 조명각의 그릇 가장자리에 부딪혔다. 팔꿈치가 아주 살짝 움직인 것을 보았지만, 그런 말은 소용없었다. \"죄송하면 됐지.\" 조명각이 남은 국을 하운의 머리 위에 천천히 부었다. 잡역 칸에서 석두가 벌떡 일어섰다. 그때 장로석에서 낮은 기침 소리가 났다. \"명각아. 검을 잡는 손으로 국을 붓는 것은 검을 욕되게 하는 일이다.\" 장문인 곽도진이었다. \"너는 오늘 연무장 모래를 그 아이와 함께 고르거라. 모래를 고르는 일도 수련이니라. 발 디딜 땅을 고를 줄 모르는 자는, 검을 디딜 자리도 고르지 못한다.\"", "choices": [{"label": "석두에게 고개를 젓는다", "effects": [{"op": "heal_party", "amount": 10}], "result": "석두의 주먹이 떨렸지만, 그는 다시 앉았다. 저분은 보고 계셨구나. 잡역 칸의 아이 하나까지도. 국물보다 뜨거운 것이 가슴에 차올랐다. 체력 10 회복"}, {"label": "연무장 모래를 고른다", "effects": [{"op": "gain_card", "card": "haun_biun"}], "result": "모래가 파인 자리를 보면 그날의 초식이 보였다. 왼발을 크게 내딛고, 오른발을 끌어 붙이고, 그대로 몸을 앞으로 던지는. \"방금 그 발놀림. 비운천리의 보법이었지.\" \"모래가 파인 자리를 따라 걸었을 뿐입니다.\" 비운천리를 얻었다."}]}
   },
   {
-    "id": "s0_story_secret_talk", "stage": "s0", "type": "story", "name": "관운각 밀담", "once": true,
-    "content": {
-      "scene": "s0_scene_secret_talk",
-      "text": "\"야, 잡역. 관운각에 등유를 채워 놓고, 해 진 뒤엔 얼씬도 하지 마라.\" 일을 마치고 내려가던 하운은 기둥 옆에 두고 온 숯 바구니를 떠올렸다. 잠깐이면 된다. 그 잠깐이, 그의 인생을 통째로 바꾸었다. 정자 안에는 장문인 곽도진과 검은 삿갓의 사내가 마주 앉아 있었다. \"그대가 문을 열면, 우리는 들어간다.\" 천마신교. 뒷걸음질 치던 하운의 발끝에 숯 바구니가 걸렸다. 덜그럭.",
-      "choices": [
-        { "label": "달린다", "result": "\"누구냐.\" 등 뒤에서 바람이 찢어지는 소리가 났다. 검기였다.",
-          "effects": [ { "op": "set_flag", "flag": "overheard_pact" } ] }
-      ]
-    }
+    "id": "s0_event_moonlit_yard",
+    "stage": "s0",
+    "type": "event",
+    "name": "달빛 연무장",
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "마지막 자갈 한 알까지 골라낸 연무장이 달빛 아래 하얗게 빛났다. 그 한가운데 학창의의 백발 도인이 서 있었다. 장문인은 손에 아무것도 들고 있지 않았다. 그의 손이 허공을 갈랐다. 소리가 없었다. 모래가 한 줄로 가지런히 일어났다가 내려앉으며, 연무장 끝까지 가서 처음 시작된 자리로 되돌아왔다. 구름바다가 근원으로 돌아간다. 운해귀종.", "choices": [{"label": "숨을 죽이고 물결을 눈에 새긴다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "소리 없이 일어나, 끝까지 갔다가, 처음 자리로 돌아오는 물결. 하운은 장문인이 남긴 모래 위의 곧은 선 하나를 지우지 않았다. 하운의 기본 카드 1장을 강화했다(+1)."}, {"label": "행랑채로 돌아가 석두에게 문규를 가르친다", "effects": [{"op": "heal_party", "amount": 8}], "result": "\"제일 조. 청운의 검은 사사로운 욕심을 위해 뽑지 아니한다.\" \"근데 형, 욕심이 뭐야?\" \"갖고 싶은데 가지면 안 되는 거.\" 석두는 코를 골며 잠들었다. 체력 8 회복"}]}
   },
   {
-    "id": "s0_event_forest_rock", "stage": "s0", "type": "event", "name": "빈 바위 아래", "once": true,
-    "conditions": { "floorRange": [4, 4] },
-    "content": {
-      "text": "땔감을 구하러 수천 번 들락거린 숲이다. 어느 바위 아래가 비었는지 그는 알았다.",
-      "choices": [
-        { "label": "바위 아래에서 숨을 고른다", "result": "체력 12 회복", "effects": [ { "op": "heal_party", "amount": 12 } ] },
-        { "label": "숨을 죽이고 발 디딤을 고친다", "result": "하운의 기본 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] }
-      ]
-    }
+    "id": "s0_event_seokdu_robe",
+    "stage": "s0",
+    "type": "event",
+    "name": "석두의 흰 도포",
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "등운시가 끝나고 사흘 뒤, 석두는 흰 도포를 입었다. 무릎을 꿇은 석두가 문규 제일 조를 외쳤다. \"청운의 검은 사사로운 욕심을 위해 뽑지 아니한다!\" 너무 큰 소리여서 사범이 귀를 막았다. 하운도 웃었다. 웃다가 목이 메었다. \"형, 어때? 나 멋있어?\"", "choices": [{"label": "\"소매가 짧다.\"", "effects": [{"op": "heal_party", "amount": 8}], "result": "흰 도포는 석두의 덩치에 맞지 않아 소매가 팔뚝 중간에서 끝나 있었다. \"사범님이 제일 큰 걸로 준 건데.\" 체력 8 회복"}, {"label": "\"그거 문규 위반이다. 제오십이 조.\"", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "\"밤에 몰래 행랑채로 올게. 한 조씩.\" \"내원 제자는 해시 이후 숙소를 떠나지 아니한다.\" \"…형은 그걸 어떻게 다 알아?\" 하운은 문규 백팔 조를 모두 외우고 있었다. 하운의 기본 카드 1장을 강화했다(+1)."}]}
   },
   {
-    "id": "s0_event_forest_slope", "stage": "s0", "type": "event", "name": "미끄러운 비탈", "once": true,
-    "conditions": { "floorRange": [4, 4] },
-    "content": {
-      "text": "어느 비탈이 미끄러운지 그는 알았다. 나무 꼭대기를 밟고 날아오는 학창의의 그림자가 달빛 아래 너울거린다.",
-      "choices": [
-        { "label": "비탈을 미끄러져 내려간다", "result": "가시덤불에 긁혔지만 거리를 벌렸다. 체력 4 잃고 하운의 기본 카드 1장 강화(+1)", "effects": [ { "op": "heal_party", "amount": -4 }, { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun", "pool": "starter" } } ] },
-        { "label": "비탈을 돌아간다", "result": "체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
-      ]
-    }
+    "id": "s0_event_village_errand",
+    "stage": "s0",
+    "type": "event",
+    "name": "운곡촌 심부름",
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"scene": "s0_scene_village", "text": "산으로 돌아오는 길에, 하운은 계속 뒤를 돌아보았다. 아무도 따라오지 않았다. 그러나 등 뒤가 계속 서늘했다. \"무슨 일이요?\" 노인은 대답하지 않았다.", "choices": [{"label": "아궁이 앞, 노인 곁에 앉는다", "effects": [{"op": "heal_party", "amount": 10}], "result": "노인은 저는 다리를 길게 뻗은 채 불꽃만 바라보았다. 하운은 아무것도 묻지 않았다. 체력 10 회복"}, {"label": "숨을 고르며 웅크린 것을 달랜다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "세 번 짧게, 한 번 길게. 아랫배의 따뜻한 것은 산문이 보일 때쯤에야 조금씩 웅크림을 풀었다. 하운의 기본 카드 1장을 강화했다(+1)."}]}
   },
   {
-    "id": "s0_event_forest_thicket", "stage": "s0", "type": "event", "name": "사람 키를 넘는 덤불", "once": true,
-    "conditions": { "floorRange": [4, 4] },
-    "content": {
-      "text": "어느 덤불이 사람 키를 넘는지 그는 알았다. 그는 짐승처럼 숲을 꿰뚫었다. 그러나 상대는 청운문의 장문인이었다.",
-      "choices": [
-        { "label": "덤불 속으로 몸을 던진다", "result": "체력 8 회복", "effects": [ { "op": "heal_party", "amount": 8 } ] },
-        { "label": "장작 패던 숨을 떠올린다", "result": "청운호흡을 얻었다.", "effects": [ { "op": "gain_card", "card": "haun_breath" } ] }
-      ]
-    }
+    "id": "s0_event_hidden_grain",
+    "stage": "s0",
+    "type": "event",
+    "name": "결을 숨기는 이레",
+    "once": true,
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "\"야, 장작. 이레 뒤에 장문인께서 후산 관운각에서 귀한 손님을 맞으신다.\" 마맛자국 사형이 심부름을 일러 두고 갔다. 이레는 길었다. 하운은 장작을 팰 때도 일부러 결을 피해 날을 내리쳤다. 장작이 두 번, 세 번 내리쳐야 겨우 쪼개졌다. 다른 잡역들처럼.", "choices": [{"label": "결을 보고도 모른 척한다", "effects": [{"op": "heal_party", "amount": -5}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun", "pool": "starter"}}], "result": "결을 보고도 모른 척하는 것이, 결을 따라 쪼개는 것보다 몇 배는 더 지쳤다. 그래도 도끼는 손에 붙었다. 체력 5 잃고 하운의 기본 카드 2장 강화(+1)"}, {"label": "아무도 없는 새벽, 한 번만 결을 따른다", "effects": [{"op": "heal_party", "amount": 8}], "result": "사람들 앞이 아니었다. 쩍. 단번에 갈라진 장작 하나가 이상하게 위로가 되었다. 체력 8 회복"}]}
   },
   {
-    "id": "s0_boss_ghost_cliff", "stage": "s0", "type": "boss", "name": "귀곡애(鬼哭崖)",
-    "content": {
-      "scene": "s0_scene_cliff",
-      "outroScene": "s0_scene_stone_gate",
-      "text": "숲이 끝났다. 천 길 낭떠러지, 귀곡애. 곽도진이 소리 없이 내려섰다. \"그 밥값을 오늘 치르거라.\" — 이길 수 없다. 3턴을 버텨라. 마지막 초식의 결을 읽어라.",
-      "enemies": ["kwak_dojin_cliff"],
-      "surviveTurns": 3,
-      "outro": "검이 움직였다. 청운십팔식의 마지막 식, 운해귀종. 그 순간 하운은 그것을 보았다. 검이 지나갈 길, 기운이 흐르는 결. 장작의 결을 읽듯이. 그는 몸을 비틀었다. 검은 그의 심장 대신 옆구리를 깊게 갈랐고, 그 반동으로 몸이 절벽 너머로 기울었다. 떨어지는 동안 하운은 암벽 중턱에서 희미하게 빛나는 오래된 석문을 보았다. 피에 젖은 손바닥이 손바닥 모양의 홈에 닿았다. 세상이 하얗게 타올랐다."
-    }
+    "id": "s0_rest_window",
+    "stage": "s0",
+    "type": "rest",
+    "name": "창문 너머 문규",
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "사흘째 되던 밤, 행랑채 창문을 누군가 톡톡 두드렸다. 석두의 커다란 얼굴이 불쑥 나타났다. \"형. 제십일 조.\" 달빛 아래, 흰 도포를 입은 거인과 잡역 소년이 창문을 사이에 두고 문규를 외웠다. \"형은 동문이야. 내가 정했어.\"", "choices": [{"label": "석두가 두고 간 고기만두를 먹는다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "\"내원은 밥이 따뜻해, 형. 형도 꼭 내원 와. 그래서 같이 따뜻한 밥 먹자.\" 하운은 식어 버린 고기만두를 천천히 먹었다. 체력 30% 회복"}, {"label": "\"제십일 조. 동문의 위급을 보고 외면하는 자는 동문이 아니다.\"", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "\"제십일 조, 외웠다!\" 고른 카드 1장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s0_rest_kitchen",
+    "stage": "s0",
+    "type": "rest",
+    "name": "주방 아궁이",
+    "conditions": {"floorRange": [3, 3]},
+    "content": {"text": "열두 개의 아궁이에 불이 지펴지고, 가마솥 여섯 개에서 김이 피어올랐다. 왕 노인은 지팡이로 바닥을 탁탁 두드리며 잡역들을 부렸다. 장작 연기 냄새와 된장 냄새.", "choices": [{"label": "아궁이 곁에서 생강 보리차를 마신다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "뜨거운 기운이 목을 타고 내려가 얼어붙은 뱃속을 녹였다. 체력 30% 회복"}, {"label": "장작더미 그늘에서 도끼질을 다듬는다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "세 번 짧게, 한 번 길게. 고른 카드 1장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s0_story_secret_talk",
+    "stage": "s0",
+    "type": "story",
+    "name": "관운각 밀담",
+    "once": true,
+    "content": {"scene": "s0_scene_secret_talk", "text": "정자 안의 공기가 얼어붙었다. 등잔불을 등진 장문인의 얼굴은 그림자에 잠겨 보이지 않았다. 다만 그 맑은 눈만이, 어둠 속에서 하운이 숨은 바위를 정확히 향했다.", "choices": [{"label": "달린다", "effects": [{"op": "set_flag", "flag": "overheard_pact"}], "result": "생각은 없었다. 오 년 동안 산을 오르내린 다리가 저절로 움직였다. 쉬익. 왼쪽 귓불이 화끈했다. 옆 바위에 손가락 두 마디 깊이의 칼자국이 새겨졌다. 검기였다. \"잡역 놈이로군. 하늘이 돕는구나. 치울 것을 미리 알려 주니.\""}]}
+  },
+  {
+    "id": "s0_event_fallen_pine",
+    "stage": "s0",
+    "type": "event",
+    "name": "쓰러진 소나무",
+    "once": true,
+    "conditions": {"floorRange": [5, 5]},
+    "content": {"text": "쉬익. 검기가 앞을 가로질렀다. 아름드리 소나무 한 그루가 허리가 잘려 하운의 앞길을 막으며 쓰러졌다. 곽도진이 쓰러진 소나무 위에 내려섰다. \"산문으로 가서 무엇을 하려고. 누가 믿겠느냐. 잡역의 말과 장문인의 말 중에.\" 한 걸음. \"그 늙은이가 너에게 무엇을 말해 주었느냐. 자신이 누구인지는 말해 주었느냐.\"", "choices": [{"label": "대답하지 못한다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "노인은 아무것도 말해 주지 않았다. 세 번 짧게, 한 번 길게. 그것뿐이었다. \"그렇겠지. 그는 늘 그랬다.\" 그 틈을 하운은 놓치지 않았다. 하운의 기본 카드 1장을 강화했다(+1)."}, {"label": "\"할아버지는….\"", "effects": [{"op": "heal_party", "amount": 6}], "result": "말을 잇지 못한 채, 하운은 쓰러진 소나무의 뿌리 쪽으로 몸을 굴렸다. 무릎이 떨렸다. 체력 6 회복"}]}
+  },
+  {
+    "id": "s0_event_badger_burrow",
+    "stage": "s0",
+    "type": "event",
+    "name": "오소리 굴",
+    "once": true,
+    "conditions": {"floorRange": [5, 5]},
+    "content": {"text": "뿌리가 뽑힌 자리의 구덩이 아래로, 작년 겨울에 발견한 오소리 굴의 입구가 있었다. 어른은 들어갈 수 없지만, 마른 소년 하나는 겨우 기어 들어갈 수 있는.", "choices": [{"label": "굴로 몸을 비틀어 넣는다", "effects": [{"op": "heal_party", "amount": -4}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "흙을 파헤치며 열 장을 기었다. 손톱이 빠질 것 같았다. 머리 위에서 목소리가 희미하게 들렸다. \"쥐의 새끼답구나. 굴을 파고 숨다니.\" 체력 4 잃고 하운의 기본 카드 1장 강화(+1)"}, {"label": "굴 끝 덤불에 엎드려 숨을 고른다", "effects": [{"op": "heal_party", "amount": 10}], "result": "세 번 짧게, 한 번 길게. 심장이 조금씩 가라앉았다. 체력 10 회복"}]}
+  },
+  {
+    "id": "s0_event_forest_slope",
+    "stage": "s0",
+    "type": "event",
+    "name": "미끄러운 비탈",
+    "once": true,
+    "conditions": {"floorRange": [5, 5]},
+    "content": {"text": "어느 비탈이 미끄러운지 그는 알았다. 하운이 덤불을 헤치고 비탈을 구르는 동안, 학창의 자락은 나무 꼭대기의 가지 끝을 밟고 너울너울 날아왔다. 가지 하나 부러지지 않았다.", "choices": [{"label": "비탈을 미끄러져 내려간다", "effects": [{"op": "heal_party", "amount": -4}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "잡목 가지가 얼굴을 할퀴었지만 거리를 벌렸다. 체력 4 잃고 하운의 기본 카드 1장 강화(+1)"}, {"label": "비탈을 돌아간다", "effects": [{"op": "heal_party", "amount": 6}], "result": "달빛이 숲 위로 쏟아질 때마다 흰 그림자가 조금씩 더 가까워져 있었다. 그래도 숨은 돌아왔다. 체력 6 회복"}]}
+  },
+  {
+    "id": "s0_event_thicket",
+    "stage": "s0",
+    "type": "event",
+    "name": "사람 키를 넘는 덤불",
+    "once": true,
+    "conditions": {"floorRange": [5, 5]},
+    "content": {"text": "오 년 동안 땔감을 구하러 수천 번 들락거린 숲이었다. 어느 바위 아래가 비었는지, 어느 덤불이 사람 키를 넘는지 그는 알았다. 그러나 상대는 청운문의 장문인이었다. 산문은 남쪽, 그 길은 막혔다. 남은 것은 북쪽, 귀곡애로 이어지는 숲.", "choices": [{"label": "덤불 속으로 몸을 던진다", "effects": [{"op": "heal_party", "amount": 8}], "result": "그는 짐승처럼 숲을 꿰뚫었다. 체력 8 회복"}, {"label": "빈 바위 아래에서 발 디딤을 고친다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "숨을 죽이고, 구령에 맞춰 바꾸던 발 디딤을 떠올렸다. 하운의 기본 카드 1장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s0_event_north_wind",
+    "stage": "s0",
+    "type": "event",
+    "name": "귀곡애로 가는 바람",
+    "once": true,
+    "conditions": {"floorRange": [5, 5]},
+    "content": {"text": "숲이 점점 성기어졌다. 나무 대신 바위가 많아지고, 바람이 거세졌다. 그 바람 속에서 낮게 우는 소리가 들려왔다. 우우웅. 귀곡애 동쪽 가장자리를 따라 내려가면 짐승 길이 있다. 혹시라도 무슨 일이 생기면 운곡촌 마 씨를 찾아가라.", "choices": [{"label": "노인의 말을 붙든다", "effects": [{"op": "heal_party", "amount": 8}], "result": "할아버지에게 알려야 했다. 쥐. 사십 년. 다리 하나를 잃은. 체력 8 회복"}, {"label": "우는 소리에 귀를 기울인다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "바람은 불었다 그쳤다 하는데, 그 소리는 바람이 그쳐도 계속되었다. 절벽 어딘가에서 무언가가 숨을 쉬는 것처럼. 하운의 기본 카드 1장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s0_boss_ghost_cliff",
+    "stage": "s0",
+    "type": "boss",
+    "name": "귀곡애(鬼哭崖)",
+    "content": {"scene": "s0_scene_cliff", "outroScene": "s0_scene_stone_gate", "text": "\"오 년이었던가. 네가 문파의 밥을 먹은 것이. 그 밥값을 오늘 치르거라.\" — 이길 수 없다. 3턴을 버텨라. 검기, 길을 막는 소나무 베기, 그리고 소리 없는 마지막 초식.", "enemies": ["kwak_dojin_cliff"], "surviveTurns": 3}
   }
 ]

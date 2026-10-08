@@ -1,12 +1,12 @@
 id: wolf_hit
 type: character-anim
 character: shadow_wolf
-summary: 그림자늑대 피격 3프레임
+summary: 그림자늑대 피격 3프레임 — 원작 외형으로 다시 그림
 depends_on: [wolf_ref]
 reference: assets/source/wolf_ref.png
 facing: left
 frame_notes:
-  1: struck, head jerked back, flames on the back blown out sideways
-  2: recoiling, hind legs skidding
-  3: recovering, snarling, flames flickering back
-placeholder: { shape: beast, color: '#2b2b3a', accent: '#ffb347' }
+  1: "struck, the smoke body tears apart at the hit point, flames blown sideways"
+  2: "recoiling, smoke swirling back together"
+  3: "recovering, snarling, the two red dots relit"
+placeholder: { shape: beast, color: '#1d2433', accent: '#ff3b3b' }

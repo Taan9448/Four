@@ -10,5 +10,14 @@
   { "id": "incorporeal", "name": "무형", "kind": "trait", "description": "내공만 소모하는 공격의 피해가 절반으로 줄어든다.", "glyph": "無", "icon": 9, "decay": 0, "special": "incorporeal" },
   { "id": "flow_eater", "name": "흐름 포식", "kind": "trait", "description": "내공·마나를 소모한 카드의 피해를 흡수해 회복하고 최대 체력이 늘어난다.", "glyph": "食", "icon": 10, "decay": 0, "special": "flow_eater" },
   { "id": "knot", "name": "매듭", "kind": "trait", "description": "결 노출이 일정 스택 이상 쌓이면 매듭이 드러난다.", "glyph": "結", "icon": 11, "decay": 0, "special": "knot" },
-  { "id": "knot_exposed", "name": "매듭 노출", "kind": "debuff", "description": "모든 흐름이 엉킨 자리가 드러났다. '날 얹기'가 큰 피해를 준다.", "glyph": "斷", "icon": 12, "decay": 0, "special": "knot_exposed" }
+  { "id": "knot_exposed", "name": "매듭 노출", "kind": "debuff", "description": "모든 흐름이 엉킨 자리가 드러났다. '날 얹기'가 큰 피해를 준다.", "glyph": "斷", "icon": 12, "decay": 0, "special": "knot_exposed" },
+  { "id": "blood_cover", "name": "피의 덮개", "kind": "trait", "description": "천마혈공. 피가 결을 덮어 결 노출이 붙지 않는다. 천외귀운이 덮개를 벗긴다.", "glyph": "血", "decay": 0, "special": "blood_cover" },
+  { "id": "hungry", "name": "틈의 굶주림", "kind": "trait", "description": "흐르는 것을 먹는다. 내공을 2 이상 실은 카드의 피해는 절반이고, 그런 카드로 쓰러뜨리면 균열 +1.", "glyph": "飢", "decay": 0, "special": "hungry" },
+  { "id": "still", "name": "흐르지 않는 자", "kind": "buff", "description": "숨까지 멈췄다. 적이 이 아군을 노리지 못한다.", "glyph": "止", "decay": 1, "decayAt": "roundEnd", "special": "unseen" },
+  { "id": "seam", "name": "꿰맬 자리", "kind": "trait", "description": "찢긴 경계. 실(바늘·내공의 실·얼음의 실·은빛 씨앗) 카드의 피해만 받는다.", "glyph": "縫", "decay": 0, "special": "seam" },
+  { "id": "mountain_regen", "name": "산이 메운다", "kind": "buff", "description": "차례 시작마다 스택 × 4만큼 체력을 되찾는다. 산과의 이음매를 끊으면(두린의 망치) 사라진다.", "glyph": "山", "decay": 0, "modifiers": { "turnStartDamagePerStack": -4 } },
+  { "id": "frozen_heart", "name": "얼음 속 심장", "kind": "buff", "description": "심장이 다른 곳(왕녀의 얼음)에 있다. 받는 피해가 80% 줄어든다.", "glyph": "心", "decay": 0, "modifiers": { "damageTakenMul": 0.2 } },
+  { "id": "shadow_body", "name": "그림자 몸", "kind": "buff", "description": "진짜 몸(검은 수정)이 따로 있다. 받는 피해가 75% 줄어든다.", "glyph": "影", "decay": 0, "modifiers": { "damageTakenMul": 0.25 } },
+  { "id": "blood_veil", "name": "두 옥좌", "kind": "buff", "description": "곽도진이 서 있는 동안 사무결은 앞에 나서지 않는다. 받는 피해가 50% 줄어든다.", "glyph": "座", "decay": 0, "modifiers": { "damageTakenMul": 0.5 } },
+  { "id": "dead_forest", "name": "죽은 숲의 몸", "kind": "buff", "description": "검은 구름 아래에서 연기가 다시 뭉친다. 받는 피해가 40% 줄어든다. 결계가 살아나면 걷힌다.", "glyph": "霧", "decay": 0, "modifiers": { "damageTakenMul": 0.6 } }
 ]

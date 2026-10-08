@@ -3,13 +3,13 @@ type: character-anim
 size: large
 character: sa_mugyeol
 chroma: green
-summary: 사무결 대기 4프레임
+summary: 사무결(혈전) 대기 4프레임 — 원작 외형으로 다시 그림
 depends_on: [sa_mugyeol_ref]
 reference: assets/source/sa_mugyeol_ref.png
 facing: left
 frame_notes:
-  1: "stands facing left, hat brim low, hands hanging, red fingernails visible"
+  1: "stands facing left, hands hanging, red fingernails visible, a thin cruel smile"
   2: "black robes ripple, a faint red mist curls around the hands"
-  3: "head tilts slightly, the thin smile showing under the hat"
+  3: "the red eyes narrow, head tilting slightly"
   4: "the mist fades, robes settle"
 placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

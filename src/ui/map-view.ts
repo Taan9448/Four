@@ -11,10 +11,10 @@ import { installTooltips, tipAttrs } from './tooltip';
 const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', boss: '王' };
 const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', boss: '보스' };
 
-/** 세계의 틈이 나타나는 사건: S3 보스를 넘은 밤의 '하늘의 금' */
+/** 세계의 틈이 나타나는 사건: S7 낙안봉을 넘은 밤의 아물지 않는 금 */
 const RIFT_FLAG = 'sky_crack';
 /** 틈이 처음 나타나는 스테이지(이 스테이지 출발 지도에서 알림 띠와 함께 그어진다) */
-const RIFT_REVEAL_STAGE = 's4';
+const RIFT_REVEAL_STAGE = 's8';
 /** 귀곡애 석문(두 세계의 유일한 통로) 자리 — journey_band 그림의 가운데 아래. 엘하임이 드러난 뒤에만 보인다 */
 const GATE = { x: 47, y: 74 };
 /** 여정 띠의 지역: 그림에서 차지하는 가로 범위(%)와 이름. 아직 들어선 적 없는 지역은 안개로 덮는다(GAME_DESIGN 14절) */

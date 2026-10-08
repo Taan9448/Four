@@ -1,0 +1,9 @@
+id: seokdu_stand
+type: character-standing
+character: seokdu
+summary: 석두 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — honest wide smile with one front tooth missing, round eyes"
+  2: "resolute expression — brows knit, fists clenched, shoulders squared like a door"
+  3: "surprised expression — round eyes even rounder, mouth open"
+placeholder: { color: '#e0cfae', accent: '#c8b08a' }

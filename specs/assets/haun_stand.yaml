@@ -1,9 +1,9 @@
 id: haun_stand
 type: character-standing
 character: haun
-summary: 진하운 반신 그림(기본·결의·놀람)
+summary: 진하운(S0 도끼) 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
 frame_notes:
-  1: "neutral expression — calm, quiet, slightly distant look; lips closed; the long bangs partly over the eyes"
-  2: "resolute expression — eyes sharpened and focused forward, jaw set, one hand lifting the axe handle to the chest"
+  1: "neutral expression — calm, quiet, slightly distant look; lips closed; the long bangs partly over the eyes; grey servant outfit"
+  2: "resolute expression — eyes sharpened and focused forward, jaw set, the woodcutting axe handle lifted to the chest"
   3: "surprised expression — eyes wide, lips slightly parted, head drawn back a little, bangs swaying"
-placeholder: { color: '#3d4459', accent: '#f2c8a0' }
+placeholder: { color: '#8a90a3', accent: '#4fb4ff' }

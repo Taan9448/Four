@@ -1,0 +1,11 @@
+id: born_hammer_ref
+type: character-ref
+character: born_hammer
+summary: 보른(두린의 망치) 기준 시트(3/4 정면 + 오른쪽 측면)
+depends_on: [born_ref]
+reference: assets/source/born_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, the same short broad dwarf, singed red beard in three braids, the heavy rune-carved war hammer resting head-down beside him, no shield"
+  2: "full body, side view facing right, same size, hammer held low across the body in both hands"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#a02634' }

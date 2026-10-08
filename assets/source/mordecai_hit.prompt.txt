@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: struck, the stitches flare and a few threads snap loose
+Cell 2: the body bends, the blue heart flickering
+Cell 3: recovers, the seams pulling tight again
+Cells 4 to 6 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: The first attempt is too large (recovery103 spritepixels). REDRAW20%SHORTER AND NARROWER at the same4x4 square-block size: the recovery's full horn-to-hem height must be84 logicalpx (=336actualpx), only65% of eachcell height. In each512px cell leave124px GREEN ABOVE the horn,52px GREEN BELOW the hem and90px GREEN on bothsides, approximate silhouette x90..422,y124..460. Same BODY SCALE in all3 poses: hit/seamsflare, bodybends, recovery; bend for cell2 rather than shrinking it. All face LEFT with the design of reference cell2. Gold loose threads stay well inside cell1 with small straight pixel-block sparks, no blur. Lower row puregreen. Match the small84/85px figures in the idle reference, not large front-view figure.

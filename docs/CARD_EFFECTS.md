@@ -2,9 +2,9 @@
 
 카드·적 행동·지원 규칙의 효과는 모두 아래 **기본 동작의 조합**으로만 표현한다. 카드별 개별 코드는 금지한다.
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
-이 문서와 `tests/engine.test.ts`를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
+이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(13개)
+## 1. 전투 기본 동작(15개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -21,6 +21,8 @@
 | `reveal_grain` | stacks | 카드 대상 | 결 노출 부여(매듭 검사 포함) |
 | `taunt` | stacks | 자신 | 도발 |
 | `add_card` | card, count, to | — | 카드 생성(hand / draw / discard) |
+| `dispel` | — | 카드 대상 | 돌려보내기(운해귀종·두린의 망치): 대상의 강화(`kind: buff`) 상태와 방어를 모두 걷어 낸다. 약화 같은 debuff·특성(trait)은 남는다 |
+| `neigong_max` | amount | — | 이번 전투에서 턴마다 차는 내공 증감(내공의 실: 팔 년 내공을 실로 뽑는다). 0 아래로 내려가지 않는다 |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
@@ -32,11 +34,15 @@
 
 1. 기본값 + 공격자 힘(스택당 +1)
 2. × 공격자 약화(0.75)
-3. 무형: 비용이 내공만이면 × 0.5
-4. 결 노출: 아군 공격이면 1스택 소모, × 1.5, 방어 무시
-5. × 대상 취약(1.5) → 내림
-6. 흐름 포식: 내공·마나 비용이 있는 카드면 피해 대신 그만큼 최대 HP·HP 증가
-7. 방어로 흡수 → HP 감소 → 0이면 쓰러짐/처치
+0. 꿰맬 자리(`seam`): 실(`thread`) 키워드 카드가 아니면 피해 0으로 끝
+1. 기본값 + 공격자 힘(스택당 +1)
+2. × 공격자 약화(0.75)
+3. 틈의 굶주림(`hungry`): 카드 비용 내공이 2 이상이면 × 0.5
+4. 무형: 비용이 내공만이면 × 0.5
+5. 결 노출: 아군 공격이면 1스택 소모, × 1.5, 방어 무시
+6. × 대상 취약(1.5)·받는 피해 보정(얼음 속 심장 0.2 등) → 내림
+7. 흐름 포식: 내공·마나 비용이 있는 카드면 피해 대신 그만큼 최대 HP·HP 증가
+8. 방어로 흡수 → HP 감소 → 0이면 쓰러짐/처치(처치 효과 → 짝 변신 → 혼자 남음 변신 → 승리 검사). 굶주린 적을 3의 카드로 쓰러뜨렸으면 균열 +1
 
 ## 3. 카드 JSON(`data/cards/<owner>.json`)
 
@@ -50,7 +56,7 @@
   "pool": "story",                      // starter | reward(전투 보상 후보) | story(이벤트로만) | status
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
-  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable
+  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다)
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
   "upgrade": {                          // 강화 +1~+5(상태 카드 제외 필수)
     "growth": [4, 0],                   //   +1~+3: 단계마다 effects[i]의 amount(없으면 stacks)에 더할 값. 효과 수와 같아야 한다
@@ -93,17 +99,32 @@
 | incorporeal | 무형 | 특성 | 내공만 쓴 공격 ×0.5 |
 | flow_eater | 흐름 포식 | 특성 | 흐름을 쓴 카드 피해 흡수 |
 | knot / knot_exposed | 매듭 / 매듭 노출 | 특성 | 결 3스택에 매듭 노출 |
+| blood_cover | 피의 덮개 | 특성 | 결 노출이 붙지 않는다(천마혈공). 천외귀운의 `remove_status`가 벗긴다 |
+| hungry | 틈의 굶주림 | 특성 | 내공 2 이상 카드 피해 ×0.5, 그 카드로 처치하면 균열 +1 |
+| still | 흐르지 않는 자 | 라운드 끝 -1 | 적이 이 아군을 노리지 못한다(special `unseen`). 다른 아군이 없으면 헛손질 |
+| seam | 꿰맬 자리 | 특성 | 실(thread) 카드의 피해만 받는다 |
+| mountain_regen | 산이 메운다 | 없음 | 차례 시작마다 스택×4 회복(`turnStartDamagePerStack` 음수 = 회복) |
+| frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
-일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack)로 데이터만으로 정의한다.
-`special`이 붙은 6개는 엔진이 메커니즘으로 처리한다.
+일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
+`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam)은 엔진이 메커니즘으로 처리한다.
 
-## 5. 적 JSON(`data/enemies.json`)
+## 5. 적 JSON(`data/enemies/<stage>.json`)
+
+적은 처음 나오는 스테이지의 파일에 정의하고, 뒤 스테이지는 id로 다시 쓴다(로더가 `data/enemies/*.json`을 모두 읽는다. id 중복은 오류).
 
 `moves[]`의 `effects`는 카드와 같은 기본 동작을 쓴다. `pattern: cycle`(순서대로) 또는 `random`(가중치, 같은 행동 3연속 금지).
 `targeting`: random | lowest_hp | highest_hp | haun. `sprite`가 있으면 `<sprite>_idle / _attack / _hit` 에셋을 쓰고, 없으면 실루엣으로 대신한다.
 
-**변신(보스 2단계)** — `transform: { triggers, into, text, partyEffects }`
-- `triggers`: `downed`(쓰러질 자리에서 대신 변신) / `lastStanding`(다른 적이 모두 쓰러져 혼자 남으면 변신). 둘 다 줄 수 있다.
+- `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
+- `deathEffects`: 이 적이 쓰러질 때 그 적을 출처로 일어나는 전투 동작. 예: 베일락 `[{ "op": "damage", "amount": 999, "target": "all_allies" }]`(졸개가 무너진다), 쐐기 `[{ "op": "rift", "amount": -2 }]`.
+
+**변신(보스 2단계)** — `transform: { triggers, partner?, into, text, partyEffects }`
+- `triggers`: `downed`(쓰러질 자리에서 대신 변신) / `lastStanding`(다른 적이 모두 쓰러져 혼자 남으면 변신) / `partnerDowned`(`partner`로 지정한 적이 쓰러지면 변신 — 사무결 ← 곽도진의 피, 셀리아스 ← 왕녀의 얼음, 그림자 암살자 ← 검은 수정). 여럿 줄 수 있다.
 - `into`의 적 정의로 바뀌고 체력은 가득 찬다. 상태는 `into.traits`로 다시 시작하고, 변신한 차례에는 행동하지 않는다. 변신한 모습은 다시 변신하지 않는다(데이터 검사).
 - `partyEffects`: 변신 순간 하운을 출처로 일어나는 전투 동작(원작 연출: 엘리아의 마나 `gain_mana`, `add_card … to: hand`).
-- 예: 사무결 → 붉은 거인 사무결(S4 혈전). 전투 이벤트 `transform`으로 화면에서 같은 자리에 새 모습으로 다시 그린다.
+- 예: 사무결 → 붉은 거인 사무결(S8 혈전), 모르데카이 → 찢긴 경계(S9 마지막 한 땀). 전투 이벤트 `transform`으로 화면에서 같은 자리에 새 모습으로 다시 그린다.
+
+## 6. 전투 마나 규칙
+
+세계 기본값 `balance.mana.worlds[world]`(`battleStart: full | carry | 숫자`, `perTurn`)을 스테이지 `mana`, 모듈 `content.mana` 순으로 덮어쓴다(`GAME_DESIGN.md` 6절). 모듈 `content.startEffects`는 전투 시작에 언제나 일어나는 전투 동작이다(이그니스전의 '흐름에 올라타기', 모르데카이전의 '고리 멈추기'를 손패에).

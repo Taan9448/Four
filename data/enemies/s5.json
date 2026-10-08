@@ -1,0 +1,89 @@
+[
+  {
+    "id": "shadow_assassin",
+    "name": "그림자 암살자",
+    "maxHp": 60,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#15121c",
+    "tier": "elite",
+    "traits": [{"status": "shadow_body", "stacks": 1}, {"status": "incorporeal", "stacks": 1}],
+    "pattern": "cycle",
+    "moves": [{"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 10}]}, {"id": "five_blades", "name": "다섯 곳의 단검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 3}]}, {"id": "scatter", "name": "흩어진다", "intent": "defend", "effects": [{"op": "block", "amount": 10, "target": "self"}]}],
+    "transform": {"triggers": ["partnerDowned"], "partner": "black_crystal", "into": "shadow_assassin_fading", "text": "수정이 둘로 갈라졌다. 망루의 모든 그림자가 소리 없는 비명을 지르며 녹아내린다."},
+    "flavor": "얼굴 없는 가늘고 긴 그림자. 물결 문자가 새겨진 검은 단검만이 실체다. 하운의 검이 그림자를 그대로 통과한다. 그림자에는 결이 없다."
+  },
+  {
+    "id": "black_crystal",
+    "name": "검은 수정",
+    "maxHp": 38,
+    "sprite": null,
+    "silhouette": "object",
+    "color": "#0d0b12",
+    "pattern": "cycle",
+    "moves": [{"id": "swallow_light", "name": "빛을 삼킨다", "intent": "defend", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "cast_shadow", "name": "그림자를 드리운다", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}],
+    "flavor": "들보 위, 달빛이 끊긴 자리에 매달린 주먹만 한 검은 수정. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다."
+  },
+  {
+    "id": "shadow_assassin_fading",
+    "name": "꺼져 가는 그림자",
+    "maxHp": 14,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#2a2438",
+    "pattern": "cycle",
+    "moves": [{"id": "last_words", "name": "…네 세계의 문도 열리겠지", "intent": "debuff", "targeting": "haun", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "last_blade", "name": "꺼져 가는 단검", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 5}]}],
+    "flavor": "갈라진 수정의 반쪽에서 꺼져 가는 목소리가 흘러나온다. 마왕이 박고 있는 쐐기 천 개, 그리고 공허의 열쇠."
+  },
+  {
+    "id": "shadow_fragment",
+    "name": "그림자",
+    "maxHp": 36,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#221d2c",
+    "traits": [{"status": "incorporeal", "stacks": 1}],
+    "pattern": "random",
+    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
+    "flavor": "그림자 암살자가 다스리던 것들의 잔당. 칼날만 실체다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
+  },
+  {
+    "id": "wedge",
+    "name": "쐐기",
+    "maxHp": 24,
+    "sprite": null,
+    "silhouette": "object",
+    "color": "#16141a",
+    "pattern": "cycle",
+    "moves": [{"id": "tangle", "name": "엉킨 결", "intent": "special", "effects": [{"op": "rift", "amount": 1}]}],
+    "deathEffects": [{"op": "rift", "amount": -2}],
+    "flavor": "팔뚝만 한 검은 쐐기. 한쪽은 뭉툭하고 한쪽은 바늘이다. 쇠의 결과 결 잃은 마나가 반대로 꼬여 경계를 갉아먹는다. 뭉툭한 끝에 작은 표식 하나 — 한스의 표식."
+  },
+  {
+    "id": "obsidian_door",
+    "name": "쐐기 박힌 흑요석 문",
+    "maxHp": 56,
+    "sprite": null,
+    "silhouette": "object",
+    "color": "#1b1724",
+    "scale": 1.4,
+    "tier": "elite",
+    "pattern": "cycle",
+    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
+    "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다."
+  },
+  {
+    "id": "vargas",
+    "name": "마왕 바르가스",
+    "maxHp": 218,
+    "sprite": "vargas",
+    "silhouette": "boss",
+    "color": "#3a3446",
+    "scale": 2,
+    "tier": "boss",
+    "pattern": "cycle",
+    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 21}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 25}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
+    "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
+    "flavor": "사람의 세 배인 키, 찢어진 박쥐 날개, 왕관처럼 솟은 비틀린 뿔 일곱, 바닥이 보이지 않는 텅 빈 우물 같은 눈. 삼천 년 전 문을 닫은 고대인. 숨결 하나에 바닥과 갑옷이 녹는다."
+  }
+]

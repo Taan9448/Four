@@ -87,6 +87,7 @@ function defaultTarget(effect: Effect, ctx: EffectContext): NonNullable<Effect['
     case 'damage':
     case 'apply_status':
     case 'reveal_grain':
+    case 'dispel':
       return cardTarget === 'all_enemies' ? 'all_enemies' : 'enemy';
     default:
       return cardTarget === 'all_allies' ? 'all_allies' : 'self';
@@ -127,8 +128,18 @@ export function resolveTargets(state: BattleState, effect: Effect, ctx: EffectCo
 
 // ───────────────────────── 상태 ─────────────────────────
 
+export function hasSpecial(state: BattleState, c: Combatant, special: string): boolean {
+  return Object.entries(c.statuses).some(([id, n]) => n > 0 && state.data.statuses.get(id)?.special === special);
+}
+
 export function addStatus(state: BattleState, target: Combatant, status: string, stacks: number): void {
   if (!state.data.statuses.has(status)) throw new Error(`알 수 없는 상태: ${status}`);
+  // 피의 덮개(천마혈공): 결이 피에 덮여 드러나지 않는다
+  if (status === 'grain' && stacks > 0 && hasSpecial(state, target, 'blood_cover')) {
+    state.events.push({ type: 'status', targetUid: target.uid, status: 'grain', stacks: 0 });
+    state.log.push(`${target.name}: 피가 결을 덮었다.`);
+    return;
+  }
   const next = (target.statuses[status] ?? 0) + stacks;
   if (next <= 0) delete target.statuses[status];
   else target.statuses[status] = next;
@@ -199,6 +210,15 @@ export function dealDamage(
   }
   const card = ctx.card;
   const usesFlow = !!card && (card.cost.neigong > 0 || card.cost.mana > 0);
+  // 꿰맬 자리: 실(thread) 카드가 아니면 들어가지 않는다
+  if (hasSpecial(state, target, 'seam') && !card?.keywords.includes('thread')) {
+    state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: 0, blocked: 0, grain: false, absorbed: false });
+    state.log.push(`${target.name}: 실이 아니면 꿰맬 수 없다.`);
+    return;
+  }
+  // 틈의 굶주림: 내공을 2 이상 실은 카드는 먹혀서 절반만 들어간다
+  const fed = !!card && card.cost.neigong >= 2 && hasSpecial(state, target, 'hungry');
+  if (fed) dmg *= 0.5;
   // 무형: 내공만 소모하는 공격은 절반
   if (card && target.statuses.incorporeal > 0 && card.cost.neigong > 0 && card.cost.mana === 0) {
     dmg *= bal.incorporealMultiplier;
@@ -232,7 +252,14 @@ export function dealDamage(
   target.hp = Math.max(0, target.hp - hpLoss);
   state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: hpLoss, blocked, grain, absorbed: false });
   state.log.push(`${source?.name ?? '?'} → ${target.name} 피해 ${hpLoss}${blocked ? ` (방어 ${blocked})` : ''}${grain ? ' [결]' : ''}`);
-  if (target.hp <= 0) knockOut(state, target);
+  if (target.hp <= 0) {
+    knockOut(state, target);
+    // 벤 짐승의 기운이 금으로 빨려 올라간다
+    if (fed && target.downed) {
+      state.log.push('벤 짐승의 기운이 하늘의 금으로 빨려 올라갔다.');
+      changeRift(state, 1);
+    }
+  }
   if (target.side === 'enemy' && !target.downed) {
     fireSupport(state, 'enemyDamaged', { triggerUid: target.uid });
   }
@@ -259,6 +286,13 @@ function knockOut(state: BattleState, target: Combatant): void {
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
+    const def = state.data.enemies.get(target.defId);
+    if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });
+    // 짝이 쓰러지면 변신(사무결 ← 곽도진, 셀리아스 ← 왕녀의 얼음)
+    for (const e of alive(state.enemies)) {
+      const t = state.data.enemies.get(e.defId)?.transform;
+      if (t?.triggers.includes('partnerDowned') && t.partner === target.defId) transformEnemy(state, e);
+    }
     const left = alive(state.enemies);
     if (left.length === 1 && hasTransform(state, left[0], 'lastStanding')) transformEnemy(state, left[0] as EnemyState);
     if (alive(state.enemies).length === 0) setResult(state, 'victory');
@@ -276,8 +310,8 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   const from = enemy.name;
   enemy.defId = into.id;
   enemy.name = into.name;
-  enemy.maxHp = into.maxHp;
-  enemy.hp = into.maxHp;
+  enemy.maxHp = into.maxHp + (into.hpPerScar ?? 0) * state.scar;
+  enemy.hp = enemy.maxHp;
   enemy.block = 0;
   enemy.downed = false;
   enemy.statuses = Object.fromEntries(into.traits.map((tr) => [tr.status, tr.stacks]));
@@ -362,7 +396,7 @@ export function runEffects(state: BattleState, effects: Effect[], ctx: EffectCon
 }
 
 function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): void {
-  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card'].includes(effect.op);
+  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
     const amount = amountOf(state, effect);
@@ -385,6 +419,12 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       case 'rift':
         changeRift(state, amount);
         return;
+      case 'neigong_max':
+        // 이번 전투에서 턴마다 차는 내공(마지막 한 땀: 팔 년 내공을 실로 뽑는다)
+        state.neigongMax = Math.max(0, state.neigongMax + amount);
+        state.events.push({ type: 'neigong_max', value: state.neigongMax });
+        state.log.push(`내공의 고리 ${amount >= 0 ? '+' : ''}${amount} (턴마다 ${state.neigongMax})`);
+        return;
       case 'add_card': {
         const cardId = effect.card;
         if (!cardId || !state.data.cards.has(cardId)) throw new Error(`add_card: 알 수 없는 카드 ${cardId}`);
@@ -401,7 +441,7 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
   }
 
   const targets = resolveTargets(state, effect, ctx);
-  if (effect.op === 'damage' && ctx.source && targets.length) {
+  if (effect.op === 'damage' && ctx.source && !ctx.source.downed && targets.length) {
     state.events.push({ type: 'attack', sourceUid: ctx.source.uid, targetUids: targets.map((t) => t.uid) });
   }
   for (const target of targets) {
@@ -441,6 +481,20 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       case 'taunt':
         addStatus(state, target, 'taunt', effect.stacks ?? effect.amount ?? 1);
         break;
+      case 'dispel': {
+        // 돌려보내기(운해귀종): 강화(buff) 상태와 방어를 걷어 낸다
+        for (const id of Object.keys(target.statuses)) {
+          if (state.data.statuses.get(id)?.kind !== 'buff') continue;
+          delete target.statuses[id];
+          state.events.push({ type: 'status', targetUid: target.uid, status: id, stacks: 0 });
+        }
+        if (target.block > 0) {
+          target.block = 0;
+          state.events.push({ type: 'block', targetUid: target.uid, amount: 0 });
+        }
+        state.log.push(`${target.name}: 흩어진 것이 제자리로 돌아갔다.`);
+        break;
+      }
     }
   }
 }

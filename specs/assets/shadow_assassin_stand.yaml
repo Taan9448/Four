@@ -1,0 +1,9 @@
+id: shadow_assassin_stand
+type: character-standing
+character: shadow_assassin
+summary: 그림자 암살자 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a faceless elongated shadow, only the engraved black dagger solid"
+  2: "resolute expression — the shadow stretched toward the viewer, the dagger raised"
+  3: "surprised expression — the shadow fraying apart like smoke"
+placeholder: { color: '#0b0b10', accent: '#5d6478' }

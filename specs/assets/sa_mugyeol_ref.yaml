@@ -3,9 +3,9 @@ type: character-ref
 size: large
 character: sa_mugyeol
 chroma: green
-summary: 사무결 기준 시트(3/4 정면 + 왼쪽 측면, 보스 128 격자)
+summary: 사무결(혈전) 기준 시트(3/4 정면 + 왼쪽 측면) — 원작 외형으로 다시 그림
 facing: left
 frame_notes:
-  1: "full body, three-quarter front view, a tall man in a deep black bamboo hat pulled low over the face, only a pale jaw and a thin cruel smile visible, black layered robes, long blood-red fingernails, hands loose at his sides"
-  2: "full body, side view facing left, same proportions, one clawed hand slightly raised"
+  1: "full body, three-quarter front view, a tall man with no hat, an unnaturally young pale handsome face, blood-red eyes, black layered robes lined with red silk, long blood-red fingernails, hands loose at his sides"
+  2: "full body, side view facing left, same proportions, one red-nailed hand slightly raised"
 placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

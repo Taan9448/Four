@@ -1,10 +1,12 @@
 id: bg_volcano_canyon
 type: background
-summary: 전투 배경 — 화산 협곡(S1 보스, 불타는 협곡 마을)
+summary: 전투 배경 — 화산 협곡(S2, 이그니스의 사슬 화로, 원작 2권 2~4장)
 frame_notes:
   1: >-
-    A volcanic canyon at night. Dark basalt cliff walls rise on the left and right edges with thin glowing orange lava cracks; in the
-    far distance a burning canyon village with small roofs and rising embers under a smoky red-brown sky. The ground is cracked dark
-    rock with a few faint orange seams. Black, dark brown and dull red with small hot orange accents; keep the fire glow low and
-    behind, not bright behind the center.
+    A volcanic canyon at night turned into a forced-labor forge. Dark basalt cliff walls rise on the left and right edges with thin
+    glowing orange lava cracks; along the cliffs stand a few large stone furnaces with heavy iron chains running from them across
+    the ground and up the walls. In the far distance, an empty, abandoned mining village (no fire on the houses) under a smoky
+    red-brown sky; the glow comes from the furnaces, not from burning houses. The ground is cracked dark rock with a few faint orange
+    seams and loose chain links. Black, dark brown and dull red with small hot orange accents; keep the fire glow low and behind,
+    not bright behind the center.
 placeholder: { color: '#4a2418' }

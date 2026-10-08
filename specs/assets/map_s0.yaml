@@ -1,11 +1,11 @@
 id: map_s0
 type: map-art
-summary: 지역 지도 — 청운산(S0)
+summary: 지역 지도 — 청운산(S0, 1권 1~6장)
 frame_notes:
   1: >-
-    Cheongun Mountain, a wuxia mountain sect. Far left: the outer gate and the woodpile yard at the foot of the mountain. Along the top and bottom edges: pine forests, a small creek and stone steps of the sect. Right of center: the main halls with tiled roofs on terraces. Far right: a sheer misty cliff, the Ghost Valley Cliff, with a dark narrow stone gate cut into it.
+    The Cheongun sect mountain in the wuxia world. Far left: the woodpile and kitchen yard behind the sect, with the grey-tiled sect halls on the main peak's waist and the gate with a golden plaque. Along the top: seven peaks like a folding screen, the western peak with a flat boulder (the sect trial ground). Along the bottom: Ungok village in the valley where two streams meet, with a two-storey inn under a willow. Far right: the steep northern back mountain and the Ghost Valley cliff (Gwigok-ae) with a small hexagonal pavilion at its edge, a sheer drop into a sea of clouds.
 framing: >-
   A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
-placeholder: { color: '#d9cba8' }
+placeholder: { color: '#d6c7a0' }

@@ -1,0 +1,9 @@
+id: gormon_stand
+type: character-standing
+character: gormon
+summary: 고르몬 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a rock face fused with the cave wall, lava-red eyes half-lidded"
+  2: "resolute expression — the stone mouth grinding open, lava-red eyes blazing"
+  3: "surprised expression — a crack running between the giant and the mountain"
+placeholder: { color: '#4a3426', accent: '#ff3b3b' }

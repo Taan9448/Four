@@ -1,0 +1,9 @@
+id: hyeolsu_stand
+type: character-standing
+character: branch_lord
+summary: 혈수마군 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — a tall proud man, cold face, blood-red hands folded"
+  2: "resolute expression — a blood-red hand raised like a blade, a red haze rising"
+  3: "surprised expression — eyes wide, the red haze over his chest torn open"
+placeholder: { color: '#6a0f1a', accent: '#ff3b3b' }

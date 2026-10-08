@@ -3,12 +3,12 @@ type: character-anim
 size: large
 character: ignis
 chroma: magenta
-summary: 화염군주 이그니스 피격 3프레임
+summary: 화염군주 이그니스 피격 3프레임 — 원작 외형으로 다시 그림
 depends_on: [ignis_ref]
 reference: assets/source/ignis_ref.png
 facing: left
 frame_notes:
-  1: "struck, lava sprays from the cracks, body rocks back"
+  1: "struck, the white flame body tears and black lava spurts, body rocks back"
   2: "the flame crown gutters low"
   3: "the flames roar back up"
-placeholder: { shape: humanoid, color: '#2a1a14', accent: '#ff8a1e' }
+placeholder: { shape: humanoid, color: '#f1efe6', accent: '#0b0b10' }

@@ -2,12 +2,12 @@
 import { canPlay, describeIntent, endTurn, incomingDamage, needsTarget, playCard, type IncomingView } from '../engine/battle';
 import { hasSkipTurn } from '../engine/effects';
 import type { GameData } from '../engine/data';
-import { resolveCard, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
+import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, shake, sleep, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
-import { frameUrl } from '../render/assets';
+import { frameUrl, spriteSource } from '../render/assets';
 import { SpritePlayer } from '../render/sprite-player';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
@@ -130,8 +130,12 @@ export class BattleView {
 
   private spriteFor(c: Combatant, anim: string): string | null {
     if (c.side === 'party') {
-      const s = this.data.characters.get(c.defId)?.sprites ?? {};
-      return s[anim] ?? (anim === 'skill' ? s.attack : null) ?? null;
+      const def = this.data.characters.get(c.defId);
+      if (!def) return null;
+      // 복장(못생긴 검·두린의 망치)은 실제 그림이 들어온 뒤에만 쓴다(임시 그림보다 기본 복장의 실제 그림이 낫다)
+      const pick = (s: Record<string, string>) => s[anim] ?? (anim === 'skill' ? s.attack : undefined);
+      const outfit = pick(spritesFor(def, this.state.flags));
+      return (outfit && spriteSource(outfit) === 'sprites' ? outfit : pick(def.sprites)) ?? null;
     }
     const def = this.data.enemies.get(c.defId);
     return def?.sprite ? `${def.sprite}_${anim === 'skill' ? 'attack' : anim}` : null;
@@ -219,9 +223,9 @@ export class BattleView {
       breath ?? '',
       h(
         'div',
-        { class: `orb neigong${s.neigong === 0 ? ' empty' : ''}`, ...tipAttrs(`내공 ${s.neigong} / ${bal.neigongPerTurn}`, '매 턴 다시 차는 기본 비용.', 'neigong') },
+        { class: `orb neigong${s.neigong === 0 ? ' empty' : ''}`, ...tipAttrs(`내공 ${s.neigong} / ${s.neigongMax}`, '매 턴 다시 차는 기본 비용.', 'neigong') },
         h('span', {}, s.neigong),
-        h('small', {}, `내공 ${s.neigong}/${bal.neigongPerTurn}`),
+        h('small', {}, `내공 ${s.neigong}/${s.neigongMax}`),
       ),
       h(
         'div',

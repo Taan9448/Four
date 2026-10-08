@@ -7,6 +7,7 @@ import {
   addCard,
   advanceStage,
   applyBattleOutcome,
+  bonusActive,
   applyRunOps,
   battleSetupFor,
   createRun,
@@ -51,7 +52,7 @@ export class App {
   }
 
   /**
-   * ?sandbox[=kyle,born][&module=s2_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
+   * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
    * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
    */
   private sandbox(seed: string, mates: string[], moduleId = 's1_battle_wolves_pair'): void {
@@ -208,7 +209,7 @@ export class App {
     const setup = battleSetupFor(data, run, enc);
     const state = createBattle(data, setup);
     const stage = data.stages.find((s) => s.id === run.stageId)!;
-    const bonus = setup.startEffects?.length ? enc.module.content.bonus?.text : undefined;
+    const bonus = bonusActive(run, enc.module) ? enc.module.content.bonus?.text : undefined;
     const view = new BattleView(
       data,
       state,
@@ -229,11 +230,14 @@ export class App {
       (final) => {
         this.clearMessages = applyBattleOutcome(data, run, enc, battleOutcome(final)!);
         if (run.status !== 'map') return this.map();
-        this.show(
-          rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
-            if (cardId) addCard(run, cardId);
-            this.map();
-          }),
+        // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
+        this.playScene(enc.module.content.outroScene, () =>
+          this.show(
+            rewardView(data, rewardOptions(data, run, enc.node.id), (cardId) => {
+              if (cardId) addCard(run, cardId);
+              this.map();
+            }),
+          ),
         );
       },
     );

@@ -95,7 +95,7 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
   const echo = data.balance.rift.echoCard;
   for (const pile of [s.draw, s.hand, s.discard]) for (const c of pile) if (c.cardId === echo) v -= 4;
   // 무림·틈은 마나가 전투 사이로 이월된다(아껴 둔 마나에 값)
-  const carry = data.balance.mana.worlds[s.world].battleStart === 'carry';
+  const carry = s.manaRule.battleStart === 'carry';
   v += s.mana * (carry ? 2 : 0.2);
   return v;
 }

@@ -1,112 +1,209 @@
 [
   {
-    "id": "s4_story_nine_stairs", "stage": "s4", "type": "story", "name": "구천 계단", "once": true,
-    "content": {
-      "scene": "s4_scene_nine_stairs",
-      "text": "새벽 축시, 정파 연합이 계단 아래에 닿았다. 어느 진을 앞세울 것인가.",
-      "choices": [
-        { "label": "소림의 금강진 — 보른이 맨 앞에서", "result": "드워프의 도끼와 소림의 곤봉이 나란히 대열을 짓이긴다. (보른의 카드 2장 강화 +1, 출전 동료 전원 체력 5 회복)",
-          "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "born" } }, { "op": "heal_party", "amount": 5 }, { "op": "set_flag", "flag": "formation_vajra" } ] },
-        { "label": "무당의 태극검진 — 측면을 막는다", "result": "태극이 흐름을 돌린다. (고른 카드 1장 강화 +1, 런 마나 +2)",
-          "effects": [ { "op": "upgrade_card", "count": 1, "choose": true }, { "op": "gain_run_mana", "amount": 2 }, { "op": "set_flag", "flag": "formation_taiji" } ] },
-        { "label": "화산의 매화검진 — 틈을 꽃잎처럼 파고든다", "result": "빠르게, 가볍게. (기본 카드 1장 제거, 하운의 카드 1장 강화 +1)",
-          "effects": [ { "op": "remove_card", "filter": { "pool": "starter" } }, { "op": "upgrade_card", "count": 1, "filter": { "owner": "haun" } }, { "op": "set_flag", "flag": "formation_plum" } ] }
-      ]
-    }
+    "id": "s4_story_grandfather_mountain",
+    "stage": "s4",
+    "type": "story",
+    "name": "할아버지 산",
+    "once": true,
+    "content": {"scene": "s4_scene_grandfather_mountain", "text": "숨 쉬지 않는 산. 북쪽 사면의 무너진 바위 더미 앞에서, 보른이 두린의 돌을 꺼낸다.", "choices": [{"label": "보른이 두린의 돌을 바위에 댄다", "result": "바위가 결을 따라 소리 없이 갈라졌다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "산의 바위에 손을 대 본다", "result": "바위의 결 위로, 훨씬 크고 느린 결이 덮여 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 함께 마나의 흐름을 짚는다", "condition": {"partyHas": "elia"}, "result": "\"이 산이… 그의 몸이에요.\" 엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
   },
   {
-    "id": "s4_boss_blood_hall", "stage": "s4", "type": "boss", "name": "혈전 — 곽도진과 사무결",
-    "content": {
-      "scene": "s4_scene_blood_hall",
-      "outroScene": "s4_scene_sky_splits",
-      "text": "두 개의 옥좌. 천하맹주와 천마신교 교주가 동시에 일어선다.",
-      "enemies": ["kwak_dojin", "sa_mugyeol"],
-      "clearEffects": [ { "op": "set_flag", "flag": "sky_split" } ]
-    }
+    "id": "s4_story_five_thousand",
+    "stage": "s4",
+    "type": "story",
+    "name": "오천의 무덤",
+    "once": true,
+    "content": {"scene": "s4_scene_five_thousand", "text": "빈 갑옷 오천의 무덤 위에, 망치를 무릎에 올린 드워프가 앉아 있다. 보른이 형의 망치를 쥐었다.", "choices": [{"label": "동굴 입구에 서서 보른을 기다린다", "result": "보른이 형의 망치를 허리에 찼다. 두린의 망치를 얻었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "heal_party", "ratio": 0.2}]}, {"label": "\"망치에 뭐라고 쓰여 있었어?\"", "result": "'보른, 다음 갱도는 네가 파라.' 두린의 망치를 얻었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}]}
   },
   {
-    "id": "s4_battle_lower_stairs", "stage": "s4", "type": "battle", "name": "아래 계단의 혈교도", "weight": 3,
-    "conditions": { "floorRange": [2, 5] },
-    "content": { "text": "계단 하나에 혈교도 셋. 위로는 끝이 보이지 않는다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"],
-      "bonus": { "condition": { "partyHas": "born" }, "text": "보른이 맨 앞에서 도끼를 휘두른다. (적 전원 취약 1)", "effects": [ { "op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies" } ] } }
+    "id": "s4_boss_gormon",
+    "stage": "s4",
+    "type": "boss",
+    "name": "산의 심장 — 고르몬",
+    "content": {"scene": "s4_scene_gormon", "outroScene": "s4_scene_durin_name", "text": "벽이 손이 되고, 손이 거인이 된다. 베면 산이 메우고, 동굴은 주먹을 쥐듯 오므라든다.", "enemies": ["gormon"], "bonus": {"condition": {"partyHas": "born"}, "text": "산과 고르몬이 만나는 이음매 — 보른의 망치(산 쪽)와 하운의 검(고르몬 쪽)이 동시에. (두린의 망치를 손에 든다, 고르몬 결 노출 2)", "effects": [{"op": "add_card", "card": "born_durin_hammer", "to": "hand"}, {"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_battle_guardians", "stage": "s4", "type": "battle", "name": "호법의 계단", "weight": 3,
-    "conditions": { "floorRange": [3, 8] },
-    "content": { "text": "호법 둘이 계단을 막고, 혈교도 하나가 뒤를 받친다.", "enemies": ["cult_guardian", "blood_cultist", "cult_guardian"] }
+    "id": "s4_battle_golem_pair",
+    "stage": "s4",
+    "type": "battle",
+    "name": "깨어난 바위 골렘",
+    "weight": 3,
+    "conditions": {"floorRange": [2, 8]},
+    "content": {"text": "갱도의 벽에서 바위가 떨어져 나와 사람 모양으로 일어선다. 갈라진 틈마다 붉은 용암이 흐른다.", "enemies": ["rock_golem", "rock_golem"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 골렘에 손을 댄다. 바위의 결이다. (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_battle_peak_elites", "stage": "s4", "type": "battle", "name": "천마봉 정예", "weight": 3,
-    "conditions": { "floorRange": [4, 10] },
-    "content": { "text": "정상이 가깝다. 마교 정예가 칼을 겨눈다.", "enemies": ["peak_elite", "peak_elite"],
-      "bonus": { "condition": { "partyHas": "kyle" }, "text": "카일이 왼편에서 가장 먼저 검을 뽑는다. (하운 방어 +8)", "effects": [ { "op": "block", "amount": 8, "target": "self" } ] } }
+    "id": "s4_battle_armor_tunnel",
+    "stage": "s4",
+    "type": "battle",
+    "name": "갱도의 빈 갑옷",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"text": "산사태를 피한 빈 갑옷 둘이 갱도를 막아선다. 투구 안에 붉은 불빛.", "enemies": ["empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "카일의 붉은 검이 갑옷의 이음매를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_battle_rift_beasts", "stage": "s4", "type": "battle", "name": "금 아래의 틈 괴물", "weight": 1, "tags": ["scar"],
-    "conditions": { "floorRange": [5, 10], "scarMin": 1 },
-    "content": { "text": "하늘의 금 아래, 그림자 같은 것이 계단 위로 기어 나온다. 내공만 실은 칼은 그것을 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith"] }
+    "id": "s4_battle_ore_spiders",
+    "stage": "s4",
+    "type": "battle",
+    "name": "금맥의 광석거미",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 6]},
+    "content": {"text": "버려진 금맥을 갉던 광석거미들이 천장에서 내려온다.", "enemies": ["ore_spider", "ore_spider"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 지팡이 끝의 빛을 높이 든다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_elite_poison_elder", "stage": "s4", "type": "elite", "name": "독장 장로", "weight": 1, "once": true,
-    "content": { "text": "장로의 독장이 소림의 방장을 노린다.", "enemies": ["poison_palm_elder"],
-      "bonus": { "condition": { "partyHas": "elia" }, "text": "엘리아의 얼음 벽이 그 사이에 솟는다. (하운 방어 +12)", "effects": [ { "op": "block", "amount": 12, "target": "self" } ] } }
+    "id": "s4_battle_wall_hands",
+    "stage": "s4",
+    "type": "battle",
+    "name": "벽에서 솟은 손",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 8]},
+    "content": {"text": "벽이 움직였다. 벽이 아니었다. 바위로 된 손이었다. 베어 낸 자리를 산이 메운다.", "enemies": ["mountain_hand", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른이 형의 망치를 고쳐 쥔다. 내리치려는 쥠이 아니라 파려는 쥠. (적 전원 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_elite_elders", "stage": "s4", "type": "elite", "name": "장로와 호법", "weight": 1, "once": true,
-    "content": { "text": "장로 하나가 호법 둘을 거느리고 계단 한가운데를 지킨다.", "enemies": ["cult_guardian", "cult_elder", "cult_guardian"],
-      "bonus": { "condition": { "partyHas": "born" }, "text": "보른과 소림의 무승들이 금강진으로 밀고 들어간다. (적 전원 약화 1)", "effects": [ { "op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies" } ] } }
+    "id": "s4_battle_golem_armor",
+    "stage": "s4",
+    "type": "battle",
+    "name": "골렘과 빈 갑옷",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 8]},
+    "content": {"text": "고르몬의 골렘이 마왕군의 빈 갑옷을 앞세우고 갱도를 내려온다.", "enemies": ["empty_armor", "rock_golem"]}
   },
   {
-    "id": "s4_event_kyle_fun", "stage": "s4", "type": "event", "name": "그래서 재밌는 거지", "weight": 2, "once": true,
-    "conditions": { "partyHas": "kyle" },
-    "content": {
-      "text": "계단 위에서 쏟아지는 칼날을 보며 카일이 씩 웃는다.",
-      "choices": [
-        { "label": "같이 웃는다", "result": "그래서 재밌는 거지를 얻었다.", "effects": [ { "op": "gain_card", "card": "kyle_fun" } ] },
-        { "label": "숨을 고르라고 한다", "result": "출전 동료 전원 체력 6 회복", "effects": [ { "op": "heal_party", "amount": 6 } ] }
-      ]
-    }
+    "id": "s4_battle_heartbeat_guard",
+    "stage": "s4",
+    "type": "battle",
+    "name": "심장이 뛸 때마다",
+    "weight": 2,
+    "conditions": {"floorRange": [6, 8]},
+    "content": {"text": "쿵. 심장 소리가 가까워질수록 벽이 깨어났다. 골렘 둘과, 벽에서 솟은 손 하나.", "enemies": ["rock_golem", "mountain_hand", "rock_golem"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "형의 망치가 골렘들의 결을 하나씩 깨뜨린다. 산의 소리를 들은 자의 망치로. (적 전원 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_event_elia_pale", "stage": "s4", "type": "event", "name": "창백해지는 엘리아", "weight": 2, "once": true,
-    "conditions": { "partyHas": "elia" },
-    "content": {
-      "text": "엘리아는 몸에 남은 엘하임의 마나를 아끼며 꼭 필요한 순간에만 방어막을 펼친다. 마나가 줄어들 때마다 얼굴이 더 창백해진다.",
-      "choices": [
-        { "label": "마나를 아끼라고 한다", "result": "엘리아가 고개를 끄덕인다. (런 마나 +3)", "effects": [ { "op": "gain_run_mana", "amount": 3 } ] },
-        { "label": "청운호흡을 나눈다", "result": "세 번 짧게, 한 번 길게. (엘리아의 카드 1장 강화 +1)", "effects": [ { "op": "upgrade_card", "count": 1, "filter": { "owner": "elia" } } ] }
-      ]
-    }
+    "id": "s4_elite_vein_golem",
+    "stage": "s4",
+    "type": "elite",
+    "name": "용암 핏줄의 골렘",
+    "weight": 2,
+    "conditions": {"floorRange": [3, 8]},
+    "content": {"text": "용암 줄기가 산의 뿌리까지 이어진 골렘. 쿵, 심장이 뛸 때마다 몸이 붉게 뛰고, 깨진 자리를 산이 메운다.", "enemies": ["vein_golem"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 눈을 감고 귀를 기울인다. 무언가를 듣고 있다. (용암 핏줄 골렘 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_event_wounded", "stage": "s4", "type": "event", "name": "계단 위의 부상자", "weight": 2,
-    "content": {
-      "text": "무당의 도사가 피투성이가 된 매화검수를 업고 내려온다.",
-      "choices": [
-        { "label": "상처를 싸매 준다", "result": "답례로 화산의 검로 하나를 배웠다. (고른 카드 1장 강화 +1)", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] },
-        { "label": "길을 서두른다", "result": "그믐까지 시간이 없다. (출전 동료 전원 체력 4 회복)", "effects": [ { "op": "heal_party", "amount": 4 } ] }
-      ]
-    }
+    "id": "s4_elite_unburied",
+    "stage": "s4",
+    "type": "elite",
+    "name": "묻히지 않은 갑옷들",
+    "weight": 1,
+    "conditions": {"floorRange": [3, 8]},
+    "content": {"text": "두린의 산사태가 미처 닿지 못한 자리. 빈 갑옷 셋이 창을 겨눈 채 갱도를 지키고 있다.", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 붉은 검이 쇠를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
-    "id": "s4_event_wider_crack", "stage": "s4", "type": "event", "name": "넓어지는 금", "weight": 2, "tags": ["scar"],
-    "conditions": { "floorRange": [4, 10] },
-    "content": {
-      "text": "그믐의 하늘, 별과 별 사이의 금이 화산에서 본 것보다 넓다.",
-      "choices": [
-        { "label": "그래도 운하검을 벼린다", "result": "끝을 내자. 최대한 빨리. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [ { "op": "upgrade_card", "count": 2, "filter": { "owner": "haun" } }, { "op": "scar", "amount": 1 } ] },
-        { "label": "내공만으로 싸울 준비를 한다", "result": "오 년 동안 장작을 패며 쌓은 숨. (런 마나 +2)", "effects": [ { "op": "gain_run_mana", "amount": 2 } ] }
-      ]
-    }
+    "id": "s4_elite_closing_cave",
+    "stage": "s4",
+    "type": "elite",
+    "name": "오므라드는 동굴",
+    "weight": 1,
+    "conditions": {"floorRange": [5, 8]},
+    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다.", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +8)", "effects": [{"op": "block", "amount": 8, "target": "self"}]}}
   },
   {
-    "id": "s4_rest_landing", "stage": "s4", "type": "rest", "name": "계단참", "weight": 1,
-    "content": {
-      "text": "계단참의 바위 그늘. 위에서 혈전의 붉은 불빛이 내려다본다.",
-      "choices": [
-        { "label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [ { "op": "heal_party", "ratio": 0.3 } ] },
-        { "label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [ { "op": "upgrade_card", "count": 1, "choose": true } ] }
-      ]
-    }
+    "id": "s4_event_wall_left",
+    "stage": "s4",
+    "type": "event",
+    "name": "벽의 문자 — 왼쪽 벽",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [2, 2], "partyHas": "born"},
+    "content": {"text": "보른이 벽의 문자를 손가락으로 쓸며 읽었다. \"'여기서 왼쪽 벽이 약하다. 보른, 기대지 마라.'\"", "choices": [{"label": "오른쪽 벽에 붙어 걷는다", "result": "아무도 왼쪽 벽에 기대지 않았다. 출전 동료 전원 체력 6 회복.", "effects": [{"op": "heal_party", "amount": 6}]}, {"label": "약한 벽의 결을 짚어 본다", "result": "바위의 결 위를 무겁고 느린 결이 짓누르고 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+  },
+  {
+    "id": "s4_event_wall_ceiling",
+    "stage": "s4",
+    "type": "event",
+    "name": "벽의 문자 — 낮은 천장",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [3, 3], "partyHas": "born"},
+    "content": {"text": "\"'여기서 천장이 낮다. 보른, 머리 조심.'\" 보른이 그 문자 앞에서 한참 서 있다가 몸을 낮췄다.", "choices": [{"label": "보른의 걸음을 따라 몸을 낮춘다", "result": "형이 남긴 길이었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "카일이 장난처럼 머리를 감싼다", "condition": {"partyHas": "kyle"}, "result": "보른의 수염이 아주 조금 움직였다. 출전 동료 전원 체력 5 회복.", "effects": [{"op": "heal_party", "amount": 5}]}]}
+  },
+  {
+    "id": "s4_event_wall_almost",
+    "stage": "s4",
+    "type": "event",
+    "name": "벽의 문자 — 거의 다 왔다",
+    "weight": 3,
+    "once": true,
+    "conditions": {"floorRange": [4, 4], "partyHas": "born"},
+    "content": {"text": "문자는 끝없이 이어졌다. 보른, 여기서 쉬어라. 보른, 여기서 오른쪽. 그리고 이틀째 밤, 새 문자. \"'보른, 거의 다 왔다.'\"", "choices": [{"label": "문자 앞에서 쉬어 간다", "result": "아무도 말하지 않았다. 출전 동료 전원 최대 체력의 25% 회복.", "effects": [{"op": "heal_party", "ratio": 0.25}]}, {"label": "오른쪽 갱도로 걸음을 재촉한다", "result": "바위의 결 위를 덮은 거대한 결이 점점 짙어졌다. 무작위 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2}]}]}
+  },
+  {
+    "id": "s4_event_heartbeat",
+    "stage": "s4",
+    "type": "event",
+    "name": "쿵.",
+    "weight": 2,
+    "once": true,
+    "conditions": {"floorRange": [2, 7]},
+    "content": {"text": "산 전체가 울리는 소리. 아주 느리고, 아주 낮은. 쿵. 하운의 아랫배가 웅크렸다. 쿵.", "choices": [{"label": "보른이 눈을 감고 귀를 기울인다", "condition": {"partyHas": "born"}, "result": "산의 소리. 보른은 무언가를 듣고 있었다. 산의 소리를 얻었다.", "effects": [{"op": "gain_card", "card": "born_mountain_voice"}]}, {"label": "숨을 맞춰 걸음을 이어 간다", "result": "세 번 짧게, 한 번 길게. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+  },
+  {
+    "id": "s4_event_cold_forge",
+    "stage": "s4",
+    "type": "event",
+    "name": "꺼진 대장간",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 7]},
+    "content": {"text": "갱도 옆으로 드워프의 대장간이 이어진다. 삼천 년 동안 불이 꺼진 적 없다던 화로마다, 이 년 동안 식은 재만 쌓여 있었다.", "choices": [{"label": "식은 모루에서 날을 세운다", "condition": {"partyHas": "born"}, "result": "보른이 모루 위에 숫돌을 올렸다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "무거운 짐을 덜어 놓고 간다", "result": "기본 카드 1장을 덱에서 뺐다.", "effects": [{"op": "remove_card", "filter": {"pool": "starter"}}]}]}
+  },
+  {
+    "id": "s4_event_silver_branch",
+    "stage": "s4",
+    "type": "event",
+    "name": "은빛 나무의 가지",
+    "weight": 1,
+    "once": true,
+    "conditions": {"floorRange": [2, 7], "partyHas": "elia"},
+    "content": {"text": "엘리아가 품에서 은빛 나뭇가지를 꺼내 보았다. 얼음 궁전에서 자란 그 은빛 나무의 가지 하나. 무겁고 느린 산의 마나 속에서도, 가지는 얼지 않은 마나를 희미하게 품고 있었다.", "choices": [{"label": "마지막을 위해 아껴 둔다", "result": "엘리아가 가지를 다시 품에 넣었다. 은빛 나무를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_silver_tree"}]}, {"label": "가지의 마나로 상처를 돌본다", "result": "은빛 마나가 상처 위로 번졌다. 출전 동료 전원 최대 체력의 30% 회복.", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
+  },
+  {
+    "id": "s4_event_crushed_armor",
+    "stage": "s4",
+    "type": "event",
+    "name": "찌그러진 갑옷 더미",
+    "weight": 2,
+    "conditions": {"floorRange": [6, 8]},
+    "content": {"text": "바위가 정확히, 마치 계산된 것처럼 무너져 있었다. 그 아래 찌그러진 빈 갑옷들. 산의 매듭을 쳐서 산을 무너뜨린 자의 솜씨였다.", "choices": [{"label": "갑옷 사이에서 드워프의 끌을 찾는다", "result": "무너진 바위가 어깨를 긁었다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 4 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -4}]}, {"label": "묵념하고 지나간다", "result": "출전 동료 전원 체력 5 회복.", "effects": [{"op": "heal_party", "amount": 5}]}]}
+  },
+  {
+    "id": "s4_event_narrowing",
+    "stage": "s4",
+    "type": "event",
+    "name": "좁혀 드는 갱도",
+    "weight": 2,
+    "conditions": {"floorRange": [5, 8]},
+    "content": {"text": "천장이 낮아졌다. 벽이 좁혀 들었다. 산이 조금씩, 주먹을 쥐듯이 오므라들고 있었다.", "choices": [{"label": "보른이 바위의 결로 길을 연다", "condition": {"partyHas": "born"}, "result": "돌이 결을 따라 비켜났다. 출전 동료 전원 체력 6 회복, 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "heal_party", "amount": 6}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "벽 사이를 밀고 나간다", "result": "바위에 쓸린 상처가 남았다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 5 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -5}]}]}
+  },
+  {
+    "id": "s4_rest_drinkable",
+    "stage": "s4",
+    "type": "rest",
+    "name": "마셔도 되는 물",
+    "weight": 2,
+    "conditions": {"floorRange": [2, 7]},
+    "content": {"text": "벽의 문자 아래 맑은 물이 고여 있었다. \"'보른, 이 물은 마셔도 된다.'\"", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  },
+  {
+    "id": "s4_rest_cold_hearth",
+    "stage": "s4",
+    "type": "rest",
+    "name": "식은 화로 곁",
+    "weight": 1,
+    "content": {"text": "식은 화로 곁에 작은 불을 피웠다. 보른이 두린의 지도를 펼쳐 붉은 선을 손가락으로 따라간다. 몇 번이고.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+  },
+  {
+    "id": "s4_rest_heart_door",
+    "stage": "s4",
+    "type": "rest",
+    "name": "산의 심장 앞",
+    "weight": 3,
+    "conditions": {"floorRange": [8, 8]},
+    "content": {"text": "쿵. 쿵. 심장 소리가 바로 벽 너머에서 울린다. 네 사람은 마지막으로 숨을 골랐다. 세 번 짧게, 한 번 길게.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   }
 ]

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "blood_guard",
+    "name": "혈위대",
+    "maxHp": 28,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#b8a8a0",
+    "pattern": "random",
+    "moves": [{"id": "red_tassel_blade", "name": "붉은 수실의 검", "intent": "attack", "targeting": "random", "weight": 3, "effects": [{"op": "damage", "amount": 7}]}, {"id": "guard_rank", "name": "혈위대 대열", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}, {"op": "block", "amount": 4, "target": "self"}]}],
+    "flavor": "검붉은 무복에 흰 도포를 덧입었다. 청운문의 제자였던 자들이 소매에 붉은 수실을 달고 마교의 칼을 찼다. 귀곡애의 귀신 이야기를 듣고 자란 청운산 사람들이다."
+  },
+  {
+    "id": "black_wind",
+    "name": "흑풍대",
+    "maxHp": 32,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#2a2a30",
+    "pattern": "random",
+    "moves": [{"id": "curved_blade", "name": "휘어 드는 곡도", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 4, "times": 2}]}, {"id": "black_wind_palm", "name": "흑풍장", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 9}]}, {"id": "light_step", "name": "경공", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
+    "flavor": "섬서 분타의 흑풍대. 검은 무복에 검은 두건, 허리에 곡도. 혈위대와 달리 마교의 정식 무사들이다. 흑풍장은 바위를 가루로 만든다고 했다."
+  },
+  {
+    "id": "pockmark_vice",
+    "name": "마맛자국 부대주",
+    "maxHp": 38,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#8a6a5a",
+    "pattern": "cycle",
+    "deathEffects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_allies"}],
+    "moves": [{"id": "one_in_ten", "name": "\"열에 하나씩\"", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}, {"id": "horseback_slash", "name": "말 위의 칼", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 9}]}, {"id": "trembling_blade", "name": "떨리는 칼", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 6}, {"op": "block", "amount": 5, "target": "self"}]}],
+    "flavor": "혈위대의 부대주. 삼 년 전 잡역 하나에게 관운각에 숯을 갖다 놓으라고 시켰던 사형이다. 그가 쓰러지면 대열이 흔들린다."
+  },
+  {
+    "id": "black_wind_captain",
+    "name": "흑풍대주",
+    "maxHp": 85,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#3a3038",
+    "scale": 1.2,
+    "tier": "elite",
+    "pattern": "cycle",
+    "moves": [{"id": "captain_palm", "name": "흑풍장", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 13}]}, {"id": "fifteen_cuts", "name": "곡도 열다섯 번", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 2, "times": 7}]}, {"id": "ragged_breath", "name": "거칠어진 숨", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "self"}]}],
+    "flavor": "얼굴에 칼자국이 세 줄 그어진, 장로 바로 아래 급의 고수. 바람처럼 휘어 들어오는 곡도가 한 번도 닿지 않자 이마에 땀이 맺히고 도법이 흐트러졌다."
+  },
+  {
+    "id": "jo_myeonggak",
+    "name": "조명각",
+    "maxHp": 172,
+    "sprite": null,
+    "silhouette": "humanoid",
+    "color": "#8aa0c8",
+    "scale": 1.3,
+    "tier": "boss",
+    "pattern": "cycle",
+    "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
+    "moves": [{"id": "hook_whip", "name": "쇠갈고리 채찍", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 6, "times": 3}]}, {"id": "demonic_art", "name": "마공", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 10, "target": "self"}]}, {"id": "heavy_biun", "name": "무거운 비운천리", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 22}, {"op": "apply_status", "status": "grain", "stacks": 2, "target": "self"}]}, {"id": "hundred_lashes", "name": "\"백 대다\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 4, "times": 4}]}],
+    "flavor": "곽도진의 직전제자. 갸름한 얼굴, 날카롭게 올라간 눈꼬리, 소매의 붉은 수실. 청운의 내공과 마교의 마기를 섞어 비운천리를 무겁게 쓴다 — 두 기운이 엉킨 매듭이 검 위에 드러난다. 그가 무릎을 꿇으면 혈위대가 무기를 내린다."
+  }
+]

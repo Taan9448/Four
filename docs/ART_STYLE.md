@@ -95,22 +95,29 @@
 
 ## 4. 캐릭터 외형(원작 근거)
 
+2026-10-08 원작 전문(제1부 전 4권) 기준으로 고쳤다(`GAME_DESIGN.md` 15절). 원작에 적힌 것은 그대로, 원작에 없는 것(머리 길이 등)은 이 화풍에 맞춰 정하되 원작과 부딪치지 않게 한다.
+
 | id | 이름 | 외형(128 격자에서 읽혀야 하는 특징) | 키 색 | 크기 |
 |---|---|---|---|---|
-| haun | 진하운 | 어깨 아래까지 내려오는 긴 흑발과 눈을 반쯤 가리는 앞머리, 창백한 피부, 날카롭고 차분한 눈매, 마른 잔근육 체형. 숯빛 긴 겉옷(넓은 소매, 발목까지)과 짙은 청회색 속옷, 가는 붉은 깃, 검은 띠, 검은 바지·장화. 무기는 소박한 벌목용 도끼(푸른 검광은 융합 이펙트) | magenta | large |
-| elia | 엘리아 | 긴 은발, 뾰족한 귀, 청회색 로브, 손끝의 빛 | magenta | large |
-| kyle | 카일 로웬 | 금발, 은빛 갑옷, 파란 겉옷, 긴 검 | magenta | large |
-| born | 보른 | 작고 다부진 드워프(사람형 키의 약 70%), 갈색 땋은 수염, 큰 도끼, 둥근 방패 | magenta | large |
-| wang | 왕일검 | 굽은 등, 지팡이, 흰 머리, 주방 노인 차림(초상화만) | none | portrait |
-| kwak_dojin | 곽도진 | 백발 도인, 흰 학창의, 송문고검 | magenta | large |
-| sa_mugyeol | 사무결 | 검은 삿갓, 창백한 얼굴, 붉은 눈, 핏빛 손톱 | green | large |
-| sa_mugyeol_giant | 붉은 거인 사무결 | 사무결의 2페이즈. 엉긴 핏빛 내공의 거구, 안에서 빛나는 갈라진 붉은 피부, 머리에 남은 깨진 삿갓 조각, 긴 붉은 손톱, 피어오르는 피안개 | green | large |
-| branch_lord | 섬서 분타주 | 다부진 중년 마교 고수, 정수리 상투의 민머리, 짙은 검은 수염, 검은 단을 댄 짙은 진홍 교복, 넓은 가죽 띠, 두꺼운 팔 보호대, 핏빛 기운이 서린 맨손 | green | large |
-| shadow_wolf | 그림자늑대 | 숯빛 늑대, 등줄기의 검은 불꽃, 호박색 눈 | magenta | large |
-| ignis | 화염군주 이그니스 | 용암과 불꽃의 거구: 갈라진 검은 현무암 피부와 빛나는 주황 용암 틈, 머리의 불꽃 왕관, 용암 주먹 | magenta | large |
-| vargas | 마왕 바르가스 | 찢어진 박쥐 날개, 일곱 뿔, 텅 빈 눈(초록빛) | magenta | large |
-| rift_beasts | 틈 괴물 | 머리 셋 달린 불비늘 개, 그림자 망령, 뼈 거인 | green | large |
-| mordecai | 지옥왕 모르데카이 | 꿰매 붙인 몸, 가슴의 푸른 심장, 실밥이 모인 매듭 | green | large |
+| haun | 진하운(S0, 도끼) | 마른 17세 소년, 어깨 아래까지 내려오는 긴 흑발과 눈을 반쯤 가리는 앞머리, 검은 눈, 창백한 피부. **청운문 잡역의 회색 잡역복**(무릎까지 오는 여민 웃옷, 끈 띠, 회색 바지, 짚신 또는 헝겊신), 물집 잡힌 손에 감은 천. 벌목 도끼 | magenta | large |
+| haun_sword | 진하운(S1~, 못생긴 검) | 같은 인물·같은 회색 잡역복(조금 해지고 옆구리를 꿰맨 자국). **장식 하나 없는 좁고 얇은 검**(투박한 손잡이, 흠 없는 칼날)과 허리의 검은 검집. 푸른 검광은 이펙트로만 | magenta | large |
+| elia | 엘리아 | 하프엘프 19세, 은발(뒤로 묶음), 끝이 살짝 솟은 귀, 회색 눈에 옅은 초록. **회색 망토와 두건**(귀를 가리는 버릇), 안에 갈색 여행복, **끝에 푸른 돌이 박힌 긴 나무 지팡이** | magenta | large |
+| kyle | 카일 로웬 | 금발, 장난기 있는 얼굴, 호리호리. 온몸 은빛 판금, 어깨·무릎의 둥근 쇠판, 가슴의 로웬 문장(푸른 바탕·흰 눈송이·은빛 검), 긴 양날 검 | magenta | large |
+| born | 보른(S1~S3, 도끼) | 작고 다부진 드워프(사람 키의 약 70%), 문짝 같은 어깨, 굵은 팔뚝, **얼굴 절반을 덮은 붉은 수염을 세 갈래로 땋음**, 자기 키만 한 양손 도끼. **방패 없음** | magenta | large |
+| born_hammer | 보른(S4~, 두린의 망치) | 같은 인물(붉은 수염은 그을려 끝이 조금 짧다). 드워프 문자가 새겨진 손잡이의 큰 전투 망치 | magenta | large |
+| wang | 왕일검(S6~) | 낫처럼 굽은 등, 흐릿한 눈 속의 날카로운 빛, 숱 적은 흰 머리. **다리가 없어 바퀴 달린 나무 의자에 앉고 무릎에 담요**(초상화만) | none | portrait |
+| wang_cook | 왕 노인(S0) | 같은 인물이 두 다리가 있을 때: 낫처럼 굽은 등, 오른 다리를 절며 지팡이, 낡은 회갈색 주방 옷과 앞치마(초상화만) | none | portrait |
+| kwak_dojin | 곽도진 | 마른 몸, 단정히 빗어 넘긴 흰머리, 이마 주름, 서른 살처럼 맑고 차가운 눈, 흰 학창의, 소나무 결 무늬 송문고검 | magenta | large |
+| sa_mugyeol | 사무결(S8) | **삿갓 없이** 피로 산 젊은 얼굴, 피를 머금은 붉은 눈, 붉은 비단을 댄 검은 장포, 길고 창백한 손가락의 핏빛 손톱 | green | large |
+| satgat_man | 삿갓의 사내(S0) | 깊이 눌러쓴 검은 삿갓(눈이 보이지 않음), 창백한 턱선, 먼지 하나 없는 검은 장포, 핏빛 손톱(초상화만) | none | portrait |
+| sa_mugyeol_giant | 붉은 거인 사무결 | 사무결의 2페이즈. 온몸이 피로 된 거구, 가슴 안에서 뛰는 핏빛 심장, 갈라진 붉은 피부, 긴 붉은 손톱, 피어오르는 피안개 | green | large |
+| branch_lord | 혈수마군 | 섬서 분타주이자 교주의 오른팔. 큰 키, 넓은 어깨, **두 손이 팔꿈치까지 핏빛**, 검은 단을 댄 짙은 진홍 교복 | green | large |
+| shadow_wolf | 그림자늑대 | 송아지만 한 늑대 모양, **털 대신 일렁이는 검은 연기**, 등줄기의 검은 불꽃, **눈 대신 붉은 점 둘** | magenta | large |
+| ignis | 화염군주 이그니스 | 사람 세 배 키의 사람 형상의 불: **흰 불길의 몸에 검은 용암이 핏줄처럼** 흐름, 불꽃 왕관, **얼굴 없이** 가장 뜨거운 흰 불 구멍 두 개가 눈 | magenta | large |
+| vargas | 마왕 바르가스 | 사람 세 배 키, 찢어진 박쥐 날개, 왕관처럼 솟은 비틀린 뿔 일곱, 바닥이 보이지 않는 텅 빈 우물 같은 눈(빛나지 않음) | magenta | large |
+| rift_beasts | 틈 괴물 | 머리 셋 달린 불비늘 개, 쐐기를 깎은 검은 단검의 그림자 망령, 뼈 거인 | green | large |
+| mordecai | 지옥왕 모르데카이 | **검은 쐐기 수백 개를 엮은 등뼈**, 꿰매 붙인 흐름의 몸, 은빛 마나의 팔·감긴 고리 같은 내공의 팔, 이름 모를 세계의 다리·날개·뿔, **푸른빛과 검은빛이 엉킨 심장**, 실밥이 모인 매듭 | green | large |
+| (장면 인물) | 석두·조명각·마 씨·실리엔·한스·토마·리나·베일락·셀리아스·고르몬·그림자 암살자 | 5절 `subjects`(반신 그림 명세 `<id>_stand`) | none | portrait |
 
 ## 5. 프롬프트·팔레트 데이터
 
@@ -168,47 +175,109 @@ palette:
   - '#4b3a6b'
 subjects:
   haun: >-
-    Jin Haun, a lean, wiry young East Asian woodcutter turned martial artist, with a cool, quiet presence; long
-    straight black hair falling past the shoulders with long bangs partly covering sharp, calm dark
-    eyes; pale skin; a long charcoal-black outer robe with wide sleeves reaching the ankles, worn open
-    over a dark slate-blue inner robe, a thin dark-red inner collar, a black cloth sash, dark trousers
-    and black boots; carries a plain woodcutting axe with a dark wooden handle and an iron head
+    Jin Haun, a lean, wiry seventeen-year-old East Asian woodcutter, a lowly servant of the Cheongun sect, with a
+    cool, quiet presence; long straight black hair falling past the shoulders with long bangs partly covering
+    sharp, calm black eyes; pale skin; a plain grey servant's outfit of the sect — a knee-length grey jacket
+    wrapped and tied with a cord sash, grey trousers, cloth shoes; strips of cloth wrapped around blistered
+    hands; carries a plain woodcutting axe with a dark wooden handle and an iron head
+  haun_sword: >-
+    Jin Haun, a lean, wiry young East Asian swordsman who used to be a woodcutter; long straight black hair
+    falling past the shoulders with long bangs partly covering sharp, calm black eyes; pale skin; the same
+    plain grey servant's outfit, a little worn and mended at the side — a knee-length grey jacket tied with a
+    cord sash, grey trousers, cloth shoes; a narrow, thin, completely unadorned straight sword with a plain
+    crude grip ("the ugly sword"), and a plain black scabbard at the hip
   elia: >-
-    Elia, a half-elf mage woman; long silver hair, pointed ears, slate-blue hooded robe with silver trim
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips,
+    grey eyes with a faint green tint; a grey travelling cloak with a hood (she tends to pull it over her ears)
+    over a simple brown travelling dress; a long wooden staff topped with a blue stone
   kyle: >-
-    Kyle Rowen, a blond young knight; silver plate armor over a blue tabard, long straight sword
+    Kyle Rowen, a blond, slim young knight with a playful grin; full silver plate armor with round steel
+    pauldrons and knee guards, the Rowen crest on the chest (a white snowflake over a silver sword on a blue
+    field), a long straight double-edged sword
   born: >-
-    Born, a short stocky dwarf warrior; braided brown beard, a big two-handed axe and a round iron shield
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; a two-handed axe as
+    tall as himself; no shield
+  born_hammer: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a slightly singed red beard braided into three braids; a heavy two-handed war hammer
+    whose handle is carved with dwarven runes (his late brother Durin's hammer); no shield
   wang: >-
-    Old Wang, the stooped kitchen elder of the Cheongun sect; thin white hair tied back, deep wrinkles,
-    gentle hazy eyes hiding a sharp glint, a worn grey-brown cook's robe with rolled sleeves and an apron,
-    a simple wooden walking stick
+    Wang Ilgeom, the old former first disciple of the Cheongun sect who hid for forty years as a kitchen elder;
+    back bent like a sickle, thin white hair tied back, deep wrinkles, hazy eyes hiding a sharp glint, a worn
+    grey-brown robe; he has lost both legs and sits in a plain wooden chair with cart wheels, a blanket lying
+    flat over his lap below the knees
+  wang_cook: >-
+    Old Wang, the stooped kitchen elder of the Cheongun sect; back bent like a sickle, thin white hair tied
+    back, deep wrinkles, gentle hazy eyes hiding a sharp glint, a worn grey-brown cook's robe with rolled
+    sleeves and an apron, limping on the right leg with a simple wooden walking stick
   kwak_dojin: >-
-    Kwak Dojin, the white-haired Taoist head of the Cheongun sect; long white hair and beard, calm cold
-    eyes, a flowing white crane-pattern Taoist robe (hakchangui), an elegant pine-patterned straight sword
+    Kwak Dojin, the Taoist head of the Cheongun sect; a thin man with neatly combed-back white hair, lines on
+    the forehead, eyes as clear and cold as a thirty-year-old's, a flowing white crane-pattern Taoist robe
+    (hakchangui), an elegant straight sword whose blade bears a pine-grain pattern
   sa_mugyeol: >-
-    a man in a deep black bamboo hat (satgat) pulled low over his face, only a pale jaw visible, a thin
-    cruel smile, black layered robes, long blood-red fingernails
+    Sa Mugyeol, the Heavenly Demon Cult leader who bought youth with blood for sixty years; no hat, an
+    unnaturally young, handsome pale face, blood-red eyes, a thin cruel smile, black layered robes lined with red
+    silk, long pale fingers with blood-red fingernails
+  satgat_man: >-
+    a mysterious man in a deep black bamboo hat (satgat) pulled low so his eyes cannot be seen, only a pale jaw
+    and a thin cruel smile visible, a spotless black long robe, long pale fingers with dark blood-red nails
   mordecai: >-
     Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together
-    from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings
-    and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest
+    from countless stolen flows, with a great spine made of hundreds of black iron wedges bound together, one
+    arm of flowing pale silver mana and one of coiled dark martial qi like rings, legs, wings and horns of
+    unknown worlds sewn on with glowing seams, a heart of tangled blue and black light pulsing in the chest
   vargas: >-
-    Vargas, the Demon King of Nocturna; towering gaunt figure, seven black horns curving back from the skull,
-    torn leathery bat wings, hollow empty eye sockets glowing faint green, a tattered black royal mantle
-    over dark obsidian armor, long clawed fingers
+    Vargas, the Demon King of Nocturna; a towering gaunt figure three times a man's height, seven twisted
+    black horns rising like a crown, torn leathery bat wings, eyes like bottomless empty wells (no glow), a
+    tattered black royal mantle over dark obsidian armor, long clawed fingers
   sa_mugyeol_giant: >-
-    the Red Giant, Sa Mugyeol transformed by the Heavenly Demon blood art; a hulking blood-red giant of
-    congealed martial qi, cracked crimson skin glowing from within, shards of a shattered black bamboo hat
-    still on the head, long blood-red claws, blood mist steaming from the shoulders
+    the Red Giant, Sa Mugyeol transformed by the Heavenly Demon blood art; a hulking giant whose whole body is
+    made of blood, cracked crimson skin glowing from within, a blood-red heart beating visibly inside the
+    chest, long blood-red claws, blood mist steaming from the shoulders
   ignis: >-
-    Ignis, the Flame Lord, one of the Demon King's Four Heavenly Kings; a hulking humanoid of molten rock,
-    cracked black basalt skin with glowing orange lava seams, a crown of living flames on the head, burning
-    yellow eyes, heavy fists of magma
+    Ignis, the Flame Lord, one of the Demon King's Four Heavenly Kings; a humanoid made of fire three times a
+    man's height, a body of white flame with black lava running through it like veins, a crown of flames, no
+    face — only two holes of the hottest white fire for eyes
   branch_lord: >-
-    the Shaanxi Branch Lord of the Heavenly Demon Cult; a burly middle-aged martial arts elder, shaved head
-    with a small topknot, thick black beard, a dark crimson cult robe with black trim, a wide leather belt,
-    heavy black forearm guards, bare hands wreathed in blood-red qi
+    Hyeolsu Magun ("Blood-Hand Demon Lord"), the Shaanxi branch lord and right hand of the Heavenly Demon Cult
+    leader; a very tall man with broad shoulders, both hands and forearms blood-red up to the elbows, a dark
+    crimson cult robe with black trim, a cold proud face
   shadow_wolf: >-
-    a shadow wolf; charcoal-black fur, black flames along its spine, amber eyes, lean and hungry
+    a shadow wolf the size of a calf; instead of fur, a body of wavering black smoke, black flames along its
+    spine, no eyes — only two red dots where the eyes should be
+  seokdu: >-
+    Seokdu, a fifteen-year-old giant of a boy, a head taller than Jin Haun, shoulders as broad as a door, round
+    eyes, one front tooth missing, an honest face; a white disciple robe with sleeves too short for him
+  jo_myeonggak: >-
+    Jo Myeonggak, a disciple of the Cheongun sect around twenty; a narrow face, sharply upturned eye corners,
+    pale with dark shadows under the eyes, a white disciple robe with a red tassel of a direct disciple
+  ma: >-
+    Ma, the innkeeper of Ungok village; a pot-bellied bald man with a double chin and old burn scars, a plain
+    innkeeper's apron over a brown robe
+  silien: >-
+    Silien, an elf woman of Silvaren and Elia's mother; silver hair reaching the ground, thin and frail, grey
+    eyes with a deep green tint, a simple pale green elven dress
+  hans: >-
+    Hans, a human blacksmith around forty from the chained village of Belkan; broad shoulders, thick forearms,
+    a beard thinned by fire burns, a heavy leather apron, soot on the face
+  toma: >-
+    Toma, a ten-year-old boy of Belkan, the blacksmith's son; red volcanic ash smudged on his face, bright
+    stubborn eyes, a too-big patched shirt
+  lina: >-
+    Princess Lina of Arden; golden hair braided and pinned up, sky-blue eyes, a sky-blue gown, later silver
+    armor; a calm, strong smile
+  veilak: >-
+    Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
+    greatsword of smoke, two red lights burning inside the empty helmet
+  celias: >-
+    Celias, the Ice Queen, one of the Four Heavenly Kings; a woman made of gathered snowflakes, twice a man's
+    height, a translucent body of ice, hair of icicles, a calm sculpted expressionless face
+  gormon: >-
+    Gormon, the Earth Giant, one of the Four Heavenly Kings; a giant of rock fused with the mountain itself,
+    a single finger as large as a man's torso, eyes red like lava, cracks and roots of stone spreading from
+    the body into the cave walls
+  shadow_assassin: >-
+    the Shadow Assassin, the last of the Four Heavenly Kings; a faceless, thin and elongated figure of shadow,
+    only the black dagger in its hand is solid, its blade engraved with wave-like ancient letters
 ```

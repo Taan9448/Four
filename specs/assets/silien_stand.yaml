@@ -1,0 +1,9 @@
+id: silien_stand
+type: character-standing
+character: silien
+summary: 실리엔 반신 그림(기본·결의·놀람)
+frame_notes:
+  1: "neutral expression — serene tired smile, ground-length silver hair"
+  2: "resolute expression — eyes deep green and shining, hands raised to hold a green barrier"
+  3: "surprised expression — eyes wide with tears, a hand at the chest"
+placeholder: { color: '#cfe0d0', accent: '#6aa84f' }

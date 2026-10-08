@@ -1,11 +1,11 @@
 id: map_s4
 type: map-art
-summary: 지역 지도 — 천마봉(S4)
+summary: 지역 지도 — 카즈둠(S4, 2권 7~8장)
 frame_notes:
   1: >-
-    The Heavenly Demon Peak. Far left: the camp of the orthodox alliance at the foot of the mountain with small tents and flags. Along the top and bottom edges: the Nine Heavens stairway zigzagging up the cliff faces, small shrines on ledges, clouds crossing the slope. Far right: the summit sanctuary, a blood-red hall on a flat terrace above a sea of clouds.
+    The grey mountain range, the backbone of Elheim. Far left: the northern slope of the dead 'Grandfather Mountain' with a hidden stone door (Durin's door). Along the top and bottom: mine tunnels drawn as cutaway lines inside the mountain, dwarf letters on stone, a watchtower of the old king. Far right: the Heart of the Mountain, a vast cavern where five thousand empty armors lie buried under a landslide, and a giant of rock fused into the cavern wall (just a shape).
 framing: >-
   A wide horizontal regional map painted from above at a slight bird-eye angle, read from left to right like a handscroll: the left edge is where the journey starts and the right edge is the final destination. Draw terrain and landmarks only, small and light. Keep a wide open, pale band across the middle (from about 15% to 85% of the height) with only faint terrain texture, because the game draws the route, node markers and a small character there; put denser landmarks along the top and bottom edges and at the far left and far right. No roads or paths drawn as lines.
 style: >-
   traditional East Asian ink-wash map painted with a brush on aged hanji paper: warm beige paper with soft fibers and slight stains, black and grey ink washes, a few muted color tints (moss green, ochre, faded blue, a little vermilion), hand-drawn brush lines with varying weight, light and airy, no hard digital gradients
-placeholder: { color: '#d6c5a2' }
+placeholder: { color: '#d6c7a0' }
