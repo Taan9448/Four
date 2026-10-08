@@ -1,8 +1,8 @@
 {
   "id": "fx_hit_grain",
   "type": "fx",
-  "frameW": 80,
-  "frameH": 80,
+  "frameW": 160,
+  "frameH": 160,
   "track": "pixel",
   "pixelScale": 8.385,
   "gridDetected": true,
@@ -10,7 +10,7 @@
     61,
     61
   ],
-  "fit": "pad",
+  "fit": "upscale",
   "frames": 5,
   "fps": 15,
   "loop": false,

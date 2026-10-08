@@ -1,14 +1,14 @@
 [
-  { "id": "weak", "name": "약화", "kind": "debuff", "description": "주는 피해가 25% 줄어든다.", "decay": 1, "modifiers": { "damageDealtMul": 0.75 } },
-  { "id": "vulnerable", "name": "취약", "kind": "debuff", "description": "받는 피해가 50% 늘어난다.", "decay": 1, "modifiers": { "damageTakenMul": 1.5 } },
-  { "id": "strength", "name": "힘", "kind": "buff", "description": "공격 피해가 스택만큼 늘어난다.", "decay": 0, "modifiers": { "damageDealtAddPerStack": 1 } },
-  { "id": "bind", "name": "빙결", "kind": "debuff", "description": "발이 얼어붙어 이번 차례에 행동하지 못한다.", "decay": 1, "modifiers": { "skipTurn": true } },
-  { "id": "stun", "name": "기절", "kind": "debuff", "description": "이번 차례에 행동하지 못한다.", "decay": 1, "modifiers": { "skipTurn": true } },
-  { "id": "poison", "name": "독", "kind": "debuff", "description": "차례 시작마다 스택만큼 체력을 잃는다.", "decay": 1, "modifiers": { "turnStartDamagePerStack": 1 } },
-  { "id": "grain", "name": "결 노출", "kind": "debuff", "description": "공격을 받으면 1스택을 소모해 피해 +50%, 방어를 무시한다.", "decay": 0, "special": "grain" },
-  { "id": "taunt", "name": "도발", "kind": "buff", "description": "적의 공격이 이 동료에게 향한다.", "decay": 1, "decayAt": "roundEnd", "special": "taunt" },
-  { "id": "incorporeal", "name": "무형", "kind": "trait", "description": "내공만 소모하는 공격의 피해가 절반으로 줄어든다.", "decay": 0, "special": "incorporeal" },
-  { "id": "flow_eater", "name": "흐름 포식", "kind": "trait", "description": "내공·마나를 소모한 카드의 피해를 흡수해 회복하고 최대 체력이 늘어난다.", "decay": 0, "special": "flow_eater" },
-  { "id": "knot", "name": "매듭", "kind": "trait", "description": "결 노출이 일정 스택 이상 쌓이면 매듭이 드러난다.", "decay": 0, "special": "knot" },
-  { "id": "knot_exposed", "name": "매듭 노출", "kind": "debuff", "description": "모든 흐름이 엉킨 자리가 드러났다. '날 얹기'가 큰 피해를 준다.", "decay": 0, "special": "knot_exposed" }
+  { "id": "weak", "name": "약화", "kind": "debuff", "description": "주는 피해가 25% 줄어든다.", "glyph": "弱", "icon": 1, "decay": 1, "modifiers": { "damageDealtMul": 0.75 } },
+  { "id": "vulnerable", "name": "취약", "kind": "debuff", "description": "받는 피해가 50% 늘어난다.", "glyph": "破", "icon": 2, "decay": 1, "modifiers": { "damageTakenMul": 1.5 } },
+  { "id": "strength", "name": "힘", "kind": "buff", "description": "공격 피해가 스택만큼 늘어난다.", "glyph": "力", "icon": 3, "decay": 0, "modifiers": { "damageDealtAddPerStack": 1 } },
+  { "id": "bind", "name": "빙결", "kind": "debuff", "description": "발이 얼어붙어 이번 차례에 행동하지 못한다.", "glyph": "氷", "icon": 4, "decay": 1, "modifiers": { "skipTurn": true } },
+  { "id": "stun", "name": "기절", "kind": "debuff", "description": "이번 차례에 행동하지 못한다.", "glyph": "暈", "icon": 5, "decay": 1, "modifiers": { "skipTurn": true } },
+  { "id": "poison", "name": "독", "kind": "debuff", "description": "차례 시작마다 스택만큼 체력을 잃는다.", "glyph": "毒", "icon": 6, "decay": 1, "modifiers": { "turnStartDamagePerStack": 1 } },
+  { "id": "grain", "name": "결 노출", "kind": "debuff", "description": "공격을 받으면 1스택을 소모해 피해 +50%, 방어를 무시한다.", "glyph": "理", "icon": 7, "decay": 0, "special": "grain" },
+  { "id": "taunt", "name": "도발", "kind": "buff", "description": "적의 공격이 이 동료에게 향한다.", "glyph": "挑", "icon": 8, "decay": 1, "decayAt": "roundEnd", "special": "taunt" },
+  { "id": "incorporeal", "name": "무형", "kind": "trait", "description": "내공만 소모하는 공격의 피해가 절반으로 줄어든다.", "glyph": "無", "icon": 9, "decay": 0, "special": "incorporeal" },
+  { "id": "flow_eater", "name": "흐름 포식", "kind": "trait", "description": "내공·마나를 소모한 카드의 피해를 흡수해 회복하고 최대 체력이 늘어난다.", "glyph": "食", "icon": 10, "decay": 0, "special": "flow_eater" },
+  { "id": "knot", "name": "매듭", "kind": "trait", "description": "결 노출이 일정 스택 이상 쌓이면 매듭이 드러난다.", "glyph": "結", "icon": 11, "decay": 0, "special": "knot" },
+  { "id": "knot_exposed", "name": "매듭 노출", "kind": "debuff", "description": "모든 흐름이 엉킨 자리가 드러났다. '날 얹기'가 큰 피해를 준다.", "glyph": "斷", "icon": 12, "decay": 0, "special": "knot_exposed" }
 ]
