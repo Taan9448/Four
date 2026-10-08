@@ -442,6 +442,17 @@ h1, h2, h3 { font-family: var(--f-head); }
 .vn-slot > * { grid-area: 1 / 1; }
 .vn-portrait.vn-face-in { animation: vn-face 0.45s ease-in-out; }
 @keyframes vn-face { from { opacity: 0; } to { opacity: 1; } }
+.vn-cg { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; transition: opacity 0.8s ease; }
+.scene-screen.has-cg .vn-cg { opacity: 1; }
+.scene-screen.has-cg .vn-slot { opacity: 0; pointer-events: none; }
+.scene-screen.has-cg .vn-box { background: rgba(8, 10, 14, 0.78); }
+.scene-screen.vn-flash::after { content: ''; position: absolute; inset: 0; background: #fff; pointer-events: none; animation: vn-flash 1.1s ease-out forwards; }
+@keyframes vn-flash { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+.scene-screen.vn-shake { animation: vn-shake 0.5s ease-in-out; }
+@keyframes vn-shake { 0%, 100% { transform: none; } 20% { transform: translate(-8px, 3px); } 40% { transform: translate(7px, -4px); } 60% { transform: translate(-5px, 2px); } 80% { transform: translate(4px, -1px); } }
+.scene-screen.vn-fade::after { content: ''; position: absolute; inset: 0; background: #000; pointer-events: none; animation: vn-fadeblack 1.4s ease-in-out forwards; }
+@keyframes vn-fadeblack { 0% { opacity: 0; } 45% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .scene-screen.vn-shake { animation: none; } }
 .vn-left { left: 3%; }
 .vn-right { right: 3%; }
 .vn-slot.dim { filter: brightness(0.45) saturate(0.6); transform: scale(0.97); }

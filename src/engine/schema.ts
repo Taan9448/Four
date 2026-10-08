@@ -143,6 +143,10 @@ export const SceneLine = z
     /** 생략하면 그 인물의 직전 표정을 유지한다(장면 첫 등장은 기본). src/engine/scene.ts */
     face: Face.optional(),
     text: z.string(),
+    /** 이 줄부터 화면 전체에 깔 장면 일러스트(story-cg 에셋 id). "none"이면 걷는다. 실제 그림이 들어오기 전에는 무시한다 */
+    cg: z.string().optional(),
+    /** 이 줄에서 한 번 일어나는 화면 연출: flash 하얗게 번쩍임, shake 흔들림, fade 어둡게 잠겼다 밝아짐 */
+    effect: z.enum(['flash', 'shake', 'fade']).optional(),
   })
   .strict();
 export type SceneLine = z.infer<typeof SceneLine>;

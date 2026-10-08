@@ -81,7 +81,9 @@ filter: `{ pool, owner, costNeigongGte }`. 무작위 선택은 `시드 + 스테�
   "lines": [
     { "text": "결국 숲이 끝났다." },                   // 화자 없음 = 내레이션
     { "speaker": "kwak_dojin", "name": "장문인 곽도진", "text": "그 밥값을 오늘 치르거라." },
-    { "speaker": "haun", "face": "resolve", "text": "산문의 현판에 쓰신 글은 다 거짓이었습니까." }
+    { "speaker": "haun", "face": "resolve", "text": "산문의 현판에 쓰신 글은 다 거짓이었습니까." },
+    { "cg": "cg_fall", "text": "세상이 기울었다. 하운은 떨어졌다." },       // cg: 이 줄부터 장면 일러스트(story-cg). "none"이면 걷는다
+    { "effect": "flash", "text": "세상이 하얗게 타올랐다." }                // effect: flash | shake | fade (이 줄에서 한 번)
   ]
 }
 ```

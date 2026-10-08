@@ -87,9 +87,9 @@ describe('캠페인 구조', () => {
 });
 
 describe('원작 보스 기믹', () => {
-  it('S0 귀곡애: 이길 수 없는 전투 — 3턴을 버티면 승리', () => {
+  it('S0 귀곡애: 이길 수 없는 전투 — 5턴을 버티면 승리', () => {
     const s = bossBattle('s0');
-    expect(s.surviveTurns).toBe(3);
+    expect(s.surviveTurns).toBe(5);
   });
 
   it('S1 실바렌: 죽은 숲(마나 0에서 시작), 군단장이 쓰러지면 졸개가 무너진다', () => {
