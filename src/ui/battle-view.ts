@@ -210,7 +210,7 @@ export class BattleView {
       },
       intent,
       h('div', { class: 'sprite-wrap' }, canvas, preview),
-      h('div', { class: 'unit-name' }, c.name),
+      h('div', { class: 'unit-name' }, c.name, c.side === 'party' && c.level ? h('small', { class: 'unit-lv' }, ` Lv${c.level}`) : ''),
       h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar' }, hp, hpText)),
       statuses,
     );

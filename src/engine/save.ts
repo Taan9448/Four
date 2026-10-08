@@ -36,6 +36,13 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   }
   if (!file || file.version !== SAVE_VERSION || !file.run) return null;
   const run = file.run;
+  // 레벨 도입(2026-10-08) 전 저장: 레벨 1, 남은 강화·소식 없음으로 채운다
+  for (const r of run.roster ?? []) {
+    r.level ??= 1;
+    r.xp ??= 0;
+  }
+  run.pendingUpgrades ??= [];
+  run.levelLog ??= [];
   return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
 }
 

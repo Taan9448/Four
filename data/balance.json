@@ -32,6 +32,15 @@
     "freezeStatus": "bind"
   },
   "crit": { "chance": 0.08, "multiplier": 1.5 },
+  "leveling": {
+    "maxLevel": 10,
+    "xp": { "battle": 5, "elite": 10, "boss": 20 },
+    "restShare": 0.5,
+    "toNext": [20, 26, 32, 38, 44, 50, 56, 62, 68],
+    "critPerLevel": 0.005,
+    "upgradeEvery": 3,
+    "debugXpPerStage": 55
+  },
   "party": { "max": 3, "reviveHp": 1 },
   "upgrade": { "maxLevel": 5, "statLevels": 3 },
   "rewards": {
@@ -46,7 +55,7 @@
   "route": {
     "nodesPerFloor": [2, 3],
     "eliteMinFloor": 3,
-    "maxCalmRun": 2,
+    "maxCalmRun": 3,
     "extraEdgeChance": 0.35,
     "scarWeightPerPoint": 0.15
   }

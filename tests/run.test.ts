@@ -76,7 +76,7 @@ describe('런 진행', () => {
 
   it('보상 등급은 노드 유형별 가중치를 따른다: 일반·전설은 나오지 않고, 엘리트·보스일수록 높은 등급이 잦다', () => {
     const run = createRun(data, 'RARITY', { stageId: 's1' });
-    run.roster.push({ id: 'elia', hp: 42, maxHp: 42 }, { id: 'kyle', hp: 52, maxHp: 52 });
+    run.roster.push({ id: 'elia', hp: 42, maxHp: 42, level: 1, xp: 0 }, { id: 'kyle', hp: 52, maxHp: 52, level: 1, xp: 0 });
     run.selected = ['haun', 'elia', 'kyle'];
     const tally = (type: 'battle' | 'elite' | 'boss') => {
       const node = run.map.floors.flat().find((n) => n.type === type)!;

@@ -32,6 +32,8 @@ export interface PartySlot {
   id: string;
   hp: number;
   maxHp: number;
+  /** 레벨(없으면 1) */
+  level?: number;
 }
 
 export interface BattleSetup {
@@ -52,6 +54,8 @@ export interface BattleSetup {
   surviveTurns?: number;
   /** 마나 규칙 덮어쓰기(스테이지 mana → 모듈 content.mana). 생략하면 세계 기본값 */
   manaRule?: WorldMana;
+  /** 적 최대 체력 배율(스테이지 enemyHpScale) */
+  enemyHpScale?: number;
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
@@ -64,14 +68,14 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   const party: Combatant[] = setup.party.map((p, i) => {
     const def = data.characters.get(p.id);
     if (!def || def.role !== 'fighter') throw new Error(`출전할 수 없는 캐릭터: ${p.id}`);
-    return { uid: `p${i}`, defId: p.id, name: def.name, side: 'party', hp: p.hp, maxHp: p.maxHp, block: 0, statuses: {}, downed: p.hp <= 0 };
+    return { uid: `p${i}`, defId: p.id, name: def.name, side: 'party', hp: p.hp, maxHp: p.maxHp, block: 0, statuses: {}, downed: p.hp <= 0, level: p.level ?? 1 };
   });
   const enemies: EnemyState[] = setup.enemies.map((id, i) => {
     const def = data.enemies.get(id);
     if (!def) throw new Error(`알 수 없는 적: ${id}`);
     const statuses: Record<string, number> = {};
     for (const t of def.traits) statuses[t.status] = t.stacks;
-    const maxHp = def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0);
+    const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0)) * (setup.enemyHpScale ?? 1));
     return {
       uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
       statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null,
@@ -119,6 +123,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   // 선천(innate) 카드는 맨 위로
   state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
 
+  state.enemyHpScale = setup.enemyHpScale ?? 1;
   fireSupport(state, 'battleStart', {});
   if (setup.startEffects?.length) {
     runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });

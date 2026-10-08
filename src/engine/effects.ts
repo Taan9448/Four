@@ -314,10 +314,11 @@ export function elementAffinity(state: BattleState, target: Combatant, element: 
   return null;
 }
 
-/** 치명타 확률: 캐릭터의 crit, 없으면 balance.crit.chance */
+/** 치명타 확률: 캐릭터의 crit(없으면 balance.crit.chance) + 레벨마다 leveling.critPerLevel */
 export function critChance(state: BattleState, c: Combatant): number {
   if (c.side !== 'party') return 0;
-  return state.data.characters.get(c.defId)?.crit ?? state.data.balance.crit.chance;
+  const base = state.data.characters.get(c.defId)?.crit ?? state.data.balance.crit.chance;
+  return base + ((c.level ?? 1) - 1) * state.data.balance.leveling.critPerLevel;
 }
 
 /**
@@ -381,7 +382,7 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   const from = enemy.name;
   enemy.defId = into.id;
   enemy.name = into.name;
-  enemy.maxHp = into.maxHp + (into.hpPerScar ?? 0) * state.scar;
+  enemy.maxHp = Math.round((into.maxHp + (into.hpPerScar ?? 0) * state.scar) * (state.enemyHpScale ?? 1));
   enemy.hp = enemy.maxHp;
   enemy.block = 0;
   enemy.downed = false;

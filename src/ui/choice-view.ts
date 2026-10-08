@@ -1,7 +1,7 @@
 // 이벤트·휴식·여관·스토리 노드의 선택지 화면과 전투 보상 화면.
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, choiceNeedsPick, choicesFor, upgradeCandidates, type RunState } from '../engine/run';
+import { applyChoice, applyLevelUpgrade, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
 import { cardView } from './card-view';
 import { h } from './dom';
 
@@ -123,4 +123,68 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
       h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기')),
     ),
   );
+}
+
+/**
+ * 레벨업 화면(전투 뒤 지도로 가기 전): 오른 레벨과 최대 체력·치명타를 보여 주고,
+ * upgradeEvery 레벨에 이르렀으면 그 동료의 카드 한 장을 고르게 한다(강화 뒤 모습으로 보여 준다)
+ */
+export function levelUpView(data: GameData, run: RunState, onDone: () => void): HTMLElement {
+  const box = h('div', { class: 'choice-box panel levelup-box' });
+  const crit = data.balance.leveling.critPerLevel;
+  const done: string[] = [];
+  const render = () => {
+    const member = run.pendingUpgrades[0];
+    const list = run.levelLog.map((l) =>
+      h(
+        'li',
+        { class: 'lv-row', style: `--owner:${data.characters.get(l.id)?.color ?? '#888'}` },
+        h('span', { class: 'lv-name' }, l.name),
+        h('span', { class: 'lv-step' }, h('small', {}, 'Lv '), String(l.from), h('i', {}, ' → '), h('b', {}, String(l.to))),
+        h('span', { class: 'lv-gain' }, `최대 체력 +${l.hpGain} · 치명 +${Math.round((l.to - l.from) * crit * 1000) / 10}%`),
+      ),
+    );
+    const upgrade = member
+      ? (() => {
+          const name = data.characters.get(member)?.name ?? member;
+          const seen = new Set<string>();
+          const cands = levelUpgradeCandidates(data, run, member).filter((c) => {
+            const key = `${c.cardId}:${c.level}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          return h(
+            'div',
+            { class: 'lv-upgrade' },
+            h('p', { class: 'choice-text' }, `${name}의 성장 — 카드 한 장을 골라 강화한다(+1). 강화 뒤 모습으로 보여 준다.`),
+            h(
+              'div',
+              { class: 'reward-cards upgrade-cards' },
+              cands.map((c) => {
+                const el = cardView(data, { ...c, level: c.level + 1 });
+                el.addEventListener('click', () => {
+                  done.push(...applyLevelUpgrade(data, run, c.uid));
+                  render();
+                });
+                return el;
+              }),
+            ),
+          );
+        })()
+      : null;
+    // 강화할 카드가 하나도 없으면 그 차례는 건너뛴다
+    if (member && !levelUpgradeCandidates(data, run, member).length) {
+      applyLevelUpgrade(data, run, null);
+      return render();
+    }
+    box.replaceChildren(
+      panelHead('昇', '성장', '레벨이 올랐다'),
+      list.length ? h('ul', { class: 'lv-list' }, list) : '',
+      done.length ? h('ul', { class: 'gains' }, done.map((d) => h('li', {}, d))) : '',
+      upgrade ?? h('div', { class: 'panel-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ((run.levelLog = []), onDone()) }, '계속')),
+    );
+  };
+  render();
+  return h('section', { class: 'screen choice-screen levelup-screen' }, box);
 }
