@@ -1,8 +1,8 @@
 {
   "id": "map_s4",
   "type": "map-art",
-  "frameW": 768,
-  "frameH": 1152,
+  "frameW": 1152,
+  "frameH": 768,
   "track": "illustration",
   "pixelScale": null,
   "gridDetected": null,
@@ -20,12 +20,12 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 1,
-  "sourceHash": "a4ae9bee2c5d0f97",
+  "sourceHash": "9d2b6465cfa5e7e0",
   "placeholder": true,
   "resizedFrom": null,
   "sourceSize": [
-    1024,
-    1536
+    1536,
+    1024
   ],
   "gridPurity": null
 }

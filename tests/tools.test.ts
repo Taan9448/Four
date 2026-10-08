@@ -326,7 +326,8 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(icons).toContain('Cells 13 to 16 are completely empty magenta');
     expect(icons).not.toContain('128x128');
     const map = promptFor('map_s1');
-    expect(map).toContain('1024x1536');
+    expect(map).toContain('1536x1024');
+    expect(map).toContain('from left to right');
     expect(map).toContain('ink-wash map');
     expect(map).toContain('Composition:');
     expect(map).not.toContain('animated feature film');

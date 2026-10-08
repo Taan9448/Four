@@ -4,6 +4,7 @@ import { findNode, type MapNode } from '../engine/route';
 import { availableNodes, playableStages, setParty, type RunState } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
+import { isDebug } from './debug';
 import { installTooltips, tipAttrs } from './tooltip';
 
 /** 노드 표식: 두루마리 위의 한자 */
@@ -14,8 +15,13 @@ const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투
 const RIFT_FLAG = 'sky_crack';
 /** 틈이 처음 나타나는 스테이지(이 스테이지 출발 지도에서 알림 띠와 함께 그어진다) */
 const RIFT_REVEAL_STAGE = 's4';
-/** 귀곡애 석문(두 세계의 유일한 통로) 자리 — journey_band 그림의 가운데 아래 */
-const GATE = { x: 47, y: 76 };
+/** 귀곡애 석문(두 세계의 유일한 통로) 자리 — journey_band 그림의 가운데 아래. 엘하임이 드러난 뒤에만 보인다 */
+const GATE = { x: 47, y: 74 };
+/** 여정 띠의 지역: 그림에서 차지하는 가로 범위(%)와 이름. 아직 들어선 적 없는 지역은 안개로 덮는다(GAME_DESIGN 14절) */
+const REGIONS = {
+  murim: { from: 0, to: 49, tag: '武林 · 무림', unknown: '낯선 땅' },
+  elheim: { from: 51, to: 100, tag: '엘하임 · Elheim', unknown: '낯선 세계' },
+} as const;
 
 export interface MapViewHandlers {
   onEnter: (node: MapNode) => void;
@@ -40,15 +46,26 @@ const art = (id: string | undefined) => {
   return url ? `background-image:url("${url}")` : '';
 };
 
-/** 위: 여정 띠. 지나온 곳·지금·다음 목적지만 보이고, 틈은 '하늘의 금' 사건 뒤에 나타난다 */
+type Stage = GameData['stages'][number];
+
+/** 장소 이름: 하운이 아직 이름을 모르면(knownFlag 전) unknownLabel. 여정 띠가 없으면 스테이지 이름 */
+export function placeName(stage: Stage, run: RunState): string {
+  const j = stage.journey;
+  if (!j) return stage.name;
+  return j.unknownLabel && j.knownFlag && !run.flags.includes(j.knownFlag) ? j.unknownLabel : j.label;
+}
+
+/** 위: 여정 띠. 지나온 곳과 지금만 보이고, 들어서 보지 않은 지역은 안개, 틈은 '하늘의 금' 사건 뒤에 나타난다 */
 function journeyBand(data: GameData, run: RunState): HTMLElement {
-  const stages = playableStages(data);
+  const stages = playableStages(data).filter((st) => st.journey);
   const cur = data.stages.find((s) => s.id === run.stageId)!;
+  const reached = stages.filter((st) => st.order <= cur.order);
   const rift = run.flags.includes(RIFT_FLAG);
-  const reveal = rift && run.stageId === RIFT_REVEAL_STAGE && run.visited.length === 0;
+  const atStart = run.visited.length === 0;
+  const revealRift = rift && run.stageId === RIFT_REVEAL_STAGE && atStart;
   const NS = 'http://www.w3.org/2000/svg';
   const crack = document.createElementNS(NS, 'svg');
-  crack.setAttribute('class', `journey-crack${reveal ? ' reveal' : ''}`);
+  crack.setAttribute('class', `journey-crack${revealRift ? ' reveal' : ''}`);
   crack.setAttribute('viewBox', '0 0 100 100');
   crack.setAttribute('preserveAspectRatio', 'none');
   if (rift) {
@@ -63,34 +80,69 @@ function journeyBand(data: GameData, run: RunState): HTMLElement {
       crack.appendChild(p);
     }
   }
-  const stops = stages
-    .filter((st) => st.journey)
+  // 지역: 그 지역의 스테이지에 한 번이라도 들어섰으면 드러난다. 이번 스테이지가 그 지역의 첫 스테이지이고 막 출발했으면 안개가 걷히는 연출
+  const regionParts = (Object.keys(REGIONS) as (keyof typeof REGIONS)[]).map((key) => {
+    const r = REGIONS[key];
+    const first = stages.find((st) => st.journey!.region === key);
+    const open = reached.some((st) => st.journey!.region === key);
+    // 캠페인의 첫 지역(무림)은 하운의 세계라 처음부터 보인다. 그 밖의 지역은 처음 들어설 때 안개가 걷힌다
+    const lifting = open && first?.id === cur.id && atStart && first.order !== stages[0].order;
+    const known = open && (!first?.journey!.knownFlag || run.flags.includes(first.journey!.knownFlag));
+    const side = key === 'murim' ? 'l' : 'r';
+    return {
+      tag: open ? h('span', { class: `tag tag-${side}` }, known ? r.tag : r.unknown) : null,
+      fog: !open || lifting ? h('div', { class: `journey-fog${lifting ? ' lifting' : ''}`, style: `left:${r.from}%;right:${100 - r.to}%` }, h('span', {}, '?')) : null,
+      lifting,
+    };
+  });
+  const elheimOpen = reached.some((st) => st.journey!.region === 'elheim');
+  const stops = reached
     .map((st) => {
       const j = st.journey!;
-      const isRift = st.world === 'rift';
-      let state: string | null = null;
-      let label = j.label;
-      if (st.order < cur.order) state = 'done';
-      else if (st.id === cur.id) state = 'here';
-      else if (isRift && rift) {
-        state = 'event';
-        label = `${j.label} ?`;
-      } else if (st.order === cur.order + 1 && !isRift) state = 'next';
-      if (!state) return null;
-      const tip = state === 'done' ? '지나온 곳' : state === 'here' ? `지금 — ${st.chapters}` : state === 'event' ? '하늘의 금 너머. 아직 아무도 가 본 적 없다.' : '다음 목적지';
-      return h('div', { class: `stop ${state}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(st.name, tip) }, h('i', {}), label);
-    });
+      const here = st.id === cur.id;
+      return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), placeName(st, run));
+    })
+    .concat(
+      // 틈의 심장: '하늘의 금' 뒤부터 사건 표시로(아직 들어서지 않았을 때)
+      stages
+        .filter((st) => st.journey!.region === 'rift' && rift && st.order > cur.order)
+        .map((st) =>
+          h('div', { class: 'stop event', style: `left:${st.journey!.x}%;top:${st.journey!.y}%`, ...tipAttrs('하늘의 금', '두 세계 사이에 생긴 금. 그 너머는 아무도 모른다.') }, h('i', {}), '?'),
+        ),
+    );
   return h(
     'div',
-    { class: `journey${art('journey_band') ? ' has-art' : ''}`, 'data-phase': rift ? 'after' : 'before', style: art('journey_band') },
+    { class: `journey${art('journey_band') ? ' has-art' : ''}`, style: art('journey_band') },
     crack,
-    h('span', { class: 'tag tag-l' }, '武林 · 무림'),
-    h('span', { class: 'tag tag-r' }, '엘하임 · Elheim'),
-    rift ? h('span', { class: 'tag tag-c' }, '세계의 틈') : null,
-    h('span', { class: 'gate', style: `left:${GATE.x}%;top:${GATE.y}%`, ...tipAttrs('귀곡애 석문', '두 세계를 잇는 단 하나의 문') }, '귀곡애 석문'),
+    regionParts.map((p) => p.fog),
+    regionParts.map((p) => p.tag),
+    rift ? h('span', { class: 'tag tag-c' }, '하늘의 금') : null,
+    elheimOpen ? h('span', { class: 'gate', style: `left:${GATE.x}%;top:${GATE.y}%`, ...tipAttrs('귀곡애 석문', '두 세계를 잇는 단 하나의 문') }, '귀곡애 석문') : null,
     stops,
-    reveal ? h('div', { class: 'banner' }, '하늘이 갈라졌다 — 두 세계 사이에 금이 생겼다') : null,
   );
+}
+
+/** 여정 띠 위에 뜨는 알림(새 지역·하늘의 금). 띠가 가로로 밀려도 보이게 띠 바깥에 둔다 */
+function journeyBanner(data: GameData, run: RunState): HTMLElement | null {
+  const cur = data.stages.find((s) => s.id === run.stageId)!;
+  if (run.visited.length > 0) return null;
+  if (run.flags.includes(RIFT_FLAG) && run.stageId === RIFT_REVEAL_STAGE) return h('div', { class: 'banner' }, '하늘이 갈라졌다 — 두 세계 사이에 금이 생겼다');
+  const stages = playableStages(data).filter((st) => st.journey);
+  const region = cur.journey?.region;
+  const first = stages.find((st) => st.journey!.region === region);
+  if (region === 'elheim' && first?.id === cur.id) return h('div', { class: 'banner' }, '석문 너머 — 달이 둘 뜨는 낯선 세계');
+  return null;
+}
+
+/** 좁은 화면에서 띠·두루마리가 가로로 밀릴 때, 처음에 지금 위치가 보이게 */
+function scrollToHere(wrap: HTMLElement, selector: string): void {
+  requestAnimationFrame(() => {
+    const el = wrap.querySelector<HTMLElement>(selector);
+    if (!el || wrap.scrollWidth <= wrap.clientWidth) return;
+    const wr = wrap.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    wrap.scrollLeft += er.left - wr.left - wr.width / 2 + er.width / 2;
+  });
 }
 
 export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers): HTMLElement {
@@ -98,14 +150,14 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   const stage = data.stages.find((s) => s.id === run.stageId)!;
   const avail = new Set(availableNodes(run).map((n) => n.id));
   const floors = run.map.floors;
-  // 두루마리(세로 2:3) 위의 자리(%): 아래 = 1층, 위 = 마지막 층(보스)
-  const span = floors.length > 1 ? 82 / (floors.length - 1) : 0;
+  // 가로 두루마리 위의 자리(%): 왼쪽 = 1층, 오른쪽 = 마지막 층(보스)
+  const span = floors.length > 1 ? 84 / (floors.length - 1) : 0;
   const pos = (n: MapNode) => {
     const count = floors[n.floor - 1].length;
     const boss = n.type === 'boss';
     return {
-      x: 12 + (76 / (count + 1)) * (n.index + 1) + (boss ? 0 : wobble(n.id, 1) * 4),
-      y: 91 - (n.floor - 1) * span + (boss ? 0 : wobble(n.id, 2) * Math.min(2, span * 0.18)),
+      x: 8 + (n.floor - 1) * span + (boss ? 0 : wobble(n.id, 1) * Math.min(1.6, span * 0.16)),
+      y: 10 + (80 / (count + 1)) * (n.index + 1) + (boss ? 0 : wobble(n.id, 2) * 4),
     };
   };
 
@@ -131,8 +183,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       }
     }
   }
-  // 출발점 → 1층
-  const start = { x: 50, y: 98 };
+  // 출발점(왼쪽 가장자리) → 1층
+  const start = { x: 2.6, y: 50 };
   if (!run.position) {
     for (const n of floors[0]) {
       const p = pos(n);
@@ -151,7 +203,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     const mod = data.modules.get(n.moduleId);
     const visited = run.visited.includes(n.id);
     const open = avail.has(n.id);
-    const known = visited || n.type === 'story' || n.type === 'boss';
+    // 들어가 본 노드만 이름이 보인다(보스 이름·이야기 제목은 가서 안다, GAME_DESIGN 14절)
+    const known = visited;
     return h(
       'button',
       {
@@ -208,34 +261,47 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     h('p', { class: 'hint' }, '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.'),
   );
 
-  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 디버그 토글
+  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
   const wangJoined = run.flags.includes('support:wang');
   const support = wangJoined
     ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, '왕일검 — 청운호흡으로 일행을 돕는다')
-    : h(
-        'label',
-        { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다. 그 전에는 디버그로 켤 수 있습니다.' },
-        h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
-        ' 왕일검 지원(디버그)',
-      );
+    : isDebug()
+      ? h(
+          'label',
+          { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다.' },
+          h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
+          ' 왕일검 지원(디버그)',
+        )
+      : null;
 
+  // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
+  const journeyWrap = h('div', { class: 'journey-wrap' }, journeyBand(data, run));
+  const scrollWrap = h('div', { class: 'scroll-wrap' }, h('div', { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) }, svg, nodes, hereMark));
+  scrollToHere(journeyWrap, '.stop.here');
+  scrollToHere(scrollWrap, '.here-mark');
   return h(
     'section',
     { class: 'screen map-screen' },
-    journeyBand(data, run),
+    h('div', { class: 'journey-area' }, journeyWrap, journeyBanner(data, run)),
     h(
       'div',
       { class: 'local' },
-      h('div', { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) }, svg, nodes, hereMark),
+      scrollWrap,
       h(
         'aside',
         { class: 'side-panel' },
         h(
           'div',
           { class: 'box stage-box' },
-          h('h2', {}, stage.name),
-          h('div', { class: 'stage-meta' }, `${stage.chapters} · 마나 ${run.mana}/${data.balance.mana.max} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
-          h('p', { class: 'stage-summary' }, stage.summary),
+          h('h2', {}, placeName(stage, run)),
+          h('p', { class: 'stage-summary' }, stage.teaser ?? ''),
+          h(
+            'div',
+            { class: 'stage-stats' },
+            h('span', tipAttrs('마나', '런 전체에서 이어지는 마나. 세계마다 차는 양이 다르다.', 'mana'), h('b', {}, `${run.mana}/${data.balance.mana.max}`), '마나'),
+            h('span', tipAttrs('상흔', '균열이 남긴 흔적.', 'rift'), h('b', {}, run.scar), '상흔'),
+            h('span', {}, h('b', {}, run.deck.length), '덱'),
+          ),
         ),
         partyBox,
         support,
@@ -243,7 +309,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h(
           'div',
           { class: 'map-actions' },
-          h('button', { class: 'btn', onclick: handlers.onShowDeck }, `덱 보기 (${run.deck.length})`),
+          h('button', { class: 'btn btn-primary', onclick: handlers.onShowDeck }, `덱 보기 (${run.deck.length})`),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
         ),

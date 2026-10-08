@@ -29,7 +29,8 @@
 html, body { margin: 0; background: var(--bg); color: var(--ink); min-height: 100%; }
 body { background: radial-gradient(ellipse at top, #1a1e28 0%, var(--bg) 60%); min-height: 100vh; }
 button { font: inherit; }
-#app { max-width: 1320px; margin: 0 auto; padding: 12px 16px 32px; }
+/* 화면을 빈 곳 없이 쓴다: 넓은 화면까지 꽉 채우고 바깥 여백은 얇게 */
+#app { padding: 10px 12px; }
 h1, h2, h3 { font-family: var(--f-head); }
 
 /* 버튼: 어두운 판 + 가는 테두리, 주요 동작은 금빛(화면 구성과 같은 결) */
@@ -51,7 +52,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .topbar-actions { display: flex; gap: 6px; align-self: center; }
 
 /* 시작 화면: 세계관 그림 한 장 + 가운데 메뉴 */
-.title-screen { position: relative; min-height: calc(100vh - 44px); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); display: grid; place-items: center; text-align: center; isolation: isolate; }
+.title-screen { position: relative; min-height: calc(100vh - 20px); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); display: grid; place-items: center; text-align: center; isolation: isolate; }
 .title-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center; }
 /* 그림이 오기 전: 왼쪽 무림(새벽 금빛) · 오른쪽 엘하임(밤, 두 달) · 가운데 하늘의 금 */
 .title-screen:not(.has-art) .title-bg {
@@ -80,8 +81,11 @@ h1, h2, h3 { font-family: var(--f-head); }
 .support-toggle { color: var(--neigong); cursor: pointer; }
 
 /* 지도: 위 여정 띠 + 아래 두루마리 지역 지도 */
-.map-screen { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; }
-.journey { position: relative; aspect-ratio: 4 / 1; max-height: 230px; width: 100%; border-bottom: 1px solid var(--line-glass); background-size: 100% auto; background-position: center; overflow: hidden; }
+/* 창 높이를 꽉 채운다: 위 여정 띠(전체 폭) → 아래 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸 */
+.map-screen { display: flex; flex-direction: column; height: calc(100vh - 20px); min-height: 560px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; }
+.journey-area { position: relative; flex: 0 0 auto; border-bottom: 1px solid var(--line-glass); }
+/* 6:1 띠 = journey_band 그림(3:2)의 높이 37.5~62.5% 띠. 폭에 맞춰 늘고 줄어 장소 표시 자리(%)가 그림과 어긋나지 않는다 */
+.journey { position: relative; aspect-ratio: 6 / 1; width: 100%; background-size: 100% auto; background-position: center; overflow: hidden; }
 /* 그림이 오기 전: 왼쪽 무림(따뜻한 먹빛) · 오른쪽 엘하임(청은빛) */
 .journey:not(.has-art) { background: radial-gradient(ellipse at 15% 40%, rgba(242, 169, 59, 0.12), transparent 40%), radial-gradient(circle at 70% 22%, rgba(223, 244, 255, 0.35) 0 9px, transparent 10px), radial-gradient(circle at 76% 30%, rgba(143, 211, 255, 0.4) 0 5px, transparent 6px), linear-gradient(90deg, #2a2722 0%, #1d1e22 44%, #141a24 56%, #10203a 100%); }
 .journey:not(.has-art)::before { content: ''; position: absolute; inset: auto 0 0; height: 45%; background: radial-gradient(ellipse at 12% 100%, #36302a 0 30%, transparent 31%), radial-gradient(ellipse at 30% 100%, #2c2824 0 26%, transparent 27%), radial-gradient(ellipse at 47% 110%, #1b1b1e 0 18%, transparent 19%), radial-gradient(ellipse at 68% 100%, #1a2a24 0 28%, transparent 29%), radial-gradient(ellipse at 90% 100%, #1c2030 0 26%, transparent 27%); }
@@ -106,17 +110,24 @@ h1, h2, h3 { font-family: var(--f-head); }
 .stop.event { color: #ff9a9a; font-weight: 600; }
 .stop.event i { border-color: var(--rift-red); background: #3a0b0b; box-shadow: 0 0 0 5px rgba(255, 75, 75, 0.25); }
 .gate { position: absolute; z-index: 1; transform: translate(-50%, -50%); font-family: var(--f-brush); font-size: 0.72rem; color: #c8b98f; text-shadow: 0 1px 2px #000; white-space: nowrap; cursor: help; }
-.journey .banner { position: absolute; z-index: 3; left: 50%; bottom: 10px; transform: translateX(-50%); padding: 6px 14px; border: 1px solid rgba(255, 90, 90, 0.6); background: rgba(40, 8, 8, 0.88); color: #ffd6d6; font-size: 0.82rem; border-radius: 6px; white-space: nowrap; animation: banner-in 0.6s 1.6s both; }
+.journey-area .banner { position: absolute; z-index: 4; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 6px 14px; border: 1px solid rgba(255, 90, 90, 0.6); background: rgba(40, 8, 8, 0.88); color: #ffd6d6; font-size: 0.82rem; border-radius: 6px; white-space: nowrap; animation: banner-in 0.6s 1.6s both; }
 @keyframes banner-in { from { opacity: 0; transform: translate(-50%, 6px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-.local { display: grid; grid-template-columns: minmax(0, 540px) minmax(0, 400px); justify-content: center; gap: 18px; padding: clamp(10px, 2vw, 20px); background: radial-gradient(ellipse at 50% 0%, #1a2130, #0b0e13 70%); }
-@media (max-width: 860px) { .local { grid-template-columns: minmax(0, 1fr); } }
+/* 안개: 아직 들어선 적 없는 지역(GAME_DESIGN 14절). 처음 들어서면 걷힌다 */
+.journey-fog { position: absolute; top: 0; bottom: 0; z-index: 3; display: grid; place-items: center; background: linear-gradient(90deg, rgba(11, 14, 19, 0) 0, rgba(11, 14, 19, 0.92) 7%, #0b0e13 30%), radial-gradient(ellipse at 60% 50%, rgba(80, 90, 110, 0.25), transparent 60%); backdrop-filter: blur(6px); }
+.journey-fog span { font-family: var(--f-brush); font-size: 1.6rem; color: rgba(200, 205, 215, 0.25); }
+.journey-fog.lifting { animation: fog-lift 2.2s 0.5s ease-in forwards; }
+@keyframes fog-lift { to { opacity: 0; visibility: hidden; } }
+.local { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 12px; background: radial-gradient(ellipse at 50% 0%, #1a2130, #0b0e13 70%); }
 /* 두루마리: 한지 바탕(그림이 오면 먹 그림 지도) + 위아래 축 */
-.scroll { position: relative; aspect-ratio: 2 / 3; width: 100%; max-height: calc(100vh - 80px); margin: 0 auto; border-radius: 4px; background-size: cover; background-position: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
+.scroll-wrap { min-width: 0; min-height: 0; padding: 0 7px; }
+/* 가로 두루마리: 남은 자리를 전부 쓴다(그림은 cover로 맞춤) */
+.scroll { position: relative; width: 100%; height: 100%; border-radius: 4px; background-size: cover; background-position: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
 .scroll:not(.has-art) { background: radial-gradient(ellipse at 12% 18%, rgba(60, 50, 35, 0.18), transparent 30%), radial-gradient(ellipse at 88% 70%, rgba(60, 50, 35, 0.16), transparent 32%), radial-gradient(ellipse at 50% 4%, rgba(30, 30, 30, 0.22), transparent 26%), radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e8dcc0, #dccdab); }
-.scroll::before, .scroll::after { content: ''; position: absolute; left: -6px; right: -6px; height: 14px; z-index: 2; border-radius: 7px; background: linear-gradient(#6b4a2a, #2e1d0f); }
-.scroll::before { top: -7px; }
-.scroll::after { bottom: -7px; }
+/* 좌우의 두루마리 축 */
+.scroll::before, .scroll::after { content: ''; position: absolute; top: -6px; bottom: -6px; width: 14px; z-index: 2; border-radius: 7px; background: linear-gradient(90deg, #6b4a2a, #2e1d0f); }
+.scroll::before { left: -7px; }
+.scroll::after { right: -7px; }
 .map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-lines line { stroke: rgba(43, 36, 26, 0.35); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
 .map-lines line.open { stroke: #1f5f8a; stroke-dasharray: none; stroke-width: 2.5; }
@@ -133,13 +144,24 @@ h1, h2, h3 { font-family: var(--f-head); }
 .node:disabled { cursor: default; }
 @keyframes node-pulse { 50% { box-shadow: 0 0 0 6px rgba(31, 95, 138, 0.22); } }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(143, 211, 255, 0.05); } }
-.here-mark { position: absolute; z-index: 3; width: 52px; transform: translate(-50%, -92%); image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)); }
-.side-panel { display: flex; flex-direction: column; gap: 10px; min-width: 0; max-width: 420px; }
+.here-mark { position: absolute; z-index: 3; width: 56px; transform: translate(-50%, -92%); image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)); }
+.side-panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow-y: auto; }
+/* 좁은 화면: 위에서 아래로 쌓고, 여정 띠와 두루마리는 가로로 밀어 본다 */
+@media (max-width: 900px) {
+  .map-screen { height: auto; min-height: 0; }
+  .journey-wrap, .scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .local { grid-template-columns: minmax(0, 1fr); }
+  .scroll-wrap { padding: 6px 7px; }
+  .scroll { min-width: 760px; height: min(62vh, 520px); }
+  .side-panel { overflow: visible; }
+}
 .side-panel .box { background: var(--panel-glass); border: 1px solid var(--line-glass); border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; line-height: 1.55; }
 .side-panel h2 { margin: 0 0 2px; font-size: 1.2rem; font-weight: 800; }
 .side-panel h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 800; }
-.stage-meta { color: var(--ink-dim); font-size: 0.78rem; }
-.stage-summary { color: #cfcabe; line-height: 1.65; margin: 8px 0 0; }
+.stage-stats { display: flex; gap: 14px; margin-top: 8px; color: var(--ink-dim); font-size: 0.75rem; }
+.stage-stats span { cursor: help; }
+.stage-stats b { color: var(--ink); font-size: 0.95rem; margin-right: 4px; font-variant-numeric: tabular-nums; }
+.stage-summary { color: #cfcabe; line-height: 1.6; margin: 6px 0 0; font-size: 0.84rem; }
 .member { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-left: 4px solid var(--owner); margin-bottom: 4px; border-radius: 4px; background: rgba(0, 0, 0, 0.25); }
 .member.on { background: rgba(60, 70, 95, 0.45); }
 .member-hp { margin-left: auto; color: var(--ink-dim); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
@@ -148,6 +170,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .legend { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; color: var(--ink-dim); font-size: 0.78rem; }
 .legend b { font-family: var(--f-brush); color: var(--ink); font-weight: 400; margin-right: 4px; }
+.side-panel .legend { margin-top: auto; }
 .side-panel .seed { margin: 0; font-family: ui-monospace, monospace; font-size: 0.75rem; }
 
 /* 선택지 */
@@ -176,7 +199,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .end-screen.finale .finale-sub { color: var(--ink-dim); margin-top: -0.5rem; }
 
 .battle { position: relative; }
-.b-scene { --dock-h: 214px; position: relative; height: clamp(640px, calc(100vh - 28px), 900px); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; isolation: isolate; }
+.b-scene { --dock-h: 214px; position: relative; height: max(600px, calc(100vh - 20px)); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; isolation: isolate; }
 /* 배경: 실제 그림이 들어오면 픽셀 그대로 덮고, 그 전에는 세계별 색 바탕 */
 .b-bg { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center 62%; image-rendering: pixelated; }
 .b-scene:not(.has-art) .b-bg { background: linear-gradient(#232a3a 0%, #1a1f2a 58%, #2a241c 62%, #14110d 100%); }
@@ -205,7 +228,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .log div:last-child { color: var(--ink); }
 
 /* 가운데: 아군(왼쪽) · 적(오른쪽) */
-.units { position: absolute; left: 0; right: 0; top: 70px; bottom: calc(var(--dock-h) - 6px); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
+.units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: calc(var(--dock-h) - 6px); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
 .side { display: flex; gap: 8px; align-items: flex-end; }
 .side-enemy { flex-direction: row-reverse; }
 .unit { position: relative; display: flex; flex-direction: column; align-items: center; width: calc(var(--unit-h) * var(--scale) * 0.62); min-width: 104px; transition: opacity 0.4s, filter 0.4s; }
@@ -283,6 +306,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .btn-endturn { font-family: var(--f-head); font-weight: 800; font-size: 1.05rem; padding: 12px 20px; }
 .key-hint { font-size: 0.65rem; color: var(--ink-dim); }
 @media (max-height: 720px) { :root { --unit-h: 160px; } .b-scene { --dock-h: 200px; } }
+/* 큰 화면: 160 프레임을 2배로(유닛이 화면에 비해 작아 보이지 않게) */
+@media (min-height: 1000px) and (min-width: 1500px) { :root { --unit-h: 320px; } .b-scene { --dock-h: 240px; } }
 
 .fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 7; }
 .fx-canvas { position: absolute; image-rendering: pixelated; }
@@ -483,11 +508,11 @@ h1, h2, h3 { font-family: var(--f-head); }
   .topbar-actions { margin-left: auto; }
   .title-screen { min-height: calc(100vh - 32px); }
   .title-foot { font-size: 0.66rem; padding: 0 12px; }
-  .journey { aspect-ratio: 5 / 2; }
+  .journey { min-width: 720px; }
   .journey .tag { font-size: 0.7rem; letter-spacing: 0.1em; }
   .stop { font-size: 0.6rem; }
   .gate { font-size: 0.6rem; }
-  .journey .banner { font-size: 0.7rem; white-space: normal; width: 90%; text-align: center; }
+  .journey-area .banner { font-size: 0.7rem; white-space: normal; width: 90%; text-align: center; }
   .node { width: 26px; height: 26px; font-size: 0.85rem; }
   .node.node-boss { width: 36px; height: 36px; font-size: 1rem; }
   .here-mark { width: 40px; }
