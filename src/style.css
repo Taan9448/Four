@@ -167,6 +167,17 @@ h1, h2, h3 { font-family: var(--f-head); }
 .member-hp { margin-left: auto; color: var(--ink-dim); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 .member-note { font-size: 0.7rem; color: var(--danger); }
 .party-box .hint { margin: 6px 0 0; font-size: 0.75rem; }
+.member-tag { font-size: 0.66rem; padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-dim); }
+.member-tag.rest { border-color: #8a6a3a; color: #e6c36a; }
+.member input:disabled + .member-name { opacity: 0.85; }
+.guide-link { margin-top: 6px; }
+.party-box.guide-pulse { animation: guide-pulse 1.2s ease-in-out 4; box-shadow: 0 0 0 2px var(--mana); }
+@keyframes guide-pulse { 50% { box-shadow: 0 0 0 3px var(--mana), 0 0 18px rgba(143, 211, 255, 0.6); } }
+.guide { max-width: 520px; line-height: 1.6; }
+.guide-lead { margin-top: 0; }
+.guide ol { padding-left: 1.2em; margin: 0.5em 0; }
+.guide li { margin-bottom: 0.35em; }
+.guide-note { color: #e6c36a; margin-bottom: 0; }
 .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .legend { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; color: var(--ink-dim); font-size: 0.78rem; }
 .legend b { font-family: var(--f-brush); color: var(--ink); font-weight: 400; margin-right: 4px; }
@@ -209,21 +220,26 @@ h1, h2, h3 { font-family: var(--f-head); }
 .b-scene.world-rift:not(.has-art) .b-bg { background: radial-gradient(ellipse at 50% 30%, rgba(255, 59, 59, 0.08), transparent 50%), linear-gradient(#0d0d14 0%, #0b0b10 58%, #23242c 62%, #0b0b10 100%); }
 .chip { background: var(--panel-glass); border: 1px solid var(--line-glass); border-radius: 8px; padding: 4px 10px; backdrop-filter: blur(3px); }
 
-.b-hud { position: absolute; top: 10px; left: 12px; right: 12px; z-index: 6; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: start; }
+.b-hud { position: absolute; top: 10px; left: 12px; right: 12px; z-index: 6; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; }
 .b-stage { justify-self: start; min-width: 0; max-width: 100%; }
 .b-stage b { font-family: var(--f-head); font-weight: 800; font-size: 1.05rem; }
 .b-stage span { color: var(--ink-dim); font-size: 0.75rem; margin-left: 8px; }
-.b-rift { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 0.72rem; color: var(--ink-dim); text-shadow: 0 1px 2px #000; cursor: help; }
-.b-rift .gauge { width: clamp(140px, 20vw, 240px); height: 8px; border-radius: 99px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 75, 75, 0.35); overflow: hidden; }
-.b-rift .gauge i { display: block; height: 100%; background: repeating-linear-gradient(115deg, #050505 0 6px, #7a1414 6px 8px); box-shadow: 0 0 8px rgba(255, 75, 75, 0.5); transition: width 0.25s; }
-.b-rift.hot .gauge { border-color: var(--rift-red); animation: hot 0.9s infinite; }
-.b-rift.hot { color: #ffb4b4; }
+/* 가운데 위: 이야기 글 → 그 아래 균열 게이지 */
+.b-center { position: absolute; top: 56px; left: 50%; transform: translateX(-50%); z-index: 5; width: min(60%, 640px); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.b-center > * { pointer-events: auto; }
+.b-rift { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 14px 7px; border-radius: 10px; background: rgba(10, 6, 8, 0.78); border: 1px solid rgba(255, 75, 75, 0.35); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); font-size: 0.82rem; color: #f1dada; text-shadow: 0 1px 2px #000; cursor: help; }
+.b-rift .gauge { width: clamp(200px, 26vw, 340px); height: 12px; border-radius: 99px; background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 75, 75, 0.5); overflow: hidden; }
+.b-rift .gauge i { display: block; height: 100%; background: repeating-linear-gradient(115deg, #050505 0 6px, #a01a1a 6px 9px); box-shadow: 0 0 10px rgba(255, 75, 75, 0.6); transition: width 0.25s; }
+.b-rift b { font-size: 1.15em; color: #ff8a8a; }
+.b-rift em { font-style: normal; color: #ff6b6b; font-weight: 700; }
+.b-rift.hot { border-color: var(--rift-red); color: #ffd0d0; animation: hot 0.9s infinite; }
+.b-rift.hot .gauge { border-color: var(--rift-red); }
 .b-rift .survive { color: var(--danger); font-weight: 700; }
 @keyframes hot { 50% { box-shadow: 0 0 10px rgba(255, 59, 59, 0.6); } }
 .b-hud-right { justify-self: end; display: flex; gap: 6px; align-items: center; }
 .piles { display: flex; gap: 6px; font-size: 0.75rem; color: var(--ink-dim); font-variant-numeric: tabular-nums; cursor: pointer; font-family: inherit; }
 .piles i { font-style: normal; color: var(--ink); font-weight: 600; margin-right: 4px; }
-.battle-intro { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); z-index: 5; margin: 0; max-width: min(60%, 640px); text-align: center; font-size: 0.82rem; line-height: 1.5; color: var(--ink); }
+.battle-intro { margin: 0; max-width: 100%; text-align: center; font-size: 0.82rem; line-height: 1.5; color: var(--ink); }
 .log { position: absolute; top: 56px; left: 14px; z-index: 5; max-width: 26%; font-size: 0.72rem; line-height: 1.55; color: var(--ink-dim); text-shadow: 0 1px 2px #000, 0 0 3px #000; pointer-events: none; opacity: 0.85; }
 .log div:last-child { color: var(--ink); }
 
@@ -243,7 +259,24 @@ h1, h2, h3 { font-family: var(--f-head); }
 .hp-text { position: absolute; inset: 0; font-size: 0.66rem; text-align: center; line-height: 12px; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
 /* 방어: 체력 막대 왼쪽의 방패 */
 .block-badge { flex: 0 0 auto; min-width: 26px; height: 26px; margin: -7px 0; display: grid; place-items: center; padding: 0 4px 3px; font-size: 0.78rem; font-weight: 700; color: #eaf6ff; background: linear-gradient(#4c8fc4, #1f3f73); clip-path: polygon(50% 0, 100% 14%, 92% 66%, 50% 100%, 8% 66%, 0 14%); text-shadow: 0 1px 1px #000; cursor: help; }
-.statuses { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; min-height: 26px; margin-top: 4px; }
+.statuses { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; min-height: 26px; margin-top: 5px; width: max(100%, 150px); }
+/* 상태 이름표: 진한 바탕 + 종류별 색 테두리(배경 그림 위에서도 읽히게) */
+.status-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 2px; border-radius: 99px; border: 1.5px solid; font-size: 0.72rem; font-weight: 600; line-height: 1.2; white-space: nowrap; cursor: help; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+.status-chip .icon { width: 20px; height: 20px; border: 0; background: none; font-size: 0.78rem; }
+.status-chip b { font-size: 0.95em; color: #fff; }
+.chip-debuff { background: rgba(70, 12, 16, 0.92); border-color: #e0646a; color: #ffc9c9; }
+.chip-buff { background: rgba(12, 48, 26, 0.92); border-color: #6cc487; color: #d2f5dc; }
+.chip-trait { background: rgba(34, 22, 58, 0.92); border-color: #a487de; color: #e4d9ff; }
+/* 피해 미리보기: 카드를 고르거나 마우스를 올리면 맞을 유닛 위에 */
+.dmg-preview { display: none; }
+.dmg-preview.on { position: absolute; left: 50%; bottom: 22%; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 3px 10px 4px; border-radius: 10px; background: rgba(40, 6, 8, 0.9); border: 2px solid #ff6b6b; box-shadow: 0 0 14px rgba(255, 70, 70, 0.55); white-space: nowrap; animation: pop-in 0.12s ease-out; }
+.dmg-preview b { font-family: var(--f-head); font-size: 1.5rem; line-height: 1.1; color: #fff; text-shadow: 0 2px 2px #000; }
+.dmg-preview small { font-size: 0.68rem; color: #ffd0d0; line-height: 1.2; }
+.dmg-preview small.blk { color: #9fd2f2; }
+.dmg-preview small.ko { color: #ffe08a; font-weight: 700; }
+.dmg-preview.kill { border-color: #ffd36b; box-shadow: 0 0 16px rgba(255, 211, 107, 0.6); }
+.dmg-preview.blocked { background: rgba(10, 24, 44, 0.9); border-color: #8fd3ff; box-shadow: none; }
+@keyframes pop-in { from { transform: translateX(-50%) scale(0.7); opacity: 0; } }
 .unit.targetable { cursor: crosshair; }
 .unit.targetable .sprite-wrap::after { content: ''; position: absolute; inset: 18% 24% 14%; border: 2px dashed var(--mana); border-radius: 12px; animation: pulse 1.2s infinite; }
 .unit.down { opacity: 0.3; filter: grayscale(1); }
@@ -299,8 +332,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 .hand { --overlap: -12px; display: flex; justify-content: center; align-items: flex-end; min-width: 0; padding-bottom: 4px; }
 .hand .card { margin: 0 calc(var(--overlap) / 2); transform: translateY(var(--lift, 0)) rotate(var(--rot, 0)); transform-origin: 50% 130%; }
-.hand .card:hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-26px) rotate(0) scale(1.06); z-index: 60 !important; }
-.hand .card.card-selected { transform: translateY(-34px) rotate(0) scale(1.06); }
+.hand .card:hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-40px) rotate(0) scale(1.2); z-index: 60 !important; }
+.hand .card.card-selected { transform: translateY(-52px) rotate(0) scale(1.26); }
 .endturn { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-bottom: 18px; }
 .turn { font-family: var(--f-head); font-size: 0.85rem; color: var(--ink-dim); }
 .btn-endturn { font-family: var(--f-head); font-weight: 800; font-size: 1.05rem; padding: 12px 20px; }
@@ -530,12 +563,14 @@ h1, h2, h3 { font-family: var(--f-head); }
   .legend { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
   .b-scene { height: auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding: 8px 6px 10px; }
-  .b-hud { position: static; grid-template-columns: minmax(0, 1fr) auto; }
+  .b-hud { position: static; }
+  .b-center { position: static; transform: none; width: auto; gap: 6px; }
   .b-stage span { display: none; }
   .b-stage b { font-size: 0.9rem; }
-  .b-rift { grid-column: 1 / -1; grid-row: 2; }
+  .b-rift { padding: 4px 10px 5px; font-size: 0.72rem; }
+  .b-rift .gauge { width: min(260px, 70vw); height: 10px; }
   .piles { display: none; }
-  .battle-intro { position: static; transform: none; max-width: none; font-size: 0.74rem; }
+  .battle-intro { font-size: 0.74rem; }
   .log { display: none; }
   .units { position: static; min-height: calc(var(--unit-h) + 96px); gap: 4px; padding: 26px 0 0; }
   .side { gap: 2px; }
@@ -550,7 +585,14 @@ h1, h2, h3 { font-family: var(--f-head); }
   .intent-icon { width: 15px; height: 15px; font-size: 0.56rem; }
   .status-icon { width: 18px; height: 18px; font-size: 0.66rem; }
   .icon .stack { font-size: 0.5rem; min-width: 11px; height: 11px; line-height: 9px; right: -4px; bottom: -4px; }
-  .statuses { min-height: 20px; gap: 2px; }
+  .statuses { min-height: 20px; gap: 2px; width: max(100%, 90px); }
+  .status-chip { font-size: 0.56rem; padding: 0 4px 0 1px; }
+  .status-chip .st-name { display: none; }
+  .status-chip .icon { width: 15px; height: 15px; font-size: 0.6rem; }
+  .dmg-preview b { font-size: 1.05rem; }
+  .dmg-preview small { font-size: 0.52rem; }
+  .hand .card:hover:not(.card-disabled) { transform: translateY(var(--lift, 0)) rotate(var(--rot, 0)); }
+  .hand .card.card-selected { transform: translateY(-30px) rotate(0) scale(1.18); }
   .shade { display: none; }
   .dock { position: static; height: auto; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'hand hand hand' 'res . end'; gap: 8px; padding: 0; }
   .b-res { grid-area: res; flex-direction: row; gap: 22px; padding: 0 0 14px 6px; }

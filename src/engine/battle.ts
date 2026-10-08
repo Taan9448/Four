@@ -356,6 +356,63 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   return { ok: true };
 }
 
+/** 전투 상태 복제(데이터·지원 규칙은 공유, RNG는 같은 위치에서 이어지는 사본) */
+export function cloneBattle(s: BattleState): BattleState {
+  const unit = <T extends Combatant>(c: T): T => ({ ...c, statuses: { ...c.statuses } });
+  const cards = (list: CardInstance[]) => list.map((c) => ({ ...c }));
+  return {
+    ...s,
+    rng: s.rng.clone(),
+    party: s.party.map(unit),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], intent: e.intent ? { ...e.intent } : null })),
+    draw: cards(s.draw),
+    hand: cards(s.hand),
+    discard: cards(s.discard),
+    exhaust: cards(s.exhaust),
+    events: [],
+    log: [],
+    supportUsed: [...s.supportUsed],
+    flags: [...s.flags],
+  };
+}
+
+/** 카드 한 장을 썼을 때 대상마다 들어갈 피해 */
+export interface CardPreviewHit {
+  /** 체력에서 깎일 양(흡수는 뺀다) */
+  hpLoss: number;
+  /** 방어로 막힐 양 */
+  blocked: number;
+  /** 피해 횟수 */
+  hits: number;
+  /** 이 카드로 쓰러진다 */
+  kills: boolean;
+}
+
+/**
+ * 피해 미리보기: 전투 상태를 복제해 그 카드를 실제로 써 보고 피해 이벤트를 모은다.
+ * 힘·약화·취약·결 노출·방어·특수 상태 등 엔진의 계산을 그대로 따르므로 화면 숫자와 실제 피해가 어긋나지 않는다.
+ * 쓸 수 없는 카드면 빈 지도.
+ */
+export function previewCard(state: BattleState, handIndex: number, targetUid?: string): Map<string, CardPreviewHit> {
+  const out = new Map<string, CardPreviewHit>();
+  if (!canPlay(state, handIndex).ok) return out;
+  const c = cloneBattle(state);
+  if (!playCard(c, handIndex, targetUid).ok) return out;
+  for (const ev of c.events) {
+    if (ev.type !== 'damage' || ev.absorbed) continue;
+    const v = out.get(ev.targetUid) ?? { hpLoss: 0, blocked: 0, hits: 0, kills: false };
+    v.hpLoss += ev.amount;
+    v.blocked += ev.blocked;
+    v.hits += 1;
+    out.set(ev.targetUid, v);
+  }
+  for (const [uid, v] of out) {
+    const before = [...state.party, ...state.enemies].find((u) => u.uid === uid);
+    v.kills = !!before && !before.downed && !![...c.party, ...c.enemies].find((u) => u.uid === uid)?.downed;
+  }
+  return out;
+}
+
 // ───────────────────────── 턴 종료와 적 턴 ─────────────────────────
 
 export function endTurn(state: BattleState): void {
