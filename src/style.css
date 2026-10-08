@@ -843,3 +843,35 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .relic-choice small { font-size: 0.72rem; font-style: italic; color: var(--ink-dim); }
 .relic-chip .item-icon, .potion-chip .item-icon { display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: inherit; background: none; font: inherit; color: inherit; }
 .item-icon.has-art img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
+
+/* ───────── 난이도·클리어 지도(2026-10-08) ───────── */
+.diff-pick { display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 600px) { .diff-cards { grid-template-columns: minmax(0, 1fr); } }
+.diff-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.diff-card { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 6px; background: rgba(20, 16, 12, 0.7); cursor: pointer; }
+.diff-card:has(input:checked) { border-color: #e2b45c; box-shadow: 0 0 12px rgba(226, 180, 92, 0.35); }
+.diff-card input { margin: 0 0 4px; }
+.diff-card small, .diff-hardcore small { color: var(--ink-dim); line-height: 1.45; }
+.diff-hardcore { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px dashed rgba(208, 70, 58, 0.6); border-radius: 6px; cursor: pointer; }
+.diff-hardcore span { display: flex; flex-direction: column; gap: 3px; }
+.mode-badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 2px 0 6px; }
+.mode-badge { padding: 1px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid; }
+.mode-badge.replay { color: #9fd0ff; border-color: rgba(143, 211, 255, 0.5); }
+.mode-badge.hard { color: #ffb36b; border-color: rgba(255, 160, 80, 0.55); }
+.mode-badge.hardcore { color: #ff8a7a; border-color: rgba(255, 110, 100, 0.6); }
+.end-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.end-unlock { color: #f2d48f; }
+.loot-notes { margin-top: 8px; }
+.loot-notes li.fallen { color: #ff8a7a; }
+.hub-local { grid-template-columns: minmax(0, 1fr) 300px; }
+.hub-list { margin: 0 7px; padding: 20px 24px; overflow-y: auto; text-align: left; }
+.hub-stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.hub-stage { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; text-align: left; }
+.hub-stage small { color: var(--ink-dim); font-weight: 400; }
+.hub-member { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; }
+.hub-member small { color: var(--ink-dim); }
+.stop.pick { background: none; border: 0; font: inherit; cursor: pointer; }
+.stop.pick:hover { color: #fff; }
+.stop.pick:hover i { box-shadow: 0 0 0 5px rgba(226, 180, 92, 0.45); }
+.stop .replays { color: #e2b45c; font-size: 0.7rem; }
+@media (max-width: 900px) { .hub-local { grid-template-columns: minmax(0, 1fr); } }

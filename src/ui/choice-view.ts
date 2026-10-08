@@ -110,6 +110,8 @@ export interface LootShown {
   loot: Loot;
   /** 칸이 가득해 못 넣은 물약 */
   potionLeft: string | null;
+  /** 전투 결과로 일어난 일(모듈 clearEffects·하드코어로 잃은 동료 등) */
+  notes?: string[];
 }
 
 /**
@@ -145,7 +147,8 @@ function lootLine(data: GameData, run: RunState, shown: LootShown): HTMLElement 
           h('button', { class: 'btn btn-small', onclick: () => ((shown.potionLeft = null), (shown.loot = { ...shown.loot, potion: null }), render()) }, '두고 간다'),
         )
       : null;
-    wrap.replaceChildren(h('div', { class: 'loot-items' }, items), swap ?? '');
+    const notes = shown.notes?.length ? h('ul', { class: 'gains loot-notes' }, shown.notes.map((n) => h('li', { class: n.includes('하드코어') ? 'fallen' : '' }, n))) : null;
+    wrap.replaceChildren(h('div', { class: 'loot-items' }, items), notes ?? '', swap ?? '');
   };
   render();
   return wrap;

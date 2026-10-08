@@ -487,6 +487,11 @@ export const Balance = z
           .strict(),
       })
       .strict(),
+    /**
+     * 난이도(2026-10-08): 첫 클리어 뒤 새 런에서 고른다. hard는 모든 스테이지의 적 체력·공격력 배율에 곱한다.
+     * 하드코어는 난이도와 따로 켜는 규칙(쓰러진 동료는 돌아오지 않는다)이라 수치가 없다
+     */
+    difficulty: z.object({ hard: z.object({ enemyHpMul: z.number().positive(), enemyDmgMul: z.number().positive() }).strict() }).strict(),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z

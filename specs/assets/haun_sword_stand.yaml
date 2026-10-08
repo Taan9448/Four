@@ -1,0 +1,11 @@
+id: haun_sword_stand
+type: character-standing
+character: haun_sword
+summary: 진하운(S1~ 못생긴 검) 반신 그림(기본·결의·놀람) — haun_stand와 같은 얼굴·같은 옷, 도끼 대신 검
+depends_on: [haun_ref]
+reference: assets/source/haun_stand.png
+frame_notes:
+  1: "neutral expression — calm, quiet, slightly distant look; lips closed; the long bangs partly over the eyes; grey servant outfit; the plain narrow 'ugly sword' in a plain black scabbard at his left hip, one hand resting lightly on the crude plain grip; NO axe anywhere"
+  2: "resolute expression — eyes sharpened and focused forward, jaw set, the narrow plain sword drawn and held upright before the chest, its plain unadorned blade catching a faint blue glint; NO axe"
+  3: "surprised expression — eyes wide, lips slightly parted, head drawn back a little, bangs swaying; the sword still sheathed at the hip; NO axe"
+placeholder: { color: '#8a90a3', accent: '#4fb4ff' }

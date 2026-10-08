@@ -76,6 +76,7 @@
       "jitter": 0.1
     }
   },
+  "difficulty": { "hard": { "enemyHpMul": 1.38, "enemyDmgMul": 1.32 } },
   "stage": { "healOnEnter": 1 },
   "route": {
     "nodesPerFloor": [2, 3],

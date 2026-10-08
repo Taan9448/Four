@@ -62,3 +62,33 @@ export function lastSlot(data: GameData): { slot: number; saved: LoadedRun } | n
 
 export const readSettings = () => readStore(SETTINGS_KEY);
 export const writeSettings = (json: string) => writeStore(SETTINGS_KEY, json);
+
+// ───────── 기록(저장 칸과 상관없이 브라우저에 하나): 캠페인을 마친 횟수 등 ─────────
+const PROFILE_KEY = 'cheonoe.profile';
+
+export interface Profile {
+  /** 캠페인을 끝까지 마친 횟수(1 이상이면 난이도 고르기가 열린다) */
+  clears: number;
+  /** 어려움·하드코어로 마친 횟수 */
+  hardClears: number;
+  hardcoreClears: number;
+}
+
+export function readProfile(): Profile {
+  try {
+    const raw = JSON.parse(readStore(PROFILE_KEY) ?? '{}') as Partial<Profile>;
+    return { clears: Number(raw.clears) || 0, hardClears: Number(raw.hardClears) || 0, hardcoreClears: Number(raw.hardcoreClears) || 0 };
+  } catch {
+    return { clears: 0, hardClears: 0, hardcoreClears: 0 };
+  }
+}
+
+/** 캠페인을 마쳤을 때 한 번 */
+export function recordClear(run: Pick<RunState, 'difficulty' | 'hardcore'>): Profile {
+  const p = readProfile();
+  p.clears += 1;
+  if (run.difficulty === 'hard') p.hardClears += 1;
+  if (run.hardcore) p.hardcoreClears += 1;
+  writeStore(PROFILE_KEY, JSON.stringify(p));
+  return p;
+}

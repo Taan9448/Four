@@ -13,6 +13,9 @@ import {
   createRun,
   createRunAt,
   enterNode,
+  finishReplay,
+  startReplay,
+  type Difficulty,
   gainXp,
   xpToNext,
   isBattle,
@@ -28,12 +31,13 @@ import { claimLoot, rollLoot } from '../engine/economy';
 import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
 import { h } from './dom';
-import { initDebug, isDebug } from './debug';
+import { initDebug } from './debug';
 import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
-import { clearRun, lastSlot, listSlots, saveRun, SLOT_COUNT } from './storage';
+import { clearRun, lastSlot, listSlots, readProfile, recordClear, saveRun, SLOT_COUNT } from './storage';
+import { hubView } from './hub-view';
 
 const data = gameData();
 
@@ -43,7 +47,9 @@ function slotSummary(run: RunState): string {
   const floor = run.map.floors.flat().find((n) => n.id === run.position)?.floor ?? 0;
   const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
   const haun = run.roster.find((r) => r.id === 'haun');
-  return `${placeName(stage, run)} · ${where}${haun ? ` · Lv ${haun.level}` : ''}`;
+  const mode = `${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`;
+  if (run.status === 'complete') return `클리어${mode}${haun ? ` · Lv ${haun.level}` : ''}`;
+  return `${run.replayOf ? '다시 하기 — ' : ''}${placeName(stage, run)} · ${where}${haun ? ` · Lv ${haun.level}` : ''}${mode}`;
 }
 
 /** 스테이지 끝 화면 머리의 세계 이름 */
@@ -57,9 +63,6 @@ export class App {
   private persist = true;
   /** 지금 런을 저장하는 칸(1~3) */
   private slot = 1;
-  /** 시작 옵션: 고른 시드(없으면 무작위)와 디버그 왕일검 지원 */
-  private seedChoice: string | null = null;
-  private wangChoice = false;
 
   constructor(private root: HTMLElement) {
     applySettings();
@@ -94,7 +97,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
@@ -129,6 +132,15 @@ export class App {
         if (!module) return this.map();
         run.gold = 300;
         return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map())));
+      }
+      case 'hub': {
+        // 캠페인을 마친 런의 클리어 지도
+        const done = createRunAt(data, 'SCREEN', 's9', { supportActive: true });
+        done.status = 'complete';
+        done.flags.push('ui:ending_seen');
+        done.replays = { s1: 2, s5: 1 };
+        this.run = done;
+        return this.hub();
       }
       case 'bossloot': {
         const loot = rollLoot(data, run, { ...first, type: 'boss' });
@@ -167,7 +179,7 @@ export class App {
 
   /**
    * 시작 화면(GAME_DESIGN 13절): 세계관 그림 한 장 위 가운데에 제목과 메뉴.
-   * 메뉴 버튼은 모두 같은 크기(이어하기 · 새로 시작 · 불러오기 · 시작 옵션 · 설정). 저장은 3칸
+   * 메뉴 버튼은 모두 같은 크기(이어하기 · 새로 시작 · 불러오기 · 설정). 저장은 3칸. 시드는 주소의 ?seed=로만(확인용)
    */
   private title(): void {
     const last = lastSlot(data);
@@ -196,7 +208,6 @@ export class App {
               : null,
             h('button', { class: `btn${last ? '' : ' btn-primary'}`, onclick: () => this.openSlots('new') }, '새로 시작', h('small', {}, '빈 칸이나 고른 칸에서')),
             anySaved ? h('button', { class: 'btn', onclick: () => this.openSlots('load') }, '불러오기', h('small', {}, `저장 ${SLOT_COUNT}칸`)) : null,
-            h('button', { class: 'btn', onclick: () => this.openStartOptions() }, '시작 옵션', h('small', {}, this.seedChoice ? `시드 ${this.seedChoice}` : '시드 무작위')),
             h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '속도 · 연출 · 안내')),
           ),
         ),
@@ -205,27 +216,34 @@ export class App {
     );
   }
 
-  /** 시작 옵션: 시드(같은 시드면 같은 지도), 디버그 옵션은 ?debug에서만(GAME_DESIGN 14절) */
-  private openStartOptions(): void {
-    const seedInput = h('input', { class: 'seed-input', value: this.seedChoice ?? '', placeholder: '비우면 무작위', maxlength: 24, 'aria-label': '시드' }) as HTMLInputElement;
-    const wang = h('input', { type: 'checkbox', checked: this.wangChoice }) as HTMLInputElement;
+  /**
+   * 새 런의 난이도(2026-10-08): 캠페인을 한 번 마친 뒤에만 고른다. 보통 · 어려움(적 체력·공격력↑), 하드코어(쓰러진 동료는 돌아오지 않는다)는 따로 켠다
+   */
+  private newRun(slot: number): void {
+    const begin = (difficulty: Difficulty, hardcore: boolean) => this.start(randomSeed(), false, undefined, slot, { difficulty, hardcore });
+    if (readProfile().clears < 1) return begin('normal', false);
+    let difficulty: Difficulty = 'normal';
+    const hardcore = h('input', { type: 'checkbox' }) as HTMLInputElement;
+    const card = (value: Difficulty, title: string, text: string) =>
+      h(
+        'label',
+        { class: 'diff-card' },
+        h('input', { type: 'radio', name: 'difficulty', checked: value === difficulty, onchange: () => (difficulty = value) }),
+        h('b', {}, title),
+        h('small', {}, text),
+      );
+    const hard = data.balance.difficulty.hard;
+    let started = false;
     const ov = openOverlay(
-      '시작 옵션',
+      '난이도',
       h(
         'div',
-        { class: 'start-options' },
-        h('label', {}, '시드 ', seedInput, h('button', { class: 'btn btn-small', 'aria-label': '무작위 시드', onclick: () => (seedInput.value = randomSeed()) }, '↻')),
-        isDebug() ? h('label', { class: 'support-toggle' }, wang, ' 왕일검 지원(디버그)') : null,
-        h('p', { class: 'hint' }, '같은 시드면 같은 지도가 나옵니다. 지도에 설 때마다 고른 칸에 자동 저장됩니다.'),
-        h('div', { class: 'confirm-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ov.close() }, '확인')),
+        { class: 'diff-pick' },
+        h('div', { class: 'diff-cards' }, card('normal', '보통', '처음 마친 그 길 그대로.'), card('hard', '어려움', `적 체력 ×${hard.enemyHpMul} · 공격력 ×${hard.enemyDmgMul}. 끝까지 가는 사람이 드물다.`)),
+        h('label', { class: 'diff-hardcore' }, hardcore, h('span', {}, h('b', {}, '하드코어'), h('small', {}, '전투가 끝날 때 쓰러져 있던 동료는 다시 일어나지 않는다. 수치는 그대로.'))),
+        h('div', { class: 'confirm-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ((started = true), ov.close(), begin(difficulty, hardcore.checked)) }, '시작')),
       ),
-      {
-        onClose: () => {
-          this.seedChoice = seedInput.value.trim() || null;
-          this.wangChoice = wang.checked;
-          this.title();
-        },
-      },
+      { onClose: () => !started && this.title(), wide: true },
     );
   }
 
@@ -258,7 +276,7 @@ export class App {
                         if (run && !(await confirmDialog('새로 시작', `저장 ${slot}의 런을 지우고 새 런을 시작합니다.`, '덮어쓰기'))) return;
                         go(() => {
                           clearRun(slot);
-                          this.start(this.seedChoice ?? randomSeed(), this.wangChoice, undefined, slot);
+                          this.newRun(slot);
                         });
                       },
                     },
@@ -301,11 +319,11 @@ export class App {
   }
 
   /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
-  private start(seed: string, support: boolean, stageId?: string, slot = this.slot): void {
+  private start(seed: string, support: boolean, stageId?: string, slot = this.slot, mode: { difficulty?: Difficulty; hardcore?: boolean } = {}): void {
     this.slot = slot;
     this.run = stageId
-      ? createRunAt(data, seed, stageId, { supportActive: support })
-      : createRun(data, seed, { supportActive: support });
+      ? createRunAt(data, seed, stageId, { supportActive: support, ...mode })
+      : createRun(data, seed, { supportActive: support, ...mode });
     this.persist = true;
     // 주소창의 ?seed=…(디버그 시작)를 지운다: 새로고침하면 타이틀의 "이어하기"로 돌아온다
     if (location.search) history.replaceState(null, '', location.pathname);
@@ -316,7 +334,9 @@ export class App {
     const run = this.run!;
     // 자동 저장: 지도(또는 스테이지 끝)에 설 때마다. 노드에 들어간 뒤 새로고침하면 그 노드 직전 지도에서 이어진다
     if (this.persist) {
-      if (run.status === 'map' || run.status === 'stage_clear') saveRun(this.slot, run);
+      // 마친 런(complete)도 남긴다(스테이지 다시 하기). 다시 하다 지면 클리어한 런으로 되돌려 저장
+      if (run.status === 'map' || run.status === 'stage_clear' || run.status === 'complete') saveRun(this.slot, run);
+      else if (run.replayOf) saveRun(this.slot, run.replayOf);
       else clearRun(this.slot);
     }
     // 레벨업 소식·고를 강화가 남았으면 먼저(전투 뒤 지도로 가기 전, 보스 뒤에는 스테이지 끝 화면 전에)
@@ -328,7 +348,14 @@ export class App {
       return this.playScene(outroScene, () => this.stageClear());
     }
     if (run.status === 'complete') {
-      // 캠페인의 끝: 에필로그 장면 → 엔딩 화면
+      // 이미 엔딩을 본 런: 클리어 지도(스테이지 다시 하기)
+      if (run.flags.includes('ui:ending_seen')) return this.hub();
+      // 캠페인의 끝: 에필로그 장면 → 엔딩 화면. 기록(난이도 열림)은 한 번만
+      run.flags.push('ui:ending_seen');
+      if (this.persist) {
+        recordClear(run);
+        saveRun(this.slot, run);
+      }
       const last = data.stages.find((s) => s.id === run.stageId)!;
       return this.playScene(last.endingScene, () => this.end(true));
     }
@@ -372,7 +399,7 @@ export class App {
     const scene = id ? data.scenes.get(id) : undefined;
     if (!scene) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
-    this.show(sceneView(data, scene, then, { background: background ?? stage?.background }));
+    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
   private battle(enc: Encounter): void {
@@ -403,7 +430,7 @@ export class App {
         if (run.status === 'defeat') return this.map();
         // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다
         const loot = rollLoot(data, run, enc.node);
-        const shown: LootShown = { loot, potionLeft: claimLoot(data, run, loot).potionLeft };
+        const shown: LootShown = { loot, potionLeft: claimLoot(data, run, loot).potionLeft, notes: run.status === 'map' ? this.clearMessages : [] };
         if (run.status !== 'map') return this.show(this.backdrop(bossLootView(data, run, shown, () => this.map()), enc.module.content.background));
         // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
         this.playScene(
@@ -428,6 +455,23 @@ export class App {
       },
     );
     this.show(view.root);
+  }
+
+  /** 클리어 지도: 마친 런의 여정 띠에서 스테이지를 골라 마지막 파티로 다시 한다(GAME_DESIGN 2절) */
+  private hub(): void {
+    const run = this.run!;
+    this.show(
+      hubView(data, run, {
+        onReplay: async (stageId) => {
+          const st = data.stages.find((s) => s.id === stageId)!;
+          if (!(await confirmDialog(`${placeName(st, run)} 다시 하기`, '마지막에 클리어한 파티·덱·유물로 이 스테이지를 처음부터 다시 한다. 결과는 이 저장에 남지 않고 이긴 횟수만 남는다.', '다시 하기'))) return;
+          this.run = startReplay(data, run, stageId);
+          this.map();
+        },
+        onShowDeck: () => openDeck(data, `덱 ${run.deck.length}장`, [{ label: '덱', cards: run.deck }]),
+        onTitle: () => this.title(),
+      }),
+    );
   }
 
   /** 보스를 넘은 뒤: 보스 모듈의 장면 글(outro)을 보여 주고 다음 스테이지로 */
@@ -466,11 +510,13 @@ export class App {
                 class: 'btn btn-primary btn-large',
                 onclick: () => {
                   this.clearMessages = [];
-                  advanceStage(data, run);
+                  // 다시 하기는 이 스테이지만: 클리어 지도로 돌아간다
+                  if (run.replayOf) this.run = finishReplay(run);
+                  else advanceStage(data, run);
                   this.map();
                 },
               },
-              next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
+              run.replayOf ? '클리어 지도로' : next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
             ),
           ),
         ),
@@ -502,8 +548,27 @@ export class App {
                   ? '지금 만들어진 이야기는 여기까지다. 다음 이야기는 이후 작업.'
                   : '하운이 쓰러졌다.',
             ),
-            h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`),
-            h('button', { class: 'btn btn-primary btn-large', onclick: () => this.title() }, '새 런'),
+            h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`),
+            finale && readProfile().clears === 1 && this.persist ? h('p', { class: 'end-unlock' }, '새 런에서 난이도(어려움)와 하드코어를 고를 수 있게 되었다.') : null,
+            h(
+              'div',
+              { class: 'end-actions' },
+              // 마친 런·다시 하던 런은 클리어 지도로(스테이지 다시 하기), 그 밖에는 새 런
+              finale || run.replayOf
+                ? h(
+                    'button',
+                    {
+                      class: 'btn btn-primary btn-large',
+                      onclick: () => {
+                        if (run.replayOf) this.run = finishReplay(run);
+                        this.map();
+                      },
+                    },
+                    '클리어 지도',
+                  )
+                : null,
+              h('button', { class: `btn btn-large${finale || run.replayOf ? '' : ' btn-primary'}`, onclick: () => this.title() }, finale || run.replayOf ? '타이틀로' : '새 런'),
+            ),
           ),
         ),
         // 이야기의 끝은 시작 화면의 세계관 그림 위에서

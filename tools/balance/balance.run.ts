@@ -13,6 +13,8 @@ const OUT = process.env.BALANCE_OUT ?? 'docs/BALANCE_REPORT.md';
 // BALANCE_START=s3: 앞 스테이지를 건너뛰고 그 스테이지부터(뒤쪽 스테이지 표본을 늘릴 때. 보상·강화 없이 시작하므로 실제보다 약하다)
 const START = process.env.BALANCE_START || undefined;
 const BOT = { ...DEFAULT_BOT, ...JSON.parse(process.env.BOT ?? '{}') };
+// BALANCE_DIFFICULTY=hard · BALANCE_HARDCORE=1: 난이도·하드코어 런으로(새 런 난이도 고르기와 같다)
+const MODE = { difficulty: (process.env.BALANCE_DIFFICULTY === 'hard' ? 'hard' : 'normal') as 'normal' | 'hard', hardcore: process.env.BALANCE_HARDCORE === '1' };
 
 const TYPE_ORDER: Record<string, number> = { battle: 0, elite: 1, story: 2, boss: 3 };
 const pct = (n: number, d: number) => (d ? `${Math.round((n / d) * 100)}%` : '-');
@@ -23,7 +25,7 @@ it('밸런스: 봇 런', () => {
   const data = gameData();
   const t0 = Date.now();
   const runs: RunReport[] = [];
-  for (let i = 1; i <= SEEDS; i++) runs.push(playRun(data, `${PREFIX}${String(i).padStart(4, '0')}`, BOT, START));
+  for (let i = 1; i <= SEEDS; i++) runs.push(playRun(data, `${PREFIX}${String(i).padStart(4, '0')}`, BOT, START, MODE));
   const ms = Date.now() - t0;
 
   const stages = playableStages(data);

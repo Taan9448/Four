@@ -12,7 +12,7 @@
 ```bash
 npm ci
 npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>]
-                            # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot[&module=<id>] (화면 하나만 띄우기)
+                            # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub[&module=<id>] (화면 하나만 띄우기)
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
