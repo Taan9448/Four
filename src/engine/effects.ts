@@ -254,9 +254,11 @@ export function dealDamage(
   else if (affinity === 'resist') dmg *= bal.elements.resistMultiplier;
   // 치명타: 아군 카드의 피해 한 번마다 굴린다(미리보기 복제·수치 시험에서는 굴리지 않는다)
   let crit = false;
-  if (source?.side === 'party' && card && !state.noCrit) {
+  // 치명타는 따로 떼어 둔 수열(critRng)로 굴려, 미리보기(굴리지 않음)와 실제의 다른 무작위(무작위 대상 등)가 어긋나지 않게 한다.
+  // 적에게 주는 피해만(자기 피해 카드는 굴리지 않는다)
+  if (source?.side === 'party' && target.side === 'enemy' && card && !state.noCrit) {
     const chance = critChance(state, source);
-    if (chance > 0 && state.rng.next() < chance) {
+    if (chance > 0 && (state.critRng ?? state.rng).next() < chance) {
       crit = true;
       dmg *= bal.crit.multiplier;
     }

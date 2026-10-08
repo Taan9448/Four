@@ -123,13 +123,16 @@ export function runTour(steps: TourStep[], opts: { id?: string; once?: boolean; 
   };
   const onResize = () => place();
 
+  // 화면에 뜨기 전에 다른 안내에 밀려 닫히면 본 것으로 치지 않는다
+  let shown = false;
   function close() {
     document.removeEventListener('keydown', onKey, true);
     window.removeEventListener('resize', onResize);
     root.classList.add('out');
     setTimeout(() => root.remove(), 200);
-    if (opts.id) markSeen(opts.id);
     if (active === handle) active = null;
+    if (!shown) return;
+    if (opts.id) markSeen(opts.id);
     opts.onDone?.();
   }
   const handle = { close };
@@ -137,6 +140,7 @@ export function runTour(steps: TourStep[], opts: { id?: string; once?: boolean; 
 
   setTimeout(() => {
     if (active !== handle) return;
+    shown = true;
     document.body.appendChild(root);
     document.addEventListener('keydown', onKey, true);
     window.addEventListener('resize', onResize);

@@ -4,7 +4,11 @@ import type { GameData } from '../engine/data';
 import type { RunState } from '../engine/run';
 import { deserializeRun, serializeRun, type LoadedRun } from '../engine/save';
 
-const RUN_KEY = 'cheonoe.run';
+/** 저장 칸 수(2026-10-08: 1칸 → 3칸). 칸마다 키가 따로이고, 옛 단일 저장(cheonoe.run)은 1번 칸으로 옮긴다 */
+export const SLOT_COUNT = 3;
+const LEGACY_RUN_KEY = 'cheonoe.run';
+const slotKey = (slot: number) => `cheonoe.run.${slot}`;
+const LAST_SLOT_KEY = 'cheonoe.lastSlot';
 const SETTINGS_KEY = 'cheonoe.settings';
 
 export function readStore(key: string): string | null {
@@ -24,9 +28,37 @@ export function writeStore(key: string, value: string | null): void {
   }
 }
 
-export const saveRun = (run: RunState) => writeStore(RUN_KEY, serializeRun(run));
-export const loadRun = (data: GameData): LoadedRun | null => deserializeRun(data, readStore(RUN_KEY));
-export const clearRun = () => writeStore(RUN_KEY, null);
+function migrateLegacy(): void {
+  const legacy = readStore(LEGACY_RUN_KEY);
+  if (legacy === null) return;
+  if (readStore(slotKey(1)) === null) writeStore(slotKey(1), legacy);
+  writeStore(LEGACY_RUN_KEY, null);
+}
+
+export function saveRun(slot: number, run: RunState): void {
+  writeStore(slotKey(slot), serializeRun(run));
+  writeStore(LAST_SLOT_KEY, String(slot));
+}
+
+export function loadRun(data: GameData, slot: number): LoadedRun | null {
+  migrateLegacy();
+  return deserializeRun(data, readStore(slotKey(slot)));
+}
+
+export const clearRun = (slot: number) => writeStore(slotKey(slot), null);
+
+/** 칸 1~SLOT_COUNT의 저장(없으면 null) */
+export function listSlots(data: GameData): { slot: number; saved: LoadedRun | null }[] {
+  return Array.from({ length: SLOT_COUNT }, (_, i) => ({ slot: i + 1, saved: loadRun(data, i + 1) }));
+}
+
+/** 마지막으로 저장한 칸(이어하기 기본값). 그 칸이 비었으면 가장 최근에 저장된 칸 */
+export function lastSlot(data: GameData): { slot: number; saved: LoadedRun } | null {
+  const slots = listSlots(data).filter((x) => x.saved) as { slot: number; saved: LoadedRun }[];
+  if (!slots.length) return null;
+  const last = Number(readStore(LAST_SLOT_KEY));
+  return slots.find((x) => x.slot === last) ?? slots.sort((a, b) => b.saved.savedAt - a.saved.savedAt)[0];
+}
 
 export const readSettings = () => readStore(SETTINGS_KEY);
 export const writeSettings = (json: string) => writeStore(SETTINGS_KEY, json);

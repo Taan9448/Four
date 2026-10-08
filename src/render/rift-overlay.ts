@@ -32,8 +32,6 @@ export class RiftOverlay {
   private cracks: SVGPathElement[] = [];
   /** 그림이 있을 때: 지금 단계의 금 한 장 */
   private stageImg: HTMLImageElement;
-  /** 찢어짐·폭주 이펙트를 재생하는 자리 */
-  private fxCanvas: HTMLCanvasElement;
   private value = 0;
 
   constructor(private max: number, private threshold: number) {
@@ -57,11 +55,9 @@ export class RiftOverlay {
     this.stageImg = document.createElement('img');
     this.stageImg.className = 'rift-stage';
     this.stageImg.alt = '';
-    this.fxCanvas = document.createElement('canvas');
-    this.fxCanvas.className = 'rift-fx';
     this.el = document.createElement('div');
     this.el.className = 'rift-overlay';
-    this.el.append(this.svg, this.stageImg, this.fxCanvas);
+    this.el.append(this.svg, this.stageImg);
   }
 
   update(value: number): void {
@@ -89,10 +85,13 @@ export class RiftOverlay {
     return this.play('fx_rift_surge');
   }
 
+  /** 이펙트마다 새 캔버스(찢어짐과 폭주가 겹쳐도 서로 지우지 않게) */
   private async play(id: string): Promise<void> {
     if (!hasArt(id)) return;
-    this.fxCanvas.classList.add('on');
-    await new SpritePlayer(this.fxCanvas).play(id);
-    this.fxCanvas.classList.remove('on');
+    const canvas = document.createElement('canvas');
+    canvas.className = 'rift-fx on';
+    this.el.appendChild(canvas);
+    await new SpritePlayer(canvas).play(id);
+    canvas.remove();
   }
 }

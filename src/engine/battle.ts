@@ -126,6 +126,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
 
   state.enemyHpScale = setup.enemyHpScale ?? 1;
+  state.critRng = setup.rng.fork('crit');
   state.enemyDmgScale = setup.enemyDmgScale ?? 1;
   fireSupport(state, 'battleStart', {});
   if (setup.startEffects?.length) {
@@ -371,6 +372,7 @@ export function cloneBattle(s: BattleState): BattleState {
   return {
     ...s,
     rng: s.rng.clone(),
+    critRng: s.critRng?.clone(),
     party: s.party.map(unit),
     enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),

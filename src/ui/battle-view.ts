@@ -307,6 +307,7 @@ export class BattleView {
     });
 
     // 대상 표시
+    if (this.selected !== null && !s.hand[this.selected]) this.selected = null;
     const need = this.selected !== null ? needsTarget(s, s.hand[this.selected]) : null;
     for (const u of this.units.values()) {
       const ok = !u.c.downed && ((need === 'enemy' && u.c.side === 'enemy') || (need === 'ally' && u.c.side === 'party'));
@@ -401,7 +402,7 @@ export class BattleView {
   // ───────────────────────── 입력 ─────────────────────────
 
   private onKey = (e: KeyboardEvent) => {
-    if (document.querySelector('.overlay')) return; // 창이 떠 있으면 전투 단축키를 받지 않는다
+    if (document.querySelector('.overlay, .tour')) return; // 창·안내가 떠 있으면 전투 단축키를 받지 않는다
     if (e.key === 'Escape') {
       this.selected = null;
       this.refresh();
@@ -420,10 +421,17 @@ export class BattleView {
       return;
     }
     const need = needsTarget(this.state, this.state.hand[i]);
-    if (!need) return void this.act(() => playCard(this.state, i));
+    // 바로 쓰는 카드: 고른 카드를 풀어 둔다(손패가 줄면 고른 칸이 다른 카드·빈 칸을 가리키게 된다)
+    if (!need) {
+      this.selected = null;
+      return void this.act(() => playCard(this.state, i));
+    }
     // 대상이 하나뿐이면 바로 사용
     const pool = (need === 'enemy' ? this.state.enemies : this.state.party).filter((c) => !c.downed);
-    if (pool.length === 1) return void this.act(() => playCard(this.state, i, pool[0].uid));
+    if (pool.length === 1) {
+      this.selected = null;
+      return void this.act(() => playCard(this.state, i, pool[0].uid));
+    }
     this.selected = i;
     this.refresh();
   }

@@ -164,8 +164,14 @@ export function levelUpView(data: GameData, run: RunState, onDone: () => void): 
               cands.map((c) => {
                 const el = cardView(data, { ...c, level: c.level + 1 });
                 el.addEventListener('click', () => {
+                  // 빠른 두 번 누름이 다음 동료의 카드까지 강화하지 않게, 한 번 고르면 이번 칸은 잠근다
+                  if (box.dataset.picked === member) return;
+                  box.dataset.picked = member;
                   done.push(...applyLevelUpgrade(data, run, c.uid));
-                  render();
+                  setTimeout(() => {
+                    delete box.dataset.picked;
+                    render();
+                  }, 250);
                 });
                 return el;
               }),
