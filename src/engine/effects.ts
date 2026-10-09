@@ -103,6 +103,24 @@ export function amountOf(state: BattleState, effect: Effect, target: Combatant |
   return amount * (ctx.mult ?? 1);
 }
 
+// ───────────────────────── 적 만들기 ─────────────────────────
+
+/** 적 하나를 전투에 세운다: 스테이지·등급 배율, 특성 상태. uid는 e<번호> */
+export function spawnEnemy(state: Pick<BattleState, 'data' | 'scar' | 'enemyHpScale' | 'enemies'>, id: string, index: number): EnemyState {
+  const def = state.data.enemies.get(id);
+  if (!def) throw new Error(`알 수 없는 적: ${id}`);
+  const statuses: Record<string, number> = {};
+  for (const t of def.traits) statuses[t.status] = t.stacks;
+  const tier = state.data.balance.enemyTiers[def.tier];
+  const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (state.scar ?? 0)) * (state.enemyHpScale ?? 1) * (tier?.hp ?? 1));
+  let uid = `e${index}`;
+  for (let n = index; state.enemies.some((e) => e.uid === uid); n++) uid = `e${n + 1}`;
+  return {
+    uid, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
+    statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null, dmgMul: tier?.dmg ?? 1,
+  };
+}
+
 // ───────────────────────── 대상 ─────────────────────────
 
 function sidesOf(state: BattleState, source: Combatant | null) {
@@ -514,7 +532,7 @@ export function runEffects(state: BattleState, effects: Effect[], ctx: EffectCon
 }
 
 function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): void {
-  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max'].includes(effect.op);
+  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
     const amount = amountOf(state, effect, undefined, ctx);
@@ -528,12 +546,31 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       case 'draw':
         drawCards(state, amount);
         return;
-      case 'discard':
-        for (let i = 0; i < amount && state.hand.length > 0; i++) {
-          const idx = state.rng.int(0, state.hand.length - 1);
-          state.discard.push(...state.hand.splice(idx, 1));
+      case 'discard': {
+        // filter.owner: 그 주인의 카드만(하운의 숨을 끊는다 → 하운 카드만 버린다)
+        const owner = effect.filter?.owner;
+        for (let i = 0; i < amount; i++) {
+          const idxs = state.hand.map((c, j) => j).filter((j) => !owner || state.data.cards.get(state.hand[j].cardId)?.owner === owner);
+          if (!idxs.length) break;
+          const [card] = state.hand.splice(state.rng.pick(idxs), 1);
+          state.discard.push(card);
+          state.events.push({ type: 'discard', cardId: card.cardId });
         }
         return;
+      }
+      case 'summon': {
+        // 소환: 적 편에 새 적을 세운다(이번 차례에는 의도가 없어 쉰다)
+        const def = effect.enemy ? state.data.enemies.get(effect.enemy) : undefined;
+        if (!def) throw new Error(`summon: 알 수 없는 적 ${effect.enemy}`);
+        for (let i = 0; i < (effect.count ?? 1); i++) {
+          if (alive(state.enemies).length >= state.data.balance.maxEnemies) break;
+          const e = spawnEnemy(state, def.id, state.enemies.length);
+          state.enemies.push(e);
+          state.events.push({ type: 'summon', uid: e.uid, sourceUid: ctx.source?.uid ?? null });
+          state.log.push(`${ctx.source?.name ?? ''}이(가) ${def.name}을(를) 불렀다.`);
+        }
+        return;
+      }
       case 'rift':
         changeRift(state, amount);
         return;

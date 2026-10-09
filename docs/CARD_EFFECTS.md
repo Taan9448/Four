@@ -4,7 +4,7 @@
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(16개)
+## 1. 전투 기본 동작(17개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -14,7 +14,7 @@
 | `gain_neigong` | amount | — | 내공 증감 |
 | `gain_mana` | amount | — | 마나 증감(0~최대) |
 | `draw` | amount | — | 카드 뽑기 |
-| `discard` | amount | — | 손패에서 무작위로 버리기 |
+| `discard` | amount, filter.owner? | — | 손패에서 무작위로 버리기. `filter.owner`면 그 주인의 카드만(끊긴 숨: 하운 카드만) |
 | `apply_status` | status, stacks | 카드 대상 | 상태 부여(`data/statuses.json`) |
 | `remove_status` | status, stacks? | 자신 | 상태 제거(stacks 없으면 전부) |
 | `rift` | amount | — | 전투 균열 증감. 증가 후 지원 트리거·폭주 검사 |
@@ -23,6 +23,7 @@
 | `add_card` | card, count, to | — | 카드 생성(hand / draw / discard) |
 | `dispel` | — | 카드 대상 | 돌려보내기(운해귀종·두린의 망치): 대상의 강화(`kind: buff`) 상태와 방어를 모두 걷어 낸다. 약화 같은 debuff·특성(trait)은 남는다 |
 | `neigong_max` | amount | — | 이번 전투에서 턴마다 차는 내공 증감(내공의 실: 팔 년 내공을 실로 뽑는다). 0 아래로 내려가지 않는다 |
+| `summon` | enemy, count | — | 적 편에 적을 세운다(`balance.maxEnemies`까지, 스테이지·등급 배율 적용). 그 차례에는 쉬고 다음 차례부터 행동한다 |
 | `lose_hp` | amount | 자신 | 체력 잃기(방어 무시, 피의 값). '체력을 잃었을 때' 발동을 부른다 |
 
 **공통 수식자**
@@ -61,7 +62,8 @@
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
   "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다)
-  "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 공용은 아무 동료의 것
+  "tags": ["haun_rift"],
+  "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 공용은 아무 동료의 것
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
   "upgrade": {                          // 강화 +1~+5(상태 카드 제외 필수)
     "growth": [4, 0],                   //   +1~+3: 단계마다 effects[i]의 amount(없으면 stacks)에 더할 값. 효과 수와 같아야 한다
@@ -117,6 +119,9 @@
 | burn | 화상 | 자기 턴 끝 -1 | 턴 시작마다 스택×2 HP 손실. 냉기 공격에 꺼진다 |
 | chill | 냉기 | 없음 | special `chill`: 3스택(보스 5)이면 빙결 1로 바뀐다. 화염 공격에 녹는다 |
 | mountain_regen | 산이 메운다 | 없음 | 차례 시작마다 스택×4 회복(`turnStartDamagePerStack` 음수 = 회복) |
+| daze | 어지러움 | 자기 턴 끝 -1 | 발동: 차례 시작에 손패에서 무작위 1장 버리기(스택과 상관없이 1장, `perStack: false` — 그림자 조각) |
+| breath_broken | 끊긴 숨 | 자기 턴 끝 -1 | 발동: 차례 시작에 하운의 카드 1장 버리기(곽도진의 청운의 박자를 흐트리다) |
+| thorns | 가시 | 없음 | 발동: 공격을 맞을 때마다 때린 쪽에게 피해 1(스택마다) — 바위 골렘·용암 핏줄의 골렘·호법 |
 | frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
@@ -164,6 +169,7 @@
 - `weak` / `resist`: 속성 약점·내성 배열(fire | ice). 예: 불의 정령·이그니스 `weak: ["ice"], resist: ["fire"]`, 아르덴의 얼음 적 `weak: ["fire"], resist: ["ice"]`.
 - `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
 - `tier`: normal | elite | boss. `balance.enemyTiers[tier]`의 체력(`hp`)·피해(`dmg`) 배율이 스테이지 배율(`stages[].enemyHpScale`·`enemyDmgScale`, 어려움이면 `balance.difficulty.hard.byStage`)과 함께 곱해진다(GAME_DESIGN 12절). 의도·받을 피해 예고에도 같이 걸린다.
+- 행동(`moves[]`)의 `condition`: 이 조건일 때만 고른다(검사 대상은 그 적 자신 — 예: `{ "hpRatioLte": 0.5 }` 체력 절반 아래). 순서대로(cycle)면 조건이 맞지 않는 행동은 건너뛴다. `oncePerBattle: true`면 한 전투에 한 번만(소환).
 - `enrage`: `{ afterTurn, text, effects }` — 그 턴부터 이 적의 차례마다(행동 뒤) effects가 이 적을 출처로 일어난다. 그 턴에 `text`를 화면에 알리고, 적 이름 아래 '격노까지 n턴' 이름표가 보인다. 예: 모르데카이 10턴부터 힘 +3.
 - `deathEffects`: 이 적이 쓰러질 때 그 적을 출처로 일어나는 전투 동작. 예: 베일락 `[{ "op": "damage", "amount": 999, "target": "all_allies" }]`(졸개가 무너진다), 쐐기 `[{ "op": "rift", "amount": -2 }]`.
 

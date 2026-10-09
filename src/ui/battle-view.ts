@@ -53,6 +53,7 @@ interface Unit {
 export class BattleView {
   readonly root: HTMLElement;
   private units = new Map<string, Unit>();
+  private enemySide!: HTMLElement;
   private field!: HTMLElement;
   private fxLayer!: HTMLElement;
   private toasts!: HTMLElement;
@@ -169,6 +170,7 @@ export class BattleView {
     const enemyEl = h('div', { class: 'side side-enemy' });
     for (const c of this.state.party) partyEl.appendChild(this.makeUnit(c).el);
     for (const c of this.state.enemies) enemyEl.appendChild(this.makeUnit(c).el);
+    this.enemySide = enemyEl;
 
     const bgUrl = frameUrl(this.ctx.background, 1, { realOnly: true });
     this.field = h(
@@ -792,6 +794,26 @@ export class BattleView {
             this.refresh();
           }
           await this.wait(600);
+          break;
+        }
+        case 'summon': {
+          // 소환: 적 편 끝에 새 자리를 만든다
+          const c = this.state.enemies.find((e) => e.uid === ev.uid);
+          if (c && !this.units.has(c.uid)) {
+            const u = this.makeUnit(c);
+            this.enemySide.appendChild(u.el);
+            u.el.classList.add('summoned');
+            floatOver(this.fxLayer, u.el, '소환', 'status');
+            sfx('transform', { volume: 0.5 });
+            this.refresh();
+          }
+          await this.wait(450);
+          break;
+        }
+        case 'discard': {
+          const haun = [...this.units.values()].find((u) => u.c.defId === 'haun');
+          if (haun) floatOver(this.fxLayer, haun.el, `버림: ${this.data.cards.get(ev.cardId)?.name ?? ev.cardId}`, 'status');
+          await this.wait(200);
           break;
         }
         case 'enrage': {

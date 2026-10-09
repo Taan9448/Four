@@ -10,7 +10,7 @@
     "scale": 1.15,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "blood_palm", "name": "핏빛 장력", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 14}]}, {"id": "elder_formation", "name": "장로의 진", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "palm_flurry", "name": "혈마장 연타", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 6, "times": 2}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
+    "moves": [{"id": "blood_palm", "name": "핏빛 장력", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 13}]}, {"id": "elder_formation", "name": "장로의 진", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "palm_flurry", "name": "혈마장 연타", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 5, "times": 2}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
     "flavor": "구천 계단의 굽이마다 장로 아홉이 섰다. 핏빛 장력이 기둥을 꿰뚫는다. 교주가 방심을 거둔 자리였다."
   },
   {
@@ -35,7 +35,7 @@
     "scale": 1.3,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "qingfeng", "name": "제3식 청풍불면", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 3}]}, {"id": "blood_wave", "name": "운해귀종 — 피의 파도", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 10}]}, {"id": "forbid_drinking", "name": "피를 마시는 것은 허락하지 않소", "intent": "special", "targeting": "random", "effects": [{"op": "remove_status", "status": "strength", "target": "all_allies"}, {"op": "block", "amount": 8, "target": "self"}]}],
+    "moves": [{"id": "qingfeng", "name": "제3식 청풍불면", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 3}]}, {"id": "break_breath", "name": "청운의 박자를 흐트리다", "intent": "debuff", "targeting": "haun", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "breath_broken", "stacks": 1}]}, {"id": "blood_wave", "name": "운해귀종 — 피의 파도", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 10}]}, {"id": "forbid_drinking", "name": "피를 마시는 것은 허락하지 않소", "intent": "special", "targeting": "random", "effects": [{"op": "remove_status", "status": "strength", "target": "all_allies"}, {"op": "block", "amount": 8, "target": "self"}]}],
     "flavor": "현허진인 곽도진. 학창의와 송문고검. 바닥의 피가 그의 운해귀종을 따라 붉은 파도로 일어선다. 사형의 목소리에 단 한 번, 검이 굳는다."
   },
   {

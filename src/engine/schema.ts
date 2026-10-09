@@ -23,6 +23,7 @@ export const BATTLE_OPS = [
   'dispel',
   'neigong_max',
   'lose_hp',
+  'summon',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -107,6 +108,8 @@ export const Effect = z
     count: z.number().int().positive().optional(),
     member: z.string().optional(),
     flag: z.string().optional(),
+    /** summon: 불러낼 적 id(count마리, balance.battle.maxEnemies까지) */
+    enemy: z.string().optional(),
     /** gain_relic·gain_potion: 얻을 유물·물약 id */
     relic: z.string().optional(),
     potion: z.string().optional(),
@@ -212,6 +215,8 @@ export const CardDef = z
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
     /** 아키타입(GAME_DESIGN 9-2): 주인 캐릭터의 archetypes id. 공용 카드는 어느 캐릭터의 것이든 붙일 수 있다 */
     tags: z.array(z.string()).default([]),
+    /** 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기' 등 */
+    onTurnEndInHand: z.array(Effect).optional(),
     /** 필수 카드(GAME_DESIGN 9-1): 보스를 깨는 열쇠. 가지고 있으면 편성과 상관없이 늘 덱에 들어간다 */
     essential: z.boolean().optional(),
     /**
@@ -286,6 +291,10 @@ export const MoveDef = z
     intent: z.enum(['attack', 'defend', 'buff', 'debuff', 'special']),
     targeting: z.enum(['random', 'lowest_hp', 'highest_hp', 'haun']).default('random'),
     weight: z.number().positive().default(1),
+    /** 이 조건일 때만 고른다(검사 대상은 이 적 자신: hpRatioLte 등). 순서대로(cycle)면 조건이 맞지 않는 행동은 건너뛴다 */
+    condition: Condition.optional(),
+    /** 한 전투에 한 번만(소환 등) */
+    oncePerBattle: z.boolean().optional(),
     effects: z.array(Effect),
   })
   .strict();
@@ -436,6 +445,8 @@ export const Balance = z
     neigongPerTurn: z.number().int().positive(),
     handSize: z.number().int().positive(),
     maxHand: z.number().int().positive(),
+    /** 한 전투에 함께 설 수 있는 적 수(소환 상한) */
+    maxEnemies: z.number().int().positive().default(5),
     mana: z.object({ max: z.number().int().positive(), worlds: z.record(World, WorldMana) }).strict(),
     rift: z
       .object({

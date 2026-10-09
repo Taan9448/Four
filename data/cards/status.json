@@ -5,5 +5,13 @@
     "effects": [],
     "text": "사용할 수 없다. 균열이 남긴 굶주린 바람.",
     "flavor": "그 안에서 굶주린 바람이 불어왔다."
+  },
+  {
+    "id": "status_miasma", "name": "독기", "owner": "status", "type": "status", "rarity": "special", "pool": "status",
+    "cost": { "neigong": 1, "mana": 0 }, "target": "none", "keywords": ["exhaust"],
+    "effects": [],
+    "onTurnEndInHand": [{ "op": "lose_hp", "amount": 3, "target": "self" }],
+    "text": "손에 든 채 턴이 끝나면 하운 체력 3을 잃는다. 내공 1을 써서 털어 낼 수 있다(소멸).",
+    "flavor": "숨을 쉴 때마다 폐 깊은 곳이 따끔거렸다."
   }
 ]

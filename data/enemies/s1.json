@@ -35,7 +35,7 @@
     "silhouette": "beast",
     "color": "#5a6a3a",
     "pattern": "cycle",
-    "moves": [{"id": "venom_tongue", "name": "독 묻은 혀", "intent": "attack", "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "poison", "stacks": 3}]}, {"id": "swell", "name": "부풀기", "intent": "defend", "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
+    "moves": [{"id": "venom_tongue", "name": "독 묻은 혀", "intent": "attack", "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "poison", "stacks": 3}]}, {"id": "swell", "name": "부풀기", "intent": "defend", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "spit_miasma", "name": "독기 뱉기", "intent": "debuff", "effects": [{"op": "add_card", "card": "status_miasma", "to": "discard"}]}],
     "flavor": "저녁마다 보른과 나간 길드 의뢰 가운데 하나. 늪지의 독두꺼비를 잡아 달라는."
   },
   {

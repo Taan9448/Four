@@ -2,6 +2,7 @@
   "neigongPerTurn": 3,
   "handSize": 5,
   "maxHand": 10,
+  "maxEnemies": 5,
   "mana": {
     "max": 10,
     "worlds": {
