@@ -1,0 +1,32 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: kindling bundle — a small bundle of dry pine twigs tied with straw, one tip glowing orange
+Cell 2: whetstone oil — a tiny clay oil bottle beside a narrow grey whetstone, a drop of oil on the stone
+Cell 3: straw sandals — a pair of woven straw sandals with knotted straw cords
+Cell 4: clay jar — a small brown clay jar mended with amber resin, a few square-holed coins peeking out
+Cell 5: paper charm — a yellowed paper charm with smudged red brush strokes (no readable letters)
+Cell 6: wooden bead — a short loop of plain wooden prayer beads with one cracked bead
+Cell 7: rice ball — a white rice ball wrapped half in a green leaf, a speck of sesame
+Cell 8: old map — a folded yellowed map with a red ink circle in one corner
+Cell 9: hemp rope — a coiled hemp rope with a tight knot
+Cell 10: flint — a dark flint stone and a small steel striker with a single spark between them
+Cell 11: ice pebble — a smooth translucent blue pebble with frost on its edge
+Cell 12: leather gloves — a dark leather glove with short iron studs on the palm
+Cell 13: blood lotus — a deep red lotus flower with dark crimson petals
+Cell 14: grain brush — a calligraphy brush whose bamboo handle shows clear wood-grain lines
+Cell 15: rift bell — a small bronze bell with a black crack running down its side, red light in the crack
+Cell 16: frost lantern — a slender silver lantern with pale blue frost glowing inside instead of flame
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+
+Fix: Keep the exact icon order, but make EVERY icon smaller and centered: its whole silhouette must fit inside a 48x48 sprite-pixel square centered in the 64x64 cell, leaving at least 8 pixels of empty magenta on ALL sides. No icon touches or nearly touches a cell edge. Remove every stray dot, line or mark below or beside the icons, especially cells 11 and 12. Use at most 12 flat palette colors per icon and crisp equal square blocks. Cell 6 is ONLY a loop of plain wooden beads with one clearly cracked bead, NO red tassel or dangling ornament. Cell 14 is ONLY the bamboo wood-grain brush, NO red tassel or decorative cord. Cell 5 has only two or three irregular smudged red brush marks, NO readable characters or text. Do not add unspecified decorations to any object. Keep all sixteen icons recognizable, the same set style, with no lines dividing the grid.
+
+Fix: Correct the remaining alignment defect: every icon must have its silhouette CENTER at the exact middle of ITS OWN cell, x=128,y=128 in a 256x256 cell, or x=32,y=32 in sprite pixels. In the previous sheet the first row is too low and the last row is too high. Shift the first-row icons upward and the fourth-row icons downward so all sixteen share the identical relative center. The WHOLE outline of each icon fits within x=10..53 AND y=10..53 on its own 64x64 grid, at most 44x44 pixels. Pay special attention to the brush, bell and lantern in cells 14,15,16: leave 10 full empty pixels above their highest tip; never clip the lantern cap. Keep exact ordering and the present unadorned bead loop and brush, no readable letters, no stray specks anywhere. Uniform pixel blocks and a maximum of 12 flat colors per icon.
