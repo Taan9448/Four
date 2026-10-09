@@ -62,9 +62,29 @@ export interface RunState {
   replays: Record<string, number>;
   /** 스테이지 다시 하기 중이면 돌아갈 클리어한 런(결과는 그 런에 남기지 않는다. 이긴 횟수만) */
   replayOf: RunState | null;
+  /** 결과 화면 통계 */
+  stats: RunStats;
 }
 
 export type Difficulty = 'normal' | 'hard';
+
+/** 결과 화면 통계(런 전체): 전투 집계를 더해 간다 */
+export interface RunStats {
+  battles: number;
+  turns: number;
+  kills: number;
+  damage: number;
+  crits: number;
+  surges: number;
+  /** 카드 id → 쓴 횟수 */
+  cards: Record<string, number>;
+  /** 진 런: 어디서 무엇에 쓰러졌나 */
+  deathCause?: string;
+}
+
+export function emptyStats(): RunStats {
+  return { battles: 0, turns: 0, kills: 0, damage: 0, crits: 0, surges: 0, cards: {} };
+}
 
 /** 상점 진열: 노드마다 한 번 정해지고, 산 것은 sold */
 export interface ShopState {
@@ -134,6 +154,7 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     fallen: [],
     replays: {},
     replayOf: null,
+    stats: emptyStats(),
   };
   // 하운과 공용의 시작 카드(각 10장)를 받고, 첫 스테이지 편성으로
   grantStarters(data, run, 'haun');
@@ -328,8 +349,20 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
   run.mana = outcome.mana;
   run.scar += outcome.scarGain;
   if (outcome.potions) run.potions = [...outcome.potions];
+  // 결과 화면 통계
+  const st = (run.stats ??= emptyStats());
+  st.battles += 1;
+  st.turns += outcome.turns ?? 0;
+  if (outcome.tally) {
+    st.kills += outcome.tally.kills;
+    st.damage += outcome.tally.damage;
+    st.crits += outcome.tally.crits;
+    st.surges += outcome.tally.surges;
+    for (const [id, n] of Object.entries(outcome.tally.cards)) st.cards[id] = (st.cards[id] ?? 0) + n;
+  }
   if (outcome.result === 'defeat') {
     run.status = 'defeat';
+    st.deathCause = `${enc.module.name} — ${outcome.tally?.haunHitBy ?? '알 수 없는 것'}`;
     return [];
   }
   // 하드코어: 전투가 끝날 때 쓰러져 있던 동료는 일행을 떠난다(하운은 쓰러지면 이미 패배)

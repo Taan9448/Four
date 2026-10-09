@@ -26,6 +26,7 @@ import {
   isFusion,
   resolveCard,
   type BattleState,
+  type BattleTally,
   type CardInstance,
   type Combatant,
   type EnemyState,
@@ -115,6 +116,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     flags: setup.flags ?? [],
     scar: setup.scar ?? 0,
     uidCounter: 0,
+    tally: { kills: 0, damage: 0, crits: 0, surges: 0, cards: {} },
   };
 
   // 출전 멤버의 카드만 덱에 들어간다(공용 카드는 항상)
@@ -255,6 +257,53 @@ export interface IntentView {
   intent: Intent;
   /** 공격이면 1회 예상 피해와 횟수, 속성 */
   damage?: { perHit: number; times: number; all: boolean; element?: Element };
+  /** 공격 말고 하는 일의 핵심 수치(방어 12 · 힘 +2 · 약화 1 · 독기 +1 · 소환 …) */
+  badges: string[];
+}
+
+/** 적 행동에서 피해 말고 하는 일을 짧은 이름표로 */
+export function intentBadges(data: GameData, effects: Effect[]): string[] {
+  const out: string[] = [];
+  const name = (id?: string) => (id ? (data.statuses.get(id)?.name ?? id) : '');
+  for (const e of effects) {
+    const n = e.amount ?? e.stacks ?? 1;
+    switch (e.op) {
+      case 'block':
+        out.push(`방어 ${n}`);
+        break;
+      case 'heal':
+        out.push(`회복 ${n}`);
+        break;
+      case 'apply_status':
+        out.push(e.target === 'self' || e.target === 'all_allies' ? `${name(e.status)} +${n}` : `${name(e.status)} ${n}`);
+        break;
+      case 'remove_status':
+        out.push(`${name(e.status)} 걷기`);
+        break;
+      case 'dispel':
+        out.push('강화 걷기');
+        break;
+      case 'add_card':
+        out.push(`${data.cards.get(e.card ?? '')?.name ?? e.card} +${e.count ?? 1}`);
+        break;
+      case 'summon':
+        out.push(`소환: ${data.enemies.get(e.enemy ?? '')?.name ?? e.enemy}${(e.count ?? 1) > 1 ? ` ×${e.count}` : ''}`);
+        break;
+      case 'gain_mana':
+        if (n < 0) out.push(`마나 ${n}`);
+        break;
+      case 'rift':
+        out.push(`균열 ${n >= 0 ? '+' : ''}${n}`);
+        break;
+      case 'taunt':
+        out.push('도발');
+        break;
+      case 'discard':
+        out.push(`버리기 ${n}`);
+        break;
+    }
+  }
+  return out;
 }
 
 export function describeIntent(state: BattleState, enemy: EnemyState): IntentView | null {
@@ -262,10 +311,12 @@ export function describeIntent(state: BattleState, enemy: EnemyState): IntentVie
   const def = state.data.enemies.get(enemy.defId)!;
   const move = def.moves.find((m) => m.id === enemy.intent!.moveId)!;
   const dmg = move.effects.find((e) => e.op === 'damage');
-  if (!dmg) return { intent: enemy.intent };
+  const badges = intentBadges(state.data, move.effects);
+  if (!dmg) return { intent: enemy.intent, badges };
   return {
     intent: enemy.intent,
     damage: { perHit: previewDamage(state, enemy, dmg.amount ?? 0), times: dmg.times ?? 1, all: dmg.target === 'all_enemies', element: dmg.element },
+    badges,
   };
 }
 
@@ -378,6 +429,7 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   state.mana -= card.cost.mana;
   state.hand.splice(handIndex, 1);
   state.events.push({ type: 'card', cardId: inst.cardId, sourceUid: owner.uid });
+  if (state.tally) state.tally.cards[inst.cardId] = (state.tally.cards[inst.cardId] ?? 0) + 1;
   state.log.push(`${owner.name}: ${card.def.name}${isFusion(card) ? ' [융합]' : ''}`);
   runEffects(state, card.effects, { source: owner, card, chosenUid: targetUid });
   // 파워(지속 효과): 아군·적이 가진 상태 중 '카드를 낸 뒤' 발동
@@ -409,6 +461,7 @@ export function cloneBattle(s: BattleState): BattleState {
     log: [],
     supportUsed: [...s.supportUsed],
     relicCounters: s.relicCounters ? { ...s.relicCounters } : undefined,
+    tally: s.tally ? { ...s.tally, cards: { ...s.tally.cards }, moves: s.tally.moves ? Object.fromEntries(Object.entries(s.tally.moves).map(([k, v]) => [k, [...v]])) : undefined } : undefined,
     potions: [...s.potions],
     flags: [...s.flags],
   };
@@ -568,6 +621,10 @@ function enemyTurn(state: BattleState): void {
     }
     state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
     state.log.push(`${enemy.name}: ${move.name}`);
+    if (state.tally) {
+      const seen = ((state.tally.moves ??= {})[enemy.defId] ??= []);
+      if (!seen.includes(move.id)) seen.push(move.id);
+    }
     runEffects(state, move.effects, { source: enemy, chosenUid: targetUid });
     // 격노: 정한 턴부터 차례마다(정한 턴에 화면에 알린다)
     if (def.enrage && state.turn >= def.enrage.afterTurn && !enemy.downed && !state.result) {
@@ -594,6 +651,9 @@ export interface BattleOutcome {
   potions?: (string | null)[];
   /** 전투가 끝날 때 쓰러져 있던 아군 id(하드코어: 돌아오지 않는다) */
   downed?: string[];
+  /** 결과 화면용 집계와 이 전투의 턴 수 */
+  tally?: BattleTally;
+  turns?: number;
 }
 
 export function battleOutcome(state: BattleState): BattleOutcome | null {
@@ -607,6 +667,8 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
     scarGain: Math.floor(state.rift * bal.rift.scarRatio),
     potions: [...state.potions],
     downed: state.party.filter((p) => p.downed).map((p) => p.defId),
+    tally: state.tally,
+    turns: state.turn,
   };
 }
 

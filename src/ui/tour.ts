@@ -82,7 +82,8 @@ export function runTour(steps: TourStep[], opts: { id?: string; once?: boolean; 
       const bw = Math.min(360, vw - 24);
       const below = box.top + box.height + 14;
       const bh = bubble.offsetHeight || 150;
-      const top = below + bh < vh - 8 ? below : Math.max(8, box.top - bh - 14);
+      // 아래·위 어디에도 다 들어가지 않으면(휴대폰 세로) 화면 안으로 눌러 넣는다
+      const top = Math.min(below + bh < vh - 8 ? below : Math.max(8, box.top - bh - 14), Math.max(8, vh - bh - 8));
       const left = Math.min(Math.max(12, box.left + box.width / 2 - bw / 2), vw - bw - 12);
       Object.assign(bubble.style, { left: `${left}px`, top: `${top}px`, width: `${bw}px` });
     } else {

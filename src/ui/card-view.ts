@@ -1,7 +1,8 @@
 // 카드 한 장의 DOM. 틀은 출신 세계로 나눈다(GAME_DESIGN 13절): 무공(한지·먹·낙관) / 마법(엘하임: 청색 양피지·은테·마법진) / 융합(내공+마나).
 import type { GameData } from '../engine/data';
 import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../engine/state';
-import { cardText } from '../engine/text';
+import { cardGlossary, cardText } from '../engine/text';
+import { tipAttrs } from './tooltip';
 import { h } from './dom';
 
 const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설' };
@@ -35,9 +36,15 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
     h('div', { class: 'card-cost', 'aria-label': `내공 ${card.cost.neigong} 마나 ${card.cost.mana}` }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), zero ? h('span', { class: 'pip-zero' }, '0') : null),
     h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
-    h('div', { class: 'card-text' }, cardText(data, inst)),
+    h('div', { class: 'card-text', ...glossaryTip(data, inst) }, cardText(data, inst)),
     def.flavor ? h('div', { class: 'card-flavor' }, def.flavor) : null,
     world === 'murim' ? h('span', { class: 'seal', 'aria-hidden': 'true' }, def.seal ?? SEAL_BY_TYPE[def.type] ?? '武') : null,
     world === 'elheim' ? h('span', { class: 'circle', 'aria-hidden': 'true' }) : null,
   );
+}
+
+/** 카드 글 위에 마우스를 올리면 용어 풀이(키워드·상태·속성) */
+function glossaryTip(data: GameData, inst: CardInstance | string): Record<string, string | undefined> {
+  const lines = cardGlossary(data, inst);
+  return lines.length ? tipAttrs('용어', lines.join('\n')) : {};
 }

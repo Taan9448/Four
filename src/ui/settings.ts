@@ -10,6 +10,8 @@ export interface Settings {
   speed: number;
   /** 영웅·전설 카드 컷인 */
   cutIn: boolean;
+  /** 쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다 */
+  confirmEndTurn: boolean;
   /** 피격·폭주 때 화면 흔들림 세기(0 끄기 · 0.5 약하게 · 1 보통) */
   shake: number;
   /** 소리 크기 0~1: 전체 · 배경음악 · 효과음 */
@@ -30,7 +32,7 @@ export const SHAKES: { value: number; label: string }[] = [
   { value: 1, label: '보통' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8 };
+const DEFAULTS: Settings = { speed: 1, cutIn: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8 };
 
 const volume = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : d);
 
@@ -46,6 +48,7 @@ function load(): Settings {
     return {
       speed: SPEEDS.some((s) => s.value === raw.speed) ? raw.speed! : DEFAULTS.speed,
       cutIn: typeof raw.cutIn === 'boolean' ? raw.cutIn : DEFAULTS.cutIn,
+      confirmEndTurn: typeof raw.confirmEndTurn === 'boolean' ? raw.confirmEndTurn : DEFAULTS.confirmEndTurn,
       shake: readShake(raw.shake),
       master: volume(raw.master, DEFAULTS.master),
       bgm: volume(raw.bgm, DEFAULTS.bgm),
@@ -85,7 +88,7 @@ export function settingsForm(): HTMLElement {
         ),
       ),
     );
-  const toggle = (key: 'cutIn', label: string, hint: string) =>
+  const toggle = (key: 'cutIn' | 'confirmEndTurn', label: string, hint: string) =>
     h(
       'label',
       { class: 'setting-row setting-toggle' },
@@ -121,6 +124,7 @@ export function settingsForm(): HTMLElement {
     slider('sfx', '효과음', '타격·카드·버튼 소리'),
     h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), radios('speed', '전투 속도', SPEEDS)),
     toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
+    toggle('confirmEndTurn', '턴 종료 확인', '쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다'),
     h('div', { class: 'setting-row' }, h('span', {}, '화면 흔들림', h('small', {}, '피격·폭주 때 흔들리는 세기')), radios('shake', '화면 흔들림', SHAKES)),
     h(
       'div',
