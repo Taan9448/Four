@@ -61,3 +61,10 @@ export function affinityChip(data: GameData, kind: 'weak' | 'resist', element: s
 export function intentIcon(kind: string): HTMLElement {
   return iconEl('icons_intent', INTENT_FRAME[kind], INTENT_GLYPH[kind] ?? '?', `intent-icon intent-${kind}`);
 }
+
+/** 적 이름 아래 작은 게이지 이름표(매듭까지 남은 결·격노까지 남은 턴) */
+export function gaugeChip(kind: 'knot' | 'enrage', short: string, label: string, tipTitle: string, tipBody: string): HTMLElement {
+  const chip = h('span', { class: `status-chip chip-${kind}` }, h('span', { class: 'st-short' }, short), h('span', { class: 'st-name' }, label));
+  Object.entries(tipAttrs(tipTitle, tipBody, kind === 'knot' ? 'debuff' : 'buff')).forEach(([k, v]) => v && chip.setAttribute(k, v));
+  return chip;
+}

@@ -144,9 +144,10 @@
     "castLine": {"speaker": "haun", "face": "neutral", "text": "세상에서 가장 단단한 장작도, 갈라질 자리는 하나다."},
     "cost": {"neigong": 0, "mana": 0},
     "target": "enemy",
+    "keywords": ["exhaust"],
     "tags": ["haun_grain"],
-    "effects": [{"op": "damage", "amount": 3}, {"op": "damage", "amount": 40, "condition": {"targetHasStatus": "knot_exposed"}}],
-    "upgrade": {"growth": [1, 10], "plus4": {"name": "결만 보고", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "탁.", "addKeywords": ["retain"]}},
+    "effects": [{"op": "damage", "amount": 3}, {"op": "damage", "amount": 40, "condition": {"targetHasStatus": "knot_exposed"}}, {"op": "remove_status", "status": "knot_exposed", "condition": {"targetHasStatus": "knot_exposed"}, "target": "enemy"}],
+    "upgrade": {"growth": [1, 10, 0], "plus4": {"name": "결만 보고", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "탁.", "addKeywords": ["retain"]}},
     "flavor": "힘으로 쪼개려 하지 마라. 나무는 원래 갈라질 자리를 가지고 있다."
   },
   {

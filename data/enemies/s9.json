@@ -30,7 +30,7 @@
     "id": "bone_giant",
     "name": "뼈 거인",
     "lore": "뼈로 이루어진 거인. 세계의 조각을 밟고 일어서면 키가 떠다니는 성벽의 세 배에 이른다. 뼈 사이로 검붉은 기운이 흘러 틈의 가장 깊은 곳과 이어져 있다. 갈비뼈로 우리를 지어 사람을 가두고, 부서져도 그 기운을 따라 다시 맞물려 일어선다. 내공을 실어 부수면 흩어진 기운이 하늘의 금으로 빨려 올라간다.",
-    "maxHp": 55,
+    "maxHp": 61,
     "sprite": null,
     "silhouette": "boss",
     "color": "#d8d0bc",
@@ -38,7 +38,7 @@
     "tier": "elite",
     "pattern": "cycle",
     "traits": [{"status": "hungry", "stacks": 1}],
-    "moves": [{"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 14}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "rib_cage", "name": "갈비뼈 우리", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}],
+    "moves": [{"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 18}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "rib_cage", "name": "갈비뼈 우리", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}],
     "transform": {"triggers": ["downed"], "into": "bone_giant_risen", "text": "뼈가 무너졌다. 그리고 뼈 사이로 흐르는 검붉은 기운을 따라, 다시 맞물려 일어섰다. \"저것들은 그것과 이어져 있어요. 베면, 그것이 알아요.\"", "partyEffects": []},
     "flavor": "뼈로 이루어진 거인. 키가 혈전의 잔해에 닿는다. 뼈 사이로 검붉은 기운이 흘러 틈의 깊은 곳과 이어져 있다. 부서져도 다시 일어선다."
   },
@@ -46,7 +46,7 @@
     "id": "bone_giant_risen",
     "name": "다시 일어선 뼈 거인",
     "lore": "무너졌던 뼈가 검붉은 기운을 따라 다시 맞물려 일어선 모습. 이음매마다 금이 남았고, 처음보다 둔해졌지만 휘두르는 뼈는 더 무겁다. 뼈 사이를 흐르는 기운은 한 번도 끊긴 적이 없다. 저것들은 그것과 이어져 있어서, 베면 그것이 안다고 엘리아는 말했다. 틈의 깊은 곳에서 무언가가 이 거인을 통해 이쪽을 보고 있다.",
-    "maxHp": 40,
+    "maxHp": 44,
     "sprite": null,
     "silhouette": "boss",
     "color": "#b8ae98",
@@ -54,21 +54,22 @@
     "tier": "elite",
     "pattern": "cycle",
     "traits": [{"status": "hungry", "stacks": 1}],
-    "moves": [{"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}, {"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 13}]}],
+    "moves": [{"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 9, "target": "all_enemies"}]}, {"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 17}]}],
     "flavor": "부서진 뼈가 검붉은 기운을 따라 다시 맞물렸다. 이음매마다 금이 남아 있다."
   },
   {
     "id": "mordecai",
     "name": "지옥왕 모르데카이",
     "lore": "세계의 틈을 다스리는 지옥왕. 경계가 갈라질 때마다 빨려 든 흐름을 꿰매 붙여 제 몸으로 삼고, 쐐기 칠백 개를 엮어 등뼈로 세웠다. 바르가스에게 문을 열라고, 사무결에게 피로 문을 열라고 속삭인 것이 그였다. 백 년 전 청운검선이 그를 이 안에 가두었다. 흐름을 실은 공격은 먹고 커진다. 흐르지 않는 자는 볼 수 없고, 남의 흐름을 꿰매 붙인 몸에는 가장 약한 실밥이 있다.",
-    "maxHp": 156,
+    "maxHp": 227,
     "sprite": "mordecai",
     "color": "#3a1030",
     "scale": 2.2,
     "tier": "boss",
     "pattern": "cycle",
     "traits": [{"status": "flow_eater", "stacks": 1}, {"status": "knot", "stacks": 1}],
-    "moves": [{"id": "elheim_arm", "name": "엘하임의 팔", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}, {"id": "murim_arm", "name": "무림의 팔", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "mimic_voice", "name": "흉내 내는 목소리 — \"더. 더 다오.\"", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 5, "times": 2}, {"op": "add_card", "card": "status_rift_echo", "to": "discard"}]}, {"id": "hungry_gaze", "name": "굶주린 시선", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
+    "enrage": {"afterTurn": 10, "text": "\"…더는 기다리지 않겠다.\" 꿰맨 팔들이 한꺼번에 조여든다. (차례마다 힘 +3)", "effects": [{"op": "apply_status", "status": "strength", "stacks": 3, "target": "self"}]},
+    "moves": [{"id": "elheim_arm", "name": "엘하임의 팔", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 15, "target": "all_enemies"}]}, {"id": "murim_arm", "name": "무림의 팔", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 20}]}, {"id": "mimic_voice", "name": "흉내 내는 목소리 — \"더. 더 다오.\"", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 10, "times": 2}, {"op": "add_card", "card": "status_rift_echo", "to": "discard"}]}, {"id": "hungry_gaze", "name": "굶주린 시선", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 18}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
     "transform": {"triggers": ["downed"], "into": "torn_border", "text": "탁. 매듭이 풀렸다. \"…아아. 이것이 결이로구나. 그 늙은 검객이 보던 것이.\" 풀려난 흐름이 소용돌이친다 — 꿰매야 한다.", "partyEffects": [{"op": "discard", "amount": 10}, {"op": "add_card", "card": "haun_unhae", "to": "hand"}, {"op": "add_card", "card": "haun_thread", "to": "hand", "count": 2}, {"op": "add_card", "card": "elia_ice_thread", "to": "hand", "condition": {"flag": "arden_ice"}}, {"op": "add_card", "card": "elia_silver_seed", "to": "hand", "condition": {"flag": "silien_seed"}}]},
     "flavor": "칠백 개의 쐐기가 엮인 등뼈. 뭉툭한 끝마다 아이 이름의 첫 글자. 경계가 갈라질 때마다 빨려 든 흐름을 꿰매 붙인 몸 — 은빛 마나의 팔, 고리처럼 감긴 내공의 팔, 이름 모를 세계의 다리와 날개와 뿔. 가슴에는 푸른빛과 검은빛이 엉킨 심장. 그 바로 아래에 가장 새로운 실밥이 있다."
   },
@@ -84,7 +85,7 @@
     "pattern": "cycle",
     "hpPerScar": 1,
     "traits": [{"status": "seam", "stacks": 1}],
-    "moves": [{"id": "loose_flow", "name": "풀려난 흐름이 긁는다", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}, {"id": "widen", "name": "경계가 벌어진다", "intent": "special", "targeting": "random", "effects": [{"op": "rift", "amount": 1}, {"op": "damage", "amount": 3, "target": "all_enemies"}]}],
+    "moves": [{"id": "loose_flow", "name": "풀려난 흐름이 긁는다", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "target": "all_enemies"}]}, {"id": "widen", "name": "경계가 벌어진다", "intent": "special", "targeting": "random", "effects": [{"op": "rift", "amount": 1}, {"op": "damage", "amount": 5, "target": "all_enemies"}]}],
     "flavor": "풀려난 흐름이 갈 곳을 잃고 소용돌이치며 경계의 찢어진 가장자리를 긁는다. 상처라서 흐름을 받지 못한다. 그 세계의 결로, 그 세계의 실로 꿰매야 한다. 갈라진 자리가 많을수록 땀도 많다."
   }
 ]

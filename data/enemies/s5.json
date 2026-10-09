@@ -3,14 +3,14 @@
     "id": "shadow_assassin",
     "name": "그림자 암살자",
     "lore": "마왕의 사천왕 가운데 마지막, 베일락의 주인. 카즈둠 옛 왕의 망루에 달빛이 끊긴 밤, 바닥의 그림자에서 가늘고 긴 형상으로 솟아올랐다. 그림자는 빛이 없는 자리이고, 없는 것에는 결이 없다. 하운의 검이 그 몸을 그대로 통과한다. 그림자를 바꿔 가며 나타나도 칼은 하나, 칼이 오는 길도 하나다. 진짜 몸은 따로 있다.",
-    "maxHp": 60,
+    "maxHp": 66,
     "sprite": null,
     "silhouette": "humanoid",
     "color": "#15121c",
     "tier": "elite",
     "traits": [{"status": "shadow_body", "stacks": 1}, {"status": "incorporeal", "stacks": 1}],
     "pattern": "cycle",
-    "moves": [{"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 10}]}, {"id": "five_blades", "name": "다섯 곳의 단검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 3}]}, {"id": "scatter", "name": "흩어진다", "intent": "defend", "effects": [{"op": "block", "amount": 10, "target": "self"}]}],
+    "moves": [{"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 13}]}, {"id": "five_blades", "name": "다섯 곳의 단검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 5, "times": 3}]}, {"id": "scatter", "name": "흩어진다", "intent": "defend", "effects": [{"op": "block", "amount": 10, "target": "self"}]}],
     "transform": {"triggers": ["partnerDowned"], "partner": "black_crystal", "into": "shadow_assassin_fading", "text": "수정이 둘로 갈라졌다. 망루의 모든 그림자가 소리 없는 비명을 지르며 녹아내린다."},
     "flavor": "얼굴 없는 가늘고 긴 그림자. 물결 문자가 새겨진 검은 단검만이 실체다. 하운의 검이 그림자를 그대로 통과한다. 그림자에는 결이 없다."
   },
@@ -68,14 +68,14 @@
     "id": "obsidian_door",
     "name": "쐐기 박힌 흑요석 문",
     "lore": "노크투르나 일곱째 회랑의 끝을 막은 흑요석의 문. 다른 회랑과 달리 수문장도 마물도 없었다. 문 표면에는 물결 같은 문자가 새겨져 있고, 문틀에 박힌 검은 쐐기 일곱 개가 주위의 허공을 아지랑이처럼 일그러뜨린다. 그롬의 말로는 이 성은 원래 삼천 년 전 고대 드워프들의 요새였다. 문 너머에서 무언가가 기다린다.",
-    "maxHp": 56,
+    "maxHp": 62,
     "sprite": null,
     "silhouette": "object",
     "color": "#1b1724",
     "scale": 1.4,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
+    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
     "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다."
   },
   {
@@ -89,7 +89,7 @@
     "scale": 2,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 21}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 25}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
+    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 12, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 25}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 29}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
     "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
     "flavor": "사람의 세 배인 키, 찢어진 박쥐 날개, 왕관처럼 솟은 비틀린 뿔 일곱, 바닥이 보이지 않는 텅 빈 우물 같은 눈. 삼천 년 전 문을 닫은 고대인. 숨결 하나에 바닥과 갑옷이 녹는다."
   }

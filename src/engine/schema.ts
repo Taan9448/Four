@@ -312,6 +312,8 @@ export const EnemyDef = z
     /** 이 적이 쓰러질 때 일어나는 일(적을 출처로 하는 전투 동작). 예: 군단장이 쓰러지면 졸개가 무너진다 */
     deathEffects: z.array(Effect).default([]),
     tier: z.enum(['normal', 'elite', 'boss']).default('normal'),
+    /** 격노: afterTurn 턴부터 이 적의 차례마다 effects(적을 출처로). 오래 끄는 전투를 끝내게 한다(모르데카이) */
+    enrage: z.object({ afterTurn: z.number().int().positive(), text: z.string(), effects: z.array(Effect).min(1) }).strict().optional(),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
     /** 속성 약점(받는 피해 × elements.weakMultiplier) · 내성(× resistMultiplier, 그 속성 상태가 붙지 않는다) */
     weak: z.array(Element).default([]),
@@ -538,7 +540,14 @@ export const Balance = z
      * 난이도(2026-10-08): 첫 클리어 뒤 새 런에서 고른다. hard는 모든 스테이지의 적 체력·공격력 배율에 곱한다.
      * 하드코어는 난이도와 따로 켜는 규칙(쓰러진 동료는 돌아오지 않는다)이라 수치가 없다
      */
-    difficulty: z.object({ hard: z.object({ enemyHpMul: z.number().positive(), enemyDmgMul: z.number().positive() }).strict() }).strict(),
+    /** 어려움(GAME_DESIGN 12절): 스테이지마다 적 체력·피해 배율(뒤 스테이지일수록 세게) */
+    difficulty: z
+      .object({ hard: z.object({ byStage: z.record(z.string(), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict()) }).strict() })
+      .strict(),
+    /** 적 등급별 체력·피해 배율(일반은 단단하고 약하게 → 한 전투 4~6턴, GAME_DESIGN 12절) */
+    enemyTiers: z
+      .partialRecord(z.enum(['normal', 'elite', 'boss']), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict())
+      .default({}),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     route: z

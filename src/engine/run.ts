@@ -312,8 +312,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
-    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? data.balance.difficulty.hard.enemyHpMul : 1),
-    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? data.balance.difficulty.hard.enemyDmgMul : 1),
+    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1),
+    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1),
     relics: run.relics,
     potions: run.potions,
   };
@@ -651,4 +651,9 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
     }
   }
   return out;
+}
+
+/** 어려움 배율(스테이지별, 없으면 1) */
+export function hardMul(data: GameData, stageId: string): { hp: number; dmg: number } {
+  return data.balance.difficulty.hard.byStage[stageId] ?? { hp: 1, dmg: 1 };
 }
