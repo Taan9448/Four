@@ -13,6 +13,7 @@ import { columnCenter, dropEdgeSlivers, keyOut, magentaCast, nearestColor, shift
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
+import { webpIllustrations } from '../tools/vite-webp.mjs';
 
 const FIXTURES = join(ROOT, 'tools/__fixtures__/specs');
 let root: string;
@@ -459,5 +460,32 @@ describe('반신 그림: 옆 칸에서 넘어온 조각 지우기', () => {
     expect(data[(8 * W + 38) * 4 + 3]).toBe(0);
     expect(data[(5 * W + 4) * 4 + 3]).toBe(255);
     expect(data[(10 * W + 20) * 4 + 3]).toBe(255);
+  });
+});
+
+describe('배포본 WebP 변환(vite-webp)', () => {
+  it('일러스트만 WebP로 내보내고, 픽셀 아트는 그대로, 실제 그림이 있는 임시 시트는 뺀다', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'webp-'));
+    const asset = (source: string, id: string, type: string) => ({ source, dir: `assets/${source}/${id}`, meta: { id, type } });
+    mkdirSync(join(dir, 'assets/sprites/cg_x'), { recursive: true });
+    writeFileSync(
+      join(dir, 'assets/manifest.json'),
+      JSON.stringify({ assets: { cg_x: asset('sprites', 'cg_x', 'story-cg'), px: asset('sprites', 'px', 'character-anim'), ph: asset('placeholders', 'ph', 'character-anim') } }),
+    );
+    const png = join(dir, 'assets/sprites/cg_x/frame_01.png');
+    await sharp({ create: { width: 64, height: 48, channels: 4, background: { r: 200, g: 120, b: 40, alpha: 0.5 } } }).png().toFile(png);
+    const plugin = webpIllustrations({ root: dir });
+    plugin.buildStart();
+    const emitted: { name: string; source: Buffer }[] = [];
+    const ctx = { emitFile: (f: { name: string; source: Buffer }) => (emitted.push(f), 'REF1') };
+    expect(await plugin.load.call(ctx, `${png}?url`)).toBe('export default import.meta.ROLLUP_FILE_URL_REF1;');
+    expect(emitted[0].name).toBe('cg_x_frame_01.webp');
+    const meta = await sharp(emitted[0].source).metadata();
+    expect([meta.format, meta.width, meta.hasAlpha]).toEqual(['webp', 64, true]);
+    // 픽셀 아트 · 아직 임시 시트인 에셋은 손대지 않는다(Vite 기본 처리)
+    expect(await plugin.load.call(ctx, join(dir, 'assets/sprites/px/frame_01.png?url'))).toBeNull();
+    expect(await plugin.load.call(ctx, join(dir, 'assets/placeholders/ph/frame_01.png?url'))).toBeNull();
+    // 실제 그림이 들어온 에셋의 임시 시트는 배포본에서 뺀다
+    expect(await plugin.load.call(ctx, join(dir, 'assets/placeholders/cg_x/frame_01.png?url'))).toBe('export default "";');
   });
 });

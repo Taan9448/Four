@@ -129,6 +129,12 @@ CI(`tools/check-ownership.mjs`): `art/*` 브랜치는 `assets/source/**`·`asset
 `tools/build-manifest.mjs`가 `predev`·`prebuild`·`test`·`typecheck` 전에 모든 `meta.json`을 모아 `assets/manifest.json`을 만든다.
 게임은 에셋 id를 **`assets/sprites/<id>` → `assets/placeholders/<id>`** 순서로 찾는다. 아트 PR이 머지되면 코드 수정 없이 임시 시트가 실제 그림으로 바뀐다.
 
+**배포본(`npm run build`)의 그림 처리**(`tools/vite-webp.mjs`, 2026-10-09):
+- 일러스트 계열(`story-cg`·`character-standing`·`map-art`·`key-art`)의 실제 그림은 배포본에서만 WebP(품질 82, 투명도 90)로 바꾼다. 원본 PNG(`assets/sprites/`)는 그대로이고, 개발 서버는 PNG를 쓴다. 바꾼 결과는 `node_modules/.cache/webp`에 남는다.
+- 픽셀 아트(캐릭터·배경·이펙트·아이콘·화면 부품)는 PNG 그대로 둔다.
+- 실제 그림이 들어온 에셋의 임시 시트는 배포본에 넣지 않는다.
+- 프레임 PNG는 base64로 JS에 넣지 않고 파일로 둔다(`vite.config.ts`의 `assetsInlineLimit`). 그림은 그 화면에 들어갈 때 받는다.
+
 ## 8. GitHub 협업 흐름
 
 - **라벨:** `asset-request`, `codex`, `claude`, `needs-fix`, `integrated`, `blocked`
