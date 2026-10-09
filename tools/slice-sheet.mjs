@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { bbox, cellRect, columnCenter, extract, fileHash, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
+import { bbox, cellRect, columnCenter, dropEdgeSlivers, extract, fileHash, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -47,6 +47,14 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
         fit: 'fill',
         kernel: 'lanczos3',
       });
+      if (spec.type === 'character-standing') {
+        // 반신 그림: 모델이 인물을 칸 밖까지 그리면 옆 칸 인물의 머리카락 조각이 가장자리에 붙어 남는다 → 지운다
+        const { data, info } = await resized.raw().toBuffer({ resolveWithObject: true });
+        const img = { data, width: info.width, height: info.height };
+        dropEdgeSlivers(img);
+        writeFileSync(fileOf(i), await toPng(img));
+        continue;
+      }
       if (spec.type !== 'ui-slices' && spec.type !== 'ui-parts') {
         await resized.png().toFile(fileOf(i));
         continue;

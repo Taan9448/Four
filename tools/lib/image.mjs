@@ -314,3 +314,55 @@ export function shiftXY(img, dx, dy) {
 
 /** 그림을 가로로 dx(정수 px)만큼 옮긴다 */
 export const shiftX = (img, dx) => shiftXY(img, dx, 0);
+
+/**
+ * 옆 칸에서 넘어온 조각 지우기(반신 그림): 그림이 있는 픽셀을 이웃(8방향)으로 이은 덩어리 가운데
+ * 가장 큰 덩어리(인물)가 아니면서 왼쪽·오른쪽 가장자리에 닿는 덩어리를 투명하게 한다.
+ * 인물에서 떨어진 머리카락 끝·반짝임처럼 가장자리에 닿지 않는 작은 덩어리는 남긴다. 지운 픽셀 수를 돌려준다
+ */
+export function dropEdgeSlivers(img, alphaMin = 24) {
+  const { data, width: W, height: H } = img;
+  const label = new Int32Array(W * H).fill(-1);
+  const sizes = [];
+  const touches = [];
+  const stack = [];
+  for (let start = 0; start < W * H; start++) {
+    if (label[start] !== -1 || data[start * 4 + 3] < alphaMin) continue;
+    const id = sizes.length;
+    let size = 0;
+    let edge = false;
+    label[start] = id;
+    stack.push(start);
+    while (stack.length) {
+      const p = stack.pop();
+      size++;
+      const x = p % W;
+      const y = (p - x) / W;
+      if (x === 0 || x === W - 1) edge = true;
+      for (let dy = -1; dy <= 1; dy++) {
+        const yy = y + dy;
+        if (yy < 0 || yy >= H) continue;
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx;
+          if (xx < 0 || xx >= W) continue;
+          const q = yy * W + xx;
+          if (label[q] !== -1 || data[q * 4 + 3] < alphaMin) continue;
+          label[q] = id;
+          stack.push(q);
+        }
+      }
+    }
+    sizes.push(size);
+    touches.push(edge);
+  }
+  if (sizes.length < 2) return 0;
+  const main = sizes.indexOf(Math.max(...sizes));
+  let removed = 0;
+  for (let p = 0; p < W * H; p++) {
+    const id = label[p];
+    if (id === -1 || id === main || !touches[id]) continue;
+    data[p * 4 + 3] = 0;
+    removed++;
+  }
+  return removed;
+}

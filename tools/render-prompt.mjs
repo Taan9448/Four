@@ -156,6 +156,7 @@ export function renderPrompt(spec, style) {
         `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
         `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. ` +
         `Only the facial expression and a small change of hands or shoulders differ between cells.\n` +
+        `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n` +
         `${frameLines}\n` +
         `Style: ${style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
         `Never use ${key.name}, pink or purple on the character.\n` +

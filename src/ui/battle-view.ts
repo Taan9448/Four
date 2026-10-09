@@ -292,8 +292,10 @@ export class BattleView {
         style: `--scale:${enemyDef?.scale ?? charDef?.scale ?? 1}`,
         onclick: () => this.onUnitClick(c),
       },
+      // 줄 피해 미리보기는 의도 이름표 바로 위에 같은 모양으로(평소에는 비어 있어 자리를 차지하지 않는다)
+      preview,
       intent,
-      h('div', { class: 'sprite-wrap' }, canvas, preview),
+      h('div', { class: 'sprite-wrap' }, canvas),
       h('div', { class: 'unit-name' }, c.name, c.side === 'party' && c.level ? h('small', { class: 'unit-lv' }, ` Lv${c.level}`) : ''),
       h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar' }, hp, hpText)),
       statuses,
