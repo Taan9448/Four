@@ -52,7 +52,11 @@
 }
 ```
 
-**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`(보유 카드에 영구로 + 이번 스테이지 덱, 이미 있으면 강화 — GAME_DESIGN 9-1), `remove_card`(filter: 이번 스테이지 덱에서만 뺀다. 덱을 얇게 하지 않는 원칙이라 지금 데이터는 쓰지 않는다), `upgrade_card`(count, filter: 보유 카드의 강화 단계가 오른다), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic), `gain_potion`(potion: 빈 칸이 없으면 두고 온다).
+**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`(보유 카드에 영구로 + 이번 스테이지 덱, 이미 있으면 강화 — GAME_DESIGN 9-1), `remove_card`(filter: 이번 스테이지 덱에서만 뺀다. 덱을 얇게 하지 않는 원칙이라 지금 데이터는 쓰지 않는다), `upgrade_card`(count, filter: 보유 카드의 강화 단계가 오른다), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic: 없으면 가지지 않은 보스 아닌 유물 중 무작위, `rarity`로 등급 제한), `gain_potion`(potion: 빈 칸이 없으면 두고 온다), `gain_random_card`(rarity: 합류한 동료·공용의 보상 카드 중 그 등급, 없는 카드 우선), `swap_card`(choose: 사람이 고른 보유 카드를 같은 주인의 다른 카드로 — 상점의 카드 바꾸기와 같다), `sell_card`(amount, choose: 고른 보유 카드를 보유·편성·덱에서 빼고 골드 amount).
+
+**선택지 필드:** `condition.goldGte`(골드가 모자라면 흐리게 보이고 고를 수 없다), `outcomes: [{ weight, effects, result }]`(확률 결과 — 선택지의 effects를 먼저 일으키고, 노드마다 정해진 시드 수열로 하나를 고른다. 노름판).
+
+**어디서나 나오는 사건(`data/modules/any.json`, `stage: "*"`):** `stages[].templateEvents`가 true인 스테이지(S1~S8) 지도에 그 스테이지의 사건과 함께 섞인다. 한 지도에 한 번씩, 스테이지마다 다시 나올 수 있다(GAME_DESIGN 10-1).
 
 **상점 노드(`shop`, 2026-10-08):** 스테이지마다 정해진 층(`forcedTypes`, S1·S2~S7은 보스 앞 휴식 바로 앞, S8은 5층) 전체가 상점이다(S0·S9는 없음). 모듈은 `content.text`(상인 소개)만 있고 선택지가 없으며, 진열은 `src/engine/economy.ts`가 노드마다 시드로 정해 `run.shop`에 남긴다. 상점·휴식은 두 번 잇따르지 않는다.
 

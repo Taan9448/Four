@@ -5,7 +5,7 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
-import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, upgradeOwned, type Loadout } from './collection';
+import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
 
 export interface RosterEntry {
   id: string;
@@ -491,13 +491,24 @@ export interface ChoiceView {
   effects: Effect[];
   result?: string;
   source: 'module' | 'support';
+  /** 확률 결과(하나가 시드 RNG로 정해진다) */
+  outcomes?: { weight: number; effects: Effect[]; result: string }[];
+  /** 고를 수 없는 까닭(골드 부족 등). 있으면 흐리게 보인다 */
+  disabled?: string;
 }
 
 export function choicesFor(data: GameData, run: RunState, module: ModuleDef): ChoiceView[] {
   const list: ChoiceView[] = (module.content.choices ?? [])
     .filter((c) => !c.condition?.partyHas || run.selected.includes(c.condition.partyHas))
     .filter((c) => !c.condition?.flag || run.flags.includes(c.condition.flag))
-    .map((c) => ({ label: c.label, effects: c.effects, result: c.result, source: 'module' as const }));
+    .map((c) => ({
+      label: c.label,
+      effects: c.effects,
+      result: c.result,
+      outcomes: c.outcomes,
+      source: 'module' as const,
+      disabled: c.condition?.goldGte !== undefined && run.gold < c.condition.goldGte ? `골드 ${c.condition.goldGte} 필요` : undefined,
+    }));
   if (module.type === 'rest' && run.supportActive) {
     for (const rule of data.support.filter((r) => r.trigger === 'restOption')) {
       list.push({ label: `[왕일검] ${rule.name}`, effects: rule.effects, result: rule.description, source: 'support' });
@@ -510,9 +521,21 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
 export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number, pick?: string): string[] {
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
+  if (choice.disabled) throw new Error(`고를 수 없는 선택지: ${choice.disabled}`);
   const out = applyRunOps(data, run, choice.effects, { pick });
+  // 확률 결과: 노드마다 정해진 수열로 하나를 고른다(같은 시드면 같은 결과)
+  if (choice.outcomes?.length) {
+    const o = createRng(run.seed).fork(`outcome:${run.stageId}:${run.position}:${module.id}`).weighted(choice.outcomes, (x) => x.weight)!;
+    out.unshift(o.result);
+    out.push(...applyRunOps(data, run, o.effects, { pick }));
+  }
   if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
   return out;
+}
+
+/** 선택지가 보유 카드 한 장을 사람에게 고르게 하는가(카드 바꾸기·팔기: pick은 카드 id) */
+export function choiceCardPick(choice: { effects: Effect[] }): Effect | undefined {
+  return choice.effects.find((e) => (e.op === 'swap_card' || e.op === 'sell_card') && e.choose);
 }
 
 /** 선택지가 강화할 카드를 사람에게 고르게 하는가 */
@@ -543,6 +566,45 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
     run.counter += 1;
     const rng = createRng(run.seed).fork(`ops:${run.stageId}:${run.position}:${run.counter}`);
     switch (e.op) {
+      case 'gain_random_card': {
+        // 합류한 동료·공용의 보상 카드 중 등급이 맞는 것(없는 카드 우선)
+        const owners = new Set([...run.roster.map((r) => r.id), 'common']);
+        const all = [...data.cards.values()].filter(
+          (d) => d.pool === 'reward' && !d.essential && owners.has(d.owner) && (!e.rarity || (e.rarity as string[]).includes(d.rarity)),
+        );
+        const fresh = all.filter((d) => run.collection[d.id] === undefined);
+        for (let i = 0; i < (e.count ?? 1); i++) {
+          const pool = fresh.length ? fresh : all;
+          if (!pool.length) break;
+          const d = rng.pick(pool);
+          fresh.splice(fresh.indexOf(d), 1);
+          out.push(acquireCard(data, run, d.id));
+        }
+        break;
+      }
+      case 'swap_card':
+      case 'sell_card': {
+        // 보유 카드 한 장(고른 카드 id, 없으면 가장 값싼 카드): 바꾸기는 같은 주인의 다른 카드로, 팔기는 골드 amount
+        const can = swappableCards(data, run);
+        const rank: Record<string, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, special: 0 };
+        const id =
+          (opts.pick && can.includes(opts.pick) ? opts.pick : undefined) ??
+          [...can].sort((a, b) => rank[data.cards.get(a)!.rarity] - rank[data.cards.get(b)!.rarity] || (run.collection[a] ?? 0) - (run.collection[b] ?? 0) || a.localeCompare(b))[0];
+        if (!id) break;
+        const name = data.cards.get(id)!.name;
+        if (e.op === 'swap_card') {
+          const r = swapCard(data, run, id, (pool) => rng.pick(pool));
+          if (r) out.push(`카드 바꾸기: ${name} → ${data.cards.get(r.to)!.name}`);
+        } else {
+          delete run.collection[id];
+          for (const key of Object.keys(run.loadout)) run.loadout[key] = run.loadout[key].filter((x) => x !== id);
+          run.deck = run.deck.filter((c) => c.cardId !== id);
+          run.stageGains = run.stageGains.filter((x) => x !== id);
+          run.gold += e.amount ?? 0;
+          out.push(`카드를 넘겼다: ${name} — 골드 +${e.amount ?? 0}`);
+        }
+        break;
+      }
       case 'gain_card': {
         const def = data.cards.get(e.card ?? '');
         if (!def) throw new Error(`gain_card: 알 수 없는 카드 ${e.card}`);
@@ -637,9 +699,22 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         }
         out.push(`동료 모두 최대 체력 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
         break;
-      case 'gain_relic':
-        out.push(...gainRelic(data, run, e.relic ?? ''));
+      case 'gain_relic': {
+        // relic이 없으면 가지지 않은 유물 중 무작위(보스 유물 제외, rarity가 있으면 그 등급만)
+        let id = e.relic;
+        if (!id) {
+          const pool = [...data.relics.values()].filter(
+            (r) => r.rarity !== 'boss' && !run.relics.includes(r.id) && (!e.rarity || (e.rarity as string[]).includes(r.rarity)),
+          );
+          id = pool.length ? rng.pick(pool).id : undefined;
+        }
+        if (id) out.push(...gainRelic(data, run, id));
+        else {
+          run.gold += 50;
+          out.push('더 얻을 유물이 없다 — 골드 +50');
+        }
         break;
+      }
       case 'gain_potion': {
         const def = data.potions.get(e.potion ?? '');
         if (!def) throw new Error(`gain_potion: 알 수 없는 물약 ${e.potion}`);

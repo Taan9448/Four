@@ -79,8 +79,9 @@ describe('캠페인 구조', () => {
   it('무림 스테이지(S0·S6~S8)의 선택지는 마나를 채우지 않는다(원작: 무림은 마나가 차지 않는다)', () => {
     const bad: string[] = [];
     for (const m of data.modules.values()) {
-      const st = data.stages.find((s) => s.id === m.stage)!;
-      if (st.world !== 'murim' && st.world !== 'rift') continue;
+      // 어디서나 나오는 사건(stage "*")은 무림에도 나오므로 늘 검사한다
+      const st = data.stages.find((s) => s.id === m.stage);
+      if (st && st.world !== 'murim' && st.world !== 'rift') continue;
       for (const c of m.content.choices ?? []) for (const e of c.effects) if (e.op === 'gain_run_mana' && (e.amount ?? 0) > 0) bad.push(`${m.id}: ${c.label}`);
     }
     expect(bad).toEqual([]);

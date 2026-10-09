@@ -134,12 +134,15 @@ describe('데이터 검사', () => {
       }
     }
     for (const m of data.modules.values()) {
-      if (!data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
+      if (m.stage !== '*' && !data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
       const battle = ['battle', 'elite', 'boss'].includes(m.type);
       if (battle && !m.content.enemies?.length) errors.push(`${m.id}: 전투 모듈에 적이 없다`);
       if (!battle && m.type !== 'shop' && !m.content.choices?.length) errors.push(`${m.id}: 선택지가 없다`);
       for (const id of m.content.enemies ?? []) if (!data.enemies.has(id)) errors.push(`${m.id}: 없는 적 ${id}`);
-      for (const [i, c] of (m.content.choices ?? []).entries()) errors.push(...checkEffects(`${m.id}#${i}`, c.effects, runOps));
+      for (const [i, c] of (m.content.choices ?? []).entries()) {
+        errors.push(...checkEffects(`${m.id}#${i}`, c.effects, runOps));
+        for (const o of c.outcomes ?? []) errors.push(...checkEffects(`${m.id}#${i} 결과`, o.effects, runOps));
+      }
       if (m.content.bonus) errors.push(...checkEffects(`${m.id}.bonus`, m.content.bonus.effects, battleOps));
       if (m.content.clearEffects) {
         if (!['battle', 'elite', 'boss'].includes(m.type)) errors.push(`${m.id}: clearEffects는 전투형 모듈만`);
