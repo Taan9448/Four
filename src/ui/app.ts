@@ -29,7 +29,7 @@ import { initAudio, playBgm, sfx } from '../render/audio';
 import { moodFor, type Mood } from '../render/music';
 import { BattleView } from './battle-view';
 import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
-import { claimLoot, rollLoot } from '../engine/economy';
+import { claimLoot, openShop, rollLoot } from '../engine/economy';
 import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
 import { relicChip } from './items';
@@ -208,6 +208,9 @@ export class App {
         const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'shop');
         if (!module) return this.map();
         run.gold = 300;
+        // 보유 맥락 표가 보이게: 진열 첫 카드는 보유 +2
+        const shelf = openShop(data, run, first.id).cards[0];
+        if (shelf) run.collection[shelf.cardId] = 2;
         return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map())));
       }
       case 'hub': {
@@ -231,7 +234,11 @@ export class App {
         const loot = rollLoot(data, run, { ...first, type: 'elite' });
         const shown: LootShown = { loot: { ...loot, potion: loot.potion ?? 'wound_salve' }, potionLeft: null };
         shown.potionLeft = claimLoot(data, run, shown.loot).potionLeft;
-        return this.show(this.backdrop(rewardView(data, rewardOptions(data, run, first.id), () => this.map(), { run, shown })));
+        // 보유 맥락 표가 셋 다 보이게: 둘째 후보는 보유 +1, 셋째는 최대 강화
+        const options = rewardOptions(data, run, first.id);
+        if (options[1]) run.collection[options[1]] = 1;
+        if (options[2]) run.collection[options[2]] = data.balance.upgrade.maxLevel;
+        return this.show(this.backdrop(rewardView(data, options, () => this.map(), { run, shown })));
       }
     }
   }
@@ -759,6 +766,9 @@ export class App {
     const today = dailySeed(new Date());
     const plan = dailyPlan(data, today);
     const todayRec = meta.daily[today.slice(1)];
+    // 서약 목록은 열린 단계와 다음 한 단계만, 나머지 잠긴 단계는 접어 둔다(문을 넘는 단추가 위로 오게)
+    let showAllOaths = false;
+    const hiddenOaths = () => data.oaths.filter((o) => o.level > maxOath + 1).length;
     const render = () => {
       const mods = oathMods(data, oath);
       const mateMax = Math.min(fighters.length, mods.maxMates ?? fighters.length);
@@ -793,6 +803,9 @@ export class App {
               }),
               h('b', {}, c.name),
               h('small', {}, `${c.archetypes.map((a) => a.name).join(' · ')} — 심연 풀 ${counts[c.id] ?? 0}장`),
+              (counts[c.id] ?? 0) < data.balance.abyss.narrowPool
+                ? h('small', { class: 'abyss-narrow' }, '좁음 — 캠페인에서 더 보고 오면 넓어진다')
+                : null,
             ),
           ),
         ),
@@ -845,7 +858,7 @@ export class App {
         h(
           'ol',
           { class: 'abyss-oaths' },
-          data.oaths.map((o) =>
+          data.oaths.filter((o) => showAllOaths || o.level <= Math.max(oath, maxOath) + 1).map((o) =>
             h(
               'li',
               { class: o.level <= oath ? 'on' : o.level > maxOath ? 'locked' : '' },
@@ -855,6 +868,9 @@ export class App {
             ),
           ),
         ),
+        hiddenOaths() && !showAllOaths
+          ? h('button', { class: 'btn btn-small abyss-oath-more', onclick: () => ((showAllOaths = true), render()) }, `잠긴 단계 ${hiddenOaths()}개 — 펼치기`)
+          : '',
         h('p', { class: 'hint' }, `고른 단계까지 모두 걸린다. 점수 ×${oathScoreMul(data, oath).toFixed(2)}. 시드 ${seed} · 길 ${abyssPaths(data).length}종 중 열린 ${openPaths.length}종에서 시드로 ${offer.length}개`),
         h(
           'div',

@@ -865,7 +865,7 @@ h1, h2, h3 { font-family: var(--f-head); }
   .float-text { font-size: 1.15rem; }
   .float-crit { font-size: 1.4rem; }
   .choice-box { padding: 16px 16px; }
-  .reward-cards { gap: 8px; margin: 12px 0 16px; }
+  .reward-cards { gap: 18px 8px; margin: 12px 0 16px; }
   .reward-cards .card { transform: none; margin: 0; }
   .reward-cards .card:hover { transform: translateY(-4px); }
   .backdrop { padding: 16px 8px; min-height: calc(100vh - 20px); }
@@ -1295,3 +1295,12 @@ img.vn-portrait, img.cutin-portrait {
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
 }
+
+/* 보상·상점 카드의 보유 맥락 표(새 카드 / 보유 +1 → +2 / 최대 → 골드) */
+.offer-badge { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); z-index: 3; white-space: nowrap; padding: 1px 7px; border-radius: 9px; font-size: 10px; font-weight: 700; line-height: 15px; letter-spacing: -0.02em; border: 1px solid rgba(0, 0, 0, 0.6); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); pointer-events: auto; }
+.offer-new { background: #2f7d4a; color: #eaffef; }
+.offer-up { background: #e2b45c; color: #2a1a06; }
+.offer-max { background: #5b5248; color: #f3e6c4; }
+.shop-cards .card { margin-top: 8px; }
+.abyss-mate small.abyss-narrow { color: #f0a050; font-weight: 600; }
+.abyss-oath-more { margin-top: 6px; width: auto; align-self: flex-start; justify-self: start; }

@@ -2,6 +2,8 @@
 import type { GameData } from '../engine/data';
 import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../engine/state';
 import { cardGlossary, cardText } from '../engine/text';
+import { acquirePreview } from '../engine/collection';
+import type { RunState } from '../engine/run';
 import { tipAttrs } from './tooltip';
 import { h } from './dom';
 
@@ -47,4 +49,22 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
 function glossaryTip(data: GameData, inst: CardInstance | string): Record<string, string | undefined> {
   const lines = cardGlossary(data, inst);
   return lines.length ? tipAttrs('용어', lines.join('\n')) : {};
+}
+
+/**
+ * 보상·상점의 카드: 얻으면 어떻게 되는지 표(새 카드 / 보유 +1 → +2 / 최대 강화 → 골드)를 붙이고, 받을 강화 단계로 보여 준다.
+ * 심연은 보유 목록이 없어 풀의 강화 단계로만 보여 준다.
+ */
+export function offerCardView(data: GameData, run: RunState, cardId: string): HTMLElement {
+  if (run.abyss) return cardView(data, { uid: `offer:${cardId}`, cardId, level: run.abyss.pool[cardId] ?? 0 });
+  const p = acquirePreview(data, run, cardId);
+  const el = cardView(data, { uid: `offer:${cardId}`, cardId, level: p.level });
+  const [cls, label, tip] =
+    p.kind === 'new'
+      ? ['new', '새 카드', '아직 없는 카드. 보유 카드와 이번 스테이지 덱에 들어간다.']
+      : p.kind === 'upgrade'
+        ? ['up', `보유 +${p.from} → +${p.level}`, '이미 가진 카드라 보유 카드가 +1 강화된다(보이는 모습이 강화 뒤).']
+        : ['max', `최대 강화 → 골드 +${p.gold}`, '이미 최대로 강화한 카드라 대신 골드를 받는다.'];
+  el.prepend(h('span', { class: `offer-badge offer-${cls}`, ...tipAttrs(label, tip) }, label));
+  return el;
 }

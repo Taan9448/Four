@@ -4,7 +4,7 @@ import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
 import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, upgradeCandidates, type RunState } from '../engine/run';
 import { swappableCards } from '../engine/collection';
-import { cardView } from './card-view';
+import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
 import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
@@ -230,7 +230,7 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
         'div',
         { class: 'reward-cards' },
         options.map((id) => {
-          const el = cardView(data, id);
+          const el = loot ? offerCardView(data, loot.run, id) : cardView(data, id);
           el.addEventListener('click', () => onPick(id));
           return el;
         }),
