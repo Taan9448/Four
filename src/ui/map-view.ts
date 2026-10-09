@@ -468,9 +468,17 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
   const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run));
+  // 두루마리 축(ui_scroll_rod, Codex 그림 3조각: 위 끝 · 가운데(늘림) · 아래 끝). 그림이 오기 전에는 CSS 축
+  const rodUrls = [1, 2, 3].map((n) => frameUrl('ui_scroll_rod', n, { realOnly: true }));
+  const rods = rodUrls.every(Boolean)
+    ? (['left', 'right'] as const).map((side) =>
+        h('div', { class: `scroll-rod ${side}`, 'aria-hidden': 'true' }, ...rodUrls.map((u, i) => h('i', { class: ['top', 'mid', 'bot'][i], style: `background-image:url("${u}")` }))),
+      )
+    : [];
   const scrollWrap = h('div', { class: 'scroll-wrap' }, h(
       'div',
-      { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) },
+      { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}${rods.length ? ' has-rod' : ''}`, style: art(stage.mapArt) },
+      ...rods,
       // 종이 결(ui_parchment): 지역 지도 위에 곱하기로 겹쳐 두루마리 종이 느낌을 낸다(그림이 들어오면)
       art('ui_parchment') ? h('div', { class: 'scroll-paper', style: art('ui_parchment') }) : null,
       svg,

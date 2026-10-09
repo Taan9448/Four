@@ -156,6 +156,15 @@ h1, h2, h3 { font-family: var(--f-head); }
 }
 .scroll::before { left: -4px; }
 .scroll::after { right: -4px; }
+/* 축 그림(ui_scroll_rod)이 오면 CSS 축 대신: 칸 하나(256×512)의 가운데 1/4이 막대. 위·아래 끝은 칸 비율 그대로, 가운데는 위아래로 이어 붙인다 */
+.scroll.has-rod::before, .scroll.has-rod::after { display: none; }
+.scroll-rod { position: absolute; top: -14px; bottom: -14px; width: 96px; z-index: 2; pointer-events: none; display: flex; flex-direction: column; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.55)); }
+.scroll-rod.left { left: -42px; }
+.scroll-rod.right { right: -42px; transform: scaleX(-1); }
+.scroll-rod i { display: block; background-repeat: no-repeat; background-size: 100% auto; }
+.scroll-rod .top { aspect-ratio: 1 / 2; max-height: 40%; flex: none; background-position: top; }
+.scroll-rod .bot { aspect-ratio: 1 / 2; max-height: 40%; flex: none; background-position: bottom; }
+.scroll-rod .mid { flex: 1; min-height: 0; background-repeat: repeat-y; }
 /* 종이가 축에 감겨 들어가는 자리의 그늘 */
 .scroll { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5), inset 22px 0 18px -12px rgba(40, 25, 10, 0.55), inset -22px 0 18px -12px rgba(40, 25, 10, 0.55); }
 .map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }

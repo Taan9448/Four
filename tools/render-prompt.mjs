@@ -161,6 +161,18 @@ export function renderPrompt(spec, style) {
         `Never use ${key.name}, pink or purple on the character.\n` +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
       );
+    case 'ui-slices':
+      return (
+        `Create ONE PNG sheet of game interface pieces, ${W}x${H} px.\n` +
+        `Grid: ${cols} columns x ${rows} row. Each cell is exactly ${cw}x${ch} px. Cell numbers start at 1 from the left.\n` +
+        `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. No scenery, no floor, no cast shadow on the background, no glow, no gradient.\n` +
+        `Subject: ${spec.summary ?? ''}.\n` +
+        `${frameLines}\n` +
+        (spec.framing ? `Composition: ${spec.framing}\n` : '') +
+        `Style: ${spec.style ?? style.illustration_style}. Crisp clean edge around every piece so it separates cleanly from the background.\n` +
+        `Never use ${key.name}, pink or purple in the pieces.\n` +
+        'Rules: no text, no letters, no numbers, no signature, no watermark, nothing crosses into the next cell.'
+      );
     default:
       // card-art, portrait, story-cg: 이야기 갈래(일러스트)
       return (
