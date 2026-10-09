@@ -1,0 +1,14 @@
+id: princess_ice_hit
+type: character-anim
+size: large
+character: princess_ice
+chroma: magenta
+summary: 왕녀의 얼음 피격 3프레임
+depends_on: [princess_ice_ref]
+reference: assets/source/princess_ice_ref.png
+facing: left
+frame_notes:
+  1: "struck, ice chips fly off the surface, the pillar shudders"
+  2: "a thin crack runs across the outer ice, not reaching her"
+  3: "the crack frosts over, still again"
+placeholder: { shape: object, color: '#d8eef8', accent: '#f2c8a0' }

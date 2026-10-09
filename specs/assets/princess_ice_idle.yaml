@@ -1,0 +1,15 @@
+id: princess_ice_idle
+type: character-anim
+size: large
+character: princess_ice
+chroma: magenta
+summary: 왕녀의 얼음 대기 4프레임
+depends_on: [princess_ice_ref]
+reference: assets/source/princess_ice_ref.png
+facing: left
+frame_notes:
+  1: "the ice pillar stands still, cold mist at its base"
+  2: "the hexagonal lines in the ice glint faintly"
+  3: "a tiny point of light shows at the princess's fingertip"
+  4: "the light fades"
+placeholder: { shape: object, color: '#d8eef8', accent: '#f2c8a0' }

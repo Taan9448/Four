@@ -1,0 +1,11 @@
+id: princess_ice_ref
+type: character-ref
+size: large
+character: princess_ice
+chroma: magenta
+summary: 왕녀의 얼음 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a tall pillar of clear ice with a golden-haired princess in a sky-blue dress frozen inside, eyes closed, one hand reaching forward, faint hexagonal lines in the ice meeting at her fingertip"
+  2: "full view, side view, same proportions, the ice pillar seen from the side with the frozen princess inside"
+placeholder: { shape: object, color: '#d8eef8', accent: '#f2c8a0' }

@@ -1,0 +1,11 @@
+id: swamp_toad_ref
+type: character-ref
+size: large
+character: swamp_toad
+chroma: magenta
+summary: 늪지 독두꺼비 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a calf-sized warty olive-green swamp toad with sickly yellow spots, bulging golden eyes and a wide mouth"
+  2: "full body, side view facing left, same proportions, squatting low"
+placeholder: { shape: beast, color: '#5a6a3a', accent: '#d8c25a' }

@@ -1,0 +1,14 @@
+id: ice_knight_hit
+type: character-anim
+size: large
+character: ice_knight
+chroma: magenta
+summary: 얼음 기사 피격 3프레임
+depends_on: [ice_knight_ref]
+reference: assets/source/ice_knight_ref.png
+facing: left
+frame_notes:
+  1: "struck, ice chips fly off the shield, the knight rocks back"
+  2: "staggers, frost dust falling"
+  3: "steadies behind the shield"
+placeholder: { shape: humanoid, color: '#9cc8de', accent: '#dff4ff' }

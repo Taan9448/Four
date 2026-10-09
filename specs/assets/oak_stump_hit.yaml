@@ -1,0 +1,14 @@
+id: oak_stump_hit
+type: character-anim
+size: large
+character: oak_stump
+chroma: magenta
+summary: 참나무 둥치 피격 3프레임
+depends_on: [oak_stump_ref]
+reference: assets/source/oak_stump_ref.png
+facing: left
+frame_notes:
+  1: "struck, wood chips fly from the top, the stump jolts"
+  2: "a thin crack along the grain, chips falling"
+  3: "settles, the crack still visible"
+placeholder: { shape: object, color: '#6e5440', accent: '#b8a184' }

@@ -1,0 +1,11 @@
+id: blood_cultist_ref
+type: character-ref
+size: large
+character: blood_cultist
+chroma: green
+summary: 혈교도 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a gaunt man in a dark blood-red martial robe with a blood-drop crest on the chest, a red headband, a faint dark red aura, a broad saber"
+  2: "full body, side view facing left, same proportions, saber held low"
+placeholder: { shape: humanoid, color: '#8a1f2a', accent: '#ff3b3b' }

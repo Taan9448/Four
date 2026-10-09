@@ -1,0 +1,15 @@
+id: ice_wolf_idle
+type: character-anim
+size: large
+character: ice_wolf
+chroma: magenta
+summary: 얼음 늑대 대기 4프레임
+depends_on: [ice_wolf_ref]
+reference: assets/source/ice_wolf_ref.png
+facing: left
+frame_notes:
+  1: "low stance facing left, frost breath drifting"
+  2: "the blue veins inside the ice pulse"
+  3: "the head lifts a little, frost mane bristling"
+  4: "settles back down"
+placeholder: { shape: beast, color: '#bfe4f2', accent: '#4fb4ff' }

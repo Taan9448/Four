@@ -1,0 +1,14 @@
+id: shadow_fragment_hit
+type: character-anim
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: 그림자 피격 3프레임
+depends_on: [shadow_fragment_ref]
+reference: assets/source/shadow_fragment_ref.png
+facing: left
+frame_notes:
+  1: "struck, the shadow scatters apart like smoke"
+  2: "the pieces drift, the blade hanging in the air"
+  3: "re-forms around the blade"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

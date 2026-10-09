@@ -1,0 +1,14 @@
+id: black_crystal_hit
+type: character-anim
+size: large
+character: black_crystal
+chroma: magenta
+summary: 검은 수정 피격 3프레임
+depends_on: [black_crystal_ref]
+reference: assets/source/black_crystal_ref.png
+facing: left
+frame_notes:
+  1: "struck, the crystal swings hard on the chain, a white flash on a facet"
+  2: "swings back, a hairline crack showing"
+  3: "settles, hanging still"
+placeholder: { shape: object, color: '#0d0b12', accent: '#4b3a6b' }

@@ -1,0 +1,14 @@
+id: mountain_hand_hit
+type: character-anim
+size: large
+character: mountain_hand
+chroma: magenta
+summary: 벽에서 솟은 손 피격 3프레임
+depends_on: [mountain_hand_ref]
+reference: assets/source/mountain_hand_ref.png
+facing: left
+frame_notes:
+  1: "struck, a chunk of stone breaks off a finger"
+  2: "the hand recoils toward the wall"
+  3: "loose stone flows back and fills the broken spot"
+placeholder: { shape: object, color: '#4e443d', accent: '#ff8a5c' }

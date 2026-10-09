@@ -1,0 +1,11 @@
+id: goblin_ref
+type: character-ref
+size: large
+character: goblin
+chroma: magenta
+summary: 고블린 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a small hunched goblin with mossy green skin, long pointed ears, yellow eyes, ragged brown leather, a rusty dagger in the right hand"
+  2: "full body, side view facing left, same proportions, crouched, the dagger held forward"
+placeholder: { shape: humanoid, color: '#6a7a3a', accent: '#b8741a' }

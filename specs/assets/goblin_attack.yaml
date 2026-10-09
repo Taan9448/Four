@@ -1,0 +1,18 @@
+id: goblin_attack
+type: character-anim
+size: large
+character: goblin
+chroma: magenta
+summary: 고블린 녹슨 단검 6프레임
+depends_on: [goblin_ref]
+reference: assets/source/goblin_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "hops back, the dagger raised"
+  2: "scurries forward to the left"
+  3: "leaps, dagger stabbing out"
+  4: "the rusty dagger stabs at full reach to the left"
+  5: "lands clumsily"
+  6: "returns to the crouch"
+placeholder: { shape: humanoid, color: '#6a7a3a', accent: '#b8741a' }

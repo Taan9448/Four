@@ -1,0 +1,14 @@
+id: black_wind_hit
+type: character-anim
+size: large
+character: black_wind
+chroma: magenta
+summary: 흑풍대 피격 3프레임
+depends_on: [black_wind_ref]
+reference: assets/source/black_wind_ref.png
+facing: left
+frame_notes:
+  1: "struck, knocked back, the hood flapping"
+  2: "skids back on one foot"
+  3: "regains the crouch"
+placeholder: { shape: humanoid, color: '#2a2a30', accent: '#5d6478' }

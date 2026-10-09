@@ -1,0 +1,18 @@
+id: swamp_toad_attack
+type: character-anim
+size: large
+character: swamp_toad
+chroma: magenta
+summary: 늪지 독두꺼비 독 묻은 혀 6프레임
+depends_on: [swamp_toad_ref]
+reference: assets/source/swamp_toad_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "leans back, the mouth opening wide"
+  2: "the body puffs up"
+  3: "the yellow tongue shoots out to the left"
+  4: "the tongue lashes at full reach to the left, poison drops flying"
+  5: "the tongue snaps back into the mouth"
+  6: "returns to the squat"
+placeholder: { shape: beast, color: '#5a6a3a', accent: '#d8c25a' }

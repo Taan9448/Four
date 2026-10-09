@@ -1,0 +1,18 @@
+id: pockmark_vice_attack
+type: character-anim
+size: large
+character: pockmark_vice
+chroma: magenta
+summary: 마맛자국 부대주 말 위의 칼 6프레임
+depends_on: [pockmark_vice_ref]
+reference: assets/source/pockmark_vice_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "the rider raises the sword high, the horse rearing a little"
+  2: "the horse lunges forward to the left"
+  3: "the rider leans out of the saddle, swinging"
+  4: "the sword cuts down at full reach to the left from horseback"
+  5: "the horse wheels back"
+  6: "returns to standing"
+placeholder: { shape: beast, color: '#8a6a5a', accent: '#a02634' }

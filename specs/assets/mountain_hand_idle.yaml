@@ -1,0 +1,15 @@
+id: mountain_hand_idle
+type: character-anim
+size: large
+character: mountain_hand
+chroma: magenta
+summary: 벽에서 솟은 손 대기 4프레임
+depends_on: [mountain_hand_ref]
+reference: assets/source/mountain_hand_ref.png
+facing: left
+frame_notes:
+  1: "the stone hand rises from the wall, fingers half open"
+  2: "the fingers flex slowly with grinding dust"
+  3: "the red cracks glow faintly"
+  4: "settles, fingers half open"
+placeholder: { shape: object, color: '#4e443d', accent: '#ff8a5c' }

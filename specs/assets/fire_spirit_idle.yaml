@@ -1,0 +1,15 @@
+id: fire_spirit_idle
+type: character-anim
+size: large
+character: fire_spirit
+chroma: magenta
+summary: 불의 정령 대기 4프레임
+depends_on: [fire_spirit_ref]
+reference: assets/source/fire_spirit_ref.png
+facing: left
+frame_notes:
+  1: "floats facing left, flames flickering"
+  2: "the flames flare upward"
+  3: "the white core in the chest brightens"
+  4: "the flames settle, embers drifting"
+placeholder: { shape: humanoid, color: '#f2a03a', accent: '#ffe08a' }

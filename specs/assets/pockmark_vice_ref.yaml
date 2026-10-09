@@ -1,0 +1,11 @@
+id: pockmark_vice_ref
+type: character-ref
+size: large
+character: pockmark_vice
+chroma: magenta
+summary: 마맛자국 부대주 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a stocky pockmarked swordsman in a dark crimson robe and white over-robe riding a dark brown horse, sword raised"
+  2: "full body, side view facing left, same proportions, the horse standing, the rider's sword held low"
+placeholder: { shape: beast, color: '#8a6a5a', accent: '#a02634' }

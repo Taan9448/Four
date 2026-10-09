@@ -1,0 +1,14 @@
+id: branch_elite_hit
+type: character-anim
+size: large
+character: branch_elite
+chroma: green
+summary: 분타 정예 피격 3프레임
+depends_on: [branch_elite_ref]
+reference: assets/source/branch_elite_ref.png
+facing: left
+frame_notes:
+  1: "struck, the armor rattles, the warrior rocks back"
+  2: "staggers but holds the ground"
+  3: "raises the blade again"
+placeholder: { shape: humanoid, color: '#6a1a20', accent: '#ff3b3b' }

@@ -1,0 +1,14 @@
+id: blood_guard_hit
+type: character-anim
+size: large
+character: blood_guard
+chroma: magenta
+summary: 혈위대 피격 3프레임
+depends_on: [blood_guard_ref]
+reference: assets/source/blood_guard_ref.png
+facing: left
+frame_notes:
+  1: "struck, recoils, the white over-robe flaring"
+  2: "stumbles back a step"
+  3: "raises the sword again, shaken"
+placeholder: { shape: humanoid, color: '#b8a8a0', accent: '#a02634' }

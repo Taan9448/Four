@@ -1,0 +1,15 @@
+id: blood_cultist_idle
+type: character-anim
+size: large
+character: blood_cultist
+chroma: green
+summary: 혈교도 대기 4프레임
+depends_on: [blood_cultist_ref]
+reference: assets/source/blood_cultist_ref.png
+facing: left
+frame_notes:
+  1: "stands facing left, saber low, dark red aura clinging"
+  2: "the aura thickens around the shoulders"
+  3: "the blood-drop crest glows faintly"
+  4: "the aura settles"
+placeholder: { shape: humanoid, color: '#8a1f2a', accent: '#ff3b3b' }

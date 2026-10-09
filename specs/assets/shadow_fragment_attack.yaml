@@ -1,0 +1,18 @@
+id: shadow_fragment_attack
+type: character-anim
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: 그림자 그림자 칼 6프레임
+depends_on: [shadow_fragment_ref]
+reference: assets/source/shadow_fragment_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "sinks down into the puddle"
+  2: "the puddle slides forward to the left"
+  3: "rises up suddenly from the floor"
+  4: "the grey blade slashes at full reach to the left, a thin grey arc"
+  5: "melts halfway back into the puddle"
+  6: "rises again to its standing shape"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

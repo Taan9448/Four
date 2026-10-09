@@ -1,0 +1,14 @@
+id: cult_guardian_hit
+type: character-anim
+size: large
+character: cult_guardian
+chroma: green
+summary: 마교 호법 피격 3프레임
+depends_on: [cult_guardian_ref]
+reference: assets/source/cult_guardian_ref.png
+facing: left
+frame_notes:
+  1: "struck, knocked back, the red qi scattering"
+  2: "skids back, one hand on the knee"
+  3: "rises back into the palm stance"
+placeholder: { shape: humanoid, color: '#5a1a24', accent: '#ff3b3b' }

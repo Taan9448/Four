@@ -1,0 +1,11 @@
+id: rock_golem_ref
+type: character-ref
+size: large
+character: rock_golem
+chroma: magenta
+summary: 바위 골렘 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a bulky man-shaped golem of grey-brown boulders with red lava glowing in the cracks, small orange eyes, huge stone fists"
+  2: "full body, side view facing left, same proportions, fists hanging low"
+placeholder: { shape: humanoid, color: '#6e6259', accent: '#ff8a5c' }

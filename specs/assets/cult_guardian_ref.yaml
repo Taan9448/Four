@@ -1,0 +1,11 @@
+id: cult_guardian_ref
+type: character-ref
+size: large
+character: cult_guardian
+chroma: green
+summary: 마교 호법 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a broad middle-aged martial artist in a long dark crimson robe with black trim, shaved head with a topknot, both palms blood-red, dark red qi curling from the hands"
+  2: "full body, side view facing left, same proportions, one red palm forward"
+placeholder: { shape: humanoid, color: '#5a1a24', accent: '#ff3b3b' }

@@ -1,0 +1,15 @@
+id: blood_guard_idle
+type: character-anim
+size: large
+character: blood_guard
+chroma: magenta
+summary: 혈위대 대기 4프레임
+depends_on: [blood_guard_ref]
+reference: assets/source/blood_guard_ref.png
+facing: left
+frame_notes:
+  1: "guard stance facing left, sword forward"
+  2: "shifts the feet nervously"
+  3: "glances aside, the red tassels swaying"
+  4: "settles into the guard stance"
+placeholder: { shape: humanoid, color: '#b8a8a0', accent: '#a02634' }

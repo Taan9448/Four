@@ -1,0 +1,11 @@
+id: stair_archer_ref
+type: character-ref
+size: large
+character: stair_archer
+chroma: green
+summary: 계단의 궁수 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a lean archer in a dark red martial robe, black leather bracer, a quiver of black-fletched arrows, a red headband, a long recurve bow held at the side"
+  2: "full body, side view facing left, same proportions, the bow held forward"
+placeholder: { shape: humanoid, color: '#7a2a2a', accent: '#f2a93b' }

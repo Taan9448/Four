@@ -1,0 +1,11 @@
+id: ice_wolf_ref
+type: character-ref
+size: large
+character: ice_wolf
+chroma: magenta
+summary: 얼음 늑대 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a large wolf with a translucent ice body, blue mana veins frozen inside, a faint hexagonal lattice in the ice, a frost mane, pale blue eyes"
+  2: "full body, side view facing left, same proportions, standing low"
+placeholder: { shape: beast, color: '#bfe4f2', accent: '#4fb4ff' }

@@ -1,0 +1,14 @@
+id: pockmark_vice_hit
+type: character-anim
+size: large
+character: pockmark_vice
+chroma: magenta
+summary: 마맛자국 부대주 피격 3프레임
+depends_on: [pockmark_vice_ref]
+reference: assets/source/pockmark_vice_ref.png
+facing: left
+frame_notes:
+  1: "struck, the rider jerks back in the saddle, the horse rearing"
+  2: "the horse sidesteps, the rider clutching the reins"
+  3: "steadies the horse"
+placeholder: { shape: beast, color: '#8a6a5a', accent: '#a02634' }

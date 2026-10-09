@@ -1,0 +1,11 @@
+id: fire_scale_hound_ref
+type: character-ref
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: 불비늘 삼두견 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a horse-sized three-headed hound covered in burning orange-red scales, three heads with glowing yellow eyes joining into one thick neck, small flames between the scales"
+  2: "full body, side view facing left, same proportions, the three heads low and forward"
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }

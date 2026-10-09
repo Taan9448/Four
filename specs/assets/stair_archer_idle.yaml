@@ -1,0 +1,15 @@
+id: stair_archer_idle
+type: character-anim
+size: large
+character: stair_archer
+chroma: green
+summary: 계단의 궁수 대기 4프레임
+depends_on: [stair_archer_ref]
+reference: assets/source/stair_archer_ref.png
+facing: left
+frame_notes:
+  1: "stands facing left, bow held low, an arrow between the fingers"
+  2: "checks the arrow fletching"
+  3: "glances up, scanning"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#7a2a2a', accent: '#f2a93b' }

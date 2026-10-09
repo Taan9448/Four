@@ -1,0 +1,15 @@
+id: black_crystal_idle
+type: character-anim
+size: large
+character: black_crystal
+chroma: magenta
+summary: 검은 수정 대기 4프레임
+depends_on: [black_crystal_ref]
+reference: assets/source/black_crystal_ref.png
+facing: left
+frame_notes:
+  1: "the crystal hangs still on its chain"
+  2: "it turns slightly, a dim violet glint on one facet"
+  3: "the shadow streaks around it stretch"
+  4: "still again"
+placeholder: { shape: object, color: '#0d0b12', accent: '#4b3a6b' }

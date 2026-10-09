@@ -1,0 +1,15 @@
+id: knotted_stump_idle
+type: character-anim
+size: large
+character: knotted_stump
+chroma: magenta
+summary: 옹이 박힌 둥치 대기 4프레임
+depends_on: [knotted_stump_ref]
+reference: assets/source/knotted_stump_ref.png
+facing: left
+frame_notes:
+  1: "the stump stands still, the knots dark"
+  2: "the twisting grain lines faintly show around the knots"
+  3: "the grain fades"
+  4: "still again"
+placeholder: { shape: object, color: '#5c4632', accent: '#8f7a63' }

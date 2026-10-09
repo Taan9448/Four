@@ -1,0 +1,14 @@
+id: empty_armor_hit
+type: character-anim
+size: large
+character: empty_armor
+chroma: magenta
+summary: 빈 갑옷 피격 3프레임
+depends_on: [empty_armor_ref]
+reference: assets/source/empty_armor_ref.png
+facing: left
+frame_notes:
+  1: "struck, the helmet knocks back, the red lights blinking out for a moment"
+  2: "the plates rattle loosely, a little ash falling out"
+  3: "the red lights relight, rigid again"
+placeholder: { shape: humanoid, color: '#2e2e38', accent: '#ff3b3b' }

@@ -1,0 +1,14 @@
+id: rift_beast_hit
+type: character-anim
+size: large
+character: rift_beast
+chroma: green
+summary: 틈의 짐승 피격 3프레임
+depends_on: [rift_beast_ref]
+reference: assets/source/rift_beast_ref.png
+facing: left
+frame_notes:
+  1: "struck, the body jerks back, violet sparks spraying from the cracks"
+  2: "recoils, legs scrabbling"
+  3: "recovers, head lowered again"
+placeholder: { shape: beast, color: '#3a1d55', accent: '#b48cff' }

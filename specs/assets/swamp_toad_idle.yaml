@@ -1,0 +1,15 @@
+id: swamp_toad_idle
+type: character-anim
+size: large
+character: swamp_toad
+chroma: magenta
+summary: 늪지 독두꺼비 대기 4프레임
+depends_on: [swamp_toad_ref]
+reference: assets/source/swamp_toad_ref.png
+facing: left
+frame_notes:
+  1: "squats facing left, throat pulsing"
+  2: "the throat sac swells slightly"
+  3: "blinks the bulging golden eyes"
+  4: "the throat settles"
+placeholder: { shape: beast, color: '#5a6a3a', accent: '#d8c25a' }

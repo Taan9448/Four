@@ -1,0 +1,11 @@
+id: blood_guard_ref
+type: character-ref
+size: large
+character: blood_guard
+chroma: magenta
+summary: 혈위대 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a young swordsman in a dark crimson martial robe under a white over-robe, red tassels on the sleeves, hair tied up, a straight sword held ready, a wary face"
+  2: "full body, side view facing left, same proportions, the sword held forward"
+placeholder: { shape: humanoid, color: '#b8a8a0', accent: '#a02634' }

@@ -1,0 +1,14 @@
+id: fire_scale_hound_hit
+type: character-anim
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: 불비늘 삼두견 피격 3프레임
+depends_on: [fire_scale_hound_ref]
+reference: assets/source/fire_scale_hound_ref.png
+facing: left
+frame_notes:
+  1: "struck, scales spark, the hound yelps and rears back"
+  2: "the three heads thrash"
+  3: "recovers, growling"
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }
