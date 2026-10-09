@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
+import { bbox, columnCenter, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -152,6 +152,26 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       }
     }
   });
+
+  // 5-1) 이어 붙이는 조각(ui-slices): 칸마다 막대 중심이 같아야 이음매가 어긋나지 않는다(자르기 도구가 맞춘다)
+  if (spec.type === 'ui-slices' && frames.length > 1) {
+    const centers = frames.map((img) => columnCenter(img)).filter((c) => c !== null);
+    if (centers.length > 1 && Math.max(...centers) - Math.min(...centers) > 1) {
+      // 이미 들어온 그림 때문에 모든 PR의 CI가 막히지 않게 경고로 둔다(다시 자르면 사라진다)
+      warnings.push(`조각의 가로 중심이 어긋났다(${centers.map((c) => c.toFixed(1)).join(' / ')}px) — main을 받아 assets:slice로 다시 자르세요`);
+    }
+  }
+
+  // 5-2) 둥근 화면 부품(ui-parts): 상태를 바꿔 끼울 때 튀지 않게 그림 상자의 가운데가 칸 가운데여야 한다(자르기 도구가 맞춘다)
+  if (spec.type === 'ui-parts') {
+    frames.forEach((img, i) => {
+      const box = bbox(img, (d, k) => d[k + 3] > 128);
+      if (!box) return;
+      const cx = (box.minX + box.maxX + 1) / 2 - img.width / 2;
+      const cy = (box.minY + box.maxY + 1) / 2 - img.height / 2;
+      if (Math.abs(cx) > 1 || Math.abs(cy) > 1) warnings.push(`프레임 ${i + 1}: 가운데에서 (${cx.toFixed(1)}, ${cy.toFixed(1)})px 벗어났다 — main을 받아 assets:slice로 다시 자르세요`);
+    });
+  }
 
   // 6) 바운딩 박스 높이 편차(대체 단계 1에서만). 1px 흔들림은 허용
   if (spec.bbox_tolerance != null && fallback === 1 && heights.length > 1) {

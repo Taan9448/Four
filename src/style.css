@@ -449,6 +449,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .globe { --d: 104px; position: relative; width: var(--d); height: var(--d); flex: 0 0 auto; }
 .globe-in { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 42%, #1b1f2b, #07080c 75%); box-shadow: 0 0 0 3px #c9a24f, 0 0 0 6px #2a1f0c, 0 0 0 7px rgba(201, 162, 79, 0.55), 0 8px 22px rgba(0, 0, 0, 0.7); }
 .globe.has-art .globe-in { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7); }
+/* 그림 틀은 구슬보다 1.5배 크게 겹치므로 위아래(물약 칸·글자)와 겹치지 않게 그만큼 띄운다 */
+.globe.has-art { margin: calc(var(--d) * 0.24) 0; }
 .globe-in::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; z-index: 3; width: 3px; margin-left: -1.5px; background: linear-gradient(#e7c26a, #6b4f1c); pointer-events: none; }
 .globe.has-art .globe-in::after { width: 2px; opacity: 0.6; }
 .globe-frame { position: absolute; left: 50%; top: 50%; z-index: 2; width: calc(var(--d) * 1.506); height: auto; transform: translate(-50%, -50%); pointer-events: none; }

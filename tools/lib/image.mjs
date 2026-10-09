@@ -273,3 +273,44 @@ export function countColors(img) {
 
 export const toPng = (img) =>
   sharp(img.data, { raw: { width: img.width, height: img.height, channels: 4 } }).png().toBuffer();
+
+/**
+ * 세로로 이어 붙이는 조각(ui-slices)의 가로 중심: 그림이 있는 줄마다 왼쪽·오른쪽 끝의 가운데를 구해 그 중앙값을 쓴다.
+ * 손잡이처럼 일부 줄만 넓은 부분이 있어도 막대 본체의 중심을 잡는다. 그림이 없으면 null
+ */
+export function columnCenter(img) {
+  const { data, width, height } = img;
+  const centers = [];
+  for (let y = 0; y < height; y++) {
+    let l = -1, r = -1;
+    for (let x = 0; x < width; x++) {
+      if (data[(y * width + x) * 4 + 3] > 128) {
+        if (l < 0) l = x;
+        r = x;
+      }
+    }
+    if (l >= 0) centers.push((l + r + 1) / 2);
+  }
+  if (!centers.length) return null;
+  centers.sort((a, b) => a - b);
+  return centers[Math.floor(centers.length / 2)];
+}
+
+/** 그림을 dx·dy(정수 px)만큼 옮긴다. 밀려난 자리는 투명 */
+export function shiftXY(img, dx, dy) {
+  const { data, width, height } = img;
+  const out = Buffer.alloc(data.length);
+  for (let y = 0; y < height; y++) {
+    const sy = y - dy;
+    if (sy < 0 || sy >= height) continue;
+    for (let x = 0; x < width; x++) {
+      const sx = x - dx;
+      if (sx < 0 || sx >= width) continue;
+      data.copy(out, (y * width + x) * 4, (sy * width + sx) * 4, (sy * width + sx) * 4 + 4);
+    }
+  }
+  return { data: out, width, height };
+}
+
+/** 그림을 가로로 dx(정수 px)만큼 옮긴다 */
+export const shiftX = (img, dx) => shiftXY(img, dx, 0);
