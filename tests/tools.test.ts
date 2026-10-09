@@ -9,7 +9,7 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
-import { columnCenter, keyOut, magentaCast, nearestColor, shiftX } from '../tools/lib/image.mjs';
+import { columnCenter, keyOut, magentaCast, nearestColor, shiftX, shiftXY } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -423,5 +423,14 @@ describe('이어 붙이는 조각(ui-slices) 가운데 맞추기', () => {
     const img = rod(64, 20, 36, 45);
     const moved = shiftX(img, Math.round(32 - columnCenter(img)!));
     expect(columnCenter(moved)).toBe(32);
+  });
+
+  it('둥근 부품은 가로·세로로 함께 옮긴다', () => {
+    const img = rod(16, 16, 2, 5);
+    const moved = shiftXY(img, 3, 2);
+    // 왼쪽 위 점(2, 0)이 (5, 2)로
+    expect(moved.data[(2 * 16 + 5) * 4 + 3]).toBe(255);
+    expect(moved.data[(0 * 16 + 2) * 4 + 3]).toBe(0);
+    expect(moved.data[(1 * 16 + 5) * 4 + 3]).toBe(0);
   });
 });

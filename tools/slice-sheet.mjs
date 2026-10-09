@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { cellRect, columnCenter, extract, fileHash, keyOut, prepareSheet, shiftX, toPng } from './lib/image.mjs';
+import { bbox, cellRect, columnCenter, extract, fileHash, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -47,15 +47,21 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
         fit: 'fill',
         kernel: 'lanczos3',
       });
-      if (spec.type !== 'ui-slices') {
+      if (spec.type !== 'ui-slices' && spec.type !== 'ui-parts') {
         await resized.png().toFile(fileOf(i));
         continue;
       }
-      // 이어 붙이는 조각: 모델이 칸마다 막대를 조금씩 다른 자리에 그려도 이음매가 어긋나지 않게, 막대 중심을 칸 가운데로 옮긴다
+      // 화면 부품은 칸마다 조금씩 다른 자리에 그려져도 게임에서 어긋나지 않게 칸 가운데로 옮긴다.
+      // ui-slices(이어 붙이는 막대): 막대 중심을 가로로만 / ui-parts(둥근 부품): 그림 상자의 가운데를 가로·세로로
       const { data, info } = await resized.raw().toBuffer({ resolveWithObject: true });
       let img = { data, width: info.width, height: info.height };
-      const c = columnCenter(img);
-      if (c !== null) img = shiftX(img, Math.round(info.width / 2 - c));
+      if (spec.type === 'ui-slices') {
+        const c = columnCenter(img);
+        if (c !== null) img = shiftX(img, Math.round(info.width / 2 - c));
+      } else {
+        const box = bbox(img, (d, k) => d[k + 3] > 128);
+        if (box) img = shiftXY(img, Math.round(info.width / 2 - (box.minX + box.maxX + 1) / 2), Math.round(info.height / 2 - (box.minY + box.maxY + 1) / 2));
+      }
       writeFileSync(fileOf(i), await toPng(img));
     }
   } else {

@@ -296,16 +296,21 @@ export function columnCenter(img) {
   return centers[Math.floor(centers.length / 2)];
 }
 
-/** 그림을 가로로 dx(정수 px)만큼 옮긴다. 밀려난 자리는 투명 */
-export function shiftX(img, dx) {
+/** 그림을 dx·dy(정수 px)만큼 옮긴다. 밀려난 자리는 투명 */
+export function shiftXY(img, dx, dy) {
   const { data, width, height } = img;
   const out = Buffer.alloc(data.length);
   for (let y = 0; y < height; y++) {
+    const sy = y - dy;
+    if (sy < 0 || sy >= height) continue;
     for (let x = 0; x < width; x++) {
       const sx = x - dx;
       if (sx < 0 || sx >= width) continue;
-      data.copy(out, (y * width + x) * 4, (y * width + sx) * 4, (y * width + sx) * 4 + 4);
+      data.copy(out, (y * width + x) * 4, (sy * width + sx) * 4, (sy * width + sx) * 4 + 4);
     }
   }
   return { data: out, width, height };
 }
+
+/** 그림을 가로로 dx(정수 px)만큼 옮긴다 */
+export const shiftX = (img, dx) => shiftXY(img, dx, 0);
