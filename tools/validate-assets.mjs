@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
+import { bbox, columnCenter, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -152,6 +152,15 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       }
     }
   });
+
+  // 5-1) 이어 붙이는 조각(ui-slices): 칸마다 막대 중심이 같아야 이음매가 어긋나지 않는다(자르기 도구가 맞춘다)
+  if (spec.type === 'ui-slices' && frames.length > 1) {
+    const centers = frames.map((img) => columnCenter(img)).filter((c) => c !== null);
+    if (centers.length > 1 && Math.max(...centers) - Math.min(...centers) > 1) {
+      // 이미 들어온 그림 때문에 모든 PR의 CI가 막히지 않게 경고로 둔다(다시 자르면 사라진다)
+      warnings.push(`조각의 가로 중심이 어긋났다(${centers.map((c) => c.toFixed(1)).join(' / ')}px) — main을 받아 assets:slice로 다시 자르세요`);
+    }
+  }
 
   // 6) 바운딩 박스 높이 편차(대체 단계 1에서만). 1px 흔들림은 허용
   if (spec.bbox_tolerance != null && fallback === 1 && heights.length > 1) {

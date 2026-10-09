@@ -9,7 +9,7 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
-import { keyOut, magentaCast, nearestColor } from '../tools/lib/image.mjs';
+import { columnCenter, keyOut, magentaCast, nearestColor, shiftX } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -401,3 +401,27 @@ describe('키 색 번짐 제거(keyOut)', () => {
   });
 });
 
+
+describe('이어 붙이는 조각(ui-slices) 가운데 맞추기', () => {
+  /** 너비 w·높이 h 투명 그림에 x0~x1 세로 막대(일부 줄은 넓은 손잡이) */
+  const rod = (w: number, h: number, x0: number, x1: number, knobRows = 0) => {
+    const data = Buffer.alloc(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      const [a, b] = y < knobRows ? [x0 - 6, x1 + 2] : [x0, x1];
+      for (let x = a; x <= b; x++) data[(y * w + x) * 4 + 3] = 255;
+    }
+    return { data, width: w, height: h };
+  };
+
+  it('손잡이가 있어도 막대 본체의 중심을 잡는다', () => {
+    expect(columnCenter(rod(64, 40, 20, 29))).toBe(25);
+    expect(columnCenter(rod(64, 40, 20, 29, 10))).toBe(25);
+    expect(columnCenter({ data: Buffer.alloc(16 * 16 * 4), width: 16, height: 16 })).toBeNull();
+  });
+
+  it('옮기면 칸 가운데에 온다', () => {
+    const img = rod(64, 20, 36, 45);
+    const moved = shiftX(img, Math.round(32 - columnCenter(img)!));
+    expect(columnCenter(moved)).toBe(32);
+  });
+});

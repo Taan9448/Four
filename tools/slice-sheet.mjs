@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { cellRect, extract, fileHash, keyOut, prepareSheet, toPng } from './lib/image.mjs';
+import { cellRect, columnCenter, extract, fileHash, keyOut, prepareSheet, shiftX, toPng } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -43,10 +43,20 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     for (const [i, n] of frameCells.entries()) {
       // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
       const cell = extract(keyedSheet ?? sheet.raw, cellRect(spec, n, sheet.raw));
-      await sharp(cell.data, { raw: { width: cell.width, height: cell.height, channels: 4 } })
-        .resize(spec.logical[0], spec.logical[1], { fit: 'fill', kernel: 'lanczos3' })
-        .png()
-        .toFile(fileOf(i));
+      const resized = sharp(cell.data, { raw: { width: cell.width, height: cell.height, channels: 4 } }).resize(spec.logical[0], spec.logical[1], {
+        fit: 'fill',
+        kernel: 'lanczos3',
+      });
+      if (spec.type !== 'ui-slices') {
+        await resized.png().toFile(fileOf(i));
+        continue;
+      }
+      // 이어 붙이는 조각: 모델이 칸마다 막대를 조금씩 다른 자리에 그려도 이음매가 어긋나지 않게, 막대 중심을 칸 가운데로 옮긴다
+      const { data, info } = await resized.raw().toBuffer({ resolveWithObject: true });
+      let img = { data, width: info.width, height: info.height };
+      const c = columnCenter(img);
+      if (c !== null) img = shiftX(img, Math.round(info.width / 2 - c));
+      writeFileSync(fileOf(i), await toPng(img));
     }
   } else {
     // 픽셀: 실제 블록 크기를 감지해 칸마다 샘플링하고 목표 프레임(spec.logical)에 맞춘다
