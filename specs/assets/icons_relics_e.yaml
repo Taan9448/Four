@@ -1,0 +1,16 @@
+id: icons_relics_e
+type: icon-sheet
+summary: 유물 아이콘 57~64(새 희귀·보스) — 칸 n = 유물 icon n+56
+# 칸 번호 = data의 icon에서 시트 첫 번호를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 8
+baseline: 0.5
+frame_notes:
+  1: "mountain core — a rough grey stone with a faint warm pulse of orange light in its center"
+  2: "eye of grain — a glass marble with wood-grain rings floating inside like an iris"
+  3: "heavy burden — a heavy bundle on a carrying frame, ropes straining, a faint green miasma wisp"
+  4: "blood pact — a small rolled contract with a red thumbprint and a drop of blood"
+  5: "hungry blade — a very thin dark blade with a red edge, narrowing to a needle point"
+  6: "empty well — a tiny stone well with a wooden bucket, pale blue light rising instead of water"
+  7: "king's coin — a large cold gold coin with a worn crown and a frost rim"
+  8: "thorn crown — a ring of black thorns with drops of red at the points"
+placeholder: { color: '#ae5a8f', accent: '#4a203a' }

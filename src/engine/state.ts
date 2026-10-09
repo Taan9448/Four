@@ -113,6 +113,8 @@ export interface BattleState {
   enemyDmgScale?: number;
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
+  /** cardPlayed 유물의 every 셈(유물 id → 맞는 카드 수) */
+  relicCounters?: Record<string, number>;
   /** 이번 턴에 낸 카드 수(scale per cardsPlayed: 이 카드 전까지) */
   cardsPlayed?: number;
   /** 상태 발동이 다른 발동을 부른 깊이(무한 되갚기 방지) */

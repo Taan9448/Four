@@ -352,8 +352,8 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
 
 // ───────────────────────── 유물·물약(런) ─────────────────────────
 
-/** 전투 밖 trigger(victory·rest)의 유물 효과를 런에 적용한다 */
-export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' | 'rest'): string[] {
+/** 전투 밖 trigger(victory·rest·shopEnter)의 유물 효과를 런에 적용한다 */
+export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' | 'rest' | 'shopEnter'): string[] {
   const out: string[] = [];
   for (const id of run.relics) {
     const relic = data.relics.get(id);
@@ -566,6 +566,11 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
     run.counter += 1;
     const rng = createRng(run.seed).fork(`ops:${run.stageId}:${run.position}:${run.counter}`);
     switch (e.op) {
+      case 'gain_potion_slot':
+        // 물약 칸 하나 더(빈 칸)
+        for (let i = 0; i < (e.amount ?? 1); i++) run.potions.push(null);
+        out.push(`물약 칸 +${e.amount ?? 1}`);
+        break;
       case 'gain_random_card': {
         // 합류한 동료·공용의 보상 카드 중 등급이 맞는 것(없는 카드 우선)
         const owners = new Set([...run.roster.map((r) => r.id), 'common']);

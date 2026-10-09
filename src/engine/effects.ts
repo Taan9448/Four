@@ -1,6 +1,6 @@
 // 효과 해석기. 카드·적 행동·지원 규칙의 효과는 모두 여기서 기본 동작의 조합으로만 해석된다.
 // 카드별 개별 코드는 두지 않는다. 기본 동작 목록은 docs/CARD_EFFECTS.md 참고.
-import { BATTLE_OPS, type Condition, type Effect, type Element, type StatusTrigger, type SupportRule } from './schema';
+import { BATTLE_OPS, type Condition, type Effect, type Element, type RelicDef, type StatusTrigger, type SupportRule } from './schema';
 import {
   alive,
   findCombatant,
@@ -311,7 +311,7 @@ export function dealDamage(
     const chance = critChance(state, source);
     if (chance > 0 && (state.critRng ?? state.rng).next() < chance) {
       crit = true;
-      dmg *= bal.crit.multiplier;
+      dmg *= hasRule(state, 'crit_heavy') ? bal.relicRules.critHeavyMultiplier : bal.crit.multiplier;
     }
   }
   dmg *= statusModifier(state, target, 'damageTakenMul');
@@ -416,6 +416,7 @@ function knockOut(state: BattleState, target: Combatant): void {
     state.events.push({ type: 'downed', uid: target.uid });
     state.log.push(`${target.name}이(가) 쓰러졌다.`);
     if (target.defId === 'haun') setResult(state, 'defeat');
+    else fireRelics(state, 'allyDowned');
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
@@ -472,7 +473,10 @@ export function changeRift(state: BattleState, delta: number): void {
   state.rift = Math.max(0, Math.min(bal.max, state.rift + delta));
   if (state.rift === before) return;
   state.events.push({ type: 'rift', value: state.rift, delta: state.rift - before });
-  if (delta > 0) fireSupport(state, 'riftChanged', {});
+  if (delta > 0) {
+    fireSupport(state, 'riftChanged', {});
+    fireRelics(state, 'riftChanged');
+  }
   if (state.rift >= bal.max) {
     state.events.push({ type: 'surge' });
     state.log.push('균열 폭주! 하늘이 갈라진다.');
@@ -712,13 +716,36 @@ export function fireSideTriggers(state: BattleState, list: Combatant[], on: Stat
 
 // ───────────────────────── 지원 규칙·유물 ─────────────────────────
 
-/** 가진 유물 중 trigger가 맞는 것의 효과를 하운을 출처로 일으킨다(전투 안 trigger만) */
-export function fireRelics(state: BattleState, trigger: 'battleStart' | 'turnStart' | 'enemyDowned'): void {
+/** 가진 유물 중 규칙(rule) 유물이 있는가 */
+export function hasRule(state: Pick<BattleState, 'data' | 'relics'>, rule: NonNullable<RelicDef['rule']>): boolean {
+  return state.relics.some((id) => state.data.relics.get(id)?.rule === rule);
+}
+
+/**
+ * 가진 유물 중 trigger가 맞는 것의 효과를 하운을 출처로 일으킨다(전투 안 trigger만).
+ * cardPlayed는 cardType·keyword로 거르고, every면 맞는 카드 n장째마다
+ */
+export function fireRelics(
+  state: BattleState,
+  trigger: 'battleStart' | 'turnStart' | 'turnEnd' | 'enemyDowned' | 'allyDowned' | 'cardPlayed' | 'riftChanged',
+  info: { card?: ResolvedCard } = {},
+): void {
   if (!state.relics.length || state.result) return;
   const haun = state.party.find((p) => p.defId === 'haun' && !p.downed) ?? state.party.find((p) => !p.downed);
   for (const id of state.relics) {
     const relic = state.data.relics.get(id);
-    if (!relic || relic.trigger !== trigger) continue;
+    if (!relic || relic.trigger !== trigger || !relic.effects.length) continue;
+    if (trigger === 'cardPlayed') {
+      const card = info.card;
+      if (!card) continue;
+      if (relic.cardType && card.def.type !== relic.cardType) continue;
+      if (relic.keyword && !card.keywords.includes(relic.keyword)) continue;
+      if (relic.every) {
+        const counters = (state.relicCounters ??= {});
+        counters[id] = (counters[id] ?? 0) + 1;
+        if (counters[id] % relic.every !== 0) continue;
+      }
+    }
     const key = `relic:${id}`;
     if (relic.oncePerBattle && state.supportUsed.includes(key)) continue;
     const ctx: EffectContext = { source: haun ?? null };

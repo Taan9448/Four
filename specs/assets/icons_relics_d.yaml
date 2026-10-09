@@ -1,0 +1,24 @@
+id: icons_relics_d
+type: icon-sheet
+summary: 유물 아이콘 41~56(새 고급·희귀) — 칸 n = 유물 icon n+40
+# 칸 번호 = data의 icon에서 시트 첫 번호를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "tinder heart — a lump of black charcoal with a glowing orange core shaped like a heart"
+  2: "iron shoulder — a dark iron pauldron with heavy rivets, dwarven style"
+  3: "war drum — a small round hand drum with a red rim and two short sticks"
+  4: "healer's bag — a green cloth satchel with a silver leaf embroidered on the flap"
+  5: "venom fang — a single curved green-tinged fang hanging on a cord"
+  6: "silk banner — a torn corner of a blue silk banner on a short pole"
+  7: "jade ring — a pale green jade ring with a tiny round hollow on its inner side"
+  8: "merchant seal — a square bronze seal stamp with a red cord tied to its handle"
+  9: "stone skin amulet — a flat grey stone amulet carved with a mountain silhouette"
+  10: "sealed scroll — a rolled scroll bound with a yellow paper seal and a black cord"
+  11: "breath pearl — a small milky white pearl with a faint swirl of mist inside"
+  12: "calm river stone — a smooth dark river stone with thin flowing water lines across it"
+  13: "heavenly needle — an extremely thin silver needle threaded with a single shining silk strand"
+  14: "phoenix ash — a small heap of grey ash with one red-gold feather resting on top"
+  15: "three moons — a dark disc pendant showing three small moons in a row, white, pale blue, white"
+  16: "sword tassel — a red silk sword tassel with a small jade bead at its knot"
+placeholder: { color: '#5a8fae', accent: '#203a4a' }
