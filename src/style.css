@@ -1314,3 +1314,6 @@ img.vn-portrait, img.cutin-portrait {
 .toasts-center .toast { font-size: 1.12rem; line-height: 1.6; padding: 12px 22px; text-align: center; background: rgba(14, 10, 12, 0.95); border-width: 2px; box-shadow: 0 12px 34px rgba(0, 0, 0, 0.75); animation: alert-in 0.25s ease-out; }
 @keyframes alert-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
 @media (max-width: 600px) { .toasts-center .toast { font-size: 0.95rem; padding: 10px 14px; } }
+
+/* 도감 기록 탭: 플레이 기록 내보내기 */
+.runlog-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
