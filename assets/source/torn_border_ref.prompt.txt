@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Torn Border, a wound in the edge between worlds; a tall jagged vertical tear in the air with ragged stitched edges, inside it a swirling vortex of stolen flows (pale silver mana threads and dark coiled qi), torn threads hanging from the rim; no face, no body.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Cell 1: full view, three-quarter front, a tall jagged tear standing upright, swirling flows of silver and dark violet inside, loose torn threads hanging from the ragged rim
+Cell 2: full view, side view facing left, same proportions, the tear seen as a thin warped slit with threads trailing
+Cells 3 to 4 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Keep the attached tear's exact ragged stitched rim, hanging threads, pale silver mana spiral and dark violet coiled qi, and the same two views, but the silhouettes are too tall (about 116 sprite pixels). REDUCE each ENTIRE tear, including its outer tips and threads, uniformly to 82% of the current height and width, for a final full height about 96 sprite pixels. This is a wound in air, NOT a person, NOT a monster face, NOT a door. Keep Cell 1 as the wider three-quarter front opening and Cell 2 as the thin LEFT-facing edge-on slit, with the SAME outer height and bottom row. On the requested 512-pixel cells the outermost top is y=76 and bottom is y=460; if the native output uses 627-pixel cells, top is y=93 and bottom y=563, giving 470 native pixels = 96 sprite pixels. Leave a conspicuous pure-green margin above and below both complete tears. Flat solid #00FF00 throughout the empty background and bottom row, no gradients, no floor, no shadows. Crisp solid square blocks and no more than 16 palette colors.
