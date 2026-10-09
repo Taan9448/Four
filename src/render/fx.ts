@@ -276,11 +276,12 @@ export function floatOver(layer: HTMLElement, target: HTMLElement, text: string,
   floatText(layer, tr.left - lr.left + tr.width / 2, tr.top - lr.top + tr.height * 0.3, text, kind);
 }
 
-export function toast(container: HTMLElement, text: string, kind: 'support' | 'info' | 'danger' = 'info'): void {
+/** hold: 사라지기 시작할 때까지(ms). 기본 1.6초 */
+export function toast(container: HTMLElement, text: string, kind: 'support' | 'info' | 'danger' = 'info', hold = 1600): void {
   const el = document.createElement('div');
   el.className = `toast toast-${kind}`;
   el.textContent = text;
   container.appendChild(el);
-  setTimeout(() => el.classList.add('toast-out'), 1600);
-  setTimeout(() => el.remove(), 2100);
+  setTimeout(() => el.classList.add('toast-out'), hold);
+  setTimeout(() => el.remove(), hold + 500);
 }

@@ -1308,3 +1308,9 @@ img.vn-portrait, img.cutin-portrait {
 /* 새 배포 알림(update-check.ts) */
 .update-banner { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); padding: 10px 14px; border: 1px solid #e2b45c; border-radius: 8px; background: rgba(20, 16, 10, 0.95); color: #f3e6c4; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); font-size: 0.9rem; }
 .update-banner .btn { flex: none; white-space: nowrap; }
+
+/* 전투 중 갑자기 일어난 일(보스 변신·격노·균열 폭주 등): 화면 가운데에 크게 */
+.toasts.toasts-center { top: 42%; transform: translate(-50%, -50%); width: min(640px, 92vw); align-items: center; z-index: 25; }
+.toasts-center .toast { font-size: 1.12rem; line-height: 1.6; padding: 12px 22px; text-align: center; background: rgba(14, 10, 12, 0.95); border-width: 2px; box-shadow: 0 12px 34px rgba(0, 0, 0, 0.75); animation: alert-in 0.25s ease-out; }
+@keyframes alert-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+@media (max-width: 600px) { .toasts-center .toast { font-size: 0.95rem; padding: 10px 14px; } }

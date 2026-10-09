@@ -63,6 +63,8 @@ export class BattleView {
   private field!: HTMLElement;
   private fxLayer!: HTMLElement;
   private toasts!: HTMLElement;
+  /** 갑자기 일어난 일(보스 변신·격노·균열 폭주·지원)은 화면 가운데에, 글이 길수록 오래 */
+  private alerts!: HTMLElement;
   private handEl!: HTMLElement;
   private resEl!: HTMLElement;
   private aimEl!: HTMLElement;
@@ -99,7 +101,7 @@ export class BattleView {
     this.rift = new RiftOverlay(bal.max, bal.echoThreshold);
     this.root = this.build();
     this.refresh();
-    if (ctx.bonusText) setTimeout(() => toast(this.toasts, ctx.bonusText!, 'support'), 300);
+    if (ctx.bonusText) setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
     this.startTours();
     // 시작 시 남은 이벤트(지원 규칙 등)는 기록만
     void this.animate(this.state.events.splice(0));
@@ -165,6 +167,7 @@ export class BattleView {
     this.resEl = h('div', { class: 'b-res' });
     this.fxLayer = h('div', { class: 'fx-layer' });
     this.toasts = h('div', { class: 'toasts' });
+    this.alerts = h('div', { class: 'toasts toasts-center' });
     this.handEl = h('div', { class: 'hand' });
     this.logEl = h('div', { class: 'log', 'aria-live': 'polite' });
     this.pilesEl = h('div', { class: 'medals' });
@@ -248,7 +251,7 @@ export class BattleView {
 
     document.addEventListener('keydown', this.onKey);
     installTooltips();
-    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts);
+    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts, this.alerts);
   }
 
   private spriteFor(c: Combatant, anim: string): string | null {
@@ -985,7 +988,7 @@ export class BattleView {
             floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
             sfx('status', { volume: 0.6 });
           }
-          if (ev.status === 'knot_exposed' && ev.stacks > 0) toast(this.toasts, '매듭이 드러났다 — 날 얹기!', 'support');
+          if (ev.status === 'knot_exposed' && ev.stacks > 0) this.alert('매듭이 드러났다 — 날 얹기!', 'support');
           break;
         }
         case 'rift':
@@ -998,7 +1001,7 @@ export class BattleView {
           await this.wait(80);
           break;
         case 'surge':
-          toast(this.toasts, '균열 폭주! 하늘이 갈라진다', 'danger');
+          this.alert('균열 폭주! 하늘이 갈라진다', 'danger');
           void this.rift.surge();
           sfx('surge');
           shake(this.field, 1);
@@ -1006,10 +1009,10 @@ export class BattleView {
           await this.wait(350);
           break;
         case 'echo':
-          toast(this.toasts, '틈의 잔향이 덱에 섞였다', 'danger');
+          this.alert('틈의 잔향이 덱에 섞였다', 'danger');
           break;
         case 'support':
-          toast(this.toasts, `왕일검 — ${ev.name}`, 'support');
+          this.alert(`왕일검 — ${ev.name}`, 'support');
           await this.wait(250);
           break;
         case 'relic': {
@@ -1052,7 +1055,7 @@ export class BattleView {
             old.player.stop();
             const fresh = this.makeUnit(old.c);
             old.el.replaceWith(fresh.el);
-            toast(this.toasts, `${ev.from} — ${ev.text}`, 'danger');
+            this.alert(`${ev.from} — ${ev.text}`, 'danger');
             sfx('transform');
             shake(this.field, 0.8);
             flash(this.field, 'red');
@@ -1086,7 +1089,7 @@ export class BattleView {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, '격노', 'crit');
           sfx('enrage');
-          toast(this.toasts, ev.text, 'danger');
+          this.alert(ev.text, 'danger');
           shake(this.field, 0.6);
           await this.wait(500);
           break;
@@ -1120,6 +1123,10 @@ export class BattleView {
   }
 
   /** 전투 연출 대기(설정의 전투 속도 배율) */
+  private alert(text: string, kind: 'support' | 'danger'): void {
+    toast(this.alerts, text, kind, Math.min(7000, 1800 + text.length * 45));
+  }
+
   private wait(ms: number): Promise<void> {
     return sleep(ms * settings.speed);
   }
