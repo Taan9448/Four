@@ -1,0 +1,15 @@
+id: poison_hand_idle
+type: character-anim
+size: large
+character: poison_hand
+chroma: magenta
+summary: 독수마군 대기 4프레임
+depends_on: [poison_hand_ref]
+reference: assets/source/poison_hand_ref.png
+facing: left
+frame_notes:
+  1: "stands, hands raised like claws, a faint green haze"
+  2: "the green veins on the wrists throb"
+  3: "flexes the poisoned fingernails"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#2a5a5a', accent: '#6aa84f' }

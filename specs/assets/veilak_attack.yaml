@@ -1,0 +1,18 @@
+id: veilak_attack
+type: character-anim
+size: large
+character: veilak
+chroma: magenta
+summary: 그림자 군단장 베일락 연기 대검 내리치기 6프레임
+depends_on: [veilak_ref]
+reference: assets/source/veilak_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the smoke greatsword high over the helmet"
+  2: "the horse rears slightly, the blade at its peak"
+  3: "spurs the horse forward to the left"
+  4: "the greatsword cleaves down to the left, a wide arc of black smoke"
+  5: "the smoke of the blow scatters"
+  6: "returns to the standing stance"
+placeholder: { shape: boss, color: '#2b2b3a', accent: '#ff3b3b' }

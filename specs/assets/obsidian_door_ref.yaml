@@ -1,0 +1,11 @@
+id: obsidian_door_ref
+type: character-ref
+size: large
+character: obsidian_door
+chroma: green
+summary: 쐐기 박힌 흑요석 문 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a tall black obsidian door in a stone frame, wave-like letters carved on it, seven black wedges driven into the frame"
+  2: "full view, side view facing left, same proportions, the door seen at an angle, wedges sticking out"
+placeholder: { shape: object, color: '#1b1724', accent: '#4b3a6b' }

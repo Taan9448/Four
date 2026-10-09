@@ -1,0 +1,15 @@
+id: gormon_idle
+type: character-anim
+size: large
+character: gormon
+chroma: magenta
+summary: 대지의 거인 고르몬 대기 4프레임
+depends_on: [gormon_ref]
+reference: assets/source/gormon_ref.png
+facing: left
+frame_notes:
+  1: "crouched, knuckles on the ground, dust trickling from the shoulders"
+  2: "the chest rises, a faint red glow in the cracks"
+  3: "the lava eyes brighten"
+  4: "settles, small stones falling"
+placeholder: { shape: boss, color: '#5b4a3f', accent: '#ff8a5c' }

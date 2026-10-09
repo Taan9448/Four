@@ -1,0 +1,14 @@
+id: bone_giant_hit
+type: character-anim
+size: large
+character: bone_giant
+chroma: green
+summary: 뼈 거인 피격 3프레임
+depends_on: [bone_giant_ref]
+reference: assets/source/bone_giant_ref.png
+facing: left
+frame_notes:
+  1: "struck, bones knocked loose"
+  2: "recoils, the ribcage rattling"
+  3: "the loose bones fit back together along the crimson qi"
+placeholder: { shape: boss, color: '#d8d0bc', accent: '#a02634' }

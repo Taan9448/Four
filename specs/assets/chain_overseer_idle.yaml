@@ -1,0 +1,15 @@
+id: chain_overseer_idle
+type: character-anim
+size: large
+character: chain_overseer
+chroma: magenta
+summary: 사슬 감독관 대기 4프레임
+depends_on: [chain_overseer_ref]
+reference: assets/source/chain_overseer_ref.png
+facing: left
+frame_notes:
+  1: "stands, the glowing chain swaying from the hand"
+  2: "the chain links clink, embers falling"
+  3: "the red lights in the helmet pulse"
+  4: "settles, chain hanging still"
+placeholder: { shape: humanoid, color: '#5a4442', accent: '#f2a93b' }

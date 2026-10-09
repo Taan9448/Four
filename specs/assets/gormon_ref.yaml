@@ -1,0 +1,11 @@
+id: gormon_ref
+type: character-ref
+size: large
+character: gormon
+chroma: magenta
+summary: 대지의 거인 고르몬 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a hunched giant of rock fused with the mountain, huge fists each finger as large as a man's torso, eyes red like lava, roots and cracks of stone spreading from the back and shoulders"
+  2: "full body, side view facing left, same proportions, knuckles resting on the ground"
+placeholder: { shape: boss, color: '#5b4a3f', accent: '#ff8a5c' }

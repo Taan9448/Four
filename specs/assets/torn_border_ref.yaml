@@ -1,0 +1,11 @@
+id: torn_border_ref
+type: character-ref
+size: large
+character: torn_border
+chroma: green
+summary: 찢긴 경계 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front, a tall jagged tear standing upright, swirling flows of silver and dark violet inside, loose torn threads hanging from the ragged rim"
+  2: "full view, side view facing left, same proportions, the tear seen as a thin warped slit with threads trailing"
+placeholder: { shape: object, color: '#4b3a6b', accent: '#dff4ff' }

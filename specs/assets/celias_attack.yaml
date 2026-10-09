@@ -1,0 +1,18 @@
+id: celias_attack
+type: character-anim
+size: large
+character: celias
+chroma: magenta
+summary: 빙결의 여왕 셀리아스 얼음 창 6프레임
+depends_on: [celias_ref]
+reference: assets/source/celias_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "lifts one hand, snowflakes gathering into the palm"
+  2: "a spear of ice forms above the hand"
+  3: "draws the hand back, the spear glowing pale blue"
+  4: "thrusts the hand forward to the left, the ice spear flying, a burst of frost"
+  5: "frost shards scatter"
+  6: "returns to the standing stance, hand lowered"
+placeholder: { shape: boss, color: '#bfe0f0', accent: '#4fb4ff' }

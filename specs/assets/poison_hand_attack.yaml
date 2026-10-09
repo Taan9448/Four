@@ -1,0 +1,18 @@
+id: poison_hand_attack
+type: character-anim
+size: large
+character: poison_hand
+chroma: magenta
+summary: 독수마군 독수 할퀴기 6프레임
+depends_on: [poison_hand_ref]
+reference: assets/source/poison_hand_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws a clawed hand back, green haze gathering"
+  2: "steps forward low"
+  3: "the hand at full draw, nails glowing"
+  4: "a raking claw strike to the left, a spray of green poison"
+  5: "the poison mist drifts"
+  6: "returns to the standing stance"
+placeholder: { shape: humanoid, color: '#2a5a5a', accent: '#6aa84f' }

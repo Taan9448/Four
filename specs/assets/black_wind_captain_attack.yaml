@@ -1,0 +1,18 @@
+id: black_wind_captain_attack
+type: character-anim
+size: large
+character: black_wind_captain
+chroma: magenta
+summary: 흑풍대주 흑풍 곡도 6프레임
+depends_on: [black_wind_captain_ref]
+reference: assets/source/black_wind_captain_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the curved saber back"
+  2: "spins forward, the robe flaring"
+  3: "the saber at the top of a curving swing"
+  4: "a curving slash to the left trailing black wind"
+  5: "follows through, the wind dispersing"
+  6: "returns to the standing stance"
+placeholder: { shape: humanoid, color: '#3a3038', accent: '#8a90a3' }

@@ -1,0 +1,11 @@
+id: ore_spider_ref
+type: character-ref
+size: large
+character: ore_spider
+chroma: magenta
+summary: 광석거미 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a cart-sized spider with a silver ore shell, eight jointed legs spread, a cluster of small dark eyes"
+  2: "full body, side view facing left, same proportions, legs folded under the body"
+placeholder: { shape: beast, color: '#c0c4cc', accent: '#4b3a6b' }

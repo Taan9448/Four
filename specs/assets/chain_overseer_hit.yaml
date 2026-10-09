@@ -1,0 +1,14 @@
+id: chain_overseer_hit
+type: character-anim
+size: large
+character: chain_overseer
+chroma: magenta
+summary: 사슬 감독관 피격 3프레임
+depends_on: [chain_overseer_ref]
+reference: assets/source/chain_overseer_ref.png
+facing: left
+frame_notes:
+  1: "struck, the armor ringing, the helmet knocked aside"
+  2: "recoils, red ash spilling from the joints"
+  3: "steadies, the chain raised"
+placeholder: { shape: humanoid, color: '#5a4442', accent: '#f2a93b' }

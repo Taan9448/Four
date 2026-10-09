@@ -1,0 +1,18 @@
+id: gormon_attack
+type: character-anim
+size: large
+character: gormon
+chroma: magenta
+summary: 대지의 거인 고르몬 산의 주먹 6프레임
+depends_on: [gormon_ref]
+reference: assets/source/gormon_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "lifts one huge fist high, rocks falling from the arm"
+  2: "the fist at its peak above the head, cracks glowing"
+  3: "leans forward to the left"
+  4: "the fist slams down to the left, the ground bursting into rock and dust"
+  5: "the dust settles around the fist"
+  6: "pulls the fist back to the crouched stance"
+placeholder: { shape: boss, color: '#5b4a3f', accent: '#ff8a5c' }

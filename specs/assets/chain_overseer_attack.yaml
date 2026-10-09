@@ -1,0 +1,18 @@
+id: chain_overseer_attack
+type: character-anim
+size: large
+character: chain_overseer
+chroma: magenta
+summary: 사슬 감독관 불사슬 휘두르기 6프레임
+depends_on: [chain_overseer_ref]
+reference: assets/source/chain_overseer_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "swings the chain back in a wide circle"
+  2: "the chain whirls above the helmet, glowing"
+  3: "steps forward to the left"
+  4: "the chain lashes down to the left, a burst of orange sparks"
+  5: "drags the chain back along the ground"
+  6: "returns to the standing stance"
+placeholder: { shape: humanoid, color: '#5a4442', accent: '#f2a93b' }

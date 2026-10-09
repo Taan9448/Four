@@ -1,0 +1,14 @@
+id: edric_rowen_hit
+type: character-anim
+size: large
+character: edric_rowen
+chroma: magenta
+summary: 에드릭 로웬 피격 3프레임
+depends_on: [edric_rowen_ref]
+reference: assets/source/edric_rowen_ref.png
+facing: left
+frame_notes:
+  1: "struck, ice chips breaking off the shoulder"
+  2: "recoils behind the shield"
+  3: "steadies, eyes glowing"
+placeholder: { shape: humanoid, color: '#7fb6d6', accent: '#4fb4ff' }

@@ -1,0 +1,36 @@
+{
+  "id": "poison_hand_attack",
+  "type": "character-anim",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    128,
+    128
+  ],
+  "fit": "pad",
+  "frames": 6,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "hit": 4
+  },
+  "blend": "normal",
+  "facing": "left",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "b1156e3411ccf904",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1
+}

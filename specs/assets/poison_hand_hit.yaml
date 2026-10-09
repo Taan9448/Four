@@ -1,0 +1,14 @@
+id: poison_hand_hit
+type: character-anim
+size: large
+character: poison_hand
+chroma: magenta
+summary: 독수마군 피격 3프레임
+depends_on: [poison_hand_ref]
+reference: assets/source/poison_hand_ref.png
+facing: left
+frame_notes:
+  1: "struck, staggering"
+  2: "recoils, clutching the wrist"
+  3: "recovers, glaring, claws raised"
+placeholder: { shape: humanoid, color: '#2a5a5a', accent: '#6aa84f' }

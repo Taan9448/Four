@@ -1,0 +1,11 @@
+id: ice_gatekeeper_ref
+type: character-ref
+size: large
+character: ice_gatekeeper
+chroma: magenta
+summary: 얼음 궁전의 문지기 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a knight of translucent ice, a tall tower shield with frost flowers on its crest, an ice spear upright"
+  2: "full body, side view facing left, same proportions, the shield held in front"
+placeholder: { shape: humanoid, color: '#8ab4cc', accent: '#dff4ff' }
