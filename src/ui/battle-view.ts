@@ -53,6 +53,10 @@ interface Unit {
 export class BattleView {
   readonly root: HTMLElement;
   private units = new Map<string, Unit>();
+  /** 키보드로 고른 대상(Tab) */
+  private targetFocus: string | null = null;
+  /** 끌어 놓기 중이던 카드(놓은 뒤 click을 한 번 막는다) */
+  private dragged = false;
   private enemySide!: HTMLElement;
   private field!: HTMLElement;
   private fxLayer!: HTMLElement;
@@ -271,6 +275,7 @@ export class BattleView {
       u.block.style.display = c.block > 0 ? '' : 'none';
       if (c.block > 0) Object.entries(tipAttrs(`방어 ${c.block}`, '받는 피해를 먼저 막는다. 자기 턴이 시작되면 사라진다.')).forEach(([k, v]) => v && u.block.setAttribute(k, v));
       u.el.classList.toggle('down', c.downed);
+      u.el.classList.toggle('target-focus', this.selected !== null && this.targetFocus === c.uid);
       clear(u.statuses);
       for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusChip(this.data, id, n));
       // 적의 속성 약점·내성(정의에서 온다, 상태가 아님)
@@ -397,7 +402,11 @@ export class BattleView {
       el.style.setProperty('--rot', `${off * step}deg`);
       el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
       el.style.zIndex = String(10 + i);
-      el.addEventListener('click', () => this.onCardClick(i));
+      el.addEventListener('click', () => {
+        if (this.dragged) return void (this.dragged = false);
+        this.onCardClick(i);
+      });
+      el.addEventListener('pointerdown', (e) => this.startDrag(e, i, el));
       el.addEventListener('mouseenter', () => this.setHover(i));
       el.addEventListener('mouseleave', () => this.setHover(null));
       this.handEl.appendChild(el);
@@ -545,14 +554,104 @@ export class BattleView {
 
   // ───────────────────────── 입력 ─────────────────────────
 
+  /**
+   * 단축키: 1~9·0 손패 고르기 · Tab/←→ 대상 바꾸기 · Enter/Space 고른 대상에 쓰기 · E 턴 종료 · Esc 취소
+   */
   private onKey = (e: KeyboardEvent) => {
     if (document.querySelector('.overlay, .tour')) return; // 창·안내가 떠 있으면 전투 단축키를 받지 않는다
+    if ((e.target as HTMLElement | null)?.closest?.('input, textarea')) return;
     if (e.key === 'Escape') {
       this.selected = null;
       this.potionSel = null;
+      this.targetFocus = null;
       this.refresh();
     } else if (e.key === 'e' || e.key === 'E') this.onEndTurn();
+    else if (/^[0-9]$/.test(e.key)) {
+      const i = e.key === '0' ? 9 : Number(e.key) - 1;
+      if (i < this.state.hand.length) this.onCardClick(i);
+    } else if (this.selected !== null && (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+      e.preventDefault();
+      this.cycleTarget(e.key === 'ArrowLeft' || (e.key === 'Tab' && e.shiftKey) ? -1 : 1);
+    } else if (this.selected !== null && this.targetFocus && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      const c = [...this.state.party, ...this.state.enemies].find((x) => x.uid === this.targetFocus);
+      if (c) this.onUnitClick(c);
+    }
   };
+
+  /** 고른 카드가 노릴 수 있는 대상들 */
+  private targetPool(): Combatant[] {
+    if (this.selected === null) return [];
+    const need = needsTarget(this.state, this.state.hand[this.selected]);
+    return (need === 'enemy' ? this.state.enemies : need === 'ally' ? this.state.party : []).filter((c) => !c.downed);
+  }
+
+  /**
+   * 끌어 놓기: 카드를 끌어 대상 위에 놓으면 그 대상에게 쓴다. 대상이 없는 카드는 손패 위쪽으로 끌어 올리면 쓴다.
+   * 조금(14px) 움직이기 전까지는 보통 누르기로 둔다
+   */
+  private startDrag(e: PointerEvent, i: number, el: HTMLElement): void {
+    if (this.busy || this.state.result || e.button !== 0) return;
+    const x0 = e.clientX;
+    const y0 = e.clientY;
+    let ghost: HTMLElement | null = null;
+    let over: HTMLElement | null = null;
+    const need = needsTarget(this.state, this.state.hand[i]);
+    const unitAt = (x: number, y: number) => {
+      const hit = document.elementFromPoint(x, y)?.closest<HTMLElement>('.unit');
+      if (!hit) return null;
+      const u = [...this.units.values()].find((v) => v.el === hit);
+      if (!u || u.c.downed) return null;
+      if ((need === 'enemy' && u.c.side !== 'enemy') || (need === 'ally' && u.c.side !== 'party') || !need) return null;
+      return u;
+    };
+    const move = (ev: PointerEvent) => {
+      if (!ghost) {
+        if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 14 || !canPlay(this.state, i).ok) return;
+        ghost = el.cloneNode(true) as HTMLElement;
+        ghost.classList.add('card-ghost', 'card-drag');
+        const r = el.getBoundingClientRect();
+        Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, pointerEvents: 'none', zIndex: '200', transform: 'none', margin: '0' });
+        document.body.appendChild(ghost);
+        el.classList.add('drag-source');
+      }
+      ghost.style.left = `${ev.clientX - ghost.offsetWidth / 2}px`;
+      ghost.style.top = `${ev.clientY - ghost.offsetHeight * 0.4}px`;
+      const u = unitAt(ev.clientX, ev.clientY);
+      if (over && over !== u?.el) over.classList.remove('drop-target');
+      over = u?.el ?? null;
+      over?.classList.add('drop-target');
+    };
+    const up = (ev: PointerEvent) => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      if (!ghost) return;
+      ghost.remove();
+      el.classList.remove('drag-source');
+      over?.classList.remove('drop-target');
+      this.dragged = true;
+      setTimeout(() => (this.dragged = false), 0);
+      const u = unitAt(ev.clientX, ev.clientY);
+      if (need && u) {
+        this.selected = null;
+        void this.act(() => playCard(this.state, i, u.c.uid), () => this.flyPlayed(i, u.c.uid));
+      } else if (!need && ev.clientY < this.handEl.getBoundingClientRect().top - 30) {
+        this.selected = null;
+        void this.act(() => playCard(this.state, i), () => this.flyPlayed(i));
+      }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  }
+
+  /** 키보드 대상: 다음·앞 대상으로 */
+  private cycleTarget(dir: 1 | -1): void {
+    const pool = this.targetPool();
+    if (!pool.length) return;
+    const at = pool.findIndex((c) => c.uid === this.targetFocus);
+    this.targetFocus = pool[(at + dir + pool.length) % pool.length].uid;
+    this.refresh();
+  }
 
   private onCardClick(i: number): void {
     if (this.busy || this.state.result) return;
@@ -579,7 +678,10 @@ export class BattleView {
       return void this.act(() => playCard(this.state, i, pool[0].uid), () => this.flyPlayed(i, pool[0].uid));
     }
     this.selected = i;
+    this.targetFocus = pool[0]?.uid ?? null;
     this.refresh();
+    // 휴대폰: 고른 카드가 손패 띠 밖이면 보이게
+    this.handEls.get(this.state.hand[i].uid)?.scrollIntoView?.({ block: 'nearest', inline: 'center', behavior: 'smooth' });
   }
 
   /** 물약: 대상이 필요 없으면 바로, 있으면 고르는 상태로(같은 칸을 다시 누르면 취소) */
@@ -618,10 +720,17 @@ export class BattleView {
     void this.act(() => playCard(this.state, i, c.uid), () => this.flyPlayed(i, c.uid));
   }
 
-  private onEndTurn(): void {
+  private onEndTurn(confirmed = false): void {
     if (this.busy || this.state.result) return;
+    // 쓸 수 있는 카드가 남았으면 한 번 묻는다(설정에서 끌 수 있다)
+    const playable = this.state.hand.filter((c, i) => canPlay(this.state, i).ok && resolveCard(this.data, c).def.type !== 'status').length;
+    if (!confirmed && settings.confirmEndTurn && playable > 0) {
+      void confirmDialog('턴 종료', `아직 쓸 수 있는 카드가 ${playable}장 있다. 턴을 끝낼까?`, '턴 끝내기').then((ok) => ok && this.onEndTurn(true));
+      return;
+    }
     this.selected = null;
     this.potionSel = null;
+    this.targetFocus = null;
     void this.act(
       () => endTurn(this.state),
       () => this.flyDiscardHand(),
