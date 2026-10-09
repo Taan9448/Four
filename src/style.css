@@ -1138,6 +1138,25 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .abyss-mate input, .abyss-path input { align-self: flex-start; }
 .abyss-mate small, .abyss-path small { color: #b9b0c4; line-height: 1.45; }
 .abyss-path-glyph { font-size: 1.4rem; color: #d9c7f2; font-family: serif; }
+.abyss-oath-row input { width: 100%; accent-color: #b996ef; }
+.abyss-oaths { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.abyss-oaths li { display: grid; grid-template-columns: 26px 1fr; column-gap: 8px; padding: 6px 8px; border: 1px solid rgba(150, 110, 210, 0.25); border-radius: 6px; background: rgba(16, 12, 24, 0.6); color: #b9b0c4; }
+.abyss-oaths li b { font-size: 0.85rem; color: #e7dccb; }
+.abyss-oaths li small { grid-column: 2; font-size: 0.75rem; line-height: 1.4; }
+.abyss-oaths li.on { border-color: #b996ef; background: rgba(60, 36, 90, 0.55); }
+.abyss-oaths li.locked { opacity: 0.45; }
+.abyss-oath-glyph { grid-row: span 2; font-family: serif; font-size: 1.2rem; color: #d9c7f2; align-self: center; }
+.abyss-daily { margin-top: 6px; padding-top: 10px; border-top: 1px dashed rgba(150, 110, 210, 0.35); }
+.codex-card.outline .card { filter: grayscale(0.85) brightness(0.75); opacity: 0.8; }
+.codex-card.outline { outline: 2px dashed rgba(220, 210, 190, 0.3); outline-offset: 3px; border-radius: 6px; }
+.codex-card.unknown.locked { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px; font-size: 1.8rem; text-align: center; }
+.codex-lock { font-family: var(--f-body, inherit); font-size: 0.68rem; line-height: 1.35; color: rgba(225, 215, 240, 0.65); }
+.codex-lock b { color: #d9c7f2; }
+.codex-achievements { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+.codex-achievements li { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-dim); opacity: 0.7; }
+.codex-achievements li.done { opacity: 1; border-color: #b996ef; color: #e7dccb; }
+.codex-achievements small { font-size: 0.75rem; line-height: 1.4; }
+.abyss-glyph { font-family: serif; color: #d9c7f2; }
 .depth-band { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 14px 18px; min-height: 84px; background: radial-gradient(ellipse at center, rgba(60, 30, 90, 0.55), rgba(8, 6, 12, 0.95)); overflow: hidden; }
 .depth-crack { position: absolute; left: 0; right: 0; top: 50%; height: 3px; background: linear-gradient(90deg, transparent, #0b0b10 8%, #3a1d55 50%, #0b0b10 92%, transparent); box-shadow: 0 0 10px rgba(160, 90, 220, 0.5); }
 .depth-stop { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px; padding: 6px 4px; border: 1px solid rgba(150, 110, 210, 0.3); border-radius: 6px; background: rgba(14, 10, 20, 0.85); color: #8f86a0; }

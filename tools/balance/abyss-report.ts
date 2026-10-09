@@ -1,6 +1,6 @@
 // BALANCE_MODE=abyss: 심연(GAME_DESIGN 16절)을 봇으로 두고 굽이별 도달률·사망 원인·동료 수별·풀 크기별 표를 낸다
 import type { GameData } from '../../src/engine/data';
-import { abyssPool } from '../../src/engine/abyss';
+import { abyssPool, unlockedRift } from '../../src/engine/abyss';
 import { DEFAULT_BOT, playAbyss, type AbyssReport, type BotOptions } from '../../src/sim/bot';
 
 /** 봇용 풀: narrow = 캠페인 한 번 마친 저장 어림(시작 카드 + 보상 카드 절반, +0~1), wide = 전부 본 저장(+2) */
@@ -19,11 +19,20 @@ export function abyssReport(data: GameData, seeds: number, prefix: string, opts:
   const pct = (n: number, d: number) => (d ? `${Math.round((n / d) * 100)}%` : '-');
   const lines: string[] = [];
   const runs: (AbyssReport & { pool: string; set: string })[] = [];
+  // 좁은 풀 = 처음 심연(업적 없음: 틈의 카드 10장), 넓은 풀 = 다 연 저장(틈의 카드 40장)
+  const fresh = unlockedRift(data, []);
   for (const pool of ['narrow', 'wide'] as const) {
     const p = botPool(data, pool);
+    const unlocked = pool === 'narrow' ? fresh : undefined;
     for (const mates of MATE_SETS)
-      for (let i = 1; i <= seeds; i++) runs.push({ ...playAbyss(data, `${prefix}${mates.join('')}${i}`, { mates, pool: p }, opts, maxDepth), pool, set: mates.join('+') });
+      for (let i = 1; i <= seeds; i++) runs.push({ ...playAbyss(data, `${prefix}${mates.join('')}${i}`, { mates, pool: p, unlocked }, opts, maxDepth), pool, set: mates.join('+') });
   }
+  // 서약 단계별(넓은 풀, 엘리아+카일)
+  const OATHS = [0, 3, 6, 10, 15];
+  const oathRuns = OATHS.map((oath) => ({
+    oath,
+    rs: Array.from({ length: seeds }, (_, i) => playAbyss(data, `${prefix}o${oath}_${i + 1}`, { mates: oath >= 14 ? ['elia'] : ['elia', 'kyle'], pool: botPool(data, 'wide'), oath }, opts, maxDepth)),
+  }));
   const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] ?? 0;
   const quant = (xs: number[], q: number) => [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(xs.length * q))] ?? 0;
   const reach = (rs: AbyssReport[], d: number) => pct(rs.filter((r) => r.depth >= d).length, rs.length);
@@ -50,6 +59,13 @@ export function abyssReport(data: GameData, seeds: number, prefix: string, opts:
     const rs = runs.filter((r) => r.pool === 'narrow' && r.set === set);
     lines.push(`| ${set} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 5)} |`);
   }
+  lines.push('');
+  lines.push('## 서약 단계별(넓은 풀, 엘리아+카일 — 14단계부터 엘리아만)');
+  lines.push('');
+  lines.push('| 서약 | 런 | 도달 중앙값 | 상위 10% | 3굽이 | 5굽이 | 8굽이 | 평균 점수 |');
+  lines.push('|---:|---:|---:|---:|---:|---:|---:|---:|');
+  for (const { oath, rs } of oathRuns)
+    lines.push(`| ${oath} | ${rs.length} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 3)} | ${reach(rs, 5)} | ${reach(rs, 8)} | ${Math.round(rs.reduce((a, r) => a + r.score, 0) / rs.length)} |`);
   lines.push('');
   lines.push('## 쓰러진 곳');
   lines.push('');

@@ -12,7 +12,7 @@ import { starterCards } from '../engine/collection';
 import { deckGroupsView } from './deck-view';
 import { openOverlay } from './overlay';
 import { loadPortrait, standingFor } from '../render/portrait';
-import { abyssScale, loopLabel, WORLD_NAME } from '../engine/abyss';
+import { abyssScale, loopLabel, nemesisEvery, WORLD_NAME } from '../engine/abyss';
 
 /** 노드 표식: 두루마리 위의 한자 */
 const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
@@ -104,7 +104,7 @@ export function placeName(stage: Stage, run: RunState): string {
  */
 function depthBand(data: GameData, run: RunState): HTMLElement {
   const ab = run.abyss!;
-  const every = data.balance.abyss.nemesisEvery;
+  const every = nemesisEvery(data, ab);
   const last = Math.max(ab.depth + 3, Math.ceil((ab.depth + 1) / every) * every);
   const first = Math.max(1, last - 11);
   const stops = [];
@@ -127,10 +127,12 @@ function depthBand(data: GameData, run: RunState): HTMLElement {
 function abyssTeaser(data: GameData, run: RunState): string {
   const ab = run.abyss!;
   const sc = abyssScale(data, ab.depth);
-  const every = data.balance.abyss.nemesisEvery;
+  const every = nemesisEvery(data, ab);
   const next = Math.ceil(ab.depth / every) * every;
   const nemesis = ab.depth % every === 0 ? '이 굽이의 끝에서 숙적, 모르데카이의 잔향이 기다린다.' : `숙적까지 ${next - ab.depth}굽이.`;
-  return `${WORLD_NAME[ab.world]}의 조각이 이어 붙은 굽이. 적이 단단해졌다(체력 ×${sc.hp.toFixed(2)}, 피해 ×${sc.dmg.toFixed(2)}). ${nemesis}`;
+  const oath = ab.oath ? ` 서약 ${ab.oath}단계(${data.oaths.find((o) => o.level === ab.oath)?.name ?? ''}까지).` : '';
+  const daily = ab.daily ? ` 오늘의 심연(${ab.daily.slice(0, 4)}.${ab.daily.slice(4, 6)}.${ab.daily.slice(6)}).` : '';
+  return `${WORLD_NAME[ab.world]}의 조각이 이어 붙은 굽이. 적이 단단해졌다(체력 ×${sc.hp.toFixed(2)}, 피해 ×${sc.dmg.toFixed(2)}). ${nemesis}${oath}${daily}`;
 }
 
 /** 동료 자세히: 반신 그림 · 소개 · 레벨·체력·경험치 · 이 동료의 보유 카드 */

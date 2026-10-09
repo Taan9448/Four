@@ -4,6 +4,7 @@ import type { GameData } from '../engine/data';
 import type { RunState } from '../engine/run';
 import { deserializeRun, serializeRun, type LoadedRun } from '../engine/save';
 import { noteRun, parseCodex, type Codex } from '../engine/codex';
+import { parseAbyssMeta, type AbyssMeta } from '../engine/abyss';
 
 /** 저장 칸 수(2026-10-08: 1칸 → 3칸). 칸마다 키가 따로이고, 옛 단일 저장(cheonoe.run)은 1번 칸으로 옮긴다 */
 export const SLOT_COUNT = 3;
@@ -105,6 +106,11 @@ export function recordAbyss(result: { started?: boolean; cleared?: number; score
   writeStore(PROFILE_KEY, JSON.stringify(p));
   return p;
 }
+
+// ───────── 심연 기록(업적·서약·멈춘 굽이·일일, 3차): src/engine/abyss.ts의 AbyssMeta ─────────
+const ABYSS_META_KEY = 'cheonoe.abyssMeta';
+export const readAbyssMeta = (data: GameData): AbyssMeta => parseAbyssMeta(data, readStore(ABYSS_META_KEY));
+export const writeAbyssMeta = (meta: AbyssMeta) => writeStore(ABYSS_META_KEY, JSON.stringify(meta));
 
 // ───────── 심연 저장(캠페인 저장 칸과 따로 1칸) ─────────
 const ABYSS_KEY = 'cheonoe.abyss';

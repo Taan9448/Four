@@ -318,6 +318,7 @@ export function dealDamage(
   let grain = false;
   if (source?.side === 'party' && (target.statuses.grain ?? 0) > 0) {
     grain = true;
+    if (state.tally) state.tally.grain = (state.tally.grain ?? 0) + 1;
     target.statuses.grain -= 1;
     if (target.statuses.grain <= 0) delete target.statuses.grain;
     dmg *= 1 + bal.grain.damageBonus;
@@ -453,7 +454,10 @@ function knockOut(state: BattleState, target: Combatant): void {
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
-    if (state.tally) state.tally.kills += 1;
+    if (state.tally) {
+      state.tally.kills += 1;
+      if ((target as EnemyState).affixes?.length) state.tally.affixKills = (state.tally.affixKills ?? 0) + 1;
+    }
     fireRelics(state, 'enemyDowned');
     const def = state.data.enemies.get(target.defId);
     if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });

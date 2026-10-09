@@ -646,6 +646,17 @@ export const Balance = z
         echoModule: z.string(),
         /** 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks */
         nemesis: z.object({ enrageStep: z.number().int().min(0), knotFrom: z.number().int().positive(), knotStacks: z.number().int().positive() }).strict(),
+        // ── 3차(메타) ──
+        /** 서약: 점수 배율(단계마다 곱), 열리는 단계 = 넘은 굽이 - depthOffset, 또는 그 단계 바로 아래로 stepDepth굽이를 넘으면 */
+        oath: z.object({ scoreMul: z.number().positive(), depthOffset: z.number().int().min(0), stepDepth: z.number().int().positive() }).strict(),
+        /** 일일 심연: 날짜 시드, 그날의 법칙 laws개(모든 굽이에), 서약 단계 범위, 동료 수 범위 */
+        daily: z
+          .object({
+            laws: z.number().int().min(0),
+            oath: z.tuple([z.number().int().min(0), z.number().int().min(0)]),
+            mates: z.tuple([z.number().int().positive(), z.number().int().positive()]),
+          })
+          .strict(),
       })
       .strict(),
     route: z
@@ -710,6 +721,74 @@ export const AffixDef = z
   })
   .strict();
 export type AffixDef = z.infer<typeof AffixDef>;
+
+/**
+ * 서약(심연 3차, GAME_DESIGN 16절): 1~15단계. 고른 단계까지 전부 걸린다(같은 키는 높은 단계가 이긴다). 점수 × balance.abyss.oath.scoreMul^단계.
+ * enemyHpMul 적 체력 배율 · startGold 시작 골드(동료 수 덤은 그대로) · restHealMul 휴식 회복 배율 · rewardChoices 보상 카드 수 상한 ·
+ * eliteFloor 이 층을 엘리트로 고정 · startScar 시작 상흔 · lawsMin 굽이마다 법칙 최소 개수 · potionSlots 물약 칸 · injuriesPersist 굽이를 넘어도 부상이 낫지 않는다 ·
+ * nemesisEvery 숙적 굽이 간격 · eliteAffixMin 엘리트 접사 최소 개수 · riftInReward 보상 후보에 틈의 카드 한 장은 반드시 · noPowers 심법(파워) 카드가 나오지 않는다 ·
+ * maxMates 동료 최대 수 · haunMaxHp 하운 최대 체력
+ */
+export const OathMods = z
+  .object({
+    enemyHpMul: z.number().positive(),
+    startGold: z.number().int().min(0),
+    restHealMul: z.number().min(0),
+    rewardChoices: z.number().int().positive(),
+    eliteFloor: z.number().int().positive(),
+    startScar: z.number().int().min(0),
+    lawsMin: z.number().int().min(0),
+    potionSlots: z.number().int().min(0),
+    injuriesPersist: z.boolean(),
+    nemesisEvery: z.number().int().positive(),
+    eliteAffixMin: z.number().int().min(0),
+    riftInReward: z.boolean(),
+    noPowers: z.boolean(),
+    maxMates: z.number().int().positive(),
+    haunMaxHp: z.number().int().positive(),
+  })
+  .partial()
+  .strict();
+export type OathMods = z.infer<typeof OathMods>;
+export const OathDef = z
+  .object({ level: z.number().int().positive(), name: z.string(), glyph: z.string().length(1), description: z.string(), mods: OathMods })
+  .strict();
+export type OathDef = z.infer<typeof OathDef>;
+
+/**
+ * 심연 업적(3차): 런 하나 안에서 조건을 채우면 영구로 기록되고 틈의 카드 한 장 또는 길 하나가 열린다. 조건과 여는 것은 미리 보인다.
+ * kind — cleared 넘은 굽이 ≥ n · nemesisKills·beastKills·affixKills·trades·elites·bosses 런 안의 셈 ≥ n ·
+ * bossWithScar 상흔 n 이상으로 보스 처치 · lowHpBoss 하운 체력 비율 n 이하로 보스 처치 · injuredClear 부상 동료 n명 이상인 채 굽이 통과 ·
+ * noPowerDepth 심법을 한 장도 내지 않고 n굽이 · grainBattle 한 전투에서 결 노출 n 소모 · mates 동료 mates명으로 시작해 n굽이 ·
+ * withMate mate와 함께 n굽이 · codexCards 도감 카드 n장 · score 점수 n · oath 서약 oath단계 이상으로 n굽이 · choice 모듈 module에서 op가 든 선택 ·
+ * worlds 서로 다른 세계 n곳의 굽이 통과 · lawsClear 법칙 n개 걸린 굽이 통과 · smallDeck 덱 n장 이하로 depth굽이 통과 · riftInDeck 덱에 틈의 카드 n장 ·
+ * gold 골드 n 모으기 · scarZeroDepth 상흔 0인 채 n굽이
+ */
+export const AchievementDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    description: z.string(),
+    check: z
+      .object({
+        kind: z.enum([
+          'cleared', 'nemesisKills', 'beastKills', 'affixKills', 'trades', 'elites', 'bosses', 'bossWithScar', 'lowHpBoss', 'injuredClear',
+          'noPowerDepth', 'grainBattle', 'mates', 'withMate', 'codexCards', 'score', 'oath', 'choice', 'worlds', 'lawsClear', 'smallDeck',
+          'riftInDeck', 'gold', 'scarZeroDepth',
+        ]),
+        n: z.number().min(0),
+        mate: z.string().optional(),
+        mates: z.number().int().positive().optional(),
+        oath: z.number().int().positive().optional(),
+        module: z.string().optional(),
+        op: z.string().optional(),
+        depth: z.number().int().positive().optional(),
+      })
+      .strict(),
+    unlock: z.object({ card: z.string().optional(), path: z.string().optional() }).strict(),
+  })
+  .strict();
+export type AchievementDef = z.infer<typeof AchievementDef>;
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z
