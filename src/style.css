@@ -93,7 +93,9 @@ h1, h2, h3 { font-family: var(--f-head); }
 /* 지도: 위 여정 띠 + 아래 두루마리 지역 지도 */
 /* 창 높이를 꽉 채운다: 위 여정 띠(전체 폭) → 아래 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸 */
 .map-screen { display: flex; flex-direction: column; height: calc(100vh - 20px); min-height: 560px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; }
-.journey-area { position: relative; flex: 0 0 auto; border-bottom: 1px solid var(--line-glass); }
+.journey-area { position: relative; flex: 0 0 auto; padding: 12px 12px 0; }
+/* 위 여정 띠(깊이 띠)와 아래 두루마리의 좌우 가장자리를 같은 줄(12px 안쪽)에 맞춘다(2026-10-09 피드백) */
+.journey-wrap { border-radius: 6px; overflow: hidden; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
 /* 6:1 띠 = journey_band 그림(3:2)의 높이 37.5~62.5% 띠. 폭에 맞춰 늘고 줄어 장소 표시 자리(%)가 그림과 어긋나지 않는다 */
 .journey { position: relative; aspect-ratio: 6 / 1; width: 100%; background-size: 100% auto; background-position: center; overflow: hidden; }
 /* 그림이 오기 전: 왼쪽 무림(따뜻한 먹빛) · 오른쪽 엘하임(청은빛) */
@@ -139,14 +141,23 @@ h1, h2, h3 { font-family: var(--f-head); }
 @keyframes fog-lift { to { opacity: 0; visibility: hidden; } }
 .local { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 12px; background: radial-gradient(ellipse at 50% 0%, #1a2130, #0b0e13 70%); }
 /* 두루마리: 한지 바탕(그림이 오면 먹 그림 지도) + 위아래 축 */
-.scroll-wrap { min-width: 0; min-height: 0; padding: 0 7px; }
+.scroll-wrap { min-width: 0; min-height: 0; padding: 0; }
 /* 가로 두루마리: 남은 자리를 전부 쓴다(그림은 cover로 맞춤) */
 .scroll { position: relative; width: 100%; height: 100%; border-radius: 4px; background-size: cover; background-position: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
 .scroll:not(.has-art) { background: radial-gradient(ellipse at 12% 18%, rgba(60, 50, 35, 0.18), transparent 30%), radial-gradient(ellipse at 88% 70%, rgba(60, 50, 35, 0.16), transparent 32%), radial-gradient(ellipse at 50% 4%, rgba(30, 30, 30, 0.22), transparent 26%), radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e8dcc0, #dccdab); }
-/* 좌우의 두루마리 축 */
-.scroll::before, .scroll::after { content: ''; position: absolute; top: -6px; bottom: -6px; width: 14px; z-index: 2; border-radius: 7px; background: linear-gradient(90deg, #6b4a2a, #2e1d0f); }
-.scroll::before { left: -7px; }
-.scroll::after { right: -7px; }
+/* 좌우의 두루마리 축: 종이 가장자리에 감긴 둥근 나무 막대(가운데가 밝은 원통) + 위아래 끝의 옻칠한 손잡이. 바깥 가장자리는 위 띠와 같은 줄 */
+.scroll::before, .scroll::after {
+  content: ''; position: absolute; top: -9px; bottom: -9px; width: 22px; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 50% at 50% 50%, #f0c27a 0, #b07a3a 38%, #5a3818 72%, #24140a 100%) top / 22px 14px no-repeat,
+    radial-gradient(ellipse 50% 50% at 50% 50%, #f0c27a 0, #b07a3a 38%, #5a3818 72%, #24140a 100%) bottom / 22px 14px no-repeat,
+    linear-gradient(90deg, transparent 4px, #2a180b 4px, #6e4824 7px, #b98446 10px, #d9a35c 11px, #b98446 12px, #6e4824 15px, #2a180b 18px, transparent 18px) center / 100% calc(100% - 10px) no-repeat;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.55));
+}
+.scroll::before { left: -4px; }
+.scroll::after { right: -4px; }
+/* 종이가 축에 감겨 들어가는 자리의 그늘 */
+.scroll { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5), inset 22px 0 18px -12px rgba(40, 25, 10, 0.55), inset -22px 0 18px -12px rgba(40, 25, 10, 0.55); }
 .map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-lines line { stroke: rgba(43, 36, 26, 0.35); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
 .map-lines line.open { stroke: #1f5f8a; stroke-dasharray: none; stroke-width: 2.5; }
