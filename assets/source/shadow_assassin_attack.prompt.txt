@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Shadow Assassin, the last of the Four Heavenly Kings; a faceless, thin and elongated figure of shadow, only the black dagger in its hand is solid, its blade engraved with wave-like ancient letters. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: sinks into a low crouch, the shadow pooling
+Cell 2: vanishes into a flat shadow on the ground
+Cell 3: rises up suddenly further to the left
+Cell 4: the black dagger stabs to the left, a thin grey flash
+Cell 5: melts back into shadow
+Cell 6: rises again in the standing stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Match the attached reference's standing height: about 105 sprite pixels including its wispy shadow, not 125 or 160. Use the SAME physical body proportions and dagger design throughout; bending or vanishing changes silhouette height but NEVER scale. Bottommost visible shadow/feet must consistently align with one shared baseline in all six cells. Keep the entire leftward dagger thrust and thin GREY flash in cell 4 inside a 10-sprite-pixel empty border; do not make the dagger larger or turn it into a sword. Cells 2 and 5 must genuinely be vanishing ground shadow, not standing figures. Limit every cell to at most 16 flat palette colors. Make exactly 4x4 pixel blocks on the same aligned grid, no finer pixels. No added objects, cast shadows, glow gradients or facial features.
