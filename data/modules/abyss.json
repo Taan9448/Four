@@ -91,5 +91,60 @@
     "name": "틈의 좌판",
     "weight": 0.5,
     "content": { "text": "떠다니는 세계의 조각 위에 누군가 좌판을 벌여 놓았다. 주인은 보이지 않는데, 값을 치르면 물건이 줄어든다." }
+  },
+  {
+    "id": "abyss_boss_sa_echo",
+    "stage": "abyss",
+    "type": "boss",
+    "name": "사무결의 잔향",
+    "content": {
+      "text": "혈전의 옥좌가 틈 너머에 떠 있다. 피의 덮개는 옅어지고, 잔향은 세 턴마다 다시 피를 두른다. 덮개가 옅어진 사이에 결을 읽어라.",
+      "enemies": ["sa_mugyeol_echo"],
+      "background": "bg_heavenly_peak"
+    }
+  },
+  {
+    "id": "abyss_elite_rift_beast",
+    "stage": "abyss",
+    "type": "elite",
+    "name": "틈의 짐승",
+    "abyss": false,
+    "content": {
+      "text": "쌓인 상흔의 냄새를 따라 무언가가 굽이를 거슬러 올라왔다. 이기면 그 몸에 박힌 틈의 조각을 거둔다.",
+      "enemies": ["rift_beast"],
+      "clearEffects": [{ "op": "gain_abyss_card" }]
+    }
+  },
+  {
+    "id": "abyss_rescue",
+    "stage": "abyss",
+    "type": "event",
+    "name": "구원 — 틈에 갇힌 동료",
+    "abyss": false,
+    "content": {
+      "text": "떠다니는 조각 위에서 익숙한 목소리가 들린다. 문 너머로 따라오지 못했던 일행 하나가 틈에 갇혀 있다. 손을 뻗으면 닿는다. 다만 그 자리에 박힌 무언가도 함께 빠져나온다.",
+      "choices": [
+        { "label": "엘리아를 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "elia" }, "effects": [{ "op": "join_party", "member": "elia" }], "result": "은발이 바람에 흩날렸다. \"…늦었잖아.\"" },
+        { "label": "카일을 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "kyle" }, "effects": [{ "op": "join_party", "member": "kyle" }], "result": "\"하운! 왼쪽은 내가 맡을게.\"" },
+        { "label": "보른을 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "born" }, "effects": [{ "op": "join_party", "member": "born" }], "result": "보른은 말없이 하운의 어깨를 한 번 두드렸다." },
+        { "label": "두고 간다 — 그 자리에 박힌 유물 하나를 거둔다", "effects": [{ "op": "gain_relic" }], "result": "목소리가 멀어졌다. 손에는 차가운 물건 하나만 남았다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_rift_echo",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 메아리",
+    "abyss": false,
+    "content": {
+      "text": "일행 넷의 그림자가 떠다니는 조각 위에 겹쳐 비친다. 틈이 속삭인다. 익숙한 초식 몇 개를 내놓으면, 있어서는 안 되는 것을 하나 주겠다고.",
+      "choices": [
+        { "label": "엘리아의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "elia" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "elia", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "카일의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "kyle" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "kyle", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "보른의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "born" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "born", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "아무것도 내놓지 않는다 — 동료 모두 최대 체력 +10", "effects": [{ "op": "gain_max_hp", "amount": 10 }], "result": "그림자들이 흩어지고, 발밑이 조금 단단해졌다." }
+      ]
+    }
   }
 ]

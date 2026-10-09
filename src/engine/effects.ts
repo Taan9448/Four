@@ -106,19 +106,36 @@ export function amountOf(state: BattleState, effect: Effect, target: Combatant |
 // ───────────────────────── 적 만들기 ─────────────────────────
 
 /** 적 하나를 전투에 세운다: 스테이지·등급 배율, 특성 상태. uid는 e<번호> */
-export function spawnEnemy(state: Pick<BattleState, 'data' | 'scar' | 'enemyHpScale' | 'enemies'>, id: string, index: number): EnemyState {
+/**
+ * 적을 세울 때 덧붙이는 것(심연): 접사(이름 앞에 붙고 체력·특성·공격 효과), 특성 더하기(굽이의 법칙·숙적 성장 — 스택을 그 값으로),
+ * 격노를 당기는 턴 수
+ */
+export interface EnemyMod {
+  affixes?: string[];
+  traits?: { status: string; stacks: number }[];
+  enrageShift?: number;
+}
+
+export function spawnEnemy(state: Pick<BattleState, 'data' | 'scar' | 'enemyHpScale' | 'enemies'>, id: string, index: number, mod?: EnemyMod): EnemyState {
   const def = state.data.enemies.get(id);
   if (!def) throw new Error(`알 수 없는 적: ${id}`);
   const statuses: Record<string, number> = {};
   for (const t of def.traits) statuses[t.status] = t.stacks;
+  const affixes = (mod?.affixes ?? []).map((a) => state.data.affixes.get(a)).filter((a): a is NonNullable<typeof a> => !!a);
+  for (const a of affixes) for (const t of a.traits) statuses[t.status] = Math.max(statuses[t.status] ?? 0, t.stacks);
+  for (const t of mod?.traits ?? []) statuses[t.status] = Math.max(statuses[t.status] ?? 0, t.stacks);
   const tier = state.data.balance.enemyTiers[def.tier];
-  const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (state.scar ?? 0)) * (state.enemyHpScale ?? 1) * (tier?.hp ?? 1));
+  const hpMul = affixes.reduce((m, a) => m * (a.hpMul ?? 1), 1);
+  const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (state.scar ?? 0)) * (state.enemyHpScale ?? 1) * (tier?.hp ?? 1) * hpMul);
   let uid = `e${index}`;
   for (let n = index; state.enemies.some((e) => e.uid === uid); n++) uid = `e${n + 1}`;
-  return {
-    uid, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
+  const enemy: EnemyState = {
+    uid, defId: id, name: [...affixes.map((a) => a.name), def.name].join(' '), side: 'enemy', hp: maxHp, maxHp, block: 0,
     statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null, dmgMul: tier?.dmg ?? 1,
   };
+  if (affixes.length) enemy.affixes = affixes.map((a) => a.id);
+  if (def.enrage && mod?.enrageShift) enemy.enrageAt = Math.max(1, def.enrage.afterTurn - mod.enrageShift);
+  return enemy;
 }
 
 // ───────────────────────── 대상 ─────────────────────────
@@ -210,7 +227,8 @@ export function addStatus(state: BattleState, target: Combatant, status: string,
     status === 'grain' &&
     (target.statuses.knot ?? 0) > 0 &&
     !(target.statuses.knot_exposed > 0) &&
-    (target.statuses.grain ?? 0) >= state.data.balance.grain.knotThreshold
+    // 매듭 스택이 많으면(심연의 숙적) 더 많은 결을 읽어야 드러난다
+    (target.statuses.grain ?? 0) >= state.data.balance.grain.knotThreshold + (target.statuses.knot - 1)
   ) {
     target.statuses.knot_exposed = 1;
     state.events.push({ type: 'status', targetUid: target.uid, status: 'knot_exposed', stacks: 1 });
@@ -324,10 +342,12 @@ export function dealDamage(
 
   // 흐름 포식: 흐름을 쓴 카드의 피해를 먹는다
   if (usesFlow && target.statuses.flow_eater > 0) {
-    target.maxHp += dmg;
-    target.hp += dmg;
-    state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: dmg, blocked: 0, grain, absorbed: true });
-    state.log.push(`${target.name}이(가) 흐름을 먹었다. (+${dmg})`);
+    // 스택이 쌓이면(심연의 숙적) 먹는 양이 스택마다 50% 늘어난다
+    const fed = Math.floor(dmg * (1 + 0.5 * (target.statuses.flow_eater - 1)));
+    target.maxHp += fed;
+    target.hp += fed;
+    state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: fed, blocked: 0, grain, absorbed: true });
+    state.log.push(`${target.name}이(가) 흐름을 먹었다. (+${fed})`);
     return;
   }
 
@@ -437,6 +457,11 @@ function knockOut(state: BattleState, target: Combatant): void {
     fireRelics(state, 'enemyDowned');
     const def = state.data.enemies.get(target.defId);
     if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });
+    // 접사(메아리치는 등)의 쓰러질 때 효과
+    for (const a of (target as EnemyState).affixes ?? []) {
+      const fx = state.data.affixes.get(a)?.deathEffects;
+      if (fx?.length) runEffects(state, fx, { source: target });
+    }
     // 짝이 쓰러지면 변신(사무결 ← 곽도진, 셀리아스 ← 왕녀의 얼음)
     for (const e of alive(state.enemies)) {
       const t = state.data.enemies.get(e.defId)?.transform;

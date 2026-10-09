@@ -115,14 +115,25 @@
     "needleRewardChoices": 2,
     "unseenCardPrice": 40,
     "worlds": {
-      "murim": { "stages": ["s6", "s7", "s8"], "bosses": ["s6_boss_full_moon", "s7_boss_blood_hand"] },
+      "murim": { "stages": ["s6", "s7", "s8"], "bosses": ["s6_boss_full_moon", "s7_boss_blood_hand", "abyss_boss_sa_echo"] },
       "elheim": { "stages": ["s1", "s2", "s3", "s4"], "bosses": ["s1_boss_veilak", "s2_boss_ignis", "s3_boss_celias", "s4_boss_gormon"] },
       "nocturna": { "stages": ["s5"], "bosses": ["s5_boss_vargas"] },
       "rift": { "stages": ["s9"], "bosses": [] }
     },
     "firstWorlds": ["murim", "elheim"],
     "riftFrom": 3,
-    "score": { "depth": 100, "boss": 50, "elite": 20, "hp": 50 }
+    "score": { "depth": 100, "boss": 50, "elite": 20, "hp": 50 },
+    "lawsAt": [[2, 1], [5, 2], [9, 3]],
+    "affixesAt": { "elite": [[3, 1], [6, 2]], "normal": [[8, 1]] },
+    "scarWeightPerPoint": 0.3,
+    "beastEvery": 10,
+    "beastModule": "abyss_elite_rift_beast",
+    "beastFloor": 5,
+    "eventDepth": 3,
+    "eventFloor": 4,
+    "rescueModule": "abyss_rescue",
+    "echoModule": "abyss_rift_echo",
+    "nemesis": { "enrageStep": 2, "knotFrom": 3, "knotStacks": 4 }
   },
   "route": {
     "nodesPerFloor": [2, 3],

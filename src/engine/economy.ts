@@ -3,7 +3,7 @@ import type { GameData } from './data';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
-import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, upgradeCandidates, type RunState, type ShopState } from './run';
+import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
 import { abyssShopPool, abyssShopRift, isAbyss, removePrice } from './abyss';
 
 type Tier = 'common' | 'uncommon' | 'rare';
@@ -39,7 +39,8 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const kind = node.type === 'boss' ? 'boss' : node.type === 'elite' ? 'elite' : 'battle';
   const rng = createRng(run.seed).fork(`loot:${run.stageId}:${node.id}`);
   const [lo, hi] = eco.gold[kind];
-  const gold = rng.int(lo, hi);
+  // 굽이의 법칙 '무거운 발': 골드 두 배
+  const gold = Math.round(rng.int(lo, hi) * lawRunMul(data, run, 'goldMul'));
   const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, [...data.potions.values()], eco.potionWeights)?.id ?? null) : null;
   let relic: string | null = null;
   let relicChoices: string[] = [];

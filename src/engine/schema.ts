@@ -71,6 +71,8 @@ export const Condition = z
     targetStatusGte: z.tuple([z.string(), z.number()]),
     world: z.union([World, z.array(World)]),
     partyHas: z.string(),
+    /** 선택지: 이 동료가 일행에 없을 때만(심연 3굽이 '구원') */
+    partyLacks: z.string(),
     turnMod: z.tuple([z.number().int().positive(), z.number().int().nonnegative()]),
     enemyId: z.string(),
     hpRatioLte: z.number(),
@@ -626,6 +628,24 @@ export const Balance = z
         firstWorlds: z.array(World).min(1),
         riftFrom: z.number().int().positive(),
         score: z.object({ depth: z.number(), boss: z.number(), elite: z.number(), hp: z.number() }).strict(),
+        // ── 2차(변동성) ──
+        /** 굽이의 법칙: [이 굽이부터, 개수]. 큰 굽이가 이긴다 */
+        lawsAt: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])),
+        /** 접사: 엘리트·일반 적 한 마리에 붙는 개수 [이 굽이부터, 개수] */
+        affixesAt: z.object({ elite: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])), normal: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])) }).strict(),
+        /** 심연의 상흔 가중(scar 모듈이 더 자주) */
+        scarWeightPerPoint: z.number().min(0),
+        /** 상흔 이만큼마다 다음 굽이에 틈의 짐승(추격 엘리트) 한 칸 */
+        beastEvery: z.number().int().positive(),
+        beastModule: z.string(),
+        beastFloor: z.number().int().positive(),
+        /** 이 굽이 이 층에 정해진 사건: 동료 자리가 남았으면 구원, 가득하면 틈의 메아리 */
+        eventDepth: z.number().int().positive(),
+        eventFloor: z.number().int().positive(),
+        rescueModule: z.string(),
+        echoModule: z.string(),
+        /** 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks */
+        nemesis: z.object({ enrageStep: z.number().int().min(0), knotFrom: z.number().int().positive(), knotStacks: z.number().int().positive() }).strict(),
       })
       .strict(),
     route: z
@@ -643,6 +663,53 @@ export const Balance = z
 export type Balance = z.infer<typeof Balance>;
 
 export const NodeType = NodeTypeEnum;
+
+/**
+ * 굽이의 법칙(심연, GAME_DESIGN 16절): 굽이 하나 동안 모든 전투·런에 걸리는 규칙. 전투: 시작 효과(하운을 출처로)·적 특성·
+ * 손패/내공/마나 회복 덮어쓰기·의도 감추기·격노. 런: 휴식 회복·골드 배율
+ */
+export const LawDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    glyph: z.string().length(1),
+    description: z.string(),
+    battle: z
+      .object({
+        startEffects: z.array(Effect).default([]),
+        enemyTraits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
+        handSize: z.number().int().positive().optional(),
+        neigongPerTurn: z.number().int().positive().optional(),
+        manaPerTurn: z.number().int().optional(),
+        hideIntent: z.boolean().optional(),
+        enrage: z.object({ afterTurn: z.number().int().positive(), text: z.string(), effects: z.array(Effect).min(1) }).strict().optional(),
+      })
+      .strict()
+      .default({ startEffects: [], enemyTraits: [] }),
+    run: z.object({ restHealMul: z.number().min(0).optional(), goldMul: z.number().min(0).optional() }).strict().default({}),
+  })
+  .strict();
+export type LawDef = z.infer<typeof LawDef>;
+
+/**
+ * 접사(심연): 엘리트·일반 적에 붙어 이름 앞에 붙는다("독기 머금은 그림자늑대"). 체력 배율·특성 상태·
+ * 공격한 뒤 효과(공격한 대상에게)·쓰러질 때 효과·첫 턴 추가 행동. boss: 보스에 붙을 수 있는가
+ */
+export const AffixDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    glyph: z.string().length(1),
+    description: z.string(),
+    hpMul: z.number().positive().optional(),
+    traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
+    onHit: z.array(Effect).default([]),
+    deathEffects: z.array(Effect).default([]),
+    firstTurnExtra: z.number().int().min(0).optional(),
+    boss: z.boolean().default(true),
+  })
+  .strict();
+export type AffixDef = z.infer<typeof AffixDef>;
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z

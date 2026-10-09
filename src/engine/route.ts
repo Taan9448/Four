@@ -78,6 +78,8 @@ function moduleEligible(
 export interface MapOverride {
   stage: StageDef;
   eligible: (mod: ModuleDef, floor: number, used: Set<string>) => boolean;
+  /** 상흔 1마다 scar 모듈 가중(생략하면 balance.route.scarWeightPerPoint) */
+  scarWeight?: number;
 }
 
 export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx: RouteContext, override?: MapOverride): StageMap {
@@ -173,7 +175,7 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
       while (!assigned && candidates.length) {
         const [type] = rng.weighted(candidates, ([, w]) => w)!;
         const mods = allModules.filter((m) => m.type === type && (override ? override.eligible(m, f, used) : moduleEligible(data, stage, m, f, ctx, used)));
-        const mod = rng.weighted(mods, (m) => m.weight * (m.tags.includes('scar') ? 1 + ctx.scar * route.scarWeightPerPoint : 1));
+        const mod = rng.weighted(mods, (m) => m.weight * (m.tags.includes('scar') ? 1 + ctx.scar * (override?.scarWeight ?? route.scarWeightPerPoint) : 1));
         if (mod) {
           node.type = type;
           node.moduleId = mod.id;
