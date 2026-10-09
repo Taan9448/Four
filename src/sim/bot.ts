@@ -232,6 +232,15 @@ function lean(def: CardDef, opts: BotOptions): number {
   return (ops.has('damage') ? opts.offenseBias : 0) + (ops.has('block') || ops.has('heal') ? opts.defenseBias : 0);
 }
 
+/** 골드 1의 값(런 점수) */
+const GOLD_VALUE = 0.12;
+/**
+ * 덱 솎기(1단계, 외부 검토 4-d): 심연에서 덱이 이 장수를 넘으면 카드 1장을 지우는 값을 골드 REMOVAL_GOLD로 친다.
+ * 봇이 카드를 안 지우면 밸런스가 큰 덱 기준으로 잡힌다(지우기 전 평균 덱 35~61장)
+ */
+export const LEAN_DECK = 25;
+export const REMOVAL_GOLD = 60;
+
 /** 런 상태 점수(선택지 비교용) */
 export function scoreRun(data: GameData, run: RunState): number {
   let v = 0;
@@ -245,7 +254,9 @@ export function scoreRun(data: GameData, run: RunState): number {
   v += run.mana * 2;
   v -= run.scar * 8;
   // 골드·유물에도 값을 준다(대가형 사건에서 공짜로 내지 않게)
-  v += run.gold * 0.12 + run.relics.length * 15;
+  v += run.gold * GOLD_VALUE + run.relics.length * 15;
+  // 심연: 덱이 크면 한 장 더 있을 때마다 '지우는 값'만큼 손해(휴식 버리기·틈의 거래가 제값을 받는다)
+  if (isAbyss(run)) v -= Math.max(0, run.deck.length - LEAN_DECK) * REMOVAL_GOLD * GOLD_VALUE;
   return v;
 }
 
@@ -311,15 +322,25 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     .map((r, i) => ({ ...r, i, rank: order.indexOf(data.relics.get(r.relicId)!.rarity) }))
     .sort((a, b) => a.rank - b.rank)
     .forEach((r) => !r.sold && run.gold >= r.price && buyRelic(data, run, r.i));
+  // 심연에서 덱이 크면 카드 지우기를 카드·물약보다 먼저: 값(골드 60 + 넘친 장당 10)이 값보다 크면 산다
+  const removeFirst = () => {
+    if (!isAbyss(run) || run.deck.length <= LEAN_DECK) return;
+    const price = removePrice(data, run);
+    const uid = pickRemoval(data, run);
+    if (uid && run.gold >= price && price <= REMOVAL_GOLD + 10 * (run.deck.length - LEAN_DECK)) buyRemove(data, run, uid);
+  };
+  removeFirst();
+  const bigDeck = isAbyss(run) && run.deck.length >= LEAN_DECK;
   shop.cards.forEach((c, i) => {
     if (c.sold || run.gold < c.price) return;
-    if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, RARITY_VALUE.rare)) buyCard(data, run, i);
+    // 덱이 큰 심연에서는 영웅 이상만(보상과 같은 기준)
+    if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, bigDeck ? RARITY_VALUE.epic : RARITY_VALUE.rare)) buyCard(data, run, i);
   });
   shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
   if (isAbyss(run)) {
-    // 심연: 남은 골드로 가장 값싼 카드 지우기
+    // 심연: 남은 골드로 가장 값싼 카드 지우기(상점마다 한 번)
     const uid = pickRemoval(data, run);
-    if (uid && run.gold >= removePrice(data, run)) buyRemove(data, run, uid);
+    if (uid && !shop.swapUsed && run.gold >= removePrice(data, run)) buyRemove(data, run, uid);
     return;
   }
   const inLoadout = new Set(Object.values(run.loadout).flat());
