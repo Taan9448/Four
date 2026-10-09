@@ -2,7 +2,8 @@
 import targets from './targets.json';
 
 export const TARGETS = targets;
-const p = (x: number) => `${Math.round(x * 100)}%`;
+// 10% 아래는 소수 한 자리(2.4%가 '2% — 목표 2% 넘음'으로 보이지 않게)
+const p = (x: number) => (x < 0.1 ? `${(x * 100).toFixed(1).replace(/\.0$/, '')}%` : `${Math.round(x * 100)}%`);
 
 /** 범위 밖이면 경고 문장, 안이면 null. lo/hi가 null이면 그쪽은 보지 않는다 */
 export function outside(label: string, value: number, lo: number | null, hi: number | null, fmt: (x: number) => string = p): string | null {
