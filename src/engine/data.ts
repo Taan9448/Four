@@ -2,9 +2,11 @@
 import { z } from 'zod';
 import {
   Balance,
+  AffixDef,
   CardDef,
   CharacterDef,
   EnemyDef,
+  LawDef,
   ModuleDef,
   PotionDef,
   RelicDef,
@@ -22,6 +24,8 @@ import supportJson from '../../data/support.json';
 import speakersJson from '../../data/speakers.json';
 import relicsJson from '../../data/relics.json';
 import potionsJson from '../../data/potions.json';
+import lawsJson from '../../data/abyss_laws.json';
+import affixesJson from '../../data/abyss_affixes.json';
 
 const cardFiles = import.meta.glob('../../data/cards/*.json', { eager: true, import: 'default' });
 const moduleFiles = import.meta.glob('../../data/modules/*.json', { eager: true, import: 'default' });
@@ -41,6 +45,9 @@ export interface GameData {
   scenes: Map<string, SceneDef>;
   relics: Map<string, RelicDef>;
   potions: Map<string, PotionDef>;
+  /** 심연: 굽이의 법칙·접사 */
+  laws: Map<string, LawDef>;
+  affixes: Map<string, AffixDef>;
 }
 
 function byId<T extends { id: string }>(items: T[], label: string): Map<string, T> {
@@ -82,6 +89,8 @@ export function loadGameData(): GameData {
     scenes: byId(scenes, 'scenes'),
     relics: byId(parse(z.array(RelicDef), relicsJson, 'data/relics.json'), 'relics'),
     potions: byId(parse(z.array(PotionDef), potionsJson, 'data/potions.json'), 'potions'),
+    laws: byId(parse(z.array(LawDef), lawsJson, 'data/abyss_laws.json'), 'laws'),
+    affixes: byId(parse(z.array(AffixDef), affixesJson, 'data/abyss_affixes.json'), 'affixes'),
   };
 }
 

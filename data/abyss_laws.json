@@ -1,0 +1,11 @@
+[
+  { "id": "dry_sky", "name": "마른 하늘", "glyph": "旱", "description": "이 굽이의 하늘에는 마나가 흐르지 않는다. 전투 중 마나가 차지 않는다.", "battle": { "manaPerTurn": 0 } },
+  { "id": "two_moons", "name": "두 개의 달", "glyph": "月", "description": "두 달이 함께 뜬다. 손패를 6장 뽑지만, 차례마다 차는 내공은 2.", "battle": { "handSize": 6, "neigongPerTurn": 2 } },
+  { "id": "echo", "name": "메아리", "glyph": "響", "description": "틈의 잔향이 따라온다. 전투가 시작될 때 버린 더미에 틈의 잔향 2장.", "battle": { "startEffects": [{ "op": "add_card", "card": "status_rift_echo", "to": "discard", "count": 2 }] } },
+  { "id": "blood_price", "name": "피의 값", "glyph": "償", "description": "흐름이 피를 요구한다. 아군의 피해가 3 세지고, 공격 카드를 낼 때마다 낸 동료가 체력 1을 잃는다.", "battle": { "startEffects": [{ "op": "apply_status", "status": "law_blood_price", "stacks": 1, "target": "all_allies" }] } },
+  { "id": "grain_seen", "name": "결이 보인다", "glyph": "紋", "description": "이 굽이의 것들은 결을 숨기지 못한다. 전투가 시작될 때 모든 적에게 결 노출 1.", "battle": { "startEffects": [{ "op": "reveal_grain", "stacks": 1, "target": "all_enemies" }] } },
+  { "id": "hunger", "name": "굶주림", "glyph": "飢", "description": "모든 적이 틈의 굶주림을 지닌다. 내공을 2 이상 실은 카드의 피해는 절반.", "battle": { "enemyTraits": [{ "status": "hungry", "stacks": 1 }] } },
+  { "id": "heavy_feet", "name": "무거운 발", "glyph": "重", "description": "발이 무겁다. 휴식의 회복이 절반이지만, 전투에서 얻는 골드는 두 배.", "run": { "restHealMul": 0.5, "goldMul": 2 } },
+  { "id": "fog", "name": "안개", "glyph": "霧", "description": "짙은 안개가 깔렸다. 적의 의도가 보이지 않는다.", "battle": { "hideIntent": true } },
+  { "id": "hasty", "name": "서두르는 자", "glyph": "急", "description": "틈이 재촉한다. 8턴부터 모든 적이 차례마다 힘 +2.", "battle": { "enrage": { "afterTurn": 8, "text": "틈이 재촉한다. 적들이 서두르기 시작했다. (차례마다 힘 +2)", "effects": [{ "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }] } } }
+]

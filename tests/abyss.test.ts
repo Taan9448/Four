@@ -174,3 +174,145 @@ describe('심연', () => {
     }
   });
 });
+
+describe('심연 2차', () => {
+  it('법칙: 2굽이 1개 · 5굽이 2개 · 9굽이 3개, 겹치지 않는다', async () => {
+    const { planLoop: plan } = await import('../src/engine/abyss');
+    const ab = start('L1', ['elia']).abyss!;
+    expect(ab.laws).toEqual([]);
+    for (const [d, n] of [[2, 1], [4, 1], [5, 2], [8, 2], [9, 3], [14, 3]] as const) {
+      const laws = plan(data, ab, d).laws;
+      expect(laws.length).toBe(n);
+      expect(new Set(laws).size).toBe(n);
+    }
+  });
+
+  it('법칙이 전투에 걸린다: 두 개의 달(손패 6·내공 2), 마른 하늘, 결이 보인다, 굶주림, 안개', () => {
+    const run = start('L2', ['elia']);
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    const setup = battleSetupFor(data, run, enc);
+    const b = createBattle(data, { ...setup, laws: ['two_moons', 'dry_sky', 'grain_seen', 'hunger', 'fog'] });
+    expect(b.hand.length).toBe(6);
+    expect(b.neigongMax).toBe(2);
+    expect(b.manaRule.perTurn).toBe(0);
+    expect(b.hideIntent).toBe(true);
+    for (const e of b.enemies) {
+      expect(e.statuses.hungry).toBe(1);
+      if (!e.statuses.blood_cover) expect(e.statuses.grain ?? 0).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('무거운 발: 전투 골드 두 배, 휴식 회복 절반', async () => {
+    const { rollLoot } = await import('../src/engine/economy');
+    const run = start('L3', ['elia']);
+    const node = { ...availableNodes(run)[0], type: 'battle' as const };
+    const base = rollLoot(data, run, node).gold;
+    run.abyss!.laws = ['heavy_feet'];
+    expect(rollLoot(data, run, node).gold).toBe(base * 2);
+    const rest = [...data.modules.values()].find((m) => m.type === 'rest' && m.stage === 's1' && m.content.choices?.some((c) => c.effects.some((e) => e.op === 'heal_party' && e.ratio)))!;
+    const i = choicesFor(data, run, rest).findIndex((c) => c.effects.some((e) => e.op === 'heal_party' && e.ratio));
+    const ratio = rest.content.choices![i].effects.find((e) => e.op === 'heal_party')!.ratio!;
+    const haun = run.roster[0];
+    haun.hp = 1;
+    applyChoice(data, run, rest, i);
+    expect(haun.hp).toBe(Math.min(haun.maxHp, 1 + Math.floor(haun.maxHp * ratio * 0.5)));
+  });
+
+  it('접사: 3굽이부터 엘리트에 붙고 이름 앞에 붙는다. 단단한은 체력 +30%, 빠른은 첫 턴에 두 번', async () => {
+    const { abyssEnemyMods } = await import('../src/engine/abyss');
+    const run = start('F1', ['elia']);
+    const elite = [...data.enemies.values()].find((e) => e.tier === 'elite')!;
+    run.abyss!.depth = 2;
+    expect(abyssEnemyMods(data, run, 'x', { id: 'n1' }, [elite.id])[0]).toBeUndefined();
+    run.abyss!.depth = 3;
+    expect(abyssEnemyMods(data, run, 'x', { id: 'n1' }, [elite.id])[0]?.affixes?.length).toBe(1);
+    run.abyss!.depth = 6;
+    expect(abyssEnemyMods(data, run, 'x', { id: 'n1' }, [elite.id])[0]?.affixes?.length).toBe(2);
+    const normal = [...data.enemies.values()].find((e) => e.tier === 'normal')!;
+    run.abyss!.depth = 8;
+    expect(abyssEnemyMods(data, run, 'x', { id: 'n1' }, [normal.id])[0]?.affixes?.length).toBe(1);
+
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    const setup = battleSetupFor(data, run, enc);
+    const plain = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [undefined] });
+    const tough = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [{ affixes: ['tough', 'venom'] }] });
+    expect(tough.enemies[0].maxHp).toBe(Math.round(plain.enemies[0].maxHp * 1.3));
+    expect(tough.enemies[0].name.startsWith('단단한 독기 머금은')).toBe(true);
+  });
+
+  it('숙적 성장: 만날 때마다 격노가 2턴 빨라지고 흐름 포식이 쌓이며, 세 번째부터 매듭 4', async () => {
+    const { abyssEnemyMods } = await import('../src/engine/abyss');
+    const run = start('N1', ['elia']);
+    const nem = data.balance.abyss.nemesisModule;
+    const ab = run.abyss!;
+    const mods = (n: number) => {
+      ab.loops = Array.from({ length: n }, (_, i) => ({ depth: (i + 1) * 5, world: 'rift' as const, boss: nem, stageId: 's9' }));
+      return abyssEnemyMods(data, run, nem, { id: 'boss' }, ['mordecai'])[0]!;
+    };
+    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: 0 });
+    expect(mods(2).enrageShift).toBe(2);
+    expect(mods(3).traits).toContainEqual({ status: 'knot', stacks: 4 });
+  });
+
+  it('3굽이 사건: 동료 자리가 남았으면 구원(합류 + 시작 카드 4장), 가득하면 틈의 메아리', () => {
+    const run = start('E1', ['elia']);
+    for (let d = 1; d < 3; d++) {
+      run.status = 'stage_clear';
+      advanceLoop(data, run);
+    }
+    const rescue = run.map.floors[data.balance.abyss.eventFloor - 1];
+    expect(rescue.length).toBe(1);
+    expect(rescue[0].moduleId).toBe(data.balance.abyss.rescueModule);
+    const mod = data.modules.get(rescue[0].moduleId)!;
+    const choices = choicesFor(data, run, mod);
+    expect(choices.some((c) => c.label.startsWith('엘리아'))).toBe(false); // 이미 일행
+    const deck = run.deck.length;
+    const i = choices.findIndex((c) => c.label.startsWith('카일'));
+    applyChoice(data, run, mod, i);
+    expect(run.roster.some((r) => r.id === 'kyle')).toBe(true);
+    expect(run.selected).toContain('kyle');
+    expect(run.deck.length).toBe(deck + data.balance.abyss.starters.mate);
+
+    const full = start('E2', ['elia', 'kyle', 'born']);
+    for (let d = 1; d < 3; d++) {
+      full.status = 'stage_clear';
+      advanceLoop(data, full);
+    }
+    const echo = full.map.floors[data.balance.abyss.eventFloor - 1][0];
+    expect(echo.moduleId).toBe(data.balance.abyss.echoModule);
+    const em = data.modules.get(echo.moduleId)!;
+    const before = full.deck.filter((c) => c.cardId.startsWith('elia_')).length;
+    const deckBefore = full.deck.length;
+    applyChoice(data, full, em, choicesFor(data, full, em).findIndex((c) => c.label.startsWith('엘리아')));
+    expect(full.deck.filter((c) => data.cards.get(c.cardId)!.owner === 'elia' && data.cards.get(c.cardId)!.pool === 'starter').length).toBe(Math.max(0, before - 4));
+    expect(full.deck.length).toBe(deckBefore - 4 + 1);
+  });
+
+  it('상흔: 10마다 다음 굽이에 틈의 짐승, 이기면 틈의 카드. 휴식의 꿰매기', () => {
+    const run = start('S1', ['elia']);
+    run.scar = 10;
+    run.status = 'stage_clear';
+    advanceLoop(data, run);
+    const beast = run.map.floors.flat().filter((n) => n.moduleId === data.balance.abyss.beastModule);
+    expect(beast.length).toBe(1);
+    expect(beast[0].type).toBe('elite');
+    run.status = 'stage_clear';
+    advanceLoop(data, run);
+    expect(run.map.floors.flat().some((n) => n.moduleId === data.balance.abyss.beastModule)).toBe(false); // 상흔 20이 되기 전엔 다시 없다
+
+    const rest = [...data.modules.values()].find((m) => m.type === 'rest' && m.stage === 's1')!;
+    run.gold = 100;
+    run.scar = 5;
+    const i = choicesFor(data, run, rest).findIndex((c) => c.label.startsWith('꿰매기'));
+    applyChoice(data, run, rest, i);
+    expect(run.scar).toBe(2);
+    expect(run.gold).toBe(40);
+  });
+
+  it('사무결의 잔향: 덮개가 옅어졌다가 세 턴마다 다시 두른다', () => {
+    const run = start('SA', ['elia']);
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    const b = createBattle(data, { ...battleSetupFor(data, run, enc), enemies: ['sa_mugyeol_echo'], enemyMods: [undefined] });
+    expect(b.enemies[0].statuses.blood_cover_fading).toBe(2);
+  });
+});

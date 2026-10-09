@@ -8,6 +8,8 @@ import type { CardInstance } from './state';
 import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, ownerKey, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
 import {
   abyssAddCard,
+  abyssEnemyMods,
+  abyssStarters,
   abyssRewardOptions,
   abyssScale,
   advanceLoop,
@@ -368,6 +370,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       potions: run.potions,
       partyMax: data.balance.abyss.partyMax,
       enemyHitCap: Math.max(1, Math.floor(haun.maxHp * data.balance.abyss.oneHitCap)),
+      laws: run.abyss!.laws ?? [],
+      enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.module.content.enemies ?? []),
     };
   }
   return {
@@ -430,6 +434,8 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     if (enc.node.type === 'elite') ab.elites += 1;
     if (enc.node.type === 'boss') ab.bosses += 1;
     awardBattleXp(data, run, enc.node.type);
+    // 심연 모듈(틈의 짐승 등)의 clearEffects만. 캠페인 모듈의 이야기 보상은 없다
+    if (enc.module.stage === 'abyss') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
     out.push(...fireRunRelics(data, run, 'victory'));
     if (enc.node.type === 'boss') run.status = 'stage_clear';
     return out;
@@ -603,6 +609,7 @@ export interface ChoiceView {
 export function choicesFor(data: GameData, run: RunState, module: ModuleDef): ChoiceView[] {
   const list: ChoiceView[] = (module.content.choices ?? [])
     .filter((c) => !c.condition?.partyHas || run.selected.includes(c.condition.partyHas))
+    .filter((c) => !c.condition?.partyLacks || !run.roster.some((r) => r.id === c.condition!.partyLacks))
     .filter((c) => !c.condition?.flag || run.flags.includes(c.condition.flag))
     .map((c) => ({
       label: c.label,
@@ -616,6 +623,15 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
   if (module.type === 'rest' && isAbyss(run)) {
     list.push({ label: '버리기 — 덱에서 카드 한 장을 뺀다', effects: [{ op: 'remove_card', choose: true }], result: '짐을 덜었다.', source: 'module' });
     if (Object.keys(run.abyss!.injuries).length) list.push({ label: '치료 — 부상을 모두 고친다', effects: [{ op: 'cure_injury' }], result: '상처를 싸맸다.', source: 'module' });
+    // 꿰매기: 상흔을 덜어 낸다(GAME_DESIGN 16절 — 심연에서 상흔은 자원)
+    if (run.scar > 0)
+      list.push({
+        label: '꿰매기 — 상흔 -3, 골드 60',
+        effects: [{ op: 'scar', amount: -3 }, { op: 'gain_gold', amount: -60 }],
+        result: '하늘의 금을 몇 땀 꿰맸다.',
+        source: 'module',
+        disabled: run.gold < 60 ? '골드 60 필요' : undefined,
+      });
   }
   if (module.type === 'rest' && run.supportActive) {
     for (const rule of data.support.filter((r) => r.trigger === 'restOption')) {
@@ -630,7 +646,10 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
   if (choice.disabled) throw new Error(`고를 수 없는 선택지: ${choice.disabled}`);
-  const out = applyRunOps(data, run, choice.effects, { pick });
+  // 굽이의 법칙 '무거운 발': 휴식의 회복이 줄어든다
+  const healMul = module.type === 'rest' ? lawRunMul(data, run, 'restHealMul') : 1;
+  const effects = healMul === 1 ? choice.effects : choice.effects.map((e) => (e.op === 'heal_party' ? { ...e, ratio: e.ratio !== undefined ? e.ratio * healMul : undefined, amount: e.amount !== undefined ? Math.floor(e.amount * healMul) : undefined } : e));
+  const out = applyRunOps(data, run, effects, { pick });
   // 확률 결과: 노드마다 정해진 수열로 하나를 고른다(같은 시드면 같은 결과)
   if (choice.outcomes?.length) {
     const o = createRng(run.seed).fork(`outcome:${run.stageId}:${run.position}:${module.id}`).weighted(choice.outcomes, (x) => x.weight)!;
@@ -639,6 +658,11 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
   }
   if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
   return out;
+}
+
+/** 지금 굽이의 법칙들이 거는 런 배율(휴식 회복·골드). 법칙이 없으면 1 */
+export function lawRunMul(data: GameData, run: RunState, key: 'restHealMul' | 'goldMul'): number {
+  return (run.abyss?.laws ?? []).reduce((m, id) => m * (data.laws.get(id)?.run[key] ?? 1), 1);
 }
 
 /** 선택지가 보유 카드 한 장을 사람에게 고르게 하는가(카드 바꾸기·팔기: pick은 카드 id) */
@@ -774,9 +798,10 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       }
       case 'remove_card': {
         // 이번 스테이지 덱에서만 뺀다(보유 카드는 그대로, GAME_DESIGN 9-1)
-        const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
-        if (pool.length) {
-          // 고르는 버리기(심연 휴식·틈의 거래)는 사람이 고른 카드 uid, 아니면 무작위
+        // count장(틈의 메아리: 동료 시작 카드 4장). 고르는 버리기(심연 휴식·틈의 거래)는 사람이 고른 카드 uid, 아니면 무작위
+        for (let i = 0; i < (e.count ?? 1); i++) {
+          const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
+          if (!pool.length) break;
           const c = (e.choose && opts.pick ? pool.find((x) => x.uid === opts.pick) : undefined) ?? rng.pick(pool);
           run.deck = run.deck.filter((x) => x.uid !== c.uid);
           out.push(`카드 제거: ${data.cards.get(c.cardId)!.name}`);
@@ -835,6 +860,17 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         // 하드코어로 잃은 동료는 다시 합류하지 않는다
         if (run.fallen.includes(def.id)) {
           out.push(`${def.name}의 자리는 비어 있다`);
+          break;
+        }
+        if (isAbyss(run) && def.role === 'fighter') {
+          // 심연 '구원': 하운 레벨 -1로 합류, 시작 카드(abyss.starters.mate장)가 덱에, 모두 출전
+          const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
+          const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
+          run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
+          run.selected.push(def.id);
+          run.abyss!.mates.push(def.id);
+          for (const id of abyssStarters(data, def.id, data.balance.abyss.starters.mate)) out.push(abyssAddCard(data, run, id));
+          out.push(`${def.name} 합류`);
           break;
         }
         if (def.role === 'support') {

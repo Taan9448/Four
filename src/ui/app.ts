@@ -544,6 +544,7 @@ export class App {
         supportActive: run.supportActive,
         bonusText: bonus,
         introText: enc.module.content.text,
+        laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
         background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
         onQuit: (abandon) => {
           if (abandon && this.persist) {

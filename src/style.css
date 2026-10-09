@@ -1140,3 +1140,9 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 /* 틈의 카드: 보랏빛 테두리에 검은 금 */
 .card.card-abyss { border-color: #9a6ad6 !important; box-shadow: 0 0 10px rgba(154, 106, 214, 0.55), inset 0 0 0 1px rgba(20, 8, 30, 0.8); }
 .card.card-abyss::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(118deg, transparent 46%, rgba(10, 6, 16, 0.85) 47%, rgba(10, 6, 16, 0.85) 48.2%, transparent 49.2%), linear-gradient(64deg, transparent 58%, rgba(10, 6, 16, 0.7) 58.6%, transparent 59.4%); mix-blend-mode: multiply; opacity: 0.4; }
+/* 심연 2차: 굽이의 법칙 배지, 안개 의도 */
+.law-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 6px; }
+.side-panel .law-badges { justify-content: flex-start; }
+.law-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border: 1px solid rgba(185, 150, 239, 0.6); border-radius: 999px; background: rgba(24, 12, 36, 0.88); color: #e6d9fb; font-size: 0.78rem; }
+.law-badge b { font-family: serif; color: #c9a7ff; }
+.intent-fog { font-weight: 700; font-size: 1rem; color: #cfc6dc; padding: 0 4px; }

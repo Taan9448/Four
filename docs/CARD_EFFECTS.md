@@ -191,4 +191,8 @@
 - **한 방 상한**: 심연 전투에서 적이 아군에게 주는 피해 한 번은 하운 최대 체력 × `abyss.oneHitCap`(내림)을 넘지 않는다(`BattleSetup.enemyHitCap`, 받을 피해 예고에도).
 - **출전 인원**: 심연은 하운 + 동료 1~3명 전원(`BattleSetup.partyMax` = `abyss.partyMax`).
 - **적 배율**: 굽이 n은 `hpBase·dmgBase × (1 + hpStep·dmgStep × (n−1))` × 스테이지 맞춤(그 스테이지 일반 전투 적의 평균 체력·피해를 S1에 맞추는 배율, 데이터에서 계산 — `stageNorm`). 캠페인의 스테이지·어려움 배율은 쓰지 않는다. 적 등급 배율(`enemyTiers`)은 그대로.
+- **굽이의 법칙**(`data/abyss_laws.json`): `battle`(`startEffects` 하운을 출처로 하는 전투 동작 · `enemyTraits` 모든 적의 특성 · `handSize` · `neigongPerTurn` · `manaPerTurn` · `hideIntent` · `enrage {afterTurn, text, effects}` 모든 적의 격노), `run`(`restHealMul` 휴식의 heal_party 배율 · `goldMul` 전투 골드 배율). 새 상태: `law_blood_price`(피해 +3, 공격 카드를 내면 체력 1).
+- **접사**(`data/abyss_affixes.json`): `hpMul` · `traits` · `onHit`(이 적이 피해를 주는 행동을 한 뒤, 그 대상에게) · `deathEffects` · `firstTurnExtra`(첫 턴 같은 행동을 더) · `boss`(보스에 붙을 수 있는가). 적 이름 앞에 `name`이 붙는다(`BattleSetup.enemyMods`).
+- **숙적 성장**: `flow_eater` 스택 n이면 흡수량 ×(1 + 0.5(n−1)), `knot` 스택 n이면 매듭이 드러나는 결 노출이 `knotThreshold + (n−1)`. 캠페인은 둘 다 1스택이라 그대로다. 격노는 `EnemyState.enrageAt`으로 당겨진다.
+- 새 상태 `blood_cover_fading`(사무결의 잔향: 피의 덮개 특수 효과, 차례마다 1씩 줄어든다).
 

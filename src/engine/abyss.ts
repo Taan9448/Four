@@ -4,7 +4,8 @@
 import type { GameData } from './data';
 import type { CardDef, ModuleDef, StageDef, World } from './schema';
 import { createRng } from './rng';
-import { generateStageMap } from './route';
+import { generateStageMap, type MapNode } from './route';
+import type { EnemyMod } from './effects';
 import type { CardInstance } from './state';
 import { createRun, emptyStats, gainRelic, type RunState } from './run';
 import { COMMON, ownerKey } from './collection';
@@ -18,7 +19,11 @@ export interface AbyssState {
   /** 이번 굽이의 보스 모듈 */
   boss: string;
   /** 지나온 굽이(지금 굽이 포함) */
-  loops: { depth: number; world: World; boss: string; stageId: string }[];
+  loops: { depth: number; world: World; boss: string; stageId: string; laws?: string[]; pinned?: { floor: number; module: string }[] }[];
+  /** 지금 굽이의 법칙(data/abyss_laws.json) */
+  laws?: string[];
+  /** 지금까지 나온 틈의 짐승(상흔 beastEvery마다 하나) */
+  beasts?: number;
   /** 시작할 때 고른 동료(하운 제외)와 길(시작 유물) */
   mates: string[];
   paths: string[];
@@ -151,6 +156,8 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
     elites: 0,
     removals: 0,
     injuries: {},
+    laws: [],
+    beasts: 0,
   };
   const level = (id: string) => run.abyss!.pool[id] ?? 0;
   run.deck = [
@@ -164,11 +171,15 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
 }
 
 /** 굽이 n의 세계와 보스(시드로). 숙적 굽이(5·10·15…)는 틈 세계의 모르데카이의 잔향 */
-export function planLoop(data: GameData, ab: AbyssState, depth: number): { world: World; boss: string; stageId: string } {
+export function planLoop(data: GameData, ab: AbyssState, depth: number): { world: World; boss: string; stageId: string; laws: string[] } {
   const cfg = data.balance.abyss;
   const rng = createRng(ab.baseSeed).fork(`abyss:loop:${depth}`);
   const prev = ab.loops[ab.loops.length - 1];
-  if (depth % cfg.nemesisEvery === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages) };
+  const laws = createRng(ab.baseSeed)
+    .fork(`abyss:laws:${depth}`)
+    .shuffle([...data.laws.keys()])
+    .slice(0, scheduled(cfg.lawsAt, depth));
+  if (depth % cfg.nemesisEvery === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages), laws };
   const all = Object.keys(cfg.worlds) as World[];
   let worlds = depth === 1 ? cfg.firstWorlds : all.filter((w) => w !== prev?.world && (w !== 'rift' || depth >= cfg.riftFrom));
   if (!worlds.length) worlds = all;
@@ -177,7 +188,14 @@ export function planLoop(data: GameData, ab: AbyssState, depth: number): { world
   const everyBoss = all.flatMap((w) => cfg.worlds[w].bosses);
   const base = own.length ? own : everyBoss;
   const bosses = base.filter((b) => b !== prev?.boss);
-  return { world, boss: rng.pick(bosses.length ? bosses : base), stageId: rng.pick(cfg.worlds[world].stages) };
+  return { world, boss: rng.pick(bosses.length ? bosses : base), stageId: rng.pick(cfg.worlds[world].stages), laws };
+}
+
+/** [이 굽이부터, 개수] 표에서 depth의 개수(가장 큰 시작 굽이가 이긴다) */
+export function scheduled(table: [number, number][], depth: number): number {
+  let n = 0;
+  for (const [from, count] of [...table].sort((a, b) => a[0] - b[0])) if (depth >= from) n = count;
+  return n;
 }
 
 /** 이 모듈이 심연 지도에 나올 수 있는가(세계의 스테이지 모듈·어디서나 사건·심연 모듈) */
@@ -198,10 +216,30 @@ export function abyssEligible(data: GameData, world: World, roster: string[], mo
 }
 
 /** 굽이 지도의 스테이지 정의: 그 세계 스테이지를 바탕으로 층수·보스·노드 비율만 심연 것으로 */
-export function abyssStage(data: GameData, stageId: string, boss: string): StageDef {
+export function abyssStage(data: GameData, stageId: string, boss: string, pinned: { floor: number; module: string }[] = []): StageDef {
   const cfg = data.balance.abyss;
   const source = data.stages.find((s) => s.id === stageId)!;
-  return { ...source, floors: cfg.floors, pinned: [], boss, typeWeights: cfg.typeWeights, forcedTypes: cfg.forcedTypes, templateEvents: true };
+  return { ...source, floors: cfg.floors, pinned, boss, typeWeights: cfg.typeWeights, forcedTypes: cfg.forcedTypes, templateEvents: true };
+}
+
+/**
+ * 굽이에 정해진 노드: eventDepth굽이의 사건(동료 자리가 남았으면 구원, 가득하면 틈의 메아리),
+ * 상흔 beastEvery마다 틈의 짐승(추격 엘리트) 하나
+ */
+function loopPins(data: GameData, run: RunState, depth: number): { floor: number; module: string }[] {
+  const cfg = data.balance.abyss;
+  const ab = run.abyss!;
+  const pins: { floor: number; module: string }[] = [];
+  if (depth === cfg.eventDepth) {
+    const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').length;
+    pins.push({ floor: cfg.eventFloor, module: fighters < cfg.partyMax ? cfg.rescueModule : cfg.echoModule });
+  }
+  if (Math.floor(run.scar / cfg.beastEvery) > (ab.beasts ?? 0)) {
+    ab.beasts = (ab.beasts ?? 0) + 1;
+    const floor = pins.some((p) => p.floor === cfg.beastFloor) ? cfg.beastFloor + 1 : cfg.beastFloor;
+    pins.push({ floor, module: cfg.beastModule });
+  }
+  return pins;
 }
 
 /** 굽이 depth를 시작한다: 세계·보스·지도, 굽이 시드 */
@@ -211,7 +249,9 @@ export function beginLoop(data: GameData, run: RunState, depth: number): void {
   ab.depth = depth;
   ab.world = plan.world;
   ab.boss = plan.boss;
-  ab.loops.push({ depth, ...plan });
+  ab.laws = plan.laws;
+  const pinned = loopPins(data, run, depth);
+  ab.loops.push({ depth, ...plan, pinned });
   run.seed = loopSeed(ab.baseSeed, depth);
   run.stageId = plan.stageId;
   run.position = null;
@@ -219,11 +259,41 @@ export function beginLoop(data: GameData, run: RunState, depth: number): void {
   run.usedModules = [];
   run.shop = null;
   run.status = 'map';
-  const stage = abyssStage(data, plan.stageId, plan.boss);
+  const stage = abyssStage(data, plan.stageId, plan.boss, pinned);
   const roster = run.roster.map((r) => r.id);
   run.map = generateStageMap(data, plan.stageId, createRng(run.seed).fork('map'), { scar: run.scar, flags: [], roster, usedModules: [] }, {
     stage,
     eligible: (mod, _floor, used) => abyssEligible(data, plan.world, roster, mod, used),
+    scarWeight: data.balance.abyss.scarWeightPerPoint,
+  });
+}
+
+/** 숙적을 몇 번째 만나는가(지금 굽이 포함) */
+export const nemesisEncounter = (data: GameData, ab: AbyssState) => ab.loops.filter((l) => l.boss === data.balance.abyss.nemesisModule).length;
+
+/**
+ * 전투의 적마다 덧붙이는 것: 접사(엘리트는 굽이에 따라 1~2개, 깊은 굽이에서는 일반 적에도), 숙적 성장
+ * (격노가 enrageStep씩 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks)
+ */
+export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, node: Pick<MapNode, 'id'>, enemies: string[]): (EnemyMod | undefined)[] {
+  const ab = run.abyss!;
+  const cfg = data.balance.abyss;
+  const rng = createRng(run.seed).fork(`affix:${run.stageId}:${node.id}`);
+  const all = [...data.affixes.values()];
+  return enemies.map((id) => {
+    const def = data.enemies.get(id);
+    if (!def) return undefined;
+    if (moduleId === cfg.nemesisModule && def.tier === 'boss') {
+      const n = nemesisEncounter(data, ab);
+      const traits = [];
+      if (def.traits.some((t) => t.status === 'flow_eater')) traits.push({ status: 'flow_eater', stacks: n });
+      if (def.traits.some((t) => t.status === 'knot')) traits.push({ status: 'knot', stacks: n >= cfg.nemesis.knotFrom ? cfg.nemesis.knotStacks : 1 });
+      return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1) };
+    }
+    const count = def.tier === 'elite' ? scheduled(cfg.affixesAt.elite, ab.depth) : def.tier === 'normal' ? scheduled(cfg.affixesAt.normal, ab.depth) : 0;
+    if (!count) return undefined;
+    const pool = all.filter((a) => def.tier !== 'boss' || a.boss);
+    return { affixes: rng.shuffle(pool.map((a) => a.id)).slice(0, count) };
   });
 }
 

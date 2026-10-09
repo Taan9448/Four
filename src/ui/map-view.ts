@@ -114,7 +114,7 @@ function depthBand(data: GameData, run: RunState): HTMLElement {
     stops.push(
       h(
         'div',
-        { class: `depth-stop${d === ab.depth ? ' here' : d < ab.depth ? ' done' : ''}${nemesis ? ' nemesis' : ''}`, ...tipAttrs(`${d}굽이`, nemesis ? '숙적 — 모르데카이의 잔향' : loop ? WORLD_NAME[loop.world] : '아직 가 보지 않은 굽이') },
+        { class: `depth-stop${d === ab.depth ? ' here' : d < ab.depth ? ' done' : ''}${nemesis ? ' nemesis' : ''}`, ...tipAttrs(`${d}굽이`, [nemesis ? '숙적 — 모르데카이의 잔향' : loop ? WORLD_NAME[loop.world] : '아직 가 보지 않은 굽이', loop?.laws?.length ? `법칙: ${loop.laws.map((id) => data.laws.get(id)?.name ?? id).join(' · ')}` : ''].filter(Boolean).join('\n')) },
         h('b', {}, String(d)),
         h('small', {}, nemesis ? '숙적' : loop ? WORLD_NAME[loop.world] : '?'),
       ),
@@ -502,6 +502,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
               )
             : null,
           h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
+          run.abyss?.laws?.length
+            ? h(
+                'div',
+                { class: 'law-badges' },
+                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, h('b', {}, l!.glyph), l!.name)),
+              )
+            : null,
           h(
             'div',
             { class: 'stage-stats' },
