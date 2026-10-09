@@ -1,0 +1,24 @@
+id: ui_endturn
+type: ui-parts
+frames: 3
+summary: >-
+  a round "end turn" button for a wuxia fantasy card game shaped like a large carved red seal (a lacquered stamp face seen from the front)
+  with a worn gold rim; the face is left BLANK because the game writes the character 終 and the words on top of it
+frame_notes:
+  1: >-
+    NORMAL: centered in the cell, a round seal button about 440 px in diameter: a thick worn gold-bronze outer rim with small cloud
+    scroll notches, inside it a slightly domed face of deep red cinnabar lacquer (#9c1c1c to #5a0d0d at the edge) with a soft raised
+    border ring carved into the lacquer; the middle 60% of the face is plain smooth red lacquer with a gentle highlight at the upper left.
+  2: >-
+    READY / HOVER: exactly the same button, same size and position as cell 1, but brighter: the lacquer is a hotter red (#d64545 center),
+    the gold rim gleams, and a thin warm gold glow line hugs the outer edge of the rim (kept inside the cell, no soft haze on the background).
+  3: >-
+    DISABLED (enemy turn): exactly the same button, same size and position, but dull and asleep: the lacquer is a dark brown-maroon
+    (#3a1a16), the rim is tarnished dark bronze without highlights, as if in shadow.
+framing: >-
+  All three buttons share exactly the same center, the same diameter and the same lighting, so the game can swap them without the button
+  jumping. Straight front view, no perspective tilt, no cast shadow on the background. Cells 4 to 6 stay empty.
+style: >-
+  refined painterly game UI ornament matching an East Asian ink-and-lacquer theme: cinnabar red lacquer, worn gold-bronze metal; soft
+  realistic shading lit from the upper left, not pixel art, crisp edges, no text, no characters, no symbols on the face
+placeholder: { color: '#9c1c1c' }

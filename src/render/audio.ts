@@ -6,6 +6,7 @@ import { composeBar, midiToHz, TRACKS, type Mood, type NoteEvent, type Voice } f
 export type Sfx =
   | 'click'
   | 'card'
+  | 'tear'
   | 'hit'
   | 'hit_heavy'
   | 'crit'
@@ -204,6 +205,10 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
     case 'card':
       // 종이 스치는 소리
       burst(t, 0.12, 0.35, out, { type: 'bandpass', hz: 2500, to: 5000, q: 0.8 });
+      break;
+    case 'tear':
+      // 종이 찢는 소리: 짧게 끊기는 거친 잡음 여러 번
+      for (let i = 0; i < 5; i++) burst(t + i * 0.028, 0.05, 0.4 - i * 0.05, out, { type: 'bandpass', hz: 1800 + i * 500, to: 4200, q: 1.2 });
       break;
     case 'turn':
       tone('sine', 660, t, 0.25, 0.15, out);

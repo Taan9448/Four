@@ -1,0 +1,17 @@
+id: fx_card_tear
+type: fx
+summary: 카드를 쓸 때 — 카드가 세로로 찢어지는 순간의 빛 솔기·종이 섬유·먹 튐·종잇조각 6프레임(낸 카드 자리 위에 겹친다. 카드 자체는 게임이 반으로 갈라 날린다)
+chroma: magenta
+frames: 6
+fps: 16
+events: { impact: 3 }
+frame_notes:
+  1: "a thin vertical jagged seam of golden-white light (#f1efe6 core, #ffe08a and #f2a93b edge) runs down the center of the cell from top to bottom, like a crack about to open; nothing else is drawn"
+  2: "the seam flares wider and brighter; tiny torn paper fibers (short cream #e0cfae and pale-gold hair-thin strands) bristle out sideways from both edges of the seam along its whole length"
+  3: "the burst at its strongest: the light seam is widest, a splash of black ink drops (#0b0b10) and a few gold flecks fly out to the left and right from the middle of the seam, and four to six small torn cream paper scraps with ragged edges spin outward"
+  4: "the seam light fades to a dim gold line; the paper scraps and ink drops have flown further out toward the left and right edges of the cell, scraps tumbling and turning"
+  5: "only the scattered scraps, a few ink drops and loose fibers remain, drifting slightly downward near the cell edges; the seam is gone"
+  6: "two or three last small paper scraps and a single ink drop near the bottom corners, almost gone"
+framing: "The effect is a TALL vertical shape centered in the cell: the seam spans about 80% of the cell height, and debris flies mainly sideways (left and right). It is laid over a playing card that the game splits in two, so keep the middle 30% of the cell width clear except for the seam itself."
+style: "crisp pixel-art effect: a golden-white light seam (#f1efe6, #ffe08a, #f2a93b), cream hanji paper scraps and fibers (#e0cfae, #b8a184 shadow), black ink drops (#0b0b10) and gold flecks (#b8741a); 2-3 flat tone steps per color, no smoke, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ffd58a' }
