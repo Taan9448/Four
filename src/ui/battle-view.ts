@@ -5,7 +5,7 @@ import { critChance, hasSkipTurn } from '../engine/effects';
 import { ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
-import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, toast } from '../render/fx';
+import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
@@ -28,7 +28,7 @@ export interface BattleContext {
   scar: number;
   supportActive: boolean;
   bonusText?: string;
-  /** 심연 굽이의 법칙(균열 게이지 옆 배지) */
+  /** 심연 굽이의 법칙(전투 화면 가운데 위 배지) */
   laws?: { id: string; name: string; glyph: string; description: string }[];
   /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
   introText?: string;
@@ -65,6 +65,8 @@ export class BattleView {
   private toasts!: HTMLElement;
   private handEl!: HTMLElement;
   private resEl!: HTMLElement;
+  private aimEl!: HTMLElement;
+  private deckMedal!: HTMLElement;
   private logEl!: HTMLElement;
   private pilesEl!: HTMLElement;
   private riftEl!: HTMLElement;
@@ -143,9 +145,9 @@ export class BattleView {
     if (tourSeen('battle-basics')) return elements();
     runTour(
       [
-        { target: '.hand', title: '손패', text: '카드를 눌러 쓴다. 카드 왼쪽 위의 금빛 점은 내공, 푸른 마름모는 마나 비용. 대상을 고르는 카드는 누른 뒤 적을 누른다.' },
-        { target: '.orb.neigong', title: '내공', text: '매 턴 다시 차는 기본 비용.' },
-        { target: '.orb.mana', title: '마나', text: '세계마다 차는 양이 다른 비용. 엘하임은 넉넉하고, 무림에서는 거의 차지 않는다.' },
+        { target: '.hand', title: '손패', text: '카드를 눌러 쓴다. 카드 왼쪽 위의 금빛 점은 내공, 푸른 마름모는 마나 비용. 대상을 고르는 카드는 누르면 가운데로 떠오르고, 금빛 고리가 붙은 적을 누르거나 그 번호 키를 누르면 쓴다.' },
+        { target: '.half.neigong', title: '내공', text: '구슬의 왼쪽 금빛. 매 턴 다시 차는 기본 비용.' },
+        { target: '.half.mana', title: '마나', text: '구슬의 오른쪽 푸른빛. 세계마다 차는 양이 다른 비용. 엘하임은 넉넉하고, 무림에서는 거의 차지 않는다.' },
         { target: '.unit-enemy .intent', title: '적의 의도', text: '적이 다음 차례에 할 행동. 피해 숫자와 노리는 아군이 보인다.' },
         { target: '.incoming', title: '받을 피해', text: '이대로 턴을 끝내면 이 아군이 받을 피해. 방어 카드를 쓰면 바로 줄어든다. 붉게 맥박치면 쓰러질 피해.' },
         { target: '.hand .card', title: '줄 피해 미리보기', text: '카드에 마우스를 올리거나 고르면, 맞을 적 위에 들어갈 피해가 뜬다. 힘·약화·취약·방어·약점이 모두 계산된 값이다.' },
@@ -165,12 +167,24 @@ export class BattleView {
     this.toasts = h('div', { class: 'toasts' });
     this.handEl = h('div', { class: 'hand' });
     this.logEl = h('div', { class: 'log', 'aria-live': 'polite' });
-    this.pilesEl = h('button', { class: 'chip piles', onclick: () => this.showPiles() });
+    this.pilesEl = h('div', { class: 'medals' });
     this.riftEl = h('div', { class: 'b-rift' });
     this.relicEl = h('div', { class: 'b-relics' }, this.state.relics.map((id) => relicChip(this.data, id)));
     this.potionEl = h('div', { class: 'b-potions' });
     this.turnEl = h('span', { class: 'turn' });
-    this.endBtn = h('button', { class: 'btn btn-primary btn-endturn', onclick: () => this.onEndTurn() }, '턴 종료') as HTMLButtonElement;
+    // 턴 종료: 붉은 인장(Codex 그림 ui_endturn — 칸1 보통 · 칸2 준비/올림 · 칸3 꺼짐). 그림이 오기 전에는 CSS 인장
+    const seal = [1, 2, 3].map((n) => frameUrl('ui_endturn', n, { realOnly: true }));
+    this.endBtn = h(
+      'button',
+      {
+        class: `seal-btn btn-endturn${seal[0] ? ' has-art' : ''}`,
+        style: seal[0] ? `--seal:url("${seal[0]}");--seal-hot:url("${seal[1] ?? seal[0]}");--seal-off:url("${seal[2] ?? seal[0]}")` : '',
+        onclick: () => this.onEndTurn(),
+      },
+      h('b', {}, '終'),
+      h('span', {}, '턴 종료'),
+    ) as HTMLButtonElement;
+    this.aimEl = h('div', { class: 'aim-ribbon' });
 
     const partyEl = h('div', { class: 'side side-party' });
     const enemyEl = h('div', { class: 'side side-enemy' });
@@ -191,22 +205,21 @@ export class BattleView {
           'div',
           { class: 'b-hud-left' },
           h('div', { class: 'chip b-stage' }, h('b', {}, this.ctx.title), h('span', {}, this.ctx.subtitle)),
-          h('div', { class: 'b-items' }, this.potionEl, this.state.relics.length ? this.relicEl : null),
         ),
+        // 오른쪽 위: 둥근 표식(뽑을 抽 · 버림 棄 · 소멸 滅 · 덱 冊 · 설정 設)
         h(
           'div',
           { class: 'b-hud-right' },
           this.pilesEl,
-          h('button', { class: 'btn btn-small', onclick: () => this.showPiles() }, '덱'),
-          h('button', { class: 'btn btn-small', 'aria-label': '메뉴', onclick: () => this.showMenu() }, '⚙'),
+          (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
+          medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
         ),
       ),
-      // 가운데 위: 이야기 글 → 그 아래 균열 게이지(잘 보이게 크게)
+      // 가운데 위: 이야기 글 · 굽이의 법칙
       h(
         'div',
         { class: 'b-center' },
         this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
-        this.riftEl,
         this.ctx.laws?.length
           ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, h('b', {}, l.glyph), l.name)))
           : null,
@@ -214,7 +227,15 @@ export class BattleView {
       this.logEl,
       h('div', { class: 'units' }, partyEl, enemyEl),
       h('div', { class: 'shade' }),
-      h('div', { class: 'dock' }, this.resEl, this.handEl, h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E'))),
+      this.aimEl,
+      // 아래: 왼쪽(물약·유물 → 자원 구슬) · 가운데(균열 → 손패) · 오른쪽(턴 종료)
+      h(
+        'div',
+        { class: 'dock' },
+        h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl, this.state.relics.length ? this.relicEl : null), this.resEl),
+        h('div', { class: 'dock-mid' }, this.riftEl, this.handEl),
+        h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E')),
+      ),
       this.fxLayer,
     );
 
@@ -317,7 +338,7 @@ export class BattleView {
       else this.renderIncoming(u, c.downed ? undefined : incoming.get(c.uid));
     }
 
-    // 위: 균열 게이지 · 버티기 / 더미
+    // 손패 위: 균열 게이지 · 버티기 / 오른쪽 위: 둥근 표식(더미 수)
     const hot = s.rift >= bal.rift.echoThreshold;
     clear(this.riftEl);
     this.riftEl.className = `b-rift${hot ? ' hot' : ''}`;
@@ -328,8 +349,12 @@ export class BattleView {
       s.surviveTurns !== null ? h('span', { class: 'survive' }, `버티기 ${Math.min(s.turn, s.surviveTurns)} / ${s.surviveTurns}턴`) : '',
     );
     this.riftEl.querySelector('span')!.replaceChildren('균열 ', h('b', {}, s.rift), ` / ${bal.rift.max}`, hot ? h('em', {}, ' 잔향') : '');
-    this.pilesEl.replaceChildren('뽑을', h('i', {}, s.draw.length), '버림', h('i', {}, s.discard.length), '소멸', h('i', {}, s.exhaust.length));
-    this.pilesEl.title = '이번 전투의 카드 더미 보기';
+    this.pilesEl.replaceChildren(
+      medal('抽', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
+      medal('棄', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
+      medal('滅', '소멸', '이번 전투에서 사라진 카드', () => this.showPiles(), s.exhaust.length),
+    );
+    this.deckMedal.querySelector('i')!.textContent = String(s.hand.length + s.draw.length + s.discard.length + s.exhaust.length);
 
     // 아래 왼쪽: 자원 구슬(내공 = 금빛 원, 마나 = 청색 마름모)
     clear(this.resEl);
@@ -346,31 +371,59 @@ export class BattleView {
     s.potions.forEach((id, i) =>
       this.potionEl.appendChild(potionChip(this.data, id, { onClick: id && !this.busy && !s.result ? () => this.onPotion(i) : undefined, extra: this.potionSel === i ? 'selected' : '' })),
     );
+    // 반반 체력구: 왼쪽 금빛 = 내공, 오른쪽 푸른빛 = 마나. 차오른 높이가 남은 양(틀은 Codex 그림 ui_orb_frame, 없으면 CSS 고리)
+    const pct = (n: number, max: number) => `${Math.round(Math.max(0, Math.min(1, max > 0 ? n / max : 0)) * 100)}%`;
+    const orbFrame = frameUrl('ui_orb_frame', 1, { realOnly: true });
     this.resEl.append(
       breath ?? '',
       h(
         'div',
-        { class: `orb neigong${s.neigong === 0 ? ' empty' : ''}`, ...tipAttrs(`내공 ${s.neigong} / ${s.neigongMax}`, '매 턴 다시 차는 기본 비용.', 'neigong') },
-        h('span', {}, s.neigong),
-        h('small', {}, `내공 ${s.neigong}/${s.neigongMax}`),
+        { class: `globe${orbFrame ? ' has-art' : ''}` },
+        h(
+          'div',
+          { class: 'globe-in' },
+          h(
+            'div',
+            { class: `half neigong${s.neigong === 0 ? ' empty' : ''}`, style: `--fill:${pct(s.neigong, s.neigongMax)}`, ...tipAttrs(`내공 ${s.neigong} / ${s.neigongMax}`, '매 턴 다시 차는 기본 비용.', 'neigong') },
+            h('i', { class: 'liquid' }),
+            h('span', {}, s.neigong),
+          ),
+          h(
+            'div',
+            { class: `half mana${s.mana === 0 ? ' empty' : ''}`, style: `--fill:${pct(s.mana, bal.mana.max)}`, ...tipAttrs(`마나 ${s.mana} / ${bal.mana.max}`, `세계마다 차는 양이 다른 유한 자원.\n${worldName[s.world] ?? s.world}`, 'mana') },
+            h('i', { class: 'liquid' }),
+            h('span', {}, s.mana),
+          ),
+          h('i', { class: 'glass' }),
+        ),
+        orbFrame ? h('img', { class: 'globe-frame', src: orbFrame, alt: '' }) : null,
       ),
-      h(
-        'div',
-        { class: `orb mana${s.mana === 0 ? ' empty' : ''}`, ...tipAttrs(`마나 ${s.mana} / ${bal.mana.max}`, `세계마다 차는 양이 다른 유한 자원.\n${worldName[s.world] ?? s.world}`, 'mana') },
-        h('span', {}, s.mana),
-        h('small', {}, `마나 ${s.mana}/${bal.mana.max}`),
-      ),
+      h('small', { class: 'globe-cap' }, h('b', { class: 'ng' }, `내공 ${s.neigong}/${s.neigongMax}`), h('b', { class: 'mn' }, `마나 ${s.mana}/${bal.mana.max}`)),
     );
 
     if (!this.handFrozen) this.renderHand();
 
     // 대상 표시
     if (this.selected !== null && !s.hand[this.selected]) this.selected = null;
-    const need = this.potionSel !== null ? potionTarget(s, this.potionSel) : this.selected !== null ? needsTarget(s, s.hand[this.selected]) : null;
+    // 대상 고르기(B안): 맞을 수 있는 대상마다 발밑 금빛 고리와 번호(숫자 키). 고른 카드는 손패 가운데에 크게 떠오른다
+    const need = this.aimNeed();
+    const pool = this.targetPool();
     for (const u of this.units.values()) {
-      const ok = !u.c.downed && ((need === 'enemy' && u.c.side === 'enemy') || (need === 'ally' && u.c.side === 'party'));
-      u.el.classList.toggle('targetable', ok);
+      const k = pool.indexOf(u.c);
+      u.el.classList.toggle('targetable', k >= 0);
+      u.el.querySelector('.aim-key')?.remove();
+      if (k >= 0 && k < 9) u.el.querySelector('.sprite-wrap')?.appendChild(h('b', { class: 'aim-key' }, k + 1));
     }
+    this.field.classList.toggle('aiming', !!need);
+    const what = this.potionSel !== null ? (s.potions[this.potionSel] ? this.data.potions.get(s.potions[this.potionSel]!)?.name : '') : this.selected !== null ? resolveCard(this.data, s.hand[this.selected].cardId).def.name : '';
+    this.aimEl.replaceChildren(
+      ...(need
+        ? [
+            h('b', {}, `${what ? `${what} — ` : ''}${need === 'enemy' ? '적' : '아군'}을 고르세요`),
+            h('span', {}, `${need === 'enemy' ? '적' : '아군'}을 누르거나 숫자 키 1~${Math.min(9, pool.length)} · ${this.potionSel !== null ? '물약' : '카드'}을 다시 누르면 취소`),
+          ]
+        : []),
+    );
 
     this.renderPreview();
 
@@ -378,12 +431,14 @@ export class BattleView {
     for (const line of s.log.slice(-5)) this.logEl.appendChild(h('div', {}, line));
     this.turnEl.textContent = `${s.turn}턴`;
     this.endBtn.disabled = this.busy || !!s.result;
+    // 쓸 카드가 남지 않았으면 턴 종료 인장이 맥박친다
+    this.endBtn.classList.toggle('ready', !this.busy && !s.result && !s.hand.some((c, i) => canPlay(s, i).ok && resolveCard(this.data, c.cardId).def.type !== 'status'));
     pruneTooltip();
   }
 
   /** 더미 칩의 숫자 자리(뽑을·버림·소멸) — 카드가 날아가고 오는 곳 */
   private pileRect(which: 'draw' | 'discard' | 'exhaust'): DOMRect {
-    const marks = this.pilesEl.querySelectorAll('i');
+    const marks = this.pilesEl.querySelectorAll('.medal');
     const el = marks[{ draw: 0, discard: 1, exhaust: 2 }[which]] ?? this.pilesEl;
     return el.getBoundingClientRect();
   }
@@ -428,6 +483,8 @@ export class BattleView {
       this.handEls.set(inst.uid, el);
     });
 
+    if (this.selected !== null && this.handEl.isConnected) this.layoutAim();
+
     const ms = 260 * Math.max(0.6, settings.speed);
     for (const x of leaving) void flyClone(x.el, this.pileRect(x.to), { ms, scale: 0.25 }, x.rect);
     const arriving = s.hand.filter((c) => !prev.has(c.uid)).map((c) => this.handEls.get(c.uid)!);
@@ -439,6 +496,33 @@ export class BattleView {
     };
     if (first || !this.handEl.isConnected) requestAnimationFrame(run);
     else run();
+  }
+
+  /**
+   * 대상 고르기 중의 손패(B안): 고른 카드는 손패 가운데로 옮겨 크게 띄우고, 나머지는 반씩 나눠 그 양옆으로 비켜 세운다.
+   * 자리(레이아웃 기준) 차이를 --dx로 넘기면 CSS가 옮긴다
+   */
+  private layoutAim(): void {
+    const s = this.state;
+    const sel = this.selected;
+    if (sel === null) return;
+    const els = s.hand.map((c) => this.handEls.get(c.uid)!);
+    const picked = els[sel];
+    if (!picked) return;
+    const cx = (el: HTMLElement) => el.offsetLeft + el.offsetWidth / 2;
+    const mid = this.handEl.offsetLeft + this.handEl.clientWidth / 2;
+    picked.style.setProperty('--dx', `${Math.round(mid - cx(picked))}px`);
+    const rest = els.filter((_, i) => i !== sel);
+    const w = picked.offsetWidth;
+    const step = w * 0.62;
+    const gap = w * 0.78;
+    const left = Math.ceil(rest.length / 2);
+    rest.forEach((el, k) => {
+      const at = k < left ? mid - gap - (left - 1 - k) * step : mid + gap + (k - left) * step;
+      el.style.setProperty('--dx', `${Math.round(at - cx(el))}px`);
+      el.style.setProperty('--aside', k < left ? '-1' : '1');
+      el.style.zIndex = String(k < left ? 10 + k : 40 - k);
+    });
   }
 
   /** 카드가 날아갈 자리: 고른 대상 → 공격이면 적 진영 → 그 밖에는 카드 주인(없으면 우리 진영) */
@@ -453,15 +537,30 @@ export class BattleView {
     return wrap(cardOwner(s, inst)?.uid) ?? this.field.querySelector<HTMLElement>('.side-party')?.getBoundingClientRect() ?? null;
   }
 
-  /** 낸 카드를 대상 쪽으로 날린다(원본은 감추고, 손패에서 빠질 때 다시 날리지 않게 표시) */
+  /**
+   * 낸 카드 찢기: 대상 쪽으로 살짝 떠올라 금빛으로 달아오른 뒤 두 조각으로 찢어져 흩어진다(원본은 감추고, 손패에서 빠질 때 다시 날리지 않게 표시).
+   * 찢기는 순간 Codex 그림 이펙트(fx_card_tear)가 들어와 있으면 그 자리에 겹친다
+   */
   private async flyPlayed(handIndex: number, targetUid?: string): Promise<void> {
     const inst = this.state.hand[handIndex];
     const el = inst ? this.handEls.get(inst.uid) : undefined;
+    if (!inst || !el) return;
     const to = this.flyTarget(handIndex, targetUid);
-    if (!inst || !el || !to) return;
     this.flown.add(inst.uid);
+    sfx('tear', { volume: 0.7 });
+    const tear = tearCard(el, {
+      ms: 460 * Math.max(0.6, settings.speed),
+      toward: to,
+      onTear: (x, y, height) => {
+        if (spriteSource('fx_card_tear') !== 'sprites') return;
+        const size = height * 1.25;
+        const canvas = h('canvas', { class: 'fx-canvas fx-tear', style: `left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px` }) as HTMLCanvasElement;
+        document.body.appendChild(canvas);
+        void new SpritePlayer(canvas).play('fx_card_tear').finally(() => canvas.remove());
+      },
+    });
     el.style.visibility = 'hidden';
-    await flyClone(el, to, { ms: 320 * Math.max(0.6, settings.speed), scale: 0.4 });
+    await tear;
   }
 
   /** 턴 종료: 남길(유지) 카드를 뺀 손패를 버린 더미로 차례로 날린다 */
@@ -588,24 +687,36 @@ export class BattleView {
       this.targetFocus = null;
       this.refresh();
     } else if (e.key === 'e' || e.key === 'E') this.onEndTurn();
-    else if (/^[0-9]$/.test(e.key)) {
+    else if (/^[1-9]$/.test(e.key) && this.aimNeed()) {
+      // 대상을 고르는 중: 숫자 = 그 번호의 대상
+      const c = this.targetPool()[Number(e.key) - 1];
+      if (c) this.onUnitClick(c);
+    } else if (/^[0-9]$/.test(e.key)) {
       const i = e.key === '0' ? 9 : Number(e.key) - 1;
       if (i < this.state.hand.length) this.onCardClick(i);
-    } else if (this.selected !== null && (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    } else if (this.aimNeed() && (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
       e.preventDefault();
       this.cycleTarget(e.key === 'ArrowLeft' || (e.key === 'Tab' && e.shiftKey) ? -1 : 1);
-    } else if (this.selected !== null && this.targetFocus && (e.key === 'Enter' || e.key === ' ')) {
+    } else if (this.aimNeed() && this.targetFocus && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
       const c = [...this.state.party, ...this.state.enemies].find((x) => x.uid === this.targetFocus);
       if (c) this.onUnitClick(c);
     }
   };
 
-  /** 고른 카드가 노릴 수 있는 대상들 */
+  /** 지금 고르는 중인 대상 종류(고른 물약 → 고른 카드) */
+  private aimNeed(): 'enemy' | 'ally' | null {
+    const s = this.state;
+    if (this.potionSel !== null) return potionTarget(s, this.potionSel) ?? null;
+    if (this.selected !== null && s.hand[this.selected]) return needsTarget(s, s.hand[this.selected]) ?? null;
+    return null;
+  }
+
+  /** 고른 카드·물약이 노릴 수 있는 대상들(번호 순서 = 화면 왼쪽부터) */
   private targetPool(): Combatant[] {
-    if (this.selected === null) return [];
-    const need = needsTarget(this.state, this.state.hand[this.selected]);
-    return (need === 'enemy' ? this.state.enemies : need === 'ally' ? this.state.party : []).filter((c) => !c.downed);
+    const need = this.aimNeed();
+    const x = (c: Combatant) => this.units.get(c.uid)?.el.getBoundingClientRect().left ?? 0;
+    return (need === 'enemy' ? this.state.enemies : need === 'ally' ? this.state.party : []).filter((c) => !c.downed).sort((a, b) => x(a) - x(b));
   }
 
   /**
@@ -768,6 +879,12 @@ export class BattleView {
     this.busy = true;
     this.hovered = null;
     this.endBtn.disabled = true;
+    // 대상 고르기 표시를 걷는다(낸 카드는 떠오른 자리에서 찢긴다)
+    this.field.classList.remove('aiming');
+    for (const u of this.units.values()) {
+      u.el.classList.remove('targetable', 'target-focus');
+      u.el.querySelector('.aim-key')?.remove();
+    }
     this.renderPreview();
     if (before) await before();
     this.handFrozen = freezeHand;
@@ -1158,3 +1275,13 @@ export class BattleView {
   }
 }
 
+
+/** 오른쪽 위 둥근 표식: 한자 한 글자 + 숫자 배지(count가 없으면 배지 없음). 이름·설명은 주석(툴팁)으로 */
+function medal(glyph: string, label: string, body: string, onclick: () => void, count?: number): HTMLElement {
+  return h(
+    'button',
+    { class: 'medal', 'aria-label': count === undefined ? label : `${label} ${count}`, onclick, ...tipAttrs(count === undefined ? label : `${label} ${count}`, body) },
+    h('b', {}, glyph),
+    count === undefined ? null : h('i', {}, count),
+  );
+}

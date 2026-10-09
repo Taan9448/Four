@@ -162,12 +162,15 @@ export function renderPrompt(spec, style) {
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
       );
     case 'ui-slices':
+    case 'ui-parts':
       return (
         `Create ONE PNG sheet of game interface pieces, ${W}x${H} px.\n` +
-        `Grid: ${cols} columns x ${rows} row. Each cell is exactly ${cw}x${ch} px. Cell numbers start at 1 from the left.\n` +
+        (rows > 1
+          ? `Grid: ${cols} columns x ${rows} rows. Each cell is exactly ${cw}x${ch} px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.\n`
+          : `Grid: ${cols} columns x ${rows} row. Each cell is exactly ${cw}x${ch} px. Cell numbers start at 1 from the left.\n`) +
         `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. No scenery, no floor, no cast shadow on the background, no glow, no gradient.\n` +
         `Subject: ${spec.summary ?? ''}.\n` +
-        `${frameLines}\n` +
+        `${frameLines}\n${empty}` +
         (spec.framing ? `Composition: ${spec.framing}\n` : '') +
         `Style: ${spec.style ?? style.illustration_style}. Crisp clean edge around every piece so it separates cleanly from the background.\n` +
         `Never use ${key.name}, pink or purple in the pieces.\n` +

@@ -1,0 +1,23 @@
+id: ui_orb_frame
+type: ui-parts
+frames: 1
+summary: >-
+  the ornate round frame of a "resource globe" for a fantasy wuxia card game, in the spirit of the health globe of classic action RPGs:
+  a heavy circular ring with a hollow round opening in the center (the game fills the opening with two liquids, gold on the left half
+  and blue on the right half, and paints the glass itself)
+frame_notes:
+  1: >-
+    THE GLOBE FRAME, centered in the cell: a thick circular ring with an outer diameter of about 460 px and a perfectly round hollow
+    opening of about 340 px in diameter in its exact center; the opening is flat key color (it will become transparent). The LEFT half
+    of the ring is carved warm bronze-gold metal with East Asian cloud scroll (xiangyun) relief and a small sun-disk boss at the left
+    middle; the RIGHT half of the ring is cool silver-steel with western filigree and a small blue crystal set at the right middle. At
+    the top center and bottom center the two halves meet at a short vertical carved spine (about 24 px wide) that continues a little
+    into the opening and stops, dividing the globe into a left and a right half. A thin dark inner lip lines the opening.
+framing: >-
+  Straight front view, perfectly round and symmetric top-to-bottom, no perspective. The ring and its two small spine stubs are the only
+  things drawn; everything outside the ring and inside the opening is flat key color. Cells 2 to 6 stay empty.
+style: >-
+  refined painterly game UI ornament, ornate but readable at 120 px on screen: aged bronze-gold (#ffd58a, #c27a1c, #6b3e08) on the left,
+  silver-steel with blue gems (#dff4ff, #8fd3ff, #4c8fc4, #1f3f73) on the right, dark recesses (#14110d); soft realistic metal shading lit
+  from the upper left, not pixel art, crisp edges, no glow outside the ring
+placeholder: { color: '#c9a24f' }

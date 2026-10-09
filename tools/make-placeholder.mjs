@@ -191,6 +191,16 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
       if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
       parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${standing(w, h, spec, n - 1)}</g>`);
     }
+  } else if (spec.type === 'ui-parts') {
+    // 둥근 부품: 쓰는 칸마다 고리 하나(칸 번호만큼 밝기를 바꿔 상태를 구분)
+    const color = spec.placeholder?.color ?? '#c9a24f';
+    for (let n = 1; n <= cols * rows; n++) {
+      if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
+      const cx = ((n - 1) % cols) * w + w / 2;
+      const cy = Math.floor((n - 1) / cols) * h + h / 2;
+      const r = Math.min(w, h) * 0.43;
+      parts.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity="${1 - (n - 1) * 0.2}"/><circle cx="${cx}" cy="${cy}" r="${r * 0.72}" fill="#202020"/>`);
+    }
   } else if (spec.type === 'icon-sheet') {
     for (let n = 1; n <= cols * rows; n++) {
       if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;

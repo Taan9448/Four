@@ -38,6 +38,8 @@ const ILLUSTRATIONS = {
   'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
   // 화면 장식 3조각(2026-10-09): 칸1 위 끝 · 칸2 가운데(위아래로 이어 붙여 늘림) · 칸3 아래 끝. 마젠타 배경을 지워 투명(지도 두루마리 축)
   'ui-slices': { canvas: [1536, 1024], output: [256, 512], grid: [3, 1], frames: 3, chroma: 'magenta' },
+  // 화면 부품(2026-10-09): 3×2칸에 둥근 부품을 상태별로 하나씩(최대 6). 마젠타 배경을 지워 투명(체력구 틀·턴 종료 인장)
+  'ui-parts': { canvas: [1536, 1024], output: [256, 256], grid: [3, 2], frames: 6, chroma: 'magenta' },
 };
 
 export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);
