@@ -35,13 +35,18 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
   const owners = loadoutOwners(data, run);
   const draft: Loadout = recommendLoadout(data, run, run.loadout);
   let tab = owners[0];
+  /** 아키타입 거르기(null: 전체) */
+  let filter: string | null = null;
+  const archName = new Map([...data.characters.values()].flatMap((c) => c.archetypes.map((a) => [a.id, a] as const)));
   const ownerName = (o: string) => (o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o));
   const root = h('section', { class: 'screen loadout-screen' });
 
   const render = () => {
     const need = requiredFor(data, run, tab);
     const picked = new Set(draft[tab] ?? []);
-    const cards = choosable(data, run, tab).sort(
+    const archetypes = data.characters.get(tab)?.archetypes ?? [];
+    if (filter && !archetypes.some((a) => a.id === filter) && tab !== COMMON) filter = null;
+    const cards = choosable(data, run, tab).filter((d) => !filter || d.tags.includes(filter)).sort(
       (a, b) => RARITY_RANK[a.rarity] - RARITY_RANK[b.rarity] || (run.collection[b.id] ?? 0) - (run.collection[a.id] ?? 0) || a.name.localeCompare(b.name, 'ko'),
     );
     const problems = loadoutProblems(data, run, draft);
@@ -64,6 +69,9 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
           cardView(data, { uid: `lo_${d.id}`, cardId: d.id, level: run.collection[d.id] ?? 0 }, { selected: on }),
           on ? h('span', { class: 'loadout-check' }, '✓') : null,
           run.stageGains.includes(d.id) ? h('span', { class: 'loadout-new', ...tipAttrs('이번 스테이지에 얻은 카드', '편성과 상관없이 이 스테이지가 끝날 때까지 덱에 들어간다.') }, '새') : null,
+          d.tags.length
+            ? h('span', { class: 'loadout-tags' }, d.tags.map((t) => h('em', { class: 'arch-tag', ...tipAttrs(archName.get(t)?.name ?? t, archName.get(t)?.text ?? '') }, archName.get(t)?.name ?? t)))
+            : null,
         );
         return el;
       }),
@@ -131,6 +139,16 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
             h('button', { class: 'btn btn-small', onclick: () => ((draft[tab] = recommendFor(data, run, tab)), render()) }, `${ownerName(tab)} 추천`),
             h('button', { class: 'btn btn-small', onclick: () => ((draft[tab] = []), render()) }, '모두 빼기'),
           ),
+          archetypes.length
+            ? h(
+                'div',
+                { class: 'arch-filter' },
+                h('button', { class: `btn btn-small${filter === null ? ' on' : ''}`, onclick: () => ((filter = null), render()) }, '전체'),
+                archetypes.map((a) =>
+                  h('button', { class: `btn btn-small${filter === a.id ? ' on' : ''}`, ...tipAttrs(a.name, a.text), onclick: () => ((filter = filter === a.id ? null : a.id), render()) }, a.name),
+                ),
+              )
+            : null,
           grid,
         ),
         h(

@@ -140,6 +140,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["elia_burn"],
     "hitFx": "fx_hit_fire",
     "effects": [{"op": "damage", "amount": 4, "element": "fire"}],
     "upgrade": {"growth": [2], "plus4": {"name": "송진", "effects": [{"op": "damage", "amount": 3, "element": "fire"}]}, "plus5": {"name": "밤길의 불", "effects": [{"op": "block", "amount": 3}]}},
@@ -167,6 +168,7 @@
     "pool": "reward",
     "cost": {"neigong": 2, "mana": 0},
     "target": "self",
+    "tags": ["born_iron"],
     "effects": [{"op": "block", "amount": 12}],
     "upgrade": {"growth": [3], "plus4": {"name": "쇠 같은 살갗", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "칼이 튕겨 나온다", "effects": [{"op": "block", "amount": 4}]}},
     "flavor": "몸을 쇠처럼 굳히는 외공. 백 번 맞아 보지 않고는 익힐 수 없다."
@@ -193,6 +195,7 @@
     "pool": "reward",
     "cost": {"neigong": 0, "mana": 0},
     "target": "self",
+    "tags": ["kyle_swift"],
     "effects": [{"op": "block", "amount": 3}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [2, 0], "plus4": {"name": "풀잎 위를", "effects": [{"op": "block", "amount": 2}]}, "plus5": {"name": "지붕 위로", "addKeywords": ["retain"]}},
     "flavor": "발끝이 풀잎을 밟았는데, 풀잎은 휘지도 않았다."
@@ -233,6 +236,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["kyle_swift"],
     "effects": [{"op": "damage", "amount": 3, "times": 3}],
     "upgrade": {"growth": [1], "plus4": {"name": "소매 속 한 자루", "effects": [{"op": "damage", "amount": 3}]}, "plus5": {"name": "돌아오는 칼", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "소매에서 칼이 나왔다는 것을, 맞은 쪽은 셋째 자루가 꽂힌 뒤에야 알았다."
@@ -273,6 +277,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_enemies",
+    "tags": ["elia_burn"],
     "hitFx": "fx_hit_fire",
     "effects": [{"op": "damage", "amount": 4, "element": "fire"}],
     "upgrade": {"growth": [1], "plus4": {"name": "번지는 불", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "남은 기름", "effects": [{"op": "damage", "amount": 3, "element": "fire"}]}},

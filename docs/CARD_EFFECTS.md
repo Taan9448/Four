@@ -4,7 +4,7 @@
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(15개)
+## 1. 전투 기본 동작(16개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -23,12 +23,16 @@
 | `add_card` | card, count, to | — | 카드 생성(hand / draw / discard) |
 | `dispel` | — | 카드 대상 | 돌려보내기(운해귀종·두린의 망치): 대상의 강화(`kind: buff`) 상태와 방어를 모두 걷어 낸다. 약화 같은 debuff·특성(trait)은 남는다 |
 | `neigong_max` | amount | — | 이번 전투에서 턴마다 차는 내공 증감(내공의 실: 팔 년 내공을 실로 뽑는다). 0 아래로 내려가지 않는다 |
+| `lose_hp` | amount | 자신 | 체력 잃기(방어 무시, 피의 값). '체력을 잃었을 때' 발동을 부른다 |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
 - `times`: 연타 횟수(`damage`).
 - `condition`: `riftGte`, `riftLte`, `targetHasStatus`, `targetStatusGte: [status, n]`, `world`, `partyHas`, `turnMod: [n, r]`, `enemyId`, `hpRatioLte`, `flag`, `scarMin`. 대상이 있는 동작은 대상마다 검사한다.
-- `scale`: `{ per: rift | hand | mana | targetStatus, status?, amount }` → 기본값 + amount × per.
+- `scale`: `{ per, status?, amount, max? }` → 기본값 + ⌊amount × per⌋(max가 있으면 더하는 값의 상한). `apply_status`·`reveal_grain`·`taunt`의 스택에도 걸린다.
+  - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수
+  - 예: 결을 따라 `{"op":"damage","amount":4,"scale":{"per":"targetStatus","status":"grain","amount":3}}`, 산처럼 `{"op":"damage","amount":0,"scale":{"per":"block","amount":0.5}}`, 불씨 잇기(화상 두 배) `{"op":"apply_status","status":"burn","stacks":0,"scale":{"per":"targetStatus","status":"burn","amount":1}}`
+  - 카드 문구는 꼬리말을 자동으로 붙인다: "피해 4 (대상의 결 노출 1당 +3)", "피해 (자신의 방어 2당 +1)".
 
 ## 2. 피해 계산 순서
 
@@ -57,6 +61,7 @@
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
   "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다)
+  "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 공용은 아무 동료의 것
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
   "upgrade": {                          // 강화 +1~+5(상태 카드 제외 필수)
     "growth": [4, 0],                   //   +1~+3: 단계마다 effects[i]의 amount(없으면 stacks)에 더할 값. 효과 수와 같아야 한다
@@ -116,6 +121,38 @@
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
 `special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, chill)은 엔진이 메커니즘으로 처리한다.
+
+## 4-1. 상태 발동(파워)
+
+상태에 `triggers`를 두면, 그 상태를 가진 쪽에게 일이 생길 때마다 효과가 **그 쪽을 출처로** 일어난다. 파워 카드(`type: power`)는 자신에게 이런 상태를 거는 카드다. 파워 카드는 늘 소멸하고 대상은 `self`(`data:check`).
+
+```jsonc
+{ "id": "p_payback", "name": "되갚기", "kind": "buff", "decay": 0, "glyph": "報",
+  "description": "공격을 맞을 때마다(방어로 막아도) 때린 적에게 피해 3(스택마다).",
+  "triggers": [ { "on": "attacked", "effects": [ { "op": "damage", "amount": 3, "target": "trigger_enemy" } ] } ] }
+```
+
+| 필드 | 뜻 |
+|---|---|
+| `on` | `turnStart` 그 편 차례 시작(아군: 카드를 뽑은 뒤, 지원 규칙·유물보다 먼저) · `turnEnd` 그 편 차례 끝(감소 전) · `cardPlayed` 아군이 카드를 낸 뒤(효과가 다 끝난 다음, 적이 가진 상태도 발동) · `attacked` 공격을 맞았을 때(방어로 다 막아도) · `hpLost` 체력을 잃었을 때(자해·화상·독 포함) |
+| `perStack` | 기본 true: 수치에 스택 수를 곱한다 |
+| `cardType` · `keyword` · `ownCards` | `cardPlayed` 거르기: 카드 유형 / 키워드(예: fusion) / 가진 동료의 카드만 |
+| `condition` | 일반 조건(대상 검사는 가진 쪽) |
+| `effects` | 전투 동작. `trigger_enemy`는 공격자(attacked·hpLost) |
+
+- 발동이 다른 발동을 부를 수 있지만 깊이 2까지만(되갚기끼리 끝없이 주고받지 않게).
+- 전투 화면은 발동할 때마다 그 쪽 위에 상태 이름을 띄운다(`power` 이벤트).
+
+| id | 이름 | 발동 |
+|---|---|---|
+| p_grain_eye | 결을 보는 눈(하운 청운출수) | 차례 시작: 무작위 적 결 노출 1 |
+| p_waterwheel | 물레방아(하운) | 차례 시작: 마나 +1 / 융합 카드를 낸 뒤: 무작위 적 피해 4 |
+| p_wildfire | 번지는 불길(엘리아 청염초) | 차례 시작: 적 전체 화상 1 |
+| p_frost_branch | 서리 내린 가지(엘리아 은빛 나무) | 차례 시작: 무작위 적 냉기 1, 아군 전체 방어 2 |
+| p_sword_rhythm | 검의 박자(카일 눈을 감고) | 공격 카드를 낸 뒤: 무작위 적 피해 2 |
+| p_blood_taste | 피 맛(카일 흉터의 맹세) | 체력을 잃었을 때: 힘 +1 |
+| p_mountain_body | 산의 소리(보른) | 차례 시작: 방어 5 |
+| p_payback | 되갚기(보른) | 공격을 맞았을 때: 때린 적에게 피해 3 |
 
 ## 5. 적 JSON(`data/enemies/<stage>.json`)
 

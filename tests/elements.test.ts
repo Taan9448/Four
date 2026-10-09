@@ -64,7 +64,7 @@ describe("속성 상성(화염·냉기)", () => {
   });
 
   it("카드 문구에 속성과 실리는 상태가 나온다", () => {
-    const t = resolveCard(data, "elia_frost_needle").def;
+    const t = resolveCard(data, "elia_cold_breath").def;
     expect(t.effects[0].element).toBe("ice");
   });
 });

@@ -58,6 +58,7 @@ function openCard(data: GameData, def: CardDef, best: number): void {
           ['주인', owner],
           ['등급', RARITY_LABEL[def.rarity] ?? def.rarity],
           ['종류', TYPE_LABEL[def.type] ?? def.type],
+          ['갈래', def.tags.map((t) => [...data.characters.values()].flatMap((c) => c.archetypes).find((a) => a.id === t)?.name ?? t).join(' · ')],
           ['본 최고 강화', best ? `+${best}` : '기본'],
         ]),
         def.flavor ? h('p', { class: 'zoom-flavor' }, def.flavor) : null,

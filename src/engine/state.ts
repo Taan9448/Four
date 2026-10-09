@@ -56,6 +56,7 @@ export type BattleEvent =
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'relic'; relicId: string; name: string }
   | { type: 'potion'; potionId: string; name: string }
+  | { type: 'power'; uid: string; status: string }
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
   | { type: 'transform'; uid: string; from: string; into: string; text: string }
@@ -105,6 +106,10 @@ export interface BattleState {
   enemyDmgScale?: number;
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
+  /** 이번 턴에 낸 카드 수(scale per cardsPlayed: 이 카드 전까지) */
+  cardsPlayed?: number;
+  /** 상태 발동이 다른 발동을 부른 깊이(무한 되갚기 방지) */
+  triggerDepth?: number;
   /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
   noCrit?: boolean;
 }

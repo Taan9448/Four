@@ -1,6 +1,6 @@
 // 효과 해석기. 카드·적 행동·지원 규칙의 효과는 모두 여기서 기본 동작의 조합으로만 해석된다.
 // 카드별 개별 코드는 두지 않는다. 기본 동작 목록은 docs/CARD_EFFECTS.md 참고.
-import { BATTLE_OPS, type Condition, type Effect, type Element, type SupportRule } from './schema';
+import { BATTLE_OPS, type Condition, type Effect, type Element, type StatusTrigger, type SupportRule } from './schema';
 import {
   alive,
   findCombatant,
@@ -18,8 +18,10 @@ export interface EffectContext {
   card?: ResolvedCard;
   /** 카드/행동이 지정한 대상 */
   chosenUid?: string;
-  /** 지원 규칙을 일으킨 적 */
+  /** 지원 규칙을 일으킨 적 / 상태 발동(attacked)의 공격자 */
   triggerUid?: string;
+  /** 상태 발동(perStack)의 스택 수: 효과 수치에 곱한다 */
+  mult?: number;
 }
 
 const BATTLE_OP_SET = new Set<string>(BATTLE_OPS);
@@ -58,18 +60,47 @@ export function checkCondition(
   return true;
 }
 
-function amountOf(state: BattleState, effect: Effect, target?: Combatant): number {
-  let amount = effect.amount ?? effect.stacks ?? 0;
+/** 효과 수치: 기본값(없으면 fallback) + 비례(scale) → 상태 발동이면 스택 수를 곱한다 */
+export function amountOf(state: BattleState, effect: Effect, target: Combatant | undefined, ctx: EffectContext, fallback = 0): number {
+  let amount = effect.amount ?? effect.stacks ?? fallback;
   const sc = effect.scale;
   if (sc) {
+    const self = ctx.source;
     let per = 0;
-    if (sc.per === 'rift') per = state.rift;
-    else if (sc.per === 'hand') per = state.hand.length;
-    else if (sc.per === 'mana') per = state.mana;
-    else if (sc.per === 'targetStatus' && sc.status) per = target?.statuses[sc.status] ?? 0;
-    amount += sc.amount * per;
+    switch (sc.per) {
+      case 'rift':
+        per = state.rift;
+        break;
+      case 'hand':
+        per = state.hand.length;
+        break;
+      case 'mana':
+        per = state.mana;
+        break;
+      case 'targetStatus':
+        per = sc.status ? (target?.statuses[sc.status] ?? 0) : 0;
+        break;
+      case 'selfStatus':
+        per = sc.status ? (self?.statuses[sc.status] ?? 0) : 0;
+        break;
+      case 'cardsPlayed':
+        per = state.cardsPlayed ?? 0;
+        break;
+      case 'block':
+        per = self?.block ?? 0;
+        break;
+      case 'missingHp':
+        per = self ? self.maxHp - self.hp : 0;
+        break;
+      case 'enemies':
+        per = alive(state.enemies).length;
+        break;
+    }
+    let add = Math.floor(sc.amount * per);
+    if (sc.max !== undefined) add = Math.min(add, sc.max);
+    amount += add;
   }
-  return amount;
+  return amount * (ctx.mult ?? 1);
 }
 
 // ───────────────────────── 대상 ─────────────────────────
@@ -310,6 +341,8 @@ export function dealDamage(
   if (target.side === 'enemy' && !target.downed) {
     fireSupport(state, 'enemyDamaged', { triggerUid: target.uid });
   }
+  if (!target.downed && source && source !== target) fireStatusTriggers(state, target, 'attacked', { attackerUid: source.uid });
+  if (!target.downed && hpLoss > 0) fireStatusTriggers(state, target, 'hpLost', { attackerUid: source?.uid });
 }
 
 /** 대상의 속성 상성: 적 정의의 weak·resist(아군은 없음) */
@@ -349,6 +382,7 @@ export function loseHp(state: BattleState, target: Combatant, amount: number): v
   target.hp = Math.max(0, target.hp - amount);
   state.events.push({ type: 'damage', sourceUid: null, targetUid: target.uid, amount, blocked: 0, grain: false, absorbed: false });
   if (target.hp <= 0) knockOut(state, target);
+  else fireStatusTriggers(state, target, 'hpLost');
 }
 
 function knockOut(state: BattleState, target: Combatant): void {
@@ -479,7 +513,7 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
   const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
-    const amount = amountOf(state, effect);
+    const amount = amountOf(state, effect, undefined, ctx);
     switch (effect.op) {
       case 'gain_neigong':
         state.neigong = Math.max(0, state.neigong + amount);
@@ -526,7 +560,7 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
   }
   for (const target of targets) {
     if (!checkCondition(state, effect.condition, ctx, target)) continue;
-    const amount = amountOf(state, effect, target);
+    const amount = amountOf(state, effect, target, ctx, ['apply_status', 'reveal_grain', 'taunt'].includes(effect.op) ? 1 : 0);
     switch (effect.op) {
       case 'damage':
         for (let i = 0; i < (effect.times ?? 1); i++) {
@@ -546,7 +580,10 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       }
       case 'apply_status':
         if (!effect.status) throw new Error('apply_status: status 필요');
-        addStatus(state, target, effect.status, effect.stacks ?? effect.amount ?? 1);
+        addStatus(state, target, effect.status, amount);
+        break;
+      case 'lose_hp':
+        loseHp(state, target, amount);
         break;
       case 'remove_status':
         if (!effect.status) throw new Error('remove_status: status 필요');
@@ -556,10 +593,10 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
         } else addStatus(state, target, effect.status, -effect.stacks);
         break;
       case 'reveal_grain':
-        addStatus(state, target, 'grain', effect.stacks ?? effect.amount ?? 1);
+        addStatus(state, target, 'grain', amount);
         break;
       case 'taunt':
-        addStatus(state, target, 'taunt', effect.stacks ?? effect.amount ?? 1);
+        addStatus(state, target, 'taunt', amount);
         break;
       case 'dispel': {
         // 돌려보내기(운해귀종): 강화(buff) 상태와 방어를 걷어 낸다
@@ -576,6 +613,59 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
         break;
       }
     }
+  }
+}
+
+// ───────────────────────── 상태 발동(파워) ─────────────────────────
+
+/** 발동이 발동을 부르는 깊이 한도(되갚기끼리 끝없이 주고받지 않게) */
+const MAX_TRIGGER_DEPTH = 2;
+
+/**
+ * holder가 가진 상태 중 on이 맞는 발동을 일으킨다(CARD_EFFECTS 4-1). 효과의 출처는 holder,
+ * trigger_enemy는 공격자(attacked·hpLost)다. perStack이면 수치에 스택 수를 곱한다
+ */
+export function fireStatusTriggers(
+  state: BattleState,
+  holder: Combatant,
+  on: StatusTrigger['on'],
+  info: { card?: ResolvedCard; cardOwnerUid?: string; attackerUid?: string } = {},
+): void {
+  if (state.result || holder.downed) return;
+  const depth = state.triggerDepth ?? 0;
+  if (depth >= MAX_TRIGGER_DEPTH) return;
+  for (const [id, stacks] of Object.entries(holder.statuses)) {
+    if (stacks <= 0) continue;
+    const def = state.data.statuses.get(id);
+    if (!def?.triggers.length) continue;
+    for (const t of def.triggers) {
+      if (t.on !== on) continue;
+      if (on === 'cardPlayed') {
+        const card = info.card;
+        if (!card) continue;
+        if (t.cardType && card.def.type !== t.cardType) continue;
+        if (t.keyword && !card.keywords.includes(t.keyword)) continue;
+        if (t.ownCards && info.cardOwnerUid !== holder.uid) continue;
+      }
+      const ctx: EffectContext = { source: holder, triggerUid: info.attackerUid, mult: t.perStack ? stacks : 1 };
+      if (!checkCondition(state, t.condition, ctx, holder)) continue;
+      state.triggerDepth = depth + 1;
+      try {
+        state.events.push({ type: 'power', uid: holder.uid, status: id });
+        runEffects(state, t.effects, ctx);
+      } finally {
+        state.triggerDepth = depth;
+      }
+      if (state.result || holder.downed) return;
+    }
+  }
+}
+
+/** 한 편 전체에 발동(차례 시작·끝, 카드를 낸 뒤) */
+export function fireSideTriggers(state: BattleState, list: Combatant[], on: StatusTrigger['on'], info: Parameters<typeof fireStatusTriggers>[3] = {}): void {
+  for (const c of alive(list)) {
+    if (state.result) return;
+    fireStatusTriggers(state, c, on, info);
   }
 }
 

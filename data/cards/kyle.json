@@ -35,6 +35,7 @@
     "cost": {"neigong": 0, "mana": 0},
     "target": "enemy",
     "keywords": ["innate"],
+    "tags": ["kyle_swift"],
     "effects": [{"op": "damage", "amount": 4}],
     "upgrade": {"growth": [2], "plus4": {"name": "가장 먼저", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "하운의 왼편", "effects": [{"op": "gain_neigong", "amount": 1}]}},
     "flavor": "그러나 전투가 시작되면, 그는 언제나 하운의 왼편에서 가장 먼저 검을 뽑았다."
@@ -48,6 +49,7 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["kyle_swift"],
     "effects": [{"op": "damage", "amount": 4}, {"op": "apply_status", "status": "vulnerable", "stacks": 2}],
     "upgrade": {"growth": [2, 0], "plus4": {"name": "무릎 꿇리기", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "박아 넣은 검", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}},
     "flavor": "\"피하고, 보고, 베고!\" 카일이 광석거미의 다리 관절에 검을 박아 넣었다."
@@ -62,6 +64,7 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_allies",
     "keywords": ["exhaust"],
+    "tags": ["kyle_blood"],
     "effects": [{"op": "heal", "amount": 4, "target": "all_allies"}],
     "upgrade": {"growth": [2], "plus4": {"name": "한 접시 더", "effects": [{"op": "block", "amount": 3, "target": "all_allies"}]}, "plus5": {"name": "서른 개씩", "removeKeywords": ["exhaust"]}},
     "flavor": "\"엘하임의 어떤 왕궁 연회에도 이런 건 없었어.\" 언젠가 아르덴 왕도에 '기사의 만두'를 열겠다는 게 그의 꿈이었다."
@@ -76,8 +79,9 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
     "keywords": ["exhaust"],
-    "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "draw", "amount": 1}],
-    "upgrade": {"growth": [1, 0], "plus4": {"name": "씩 웃다", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "그래서 재밌는 거지", "removeKeywords": ["exhaust"]}},
+    "tags": ["kyle_blood"],
+    "effects": [{"op": "lose_hp", "amount": 3, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "draw", "amount": 1}],
+    "upgrade": {"growth": [0, 1, 0], "plus4": {"name": "씩 웃다", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "그래서 재밌는 거지", "removeKeywords": ["exhaust"]}},
     "flavor": "\"그럼 강해지면 되겠네.\" 카일은 그렇게 말하고 씩 웃었다."
   },
   {
@@ -90,8 +94,9 @@
     "castLine": {"speaker": "kyle", "face": "resolve", "text": "살아서 돌아가면, 고향 술집에서 이 이야기를 백 번은 우려먹을 거야."},
     "cost": {"neigong": 2, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 18}, {"op": "apply_status", "status": "weak", "stacks": 2}, {"op": "damage", "amount": 3, "target": "self"}],
-    "upgrade": {"growth": [4, 0, 0], "plus4": {"name": "부러진 왼팔을 감싸다", "effects": [{"op": "heal", "amount": 3, "target": "self"}]}, "plus5": {"name": "마왕의 날개", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}},
+    "tags": ["kyle_blood"],
+    "effects": [{"op": "lose_hp", "amount": 4, "target": "self"}, {"op": "damage", "amount": 12, "scale": {"per": "missingHp", "amount": 0.25, "max": 15}}, {"op": "apply_status", "status": "weak", "stacks": 2}],
+    "upgrade": {"growth": [0, 3, 0], "plus4": {"name": "부러진 왼팔을 감싸다", "effects": [{"op": "heal", "amount": 3, "target": "self"}]}, "plus5": {"name": "마왕의 날개", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}},
     "flavor": "카일의 붉은 검이 마왕의 날개 하나를 베었으나, 그 대가로 왼팔이 부러졌다."
   },
   {
@@ -126,14 +131,16 @@
     "id": "kyle_eyes_closed",
     "name": "눈을 감고",
     "owner": "kyle",
-    "type": "attack",
+    "type": "power",
     "rarity": "rare",
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
-    "target": "enemy",
-    "effects": [{"op": "reveal_grain", "stacks": 1}, {"op": "damage", "amount": 7}],
-    "upgrade": {"growth": [0, 3], "plus4": {"name": "칼이 오는 길", "effects": [{"op": "block", "amount": 5, "target": "self"}]}, "plus5": {"name": "온 길로 되돌려", "effects": [{"op": "damage", "amount": 5, "target": "random_enemy"}]}},
-    "flavor": "\"보여. 칼이 오는 길은 하나야.\" 오십 년 걸릴 줄 알았는데, 이 년 걸렸다."
+    "target": "self",
+    "keywords": ["exhaust"],
+    "tags": ["kyle_swift"],
+    "effects": [{"op": "apply_status", "status": "p_sword_rhythm", "stacks": 1, "target": "self"}, {"op": "draw", "amount": 1}],
+    "upgrade": {"growth": [0, 1], "plus4": {"name": "칼이 오는 길", "effects": [{"op": "block", "amount": 5, "target": "self"}]}, "plus5": {"name": "온 길로 되돌려", "cost": {"neigong": 0, "mana": 0}}},
+    "flavor": "\"보여. 칼이 오는 길은 하나야.\" 눈을 감자 검의 박자가 들렸다. 오십 년 걸릴 줄 알았는데, 이 년 걸렸다."
   },
   {
     "id": "kyle_shield_wall",
@@ -157,7 +164,8 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_enemies",
-    "effects": [{"op": "damage", "amount": 5}],
+    "tags": ["kyle_swift"],
+    "effects": [{"op": "damage", "amount": 4, "scale": {"per": "cardsPlayed", "amount": 1, "max": 6}}],
     "upgrade": {"growth": [2], "plus4": {"name": "쿵", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "반격 창", "effects": [{"op": "block", "amount": 4, "target": "all_allies"}]}},
     "flavor": "쿵. 방패 백 개가 한꺼번에 땅을 찍었다. \"전진!\""
   },
@@ -210,6 +218,7 @@
     "cost": {"neigong": 0, "mana": 0},
     "target": "self",
     "keywords": ["exhaust"],
+    "tags": ["kyle_blood"],
     "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}, {"op": "block", "amount": 3}],
     "upgrade": {"growth": [0, 2], "plus4": {"name": "고향 술집 이야기", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "한 번 더 외친다", "removeKeywords": ["exhaust"]}},
     "flavor": "\"하나, 둘, 셋— 하앗!\" 기합 소리가 커질수록 엘리아의 한숨도 길어졌다."
@@ -236,36 +245,39 @@
     "pool": "starter",
     "cost": {"neigong": 0, "mana": 0},
     "target": "all_allies",
+    "tags": ["kyle_swift"],
     "effects": [{"op": "block", "amount": 2, "target": "all_allies"}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [1, 0], "plus4": {"name": "어깨의 힘을 빼고", "effects": [{"op": "heal", "amount": 2, "target": "all_allies"}]}, "plus5": {"name": "백 번은 우려먹을 이야기", "effects": [{"op": "gain_neigong", "amount": 1}]}},
     "flavor": "\"그러니까 그 거미가 말이야—\" 아무도 웃지 않았지만, 다들 어깨에서 힘이 빠졌다."
   },
   {
-    "id": "kyle_this_way",
-    "name": "이쪽이다!",
-    "owner": "kyle",
-    "type": "skill",
-    "rarity": "uncommon",
-    "pool": "reward",
-    "cost": {"neigong": 1, "mana": 0},
-    "target": "self",
-    "effects": [{"op": "taunt", "target": "self"}, {"op": "block", "amount": 8}],
-    "upgrade": {"growth": [0, 3], "plus4": {"name": "은빛 판금", "effects": [{"op": "block", "amount": 4}]}, "plus5": {"name": "로웬의 이름", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}},
-    "flavor": "카일이 검면으로 투구를 두드렸다. \"이쪽이다, 이 못생긴 놈아!\""
-  },
-  {
-    "id": "kyle_hot_blade",
-    "name": "달군 검날",
+    "id": "kyle_sword_path",
+    "name": "검의 길",
     "owner": "kyle",
     "type": "attack",
     "rarity": "uncommon",
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "hitFx": "fx_hit_fire",
-    "effects": [{"op": "damage", "amount": 6, "element": "fire"}, {"op": "remove_status", "status": "chill", "target": "all_allies"}],
-    "upgrade": {"growth": [2, 0], "plus4": {"name": "얼음을 녹이는 검", "effects": [{"op": "remove_status", "status": "bind", "target": "all_allies"}]}, "plus5": {"name": "불을 삼킨 검", "effects": [{"op": "block", "amount": 4}]}},
-    "flavor": "이그니스의 심장으로 벼린 검은 식지 않았다. 검면을 동료의 언 어깨에 대자 서리가 김이 되어 올랐다."
+    "tags": ["kyle_swift"],
+    "effects": [{"op": "damage", "amount": 3, "scale": {"per": "cardsPlayed", "amount": 3, "max": 18}}],
+    "upgrade": {"growth": [2], "plus4": {"name": "한 걸음 더", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "끊기지 않는 검", "cost": {"neigong": 0, "mana": 0}}},
+    "flavor": "한 번 벤 자리에서 다음 길이 보인다. 카일의 검은 멈추는 법을 잊었다."
+  },
+  {
+    "id": "kyle_scar_oath",
+    "name": "흉터의 맹세",
+    "owner": "kyle",
+    "type": "power",
+    "rarity": "uncommon",
+    "pool": "reward",
+    "cost": {"neigong": 0, "mana": 0},
+    "target": "self",
+    "keywords": ["exhaust"],
+    "tags": ["kyle_blood"],
+    "effects": [{"op": "apply_status", "status": "p_blood_taste", "stacks": 1, "target": "self"}, {"op": "lose_hp", "amount": 2, "target": "self"}, {"op": "block", "amount": 3, "target": "self"}],
+    "upgrade": {"growth": [0, 0, 2], "plus4": {"name": "이를 악물다", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "상처는 훈장", "effects": [{"op": "block", "amount": 6, "target": "self"}]}},
+    "flavor": "부러진 팔이 붙은 자리를 카일은 자랑처럼 걷어 보였다. \"아플수록 손이 빨라져.\""
   },
   {
     "id": "kyle_rowen_blade",
@@ -276,6 +288,7 @@
     "pool": "reward",
     "cost": {"neigong": 2, "mana": 0},
     "target": "enemy",
+    "tags": ["kyle_swift"],
     "castLine": {"speaker": "kyle", "face": "resolve", "text": "로웬 가문의 검이다. 똑똑히 봐 둬."},
     "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 2}, {"op": "damage", "amount": 9, "times": 2}, {"op": "block", "amount": 6}],
     "upgrade": {"growth": [0, 2, 2], "plus4": {"name": "흰 눈송이", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "은빛 검", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}},

@@ -9,6 +9,7 @@ import {
   dealDamage,
   drawCards,
   fireRelics,
+  fireSideTriggers,
   fireSupport,
   hasSkipTurn,
   loseHp,
@@ -147,6 +148,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
 function startPlayerTurn(state: BattleState): void {
   const bal = state.data.balance;
   state.turn += 1;
+  state.cardsPlayed = 0;
   state.events.push({ type: 'turn', turn: state.turn });
   state.neigong = state.neigongMax;
   if (state.turn > 1) {
@@ -158,6 +160,8 @@ function startPlayerTurn(state: BattleState): void {
   applyTurnStartStatuses(state, state.party);
   if (state.result) return;
   drawCards(state, bal.handSize);
+  fireSideTriggers(state, state.party, 'turnStart');
+  if (state.result) return;
   fireSupport(state, 'turnStart', {});
   fireRelics(state, 'turnStart');
   if (state.result) return;
@@ -371,7 +375,10 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   state.events.push({ type: 'card', cardId: inst.cardId, sourceUid: owner.uid });
   state.log.push(`${owner.name}: ${card.def.name}${isFusion(card) ? ' [융합]' : ''}`);
   runEffects(state, card.effects, { source: owner, card, chosenUid: targetUid });
-  if (card.keywords.includes('exhaust')) state.exhaust.push(inst);
+  // 파워(지속 효과): 아군·적이 가진 상태 중 '카드를 낸 뒤' 발동
+  fireSideTriggers(state, [...state.party, ...state.enemies], 'cardPlayed', { card, cardOwnerUid: owner.uid });
+  state.cardsPlayed = (state.cardsPlayed ?? 0) + 1;
+  if (card.keywords.includes('exhaust') || card.def.type === 'power') state.exhaust.push(inst);
   else state.discard.push(inst);
   return { ok: true };
 }
@@ -472,6 +479,8 @@ export function endTurn(state: BattleState): void {
     else state.discard.push(c);
   }
   state.hand = keep;
+  fireSideTriggers(state, state.party, 'turnEnd');
+  if (state.result) return;
   decayStatuses(state, state.party, 'ownTurnEnd');
 
   // 균열: 세계별 감쇠 뒤, 임계치 이상이면 틈의 잔향
@@ -484,6 +493,8 @@ export function endTurn(state: BattleState): void {
   }
 
   enemyTurn(state);
+  if (state.result) return;
+  fireSideTriggers(state, state.enemies, 'turnEnd');
   if (state.result) return;
   // 버티기 전투: 정한 턴의 적 행동까지 견디면 승리
   if (state.surviveTurns !== null && state.turn >= state.surviveTurns) {
@@ -501,6 +512,7 @@ export function endTurn(state: BattleState): void {
 function enemyTurn(state: BattleState): void {
   for (const e of state.enemies) e.block = 0;
   applyTurnStartStatuses(state, state.enemies);
+  fireSideTriggers(state, state.enemies, 'turnStart');
   for (const enemy of state.enemies) {
     if (state.result) return;
     if (enemy.downed || !enemy.intent) continue;
