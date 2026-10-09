@@ -21,7 +21,7 @@
     "color": "#5a1a24",
     "pattern": "cycle",
     "deathEffects": [{"op": "remove_status", "status": "incorporeal", "target": "all_allies"}],
-    "moves": [{"id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [{"op": "block", "amount": 7, "target": "all_allies"}, {"op": "apply_status", "status": "thorns", "stacks": 2, "target": "self"}]}, {"id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
+    "moves": [{"id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [{"op": "block", "amount": 7, "target": "all_allies"}, {"op": "apply_status", "status": "thorns", "stacks": 1, "target": "self"}]}, {"id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
     "flavor": "손바닥이 피처럼 붉다. 셋이 서면 진이 되고, 진은 삼 년 동안 무당을 가뒀다. 하나가 쓰러지면 진의 매듭이 풀린다."
   },
   {
