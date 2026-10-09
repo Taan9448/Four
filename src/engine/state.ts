@@ -142,6 +142,9 @@ export interface BattleTally {
   surges: number;
   cards: Record<string, number>;
   haunHitBy?: string;
+  /** 심연 업적: 터뜨린 결 노출 수, 쓰러뜨린 접사 붙은 적 수 */
+  grain?: number;
+  affixKills?: number;
   /** 적 id → 이 전투에서 쓴 행동 id(도감에 적는다) */
   moves?: Record<string, string[]>;
 }

@@ -1,7 +1,9 @@
 // 도감 화면(GAME_DESIGN 2절): 시작 화면에서 연다. 한 번이라도 본 것만 보이고, 못 본 칸은 ? 실루엣.
-// 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 기록
+// 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 심연(3차) · 기록
+// 카드 칸은 3단계: ? (모름) → 윤곽(본 적 있음: 심연 풀에 들어간다) → 실물(보유: 강화 단계)
 import { codexCards, codexPeople, codexProgress, type Codex } from '../engine/codex';
 import type { GameData } from '../engine/data';
+import { riftCards, unlockedRift, unlockName, unlockSource, oathMax, type AbyssMeta } from '../engine/abyss';
 import { intentBadges } from '../engine/battle';
 import type { CardDef, EnemyDef } from '../engine/schema';
 import { frameUrl } from '../render/assets';
@@ -19,13 +21,14 @@ export interface CodexHandlers {
   onPlayScene: (sceneId: string, tab: CodexTab) => void;
 }
 
-export type CodexTab = 'cards' | 'enemies' | 'items' | 'people' | 'scenes' | 'stats';
+export type CodexTab = 'cards' | 'enemies' | 'items' | 'people' | 'scenes' | 'abyss' | 'stats';
 const TABS: { id: CodexTab; label: string }[] = [
   { id: 'cards', label: '카드' },
   { id: 'enemies', label: '적' },
   { id: 'items', label: '유물·물약' },
   { id: 'people', label: '인물' },
   { id: 'scenes', label: '장면' },
+  { id: 'abyss', label: '심연' },
   { id: 'stats', label: '기록' },
 ];
 
@@ -180,32 +183,36 @@ function cardsTab(data: GameData, codex: Codex, owned?: Record<string, number>):
   const rank = (owner: string) => (order.includes(owner) ? order.indexOf(owner) : order.length);
   const owners = [...new Set(cards.map((c) => c.owner))].sort((a, b) => rank(a) - rank(b));
   const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'special'];
-  const tile = (def: CardDef) =>
-    def.id in codex.cards
-      ? h(
-          'div',
-          { class: 'deck-card codex-card zoomable', title: '눌러서 크게 보기', onclick: () => openCard(data, def, codex.cards[def.id]) },
-          cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: codex.cards[def.id] }),
-          owned
-            ? h(
-                'span',
-                { class: `codex-own${owned[def.id] !== undefined ? ' on' : ''}` },
-                owned[def.id] !== undefined ? `보유${owned[def.id] ? ` +${owned[def.id]}` : ''}` : '미보유',
-              )
-            : null,
-        )
-      : h('div', { class: `codex-card unknown rarity-${def.rarity}` }, h('span', {}, '?'));
+  const tile = (def: CardDef) => {
+    const have = owned?.[def.id];
+    if (!(def.id in codex.cards) && have === undefined) return h('div', { class: `codex-card unknown rarity-${def.rarity}` }, h('span', {}, '?'));
+    // 실물(보유: 보유 강화 단계) · 윤곽(본 적만 있음)
+    const real = !owned || have !== undefined;
+    const level = have ?? codex.cards[def.id] ?? 0;
+    return h(
+      'div',
+      { class: `deck-card codex-card zoomable${real ? '' : ' outline'}`, title: real ? '눌러서 크게 보기' : '본 적 있는 카드(윤곽) — 심연의 보상에 +0으로 나온다', onclick: () => openCard(data, def, Math.max(level, codex.cards[def.id] ?? 0)) },
+      cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: real ? level : 0 }),
+      owned ? h('span', { class: `codex-own${real ? ' on' : ''}` }, real ? `보유${have ? ` +${have}` : ''}` : '윤곽 · 본 적 있음') : null,
+    );
+  };
   return h(
     'div',
     {},
     owners.map((owner) => {
       const list = cards.filter((c) => c.owner === owner).sort((a, b) => rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity) || a.name.localeCompare(b.name, 'ko'));
-      const seen = list.filter((c) => c.id in codex.cards).length;
+      const seen = list.filter((c) => c.id in codex.cards || owned?.[c.id] !== undefined).length;
       const name = data.characters.get(owner)?.name ?? '공용';
       const have = owned ? list.filter((c) => owned[c.id] !== undefined).length : null;
-      return section(name, `${seen} / ${list.length}${have !== null ? ` · 이 저장에 보유 ${have}` : ''}`, h('div', { class: 'deck-cards' }, list.map(tile)));
+      return section(name, `${seen} / ${list.length}${have !== null ? ` · 보유 ${have}` : ''}`, h('div', { class: 'deck-cards' }, list.map(tile)));
     }),
-    h('p', { class: 'hint' }, `가지거나 보상·상점에서 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.${owned ? ' 아래 표시는 지금 저장의 보유 여부와 강화 단계.' : ''}`),
+    h(
+      'p',
+      { class: 'hint' },
+      owned
+        ? '칸은 세 단계: ? 모름 → 윤곽(보상·상점·사건에서 본 카드. 심연의 보상에 +0으로 나온다) → 실물(보유. 보유한 강화 단계로 심연에 나온다).'
+        : '가지거나 보상·상점에서 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.',
+    ),
   );
 }
 
@@ -347,6 +354,82 @@ function scenesTab(data: GameData, codex: Codex, onPlay: (id: string) => void): 
   );
 }
 
+/** 심연 탭(3차): 기록 · 굽이별 멈춘 횟수 · 일일 · 업적 · 틈의 카드 40칸 · 법칙·접사(만난 것만) */
+function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMeta): HTMLElement {
+  const src = unlockSource(data);
+  const open = unlockedRift(data, meta.achievements);
+  const rift = riftCards(data);
+  const order = [...data.characters.keys(), 'common'];
+  rift.sort((a, b) => order.indexOf(a.owner) - order.indexOf(b.owner) || ['rare', 'epic', 'legendary'].indexOf(a.rarity) - ['rare', 'epic', 'legendary'].indexOf(b.rarity));
+  const deaths = Object.entries(meta.deaths).sort((a, b) => Number(a[0]) - Number(b[0]));
+  const most = Math.max(1, ...deaths.map(([, n]) => n));
+  const daily = Object.entries(meta.daily).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 7);
+  const rows: [string, string | number][] = [
+    ['시작한 심연', profile.abyssRuns],
+    ['가장 깊이 넘은 굽이', profile.abyssBestDepth],
+    ['가장 높은 점수', profile.abyssBestScore],
+    ['열린 서약', `${oathMax(data, profile.abyssBestDepth, meta.oathCleared)} / ${data.oaths.length}단계`],
+    ['이룬 업적', `${meta.achievements.length} / ${data.achievements.size}`],
+  ];
+  const named = (glyph: string, name: string, text: string) => h('div', { class: 'codex-item' }, h('span', { class: 'relic-chip abyss-glyph' }, glyph), h('div', {}, h('b', {}, name), h('small', {}, text)));
+  const unknown = () => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???'), h('small', {}, '심연에서 만나면 적힌다')));
+  return h(
+    'div',
+    {},
+    section('기록', null, h('dl', { class: 'codex-stats' }, rows.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, String(v))]))),
+    section(
+      '굽이별 멈춘 횟수',
+      null,
+      deaths.length
+        ? h('div', { class: 'codex-progress' }, deaths.map(([d, n]) => h('div', {}, h('span', {}, `${d}굽이`), h('div', { class: 'bar' }, h('i', { style: `width:${(100 * n) / most}%` })), h('small', {}, `${n}번`))))
+        : h('p', { class: 'hint' }, '아직 멈춘 굽이가 없다.'),
+    ),
+    daily.length
+      ? section('오늘의 심연', `최근 ${daily.length}일`, h('dl', { class: 'codex-stats' }, daily.flatMap(([d, r]) => [h('dt', {}, `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6)}`), h('dd', {}, `${r.score}점 · ${r.cleared}굽이`)])))
+      : null,
+    section(
+      '틈의 카드',
+      `열림 ${open.length} / ${rift.length}`,
+      h(
+        'div',
+        { class: 'deck-cards' },
+        rift.map((def) => {
+          if (open.includes(def.id))
+            return h('div', { class: 'deck-card codex-card zoomable', title: '눌러서 크게 보기', onclick: () => openCard(data, def, 0) }, cardView(data, { uid: `codex_${def.id}`, cardId: def.id, level: 0 }));
+          const a = src.get(def.id);
+          return h(
+            'div',
+            { class: `codex-card unknown locked rarity-${def.rarity}` },
+            h('span', {}, '?'),
+            h('small', { class: 'codex-lock' }, h('b', {}, def.name), a ? ` — ${a.name}: ${a.description}` : ''),
+          );
+        }),
+      ),
+    ),
+    section(
+      '업적',
+      `${meta.achievements.length} / ${data.achievements.size}`,
+      h(
+        'ul',
+        { class: 'codex-achievements' },
+        [...data.achievements.values()].map((a) =>
+          h('li', { class: meta.achievements.includes(a.id) ? 'done' : '' }, h('b', {}, `${meta.achievements.includes(a.id) ? '✓ ' : ''}${a.name}`), h('small', {}, `${a.description} → ${unlockName(data, a)}`)),
+        ),
+      ),
+    ),
+    section(
+      '굽이의 법칙',
+      `${(codex.laws ?? []).length} / ${data.laws.size}`,
+      h('div', { class: 'codex-items' }, [...data.laws.values()].map((l) => ((codex.laws ?? []).includes(l.id) ? named(l.glyph, l.name, l.description) : unknown()))),
+    ),
+    section(
+      '접사',
+      `${(codex.affixes ?? []).length} / ${data.affixes.size}`,
+      h('div', { class: 'codex-items' }, [...data.affixes.values()].map((a) => ((codex.affixes ?? []).includes(a.id) ? named(a.glyph, a.name, a.description) : unknown()))),
+    ),
+  );
+}
+
 function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
   const rows: [string, string | number][] = [
     ['시작한 런', codex.stats.runs],
@@ -375,7 +458,15 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
 }
 
 /** owned: 지금 런의 보유 카드(지도에서 열었을 때) — 카드 칸에 보유 여부·강화 단계 */
-export function codexView(data: GameData, codex: Codex, profile: Profile, handlers: CodexHandlers, start: CodexTab = 'cards', owned?: Record<string, number>): HTMLElement {
+export function codexView(
+  data: GameData,
+  codex: Codex,
+  profile: Profile,
+  handlers: CodexHandlers,
+  start: CodexTab = 'cards',
+  owned?: Record<string, number>,
+  meta?: AbyssMeta,
+): HTMLElement {
   installTooltips();
   const prog = codexProgress(data, codex);
   const seen = prog.reduce((a, p) => a + p.seen, 0);
@@ -395,7 +486,9 @@ export function codexView(data: GameData, codex: Codex, profile: Profile, handle
               ? peopleTab(data, codex)
               : tab === 'scenes'
                 ? scenesTab(data, codex, (id) => handlers.onPlayScene(id, 'scenes'))
-                : statsTab(data, codex, profile);
+                : tab === 'abyss'
+                  ? abyssTab(data, codex, profile, meta ?? { achievements: [], deaths: {}, oathCleared: -1, daily: {} })
+                  : statsTab(data, codex, profile);
     body.replaceChildren(content);
     body.scrollTop = 0;
   };
@@ -406,7 +499,7 @@ export function codexView(data: GameData, codex: Codex, profile: Profile, handle
         'button',
         { class: 'codex-tab', role: 'tab', 'data-tab': t.id, onclick: () => select(t.id) },
         t.label,
-        p && t.id !== 'items' ? h('small', {}, `${p.seen}/${p.total}`) : null,
+        p && t.id !== 'items' ? h('small', {}, `${p.seen}/${p.total}`) : t.id === 'abyss' && meta ? h('small', {}, `${meta.achievements.length}/${data.achievements.size}`) : null,
       ),
     );
   }

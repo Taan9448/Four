@@ -18,7 +18,12 @@ import {
   injure,
   isAbyss,
   revealUnseenCard,
+  runOath,
   stageNorm,
+  trackBattle,
+  trackChoice,
+  trackLoopClear,
+  trackTick,
   type AbyssState,
 } from './abyss';
 
@@ -364,7 +369,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       scar: run.scar,
       startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
       manaRule: mana ?? own?.mana ?? stage.mana,
-      enemyHpScale: scale.hp * norm.hp,
+      // 서약 '두꺼운 살'
+      enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1),
       enemyDmgScale: scale.dmg * norm.dmg * shadow,
       relics: run.relics,
       potions: run.potions,
@@ -437,7 +443,11 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     // 심연 모듈(틈의 짐승 등)의 clearEffects만. 캠페인 모듈의 이야기 보상은 없다
     if (enc.module.stage === 'abyss') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
     out.push(...fireRunRelics(data, run, 'victory'));
-    if (enc.node.type === 'boss') run.status = 'stage_clear';
+    trackBattle(data, run, enc.module.id, enc.node.type, outcome.tally);
+    if (enc.node.type === 'boss') {
+      run.status = 'stage_clear';
+      trackLoopClear(data, run);
+    }
     return out;
   }
   // 하드코어: 전투가 끝날 때 쓰러져 있던 동료는 일행을 떠난다(하운은 쓰러지면 이미 패배)
@@ -657,12 +667,14 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
     out.push(...applyRunOps(data, run, o.effects, { pick }));
   }
   if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
+  if (isAbyss(run)) trackChoice(data, run, module, [...new Set(choice.effects.map((e) => e.op))]);
   return out;
 }
 
-/** 지금 굽이의 법칙들이 거는 런 배율(휴식 회복·골드). 법칙이 없으면 1 */
+/** 지금 굽이의 법칙들(과 서약)이 거는 런 배율(휴식 회복·골드). 없으면 1 */
 export function lawRunMul(data: GameData, run: RunState, key: 'restHealMul' | 'goldMul'): number {
-  return (run.abyss?.laws ?? []).reduce((m, id) => m * (data.laws.get(id)?.run[key] ?? 1), 1);
+  const oath = key === 'restHealMul' && run.abyss ? (runOath(data, run).restHealMul ?? 1) : 1;
+  return (run.abyss?.laws ?? []).reduce((m, id) => m * (data.laws.get(id)?.run[key] ?? 1), oath);
 }
 
 /** 선택지가 보유 카드 한 장을 사람에게 고르게 하는가(카드 바꾸기·팔기: pick은 카드 id) */
@@ -725,7 +737,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           const owners = new Set([...run.roster.map((r) => r.id), COMMON]);
           const pool = Object.keys(run.abyss!.pool)
             .map((id) => data.cards.get(id)!)
-            .filter((d) => owners.has(ownerKey(data, d)) && (!e.rarity || (e.rarity as string[]).includes(d.rarity)));
+            .filter((d) => owners.has(ownerKey(data, d)) && (!e.rarity || (e.rarity as string[]).includes(d.rarity)) && !(d.type === 'power' && runOath(data, run).noPowers));
           for (let i = 0; i < (e.count ?? 1) && pool.length; i++) out.push(abyssAddCard(data, run, rng.pick(pool).id));
           break;
         }
@@ -757,7 +769,9 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           run.deck = run.deck.filter((x) => x.uid !== c.uid);
           if (e.op === 'swap_card') {
             const owner = ownerKey(data, def);
-            const pool = Object.keys(run.abyss!.pool).filter((id) => id !== c.cardId && ownerKey(data, data.cards.get(id)!) === owner);
+            const pool = Object.keys(run.abyss!.pool).filter(
+              (id) => id !== c.cardId && ownerKey(data, data.cards.get(id)!) === owner && !(data.cards.get(id)!.type === 'power' && runOath(data, run).noPowers),
+            );
             if (pool.length) {
               const to = rng.pick(pool);
               abyssAddCard(data, run, to);
@@ -869,7 +883,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
           run.selected.push(def.id);
           run.abyss!.mates.push(def.id);
-          for (const id of abyssStarters(data, def.id, data.balance.abyss.starters.mate)) out.push(abyssAddCard(data, run, id));
+          for (const id of abyssStarters(data, def.id, data.balance.abyss.starters.mate, !!runOath(data, run).noPowers)) out.push(abyssAddCard(data, run, id));
           out.push(`${def.name} 합류`);
           break;
         }
@@ -937,6 +951,8 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         throw new Error(`전투 동작 "${e.op}"은 런 단위에서 쓸 수 없다`);
     }
   }
+  // 심연 업적 셈(가장 많았던 골드·상흔, 덱의 틈의 카드)
+  if (run.abyss) trackTick(data, run);
   return out;
 }
 

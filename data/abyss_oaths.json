@@ -1,0 +1,17 @@
+[
+  { "level": 1, "name": "두꺼운 살", "glyph": "厚", "description": "적의 체력이 10% 많다.", "mods": { "enemyHpMul": 1.1 } },
+  { "level": 2, "name": "빈 주머니", "glyph": "空", "description": "골드 없이 문을 넘는다(동료 수 덤은 그대로).", "mods": { "startGold": 0 } },
+  { "level": 3, "name": "얕은 잠", "glyph": "眠", "description": "휴식의 회복이 절반이다.", "mods": { "restHealMul": 0.5 } },
+  { "level": 4, "name": "좁은 눈", "glyph": "眼", "description": "전투 보상 카드가 2장만 나온다.", "mods": { "rewardChoices": 2 } },
+  { "level": 5, "name": "막아선 자", "glyph": "阻", "description": "굽이마다 6층이 엘리트다.", "mods": { "eliteFloor": 6 } },
+  { "level": 6, "name": "갈라진 하늘", "glyph": "裂", "description": "상흔 5를 지고 시작한다.", "mods": { "startScar": 5 } },
+  { "level": 7, "name": "첫 굽이의 법칙", "glyph": "法", "description": "1굽이부터 법칙이 하나 이상 붙는다.", "mods": { "lawsMin": 1 } },
+  { "level": 8, "name": "가벼운 짐", "glyph": "囊", "description": "물약 칸이 2개다.", "mods": { "potionSlots": 2 } },
+  { "level": 9, "name": "아물지 않는 상처", "glyph": "傷", "description": "굽이를 넘어도 부상이 낫지 않는다(휴식의 치료로만).", "mods": { "injuriesPersist": true } },
+  { "level": 10, "name": "가까운 숙적", "glyph": "仇", "description": "숙적이 3굽이마다 기다린다.", "mods": { "nemesisEvery": 3 } },
+  { "level": 11, "name": "겹친 이름", "glyph": "重", "description": "엘리트는 처음부터 접사를 2개 지닌다.", "mods": { "eliteAffixMin": 2 } },
+  { "level": 12, "name": "틈의 손", "glyph": "隙", "description": "전투 보상 후보에 틈의 카드가 반드시 한 장 섞인다. 고르지 않을 수는 있다.", "mods": { "riftInReward": true } },
+  { "level": 13, "name": "닫힌 마음", "glyph": "閉", "description": "심법(파워) 카드가 보상·상점·시작 덱에 나오지 않는다.", "mods": { "noPowers": true } },
+  { "level": 14, "name": "둘만의 길", "glyph": "二", "description": "동료는 한 명만 데려갈 수 있다.", "mods": { "maxMates": 1 } },
+  { "level": 15, "name": "하운의 맹세", "glyph": "誓", "description": "하운의 최대 체력이 50이다.", "mods": { "haunMaxHp": 50 } }
+]

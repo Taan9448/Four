@@ -2,7 +2,7 @@
 // 굽이(지도 하나)마다 세계·보스가 시드로 정해지고, 캠페인의 모듈·적·배경·마나 규칙을 그대로 쓴다.
 // 보상 풀은 이 저장 칸의 보유 카드 + 도감에 기록된 카드(본 적 있는 카드)와 열린 틈의 카드. 얻은 카드는 덱에만 들어간다(보유 목록과 무관).
 import type { GameData } from './data';
-import type { CardDef, ModuleDef, StageDef, World } from './schema';
+import type { AchievementDef, CardDef, ModuleDef, OathMods, StageDef, World } from './schema';
 import { createRng } from './rng';
 import { generateStageMap, type MapNode } from './route';
 import type { EnemyMod } from './effects';
@@ -39,6 +39,66 @@ export interface AbyssState {
   removals: number;
   /** 부상: 동료 id → 줄어든 최대 체력(다음 굽이에 돌아온다) */
   injuries: Record<string, number>;
+  /** 3차: 서약 단계(0~15), 일일 심연이면 날짜(yyyymmdd)와 그날 모든 굽이에 붙는 법칙 */
+  oath?: number;
+  daily?: string;
+  dailyLaws?: string[];
+  /** 업적 셈(이 런 안에서) */
+  track?: AbyssTrack;
+}
+
+/** 업적(data/abyss_achievements.json)을 재는 런 안의 셈 */
+export interface AbyssTrack {
+  startMates: number;
+  nemesisKills: number;
+  beastKills: number;
+  affixKills: number;
+  trades: number;
+  /** 상흔이 가장 높았을 때 쓰러뜨린 굽이 보스(그때 상흔), 하운 체력 비율이 가장 낮았을 때 쓰러뜨린 굽이 보스(그때 비율) */
+  bossScarMax: number;
+  bossLowHp: number;
+  /** 한 전투에서 터뜨린 결 노출의 최대 */
+  grainBattleMax: number;
+  /** 심법 카드를 낸 적이 있다 / 그 전까지 넘은 굽이 */
+  powerPlayed: boolean;
+  noPowerDepth: number;
+  /** 고른 선택지의 "모듈:동작" */
+  choiceOps: string[];
+  /** 넘은 굽이의 세계, 넘은 굽이에 걸렸던 법칙 수의 최대, 굽이를 넘을 때 부상 동료 수의 최대 */
+  worlds: World[];
+  lawsClearMax: number;
+  injuredClearMax: number;
+  /** 굽이를 넘을 때 덱 장수(굽이 번호 → 장수) */
+  deckAtClear: Record<string, number>;
+  riftInDeckMax: number;
+  maxGold: number;
+  maxScar: number;
+  /** 상흔 0으로 넘은 가장 깊은 굽이 */
+  scarZeroDepth: number;
+}
+
+export function emptyTrack(startMates: number): AbyssTrack {
+  return {
+    startMates,
+    nemesisKills: 0,
+    beastKills: 0,
+    affixKills: 0,
+    trades: 0,
+    bossScarMax: 0,
+    bossLowHp: 1,
+    grainBattleMax: 0,
+    powerPlayed: false,
+    noPowerDepth: 0,
+    choiceOps: [],
+    worlds: [],
+    lawsClearMax: 0,
+    injuredClearMax: 0,
+    deckAtClear: {},
+    riftInDeckMax: 0,
+    maxGold: 0,
+    maxScar: 0,
+    scarZeroDepth: 0,
+  };
 }
 
 export const isAbyss = (run: Pick<RunState, 'mode'>): boolean => run.mode === 'abyss';
@@ -49,18 +109,88 @@ export const loopSeed = (base: string, depth: number) => `${base}~d${depth}`;
 /** 심연의 길(시작 유물) 전체 */
 export const abyssPaths = (data: GameData) => [...data.relics.values()].filter((r) => r.rarity === 'path');
 
-/** 시드로 길 후보 balance.abyss.pathOffer개 */
-export function pathOffer(data: GameData, seed: string): string[] {
+/** 시드로 길 후보 balance.abyss.pathOffer개(열린 길 중에서. 생략하면 전부) */
+export function pathOffer(data: GameData, seed: string, unlocked?: string[]): string[] {
   const rng = createRng(seed).fork('abyss:paths');
   return rng
-    .shuffle(abyssPaths(data).map((r) => r.id))
+    .shuffle(abyssPaths(data).map((r) => r.id).filter((id) => !unlocked || unlocked.includes(id)))
     .slice(0, data.balance.abyss.pathOffer);
+}
+
+// ───────── 서약·해금·일일(3차) ─────────
+
+/** 서약 단계까지의 규칙(같은 키는 높은 단계가 이긴다) */
+export function oathMods(data: GameData, level: number): OathMods {
+  const out: OathMods = {};
+  for (const o of data.oaths) if (o.level <= level) Object.assign(out, o.mods);
+  return out;
+}
+
+/** 이 런의 서약 규칙 */
+export const runOath = (data: GameData, run: Pick<RunState, 'abyss'>): OathMods => oathMods(data, run.abyss?.oath ?? 0);
+
+/**
+ * 고를 수 있는 가장 높은 서약: 넘은 굽이 - depthOffset(5굽이 → 3단계), 또는 서약 L로 stepDepth굽이를 넘었으면 L+1.
+ * oathCleared: stepDepth굽이를 넘은 가장 높은 서약 단계(없으면 -1)
+ */
+export function oathMax(data: GameData, bestCleared: number, oathCleared = -1): number {
+  const cfg = data.balance.abyss.oath;
+  return Math.max(0, Math.min(data.oaths.length, Math.max(bestCleared - cfg.depthOffset, oathCleared + 1)));
+}
+
+/** 서약 단계의 점수 배율 */
+export const oathScoreMul = (data: GameData, level: number) => data.balance.abyss.oath.scoreMul ** level;
+
+/** 업적이 여는 것(틈의 카드·길) → 그 업적 */
+export function unlockSource(data: GameData): Map<string, AchievementDef> {
+  const out = new Map<string, AchievementDef>();
+  for (const a of data.achievements.values()) for (const id of [a.unlock.card, a.unlock.path]) if (id) out.set(id, a);
+  return out;
+}
+
+/** 열린 틈의 카드: 업적이 걸리지 않은 것(처음부터) + 이룬 업적이 연 것 */
+export function unlockedRift(data: GameData, achieved: readonly string[]): string[] {
+  const src = unlockSource(data);
+  return riftCards(data)
+    .filter((c) => !src.has(c.id) || achieved.includes(src.get(c.id)!.id))
+    .map((c) => c.id);
+}
+
+/** 열린 길 */
+export function unlockedPaths(data: GameData, achieved: readonly string[]): string[] {
+  const src = unlockSource(data);
+  return abyssPaths(data)
+    .filter((r) => !src.has(r.id) || achieved.includes(src.get(r.id)!.id))
+    .map((r) => r.id);
+}
+
+/** 일일 심연 시드: 그날 날짜(지역 시간) */
+export function dailySeed(date: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `D${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}`;
+}
+
+/** 일일 심연의 정해진 것: 동료·길·서약·그날의 법칙(모두 시드로, 해금과 상관없이) */
+export function dailyPlan(data: GameData, seed: string): { mates: string[]; paths: string[]; oath: number; laws: string[] } {
+  const cfg = data.balance.abyss.daily;
+  const rng = createRng(seed).fork('abyss:daily');
+  const fighters = [...data.characters.values()].filter((c) => c.role === 'fighter' && c.id !== 'haun').map((c) => c.id);
+  const oath = rng.int(cfg.oath[0], cfg.oath[1]);
+  const maxMates = oathMods(data, oath).maxMates ?? fighters.length;
+  const count = Math.min(maxMates, rng.int(cfg.mates[0], cfg.mates[1]));
+  const mates = rng.shuffle([...fighters]).slice(0, count);
+  const paths = pathOffer(data, seed).slice(0, pathPicks(data, count).picks);
+  const laws = rng.shuffle([...data.laws.keys()]).slice(0, cfg.laws);
+  return { mates, paths, oath, laws };
 }
 
 /** 동료 수(1~3)에 따른 고를 길 개수와 덤 골드 */
 export function pathPicks(data: GameData, mateCount: number): { picks: number; gold: number } {
   return data.balance.abyss.pathPicks[String(mateCount)] ?? { picks: 1, gold: 0 };
 }
+
+/** 서약 '닫힌 마음': 심법이 나오지 않는다 */
+const oathAllows = (data: GameData, run: Pick<RunState, 'abyss'>, def: CardDef | undefined) => !!def && !(def.type === 'power' && runOath(data, run).noPowers);
 
 /** 심연 보상에 나올 수 있는 카드인가(시작·보상 카드. 이야기·상태·틈의 카드 제외) */
 const poolable = (def: CardDef | undefined) => !!def && (def.pool === 'starter' || def.pool === 'reward') && !def.essential;
@@ -91,9 +221,9 @@ export function poolByOwner(data: GameData, pool: Record<string, number>): Recor
   return out;
 }
 
-/** 시작 덱의 한 주인 몫: 그 주인의 시작 카드에서 공격 절반(올림) + 나머지(데이터 순서, 결정적) */
-export function abyssStarters(data: GameData, owner: string, n: number): string[] {
-  const all = [...data.cards.values()].filter((d) => d.pool === 'starter' && ownerKey(data, d) === owner);
+/** 시작 덱의 한 주인 몫: 그 주인의 시작 카드에서 공격 절반(올림) + 나머지(데이터 순서, 결정적). noPowers면 심법을 뺀다 */
+export function abyssStarters(data: GameData, owner: string, n: number, noPowers = false): string[] {
+  const all = [...data.cards.values()].filter((d) => d.pool === 'starter' && ownerKey(data, d) === owner && !(noPowers && d.type === 'power'));
   const attacks = all.filter((d) => d.type === 'attack');
   const others = all.filter((d) => d.type !== 'attack');
   const pick = [...attacks.slice(0, Math.ceil(n / 2)), ...others.slice(0, n - Math.min(attacks.length, Math.ceil(n / 2)))];
@@ -114,15 +244,24 @@ export interface AbyssStart {
   pool: Record<string, number>;
   /** 열린 틈의 카드(생략하면 전부) */
   unlocked?: string[];
+  /** 열린 길(생략하면 전부) */
+  unlockedPaths?: string[];
+  /** 서약 단계(0~15) */
+  oath?: number;
+  /** 일일 심연: 날짜와 그날의 법칙 */
+  daily?: { date: string; laws: string[] };
 }
 
 /** 새 심연 런: 하운 + 동료, 시작 덱, 길(시작 유물), 1굽이 */
 export function createAbyssRun(data: GameData, seed: string, start: AbyssStart): RunState {
   const ab = data.balance.abyss;
+  const oath = Math.max(0, Math.min(data.oaths.length, start.oath ?? 0));
+  const mods = oathMods(data, oath);
   const mates = [...new Set(start.mates)].filter((id) => id !== 'haun' && data.characters.get(id)?.role === 'fighter');
-  if (mates.length < 1 || mates.length > ab.partyMax - 1) throw new Error(`심연 동료는 1~${ab.partyMax - 1}명`);
+  const mateMax = Math.min(ab.partyMax - 1, mods.maxMates ?? Infinity);
+  if (mates.length < 1 || mates.length > mateMax) throw new Error(`심연 동료는 1~${mateMax}명`);
   const picks = pathPicks(data, mates.length);
-  const offer = pathOffer(data, seed);
+  const offer = pathOffer(data, seed, start.daily ? undefined : start.unlockedPaths);
   const paths = [...new Set(start.paths)];
   if (paths.length !== picks.picks || !paths.every((p) => offer.includes(p))) throw new Error(`길은 후보 ${offer.join(', ')} 중 ${picks.picks}개`);
 
@@ -135,12 +274,15 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
   run.stageGains = [];
   run.roster = ['haun', ...mates].map((id) => {
     const def = data.characters.get(id)!;
-    return { id, hp: def.maxHp, maxHp: def.maxHp, level: 1, xp: 0 };
+    const max = id === 'haun' && mods.haunMaxHp ? mods.haunMaxHp : def.maxHp;
+    return { id, hp: max, maxHp: max, level: 1, xp: 0 };
   });
   run.selected = run.roster.map((r) => r.id);
   run.flags = [];
   run.stats = emptyStats();
-  run.gold = data.balance.economy.startGold + picks.gold;
+  run.gold = (mods.startGold ?? data.balance.economy.startGold) + picks.gold;
+  run.scar = mods.startScar ?? 0;
+  if (mods.potionSlots !== undefined) run.potions = Array.from({ length: mods.potionSlots }, () => null);
   run.abyss = {
     baseSeed: seed,
     depth: 0,
@@ -158,14 +300,20 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
     injuries: {},
     laws: [],
     beasts: 0,
+    oath,
+    daily: start.daily?.date,
+    dailyLaws: start.daily?.laws,
+    track: emptyTrack(mates.length),
   };
   const level = (id: string) => run.abyss!.pool[id] ?? 0;
+  const noPow = !!mods.noPowers;
   run.deck = [
-    ...abyssStarters(data, 'haun', ab.starters.haun),
-    ...abyssStarters(data, COMMON, ab.starters.common),
-    ...mates.flatMap((m) => abyssStarters(data, m, ab.starters.mate)),
+    ...abyssStarters(data, 'haun', ab.starters.haun, noPow),
+    ...abyssStarters(data, COMMON, ab.starters.common, noPow),
+    ...mates.flatMap((m) => abyssStarters(data, m, ab.starters.mate, noPow)),
   ].map((id) => instance(run, id, level(id)));
   for (const p of paths) gainRelic(data, run, p);
+  trackTick(data, run);
   beginLoop(data, run, 1);
   return run;
 }
@@ -173,13 +321,20 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
 /** 굽이 n의 세계와 보스(시드로). 숙적 굽이(5·10·15…)는 틈 세계의 모르데카이의 잔향 */
 export function planLoop(data: GameData, ab: AbyssState, depth: number): { world: World; boss: string; stageId: string; laws: string[] } {
   const cfg = data.balance.abyss;
+  const mods = oathMods(data, ab.oath ?? 0);
   const rng = createRng(ab.baseSeed).fork(`abyss:loop:${depth}`);
   const prev = ab.loops[ab.loops.length - 1];
-  const laws = createRng(ab.baseSeed)
-    .fork(`abyss:laws:${depth}`)
-    .shuffle([...data.laws.keys()])
-    .slice(0, scheduled(cfg.lawsAt, depth));
-  if (depth % cfg.nemesisEvery === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages), laws };
+  // 법칙: 굽이 표(서약 '첫 굽이의 법칙'이면 최소 lawsMin) + 일일 심연의 그날 법칙(모든 굽이에)
+  const fixed = ab.dailyLaws ?? [];
+  const count = Math.max(scheduled(cfg.lawsAt, depth), mods.lawsMin ?? 0);
+  const laws = [
+    ...fixed,
+    ...createRng(ab.baseSeed)
+      .fork(`abyss:laws:${depth}`)
+      .shuffle([...data.laws.keys()].filter((id) => !fixed.includes(id)))
+      .slice(0, count),
+  ];
+  if (depth % nemesisEvery(data, ab) === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages), laws };
   const all = Object.keys(cfg.worlds) as World[];
   let worlds = depth === 1 ? cfg.firstWorlds : all.filter((w) => w !== prev?.world && (w !== 'rift' || depth >= cfg.riftFrom));
   if (!worlds.length) worlds = all;
@@ -190,6 +345,9 @@ export function planLoop(data: GameData, ab: AbyssState, depth: number): { world
   const bosses = base.filter((b) => b !== prev?.boss);
   return { world, boss: rng.pick(bosses.length ? bosses : base), stageId: rng.pick(cfg.worlds[world].stages), laws };
 }
+
+/** 숙적 굽이 간격(서약 '가까운 숙적'이면 좁다) */
+export const nemesisEvery = (data: GameData, ab: Pick<AbyssState, 'oath'>) => oathMods(data, ab.oath ?? 0).nemesisEvery ?? data.balance.abyss.nemesisEvery;
 
 /** [이 굽이부터, 개수] 표에서 depth의 개수(가장 큰 시작 굽이가 이긴다) */
 export function scheduled(table: [number, number][], depth: number): number {
@@ -216,10 +374,13 @@ export function abyssEligible(data: GameData, world: World, roster: string[], mo
 }
 
 /** 굽이 지도의 스테이지 정의: 그 세계 스테이지를 바탕으로 층수·보스·노드 비율만 심연 것으로 */
-export function abyssStage(data: GameData, stageId: string, boss: string, pinned: { floor: number; module: string }[] = []): StageDef {
+export function abyssStage(data: GameData, stageId: string, boss: string, pinned: { floor: number; module: string }[] = [], oath = 0): StageDef {
   const cfg = data.balance.abyss;
   const source = data.stages.find((s) => s.id === stageId)!;
-  return { ...source, floors: cfg.floors, pinned, boss, typeWeights: cfg.typeWeights, forcedTypes: cfg.forcedTypes, templateEvents: true };
+  // 서약 '막아선 자': 한 층을 엘리트로
+  const elite = oathMods(data, oath).eliteFloor;
+  const forcedTypes = elite ? { ...cfg.forcedTypes, [String(elite)]: 'elite' as const } : cfg.forcedTypes;
+  return { ...source, floors: cfg.floors, pinned, boss, typeWeights: cfg.typeWeights, forcedTypes, templateEvents: true };
 }
 
 /**
@@ -232,7 +393,9 @@ function loopPins(data: GameData, run: RunState, depth: number): { floor: number
   const pins: { floor: number; module: string }[] = [];
   if (depth === cfg.eventDepth) {
     const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').length;
-    pins.push({ floor: cfg.eventFloor, module: fighters < cfg.partyMax ? cfg.rescueModule : cfg.echoModule });
+    // 서약 '둘만의 길'이면 자리가 없다
+    const cap = Math.min(cfg.partyMax, 1 + (runOath(data, run).maxMates ?? cfg.partyMax));
+    pins.push({ floor: cfg.eventFloor, module: fighters < cap ? cfg.rescueModule : cfg.echoModule });
   }
   if (Math.floor(run.scar / cfg.beastEvery) > (ab.beasts ?? 0)) {
     ab.beasts = (ab.beasts ?? 0) + 1;
@@ -259,7 +422,7 @@ export function beginLoop(data: GameData, run: RunState, depth: number): void {
   run.usedModules = [];
   run.shop = null;
   run.status = 'map';
-  const stage = abyssStage(data, plan.stageId, plan.boss, pinned);
+  const stage = abyssStage(data, plan.stageId, plan.boss, pinned, ab.oath ?? 0);
   const roster = run.roster.map((r) => r.id);
   run.map = generateStageMap(data, plan.stageId, createRng(run.seed).fork('map'), { scar: run.scar, flags: [], roster, usedModules: [] }, {
     stage,
@@ -290,7 +453,12 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
       if (def.traits.some((t) => t.status === 'knot')) traits.push({ status: 'knot', stacks: n >= cfg.nemesis.knotFrom ? cfg.nemesis.knotStacks : 1 });
       return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1) };
     }
-    const count = def.tier === 'elite' ? scheduled(cfg.affixesAt.elite, ab.depth) : def.tier === 'normal' ? scheduled(cfg.affixesAt.normal, ab.depth) : 0;
+    const count =
+      def.tier === 'elite'
+        ? Math.max(scheduled(cfg.affixesAt.elite, ab.depth), runOath(data, run).eliteAffixMin ?? 0)
+        : def.tier === 'normal'
+          ? scheduled(cfg.affixesAt.normal, ab.depth)
+          : 0;
     if (!count) return undefined;
     const pool = all.filter((a) => def.tier !== 'boss' || a.boss);
     return { affixes: rng.shuffle(pool.map((a) => a.id)).slice(0, count) };
@@ -301,11 +469,14 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
 export function advanceLoop(data: GameData, run: RunState): void {
   const ab = run.abyss!;
   if (run.status !== 'stage_clear') throw new Error('굽이 보스를 넘은 뒤에만 다음 굽이로 간다');
-  for (const [id, amount] of Object.entries(ab.injuries)) {
-    const r = run.roster.find((x) => x.id === id);
-    if (r) r.maxHp += amount;
+  // 서약 '아물지 않는 상처'면 부상이 그대로
+  if (!runOath(data, run).injuriesPersist) {
+    for (const [id, amount] of Object.entries(ab.injuries)) {
+      const r = run.roster.find((x) => x.id === id);
+      if (r) r.maxHp += amount;
+    }
+    ab.injuries = {};
   }
-  ab.injuries = {};
   for (const r of run.roster) r.hp = Math.min(r.maxHp, Math.max(1, r.hp) + Math.floor(r.maxHp * data.balance.abyss.healOnLoop));
   beginLoop(data, run, ab.depth + 1);
 }
@@ -356,7 +527,7 @@ export function abyssRewardOptions(data: GameData, run: RunState, nodeId: string
   const owners = new Set([...run.roster.map((r) => r.id), COMMON]);
   const fits = (id: string) => {
     const d = data.cards.get(id);
-    return !!d && owners.has(ownerKey(data, d)) && !powerInDeck(data, run, id);
+    return !!d && owners.has(ownerKey(data, d)) && !powerInDeck(data, run, id) && oathAllows(data, run, d);
   };
   const left = Object.keys(ab.pool).filter(fits).map((id) => data.cards.get(id)!);
   const rift = ab.unlocked.filter(fits).map((id) => data.cards.get(id)!);
@@ -364,8 +535,12 @@ export function abyssRewardOptions(data: GameData, run: RunState, nodeId: string
   const rng = createRng(run.seed).fork(`reward:${run.stageId}:${nodeId}`);
   const pool = rng.shuffle([...left]);
   const riftLeft = rng.shuffle([...rift]);
-  const n = run.relics.some((id) => data.relics.get(id)?.rule === 'needle') ? data.balance.abyss.needleRewardChoices : data.balance.rewards.cardChoices;
+  const mods = runOath(data, run);
+  const base = run.relics.some((id) => data.relics.get(id)?.rule === 'needle') ? data.balance.abyss.needleRewardChoices : data.balance.rewards.cardChoices;
+  const n = Math.min(base, mods.rewardChoices ?? base);
   const picked: string[] = [];
+  // 서약 '틈의 손': 틈의 카드 한 장은 반드시(첫 칸)
+  if (mods.riftInReward && riftLeft.length) picked.push(riftLeft.shift()!.id);
   while (picked.length < n && (pool.length || riftLeft.length)) {
     if (riftLeft.length && (rng.next() < data.balance.abyss.riftCardChance || !pool.length)) {
       picked.push(riftLeft.shift()!.id);
@@ -384,13 +559,13 @@ export function abyssShopPool(data: GameData, run: RunState): CardDef[] {
   const owners = new Set([...run.roster.map((r) => r.id), COMMON]);
   return Object.keys(run.abyss!.pool)
     .map((id) => data.cards.get(id)!)
-    .filter((d) => owners.has(ownerKey(data, d)) && !powerInDeck(data, run, d.id));
+    .filter((d) => owners.has(ownerKey(data, d)) && !powerInDeck(data, run, d.id) && oathAllows(data, run, d));
 }
 
 /** 상점의 틈의 카드 한 칸 후보 */
 export function abyssShopRift(data: GameData, run: RunState): CardDef[] {
   const owners = new Set([...run.roster.map((r) => r.id), COMMON]);
-  return run.abyss!.unlocked.map((id) => data.cards.get(id)!).filter((d) => d && owners.has(ownerKey(data, d)) && !powerInDeck(data, run, d.id));
+  return run.abyss!.unlocked.map((id) => data.cards.get(id)!).filter((d) => d && owners.has(ownerKey(data, d)) && !powerInDeck(data, run, d.id) && oathAllows(data, run, d));
 }
 
 /** 틈의 거래: 열린 틈의 카드 한 장(희귀 이상)을 덱에 */
@@ -470,9 +645,188 @@ export function abyssScore(data: GameData, run: RunState): number {
   const haun = run.roster.find((r) => r.id === 'haun');
   const cleared = ab.depth - (run.status === 'stage_clear' ? 0 : 1);
   const hp = haun && run.status !== 'defeat' ? haun.hp / haun.maxHp : 0;
-  return Math.round(cleared * s.depth + ab.bosses * s.boss + ab.elites * s.elite + hp * s.hp);
+  return Math.round((cleared * s.depth + ab.bosses * s.boss + ab.elites * s.elite + hp * s.hp) * oathScoreMul(data, ab.oath ?? 0));
+}
+
+/** 넘은 굽이 수 */
+export const abyssCleared = (run: RunState) => run.abyss!.depth - (run.status === 'stage_clear' ? 0 : 1);
+
+// ───────── 업적 셈(3차) ─────────
+
+const track = (run: RunState) => (run.abyss!.track ??= emptyTrack(run.abyss!.mates.length));
+
+/** 늘 재는 것: 가장 많았던 골드·상흔, 덱의 틈의 카드 수 */
+export function trackTick(data: GameData, run: RunState): void {
+  if (!run.abyss) return;
+  const t = track(run);
+  t.maxGold = Math.max(t.maxGold, run.gold);
+  t.maxScar = Math.max(t.maxScar, run.scar);
+  t.riftInDeckMax = Math.max(t.riftInDeckMax, run.deck.filter((c) => data.cards.get(c.cardId)?.pool === 'abyss').length);
+}
+
+/** 이긴 전투: 숙적·짐승·보스 처치, 접사 적 처치, 결 노출, 심법 */
+export function trackBattle(
+  data: GameData,
+  run: RunState,
+  moduleId: string,
+  nodeType: string,
+  tally: { affixKills?: number; grain?: number; cards: Record<string, number> } | undefined,
+): void {
+  const t = track(run);
+  const cfg = data.balance.abyss;
+  if (moduleId === cfg.nemesisModule) t.nemesisKills += 1;
+  if (moduleId === cfg.beastModule) t.beastKills += 1;
+  if (nodeType === 'boss') {
+    t.bossScarMax = Math.max(t.bossScarMax, run.scar);
+    const haun = run.roster.find((r) => r.id === 'haun');
+    if (haun) t.bossLowHp = Math.min(t.bossLowHp, haun.hp / haun.maxHp);
+  }
+  t.affixKills += tally?.affixKills ?? 0;
+  t.grainBattleMax = Math.max(t.grainBattleMax, tally?.grain ?? 0);
+  if (Object.keys(tally?.cards ?? {}).some((id) => data.cards.get(id)?.type === 'power')) t.powerPlayed = true;
+  trackTick(data, run);
+}
+
+/** 굽이를 넘었을 때(보스를 쓰러뜨린 직후) */
+export function trackLoopClear(data: GameData, run: RunState): void {
+  const ab = run.abyss!;
+  const t = track(run);
+  trackTick(data, run);
+  if (!t.worlds.includes(ab.world)) t.worlds.push(ab.world);
+  t.lawsClearMax = Math.max(t.lawsClearMax, ab.laws?.length ?? 0);
+  t.injuredClearMax = Math.max(t.injuredClearMax, Object.keys(ab.injuries).length);
+  t.deckAtClear[String(ab.depth)] = run.deck.length;
+  if (!t.powerPlayed) t.noPowerDepth = ab.depth;
+  if (t.maxScar === 0) t.scarZeroDepth = ab.depth;
+}
+
+/** 고른 선택지(틈의 거래 셈, "모듈:동작") */
+export function trackChoice(data: GameData, run: RunState, module: ModuleDef, ops: string[]): void {
+  const t = track(run);
+  if (module.tags.includes('trade') && ops.length) t.trades += 1;
+  for (const op of ops) if (!t.choiceOps.includes(`${module.id}:${op}`)) t.choiceOps.push(`${module.id}:${op}`);
+  trackTick(data, run);
+}
+
+/** 업적 하나를 이 런이 채웠는가. ctx: 런 밖의 것(도감 카드 수) */
+export function achievementMet(data: GameData, run: RunState, a: AchievementDef, ctx: { codexCards?: number } = {}): boolean {
+  const ab = run.abyss;
+  if (!ab) return false;
+  const t = track(run);
+  const c = a.check;
+  const cleared = abyssCleared(run);
+  switch (c.kind) {
+    case 'cleared':
+      return cleared >= c.n;
+    case 'nemesisKills':
+    case 'beastKills':
+    case 'affixKills':
+    case 'trades':
+      return t[c.kind] >= c.n;
+    case 'elites':
+      return ab.elites >= c.n;
+    case 'bosses':
+      return ab.bosses >= c.n;
+    case 'bossWithScar':
+      return t.bossScarMax >= c.n;
+    case 'lowHpBoss':
+      return t.bossLowHp <= c.n;
+    case 'injuredClear':
+      return t.injuredClearMax >= c.n;
+    case 'noPowerDepth':
+      return t.noPowerDepth >= c.n;
+    case 'grainBattle':
+      return t.grainBattleMax >= c.n;
+    case 'mates':
+      return t.startMates === c.mates && cleared >= c.n;
+    case 'withMate':
+      return run.roster.some((r) => r.id === c.mate) && cleared >= c.n;
+    case 'codexCards':
+      return (ctx.codexCards ?? 0) >= c.n;
+    case 'score':
+      return abyssScore(data, run) >= c.n;
+    case 'oath':
+      return (ab.oath ?? 0) >= (c.oath ?? 0) && cleared >= c.n;
+    case 'choice':
+      return t.choiceOps.includes(`${c.module}:${c.op}`);
+    case 'worlds':
+      return t.worlds.length >= c.n;
+    case 'lawsClear':
+      return t.lawsClearMax >= c.n;
+    case 'smallDeck':
+      return Object.entries(t.deckAtClear).some(([d, size]) => Number(d) >= (c.depth ?? 1) && size <= c.n);
+    case 'riftInDeck':
+      return t.riftInDeckMax >= c.n;
+    case 'gold':
+      return t.maxGold >= c.n;
+    case 'scarZeroDepth':
+      return t.scarZeroDepth >= c.n;
+  }
+}
+
+/** 이 런이 채운 업적 중 아직 이루지 않은 것 */
+export function newAchievements(data: GameData, run: RunState, achieved: readonly string[], ctx: { codexCards?: number } = {}): AchievementDef[] {
+  return [...data.achievements.values()].filter((a) => !achieved.includes(a.id) && achievementMet(data, run, a, ctx));
 }
 
 /** 굽이 이름: "심연 3굽이 · 엘하임" */
 export const WORLD_NAME: Record<World, string> = { murim: '무림', elheim: '엘하임', nocturna: '마왕성', rift: '세계의 틈' };
 export const loopLabel = (ab: AbyssState) => `심연 ${ab.depth}굽이 · ${WORLD_NAME[ab.world]}`;
+
+// ───────── 심연 기록(저장 칸과 상관없이 브라우저에 하나, 3차) ─────────
+
+export interface AbyssMeta {
+  /** 이룬 업적 id(틈의 카드·길이 열린다) */
+  achievements: string[];
+  /** 굽이 번호 → 그 굽이에서 멈춘 횟수 */
+  deaths: Record<string, number>;
+  /** balance.abyss.oath.stepDepth굽이를 넘은 가장 높은 서약 단계(-1: 없음) */
+  oathCleared: number;
+  /** 일일 심연: 날짜(yyyymmdd) → 그날 최고 기록 */
+  daily: Record<string, { score: number; cleared: number; ended: boolean }>;
+}
+
+export const emptyAbyssMeta = (): AbyssMeta => ({ achievements: [], deaths: {}, oathCleared: -1, daily: {} });
+
+/** 깨졌거나 옛 기록도 받아 준다. 데이터에 없는 업적은 버린다 */
+export function parseAbyssMeta(data: GameData, text: string | null): AbyssMeta {
+  const m = emptyAbyssMeta();
+  if (!text) return m;
+  try {
+    const raw = JSON.parse(text) as Partial<AbyssMeta>;
+    m.achievements = Array.isArray(raw.achievements) ? [...new Set(raw.achievements.filter((id) => typeof id === 'string' && data.achievements.has(id)))] : [];
+    for (const [d, n] of Object.entries(raw.deaths ?? {})) if (Number(n) > 0) m.deaths[d] = Number(n);
+    m.oathCleared = Number.isFinite(Number(raw.oathCleared)) ? Math.max(-1, Number(raw.oathCleared)) : -1;
+    for (const [d, r] of Object.entries(raw.daily ?? {}))
+      if (r && typeof r === 'object') m.daily[d] = { score: Number(r.score) || 0, cleared: Number(r.cleared) || 0, ended: !!r.ended };
+  } catch {
+    /* 깨진 기록: 빈 기록 */
+  }
+  return m;
+}
+
+/**
+ * 굽이를 넘었을 때(ended false)·런이 끝났을 때(ended true) 기록을 갱신한다: 새 업적, 서약 단계, 멈춘 굽이, 일일 기록.
+ * 새로 이룬 업적을 돌려준다
+ */
+export function updateAbyssMeta(data: GameData, meta: AbyssMeta, run: RunState, opts: { ended: boolean; codexCards?: number }): AchievementDef[] {
+  const ab = run.abyss!;
+  const fresh = newAchievements(data, run, meta.achievements, { codexCards: opts.codexCards });
+  meta.achievements.push(...fresh.map((a) => a.id));
+  const cleared = abyssCleared(run);
+  if (cleared >= data.balance.abyss.oath.stepDepth) meta.oathCleared = Math.max(meta.oathCleared, ab.oath ?? 0);
+  if (opts.ended) meta.deaths[String(ab.depth)] = (meta.deaths[String(ab.depth)] ?? 0) + 1;
+  if (ab.daily) {
+    const score = abyssScore(data, run);
+    const prev = meta.daily[ab.daily];
+    if (!prev || score >= prev.score) meta.daily[ab.daily] = { score, cleared, ended: opts.ended };
+  }
+  return fresh;
+}
+
+/** 업적이 여는 것의 이름(틈의 카드 또는 길) */
+export function unlockName(data: GameData, a: AchievementDef): string {
+  if (a.unlock.card) return `틈의 카드 「${data.cards.get(a.unlock.card)?.name ?? a.unlock.card}」`;
+  if (a.unlock.path) return `${data.relics.get(a.unlock.path)?.name ?? a.unlock.path}`;
+  return '';
+}

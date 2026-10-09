@@ -1,0 +1,27 @@
+id: ui_scroll_rod
+type: ui-slices
+summary: >-
+  the wooden roller of an old East Asian handscroll (map scroll), drawn standing upright, cut into three pieces so the game can stretch
+  it to any height — a lacquered dark-wood rod with the cream paper of the scroll wound tightly around it and ornamental end knobs
+frame_notes:
+  1: >-
+    TOP END of the roller, standing upright and centered horizontally in the cell: a round end knob (finial) of dark red-brown lacquered
+    wood with a thin worn gold-bronze cap ring, seen straight from the side, sitting on top of the rod. Below the knob the rod begins:
+    a vertical cylinder about 128 px wide (a quarter of the cell width) wrapped in several turns of cream-beige hanji paper with a thin dark brocade edge band, and it
+    runs straight down and out through the BOTTOM edge of the cell at full width, cut perfectly flat by the cell edge.
+  2: >-
+    MIDDLE of the roller: only the straight vertical cylinder of wound cream-beige paper (same width, same colors, same position as in
+    cells 1 and 3), filling the cell from the very top edge to the very bottom edge. It must tile seamlessly when stacked vertically:
+    no knob, no ring, no tie, no change along its length except soft paper fibers and subtle horizontal-free shading. Lit from the left,
+    a soft highlight running down the left third and a darker rounded shadow on the right side so it reads as a round cylinder.
+  3: >-
+    BOTTOM END of the roller: the same cylinder enters from the TOP edge of the cell at full width (cut flat by the cell edge), then ends
+    in a matching round dark lacquered wood end knob with a thin worn gold-bronze cap ring at the bottom, mirror image of cell 1.
+framing: >-
+  All three pieces share exactly the same horizontal center, the same rod width and the same lighting, so cell 1 + cell 2 (repeated)
+  + cell 3 stacked vertically form one continuous roller. The rod is narrow (about a quarter of the cell width); the rest of the cell
+  is flat key color. Straight side view, no perspective tilt, no cast shadow.
+style: >-
+  refined painterly game UI ornament matching an East Asian ink-and-wash parchment map: warm natural wood and lacquer browns, aged
+  cream paper, small touches of worn gold; soft realistic shading, not pixel art, no outlines heavier than 2 px
+placeholder: { color: '#8a5a2b' }

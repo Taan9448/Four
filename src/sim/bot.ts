@@ -471,13 +471,13 @@ export interface AbyssReport {
 export function playAbyss(
   data: GameData,
   seed: string,
-  start: { mates: string[]; pool: Record<string, number> },
+  start: { mates: string[]; pool: Record<string, number>; oath?: number; unlocked?: string[] },
   opts: BotOptions = DEFAULT_BOT,
   maxDepth = 20,
 ): AbyssReport {
   const n = pathPicks(data, start.mates.length).picks;
   const offer = pathOffer(data, seed).sort((a, b) => PATH_ORDER.indexOf(a) - PATH_ORDER.indexOf(b));
-  const run = createAbyssRun(data, seed, { mates: start.mates, paths: offer.slice(0, n), pool: start.pool });
+  const run = createAbyssRun(data, seed, { mates: start.mates, paths: offer.slice(0, n), pool: start.pool, oath: start.oath, unlocked: start.unlocked });
   const battles: BattleRecord[] = [];
   let diedAt: string | null = null;
   let diedModule: string | null = null;
