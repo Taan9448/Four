@@ -158,6 +158,20 @@ export function upgradeOwned(data: GameData, run: RunState, cardId: string): boo
   return true;
 }
 
+/** 카드를 얻으면 어떻게 되는가(보상·상점 표시): 새 카드 / 보유 카드 강화 / 최대 강화라 골드 */
+export type AcquirePreview =
+  | { kind: 'new'; level: 0 }
+  | { kind: 'upgrade'; from: number; level: number }
+  | { kind: 'maxed'; level: number; gold: number };
+
+export function acquirePreview(data: GameData, run: RunState, cardId: string): AcquirePreview {
+  const def = data.cards.get(cardId);
+  const lv = run.collection[cardId];
+  if (lv === undefined) return { kind: 'new', level: 0 };
+  if (def?.upgrade && lv < data.balance.upgrade.maxLevel) return { kind: 'upgrade', from: lv, level: lv + 1 };
+  return { kind: 'maxed', level: lv, gold: data.balance.loadout.maxedGold };
+}
+
 /**
  * 카드를 얻는다(보상·상점·이벤트·이야기). 처음이면 보유 목록과 이번 스테이지 덱에, 이미 있으면 +1 강화(덱에 없으면 이번 스테이지 덱에도),
  * 최대 강화면 골드. 결과 문구

@@ -6,7 +6,7 @@ import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
 import type { CardInstance } from '../engine/state';
-import { cardView } from './card-view';
+import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
 import { goldChip, potionChip, relicChip } from './items';
 import { openOverlay } from './overlay';
@@ -64,7 +64,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
         'div',
         { class: 'shop-cards' },
         shop.cards.map((item, i) => {
-          const el = cardView(data, item.cardId);
+          const el = item.sold ? cardView(data, item.cardId) : offerCardView(data, run, item.cardId);
           return h(
             'div',
             { class: `shop-item${item.sold ? ' sold' : ''}` },

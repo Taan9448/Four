@@ -114,6 +114,7 @@
     "shadowEliteDmg": 1.2,
     "needleRewardChoices": 2,
     "unseenCardPrice": 40,
+    "narrowPool": 15,
     "worlds": {
       "murim": { "stages": ["s6", "s7", "s8"], "bosses": ["s6_boss_full_moon", "s7_boss_blood_hand", "abyss_boss_sa_echo"] },
       "elheim": { "stages": ["s1", "s2", "s3", "s4"], "bosses": ["s1_boss_veilak", "s2_boss_ignis", "s3_boss_celias", "s4_boss_gormon"] },

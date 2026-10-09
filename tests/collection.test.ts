@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   acquireCard,
+  acquirePreview,
   COMMON,
   loadoutOwners,
   loadoutProblems,
@@ -44,8 +45,11 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     const run = createRun(data, 'COL3');
     setLoadout(data, run, run.loadout);
     const card = [...data.cards.values()].find((c) => c.pool === 'reward' && c.owner === 'haun' && c.upgrade)!;
+    // 보상·상점 표시(acquirePreview)는 실제 결과와 같다
+    expect(acquirePreview(data, run, card.id)).toEqual({ kind: 'new', level: 0 });
     acquireCard(data, run, card.id);
     expect(run.collection[card.id]).toBe(0);
+    expect(acquirePreview(data, run, card.id)).toEqual({ kind: 'upgrade', from: 0, level: 1 });
     expect(run.stageGains).toContain(card.id);
     expect(deckIds(run).filter((id) => id === card.id)).toHaveLength(1);
     acquireCard(data, run, card.id);
@@ -53,6 +57,7 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     expect(run.deck.find((c) => c.cardId === card.id)!.level).toBe(1);
     expect(deckIds(run).filter((id) => id === card.id)).toHaveLength(1);
     run.collection[card.id] = data.balance.upgrade.maxLevel;
+    expect(acquirePreview(data, run, card.id)).toEqual({ kind: 'maxed', level: data.balance.upgrade.maxLevel, gold: data.balance.loadout.maxedGold });
     const gold = run.gold;
     acquireCard(data, run, card.id);
     expect(run.gold).toBe(gold + data.balance.loadout.maxedGold);
