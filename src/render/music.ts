@@ -2,7 +2,7 @@
 // 곡마다 박자·음계·화성 진행·악기 구성을 두고, 마디마다 선율을 곡 이름 + 마디 번호로 정한 의사 난수로 만든다
 // (같은 곡은 늘 같은 선율 — 엔진의 시드 RNG와는 상관없는 연출용).
 
-export type Mood = 'title' | 'murim' | 'elheim' | 'nocturna' | 'rift' | 'battle' | 'boss';
+export type Mood = 'title' | 'murim' | 'elheim' | 'nocturna' | 'rift' | 'battle' | 'boss' | 'ending';
 
 /** 악기: pluck 고쟁(뜯는 현) · harp 하프 · bell 종 · pad 깔린 화음 · bass 낮은 현 · drum 큰북 · hat 작은 북 · drone 낮은 울림 · glass 유리 소리 */
 export type Voice = 'pluck' | 'harp' | 'bell' | 'pad' | 'bass' | 'drum' | 'hat' | 'drone' | 'glass';
@@ -58,6 +58,8 @@ export const TRACKS: Record<Mood, Track> = {
   battle: { mood: 'battle', bpm: 118, beatsPerBar: 4, root: 57, scale: PENTA_MINOR, progression: [0, 0, 3, 4], lead: 'pluck', density: 8, rest: 0.25, backing: 'battle', gain: 1 },
   // 보스: 더 빠르고 낮게, 화성 단음계
   boss: { mood: 'boss', bpm: 132, beatsPerBar: 4, root: 52, scale: HARMONIC_MINOR, progression: [0, 5, 3, 4], lead: 'pluck', density: 8, rest: 0.2, backing: 'boss', gain: 1 },
+  // 엔딩: 느리고 밝은 오음계, 하프 반주(파일 assets/audio/bgm/ending.ogg가 있으면 그것)
+  ending: { mood: 'ending', bpm: 60, beatsPerBar: 4, root: 60, scale: [0, 2, 4, 7, 9], progression: [0, 3, 4, 0], lead: 'bell', density: 3, rest: 0.4, backing: 'harp', gain: 2.2 },
 };
 
 /** 곡 이름 + 마디 번호로 정하는 의사 난수(mulberry32) */

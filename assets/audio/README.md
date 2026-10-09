@@ -1,6 +1,6 @@
 # 소리 파일 자리(assets/audio)
 
-배경음악 7곡 전부와 효과음 16개는 opengameart.org의 CC0 음원 파일이다(아래 '출처' 표). 파일이 없는 효과음 5개(`status`, `rift`, `relic`, `down`, `transform`)는 브라우저에서 합성한 소리를 그대로 쓴다. 합성하는 코드는 `src/render/audio.ts`, 곡의 악보는 `src/render/music.ts`에 있다.
+배경음악 8곡 전부와 효과음 22개는 opengameart.org의 CC0 음원 파일이다(아래 '출처' 표). 파일이 없는 효과음 4개(`status`, `rift`, `down`, `transform`)는 브라우저에서 합성한 소리를 그대로 쓴다. 합성하는 코드는 `src/render/audio.ts`, 곡의 악보는 `src/render/music.ts`에 있다.
 이 폴더에 아래 이름으로 파일을 넣으면, 그 곡이나 소리만 합성 대신 그 파일로 바뀐다. 다른 코드는 고치지 않아도 된다. 파일을 지우면 다시 합성 소리로 돌아간다.
 
 - 파일 형식: `.ogg`, `.mp3`, `.wav`
@@ -12,13 +12,14 @@
 
 | 곡 | 언제 |
 |---|---|
-| `title` | 시작 화면 · 도감 · 클리어 지도 · 엔딩 |
+| `title` | 시작 화면 · 도감 · 클리어 지도 · 패배 화면 |
 | `murim` | 무림 스테이지 지도·장면(S0 청운산, S6~S8) |
 | `elheim` | 엘하임 스테이지(S1~S4) |
 | `nocturna` | 마왕성 노크투르나(S5) |
 | `rift` | 세계의 틈(S9) |
 | `battle` | 일반·정예 전투 |
 | `boss` | 보스 전투 |
+| `ending` | 엔딩 장면 · 엔딩 화면 |
 
 ## 효과음 — `assets/audio/sfx/<이름>.ogg`
 
@@ -42,13 +43,18 @@
 | `coin` | 골드를 얻거나 상점에서 삼 |
 | `down` | 쓰러짐 |
 | `transform` | 보스 변신 |
+| `cutin` | 컷인(필살기·합격기 연출) |
+| `power` | 상시 효과(파워) 카드가 걸림 |
+| `summon` | 적이 졸개를 부름 |
+| `enrage` | 적이 격노함 |
+| `discard` | 카드를 버림 |
 | `levelup` | 레벨 업 |
 | `victory` | 전투 승리 |
 | `defeat` | 전투 패배 |
 
 ## 출처
 
-모두 opengameart.org에서 받았고, 각 페이지의 License 칸이 CC0(퍼블릭 도메인)인 것만 골랐다. 2026-10-08에 확인했다. (freepd.com은 2025년에 문을 닫아 쓰지 못했다.)
+모두 opengameart.org에서 받았고, 각 페이지의 License 칸이 CC0(퍼블릭 도메인)인 것만 골랐다. 2026-10-08(엔딩 곡·효과음 6개는 2026-10-09)에 확인했다. (freepd.com은 2025년에 문을 닫아 쓰지 못했다.)
 받은 원본은 ffmpeg로 손질했다: 배경음악은 Vorbis 96kbps 스테레오, 통합 음량 −18 LUFS로 맞췄다. 효과음은 Vorbis 모노로, 앞뒤 무음을 자르고 끝을 짧게 페이드아웃한 뒤 최대 음량을 약 −3 dBFS(버튼 `click`은 −9 dBFS)로 맞췄다.
 
 ### 배경음악
@@ -62,6 +68,7 @@
 | `bgm/rift.ogg` | Whispers From Beyond(JRPG Music Pack #3 [Evil]) · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/jrpg-pack-3-evil | CC0 |
 | `bgm/battle.ogg` | Battle Theme A · cynicmusic | https://opengameart.org/content/battle-theme-a | CC0 — 앞 0.35초 페이드인과 끝 잔향을 잘라 반복이 끊기지 않게 했다 |
 | `bgm/boss.ogg` | Epic Boss Battle [Seamlessly Looping] · Juhani Junkala(SubspaceAudio) | https://opengameart.org/content/boss-battle-music | CC0 |
+| `bgm/ending.ogg` | Ending Scene(orchestral) · nene | https://opengameart.org/content/ending-scene | CC0 |
 
 ### 효과음
 
@@ -83,5 +90,11 @@
 | `sfx/levelup.ogg` | Level Up.mp3(7 Assorted Sound Effects) · Joth(앞 3.2초) | https://opengameart.org/content/7-assorted-sound-effects-menu-level-up | CC0 |
 | `sfx/victory.ogg` | Medieval: Victory Theme · RandomMind(앞 3.2초, 끝 1초 페이드아웃 — 전투 뒤 장소 곡과 겹치지 않게) | https://opengameart.org/content/medieval-victory-theme | CC0 |
 | `sfx/defeat.ogg` | Medieval: Defeat Theme · RandomMind(앞 8.6초) | https://opengameart.org/content/medieval-defeat-theme | CC0 |
+| `sfx/cutin.ogg` | battle/sword-unsheathe.wav(RPG Sound Pack) · artisticdude | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/power.ogg` | battle/magic1.wav(RPG Sound Pack) · artisticdude(−6 dBFS) | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/summon.ogg` | NPC/shade/shade5.wav(RPG Sound Pack) · artisticdude | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/enrage.ogg` | NPC/gutteral beast/mnstr2.wav(RPG Sound Pack) · artisticdude | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/discard.ogg` | inventory/cloth.wav(RPG Sound Pack) · artisticdude(−6 dBFS) | https://opengameart.org/content/rpg-sound-pack | CC0 |
+| `sfx/relic.ogg` | inventory/metal-ringing.wav(RPG Sound Pack) · artisticdude(−6 dBFS) | https://opengameart.org/content/rpg-sound-pack | CC0 |
 
-합성 소리 그대로인 효과음: `status`, `rift`, `relic`, `down`, `transform` — 짧고 자주 나거나(`status`, `rift`, `relic`) 쓰러지는 몸·보스 변신에 맞는 CC0 소리를 찾지 못해 남겨 두었다.
+합성 소리 그대로인 효과음: `status`, `rift`, `down`, `transform` — 짧고 자주 나거나(`status`, `rift`) 쓰러지는 몸·보스 변신에 맞는 CC0 소리를 찾지 못해 남겨 두었다.
