@@ -3,6 +3,7 @@ import type { GameData } from '../../src/engine/data';
 import { playableStages } from '../../src/engine/run';
 import { BOT_STYLE_NAME, type RunReport } from '../../src/sim/bot';
 import type { CampaignBatch } from './shared';
+import { outside, TARGETS, warningSection } from './warnings';
 
 const TYPE_ORDER: Record<string, number> = { battle: 0, elite: 1, story: 2, boss: 3 };
 const pct = (n: number, d: number) => (d ? `${Math.round((n / d) * 100)}%` : '-');
@@ -25,6 +26,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   lines.push('봇은 한 수 앞만 보는 탐욕 봇이라 사람보다 약하다. 절대 승률보다 **스테이지·전투 사이의 상대적인 어려움**을 본다. 목표는 `docs/GAME_DESIGN.md` 12절.');
   lines.push(`대표값은 ${names.join('·')} 표본을 합친 값(= 두 성향의 평균). 한 성향에게만 쉬운 곳은 성향별 칸에서 갈린다.`);
   lines.push('');
+  lines.push(...campaignWarnings(data, runs, stages.map((x) => x.id)));
   lines.push('## 요약');
   lines.push('');
   lines.push(`- 완주(에필로그까지): **${wins(runs)}/${runs.length} (${pct(wins(runs), runs.length)})** — ${batches.map((b) => `${BOT_STYLE_NAME[b.style]} ${pct(wins(b.runs), b.runs.length)}`).join(' · ')}`);
@@ -81,4 +83,32 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   }
   lines.push('');
   return lines.join('\n');
+}
+
+/** 목표 밖: 완주율, 일반 전투 패배, 엘리트 패배(3~7%), 스테이지별 보스 패배 상한. 표본이 30번 미만인 전투는 보지 않는다 */
+function campaignWarnings(data: GameData, runs: RunReport[], stageIds: string[]): string[] {
+  const t = TARGETS.campaign;
+  const ws: (string | null)[] = [];
+  if (runs.every((r) => r.stageEntry[0]?.stageId === 's0')) ws.push(outside('완주', runs.filter((r) => r.result === 'complete').length / runs.length, t.complete[0], t.complete[1]));
+  const byModule = new Map<string, RunReport['battles']>();
+  for (const b of runs.flatMap((r) => r.battles)) byModule.set(b.moduleId, [...(byModule.get(b.moduleId) ?? []), b]);
+  const order = (id: string) => stageIds.indexOf(data.modules.get(id)?.stage ?? '');
+  // 너무 쉬운 엘리트(목표 하한 아래)는 한 줄로 모은다(위험하지 않아 이름만)
+  const easy: string[] = [];
+  for (const [id, bs] of [...byModule].sort((a, b) => order(a[0]) - order(b[0]))) {
+    if (bs.length < 30) continue;
+    const rate = bs.filter((b) => b.result === 'defeat').length / bs.length;
+    const name = `${data.modules.get(id)?.name ?? id} (${bs[0].type})`;
+    if (bs[0].type === 'battle') ws.push(outside(name, rate, null, t.battleDefeatMax));
+    else if (bs[0].type === 'elite') {
+      ws.push(outside(name, rate, null, t.eliteDefeat[1]));
+      if (rate < t.eliteDefeat[0]) easy.push(data.modules.get(id)?.name ?? id);
+    }
+    else if (bs[0].type === 'boss') {
+      const max = (t.bossDefeatMax as Record<string, number>)[bs[0].stageId];
+      if (max !== undefined) ws.push(outside(name, rate, null, max));
+    }
+  }
+  if (easy.length) ws.push(`엘리트 ${easy.length}곳이 목표 하한 ${Math.round(t.eliteDefeat[0] * 100)}% 아래: ${easy.join(' · ')}`);
+  return warningSection(ws);
 }

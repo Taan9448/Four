@@ -3,6 +3,7 @@ import type { GameData } from '../../src/engine/data';
 import { abyssPool, unlockedRift } from '../../src/engine/abyss';
 import { BOT_STYLE_NAME, playAbyss, type AbyssReport, type BotOptions } from '../../src/sim/bot';
 import type { AbyssBatch } from './shared';
+import { outside, TARGETS, warningSection } from './warnings';
 
 /** 봇용 풀: narrow = 캠페인 한 번 마친 저장 어림(시작 카드 + 보상 카드 절반, +0~1), wide = 전부 본 저장(+2) */
 export function botPool(data: GameData, kind: 'narrow' | 'wide'): Record<string, number> {
@@ -53,6 +54,25 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   lines.push(`봇 ${batches.map((b) => BOT_STYLE_NAME[b.style]).join(' · ')}(\`src/sim/bot.ts\` BOT_STYLES)의 표본을 합친 값 = 두 성향의 평균. 성향별 숫자는 아래 '봇 성향별'.`);
   lines.push('목표(GAME_DESIGN 16절): 도달 굽이 중앙값 4, 8굽이 10%, 12굽이 1%. 동료 수별 중앙값 차이 1굽이 안. 풀이 좁아도 4굽이.');
   lines.push('');
+  // 경고: 숙적 비중 · 5굽이·15굽이 도달 · 넓은 풀 중앙값 · 평균 덱 · 서약이 앞 단계보다 쉬운지
+  const t = TARGETS.abyss;
+  const bossDeaths = runs.filter((r) => r.result === 'defeat' && r.diedAt === 'boss');
+  const nemesis = bossDeaths.filter((r) => r.diedModule === data.balance.abyss.nemesisModule).length;
+  const ws: (string | null)[] = [
+    bossDeaths.length ? outside('숙적이 차지하는 보스 패배 비중', nemesis / bossDeaths.length, null, t.nemesisShareMax) : null,
+    outside('5굽이 도달', runs.filter((r) => r.depth >= 5).length / runs.length, t.reach5[0], t.reach5[1]),
+    outside(`${maxDepth}굽이 도달`, runs.filter((r) => r.depth >= maxDepth).length / runs.length, null, t.reach15Max),
+    outside('넓은 풀 도달 중앙값', median(runs.filter((r) => r.pool === 'wide').map((r) => r.depth)), null, t.wideMedianMax, (x) => `${x}굽이`),
+    outside('평균 덱', runs.reduce((a, r) => a + r.deckSize, 0) / runs.length, t.deck[0], t.deck[1], (x) => `${x.toFixed(0)}장`),
+  ];
+  oathRuns.forEach(({ oath, rs }, i) => {
+    if (!i) return;
+    const prev = oathRuns[i - 1];
+    const a = median(prev.rs.map((r) => r.depth));
+    const b = median(rs.map((r) => r.depth));
+    if (b > a) ws.push(`서약 ${oath}단계가 ${prev.oath}단계보다 쉽다(도달 중앙값 ${b} > ${a}) — 단계마다 같거나 어려워야 한다`);
+  });
+  lines.push(...warningSection(ws));
   lines.push('## 봇 성향별');
   lines.push('');
   lines.push('| 성향 | 런 | 도달 중앙값 | 상위 10% | 5굽이 | 8굽이 | 평균 덱 |');
