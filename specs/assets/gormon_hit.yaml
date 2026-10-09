@@ -1,0 +1,14 @@
+id: gormon_hit
+type: character-anim
+size: large
+character: gormon
+chroma: magenta
+summary: 대지의 거인 고르몬 피격 3프레임
+depends_on: [gormon_ref]
+reference: assets/source/gormon_ref.png
+facing: left
+frame_notes:
+  1: "struck, a chunk of rock breaking off the shoulder"
+  2: "recoils, the body shuddering, dust pouring"
+  3: "stones roll back into place, the lava eyes glaring"
+placeholder: { shape: boss, color: '#5b4a3f', accent: '#ff8a5c' }

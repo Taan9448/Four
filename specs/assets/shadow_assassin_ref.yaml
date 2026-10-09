@@ -1,0 +1,11 @@
+id: shadow_assassin_ref
+type: character-ref
+size: large
+character: shadow_assassin
+chroma: green
+summary: 그림자 암살자 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a faceless thin elongated figure of shadow, only the black dagger in its hand is solid, the blade engraved with wave-like letters"
+  2: "full body, side view facing left, same proportions, the dagger held low"
+placeholder: { shape: humanoid, color: '#15121c', accent: '#8a90a3' }

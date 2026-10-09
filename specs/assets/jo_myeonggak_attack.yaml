@@ -1,0 +1,18 @@
+id: jo_myeonggak_attack
+type: character-anim
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: 조명각 쇠갈고리 채찍 6프레임
+depends_on: [jo_myeonggak_ref]
+reference: assets/source/jo_myeonggak_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the whip back over the shoulder"
+  2: "the whip uncoils behind him"
+  3: "steps forward, the arm swinging"
+  4: "the iron-hook whip lashes out to the left at full length, a dark red crack of qi at the tip"
+  5: "the whip snaps back"
+  6: "recoils the whip into a coil, standing again"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

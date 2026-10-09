@@ -1,0 +1,11 @@
+id: celias_ref
+type: character-ref
+size: large
+character: celias
+chroma: magenta
+summary: 빙결의 여왕 셀리아스 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a tall woman made of gathered snowflakes and translucent ice, hair of long icicles, a calm sculpted expressionless face, a long gown of frost"
+  2: "full body, side view facing left, same proportions, one hand lowered, the icicle hair hanging straight"
+placeholder: { shape: boss, color: '#bfe0f0', accent: '#4fb4ff' }

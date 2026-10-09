@@ -1,0 +1,11 @@
+id: black_wind_captain_ref
+type: character-ref
+size: large
+character: black_wind_captain
+chroma: magenta
+summary: 흑풍대주 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a lean man in black martial robes, three scars across the face, a curved saber, black wind swirling around the left palm"
+  2: "full body, side view facing left, same proportions, saber held low"
+placeholder: { shape: humanoid, color: '#3a3038', accent: '#8a90a3' }

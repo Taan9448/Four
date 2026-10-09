@@ -1,0 +1,11 @@
+id: poison_hand_ref
+type: character-ref
+size: large
+character: poison_hand
+chroma: magenta
+summary: 독수마군 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a gaunt man in a dark green cult robe, long poisoned blue-green fingernails, green veins on the wrists"
+  2: "full body, side view facing left, same proportions, poisoned hands raised like claws"
+placeholder: { shape: humanoid, color: '#2a5a5a', accent: '#6aa84f' }

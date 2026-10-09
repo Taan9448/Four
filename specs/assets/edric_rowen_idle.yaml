@@ -1,0 +1,15 @@
+id: edric_rowen_idle
+type: character-anim
+size: large
+character: edric_rowen
+chroma: magenta
+summary: 에드릭 로웬 대기 4프레임
+depends_on: [edric_rowen_ref]
+reference: assets/source/edric_rowen_ref.png
+facing: left
+frame_notes:
+  1: "stands at guard, sword lowered, frost drifting"
+  2: "the blue light in the eyes brightens"
+  3: "shifts the shield slightly"
+  4: "settles back to guard"
+placeholder: { shape: humanoid, color: '#7fb6d6', accent: '#4fb4ff' }

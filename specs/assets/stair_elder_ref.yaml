@@ -1,0 +1,11 @@
+id: stair_elder_ref
+type: character-ref
+size: large
+character: stair_elder
+chroma: green
+summary: 계단의 장로 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, an old man with a long grey beard in a crimson elder's robe, blood-red glowing palms"
+  2: "full body, side view facing left, same proportions, one palm raised"
+placeholder: { shape: humanoid, color: '#6a1a22', accent: '#ff3b3b' }

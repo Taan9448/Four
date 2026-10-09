@@ -1,0 +1,18 @@
+id: edric_rowen_attack
+type: character-anim
+size: large
+character: edric_rowen
+chroma: magenta
+summary: 에드릭 로웬 로웬의 검 6프레임
+depends_on: [edric_rowen_ref]
+reference: assets/source/edric_rowen_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the ice sword over the shoulder"
+  2: "steps forward, shield up"
+  3: "the sword at its peak, blue mana glowing along the blade"
+  4: "a heavy diagonal slash down to the left, a burst of frost"
+  5: "follows through, the blade low"
+  6: "returns to guard"
+placeholder: { shape: humanoid, color: '#7fb6d6', accent: '#4fb4ff' }

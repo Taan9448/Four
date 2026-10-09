@@ -1,0 +1,11 @@
+id: chain_overseer_ref
+type: character-ref
+size: large
+character: chain_overseer
+chroma: magenta
+summary: 사슬 감독관 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a tall empty black armor, red lights inside the helmet, a heavy glowing iron chain wrapped around one forearm and hanging to the ground"
+  2: "full body, side view facing left, same proportions, the chain coiled in both hands"
+placeholder: { shape: humanoid, color: '#5a4442', accent: '#f2a93b' }

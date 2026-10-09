@@ -1,0 +1,11 @@
+id: vein_golem_ref
+type: character-ref
+size: large
+character: vein_golem
+chroma: green
+summary: 용암 핏줄 골렘 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a hulking rock golem covered in glowing lava veins, long heavy arms, a blocky head with a burning crack"
+  2: "full body, side view facing left, same proportions, arms hanging to the knees"
+placeholder: { shape: humanoid, color: '#7a3b2a', accent: '#ff8a5c' }

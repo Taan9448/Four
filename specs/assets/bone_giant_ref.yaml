@@ -1,0 +1,11 @@
+id: bone_giant_ref
+type: character-ref
+size: large
+character: bone_giant
+chroma: green
+summary: 뼈 거인 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a hunched giant of pale bones, a cage-like ribcage, dark crimson qi flowing between the bones, red light in the skull sockets"
+  2: "full body, side view facing left, same proportions, long bone arms hanging"
+placeholder: { shape: boss, color: '#d8d0bc', accent: '#a02634' }

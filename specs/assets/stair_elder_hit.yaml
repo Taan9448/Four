@@ -1,0 +1,14 @@
+id: stair_elder_hit
+type: character-anim
+size: large
+character: stair_elder
+chroma: green
+summary: 계단의 장로 피격 3프레임
+depends_on: [stair_elder_ref]
+reference: assets/source/stair_elder_ref.png
+facing: left
+frame_notes:
+  1: "struck, the beard flying"
+  2: "recoils a step, robe whipping"
+  3: "steadies, palm raised"
+placeholder: { shape: humanoid, color: '#6a1a22', accent: '#ff3b3b' }

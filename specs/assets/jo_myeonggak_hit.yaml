@@ -1,0 +1,14 @@
+id: jo_myeonggak_hit
+type: character-anim
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: 조명각 피격 3프레임
+depends_on: [jo_myeonggak_ref]
+reference: assets/source/jo_myeonggak_ref.png
+facing: left
+frame_notes:
+  1: "struck, head snapping to the side"
+  2: "recoils a step, the white robe whipping"
+  3: "recovers, glaring, whip raised"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

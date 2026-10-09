@@ -1,0 +1,15 @@
+id: torn_border_idle
+type: character-anim
+size: large
+character: torn_border
+chroma: green
+summary: 찢긴 경계 대기 4프레임
+depends_on: [torn_border_ref]
+reference: assets/source/torn_border_ref.png
+facing: left
+frame_notes:
+  1: "the flows inside swirl slowly"
+  2: "the ragged rim ripples outward a little"
+  3: "loose threads lift and wave"
+  4: "the tear settles back"
+placeholder: { shape: object, color: '#4b3a6b', accent: '#dff4ff' }

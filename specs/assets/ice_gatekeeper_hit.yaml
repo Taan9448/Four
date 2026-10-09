@@ -1,0 +1,14 @@
+id: ice_gatekeeper_hit
+type: character-anim
+size: large
+character: ice_gatekeeper
+chroma: magenta
+summary: 얼음 궁전의 문지기 피격 3프레임
+depends_on: [ice_gatekeeper_ref]
+reference: assets/source/ice_gatekeeper_ref.png
+facing: left
+frame_notes:
+  1: "struck on the shield, frost cracking"
+  2: "slides back a step, ice chips flying"
+  3: "braces behind the shield again"
+placeholder: { shape: humanoid, color: '#8ab4cc', accent: '#dff4ff' }

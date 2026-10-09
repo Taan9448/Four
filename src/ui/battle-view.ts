@@ -223,7 +223,12 @@ export class BattleView {
       return (outfit && spriteSource(outfit) === 'sprites' ? outfit : pick(def.sprites)) ?? null;
     }
     const def = this.data.enemies.get(c.defId);
-    return def?.sprite ? `${def.sprite}_${anim === 'skill' ? 'attack' : anim}` : null;
+    if (!def?.sprite) return null;
+    // 물체형 적(문·경계)은 공격 그림이 없다. 대기 그림만 실제로 들어왔으면 임시 그림 대신 대기 그림을 이어 쓴다
+    const id = `${def.sprite}_${anim === 'skill' ? 'attack' : anim}`;
+    const idle = `${def.sprite}_idle`;
+    if (!spriteSource(id) || (spriteSource(idle) === 'sprites' && spriteSource(id) !== 'sprites')) return idle;
+    return id;
   }
 
   private makeUnit(c: Combatant): Unit {

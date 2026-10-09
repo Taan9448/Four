@@ -1,0 +1,14 @@
+id: obsidian_door_hit
+type: character-anim
+size: large
+character: obsidian_door
+chroma: green
+summary: 쐐기 박힌 흑요석 문 피격 3프레임
+depends_on: [obsidian_door_ref]
+reference: assets/source/obsidian_door_ref.png
+facing: left
+frame_notes:
+  1: "struck, a crack running across the obsidian"
+  2: "the wedges shudder, the haze flaring"
+  3: "the crack seals back"
+placeholder: { shape: object, color: '#1b1724', accent: '#4b3a6b' }

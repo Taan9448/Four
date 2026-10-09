@@ -1,0 +1,14 @@
+id: vein_golem_hit
+type: character-anim
+size: large
+character: vein_golem
+chroma: green
+summary: 용암 핏줄 골렘 피격 3프레임
+depends_on: [vein_golem_ref]
+reference: assets/source/vein_golem_ref.png
+facing: left
+frame_notes:
+  1: "struck, a chunk of rock flying, lava spurting"
+  2: "recoils, the veins flickering"
+  3: "the crack fills with lava, steadying"
+placeholder: { shape: humanoid, color: '#7a3b2a', accent: '#ff8a5c' }

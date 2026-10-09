@@ -1,0 +1,18 @@
+id: ice_gatekeeper_attack
+type: character-anim
+size: large
+character: ice_gatekeeper
+chroma: magenta
+summary: 얼음 궁전의 문지기 얼음 창 찌르기 6프레임
+depends_on: [ice_gatekeeper_ref]
+reference: assets/source/ice_gatekeeper_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the spear above the shield"
+  2: "steps forward behind the shield"
+  3: "draws the spear back"
+  4: "thrusts the ice spear forward to the left past the shield, a burst of frost"
+  5: "pulls the spear back"
+  6: "returns to guard behind the shield"
+placeholder: { shape: humanoid, color: '#8ab4cc', accent: '#dff4ff' }
