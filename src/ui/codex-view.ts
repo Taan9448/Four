@@ -2,6 +2,7 @@
 // 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 기록
 import { codexCards, codexPeople, codexProgress, type Codex } from '../engine/codex';
 import type { GameData } from '../engine/data';
+import { intentBadges } from '../engine/battle';
 import type { CardDef, EnemyDef } from '../engine/schema';
 import { frameUrl } from '../render/assets';
 import { loadPortrait } from '../render/portrait';
@@ -71,7 +72,7 @@ function openCard(data: GameData, def: CardDef, best: number): void {
 }
 
 /** 적: 만나기만 했으면 그림과 이름, 이겼으면 체력·약점·특성·기술까지 */
-function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: number }): void {
+function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: number }, seenMoves: string[]): void {
   const url = e.sprite ? frameUrl(`${e.sprite}_idle`, 1, { realOnly: true }) : null;
   const known = rec.defeated > 0;
   const list = (xs: string[]) => xs.map((x) => ELEMENT_LABEL[x] ?? x).join(' · ');
@@ -97,9 +98,22 @@ function openEnemy(data: GameData, e: EnemyDef, rec: { seen: number; defeated: n
           ['내성', known ? list(e.resist) : ''],
           ['특성', known ? e.traits.map((t) => `${data.statuses.get(t.status)?.name ?? t.status} ${t.stacks}`).join(' · ') : ''],
         ]),
-        known
-          ? h('div', { class: 'zoom-moves' }, h('h4', {}, '쓰는 기술'), h('ul', {}, e.moves.map((m) => h('li', {}, h('b', {}, m.name), h('small', {}, INTENT_LABEL[m.intent] ?? m.intent)))))
-          : h('p', { class: 'hint' }, '한 번 이기면 체력·약점·쓰는 기술을 알게 된다.'),
+        // 쓰는 기술: 전투에서 본 기술만 이름과 하는 일이 적힌다(GAME_DESIGN 14절)
+        h(
+          'div',
+          { class: 'zoom-moves' },
+          h('h4', {}, `쓰는 기술 ${e.moves.filter((m) => seenMoves.includes(m.id)).length} / ${e.moves.length}`),
+          h(
+            'ul',
+            {},
+            e.moves.map((m) =>
+              seenMoves.includes(m.id)
+                ? h('li', {}, h('b', {}, m.name), h('small', {}, [INTENT_LABEL[m.intent] ?? m.intent, ...moveSummary(data, m)].join(' · ')))
+                : h('li', { class: 'unseen' }, h('b', {}, '???'), h('small', {}, '아직 보지 못한 기술')),
+            ),
+          ),
+        ),
+        known ? null : h('p', { class: 'hint' }, '한 번 이기면 체력·약점·특성을 알게 된다.'),
       ),
     ),
     { wide: true },
@@ -222,7 +236,7 @@ function enemiesTab(data: GameData, codex: Codex): HTMLElement {
             ].filter(Boolean);
             return h(
               'div',
-              { class: `codex-enemy zoomable tier-${e.tier}${rec.defeated ? ' defeated' : ''}`, title: '눌러서 자세히', onclick: () => openEnemy(data, e, rec) },
+              { class: `codex-enemy zoomable tier-${e.tier}${rec.defeated ? ' defeated' : ''}`, title: '눌러서 자세히', onclick: () => openEnemy(data, e, rec, codex.moves[e.id] ?? []) },
               h(
                 'div',
                 { class: 'codex-pic', style: e.color ? `--sil:${e.color}` : '' },
@@ -411,4 +425,11 @@ export function codexView(data: GameData, codex: Codex, profile: Profile, handle
   );
   select(start);
   return root;
+}
+
+/** 적 기술 한 줄: 피해(×횟수, 전체)와 그 밖의 핵심 수치 */
+function moveSummary(data: GameData, m: EnemyDef['moves'][number]): string[] {
+  const out: string[] = [];
+  for (const e of m.effects) if (e.op === 'damage') out.push(`피해 ${e.amount ?? 0}${(e.times ?? 1) > 1 ? `×${e.times}` : ''}${e.target === 'all_enemies' ? ' 전체' : ''}`);
+  return [...out, ...intentBadges(data, m.effects)];
 }

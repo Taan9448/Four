@@ -32,6 +32,7 @@ import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } fro
 import { claimLoot, rollLoot } from '../engine/economy';
 import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
+import { relicChip } from './items';
 import { h } from './dom';
 import { initDebug } from './debug';
 import { mapView, openPartyGuide, placeName } from './map-view';
@@ -493,7 +494,7 @@ export class App {
         const outcome = battleOutcome(final)!;
         // 전투가 끝나면 장소의 곡으로(지면 엔딩 화면이 멈춘다)
         playBgm(outcome.result === 'victory' ? moodFor(stage.world) : null);
-        this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory'));
+        this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory', final.tally?.moves));
         this.clearMessages = applyBattleOutcome(data, run, enc, outcome);
         if (run.status === 'defeat') return this.map();
         // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다
@@ -638,6 +639,46 @@ export class App {
     );
   }
 
+  /** 결과 화면 통계: 전투·턴·처치·피해·치명타·균열 폭주, 많이 쓴 카드 5장, 패배 원인, 마지막 파티·유물·덱 */
+  private runStats(run: RunState, win: boolean): HTMLElement {
+    const st = run.stats;
+    const top = Object.entries(st?.cards ?? {})
+      .filter(([id]) => data.cards.get(id)?.type !== 'status')
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    const cell = (label: string, value: string | number) => h('div', { class: 'rs-cell' }, h('b', {}, String(value)), h('small', {}, label));
+    return h(
+      'div',
+      { class: 'run-stats panel' },
+      h(
+        'div',
+        { class: 'rs-grid' },
+        cell('전투', st?.battles ?? 0),
+        cell('턴', st?.turns ?? 0),
+        cell('처치', st?.kills ?? 0),
+        cell('준 피해', (st?.damage ?? 0).toLocaleString('ko-KR')),
+        cell('치명타', st?.crits ?? 0),
+        cell('균열 폭주', st?.surges ?? 0),
+      ),
+      !win && st?.deathCause ? h('p', { class: 'rs-death' }, `쓰러진 곳: ${st.deathCause}`) : null,
+      top.length
+        ? h(
+            'div',
+            { class: 'rs-top' },
+            h('h3', {}, '많이 쓴 카드'),
+            h('ol', {}, top.map(([id, n]) => h('li', {}, h('span', {}, data.cards.get(id)?.name ?? id), h('small', {}, `${n}번`)))),
+          )
+        : null,
+      h(
+        'div',
+        { class: 'rs-party' },
+        run.roster.map((r) => h('span', { class: 'chip' }, `${data.characters.get(r.id)?.name ?? r.id} Lv${r.level}`)),
+        run.relics.length ? h('span', { class: 'rs-relics' }, run.relics.map((id) => relicChip(data, id))) : null,
+        h('button', { class: 'btn btn-small', onclick: () => openDeck(data, '마지막 덱', [{ label: `덱 ${run.deck.length}장`, cards: run.deck }]) }, '마지막 덱 보기'),
+      ),
+    );
+  }
+
   private end(win: boolean): void {
     const run = this.run!;
     playBgm(win ? 'title' : null);
@@ -664,6 +705,7 @@ export class App {
                   : '하운이 쓰러졌다.',
             ),
             h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`),
+            this.runStats(run, win),
             finale && readProfile().clears === 1 && this.persist ? h('p', { class: 'end-unlock' }, '새 런에서 난이도(어려움)와 하드코어를 고를 수 있게 되었다.') : null,
             h(
               'div',
@@ -683,6 +725,26 @@ export class App {
                   )
                 : null,
               h('button', { class: `btn btn-large${finale || run.replayOf ? '' : ' btn-primary'}`, onclick: () => this.title() }, finale || run.replayOf ? '타이틀로' : '새 런'),
+              // 같은 시드로 처음부터(같은 지도·같은 보상), 다른 사람에게 줄 시드 복사
+              !run.replayOf
+                ? h(
+                    'button',
+                    { class: 'btn btn-large', onclick: () => this.start(run.seed, run.supportActive, undefined, this.slot, { difficulty: run.difficulty, hardcore: run.hardcore }) },
+                    '같은 시드로 다시',
+                  )
+                : null,
+              h(
+                'button',
+                {
+                  class: 'btn btn-large',
+                  onclick: (e: Event) => {
+                    const btn = e.currentTarget as HTMLButtonElement;
+                    const done = () => (btn.textContent = `복사됨: ${run.seed}`);
+                    navigator.clipboard?.writeText(run.seed).then(done, () => (btn.textContent = `시드: ${run.seed}`)) ?? (btn.textContent = `시드: ${run.seed}`);
+                  },
+                },
+                '시드 복사',
+              ),
             ),
           ),
         ),

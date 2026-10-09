@@ -113,6 +113,43 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
   }
 }
 
+/** 키워드 풀이(카드 용어 주석) */
+export const KEYWORD_HELP: Record<string, string> = {
+  exhaust: '소멸 — 쓰면 이번 전투에서는 덱으로 돌아오지 않는다.',
+  retain: '유지 — 턴이 끝나도 손에 남는다.',
+  innate: '선천 — 전투 첫 손패에 늘 들어온다.',
+  fusion: '융합 — 내공과 마나를 함께 써서 균열이 오른다(하운만).',
+  thread: '실 — 꿰맬 자리에 들어가는 유일한 피해.',
+  unplayable: '사용 불가 — 낼 수 없다.',
+};
+
+/** 카드 용어 주석: 키워드·심법·이 카드가 다루는 상태와 속성의 풀이 */
+export function cardGlossary(data: GameData, inst: CardInstance | string): string[] {
+  const card = resolveCard(data, inst);
+  const out: string[] = [];
+  for (const k of card.keywords) if (KEYWORD_HELP[k]) out.push(KEYWORD_HELP[k]);
+  if (card.def.type === 'power') out.push('심법 — 한 번 쓰면 소멸하고, 지속 효과가 전투가 끝날 때까지 남는다.');
+  const statuses = new Set<string>();
+  const elements = new Set<string>();
+  for (const e of card.effects) {
+    if (e.status) statuses.add(e.status);
+    if (e.op === 'reveal_grain') statuses.add('grain');
+    if (e.op === 'taunt') statuses.add('taunt');
+    if (e.scale?.status) statuses.add(e.scale.status);
+    if (e.condition?.targetHasStatus) statuses.add(e.condition.targetHasStatus);
+    if (e.element) elements.add(e.element);
+  }
+  for (const el of elements) {
+    const rider = data.balance.elements[el as 'fire' | 'ice'];
+    statuses.add(rider.status);
+  }
+  for (const id of statuses) {
+    const st = data.statuses.get(id);
+    if (st && !st.triggers.length) out.push(`${st.name} — ${st.description}`);
+  }
+  return out;
+}
+
 const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실' };
 
 /** 특수 스킬(+4·+5) 한 줄: 추가 효과·키워드 변화·비용 변화 */

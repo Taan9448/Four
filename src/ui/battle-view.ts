@@ -469,10 +469,19 @@ export class BattleView {
     const dmg = d ? `${d.perHit}${d.times > 1 ? `×${d.times}` : ''}` : '';
     const skip = hasSkipTurn(s, enemy);
     u.intent.classList.toggle('skipped', skip);
-    u.intent.append(intentIcon(view.intent.kind), h('span', {}, view.intent.name), dmg ? h('b', {}, dmg) : '', d?.element ? elementMark(d.element) : '', d?.all ? h('span', { class: 'intent-target' }, '전체') : target ? h('span', { class: 'intent-target' }, `→ ${target.name}`) : '');
+    u.intent.append(
+      intentIcon(view.intent.kind),
+      h('span', {}, view.intent.name),
+      dmg ? h('b', {}, dmg) : '',
+      d?.element ? elementMark(d.element) : '',
+      // 공격 말고 하는 일의 핵심 수치(방어·강화·약화·카드·소환)
+      ...view.badges.map((b) => h('span', { class: `intent-badge intent-badge-${view.intent.kind}` }, b)),
+      d?.all ? h('span', { class: 'intent-target' }, '전체') : target ? h('span', { class: 'intent-target' }, `→ ${target.name}`) : '',
+    );
     const body = [
       `${INTENT_LABEL[view.intent.kind] ?? ''}${d ? ` · 1회 ${d.perHit}${d.times > 1 ? ` × ${d.times}회` : ''}${d.all ? ' · 아군 전체' : ''}` : ''}`,
       d?.element ? `${ELEMENT_LABEL[d.element]} 공격: 맞으면 ${this.data.statuses.get(this.data.balance.elements[d.element].status)?.name} ${this.data.balance.elements[d.element].stacks}` : '',
+      view.badges.length ? `그 밖에: ${view.badges.join(' · ')}` : '',
       target && !d?.all ? `노리는 대상: ${target.name}` : '',
       skip ? '움직이지 못해 이번 차례에는 행동하지 않는다.' : '',
     ].filter(Boolean);

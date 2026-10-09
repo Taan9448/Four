@@ -113,6 +113,8 @@ export interface BattleState {
   enemyDmgScale?: number;
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
+  /** 결과 화면용 전투 집계(처치·준 피해·치명타·균열 폭주·쓴 카드·하운을 마지막으로 때린 것) */
+  tally?: BattleTally;
   /** cardPlayed 유물의 every 셈(유물 id → 맞는 카드 수) */
   relicCounters?: Record<string, number>;
   /** 이번 턴에 낸 카드 수(scale per cardsPlayed: 이 카드 전까지) */
@@ -121,6 +123,17 @@ export interface BattleState {
   triggerDepth?: number;
   /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
   noCrit?: boolean;
+}
+
+export interface BattleTally {
+  kills: number;
+  damage: number;
+  crits: number;
+  surges: number;
+  cards: Record<string, number>;
+  haunHitBy?: string;
+  /** 적 id → 이 전투에서 쓴 행동 id(도감에 적는다) */
+  moves?: Record<string, string[]>;
 }
 
 export interface ResolvedCard {

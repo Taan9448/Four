@@ -22,11 +22,13 @@ export interface Codex {
   /** 동료(characters)·장면 화자(speakers) id */
   people: string[];
   scenes: string[];
+  /** 적 id → 본 행동 id(GAME_DESIGN 14절: 본 기술만 도감에 적힌다) */
+  moves: Record<string, string[]>;
   stats: CodexStats;
 }
 
 export function emptyCodex(): Codex {
-  return { cards: {}, enemies: {}, relics: [], potions: [], people: [], scenes: [], stats: { runs: 0, victories: 0, defeats: 0, kills: 0 } };
+  return { cards: {}, enemies: {}, relics: [], potions: [], people: [], scenes: [], moves: {}, stats: { runs: 0, victories: 0, defeats: 0, kills: 0 } };
 }
 
 const addTo = (list: string[], id: string) => {
@@ -52,6 +54,10 @@ export function parseCodex(data: GameData, text: string | null): Codex {
   c.potions = keep(raw.potions, (id) => data.potions.has(id));
   c.people = keep(raw.people, (id) => data.characters.has(id) || data.speakers.has(id));
   c.scenes = keep(raw.scenes, (id) => data.scenes.has(id));
+  for (const [id, ms] of Object.entries(raw.moves ?? {})) {
+    const def = data.enemies.get(id);
+    if (def) c.moves[id] = keep(ms, (m) => def.moves.some((x) => x.id === m));
+  }
   for (const k of Object.keys(c.stats) as (keyof CodexStats)[]) c.stats[k] = Math.max(0, Number(raw.stats?.[k]) || 0);
   return c;
 }
@@ -95,7 +101,8 @@ export function noteEnemiesSeen(codex: Codex, enemyIds: readonly string[]): Code
  * 전투가 끝났을 때. victory면 그 전투의 적(변신한 모습·불려 나온 적 포함)을 이긴 것으로 센다.
  * 끝에서 처음 보는 적(변신·소환)도 만난 것으로 적는다
  */
-export function noteBattleEnd(codex: Codex, enemyIds: readonly string[], victory: boolean): Codex {
+export function noteBattleEnd(codex: Codex, enemyIds: readonly string[], victory: boolean, moves: Record<string, string[]> = {}): Codex {
+  for (const [id, ms] of Object.entries(moves)) for (const m of ms) addTo((codex.moves[id] ??= []), m);
   for (const id of new Set(enemyIds)) {
     const e = (codex.enemies[id] ??= { seen: 1, defeated: 0 });
     if (victory) e.defeated += 1;

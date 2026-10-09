@@ -1,7 +1,7 @@
 // 런 저장·불러오기: RunState를 JSON 문자열로 바꾸고, 읽을 때 데이터와 맞는지 확인한다.
 // 브라우저 저장소(localStorage)는 UI가 맡는다. 여기는 순수 함수만.
 import type { GameData } from './data';
-import type { RunState } from './run';
+import { emptyStats, type RunState } from './run';
 import { collectionFromDeck, grantStarters, loadoutOwners, recommendLoadout } from './collection';
 
 // 2: 10스테이지 개편(2026-10-08) — 스테이지 id의 뜻이 바뀌어 옛 저장은 버린다
@@ -63,6 +63,7 @@ function migrate(data: GameData, run: RunState): void {
   run.hardcore ??= false;
   run.fallen ??= [];
   run.replays ??= {};
+  run.stats ??= emptyStats();
   run.replayOf ??= null;
   // 보유 카드·편성 도입(2026-10-08, GAME_DESIGN 9-1) 전 저장: 지금 덱을 보유 목록으로, 시작 카드를 받고, 추천 편성.
   // 이번 스테이지는 지금 덱 그대로 이어 가고 다음 스테이지부터 편성한다

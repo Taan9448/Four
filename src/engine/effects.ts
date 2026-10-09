@@ -333,6 +333,13 @@ export function dealDamage(
   }
   const hpLoss = dmg - blocked;
   target.hp = Math.max(0, target.hp - hpLoss);
+  if (state.tally) {
+    if (source?.side === 'party' && target.side === 'enemy') {
+      state.tally.damage += hpLoss;
+      if (crit) state.tally.crits += 1;
+    }
+    if (target.side === 'party' && target.defId === 'haun' && hpLoss > 0) state.tally.haunHitBy = source?.name ?? '알 수 없는 것';
+  }
   state.events.push({
     type: 'damage',
     sourceUid: source?.uid ?? null,
@@ -399,6 +406,7 @@ function applyElement(state: BattleState, target: Combatant, element: Element | 
 
 export function loseHp(state: BattleState, target: Combatant, amount: number): void {
   if (target.downed || amount <= 0) return;
+  if (state.tally && target.defId === 'haun' && target.side === 'party') state.tally.haunHitBy = '독·화상·자해 같은 체력 손실';
   target.hp = Math.max(0, target.hp - amount);
   state.events.push({ type: 'damage', sourceUid: null, targetUid: target.uid, amount, blocked: 0, grain: false, absorbed: false });
   if (target.hp <= 0) knockOut(state, target);
@@ -420,6 +428,7 @@ function knockOut(state: BattleState, target: Combatant): void {
   } else {
     state.events.push({ type: 'death', uid: target.uid });
     state.log.push(`${target.name} 처치.`);
+    if (state.tally) state.tally.kills += 1;
     fireRelics(state, 'enemyDowned');
     const def = state.data.enemies.get(target.defId);
     if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });
@@ -479,6 +488,7 @@ export function changeRift(state: BattleState, delta: number): void {
   }
   if (state.rift >= bal.max) {
     state.events.push({ type: 'surge' });
+    if (state.tally) state.tally.surges += 1;
     state.log.push('균열 폭주! 하늘이 갈라진다.');
     for (const p of alive(state.party)) loseHp(state, p, bal.surgeDamage);
     const v = state.rift;

@@ -1083,3 +1083,26 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 
 .choice.choice-off { opacity: 0.45; cursor: not-allowed; }
 .choice .choice-why { margin-left: auto; color: #e08a7a; font-size: 0.8rem; }
+
+/* 결과 화면 통계 */
+.run-stats { width: min(640px, 100%); display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; text-align: left; }
+.rs-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.rs-cell { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border: 1px solid rgba(226, 180, 92, 0.35); border-radius: 6px; background: rgba(0, 0, 0, 0.35); }
+.rs-cell b { font-size: 1.2rem; color: #f4ecd8; }
+.rs-cell small { color: var(--ink-dim); font-size: 0.72rem; }
+.rs-death { margin: 0; color: #ffb4a8; }
+.rs-top h3 { margin: 0 0 4px; font-size: 0.9rem; color: #e2b45c; }
+.rs-top ol { margin: 0; padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+.rs-top li span { margin-right: 6px; }
+.rs-top li small { color: var(--ink-dim); }
+.rs-party { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rs-relics { display: inline-flex; flex-wrap: wrap; gap: 3px; }
+@media (max-width: 640px) { .rs-grid { grid-template-columns: repeat(3, 1fr); } .rs-top ol { grid-template-columns: 1fr; } }
+
+/* 의도 이름표: 공격 말고 하는 일의 핵심 수치 */
+.intent-badge { padding: 0 5px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: rgba(60, 60, 80, 0.85); color: #e8e8f2; border: 1px solid rgba(255, 255, 255, 0.18); white-space: nowrap; }
+.intent-badge-defend { background: rgba(30, 60, 100, 0.9); color: #cfe6ff; }
+.intent-badge-buff { background: rgba(100, 60, 20, 0.9); color: #ffe0b0; }
+.intent-badge-debuff { background: rgba(70, 30, 90, 0.9); color: #ecd2ff; }
+.intent-badge-special { background: rgba(90, 20, 30, 0.9); color: #ffd0d6; }
+.zoom-moves li.unseen { opacity: 0.55; }
