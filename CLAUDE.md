@@ -17,7 +17,7 @@ npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
-npm run balance             # 자동 플레이 봇 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s8)
+npm run balance             # 자동 플레이 봇(수비형·공격형 동시) 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s8)
                             # BALANCE_MODE=abyss → 심연 보고서 docs/BALANCE_ABYSS.md
 npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s8:s8_boss_blood_hall)
 npm run build               # dist/

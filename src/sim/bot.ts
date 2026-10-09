@@ -46,9 +46,42 @@ export interface BotOptions {
   strengthWeight: number;
   /** 다음 턴 하운에게 들어올 예상 피해 1당 감점 */
   threatWeight: number;
+  /** 하운 체력 1의 값(동료는 1). 하운이 쓰러지면 패배라 더 무겁다 */
+  haunHpWeight: number;
+  /** 적의 남은 체력 1의 감점 */
+  enemyHpWeight: number;
+  /** 보상·강화·상점에서 피해 카드에 주는 가산점 / 방어·회복 카드에 주는 가산점(같은 등급 안에서 갈린다) */
+  offenseBias: number;
+  defenseBias: number;
+  /** 엘리트에 들어가는 하운 체력 비율: 이보다 높으면 엘리트를 먼저, 둘째 값보다 낮으면 피한다 */
+  eliteHp: [number, number];
 }
 
-export const DEFAULT_BOT: BotOptions = { minRewardValue: 6, strengthWeight: 0, threatWeight: 1 };
+/** 기본 봇(두 성향의 바탕. 테스트·전투 추적에 쓴다) */
+export const DEFAULT_BOT: BotOptions = {
+  minRewardValue: 6,
+  strengthWeight: 0,
+  threatWeight: 1,
+  haunHpWeight: 2,
+  enemyHpWeight: 1,
+  offenseBias: 3,
+  defenseBias: 2,
+  eliteHp: [0.75, 0.55],
+};
+
+/**
+ * 봇 두 종(1단계, 외부 검토 3-E): 한 종이면 그 봇에게만 이득인 선택(서약·유물)이 수치에 섞인다.
+ * 보고서는 두 성향의 평균을 대표값으로 쓴다(tools/balance).
+ * - 수비형: 들어올 피해·하운 체력을 무겁게, 방어 카드를 고르고, 엘리트는 체력이 넉넉할 때만
+ * - 공격형: 적 체력을 빨리 깎는 쪽을, 피해 카드를 고르고, 엘리트를 더 자주
+ */
+export const BOT_STYLES = {
+  guard: { ...DEFAULT_BOT, threatWeight: 1.6, haunHpWeight: 2.5, enemyHpWeight: 0.9, offenseBias: 1, defenseBias: 6, eliteHp: [0.85, 0.65] },
+  strike: { ...DEFAULT_BOT, threatWeight: 0.6, haunHpWeight: 2, enemyHpWeight: 1.25, offenseBias: 6, defenseBias: 0, eliteHp: [0.65, 0.45] },
+} satisfies Record<string, BotOptions>;
+
+export type BotStyle = keyof typeof BOT_STYLES;
+export const BOT_STYLE_NAME: Record<BotStyle, string> = { guard: '수비형', strike: '공격형' };
 
 // ───────────────────────── 전투 ─────────────────────────
 
@@ -58,13 +91,13 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
   const data = s.data;
   let v = s.result === 'victory' ? 5000 : 0;
   // 하운이 쓰러지면 패배이므로 하운의 체력을 두 배로 친다
-  for (const p of s.party) v += p.downed ? -120 : p.hp * (p.defId === 'haun' ? 2 : 1);
+  for (const p of s.party) v += p.downed ? -120 : p.hp * (p.defId === 'haun' ? opts.haunHpWeight : 1);
   // 변신이 남은 적(뼈 거인·셀리아스 등)은 다음 모습의 체력까지 친다. 안 그러면 처치하면 체력이 '늘어나' 보여 봇이 마무리를 미룬다
   const phaseHp = (e: (typeof s.enemies)[number]) => {
     const into = data.enemies.get(data.enemies.get(e.defId)?.transform?.into ?? '');
     return into ? Math.round(into.maxHp * (s.enemyHpScale ?? 1)) : 0;
   };
-  for (const e of alive(s.enemies)) v -= (e.hp + phaseHp(e)) * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
+  for (const e of alive(s.enemies)) v -= (e.hp + phaseHp(e)) * opts.enemyHpWeight * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
   if (opts.threatWeight && !s.result) {
     const haun = s.party.find((p) => p.defId === 'haun');
     for (const e of alive(s.enemies)) {
@@ -193,6 +226,12 @@ function cardValue(def: CardDef): number {
   return RARITY_VALUE[def.rarity] ?? 0;
 }
 
+/** 성향 가산점: 피해를 주는 카드 / 방어·회복 카드 */
+function lean(def: CardDef, opts: BotOptions): number {
+  const ops = new Set(def.effects.map((e) => e.op));
+  return (ops.has('damage') ? opts.offenseBias : 0) + (ops.has('block') || ops.has('heal') ? opts.defenseBias : 0);
+}
+
 /** 런 상태 점수(선택지 비교용) */
 export function scoreRun(data: GameData, run: RunState): number {
   let v = 0;
@@ -211,11 +250,11 @@ export function scoreRun(data: GameData, run: RunState): number {
 }
 
 /** 고르는 강화: 등급이 높고 덜 강화된 카드 */
-function pickUpgrade(data: GameData, run: RunState, filter: Parameters<typeof upgradeCandidates>[2]): string | undefined {
+function pickUpgrade(data: GameData, run: RunState, filter: Parameters<typeof upgradeCandidates>[2], opts: BotOptions): string | undefined {
   const list = upgradeCandidates(data, run, filter);
   const score = (c: CardInstance) => {
     const def = data.cards.get(c.cardId)!;
-    return cardValue(def) * 10 + (def.type === 'attack' ? 5 : 0) - c.level * 3;
+    return cardValue(def) * 10 + lean(def, opts) - c.level * 3;
   };
   return list.sort((a, b) => score(b) - score(a))[0]?.uid;
 }
@@ -231,7 +270,7 @@ function pickRemoval(data: GameData, run: RunState): string | undefined {
 }
 
 /** 선택지: 각 선택지를 런 사본에 적용해 점수가 가장 높은 것(같으면 앞의 것) */
-function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<typeof choicesFor>[2] }): { index: number; pick?: string } | null {
+function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<typeof choicesFor>[2] }, opts: BotOptions): { index: number; pick?: string } | null {
   const choices = choicesFor(data, run, enc.module);
   let best: { index: number; pick?: string; v: number } | null = null;
   choices.forEach((c, index) => {
@@ -239,7 +278,7 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
     const pickEffect = choiceNeedsPick(c);
     const removeEffect = choiceRemovePick(c);
     const copy = structuredClone(run);
-    const pick = pickEffect ? pickUpgrade(data, copy, pickEffect.filter) : removeEffect ? pickRemoval(data, copy) : undefined;
+    const pick = pickEffect ? pickUpgrade(data, copy, pickEffect.filter, opts) : removeEffect ? pickRemoval(data, copy) : undefined;
     if ((pickEffect || removeEffect) && !pick) return; // 강화·버릴 카드가 없다
     applyChoice(data, copy, enc.module, index, pick);
     const v = scoreRun(data, copy);
@@ -252,7 +291,7 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
 function decideReward(data: GameData, run: RunState, options: string[], opts: BotOptions): string | undefined {
   const score = (id: string) => {
     const def = data.cards.get(id)!;
-    return cardValue(def) * 10 + (def.type === 'attack' ? 3 : def.type === 'skill' ? 2 : 1);
+    return cardValue(def) * 10 + lean(def, opts);
   };
   const best = [...options].sort((a, b) => score(b) - score(a))[0];
   if (!best) return undefined;
@@ -303,7 +342,7 @@ function decideParty(data: GameData, run: RunState): void {
 }
 
 /** 다음 노드: 하운의 체력 비율에 따라 휴식·전투·엘리트를 고른다 */
-function decideNode(run: RunState, nodes: MapNode[]): MapNode {
+function decideNode(run: RunState, nodes: MapNode[], opts: BotOptions): MapNode {
   const haun = run.roster.find((r) => r.id === 'haun')!;
   const hp = haun.hp / haun.maxHp;
   const score = (n: MapNode) => {
@@ -318,7 +357,7 @@ function decideNode(run: RunState, nodes: MapNode[]): MapNode {
       case 'battle':
         return hp > 0.5 ? 5 : 2;
       case 'elite':
-        return hp > 0.75 ? 6 : hp > 0.55 ? 3 : 0;
+        return hp > opts.eliteHp[0] ? 6 : hp > opts.eliteHp[1] ? 3 : 0;
       default:
         return 10; // 스토리·보스(고정 노드)
     }
@@ -382,7 +421,7 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
     decideParty(data, run);
     const nodes = availableNodes(run);
     if (!nodes.length) throw new Error(`${seed}: ${run.stageId}에서 갈 곳이 없다`);
-    const enc = enterNode(data, run, decideNode(run, nodes).id);
+    const enc = enterNode(data, run, decideNode(run, nodes, opts).id);
     floor = enc.node.floor;
     if (isBattle(enc)) {
       const state = createBattle(data, battleSetupFor(data, run, enc));
@@ -422,12 +461,12 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
     } else if (enc.module.type === 'inn' && run.stageGains.length) {
       // 여관: 이번 스테이지에 얻은 카드까지 넣어 추천 편성으로 다시 짠 뒤 선택지
       setLoadout(data, run, recommendLoadout(data, run));
-      const d = decideChoice(data, run, enc);
+      const d = decideChoice(data, run, enc, opts);
       if (d) applyChoice(data, run, enc.module, d.index, d.pick);
     } else if (enc.module.type === 'shop') {
       shopTurn(data, run, enc.node.id, opts);
     } else {
-      const d = decideChoice(data, run, enc);
+      const d = decideChoice(data, run, enc, opts);
       if (d) applyChoice(data, run, enc.module, d.index, d.pick);
     }
   }
@@ -494,7 +533,7 @@ export function playAbyss(
     }
     const nodes = availableNodes(run);
     if (!nodes.length) throw new Error(`${seed}: 심연 ${run.abyss!.depth}굽이에서 갈 곳이 없다`);
-    const enc = enterNode(data, run, decideNode(run, nodes).id);
+    const enc = enterNode(data, run, decideNode(run, nodes, opts).id);
     if (isBattle(enc)) {
       const state = createBattle(data, battleSetupFor(data, run, enc));
       const hpBefore = partyHp(state);
@@ -532,7 +571,7 @@ export function playAbyss(
     } else if (enc.module.type === 'shop') {
       shopTurn(data, run, enc.node.id, opts);
     } else {
-      const d = decideChoice(data, run, enc);
+      const d = decideChoice(data, run, enc, opts);
       if (d) applyChoice(data, run, enc.module, d.index, d.pick);
     }
   }
