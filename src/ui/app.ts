@@ -138,6 +138,9 @@ export class App {
       ...mates.map((member) => ({ op: 'join_party' as const, member })),
       { op: 'gain_card', card: 'haun_byeogun', count: 2 },
       { op: 'gain_card', card: 'haun_cloud_form' },
+      // 유물 칸이 보이게 둘(전투 화면 확인용)
+      { op: 'gain_relic', relic: 'woodcutter_whetstone' },
+      { op: 'gain_relic', relic: 'cloud_tea' },
     ]);
     this.run = run;
     const node = { id: 'sandbox', floor: 0, index: 0, type: module.type, moduleId, next: [] };

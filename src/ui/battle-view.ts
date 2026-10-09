@@ -1,7 +1,7 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
 import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { potionChip, relicChip } from './items';
-import { critChance, hasSkipTurn } from '../engine/effects';
+import { hasSkipTurn } from '../engine/effects';
 import { ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
@@ -207,19 +207,26 @@ export class BattleView {
           h('div', { class: 'chip b-stage' }, h('b', {}, this.ctx.title), h('span', {}, this.ctx.subtitle)),
         ),
         // 오른쪽 위: 둥근 표식(뽑을 抽 · 버림 棄 · 소멸 滅 · 덱 冊 · 설정 設)
+        // 그 아래 유물 줄
         h(
           'div',
           { class: 'b-hud-right' },
-          this.pilesEl,
-          (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
-          medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
+          h(
+            'div',
+            { class: 'medal-row' },
+            this.pilesEl,
+            (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
+            medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
+          ),
+          this.state.relics.length ? this.relicEl : null,
         ),
       ),
-      // 가운데 위: 이야기 글 · 굽이의 법칙
+      // 가운데 위: 이야기 글 → 그 아래 균열 게이지(바탕 없이) · 굽이의 법칙
       h(
         'div',
         { class: 'b-center' },
         this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
+        this.riftEl,
         this.ctx.laws?.length
           ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, h('b', {}, l.glyph), l.name)))
           : null,
@@ -228,12 +235,12 @@ export class BattleView {
       h('div', { class: 'units' }, partyEl, enemyEl),
       h('div', { class: 'shade' }),
       this.aimEl,
-      // 아래: 왼쪽(물약·유물 → 자원 구슬) · 가운데(균열 → 손패) · 오른쪽(턴 종료)
+      // 아래: 왼쪽(물약 → 자원 구슬) · 가운데(손패) · 오른쪽(턴 종료)
       h(
         'div',
         { class: 'dock' },
-        h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl, this.state.relics.length ? this.relicEl : null), this.resEl),
-        h('div', { class: 'dock-mid' }, this.riftEl, this.handEl),
+        h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl), this.resEl),
+        h('div', { class: 'dock-mid' }, this.handEl),
         h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E')),
       ),
       this.fxLayer,
@@ -372,7 +379,8 @@ export class BattleView {
       this.potionEl.appendChild(potionChip(this.data, id, { onClick: id && !this.busy && !s.result ? () => this.onPotion(i) : undefined, extra: this.potionSel === i ? 'selected' : '' })),
     );
     // 반반 체력구: 왼쪽 금빛 = 내공, 오른쪽 푸른빛 = 마나. 차오른 높이가 남은 양(틀은 Codex 그림 ui_orb_frame, 없으면 CSS 고리)
-    const pct = (n: number, max: number) => `${Math.round(Math.max(0, Math.min(1, max > 0 ? n / max : 0)) * 100)}%`;
+    // 가득 차도 물결 수면이 보이게 높이의 80%까지만 채운다(액체가 담긴 느낌)
+    const pct = (n: number, max: number) => `${Math.round(Math.max(0, Math.min(1, max > 0 ? n / max : 0)) * 80)}%`;
     const orbFrame = frameUrl('ui_orb_frame', 1, { realOnly: true });
     this.resEl.append(
       breath ?? '',
@@ -411,8 +419,6 @@ export class BattleView {
     for (const u of this.units.values()) {
       const k = pool.indexOf(u.c);
       u.el.classList.toggle('targetable', k >= 0);
-      u.el.querySelector('.aim-key')?.remove();
-      if (k >= 0 && k < 9) u.el.querySelector('.sprite-wrap')?.appendChild(h('b', { class: 'aim-key' }, k + 1));
     }
     this.field.classList.toggle('aiming', !!need);
     const what = this.potionSel !== null ? (s.potions[this.potionSel] ? this.data.potions.get(s.potions[this.potionSel]!)?.name : '') : this.selected !== null ? resolveCard(this.data, s.hand[this.selected].cardId).def.name : '';
@@ -420,7 +426,7 @@ export class BattleView {
       ...(need
         ? [
             h('b', {}, `${what ? `${what} — ` : ''}${need === 'enemy' ? '적' : '아군'}을 고르세요`),
-            h('span', {}, `${need === 'enemy' ? '적' : '아군'}을 누르거나 숫자 키 1~${Math.min(9, pool.length)} · ${this.potionSel !== null ? '물약' : '카드'}을 다시 누르면 취소`),
+            h('span', {}, `금빛 고리가 붙은 ${need === 'enemy' ? '적' : '아군'}을 누르세요 · ${this.potionSel !== null ? '물약' : '카드'}을 다시 누르면 취소`),
           ]
         : []),
     );
@@ -549,7 +555,7 @@ export class BattleView {
     this.flown.add(inst.uid);
     sfx('tear', { volume: 0.7 });
     const tear = tearCard(el, {
-      ms: 460 * Math.max(0.6, settings.speed),
+      ms: 700 * Math.max(0.6, settings.speed),
       toward: to,
       onTear: (x, y, height) => {
         if (spriteSource('fx_card_tear') !== 'sprites') return;
@@ -650,19 +656,17 @@ export class BattleView {
     const i = this.selected ?? this.hovered;
     if (i === null || this.busy || s.result || !s.hand[i]) return;
     const need = needsTarget(s, s.hand[i]);
-    // 치명타는 미리보기에 넣지 않고(운을 미리 보이지 않게) 확률만 적는다
-    const owner = cardOwner(s, s.hand[i]);
-    const crit = owner ? critChance(s, owner) : 0;
+    // 줄 피해는 아군의 받을 피해와 같은 작은 상자로(치명타는 운이라 미리 보이지 않는다)
     const show = (uid: string, v: CardPreviewHit | undefined) => {
       const u = this.units.get(uid);
       if (!u || !v || u.c.downed) return;
       u.preview.className = `dmg-preview on${v.kills ? ' kill' : ''}${v.hpLoss === 0 ? ' blocked' : ''}`;
       u.preview.append(
+        intentIcon('attack'),
         h('b', {}, v.hpLoss > 0 ? `−${v.hpLoss}` : '0'),
-        v.hits > 1 ? h('small', {}, `${v.hits}회`) : '',
+        v.hits > 1 ? h('small', {}, `×${v.hits}`) : '',
         v.blocked > 0 ? h('small', { class: 'blk' }, `방어 ${v.blocked}`) : '',
         v.kills ? h('small', { class: 'ko' }, '처치') : '',
-        crit > 0 && v.hpLoss > 0 && u.c.side === 'enemy' ? h('small', { class: 'cr' }, `치명 ${Math.round(crit * 100)}%`) : '',
       );
     };
     if (need === 'enemy') {
@@ -813,8 +817,11 @@ export class BattleView {
     this.selected = i;
     this.targetFocus = pool[0]?.uid ?? null;
     this.refresh();
-    // 휴대폰: 고른 카드가 손패 띠 밖이면 보이게
-    this.handEls.get(this.state.hand[i].uid)?.scrollIntoView?.({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    // 휴대폰: 고른 카드가 손패 띠 밖이면 손패 띠만 옆으로 민다(화면 전체가 움직이지 않게)
+    const picked = this.handEls.get(this.state.hand[i].uid);
+    if (picked && this.handEl.scrollWidth > this.handEl.clientWidth + 1) {
+      this.handEl.scrollTo?.({ left: picked.offsetLeft - this.handEl.offsetLeft - (this.handEl.clientWidth - picked.offsetWidth) / 2, behavior: 'smooth' });
+    }
   }
 
   /** 물약: 대상이 필요 없으면 바로, 있으면 고르는 상태로(같은 칸을 다시 누르면 취소) */
@@ -883,7 +890,6 @@ export class BattleView {
     this.field.classList.remove('aiming');
     for (const u of this.units.values()) {
       u.el.classList.remove('targetable', 'target-focus');
-      u.el.querySelector('.aim-key')?.remove();
     }
     this.renderPreview();
     if (before) await before();
