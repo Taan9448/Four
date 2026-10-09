@@ -60,6 +60,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run data:check
       - run: npm test
+        env:
+          # 임시 시트 전부를 검사한다(로컬에서는 규격마다 한 건만)
+          FULL_ASSETS: '1'
       - run: npm run build
 
   assets:

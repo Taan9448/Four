@@ -2,6 +2,7 @@
 import type { GameData } from './data';
 import type { Effect, UpgradeSkill } from './schema';
 import { resolveCard, type CardInstance } from './state';
+import { defaultTargetFor } from './effects';
 
 /** 속성 이름(카드 문구·의도·약점 표시) */
 export const ELEMENT_LABEL: Record<string, string> = { fire: '화염', ice: '냉기' };
@@ -62,7 +63,8 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
 
 function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
   const n = e.amount ?? e.stacks ?? 0;
-  const tgt = e.target ? TARGET_LABEL[e.target] : cardTarget === 'all_enemies' ? '적 전체' : '';
+  // 대상 이름은 엔진과 같은 규칙으로(effects.defaultTargetFor): 카드가 '적 전체'여도 방어·회복은 자신에게 간다
+  const tgt = TARGET_LABEL[e.target ?? defaultTargetFor(e.op, cardTarget)] ?? '';
   const pre = condText(data, e);
   const times = e.times && e.times > 1 ? ` ×${e.times}` : '';
   switch (e.op) {
@@ -93,13 +95,16 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       const st = data.statuses.get(e.status ?? '');
       // 파워(지속 효과): 상태의 설명을 그대로 보여 준다
       if (st?.triggers.length && (e.target ?? 'self') === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description.replace(/\.$/, '')}`;
-      if (e.scale && e.stacks === undefined && e.amount === undefined) return `${pre}${st?.name ?? e.status} 부여`;
-      return `${pre}${st?.name ?? e.status} ${e.stacks ?? e.amount ?? 1} 부여`;
+      // 여럿에게 거는 상태는 대상을 적는다(적 하나·자신은 생략)
+      const to = tgt && tgt !== '적 1명' && tgt !== '자신' ? `${tgt}에게 ` : '';
+      if (e.scale && e.stacks === undefined && e.amount === undefined) return `${pre}${to}${st?.name ?? e.status} 부여`;
+      return `${pre}${to}${st?.name ?? e.status} ${e.stacks ?? e.amount ?? 1} 부여`;
     }
     case 'lose_hp':
       return `${pre}${tgt && tgt !== '자신' ? `${tgt}의 ` : ''}체력 ${n} 잃기`;
     case 'remove_status':
-      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}의 ` : ''}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ? `${e.stacks} ` : ''}제거`;
+      // 대상을 적지 않은 제거는 기본이 자신이라 이름을 생략하고, 명시한 '자신'은 그대로 적는다
+      return `${pre}${tgt && tgt !== '적 1명' && (e.target || tgt !== '자신') ? `${tgt}의 ` : ''}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ? `${e.stacks} ` : ''}제거`;
     case 'rift':
       return `${pre}균열 ${n >= 0 ? '+' : ''}${n}`;
     case 'reveal_grain':

@@ -147,9 +147,12 @@ function sidesOf(state: BattleState, source: Combatant | null) {
   return { own, opposing };
 }
 
-function defaultTarget(effect: Effect, ctx: EffectContext): NonNullable<Effect['target']> {
-  const cardTarget = ctx.card?.def.target;
-  switch (effect.op) {
+/**
+ * 효과에 target이 없을 때의 대상: 적에게 거는 효과(피해·상태 부여·결 노출·걷어 내기)는 카드가 '적 전체'면 적 전체, 아니면 적 하나.
+ * 그 밖의 효과(방어·회복·체력 잃기·자원 등)는 카드가 '아군 전체'면 아군 전체, 아니면 자신. 카드 글(text.ts)도 이 규칙을 그대로 쓴다
+ */
+export function defaultTargetFor(op: Effect['op'], cardTarget: string | undefined): NonNullable<Effect['target']> {
+  switch (op) {
     case 'damage':
     case 'apply_status':
     case 'reveal_grain':
@@ -158,6 +161,10 @@ function defaultTarget(effect: Effect, ctx: EffectContext): NonNullable<Effect['
     default:
       return cardTarget === 'all_allies' ? 'all_allies' : 'self';
   }
+}
+
+function defaultTarget(effect: Effect, ctx: EffectContext): NonNullable<Effect['target']> {
+  return defaultTargetFor(effect.op, ctx.card?.def.target);
 }
 
 export function resolveTargets(state: BattleState, effect: Effect, ctx: EffectContext): Combatant[] {

@@ -295,14 +295,22 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(errors).toEqual([]);
   });
 
-  it('모든 임시 시트가 검증을 통과한다(파이프라인 자체 시험)', async () => {
+  // 명세가 300개를 넘어 전부 검사하면 70초쯤 걸린다. 평소에는 규격(유형·크기·키 색·프레임 수)마다 대표 한 건만,
+  // CI(FULL_ASSETS=1)에서는 전부 검사한다
+  it('임시 시트가 검증을 통과한다(파이프라인 자체 시험)', async () => {
+    const full = process.env.FULL_ASSETS === '1';
+    const seen = new Set<string>();
     for (const id of listSpecIds()) {
       if (!existsSync(paths().placeholderSheet(id))) continue;
+      const spec = loadSpec(id);
+      const kind = `${spec.type}|${spec.size}|${spec.chroma}|${spec.frames}`;
+      if (!full && seen.has(kind)) continue;
+      seen.add(kind);
       const r = await validateAsset(id, { placeholder: true, previews: false });
       expect(r.errors, id).toEqual([]);
     }
-    // 명세가 200개 가까이라 느린 기계에서는 30초를 넘긴다
-  }, 120_000);
+    expect(seen.size).toBeGreaterThan(10);
+  }, 180_000);
 
   it('완성 프롬프트에 캔버스·격자·프레임 메모·빈 칸·키 색이 들어간다', () => {
     const text = promptFor('haun_attack');

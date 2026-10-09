@@ -54,6 +54,10 @@ describe('효과 해석기와 자원', () => {
     expect(cardText(data, 'haun_byeogun')).toContain('융합');
     expect(cardText(data, 'haun_byeogun')).toContain('균열 +3');
     for (const id of data.cards.keys()) expect(cardText(data, id).length).toBeGreaterThan(0);
+    // 대상 이름은 엔진 규칙과 같다: 적 전체 카드라도 방어는 자신에게, 상태는 적 전체에게
+    expect(cardText(data, 'haun_nakun')).toBe('방어 8 (균열 1당 +1). 적 전체에게 약화 1 부여');
+    // 명시한 아군 대상(부작용)도 글에 드러난다
+    expect(cardText(data, 'abyss_elia_black_fire')).toContain('아군 전체에게 화상 1 부여');
   });
 });
 
