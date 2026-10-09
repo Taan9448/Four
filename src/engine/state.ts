@@ -111,6 +111,8 @@ export interface BattleState {
   enemyHpScale?: number;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale). 의도·받을 피해 예고에도 같이 걸린다 */
   enemyDmgScale?: number;
+  /** 적의 피해 한 번의 상한(심연의 한 방 상한, 받을 피해 예고에도) */
+  enemyHitCap?: number;
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
   /** 결과 화면용 전투 집계(처치·준 피해·치명타·균열 폭주·쓴 카드·하운을 마지막으로 때린 것) */

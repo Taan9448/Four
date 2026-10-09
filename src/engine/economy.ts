@@ -4,6 +4,7 @@ import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, upgradeCandidates, type RunState, type ShopState } from './run';
+import { abyssShopPool, abyssShopRift, isAbyss, removePrice } from './abyss';
 
 type Tier = 'common' | 'uncommon' | 'rare';
 
@@ -29,7 +30,7 @@ function pickByTier<T extends { rarity: string }>(rng: Rng, pool: T[], weights: 
 
 /** 아직 없는 유물 후보(상점·엘리트용: 보스 유물 제외) */
 function relicPool(data: GameData, run: RunState, exclude: string[] = []) {
-  return [...data.relics.values()].filter((r) => r.rarity !== 'boss' && r.shop && !run.relics.includes(r.id) && !exclude.includes(r.id));
+  return [...data.relics.values()].filter((r) => r.rarity !== 'boss' && r.rarity !== 'path' && r.shop && !run.relics.includes(r.id) && !exclude.includes(r.id));
 }
 
 /** 이긴 전투의 전리품을 굴린다(적용하지 않는다) */
@@ -92,8 +93,12 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
   const priced = (r: Rng, base: number, jitter: number) => Math.max(5, Math.round((jitterPrice(r, base, jitter) * discount) / 5) * 5);
   // 카드: 합류한 동료(쉬는 동료 포함)와 공용의 보상 카드, 전투 보상과 같은 등급 가중치
   const owners = new Set(run.roster.map((r) => r.id));
+  // 심연: 심연 풀(보유 ∪ 도감)에서, 그리고 틈의 카드 한 칸(GAME_DESIGN 16절)
+  const abyss = isAbyss(run);
   const cardPool = rng.shuffle(
-    [...data.cards.values()].filter((c) => c.pool === 'reward' && !c.essential && (owners.has(c.owner) || !data.characters.has(c.owner)) && sh.cardPrice[c.rarity] !== undefined),
+    (abyss ? abyssShopPool(data, run) : [...data.cards.values()].filter((c) => c.pool === 'reward' && !c.essential && (owners.has(c.owner) || !data.characters.has(c.owner)))).filter(
+      (c) => sh.cardPrice[c.rarity] !== undefined,
+    ),
   );
   const cards: ShopState['cards'] = [];
   const weights = data.balance.rewards.rarityWeights.battle;
@@ -101,6 +106,12 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
     const def = pickByTier(rng, cardPool, weights)!;
     cardPool.splice(cardPool.indexOf(def), 1);
     cards.push({ cardId: def.id, price: priced(rng, sh.cardPrice[def.rarity]!, sh.jitter), sold: false });
+  }
+  if (abyss) {
+    const rift = abyssShopRift(data, run);
+    const def = rift.length ? rng.pick(rift) : null;
+    const base = def ? data.balance.abyss.shopRiftPrice[def.rarity] : undefined;
+    if (def && base) cards.push({ cardId: def.id, price: priced(rng, base, sh.jitter), sold: false });
   }
   const relics: ShopState['relics'] = [];
   for (let i = 0; i < sh.relics; i++) {
@@ -187,6 +198,21 @@ export function buySwap(data: GameData, run: RunState, cardId: string): BuyResul
   shop.swapUsed = true;
   run.shopSwaps += 1;
   return { ok: true, message: `카드 바꾸기: ${data.cards.get(res.from)!.name} → ${data.cards.get(res.to)!.name}` };
+}
+
+/** 심연 상점의 카드 지우기(카드 바꾸기 대신): 덱에서 한 장을 뺀다. 상점마다 한 번, 쓸수록 비싸진다(바늘의 길이면 공짜) */
+export function buyRemove(data: GameData, run: RunState, uid: string): BuyResult {
+  const shop = shopOf(run);
+  if (!isAbyss(run)) return { ok: false, reason: '심연에서만' };
+  if (shop.swapUsed) return { ok: false, reason: '이 상점에서는 이미 지웠다' };
+  const c = run.deck.find((x) => x.uid === uid);
+  if (!c) return { ok: false, reason: '덱에 없는 카드' };
+  const fail = pay(run, removePrice(data, run));
+  if (fail) return fail;
+  shop.swapUsed = true;
+  run.abyss!.removals += 1;
+  run.deck = run.deck.filter((x) => x.uid !== uid);
+  return { ok: true, message: `카드 지우기: ${data.cards.get(c.cardId)!.name}` };
 }
 
 export function buyUpgrade(data: GameData, run: RunState, uid: string): BuyResult {

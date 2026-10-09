@@ -73,6 +73,8 @@ export function noteRun(codex: Codex, run: RunState): Codex {
   for (const x of run.shop?.cards ?? []) codex.cards[x.cardId] ??= 0;
   for (const x of run.shop?.relics ?? []) addTo(codex.relics, x.relicId);
   for (const x of run.shop?.potions ?? []) addTo(codex.potions, x.potionId);
+  // 심연 틈의 거래에서 들여다본 카드
+  for (const id of run.abyss?.revealed ?? []) codex.cards[id] ??= 0;
   if (run.replayOf) noteRun(codex, run.replayOf);
   return codex;
 }
@@ -123,8 +125,8 @@ export function noteScene(data: GameData, codex: Codex, sceneId: string): Codex 
   return codex;
 }
 
-/** 도감에 싣는 카드: 상태·저주는 빼고 */
-export const codexCards = (data: GameData) => [...data.cards.values()].filter((c) => c.pool !== 'status' && c.owner !== 'status');
+/** 도감에 싣는 카드: 상태·저주와 틈의 카드(심연 전용)는 빼고 */
+export const codexCards = (data: GameData) => [...data.cards.values()].filter((c) => c.pool !== 'status' && c.owner !== 'status' && c.pool !== 'abyss');
 
 /** 도감에 싣는 인물: 동료(지원 포함) 다음 장면 화자 */
 export const codexPeople = (data: GameData) => [...new Set([...data.characters.keys(), ...data.speakers.keys()])];

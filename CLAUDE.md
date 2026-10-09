@@ -11,12 +11,14 @@
 ## 명령
 ```bash
 npm ci
-npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>]
+npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>], ?abyss[=시드](심연 시작)
                             # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex|loadout[&module=<id>] (화면 하나만 띄우기)
+                            # ?screen=abyssclear|abyssend|abyssshop|abyssrest[&module=<id>] (심연 화면)
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
 npm run balance             # 자동 플레이 봇 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s8)
+                            # BALANCE_MODE=abyss → 심연 보고서 docs/BALANCE_ABYSS.md
 npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s8:s8_boss_blood_hall)
 npm run build               # dist/
 npm run assets:placeholder -- <id> | --all
@@ -39,7 +41,7 @@ npm run assets:status
 9. **작업을 끝내면** 무엇을 바꿨는지와 사람이 해야 할 일을 짧게 보고한다.
 
 ## 구조
-- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), economy(골드·상점·전리품), collection(보유 카드·편성), codex(도감 기록), save(저장 직렬화), text(카드 문구)
+- `src/engine/` — rng, schema(데이터 타입), data(로더), state, effects(해석기), battle, route(지도 생성), run(런 진행), economy(골드·상점·전리품), collection(보유 카드·편성), codex(도감 기록), save(저장 직렬화), text(카드 문구), abyss(심연: 굽이·풀·점수)
 - `src/sim/` — bot(자동 플레이 봇: 밸런스 측정용, 엔진만 씀)
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview, portrait(반신 그림), audio(합성 효과음·배경음악), music(곡 악보)
 - `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, hub-view(클리어 지도), shop-view, codex-view(도감), loadout-view(편성), overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage)

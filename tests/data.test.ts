@@ -151,7 +151,7 @@ describe('데이터 검사', () => {
       }
     }
     for (const m of data.modules.values()) {
-      if (m.stage !== '*' && !data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
+      if (m.stage !== '*' && m.stage !== 'abyss' && !data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
       const battle = ['battle', 'elite', 'boss'].includes(m.type);
       if (battle && !m.content.enemies?.length) errors.push(`${m.id}: 전투 모듈에 적이 없다`);
       if (!battle && m.type !== 'shop' && !m.content.choices?.length) errors.push(`${m.id}: 선택지가 없다`);
@@ -282,6 +282,24 @@ describe('데이터 검사', () => {
 
   it('장면 표정: 한 인물의 표정은 바뀐 뒤 3줄 안에 다시 바뀌지 않는다(표정이 확확 바뀌지 않게)', () => {
     const bad = [...data.scenes.values()].flatMap((sc) => fastFaceChanges(sc));
+    expect(bad).toEqual([]);
+  });
+
+  it('틈의 카드(심연, GAME_DESIGN 16절): 대가(균열 +·체력 잃기·소멸) 하나는 반드시, 희귀 이상, 심연 모듈·보스가 있다', () => {
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.pool !== 'abyss') continue;
+      const cost = c.keywords.includes('exhaust') || c.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) > 0) || e.op === 'lose_hp' || (e.op === 'apply_status' && data.statuses.get(e.status ?? '')?.triggers.some((t) => t.effects.some((x) => x.op === 'lose_hp'))));
+      if (!cost) bad.push(`${c.id}: 대가가 없다`);
+      if (!['rare', 'epic', 'legendary'].includes(c.rarity)) bad.push(`${c.id}: 희귀 이상이어야 한다`);
+    }
+    const ab = data.balance.abyss;
+    if (data.modules.get(ab.nemesisModule)?.type !== 'boss') bad.push(`숙적 모듈 ${ab.nemesisModule}이(가) 보스가 아니다`);
+    for (const [w, cfg] of Object.entries(ab.worlds)) {
+      for (const st of cfg.stages) if (!data.stages.some((s) => s.id === st)) bad.push(`심연 ${w}: 없는 스테이지 ${st}`);
+      for (const b of cfg.bosses) if (data.modules.get(b)?.type !== 'boss') bad.push(`심연 ${w}: ${b}는 보스가 아니다`);
+    }
+    for (const r of data.relics.values()) if (r.rarity === 'path' && r.shop) bad.push(`${r.id}: 길은 상점에 나오지 않는다`);
     expect(bad).toEqual([]);
   });
 

@@ -1,0 +1,95 @@
+[
+  {
+    "id": "abyss_boss_mordecai",
+    "stage": "abyss",
+    "type": "boss",
+    "name": "모르데카이의 잔향",
+    "content": {
+      "text": "닫힌 줄 알았던 틈 너머, 같은 목소리가 더 깊은 곳에서 울린다. 흐름을 실은 공격은 먹힌다. 숨을 멈추고 결을 읽어 매듭을 드러내고, 날을 얹어라.",
+      "enemies": ["mordecai"],
+      "background": "bg_rift",
+      "mana": { "battleStart": 0, "perTurn": 0 },
+      "startEffects": [
+        { "op": "add_card", "card": "haun_stop_ring", "to": "hand" },
+        { "op": "add_card", "card": "haun_stop_ring", "to": "draw", "count": 2 },
+        { "op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2 }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_cut",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 덜어 내는 값",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 길을 막고 선다. 손바닥 위에 아무것도 없는데, 무언가를 팔겠다고 한다. \"덜어 내 주지. 값은 하늘의 금으로.\"",
+      "choices": [
+        { "label": "덱에서 카드 한 장을 영구히 덜어 낸다 — 상흔 +2", "effects": [{ "op": "remove_card", "choose": true }, { "op": "scar", "amount": 2 }], "result": "카드가 그림자 속으로 녹아 사라졌다. 어딘가의 하늘이 조금 더 벌어졌다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 아무 말 없이 길을 비켰다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_card",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 있어서는 안 되는 초식",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 검은 금이 간 카드 한 장을 내민다. \"틈 너머에서 주워 온 것이다. 몸으로 값을 치러라.\"",
+      "choices": [
+        { "label": "틈의 카드 한 장(희귀 이상)을 받는다 — 동료 모두 최대 체력 -8", "effects": [{ "op": "gain_abyss_card" }, { "op": "gain_max_hp", "amount": -8 }], "result": "카드를 쥐자 손끝이 차갑게 식었다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 카드를 거두었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_scar",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 금을 사는 자",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 하늘의 금을 손가락으로 훑는다. \"그 흉터, 내가 사겠다. 가진 것을 전부 내놓아라.\"",
+      "choices": [
+        { "label": "상흔을 모두 지운다 — 골드를 모두 낸다", "condition": { "goldGte": 1 }, "effects": [{ "op": "scar", "amount": -999 }, { "op": "gain_gold", "amount": -99999 }], "result": "주머니가 가벼워지고, 하늘의 금이 한 땀씩 아물었다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 아쉬운 듯 손을 거두었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_relic",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 누군가의 몫",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 빛나는 물건 하나를 흔든다. \"이건 공짜가 아니다. 네 일행 중 하나가 값을 치른다.\"",
+      "choices": [
+        { "label": "유물 하나를 받는다 — 동료 한 명이 다음 굽이까지 부상", "effects": [{ "op": "gain_relic" }, { "op": "injure" }], "result": "물건을 받는 순간 일행 하나가 신음했다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 물건을 다시 어둠 속에 넣었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_shop",
+    "stage": "abyss",
+    "type": "shop",
+    "name": "틈의 좌판",
+    "weight": 0.5,
+    "content": { "text": "떠다니는 세계의 조각 위에 누군가 좌판을 벌여 놓았다. 주인은 보이지 않는데, 값을 치르면 물건이 줄어든다." }
+  }
+]
