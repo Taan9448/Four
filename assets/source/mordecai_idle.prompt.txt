@@ -3,18 +3,17 @@ Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
 Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
 PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
 Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
-Subject: Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together from countless stolen flows, one arm of pale silver mana and one of dark martial qi, faint faces and wings and horns of unknown worlds sewn into it with glowing seams, a pulsing blue heart in the middle of the chest. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+Subject: Mordecai, the King of Hell who rules the rift between worlds; a towering shapeless body stitched together from countless stolen flows, with a great spine made of hundreds of black iron wedges bound together, one arm of flowing pale silver mana and one of coiled dark martial qi like rings, legs, wings and horns of unknown worlds sewn on with glowing seams, a heart of tangled blue and black light pulsing in the chest. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
 The SAME character in every cell, at the SAME scale. Side view, facing left.
 Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
 Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
 Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
 Never use green or similar hues on the character.
 Frames:
-Cell 1: looming stance facing left, the blue heart pulsing
-Cell 2: the stitched seams glow, faint faces shifting under the surface
-Cell 3: the blue heart dims
+Cell 1: looming stance facing left, the blue-black heart pulsing
+Cell 2: the stitched seams glow along the wedge spine
+Cell 3: the heart dims
 Cell 4: the body sways slightly, seams fading back
 Cells 5 to 6 are completely empty green.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
-Fix: The previous attempt is 104 sprite pixels tall; the reference LEFT side is only84. REDRAW SIGNIFICANTLY SMALLER: reduce head-to-hem HEIGHT and WIDTH by20%, but keep the SAME4x4px square blocks, NOT larger blocks. In each512px cell, the ENTIRE horn-to-tentacle figure occupies ONLY336px vertically (65% of the cell height). Make VERY LARGE GREEN MARGINS: about124px GREEN ABOVE the horn,52px GREEN BELOW the lowest robe curl, and about90px GREEN left/right. Exact full silhouette bounds approximately x=90..422,y=124..460 in each cell. ALL4 sprites use the LEFT-FACING SIDE VIEW of reference cell2, same84px height, same gold stitch seams, silver arm, blue-black arm, brown stitched robe and blue chest heart. ONLY subtle heart/seam brightness changes and1-block sway. Cells5/6 solidgreen.
