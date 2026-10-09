@@ -31,6 +31,8 @@ export interface EnemyState extends Combatant {
   side: 'enemy';
   /** 등급 피해 배율(balance.enemyTiers) */
   dmgMul?: number;
+  /** 이 전투에서 쓴 한 번만 행동(oncePerBattle) */
+  usedOnce?: string[];
   moveCursor: number;
   lastMoves: string[];
   intent: Intent | null;
@@ -60,6 +62,8 @@ export type BattleEvent =
   | { type: 'potion'; potionId: string; name: string }
   | { type: 'power'; uid: string; status: string }
   | { type: 'enrage'; uid: string; text: string }
+  | { type: 'summon'; uid: string; sourceUid: string | null }
+  | { type: 'discard'; cardId: string }
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
   | { type: 'transform'; uid: string; from: string; into: string; text: string }

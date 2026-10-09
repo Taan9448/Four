@@ -48,7 +48,7 @@
     "color": "#221d2c",
     "traits": [{"status": "incorporeal", "stacks": 1}],
     "pattern": "random",
-    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
+    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "whisper", "name": "그림자 속삭임", "intent": "debuff", "weight": 1, "effects": [{"op": "apply_status", "status": "daze", "stacks": 1}]}],
     "flavor": "그림자 암살자가 다스리던 것들의 잔당. 칼날만 실체다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
   },
   {
@@ -89,7 +89,7 @@
     "scale": 2,
     "tier": "boss",
     "pattern": "cycle",
-    "moves": [{"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 12, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 25}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 29}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
+    "moves": [{"id": "throne_rage", "name": "왕좌의 분노", "intent": "attack", "condition": {"hpRatioLte": 0.5}, "targeting": "haun", "effects": [{"op": "damage", "amount": 14}, {"op": "apply_status", "status": "vulnerable", "stacks": 2}]}, {"id": "ceiling", "name": "손짓 하나에 무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 12, "target": "all_enemies"}]}, {"id": "breath", "name": "숨결", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "dispel"}, {"op": "damage", "amount": 25}]}, {"id": "drink", "name": "엉킨 마나를 빨아들인다", "intent": "buff", "effects": [{"op": "gain_mana", "amount": -3}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 14, "target": "self"}]}, {"id": "wing", "name": "찢어진 날개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 29}]}, {"id": "gaze", "name": "텅 빈 우물 같은 눈", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 10, "target": "self"}]}],
     "deathEffects": [{"op": "damage", "amount": 999, "target": "all_allies"}],
     "flavor": "사람의 세 배인 키, 찢어진 박쥐 날개, 왕관처럼 솟은 비틀린 뿔 일곱, 바닥이 보이지 않는 텅 빈 우물 같은 눈. 삼천 년 전 문을 닫은 고대인. 숨결 하나에 바닥과 갑옷이 녹는다."
   }

@@ -1,6 +1,6 @@
 // 전투 진행: 생성 → 플레이어 턴(카드 사용) → 턴 종료 → 적 턴 → 다음 턴.
 import type { GameData } from './data';
-import type { Effect, Element, World, WorldMana } from './schema';
+import type { Effect, Element, MoveDef, World, WorldMana } from './schema';
 import type { Rng } from './rng';
 import {
   addStatus,
@@ -10,6 +10,7 @@ import {
   drawCards,
   fireRelics,
   fireSideTriggers,
+  spawnEnemy,
   fireSupport,
   hasSkipTurn,
   loseHp,
@@ -78,18 +79,9 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     if (!def || def.role !== 'fighter') throw new Error(`출전할 수 없는 캐릭터: ${p.id}`);
     return { uid: `p${i}`, defId: p.id, name: def.name, side: 'party', hp: p.hp, maxHp: p.maxHp, block: 0, statuses: {}, downed: p.hp <= 0, level: p.level ?? 1 };
   });
-  const enemies: EnemyState[] = setup.enemies.map((id, i) => {
-    const def = data.enemies.get(id);
-    if (!def) throw new Error(`알 수 없는 적: ${id}`);
-    const statuses: Record<string, number> = {};
-    for (const t of def.traits) statuses[t.status] = t.stacks;
-    const tier = bal.enemyTiers[def.tier];
-    const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0)) * (setup.enemyHpScale ?? 1) * (tier?.hp ?? 1));
-    return {
-      uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
-      statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null, dmgMul: tier?.dmg ?? 1,
-    };
-  });
+  const enemies: EnemyState[] = [];
+  const spawnCtx = { data, scar: setup.scar ?? 0, enemyHpScale: setup.enemyHpScale ?? 1, enemies };
+  setup.enemies.forEach((id, i) => enemies.push(spawnEnemy(spawnCtx, id, i)));
 
   const worldMana = setup.manaRule ?? bal.mana.worlds[setup.world];
   const startMana =
@@ -228,16 +220,26 @@ function pickTarget(state: BattleState, targeting: string): Combatant | null {
 function rollIntents(state: BattleState): void {
   for (const enemy of alive(state.enemies)) {
     const def = state.data.enemies.get(enemy.defId)!;
-    let move = def.moves[0];
+    // 조건(체력 절반 아래 등)·한 번만 행동을 거른다. 모두 걸리면 조건 없는 첫 행동
+    const usable = (m: MoveDef) =>
+      !(m.oncePerBattle && enemy.usedOnce?.includes(m.id)) && checkCondition(state, m.condition, { source: enemy }, enemy);
+    let move = def.moves.find((m) => !m.condition && !m.oncePerBattle) ?? def.moves[0];
     if (def.pattern === 'cycle') {
-      move = def.moves[enemy.moveCursor % def.moves.length];
-      enemy.moveCursor += 1;
+      for (let k = 0; k < def.moves.length; k++) {
+        const m = def.moves[enemy.moveCursor % def.moves.length];
+        enemy.moveCursor += 1;
+        if (usable(m)) {
+          move = m;
+          break;
+        }
+      }
     } else {
       // 같은 행동을 세 번 연속 하지 않는다
       const banned = enemy.lastMoves.length >= 2 && enemy.lastMoves[0] === enemy.lastMoves[1] ? enemy.lastMoves[0] : null;
-      const options = def.moves.filter((m) => m.id !== banned);
-      move = state.rng.weighted(options, (m) => m.weight) ?? def.moves[0];
+      const options = def.moves.filter((m) => m.id !== banned && usable(m));
+      move = state.rng.weighted(options, (m) => m.weight) ?? move;
     }
+    if (move.oncePerBattle) (enemy.usedOnce ??= []).push(move.id);
     enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
     const targetsParty = move.effects.some(
       (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
@@ -393,7 +395,7 @@ export function cloneBattle(s: BattleState): BattleState {
     rng: s.rng.clone(),
     critRng: s.critRng?.clone(),
     party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], intent: e.intent ? { ...e.intent } : null })),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),
     hand: cards(s.hand),
     discard: cards(s.discard),
@@ -473,6 +475,13 @@ export function usePotion(state: BattleState, slot: number, targetUid?: string):
 export function endTurn(state: BattleState): void {
   if (state.result) return;
   const bal = state.data.balance;
+  // 손에 든 채 턴이 끝나면 아픈 카드(독기 등): 하운을 출처로
+  const haun = alive(state.party).find((p) => p.defId === 'haun');
+  for (const c of [...state.hand]) {
+    const fx = state.data.cards.get(c.cardId)?.onTurnEndInHand;
+    if (fx?.length && haun && !state.result) runEffects(state, fx, { source: haun });
+  }
+  if (state.result) return;
   // 손패 정리(유지 카드 제외)
   const keep: CardInstance[] = [];
   for (const c of state.hand) {

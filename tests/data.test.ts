@@ -31,6 +31,7 @@ function checkEffects(label: string, effects: Effect[], allowed: Set<string>): s
       errors.push(`${label}: 조건의 알 수 없는 상태 ${e.condition.targetHasStatus}`);
     }
     if (e.card && !data.cards.has(e.card)) errors.push(`${label}: 알 수 없는 카드 ${e.card}`);
+    if (e.op === 'summon' && !(e.enemy && data.enemies.has(e.enemy))) errors.push(`${label}: summon의 알 수 없는 적 ${e.enemy}`);
     if (e.member && !data.characters.has(e.member)) errors.push(`${label}: 알 수 없는 캐릭터 ${e.member}`);
     if (e.op === 'apply_status' && !e.status) errors.push(`${label}: apply_status에 status 없음`);
     if (e.scale?.status && !data.statuses.has(e.scale.status)) errors.push(`${label}: 비례의 알 수 없는 상태 ${e.scale.status}`);

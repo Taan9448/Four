@@ -23,7 +23,7 @@
     "color": "#2a2633",
     "pattern": "cycle",
     "traits": [{"status": "incorporeal", "stacks": 1}, {"status": "hungry", "stacks": 1}],
-    "moves": [{"id": "wedge_dagger", "name": "쐐기 단검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "dagger_throw", "name": "단검 던지기", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 5, "times": 2}]}, {"id": "wither", "name": "흐름 갉아먹기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 4}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
+    "moves": [{"id": "wedge_dagger", "name": "쐐기 단검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10}]}, {"id": "dagger_throw", "name": "단검 던지기", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 5, "times": 2}]}, {"id": "wither", "name": "흐름 갉아먹기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 4}, {"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "add_card", "card": "status_rift_echo", "to": "discard"}]}],
     "flavor": "사람의 형상을 한 그림자. 손에 쐐기를 깎아 만든 검은 단검을 들었다. 결도, 그림자를 드리우는 수정도 없다. 카즈둠에서 부서진 그림자 암살자의 잔재. 장력은 그냥 통과한다."
   },
   {
