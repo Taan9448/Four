@@ -18,3 +18,5 @@ Cell 5: the red wave breaks into sparks, robes flaring
 Cell 6: returns to standing, hands lowered
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Correct only the effect clipping noted by the reviewer in the attached existing six-frame attack sheet. Preserve the youthful face, hair, robe, pose sequence, character height and foot baseline in all six frames. In cell 4 reduce the crimson palm blast and draw its entire rounded leftmost tip well INSIDE the cell, leaving at least 10 sprite pixels (40 source pixels) of clear green margin at the left edge. Never cut the blast off into a straight vertical end. In cell 5 completely remove the stray vertical column of red dots along the left cell edge; only a few small nearby sparks may remain around the withdrawing hand, all well inside the same 10-pixel margin. No effects may bleed across cell boundaries. The other four poses and their sizes stay unchanged.
