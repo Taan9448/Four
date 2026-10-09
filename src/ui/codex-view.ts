@@ -1,6 +1,7 @@
 // 도감 화면(GAME_DESIGN 2절): 시작 화면에서 연다. 한 번이라도 본 것만 보이고, 못 본 칸은 ? 실루엣.
 // 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 심연(3차) · 기록
 // 카드 칸은 3단계: ? (모름) → 윤곽(본 적 있음: 심연 풀에 들어간다) → 실물(보유: 강화 단계)
+import { clearRunLog, exportRunLog, readRunLog, RUN_LOG_MAX } from './run-log';
 import { codexCards, codexPeople, codexProgress, type Codex } from '../engine/codex';
 import type { GameData } from '../engine/data';
 import { riftCards, unlockedRift, unlockName, unlockSource, oathMax, type AbyssMeta } from '../engine/abyss';
@@ -13,7 +14,7 @@ import { h } from './dom';
 import { potionChip, relicChip } from './items';
 import type { Profile } from './storage';
 import { installTooltips } from './tooltip';
-import { openOverlay } from './overlay';
+import { confirmDialog, openOverlay } from './overlay';
 
 export interface CodexHandlers {
   onBack: () => void;
@@ -430,6 +431,45 @@ function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMet
   );
 }
 
+/** 플레이 기록 내보내기(사람 플레이 통계 — 밸런스 비교용) */
+function runLogSection(): HTMLElement {
+  const body = h('div', { class: 'runlog' });
+  const render = () => {
+    const log = readRunLog();
+    const camp = log.filter((e) => e.mode === 'campaign');
+    const done = camp.filter((e) => e.result === 'complete').length;
+    body.replaceChildren(
+      h(
+        'p',
+        { class: 'hint' },
+        log.length
+          ? `끝난 런 ${log.length}판(최근 ${RUN_LOG_MAX}판까지) — 캠페인 ${camp.length}판 중 완주 ${done} · 심연 ${log.length - camp.length}판. 내보낸 파일로 봇과 같은 표를 만들어 난이도를 맞춘다.`
+          : '끝난 런이 아직 없다. 캠페인이나 심연을 끝내면(완주·패배) 한 줄씩 쌓인다.',
+      ),
+      h(
+        'div',
+        { class: 'runlog-actions' },
+        h('button', { class: 'btn btn-small btn-primary', disabled: !log.length, onclick: () => exportRunLog() }, '통계 내보내기(JSON)'),
+        h(
+          'button',
+          {
+            class: 'btn btn-small',
+            disabled: !log.length,
+            onclick: async () => {
+              if (!(await confirmDialog('플레이 기록 지우기', '쌓인 플레이 기록을 지웁니다. 도감과 저장은 그대로입니다.', '지우기'))) return;
+              clearRunLog();
+              render();
+            },
+          },
+          '지우기',
+        ),
+      ),
+    );
+  };
+  render();
+  return section('플레이 기록', null, body);
+}
+
 function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
   const rows: [string, string | number][] = [
     ['시작한 런', codex.stats.runs],
@@ -445,6 +485,7 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
     'div',
     {},
     section('기록', null, h('dl', { class: 'codex-stats' }, rows.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, String(v))]))),
+    runLogSection(),
     section(
       '채운 칸',
       null,

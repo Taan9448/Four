@@ -103,6 +103,23 @@ export interface RunStats {
   cards: Record<string, number>;
   /** 진 런: 어디서 무엇에 쓰러졌나 */
   deathCause?: string;
+  /** 전투마다 한 줄(사람 플레이 통계 내보내기 — 봇 보고서와 같은 칸) */
+  log?: BattleLog[];
+}
+
+/** 전투 한 번의 기록. 체력은 출전 멤버 합(전/후)과 최대 체력 합 */
+export interface BattleLog {
+  stageId: string;
+  moduleId: string;
+  type: string;
+  floor: number;
+  result: 'victory' | 'defeat';
+  turns: number;
+  hpBefore: number;
+  hpAfter: number;
+  hpMax: number;
+  haunBefore: number;
+  haunAfter: number;
 }
 
 export function emptyStats(): RunStats {
@@ -405,6 +422,10 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
 
 /** 전투 결과를 런에 반영한다. 이기면 모듈의 clearEffects(보스가 아니어도)를 적용하고 그 결과 메시지를 돌려준다 */
 export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter, outcome: BattleOutcome): string[] {
+  // 통계 기록: 반영 전의 체력(출전 멤버)
+  const fought = outcome.party.map((p) => run.roster.find((x) => x.id === p.id)).filter((r): r is NonNullable<typeof r> => !!r);
+  const hpBefore = fought.reduce((a, r) => a + r.hp, 0);
+  const haunBefore = run.roster.find((r) => r.id === 'haun')?.hp ?? 0;
   for (const p of outcome.party) {
     const r = run.roster.find((x) => x.id === p.id);
     if (r) r.hp = Math.max(0, Math.min(r.maxHp, p.hp));
@@ -416,6 +437,21 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
   const st = (run.stats ??= emptyStats());
   st.battles += 1;
   st.turns += outcome.turns ?? 0;
+  const downed = new Set(outcome.downed ?? []);
+  const after = (id: string) => (downed.has(id) || (outcome.result === 'defeat' && id === 'haun') ? 0 : (outcome.party.find((p) => p.id === id)?.hp ?? 0));
+  (st.log ??= []).push({
+    stageId: isAbyss(run) ? `d${run.abyss!.depth}` : run.stageId,
+    moduleId: enc.module.id,
+    type: enc.node.type,
+    floor: enc.node.floor,
+    result: outcome.result,
+    turns: outcome.turns ?? 0,
+    hpBefore,
+    hpAfter: fought.reduce((a, r) => a + after(r.id), 0),
+    hpMax: fought.reduce((a, r) => a + r.maxHp, 0),
+    haunBefore,
+    haunAfter: after('haun'),
+  });
   if (outcome.tally) {
     st.kills += outcome.tally.kills;
     st.damage += outcome.tally.damage;

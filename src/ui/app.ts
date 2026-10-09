@@ -1,5 +1,6 @@
 // 화면 흐름: 타이틀 → 지도 → (스토리/이벤트/휴식/여관 | 전투 → 보상) → 지도 … → 스테이지 클리어 / 패배
 import { checkForUpdate } from './update-check';
+import { logRun } from './run-log';
 import { battleOutcome, createBattle } from '../engine/battle';
 import { gameData } from '../engine/data';
 import { randomSeed } from '../engine/rng';
@@ -1014,6 +1015,7 @@ export class App {
     const cleared = ab.depth - 1;
     const best = readProfile();
     if (this.persist) recordAbyss({ cleared, score });
+    if (this.persist) logRun(data, run, 'defeat');
     const unlocks = this.abyssRecord(true);
     playBgm(null);
     this.show(
@@ -1100,6 +1102,7 @@ export class App {
 
   private end(win: boolean): void {
     const run = this.run!;
+    if (this.persist && !run.replayOf) logRun(data, run, win ? 'complete' : 'defeat');
     const last = data.stages.find((s) => s.id === run.stageId)!;
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;

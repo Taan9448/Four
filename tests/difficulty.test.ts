@@ -43,6 +43,19 @@ describe('난이도', () => {
     expect(run.roster.some((r) => r.id === mate)).toBe(false);
   });
 
+  it('전투 기록(사람 플레이 통계): 전투마다 모듈·결과·턴·체력 전후가 한 줄씩 남는다', () => {
+    const run = createRunAt(data, 'LOG', 's3');
+    const mate = run.selected.find((id) => id !== 'haun')!;
+    const before = run.roster.filter((r) => run.selected.includes(r.id)).reduce((a, r) => a + r.hp, 0);
+    const enc = encounter('s3');
+    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: id === mate ? 1 : 50 })), mana: run.mana, scarGain: 0, downed: [mate], turns: 4 });
+    const log = run.stats!.log!;
+    expect(log).toHaveLength(1);
+    expect(log[0]).toMatchObject({ stageId: 's3', moduleId: enc.module.id, type: 'battle', result: 'victory', turns: 4, hpBefore: before, haunAfter: 50 });
+    expect(log[0].hpAfter).toBe(50 * (run.selected.length - 1)); // 쓰러진 동료는 0으로 센다
+    expect(deserializeRun(data, serializeRun(run))!.run.stats!.log).toEqual(log);
+  });
+
   it('하드코어가 아니면 쓰러진 동료는 체력 1로 돌아온다', () => {
     const run = createRunAt(data, 'HC', 's3');
     const mate = run.selected.find((id) => id !== 'haun')!;
