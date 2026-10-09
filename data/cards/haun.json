@@ -34,6 +34,7 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "effects": [{"op": "reveal_grain", "stacks": 2}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [1, 0], "plus4": {"name": "눈에 익은 결", "cost": {"neigong": 0, "mana": 0}}, "plus5": {"name": "나무가 몸을 연다", "addKeywords": ["retain"]}},
     "flavor": "결을 따라 기운이 흐르는 길이 보였고, 그 길에 날을 얹으면 나무는 스스로 몸을 열었다."
@@ -61,6 +62,7 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "effects": [{"op": "damage", "amount": 4, "times": 2}],
     "upgrade": {"growth": [1], "plus4": {"name": "십팔식의 연환", "effects": [{"op": "damage", "amount": 4}]}, "plus5": {"name": "담장 너머의 구령", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "뒷마당 대련 끝에 카일이 고쳐 준 검. 담장 너머로 구령만 들었던 청운십팔식."
@@ -69,13 +71,15 @@
     "id": "haun_waterwheel",
     "name": "물레방아",
     "owner": "haun",
-    "type": "skill",
+    "type": "power",
     "rarity": "rare",
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
-    "effects": [{"op": "block", "amount": 4}, {"op": "gain_mana", "amount": 2}],
-    "upgrade": {"growth": [2, 1], "plus4": {"name": "물레방아 고리", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "흐르는 강물", "addKeywords": ["retain"]}},
+    "keywords": ["exhaust"],
+    "tags": ["haun_rift"],
+    "effects": [{"op": "apply_status", "status": "p_waterwheel", "stacks": 1, "target": "self"}, {"op": "gain_mana", "amount": 2}],
+    "upgrade": {"growth": [0, 1], "plus4": {"name": "물레방아 고리", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "흐르는 강물", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "고리가 스스로 돌며 강물을 끌어왔다. 마나는 강물이고, 내공은 물레방아였다."
   },
   {
@@ -90,6 +94,7 @@
     "cost": {"neigong": 1, "mana": 2},
     "target": "enemy",
     "keywords": ["fusion"],
+    "tags": ["haun_rift"],
     "effects": [{"op": "damage", "amount": 18}, {"op": "rift", "amount": 3}],
     "upgrade": {"growth": [4, 0], "plus4": {"name": "구름을 쪼개다", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 2}]}, "plus5": {"name": "강을 끊다", "effects": [{"op": "rift", "amount": -2}]}},
     "flavor": "구름은 산을 넘고, 강은 바다로 흐른다. 거슬러 끌어오지 않고 흐름에 올라탔다."
@@ -107,6 +112,7 @@
     "cost": {"neigong": 2, "mana": 4},
     "target": "all_enemies",
     "keywords": ["fusion", "exhaust"],
+    "tags": ["haun_rift"],
     "effects": [{"op": "remove_status", "status": "blood_cover", "target": "all_enemies"}, {"op": "damage", "amount": 30}, {"op": "rift", "amount": 6}],
     "upgrade": {"growth": [0, 5, 0], "plus4": {"name": "하늘 밖의 구름", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2}]}, "plus5": {"name": "제자리로 돌아간다", "effects": [{"op": "gain_mana", "amount": 2}]}},
     "flavor": "빼앗지 않고, 섞지 않고. 하늘 밖으로 끌려온 구름을 제자리로 흘려보냈다."
@@ -125,7 +131,8 @@
     "effects": [{"op": "dispel"}, {"op": "damage", "amount": 12}, {"op": "damage", "amount": 6, "condition": {"targetHasStatus": "grain"}}, {"op": "rift", "amount": -2}],
     "upgrade": {"growth": [0, 3, 2, 0], "plus4": {"name": "흩어진 것을 제자리로", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "엉킨 것을 제 결로", "effects": [{"op": "draw", "amount": 1}, {"op": "gain_neigong", "amount": 1}]}},
     "flavor": "흩어진 것을 제자리로. 엉킨 것을 제 결로. 마당의 모래가 소리 없이 제자리로 가라앉았다.",
-    "keywords": ["thread"]
+    "keywords": ["thread"],
+    "tags": ["haun_grain"]
   },
   {
     "id": "haun_place_blade",
@@ -137,6 +144,7 @@
     "castLine": {"speaker": "haun", "face": "neutral", "text": "세상에서 가장 단단한 장작도, 갈라질 자리는 하나다."},
     "cost": {"neigong": 0, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "effects": [{"op": "damage", "amount": 3}, {"op": "damage", "amount": 40, "condition": {"targetHasStatus": "knot_exposed"}}],
     "upgrade": {"growth": [1, 10], "plus4": {"name": "결만 보고", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "탁.", "addKeywords": ["retain"]}},
     "flavor": "힘으로 쪼개려 하지 마라. 나무는 원래 갈라질 자리를 가지고 있다."
@@ -151,6 +159,7 @@
     "cost": {"neigong": 1, "mana": 1},
     "target": "enemy",
     "keywords": ["fusion"],
+    "tags": ["haun_rift"],
     "fx": "fx_slash_blue",
     "effects": [{"op": "damage", "amount": 10}, {"op": "rift", "amount": 2}],
     "upgrade": {"growth": [3, 0], "plus4": {"name": "새벽빛", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "한낮빛", "effects": [{"op": "damage", "amount": 4}]}},
@@ -166,6 +175,7 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
     "keywords": ["exhaust"],
+    "tags": ["haun_rift"],
     "castLine": {"speaker": "haun", "face": "resolve", "text": "구름은 산을 넘고, 강은 바다로 흐른다."},
     "fx": "fx_slash_blue",
     "effects": [{"op": "gain_mana", "amount": 10}, {"op": "damage", "amount": 18}, {"op": "rift", "amount": 3}],
@@ -181,22 +191,25 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "weak", "stacks": 1}],
-    "upgrade": {"growth": [2, 0], "plus4": {"name": "이음매 누르기", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "검을 뽑지 않고", "effects": [{"op": "draw", "amount": 1}]}},
+    "tags": ["haun_rift"],
+    "effects": [{"op": "damage", "amount": 4, "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "upgrade": {"growth": [2, 0], "plus4": {"name": "이음매 누르기", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "금을 밟고", "effects": [{"op": "damage", "amount": 0, "scale": {"per": "rift", "amount": 1}}]}},
     "flavor": "검을 뽑지 않았다. 검집 끝으로 어깨와 손목의 이음매를 눌렀을 뿐인데, 곡도가 땅에 떨어졌다."
   },
   {
     "id": "haun_chulsu",
     "name": "청운출수",
     "owner": "haun",
-    "type": "skill",
+    "type": "power",
     "rarity": "rare",
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
-    "target": "enemy",
-    "effects": [{"op": "apply_status", "status": "weak", "stacks": 2}, {"op": "draw", "amount": 1}],
-    "upgrade": {"growth": [1, 0], "plus4": {"name": "감아 빼앗다", "effects": [{"op": "remove_status", "status": "strength", "stacks": 2}]}, "plus5": {"name": "산굴에서 피어나는 구름", "effects": [{"op": "block", "amount": 5}]}},
-    "flavor": "청운십팔식 제일식. 찌르지 않고 피어올라, 상대의 검을 감아 빼앗는다."
+    "target": "self",
+    "keywords": ["exhaust"],
+    "tags": ["haun_grain"],
+    "effects": [{"op": "apply_status", "status": "p_grain_eye", "stacks": 1, "target": "self"}, {"op": "reveal_grain", "stacks": 1, "target": "random_enemy"}],
+    "upgrade": {"growth": [0, 1], "plus4": {"name": "감아 빼앗다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "산굴에서 피어나는 구름", "cost": {"neigong": 0, "mana": 0}}},
+    "flavor": "청운십팔식 제일식. 찌르지 않고 피어오른다. 그 뒤로 하운의 눈에는, 상대의 몸에 난 결이 먼저 보였다."
   },
   {
     "id": "haun_biun",
@@ -207,8 +220,9 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
-    "effects": [{"op": "block", "amount": 7}, {"op": "draw", "amount": 1}],
-    "upgrade": {"growth": [3, 0], "plus4": {"name": "등 뒤로", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "random_enemy"}]}, "plus5": {"name": "구름은 무겁지 않다", "addKeywords": ["retain"]}},
+    "tags": ["haun_rift"],
+    "effects": [{"op": "block", "amount": 5, "scale": {"per": "rift", "amount": 1, "max": 6}}, {"op": "draw", "amount": 1}],
+    "upgrade": {"growth": [2, 0], "plus4": {"name": "등 뒤로", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "random_enemy"}]}, "plus5": {"name": "구름은 무겁지 않다", "addKeywords": ["retain"]}},
     "flavor": "청운십팔식 제칠식. 구름은 무겁지 않습니다. 몸이 미끄러지듯 상대의 등 뒤로 돌아갔다."
   },
   {
@@ -220,7 +234,8 @@
     "pool": "reward",
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_enemies",
-    "effects": [{"op": "block", "amount": 10, "target": "self"}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "tags": ["haun_rift"],
+    "effects": [{"op": "block", "amount": 8, "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
     "upgrade": {"growth": [3, 0], "plus4": {"name": "흘려보낸 장력", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "자국 없이", "cost": {"neigong": 1, "mana": 0}}},
     "flavor": "청운십팔식 제십오식. 떨어지는 구름은 자국을 남기지 않는다. 장력을 흘려보내자 상대의 균형이 무너졌다."
   },
@@ -263,6 +278,7 @@
     "pool": "starter",
     "cost": {"neigong": 0, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "effects": [{"op": "damage", "amount": 3}, {"op": "reveal_grain", "stacks": 1}],
     "upgrade": {"growth": [1, 0], "plus4": {"name": "마른 가지", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "엉킨 한 점", "effects": [{"op": "reveal_grain", "stacks": 1}]}},
     "flavor": "검이 없어 나뭇가지를 주웠다. 늑대의 목덜미, 결이 엉킨 한 점을 그 끝으로 찔렀다."
@@ -322,15 +338,16 @@
   },
   {
     "id": "haun_ride_grain",
-    "name": "결을 타다",
+    "name": "결을 따라",
     "owner": "haun",
     "type": "attack",
     "rarity": "uncommon",
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 5}, {"op": "damage", "amount": 5, "condition": {"targetHasStatus": "grain"}}],
-    "upgrade": {"growth": [1, 2], "plus4": {"name": "엇결은 피하고", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "물 흐르듯", "effects": [{"op": "draw", "amount": 1}]}},
+    "tags": ["haun_grain"],
+    "effects": [{"op": "damage", "amount": 4, "scale": {"per": "targetStatus", "status": "grain", "amount": 3}}],
+    "upgrade": {"growth": [2], "plus4": {"name": "엇결은 피하고", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "물 흐르듯", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "결은 한 줄로 끝나지 않는다. 한 번 가른 자리 끝에서, 다음 결이 기다리고 있었다."
   },
   {
@@ -342,6 +359,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "effects": [{"op": "damage", "amount": 4}, {"op": "reveal_grain", "stacks": 2}],
     "upgrade": {"growth": [2, 0], "plus4": {"name": "쐐기 하나 더", "effects": [{"op": "reveal_grain", "stacks": 1}]}, "plus5": {"name": "저절로 벌어진다", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "도끼날을 쐐기처럼 박아 두면, 나무는 제 무게로 결을 따라 벌어졌다."
@@ -356,6 +374,7 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
     "keywords": ["exhaust"],
+    "tags": ["haun_rift"],
     "castLine": {"speaker": "haun", "face": "resolve", "text": "세 번 짧게, 한 번 길게."},
     "effects": [{"op": "neigong_max", "amount": 1}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [0, 1], "plus4": {"name": "단전의 온기", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "빌리지 않으니", "cost": {"neigong": 0, "mana": 0}}},
@@ -370,6 +389,7 @@
     "pool": "reward",
     "cost": {"neigong": 2, "mana": 0},
     "target": "enemy",
+    "tags": ["haun_grain"],
     "castLine": {"speaker": "haun", "face": "resolve", "text": "제일식부터 제십팔식까지. 한 호흡에."},
     "effects": [{"op": "damage", "amount": 3, "times": 6}],
     "upgrade": {"growth": [1], "plus4": {"name": "담장 너머의 구령", "effects": [{"op": "reveal_grain", "stacks": 2}]}, "plus5": {"name": "끊기지 않는 구름", "effects": [{"op": "draw", "amount": 2}]}},
@@ -385,6 +405,7 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
     "keywords": ["exhaust"],
+    "tags": ["haun_grain"],
     "castLine": {"speaker": "haun", "face": "neutral", "text": "결국, 다 장작 패기야."},
     "effects": [{"op": "reveal_grain", "stacks": 3}, {"op": "damage", "amount": 8, "times": 3}],
     "upgrade": {"growth": [0, 1], "plus4": {"name": "새벽 도끼 소리", "effects": [{"op": "draw", "amount": 2}]}, "plus5": {"name": "청운산의 새벽", "cost": {"neigong": 0, "mana": 0}}},

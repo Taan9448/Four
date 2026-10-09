@@ -26,7 +26,41 @@ function condText(data: GameData, e: Effect): string {
   return '조건부: ';
 }
 
+const SCALE_LABEL: Record<string, string> = {
+  rift: '균열 1당',
+  hand: '손패 1장당',
+  mana: '마나 1당',
+  cardsPlayed: '이번 턴에 먼저 낸 카드 1장당',
+  block: '자신의 방어 1당',
+  missingHp: '자신이 잃은 체력 1당',
+  enemies: '적 1명당',
+};
+
+/** 비례 수치 꼬리말: "(결 노출 1스택당 +3)" / 방어의 절반이면 "(자신의 방어 2당 +1)" */
+function scaleText(data: GameData, e: Effect): string {
+  const sc = e.scale;
+  if (!sc) return '';
+  const st = sc.status ? (data.statuses.get(sc.status)?.name ?? sc.status) : '';
+  const label =
+    sc.per === 'targetStatus' ? `대상의 ${st} 1당` : sc.per === 'selfStatus' ? `자신의 ${st} 1당` : (SCALE_LABEL[sc.per] ?? sc.per);
+  let body: string;
+  if (sc.amount >= 1 || sc.amount <= -1) body = `${label} ${sc.amount > 0 ? '+' : ''}${sc.amount}`;
+  else {
+    const every = Math.round(1 / Math.abs(sc.amount));
+    body = `${label.replace(/ 1(장|명)?당$/, (_m, u) => ` ${every}${u ?? ''}당`)} ${sc.amount > 0 ? '+' : '-'}1`;
+  }
+  return ` (${body}${sc.max !== undefined ? `, 최대 +${sc.max}` : ''})`;
+}
+
 export function describeEffect(data: GameData, e: Effect, cardTarget?: string): string {
+  if (e.op === 'apply_status' && data.statuses.get(e.status ?? '')?.triggers.length) return describeBase(data, e, cardTarget);
+  // 기본값 0에 비례만 있으면 "피해 (자신의 방어 2당 +1)"
+  const base = describeBase(data, e, cardTarget);
+  const tail = scaleText(data, e);
+  return tail && (e.amount ?? e.stacks ?? 0) === 0 ? base.replace(/ 0(?=( ×\d+)?(\(|$))/, '') + tail : base + tail;
+}
+
+function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
   const n = e.amount ?? e.stacks ?? 0;
   const tgt = e.target ? TARGET_LABEL[e.target] : cardTarget === 'all_enemies' ? '적 전체' : '';
   const pre = condText(data, e);
@@ -55,8 +89,15 @@ export function describeEffect(data: GameData, e: Effect, cardTarget?: string): 
       return `${pre}카드 ${n}장 뽑기`;
     case 'discard':
       return `${pre}무작위 카드 ${n}장 버리기`;
-    case 'apply_status':
-      return `${pre}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ?? 1} 부여`;
+    case 'apply_status': {
+      const st = data.statuses.get(e.status ?? '');
+      // 파워(지속 효과): 상태의 설명을 그대로 보여 준다
+      if (st?.triggers.length && (e.target ?? 'self') === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description}`;
+      if (e.scale && e.stacks === undefined && e.amount === undefined) return `${pre}${st?.name ?? e.status} 부여`;
+      return `${pre}${st?.name ?? e.status} ${e.stacks ?? e.amount ?? 1} 부여`;
+    }
+    case 'lose_hp':
+      return `${pre}${tgt && tgt !== '자신' ? `${tgt}의 ` : ''}체력 ${n} 잃기`;
     case 'remove_status':
       return `${pre}${tgt && tgt !== '적 1명' ? `${tgt}의 ` : ''}${data.statuses.get(e.status ?? '')?.name ?? e.status} ${e.stacks ? `${e.stacks} ` : ''}제거`;
     case 'rift':

@@ -1053,6 +1053,10 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .loadout-card.on .card { box-shadow: 0 0 0 3px #e2b45c, 0 10px 22px rgba(0, 0, 0, 0.6); }
 .loadout-card.full .card { opacity: 0.45; filter: saturate(0.5); }
 .loadout-check { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #e2b45c; color: #1a1408; font-weight: 800; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+.loadout-tags { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; white-space: nowrap; }
+.arch-tag { font-style: normal; padding: 1px 6px; border-radius: 8px; background: #3b2a4a; color: #f1e3ff; font-size: 0.68rem; font-weight: 700; border: 1px solid #8a6aa8; }
+.arch-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
+.arch-filter .btn.on { background: #e2b45c; color: #1a1408; }
 .loadout-new { position: absolute; top: -8px; left: -8px; padding: 1px 6px; border-radius: 8px; background: #1f6fa8; color: #e6f6ff; font-size: 0.72rem; font-weight: 700; }
 .loadout-side { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
 .loadout-side h3 { margin: 0 0 8px; font-size: 0.95rem; }

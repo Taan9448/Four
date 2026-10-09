@@ -33,6 +33,8 @@ function checkEffects(label: string, effects: Effect[], allowed: Set<string>): s
     if (e.card && !data.cards.has(e.card)) errors.push(`${label}: 알 수 없는 카드 ${e.card}`);
     if (e.member && !data.characters.has(e.member)) errors.push(`${label}: 알 수 없는 캐릭터 ${e.member}`);
     if (e.op === 'apply_status' && !e.status) errors.push(`${label}: apply_status에 status 없음`);
+    if (e.scale?.status && !data.statuses.has(e.scale.status)) errors.push(`${label}: 비례의 알 수 없는 상태 ${e.scale.status}`);
+    if ((e.scale?.per === 'targetStatus' || e.scale?.per === 'selfStatus') && !e.scale.status) errors.push(`${label}: ${e.scale.per}에 status 없음`);
   }
   return errors;
 }
@@ -54,6 +56,38 @@ describe('데이터 검사', () => {
       if (fusion && c.owner !== 'haun') errors.push(`${c.id}: 융합(내공+마나 동시 소모)은 하운 전용이다`);
       if (fusion && !c.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) > 0)) errors.push(`${c.id}: 융합 카드는 균열을 올려야 한다`);
     }
+    expect(errors).toEqual([]);
+  });
+
+  it('상태 발동(파워): 발동 효과는 전투 동작만 쓰고, 파워 카드는 소멸하며 자신에게 발동 상태를 건다', () => {
+    const errors: string[] = [];
+    for (const st of data.statuses.values()) for (const t of st.triggers) errors.push(...checkEffects(`상태 ${st.id}`, t.effects, battleOps));
+    for (const c of data.cards.values()) {
+      if (c.type !== 'power') continue;
+      if (!c.keywords.includes('exhaust')) errors.push(`${c.id}: 파워 카드는 소멸(exhaust)`);
+      if (c.target !== 'self') errors.push(`${c.id}: 파워 카드의 대상은 self`);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('아키타입(9-2): 싸우는 동료는 아키타입 2개, 카드 태그는 주인의 것(공용은 아무 동료의 것), 아키타입마다 보유할 수 있는 카드 4장 이상', () => {
+    const errors: string[] = [];
+    const all = new Map<string, string>();
+    for (const ch of data.characters.values()) {
+      if (ch.role !== 'fighter') continue;
+      if (ch.archetypes.length !== 2) errors.push(`${ch.id}: 아키타입 ${ch.archetypes.length}개(2개여야 한다)`);
+      for (const a of ch.archetypes) all.set(a.id, ch.id);
+    }
+    const count = new Map<string, number>();
+    for (const c of data.cards.values()) {
+      for (const t of c.tags) {
+        const owner = all.get(t);
+        if (!owner) errors.push(`${c.id}: 알 수 없는 아키타입 ${t}`);
+        else if (c.owner !== 'common' && c.owner !== owner) errors.push(`${c.id}: ${t}는 ${owner}의 아키타입`);
+        if (c.owner === owner && (c.pool === 'starter' || c.pool === 'reward')) count.set(t, (count.get(t) ?? 0) + 1);
+      }
+    }
+    for (const [t] of all) if ((count.get(t) ?? 0) < 4) errors.push(`${t}: 시작·보상 카드 ${count.get(t) ?? 0}장(4장 이상)`);
     expect(errors).toEqual([]);
   });
 

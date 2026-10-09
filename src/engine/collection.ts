@@ -42,13 +42,33 @@ function score(data: GameData, run: Pick<RunState, 'collection'>, def: CardDef):
   return RARITY_SCORE[def.rarity] * 10 + (run.collection[def.id] ?? 0) * 4 + (def.cost.neigong + def.cost.mana === 0 ? 1 : 0);
 }
 
+/** 아키타입에 모으는 가산점(GAME_DESIGN 9-2): 한 갈래의 카드끼리 맞물리게 */
+const FOCUS_BONUS = 12;
+
+/** 이 주인이 가진 카드로 가장 강한 아키타입(동료: 자기 것 / 공용: 없음) */
+export function focusArchetype(data: GameData, run: Pick<RunState, 'collection'>, owner: string): string | null {
+  const archetypes = data.characters.get(owner)?.archetypes ?? [];
+  let best: string | null = null;
+  let bestV = 0;
+  for (const a of archetypes) {
+    const v = choosable(data, run, owner)
+      .filter((d) => d.tags.includes(a.id))
+      .reduce((sum, d) => sum + score(data, run, d), 0);
+    if (v > bestV) [best, bestV] = [a.id, v];
+  }
+  return best;
+}
+
 /**
  * 추천 편성(한 주인): 점수 높은 카드부터, 공격과 그 밖(방어·기술·심법)이 한쪽으로 쏠리지 않게
- * (칸의 3/8 이상은 공격, 1/4 이상은 공격 아닌 카드 — 가진 카드가 허락하는 만큼)
+ * (칸의 3/8 이상은 공격, 1/4 이상은 공격 아닌 카드 — 가진 카드가 허락하는 만큼).
+ * 동료는 가장 강한 아키타입의 카드에 가산점을 준다
  */
 export function recommendFor(data: GameData, run: Pick<RunState, 'collection'>, owner: string): string[] {
   const n = requiredFor(data, run, owner);
-  const sorted = choosable(data, run, owner).sort((a, b) => score(data, run, b) - score(data, run, a) || a.id.localeCompare(b.id));
+  const focus = focusArchetype(data, run, owner);
+  const value = (d: CardDef) => score(data, run, d) + (focus && d.tags.includes(focus) ? FOCUS_BONUS : 0);
+  const sorted = choosable(data, run, owner).sort((a, b) => value(b) - value(a) || a.id.localeCompare(b.id));
   const attacks = sorted.filter((d) => d.type === 'attack');
   const others = sorted.filter((d) => d.type !== 'attack');
   const minAtk = Math.min(attacks.length, Math.ceil((n * 3) / 8));

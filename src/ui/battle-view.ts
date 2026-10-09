@@ -765,6 +765,13 @@ export class BattleView {
           await this.wait(600);
           break;
         }
+        case 'power': {
+          // 파워(발동 상태)가 일어났다: 그 상태 이름을 띄운다
+          const u = this.units.get(ev.uid);
+          if (u) floatOver(this.fxLayer, u.el, `${this.data.statuses.get(ev.status)?.glyph ?? ''} ${this.data.statuses.get(ev.status)?.name ?? ev.status}`, 'status');
+          await this.wait(160);
+          break;
+        }
         case 'skip': {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, '움직이지 못함', 'status');

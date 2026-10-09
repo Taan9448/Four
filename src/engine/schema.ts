@@ -22,6 +22,7 @@ export const BATTLE_OPS = [
   'add_card',
   'dispel',
   'neigong_max',
+  'lose_hp',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -71,11 +72,17 @@ export const Condition = z
   .strict();
 export type Condition = z.infer<typeof Condition>;
 
+/**
+ * 비례 수치: 기본값 + amount × per(소수면 내림). max가 있으면 더하는 값이 그 이상 커지지 않는다.
+ * per — rift 균열 · hand 손패 수 · mana 마나 · targetStatus 대상의 status 스택 · selfStatus 자신의 status 스택 ·
+ * cardsPlayed 이번 턴에 이 카드 전에 낸 카드 수 · block 자신의 방어 · missingHp 자신이 잃은 체력 · enemies 살아 있는 적 수
+ */
 export const Scale = z
   .object({
-    per: z.enum(['rift', 'targetStatus', 'hand', 'mana']),
+    per: z.enum(['rift', 'targetStatus', 'hand', 'mana', 'selfStatus', 'cardsPlayed', 'block', 'missingHp', 'enemies']),
     status: z.string().optional(),
     amount: z.number(),
+    max: z.number().optional(),
   })
   .strict();
 export type Scale = z.infer<typeof Scale>;
@@ -203,6 +210,8 @@ export const CardDef = z
     seal: z.string().length(1).optional(),
     /** 영웅·전설 카드: 쓸 때마다 반신 그림과 함께 나오는 대사(컷인) */
     castLine: z.object({ speaker: z.string(), face: Face.default('resolve'), text: z.string() }).strict().optional(),
+    /** 아키타입(GAME_DESIGN 9-2): 주인 캐릭터의 archetypes id. 공용 카드는 어느 캐릭터의 것이든 붙일 수 있다 */
+    tags: z.array(z.string()).default([]),
     /** 필수 카드(GAME_DESIGN 9-1): 보스를 깨는 열쇠. 가지고 있으면 편성과 상관없이 늘 덱에 들어간다 */
     essential: z.boolean().optional(),
     /**
@@ -216,6 +225,25 @@ export const CardDef = z
   })
   .strict();
 export type CardDef = z.infer<typeof CardDef>;
+
+/**
+ * 상태의 발동(지속 효과·파워, CARD_EFFECTS 4-1): 가진 쪽에게 일이 생길 때마다 effects가 그 쪽을 출처로 일어난다.
+ * on — turnStart 그 편 차례 시작(뽑은 뒤) · turnEnd 그 편 차례 끝 · cardPlayed 아군이 카드를 낸 뒤 ·
+ * attacked 공격을 맞았을 때(방어로 다 막아도) · hpLost 체력을 잃었을 때(자해·화상 포함)
+ * perStack(기본 true): 수치에 스택 수를 곱한다. cardType·keyword·ownCards: cardPlayed 거르기(ownCards는 가진 동료의 카드만)
+ */
+export const StatusTrigger = z
+  .object({
+    on: z.enum(['turnStart', 'turnEnd', 'cardPlayed', 'attacked', 'hpLost']),
+    cardType: z.enum(['attack', 'skill', 'power']).optional(),
+    keyword: Keyword.optional(),
+    ownCards: z.boolean().optional(),
+    perStack: z.boolean().default(true),
+    condition: Condition.optional(),
+    effects: z.array(Effect).min(1),
+  })
+  .strict();
+export type StatusTrigger = z.infer<typeof StatusTrigger>;
 
 export const StatusDef = z
   .object({
@@ -246,6 +274,7 @@ export const StatusDef = z
     special: z
       .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'chill'])
       .optional(),
+    triggers: z.array(StatusTrigger).default([]),
   })
   .strict();
 export type StatusDef = z.infer<typeof StatusDef>;
@@ -331,6 +360,8 @@ export const CharacterDef = z
     description: z.string(),
     /** 도감의 긴 소개(합류했을 때 아는 만큼) */
     lore: z.string().optional(),
+    /** 아키타입 2개(GAME_DESIGN 9-2): 카드의 tags가 이 id를 쓴다 */
+    archetypes: z.array(z.object({ id: z.string(), name: z.string(), text: z.string() }).strict()).default([]),
   })
   .strict();
 export type CharacterDef = z.infer<typeof CharacterDef>;

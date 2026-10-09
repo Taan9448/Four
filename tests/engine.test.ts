@@ -215,13 +215,13 @@ describe('파티', () => {
     }
   });
 
-  it('날개 베기는 적에게 큰 피해와 약화, 카일 자신은 대가로 피해를 입는다', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }], enemies: ['test_wolf_alpha'] });
+  it('날개 베기: 카일이 먼저 체력 4를 잃고, 잃은 체력 4당 피해 +1(최대 +15)로 벤 뒤 약화', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 32, maxHp: 52 }], enemies: ['test_wolf_alpha'] });
     const before = wolf(s).hp;
     playCard(s, give(s, 'kyle_wing_cut'), wolf(s).uid);
-    expect(before - wolf(s).hp).toBe(18);
+    expect(before - wolf(s).hp).toBe(12 + 6); // 잃은 체력 24 → +6
     expect(wolf(s).statuses.weak).toBe(2);
-    expect(s.party[1].hp).toBe(49);
+    expect(s.party[1].hp).toBe(28);
     expect(s.party[0].hp).toBe(60);
   });
 

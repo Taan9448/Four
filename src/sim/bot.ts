@@ -73,6 +73,8 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
   }
   const kind = (id: string) => data.statuses.get(id)?.kind;
   for (const p of alive(s.party)) for (const [id, n] of Object.entries(p.statuses)) v += kind(id) === 'buff' ? 2 * n : kind(id) === 'debuff' ? -2 * n : 0;
+  // 파워(발동 상태)는 전투가 끝날 때까지 값을 낸다: 한 수 앞만 보는 봇이 미리 깔아 두게
+  for (const p of alive(s.party)) for (const [id, n] of Object.entries(p.statuses)) if (data.statuses.get(id)?.triggers.length) v += POWER_VALUE * n;
   for (const e of alive(s.enemies)) for (const [id, n] of Object.entries(e.statuses)) v += kind(id) === 'debuff' ? 2 * n : kind(id) === 'buff' ? -2 * n : 0;
   // 매듭(모르데카이): 결 노출을 문턱까지 쌓아 매듭을 드러내는 준비에 값을 준다(한 수 앞만 보는 봇이 준비 동작을 버리지 않게)
   const knotAt = data.balance.grain.knotThreshold;
@@ -98,6 +100,8 @@ function scoreAfterEndTurn(s: BattleState, opts: BotOptions): number {
   return scoreBattle(c, opts);
 }
 
+/** 파워 1스택의 값(남은 전투 동안 낼 값의 어림) */
+const POWER_VALUE = 14;
 /** 카드를 쓰는 것 자체에 주는 작은 가산점(뽑기·내공 회복처럼 이번 턴 안에서만 값이 나는 카드도 쓰게) */
 const PLAY_BIAS = 0.5;
 /** 물약을 쓰는 값(아껴 둔다: 이만큼 나아질 때만 쓴다) */
