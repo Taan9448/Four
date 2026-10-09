@@ -1,7 +1,8 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
+import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
 import type { CardInstance } from '../engine/state';
@@ -116,7 +117,26 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           'div',
           { class: 'shop-col' },
           h('h3', { class: 'shop-h' }, '손질(상점마다 한 번)'),
-          h(
+          run.abyss
+            ? h(
+                'div',
+                { class: `shop-line${shop.swapUsed ? ' sold' : ''}` },
+                h('span', { class: 'service-glyph' }, '棄'),
+                h('div', { class: 'shop-desc' }, h('b', {}, '카드 지우기'), h('small', {}, '덱에서 카드 한 장을 영영 뺀다. 쓸 때마다 값이 오른다.')),
+                price(removePrice(data, run), shop.swapUsed),
+                shop.swapUsed
+                  ? null
+                  : h(
+                      'button',
+                      {
+                        class: 'btn btn-small',
+                        disabled: run.gold < removePrice(data, run) || run.deck.length <= 1,
+                        onclick: () => pickCard(data, `지울 카드 고르기 — ${removePrice(data, run)}골드`, run.deck, (uid) => result(buyRemove(data, run, uid))),
+                      },
+                      '고르기',
+                    ),
+              )
+            : h(
             'div',
             { class: `shop-line${shop.swapUsed ? ' sold' : ''}` },
             h('span', { class: 'service-glyph' }, '換'),
@@ -144,7 +164,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
             'div',
             { class: `shop-line${shop.upgradeUsed ? ' sold' : ''}` },
             h('span', { class: 'service-glyph' }, '鍛'),
-            h('div', { class: 'shop-desc' }, h('b', {}, '카드 강화'), h('small', {}, '이번 덱의 카드 한 장을 강화한다(+1, 보유 카드에 남는다).')),
+            h('div', { class: 'shop-desc' }, h('b', {}, '카드 강화'), h('small', {}, run.abyss ? '덱의 카드 한 장을 강화한다(+1, 이번 심연에서만).' : '이번 덱의 카드 한 장을 강화한다(+1, 보유 카드에 남는다).')),
             price(upCost, shop.upgradeUsed),
             shop.upgradeUsed
               ? null

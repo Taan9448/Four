@@ -45,6 +45,11 @@ export const RUN_OPS = [
   'swap_card',
   'sell_card',
   'gain_potion_slot',
+  // 심연(GAME_DESIGN 16절)
+  'gain_abyss_card',
+  'reveal_unseen_card',
+  'injure',
+  'cure_injury',
 ] as const;
 
 export const Target = z.enum([
@@ -205,7 +210,8 @@ export const CardDef = z
     type: z.enum(['attack', 'skill', 'power', 'status']),
     /** 등급: 일반·고급·희귀·영웅·전설(+ 상태·저주용 special). 영웅·전설은 castLine 필수 */
     rarity: Rarity,
-    pool: z.enum(['starter', 'reward', 'story', 'status']),
+    /** abyss: 틈의 카드(심연 전용, 캠페인에는 나오지 않는다) */
+    pool: z.enum(['starter', 'reward', 'story', 'status', 'abyss']),
     cost: Cost,
     target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
     keywords: z.array(Keyword).default([]),
@@ -409,7 +415,8 @@ export const RelicDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
-    rarity: z.enum(['common', 'uncommon', 'rare', 'boss']),
+    /** path: 심연의 시작 유물(길). 보상·상점에 나오지 않는다 */
+    rarity: z.enum(['common', 'uncommon', 'rare', 'boss', 'path']),
     /** 아이콘 그림이 없을 때 표시할 한 글자 */
     glyph: z.string().length(1),
     /** 유물 아이콘 시트(icons_relics)의 프레임 번호(1부터) */
@@ -428,7 +435,8 @@ export const RelicDef = z
     keyword: Keyword.optional(),
     every: z.number().int().positive().optional(),
     /** 규칙을 바꾸는 유물(엔진이 처리, 수치는 balance.relicRules) */
-    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount']).optional(),
+    /** reveal_map 지도의 ? 노드가 모두 보이고 엘리트 피해 ×balance.abyss.shadowEliteDmg · needle 심연 상점 지우기 무료·보상 카드 2장(심연 길) */
+    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount', 'reveal_map', 'needle']).optional(),
     effects: z.array(Effect).default([]),
     shop: z.boolean().default(true),
   })
@@ -457,6 +465,8 @@ export const WorldMana = z
   .object({ battleStart: z.union([z.enum(['full', 'carry']), z.number().int().min(0)]), perTurn: z.number().int() })
   .strict();
 export type WorldMana = z.infer<typeof WorldMana>;
+
+const NodeTypeEnum = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'shop', 'story', 'boss']);
 
 export const Balance = z
   .object({
@@ -581,6 +591,43 @@ export const Balance = z
       .default({}),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
+    /**
+     * 심연(GAME_DESIGN 16절): 굽이 n의 적 배율 hpBase·dmgBase × (1 + step × (n-1)), 지도 층수·노드 비율, 굽이를 넘을 때 회복,
+     * 숙적 굽이, 동료 수별 길 개수·골드, 시작 카드 장수, 틈의 카드가 보상에 섞일 확률, 상점 지우기 가격, 한 방 상한(하운 최대 체력 비율), 점수
+     */
+    abyss: z
+      .object({
+        hpBase: z.number().positive(),
+        dmgBase: z.number().positive(),
+        hpStep: z.number().min(0),
+        dmgStep: z.number().min(0),
+        floors: z.number().int().positive(),
+        typeWeights: z.partialRecord(NodeTypeEnum, z.number()),
+        forcedTypes: z.record(z.string(), NodeTypeEnum),
+        healOnLoop: z.number().min(0).max(1),
+        nemesisEvery: z.number().int().positive(),
+        nemesisModule: z.string(),
+        partyMax: z.number().int().positive(),
+        starters: z.object({ haun: z.number().int().positive(), common: z.number().int().min(0), mate: z.number().int().positive() }).strict(),
+        /** 동료 수(1~3) → 고를 길 개수·덤 골드 */
+        pathPicks: z.record(z.string(), z.object({ picks: z.number().int().positive(), gold: z.number().int().min(0) }).strict()),
+        pathOffer: z.number().int().positive(),
+        riftCardChance: z.number().min(0).max(1),
+        removePrice: z.number().int().min(0),
+        removeStep: z.number().int().min(0),
+        shopRiftPrice: z.partialRecord(Rarity, z.number().int().positive()),
+        oneHitCap: z.number().min(0).max(1),
+        injuryRatio: z.number().min(0).max(1),
+        shadowEliteDmg: z.number().positive(),
+        needleRewardChoices: z.number().int().positive(),
+        unseenCardPrice: z.number().int().min(0),
+        /** 세계 → 그 세계의 지도에 쓸 스테이지(모듈·적·배경·마나 규칙), 보스 모듈 */
+        worlds: z.record(World, z.object({ stages: z.array(z.string()).min(1), bosses: z.array(z.string()) }).strict()),
+        firstWorlds: z.array(World).min(1),
+        riftFrom: z.number().int().positive(),
+        score: z.object({ depth: z.number(), boss: z.number(), elite: z.number(), hp: z.number() }).strict(),
+      })
+      .strict(),
     route: z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
@@ -595,7 +642,7 @@ export const Balance = z
   .strict();
 export type Balance = z.infer<typeof Balance>;
 
-export const NodeType = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'shop', 'story', 'boss']);
+export const NodeType = NodeTypeEnum;
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z
@@ -666,6 +713,8 @@ export const ModuleDef = z
     weight: z.number().min(0).default(1),
     tags: z.array(z.string()).default([]),
     once: z.boolean().default(false),
+    /** 심연(GAME_DESIGN 16절)에 나오는가. false면 빠진다(이야기 노드·동료 합류/이탈 사건은 엔진이 따로 뺀다) */
+    abyss: z.boolean().optional(),
     conditions: Condition.default({}),
     content: z
       .object({

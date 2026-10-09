@@ -28,7 +28,7 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
   return h(
     'div',
     {
-      class: `card t-${world} card-${def.type} rarity-${def.rarity}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
+      class: `card t-${world} card-${def.type} rarity-${def.rarity}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
       title: opts.disabled ?? def.flavor ?? '',
     },

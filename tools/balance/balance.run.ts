@@ -5,6 +5,7 @@ import { it } from 'vitest';
 import { gameData } from '../../src/engine/data';
 import { playableStages } from '../../src/engine/run';
 import { DEFAULT_BOT, playRun, type RunReport } from '../../src/sim/bot';
+import { abyssReport } from './abyss-report';
 
 const SEEDS = Number(process.env.BALANCE_SEEDS ?? 300);
 const PREFIX = process.env.BALANCE_PREFIX ?? 'B';
@@ -23,6 +24,14 @@ const f1 = (x: number) => x.toFixed(1);
 
 it('밸런스: 봇 런', () => {
   const data = gameData();
+  // BALANCE_MODE=abyss: 심연 보고서(docs/BALANCE_ABYSS.md, 조합마다 시드 BALANCE_SEEDS개 — 기본 40)
+  if (process.env.BALANCE_MODE === 'abyss') {
+    const text = abyssReport(data, Number(process.env.BALANCE_SEEDS ?? 40), PREFIX === 'B' ? 'A' : PREFIX, BOT);
+    const out = process.env.BALANCE_OUT ?? 'docs/BALANCE_ABYSS.md';
+    if (out !== '-') writeFileSync(out, text + '\n');
+    process.stderr.write(`\n${text.split('\n## 쓰러진 곳')[0]}\n`);
+    return;
+  }
   const t0 = Date.now();
   const runs: RunReport[] = [];
   for (let i = 1; i <= SEEDS; i++) runs.push(playRun(data, `${PREFIX}${String(i).padStart(4, '0')}`, BOT, START, MODE));

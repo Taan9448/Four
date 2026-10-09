@@ -182,3 +182,13 @@
 ## 6. 전투 마나 규칙
 
 세계 기본값 `balance.mana.worlds[world]`(`battleStart: full | carry | 숫자`, `perTurn`)을 스테이지 `mana`, 모듈 `content.mana` 순으로 덮어쓴다(`GAME_DESIGN.md` 6절). 모듈 `content.startEffects`는 전투 시작에 언제나 일어나는 전투 동작이다(이그니스전의 '흐름에 올라타기', 모르데카이전의 '고리 멈추기'를 손패에).
+
+## 7. 심연(GAME_DESIGN 16절)
+
+- **틈의 카드**(`data/cards/abyss.json`, `pool: "abyss"`): 심연 보상(슬롯마다 `abyss.riftCardChance`)·심연 상점 한 칸·틈의 거래로만 나온다. 캠페인 보상·상점·도감 수치에는 들어가지 않는다. 희귀 이상, 대가(균열 +·체력 잃기·소멸·체력을 잃는 발동 상태) 하나는 반드시(`npm run data:check`). 카드 틀은 보랏빛 테두리에 검은 금(`card-abyss`).
+- 1차 10장: 하운 3(틈을 가르는 도끼·금 밟기·흐르지 않는 숨) · 엘리아 2(검은 불·빌린 강물) · 카일 2(왼편이 아닌 검·마지막 돌격) · 보른 2(산을 삼키다·두린의 그림자) · 공용 1(꿰맨 자리). 새 발동 상태 `p_still_breath`(차례 시작 결 노출 2, 차례 끝 체력 2 잃기)·`p_durin_shadow`(맞으면 반격 5, 차례 시작 체력 1 잃기).
+- **길**(시작 유물, `data/relics.json`의 `rarity: "path"`, `shop: false`): 장작꾼(전투 시작 결 노출 1) · 강물(전투 시작 마나 +3) · 산(최대 체력 +15) · 빚(골드 +150, 상흔 +3) · 바늘(규칙 `needle`: 상점 카드 지우기 공짜, 보상 카드 `abyss.needleRewardChoices`장) · 그림자(규칙 `reveal_map`: 지도의 ? 노드 종류가 보이고 엘리트 피해 ×`abyss.shadowEliteDmg`). 무작위 유물(`gain_relic`)·상점·전리품에는 나오지 않는다.
+- **한 방 상한**: 심연 전투에서 적이 아군에게 주는 피해 한 번은 하운 최대 체력 × `abyss.oneHitCap`(내림)을 넘지 않는다(`BattleSetup.enemyHitCap`, 받을 피해 예고에도).
+- **출전 인원**: 심연은 하운 + 동료 1~3명 전원(`BattleSetup.partyMax` = `abyss.partyMax`).
+- **적 배율**: 굽이 n은 `hpBase·dmgBase × (1 + hpStep·dmgStep × (n−1))` × 스테이지 맞춤(그 스테이지 일반 전투 적의 평균 체력·피해를 S1에 맞추는 배율, 데이터에서 계산 — `stageNorm`). 캠페인의 스테이지·어려움 배율은 쓰지 않는다. 적 등급 배율(`enemyTiers`)은 그대로.
+

@@ -1112,3 +1112,31 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .hand .card.drag-source { opacity: 0.35; }
 .card-drag { transform: rotate(-4deg) scale(1.08) !important; box-shadow: 0 18px 30px rgba(0, 0, 0, 0.7); }
 .hand .card { touch-action: pan-x; }
+
+/* ───────── 심연(GAME_DESIGN 16절) ───────── */
+.btn-abyss { border-color: rgba(150, 110, 210, 0.7); background: linear-gradient(180deg, rgba(40, 24, 60, 0.92), rgba(18, 10, 28, 0.92)); }
+.btn-abyss:hover { box-shadow: 0 0 14px rgba(150, 110, 210, 0.45); }
+.abyss-start { display: flex; flex-direction: column; gap: 10px; }
+.abyss-start h3 { margin: 6px 0 0; font-size: 0.95rem; color: #d9c7f2; }
+.abyss-intro { margin: 0; color: #e7dccb; line-height: 1.6; }
+.abyss-mates, .abyss-paths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .abyss-mates, .abyss-paths { grid-template-columns: minmax(0, 1fr); } }
+.abyss-mate, .abyss-path { display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid rgba(150, 110, 210, 0.4); border-radius: 6px; background: rgba(16, 12, 24, 0.75); cursor: pointer; }
+.abyss-mate { border-left: 4px solid var(--owner, #888); }
+.abyss-mate.on, .abyss-path.on { border-color: #b996ef; box-shadow: 0 0 12px rgba(185, 150, 239, 0.35); }
+.abyss-mate input, .abyss-path input { align-self: flex-start; }
+.abyss-mate small, .abyss-path small { color: #b9b0c4; line-height: 1.45; }
+.abyss-path-glyph { font-size: 1.4rem; color: #d9c7f2; font-family: serif; }
+.depth-band { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 14px 18px; min-height: 84px; background: radial-gradient(ellipse at center, rgba(60, 30, 90, 0.55), rgba(8, 6, 12, 0.95)); overflow: hidden; }
+.depth-crack { position: absolute; left: 0; right: 0; top: 50%; height: 3px; background: linear-gradient(90deg, transparent, #0b0b10 8%, #3a1d55 50%, #0b0b10 92%, transparent); box-shadow: 0 0 10px rgba(160, 90, 220, 0.5); }
+.depth-stop { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px; padding: 6px 4px; border: 1px solid rgba(150, 110, 210, 0.3); border-radius: 6px; background: rgba(14, 10, 20, 0.85); color: #8f86a0; }
+.depth-stop b { font-size: 1rem; }
+.depth-stop small { font-size: 0.68rem; white-space: nowrap; }
+.depth-stop.done { color: #c9bedb; }
+.depth-stop.here { color: #fff; border-color: #c9a7ff; box-shadow: 0 0 14px rgba(201, 167, 255, 0.6); }
+.depth-stop.nemesis { border-color: rgba(255, 80, 80, 0.6); }
+.depth-stop.nemesis small { color: #ff9a9a; }
+@media (max-width: 720px) { .depth-band { overflow-x: auto; justify-content: flex-start; } }
+/* 틈의 카드: 보랏빛 테두리에 검은 금 */
+.card.card-abyss { border-color: #9a6ad6 !important; box-shadow: 0 0 10px rgba(154, 106, 214, 0.55), inset 0 0 0 1px rgba(20, 8, 30, 0.8); }
+.card.card-abyss::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(118deg, transparent 46%, rgba(10, 6, 16, 0.85) 47%, rgba(10, 6, 16, 0.85) 48.2%, transparent 49.2%), linear-gradient(64deg, transparent 58%, rgba(10, 6, 16, 0.7) 58.6%, transparent 59.4%); mix-blend-mode: multiply; opacity: 0.4; }

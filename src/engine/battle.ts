@@ -67,12 +67,17 @@ export interface BattleSetup {
   relics?: string[];
   /** 물약 칸(빈 칸 null) */
   potions?: (string | null)[];
+  /** 출전 인원 상한(생략하면 balance.party.max. 심연은 전원 출전) */
+  partyMax?: number;
+  /** 적의 피해 한 번의 상한(심연의 한 방 상한) */
+  enemyHitCap?: number;
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   const bal = data.balance;
-  if (setup.party.length === 0 || setup.party.length > bal.party.max) {
-    throw new Error(`출전 인원은 1~${bal.party.max}명이어야 한다`);
+  const partyMax = setup.partyMax ?? bal.party.max;
+  if (setup.party.length === 0 || setup.party.length > partyMax) {
+    throw new Error(`출전 인원은 1~${partyMax}명이어야 한다`);
   }
   if (!setup.party.some((p) => p.id === 'haun')) throw new Error('하운은 항상 출전한다');
 
@@ -132,6 +137,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.enemyHpScale = setup.enemyHpScale ?? 1;
   state.critRng = setup.rng.fork('crit');
   state.enemyDmgScale = setup.enemyDmgScale ?? 1;
+  if (setup.enemyHitCap) state.enemyHitCap = setup.enemyHitCap;
   fireSupport(state, 'battleStart', {});
   fireRelics(state, 'battleStart');
   if (setup.startEffects?.length) {

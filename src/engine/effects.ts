@@ -256,7 +256,12 @@ function enemyBase(state: BattleState, source: Combatant | null, base: number): 
 /** 받을 피해 예고용: 대상의 받는 피해 보정(취약 등)까지 넣은 1회 피해. dealDamage와 같은 순서로 계산한다 */
 export function previewDamageOn(state: BattleState, source: Combatant, target: Combatant, base: number): number {
   const dmg = (enemyBase(state, source, base) + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul') * statusModifier(state, target, 'damageTakenMul');
-  return Math.max(0, Math.floor(dmg));
+  return hitCap(state, source, target, Math.max(0, Math.floor(dmg)));
+}
+
+/** 심연의 한 방 상한: 적이 아군에게 주는 피해 한 번은 enemyHitCap을 넘지 않는다 */
+function hitCap(state: BattleState, source: Combatant | null, target: Combatant, dmg: number): number {
+  return state.enemyHitCap && source?.side === 'enemy' && target.side === 'party' ? Math.min(dmg, state.enemyHitCap) : dmg;
 }
 
 // ───────────────────────── 피해·균열 ─────────────────────────
@@ -315,7 +320,7 @@ export function dealDamage(
     }
   }
   dmg *= statusModifier(state, target, 'damageTakenMul');
-  dmg = Math.max(0, Math.floor(dmg));
+  dmg = hitCap(state, source, target, Math.max(0, Math.floor(dmg)));
 
   // 흐름 포식: 흐름을 쓴 카드의 피해를 먹는다
   if (usesFlow && target.statuses.flow_eater > 0) {
