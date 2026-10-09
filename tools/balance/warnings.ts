@@ -17,3 +17,9 @@ export function warningSection(lines: (string | null)[]): string[] {
   const ws = lines.filter((x): x is string => !!x);
   return ['## 경고', '', ...(ws.length ? ws.map((w) => `- ⚠ ${w}`) : ['- 목표 밖인 값이 없다.']), '', '목표: `tools/balance/targets.json`(GAME_DESIGN 12절·16절).', ''];
 }
+
+/** '목표와 지금' 표(2단계 PR마다 이 표의 숫자를 전후로 비교한다) */
+export function targetTable(rows: { label: string; target: string; now: string; ok: boolean }[]): string[] {
+  return ['## 목표와 지금', '', '| 항목 | 목표 | 지금 | |', '|---|---|---|---|', ...rows.map((r) => `| ${r.label} | ${r.target} | ${r.now} | ${r.ok ? '✓' : '⚠'} |`), ''];
+}
+export const fmtPct = p;
