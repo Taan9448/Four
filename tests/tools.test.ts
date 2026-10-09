@@ -9,7 +9,7 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
-import { columnCenter, keyOut, magentaCast, nearestColor, shiftX, shiftXY } from '../tools/lib/image.mjs';
+import { columnCenter, dropEdgeSlivers, keyOut, magentaCast, nearestColor, shiftX, shiftXY } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -432,5 +432,24 @@ describe('이어 붙이는 조각(ui-slices) 가운데 맞추기', () => {
     expect(moved.data[(2 * 16 + 5) * 4 + 3]).toBe(255);
     expect(moved.data[(0 * 16 + 2) * 4 + 3]).toBe(0);
     expect(moved.data[(1 * 16 + 5) * 4 + 3]).toBe(0);
+  });
+});
+
+describe('반신 그림: 옆 칸에서 넘어온 조각 지우기', () => {
+  it('가장자리에 닿은 작은 덩어리만 지우고, 인물과 떨어진 안쪽 머리카락 끝은 남긴다', () => {
+    const W = 40;
+    const H = 30;
+    const data = Buffer.alloc(W * H * 4);
+    const fill = (x0: number, x1: number, y0: number, y1: number) => {
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) data[(y * W + x) * 4 + 3] = 255;
+    };
+    fill(10, 29, 2, 29); // 인물(가장 큰 덩어리, 아래 가장자리에 닿아도 된다)
+    fill(37, 39, 5, 12); // 오른쪽 가장자리에 붙은 옆 칸 조각
+    fill(3, 5, 4, 6); // 인물과 떨어졌지만 가장자리에 닿지 않는 머리카락 끝
+    const img = { data, width: W, height: H };
+    expect(dropEdgeSlivers(img)).toBe(3 * 8);
+    expect(data[(8 * W + 38) * 4 + 3]).toBe(0);
+    expect(data[(5 * W + 4) * 4 + 3]).toBe(255);
+    expect(data[(10 * W + 20) * 4 + 3]).toBe(255);
   });
 });
