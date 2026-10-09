@@ -1,4 +1,5 @@
 // 화면 흐름: 타이틀 → 지도 → (스토리/이벤트/휴식/여관 | 전투 → 보상) → 지도 … → 스테이지 클리어 / 패배
+import { checkForUpdate } from './update-check';
 import { battleOutcome, createBattle } from '../engine/battle';
 import { gameData } from '../engine/data';
 import { randomSeed } from '../engine/rng';
@@ -461,6 +462,7 @@ export class App {
 
   private map(): void {
     const run = this.run!;
+    void checkForUpdate();
     // 자동 저장: 지도(또는 스테이지 끝)에 설 때마다. 노드에 들어간 뒤 새로고침하면 그 노드 직전 지도에서 이어진다
     if (this.persist && run.abyss) {
       // 심연: 따로 1칸. 쓰러지면 지운다
