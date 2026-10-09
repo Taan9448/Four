@@ -1304,3 +1304,7 @@ img.vn-portrait, img.cutin-portrait {
 .shop-cards .card { margin-top: 8px; }
 .abyss-mate small.abyss-narrow { color: #f0a050; font-weight: 600; }
 .abyss-oath-more { margin-top: 6px; width: auto; align-self: flex-start; justify-self: start; }
+
+/* 새 배포 알림(update-check.ts) */
+.update-banner { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); padding: 10px 14px; border: 1px solid #e2b45c; border-radius: 8px; background: rgba(20, 16, 10, 0.95); color: #f3e6c4; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); font-size: 0.9rem; }
+.update-banner .btn { flex: none; white-space: nowrap; }
