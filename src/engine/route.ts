@@ -61,8 +61,8 @@ function moduleEligible(
   ctx: RouteContext,
   used: Set<string>,
 ): boolean {
-  if (mod.stage !== stage.id) return false;
-  if (mod.once && used.has(mod.id)) return false;
+  if (mod.stage !== stage.id && !(mod.stage === '*' && stage.templateEvents)) return false;
+  if ((mod.once || mod.stage === '*') && used.has(mod.id)) return false;
   const c = mod.conditions;
   if (c.floorRange && (floor < c.floorRange[0] || floor > c.floorRange[1])) return false;
   if (c.scarMin !== undefined && ctx.scar < c.scarMin) return false;
@@ -171,7 +171,8 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
         if (mod) {
           node.type = type;
           node.moduleId = mod.id;
-          if (mod.once) used.add(mod.id);
+          // 어디서나 나오는 사건(stage "*")은 한 지도에 한 번씩만(스테이지마다 다시 나올 수 있다)
+          if (mod.once || mod.stage === '*') used.add(mod.id);
           assigned = true;
         } else {
           candidates = candidates.filter(([t]) => t !== type);

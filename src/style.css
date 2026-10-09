@@ -1080,3 +1080,6 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 
 .unit.summoned { animation: summon-in 0.5s ease-out; }
 @keyframes summon-in { from { opacity: 0; transform: translateY(-18px) scale(0.9); } to { opacity: 1; transform: none; } }
+
+.choice.choice-off { opacity: 0.45; cursor: not-allowed; }
+.choice .choice-why { margin-left: auto; color: #e08a7a; font-size: 0.8rem; }

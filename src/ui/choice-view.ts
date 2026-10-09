@@ -2,7 +2,8 @@
 import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, applyLevelUpgrade, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
+import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
+import { swappableCards } from '../engine/collection';
 import { cardView } from './card-view';
 import { h } from './dom';
 import { gainRelic } from '../engine/run';
@@ -62,15 +63,19 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
               h(
                 'button',
                 {
-                  class: `btn choice${c.source === 'support' ? ' choice-support' : ''}`,
+                  class: `btn choice${c.source === 'support' ? ' choice-support' : ''}${c.disabled ? ' choice-off' : ''}`,
+                  disabled: !!c.disabled,
                   onclick: () => {
                     const pick = choiceNeedsPick(c);
                     if (pick) return pickUpgrade(pick.filter, i, c.result);
+                    const cardPick = choiceCardPick(c);
+                    if (cardPick) return pickOwned(cardPick.op === 'sell_card' ? '넘길 카드' : '바꿀 카드', i, c.result);
                     render(applyChoice(data, run, module, i), c.result);
                   },
                 },
                 h('span', { class: 'choice-mark' }, '▸'),
                 h('span', {}, c.label),
+                c.disabled ? h('small', { class: 'choice-why' }, c.disabled) : null,
               ),
             ),
             // 여관: 편성 바꾸기(선택지와 따로, 고르기 전에)
@@ -83,6 +88,26 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                 )
               : null,
           ),
+    );
+  };
+  // 카드 바꾸기·팔기: 보유 카드 한 장을 고른다(필수 카드는 빠진다)
+  const pickOwned = (title: string, index: number, resultText?: string) => {
+    const ids = swappableCards(data, run).sort((a, b) => (data.cards.get(a)!.owner).localeCompare(data.cards.get(b)!.owner) || a.localeCompare(b));
+    box.replaceChildren(
+      panelHead('換', module.name, title),
+      h('p', { class: 'choice-text' }, '보유 카드 한 장을 고른다. 편성에 들어 있었으면 그 자리도 바뀐다.'),
+      ids.length
+        ? h(
+            'div',
+            { class: 'reward-cards upgrade-cards' },
+            ids.map((id) => {
+              const el = cardView(data, { uid: `own_${id}`, cardId: id, level: run.collection[id] ?? 0 });
+              el.addEventListener('click', () => render(applyChoice(data, run, module, index, id), resultText));
+              return el;
+            }),
+          )
+        : h('p', {}, '고를 카드가 없다.'),
+      h('button', { class: 'btn', onclick: () => render() }, '돌아가기'),
     );
   };
   // 수련: 강화할 카드를 고른다. 카드는 강화 뒤 모습(+1)으로 보여 준다

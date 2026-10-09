@@ -188,6 +188,8 @@ export function scoreRun(data: GameData, run: RunState): number {
   }
   v += run.mana * 2;
   v -= run.scar * 8;
+  // 골드·유물에도 값을 준다(대가형 사건에서 공짜로 내지 않게)
+  v += run.gold * 0.12 + run.relics.length * 15;
   return v;
 }
 
@@ -206,6 +208,7 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
   const choices = choicesFor(data, run, enc.module);
   let best: { index: number; pick?: string; v: number } | null = null;
   choices.forEach((c, index) => {
+    if (c.disabled) return;
     const pickEffect = choiceNeedsPick(c);
     const copy = structuredClone(run);
     const pick = pickEffect ? pickUpgrade(data, copy, pickEffect.filter) : undefined;

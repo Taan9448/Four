@@ -41,6 +41,9 @@ export const RUN_OPS = [
   'gain_max_hp',
   'gain_relic',
   'gain_potion',
+  'gain_random_card',
+  'swap_card',
+  'sell_card',
 ] as const;
 
 export const Target = z.enum([
@@ -68,6 +71,8 @@ export const Condition = z
     flag: z.string(),
     scarMin: z.number(),
     floorRange: z.tuple([z.number(), z.number()]),
+    /** 선택지: 골드가 이만큼 있어야 고를 수 있다(모자라면 흐리게 보인다) */
+    goldGte: z.number(),
   })
   .partial()
   .strict();
@@ -108,7 +113,9 @@ export const Effect = z
     count: z.number().int().positive().optional(),
     member: z.string().optional(),
     flag: z.string().optional(),
-    /** summon: 불러낼 적 id(count마리, balance.battle.maxEnemies까지) */
+    /** gain_random_card: 이 등급 중에서(합류한 동료·공용의 보상 카드, 없는 카드 우선) */
+    rarity: z.array(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary'])).optional(),
+    /** summon: 불러낼 적 id(count마리, balance.maxEnemies까지) */
     enemy: z.string().optional(),
     /** gain_relic·gain_potion: 얻을 유물·물약 id */
     relic: z.string().optional(),
@@ -591,6 +598,8 @@ export const StageDef = z
     /** 이 스테이지 적의 공격 피해 배율(기본 1). 의도·받을 피해 예고에도 걸린다 */
     enemyDmgScale: z.number().positive().default(1),
     playable: z.boolean(),
+    /** 어디서나 나오는 대가형 사건(stage "*" 모듈)이 이 스테이지 지도에 섞이는가(S0·S9는 아니다) */
+    templateEvents: z.boolean().default(true),
     pinned: z.array(z.object({ floor: z.number().int().positive(), module: z.string() }).strict()).default([]),
     forcedTypes: z.record(z.string(), NodeType).default({}),
     typeWeights: z.partialRecord(NodeType, z.number()).default({}),
@@ -623,8 +632,16 @@ export const StageDef = z
   .strict();
 export type StageDef = z.infer<typeof StageDef>;
 
+/** 확률 결과(노름판 등): 선택지를 고르면 weight로 하나가 시드 RNG로 정해진다 */
+const Outcome = z.object({ weight: z.number().positive(), effects: z.array(Effect), result: z.string() }).strict();
 const Choice = z
-  .object({ label: z.string(), condition: Condition.optional(), effects: z.array(Effect), result: z.string().optional() })
+  .object({
+    label: z.string(),
+    condition: Condition.optional(),
+    effects: z.array(Effect),
+    result: z.string().optional(),
+    outcomes: z.array(Outcome).optional(),
+  })
   .strict();
 
 export const ModuleDef = z
