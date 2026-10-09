@@ -16,7 +16,7 @@
     "typecheck": "node tools/build-manifest.mjs && tsc --noEmit",
     "test": "node tools/build-manifest.mjs && vitest run",
     "data:check": "vitest run tests/data.test.ts",
-    "balance": "vitest run --config vitest.balance.config.ts tools/balance/balance.run.ts",
+    "balance": "vitest run --config vitest.balance.config.ts tools/balance/play. && vitest run --config vitest.balance.config.ts tools/balance/report.run.ts",
     "balance:trace": "vitest run --config vitest.balance.config.ts tools/balance/trace.run.ts",
     "assets:slice": "node tools/slice-sheet.mjs",
     "assets:validate": "node tools/validate-assets.mjs",
