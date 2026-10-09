@@ -60,6 +60,18 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
+  it('카드 대상: 적 전체 카드의 자기 쪽 효과(방어·회복·체력 잃기·상태 제거)는 target을 적는다(글이 "적 전체에게 방어"로 오해되지 않게)', () => {
+    const enemyOps = new Set(['damage', 'apply_status', 'reveal_grain', 'dispel']);
+    const noTarget = new Set(['draw', 'discard', 'rift', 'gain_neigong', 'gain_mana', 'neigong_max', 'add_card', 'taunt']);
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.target !== 'all_enemies') continue;
+      const effs = [...c.effects, ...(c.upgrade?.plus4?.effects ?? []), ...(c.upgrade?.plus5?.effects ?? [])];
+      for (const e of effs) if (!enemyOps.has(e.op) && !noTarget.has(e.op) && !e.target) bad.push(`${c.id}: ${e.op}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
   it('상태 발동(파워): 발동 효과는 전투 동작만 쓰고, 파워 카드는 소멸하며 자신에게 발동 상태를 건다', () => {
     const errors: string[] = [];
     for (const st of data.statuses.values()) for (const t of st.triggers) errors.push(...checkEffects(`상태 ${st.id}`, t.effects, battleOps));

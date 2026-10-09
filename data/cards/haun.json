@@ -236,7 +236,7 @@
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_enemies",
     "tags": ["haun_rift"],
-    "effects": [{"op": "block", "amount": 8, "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "effects": [{"op": "block", "amount": 8, "target": "self", "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
     "upgrade": {"growth": [3, 0], "plus4": {"name": "흘려보낸 장력", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "자국 없이", "cost": {"neigong": 1, "mana": 0}}},
     "flavor": "청운십팔식 제십오식. 떨어지는 구름은 자국을 남기지 않는다. 장력을 흘려보내자 상대의 균형이 무너졌다."
   },
