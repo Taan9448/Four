@@ -3,7 +3,7 @@ import type { GameData } from '../../src/engine/data';
 import { playableStages } from '../../src/engine/run';
 import { BOT_STYLE_NAME, type RunReport } from '../../src/sim/bot';
 import type { CampaignBatch } from './shared';
-import { outside, TARGETS, warningSection } from './warnings';
+import { fmtPct, outside, TARGETS, targetTable, warningSection } from './warnings';
 
 const TYPE_ORDER: Record<string, number> = { battle: 0, elite: 1, story: 2, boss: 3 };
 const pct = (n: number, d: number) => (d ? `${Math.round((n / d) * 100)}%` : '-');
@@ -26,6 +26,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   lines.push('봇은 한 수 앞만 보는 탐욕 봇이라 사람보다 약하다. 절대 승률보다 **스테이지·전투 사이의 상대적인 어려움**을 본다. 목표는 `docs/GAME_DESIGN.md` 12절.');
   lines.push(`대표값은 ${names.join('·')} 표본을 합친 값(= 두 성향의 평균). 한 성향에게만 쉬운 곳은 성향별 칸에서 갈린다.`);
   lines.push('');
+  lines.push(...campaignTargets(data, runs, stages.map((x) => x.id)));
   lines.push(...campaignWarnings(data, runs, stages.map((x) => x.id)));
   lines.push('## 요약');
   lines.push('');
@@ -111,4 +112,28 @@ function campaignWarnings(data: GameData, runs: RunReport[], stageIds: string[])
   }
   if (easy.length) ws.push(`엘리트 ${easy.length}곳이 목표 하한 ${Math.round(t.eliteDefeat[0] * 100)}% 아래: ${easy.join(' · ')}`);
   return warningSection(ws);
+}
+
+/** 목표와 지금: 완주 · 일반 전투 최대 패배 · 엘리트 최대 패배 · 스테이지별 보스 패배 */
+function campaignTargets(data: GameData, runs: RunReport[], stageIds: string[]): string[] {
+  const t = TARGETS.campaign;
+  const rows: { label: string; target: string; now: string; ok: boolean }[] = [];
+  const done = runs.filter((r) => r.result === 'complete').length / runs.length;
+  rows.push({ label: '완주', target: `${fmtPct(t.complete[0])}~${fmtPct(t.complete[1])}`, now: fmtPct(done), ok: done >= t.complete[0] && done <= t.complete[1] });
+  const byModule = new Map<string, RunReport['battles']>();
+  for (const b of runs.flatMap((r) => r.battles)) byModule.set(b.moduleId, [...(byModule.get(b.moduleId) ?? []), b]);
+  const rate = (bs: RunReport['battles']) => bs.filter((b) => b.result === 'defeat').length / bs.length;
+  const worst = (type: string) => [...byModule].filter(([, bs]) => bs[0].type === type && bs.length >= 30).map(([id, bs]) => ({ id, r: rate(bs) })).sort((a, b) => b.r - a.r)[0];
+  const wb = worst('battle');
+  if (wb) rows.push({ label: '일반 전투 패배(가장 높은 곳)', target: `${fmtPct(t.battleDefeatMax)} 이하`, now: `${fmtPct(wb.r)} ${data.modules.get(wb.id)?.name ?? wb.id}`, ok: wb.r <= t.battleDefeatMax });
+  const we = worst('elite');
+  if (we) rows.push({ label: '엘리트 패배(가장 높은 곳)', target: `${fmtPct(t.eliteDefeat[0])}~${fmtPct(t.eliteDefeat[1])}`, now: `${fmtPct(we.r)} ${data.modules.get(we.id)?.name ?? we.id}`, ok: we.r <= t.eliteDefeat[1] });
+  for (const st of stageIds) {
+    const max = (t.bossDefeatMax as Record<string, number>)[st];
+    const boss = [...byModule].find(([, bs]) => bs[0].type === 'boss' && bs[0].stageId === st);
+    if (max === undefined || !boss) continue;
+    const r = rate(boss[1]);
+    rows.push({ label: `보스 패배 ${st.toUpperCase()} ${data.modules.get(boss[0])?.name ?? ''}`, target: `${fmtPct(max)} 이하`, now: fmtPct(r), ok: r <= max });
+  }
+  return targetTable(rows);
 }

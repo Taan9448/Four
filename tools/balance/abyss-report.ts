@@ -3,7 +3,7 @@ import type { GameData } from '../../src/engine/data';
 import { abyssPool, unlockedRift } from '../../src/engine/abyss';
 import { BOT_STYLE_NAME, playAbyss, type AbyssReport, type BotOptions } from '../../src/sim/bot';
 import type { AbyssBatch } from './shared';
-import { outside, TARGETS, warningSection } from './warnings';
+import { fmtPct, outside, TARGETS, targetTable, warningSection } from './warnings';
 
 /** 봇용 풀: narrow = 캠페인 한 번 마친 저장 어림(시작 카드 + 보상 카드 절반, +0~1), wide = 전부 본 저장(+2) */
 export function botPool(data: GameData, kind: 'narrow' | 'wide'): Record<string, number> {
@@ -72,6 +72,22 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
     const b = median(rs.map((r) => r.depth));
     if (b > a) ws.push(`서약 ${oath}단계가 ${prev.oath}단계보다 쉽다(도달 중앙값 ${b} > ${a}) — 단계마다 같거나 어려워야 한다`);
   });
+  const nemShare = bossDeaths.length ? nemesis / bossDeaths.length : 0;
+  const r5 = runs.filter((r) => r.depth >= 5).length / runs.length;
+  const r15 = runs.filter((r) => r.depth >= maxDepth).length / runs.length;
+  const wideMed = median(runs.filter((r) => r.pool === 'wide').map((r) => r.depth));
+  const deck = runs.reduce((a, r) => a + r.deckSize, 0) / runs.length;
+  const oathOk = oathRuns.every(({ rs }, i) => !i || median(rs.map((r) => r.depth)) <= median(oathRuns[i - 1].rs.map((r) => r.depth)));
+  lines.push(
+    ...targetTable([
+      { label: '숙적이 차지하는 보스 패배 비중', target: `${fmtPct(t.nemesisShareMax)} 이하`, now: fmtPct(nemShare), ok: nemShare <= t.nemesisShareMax },
+      { label: '5굽이 도달', target: `${fmtPct(t.reach5[0])}~${fmtPct(t.reach5[1])}`, now: fmtPct(r5), ok: r5 >= t.reach5[0] && r5 <= t.reach5[1] },
+      { label: `${maxDepth}굽이 도달`, target: `${fmtPct(t.reach15Max)} 이하`, now: fmtPct(r15), ok: r15 <= t.reach15Max },
+      { label: '넓은 풀 도달 중앙값', target: `${t.wideMedianMax}굽이 이하`, now: `${wideMed}굽이`, ok: wideMed <= t.wideMedianMax },
+      { label: '평균 덱', target: `${t.deck[0]}~${t.deck[1]}장`, now: `${deck.toFixed(0)}장`, ok: deck >= t.deck[0] && deck <= t.deck[1] },
+      { label: '서약 단계(앞 단계보다 쉽지 않게)', target: '단계마다 같거나 어렵게', now: oathOk ? '지킴' : '거꾸로인 단계 있음', ok: oathOk },
+    ]),
+  );
   lines.push(...warningSection(ws));
   lines.push('## 봇 성향별');
   lines.push('');
