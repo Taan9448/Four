@@ -92,7 +92,7 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
     case 'apply_status': {
       const st = data.statuses.get(e.status ?? '');
       // 파워(지속 효과): 상태의 설명을 그대로 보여 준다
-      if (st?.triggers.length && (e.target ?? 'self') === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description}`;
+      if (st?.triggers.length && (e.target ?? 'self') === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description.replace(/\.$/, '')}`;
       if (e.scale && e.stacks === undefined && e.amount === undefined) return `${pre}${st?.name ?? e.status} 부여`;
       return `${pre}${st?.name ?? e.status} ${e.stacks ?? e.amount ?? 1} 부여`;
     }

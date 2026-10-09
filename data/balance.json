@@ -3,6 +3,7 @@
   "handSize": 5,
   "maxHand": 10,
   "maxEnemies": 5,
+  "relicRules": { "keepBlockRatio": 0.5, "critHeavyMultiplier": 2.0, "shopDiscount": 0.8 },
   "mana": {
     "max": 10,
     "worlds": {

@@ -52,7 +52,7 @@
 }
 ```
 
-**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`(보유 카드에 영구로 + 이번 스테이지 덱, 이미 있으면 강화 — GAME_DESIGN 9-1), `remove_card`(filter: 이번 스테이지 덱에서만 뺀다. 덱을 얇게 하지 않는 원칙이라 지금 데이터는 쓰지 않는다), `upgrade_card`(count, filter: 보유 카드의 강화 단계가 오른다), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic: 없으면 가지지 않은 보스 아닌 유물 중 무작위, `rarity`로 등급 제한), `gain_potion`(potion: 빈 칸이 없으면 두고 온다), `gain_random_card`(rarity: 합류한 동료·공용의 보상 카드 중 그 등급, 없는 카드 우선), `swap_card`(choose: 사람이 고른 보유 카드를 같은 주인의 다른 카드로 — 상점의 카드 바꾸기와 같다), `sell_card`(amount, choose: 고른 보유 카드를 보유·편성·덱에서 빼고 골드 amount).
+**런 단위 동작**(선택지·휴식·지원 규칙의 `restOption`): `gain_card`(보유 카드에 영구로 + 이번 스테이지 덱, 이미 있으면 강화 — GAME_DESIGN 9-1), `remove_card`(filter: 이번 스테이지 덱에서만 뺀다. 덱을 얇게 하지 않는 원칙이라 지금 데이터는 쓰지 않는다), `upgrade_card`(count, filter: 보유 카드의 강화 단계가 오른다), `heal_party`(amount | ratio), `gain_run_mana`, `scar`, `set_flag`, `join_party`, `leave_party`(빈 출전 자리는 남은 동료로 채운다), `gain_gold`(amount), `gain_max_hp`(amount: 합류한 동료 모두), `gain_relic`(relic: 없으면 가지지 않은 보스 아닌 유물 중 무작위, `rarity`로 등급 제한), `gain_potion`(potion: 빈 칸이 없으면 두고 온다), `gain_random_card`(rarity: 합류한 동료·공용의 보상 카드 중 그 등급, 없는 카드 우선), `swap_card`(choose: 사람이 고른 보유 카드를 같은 주인의 다른 카드로 — 상점의 카드 바꾸기와 같다), `sell_card`(amount, choose: 고른 보유 카드를 보유·편성·덱에서 빼고 골드 amount), `gain_potion_slot`(amount: 물약 칸 늘리기 — 옥가락지).
 
 **선택지 필드:** `condition.goldGte`(골드가 모자라면 흐리게 보이고 고를 수 없다), `outcomes: [{ weight, effects, result }]`(확률 결과 — 선택지의 effects를 먼저 일으키고, 노드마다 정해진 시드 수열로 하나를 고른다. 노름판).
 

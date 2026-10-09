@@ -1,0 +1,18 @@
+id: icons_potions_b
+type: icon-sheet
+summary: 물약 아이콘 14~23 — 칸 n = 물약 icon n+13
+# 칸 번호 = data의 icon에서 시트 첫 번호를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 10
+baseline: 0.5
+frame_notes:
+  1: "smoke bomb — a round black clay ball with a short fuse and a curl of grey smoke"
+  2: "grain powder — a small paper packet spilling light brown powder that forms faint wood-grain lines"
+  3: "clear mind tea — a small white cup of pale green tea, completely clear, a single leaf floating"
+  4: "blaze oil — a squat glass jar of thick orange oil with a flame licking its rim"
+  5: "antidote — a bundle of three green herb sprigs tied with white thread"
+  6: "taunt flag — a tiny red triangular flag on a short stick"
+  7: "ring pill — a single round golden pill with a thin glowing ring around it"
+  8: "blood draught — a narrow vial of dark red liquid with a bone stopper"
+  9: "freeze bomb — a round glass orb filled with swirling blue-white frost, ice spikes on its surface"
+  10: "swift pill — a small pale blue pill resting on a single feather"
+placeholder: { color: '#7a6ab0', accent: '#2a2050' }

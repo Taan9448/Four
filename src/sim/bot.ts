@@ -169,6 +169,21 @@ export function playBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT, maxTu
 // ───────────────────────── 런 ─────────────────────────
 
 
+/** 보스 유물의 대가 어림(봇이 고를 때): 자해·균열·나쁜 상태·독기·최대 체력 감소 */
+function relicDownside(data: GameData, id: string): number {
+  const r = data.relics.get(id);
+  if (!r) return 99;
+  let d = 0;
+  for (const e of r.effects) {
+    if (e.op === 'lose_hp') d += (e.amount ?? 0) * (r.trigger === 'turnStart' ? 1 : 0.3);
+    if (e.op === 'rift' && (e.amount ?? 0) > 0) d += e.amount!;
+    if (e.op === 'apply_status' && (e.status === 'weak' || e.status === 'vulnerable') && e.target !== 'all_enemies' && e.target !== 'enemy') d += 1;
+    if (e.op === 'add_card' && data.cards.get(e.card ?? '')?.type === 'status') d += e.count ?? 1;
+    if (e.op === 'gain_max_hp' && (e.amount ?? 0) < 0) d += -e.amount! / 3;
+  }
+  return d;
+}
+
 const RARITY_VALUE: Record<string, number> = { common: 2, uncommon: 4, rare: 6, epic: 9, legendary: 12, special: -10 };
 
 function cardValue(def: CardDef): number {
@@ -317,6 +332,8 @@ export interface RunReport {
   stageEntry: { stageId: string; haunRatio: number; deck: number; haunLevel: number }[];
   deckSize: number;
   scar: number;
+  /** 끝날 때 가진 유물 */
+  relics: string[];
 }
 
 const partyHp = (s: BattleState) => s.party.reduce((a, p) => a + Math.max(0, p.downed ? 0 : p.hp), 0);
@@ -368,10 +385,11 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
       });
       applyBattleOutcome(data, run, enc, outcome);
       if (outcome.result === 'victory') {
-        // 전리품: 칸이 가득한 물약은 두고 가고, 보스 유물은 첫 후보(보스 유물이 앞에 온다)
+        // 전리품: 칸이 가득한 물약은 두고 가고, 보스 유물은 대가가 무겁지 않은 첫 후보(모두 무거우면 건너뛴다)
         const loot = rollLoot(data, run, enc.node);
         claimLoot(data, run, loot);
-        if (loot.relicChoices.length) gainRelic(data, run, loot.relicChoices[0]);
+        const pick = loot.relicChoices.find((id) => relicDownside(data, id) < 2);
+        if (pick) gainRelic(data, run, pick);
       }
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
       while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
@@ -401,6 +419,7 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
     stageEntry,
     deckSize: run.deck.length,
     scar: run.scar,
+    relics: [...run.relics],
   };
 }
 

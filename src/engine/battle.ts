@@ -10,6 +10,7 @@ import {
   drawCards,
   fireRelics,
   fireSideTriggers,
+  hasRule,
   spawnEnemy,
   fireSupport,
   hasSkipTurn,
@@ -148,11 +149,12 @@ function startPlayerTurn(state: BattleState): void {
     const per = state.manaRule.perTurn;
     state.mana = Math.max(0, Math.min(bal.mana.max, state.mana + per));
   }
-  // 첫 차례에는 전투 시작 때 얻은 방어(유물·모듈 보너스)를 지우지 않는다
-  if (state.turn > 1) for (const p of state.party) p.block = 0;
+  // 첫 차례에는 전투 시작 때 얻은 방어(유물·모듈 보너스)를 지우지 않는다. 규칙 유물 keep_block이면 일부가 남는다
+  const keep = hasRule(state, 'keep_block') ? bal.relicRules.keepBlockRatio : 0;
+  if (state.turn > 1) for (const p of state.party) p.block = Math.floor(p.block * keep);
   applyTurnStartStatuses(state, state.party);
   if (state.result) return;
-  drawCards(state, bal.handSize);
+  drawCards(state, bal.handSize + (hasRule(state, 'hand_plus_one') ? 1 : 0));
   fireSideTriggers(state, state.party, 'turnStart');
   if (state.result) return;
   fireSupport(state, 'turnStart', {});
@@ -380,6 +382,9 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   runEffects(state, card.effects, { source: owner, card, chosenUid: targetUid });
   // 파워(지속 효과): 아군·적이 가진 상태 중 '카드를 낸 뒤' 발동
   fireSideTriggers(state, [...state.party, ...state.enemies], 'cardPlayed', { card, cardOwnerUid: owner.uid });
+  fireRelics(state, 'cardPlayed', { card });
+  // 규칙 유물 fusion_calm: 융합의 균열을 1 덜 올린다
+  if (isFusion(card) && hasRule(state, 'fusion_calm')) changeRift(state, -1);
   state.cardsPlayed = (state.cardsPlayed ?? 0) + 1;
   if (card.keywords.includes('exhaust') || card.def.type === 'power') state.exhaust.push(inst);
   else state.discard.push(inst);
@@ -403,6 +408,7 @@ export function cloneBattle(s: BattleState): BattleState {
     events: [],
     log: [],
     supportUsed: [...s.supportUsed],
+    relicCounters: s.relicCounters ? { ...s.relicCounters } : undefined,
     potions: [...s.potions],
     flags: [...s.flags],
   };
@@ -482,13 +488,23 @@ export function endTurn(state: BattleState): void {
     if (fx?.length && haun && !state.result) runEffects(state, fx, { source: haun });
   }
   if (state.result) return;
-  // 손패 정리(유지 카드 제외)
+  // 손패 정리(유지 카드 제외). 규칙 유물 retain_one: 비용이 가장 큰 카드 1장을 더 남긴다(상태 카드 제외)
   const keep: CardInstance[] = [];
+  let spare: CardInstance | undefined;
+  if (hasRule(state, 'retain_one')) {
+    const cost = (c: CardInstance) => {
+      const r = resolveCard(state.data, c);
+      return r.def.type === 'status' || r.keywords.includes('retain') ? -1 : r.cost.neigong + r.cost.mana;
+    };
+    spare = [...state.hand].sort((a, b) => cost(b) - cost(a)).find((c) => cost(c) >= 0);
+  }
   for (const c of state.hand) {
-    if (resolveCard(state.data, c).keywords.includes('retain')) keep.push(c);
+    if (c === spare || resolveCard(state.data, c).keywords.includes('retain')) keep.push(c);
     else state.discard.push(c);
   }
   state.hand = keep;
+  fireRelics(state, 'turnEnd');
+  if (state.result) return;
   fireSideTriggers(state, state.party, 'turnEnd');
   if (state.result) return;
   decayStatuses(state, state.party, 'ownTurnEnd');
@@ -496,7 +512,7 @@ export function endTurn(state: BattleState): void {
   // 균열: 세계별 감쇠 뒤, 임계치 이상이면 틈의 잔향
   const decay = bal.rift.decay[state.world];
   if (decay > 0 && state.rift > 0) changeRift(state, -decay);
-  if (state.rift >= bal.rift.echoThreshold) {
+  if (state.rift >= bal.rift.echoThreshold && !hasRule(state, 'no_echo')) {
     state.discard.push(newCard(state, bal.rift.echoCard));
     state.events.push({ type: 'echo' });
     state.log.push('틈의 잔향이 덱에 섞였다.');

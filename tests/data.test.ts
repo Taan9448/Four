@@ -92,6 +92,23 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
+  it('유물·물약: 전투 발동은 전투 동작, 런 발동(pickup·victory·rest·shopEnter)은 런 동작만 쓴다. passive는 rule이 있다. 수량 목표(유물 60~80·물약 20~25)', () => {
+    const errors: string[] = [];
+    const runTriggers = new Set(['pickup', 'victory', 'rest', 'shopEnter']);
+    for (const r of data.relics.values()) {
+      errors.push(...checkEffects(`유물 ${r.id}`, r.effects, runTriggers.has(r.trigger) ? runOps : battleOps));
+      if (r.trigger === 'passive' && !r.rule) errors.push(`${r.id}: passive 유물은 rule이 있어야 한다`);
+      if (r.trigger !== 'passive' && !r.effects.length) errors.push(`${r.id}: 효과가 없다`);
+      if ((r.cardType || r.keyword || r.every) && r.trigger !== 'cardPlayed') errors.push(`${r.id}: cardType·keyword·every는 cardPlayed에서만`);
+    }
+    for (const p of data.potions.values()) errors.push(...checkEffects(`물약 ${p.id}`, p.effects, battleOps));
+    expect(errors).toEqual([]);
+    expect(data.relics.size).toBeGreaterThanOrEqual(60);
+    expect(data.relics.size).toBeLessThanOrEqual(80);
+    expect(data.potions.size).toBeGreaterThanOrEqual(20);
+    expect(data.potions.size).toBeLessThanOrEqual(25);
+  });
+
   it('보유·편성(9-1): 싸우는 동료와 공용의 시작 카드가 편성 칸보다 많고, 필수 카드는 이야기로만 얻는다', () => {
     const errors: string[] = [];
     const starters = (owner: string) => [...data.cards.values()].filter((c) => c.pool === 'starter' && (data.characters.has(c.owner) ? c.owner : 'common') === owner);

@@ -3,7 +3,7 @@ import type { GameData } from './data';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
-import { addCard, applyRunOps, gainPotion, gainRelic, upgradeCandidates, type RunState, type ShopState } from './run';
+import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, upgradeCandidates, type RunState, type ShopState } from './run';
 
 type Tier = 'common' | 'uncommon' | 'rare';
 
@@ -75,7 +75,7 @@ export function swapPotion(run: RunState, slot: number, potion: string): void {
 // ───────────────────────── 상점 ─────────────────────────
 
 /** 가격을 ±jitter로 흔든다(5 단위) */
-function priced(rng: Rng, base: number, jitter: number): number {
+function jitterPrice(rng: Rng, base: number, jitter: number): number {
   const f = 1 + (rng.next() * 2 - 1) * jitter;
   return Math.max(5, Math.round((base * f) / 5) * 5);
 }
@@ -86,6 +86,10 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
   const eco = data.balance.economy;
   const sh = eco.shop;
   const rng = createRng(run.seed).fork(`shop:${run.stageId}:${nodeId}`);
+  // 상점에 처음 들어설 때 유물(shopEnter), 규칙 유물 shop_discount면 진열 가격이 싸다
+  fireRunRelics(data, run, 'shopEnter');
+  const discount = run.relics.some((id) => data.relics.get(id)?.rule === 'shop_discount') ? data.balance.relicRules.shopDiscount : 1;
+  const priced = (r: Rng, base: number, jitter: number) => Math.max(5, Math.round((jitterPrice(r, base, jitter) * discount) / 5) * 5);
   // 카드: 합류한 동료(쉬는 동료 포함)와 공용의 보상 카드, 전투 보상과 같은 등급 가중치
   const owners = new Set(run.roster.map((r) => r.id));
   const cardPool = rng.shuffle(

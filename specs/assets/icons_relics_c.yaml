@@ -1,0 +1,24 @@
+id: icons_relics_c
+type: icon-sheet
+summary: 유물 아이콘 25~40(새 일반·고급) — 칸 n = 유물 icon n+24
+# 칸 번호 = data의 icon에서 시트 첫 번호를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "kindling bundle — a small bundle of dry pine twigs tied with straw, one tip glowing orange"
+  2: "whetstone oil — a tiny clay oil bottle beside a narrow grey whetstone, a drop of oil on the stone"
+  3: "straw sandals — a pair of woven straw sandals with knotted straw cords"
+  4: "clay jar — a small brown clay jar mended with amber resin, a few square-holed coins peeking out"
+  5: "paper charm — a yellowed paper charm with smudged red brush strokes (no readable letters)"
+  6: "wooden bead — a short loop of plain wooden prayer beads with one cracked bead"
+  7: "rice ball — a white rice ball wrapped half in a green leaf, a speck of sesame"
+  8: "old map — a folded yellowed map with a red ink circle in one corner"
+  9: "hemp rope — a coiled hemp rope with a tight knot"
+  10: "flint — a dark flint stone and a small steel striker with a single spark between them"
+  11: "ice pebble — a smooth translucent blue pebble with frost on its edge"
+  12: "leather gloves — a dark leather glove with short iron studs on the palm"
+  13: "blood lotus — a deep red lotus flower with dark crimson petals"
+  14: "grain brush — a calligraphy brush whose bamboo handle shows clear wood-grain lines"
+  15: "rift bell — a small bronze bell with a black crack running down its side, red light in the crack"
+  16: "frost lantern — a slender silver lantern with pale blue frost glowing inside instead of flame"
+placeholder: { color: '#8fae5a', accent: '#3a4a20' }

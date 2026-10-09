@@ -44,6 +44,7 @@ export const RUN_OPS = [
   'gain_random_card',
   'swap_card',
   'sell_card',
+  'gain_potion_slot',
 ] as const;
 
 export const Target = z.enum([
@@ -415,10 +416,20 @@ export const RelicDef = z
     icon: z.number().int().positive().optional(),
     description: z.string(),
     flavor: z.string().optional(),
-    trigger: z.enum(['battleStart', 'turnStart', 'enemyDowned', 'pickup', 'victory', 'rest']),
+    /**
+     * 전투: battleStart · turnStart · turnEnd · enemyDowned · allyDowned(동료가 쓰러질 때) · cardPlayed(카드를 낸 뒤, cardType·keyword·every로 거른다) ·
+     * riftChanged(균열이 오를 때). 런: pickup(얻는 순간) · victory · rest · shopEnter(상점에 처음 들어설 때). passive: 효과 없이 rule만
+     */
+    trigger: z.enum(['battleStart', 'turnStart', 'turnEnd', 'enemyDowned', 'allyDowned', 'cardPlayed', 'riftChanged', 'pickup', 'victory', 'rest', 'shopEnter', 'passive']),
     condition: Condition.default({}),
     oncePerBattle: z.boolean().default(false),
-    effects: z.array(Effect).min(1),
+    /** cardPlayed 거르기: 카드 유형·키워드, every: 이 전투에서 맞는 카드 n장째마다 */
+    cardType: z.enum(['attack', 'skill', 'power']).optional(),
+    keyword: Keyword.optional(),
+    every: z.number().int().positive().optional(),
+    /** 규칙을 바꾸는 유물(엔진이 처리, 수치는 balance.relicRules) */
+    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount']).optional(),
+    effects: z.array(Effect).default([]),
     shop: z.boolean().default(true),
   })
   .strict();
@@ -452,6 +463,8 @@ export const Balance = z
     neigongPerTurn: z.number().int().positive(),
     handSize: z.number().int().positive(),
     maxHand: z.number().int().positive(),
+    /** 규칙 유물의 수치: keepBlockRatio 차례가 바뀌어도 남는 방어 비율 · critHeavyMultiplier 치명타 배율 · shopDiscount 상점 가격 배율 */
+    relicRules: z.object({ keepBlockRatio: z.number(), critHeavyMultiplier: z.number(), shopDiscount: z.number() }).strict(),
     /** 한 전투에 함께 설 수 있는 적 수(소환 상한) */
     maxEnemies: z.number().int().positive().default(5),
     mana: z.object({ max: z.number().int().positive(), worlds: z.record(World, WorldMana) }).strict(),
