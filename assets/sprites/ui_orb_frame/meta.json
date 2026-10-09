@@ -1,0 +1,31 @@
+{
+  "id": "ui_orb_frame",
+  "type": "ui-parts",
+  "frameW": 256,
+  "frameH": 256,
+  "track": "illustration",
+  "pixelScale": null,
+  "gridDetected": null,
+  "nativeSize": null,
+  "fit": null,
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "7cb2e3fab86164f5",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": null
+}
