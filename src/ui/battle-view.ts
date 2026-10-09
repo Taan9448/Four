@@ -15,7 +15,7 @@ import { sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { affinityChip, elementMark, INTENT_LABEL, intentIcon, statusChip } from './icons';
+import { affinityChip, elementMark, gaugeChip, INTENT_LABEL, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
@@ -106,7 +106,22 @@ export class BattleView {
       const d = this.data.enemies.get(e.defId);
       return !!d && (d.weak.length > 0 || d.resist.length > 0);
     });
-    const elements = () => {
+    // 틈의 심장(모르데카이): 흐름 포식·매듭·고리 멈추기·격노를 처음 만날 때 짚는다
+    const heart = this.state.enemies.find((e) => (e.statuses.flow_eater ?? 0) > 0 || (e.statuses.knot ?? 0) > 0);
+    const heartTour = (then: () => void) => {
+      if (!heart || tourSeen('battle-rift-heart')) return then();
+      const enrage = this.data.enemies.get(heart.defId)?.enrage;
+      runTour(
+        [
+          { target: '.unit-enemy .status-chip', title: '흐름 포식', text: '내공이나 마나를 쓴 카드의 피해는 먹혀서 붉은 "먹힘 +N"으로 뜨고, 그만큼 체력이 늘어난다. 비용 0인 카드로 때리거나 결을 쌓아라.' },
+          { target: '.unit-enemy .chip-knot', title: '매듭 게이지', text: `결 노출을 ${bal.grain.knotThreshold}까지 쌓으면 매듭이 드러난다. 드러난 매듭에 '날 얹기'(비용 0)를 얹으면 크게 들어간다.` },
+          { target: '.hand', title: '고리 멈추기', text: '내공을 모두 비우고 흐르지 않는 자가 된다. 그 차례에는 모르데카이가 하운을 보지 못하고, 결이 드러난다. 매듭을 열 준비에 쓴다.' },
+          ...(enrage ? [{ target: '.unit-enemy .chip-enrage', title: '격노', text: `${enrage.afterTurn}턴부터 차례마다 더 세진다. 오래 끌수록 불리하다.` }] : []),
+        ],
+        { id: 'battle-rift-heart', once: true, onDone: then },
+      );
+    };
+    const affinity = () => {
       if (!hasAffinity) return;
       runTour(
         [
@@ -117,6 +132,7 @@ export class BattleView {
         { id: 'battle-elements', once: true },
       );
     };
+    const elements = () => heartTour(affinity);
     if (tourSeen('battle-basics')) return elements();
     runTour(
       [
@@ -260,6 +276,19 @@ export class BattleView {
       if (edef && !c.downed) {
         for (const el of edef.weak) u.statuses.appendChild(affinityChip(this.data, 'weak', el));
         for (const el of edef.resist) u.statuses.appendChild(affinityChip(this.data, 'resist', el));
+        // 매듭 게이지: 결 노출을 문턱까지 쌓으면 매듭이 드러난다(날 얹기)
+        if ((c.statuses.knot ?? 0) > 0 && !(c.statuses.knot_exposed > 0)) {
+          const at = bal.grain.knotThreshold;
+          const n = Math.min(c.statuses.grain ?? 0, at);
+          u.statuses.appendChild(gaugeChip('knot', `${n}/${at}`, `매듭 ${n}/${at}`, `매듭까지 결 노출 ${n} / ${at}`, `결 노출을 ${at}까지 쌓으면 매듭이 드러난다. 드러난 매듭에 '날 얹기'를 얹으면 크게 들어간다.`));
+        }
+        // 격노까지 남은 턴
+        if (edef.enrage) {
+          const left = edef.enrage.afterTurn - s.turn;
+          const chip = gaugeChip('enrage', left > 0 ? `${left}` : '怒', left > 0 ? `격노까지 ${left}턴` : '격노', left > 0 ? `${left}턴 뒤 격노` : '격노', edef.enrage.text);
+          if (left <= 0) chip.classList.add('on');
+          u.statuses.appendChild(chip);
+        }
       }
       clear(u.intent);
       if (c.side === 'enemy') this.renderIntent(u, c as EnemyState);
@@ -634,7 +663,7 @@ export class BattleView {
         case 'damage': {
           const u = this.units.get(ev.targetUid);
           if (!u) break;
-          if (ev.absorbed) floatOver(this.fxLayer, u.el, `흡수 +${ev.amount}`, 'absorb');
+          if (ev.absorbed) floatOver(this.fxLayer, u.el, `먹힘 +${ev.amount}`, 'absorb');
           else {
             // 소리: 맞은 쪽 자리(적 오른쪽, 일행 왼쪽)에서. 막혀서 0이면 막는 소리
             const pan = u.c.side === 'enemy' ? 0.35 : -0.35;
@@ -763,6 +792,14 @@ export class BattleView {
             this.refresh();
           }
           await this.wait(600);
+          break;
+        }
+        case 'enrage': {
+          const u = this.units.get(ev.uid);
+          if (u) floatOver(this.fxLayer, u.el, '격노', 'crit');
+          toast(this.toasts, ev.text, 'danger');
+          shake(this.field, 0.6);
+          await this.wait(500);
           break;
         }
         case 'power': {

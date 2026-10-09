@@ -163,6 +163,8 @@
 
 - `weak` / `resist`: 속성 약점·내성 배열(fire | ice). 예: 불의 정령·이그니스 `weak: ["ice"], resist: ["fire"]`, 아르덴의 얼음 적 `weak: ["fire"], resist: ["ice"]`.
 - `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
+- `tier`: normal | elite | boss. `balance.enemyTiers[tier]`의 체력(`hp`)·피해(`dmg`) 배율이 스테이지 배율(`stages[].enemyHpScale`·`enemyDmgScale`, 어려움이면 `balance.difficulty.hard.byStage`)과 함께 곱해진다(GAME_DESIGN 12절). 의도·받을 피해 예고에도 같이 걸린다.
+- `enrage`: `{ afterTurn, text, effects }` — 그 턴부터 이 적의 차례마다(행동 뒤) effects가 이 적을 출처로 일어난다. 그 턴에 `text`를 화면에 알리고, 적 이름 아래 '격노까지 n턴' 이름표가 보인다. 예: 모르데카이 10턴부터 힘 +3.
 - `deathEffects`: 이 적이 쓰러질 때 그 적을 출처로 일어나는 전투 동작. 예: 베일락 `[{ "op": "damage", "amount": 999, "target": "all_allies" }]`(졸개가 무너진다), 쐐기 `[{ "op": "rift", "amount": -2 }]`.
 
 **변신(보스 2단계)** — `transform: { triggers, partner?, into, text, partyEffects }`

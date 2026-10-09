@@ -29,6 +29,8 @@ export interface Intent {
 
 export interface EnemyState extends Combatant {
   side: 'enemy';
+  /** 등급 피해 배율(balance.enemyTiers) */
+  dmgMul?: number;
   moveCursor: number;
   lastMoves: string[];
   intent: Intent | null;
@@ -57,6 +59,7 @@ export type BattleEvent =
   | { type: 'relic'; relicId: string; name: string }
   | { type: 'potion'; potionId: string; name: string }
   | { type: 'power'; uid: string; status: string }
+  | { type: 'enrage'; uid: string; text: string }
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
   | { type: 'transform'; uid: string; from: string; into: string; text: string }

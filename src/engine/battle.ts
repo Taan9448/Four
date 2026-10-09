@@ -83,10 +83,11 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     if (!def) throw new Error(`알 수 없는 적: ${id}`);
     const statuses: Record<string, number> = {};
     for (const t of def.traits) statuses[t.status] = t.stacks;
-    const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0)) * (setup.enemyHpScale ?? 1));
+    const tier = bal.enemyTiers[def.tier];
+    const maxHp = Math.round((def.maxHp + (def.hpPerScar ?? 0) * (setup.scar ?? 0)) * (setup.enemyHpScale ?? 1) * (tier?.hp ?? 1));
     return {
       uid: `e${i}`, defId: id, name: def.name, side: 'enemy', hp: maxHp, maxHp, block: 0,
-      statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null,
+      statuses, downed: false, moveCursor: 0, lastMoves: [], intent: null, dmgMul: tier?.dmg ?? 1,
     };
   });
 
@@ -543,6 +544,14 @@ function enemyTurn(state: BattleState): void {
     state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
     state.log.push(`${enemy.name}: ${move.name}`);
     runEffects(state, move.effects, { source: enemy, chosenUid: targetUid });
+    // 격노: 정한 턴부터 차례마다(정한 턴에 화면에 알린다)
+    if (def.enrage && state.turn >= def.enrage.afterTurn && !enemy.downed && !state.result) {
+      if (state.turn === def.enrage.afterTurn) {
+        state.events.push({ type: 'enrage', uid: enemy.uid, text: def.enrage.text });
+        state.log.push(`${enemy.name}: ${def.enrage.text}`);
+      }
+      runEffects(state, def.enrage.effects, { source: enemy, chosenUid: targetUid });
+    }
   }
   if (!state.result && alive(state.party).length === 0) setResult(state, 'defeat');
 }

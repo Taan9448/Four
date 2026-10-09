@@ -281,7 +281,7 @@ export class App {
       h(
         'div',
         { class: 'diff-pick' },
-        h('div', { class: 'diff-cards' }, card('normal', '보통', '처음 마친 그 길 그대로.'), card('hard', '어려움', `적 체력 ×${hard.enemyHpMul} · 공격력 ×${hard.enemyDmgMul}. 끝까지 가는 사람이 드물다.`)),
+        h('div', { class: 'diff-cards' }, card('normal', '보통', '처음 마친 그 길 그대로.'), card('hard', '어려움', `적 체력·공격력이 앞 스테이지 ×${hard.byStage.s0?.hp ?? 1}·×${hard.byStage.s0?.dmg ?? 1}에서 끝 ×${hard.byStage.s9?.hp ?? 1}·×${hard.byStage.s9?.dmg ?? 1}까지 오른다. 끝까지 가는 사람이 드물다.`)),
         h('label', { class: 'diff-hardcore' }, hardcore, h('span', {}, h('b', {}, '하드코어'), h('small', {}, '전투가 끝날 때 쓰러져 있던 동료는 다시 일어나지 않는다. 수치는 그대로.'))),
         h('div', { class: 'confirm-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ((started = true), ov.close(), begin(difficulty, hardcore.checked)) }, '시작')),
       ),

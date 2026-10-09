@@ -228,9 +228,11 @@ export function previewDamage(state: BattleState, source: Combatant, base: numbe
   return Math.max(0, Math.floor((enemyBase(state, source, base) + strengthBonus(state, source)) * statusModifier(state, source, 'damageDealtMul')));
 }
 
-/** 적의 피해 기본값에 스테이지 공격력 배율(enemyDmgScale)을 건다(반올림). 아군은 그대로 */
+/** 적의 피해 기본값에 스테이지 공격력 배율(enemyDmgScale)·등급 배율(dmgMul)을 건다(반올림). 아군은 그대로 */
 function enemyBase(state: BattleState, source: Combatant | null, base: number): number {
-  return source?.side === 'enemy' && state.enemyDmgScale && state.enemyDmgScale !== 1 ? Math.round(base * state.enemyDmgScale) : base;
+  if (source?.side !== 'enemy') return base;
+  const mul = (state.enemyDmgScale ?? 1) * ((source as EnemyState).dmgMul ?? 1);
+  return mul !== 1 ? Math.round(base * mul) : base;
 }
 
 /** 받을 피해 예고용: 대상의 받는 피해 보정(취약 등)까지 넣은 1회 피해. dealDamage와 같은 순서로 계산한다 */
@@ -424,7 +426,9 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   const from = enemy.name;
   enemy.defId = into.id;
   enemy.name = into.name;
-  enemy.maxHp = Math.round((into.maxHp + (into.hpPerScar ?? 0) * state.scar) * (state.enemyHpScale ?? 1));
+  const tier = state.data.balance.enemyTiers[into.tier];
+  enemy.maxHp = Math.round((into.maxHp + (into.hpPerScar ?? 0) * state.scar) * (state.enemyHpScale ?? 1) * (tier?.hp ?? 1));
+  enemy.dmgMul = tier?.dmg ?? 1;
   enemy.hp = enemy.maxHp;
   enemy.block = 0;
   enemy.downed = false;

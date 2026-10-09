@@ -6,6 +6,9 @@ import type { BattleState, CardInstance } from '../src/engine/state';
 import fixtureEnemies from './fixtures-enemies.json';
 
 export const data = gameData();
+/** 등급 배율(balance.enemyTiers)은 밸런스 수치라 규칙 시험에서는 끈다(tests/difficulty.test.ts가 따로 본다) */
+export const enemyTiers = data.balance.enemyTiers;
+data.balance.enemyTiers = {};
 
 // 엔진 테스트용 적: 게임 데이터의 수치가 바뀌어도 엔진 규칙 테스트가 흔들리지 않게 고정 수치로 따로 둔다
 for (const e of fixtureEnemies) if (!data.enemies.has(e.id)) data.enemies.set(e.id, EnemyDef.parse(e));
