@@ -1,0 +1,14 @@
+id: ice_wolf_hit
+type: character-anim
+size: large
+character: ice_wolf
+chroma: magenta
+summary: 얼음 늑대 피격 3프레임
+depends_on: [ice_wolf_ref]
+reference: assets/source/ice_wolf_ref.png
+facing: left
+frame_notes:
+  1: "struck, ice chips fly, the wolf flinches back"
+  2: "a small crack runs across the lattice"
+  3: "recovers, the crack frosting over"
+placeholder: { shape: beast, color: '#bfe4f2', accent: '#4fb4ff' }

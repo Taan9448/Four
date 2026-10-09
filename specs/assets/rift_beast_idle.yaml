@@ -1,0 +1,15 @@
+id: rift_beast_idle
+type: character-anim
+size: large
+character: rift_beast
+chroma: green
+summary: 틈의 짐승 대기 4프레임
+depends_on: [rift_beast_ref]
+reference: assets/source/rift_beast_ref.png
+facing: left
+frame_notes:
+  1: "low crouch facing left, head forward, the violet cracks pulsing softly"
+  2: "the spine shards glint, the body breathes in"
+  3: "the jaw opens slightly, black teeth showing"
+  4: "settles back into the crouch"
+placeholder: { shape: beast, color: '#3a1d55', accent: '#b48cff' }

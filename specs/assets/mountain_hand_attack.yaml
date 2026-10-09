@@ -1,0 +1,18 @@
+id: mountain_hand_attack
+type: character-anim
+size: large
+character: mountain_hand
+chroma: magenta
+summary: 벽에서 솟은 손 움켜쥐기 6프레임
+depends_on: [mountain_hand_ref]
+reference: assets/source/mountain_hand_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "the hand draws back toward the wall, fingers spreading"
+  2: "the fingers open wide"
+  3: "the hand lunges forward to the left"
+  4: "the huge fingers clench shut at full reach to the left, rock dust bursting"
+  5: "holds the grip, cracks glowing"
+  6: "returns to the half-open pose"
+placeholder: { shape: object, color: '#4e443d', accent: '#ff8a5c' }

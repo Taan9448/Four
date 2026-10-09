@@ -1,0 +1,18 @@
+id: stair_archer_attack
+type: character-anim
+size: large
+character: stair_archer
+chroma: green
+summary: 계단의 궁수 겨눈 화살 6프레임
+depends_on: [stair_archer_ref]
+reference: assets/source/stair_archer_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws an arrow from the quiver"
+  2: "nocks it and raises the bow to the left"
+  3: "pulls the string back fully, body tense"
+  4: "releases, the arrow flying to the left with a streak"
+  5: "the bowstring vibrates"
+  6: "lowers the bow"
+placeholder: { shape: humanoid, color: '#7a2a2a', accent: '#f2a93b' }

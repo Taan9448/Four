@@ -1,0 +1,11 @@
+id: wedge_ref
+type: character-ref
+size: large
+character: wedge
+chroma: magenta
+summary: 쐐기 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a forearm-long black iron wedge hanging in the air at a slant, blunt at one end and needle-sharp at the other, engraved with wave-like letters, the air around it warping with thin violet distortion lines"
+  2: "full view, side view, same proportions, the wedge seen from the side, needle point down"
+placeholder: { shape: object, color: '#16141a', accent: '#4b3a6b' }

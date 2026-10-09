@@ -1,0 +1,14 @@
+id: wedge_hit
+type: character-anim
+size: large
+character: wedge
+chroma: magenta
+summary: 쐐기 피격 3프레임
+depends_on: [wedge_ref]
+reference: assets/source/wedge_ref.png
+facing: left
+frame_notes:
+  1: "struck, the wedge rings and shudders in the air"
+  2: "it tilts loose, the distortion flickering"
+  3: "steadies, the warping returning"
+placeholder: { shape: object, color: '#16141a', accent: '#4b3a6b' }

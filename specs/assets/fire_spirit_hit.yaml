@@ -1,0 +1,14 @@
+id: fire_spirit_hit
+type: character-anim
+size: large
+character: fire_spirit
+chroma: magenta
+summary: 불의 정령 피격 3프레임
+depends_on: [fire_spirit_ref]
+reference: assets/source/fire_spirit_ref.png
+facing: left
+frame_notes:
+  1: "struck, the flames scatter and gutter"
+  2: "the body shrinks, flickering weakly"
+  3: "flares back up to its full shape"
+placeholder: { shape: humanoid, color: '#f2a03a', accent: '#ffe08a' }

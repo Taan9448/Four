@@ -1,0 +1,15 @@
+id: black_wind_idle
+type: character-anim
+size: large
+character: black_wind
+chroma: magenta
+summary: 흑풍대 대기 4프레임
+depends_on: [black_wind_ref]
+reference: assets/source/black_wind_ref.png
+facing: left
+frame_notes:
+  1: "light crouch facing left, saber low"
+  2: "the black robe ripples as in wind"
+  3: "shifts weight, ready to spring"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#2a2a30', accent: '#5d6478' }

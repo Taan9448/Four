@@ -1,0 +1,18 @@
+id: fire_scale_hound_attack
+type: character-anim
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: 불비늘 삼두견 세 머리 물기 6프레임
+depends_on: [fire_scale_hound_ref]
+reference: assets/source/fire_scale_hound_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "crouches, the three heads pulled back"
+  2: "springs forward to the left"
+  3: "the three jaws open wide"
+  4: "the three heads bite at full reach to the left, sparks and embers bursting"
+  5: "lands, the heads shaking"
+  6: "returns to standing"
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }

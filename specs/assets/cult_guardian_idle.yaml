@@ -1,0 +1,15 @@
+id: cult_guardian_idle
+type: character-anim
+size: large
+character: cult_guardian
+chroma: green
+summary: 마교 호법 대기 4프레임
+depends_on: [cult_guardian_ref]
+reference: assets/source/cult_guardian_ref.png
+facing: left
+frame_notes:
+  1: "palm stance facing left, one red palm forward"
+  2: "dark red qi curls up from the palms"
+  3: "breathes deeply, the robe stirring"
+  4: "the qi settles"
+placeholder: { shape: humanoid, color: '#5a1a24', accent: '#ff3b3b' }

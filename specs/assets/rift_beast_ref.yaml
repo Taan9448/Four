@@ -1,0 +1,11 @@
+id: rift_beast_ref
+type: character-ref
+size: large
+character: rift_beast
+chroma: green
+summary: 틈의 짐승 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a long low six-legged beast of dark violet hide with glowing violet cracks, black wedge-shaped teeth, black crystal shards along the spine, no eyes"
+  2: "full body, side view facing left, same proportions, crouched low, head forward"
+placeholder: { shape: beast, color: '#3a1d55', accent: '#b48cff' }

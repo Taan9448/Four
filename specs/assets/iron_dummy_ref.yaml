@@ -1,0 +1,11 @@
+id: iron_dummy_ref
+type: character-ref
+size: large
+character: iron_dummy
+chroma: magenta
+summary: 철목인 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a man-sized black iron-wood training dummy with three short wooden arms at different heights, one leg-post and a stone base"
+  2: "full view, side view facing left, same proportions, the arms sticking out to the side"
+placeholder: { shape: object, color: '#4a4038', accent: '#8a90a3' }

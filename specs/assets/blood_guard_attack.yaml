@@ -1,0 +1,18 @@
+id: blood_guard_attack
+type: character-anim
+size: large
+character: blood_guard
+chroma: magenta
+summary: 혈위대 붉은 수실의 검 6프레임
+depends_on: [blood_guard_ref]
+reference: assets/source/blood_guard_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the sword back to the shoulder"
+  2: "steps forward to the left"
+  3: "slashes diagonally"
+  4: "the sword strikes at full reach to the left, the red tassels flying"
+  5: "follows through"
+  6: "returns to the guard stance"
+placeholder: { shape: humanoid, color: '#b8a8a0', accent: '#a02634' }

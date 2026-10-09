@@ -1,0 +1,14 @@
+id: goblin_hit
+type: character-anim
+size: large
+character: goblin
+chroma: magenta
+summary: 고블린 피격 3프레임
+depends_on: [goblin_ref]
+reference: assets/source/goblin_ref.png
+facing: left
+frame_notes:
+  1: "struck, the goblin yelps and flies back a little, ears flattened"
+  2: "stumbles, almost dropping the dagger"
+  3: "scrambles back into the crouch"
+placeholder: { shape: humanoid, color: '#6a7a3a', accent: '#b8741a' }

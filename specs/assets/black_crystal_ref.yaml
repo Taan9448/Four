@@ -1,0 +1,11 @@
+id: black_crystal_ref
+type: character-ref
+size: large
+character: black_crystal
+chroma: magenta
+summary: 검은 수정 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a fist-sized many-faceted black crystal hanging on a short black chain from a dark wooden beam end, faint dark shadow streaks flowing away from it"
+  2: "full view, side view, same proportions, the crystal on its chain seen from the side"
+placeholder: { shape: object, color: '#0d0b12', accent: '#4b3a6b' }

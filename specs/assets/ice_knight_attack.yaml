@@ -1,0 +1,18 @@
+id: ice_knight_attack
+type: character-anim
+size: large
+character: ice_knight
+chroma: magenta
+summary: 얼음 기사 얼음 검 6프레임
+depends_on: [ice_knight_ref]
+reference: assets/source/ice_knight_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the ice sword high"
+  2: "steps forward to the left, frost cracking under the foot"
+  3: "swings the sword down"
+  4: "the ice sword strikes at full reach to the left, a spray of frost"
+  5: "the sword sweeps through"
+  6: "returns behind the shield"
+placeholder: { shape: humanoid, color: '#9cc8de', accent: '#dff4ff' }

@@ -21,6 +21,8 @@
   {
     "id": "rift_beast",
     "name": "틈의 짐승",
+    "sprite": "rift_beast",
+    "scale": 1.3,
     "lore": "상흔이 벌려 놓은 금의 냄새를 맡고 굽이를 따라 내려오는 짐승. 쌓인 상흔만큼 더 깊은 곳에서 기어 나온다. 이기면 그 몸에 박혀 있던 틈의 조각을 거둔다.",
     "maxHp": 72,
     "silhouette": "beast",

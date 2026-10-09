@@ -1,0 +1,11 @@
+id: oak_stump_ref
+type: character-ref
+size: large
+character: oak_stump
+chroma: magenta
+summary: 참나무 둥치 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a waist-high old oak stump with rough dark bark, the flat cut top showing pale growth rings and visible grain lines"
+  2: "full view, side view, same proportions, the stump seen from the side, bark texture and the cut top edge"
+placeholder: { shape: object, color: '#6e5440', accent: '#b8a184' }

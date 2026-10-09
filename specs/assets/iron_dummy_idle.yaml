@@ -1,0 +1,15 @@
+id: iron_dummy_idle
+type: character-anim
+size: large
+character: iron_dummy
+chroma: magenta
+summary: 철목인 대기 4프레임
+depends_on: [iron_dummy_ref]
+reference: assets/source/iron_dummy_ref.png
+facing: left
+frame_notes:
+  1: "the dummy stands still"
+  2: "a dull metallic sheen slides across the dark wood"
+  3: "the sheen fades"
+  4: "still again"
+placeholder: { shape: object, color: '#4a4038', accent: '#8a90a3' }

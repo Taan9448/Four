@@ -1,0 +1,15 @@
+id: oak_stump_idle
+type: character-anim
+size: large
+character: oak_stump
+chroma: magenta
+summary: 참나무 둥치 대기 4프레임
+depends_on: [oak_stump_ref]
+reference: assets/source/oak_stump_ref.png
+facing: left
+frame_notes:
+  1: "the stump stands still"
+  2: "a faint pale line of wood grain shows on the cut top"
+  3: "the grain line fades"
+  4: "still again"
+placeholder: { shape: object, color: '#6e5440', accent: '#b8a184' }

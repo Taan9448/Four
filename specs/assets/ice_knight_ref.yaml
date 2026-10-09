@@ -1,0 +1,11 @@
+id: ice_knight_ref
+type: character-ref
+size: large
+character: ice_knight
+chroma: magenta
+summary: 얼음 기사 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a knight made entirely of translucent pale-blue ice, a closed-eyed face visible inside the ice behind the open helmet, an ice longsword and a round ice shield"
+  2: "full body, side view facing left, same proportions, shield in front, sword ready"
+placeholder: { shape: humanoid, color: '#9cc8de', accent: '#dff4ff' }

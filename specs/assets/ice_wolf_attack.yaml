@@ -1,0 +1,18 @@
+id: ice_wolf_attack
+type: character-anim
+size: large
+character: ice_wolf
+chroma: magenta
+summary: 얼음 늑대 얼음 이빨 6프레임
+depends_on: [ice_wolf_ref]
+reference: assets/source/ice_wolf_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "crouches, claws digging in"
+  2: "springs forward to the left, sliding silently"
+  3: "the jaws open wide in mid-leap"
+  4: "the ice fangs snap at full reach to the left, frost shards spraying"
+  5: "lands, skidding"
+  6: "returns to the low stance"
+placeholder: { shape: beast, color: '#bfe4f2', accent: '#4fb4ff' }

@@ -1,0 +1,18 @@
+id: empty_armor_attack
+type: character-anim
+size: large
+character: empty_armor
+chroma: magenta
+summary: 빈 갑옷 창 찌르기 6프레임
+depends_on: [empty_armor_ref]
+reference: assets/source/empty_armor_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the spear back in one stiff motion"
+  2: "steps forward to the left with a heavy clank"
+  3: "thrusts the spear forward"
+  4: "the spear thrust lands at full reach to the left"
+  5: "pulls the spear back"
+  6: "returns to the rigid stance"
+placeholder: { shape: humanoid, color: '#2e2e38', accent: '#ff3b3b' }

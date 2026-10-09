@@ -1,0 +1,11 @@
+id: empty_armor_ref
+type: character-ref
+size: large
+character: empty_armor
+chroma: magenta
+summary: 빈 갑옷 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, an empty black plate armor with two red lights inside the helmet slit, dark empty gaps at the joints, a little red ash in the seams, a long spear held upright"
+  2: "full body, side view facing left, same proportions, the spear held forward"
+placeholder: { shape: humanoid, color: '#2e2e38', accent: '#ff3b3b' }

@@ -1,0 +1,11 @@
+id: mountain_hand_ref
+type: character-ref
+size: large
+character: mountain_hand
+chroma: magenta
+summary: 벽에서 솟은 손 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a giant rock hand and forearm rising out of a broken slab of cave wall, fingers as large as a man's torso, faint red glowing cracks"
+  2: "full view, side view facing left, same proportions, the hand half closed"
+placeholder: { shape: object, color: '#4e443d', accent: '#ff8a5c' }

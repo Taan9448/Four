@@ -1,0 +1,15 @@
+id: shadow_fragment_idle
+type: character-anim
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: 그림자 대기 4프레임
+depends_on: [shadow_fragment_ref]
+reference: assets/source/shadow_fragment_ref.png
+facing: left
+frame_notes:
+  1: "rises from the dark puddle facing left, edges wavering"
+  2: "sways like smoke, thinning"
+  3: "the grey blade glints"
+  4: "settles back to its shape"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

@@ -1,0 +1,15 @@
+id: rock_golem_idle
+type: character-anim
+size: large
+character: rock_golem
+chroma: magenta
+summary: 바위 골렘 대기 4프레임
+depends_on: [rock_golem_ref]
+reference: assets/source/rock_golem_ref.png
+facing: left
+frame_notes:
+  1: "heavy stance facing left, fists low"
+  2: "the lava in the cracks glows brighter"
+  3: "the shoulders grind with a puff of dust"
+  4: "the glow dims"
+placeholder: { shape: humanoid, color: '#6e6259', accent: '#ff8a5c' }

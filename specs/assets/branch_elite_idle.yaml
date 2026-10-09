@@ -1,0 +1,15 @@
+id: branch_elite_idle
+type: character-anim
+size: large
+character: branch_elite
+chroma: green
+summary: 분타 정예 대기 4프레임
+depends_on: [branch_elite_ref]
+reference: assets/source/branch_elite_ref.png
+facing: left
+frame_notes:
+  1: "guard stance facing left, blade forward"
+  2: "the left palm glows red"
+  3: "the armor plates shift"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#6a1a20', accent: '#ff3b3b' }

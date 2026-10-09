@@ -1,0 +1,14 @@
+id: swamp_toad_hit
+type: character-anim
+size: large
+character: swamp_toad
+chroma: magenta
+summary: 늪지 독두꺼비 피격 3프레임
+depends_on: [swamp_toad_ref]
+reference: assets/source/swamp_toad_ref.png
+facing: left
+frame_notes:
+  1: "struck, the body squashes flat for a moment"
+  2: "bounces back, eyes squeezed shut"
+  3: "settles into the squat"
+placeholder: { shape: beast, color: '#5a6a3a', accent: '#d8c25a' }

@@ -1,0 +1,15 @@
+id: empty_armor_idle
+type: character-anim
+size: large
+character: empty_armor
+chroma: magenta
+summary: 빈 갑옷 대기 4프레임
+depends_on: [empty_armor_ref]
+reference: assets/source/empty_armor_ref.png
+facing: left
+frame_notes:
+  1: "stands rigid facing left, spear forward"
+  2: "the red lights in the helmet flicker"
+  3: "the armor plates shift with a faint rattle"
+  4: "rigid again"
+placeholder: { shape: humanoid, color: '#2e2e38', accent: '#ff3b3b' }

@@ -119,6 +119,7 @@
 | mordecai | 지옥왕 모르데카이 | **검은 쐐기 수백 개를 엮은 등뼈**, 꿰매 붙인 흐름의 몸, 은빛 마나의 팔·감긴 고리 같은 내공의 팔, 이름 모를 세계의 다리·날개·뿔, **푸른빛과 검은빛이 엉킨 심장**, 실밥이 모인 매듭 | green | large |
 | (장면 인물) | 석두·조명각·마 씨·실리엔·한스·토마·리나·베일락·셀리아스·고르몬·그림자 암살자 | 5절 `subjects`(반신 그림 명세 `<id>_stand`) | none | portrait |
 | (적 보스·엘리트, 2026-10-09) | 베일락·셀리아스·고르몬·조명각·찢긴 경계·광석거미·사슬 감독관·얼음 궁전의 문지기·에드릭 로웬·용암 핏줄 골렘·그림자 암살자·쐐기 박힌 흑요석 문·흑풍대주·독수마군·계단의 장로·뼈 거인 | 5절 `subjects`(전투 명세 `<id>_ref`·`_idle`·`_attack`·`_hit`, 문·경계 같은 물체는 공격 없이 `_idle`·`_hit`). 부서지는 셀리아스·다시 일어선 뼈 거인은 같은 그림에 색 필터 | 보라·붉은 몸은 green, 나머지 magenta | large |
+| (일반 적·틈의 짐승, 2026-10-09 2차) | 틈의 짐승·참나무 둥치·옹이 박힌 둥치·철목인·고블린·늪지 독두꺼비·빈 갑옷·불의 정령·얼음 늑대·얼음 기사·왕녀의 얼음·바위 골렘·벽에서 솟은 손·검은 수정·그림자·쐐기·혈위대·흑풍대·마맛자국 부대주·혈교도·마교 호법·분타 정예·계단의 궁수·불비늘 삼두견 | 5절 `subjects`(전투 스프라이트 `<id>_ref/idle/attack/hit`, 물건은 공격 없음). 로웬가의 얼음 기사는 에드릭 로웬, 꺼져 가는 그림자·그림자 망령은 그림자 암살자, 재 묻은 빈 갑옷은 빈 갑옷 그림을 같이 쓴다 | 명세 | large |
 
 ## 5. 프롬프트·팔레트 데이터
 
@@ -326,4 +327,93 @@ subjects:
     the Bone Giant of the rift, a hunched giant built of huge pale bones fitted together, a ribcage like a
     cage, dark crimson qi flowing in the gaps between the bones like veins, a skull with dim red light in
     the sockets
+  rift_beast: >-
+    the Rift Beast, a hound-like predator crawling down from the deeper rifts; a long low body of dark
+    violet hide split by glowing cracks like torn sky, a jaw full of black wedge-shaped teeth, shards of
+    black rift crystal embedded along the spine, six thin clawed legs, no eyes, only a faint violet glow
+    inside the cracks
+  oak_stump: >-
+    a thick old oak stump from the woodpile of the Cheongun sect, waist high, rough dark bark, a flat cut
+    top showing pale wood rings and fine visible grain lines, a few small roots at the base; an inanimate
+    object, no face
+  knotted_stump: >-
+    a gnarled tree stump covered in twisted knots, the grain bending again and again around three large dark
+    knots, an old axe head stuck deep in its side; an inanimate object, no face
+  iron_dummy: >-
+    the Iron-Wood Training Dummy of the Cheongun sect, a man-sized wooden training dummy carved from black
+    iron-wood as hard as metal, a thick round trunk with three short wooden arms sticking out at different
+    heights and one leg-post, set in a stone base, tiny nicks on its surface; an inanimate object, no face
+  goblin: >-
+    a small goblin, about two thirds a man's height, mossy green skin, long pointed ears, a big nose, yellow
+    eyes, ragged brown leather scraps and a rope belt, a rusty dagger in one hand and a pouch of stones at
+    the hip
+  swamp_toad: >-
+    a huge swamp toad as large as a calf, warty olive-green and brown skin with sickly yellow poison spots,
+    bulging golden eyes, a wide mouth, a long yellowish tongue with a poison-dripping tip
+  empty_armor: >-
+    an empty suit of black plate armor of the Demon King's army with no body inside, two red lights floating
+    inside the helmet slit, dark gaps visible at the joints, red ash caught in the seams, a long plain spear
+  fire_spirit: >-
+    a Fire Spirit, a flame that stood up in human shape out of a volcanic forge; a floating body of orange
+    and yellow fire with a bright white-yellow core in the chest, no legs, arms of flickering flame, two
+    dark hollows for eyes, embers trailing below
+  ice_wolf: >-
+    an Ice Wolf of frozen Arden, a large wolf with a translucent body of ice, blue mana frozen inside it
+    like veins, a faint hexagonal lattice pattern across the ice, frost mane, pale glowing blue eyes
+  ice_knight: >-
+    an Ice Knight of Arden, a knight frozen solid on the night the Ice Queen froze the kingdom; armor and
+    body both turned to translucent pale-blue ice, a closed-eyed human face visible inside the ice of the
+    open helmet, an ice longsword and a round ice shield
+  princess_ice: >-
+    a tall pillar of clear ice standing behind the throne; frozen inside it a young princess with golden
+    hair braided up and a sky-blue dress, eyes closed, one hand reaching forward as if to catch someone; at
+    her reaching fingertip a tiny point where all the hexagonal ice lines meet; an object, she does not move
+  rock_golem: >-
+    a Rock Golem shaped from the stone of Grandfather Mountain, a bulky man-shaped body of grey-brown
+    boulders, red lava glowing in the cracks between the stones, small glowing orange eyes, huge stone fists
+  mountain_hand: >-
+    a giant hand of rock rising out of a mine wall, part of the mountain itself; a huge stone forearm
+    emerging from a broken slab of cave wall, each finger as large as a man's torso, cracks glowing faintly
+    red, small rubble at the base
+  black_crystal: >-
+    a fist-sized black crystal hanging on a short black chain from a wooden beam, smooth and many-faceted,
+    swallowing the light so that dark shadow streaks flow away from it in one direction; an object
+  shadow_fragment: >-
+    a Shadow, a remnant of the Shadow Assassin's power; a flat, flowing man-shaped shadow rising out of the
+    floor, its lower body still melted into a puddle of darkness, no face, one arm ending in a solid grey
+    blade, the only real thing about it
+  wedge: >-
+    a black iron wedge as long as a forearm driven into the air itself, one end blunt and one end a needle
+    point, engraved with flowing wave-like letters, the air around it twisting and warping like heat haze
+    with thin violet distortion lines; an object floating in place
+  blood_guard: >-
+    a Blood Guard of the demonic cult, once a Cheongun disciple; a young swordsman in a dark crimson martial
+    robe under a white over-robe, red tassels on the sleeves, hair tied up, a straight sword, a wary uneasy
+    face
+  black_wind: >-
+    a Black Wind Squad warrior of the demonic cult's Shaanxi branch; a lean fighter all in black, black
+    martial robe and a black hood covering the head and lower face, only sharp eyes showing, a curved saber
+  pockmark_vice: >-
+    the pockmarked vice-captain of the Blood Guard, mounted on a dark brown horse; a stocky man in his late
+    twenties with a pockmarked face and a thin mustache, a dark crimson martial robe under a white over-robe
+    with red tassels, a straight sword raised; the horse with a plain leather saddle and bridle
+  blood_cultist: >-
+    a Blood Cultist, a rank-and-file follower of the Heavenly Demon Cult; a gaunt man in a dark blood-red
+    martial robe with a blood-drop crest on the chest, a red headband, a thin heavy dark red aura clinging
+    to the body, a broad blood-red saber
+  cult_guardian: >-
+    a Demon Cult Guardian, a guardian-protector of the Heavenly Demon Cult; a broad middle-aged martial
+    artist in a long dark crimson robe with black trim, a shaved head with a topknot, both palms blood-red,
+    dark red qi curling up from the hands
+  branch_elite: >-
+    an Elite of the cult's Shaanxi branch, bodyguard of the branch lord; a tall broad warrior in dark
+    crimson lamellar armor over a black robe, a blood-drop crest on the chest plate, a red-glowing left palm
+    and a heavy dao blade in the right hand
+  stair_archer: >-
+    an archer of the cult on the Nine Heaven Stairs; a lean man in a dark red martial robe with a black
+    leather bracer and a quiver of black-fletched arrows on the back, a red headband, a long recurve bow
+  fire_scale_hound: >-
+    a three-headed hound from the rift, larger than a horse; burning orange-red scales instead of fur, three
+    dog heads with glowing yellow eyes on necks that join into one thick neck, small flames flickering
+    between the scales, a long spiked tail
 ```

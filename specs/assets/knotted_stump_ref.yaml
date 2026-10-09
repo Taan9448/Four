@@ -1,0 +1,11 @@
+id: knotted_stump_ref
+type: character-ref
+size: large
+character: knotted_stump
+chroma: magenta
+summary: 옹이 박힌 둥치 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a gnarled waist-high stump with three large dark knots and twisting grain, an old rusty axe head stuck deep in its side"
+  2: "full view, side view, same proportions, the knots and the stuck axe head seen from the side"
+placeholder: { shape: object, color: '#5c4632', accent: '#8f7a63' }

@@ -1,0 +1,15 @@
+id: fire_scale_hound_idle
+type: character-anim
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: 불비늘 삼두견 대기 4프레임
+depends_on: [fire_scale_hound_ref]
+reference: assets/source/fire_scale_hound_ref.png
+facing: left
+frame_notes:
+  1: "stands facing left, the three heads swaying"
+  2: "flames flicker up between the scales"
+  3: "one head snaps at the air, the others growling"
+  4: "settles"
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }

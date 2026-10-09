@@ -1,0 +1,15 @@
+id: wedge_idle
+type: character-anim
+size: large
+character: wedge
+chroma: magenta
+summary: 쐐기 대기 4프레임
+depends_on: [wedge_ref]
+reference: assets/source/wedge_ref.png
+facing: left
+frame_notes:
+  1: "the wedge hangs in the air, the air around it warping"
+  2: "the engraved letters glint faintly violet"
+  3: "the distortion lines twist tighter"
+  4: "settles"
+placeholder: { shape: object, color: '#16141a', accent: '#4b3a6b' }

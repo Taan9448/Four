@@ -1,0 +1,18 @@
+id: rift_beast_attack
+type: character-anim
+size: large
+character: rift_beast
+chroma: green
+summary: 틈의 짐승 금을 문 이빨 6프레임
+depends_on: [rift_beast_ref]
+reference: assets/source/rift_beast_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws back on the hind legs, the jaw opening"
+  2: "the cracks along the body flare violet"
+  3: "lunges forward to the left, low to the ground"
+  4: "the jaw snaps shut at full reach to the left, a burst of violet splinters"
+  5: "lands, the glow dimming"
+  6: "returns to the low crouch"
+placeholder: { shape: beast, color: '#3a1d55', accent: '#b48cff' }

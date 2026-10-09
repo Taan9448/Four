@@ -1,0 +1,11 @@
+id: black_wind_ref
+type: character-ref
+size: large
+character: black_wind
+chroma: magenta
+summary: 흑풍대 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a lean fighter in a black martial robe and black hood covering the head and lower face, sharp eyes, a curved saber held low"
+  2: "full body, side view facing left, same proportions, crouched slightly, saber held behind"
+placeholder: { shape: humanoid, color: '#2a2a30', accent: '#5d6478' }

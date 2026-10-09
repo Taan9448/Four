@@ -1,0 +1,18 @@
+id: fire_spirit_attack
+type: character-anim
+size: large
+character: fire_spirit
+chroma: magenta
+summary: 불의 정령 불길 덮치기 6프레임
+depends_on: [fire_spirit_ref]
+reference: assets/source/fire_spirit_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws a flame arm back, fire gathering"
+  2: "the whole body flares bigger"
+  3: "flings the flame arm forward to the left"
+  4: "a gout of fire bursts at full reach to the left"
+  5: "the flames shrink back"
+  6: "returns to floating"
+placeholder: { shape: humanoid, color: '#f2a03a', accent: '#ffe08a' }

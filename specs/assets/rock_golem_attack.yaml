@@ -1,0 +1,18 @@
+id: rock_golem_attack
+type: character-anim
+size: large
+character: rock_golem
+chroma: magenta
+summary: 바위 골렘 바위 주먹 6프레임
+depends_on: [rock_golem_ref]
+reference: assets/source/rock_golem_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises a stone fist high"
+  2: "the lava cracks flare"
+  3: "swings the fist down and forward to the left"
+  4: "the fist smashes at full reach to the left, rock dust bursting"
+  5: "pulls the fist back, pebbles falling"
+  6: "returns to the heavy stance"
+placeholder: { shape: humanoid, color: '#6e6259', accent: '#ff8a5c' }

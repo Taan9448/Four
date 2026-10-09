@@ -1,0 +1,14 @@
+id: rock_golem_hit
+type: character-anim
+size: large
+character: rock_golem
+chroma: magenta
+summary: 바위 골렘 피격 3프레임
+depends_on: [rock_golem_ref]
+reference: assets/source/rock_golem_ref.png
+facing: left
+frame_notes:
+  1: "struck, stone chips fly, the golem rocks back"
+  2: "staggers, a pebble shower falling"
+  3: "steadies, the lava glow returning"
+placeholder: { shape: humanoid, color: '#6e6259', accent: '#ff8a5c' }

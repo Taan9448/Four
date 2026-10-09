@@ -1,0 +1,15 @@
+id: pockmark_vice_idle
+type: character-anim
+size: large
+character: pockmark_vice
+chroma: magenta
+summary: 마맛자국 부대주 대기 4프레임
+depends_on: [pockmark_vice_ref]
+reference: assets/source/pockmark_vice_ref.png
+facing: left
+frame_notes:
+  1: "the horse stands facing left, the rider holding the reins and sword"
+  2: "the horse shifts and snorts"
+  3: "the rider glances down, the sword trembling slightly"
+  4: "settles"
+placeholder: { shape: beast, color: '#8a6a5a', accent: '#a02634' }

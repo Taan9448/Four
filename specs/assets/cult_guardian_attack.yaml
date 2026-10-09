@@ -1,0 +1,18 @@
+id: cult_guardian_attack
+type: character-anim
+size: large
+character: cult_guardian
+chroma: green
+summary: 마교 호법 혈마장 6프레임
+depends_on: [cult_guardian_ref]
+reference: assets/source/cult_guardian_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the red palm back to the hip"
+  2: "steps forward to the left, qi gathering"
+  3: "pushes the palm forward"
+  4: "the blood-red palm strikes at full reach to the left, a red qi burst"
+  5: "the burst fades"
+  6: "returns to the palm stance"
+placeholder: { shape: humanoid, color: '#5a1a24', accent: '#ff3b3b' }

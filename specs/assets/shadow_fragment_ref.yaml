@@ -1,0 +1,11 @@
+id: shadow_fragment_ref
+type: character-ref
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: 그림자 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a flowing man-shaped shadow rising from a dark puddle on the floor, no face, one arm ending in a solid grey blade"
+  2: "full body, side view facing left, same proportions, the blade arm held low"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

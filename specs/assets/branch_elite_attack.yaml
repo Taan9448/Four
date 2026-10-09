@@ -1,0 +1,18 @@
+id: branch_elite_attack
+type: character-anim
+size: large
+character: branch_elite
+chroma: green
+summary: 분타 정예 혈도 6프레임
+depends_on: [branch_elite_ref]
+reference: assets/source/branch_elite_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the heavy dao blade"
+  2: "steps forward to the left"
+  3: "swings the blade down hard"
+  4: "the dao strikes at full reach to the left, a red trail behind the blade"
+  5: "follows through"
+  6: "returns to the guard stance"
+placeholder: { shape: humanoid, color: '#6a1a20', accent: '#ff3b3b' }

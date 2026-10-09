@@ -1,0 +1,14 @@
+id: iron_dummy_hit
+type: character-anim
+size: large
+character: iron_dummy
+chroma: magenta
+summary: 철목인 피격 3프레임
+depends_on: [iron_dummy_ref]
+reference: assets/source/iron_dummy_ref.png
+facing: left
+frame_notes:
+  1: "struck, a bright spark flies off the iron-wood, the dummy shudders"
+  2: "the arms rattle and vibrate"
+  3: "settles, only a tiny nick left"
+placeholder: { shape: object, color: '#4a4038', accent: '#8a90a3' }
