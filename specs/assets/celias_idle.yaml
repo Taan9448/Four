@@ -1,0 +1,15 @@
+id: celias_idle
+type: character-anim
+size: large
+character: celias
+chroma: magenta
+summary: 빙결의 여왕 셀리아스 대기 4프레임
+depends_on: [celias_ref]
+reference: assets/source/celias_ref.png
+facing: left
+frame_notes:
+  1: "stands still, a few snowflakes drifting around her"
+  2: "the icicle hair glints, the body faintly brightening"
+  3: "raises her chin slightly, frost spreading at her feet"
+  4: "settles back, snowflakes falling"
+placeholder: { shape: boss, color: '#bfe0f0', accent: '#4fb4ff' }

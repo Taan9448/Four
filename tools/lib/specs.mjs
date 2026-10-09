@@ -36,6 +36,8 @@ const ILLUSTRATIONS = {
   'map-art': { canvas: [1536, 1024], output: [1152, 768] }, // 가로(2026-10-08 세로 → 가로): 왼쪽 = 출발, 오른쪽 = 보스
   // 비주얼 노벨·컷인용 반신 그림: 한 시트에 표정 3장(기본·결의·놀람), 배경은 키 색으로 지워 투명하게
   'character-standing': { canvas: [1536, 1024], output: [512, 1024], grid: [3, 1], frames: 3, chroma: 'magenta' },
+  // 화면 장식 3조각(2026-10-09): 칸1 위 끝 · 칸2 가운데(위아래로 이어 붙여 늘림) · 칸3 아래 끝. 마젠타 배경을 지워 투명(지도 두루마리 축)
+  'ui-slices': { canvas: [1536, 1024], output: [256, 512], grid: [3, 1], frames: 3, chroma: 'magenta' },
 };
 
 export const ILLUSTRATION_TYPES = Object.keys(ILLUSTRATIONS);

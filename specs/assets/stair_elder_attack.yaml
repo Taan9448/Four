@@ -1,0 +1,18 @@
+id: stair_elder_attack
+type: character-anim
+size: large
+character: stair_elder
+chroma: green
+summary: 계단의 장로 혈마장 6프레임
+depends_on: [stair_elder_ref]
+reference: assets/source/stair_elder_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws one palm back, blood-red qi gathering"
+  2: "steps forward"
+  3: "the palm at full draw, glowing"
+  4: "a blood-red palm strike thrust to the left, a crimson shock ring"
+  5: "the crimson ring fades"
+  6: "returns to the standing stance"
+placeholder: { shape: humanoid, color: '#6a1a22', accent: '#ff3b3b' }

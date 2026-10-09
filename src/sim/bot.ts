@@ -5,7 +5,8 @@
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
-import { buyCard, buyPotion, buyRelic, buySwap, claimLoot, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buySwap, claimLoot, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
 import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
 export { cloneBattle };
@@ -21,6 +22,7 @@ import {
   availableNodes,
   battleSetupFor,
   choiceNeedsPick,
+  choiceRemovePick,
   choicesFor,
   createRun,
   createRunAt,
@@ -218,6 +220,16 @@ function pickUpgrade(data: GameData, run: RunState, filter: Parameters<typeof up
   return list.sort((a, b) => score(b) - score(a))[0]?.uid;
 }
 
+/** 버릴 카드(심연): 덱이 15장 넘을 때만, 가장 값싼 시작 카드 */
+function pickRemoval(data: GameData, run: RunState): string | undefined {
+  if (run.deck.length <= 15) return undefined;
+  const score = (c: CardInstance) => {
+    const def = data.cards.get(c.cardId)!;
+    return cardValue(def) * 10 + c.level * 5 - (def.pool === 'starter' ? 8 : 0);
+  };
+  return [...run.deck].sort((a, b) => score(a) - score(b))[0]?.uid;
+}
+
 /** 선택지: 각 선택지를 런 사본에 적용해 점수가 가장 높은 것(같으면 앞의 것) */
 function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<typeof choicesFor>[2] }): { index: number; pick?: string } | null {
   const choices = choicesFor(data, run, enc.module);
@@ -225,9 +237,10 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
   choices.forEach((c, index) => {
     if (c.disabled) return;
     const pickEffect = choiceNeedsPick(c);
+    const removeEffect = choiceRemovePick(c);
     const copy = structuredClone(run);
-    const pick = pickEffect ? pickUpgrade(data, copy, pickEffect.filter) : undefined;
-    if (pickEffect && !pick) return; // 강화할 카드가 없다
+    const pick = pickEffect ? pickUpgrade(data, copy, pickEffect.filter) : removeEffect ? pickRemoval(data, copy) : undefined;
+    if ((pickEffect || removeEffect) && !pick) return; // 강화·버릴 카드가 없다
     applyChoice(data, copy, enc.module, index, pick);
     const v = scoreRun(data, copy);
     if (!best || v > best.v) best = { index, pick, v };
@@ -246,6 +259,8 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   const value = cardValue(data.cards.get(best)!);
   // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 값이 기준 이상이면 늘 가진다
   if (value < opts.minRewardValue) return undefined;
+  // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
+  if (isAbyss(run) && run.deck.length >= 25 && value < RARITY_VALUE.epic) return undefined;
   return best;
 }
 
@@ -262,6 +277,12 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, RARITY_VALUE.rare)) buyCard(data, run, i);
   });
   shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
+  if (isAbyss(run)) {
+    // 심연: 남은 골드로 가장 값싼 카드 지우기
+    const uid = pickRemoval(data, run);
+    if (uid && run.gold >= removePrice(data, run)) buyRemove(data, run, uid);
+    return;
+  }
   const inLoadout = new Set(Object.values(run.loadout).flat());
   const weakest = swappable(data, run)
     .filter((id) => !inLoadout.has(id))
@@ -423,3 +444,110 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
   };
 }
 
+
+// ───────────────────────── 심연(GAME_DESIGN 16절) ─────────────────────────
+
+/** 봇이 고르는 길 순서 */
+const PATH_ORDER = ['path_mountain', 'path_river', 'path_woodcutter', 'path_debt', 'path_needle', 'path_shadow'];
+
+export interface AbyssReport {
+  seed: string;
+  mates: number;
+  /** 쓰러진(또는 멈춘) 굽이 */
+  depth: number;
+  /** 넘은 굽이 수 */
+  cleared: number;
+  result: 'defeat' | 'stopped';
+  /** 쓰러진 곳: boss · elite · battle */
+  diedAt: string | null;
+  diedModule: string | null;
+  poolSize: number;
+  deckSize: number;
+  score: number;
+  battles: BattleRecord[];
+}
+
+/** 심연 런 하나를 maxDepth 굽이까지(또는 쓰러질 때까지) 둔다 */
+export function playAbyss(
+  data: GameData,
+  seed: string,
+  start: { mates: string[]; pool: Record<string, number>; oath?: number; unlocked?: string[] },
+  opts: BotOptions = DEFAULT_BOT,
+  maxDepth = 20,
+): AbyssReport {
+  const n = pathPicks(data, start.mates.length).picks;
+  const offer = pathOffer(data, seed).sort((a, b) => PATH_ORDER.indexOf(a) - PATH_ORDER.indexOf(b));
+  const run = createAbyssRun(data, seed, { mates: start.mates, paths: offer.slice(0, n), pool: start.pool, oath: start.oath, unlocked: start.unlocked });
+  const battles: BattleRecord[] = [];
+  let diedAt: string | null = null;
+  let diedModule: string | null = null;
+  let result: AbyssReport['result'] = 'stopped';
+  for (let guard = 0; guard < 4000; guard++) {
+    if (run.status === 'defeat') {
+      result = 'defeat';
+      break;
+    }
+    if (run.status === 'stage_clear') {
+      if (run.abyss!.depth >= maxDepth) break;
+      advanceStage(data, run);
+      continue;
+    }
+    const nodes = availableNodes(run);
+    if (!nodes.length) throw new Error(`${seed}: 심연 ${run.abyss!.depth}굽이에서 갈 곳이 없다`);
+    const enc = enterNode(data, run, decideNode(run, nodes).id);
+    if (isBattle(enc)) {
+      const state = createBattle(data, battleSetupFor(data, run, enc));
+      const hpBefore = partyHp(state);
+      const haunBefore = state.party.find((p) => p.defId === 'haun')!.hp;
+      playBattle(state, opts);
+      const outcome = battleOutcome(state)!;
+      battles.push({
+        stageId: `d${run.abyss!.depth}`,
+        moduleId: enc.module.id,
+        type: enc.node.type,
+        floor: enc.node.floor,
+        result: outcome.result,
+        turns: state.turn,
+        hpBefore,
+        hpAfter: partyHp(state),
+        hpMax: state.party.reduce((a, p) => a + p.maxHp, 0),
+        haunBefore,
+        haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
+        rift: state.rift,
+      });
+      applyBattleOutcome(data, run, enc, outcome);
+      if (outcome.result === 'defeat') {
+        diedAt = enc.node.type;
+        diedModule = enc.module.id;
+        continue;
+      }
+      const loot = rollLoot(data, run, enc.node);
+      claimLoot(data, run, loot);
+      const pick = loot.relicChoices.find((id) => relicDownside(data, id) < 2);
+      if (pick) gainRelic(data, run, pick);
+      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
+      run.levelLog = [];
+      const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
+      if (card) addCard(data, run, card);
+    } else if (enc.module.type === 'shop') {
+      shopTurn(data, run, enc.node.id, opts);
+    } else {
+      const d = decideChoice(data, run, enc);
+      if (d) applyChoice(data, run, enc.module, d.index, d.pick);
+    }
+  }
+  const ab = run.abyss!;
+  return {
+    seed,
+    mates: start.mates.length,
+    depth: ab.depth,
+    cleared: ab.depth - (run.status === 'stage_clear' ? 0 : 1),
+    result,
+    diedAt,
+    diedModule,
+    poolSize: Object.keys(ab.pool).length,
+    deckSize: run.deck.length,
+    score: abyssScore(data, run),
+    battles,
+  };
+}

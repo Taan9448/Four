@@ -1,0 +1,11 @@
+id: jo_myeonggak_ref
+type: character-ref
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: 조명각 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a young man around twenty, a narrow face with sharply upturned eye corners, pale with dark shadows under the eyes, a white Cheongun disciple robe with a red tassel on the sleeve, a coiled iron-hook whip in the right hand"
+  2: "full body, side view facing left, same proportions, the whip hanging coiled at his side"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

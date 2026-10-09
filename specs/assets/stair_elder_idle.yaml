@@ -1,0 +1,15 @@
+id: stair_elder_idle
+type: character-anim
+size: large
+character: stair_elder
+chroma: green
+summary: 계단의 장로 대기 4프레임
+depends_on: [stair_elder_ref]
+reference: assets/source/stair_elder_ref.png
+facing: left
+frame_notes:
+  1: "stands with hands behind the back, beard stirring"
+  2: "a red haze rises from the shoulders"
+  3: "one palm glows brighter"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#6a1a22', accent: '#ff3b3b' }

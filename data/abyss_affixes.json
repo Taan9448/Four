@@ -1,0 +1,10 @@
+[
+  { "id": "tough", "name": "단단한", "glyph": "堅", "description": "최대 체력 +30%.", "hpMul": 1.3 },
+  { "id": "swift", "name": "빠른", "glyph": "疾", "description": "첫 턴에 두 번 움직인다.", "firstTurnExtra": 1 },
+  { "id": "venom", "name": "독기 머금은", "glyph": "毒", "description": "공격할 때마다 대상에게 독 1.", "onHit": [{ "op": "apply_status", "status": "poison", "stacks": 1 }] },
+  { "id": "shadow", "name": "그림자 깃든", "glyph": "影", "description": "무형: 내공만 쓰는 공격의 피해가 절반.", "traits": [{ "status": "incorporeal", "stacks": 1 }] },
+  { "id": "glutton", "name": "탐식하는", "glyph": "貪", "description": "공격할 때마다 마나 -1.", "onHit": [{ "op": "gain_mana", "amount": -1 }] },
+  { "id": "spiteful", "name": "되돌리는", "glyph": "返", "description": "맞을 때마다 때린 쪽에게 피해 3(가시 3).", "traits": [{ "status": "thorns", "stacks": 3 }] },
+  { "id": "blood_covered", "name": "피 덮인", "glyph": "血", "description": "피의 덮개: 결 노출이 붙지 않는다. 보스에는 붙지 않는다.", "traits": [{ "status": "blood_cover", "stacks": 1 }], "boss": false },
+  { "id": "echoing", "name": "메아리치는", "glyph": "響", "description": "쓰러지면 버린 더미에 틈의 잔향 1장.", "deathEffects": [{ "op": "add_card", "card": "status_rift_echo", "to": "discard" }] }
+]

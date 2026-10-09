@@ -93,7 +93,9 @@ h1, h2, h3 { font-family: var(--f-head); }
 /* 지도: 위 여정 띠 + 아래 두루마리 지역 지도 */
 /* 창 높이를 꽉 채운다: 위 여정 띠(전체 폭) → 아래 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸 */
 .map-screen { display: flex; flex-direction: column; height: calc(100vh - 20px); min-height: 560px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0e13; }
-.journey-area { position: relative; flex: 0 0 auto; border-bottom: 1px solid var(--line-glass); }
+.journey-area { position: relative; flex: 0 0 auto; padding: 12px 12px 0; }
+/* 위 여정 띠(깊이 띠)와 아래 두루마리의 좌우 가장자리를 같은 줄(12px 안쪽)에 맞춘다(2026-10-09 피드백) */
+.journey-wrap { border-radius: 6px; overflow: hidden; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
 /* 6:1 띠 = journey_band 그림(3:2)의 높이 37.5~62.5% 띠. 폭에 맞춰 늘고 줄어 장소 표시 자리(%)가 그림과 어긋나지 않는다 */
 .journey { position: relative; aspect-ratio: 6 / 1; width: 100%; background-size: 100% auto; background-position: center; overflow: hidden; }
 /* 그림이 오기 전: 왼쪽 무림(따뜻한 먹빛) · 오른쪽 엘하임(청은빛) */
@@ -139,14 +141,32 @@ h1, h2, h3 { font-family: var(--f-head); }
 @keyframes fog-lift { to { opacity: 0; visibility: hidden; } }
 .local { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 12px; background: radial-gradient(ellipse at 50% 0%, #1a2130, #0b0e13 70%); }
 /* 두루마리: 한지 바탕(그림이 오면 먹 그림 지도) + 위아래 축 */
-.scroll-wrap { min-width: 0; min-height: 0; padding: 0 7px; }
+.scroll-wrap { min-width: 0; min-height: 0; padding: 0; }
 /* 가로 두루마리: 남은 자리를 전부 쓴다(그림은 cover로 맞춤) */
 .scroll { position: relative; width: 100%; height: 100%; border-radius: 4px; background-size: cover; background-position: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5); }
 .scroll:not(.has-art) { background: radial-gradient(ellipse at 12% 18%, rgba(60, 50, 35, 0.18), transparent 30%), radial-gradient(ellipse at 88% 70%, rgba(60, 50, 35, 0.16), transparent 32%), radial-gradient(ellipse at 50% 4%, rgba(30, 30, 30, 0.22), transparent 26%), radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e8dcc0, #dccdab); }
-/* 좌우의 두루마리 축 */
-.scroll::before, .scroll::after { content: ''; position: absolute; top: -6px; bottom: -6px; width: 14px; z-index: 2; border-radius: 7px; background: linear-gradient(90deg, #6b4a2a, #2e1d0f); }
-.scroll::before { left: -7px; }
-.scroll::after { right: -7px; }
+/* 좌우의 두루마리 축: 종이 가장자리에 감긴 둥근 나무 막대(가운데가 밝은 원통) + 위아래 끝의 옻칠한 손잡이. 바깥 가장자리는 위 띠와 같은 줄 */
+.scroll::before, .scroll::after {
+  content: ''; position: absolute; top: -9px; bottom: -9px; width: 22px; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 50% at 50% 50%, #f0c27a 0, #b07a3a 38%, #5a3818 72%, #24140a 100%) top / 22px 14px no-repeat,
+    radial-gradient(ellipse 50% 50% at 50% 50%, #f0c27a 0, #b07a3a 38%, #5a3818 72%, #24140a 100%) bottom / 22px 14px no-repeat,
+    linear-gradient(90deg, transparent 4px, #2a180b 4px, #6e4824 7px, #b98446 10px, #d9a35c 11px, #b98446 12px, #6e4824 15px, #2a180b 18px, transparent 18px) center / 100% calc(100% - 10px) no-repeat;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.55));
+}
+.scroll::before { left: -4px; }
+.scroll::after { right: -4px; }
+/* 축 그림(ui_scroll_rod)이 오면 CSS 축 대신: 칸 하나(256×512)의 가운데 1/4이 막대. 위·아래 끝은 칸 비율 그대로, 가운데는 위아래로 이어 붙인다 */
+.scroll.has-rod::before, .scroll.has-rod::after { display: none; }
+.scroll-rod { position: absolute; top: -14px; bottom: -14px; width: 96px; z-index: 2; pointer-events: none; display: flex; flex-direction: column; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.55)); }
+.scroll-rod.left { left: -42px; }
+.scroll-rod.right { right: -42px; transform: scaleX(-1); }
+.scroll-rod i { display: block; background-repeat: no-repeat; background-size: 100% auto; }
+.scroll-rod .top { aspect-ratio: 1 / 2; max-height: 40%; flex: none; background-position: top; }
+.scroll-rod .bot { aspect-ratio: 1 / 2; max-height: 40%; flex: none; background-position: bottom; }
+.scroll-rod .mid { flex: 1; min-height: 0; background-repeat: repeat-y; }
+/* 종이가 축에 감겨 들어가는 자리의 그늘 */
+.scroll { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(60, 40, 20, 0.5), inset 22px 0 18px -12px rgba(40, 25, 10, 0.55), inset -22px 0 18px -12px rgba(40, 25, 10, 0.55); }
 .map-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .map-lines line { stroke: rgba(43, 36, 26, 0.35); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
 .map-lines line.open { stroke: #1f5f8a; stroke-dasharray: none; stroke-width: 2.5; }
@@ -1112,3 +1132,56 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .hand .card.drag-source { opacity: 0.35; }
 .card-drag { transform: rotate(-4deg) scale(1.08) !important; box-shadow: 0 18px 30px rgba(0, 0, 0, 0.7); }
 .hand .card { touch-action: pan-x; }
+
+/* ───────── 심연(GAME_DESIGN 16절) ───────── */
+.btn-abyss { border-color: rgba(150, 110, 210, 0.7); background: linear-gradient(180deg, rgba(40, 24, 60, 0.92), rgba(18, 10, 28, 0.92)); }
+.btn-abyss:hover { box-shadow: 0 0 14px rgba(150, 110, 210, 0.45); }
+.abyss-start { display: flex; flex-direction: column; gap: 10px; }
+.abyss-start h3 { margin: 6px 0 0; font-size: 0.95rem; color: #d9c7f2; }
+.abyss-intro { margin: 0; color: #e7dccb; line-height: 1.6; }
+.abyss-mates, .abyss-paths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .abyss-mates, .abyss-paths { grid-template-columns: minmax(0, 1fr); } }
+.abyss-mate, .abyss-path { display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid rgba(150, 110, 210, 0.4); border-radius: 6px; background: rgba(16, 12, 24, 0.75); cursor: pointer; }
+.abyss-mate { border-left: 4px solid var(--owner, #888); }
+.abyss-mate.on, .abyss-path.on { border-color: #b996ef; box-shadow: 0 0 12px rgba(185, 150, 239, 0.35); }
+.abyss-mate input, .abyss-path input { align-self: flex-start; }
+.abyss-mate small, .abyss-path small { color: #b9b0c4; line-height: 1.45; }
+.abyss-path-glyph { font-size: 1.4rem; color: #d9c7f2; font-family: serif; }
+.abyss-oath-row input { width: 100%; accent-color: #b996ef; }
+.abyss-oaths { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.abyss-oaths li { display: grid; grid-template-columns: 26px 1fr; column-gap: 8px; padding: 6px 8px; border: 1px solid rgba(150, 110, 210, 0.25); border-radius: 6px; background: rgba(16, 12, 24, 0.6); color: #b9b0c4; }
+.abyss-oaths li b { font-size: 0.85rem; color: #e7dccb; }
+.abyss-oaths li small { grid-column: 2; font-size: 0.75rem; line-height: 1.4; }
+.abyss-oaths li.on { border-color: #b996ef; background: rgba(60, 36, 90, 0.55); }
+.abyss-oaths li.locked { opacity: 0.45; }
+.abyss-oath-glyph { grid-row: span 2; font-family: serif; font-size: 1.2rem; color: #d9c7f2; align-self: center; }
+.abyss-daily { margin-top: 6px; padding-top: 10px; border-top: 1px dashed rgba(150, 110, 210, 0.35); }
+.codex-card.outline .card { filter: grayscale(0.85) brightness(0.75); opacity: 0.8; }
+.codex-card.outline { outline: 2px dashed rgba(220, 210, 190, 0.3); outline-offset: 3px; border-radius: 6px; }
+.codex-card.unknown.locked { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px; font-size: 1.8rem; text-align: center; }
+.codex-lock { font-family: var(--f-body, inherit); font-size: 0.68rem; line-height: 1.35; color: rgba(225, 215, 240, 0.65); }
+.codex-lock b { color: #d9c7f2; }
+.codex-achievements { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+.codex-achievements li { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink-dim); opacity: 0.7; }
+.codex-achievements li.done { opacity: 1; border-color: #b996ef; color: #e7dccb; }
+.codex-achievements small { font-size: 0.75rem; line-height: 1.4; }
+.abyss-glyph { font-family: serif; color: #d9c7f2; }
+.depth-band { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 14px 18px; min-height: 84px; background: radial-gradient(ellipse at center, rgba(60, 30, 90, 0.55), rgba(8, 6, 12, 0.95)); overflow: hidden; }
+.depth-crack { position: absolute; left: 0; right: 0; top: 50%; height: 3px; background: linear-gradient(90deg, transparent, #0b0b10 8%, #3a1d55 50%, #0b0b10 92%, transparent); box-shadow: 0 0 10px rgba(160, 90, 220, 0.5); }
+.depth-stop { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px; padding: 6px 4px; border: 1px solid rgba(150, 110, 210, 0.3); border-radius: 6px; background: rgba(14, 10, 20, 0.85); color: #8f86a0; }
+.depth-stop b { font-size: 1rem; }
+.depth-stop small { font-size: 0.68rem; white-space: nowrap; }
+.depth-stop.done { color: #c9bedb; }
+.depth-stop.here { color: #fff; border-color: #c9a7ff; box-shadow: 0 0 14px rgba(201, 167, 255, 0.6); }
+.depth-stop.nemesis { border-color: rgba(255, 80, 80, 0.6); }
+.depth-stop.nemesis small { color: #ff9a9a; }
+@media (max-width: 720px) { .depth-band { overflow-x: auto; justify-content: flex-start; } }
+/* 틈의 카드: 보랏빛 테두리에 검은 금 */
+.card.card-abyss { border-color: #9a6ad6 !important; box-shadow: 0 0 10px rgba(154, 106, 214, 0.55), inset 0 0 0 1px rgba(20, 8, 30, 0.8); }
+.card.card-abyss::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(118deg, transparent 46%, rgba(10, 6, 16, 0.85) 47%, rgba(10, 6, 16, 0.85) 48.2%, transparent 49.2%), linear-gradient(64deg, transparent 58%, rgba(10, 6, 16, 0.7) 58.6%, transparent 59.4%); mix-blend-mode: multiply; opacity: 0.4; }
+/* 심연 2차: 굽이의 법칙 배지, 안개 의도 */
+.law-badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 6px; }
+.side-panel .law-badges { justify-content: flex-start; }
+.law-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border: 1px solid rgba(185, 150, 239, 0.6); border-radius: 999px; background: rgba(24, 12, 36, 0.88); color: #e6d9fb; font-size: 0.78rem; }
+.law-badge b { font-family: serif; color: #c9a7ff; }
+.intent-fog { font-weight: 700; font-size: 1rem; color: #cfc6dc; padding: 0 4px; }

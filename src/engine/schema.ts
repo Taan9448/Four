@@ -45,6 +45,11 @@ export const RUN_OPS = [
   'swap_card',
   'sell_card',
   'gain_potion_slot',
+  // 심연(GAME_DESIGN 16절)
+  'gain_abyss_card',
+  'reveal_unseen_card',
+  'injure',
+  'cure_injury',
 ] as const;
 
 export const Target = z.enum([
@@ -66,6 +71,8 @@ export const Condition = z
     targetStatusGte: z.tuple([z.string(), z.number()]),
     world: z.union([World, z.array(World)]),
     partyHas: z.string(),
+    /** 선택지: 이 동료가 일행에 없을 때만(심연 3굽이 '구원') */
+    partyLacks: z.string(),
     turnMod: z.tuple([z.number().int().positive(), z.number().int().nonnegative()]),
     enemyId: z.string(),
     hpRatioLte: z.number(),
@@ -205,7 +212,8 @@ export const CardDef = z
     type: z.enum(['attack', 'skill', 'power', 'status']),
     /** 등급: 일반·고급·희귀·영웅·전설(+ 상태·저주용 special). 영웅·전설은 castLine 필수 */
     rarity: Rarity,
-    pool: z.enum(['starter', 'reward', 'story', 'status']),
+    /** abyss: 틈의 카드(심연 전용, 캠페인에는 나오지 않는다) */
+    pool: z.enum(['starter', 'reward', 'story', 'status', 'abyss']),
     cost: Cost,
     target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
     keywords: z.array(Keyword).default([]),
@@ -409,7 +417,8 @@ export const RelicDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
-    rarity: z.enum(['common', 'uncommon', 'rare', 'boss']),
+    /** path: 심연의 시작 유물(길). 보상·상점에 나오지 않는다 */
+    rarity: z.enum(['common', 'uncommon', 'rare', 'boss', 'path']),
     /** 아이콘 그림이 없을 때 표시할 한 글자 */
     glyph: z.string().length(1),
     /** 유물 아이콘 시트(icons_relics)의 프레임 번호(1부터) */
@@ -428,7 +437,8 @@ export const RelicDef = z
     keyword: Keyword.optional(),
     every: z.number().int().positive().optional(),
     /** 규칙을 바꾸는 유물(엔진이 처리, 수치는 balance.relicRules) */
-    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount']).optional(),
+    /** reveal_map 지도의 ? 노드가 모두 보이고 엘리트 피해 ×balance.abyss.shadowEliteDmg · needle 심연 상점 지우기 무료·보상 카드 2장(심연 길) */
+    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount', 'reveal_map', 'needle']).optional(),
     effects: z.array(Effect).default([]),
     shop: z.boolean().default(true),
   })
@@ -457,6 +467,8 @@ export const WorldMana = z
   .object({ battleStart: z.union([z.enum(['full', 'carry']), z.number().int().min(0)]), perTurn: z.number().int() })
   .strict();
 export type WorldMana = z.infer<typeof WorldMana>;
+
+const NodeTypeEnum = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'shop', 'story', 'boss']);
 
 export const Balance = z
   .object({
@@ -581,6 +593,72 @@ export const Balance = z
       .default({}),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
+    /**
+     * 심연(GAME_DESIGN 16절): 굽이 n의 적 배율 hpBase·dmgBase × (1 + step × (n-1)), 지도 층수·노드 비율, 굽이를 넘을 때 회복,
+     * 숙적 굽이, 동료 수별 길 개수·골드, 시작 카드 장수, 틈의 카드가 보상에 섞일 확률, 상점 지우기 가격, 한 방 상한(하운 최대 체력 비율), 점수
+     */
+    abyss: z
+      .object({
+        hpBase: z.number().positive(),
+        dmgBase: z.number().positive(),
+        hpStep: z.number().min(0),
+        dmgStep: z.number().min(0),
+        floors: z.number().int().positive(),
+        typeWeights: z.partialRecord(NodeTypeEnum, z.number()),
+        forcedTypes: z.record(z.string(), NodeTypeEnum),
+        healOnLoop: z.number().min(0).max(1),
+        nemesisEvery: z.number().int().positive(),
+        nemesisModule: z.string(),
+        partyMax: z.number().int().positive(),
+        starters: z.object({ haun: z.number().int().positive(), common: z.number().int().min(0), mate: z.number().int().positive() }).strict(),
+        /** 동료 수(1~3) → 고를 길 개수·덤 골드 */
+        pathPicks: z.record(z.string(), z.object({ picks: z.number().int().positive(), gold: z.number().int().min(0) }).strict()),
+        pathOffer: z.number().int().positive(),
+        riftCardChance: z.number().min(0).max(1),
+        removePrice: z.number().int().min(0),
+        removeStep: z.number().int().min(0),
+        shopRiftPrice: z.partialRecord(Rarity, z.number().int().positive()),
+        oneHitCap: z.number().min(0).max(1),
+        injuryRatio: z.number().min(0).max(1),
+        shadowEliteDmg: z.number().positive(),
+        needleRewardChoices: z.number().int().positive(),
+        unseenCardPrice: z.number().int().min(0),
+        /** 세계 → 그 세계의 지도에 쓸 스테이지(모듈·적·배경·마나 규칙), 보스 모듈 */
+        worlds: z.record(World, z.object({ stages: z.array(z.string()).min(1), bosses: z.array(z.string()) }).strict()),
+        firstWorlds: z.array(World).min(1),
+        riftFrom: z.number().int().positive(),
+        score: z.object({ depth: z.number(), boss: z.number(), elite: z.number(), hp: z.number() }).strict(),
+        // ── 2차(변동성) ──
+        /** 굽이의 법칙: [이 굽이부터, 개수]. 큰 굽이가 이긴다 */
+        lawsAt: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])),
+        /** 접사: 엘리트·일반 적 한 마리에 붙는 개수 [이 굽이부터, 개수] */
+        affixesAt: z.object({ elite: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])), normal: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])) }).strict(),
+        /** 심연의 상흔 가중(scar 모듈이 더 자주) */
+        scarWeightPerPoint: z.number().min(0),
+        /** 상흔 이만큼마다 다음 굽이에 틈의 짐승(추격 엘리트) 한 칸 */
+        beastEvery: z.number().int().positive(),
+        beastModule: z.string(),
+        beastFloor: z.number().int().positive(),
+        /** 이 굽이 이 층에 정해진 사건: 동료 자리가 남았으면 구원, 가득하면 틈의 메아리 */
+        eventDepth: z.number().int().positive(),
+        eventFloor: z.number().int().positive(),
+        rescueModule: z.string(),
+        echoModule: z.string(),
+        /** 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks */
+        nemesis: z.object({ enrageStep: z.number().int().min(0), knotFrom: z.number().int().positive(), knotStacks: z.number().int().positive() }).strict(),
+        // ── 3차(메타) ──
+        /** 서약: 점수 배율(단계마다 곱), 열리는 단계 = 넘은 굽이 - depthOffset, 또는 그 단계 바로 아래로 stepDepth굽이를 넘으면 */
+        oath: z.object({ scoreMul: z.number().positive(), depthOffset: z.number().int().min(0), stepDepth: z.number().int().positive() }).strict(),
+        /** 일일 심연: 날짜 시드, 그날의 법칙 laws개(모든 굽이에), 서약 단계 범위, 동료 수 범위 */
+        daily: z
+          .object({
+            laws: z.number().int().min(0),
+            oath: z.tuple([z.number().int().min(0), z.number().int().min(0)]),
+            mates: z.tuple([z.number().int().positive(), z.number().int().positive()]),
+          })
+          .strict(),
+      })
+      .strict(),
     route: z
       .object({
         nodesPerFloor: z.tuple([z.number().int().positive(), z.number().int().positive()]),
@@ -595,7 +673,122 @@ export const Balance = z
   .strict();
 export type Balance = z.infer<typeof Balance>;
 
-export const NodeType = z.enum(['battle', 'elite', 'event', 'rest', 'inn', 'shop', 'story', 'boss']);
+export const NodeType = NodeTypeEnum;
+
+/**
+ * 굽이의 법칙(심연, GAME_DESIGN 16절): 굽이 하나 동안 모든 전투·런에 걸리는 규칙. 전투: 시작 효과(하운을 출처로)·적 특성·
+ * 손패/내공/마나 회복 덮어쓰기·의도 감추기·격노. 런: 휴식 회복·골드 배율
+ */
+export const LawDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    glyph: z.string().length(1),
+    description: z.string(),
+    battle: z
+      .object({
+        startEffects: z.array(Effect).default([]),
+        enemyTraits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
+        handSize: z.number().int().positive().optional(),
+        neigongPerTurn: z.number().int().positive().optional(),
+        manaPerTurn: z.number().int().optional(),
+        hideIntent: z.boolean().optional(),
+        enrage: z.object({ afterTurn: z.number().int().positive(), text: z.string(), effects: z.array(Effect).min(1) }).strict().optional(),
+      })
+      .strict()
+      .default({ startEffects: [], enemyTraits: [] }),
+    run: z.object({ restHealMul: z.number().min(0).optional(), goldMul: z.number().min(0).optional() }).strict().default({}),
+  })
+  .strict();
+export type LawDef = z.infer<typeof LawDef>;
+
+/**
+ * 접사(심연): 엘리트·일반 적에 붙어 이름 앞에 붙는다("독기 머금은 그림자늑대"). 체력 배율·특성 상태·
+ * 공격한 뒤 효과(공격한 대상에게)·쓰러질 때 효과·첫 턴 추가 행동. boss: 보스에 붙을 수 있는가
+ */
+export const AffixDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    glyph: z.string().length(1),
+    description: z.string(),
+    hpMul: z.number().positive().optional(),
+    traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
+    onHit: z.array(Effect).default([]),
+    deathEffects: z.array(Effect).default([]),
+    firstTurnExtra: z.number().int().min(0).optional(),
+    boss: z.boolean().default(true),
+  })
+  .strict();
+export type AffixDef = z.infer<typeof AffixDef>;
+
+/**
+ * 서약(심연 3차, GAME_DESIGN 16절): 1~15단계. 고른 단계까지 전부 걸린다(같은 키는 높은 단계가 이긴다). 점수 × balance.abyss.oath.scoreMul^단계.
+ * enemyHpMul 적 체력 배율 · startGold 시작 골드(동료 수 덤은 그대로) · restHealMul 휴식 회복 배율 · rewardChoices 보상 카드 수 상한 ·
+ * eliteFloor 이 층을 엘리트로 고정 · startScar 시작 상흔 · lawsMin 굽이마다 법칙 최소 개수 · potionSlots 물약 칸 · injuriesPersist 굽이를 넘어도 부상이 낫지 않는다 ·
+ * nemesisEvery 숙적 굽이 간격 · eliteAffixMin 엘리트 접사 최소 개수 · riftInReward 보상 후보에 틈의 카드 한 장은 반드시 · noPowers 심법(파워) 카드가 나오지 않는다 ·
+ * maxMates 동료 최대 수 · haunMaxHp 하운 최대 체력
+ */
+export const OathMods = z
+  .object({
+    enemyHpMul: z.number().positive(),
+    startGold: z.number().int().min(0),
+    restHealMul: z.number().min(0),
+    rewardChoices: z.number().int().positive(),
+    eliteFloor: z.number().int().positive(),
+    startScar: z.number().int().min(0),
+    lawsMin: z.number().int().min(0),
+    potionSlots: z.number().int().min(0),
+    injuriesPersist: z.boolean(),
+    nemesisEvery: z.number().int().positive(),
+    eliteAffixMin: z.number().int().min(0),
+    riftInReward: z.boolean(),
+    noPowers: z.boolean(),
+    maxMates: z.number().int().positive(),
+    haunMaxHp: z.number().int().positive(),
+  })
+  .partial()
+  .strict();
+export type OathMods = z.infer<typeof OathMods>;
+export const OathDef = z
+  .object({ level: z.number().int().positive(), name: z.string(), glyph: z.string().length(1), description: z.string(), mods: OathMods })
+  .strict();
+export type OathDef = z.infer<typeof OathDef>;
+
+/**
+ * 심연 업적(3차): 런 하나 안에서 조건을 채우면 영구로 기록되고 틈의 카드 한 장 또는 길 하나가 열린다. 조건과 여는 것은 미리 보인다.
+ * kind — cleared 넘은 굽이 ≥ n · nemesisKills·beastKills·affixKills·trades·elites·bosses 런 안의 셈 ≥ n ·
+ * bossWithScar 상흔 n 이상으로 보스 처치 · lowHpBoss 하운 체력 비율 n 이하로 보스 처치 · injuredClear 부상 동료 n명 이상인 채 굽이 통과 ·
+ * noPowerDepth 심법을 한 장도 내지 않고 n굽이 · grainBattle 한 전투에서 결 노출 n 소모 · mates 동료 mates명으로 시작해 n굽이 ·
+ * withMate mate와 함께 n굽이 · codexCards 도감 카드 n장 · score 점수 n · oath 서약 oath단계 이상으로 n굽이 · choice 모듈 module에서 op가 든 선택 ·
+ * worlds 서로 다른 세계 n곳의 굽이 통과 · lawsClear 법칙 n개 걸린 굽이 통과 · smallDeck 덱 n장 이하로 depth굽이 통과 · riftInDeck 덱에 틈의 카드 n장 ·
+ * gold 골드 n 모으기 · scarZeroDepth 상흔 0인 채 n굽이
+ */
+export const AchievementDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    name: z.string(),
+    description: z.string(),
+    check: z
+      .object({
+        kind: z.enum([
+          'cleared', 'nemesisKills', 'beastKills', 'affixKills', 'trades', 'elites', 'bosses', 'bossWithScar', 'lowHpBoss', 'injuredClear',
+          'noPowerDepth', 'grainBattle', 'mates', 'withMate', 'codexCards', 'score', 'oath', 'choice', 'worlds', 'lawsClear', 'smallDeck',
+          'riftInDeck', 'gold', 'scarZeroDepth',
+        ]),
+        n: z.number().min(0),
+        mate: z.string().optional(),
+        mates: z.number().int().positive().optional(),
+        oath: z.number().int().positive().optional(),
+        module: z.string().optional(),
+        op: z.string().optional(),
+        depth: z.number().int().positive().optional(),
+      })
+      .strict(),
+    unlock: z.object({ card: z.string().optional(), path: z.string().optional() }).strict(),
+  })
+  .strict();
+export type AchievementDef = z.infer<typeof AchievementDef>;
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z
@@ -666,6 +859,8 @@ export const ModuleDef = z
     weight: z.number().min(0).default(1),
     tags: z.array(z.string()).default([]),
     once: z.boolean().default(false),
+    /** 심연(GAME_DESIGN 16절)에 나오는가. false면 빠진다(이야기 노드·동료 합류/이탈 사건은 엔진이 따로 뺀다) */
+    abyss: z.boolean().optional(),
     conditions: Condition.default({}),
     content: z
       .object({

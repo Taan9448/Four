@@ -118,6 +118,7 @@
 | rift_beasts | 틈 괴물 | 머리 셋 달린 불비늘 개, 쐐기를 깎은 검은 단검의 그림자 망령, 뼈 거인 | green | large |
 | mordecai | 지옥왕 모르데카이 | **검은 쐐기 수백 개를 엮은 등뼈**, 꿰매 붙인 흐름의 몸, 은빛 마나의 팔·감긴 고리 같은 내공의 팔, 이름 모를 세계의 다리·날개·뿔, **푸른빛과 검은빛이 엉킨 심장**, 실밥이 모인 매듭 | green | large |
 | (장면 인물) | 석두·조명각·마 씨·실리엔·한스·토마·리나·베일락·셀리아스·고르몬·그림자 암살자 | 5절 `subjects`(반신 그림 명세 `<id>_stand`) | none | portrait |
+| (적 보스·엘리트, 2026-10-09) | 베일락·셀리아스·고르몬·조명각·찢긴 경계·광석거미·사슬 감독관·얼음 궁전의 문지기·에드릭 로웬·용암 핏줄 골렘·그림자 암살자·쐐기 박힌 흑요석 문·흑풍대주·독수마군·계단의 장로·뼈 거인 | 5절 `subjects`(전투 명세 `<id>_ref`·`_idle`·`_attack`·`_hit`, 문·경계 같은 물체는 공격 없이 `_idle`·`_hit`). 부서지는 셀리아스·다시 일어선 뼈 거인은 같은 그림에 색 필터 | 보라·붉은 몸은 green, 나머지 magenta | large |
 
 ## 5. 프롬프트·팔레트 데이터
 
@@ -280,4 +281,49 @@ subjects:
   shadow_assassin: >-
     the Shadow Assassin, the last of the Four Heavenly Kings; a faceless, thin and elongated figure of shadow,
     only the black dagger in its hand is solid, its blade engraved with wave-like ancient letters
+  torn_border: >-
+    the Torn Border, a wound in the edge between worlds; a tall jagged vertical tear in the air with ragged
+    stitched edges, inside it a swirling vortex of stolen flows (pale silver mana threads and dark coiled
+    qi), torn threads hanging from the rim; no face, no body
+  ore_spider: >-
+    the Ore Spider, a giant spider as large as a cart that grew by eating silver in an old mine; a body
+    covered in a hard silver ore shell with rough crystal ridges, eight long jointed legs, a cluster of
+    small dark violet eyes, white silk strands trailing from the abdomen
+  chain_overseer: >-
+    the Chain Overseer, an empty suit of black armor a head taller than the others, red ash packed in the
+    joints, two red lights inside the helmet, both hands gripping a heavy iron chain whose links glow orange
+    like hot iron
+  ice_gatekeeper: >-
+    the Gatekeeper of the Ice Palace, a knight who fell guarding the city gate ten years ago, now frozen
+    solid; armor and body all turned to translucent ice, a large tower shield bearing the crest of Arden
+    with frost flowers blooming on it, a long ice spear
+  edric_rowen: >-
+    Edric Rowen, a knight of Arden and Kyle's father, frozen into an ice knight; a broad-shouldered man in
+    plate armor all turned to translucent ice, eyes replaced by the light of frozen blue mana, a round
+    shield bearing the Rowen crest (a white snowflake and a silver sword on blue), a long double-edged sword
+    of ice
+  vein_golem: >-
+    the Lava-Vein Golem, a hulking golem of dark rock whose lava veins run down into the roots of the
+    mountain; glowing orange-red lava veins across the whole body pulse like a heartbeat, a heavy blocky
+    head with no face but a burning crack
+  obsidian_door: >-
+    the Obsidian Door, a huge sealed door of black obsidian at the end of the seventh corridor of Nocturna;
+    wave-like ancient letters carved on its surface, seven black iron wedges driven into the door frame, the
+    air around the wedges warped like heat haze
+  black_wind_captain: >-
+    the Black Wind Captain of the Heavenly Demon Cult's Shaanxi branch; a lean hard man in black martial
+    robes and a black hood pushed back, three sword scars across the face, a curved saber in one hand, the
+    other palm wrapped in black wind
+  poison_hand: >-
+    Poison-Hand Demon Lord, an elder of the Heavenly Demon Cult's Shaanxi branch; a gaunt middle-aged man in
+    a dark green cult robe, long fingernails painted dark blue-green with poison, dark green veins running
+    up from the wrists
+  stair_elder: >-
+    an Elder of the Nine Heaven Stairs of the Heavenly Demon Cult; an old man with a long grey beard and a
+    stern face, a deep crimson elder's robe with black trim and a blood-drop crest on the chest, both palms
+    glowing blood-red with demon qi
+  bone_giant: >-
+    the Bone Giant of the rift, a hunched giant built of huge pale bones fitted together, a ribcage like a
+    cage, dark crimson qi flowing in the gaps between the bones like veins, a skull with dim red light in
+    the sockets
 ```

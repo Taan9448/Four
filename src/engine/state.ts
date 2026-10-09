@@ -33,6 +33,10 @@ export interface EnemyState extends Combatant {
   dmgMul?: number;
   /** 이 전투에서 쓴 한 번만 행동(oncePerBattle) */
   usedOnce?: string[];
+  /** 심연 접사(data/abyss_affixes.json) */
+  affixes?: string[];
+  /** 격노가 시작되는 턴(숙적 성장으로 당겨진다. 없으면 정의의 afterTurn) */
+  enrageAt?: number;
   moveCursor: number;
   lastMoves: string[];
   intent: Intent | null;
@@ -111,6 +115,12 @@ export interface BattleState {
   enemyHpScale?: number;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale). 의도·받을 피해 예고에도 같이 걸린다 */
   enemyDmgScale?: number;
+  /** 적의 피해 한 번의 상한(심연의 한 방 상한, 받을 피해 예고에도) */
+  enemyHitCap?: number;
+  /** 심연 굽이의 법칙: 손패 수 덮어쓰기, 적 의도 감추기(화면만), 모든 적의 격노 */
+  handSize?: number;
+  hideIntent?: boolean;
+  lawEnrage?: { afterTurn: number; text: string; effects: Effect[] }[];
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
   /** 결과 화면용 전투 집계(처치·준 피해·치명타·균열 폭주·쓴 카드·하운을 마지막으로 때린 것) */
@@ -132,6 +142,9 @@ export interface BattleTally {
   surges: number;
   cards: Record<string, number>;
   haunHitBy?: string;
+  /** 심연 업적: 터뜨린 결 노출 수, 쓰러뜨린 접사 붙은 적 수 */
+  grain?: number;
+  affixKills?: number;
   /** 적 id → 이 전투에서 쓴 행동 id(도감에 적는다) */
   moves?: Record<string, string[]>;
 }

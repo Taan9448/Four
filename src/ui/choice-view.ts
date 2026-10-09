@@ -2,7 +2,7 @@
 import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choicesFor, levelUpgradeCandidates, upgradeCandidates, type RunState } from '../engine/run';
+import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, upgradeCandidates, type RunState } from '../engine/run';
 import { swappableCards } from '../engine/collection';
 import { cardView } from './card-view';
 import { h } from './dom';
@@ -68,6 +68,8 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                   onclick: () => {
                     const pick = choiceNeedsPick(c);
                     if (pick) return pickUpgrade(pick.filter, i, c.result);
+                    const remove = choiceRemovePick(c);
+                    if (remove) return pickRemove(remove.filter, i, c.result);
                     const cardPick = choiceCardPick(c);
                     if (cardPick) return pickOwned(cardPick.op === 'sell_card' ? '넘길 카드' : '바꿀 카드', i, c.result);
                     render(applyChoice(data, run, module, i), c.result);
@@ -92,6 +94,8 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
   };
   // 카드 바꾸기·팔기: 보유 카드 한 장을 고른다(필수 카드는 빠진다)
   const pickOwned = (title: string, index: number, resultText?: string) => {
+    // 심연: 보유 목록이 없다. 덱의 카드 한 장
+    if (run.abyss) return pickDeck('換', title, '덱의 카드 한 장을 고른다.', run.deck.filter((c) => data.cards.get(c.cardId)!.type !== 'status'), index, resultText);
     const ids = swappableCards(data, run).sort((a, b) => (data.cards.get(a)!.owner).localeCompare(data.cards.get(b)!.owner) || a.localeCompare(b));
     box.replaceChildren(
       panelHead('換', module.name, title),
@@ -103,6 +107,27 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             ids.map((id) => {
               const el = cardView(data, { uid: `own_${id}`, cardId: id, level: run.collection[id] ?? 0 });
               el.addEventListener('click', () => render(applyChoice(data, run, module, index, id), resultText));
+              return el;
+            }),
+          )
+        : h('p', {}, '고를 카드가 없다.'),
+      h('button', { class: 'btn', onclick: () => render() }, '돌아가기'),
+    );
+  };
+  // 버리기(심연 휴식·틈의 거래): 덱에서 뺄 카드
+  const pickRemove = (filter: Parameters<typeof removeCandidates>[2], index: number, resultText?: string) =>
+    pickDeck('棄', '덜어 낼 카드', '덱에서 영영 빠진다.', removeCandidates(data, run, filter), index, resultText);
+  const pickDeck = (seal: string, title: string, text: string, list: ReturnType<typeof removeCandidates>, index: number, resultText?: string) => {
+    box.replaceChildren(
+      panelHead(seal, module.name, title),
+      h('p', { class: 'choice-text' }, text),
+      list.length
+        ? h(
+            'div',
+            { class: 'reward-cards upgrade-cards' },
+            list.map((c) => {
+              const el = cardView(data, c);
+              el.addEventListener('click', () => render(applyChoice(data, run, module, index, c.uid), resultText));
               return el;
             }),
           )

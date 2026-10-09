@@ -1,0 +1,150 @@
+[
+  {
+    "id": "abyss_boss_mordecai",
+    "stage": "abyss",
+    "type": "boss",
+    "name": "모르데카이의 잔향",
+    "content": {
+      "text": "닫힌 줄 알았던 틈 너머, 같은 목소리가 더 깊은 곳에서 울린다. 흐름을 실은 공격은 먹힌다. 숨을 멈추고 결을 읽어 매듭을 드러내고, 날을 얹어라.",
+      "enemies": ["mordecai"],
+      "background": "bg_rift",
+      "mana": { "battleStart": 0, "perTurn": 0 },
+      "startEffects": [
+        { "op": "add_card", "card": "haun_stop_ring", "to": "hand" },
+        { "op": "add_card", "card": "haun_stop_ring", "to": "draw", "count": 2 },
+        { "op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2 }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_cut",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 덜어 내는 값",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 길을 막고 선다. 손바닥 위에 아무것도 없는데, 무언가를 팔겠다고 한다. \"덜어 내 주지. 값은 하늘의 금으로.\"",
+      "choices": [
+        { "label": "덱에서 카드 한 장을 영구히 덜어 낸다 — 상흔 +2", "effects": [{ "op": "remove_card", "choose": true }, { "op": "scar", "amount": 2 }], "result": "카드가 그림자 속으로 녹아 사라졌다. 어딘가의 하늘이 조금 더 벌어졌다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 아무 말 없이 길을 비켰다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_card",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 있어서는 안 되는 초식",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 검은 금이 간 카드 한 장을 내민다. \"틈 너머에서 주워 온 것이다. 몸으로 값을 치러라.\"",
+      "choices": [
+        { "label": "틈의 카드 한 장(희귀 이상)을 받는다 — 동료 모두 최대 체력 -8", "effects": [{ "op": "gain_abyss_card" }, { "op": "gain_max_hp", "amount": -8 }], "result": "카드를 쥐자 손끝이 차갑게 식었다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 카드를 거두었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_scar",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 금을 사는 자",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 하늘의 금을 손가락으로 훑는다. \"그 흉터, 내가 사겠다. 가진 것을 전부 내놓아라.\"",
+      "choices": [
+        { "label": "상흔을 모두 지운다 — 골드를 모두 낸다", "condition": { "goldGte": 1 }, "effects": [{ "op": "scar", "amount": -999 }, { "op": "gain_gold", "amount": -99999 }], "result": "주머니가 가벼워지고, 하늘의 금이 한 땀씩 아물었다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 아쉬운 듯 손을 거두었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_trade_relic",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 거래 — 누군가의 몫",
+    "tags": ["trade"],
+    "weight": 3,
+    "once": true,
+    "content": {
+      "text": "얼굴 없는 그림자가 빛나는 물건 하나를 흔든다. \"이건 공짜가 아니다. 네 일행 중 하나가 값을 치른다.\"",
+      "choices": [
+        { "label": "유물 하나를 받는다 — 동료 한 명이 다음 굽이까지 부상", "effects": [{ "op": "gain_relic" }, { "op": "injure" }], "result": "물건을 받는 순간 일행 하나가 신음했다." },
+        { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
+        { "label": "지나간다", "effects": [], "result": "그림자는 물건을 다시 어둠 속에 넣었다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_shop",
+    "stage": "abyss",
+    "type": "shop",
+    "name": "틈의 좌판",
+    "weight": 0.5,
+    "content": { "text": "떠다니는 세계의 조각 위에 누군가 좌판을 벌여 놓았다. 주인은 보이지 않는데, 값을 치르면 물건이 줄어든다." }
+  },
+  {
+    "id": "abyss_boss_sa_echo",
+    "stage": "abyss",
+    "type": "boss",
+    "name": "사무결의 잔향",
+    "content": {
+      "text": "혈전의 옥좌가 틈 너머에 떠 있다. 피의 덮개는 옅어지고, 잔향은 세 턴마다 다시 피를 두른다. 덮개가 옅어진 사이에 결을 읽어라.",
+      "enemies": ["sa_mugyeol_echo"],
+      "background": "bg_heavenly_peak"
+    }
+  },
+  {
+    "id": "abyss_elite_rift_beast",
+    "stage": "abyss",
+    "type": "elite",
+    "name": "틈의 짐승",
+    "abyss": false,
+    "content": {
+      "text": "쌓인 상흔의 냄새를 따라 무언가가 굽이를 거슬러 올라왔다. 이기면 그 몸에 박힌 틈의 조각을 거둔다.",
+      "enemies": ["rift_beast"],
+      "clearEffects": [{ "op": "gain_abyss_card" }]
+    }
+  },
+  {
+    "id": "abyss_rescue",
+    "stage": "abyss",
+    "type": "event",
+    "name": "구원 — 틈에 갇힌 동료",
+    "abyss": false,
+    "content": {
+      "text": "떠다니는 조각 위에서 익숙한 목소리가 들린다. 문 너머로 따라오지 못했던 일행 하나가 틈에 갇혀 있다. 손을 뻗으면 닿는다. 다만 그 자리에 박힌 무언가도 함께 빠져나온다.",
+      "choices": [
+        { "label": "엘리아를 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "elia" }, "effects": [{ "op": "join_party", "member": "elia" }], "result": "은발이 바람에 흩날렸다. \"…늦었잖아.\"" },
+        { "label": "카일을 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "kyle" }, "effects": [{ "op": "join_party", "member": "kyle" }], "result": "\"하운! 왼쪽은 내가 맡을게.\"" },
+        { "label": "보른을 데려간다 — 일행에 합류(시작 카드 4장)", "condition": { "partyLacks": "born" }, "effects": [{ "op": "join_party", "member": "born" }], "result": "보른은 말없이 하운의 어깨를 한 번 두드렸다." },
+        { "label": "두고 간다 — 그 자리에 박힌 유물 하나를 거둔다", "effects": [{ "op": "gain_relic" }], "result": "목소리가 멀어졌다. 손에는 차가운 물건 하나만 남았다." }
+      ]
+    }
+  },
+  {
+    "id": "abyss_rift_echo",
+    "stage": "abyss",
+    "type": "event",
+    "name": "틈의 메아리",
+    "abyss": false,
+    "content": {
+      "text": "일행 넷의 그림자가 떠다니는 조각 위에 겹쳐 비친다. 틈이 속삭인다. 익숙한 초식 몇 개를 내놓으면, 있어서는 안 되는 것을 하나 주겠다고.",
+      "choices": [
+        { "label": "엘리아의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "elia" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "elia", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "카일의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "kyle" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "kyle", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "보른의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "born" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "born", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
+        { "label": "아무것도 내놓지 않는다 — 동료 모두 최대 체력 +10", "effects": [{ "op": "gain_max_hp", "amount": 10 }], "result": "그림자들이 흩어지고, 발밑이 조금 단단해졌다." }
+      ]
+    }
+  }
+]

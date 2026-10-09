@@ -12,6 +12,7 @@ import {
   fireSideTriggers,
   hasRule,
   spawnEnemy,
+  type EnemyMod,
   fireSupport,
   hasSkipTurn,
   loseHp,
@@ -67,12 +68,21 @@ export interface BattleSetup {
   relics?: string[];
   /** 물약 칸(빈 칸 null) */
   potions?: (string | null)[];
+  /** 출전 인원 상한(생략하면 balance.party.max. 심연은 전원 출전) */
+  partyMax?: number;
+  /** 적의 피해 한 번의 상한(심연의 한 방 상한) */
+  enemyHitCap?: number;
+  /** 심연 굽이의 법칙(data/abyss_laws.json) */
+  laws?: string[];
+  /** 적마다 덧붙이는 것(심연 접사·숙적 성장). enemies와 같은 순서 */
+  enemyMods?: (EnemyMod | undefined)[];
 }
 
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   const bal = data.balance;
-  if (setup.party.length === 0 || setup.party.length > bal.party.max) {
-    throw new Error(`출전 인원은 1~${bal.party.max}명이어야 한다`);
+  const partyMax = setup.partyMax ?? bal.party.max;
+  if (setup.party.length === 0 || setup.party.length > partyMax) {
+    throw new Error(`출전 인원은 1~${partyMax}명이어야 한다`);
   }
   if (!setup.party.some((p) => p.id === 'haun')) throw new Error('하운은 항상 출전한다');
 
@@ -83,9 +93,16 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   });
   const enemies: EnemyState[] = [];
   const spawnCtx = { data, scar: setup.scar ?? 0, enemyHpScale: setup.enemyHpScale ?? 1, enemies };
-  setup.enemies.forEach((id, i) => enemies.push(spawnEnemy(spawnCtx, id, i)));
+  const laws = (setup.laws ?? []).map((id) => data.laws.get(id)).filter((l): l is NonNullable<typeof l> => !!l);
+  const lawTraits = laws.flatMap((l) => l.battle.enemyTraits);
+  setup.enemies.forEach((id, i) => {
+    const mod = setup.enemyMods?.[i];
+    enemies.push(spawnEnemy(spawnCtx, id, i, lawTraits.length ? { ...mod, traits: [...(mod?.traits ?? []), ...lawTraits] } : mod));
+  });
 
-  const worldMana = setup.manaRule ?? bal.mana.worlds[setup.world];
+  let worldMana = setup.manaRule ?? bal.mana.worlds[setup.world];
+  // 법칙: 마나가 차지 않는다 등(마나 회복 덮어쓰기)
+  for (const l of laws) if (l.battle.manaPerTurn !== undefined) worldMana = { ...worldMana, perTurn: l.battle.manaPerTurn };
   const startMana =
     worldMana.battleStart === 'full' ? bal.mana.max : worldMana.battleStart === 'carry' ? setup.mana : worldMana.battleStart;
   const state: BattleState = {
@@ -94,7 +111,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     world: setup.world,
     turn: 0,
     neigong: 0,
-    neigongMax: bal.neigongPerTurn,
+    neigongMax: laws.find((l) => l.battle.neigongPerTurn)?.battle.neigongPerTurn ?? bal.neigongPerTurn,
     manaRule: worldMana,
     mana: Math.max(0, Math.min(bal.mana.max, startMana)),
     rift: 0,
@@ -132,11 +149,18 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.enemyHpScale = setup.enemyHpScale ?? 1;
   state.critRng = setup.rng.fork('crit');
   state.enemyDmgScale = setup.enemyDmgScale ?? 1;
+  if (setup.enemyHitCap) state.enemyHitCap = setup.enemyHitCap;
+  const handLaw = laws.find((l) => l.battle.handSize);
+  if (handLaw) state.handSize = handLaw.battle.handSize;
+  if (laws.some((l) => l.battle.hideIntent)) state.hideIntent = true;
+  const enrages = laws.flatMap((l) => (l.battle.enrage ? [l.battle.enrage] : []));
+  if (enrages.length) state.lawEnrage = enrages;
   fireSupport(state, 'battleStart', {});
   fireRelics(state, 'battleStart');
   if (setup.startEffects?.length) {
     runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });
   }
+  for (const l of laws) if (l.battle.startEffects.length) runEffects(state, l.battle.startEffects, { source: party.find((p) => p.defId === 'haun')! });
   startPlayerTurn(state);
   return state;
 }
@@ -156,7 +180,7 @@ function startPlayerTurn(state: BattleState): void {
   if (state.turn > 1) for (const p of state.party) p.block = Math.floor(p.block * keep);
   applyTurnStartStatuses(state, state.party);
   if (state.result) return;
-  drawCards(state, bal.handSize + (hasRule(state, 'hand_plus_one') ? 1 : 0));
+  drawCards(state, (state.handSize ?? bal.handSize) + (hasRule(state, 'hand_plus_one') ? 1 : 0));
   fireSideTriggers(state, state.party, 'turnStart');
   if (state.result) return;
   fireSupport(state, 'turnStart', {});
@@ -625,14 +649,35 @@ function enemyTurn(state: BattleState): void {
       const seen = ((state.tally.moves ??= {})[enemy.defId] ??= []);
       if (!seen.includes(move.id)) seen.push(move.id);
     }
-    runEffects(state, move.effects, { source: enemy, chosenUid: targetUid });
-    // 격노: 정한 턴부터 차례마다(정한 턴에 화면에 알린다)
-    if (def.enrage && state.turn >= def.enrage.afterTurn && !enemy.downed && !state.result) {
-      if (state.turn === def.enrage.afterTurn) {
+    // 접사: 빠른(첫 턴에 한 번 더), 공격한 뒤 효과(독기·탐식)
+    const affixes = (enemy.affixes ?? []).map((a) => state.data.affixes.get(a)!).filter(Boolean);
+    const extra = state.turn === 1 ? affixes.reduce((n, a) => n + (a.firstTurnExtra ?? 0), 0) : 0;
+    const attacks = move.effects.some((e) => e.op === 'damage');
+    for (let k = 0; k <= extra && !state.result && !enemy.downed; k++) {
+      if (k > 0) {
+        state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
+        state.log.push(`${enemy.name}: ${move.name}(한 번 더)`);
+      }
+      runEffects(state, move.effects, { source: enemy, chosenUid: targetUid });
+      if (attacks) for (const a of affixes) if (a.onHit.length && !state.result) runEffects(state, a.onHit, { source: enemy, chosenUid: targetUid });
+    }
+    // 격노: 정한 턴부터 차례마다(정한 턴에 화면에 알린다). 숙적 성장으로 당겨질 수 있다
+    const enrageAt = enemy.enrageAt ?? def.enrage?.afterTurn;
+    if (def.enrage && enrageAt && state.turn >= enrageAt && !enemy.downed && !state.result) {
+      if (state.turn === enrageAt) {
         state.events.push({ type: 'enrage', uid: enemy.uid, text: def.enrage.text });
         state.log.push(`${enemy.name}: ${def.enrage.text}`);
       }
       runEffects(state, def.enrage.effects, { source: enemy, chosenUid: targetUid });
+    }
+    // 굽이의 법칙 '서두르는 자': 모든 적이 정한 턴부터 차례마다
+    for (const le of state.lawEnrage ?? []) {
+      if (state.turn < le.afterTurn || enemy.downed || state.result) continue;
+      if (state.turn === le.afterTurn && enemy === alive(state.enemies)[0]) {
+        state.events.push({ type: 'enrage', uid: enemy.uid, text: le.text });
+        state.log.push(le.text);
+      }
+      runEffects(state, le.effects, { source: enemy, chosenUid: targetUid });
     }
   }
   if (!state.result && alive(state.party).length === 0) setResult(state, 'defeat');

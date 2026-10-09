@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sa_mugyeol_echo",
+    "name": "사무결의 잔향",
+    "lore": "틈 너머에 남은 교주의 잔향. 천마혈공의 피는 이제 결을 오래 덮지 못한다. 덮개는 곧 옅어지고, 잔향은 세 턴마다 다시 피를 두른다. 그 사이로 결이 잠깐 드러난다.",
+    "maxHp": 190,
+    "sprite": "sa_mugyeol",
+    "tint": "saturate(0.6) brightness(0.85)",
+    "color": "#5a1020",
+    "scale": 1.2,
+    "tier": "boss",
+    "pattern": "cycle",
+    "traits": [{ "status": "blood_cover_fading", "stacks": 2 }],
+    "moves": [
+      { "id": "echo_palm", "name": "천마혈공의 잔향", "intent": "attack", "targeting": "haun", "effects": [{ "op": "damage", "amount": 13 }] },
+      { "id": "echo_taste", "name": "하늘 밖의 맛", "intent": "attack", "targeting": "random", "effects": [{ "op": "damage", "amount": 7 }, { "op": "heal", "amount": 10, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }] },
+      { "id": "echo_cover", "name": "피를 다시 두르다", "intent": "buff", "effects": [{ "op": "apply_status", "status": "blood_cover_fading", "stacks": 2, "target": "self" }, { "op": "block", "amount": 14, "target": "self" }, { "op": "damage", "amount": 6, "target": "all_enemies" }] }
+    ],
+    "flavor": "피로 산 젊음의 잔향. 덮개가 옅어지는 사이에만 결이 보인다."
+  },
+  {
+    "id": "rift_beast",
+    "name": "틈의 짐승",
+    "lore": "상흔이 벌려 놓은 금의 냄새를 맡고 굽이를 따라 내려오는 짐승. 쌓인 상흔만큼 더 깊은 곳에서 기어 나온다. 이기면 그 몸에 박혀 있던 틈의 조각을 거둔다.",
+    "maxHp": 72,
+    "silhouette": "beast",
+    "color": "#3a1d55",
+    "scale": 1.3,
+    "tier": "elite",
+    "pattern": "cycle",
+    "traits": [{ "status": "hungry", "stacks": 1 }],
+    "moves": [
+      { "id": "beast_bite", "name": "금을 문 이빨", "intent": "attack", "targeting": "random", "effects": [{ "op": "damage", "amount": 11 }, { "op": "rift", "amount": 1 }] },
+      { "id": "beast_howl", "name": "틈의 울부짖음", "intent": "buff", "effects": [{ "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 10, "target": "self" }] },
+      { "id": "beast_rend", "name": "찢어발기기", "intent": "attack", "targeting": "lowest_hp", "effects": [{ "op": "damage", "amount": 6, "times": 2 }] }
+    ]
+  }
+]

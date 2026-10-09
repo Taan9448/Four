@@ -1,0 +1,14 @@
+id: black_wind_captain_hit
+type: character-anim
+size: large
+character: black_wind_captain
+chroma: magenta
+summary: 흑풍대주 피격 3프레임
+depends_on: [black_wind_captain_ref]
+reference: assets/source/black_wind_captain_ref.png
+facing: left
+frame_notes:
+  1: "struck, head turned aside"
+  2: "recoils, the black robe whipping"
+  3: "recovers, saber raised"
+placeholder: { shape: humanoid, color: '#3a3038', accent: '#8a90a3' }

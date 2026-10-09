@@ -28,6 +28,8 @@ export interface BattleContext {
   scar: number;
   supportActive: boolean;
   bonusText?: string;
+  /** 심연 굽이의 법칙(균열 게이지 옆 배지) */
+  laws?: { id: string; name: string; glyph: string; description: string }[];
   /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
   introText?: string;
   /** 전투 배경 에셋 id(실제 그림이 있을 때만 쓴다) */
@@ -200,7 +202,15 @@ export class BattleView {
         ),
       ),
       // 가운데 위: 이야기 글 → 그 아래 균열 게이지(잘 보이게 크게)
-      h('div', { class: 'b-center' }, this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null, this.riftEl),
+      h(
+        'div',
+        { class: 'b-center' },
+        this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
+        this.riftEl,
+        this.ctx.laws?.length
+          ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, h('b', {}, l.glyph), l.name)))
+          : null,
+      ),
       this.logEl,
       h('div', { class: 'units' }, partyEl, enemyEl),
       h('div', { class: 'shade' }),
@@ -223,7 +233,12 @@ export class BattleView {
       return (outfit && spriteSource(outfit) === 'sprites' ? outfit : pick(def.sprites)) ?? null;
     }
     const def = this.data.enemies.get(c.defId);
-    return def?.sprite ? `${def.sprite}_${anim === 'skill' ? 'attack' : anim}` : null;
+    if (!def?.sprite) return null;
+    // 물체형 적(문·경계)은 공격 그림이 없다. 대기 그림만 실제로 들어왔으면 임시 그림 대신 대기 그림을 이어 쓴다
+    const id = `${def.sprite}_${anim === 'skill' ? 'attack' : anim}`;
+    const idle = `${def.sprite}_idle`;
+    if (!spriteSource(id) || (spriteSource(idle) === 'sprites' && spriteSource(id) !== 'sprites')) return idle;
+    return id;
   }
 
   private makeUnit(c: Combatant): Unit {
@@ -473,6 +488,12 @@ export class BattleView {
     const view = enemy.downed ? null : describeIntent(s, enemy);
     u.intent.style.display = view ? '' : 'none';
     if (!view) return;
+    // 굽이의 법칙 '안개': 의도가 보이지 않는다
+    if (s.hideIntent) {
+      u.intent.append(h('span', { class: 'intent-fog' }, '?'));
+      Object.entries(tipAttrs('안개', '짙은 안개 때문에 이 적이 무엇을 할지 보이지 않는다.')).forEach(([k, v]) => v !== undefined && u.intent.setAttribute(k, v));
+      return;
+    }
     const target = view.intent.targetUid ? s.party.find((p) => p.uid === view.intent.targetUid) : undefined;
     const d = view.damage;
     const dmg = d ? `${d.perHit}${d.times > 1 ? `×${d.times}` : ''}` : '';
@@ -499,6 +520,7 @@ export class BattleView {
 
   /** 아군 머리 위: 이번 적 턴에 받을 피해(방어를 뺀 값). 쓰러질 피해면 진하게 */
   private renderIncoming(u: Unit, v: IncomingView | undefined): void {
+    if (this.state.hideIntent) v = undefined;
     u.intent.style.display = v && v.raw > 0 ? '' : 'none';
     if (!v || v.raw === 0) return;
     u.intent.className = `incoming${v.lethal ? ' lethal' : ''}${v.hpLoss === 0 ? ' safe' : ''}`;

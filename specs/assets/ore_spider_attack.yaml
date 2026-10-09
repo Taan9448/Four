@@ -1,0 +1,18 @@
+id: ore_spider_attack
+type: character-anim
+size: large
+character: ore_spider
+chroma: magenta
+summary: 광석거미 은빛 송곳니 6프레임
+depends_on: [ore_spider_ref]
+reference: assets/source/ore_spider_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "rears up on the hind legs, front legs raised"
+  2: "the fangs open wide"
+  3: "lunges forward to the left"
+  4: "the fangs and front legs strike to the left, a spray of silver shards"
+  5: "lands back on all legs"
+  6: "returns to the crouched stance"
+placeholder: { shape: beast, color: '#c0c4cc', accent: '#4b3a6b' }

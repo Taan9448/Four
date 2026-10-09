@@ -182,3 +182,21 @@
 ## 6. 전투 마나 규칙
 
 세계 기본값 `balance.mana.worlds[world]`(`battleStart: full | carry | 숫자`, `perTurn`)을 스테이지 `mana`, 모듈 `content.mana` 순으로 덮어쓴다(`GAME_DESIGN.md` 6절). 모듈 `content.startEffects`는 전투 시작에 언제나 일어나는 전투 동작이다(이그니스전의 '흐름에 올라타기', 모르데카이전의 '고리 멈추기'를 손패에).
+
+## 7. 심연(GAME_DESIGN 16절)
+
+- **틈의 카드**(`data/cards/abyss.json`, `pool: "abyss"`): 심연 보상(슬롯마다 `abyss.riftCardChance`)·심연 상점 한 칸·틈의 거래로만 나온다. 캠페인 보상·상점·도감 수치에는 들어가지 않는다. 희귀 이상, 대가(균열 +·체력 잃기·소멸·체력을 잃는 발동 상태) 하나는 반드시(`npm run data:check`). 카드 틀은 보랏빛 테두리에 검은 금(`card-abyss`).
+- 1차 10장: 하운 3(틈을 가르는 도끼·금 밟기·흐르지 않는 숨) · 엘리아 2(검은 불·빌린 강물) · 카일 2(왼편이 아닌 검·마지막 돌격) · 보른 2(산을 삼키다·두린의 그림자) · 공용 1(꿰맨 자리). 새 발동 상태 `p_still_breath`(차례 시작 결 노출 2, 차례 끝 체력 2 잃기)·`p_durin_shadow`(맞으면 반격 5, 차례 시작 체력 1 잃기).
+- **길**(시작 유물, `data/relics.json`의 `rarity: "path"`, `shop: false`): 장작꾼(전투 시작 결 노출 1) · 강물(전투 시작 마나 +3) · 산(최대 체력 +15) · 빚(골드 +150, 상흔 +3) · 바늘(규칙 `needle`: 상점 카드 지우기 공짜, 보상 카드 `abyss.needleRewardChoices`장) · 그림자(규칙 `reveal_map`: 지도의 ? 노드 종류가 보이고 엘리트 피해 ×`abyss.shadowEliteDmg`). 무작위 유물(`gain_relic`)·상점·전리품에는 나오지 않는다.
+- **한 방 상한**: 심연 전투에서 적이 아군에게 주는 피해 한 번은 하운 최대 체력 × `abyss.oneHitCap`(내림)을 넘지 않는다(`BattleSetup.enemyHitCap`, 받을 피해 예고에도).
+- **출전 인원**: 심연은 하운 + 동료 1~3명 전원(`BattleSetup.partyMax` = `abyss.partyMax`).
+- **적 배율**: 굽이 n은 `hpBase·dmgBase × (1 + hpStep·dmgStep × (n−1))` × 스테이지 맞춤(그 스테이지 일반 전투 적의 평균 체력·피해를 S1에 맞추는 배율, 데이터에서 계산 — `stageNorm`). 캠페인의 스테이지·어려움 배율은 쓰지 않는다. 적 등급 배율(`enemyTiers`)은 그대로.
+- **굽이의 법칙**(`data/abyss_laws.json`): `battle`(`startEffects` 하운을 출처로 하는 전투 동작 · `enemyTraits` 모든 적의 특성 · `handSize` · `neigongPerTurn` · `manaPerTurn` · `hideIntent` · `enrage {afterTurn, text, effects}` 모든 적의 격노), `run`(`restHealMul` 휴식의 heal_party 배율 · `goldMul` 전투 골드 배율). 새 상태: `law_blood_price`(피해 +3, 공격 카드를 내면 체력 1).
+- **접사**(`data/abyss_affixes.json`): `hpMul` · `traits` · `onHit`(이 적이 피해를 주는 행동을 한 뒤, 그 대상에게) · `deathEffects` · `firstTurnExtra`(첫 턴 같은 행동을 더) · `boss`(보스에 붙을 수 있는가). 적 이름 앞에 `name`이 붙는다(`BattleSetup.enemyMods`).
+- **숙적 성장**: `flow_eater` 스택 n이면 흡수량 ×(1 + 0.5(n−1)), `knot` 스택 n이면 매듭이 드러나는 결 노출이 `knotThreshold + (n−1)`. 캠페인은 둘 다 1스택이라 그대로다. 격노는 `EnemyState.enrageAt`으로 당겨진다.
+- 새 상태 `blood_cover_fading`(사무결의 잔향: 피의 덮개 특수 효과, 차례마다 1씩 줄어든다).
+- **틈의 카드 3차 30장**(모두 업적으로 열린다, `data/abyss_achievements.json`의 `unlock.card`): 하운 7(하늘 가르기·거스른 결·빈 숨·조각 딛기·천 번 쪼개기·쐐기 도끼·솔기 먹는 자) · 엘리아 6(재의 비·얼어붙은 강·훔친 흐름·틈의 장막·은빛 폭풍·마지막 씨앗) · 카일 6(붉은 맹세·돌진·피 묻은 날·방패 깨기·아버지의 검·끝없는 돌격) · 보른 6(무너지는 갱도·돌 살갗·쇠의 뜻·망치의 메아리·산의 심장·오천 번의 망치) · 공용 5(허공의 조각·빌린 시간·거울 세계·찢어 열기·마지막 빛). 합계 40장(하운 10·엘리아 8·카일 8·보른 8·공용 6, 희귀 20·영웅 14·전설 6). 업적이 걸리지 않은 1차 10장은 처음부터 열린다.
+- 새 상태(틈의 카드 심법): `p_rift_hunger`(차례 시작 균열 +1·적 전체 피해 5) · `p_last_seed`(차례 시작 아군 전체 회복 4·균열 +1) · `p_endless_charge`(이 동료가 공격 카드를 낼 때마다 무작위 적 피해 3, 차례 끝 체력 1 잃기) · `p_five_thousand`(차례 시작 아군 전체 방어 4·체력 1 잃기).
+- **서약**(`data/abyss_oaths.json`, 1~15단계): `{level, name, glyph, description, mods}`. 고른 단계까지의 `mods`를 차례로 덮어쓴다(`oathMods`). 키 — `enemyHpMul` · `startGold` · `restHealMul` · `rewardChoices` · `eliteFloor` · `startScar` · `lawsMin` · `potionSlots` · `injuriesPersist` · `nemesisEvery` · `eliteAffixMin` · `riftInReward` · `noPowers` · `maxMates` · `haunMaxHp`. 엔진은 이 키만 읽는다(새 서약은 데이터로, 새 키는 스키마 `OathMods`와 `abyss.ts`·테스트를 함께).
+- **업적**(`data/abyss_achievements.json`): `{id, name, description, check: {kind, n, mate?, mates?, oath?, module?, op?, depth?}, unlock: {card | path}}`. `kind`는 스키마 `AchievementDef`의 목록(넘은 굽이·숙적/짐승/접사 적 처치·거래·보스/엘리트·상흔 보스·저체력 보스·부상 통과·심법 없이·한 전투 결 노출·동료 수·함께한 동료·도감 카드·점수·서약·선택지(모듈:동작)·세계 수·법칙 수·덱 크기·덱의 틈의 카드·골드·상흔 0). 셈은 런의 `abyss.track`(`trackBattle`·`trackLoopClear`·`trackChoice`·`trackTick`), 판정은 `achievementMet`. 전투 집계 `tally.grain`(터뜨린 결 노출)·`tally.affixKills`(접사 붙은 적 처치)를 쓴다.
+

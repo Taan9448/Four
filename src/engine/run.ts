@@ -5,7 +5,27 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
-import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
+import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, ownerKey, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
+import {
+  abyssAddCard,
+  abyssEnemyMods,
+  abyssStarters,
+  abyssRewardOptions,
+  abyssScale,
+  advanceLoop,
+  cureInjuries,
+  gainAbyssCard,
+  injure,
+  isAbyss,
+  revealUnseenCard,
+  runOath,
+  stageNorm,
+  trackBattle,
+  trackChoice,
+  trackLoopClear,
+  trackTick,
+  type AbyssState,
+} from './abyss';
 
 export interface RosterEntry {
   id: string;
@@ -64,6 +84,9 @@ export interface RunState {
   replayOf: RunState | null;
   /** 결과 화면 통계 */
   stats: RunStats;
+  /** 심연 런(GAME_DESIGN 16절). 없으면 캠페인 */
+  mode?: 'campaign' | 'abyss';
+  abyss?: AbyssState;
 }
 
 export type Difficulty = 'normal' | 'hard';
@@ -253,6 +276,11 @@ export function nextStage(data: GameData, run: RunState) {
  */
 export function advanceStage(data: GameData, run: RunState): boolean {
   if (run.status !== 'stage_clear') throw new Error('보스를 넘은 뒤에만 다음 스테이지로 간다');
+  // 심연: 끝이 없다. 다음 굽이로
+  if (isAbyss(run)) {
+    advanceLoop(data, run);
+    return true;
+  }
   const next = nextStage(data, run);
   if (!next) {
     run.status = 'complete';
@@ -270,7 +298,8 @@ export function advanceStage(data: GameData, run: RunState): boolean {
 
 /** 카드를 얻는다(보상 고르기 등): 보유 목록에 영구로, 이번 스테이지 덱에도. 이미 있으면 강화(GAME_DESIGN 9-1). 결과 문구 */
 export function addCard(data: GameData, run: RunState, cardId: string): string {
-  return acquireCard(data, run, cardId);
+  // 심연: 보유 목록과 상관없이 덱에 바로(GAME_DESIGN 16절)
+  return isAbyss(run) ? abyssAddCard(data, run, cardId) : acquireCard(data, run, cardId);
 }
 
 export function availableNodes(run: RunState): MapNode[] {
@@ -300,7 +329,7 @@ export function isBattle(enc: Encounter): boolean {
 }
 
 export function stageWorld(data: GameData, run: RunState) {
-  return data.stages.find((s) => s.id === run.stageId)!.world;
+  return run.abyss?.world ?? data.stages.find((s) => s.id === run.stageId)!.world;
 }
 
 /** 모듈의 전투 보너스가 이번 편성·플래그로 켜지는가(condition: partyHas·flag) */
@@ -317,6 +346,40 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
   const { bonus, startEffects: always = [], mana } = enc.module.content;
   const bonusOn = bonusActive(run, enc.module);
   const stage = data.stages.find((s) => s.id === run.stageId)!;
+  if (isAbyss(run)) {
+    // 심연: 모듈이 난 스테이지의 세계·마나 규칙(틈 굽이의 다른 세계 보스도 제 규칙으로), 굽이 배율. 스테이지·어려움 배율은 쓰지 않는다
+    const own = data.stages.find((s) => s.id === enc.module.stage);
+    const scale = abyssScale(data, run.abyss!.depth);
+    const norm = stageNorm(data, own?.id ?? run.stageId);
+    const shadow = enc.node.type === 'elite' && run.relics.some((id) => data.relics.get(id)?.rule === 'reveal_map') ? data.balance.abyss.shadowEliteDmg : 1;
+    const haun = run.roster.find((r) => r.id === 'haun')!;
+    return {
+      world: own?.world ?? run.abyss!.world,
+      party: run.selected.map((id) => {
+        const r = run.roster.find((x) => x.id === id)!;
+        return { id, hp: r.hp, maxHp: r.maxHp, level: r.level };
+      }),
+      enemies: enc.module.content.enemies ?? [],
+      surviveTurns: enc.module.content.surviveTurns,
+      deck: run.deck,
+      mana: run.mana,
+      rng: createRng(run.seed).fork(`battle:${run.stageId}:${enc.node.id}`),
+      supportActive: false,
+      flags: run.flags,
+      scar: run.scar,
+      startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
+      manaRule: mana ?? own?.mana ?? stage.mana,
+      // 서약 '두꺼운 살'
+      enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1),
+      enemyDmgScale: scale.dmg * norm.dmg * shadow,
+      relics: run.relics,
+      potions: run.potions,
+      partyMax: data.balance.abyss.partyMax,
+      enemyHitCap: Math.max(1, Math.floor(haun.maxHp * data.balance.abyss.oneHitCap)),
+      laws: run.abyss!.laws ?? [],
+      enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.module.content.enemies ?? []),
+    };
+  }
   return {
     world: stageWorld(data, run),
     party: run.selected.map((id) => {
@@ -365,8 +428,29 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     st.deathCause = `${enc.module.name} — ${outcome.tally?.haunHitBy ?? '알 수 없는 것'}`;
     return [];
   }
-  // 하드코어: 전투가 끝날 때 쓰러져 있던 동료는 일행을 떠난다(하운은 쓰러지면 이미 패배)
   const out: string[] = [];
+  if (isAbyss(run)) {
+    // 심연: 쓰러진 채 끝난 동료는 부상(다음 굽이까지 최대 체력 감소). 보스·엘리트 수는 점수에. 이야기 clearEffects는 없다
+    const ab = run.abyss!;
+    const rng = createRng(run.seed).fork(`injury:${enc.node.id}`);
+    for (const id of outcome.downed ?? []) {
+      const msg = id !== 'haun' && !(id in ab.injuries) ? injure(data, run, (ids) => rng.pick(ids), id) : null;
+      if (msg) out.push(msg);
+    }
+    if (enc.node.type === 'elite') ab.elites += 1;
+    if (enc.node.type === 'boss') ab.bosses += 1;
+    awardBattleXp(data, run, enc.node.type);
+    // 심연 모듈(틈의 짐승 등)의 clearEffects만. 캠페인 모듈의 이야기 보상은 없다
+    if (enc.module.stage === 'abyss') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
+    out.push(...fireRunRelics(data, run, 'victory'));
+    trackBattle(data, run, enc.module.id, enc.node.type, outcome.tally);
+    if (enc.node.type === 'boss') {
+      run.status = 'stage_clear';
+      trackLoopClear(data, run);
+    }
+    return out;
+  }
+  // 하드코어: 전투가 끝날 때 쓰러져 있던 동료는 일행을 떠난다(하운은 쓰러지면 이미 패배)
   if (run.hardcore) {
     for (const id of outcome.downed ?? []) {
       if (id === 'haun' || !run.roster.some((r) => r.id === id)) continue;
@@ -422,6 +506,7 @@ export function gainPotion(data: GameData, run: RunState, id: string): boolean {
  * 등급을 먼저 뽑고 그 등급에서 카드를 고른다. 같은 카드는 한 번만. 시드로 결정된다.
  */
 export function rewardOptions(data: GameData, run: RunState, nodeId: string): string[] {
+  if (isAbyss(run)) return abyssRewardOptions(data, run, nodeId, findNode(run.map, nodeId)?.type);
   const owners = new Set(run.selected);
   const pool = [...data.cards.values()].filter(
     (c) => c.pool === 'reward' && !c.essential && (owners.has(c.owner) || !data.characters.has(c.owner)),
@@ -498,7 +583,7 @@ export function applyLevelUpgrade(data: GameData, run: RunState, uid: string | n
   if (!pool.length) return [];
   run.counter += 1;
   const card = (uid && pool.find((c) => c.uid === uid)) || createRng(run.seed).fork(`levelup:${run.counter}`).pick(pool);
-  upgradeOwned(data, run, card.cardId);
+  upgradeCard(data, run, card);
   const def = data.cards.get(card.cardId)!;
   const skill = card.level > data.balance.upgrade.statLevels ? (card.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
   return [`카드 강화: ${def.name} +${card.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`];
@@ -509,7 +594,8 @@ export function applyLevelUpgrade(data: GameData, run: RunState, uid: string | n
 export function setParty(data: GameData, run: RunState, ids: string[]): void {
   const unique = [...new Set(ids)];
   if (!unique.includes('haun')) throw new Error('하운은 항상 출전한다');
-  if (unique.length > data.balance.party.max) throw new Error(`출전은 최대 ${data.balance.party.max}명`);
+  const max = isAbyss(run) ? data.balance.abyss.partyMax : data.balance.party.max;
+  if (unique.length > max) throw new Error(`출전은 최대 ${max}명`);
   for (const id of unique) {
     if (!run.roster.some((r) => r.id === id)) throw new Error(`합류하지 않은 동료: ${id}`);
     if (data.characters.get(id)?.role !== 'fighter') throw new Error(`전투에 나설 수 없는 캐릭터: ${id}`);
@@ -533,6 +619,7 @@ export interface ChoiceView {
 export function choicesFor(data: GameData, run: RunState, module: ModuleDef): ChoiceView[] {
   const list: ChoiceView[] = (module.content.choices ?? [])
     .filter((c) => !c.condition?.partyHas || run.selected.includes(c.condition.partyHas))
+    .filter((c) => !c.condition?.partyLacks || !run.roster.some((r) => r.id === c.condition!.partyLacks))
     .filter((c) => !c.condition?.flag || run.flags.includes(c.condition.flag))
     .map((c) => ({
       label: c.label,
@@ -542,6 +629,20 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
       source: 'module' as const,
       disabled: c.condition?.goldGte !== undefined && run.gold < c.condition.goldGte ? `골드 ${c.condition.goldGte} 필요` : undefined,
     }));
+  // 심연의 휴식: 카드 버리기(1장), 부상이 있으면 치료(GAME_DESIGN 16절)
+  if (module.type === 'rest' && isAbyss(run)) {
+    list.push({ label: '버리기 — 덱에서 카드 한 장을 뺀다', effects: [{ op: 'remove_card', choose: true }], result: '짐을 덜었다.', source: 'module' });
+    if (Object.keys(run.abyss!.injuries).length) list.push({ label: '치료 — 부상을 모두 고친다', effects: [{ op: 'cure_injury' }], result: '상처를 싸맸다.', source: 'module' });
+    // 꿰매기: 상흔을 덜어 낸다(GAME_DESIGN 16절 — 심연에서 상흔은 자원)
+    if (run.scar > 0)
+      list.push({
+        label: '꿰매기 — 상흔 -3, 골드 60',
+        effects: [{ op: 'scar', amount: -3 }, { op: 'gain_gold', amount: -60 }],
+        result: '하늘의 금을 몇 땀 꿰맸다.',
+        source: 'module',
+        disabled: run.gold < 60 ? '골드 60 필요' : undefined,
+      });
+  }
   if (module.type === 'rest' && run.supportActive) {
     for (const rule of data.support.filter((r) => r.trigger === 'restOption')) {
       list.push({ label: `[왕일검] ${rule.name}`, effects: rule.effects, result: rule.description, source: 'support' });
@@ -555,7 +656,10 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
   if (choice.disabled) throw new Error(`고를 수 없는 선택지: ${choice.disabled}`);
-  const out = applyRunOps(data, run, choice.effects, { pick });
+  // 굽이의 법칙 '무거운 발': 휴식의 회복이 줄어든다
+  const healMul = module.type === 'rest' ? lawRunMul(data, run, 'restHealMul') : 1;
+  const effects = healMul === 1 ? choice.effects : choice.effects.map((e) => (e.op === 'heal_party' ? { ...e, ratio: e.ratio !== undefined ? e.ratio * healMul : undefined, amount: e.amount !== undefined ? Math.floor(e.amount * healMul) : undefined } : e));
+  const out = applyRunOps(data, run, effects, { pick });
   // 확률 결과: 노드마다 정해진 수열로 하나를 고른다(같은 시드면 같은 결과)
   if (choice.outcomes?.length) {
     const o = createRng(run.seed).fork(`outcome:${run.stageId}:${run.position}:${module.id}`).weighted(choice.outcomes, (x) => x.weight)!;
@@ -563,7 +667,14 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
     out.push(...applyRunOps(data, run, o.effects, { pick }));
   }
   if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
+  if (isAbyss(run)) trackChoice(data, run, module, [...new Set(choice.effects.map((e) => e.op))]);
   return out;
+}
+
+/** 지금 굽이의 법칙들(과 서약)이 거는 런 배율(휴식 회복·골드). 없으면 1 */
+export function lawRunMul(data: GameData, run: RunState, key: 'restHealMul' | 'goldMul'): number {
+  const oath = key === 'restHealMul' && run.abyss ? (runOath(data, run).restHealMul ?? 1) : 1;
+  return (run.abyss?.laws ?? []).reduce((m, id) => m * (data.laws.get(id)?.run[key] ?? 1), oath);
 }
 
 /** 선택지가 보유 카드 한 장을 사람에게 고르게 하는가(카드 바꾸기·팔기: pick은 카드 id) */
@@ -574,6 +685,22 @@ export function choiceCardPick(choice: { effects: Effect[] }): Effect | undefine
 /** 선택지가 강화할 카드를 사람에게 고르게 하는가 */
 export function choiceNeedsPick(choice: { effects: Effect[] }): Effect | undefined {
   return choice.effects.find((e) => e.op === 'upgrade_card' && e.choose);
+}
+
+/** 선택지가 덱에서 뺄 카드를 사람에게 고르게 하는가(pick은 카드 uid) */
+export function choiceRemovePick(choice: { effects: Effect[] }): Effect | undefined {
+  return choice.effects.find((e) => e.op === 'remove_card' && e.choose);
+}
+
+/** 덱에서 뺄 수 있는 카드(filter에 맞음) */
+export function removeCandidates(data: GameData, run: RunState, filter?: Effect['filter']): CardInstance[] {
+  return run.deck.filter((c) => matchesFilter(data, c, filter));
+}
+
+/** 카드 한 장 강화: 캠페인은 보유 카드 종류에(같은 카드 모두), 심연은 그 한 장만 */
+function upgradeCard(data: GameData, run: RunState, c: CardInstance): void {
+  if (isAbyss(run)) c.level = Math.min(data.balance.upgrade.maxLevel, c.level + 1);
+  else upgradeOwned(data, run, c.cardId);
 }
 
 /** 강화할 수 있는 카드(강화 정의가 있고 최대 단계 미만, filter에 맞음) */
@@ -605,6 +732,15 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push(`물약 칸 +${e.amount ?? 1}`);
         break;
       case 'gain_random_card': {
+        if (isAbyss(run)) {
+          // 심연: 풀(합류 동료·공용) 중 등급이 맞는 것
+          const owners = new Set([...run.roster.map((r) => r.id), COMMON]);
+          const pool = Object.keys(run.abyss!.pool)
+            .map((id) => data.cards.get(id)!)
+            .filter((d) => owners.has(ownerKey(data, d)) && (!e.rarity || (e.rarity as string[]).includes(d.rarity)) && !(d.type === 'power' && runOath(data, run).noPowers));
+          for (let i = 0; i < (e.count ?? 1) && pool.length; i++) out.push(abyssAddCard(data, run, rng.pick(pool).id));
+          break;
+        }
         // 합류한 동료·공용의 보상 카드 중 등급이 맞는 것(없는 카드 우선)
         const owners = new Set([...run.roster.map((r) => r.id), 'common']);
         const all = [...data.cards.values()].filter(
@@ -622,6 +758,31 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       }
       case 'swap_card':
       case 'sell_card': {
+        if (isAbyss(run)) {
+          // 심연: 덱의 카드 한 장(고른 카드 id, 없으면 가장 값싼 카드). 바꾸기는 같은 주인의 풀 카드로
+          const rank: Record<string, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, special: 0 };
+          const deck = run.deck.filter((c) => data.cards.get(c.cardId)!.type !== 'status');
+          const c = (opts.pick ? deck.find((x) => x.cardId === opts.pick || x.uid === opts.pick) : undefined) ??
+            [...deck].sort((a, b) => rank[data.cards.get(a.cardId)!.rarity] - rank[data.cards.get(b.cardId)!.rarity] || a.level - b.level || a.uid.localeCompare(b.uid))[0];
+          if (!c) break;
+          const def = data.cards.get(c.cardId)!;
+          run.deck = run.deck.filter((x) => x.uid !== c.uid);
+          if (e.op === 'swap_card') {
+            const owner = ownerKey(data, def);
+            const pool = Object.keys(run.abyss!.pool).filter(
+              (id) => id !== c.cardId && ownerKey(data, data.cards.get(id)!) === owner && !(data.cards.get(id)!.type === 'power' && runOath(data, run).noPowers),
+            );
+            if (pool.length) {
+              const to = rng.pick(pool);
+              abyssAddCard(data, run, to);
+              out.push(`카드 바꾸기: ${def.name} → ${data.cards.get(to)!.name}`);
+            } else run.deck.push(c);
+          } else {
+            run.gold += e.amount ?? 0;
+            out.push(`카드를 넘겼다: ${def.name} — 골드 +${e.amount ?? 0}`);
+          }
+          break;
+        }
         // 보유 카드 한 장(고른 카드 id, 없으면 가장 값싼 카드): 바꾸기는 같은 주인의 다른 카드로, 팔기는 골드 amount
         const can = swappableCards(data, run);
         const rank: Record<string, number> = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, special: 0 };
@@ -646,14 +807,16 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       case 'gain_card': {
         const def = data.cards.get(e.card ?? '');
         if (!def) throw new Error(`gain_card: 알 수 없는 카드 ${e.card}`);
-        for (let i = 0; i < (e.count ?? 1); i++) out.push(acquireCard(data, run, def.id));
+        for (let i = 0; i < (e.count ?? 1); i++) out.push(addCard(data, run, def.id));
         break;
       }
       case 'remove_card': {
         // 이번 스테이지 덱에서만 뺀다(보유 카드는 그대로, GAME_DESIGN 9-1)
-        const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
-        if (pool.length) {
-          const c = rng.pick(pool);
+        // count장(틈의 메아리: 동료 시작 카드 4장). 고르는 버리기(심연 휴식·틈의 거래)는 사람이 고른 카드 uid, 아니면 무작위
+        for (let i = 0; i < (e.count ?? 1); i++) {
+          const pool = run.deck.filter((c) => matchesFilter(data, c, e.filter));
+          if (!pool.length) break;
+          const c = (e.choose && opts.pick ? pool.find((x) => x.uid === opts.pick) : undefined) ?? rng.pick(pool);
           run.deck = run.deck.filter((x) => x.uid !== c.uid);
           out.push(`카드 제거: ${data.cards.get(c.cardId)!.name}`);
         }
@@ -664,7 +827,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         const pool = upgradeCandidates(data, run, e.filter);
         const chosen = e.choose && opts.pick ? pool.filter((c) => c.uid === opts.pick) : rng.shuffle([...pool]).slice(0, e.count ?? 1);
         for (const c of chosen) {
-          upgradeOwned(data, run, c.cardId);
+          upgradeCard(data, run, c);
           const def = data.cards.get(c.cardId)!;
           const skill = c.level > data.balance.upgrade.statLevels ? (c.level === 4 ? def.upgrade!.plus4 : def.upgrade!.plus5) : null;
           out.push(`카드 강화: ${def.name} +${c.level}${skill ? ` — 특수 스킬 「${skill.name}」` : ''}`);
@@ -685,7 +848,21 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         break;
       case 'scar':
         run.scar = Math.max(0, run.scar + (e.amount ?? 0));
-        out.push(`상흔 ${e.amount}`);
+        out.push((e.amount ?? 0) <= -99 ? '상흔을 모두 지웠다' : `상흔 ${e.amount}`);
+        break;
+      case 'gain_abyss_card':
+        if (isAbyss(run)) out.push(gainAbyssCard(data, run, (pool) => rng.pick(pool)));
+        break;
+      case 'reveal_unseen_card':
+        if (isAbyss(run)) out.push(revealUnseenCard(data, run, (pool) => rng.pick(pool)));
+        break;
+      case 'injure': {
+        const msg = isAbyss(run) ? injure(data, run, (ids) => rng.pick(ids)) : null;
+        out.push(msg ?? '다친 사람은 없다');
+        break;
+      }
+      case 'cure_injury':
+        out.push(...cureInjuries(data, run));
         break;
       case 'set_flag':
         if (e.flag && !run.flags.includes(e.flag)) run.flags.push(e.flag);
@@ -697,6 +874,17 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         // 하드코어로 잃은 동료는 다시 합류하지 않는다
         if (run.fallen.includes(def.id)) {
           out.push(`${def.name}의 자리는 비어 있다`);
+          break;
+        }
+        if (isAbyss(run) && def.role === 'fighter') {
+          // 심연 '구원': 하운 레벨 -1로 합류, 시작 카드(abyss.starters.mate장)가 덱에, 모두 출전
+          const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
+          const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
+          run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
+          run.selected.push(def.id);
+          run.abyss!.mates.push(def.id);
+          for (const id of abyssStarters(data, def.id, data.balance.abyss.starters.mate, !!runOath(data, run).noPowers)) out.push(abyssAddCard(data, run, id));
+          out.push(`${def.name} 합류`);
           break;
         }
         if (def.role === 'support') {
@@ -727,7 +915,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       }
       case 'gain_gold':
         run.gold = Math.max(0, run.gold + (e.amount ?? 0));
-        out.push(`골드 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
+        out.push((e.amount ?? 0) <= -9999 ? '골드를 모두 냈다' : `골드 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
         break;
       case 'gain_max_hp':
         // 전투에 나서는 동료 모두(합류한 동료 전부)의 최대 체력과 체력
@@ -742,7 +930,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         let id = e.relic;
         if (!id) {
           const pool = [...data.relics.values()].filter(
-            (r) => r.rarity !== 'boss' && !run.relics.includes(r.id) && (!e.rarity || (e.rarity as string[]).includes(r.rarity)),
+            (r) => r.rarity !== 'boss' && r.rarity !== 'path' && !run.relics.includes(r.id) && (!e.rarity || (e.rarity as string[]).includes(r.rarity)),
           );
           id = pool.length ? rng.pick(pool).id : undefined;
         }
@@ -763,6 +951,8 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         throw new Error(`전투 동작 "${e.op}"은 런 단위에서 쓸 수 없다`);
     }
   }
+  // 심연 업적 셈(가장 많았던 골드·상흔, 덱의 틈의 카드)
+  if (run.abyss) trackTick(data, run);
   return out;
 }
 

@@ -24,11 +24,14 @@ export interface Codex {
   scenes: string[];
   /** 적 id → 본 행동 id(GAME_DESIGN 14절: 본 기술만 도감에 적힌다) */
   moves: Record<string, string[]>;
+  /** 심연에서 만난 굽이의 법칙·접사(data/abyss_laws.json·abyss_affixes.json) */
+  laws: string[];
+  affixes: string[];
   stats: CodexStats;
 }
 
 export function emptyCodex(): Codex {
-  return { cards: {}, enemies: {}, relics: [], potions: [], people: [], scenes: [], moves: {}, stats: { runs: 0, victories: 0, defeats: 0, kills: 0 } };
+  return { cards: {}, enemies: {}, relics: [], potions: [], people: [], scenes: [], moves: {}, laws: [], affixes: [], stats: { runs: 0, victories: 0, defeats: 0, kills: 0 } };
 }
 
 const addTo = (list: string[], id: string) => {
@@ -54,6 +57,8 @@ export function parseCodex(data: GameData, text: string | null): Codex {
   c.potions = keep(raw.potions, (id) => data.potions.has(id));
   c.people = keep(raw.people, (id) => data.characters.has(id) || data.speakers.has(id));
   c.scenes = keep(raw.scenes, (id) => data.scenes.has(id));
+  c.laws = keep(raw.laws, (id) => data.laws.has(id));
+  c.affixes = keep(raw.affixes, (id) => data.affixes.has(id));
   for (const [id, ms] of Object.entries(raw.moves ?? {})) {
     const def = data.enemies.get(id);
     if (def) c.moves[id] = keep(ms, (m) => def.moves.some((x) => x.id === m));
@@ -73,6 +78,10 @@ export function noteRun(codex: Codex, run: RunState): Codex {
   for (const x of run.shop?.cards ?? []) codex.cards[x.cardId] ??= 0;
   for (const x of run.shop?.relics ?? []) addTo(codex.relics, x.relicId);
   for (const x of run.shop?.potions ?? []) addTo(codex.potions, x.potionId);
+  // 심연 틈의 거래에서 들여다본 카드
+  for (const id of run.abyss?.revealed ?? []) codex.cards[id] ??= 0;
+  // 심연에서 지나온 굽이의 법칙
+  for (const l of run.abyss?.loops ?? []) for (const id of l.laws ?? []) addTo((codex.laws ??= []), id);
   if (run.replayOf) noteRun(codex, run.replayOf);
   return codex;
 }
@@ -85,6 +94,12 @@ export function noteCard(codex: Codex, cardId: string, level = 0): Codex {
 
 export function noteItem(codex: Codex, kind: 'relics' | 'potions', id: string | null | undefined): Codex {
   if (id) addTo(codex[kind], id);
+  return codex;
+}
+
+/** 심연 전투에서 만난 접사 */
+export function noteAffixes(codex: Codex, affixIds: readonly string[]): Codex {
+  for (const id of affixIds) addTo((codex.affixes ??= []), id);
   return codex;
 }
 
@@ -123,8 +138,8 @@ export function noteScene(data: GameData, codex: Codex, sceneId: string): Codex 
   return codex;
 }
 
-/** 도감에 싣는 카드: 상태·저주는 빼고 */
-export const codexCards = (data: GameData) => [...data.cards.values()].filter((c) => c.pool !== 'status' && c.owner !== 'status');
+/** 도감에 싣는 카드: 상태·저주와 틈의 카드(심연 전용)는 빼고 */
+export const codexCards = (data: GameData) => [...data.cards.values()].filter((c) => c.pool !== 'status' && c.owner !== 'status' && c.pool !== 'abyss');
 
 /** 도감에 싣는 인물: 동료(지원 포함) 다음 장면 화자 */
 export const codexPeople = (data: GameData) => [...new Set([...data.characters.keys(), ...data.speakers.keys()])];

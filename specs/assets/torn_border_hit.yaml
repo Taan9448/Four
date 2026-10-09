@@ -1,0 +1,14 @@
+id: torn_border_hit
+type: character-anim
+size: large
+character: torn_border
+chroma: green
+summary: 찢긴 경계 피격 3프레임
+depends_on: [torn_border_ref]
+reference: assets/source/torn_border_ref.png
+facing: left
+frame_notes:
+  1: "struck, the rim of the tear flinching inward"
+  2: "the inner flows scatter wildly"
+  3: "the flows swirl back together"
+placeholder: { shape: object, color: '#4b3a6b', accent: '#dff4ff' }

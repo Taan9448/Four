@@ -74,8 +74,16 @@ function moduleEligible(
   return true;
 }
 
-export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx: RouteContext): StageMap {
-  const stage = data.stages.find((s) => s.id === stageId);
+/** 심연(GAME_DESIGN 16절): 스테이지 정의를 바꿔 끼우고(층수·보스·비율), 모듈 자격을 따로 판정한다 */
+export interface MapOverride {
+  stage: StageDef;
+  eligible: (mod: ModuleDef, floor: number, used: Set<string>) => boolean;
+  /** 상흔 1마다 scar 모듈 가중(생략하면 balance.route.scarWeightPerPoint) */
+  scarWeight?: number;
+}
+
+export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx: RouteContext, override?: MapOverride): StageMap {
+  const stage = override?.stage ?? data.stages.find((s) => s.id === stageId);
   if (!stage) throw new Error(`알 수 없는 스테이지: ${stageId}`);
   if (!stage.boss) throw new Error(`스테이지 ${stageId}에 보스 모듈이 없다`);
   const route = data.balance.route;
@@ -161,13 +169,15 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
         if (calmFull && isCalm(type)) return false;
         return true;
       });
+      // 정해진 유형(forcedTypes)에 쓸 모듈이 바닥나면(심연 서약 '막아선 자'로 엘리트가 몰릴 때 등) 보통 유형으로 돌아간다
+      const unforced = candidates.filter(([t]) => t !== forced);
       if (forced && !(forced === 'rest' && parentRest)) candidates = [[forced, 1]];
 
       let assigned = false;
       while (!assigned && candidates.length) {
         const [type] = rng.weighted(candidates, ([, w]) => w)!;
-        const mods = allModules.filter((m) => m.type === type && moduleEligible(data, stage, m, f, ctx, used));
-        const mod = rng.weighted(mods, (m) => m.weight * (m.tags.includes('scar') ? 1 + ctx.scar * route.scarWeightPerPoint : 1));
+        const mods = allModules.filter((m) => m.type === type && (override ? override.eligible(m, f, used) : moduleEligible(data, stage, m, f, ctx, used)));
+        const mod = rng.weighted(mods, (m) => m.weight * (m.tags.includes('scar') ? 1 + ctx.scar * (override?.scarWeight ?? route.scarWeightPerPoint) : 1));
         if (mod) {
           node.type = type;
           node.moduleId = mod.id;
@@ -176,6 +186,7 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
           assigned = true;
         } else {
           candidates = candidates.filter(([t]) => t !== type);
+          if (!candidates.length && type === forced && unforced.length) candidates = unforced;
         }
       }
       if (!assigned) throw new Error(`${stageId} ${f}층에 배정할 모듈이 없다`);
@@ -194,9 +205,9 @@ export function findNode(map: StageMap, id: string): MapNode | undefined {
 }
 
 /** 지도 규칙 검사. 테스트와 디버그에서 쓴다. 빈 배열이면 통과. */
-export function validateMap(data: GameData, map: StageMap): string[] {
+export function validateMap(data: GameData, map: StageMap, stageOverride?: StageDef): string[] {
   const errors: string[] = [];
-  const stage = data.stages.find((s) => s.id === map.stageId)!;
+  const stage = stageOverride ?? data.stages.find((s) => s.id === map.stageId)!;
   const all = map.floors.flat();
   const byId = new Map(all.map((n) => [n.id, n]));
   const boss = map.floors[map.floors.length - 1];

@@ -1,0 +1,11 @@
+id: edric_rowen_ref
+type: character-ref
+size: large
+character: edric_rowen
+chroma: magenta
+summary: 에드릭 로웬 기준 시트(3/4 정면 + 왼쪽 측면)
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a broad-shouldered ice knight with glowing blue eyes, a round shield with the Rowen crest, a long ice sword"
+  2: "full body, side view facing left, same proportions, sword lowered, shield forward"
+placeholder: { shape: humanoid, color: '#7fb6d6', accent: '#4fb4ff' }

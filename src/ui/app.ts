@@ -39,12 +39,51 @@ import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
-import { clearRun, lastSlot, listSlots, readCodex, readProfile, recordClear, saveRun, SLOT_COUNT, updateCodex } from './storage';
+import {
+  campaignCollection,
+  clearAbyss,
+  clearRun,
+  lastSlot,
+  listSlots,
+  loadAbyss,
+  readCodex,
+  readProfile,
+  readAbyssMeta,
+  recordAbyss,
+  recordClear,
+  saveAbyss,
+  writeAbyssMeta,
+  saveRun,
+  SLOT_COUNT,
+  updateCodex,
+} from './storage';
+import {
+  abyssPaths,
+  abyssPool,
+  abyssScore,
+  createAbyssRun,
+  dailyPlan,
+  dailySeed,
+  loopLabel,
+  nemesisEvery,
+  oathMax,
+  oathMods,
+  oathScoreMul,
+  pathOffer,
+  pathPicks,
+  poolByOwner,
+  riftCards,
+  unlockedPaths,
+  unlockedRift,
+  unlockName,
+  updateAbyssMeta,
+  WORLD_NAME,
+} from '../engine/abyss';
 import { hubView } from './hub-view';
 import { loadoutView } from './loadout-view';
 import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
-import { noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, type Codex } from '../engine/codex';
+import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, type Codex } from '../engine/codex';
 
 const data = gameData();
 
@@ -80,11 +119,13 @@ export class App {
     if (params.has('screen')) this.screen(params.get('screen') || 'reward', params.get('module') ?? undefined, params.get('stage') ?? 's2');
     else if (params.has('sandbox'))
       this.sandbox(seed ?? 'SANDBOX', (params.get('sandbox') || 'elia').split(',').filter(Boolean), params.get('module') ?? undefined);
+    else if (params.has('abyss')) this.openAbyss(params.get('abyss') || randomSeed());
     else if (seed) this.start(seed, params.has('wang'), params.get('stage') ?? undefined);
     else this.title();
   }
 
   /**
+   * ?abyss[=시드] — 심연 시작 화면을 바로(스토리를 마치지 않아도, 확인용).
    * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
    * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
    */
@@ -108,8 +149,30 @@ export class App {
    * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭) · loadout
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
-    const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
     this.persist = false;
+    if (name.startsWith('abyss')) {
+      // 심연 화면 확인: abyssclear(굽이를 넘음) · abyssend(멈춤) · abyssshop(상점) · abyssrest(휴식)
+      const seed = 'SCREEN';
+      const ar = createAbyssRun(data, seed, { mates: ['elia', 'kyle'], paths: pathOffer(data, seed).slice(0, 1), pool: this.abyssPoolNow() });
+      ar.abyss!.revealed = [...data.cards.keys()].slice(0, 2);
+      this.run = ar;
+      if (name === 'abyssclear') {
+        ar.status = 'stage_clear';
+        return this.abyssLoopClear();
+      }
+      if (name === 'abyssend') {
+        ar.status = 'defeat';
+        return this.abyssEnd();
+      }
+      if (name === 'abyssshop') {
+        ar.gold = 300;
+        const shop = data.modules.get('abyss_shop')!;
+        return this.show(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map())));
+      }
+      const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
+      return this.show(this.backdrop(choiceView(data, ar, mod, () => this.map())));
+    }
+    const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
     this.run = run;
     const first = run.map.floors[0][0];
     switch (name) {
@@ -193,7 +256,9 @@ export class App {
           },
         },
         tab,
-        from ? this.run?.collection : undefined,
+        // 카드 칸의 실물(보유): 캠페인 지도에서 열면 지금 저장, 그 밖(시작 화면·심연)은 이 브라우저의 모든 저장 칸
+        from && this.run && !this.run.abyss ? this.run.collection : campaignCollection(data),
+        readAbyssMeta(data),
       ),
     );
   }
@@ -225,6 +290,7 @@ export class App {
   private title(): void {
     const last = lastSlot(data);
     const anySaved = listSlots(data).some((x) => x.saved);
+    const abyssSaved = loadAbyss(data);
     const url = frameUrl('title_world', 1, { realOnly: true });
     playBgm('title');
     this.show(
@@ -250,6 +316,15 @@ export class App {
               : null,
             h('button', { class: `btn${last ? '' : ' btn-primary'}`, onclick: () => this.openSlots('new') }, '새로 시작', h('small', {}, '빈 칸이나 고른 칸에서')),
             anySaved ? h('button', { class: 'btn', onclick: () => this.openSlots('load') }, '불러오기', h('small', {}, `저장 ${SLOT_COUNT}칸`)) : null,
+            // 심연(GAME_DESIGN 16절): 스토리를 한 번 마친 뒤 열린다
+            readProfile().clears >= 1 || abyssSaved
+              ? h(
+                  'button',
+                  { class: 'btn btn-abyss', onclick: () => (abyssSaved ? this.resumeAbyss(abyssSaved.run) : this.openAbyss()) },
+                  abyssSaved ? '심연 — 이어하기' : '심연',
+                  h('small', {}, abyssSaved ? loopLabel(abyssSaved.run.abyss!) : `바늘구멍만 한 문 너머${readProfile().abyssBestDepth ? ` · 최고 ${readProfile().abyssBestDepth}굽이` : ''}`),
+                )
+              : null,
             h('button', { class: 'btn', onclick: () => this.codex() }, '도감', h('small', {}, '본 카드 · 적 · 장면')),
             h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '소리 · 속도 · 연출')),
           ),
@@ -377,7 +452,11 @@ export class App {
   private map(): void {
     const run = this.run!;
     // 자동 저장: 지도(또는 스테이지 끝)에 설 때마다. 노드에 들어간 뒤 새로고침하면 그 노드 직전 지도에서 이어진다
-    if (this.persist) {
+    if (this.persist && run.abyss) {
+      // 심연: 따로 1칸. 쓰러지면 지운다
+      if (run.status === 'defeat') clearAbyss();
+      else saveAbyss(run);
+    } else if (this.persist) {
       // 마친 런(complete)도 남긴다(스테이지 다시 하기). 다시 하다 지면 클리어한 런으로 되돌려 저장
       if (run.status === 'map' || run.status === 'stage_clear' || run.status === 'complete') saveRun(this.slot, run);
       else if (run.replayOf) saveRun(this.slot, run.replayOf);
@@ -391,6 +470,8 @@ export class App {
     }
     // 스테이지를 시작하기 전 편성(GAME_DESIGN 9-1): 다 채워야 출발한다
     if (run.status === 'map' && run.needsLoadout) return this.loadout();
+    if (run.abyss && run.status === 'stage_clear') return this.abyssLoopClear();
+    if (run.abyss && run.status === 'defeat') return this.abyssEnd();
     if (run.status === 'stage_clear') {
       // 보스의 끝 장면(outroScene) → 스테이지 끝 화면
       const stage = data.stages.find((s) => s.id === run.stageId)!;
@@ -410,12 +491,12 @@ export class App {
       return this.playScene(last.endingScene, () => this.end(true), undefined, 'ending');
     }
     if (run.status === 'defeat') return this.end(false);
-    playBgm(moodFor(data.stages.find((s) => s.id === run.stageId)?.world));
+    playBgm(moodFor(run.abyss?.world ?? data.stages.find((s) => s.id === run.stageId)?.world));
     // 출전 편성 안내: 동료가 처음 합류했을 때, 자리가 처음 가득 찼을 때 한 번씩(런 플래그로 기억)
     const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter').length;
     const guide = (flag: string, when: boolean) => when && !run.flags.includes(flag) && (run.flags.push(flag), true);
-    const firstMate = guide('ui:party_guide', fighters >= 2);
-    const overFull = guide('ui:party_full', fighters > data.balance.party.max);
+    const firstMate = !run.abyss && guide('ui:party_guide', fighters >= 2);
+    const overFull = !run.abyss && guide('ui:party_full', fighters > data.balance.party.max);
     this.show(
       mapView(data, run, {
         onEnter: (node) => this.enter(node),
@@ -441,6 +522,9 @@ export class App {
       if (isBattle(enc)) this.battle(enc);
       else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background));
       else {
+        // 이벤트 선택지에 이름으로 나온 카드도 본 것(GAME_DESIGN 16절 — 도감 기록 기준)
+        const named = (enc.module.content.choices ?? []).flatMap((c) => [...c.effects, ...(c.outcomes ?? []).flatMap((o) => o.effects)]).filter((e) => e.op === 'gain_card' && e.card);
+        if (named.length) this.note((c) => named.forEach((e) => noteCard(c, e.card!)));
         const showChoice = (): void =>
           this.show(
             this.backdrop(
@@ -451,8 +535,8 @@ export class App {
         showChoice();
       }
     };
-    // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다
-    this.playScene(enc.module.content.scene, go, enc.module.content.background);
+    // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다(심연에는 이야기 장면이 없다)
+    this.playScene(run.abyss ? undefined : enc.module.content.scene, go, enc.module.content.background);
   }
 
   /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then. 배경은 background(모듈 배경) → 지금 스테이지의 전투 배경 */
@@ -469,9 +553,10 @@ export class App {
     const run = this.run!;
     const setup = battleSetupFor(data, run, enc);
     const state = createBattle(data, setup);
-    this.note((c) => noteEnemiesSeen(c, state.enemies.map((e) => e.defId)));
+    this.note((c) => noteAffixes(noteEnemiesSeen(c, state.enemies.map((e) => e.defId)), state.enemies.flatMap((e) => e.affixes ?? [])));
     const stage = data.stages.find((s) => s.id === run.stageId)!;
-    playBgm(moodFor(stage.world, enc.module.type === 'boss' ? 'boss' : 'battle'));
+    const own = data.stages.find((s) => s.id === enc.module.stage) ?? stage;
+    playBgm(moodFor(run.abyss ? own.world : stage.world, enc.module.type === 'boss' ? 'boss' : 'battle'));
     const bonus = bonusActive(run, enc.module) ? enc.module.content.bonus?.text : undefined;
     const view = new BattleView(
       data,
@@ -484,9 +569,13 @@ export class App {
         supportActive: run.supportActive,
         bonusText: bonus,
         introText: enc.module.content.text,
-        background: enc.module.content.background ?? stage.background,
+        laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
+        background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
         onQuit: (abandon) => {
-          if (abandon && this.persist) clearRun(this.slot);
+          if (abandon && this.persist) {
+            if (run.abyss) clearAbyss();
+            else clearRun(this.slot);
+          }
           this.title();
         },
       },
@@ -504,7 +593,7 @@ export class App {
         if (run.status !== 'map') return this.show(this.backdrop(bossLootView(data, run, shown, () => this.map()), enc.module.content.background));
         // 일반·엘리트 전투의 끝 장면(원작의 그 전투 뒷이야기) → 보상
         this.playScene(
-          enc.module.content.outroScene,
+          run.abyss ? undefined : enc.module.content.outroScene,
           () =>
             this.show(
               this.backdrop(
@@ -530,6 +619,7 @@ export class App {
   /** 보유 카드 보기: 이번 스테이지 덱 + 주인별 보유 카드(강화 단계 그대로) */
   private showCards(): void {
     const run = this.run!;
+    if (run.abyss) return openDeck(data, `덱 ${run.deck.length}장`, [{ label: loopLabel(run.abyss), cards: run.deck }]);
     const owned = (owner: string) =>
       Object.entries(run.collection)
         .filter(([id]) => {
@@ -632,6 +722,314 @@ export class App {
                 },
               },
               run.replayOf ? '클리어 지도로' : next ? '계속' : stage.endingScene ? '에필로그' : '마치기',
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ───────────────────────── 심연(GAME_DESIGN 16절) ─────────────────────────
+
+  /** 심연 풀(이 브라우저의 저장 칸 보유 카드 ∪ 도감 기록) */
+  private abyssPoolNow(): Record<string, number> {
+    return abyssPool(data, campaignCollection(data), readCodex(data).cards);
+  }
+
+  /** 심연 시작: 동료 1~3명, 길(동료 수에 따라 1~2개), 서약 단계. 시드는 새로. 아래에 오늘의 심연 */
+  private openAbyss(seed = randomSeed(), presetMates?: string[], presetPaths?: string[], presetOath?: number): void {
+    const pool = this.abyssPoolNow();
+    const counts = poolByOwner(data, pool);
+    const meta = readAbyssMeta(data);
+    const profile = readProfile();
+    const openPaths = unlockedPaths(data, meta.achievements);
+    const openRift = unlockedRift(data, meta.achievements);
+    const maxOath = oathMax(data, profile.abyssBestDepth, meta.oathCleared);
+    let oath = Math.min(maxOath, presetOath ?? 0);
+    const mates = new Set<string>(presetMates ?? ['elia']);
+    const offer = pathOffer(data, seed, openPaths);
+    const paths = new Set<string>(presetPaths?.filter((p) => offer.includes(p)) ?? []);
+    const body = h('div', { class: 'abyss-start' });
+    let started = false;
+    const ov = openOverlay('심연 — 바늘구멍만 한 문', body, { onClose: () => !started && this.title(), wide: true });
+    const fighters = [...data.characters.values()].filter((c) => c.role === 'fighter' && c.id !== 'haun');
+    const today = dailySeed(new Date());
+    const plan = dailyPlan(data, today);
+    const todayRec = meta.daily[today.slice(1)];
+    const render = () => {
+      const mods = oathMods(data, oath);
+      const mateMax = Math.min(fighters.length, mods.maxMates ?? fighters.length);
+      while (mates.size > mateMax) mates.delete([...mates][mates.size - 1]);
+      const picks = pathPicks(data, mates.size);
+      while (paths.size > picks.picks) paths.delete([...paths][paths.size - 1]);
+      const ready = mates.size >= 1 && paths.size === picks.picks;
+      body.replaceChildren(
+        h('p', { class: 'abyss-intro' }, '하늘을 꿰맨 뒤, 바늘구멍만 한 문이 남았다. 문 너머를 한 굽이씩 내려간다. 끝은 없다 — 얼마나 깊이 갔는지만 남는다.'),
+        h(
+          'p',
+          { class: 'hint' },
+          `업적 ${meta.achievements.length}/${data.achievements.size} · 열린 틈의 카드 ${openRift.length}/${riftCards(data).length} · 열린 길 ${openPaths.length}/${abyssPaths(data).length}${profile.abyssBestDepth ? ` · 최고 ${profile.abyssBestDepth}굽이 · ${profile.abyssBestScore}점` : ''}`,
+        ),
+        h('h3', {}, `함께 갈 동료 (${mates.size}/${mateMax}) — 하운은 늘 간다`),
+        h(
+          'div',
+          { class: 'abyss-mates' },
+          fighters.map((c) =>
+            h(
+              'label',
+              { class: `abyss-mate${mates.has(c.id) ? ' on' : ''}`, style: `--owner:${c.color}` },
+              h('input', {
+                type: 'checkbox',
+                checked: mates.has(c.id),
+                disabled: !mates.has(c.id) && mates.size >= mateMax,
+                onchange: (e: Event) => {
+                  if ((e.target as HTMLInputElement).checked) mates.add(c.id);
+                  else mates.delete(c.id);
+                  render();
+                },
+              }),
+              h('b', {}, c.name),
+              h('small', {}, `${c.archetypes.map((a) => a.name).join(' · ')} — 심연 풀 ${counts[c.id] ?? 0}장`),
+            ),
+          ),
+        ),
+        h('p', { class: 'hint' }, `심연 풀: 하운 ${counts.haun ?? 0}장 · 공용 ${counts.common ?? 0}장${fighters.map((c) => ` · ${c.name} ${counts[c.id] ?? 0}장`).join('')}. 캠페인에서 보거나 얻은 카드만 보상에 나온다 — 더 보고 오면 넓어진다.`),
+        h('h3', {}, `길 — ${picks.picks}개 고르기${picks.gold ? ` (덤: 골드 +${picks.gold})` : ''}`),
+        h('p', { class: 'hint' }, '동료가 적을수록 길을 더 고른다(1명: 2개와 골드 100 · 2명: 1개와 골드 50 · 3명: 1개).'),
+        h(
+          'div',
+          { class: 'abyss-paths' },
+          offer.map((id) => {
+            const r = data.relics.get(id)!;
+            return h(
+              'label',
+              { class: `abyss-path${paths.has(id) ? ' on' : ''}` },
+              h('input', {
+                type: 'checkbox',
+                checked: paths.has(id),
+                disabled: !paths.has(id) && paths.size >= picks.picks,
+                onchange: (e: Event) => {
+                  if ((e.target as HTMLInputElement).checked) paths.add(id);
+                  else paths.delete(id);
+                  render();
+                },
+              }),
+              h('span', { class: 'abyss-path-glyph' }, r.glyph),
+              h('b', {}, r.name),
+              h('small', {}, r.description),
+            );
+          }),
+        ),
+        h('h3', {}, `서약 — ${oath ? `${oath}단계` : '없음'} (열린 단계 ${maxOath}/${data.oaths.length})`),
+        h(
+          'div',
+          { class: 'abyss-oath-row' },
+          maxOath
+          ? h('input', {
+              type: 'range',
+              class: 'abyss-oath-range',
+              min: 0,
+              max: maxOath,
+              value: oath,
+              'aria-label': '서약 단계',
+              onchange: (e: Event) => {
+                oath = Number((e.target as HTMLInputElement).value);
+                render();
+              },
+            })
+          : null,
+        ),
+        h(
+          'ol',
+          { class: 'abyss-oaths' },
+          data.oaths.map((o) =>
+            h(
+              'li',
+              { class: o.level <= oath ? 'on' : o.level > maxOath ? 'locked' : '' },
+              h('span', { class: 'abyss-oath-glyph' }, o.glyph),
+              h('b', {}, o.level > maxOath ? `${o.level}단계 — 잠김` : `${o.level}. ${o.name}`),
+              h('small', {}, o.level > maxOath ? (o.level === maxOath + 1 ? `${o.level + data.balance.abyss.oath.depthOffset}굽이를 넘거나, 서약 ${o.level - 1}단계로 ${data.balance.abyss.oath.stepDepth}굽이를 넘으면 열린다` : '') : o.description),
+            ),
+          ),
+        ),
+        h('p', { class: 'hint' }, `고른 단계까지 모두 걸린다. 점수 ×${oathScoreMul(data, oath).toFixed(2)}. 시드 ${seed} · 길 ${abyssPaths(data).length}종 중 열린 ${openPaths.length}종에서 시드로 ${offer.length}개`),
+        h(
+          'div',
+          { class: 'confirm-actions' },
+          h(
+            'button',
+            {
+              class: 'btn btn-primary',
+              disabled: !ready,
+              onclick: () => {
+                started = true;
+                ov.close();
+                this.startAbyss(seed, [...mates], [...paths], oath);
+              },
+            },
+            '문을 넘는다',
+          ),
+        ),
+        h(
+          'div',
+          { class: 'abyss-daily' },
+          h('h3', {}, `오늘의 심연 — ${today.slice(1, 5)}.${today.slice(5, 7)}.${today.slice(7)}`),
+          h(
+            'p',
+            { class: 'hint' },
+            `모두가 같은 시드(${today}): 동료 ${plan.mates.map((id) => data.characters.get(id)?.name ?? id).join('·')} · 길 ${plan.paths.map((id) => data.relics.get(id)?.name ?? id).join('·')} · 서약 ${plan.oath}단계 · 그날의 법칙 ${plan.laws.map((id) => data.laws.get(id)?.name ?? id).join('·')}(모든 굽이에).${todayRec ? ` 오늘 최고 ${todayRec.score}점(${todayRec.cleared}굽이).` : ''}`,
+          ),
+          h(
+            'button',
+            {
+              class: 'btn',
+              onclick: () => {
+                started = true;
+                ov.close();
+                this.startDaily();
+              },
+            },
+            '오늘의 심연',
+          ),
+        ),
+      );
+    };
+    render();
+  }
+
+  private startAbyss(seed: string, mates: string[], paths: string[], oath = 0): void {
+    const meta = readAbyssMeta(data);
+    this.run = createAbyssRun(data, seed, {
+      mates,
+      paths,
+      oath,
+      pool: this.abyssPoolNow(),
+      unlocked: unlockedRift(data, meta.achievements),
+      unlockedPaths: unlockedPaths(data, meta.achievements),
+    });
+    this.persist = true;
+    recordAbyss({ started: true });
+    this.map();
+  }
+
+  /** 오늘의 심연: 날짜 시드로 동료·길·서약·그날의 법칙이 정해진다(해금과 상관없이. 틈의 카드는 이 브라우저에서 열린 것) */
+  private startDaily(): void {
+    const seed = dailySeed(new Date());
+    const plan = dailyPlan(data, seed);
+    this.run = createAbyssRun(data, seed, {
+      mates: plan.mates,
+      paths: plan.paths,
+      oath: plan.oath,
+      pool: this.abyssPoolNow(),
+      unlocked: unlockedRift(data, readAbyssMeta(data).achievements),
+      daily: { date: seed.slice(1), laws: plan.laws },
+    });
+    this.persist = true;
+    recordAbyss({ started: true });
+    this.map();
+  }
+
+  private resumeAbyss(run: RunState): void {
+    this.run = run;
+    this.persist = true;
+    this.map();
+  }
+
+  /** 심연 기록 갱신(업적·서약·멈춘 굽이·일일). 새로 이룬 업적의 안내 문구 */
+  private abyssRecord(ended: boolean): string[] {
+    if (!this.persist) return [];
+    const run = this.run!;
+    const meta = readAbyssMeta(data);
+    const codex = readCodex(data);
+    const fresh = updateAbyssMeta(data, meta, run, { ended, codexCards: codexCards(data).filter((c) => c.id in codex.cards).length });
+    writeAbyssMeta(meta);
+    return fresh.map((a) => `업적 「${a.name}」 — ${unlockName(data, a)}이(가) 열렸다`);
+  }
+
+  /** 굽이 보스를 넘은 뒤: 다음 굽이로 */
+  private abyssLoopClear(): void {
+    const run = this.run!;
+    const ab = run.abyss!;
+    if (this.persist) recordAbyss({ cleared: ab.depth, score: abyssScore(data, run) });
+    const unlocks = this.abyssRecord(false);
+    const every = nemesisEvery(data, ab);
+    this.show(
+      this.backdrop(
+        h(
+          'section',
+          { class: 'screen end-screen stage-clear win abyss-clear' },
+          h(
+            'div',
+            { class: 'end-box' },
+            h('div', { class: 'end-kicker' }, `심연 · ${WORLD_NAME[ab.world]}${ab.oath ? ` · 서약 ${ab.oath}` : ''}${ab.daily ? ' · 오늘의 심연' : ''}`),
+            h('h1', {}, `${ab.depth}굽이를 넘었다`),
+            h('p', { class: 'outro' }, (ab.depth + 1) % every === 0 ? '다음 굽이 끝에서 익숙한 목소리가 울린다. 숙적이 기다린다.' : '틈은 더 깊이 이어진다. 다음 굽이로 내려가면 상처가 조금 아문다.'),
+            unlocks.length ? h('ul', { class: 'gains end-unlock' }, ...unlocks.map((m) => h('li', {}, m))) : null,
+            this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
+            h('p', { class: 'hint' }, `점수 ${abyssScore(data, run)} · 보스 ${ab.bosses} · 엘리트 ${ab.elites} · 덱 ${run.deck.length}장 · 상흔 ${run.scar}`),
+            h(
+              'button',
+              {
+                class: 'btn btn-primary btn-large',
+                onclick: () => {
+                  this.clearMessages = [];
+                  advanceStage(data, run);
+                  this.map();
+                },
+              },
+              `${ab.depth + 1}굽이로`,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /** 심연의 끝: N굽이에서 멈췄다 + 사망 원인 + 점수 + 새로 기록한 카드·이룬 업적 */
+  private abyssEnd(): void {
+    const run = this.run!;
+    const ab = run.abyss!;
+    const score = abyssScore(data, run);
+    const cleared = ab.depth - 1;
+    const best = readProfile();
+    if (this.persist) recordAbyss({ cleared, score });
+    const unlocks = this.abyssRecord(true);
+    playBgm(null);
+    this.show(
+      this.backdrop(
+        h(
+          'section',
+          { class: 'screen end-screen lose abyss-end' },
+          h(
+            'div',
+            { class: 'end-box' },
+            h('div', { class: 'end-kicker' }, `심연${ab.oath ? ` · 서약 ${ab.oath}` : ''}${ab.daily ? ' · 오늘의 심연' : ''}`),
+            h('h1', {}, `${ab.depth}굽이에서 멈췄다`),
+            h('p', { class: 'outro' }, `넘은 굽이 ${cleared} · 점수 ${score}${score > best.abyssBestScore && this.persist ? ' — 새 기록' : ''}`),
+            run.stats?.deathCause ? h('p', { class: 'hint' }, `쓰러진 곳: ${run.stats.deathCause}`) : null,
+            ab.revealed.length ? h('p', { class: 'end-unlock' }, `이번 심연에서 처음 본 카드 ${ab.revealed.length}장 — 도감에 적었다. 다음 심연부터 보상에 나온다.`) : null,
+            unlocks.length ? h('ul', { class: 'gains end-unlock' }, ...unlocks.map((m) => h('li', {}, m))) : null,
+            h('p', { class: 'hint' }, `시드 ${ab.baseSeed} · 보스 ${ab.bosses} · 엘리트 ${ab.elites} · 덱 ${run.deck.length}장 · 상흔 ${run.scar}`),
+            this.runStats(run, false),
+            h(
+              'div',
+              { class: 'end-actions' },
+              h('button', { class: 'btn btn-primary btn-large', onclick: () => this.openAbyss() }, '새 심연'),
+              ab.daily
+                ? h('button', { class: 'btn btn-large', onclick: () => this.startDaily() }, '오늘의 심연 다시')
+                : h('button', { class: 'btn btn-large', onclick: () => this.openAbyss(ab.baseSeed, ab.mates.slice(0, ab.track?.startMates ?? ab.mates.length), ab.paths, ab.oath) }, '같은 시드로 다시'),
+              h(
+                'button',
+                {
+                  class: 'btn btn-large',
+                  onclick: (e: Event) => {
+                    const btn = e.currentTarget as HTMLButtonElement;
+                    navigator.clipboard?.writeText(ab.baseSeed).then(() => (btn.textContent = `복사됨: ${ab.baseSeed}`), () => (btn.textContent = `시드: ${ab.baseSeed}`));
+                  },
+                },
+                '시드 복사',
+              ),
+              h('button', { class: 'btn btn-large', onclick: () => this.title() }, '타이틀로'),
             ),
           ),
         ),

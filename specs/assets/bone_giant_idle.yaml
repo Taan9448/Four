@@ -1,0 +1,15 @@
+id: bone_giant_idle
+type: character-anim
+size: large
+character: bone_giant
+chroma: green
+summary: 뼈 거인 대기 4프레임
+depends_on: [bone_giant_ref]
+reference: assets/source/bone_giant_ref.png
+facing: left
+frame_notes:
+  1: "hunched, bones creaking, crimson qi flowing"
+  2: "the ribcage rises"
+  3: "the red light in the skull brightens"
+  4: "settles"
+placeholder: { shape: boss, color: '#d8d0bc', accent: '#a02634' }

@@ -1,0 +1,15 @@
+id: ore_spider_idle
+type: character-anim
+size: large
+character: ore_spider
+chroma: magenta
+summary: 광석거미 대기 4프레임
+depends_on: [ore_spider_ref]
+reference: assets/source/ore_spider_ref.png
+facing: left
+frame_notes:
+  1: "crouched low, legs tapping the ground one after another"
+  2: "the silver shell lifts slightly"
+  3: "the front legs rise and twitch"
+  4: "settles back down"
+placeholder: { shape: beast, color: '#c0c4cc', accent: '#4b3a6b' }

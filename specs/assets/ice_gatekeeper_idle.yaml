@@ -1,0 +1,15 @@
+id: ice_gatekeeper_idle
+type: character-anim
+size: large
+character: ice_gatekeeper
+chroma: magenta
+summary: 얼음 궁전의 문지기 대기 4프레임
+depends_on: [ice_gatekeeper_ref]
+reference: assets/source/ice_gatekeeper_ref.png
+facing: left
+frame_notes:
+  1: "stands guard behind the shield, frost drifting"
+  2: "frost flowers on the shield spread a little"
+  3: "the ice spear glints"
+  4: "settles back, perfectly still"
+placeholder: { shape: humanoid, color: '#8ab4cc', accent: '#dff4ff' }

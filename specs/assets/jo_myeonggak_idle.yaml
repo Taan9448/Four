@@ -1,0 +1,15 @@
+id: jo_myeonggak_idle
+type: character-anim
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: 조명각 대기 4프레임
+depends_on: [jo_myeonggak_ref]
+reference: assets/source/jo_myeonggak_ref.png
+facing: left
+frame_notes:
+  1: "stands with his chin raised, the coiled whip hanging"
+  2: "taps the whip handle against his palm"
+  3: "the red tassel sways, a sneering mouth"
+  4: "settles back to the standing stance"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

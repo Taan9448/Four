@@ -1,0 +1,18 @@
+id: bone_giant_attack
+type: character-anim
+size: large
+character: bone_giant
+chroma: green
+summary: 뼈 거인 뼈 내리치기 6프레임
+depends_on: [bone_giant_ref]
+reference: assets/source/bone_giant_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises a long bone arm high"
+  2: "the arm at its peak, crimson qi flaring"
+  3: "leans forward to the left"
+  4: "the bone arm crashes down to the left, bone shards and red qi bursting"
+  5: "pulls the arm back"
+  6: "returns to the hunched stance"
+placeholder: { shape: boss, color: '#d8d0bc', accent: '#a02634' }

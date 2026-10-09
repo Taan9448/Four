@@ -12,6 +12,7 @@ import { starterCards } from '../engine/collection';
 import { deckGroupsView } from './deck-view';
 import { openOverlay } from './overlay';
 import { loadPortrait, standingFor } from '../render/portrait';
+import { abyssScale, loopLabel, nemesisEvery, WORLD_NAME } from '../engine/abyss';
 
 /** 노드 표식: 두루마리 위의 한자 */
 const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
@@ -91,9 +92,47 @@ type Stage = GameData['stages'][number];
 
 /** 장소 이름: 하운이 아직 이름을 모르면(knownFlag 전) unknownLabel. 여정 띠가 없으면 스테이지 이름 */
 export function placeName(stage: Stage, run: RunState): string {
+  if (run.abyss) return loopLabel(run.abyss);
   const j = stage.journey;
   if (!j) return stage.name;
   return j.unknownLabel && j.knownFlag && !run.flags.includes(j.knownFlag) ? j.unknownLabel : j.label;
+}
+
+/**
+ * 심연의 깊이 띠(여정 띠 대신): 굽이가 아래로 이어지는 검은 금. 지나온 굽이는 세계 이름, 지금 굽이는 밝게,
+ * 숙적 굽이(5·10·15…)에는 표식
+ */
+function depthBand(data: GameData, run: RunState): HTMLElement {
+  const ab = run.abyss!;
+  const every = nemesisEvery(data, ab);
+  const last = Math.max(ab.depth + 3, Math.ceil((ab.depth + 1) / every) * every);
+  const first = Math.max(1, last - 11);
+  const stops = [];
+  for (let d = first; d <= last; d++) {
+    const loop = ab.loops.find((l) => l.depth === d);
+    const nemesis = d % every === 0;
+    stops.push(
+      h(
+        'div',
+        { class: `depth-stop${d === ab.depth ? ' here' : d < ab.depth ? ' done' : ''}${nemesis ? ' nemesis' : ''}`, ...tipAttrs(`${d}굽이`, [nemesis ? '숙적 — 모르데카이의 잔향' : loop ? WORLD_NAME[loop.world] : '아직 가 보지 않은 굽이', loop?.laws?.length ? `법칙: ${loop.laws.map((id) => data.laws.get(id)?.name ?? id).join(' · ')}` : ''].filter(Boolean).join('\n')) },
+        h('b', {}, String(d)),
+        h('small', {}, nemesis ? '숙적' : loop ? WORLD_NAME[loop.world] : '?'),
+      ),
+    );
+  }
+  return h('div', { class: 'depth-band' }, h('div', { class: 'depth-crack' }), ...stops);
+}
+
+/** 심연 지도의 도입 글: 지금 굽이의 세기와 다음 숙적 */
+function abyssTeaser(data: GameData, run: RunState): string {
+  const ab = run.abyss!;
+  const sc = abyssScale(data, ab.depth);
+  const every = nemesisEvery(data, ab);
+  const next = Math.ceil(ab.depth / every) * every;
+  const nemesis = ab.depth % every === 0 ? '이 굽이의 끝에서 숙적, 모르데카이의 잔향이 기다린다.' : `숙적까지 ${next - ab.depth}굽이.`;
+  const oath = ab.oath ? ` 서약 ${ab.oath}단계(${data.oaths.find((o) => o.level === ab.oath)?.name ?? ''}까지).` : '';
+  const daily = ab.daily ? ` 오늘의 심연(${ab.daily.slice(0, 4)}.${ab.daily.slice(4, 6)}.${ab.daily.slice(6)}).` : '';
+  return `${WORLD_NAME[ab.world]}의 조각이 이어 붙은 굽이. 적이 단단해졌다(체력 ×${sc.hp.toFixed(2)}, 피해 ×${sc.dmg.toFixed(2)}). ${nemesis}${oath}${daily}`;
 }
 
 /** 동료 자세히: 반신 그림 · 소개 · 레벨·체력·경험치 · 이 동료의 보유 카드 */
@@ -305,6 +344,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     }
   }
 
+  const revealAll = !!run.abyss && run.relics.some((id) => data.relics.get(id)?.rule === 'reveal_map');
   const nodes = floors.flat().map((n) => {
     const p = pos(n);
     const mod = data.modules.get(n.moduleId);
@@ -313,7 +353,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     // 들어가 본 노드만 이름이 보인다(보스 이름·이야기 제목은 가서 안다, GAME_DESIGN 14절)
     const known = visited;
     // 종류는 지나온 곳만. 갈 수 있는 갈림길도 들어가 봐야 안다 — 모양·색까지 감춘 ? 표식(2026-10-08 사용자 결정)
-    if (!visited)
+    // 심연의 그림자의 길: 종류가 모두 보인다(이름은 여전히 들어가 봐야)
+    if (!visited && !revealAll)
       return h(
         'button',
         {
@@ -346,13 +387,14 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   const mark = frameUrl('haun_idle', 1);
   const hereMark = mark ? h('img', { class: 'here-mark', src: mark, alt: '지금 위치', style: `left:${hp.x}%;top:${hp.y}%` }) : null;
 
-  // 파티 편성(하운 고정, 최대 3명)
+  // 파티 편성(하운 고정, 최대 3명). 심연은 모두 출전(편성 없음)
   const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
-  const full = run.selected.length >= data.balance.party.max;
+  const partyMax = run.abyss ? data.balance.abyss.partyMax : data.balance.party.max;
+  const full = run.selected.length >= partyMax;
   const partyBox = h(
     'div',
     { class: `box party-box${handlers.highlightParty ? ' guide-pulse' : ''}` },
-    h('h3', {}, `출전 (${run.selected.length}/${data.balance.party.max})`),
+    h('h3', {}, run.abyss ? `일행 (${run.selected.length})` : `출전 (${run.selected.length}/${data.balance.party.max})`),
     fighters.map((r) => {
       const def = data.characters.get(r.id)!;
       const checked = run.selected.includes(r.id);
@@ -364,7 +406,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           type: 'checkbox',
           checked,
           // 자리가 가득 차면 쉬는 동료는 먼저 한 명을 빼야 고를 수 있다
-          disabled: r.id === 'haun' || (!checked && full),
+          disabled: r.id === 'haun' || !!run.abyss || (!checked && full),
           onchange: (e: Event) => {
             const on = (e.target as HTMLInputElement).checked;
             const next = on ? [...run.selected, r.id] : run.selected.filter((x) => x !== r.id);
@@ -377,7 +419,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           },
         }),
         h('span', { class: 'member-name' }, def.name),
-        r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
+        r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
         h('span', { class: 'member-lv', title: xpToNext(data, r.level) === null ? '최대 레벨' : `경험치 ${r.xp} / ${xpToNext(data, r.level)}` }, `Lv ${r.level}`),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),
@@ -402,11 +444,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     h(
       'p',
       { class: 'hint' },
-      fighters.length > data.balance.party.max && full
+      run.abyss
+        ? '심연에서는 모두 출전한다. 쓰러진 채 전투가 끝난 동료는 다음 굽이까지 부상(최대 체력 감소).'
+        : fighters.length > data.balance.party.max && full
         ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.`
         : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
     ),
-    fighters.length > 1 ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
+    fighters.length > 1 && !run.abyss ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );
 
   // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
@@ -423,10 +467,18 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       : null;
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
-  const journeyWrap = h('div', { class: 'journey-wrap' }, journeyBand(data, run));
+  const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run));
+  // 두루마리 축(ui_scroll_rod, Codex 그림 3조각: 위 끝 · 가운데(늘림) · 아래 끝). 그림이 오기 전에는 CSS 축
+  const rodUrls = [1, 2, 3].map((n) => frameUrl('ui_scroll_rod', n, { realOnly: true }));
+  const rods = rodUrls.every(Boolean)
+    ? (['left', 'right'] as const).map((side) =>
+        h('div', { class: `scroll-rod ${side}`, 'aria-hidden': 'true' }, ...rodUrls.map((u, i) => h('i', { class: ['top', 'mid', 'bot'][i], style: `background-image:url("${u}")` }))),
+      )
+    : [];
   const scrollWrap = h('div', { class: 'scroll-wrap' }, h(
       'div',
-      { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}`, style: art(stage.mapArt) },
+      { class: `scroll${art(stage.mapArt) ? ' has-art' : ''}${rods.length ? ' has-rod' : ''}`, style: art(stage.mapArt) },
+      ...rods,
       // 종이 결(ui_parchment): 지역 지도 위에 곱하기로 겹쳐 두루마리 종이 느낌을 낸다(그림이 들어오면)
       art('ui_parchment') ? h('div', { class: 'scroll-paper', style: art('ui_parchment') }) : null,
       svg,
@@ -438,7 +490,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   return h(
     'section',
     { class: 'screen map-screen' },
-    h('div', { class: 'journey-area' }, journeyWrap, journeyBanner(data, run)),
+    h('div', { class: 'journey-area' }, journeyWrap, run.abyss ? null : journeyBanner(data, run)),
     h(
       'div',
       { class: 'local' },
@@ -459,7 +511,14 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
                 run.hardcore ? h('span', { class: 'mode-badge hardcore', ...tipAttrs('하드코어', `쓰러진 동료는 돌아오지 않는다.${run.fallen.length ? `\n잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}` : ''}`) }, '하드코어') : null,
               )
             : null,
-          h('p', { class: 'stage-summary' }, stage.teaser ?? ''),
+          h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
+          run.abyss?.laws?.length
+            ? h(
+                'div',
+                { class: 'law-badges' },
+                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, h('b', {}, l!.glyph), l!.name)),
+              )
+            : null,
           h(
             'div',
             { class: 'stage-stats' },
@@ -476,7 +535,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           'div',
           { class: 'map-actions' },
           // 보유 카드 · 도감은 한 줄씩, 설정 · 타이틀로는 반 줄씩
-          h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
+          h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, run.abyss ? `덱 (${run.deck.length})` : `보유 카드 (${run.deck.length})`),
           h('button', { class: 'btn wide', onclick: handlers.onCodex }, '도감'),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
