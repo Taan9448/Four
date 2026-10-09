@@ -24,7 +24,12 @@ export type Sfx =
   | 'levelup'
   | 'victory'
   | 'defeat'
-  | 'turn';
+  | 'turn'
+  | 'cutin'
+  | 'power'
+  | 'summon'
+  | 'enrage'
+  | 'discard';
 
 const files = import.meta.glob('../../assets/audio/**/*.{ogg,mp3,wav}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 const fileFor = (kind: 'bgm' | 'sfx', name: string): string | undefined =>
@@ -277,6 +282,25 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
     case 'victory':
       [69, 72, 76, 81].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.12, i === 3 ? 1.4 : 0.4, 0.2, out));
       tone('sine', midiToHz(45), t, 1.6, 0.3, out);
+      break;
+    case 'cutin':
+      // 검을 뽑는 쇳소리
+      burst(t, 0.3, 0.5, out, { type: 'highpass', hz: 3000, to: 6000 });
+      tone('triangle', 2200, t + 0.05, 0.4, 0.12, out, { to: 2600 });
+      break;
+    case 'power':
+      [74, 79, 86].forEach((m, i) => tone('sine', midiToHz(m), t + i * 0.05, 0.35, 0.08, out, { attack: 0.02 }));
+      break;
+    case 'summon':
+      tone('sawtooth', 110, t, 0.5, 0.18, out, { to: 70, attack: 0.05 });
+      burst(t, 0.4, 0.3, out, { type: 'bandpass', hz: 400, to: 1200 });
+      break;
+    case 'enrage':
+      tone('sawtooth', 90, t, 0.6, 0.3, out, { to: 140, attack: 0.03 });
+      tone('square', 60, t, 0.5, 0.15, out);
+      break;
+    case 'discard':
+      burst(t, 0.1, 0.25, out, { type: 'bandpass', hz: 1800, to: 900, q: 0.7 });
       break;
     case 'defeat':
       [64, 63, 60, 57].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.28, i === 3 ? 1.6 : 0.5, 0.18, out));

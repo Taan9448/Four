@@ -922,7 +922,7 @@ export class BattleView {
             this.enemySide.appendChild(u.el);
             u.el.classList.add('summoned');
             floatOver(this.fxLayer, u.el, '소환', 'status');
-            sfx('transform', { volume: 0.5 });
+            sfx('summon');
             this.refresh();
           }
           await this.wait(450);
@@ -931,12 +931,14 @@ export class BattleView {
         case 'discard': {
           const haun = [...this.units.values()].find((u) => u.c.defId === 'haun');
           if (haun) floatOver(this.fxLayer, haun.el, `버림: ${this.data.cards.get(ev.cardId)?.name ?? ev.cardId}`, 'status');
+          sfx('discard', { volume: 0.7 });
           await this.wait(200);
           break;
         }
         case 'enrage': {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, '격노', 'crit');
+          sfx('enrage');
           toast(this.toasts, ev.text, 'danger');
           shake(this.field, 0.6);
           await this.wait(500);
@@ -946,6 +948,7 @@ export class BattleView {
           // 파워(발동 상태)가 일어났다: 그 상태 이름을 띄운다
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, `${this.data.statuses.get(ev.status)?.glyph ?? ''} ${this.data.statuses.get(ev.status)?.name ?? ev.status}`, 'status');
+          sfx('power', { volume: 0.5 });
           await this.wait(160);
           break;
         }
@@ -1081,6 +1084,7 @@ export class BattleView {
   /** 영웅·전설 카드 컷인: 화면이 어두워지고 반신 그림과 대사가 나온 뒤 스킬이 나간다. 매번 재생, 클릭하면 건너뜀 */
   private async cutIn(cardId: string, line: { speaker: string; face: 'neutral' | 'resolve' | 'surprise'; text: string }): Promise<void> {
     const def = resolveCard(this.data, cardId).def;
+    sfx('cutin');
     const who = speakerInfo(this.data, line.speaker);
     const img = await loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags));
     const portrait = img

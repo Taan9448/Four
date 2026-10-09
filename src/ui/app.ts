@@ -26,7 +26,7 @@ import {
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { initAudio, playBgm, sfx } from '../render/audio';
-import { moodFor } from '../render/music';
+import { moodFor, type Mood } from '../render/music';
 import { BattleView } from './battle-view';
 import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
 import { claimLoot, rollLoot } from '../engine/economy';
@@ -407,7 +407,7 @@ export class App {
         saveRun(this.slot, run);
       }
       const last = data.stages.find((s) => s.id === run.stageId)!;
-      return this.playScene(last.endingScene, () => this.end(true));
+      return this.playScene(last.endingScene, () => this.end(true), undefined, 'ending');
     }
     if (run.status === 'defeat') return this.end(false);
     playBgm(moodFor(data.stages.find((s) => s.id === run.stageId)?.world));
@@ -456,12 +456,12 @@ export class App {
   }
 
   /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then. 배경은 background(모듈 배경) → 지금 스테이지의 전투 배경 */
-  private playScene(id: string | undefined, then: () => void, background?: string): void {
+  private playScene(id: string | undefined, then: () => void, background?: string, mood?: Mood): void {
     const scene = id ? data.scenes.get(id) : undefined;
     if (!scene) return then();
     this.note((c) => noteScene(data, c, scene.id));
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
-    playBgm(moodFor(scene.world ?? stage?.world));
+    playBgm(mood ?? moodFor(scene.world ?? stage?.world));
     this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
@@ -681,10 +681,10 @@ export class App {
 
   private end(win: boolean): void {
     const run = this.run!;
-    playBgm(win ? 'title' : null);
     const last = data.stages.find((s) => s.id === run.stageId)!;
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;
+    playBgm(finale ? 'ending' : win ? 'title' : null);
     this.show(
       this.backdrop(
         h(
