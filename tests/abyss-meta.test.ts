@@ -265,3 +265,16 @@ describe('심연 3차 — 전투 셈', () => {
     expect(s.tally!.affixKills).toBe(1);
   });
 });
+
+describe('심연 3차 — 지도', () => {
+  it('서약 5(6층 엘리트): 엘리트 모듈이 적은 틈 세계 굽이도 지도가 만들어진다', () => {
+    for (const seed of ['RF1', 'RF2', 'RF3', 'RF4', 'RF5', 'RF6']) {
+      const run = start(seed, ['elia', 'kyle'], { oath: 5 });
+      for (let d = 1; d < 12; d++) {
+        run.status = 'stage_clear';
+        advanceLoop(data, run);
+        expect(run.map.floors.length).toBe(data.balance.abyss.floors + 1);
+      }
+    }
+  });
+});

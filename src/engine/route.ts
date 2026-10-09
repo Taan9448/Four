@@ -169,6 +169,8 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
         if (calmFull && isCalm(type)) return false;
         return true;
       });
+      // 정해진 유형(forcedTypes)에 쓸 모듈이 바닥나면(심연 서약 '막아선 자'로 엘리트가 몰릴 때 등) 보통 유형으로 돌아간다
+      const unforced = candidates.filter(([t]) => t !== forced);
       if (forced && !(forced === 'rest' && parentRest)) candidates = [[forced, 1]];
 
       let assigned = false;
@@ -184,6 +186,7 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
           assigned = true;
         } else {
           candidates = candidates.filter(([t]) => t !== type);
+          if (!candidates.length && type === forced && unforced.length) candidates = unforced;
         }
       }
       if (!assigned) throw new Error(`${stageId} ${f}층에 배정할 모듈이 없다`);
