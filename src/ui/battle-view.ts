@@ -65,6 +65,11 @@ export class BattleView {
   private toasts!: HTMLElement;
   /** 갑자기 일어난 일(보스 변신·격노·균열 폭주·지원)은 화면 가운데에, 글이 길수록 오래 */
   private alerts!: HTMLElement;
+  /**
+   * 연출 중에 보여 주는 체력(2026-10-09): 엔진은 한 번에 끝까지 계산하므로, 상태의 체력은 이미 마지막 값이다.
+   * 행동 직전 체력을 적어 두고 피해·회복 이벤트가 재생될 때마다 옮겨, 체력 바가 공격보다 먼저 줄지 않게 한다. 연출이 끝나면 비운다
+   */
+  private shown = new Map<string, { hp: number; maxHp: number; downed: boolean }>();
   private handEl!: HTMLElement;
   private resEl!: HTMLElement;
   private aimEl!: HTMLElement;
@@ -317,12 +322,15 @@ export class BattleView {
     const incoming = s.result ? new Map() : incomingDamage(s);
     for (const u of this.units.values()) {
       const c = u.c;
-      u.hp.style.width = `${Math.max(0, (c.hp / c.maxHp) * 100)}%`;
-      u.hpText.textContent = `${c.hp} / ${c.maxHp}`;
+      const shown = this.shown.get(c.uid);
+      const hp = shown?.hp ?? c.hp;
+      const maxHp = shown?.maxHp ?? c.maxHp;
+      u.hp.style.width = `${Math.max(0, (hp / maxHp) * 100)}%`;
+      u.hpText.textContent = `${Math.max(0, hp)} / ${maxHp}`;
       u.block.textContent = c.block > 0 ? String(c.block) : '';
       u.block.style.display = c.block > 0 ? '' : 'none';
       if (c.block > 0) Object.entries(tipAttrs(`방어 ${c.block}`, '받는 피해를 먼저 막는다. 자기 턴이 시작되면 사라진다.')).forEach(([k, v]) => v && u.block.setAttribute(k, v));
-      u.el.classList.toggle('down', c.downed);
+      u.el.classList.toggle('down', shown?.downed ?? c.downed);
       u.el.classList.toggle('target-focus', this.selected !== null && this.targetFocus === c.uid);
       clear(u.statuses);
       for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusChip(this.data, id, n));
@@ -900,9 +908,12 @@ export class BattleView {
     if (before) await before();
     this.handFrozen = freezeHand;
     // 여기서 다시 그리지 않는다: 낸 카드가 손패에 잠깐 되살아나거나, 피해가 연출보다 먼저 보이지 않게(연출이 이벤트마다 다시 그린다)
+    // 행동 직전 체력을 적어 둔다(연출이 이벤트마다 옮긴다)
+    this.shown = new Map([...this.state.party, ...this.state.enemies].map((c) => [c.uid, { hp: c.hp, maxHp: c.maxHp, downed: c.downed }]));
     const r = fn() as { ok?: boolean; reason?: string } | undefined;
     if (r && r.ok === false && r.reason) toast(this.toasts, r.reason, 'danger');
     await this.animate(this.state.events.splice(0));
+    this.shown.clear();
     this.busy = false;
     this.handFrozen = false;
     this.refresh();
@@ -933,6 +944,11 @@ export class BattleView {
         case 'damage': {
           const u = this.units.get(ev.targetUid);
           if (!u) break;
+          const sh = this.shown.get(ev.targetUid);
+          if (sh && ev.absorbed) {
+            sh.hp += ev.amount;
+            sh.maxHp += ev.amount;
+          } else if (sh) sh.hp = Math.max(0, sh.hp - ev.amount);
           if (ev.absorbed) floatOver(this.fxLayer, u.el, `먹힘 +${ev.amount}`, 'absorb');
           else {
             // 소리: 맞은 쪽 자리(적 오른쪽, 일행 왼쪽)에서. 막혀서 0이면 막는 소리
@@ -976,6 +992,8 @@ export class BattleView {
         }
         case 'heal': {
           const u = this.units.get(ev.targetUid);
+          const sh = this.shown.get(ev.targetUid);
+          if (sh) sh.hp = Math.min(sh.maxHp, sh.hp + ev.amount);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount}`, 'heal');
           sfx('heal');
           this.refresh();
@@ -1040,6 +1058,8 @@ export class BattleView {
         case 'downed':
         case 'death': {
           const u = this.units.get(ev.uid);
+          const sh = this.shown.get(ev.uid);
+          if (sh) sh.downed = true;
           if (u) {
             u.player.stop();
             u.el.classList.add('down');
@@ -1051,6 +1071,8 @@ export class BattleView {
         case 'transform': {
           // 보스 2단계: 같은 자리에서 새 모습(실루엣·크기·이름)으로 다시 만든다
           const old = this.units.get(ev.uid);
+          // 새 모습의 체력은 상태의 값 그대로
+          this.shown.delete(ev.uid);
           if (old) {
             old.player.stop();
             const fresh = this.makeUnit(old.c);
