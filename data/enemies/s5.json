@@ -49,7 +49,7 @@
     "color": "#221d2c",
     "traits": [{"status": "incorporeal", "stacks": 1}],
     "pattern": "random",
-    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "whisper", "name": "그림자 속삭임", "intent": "debuff", "weight": 1, "effects": [{"op": "apply_status", "status": "daze", "stacks": 1}]}],
+    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 8}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "whisper", "name": "그림자 속삭임", "intent": "debuff", "weight": 1, "effects": [{"op": "apply_status", "status": "daze", "stacks": 1}]}],
     "flavor": "그림자 암살자가 다스리던 것들의 잔당. 칼날만 실체다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
   },
   {

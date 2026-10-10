@@ -35,7 +35,7 @@
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "venom_nail", "name": "검푸른 독 손톱", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "poison", "stacks": 3}]}, {"id": "draw_venom", "name": "독기 끌어올리기", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 10, "target": "self"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "self"}]}, {"id": "myriad_venom", "name": "만독수", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "all_enemies"}, {"op": "add_card", "card": "status_miasma", "to": "discard"}]}],
+    "moves": [{"id": "venom_nail", "name": "검푸른 독 손톱", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "poison", "stacks": 3}]}, {"id": "draw_venom", "name": "독기 끌어올리기", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 10, "target": "self"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "self"}]}, {"id": "myriad_venom", "name": "만독수", "intent": "attack", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "poison", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "status_miasma", "to": "discard"}]}],
     "flavor": "소림의 잿더미를 감시하던 분타의 장로. 검푸른 독을 바른 손톱. 독은 손톱 끝에서 손목의 경맥으로 이어져 흐른다 — 끌어올릴수록 제 경맥에도 고인다."
   },
   {

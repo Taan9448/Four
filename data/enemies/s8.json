@@ -22,7 +22,7 @@
     "silhouette": "humanoid",
     "color": "#7a2a2a",
     "pattern": "cycle",
-    "moves": [{"id": "arrow_rain", "name": "화살 비", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies"}]}, {"id": "aimed_shot", "name": "겨눈 화살", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 10}]}, {"id": "draw_bow", "name": "시위를 당긴다", "intent": "buff", "targeting": "random", "effects": [{"op": "block", "amount": 6, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "arrow_rain", "name": "화살 비", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies"}]}, {"id": "aimed_shot", "name": "겨눈 화살", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 8}]}, {"id": "draw_bow", "name": "시위를 당긴다", "intent": "buff", "targeting": "random", "effects": [{"op": "block", "amount": 6, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "flavor": "끊긴 계단 너머 절벽 위, 혈교도 수백이 활을 겨누고 있었다. 화살이 쏟아졌다."
   },
   {

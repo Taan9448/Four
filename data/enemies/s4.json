@@ -39,7 +39,7 @@
     "tier": "elite",
     "traits": [{"status": "mountain_regen", "stacks": 1}, {"status": "thorns", "stacks": 2}],
     "pattern": "cycle",
-    "moves": [{"id": "lava_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 17, "element": "fire"}]}, {"id": "harden", "name": "산의 껍질", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "rockfall", "name": "무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}],
+    "moves": [{"id": "lava_fist", "name": "용암 주먹", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 14, "element": "fire"}]}, {"id": "harden", "name": "산의 껍질", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "rockfall", "name": "무너지는 천장", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}],
     "flavor": "몸 안의 용암 핏줄이 산의 뿌리와 이어져 있다. 쿵, 심장 소리가 울릴 때마다 붉게 뛴다.",
     "weak": ["ice"],
     "resist": ["fire"]
