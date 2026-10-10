@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: a fist-sized black crystal hanging on a short black chain from a wooden beam, smooth and many-faceted, swallowing the light so that dark shadow streaks flow away from it in one direction; an object.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Cell 1: full view, three-quarter front view, a fist-sized many-faceted black crystal hanging on a short black chain from a dark wooden beam end, faint dark shadow streaks flowing away from it
+Cell 2: full view, side view, same proportions, the crystal on its chain seen from the side
+Cells 3 to 4 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Preserve the same faceted black crystal, short black chain and plain beam end in both views. Use ONLY EIGHT flat colors for the objects: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478 for crystal/chain/shadow, and #2a1d16, #4a3426, #6e5440 for plain dark wood. No white, pale silver, gold, purple or intermediate blended shades, no tiny speckled wood texture. Crisp equal square blocks with no anti-aliasing. Keep the crystal itself and chain at exactly the same size and vertical level in both cells; the lowest crystal tip is on the same row, sprite row115 counting from1. The whole beam-chain-crystal assembly is about96 sprite pixels high, with clear top and side margins. Shadows are short faint dark streaks flowing only horizontally rightward from the crystal, never trailing below its tip. Do not add any stand, floor or background wall. Cells3 and4 are empty magenta.
+
+Fix: FINAL palette override: render this as a very simple SIX-COLOR sprite, not a textured illustration. The only object colors are #0b0b10, #1d2433, #3d4459 (three dark crystal/chain/shadow tones) and #2a1d16, #4a3426, #6e5440 (three plain dark-wood tones). Replace the previous 32-color and 8-color palettes entirely. Large solid flat facet planes, no shiny silver highlights; wood is three broad flat stripes, no speckled grain. Shadows are flat dark one-direction streaks, not blended smoke. Every color boundary is a sharp stair step made of equal solid square blocks. Both complete assemblies are the same 96-pixel height with the crystal tips at the same baseline. Empty magenta margin on all sides and completely empty bottom row.
