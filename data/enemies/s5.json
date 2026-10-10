@@ -76,7 +76,7 @@
     "scale": 1.4,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
+    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
     "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다."
   },
   {

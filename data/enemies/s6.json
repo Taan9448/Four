@@ -20,7 +20,7 @@
     "silhouette": "humanoid",
     "color": "#2a2a30",
     "pattern": "random",
-    "moves": [{"id": "curved_blade", "name": "휘어 드는 곡도", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 4, "times": 2}]}, {"id": "black_wind_palm", "name": "흑풍장", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 9}]}, {"id": "light_step", "name": "경공", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
+    "moves": [{"id": "curved_blade", "name": "휘어 드는 곡도", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 3, "times": 2}]}, {"id": "black_wind_palm", "name": "흑풍장", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 9}]}, {"id": "light_step", "name": "경공", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}],
     "flavor": "섬서 분타의 흑풍대. 검은 무복에 검은 두건, 허리에 곡도. 혈위대와 달리 마교의 정식 무사들이다. 흑풍장은 바위를 가루로 만든다고 했다."
   },
   {

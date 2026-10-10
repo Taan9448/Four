@@ -94,7 +94,7 @@
     "name": "혈위대 이백",
     "weight": 1,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "마맛자국 부대주가 다시 왔다. 이번에는 쉰이 아니라 이백. 대열이 계곡 입구를 가득 메운다. (적 전원 힘 1)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"text": "마맛자국 부대주가 다시 왔다. 이번에는 쉰이 아니라 이백. 대열이 계곡 입구를 가득 메운다. (적 전원 힘 2)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_event_valley_fortress",
