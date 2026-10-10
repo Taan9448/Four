@@ -10,10 +10,11 @@ Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game s
 Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
 Never use green or similar hues on the character.
 Frames:
-Cell 1: separated part, the narrow LEFT-SIDE VIEW jagged stitched rim ONLY, its central hole is empty green, no vortex
-Cell 2: separated part, ONLY the slender silver mana and dark purple coiled qi interior ribbon from the narrow side-view tear, no stitched rim
-Cell 3: separated part, ONLY a small set of the reference dangling stitched threads, no rim and no vortex
-Cells 4 to 6 are completely empty green.
+Cell 1: the flows inside swirl slowly
+Cell 2: the ragged rim ripples outward a little
+Cell 3: loose threads lift and wave
+Cell 4: the tear settles back
+Cells 5 to 6 are completely empty green.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
-Fix: Fallback level3 PARTS sheet because the key poses changed viewpoint. One consistent narrow side-view design separated into THREE parts, not three whole portals. Reference cell2 is authoritative. Rim height100spritepx =400sourcepx, width24spritepx =96sourcepx, centered at local x256,y256; top56 bottom455. Interior ribbon is narrower and shorter so it fits INSIDE this rim when assembled, height88spritepx, width12spritepx; do not draw a broad front-view swirl. Threads only small strands. Same crisp pixel size and original pale rim/red stitch/silver/purple colors on all parts. At least56sourcepx green margin on all sides. No human head, body, limbs or weapon: this character is an object. Entire bottom row empty green. No labels or borders.
+Fix: Use fallback level1: FOUR COMPLETE tears, not separated parts. Every active cell contains the entire stitched rim AND inner silver mana/dark purple qi vortex AND dangling threads together as ONE complete object, exactly like the attached reference. Keep same reference scale, shape and LEFT narrow side view across all four cells; only the inner swirl rotation and loose thread positions change slightly. Cells1,2,3 in top row and cell4 at bottom-left; cells5,6 empty green. Keep each complete tear inside its own 512x512 cell, no fragments across row/column boundaries. Do not draw separate rim-only, vortex-only or debris-only frames; NO fallback3 parts.

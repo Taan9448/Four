@@ -11,7 +11,7 @@
     128
   ],
   "fit": "pad",
-  "frames": 3,
+  "frames": 4,
   "fps": 6,
   "loop": true,
   "anchor": [
@@ -21,14 +21,14 @@
   "events": {},
   "blend": "normal",
   "facing": "left",
-  "fallbackLevel": 3,
+  "fallbackLevel": 1,
   "virtualFrames": 4,
-  "sourceHash": "89770a7eb84b4418",
+  "sourceHash": "3da9f28542252fee",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.49
+  "gridPurity": 0.568
 }
