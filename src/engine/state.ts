@@ -39,6 +39,8 @@ export interface EnemyState extends Combatant {
   enrageAt?: number;
   /** 흐름 포식이 먹는 양 배율(심연 숙적의 옅은 잔향. 없으면 1) */
   feedMul?: number;
+  /** 변신한 모습의 체력 배율(심연 숙적: 굽이 배율 대신. 없으면 전투의 enemyHpScale) */
+  transformHpScale?: number;
   moveCursor: number;
   lastMoves: string[];
   intent: Intent | null;

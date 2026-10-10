@@ -658,6 +658,11 @@ export const Balance = z
             knotFrom: z.number().int().positive(),
             knotStacks: z.number().int().positive(),
             faint: z.object({ enrageDelay: z.number().int().min(0), feedMul: z.number().min(0) }).strict().optional(),
+            /**
+             * 변신한 뒤(찢긴 경계)의 체력 배율 — 만날 때마다 [첫째, 둘째, 셋째 이후]. 굽이 배율 대신 쓴다:
+             * 경계는 실 카드(피해가 오르지 않는다)로만 꿰매므로 굽이 배율을 따르면 깊을수록 끝없이 길어졌다(5굽이 평균 26턴, 2026-10-10)
+             */
+            borderHpScale: z.array(z.number().positive()).min(1).optional(),
           })
           .strict(),
         // ── 3차(메타) ──

@@ -451,9 +451,11 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
       const traits = [];
       if (def.traits.some((t) => t.status === 'flow_eater')) traits.push({ status: 'flow_eater', stacks: n });
       if (def.traits.some((t) => t.status === 'knot')) traits.push({ status: 'knot', stacks: n >= cfg.nemesis.knotFrom ? cfg.nemesis.knotStacks : 1 });
+      const borders = cfg.nemesis.borderHpScale;
+      const border = borders ? { transformHpScale: borders[Math.min(n, borders.length) - 1] } : {};
       const faint = n === 1 ? cfg.nemesis.faint : undefined;
-      if (faint) return { traits, enrageShift: -faint.enrageDelay, feedMul: faint.feedMul };
-      return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1) };
+      if (faint) return { traits, enrageShift: -faint.enrageDelay, feedMul: faint.feedMul, ...border };
+      return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1), ...border };
     }
     const count =
       def.tier === 'elite'

@@ -13,7 +13,7 @@ import {
   riftCards,
 } from '../src/engine/abyss';
 import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, type RunState } from '../src/engine/run';
-import { createBattle } from '../src/engine/battle';
+import { createBattle, playCard } from '../src/engine/battle';
 import { spawnEnemy } from '../src/engine/effects';
 import { validateMap } from '../src/engine/route';
 import { buyRemove, openShop } from '../src/engine/economy';
@@ -251,7 +251,10 @@ describe('심연 2차', () => {
       return abyssEnemyMods(data, run, nem, { id: 'boss' }, ['mordecai'])[0]!;
     };
     const faint = data.balance.abyss.nemesis.faint!;
-    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: -faint.enrageDelay, feedMul: faint.feedMul });
+    const borders = data.balance.abyss.nemesis.borderHpScale!;
+    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: -faint.enrageDelay, feedMul: faint.feedMul, transformHpScale: borders[0] });
+    expect(mods(2).transformHpScale).toBe(borders[1]);
+    expect(mods(9).transformHpScale).toBe(borders[borders.length - 1]);
     expect(mods(2).enrageShift).toBe(2);
     expect(mods(2).feedMul).toBeUndefined();
     expect(mods(3).traits).toContainEqual({ status: 'knot', stacks: 4 });
@@ -265,6 +268,30 @@ describe('심연 2차', () => {
     expect(full.enrageAt).toBe(enrage - 2);
     expect(weak.feedMul).toBe(faint.feedMul);
     expect(full.feedMul).toBeUndefined();
+    expect(weak.transformHpScale).toBe(borders[0]);
+  });
+
+  it('숙적이 변신한 찢긴 경계의 체력은 굽이 배율이 아니라 만남마다의 배율을 따른다', () => {
+    const run = start('B1', ['elia']);
+    const nem = data.balance.abyss.nemesisModule;
+    const ab = run.abyss!;
+    ab.depth = 10;
+    ab.loops = [5, 10].map((depth) => ({ depth, world: 'rift' as const, boss: nem, stageId: 's9' }));
+    run.scar = 6;
+    const enc = { module: data.modules.get(nem)!, node: { id: 'boss', floor: 9, index: 0, type: 'boss' as const, moduleId: nem, next: [] } };
+    const s = createBattle(data, battleSetupFor(data, run, enc as never));
+    const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_stop_ring'), m.uid);
+    m.hp = 1;
+    m.statuses = {};
+    m.block = 0;
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_place_blade'), m.uid);
+    const border = s.enemies.find((e) => e.defId === 'torn_border')!;
+    const def = data.enemies.get('torn_border')!;
+    const tier = data.balance.enemyTiers[def.tier]?.hp ?? 1;
+    const scale = data.balance.abyss.nemesis.borderHpScale![1];
+    expect(border.maxHp).toBe(Math.round((def.maxHp + (def.hpPerScar ?? 0) * s.scar) * scale * tier));
+    expect(s.enemyHpScale!).toBeGreaterThan(scale); // 굽이 배율이었으면 훨씬 컸다
   });
 
   it('3굽이 사건: 동료 자리가 남았으면 구원(합류 + 시작 카드 4장), 가득하면 틈의 메아리', () => {
