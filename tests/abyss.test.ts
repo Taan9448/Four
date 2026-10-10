@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { gameData } from '../src/engine/data';
 import {
   abyssPool,
+  abyssScale,
   abyssStage,
   advanceLoop,
   createAbyssRun,
@@ -12,8 +13,9 @@ import {
   removePrice,
   riftCards,
 } from '../src/engine/abyss';
-import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, type RunState } from '../src/engine/run';
-import { createBattle } from '../src/engine/battle';
+import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, skipReward, type RunState } from '../src/engine/run';
+import { createBattle, playCard } from '../src/engine/battle';
+import { spawnEnemy } from '../src/engine/effects';
 import { validateMap } from '../src/engine/route';
 import { buyRemove, openShop } from '../src/engine/economy';
 import { deserializeRun, serializeRun } from '../src/engine/save';
@@ -32,6 +34,34 @@ describe('심연', () => {
     expect(pool.kyle_strike).toBe(0);
     expect(pool.haun_byeogun).toBeUndefined(); // 이야기 카드
     expect(Object.keys(pool).every((id) => ['starter', 'reward'].includes(data.cards.get(id)!.pool))).toBe(true);
+    // 가져오는 강화는 importMax(+2)까지
+    expect(abyssPool(data, { elia_fireball: 5 }, []).elia_fireball).toBe(data.balance.abyss.importMax);
+  });
+
+  it('배율: deep.from굽이부터 굽이마다 더 가파르게 오른다', () => {
+    const ab = data.balance.abyss;
+    const deep = ab.deep!;
+    const at = (n: number) => abyssScale(data, n);
+    expect(at(1)).toEqual({ hp: ab.hpBase, dmg: ab.dmgBase });
+    expect(at(deep.from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (deep.from - 1)));
+    expect(at(deep.from + 1).hp - at(deep.from).hp).toBeCloseTo(ab.hpBase * deep.hpStep);
+    expect(at(deep.from + 1).dmg - at(deep.from).dmg).toBeCloseTo(ab.dmgBase * deep.dmgStep);
+    expect(at(deep.from).hp - at(deep.from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+  });
+
+  it('숙적과 서약 막아선 자의 엘리트는 유물을 떨구지 않는다(골드는 그대로)', async () => {
+    const { rollLoot } = await import('../src/engine/economy');
+    const run = start('NL1', ['elia']);
+    const nem = { id: 'x', floor: 9, index: 0, type: 'boss' as const, moduleId: data.balance.abyss.nemesisModule, next: [] };
+    const boss = { ...nem, moduleId: 's1_boss_veilak' };
+    expect(rollLoot(data, run, nem).relicChoices).toEqual([]);
+    expect(rollLoot(data, run, nem).gold).toBeGreaterThan(0);
+    expect(rollLoot(data, run, boss).relicChoices.length).toBeGreaterThan(0);
+    const elite = { id: 'y', floor: 6, index: 0, type: 'elite' as const, moduleId: 's1_elite_x', next: [] };
+    expect(rollLoot(data, run, elite).relic).not.toBeNull();
+    run.abyss!.oath = 5; // 막아선 자: 6층 엘리트
+    expect(rollLoot(data, run, elite).relic).toBeNull();
+    expect(rollLoot(data, run, { ...elite, floor: 4 }).relic).not.toBeNull();
   });
 
   it('시작: 동료 수에 따라 덱 14·18·22장, 2명이면 골드 +50, 보유 목록은 비어 있다', () => {
@@ -115,15 +145,23 @@ describe('심연', () => {
     expect(s6.enemyHitCap).toBe(Math.floor(70 * data.balance.abyss.oneHitCap));
   });
 
-  it('제거: 휴식의 버리기(고른 카드), 상점 지우기는 쓸수록 비싸다', () => {
+  it('제거: 휴식의 쉬고 버리기(회복 + 고른 카드, 굽이마다 한 번), 상점 지우기는 쓸수록 비싸다', () => {
     const run = start('C1', ['elia']);
     const rest = [...data.modules.values()].find((m) => m.type === 'rest' && m.stage === 's1')!;
+    const haun = run.roster.find((r) => r.id === 'haun')!;
+    haun.hp = 20;
     const choices = choicesFor(data, run, rest);
-    const i = choices.findIndex((c) => c.label.startsWith('버리기'));
+    const i = choices.findIndex((c) => c.label.startsWith('쉬고 버리기'));
     expect(i).toBeGreaterThanOrEqual(0);
+    expect(choices.some((c) => c.label.startsWith('버리기'))).toBe(false);
     const target = run.deck[3];
     applyChoice(data, run, rest, i, target.uid);
     expect(run.deck.some((c) => c.uid === target.uid)).toBe(false);
+    expect(haun.hp).toBeGreaterThan(20);
+    // 같은 굽이에서는 다시 못 쓰고, 다음 굽이에서는 다시 쓴다
+    expect(choicesFor(data, run, rest)[i].disabled).toBe('이번 굽이에 이미 버렸다');
+    run.abyss!.depth += 1;
+    expect(choicesFor(data, run, rest)[i].disabled).toBeUndefined();
 
     run.gold = 500;
     run.shop = null;
@@ -132,6 +170,20 @@ describe('심연', () => {
     expect(buyRemove(data, run, run.deck[0].uid).ok).toBe(true);
     expect(removePrice(data, run)).toBe(p1 + data.balance.abyss.removeStep);
     expect(buyRemove(data, run, run.deck[0].uid).ok).toBe(false); // 상점마다 한 번
+  });
+
+  it('보상 넘어가기: 골드 +skipReward.gold, 또는 고른 카드 한 장을 덱에서 뺀다(심연만)', () => {
+    const run = start('K1', ['elia']);
+    const cfg = data.balance.abyss.skipReward;
+    const gold = run.gold;
+    skipReward(data, run, 'gold');
+    expect(run.gold).toBe(gold + cfg.gold);
+    const target = run.deck[2];
+    const n = run.deck.length;
+    skipReward(data, run, 'remove', target.uid);
+    expect(run.deck.length).toBe(n - 1);
+    expect(run.deck.some((c) => c.uid === target.uid)).toBe(false);
+    expect(skipReward(data, run, 'remove')).toEqual([]); // 고른 카드가 없으면 아무 일도 없다
   });
 
   it('틈의 거래: 본 적 없는 카드는 풀에 들어가고, 부상은 다음 굽이에 낫고, 상흔을 모두 지울 수 있다', () => {
@@ -236,11 +288,12 @@ describe('심연 2차', () => {
     const setup = battleSetupFor(data, run, enc);
     const plain = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [undefined] });
     const tough = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [{ affixes: ['tough', 'venom'] }] });
-    expect(tough.enemies[0].maxHp).toBe(Math.round(plain.enemies[0].maxHp * 1.3));
+    // 체력은 (기본 × 배율 × 1.3)을 한 번에 반올림한다 — 반올림한 값에 1.3을 곱한 것과 1 차이가 날 수 있다
+    expect(Math.abs(tough.enemies[0].maxHp - plain.enemies[0].maxHp * 1.3)).toBeLessThanOrEqual(1);
     expect(tough.enemies[0].name.startsWith('단단한 독기 머금은')).toBe(true);
   });
 
-  it('숙적 성장: 만날 때마다 격노가 2턴 빨라지고 흐름 포식이 쌓이며, 세 번째부터 매듭 4', async () => {
+  it('숙적 성장: 첫 만남은 옅은 잔향(격노 2턴 늦게·덜 먹음), 그 뒤 만날 때마다 격노가 빨라지고 흐름 포식이 쌓이며, 세 번째부터 매듭 4', async () => {
     const { abyssEnemyMods } = await import('../src/engine/abyss');
     const run = start('N1', ['elia']);
     const nem = data.balance.abyss.nemesisModule;
@@ -249,9 +302,48 @@ describe('심연 2차', () => {
       ab.loops = Array.from({ length: n }, (_, i) => ({ depth: (i + 1) * 5, world: 'rift' as const, boss: nem, stageId: 's9' }));
       return abyssEnemyMods(data, run, nem, { id: 'boss' }, ['mordecai'])[0]!;
     };
-    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: 0 });
+    const faint = data.balance.abyss.nemesis.faint!;
+    const borders = data.balance.abyss.nemesis.borderHpScale!;
+    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: -faint.enrageDelay, feedMul: faint.feedMul, transformHpScale: borders[0] });
+    expect(mods(2).transformHpScale).toBe(borders[1]);
+    expect(mods(9).transformHpScale).toBe(borders[borders.length - 1]);
     expect(mods(2).enrageShift).toBe(2);
+    expect(mods(2).feedMul).toBeUndefined();
     expect(mods(3).traits).toContainEqual({ status: 'knot', stacks: 4 });
+
+    // 옅은 잔향: 격노가 늦고, 흐름을 실은 카드의 피해를 덜 먹는다
+    const enrage = data.enemies.get('mordecai')!.enrage!.afterTurn;
+    const st = { data, scar: 0, enemyHpScale: 1, enemies: [] };
+    const weak = spawnEnemy(st, 'mordecai', 0, mods(1));
+    const full = spawnEnemy(st, 'mordecai', 0, mods(2));
+    expect(weak.enrageAt).toBe(enrage + faint.enrageDelay);
+    expect(full.enrageAt).toBe(enrage - 2);
+    expect(weak.feedMul).toBe(faint.feedMul);
+    expect(full.feedMul).toBeUndefined();
+    expect(weak.transformHpScale).toBe(borders[0]);
+  });
+
+  it('숙적이 변신한 찢긴 경계의 체력은 굽이 배율이 아니라 만남마다의 배율을 따른다', () => {
+    const run = start('B1', ['elia']);
+    const nem = data.balance.abyss.nemesisModule;
+    const ab = run.abyss!;
+    ab.depth = 10;
+    ab.loops = [5, 10].map((depth) => ({ depth, world: 'rift' as const, boss: nem, stageId: 's9' }));
+    run.scar = 6;
+    const enc = { module: data.modules.get(nem)!, node: { id: 'boss', floor: 9, index: 0, type: 'boss' as const, moduleId: nem, next: [] } };
+    const s = createBattle(data, battleSetupFor(data, run, enc as never));
+    const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_stop_ring'), m.uid);
+    m.hp = 1;
+    m.statuses = {};
+    m.block = 0;
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_place_blade'), m.uid);
+    const border = s.enemies.find((e) => e.defId === 'torn_border')!;
+    const def = data.enemies.get('torn_border')!;
+    const tier = data.balance.enemyTiers[def.tier]?.hp ?? 1;
+    const scale = data.balance.abyss.nemesis.borderHpScale![1];
+    expect(border.maxHp).toBe(Math.round((def.maxHp + (def.hpPerScar ?? 0) * s.scar) * scale * tier));
+    expect(s.enemyHpScale!).toBeGreaterThan(scale); // 굽이 배율이었으면 훨씬 컸다
   });
 
   it('3굽이 사건: 동료 자리가 남았으면 구원(합류 + 시작 카드 4장), 가득하면 틈의 메아리', () => {
