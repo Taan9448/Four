@@ -15,3 +15,5 @@ Cell 2: full body, side view facing left, same proportions, squatting low
 Cells 3 to 4 are completely empty magenta.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: The skin is olive green (#2f5a3a / #6aa84f tones) with sickly yellow spots; no brown body. Change ONLY the base SKIN COLOR of both toads to clearly OLIVE GREEN. Preserve the same warty bulky body, sickly yellow spots, gold eyes, wide mouth, squat legs, scale and two poses from the attached original. Cell1 three-quarter front, cell2 LEFT-facing side. Both remain entirely within own top cells with same baseline; bottom2 cells remain pure magenta. Use green palette for the dominant skin and distinct yellow ONLY for spots, not dominant yellow/brown skin.
