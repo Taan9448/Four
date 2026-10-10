@@ -1,0 +1,36 @@
+{
+  "id": "fire_spirit_attack",
+  "type": "character-anim",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 6.385,
+  "gridDetected": true,
+  "nativeSize": [
+    81,
+    80
+  ],
+  "fit": "pad",
+  "frames": 3,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "hit": 4
+  },
+  "blend": "normal",
+  "facing": "left",
+  "fallbackLevel": 2,
+  "virtualFrames": 6,
+  "sourceHash": "566d1544f314c376",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.517
+}
