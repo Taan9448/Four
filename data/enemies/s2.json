@@ -9,7 +9,7 @@
     "color": "#f2a03a",
     "hitFx": "fx_hit_fire",
     "pattern": "cycle",
-    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 2, "element": "fire"}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "element": "fire"}]}],
+    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 3, "times": 2, "element": "fire"}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "element": "fire"}]}],
     "flavor": "협곡의 화로에서 불길 한 덩이가 떨어져 나와 사람의 형상으로 일어섰다. 화로가 꺼지지 않는 한 불씨는 다시 일어선다.",
     "weak": ["ice"],
     "resist": ["fire"]
