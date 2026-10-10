@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: a Blood Cultist, a rank-and-file follower of the Heavenly Demon Cult; a gaunt man in a dark blood-red martial robe with a blood-drop crest on the chest, a red headband, a thin heavy dark red aura clinging to the body, a broad blood-red saber.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Cell 1: full body, three-quarter front view, a gaunt man in a dark blood-red martial robe with a blood-drop crest on the chest, a red headband, a faint dark red aura, a broad saber
+Cell 2: full body, side view facing left, same proportions, saber held low
+Cells 3 to 4 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Redraw as a MUCH SIMPLER smaller gaunt cultist. Body head-to-boots exactly about 96 pixel blocks tall (384 source pixels if blocks are 4px); if canvas comes out larger than requested, do not enlarge the body to fill it. Boots on the same row 115, broad blade and aura must also stay at least TEN native blocks inside all edges. Use ONLY SIX flat colors: #1d2433 navy outline, hair and boots; #5a1020 deep blood red; #a02634 crimson; #ff3b3b simple blood-drop crest and a few blade accents; #f2c8a0 skin; #c98f6b skin shadow. No gold trim or ornaments, no intricate robe designs, no metal silver, no added armor. A plain dark red robe with ONE SIMPLE blood-drop chest crest, short red headband ends, a wide undecorated BLOOD-RED saber. The faint dark-red aura is ONLY a few sparse solid dark-red blocks hugging the silhouette, no large flame tendrils, no airborne sparks, no floor puddle. All equal solid square blocks, hard edges, no blur, gradient or noise. Same gaunt face and slim frame in both views, first front 3/4, second true left profile with saber low.
