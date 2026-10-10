@@ -29,6 +29,7 @@ import {
   enterNode,
   isBattle,
   rewardOptions,
+  skipReward,
   setParty,
   upgradeCandidates,
   type RunOptions,
@@ -314,6 +315,19 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   return best;
 }
 
+/** 심연 보상 넘어가기: 골드와 한 장 지우기 중 런 점수가 높은 쪽 */
+function decideSkip(data: GameData, run: RunState): void {
+  const pick = pickRemoval(data, run);
+  const gold = structuredClone(run);
+  skipReward(data, gold, 'gold');
+  if (pick) {
+    const removed = structuredClone(run);
+    skipReward(data, removed, 'remove', pick);
+    if (scoreRun(data, removed) > scoreRun(data, gold)) return void skipReward(data, run, 'remove', pick);
+  }
+  skipReward(data, run, 'gold');
+}
+
 /** 상점: 유물(비싼 등급부터) → 값진 카드 → 물약 → 남으면 편성에 없는 가장 약한 카드 바꾸기 */
 function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOptions): void {
   const shop = openShop(data, run, nodeId);
@@ -400,6 +414,18 @@ export interface BattleRecord {
   haunBefore: number;
   haunAfter: number;
   rift: number;
+  /** 변신(모르데카이 → 찢긴 경계 등)이 일어난 턴(없으면 undefined) */
+  transformTurn?: number;
+}
+
+/** 전투 사건에서 첫 변신이 일어난 턴 */
+function transformTurn(s: BattleState): number | undefined {
+  let turn = 1;
+  for (const e of s.events) {
+    if (e.type === 'turn') turn = e.turn;
+    if (e.type === 'transform') return turn;
+  }
+  return undefined;
 }
 
 export interface RunReport {
@@ -574,6 +600,7 @@ export function playAbyss(
         haunBefore,
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
+        transformTurn: transformTurn(state),
       });
       applyBattleOutcome(data, run, enc, outcome);
       if (outcome.result === 'defeat') {
@@ -589,6 +616,7 @@ export function playAbyss(
       run.levelLog = [];
       const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
       if (card) addCard(data, run, card);
+      else decideSkip(data, run);
     } else if (enc.module.type === 'shop') {
       shopTurn(data, run, enc.node.id, opts);
     } else {

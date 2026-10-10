@@ -369,6 +369,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     const scale = abyssScale(data, run.abyss!.depth);
     const norm = stageNorm(data, own?.id ?? run.stageId);
     const shadow = enc.node.type === 'elite' && run.relics.some((id) => data.relics.get(id)?.rule === 'reveal_map') ? data.balance.abyss.shadowEliteDmg : 1;
+    const boss = enc.node.type === 'boss' && enc.module.id !== data.balance.abyss.nemesisModule ? data.balance.abyss.bossDmgMul : 1;
     const haun = run.roster.find((r) => r.id === 'haun')!;
     return {
       world: own?.world ?? run.abyss!.world,
@@ -388,7 +389,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       manaRule: mana ?? own?.mana ?? stage.mana,
       // 서약 '두꺼운 살'
       enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1),
-      enemyDmgScale: scale.dmg * norm.dmg * shadow,
+      enemyDmgScale: scale.dmg * norm.dmg * shadow * boss,
       relics: run.relics,
       potions: run.potions,
       partyMax: data.balance.abyss.partyMax,
@@ -650,6 +651,8 @@ export interface ChoiceView {
   outcomes?: { weight: number; effects: Effect[]; result: string }[];
   /** 고를 수 없는 까닭(골드 부족 등). 있으면 흐리게 보인다 */
   disabled?: string;
+  /** 심연 휴식 '쉬고 버리기'(굽이마다 횟수 제한) */
+  restDiscard?: true;
 }
 
 export function choicesFor(data: GameData, run: RunState, module: ModuleDef): ChoiceView[] {
@@ -665,9 +668,21 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
       source: 'module' as const,
       disabled: c.condition?.goldGte !== undefined && run.gold < c.condition.goldGte ? `골드 ${c.condition.goldGte} 필요` : undefined,
     }));
-  // 심연의 휴식: 카드 버리기(1장), 부상이 있으면 치료(GAME_DESIGN 16절)
+  // 심연의 휴식: 쉬고 버리기(쉬기와 함께 카드 1장, 굽이마다 restDiscards번), 부상이 있으면 치료(GAME_DESIGN 16절)
   if (module.type === 'rest' && isAbyss(run)) {
-    list.push({ label: '버리기 — 덱에서 카드 한 장을 뺀다', effects: [{ op: 'remove_card', choose: true }], result: '짐을 덜었다.', source: 'module' });
+    const ab = run.abyss!;
+    const rest = list.find((c) => c.effects.some((e) => e.op === 'heal_party'));
+    const used = ab.restDiscard?.depth === ab.depth ? ab.restDiscard.used : 0;
+    const limit = data.balance.abyss.restDiscards;
+    if (limit > 0)
+      list.push({
+        label: '쉬고 버리기 — 쉬고, 덱에서 카드 한 장을 뺀다(굽이마다 한 번)',
+        effects: [...(rest?.effects ?? []), { op: 'remove_card', choose: true }],
+        result: '쉬면서 짐을 덜었다.',
+        source: 'module',
+        restDiscard: true,
+        disabled: used >= limit ? '이번 굽이에 이미 버렸다' : run.deck.length <= 1 ? '덱이 너무 적다' : undefined,
+      });
     if (Object.keys(run.abyss!.injuries).length) list.push({ label: '치료 — 부상을 모두 고친다', effects: [{ op: 'cure_injury' }], result: '상처를 싸맸다.', source: 'module' });
     // 꿰매기: 상흔을 덜어 낸다(GAME_DESIGN 16절 — 심연에서 상흔은 자원)
     if (run.scar > 0)
@@ -702,6 +717,10 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
     out.unshift(o.result);
     out.push(...applyRunOps(data, run, o.effects, { pick }));
   }
+  if (choice.restDiscard) {
+    const ab = run.abyss!;
+    ab.restDiscard = { depth: ab.depth, used: (ab.restDiscard?.depth === ab.depth ? ab.restDiscard.used : 0) + 1 };
+  }
   if (module.type === 'rest') out.push(...fireRunRelics(data, run, 'rest'));
   if (isAbyss(run)) trackChoice(data, run, module, [...new Set(choice.effects.map((e) => e.op))]);
   return out;
@@ -726,6 +745,18 @@ export function choiceNeedsPick(choice: { effects: Effect[] }): Effect | undefin
 /** 선택지가 덱에서 뺄 카드를 사람에게 고르게 하는가(pick은 카드 uid) */
 export function choiceRemovePick(choice: { effects: Effect[] }): Effect | undefined {
   return choice.effects.find((e) => e.op === 'remove_card' && e.choose);
+}
+
+/**
+ * 심연: 전투 보상을 넘어갈 때 받는 것(balance.abyss.skipReward). gold — 골드, remove — 고른 카드(pick) 한 장을 덱에서 뺀다.
+ * 캠페인은 아무것도 없다(얻은 카드는 보유로 남으니 넘어갈 이유가 적다)
+ */
+export function skipReward(data: GameData, run: RunState, kind: 'gold' | 'remove', pick?: string): string[] {
+  if (!isAbyss(run)) return [];
+  const cfg = data.balance.abyss.skipReward;
+  if (kind === 'gold') return cfg.gold ? applyRunOps(data, run, [{ op: 'gain_gold', amount: cfg.gold }]) : [];
+  if (!cfg.remove || !pick) return [];
+  return applyRunOps(data, run, [{ op: 'remove_card', choose: true }], { pick });
 }
 
 /** 덱에서 뺄 수 있는 카드(filter에 맞음) */

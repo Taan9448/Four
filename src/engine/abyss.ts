@@ -37,6 +37,8 @@ export interface AbyssState {
   elites: number;
   /** 상점 카드 지우기를 쓴 횟수(쓸수록 비싸진다) */
   removals: number;
+  /** 휴식 '쉬고 버리기'를 쓴 굽이와 그 굽이에서 쓴 횟수(굽이마다 restDiscards번) */
+  restDiscard?: { depth: number; used: number };
   /** 부상: 동료 id → 줄어든 최대 체력(다음 굽이에 돌아온다) */
   injuries: Record<string, number>;
   /** 3차: 서약 단계(0~15), 일일 심연이면 날짜(yyyymmdd)와 그날 모든 굽이에 붙는 법칙 */
@@ -204,7 +206,9 @@ export function abyssPool(data: GameData, collection: Record<string, number>, co
   // 시작 카드는 늘 본 것(어느 저장이든 처음부터 가진다)
   for (const d of data.cards.values()) if (d.pool === 'starter') out[d.id] = 0;
   for (const id of Array.isArray(codexCards) ? codexCards : Object.keys(codexCards)) if (poolable(data.cards.get(id))) out[id] = 0;
-  for (const [id, lv] of Object.entries(collection)) if (poolable(data.cards.get(id))) out[id] = Math.min(lv, data.balance.upgrade.maxLevel);
+  // 가져오는 강화는 importMax(+2)까지: +3 이상은 심연 안 강화로만(2026-10-10, 풀 크기에 따른 난이도 차 줄이기)
+  const cap = Math.min(data.balance.abyss.importMax, data.balance.upgrade.maxLevel);
+  for (const [id, lv] of Object.entries(collection)) if (poolable(data.cards.get(id))) out[id] = Math.min(lv, cap);
   return out;
 }
 
@@ -436,7 +440,7 @@ export const nemesisEncounter = (data: GameData, ab: AbyssState) => ab.loops.fil
 
 /**
  * 전투의 적마다 덧붙이는 것: 접사(엘리트는 굽이에 따라 1~2개, 깊은 굽이에서는 일반 적에도), 숙적 성장
- * (격노가 enrageStep씩 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks)
+ * (격노가 enrageStep씩 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks. 첫 만남은 옅은 잔향 — 격노가 늦고 덜 먹는다)
  */
 export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, node: Pick<MapNode, 'id'>, enemies: string[]): (EnemyMod | undefined)[] {
   const ab = run.abyss!;
@@ -451,7 +455,11 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
       const traits = [];
       if (def.traits.some((t) => t.status === 'flow_eater')) traits.push({ status: 'flow_eater', stacks: n });
       if (def.traits.some((t) => t.status === 'knot')) traits.push({ status: 'knot', stacks: n >= cfg.nemesis.knotFrom ? cfg.nemesis.knotStacks : 1 });
-      return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1) };
+      const borders = cfg.nemesis.borderHpScale;
+      const border = borders ? { transformHpScale: borders[Math.min(n, borders.length) - 1] } : {};
+      const faint = n === 1 ? cfg.nemesis.faint : undefined;
+      if (faint) return { traits, enrageShift: -faint.enrageDelay, feedMul: faint.feedMul, ...border };
+      return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1), ...border };
     }
     const count =
       def.tier === 'elite'
@@ -632,10 +640,16 @@ export function stageNorm(data: GameData, stageId: string): { hp: number; dmg: n
   return out;
 }
 
-/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))) */
+/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). deep.from굽이부터는 굽이마다 deep 단계만큼 오른다 */
 export function abyssScale(data: GameData, depth: number): { hp: number; dmg: number } {
   const cfg = data.balance.abyss;
-  return { hp: cfg.hpBase * (1 + cfg.hpStep * (depth - 1)), dmg: cfg.dmgBase * (1 + cfg.dmgStep * (depth - 1)) };
+  const from = cfg.deep?.from ?? Infinity;
+  const near = Math.min(depth, from) - 1;
+  const far = Math.max(0, depth - from);
+  return {
+    hp: cfg.hpBase * (1 + cfg.hpStep * near + (cfg.deep?.hpStep ?? 0) * far),
+    dmg: cfg.dmgBase * (1 + cfg.dmgStep * near + (cfg.deep?.dmgStep ?? 0) * far),
+  };
 }
 
 /** 점수: 넘은 굽이 × depth + 보스 × boss + 엘리트 × elite + 남은 하운 체력 비율 × hp */

@@ -603,6 +603,10 @@ export const Balance = z
         dmgBase: z.number().positive(),
         hpStep: z.number().min(0),
         dmgStep: z.number().min(0),
+        /** 깊은 굽이 가속(2026-10-10, 2단계): from굽이부터는 굽이마다 hpStep·dmgStep 대신 이 값만큼 오른다 */
+        deep: z.object({ from: z.number().int().positive(), hpStep: z.number().min(0), dmgStep: z.number().min(0) }).strict().optional(),
+        /** 캠페인 보유 카드를 심연 풀로 가져올 때 강화 상한(그 위는 심연 안 강화로만) */
+        importMax: z.number().int().min(0).default(2),
         floors: z.number().int().positive(),
         typeWeights: z.partialRecord(NodeTypeEnum, z.number()),
         forcedTypes: z.record(z.string(), NodeTypeEnum),
@@ -617,8 +621,14 @@ export const Balance = z
         riftCardChance: z.number().min(0).max(1),
         removePrice: z.number().int().min(0),
         removeStep: z.number().int().min(0),
+        /** 휴식 '쉬고 버리기'(쉬기와 버리기를 함께)를 굽이마다 몇 번 쓸 수 있는가(2026-10-10, 2단계 덱 솎기) */
+        restDiscards: z.number().int().min(0).default(1),
+        /** 보상을 넘어갈 때 고르는 것: 골드 gold, 또는(remove) 덱에서 한 장 지우기 — 넘어가는 것이 손해가 아니게(2026-10-10) */
+        skipReward: z.object({ gold: z.number().int().min(0), remove: z.boolean() }).strict().default({ gold: 0, remove: false }),
         shopRiftPrice: z.partialRecord(Rarity, z.number().int().positive()),
         oneHitCap: z.number().min(0).max(1),
+        /** 숙적이 아닌 굽이 보스의 피해 배율(2026-10-10, 2단계: 보스도 무섭게 해 숙적에 몰린 죽음을 나눈다) */
+        bossDmgMul: z.number().positive().default(1),
         injuryRatio: z.number().min(0).max(1),
         shadowEliteDmg: z.number().positive(),
         needleRewardChoices: z.number().int().positive(),
@@ -646,8 +656,23 @@ export const Balance = z
         eventFloor: z.number().int().positive(),
         rescueModule: z.string(),
         echoModule: z.string(),
-        /** 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks */
-        nemesis: z.object({ enrageStep: z.number().int().min(0), knotFrom: z.number().int().positive(), knotStacks: z.number().int().positive() }).strict(),
+        /**
+         * 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks.
+         * faint — 첫 만남은 '옅은 잔향'(2026-10-10, 2단계): 격노가 enrageDelay턴 늦고 흐름 포식이 먹는 양 ×feedMul
+         */
+        nemesis: z
+          .object({
+            enrageStep: z.number().int().min(0),
+            knotFrom: z.number().int().positive(),
+            knotStacks: z.number().int().positive(),
+            faint: z.object({ enrageDelay: z.number().int().min(0), feedMul: z.number().min(0) }).strict().optional(),
+            /**
+             * 변신한 뒤(찢긴 경계)의 체력 배율 — 만날 때마다 [첫째, 둘째, 셋째 이후]. 굽이 배율 대신 쓴다:
+             * 경계는 실 카드(피해가 오르지 않는다)로만 꿰매므로 굽이 배율을 따르면 깊을수록 끝없이 길어졌다(5굽이 평균 26턴, 2026-10-10)
+             */
+            borderHpScale: z.array(z.number().positive()).min(1).optional(),
+          })
+          .strict(),
         // ── 3차(메타) ──
         /** 서약: 점수 배율(단계마다 곱), 열리는 단계 = 넘은 굽이 - depthOffset, 또는 그 단계 바로 아래로 stepDepth굽이를 넘으면 */
         oath: z.object({ scoreMul: z.number().positive(), depthOffset: z.number().int().min(0), stepDepth: z.number().int().positive() }).strict(),
