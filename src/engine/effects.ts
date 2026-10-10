@@ -113,7 +113,12 @@ export function amountOf(state: BattleState, effect: Effect, target: Combatant |
 export interface EnemyMod {
   affixes?: string[];
   traits?: { status: string; stacks: number }[];
+  /** 격노를 당기는 턴 수(음수면 늦춘다) */
   enrageShift?: number;
+  /** 흐름 포식이 먹는 양 배율 */
+  feedMul?: number;
+  /** 변신한 모습의 체력 배율(전투의 적 체력 배율 대신) */
+  transformHpScale?: number;
 }
 
 export function spawnEnemy(state: Pick<BattleState, 'data' | 'scar' | 'enemyHpScale' | 'enemies'>, id: string, index: number, mod?: EnemyMod): EnemyState {
@@ -135,6 +140,8 @@ export function spawnEnemy(state: Pick<BattleState, 'data' | 'scar' | 'enemyHpSc
   };
   if (affixes.length) enemy.affixes = affixes.map((a) => a.id);
   if (def.enrage && mod?.enrageShift) enemy.enrageAt = Math.max(1, def.enrage.afterTurn - mod.enrageShift);
+  if (mod?.feedMul !== undefined && mod.feedMul !== 1) enemy.feedMul = mod.feedMul;
+  if (mod?.transformHpScale !== undefined) enemy.transformHpScale = mod.transformHpScale;
   return enemy;
 }
 
@@ -350,8 +357,8 @@ export function dealDamage(
 
   // 흐름 포식: 흐름을 쓴 카드의 피해를 먹는다
   if (usesFlow && target.statuses.flow_eater > 0) {
-    // 스택이 쌓이면(심연의 숙적) 먹는 양이 스택마다 50% 늘어난다
-    const fed = Math.floor(dmg * (1 + 0.5 * (target.statuses.flow_eater - 1)));
+    // 스택이 쌓이면(심연의 숙적) 먹는 양이 스택마다 50% 늘어난다. 옅은 잔향(첫 만남)은 feedMul만큼만 먹는다
+    const fed = Math.floor(dmg * (1 + 0.5 * (target.statuses.flow_eater - 1)) * ((target as EnemyState).feedMul ?? 1));
     target.maxHp += fed;
     target.hp += fed;
     state.events.push({ type: 'damage', sourceUid: source?.uid ?? null, targetUid: target.uid, amount: fed, blocked: 0, grain, absorbed: true });
@@ -496,7 +503,7 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   enemy.defId = into.id;
   enemy.name = into.name;
   const tier = state.data.balance.enemyTiers[into.tier];
-  enemy.maxHp = Math.round((into.maxHp + (into.hpPerScar ?? 0) * state.scar) * (state.enemyHpScale ?? 1) * (tier?.hp ?? 1));
+  enemy.maxHp = Math.round((into.maxHp + (into.hpPerScar ?? 0) * state.scar) * (enemy.transformHpScale ?? state.enemyHpScale ?? 1) * (tier?.hp ?? 1));
   enemy.dmgMul = tier?.dmg ?? 1;
   enemy.hp = enemy.maxHp;
   enemy.block = 0;

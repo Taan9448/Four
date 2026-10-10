@@ -382,6 +382,10 @@ describe('폴더 소유권 검사', () => {
   it('manifest.json은 누구도 커밋할 수 없고, art 브랜치 이름은 형식을 지켜야 한다', () => {
     expect(checkOwnership('feat/x', ['assets/manifest.json']).length).toBe(1);
     expect(checkOwnership('art/haun', ['assets/source/haun_ref.png']).length).toBe(1);
+    // 다시 그리기 브랜치
+    expect(checkOwnership('art/464-veilak_idle-fix', ['assets/source/veilak_idle.png'])).toEqual([]);
+    expect(checkOwnership('art/464-veilak_idle-fix-2', ['assets/source/veilak_idle.png'])).toEqual([]);
+    expect(checkOwnership('art/464-veilak_idle-redo', ['assets/source/veilak_idle.png']).length).toBe(1);
   });
 });
 

@@ -9,7 +9,7 @@
     "color": "#f2a03a",
     "hitFx": "fx_hit_fire",
     "pattern": "cycle",
-    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 4, "times": 2, "element": "fire"}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 8, "element": "fire"}]}],
+    "moves": [{"id": "sparks", "name": "불티", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 3, "times": 2, "element": "fire"}]}, {"id": "forge_breath", "name": "화로의 숨", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}]}, {"id": "flame_fall", "name": "불길 덮치기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 7, "element": "fire"}]}],
     "flavor": "협곡의 화로에서 불길 한 덩이가 떨어져 나와 사람의 형상으로 일어섰다. 화로가 꺼지지 않는 한 불씨는 다시 일어선다.",
     "weak": ["ice"],
     "resist": ["fire"]
@@ -51,7 +51,7 @@
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "shackle", "name": "사슬 채우기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies", "element": "fire"}]}, {"id": "overseer_spear", "name": "감독관의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 18}]}, {"id": "call_armor", "name": "감시대를 부른다", "intent": "special", "effects": [{"op": "block", "amount": 8, "target": "self"}, {"op": "summon", "enemy": "ash_armor"}], "oncePerBattle": true}],
+    "moves": [{"id": "shackle", "name": "사슬 채우기", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "weak", "stacks": 2}]}, {"id": "heat_chains", "name": "사슬 달구기", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies", "element": "fire"}]}, {"id": "overseer_spear", "name": "감독관의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 16}]}, {"id": "call_armor", "name": "감시대를 부른다", "intent": "special", "effects": [{"op": "block", "amount": 8, "target": "self"}, {"op": "summon", "enemy": "ash_armor"}], "oncePerBattle": true}],
     "flavor": "다른 빈 갑옷보다 머리 하나 큰 갑옷. 손에 쥔 굵은 사슬이 쇠기둥을 지나 큰 화로까지 거미줄처럼 이어져 있다. 사슬을 하나 끊으면 큰 화로가 알아챈다."
   },
   {

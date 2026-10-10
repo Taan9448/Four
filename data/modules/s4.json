@@ -92,7 +92,7 @@
     "name": "묻히지 않은 갑옷들",
     "weight": 1,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "두린의 산사태가 미처 닿지 못한 자리. 빈 갑옷 셋이 창을 겨눈 채 갱도를 지키고 있다.", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 붉은 검이 쇠를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "두린의 산사태가 미처 닿지 못한 자리. 빈 갑옷 셋이 창을 겨눈 채 갱도를 지키고 있다. (적 전원 힘 1)", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 붉은 검이 쇠를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s4_elite_closing_cave",
@@ -101,7 +101,7 @@
     "name": "오므라드는 동굴",
     "weight": 1,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다.", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +8)", "effects": [{"op": "block", "amount": 8, "target": "self"}]}}
+    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다. (적 전원 힘 1)", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +8)", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s4_event_wall_left",
