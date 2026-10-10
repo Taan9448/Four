@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { gameData } from '../src/engine/data';
 import {
   abyssPool,
+  abyssScale,
   abyssStage,
   advanceLoop,
   createAbyssRun,
@@ -33,6 +34,34 @@ describe('심연', () => {
     expect(pool.kyle_strike).toBe(0);
     expect(pool.haun_byeogun).toBeUndefined(); // 이야기 카드
     expect(Object.keys(pool).every((id) => ['starter', 'reward'].includes(data.cards.get(id)!.pool))).toBe(true);
+    // 가져오는 강화는 importMax(+2)까지
+    expect(abyssPool(data, { elia_fireball: 5 }, []).elia_fireball).toBe(data.balance.abyss.importMax);
+  });
+
+  it('배율: deep.from굽이부터 굽이마다 더 가파르게 오른다', () => {
+    const ab = data.balance.abyss;
+    const deep = ab.deep!;
+    const at = (n: number) => abyssScale(data, n);
+    expect(at(1)).toEqual({ hp: ab.hpBase, dmg: ab.dmgBase });
+    expect(at(deep.from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (deep.from - 1)));
+    expect(at(deep.from + 1).hp - at(deep.from).hp).toBeCloseTo(ab.hpBase * deep.hpStep);
+    expect(at(deep.from + 1).dmg - at(deep.from).dmg).toBeCloseTo(ab.dmgBase * deep.dmgStep);
+    expect(at(deep.from).hp - at(deep.from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+  });
+
+  it('숙적과 서약 막아선 자의 엘리트는 유물을 떨구지 않는다(골드는 그대로)', async () => {
+    const { rollLoot } = await import('../src/engine/economy');
+    const run = start('NL1', ['elia']);
+    const nem = { id: 'x', floor: 9, index: 0, type: 'boss' as const, moduleId: data.balance.abyss.nemesisModule, next: [] };
+    const boss = { ...nem, moduleId: 's1_boss_veilak' };
+    expect(rollLoot(data, run, nem).relicChoices).toEqual([]);
+    expect(rollLoot(data, run, nem).gold).toBeGreaterThan(0);
+    expect(rollLoot(data, run, boss).relicChoices.length).toBeGreaterThan(0);
+    const elite = { id: 'y', floor: 6, index: 0, type: 'elite' as const, moduleId: 's1_elite_x', next: [] };
+    expect(rollLoot(data, run, elite).relic).not.toBeNull();
+    run.abyss!.oath = 5; // 막아선 자: 6층 엘리트
+    expect(rollLoot(data, run, elite).relic).toBeNull();
+    expect(rollLoot(data, run, { ...elite, floor: 4 }).relic).not.toBeNull();
   });
 
   it('시작: 동료 수에 따라 덱 14·18·22장, 2명이면 골드 +50, 보유 목록은 비어 있다', () => {

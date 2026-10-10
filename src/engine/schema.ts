@@ -603,6 +603,10 @@ export const Balance = z
         dmgBase: z.number().positive(),
         hpStep: z.number().min(0),
         dmgStep: z.number().min(0),
+        /** 깊은 굽이 가속(2026-10-10, 2단계): from굽이부터는 굽이마다 hpStep·dmgStep 대신 이 값만큼 오른다 */
+        deep: z.object({ from: z.number().int().positive(), hpStep: z.number().min(0), dmgStep: z.number().min(0) }).strict().optional(),
+        /** 캠페인 보유 카드를 심연 풀로 가져올 때 강화 상한(그 위는 심연 안 강화로만) */
+        importMax: z.number().int().min(0).default(2),
         floors: z.number().int().positive(),
         typeWeights: z.partialRecord(NodeTypeEnum, z.number()),
         forcedTypes: z.record(z.string(), NodeTypeEnum),

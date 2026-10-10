@@ -204,7 +204,9 @@ export function abyssPool(data: GameData, collection: Record<string, number>, co
   // 시작 카드는 늘 본 것(어느 저장이든 처음부터 가진다)
   for (const d of data.cards.values()) if (d.pool === 'starter') out[d.id] = 0;
   for (const id of Array.isArray(codexCards) ? codexCards : Object.keys(codexCards)) if (poolable(data.cards.get(id))) out[id] = 0;
-  for (const [id, lv] of Object.entries(collection)) if (poolable(data.cards.get(id))) out[id] = Math.min(lv, data.balance.upgrade.maxLevel);
+  // 가져오는 강화는 importMax(+2)까지: +3 이상은 심연 안 강화로만(2026-10-10, 풀 크기에 따른 난이도 차 줄이기)
+  const cap = Math.min(data.balance.abyss.importMax, data.balance.upgrade.maxLevel);
+  for (const [id, lv] of Object.entries(collection)) if (poolable(data.cards.get(id))) out[id] = Math.min(lv, cap);
   return out;
 }
 
@@ -636,10 +638,16 @@ export function stageNorm(data: GameData, stageId: string): { hp: number; dmg: n
   return out;
 }
 
-/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))) */
+/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). deep.from굽이부터는 굽이마다 deep 단계만큼 오른다 */
 export function abyssScale(data: GameData, depth: number): { hp: number; dmg: number } {
   const cfg = data.balance.abyss;
-  return { hp: cfg.hpBase * (1 + cfg.hpStep * (depth - 1)), dmg: cfg.dmgBase * (1 + cfg.dmgStep * (depth - 1)) };
+  const from = cfg.deep?.from ?? Infinity;
+  const near = Math.min(depth, from) - 1;
+  const far = Math.max(0, depth - from);
+  return {
+    hp: cfg.hpBase * (1 + cfg.hpStep * near + (cfg.deep?.hpStep ?? 0) * far),
+    dmg: cfg.dmgBase * (1 + cfg.dmgStep * near + (cfg.deep?.dmgStep ?? 0) * far),
+  };
 }
 
 /** 점수: 넘은 굽이 × depth + 보스 × boss + 엘리트 × elite + 남은 하운 체력 비율 × hp */

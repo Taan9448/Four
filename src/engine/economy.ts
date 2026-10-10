@@ -4,7 +4,7 @@ import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
-import { abyssShopPool, abyssShopRift, isAbyss, removePrice } from './abyss';
+import { abyssShopPool, abyssShopRift, isAbyss, removePrice, runOath } from './abyss';
 
 type Tier = 'common' | 'uncommon' | 'rare';
 
@@ -44,8 +44,10 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, [...data.potions.values()], eco.potionWeights)?.id ?? null) : null;
   let relic: string | null = null;
   let relicChoices: string[] = [];
-  if (kind === 'elite') relic = pickByTier(rng, relicPool(data, run), eco.relicWeights.elite)?.id ?? null;
-  if (kind === 'boss') {
+  // 심연의 숙적·서약 '막아선 자'의 엘리트는 유물을 떨구지 않는다(2026-10-10: 숙적이 잦은 서약이 유물 때문에 봇에게 이득이던 것)
+  const noRelic = isAbyss(run) && (node.moduleId === data.balance.abyss.nemesisModule || (kind === 'elite' && node.floor === runOath(data, run).eliteFloor));
+  if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run), eco.relicWeights.elite)?.id ?? null;
+  if (kind === 'boss' && !noRelic) {
     const boss = rng.shuffle([...data.relics.values()].filter((r) => r.rarity === 'boss' && !run.relics.includes(r.id))).map((r) => r.id);
     const rare = rng.shuffle(relicPool(data, run).filter((r) => r.rarity === 'rare')).map((r) => r.id);
     relicChoices = [...boss, ...rare].slice(0, eco.bossRelicChoices);
