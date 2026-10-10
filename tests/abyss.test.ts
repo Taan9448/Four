@@ -288,7 +288,8 @@ describe('심연 2차', () => {
     const setup = battleSetupFor(data, run, enc);
     const plain = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [undefined] });
     const tough = createBattle(data, { ...setup, enemies: [elite.id], enemyMods: [{ affixes: ['tough', 'venom'] }] });
-    expect(tough.enemies[0].maxHp).toBe(Math.round(plain.enemies[0].maxHp * 1.3));
+    // 체력은 (기본 × 배율 × 1.3)을 한 번에 반올림한다 — 반올림한 값에 1.3을 곱한 것과 1 차이가 날 수 있다
+    expect(Math.abs(tough.enemies[0].maxHp - plain.enemies[0].maxHp * 1.3)).toBeLessThanOrEqual(1);
     expect(tough.enemies[0].name.startsWith('단단한 독기 머금은')).toBe(true);
   });
 
