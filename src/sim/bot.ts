@@ -400,6 +400,18 @@ export interface BattleRecord {
   haunBefore: number;
   haunAfter: number;
   rift: number;
+  /** 변신(모르데카이 → 찢긴 경계 등)이 일어난 턴(없으면 undefined) */
+  transformTurn?: number;
+}
+
+/** 전투 사건에서 첫 변신이 일어난 턴 */
+function transformTurn(s: BattleState): number | undefined {
+  let turn = 1;
+  for (const e of s.events) {
+    if (e.type === 'turn') turn = e.turn;
+    if (e.type === 'transform') return turn;
+  }
+  return undefined;
 }
 
 export interface RunReport {
@@ -574,6 +586,7 @@ export function playAbyss(
         haunBefore,
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
+        transformTurn: transformTurn(state),
       });
       applyBattleOutcome(data, run, enc, outcome);
       if (outcome.result === 'defeat') {
