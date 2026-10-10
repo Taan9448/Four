@@ -621,6 +621,10 @@ export const Balance = z
         riftCardChance: z.number().min(0).max(1),
         removePrice: z.number().int().min(0),
         removeStep: z.number().int().min(0),
+        /** 휴식 '쉬고 버리기'(쉬기와 버리기를 함께)를 굽이마다 몇 번 쓸 수 있는가(2026-10-10, 2단계 덱 솎기) */
+        restDiscards: z.number().int().min(0).default(1),
+        /** 보상을 넘어갈 때 고르는 것: 골드 gold, 또는(remove) 덱에서 한 장 지우기 — 넘어가는 것이 손해가 아니게(2026-10-10) */
+        skipReward: z.object({ gold: z.number().int().min(0), remove: z.boolean() }).strict().default({ gold: 0, remove: false }),
         shopRiftPrice: z.partialRecord(Rarity, z.number().int().positive()),
         oneHitCap: z.number().min(0).max(1),
         /** 숙적이 아닌 굽이 보스의 피해 배율(2026-10-10, 2단계: 보스도 무섭게 해 숙적에 몰린 죽음을 나눈다) */

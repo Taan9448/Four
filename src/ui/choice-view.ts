@@ -2,7 +2,7 @@
 import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, upgradeCandidates, type RunState } from '../engine/run';
+import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, skipReward, upgradeCandidates, type RunState } from '../engine/run';
 import { swappableCards } from '../engine/collection';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
@@ -217,14 +217,14 @@ function lootLine(data: GameData, run: RunState, shown: LootShown): HTMLElement 
 }
 
 export function rewardView(data: GameData, options: string[], onPick: (cardId: string | null) => void, loot?: { run: RunState; shown: LootShown }): HTMLElement {
-  return h(
-    'section',
-    { class: 'screen reward-screen backdrop' },
-    h(
-      'div',
-      { class: 'choice-box panel reward-box' },
+  const run = loot?.run;
+  // 심연: 넘어가면 골드, 또는 덱에서 한 장 덜어 내기(balance.abyss.skipReward)
+  const skip = run?.abyss ? data.balance.abyss.skipReward : null;
+  const box = h('div', { class: 'choice-box panel reward-box' });
+  const main = () =>
+    box.replaceChildren(
       panelHead('賞', '전투 승리', '전리품'),
-      loot ? lootLine(data, loot.run, loot.shown) : null,
+      ...(loot ? [lootLine(data, loot.run, loot.shown)] : []),
       h('p', { class: 'choice-text' }, '카드 한 장을 골라 덱에 더한다. 마음에 드는 카드가 없으면 넘어간다.'),
       h(
         'div',
@@ -235,9 +235,32 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
           return el;
         }),
       ),
-      h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기')),
-    ),
-  );
+      h(
+        'div',
+        { class: 'panel-actions' },
+        skip?.gold
+          ? h('button', { class: 'btn', onclick: () => (skipReward(data, run!, 'gold'), onPick(null)) }, `넘어가기 — 골드 +${skip.gold}`)
+          : h('button', { class: 'btn', onclick: () => onPick(null) }, '넘어가기'),
+        skip?.remove && run!.deck.length > 1 ? h('button', { class: 'btn', onclick: pickRemove }, '넘어가며 한 장 덜어 내기') : null,
+      ),
+    );
+  const pickRemove = () =>
+    box.replaceChildren(
+      panelHead('棄', '전투 승리', '덜어 낼 카드'),
+      h('p', { class: 'choice-text' }, '보상 대신 덱에서 카드 한 장을 영영 뺀다.'),
+      h(
+        'div',
+        { class: 'reward-cards upgrade-cards' },
+        removeCandidates(data, run!).map((c) => {
+          const el = cardView(data, c);
+          el.addEventListener('click', () => (skipReward(data, run!, 'remove', c.uid), onPick(null)));
+          return el;
+        }),
+      ),
+      h('button', { class: 'btn', onclick: main }, '돌아가기'),
+    );
+  main();
+  return h('section', { class: 'screen reward-screen backdrop' }, box);
 }
 
 /** 보스 전리품: 골드·물약을 받고, 유물 후보 중 하나를 고른다 */

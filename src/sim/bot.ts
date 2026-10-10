@@ -29,6 +29,7 @@ import {
   enterNode,
   isBattle,
   rewardOptions,
+  skipReward,
   setParty,
   upgradeCandidates,
   type RunOptions,
@@ -312,6 +313,19 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
   if (isAbyss(run) && run.deck.length >= 25 && value < RARITY_VALUE.epic) return undefined;
   return best;
+}
+
+/** 심연 보상 넘어가기: 골드와 한 장 지우기 중 런 점수가 높은 쪽 */
+function decideSkip(data: GameData, run: RunState): void {
+  const pick = pickRemoval(data, run);
+  const gold = structuredClone(run);
+  skipReward(data, gold, 'gold');
+  if (pick) {
+    const removed = structuredClone(run);
+    skipReward(data, removed, 'remove', pick);
+    if (scoreRun(data, removed) > scoreRun(data, gold)) return void skipReward(data, run, 'remove', pick);
+  }
+  skipReward(data, run, 'gold');
 }
 
 /** 상점: 유물(비싼 등급부터) → 값진 카드 → 물약 → 남으면 편성에 없는 가장 약한 카드 바꾸기 */
@@ -602,6 +616,7 @@ export function playAbyss(
       run.levelLog = [];
       const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
       if (card) addCard(data, run, card);
+      else decideSkip(data, run);
     } else if (enc.module.type === 'shop') {
       shopTurn(data, run, enc.node.id, opts);
     } else {

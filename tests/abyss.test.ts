@@ -13,7 +13,7 @@ import {
   removePrice,
   riftCards,
 } from '../src/engine/abyss';
-import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, type RunState } from '../src/engine/run';
+import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, skipReward, type RunState } from '../src/engine/run';
 import { createBattle, playCard } from '../src/engine/battle';
 import { spawnEnemy } from '../src/engine/effects';
 import { validateMap } from '../src/engine/route';
@@ -145,15 +145,23 @@ describe('심연', () => {
     expect(s6.enemyHitCap).toBe(Math.floor(70 * data.balance.abyss.oneHitCap));
   });
 
-  it('제거: 휴식의 버리기(고른 카드), 상점 지우기는 쓸수록 비싸다', () => {
+  it('제거: 휴식의 쉬고 버리기(회복 + 고른 카드, 굽이마다 한 번), 상점 지우기는 쓸수록 비싸다', () => {
     const run = start('C1', ['elia']);
     const rest = [...data.modules.values()].find((m) => m.type === 'rest' && m.stage === 's1')!;
+    const haun = run.roster.find((r) => r.id === 'haun')!;
+    haun.hp = 20;
     const choices = choicesFor(data, run, rest);
-    const i = choices.findIndex((c) => c.label.startsWith('버리기'));
+    const i = choices.findIndex((c) => c.label.startsWith('쉬고 버리기'));
     expect(i).toBeGreaterThanOrEqual(0);
+    expect(choices.some((c) => c.label.startsWith('버리기'))).toBe(false);
     const target = run.deck[3];
     applyChoice(data, run, rest, i, target.uid);
     expect(run.deck.some((c) => c.uid === target.uid)).toBe(false);
+    expect(haun.hp).toBeGreaterThan(20);
+    // 같은 굽이에서는 다시 못 쓰고, 다음 굽이에서는 다시 쓴다
+    expect(choicesFor(data, run, rest)[i].disabled).toBe('이번 굽이에 이미 버렸다');
+    run.abyss!.depth += 1;
+    expect(choicesFor(data, run, rest)[i].disabled).toBeUndefined();
 
     run.gold = 500;
     run.shop = null;
@@ -162,6 +170,20 @@ describe('심연', () => {
     expect(buyRemove(data, run, run.deck[0].uid).ok).toBe(true);
     expect(removePrice(data, run)).toBe(p1 + data.balance.abyss.removeStep);
     expect(buyRemove(data, run, run.deck[0].uid).ok).toBe(false); // 상점마다 한 번
+  });
+
+  it('보상 넘어가기: 골드 +skipReward.gold, 또는 고른 카드 한 장을 덱에서 뺀다(심연만)', () => {
+    const run = start('K1', ['elia']);
+    const cfg = data.balance.abyss.skipReward;
+    const gold = run.gold;
+    skipReward(data, run, 'gold');
+    expect(run.gold).toBe(gold + cfg.gold);
+    const target = run.deck[2];
+    const n = run.deck.length;
+    skipReward(data, run, 'remove', target.uid);
+    expect(run.deck.length).toBe(n - 1);
+    expect(run.deck.some((c) => c.uid === target.uid)).toBe(false);
+    expect(skipReward(data, run, 'remove')).toEqual([]); // 고른 카드가 없으면 아무 일도 없다
   });
 
   it('틈의 거래: 본 적 없는 카드는 풀에 들어가고, 부상은 다음 굽이에 낫고, 상흔을 모두 지울 수 있다', () => {

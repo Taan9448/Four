@@ -37,6 +37,8 @@ export interface AbyssState {
   elites: number;
   /** 상점 카드 지우기를 쓴 횟수(쓸수록 비싸진다) */
   removals: number;
+  /** 휴식 '쉬고 버리기'를 쓴 굽이와 그 굽이에서 쓴 횟수(굽이마다 restDiscards번) */
+  restDiscard?: { depth: number; used: number };
   /** 부상: 동료 id → 줄어든 최대 체력(다음 굽이에 돌아온다) */
   injuries: Record<string, number>;
   /** 3차: 서약 단계(0~15), 일일 심연이면 날짜(yyyymmdd)와 그날 모든 굽이에 붙는 법칙 */
