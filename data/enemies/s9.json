@@ -31,7 +31,7 @@
     "id": "bone_giant",
     "name": "뼈 거인",
     "lore": "뼈로 이루어진 거인. 세계의 조각을 밟고 일어서면 키가 떠다니는 성벽의 세 배에 이른다. 뼈 사이로 검붉은 기운이 흘러 틈의 가장 깊은 곳과 이어져 있다. 갈비뼈로 우리를 지어 사람을 가두고, 부서져도 그 기운을 따라 다시 맞물려 일어선다. 내공을 실어 부수면 흩어진 기운이 하늘의 금으로 빨려 올라간다.",
-    "maxHp": 61,
+    "maxHp": 66,
     "sprite": "bone_giant",
     "silhouette": "boss",
     "color": "#d8d0bc",
@@ -39,7 +39,7 @@
     "tier": "elite",
     "pattern": "cycle",
     "traits": [{"status": "hungry", "stacks": 1}],
-    "moves": [{"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 18}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "rib_cage", "name": "갈비뼈 우리", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}],
+    "moves": [{"id": "bone_stomp", "name": "뼈 밟기", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 21}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, {"id": "rib_cage", "name": "갈비뼈 우리", "intent": "defend", "targeting": "random", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "bone_sweep", "name": "뼈 휩쓸기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}],
     "transform": {"triggers": ["downed"], "into": "bone_giant_risen", "text": "뼈가 무너졌다. 그리고 뼈 사이로 흐르는 검붉은 기운을 따라, 다시 맞물려 일어섰다. \"저것들은 그것과 이어져 있어요. 베면, 그것이 알아요.\"", "partyEffects": []},
     "flavor": "뼈로 이루어진 거인. 키가 혈전의 잔해에 닿는다. 뼈 사이로 검붉은 기운이 흘러 틈의 깊은 곳과 이어져 있다. 부서져도 다시 일어선다."
   },

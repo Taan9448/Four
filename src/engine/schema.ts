@@ -830,6 +830,8 @@ export const StageDef = z
     enemyHpScale: z.number().positive().default(1),
     /** 이 스테이지 적의 공격 피해 배율(기본 1). 의도·받을 피해 예고에도 걸린다 */
     enemyDmgScale: z.number().positive().default(1),
+    /** 이 스테이지 보스의 피해 배율(enemyDmgScale에 곱한다). 2026-10-10 2단계: 보스 패배가 상한까지 여유 있는 스테이지만 올려 완주율을 맞춘다 */
+    bossDmgMul: z.number().positive().default(1),
     playable: z.boolean(),
     /** 어디서나 나오는 대가형 사건(stage "*" 모듈)이 이 스테이지 지도에 섞이는가(S0·S9는 아니다) */
     templateEvents: z.boolean().default(true),

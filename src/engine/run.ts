@@ -415,7 +415,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
     enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1),
-    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1),
+    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1),
     relics: run.relics,
     potions: run.potions,
   };

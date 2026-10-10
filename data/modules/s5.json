@@ -100,7 +100,7 @@
     "name": "다섯째 회랑",
     "weight": 2,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"text": "불의 정령, 얼음 기사, 그림자. 세 사천왕의 잔당이 한 회랑을 함께 지킨다. 회랑마다 수문장이 있을 거라던 그롬의 말대로.", "enemies": ["fire_spirit", "ice_knight", "shadow_fragment"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "붉은 검이 불을 삼키고 얼음을 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "불의 정령, 얼음 기사, 그림자. 세 사천왕의 잔당이 한 회랑을 함께 지킨다. 회랑마다 수문장이 있을 거라던 그롬의 말대로. (적 전원 힘 1)", "enemies": ["fire_spirit", "ice_knight", "shadow_fragment"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "붉은 검이 불을 삼키고 얼음을 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s5_elite_corridor_warden",
