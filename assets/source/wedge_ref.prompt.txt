@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: a black iron wedge as long as a forearm driven into the air itself, one end blunt and one end a needle point, engraved with flowing wave-like letters, the air around it twisting and warping like heat haze with thin violet distortion lines; an object floating in place.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Cell 1: full view, three-quarter front view, a forearm-long black iron wedge hanging in the air at a slant, blunt at one end and needle-sharp at the other, engraved with wave-like letters, the air around it warping with thin violet distortion lines
+Cell 2: full view, side view, same proportions, the wedge seen from the side, needle point down
+Cells 3 to 4 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Use ONLY SIX solid colors for both wedges and all distortion lines: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #4b3a6b. Override the previous full palette. The wedge is plain BLACK IRON with only faint one-block grey wave-like engraved marks, not bright silver filigree, jewelry, a sword hilt or ornamental metalwork. Distortion is a few thin flat DARK VIOLET #4b3a6b lines, no pale lavender, pink, glow, blending or gradients. Both wedges have exactly the same physical length, about96 sprite pixels, and the same rectangular blunt end tapering to a needle point. Cell1 is three-quarter view at a slight slant; cell2 is a strict side view with the point straight down. Place both tips on sprite row115, counting from1, and keep at least10 sprite pixels of clear empty space around every effect. Hard solid square blocks, no anti-aliasing, no speckled texture. Bottom two cells entirely empty magenta.
