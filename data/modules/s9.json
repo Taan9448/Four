@@ -117,7 +117,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "불비늘 삼두견 무리가 조각을 건너뛰며 둘러싼다. 머리 셋이 하나의 목으로 모이는 이음매. 장작 패기다.", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일은 목을, 보른은 다리를, 엘리아는 눈을. \"결국 다 장작 패기야.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "불비늘 삼두견 무리가 조각을 건너뛰며 둘러싼다. 머리 셋이 하나의 목으로 모이는 이음매. 장작 패기다. (적 전원 힘 1)", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일은 목을, 보른은 다리를, 엘리아는 눈을. \"결국 다 장작 패기야.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s9_event_toma_wedge",
