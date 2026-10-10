@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a greatsword of smoke, two red lights burning inside the empty helmet. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: preparation pose, raises the smoke greatsword beside the helmet, horse planted in a compact stance
+Cell 2: impact pose, greatsword cleaves down to the left with a tightly curled black smoke arc, horse knees bent
+Cell 3: recovery pose, returns to the reference standing guard stance, greatsword held low
+Cell 4: EMPTY (background only)
+Cell 5: EMPTY (background only)
+Cell 6: EMPTY (background only)
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Fallback level 2: three KEY poses only, all occupying identical scale and matching the attached reference's mounted knight and horse design. Keep mounted head-to-hoof height constant, do not shrink the recovery pose. Grounding hooves all at local y=459. Keep all three colored silhouettes inside local x=48..463,y=48..459 in every 512px cell, including sword tips, smoke and cloak. All lower row cells absolutely pure magenta. Avoid raised arm extending above safe area; keep elbows bent and sword angled beside the helmet. Keep slash close to hand, cape folded close, same horse torso and helmet dimensions. No pixels reach a cell boundary.
