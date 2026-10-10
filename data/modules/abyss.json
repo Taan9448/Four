@@ -27,7 +27,7 @@
     "content": {
       "text": "얼굴 없는 그림자가 길을 막고 선다. 손바닥 위에 아무것도 없는데, 무언가를 팔겠다고 한다. \"덜어 내 주지. 값은 하늘의 금으로.\"",
       "choices": [
-        { "label": "덱에서 카드 한 장을 영구히 덜어 낸다 — 상흔 +2", "effects": [{ "op": "remove_card", "choose": true }, { "op": "scar", "amount": 2 }], "result": "카드가 그림자 속으로 녹아 사라졌다. 어딘가의 하늘이 조금 더 벌어졌다." },
+        { "label": "덱에서 카드 한 장을 영구히 덜어 낸다 — 상흔 +1", "effects": [{ "op": "remove_card", "choose": true }, { "op": "scar", "amount": 1 }], "result": "카드가 그림자 속으로 녹아 사라졌다. 어딘가의 하늘이 조금 더 벌어졌다." },
         { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
         { "label": "지나간다", "effects": [], "result": "그림자는 아무 말 없이 길을 비켰다." }
       ]

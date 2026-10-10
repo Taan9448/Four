@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: the Ore Spider, a giant spider as large as a cart that grew by eating silver in an old mine; a body covered in a hard silver ore shell with rough crystal ridges, eight long jointed legs, a cluster of small dark violet eyes, white silk strands trailing from the abdomen. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: rears up on the hind legs, front legs raised
+Cell 2: the fangs open wide
+Cell 3: lunges forward to the left
+Cell 4: the fangs and front legs strike to the left, a spray of silver shards
+Cell 5: lands back on all legs
+Cell 6: returns to the crouched stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: All six frames are the SIDE view facing left, exactly like cell 2 of the reference sheet; never turn to a front view. Correct frames 1, 2, 5 and 6 to the SAME left profile as frames 3 and 4 and the main idle. Each spider has exactly ONE head and ONE cluster of violet eyes at the LEFT end, a single crystal-shelled abdomen at the RIGHT, and eight angular jointed legs. No duplicated faces, no frontal symmetry, no second head. Keep the same silver ore shell, crystal ridge silhouette, limb shapes and white silk trailing behind to the right. Body height must match the reference profile and idle, about 82 sprite pixels; preserve body scale while the legs rear or strike. Keep feet on the same local row within each sheet row; figures and all silver shards stay fully in their own 512px cells. Arrange SIX poses exactly in a 3-column 2-row grid.
+Fix: Frame 4 must have exactly ONE spider head: the violet eye cluster and TWO downward silver fangs belong together on that SINGLE head at the far LEFT end of the body. The last sheet incorrectly showed a second face and another pair of fangs in the middle of frame 4; remove that duplicate head entirely. The forelegs are jointed silver legs without eyes or fang-like mouths. Apply the same unmistakable LEFT profile anatomy from reference cell 2 in every frame, including the strike. Keep the same body size in all six cells, roughly 83 sprite pixels crown-to-feet at rest (332 source pixels), with shell scale unchanged during the lunge. Target resting shell top y=124 and foot bottom y=455 per cell, including frames 5 and 6. All silk and silver shards stay inside the cell.

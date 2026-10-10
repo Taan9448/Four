@@ -49,7 +49,7 @@
     "color": "#221d2c",
     "traits": [{"status": "incorporeal", "stacks": 1}],
     "pattern": "random",
-    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 9}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "whisper", "name": "그림자 속삭임", "intent": "debuff", "weight": 1, "effects": [{"op": "apply_status", "status": "daze", "stacks": 1}]}],
+    "moves": [{"id": "shadow_blade", "name": "그림자 칼", "intent": "attack", "targeting": "lowest_hp", "weight": 3, "effects": [{"op": "damage", "amount": 8}]}, {"id": "underfoot", "name": "발밑에서", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "scatter", "name": "흩어졌다 일어서기", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 8, "target": "self"}]}, {"id": "whisper", "name": "그림자 속삭임", "intent": "debuff", "weight": 1, "effects": [{"op": "apply_status", "status": "daze", "stacks": 1}]}],
     "flavor": "그림자 암살자가 다스리던 것들의 잔당. 칼날만 실체다. 내공만 실은 칼은 그림자를 스칠 뿐이다."
   },
   {
@@ -76,7 +76,7 @@
     "scale": 1.4,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
+    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 12, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
     "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다."
   },
   {
