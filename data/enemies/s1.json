@@ -61,7 +61,7 @@
     "scale": 1.3,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "sickle_legs", "name": "낫 같은 앞다리", "intent": "attack", "effects": [{"op": "damage", "amount": 8, "times": 2}]}, {"id": "silver_shell", "name": "은빛 껍질", "intent": "defend", "effects": [{"op": "block", "amount": 16, "target": "self"}]}, {"id": "web", "name": "거미줄", "intent": "debuff", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "bind", "stacks": 1}]}],
+    "moves": [{"id": "sickle_legs", "name": "낫 같은 앞다리", "intent": "attack", "effects": [{"op": "damage", "amount": 7, "times": 2}]}, {"id": "silver_shell", "name": "은빛 껍질", "intent": "defend", "effects": [{"op": "block", "amount": 16, "target": "self"}]}, {"id": "web", "name": "거미줄", "intent": "debuff", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 5}, {"op": "apply_status", "status": "bind", "stacks": 1}]}],
     "flavor": "몸통이 수레만 하고, 온몸이 은빛 껍질로 덮였다. 은을 먹고 자란 거미. 불덩이가 껍질에 부딪혀 흩어졌다. \"마법이 튕겨 나가!\" 그러나 다리와 몸통이 만나는 관절, 껍질이 가장 얇아지는 곳에 이음매가 있었다."
   },
   {

@@ -592,7 +592,8 @@ export const Balance = z
       .partialRecord(z.enum(['normal', 'elite', 'boss']), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict())
       .default({}),
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
-    stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
+    /** 캠페인 스테이지: 들어설 때 회복, 보스 피해 배율(2026-10-10 2단계: 보스 패배는 상한까지 여유가 있어 완주율을 보스로 맞춘다) */
+    stage: z.object({ healOnEnter: z.number().min(0).max(1), bossDmgMul: z.number().positive().default(1) }).strict(),
     /**
      * 심연(GAME_DESIGN 16절): 굽이 n의 적 배율 hpBase·dmgBase × (1 + step × (n-1)), 지도 층수·노드 비율, 굽이를 넘을 때 회복,
      * 숙적 굽이, 동료 수별 길 개수·골드, 시작 카드 장수, 틈의 카드가 보상에 섞일 확률, 상점 지우기 가격, 한 방 상한(하운 최대 체력 비율), 점수

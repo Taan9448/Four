@@ -187,7 +187,7 @@
     "chapters": "4권",
     "world": "rift",
     "floors": 10,
-    "enemyHpScale": 1.35,
+    "enemyHpScale": 1.45,
     "enemyDmgScale": 2.3,
     "playable": true,
     "templateEvents": false,
