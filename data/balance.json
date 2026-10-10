@@ -95,7 +95,7 @@
     "dmgBase": 1.0,
     "hpStep": 0.4,
     "dmgStep": 0.27,
-    "deep": { "from": 7, "hpStep": 0.8, "dmgStep": 0.6 },
+    "deep": { "from": 6, "hpStep": 1.0, "dmgStep": 0.8 },
     "importMax": 2,
     "floors": 9,
     "typeWeights": { "battle": 52, "event": 18, "elite": 13, "rest": 8, "shop": 5 },
