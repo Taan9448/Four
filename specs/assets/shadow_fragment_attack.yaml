@@ -8,6 +8,7 @@ depends_on: [shadow_fragment_ref]
 reference: assets/source/shadow_fragment_ref.png
 facing: left
 events: { hit: 4 }
+bbox_tolerance: null   # 그림자로 꺼졌다 솟는 동작: 칸2·5의 납작한 그림자와 선 자세의 높이 차가 동작 자체라 높이 편차를 검사하지 않는다(2026-10-10 검토)
 frame_notes:
   1: "sinks down into the puddle"
   2: "the puddle slides forward to the left"
