@@ -619,6 +619,8 @@ export const Balance = z
         removeStep: z.number().int().min(0),
         shopRiftPrice: z.partialRecord(Rarity, z.number().int().positive()),
         oneHitCap: z.number().min(0).max(1),
+        /** 숙적이 아닌 굽이 보스의 피해 배율(2026-10-10, 2단계: 보스도 무섭게 해 숙적에 몰린 죽음을 나눈다) */
+        bossDmgMul: z.number().positive().default(1),
         injuryRatio: z.number().min(0).max(1),
         shadowEliteDmg: z.number().positive(),
         needleRewardChoices: z.number().int().positive(),
@@ -646,8 +648,18 @@ export const Balance = z
         eventFloor: z.number().int().positive(),
         rescueModule: z.string(),
         echoModule: z.string(),
-        /** 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks */
-        nemesis: z.object({ enrageStep: z.number().int().min(0), knotFrom: z.number().int().positive(), knotStacks: z.number().int().positive() }).strict(),
+        /**
+         * 숙적 성장(만날 때마다): 격노가 n턴 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks.
+         * faint — 첫 만남은 '옅은 잔향'(2026-10-10, 2단계): 격노가 enrageDelay턴 늦고 흐름 포식이 먹는 양 ×feedMul
+         */
+        nemesis: z
+          .object({
+            enrageStep: z.number().int().min(0),
+            knotFrom: z.number().int().positive(),
+            knotStacks: z.number().int().positive(),
+            faint: z.object({ enrageDelay: z.number().int().min(0), feedMul: z.number().min(0) }).strict().optional(),
+          })
+          .strict(),
         // ── 3차(메타) ──
         /** 서약: 점수 배율(단계마다 곱), 열리는 단계 = 넘은 굽이 - depthOffset, 또는 그 단계 바로 아래로 stepDepth굽이를 넘으면 */
         oath: z.object({ scoreMul: z.number().positive(), depthOffset: z.number().int().min(0), stepDepth: z.number().int().positive() }).strict(),

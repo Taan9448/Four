@@ -110,6 +110,7 @@
     "removeStep": 25,
     "shopRiftPrice": { "rare": 90, "epic": 110, "legendary": 160 },
     "oneHitCap": 0.45,
+    "bossDmgMul": 1,
     "injuryRatio": 0.2,
     "shadowEliteDmg": 1.2,
     "needleRewardChoices": 2,
@@ -134,7 +135,7 @@
     "eventFloor": 4,
     "rescueModule": "abyss_rescue",
     "echoModule": "abyss_rift_echo",
-    "nemesis": { "enrageStep": 2, "knotFrom": 3, "knotStacks": 4 },
+    "nemesis": { "enrageStep": 2, "knotFrom": 3, "knotStacks": 4, "faint": { "enrageDelay": 2, "feedMul": 0.5 } },
     "oath": { "scoreMul": 1.1, "depthOffset": 2, "stepDepth": 5 },
     "daily": { "laws": 1, "oath": [1, 5], "mates": [1, 3] }
   },

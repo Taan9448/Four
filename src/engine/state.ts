@@ -35,8 +35,10 @@ export interface EnemyState extends Combatant {
   usedOnce?: string[];
   /** 심연 접사(data/abyss_affixes.json) */
   affixes?: string[];
-  /** 격노가 시작되는 턴(숙적 성장으로 당겨진다. 없으면 정의의 afterTurn) */
+  /** 격노가 시작되는 턴(숙적 성장으로 당겨지거나 옅은 잔향으로 늦춰진다. 없으면 정의의 afterTurn) */
   enrageAt?: number;
+  /** 흐름 포식이 먹는 양 배율(심연 숙적의 옅은 잔향. 없으면 1) */
+  feedMul?: number;
   moveCursor: number;
   lastMoves: string[];
   intent: Intent | null;

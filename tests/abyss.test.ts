@@ -14,6 +14,7 @@ import {
 } from '../src/engine/abyss';
 import { applyChoice, applyRunOps, battleSetupFor, choicesFor, enterNode, rewardOptions, availableNodes, type RunState } from '../src/engine/run';
 import { createBattle } from '../src/engine/battle';
+import { spawnEnemy } from '../src/engine/effects';
 import { validateMap } from '../src/engine/route';
 import { buyRemove, openShop } from '../src/engine/economy';
 import { deserializeRun, serializeRun } from '../src/engine/save';
@@ -240,7 +241,7 @@ describe('심연 2차', () => {
     expect(tough.enemies[0].name.startsWith('단단한 독기 머금은')).toBe(true);
   });
 
-  it('숙적 성장: 만날 때마다 격노가 2턴 빨라지고 흐름 포식이 쌓이며, 세 번째부터 매듭 4', async () => {
+  it('숙적 성장: 첫 만남은 옅은 잔향(격노 2턴 늦게·덜 먹음), 그 뒤 만날 때마다 격노가 빨라지고 흐름 포식이 쌓이며, 세 번째부터 매듭 4', async () => {
     const { abyssEnemyMods } = await import('../src/engine/abyss');
     const run = start('N1', ['elia']);
     const nem = data.balance.abyss.nemesisModule;
@@ -249,9 +250,21 @@ describe('심연 2차', () => {
       ab.loops = Array.from({ length: n }, (_, i) => ({ depth: (i + 1) * 5, world: 'rift' as const, boss: nem, stageId: 's9' }));
       return abyssEnemyMods(data, run, nem, { id: 'boss' }, ['mordecai'])[0]!;
     };
-    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: 0 });
+    const faint = data.balance.abyss.nemesis.faint!;
+    expect(mods(1)).toEqual({ traits: [{ status: 'flow_eater', stacks: 1 }, { status: 'knot', stacks: 1 }], enrageShift: -faint.enrageDelay, feedMul: faint.feedMul });
     expect(mods(2).enrageShift).toBe(2);
+    expect(mods(2).feedMul).toBeUndefined();
     expect(mods(3).traits).toContainEqual({ status: 'knot', stacks: 4 });
+
+    // 옅은 잔향: 격노가 늦고, 흐름을 실은 카드의 피해를 덜 먹는다
+    const enrage = data.enemies.get('mordecai')!.enrage!.afterTurn;
+    const st = { data, scar: 0, enemyHpScale: 1, enemies: [] };
+    const weak = spawnEnemy(st, 'mordecai', 0, mods(1));
+    const full = spawnEnemy(st, 'mordecai', 0, mods(2));
+    expect(weak.enrageAt).toBe(enrage + faint.enrageDelay);
+    expect(full.enrageAt).toBe(enrage - 2);
+    expect(weak.feedMul).toBe(faint.feedMul);
+    expect(full.feedMul).toBeUndefined();
   });
 
   it('3굽이 사건: 동료 자리가 남았으면 구원(합류 + 시작 카드 4장), 가득하면 틈의 메아리', () => {

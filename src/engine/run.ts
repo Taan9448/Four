@@ -369,6 +369,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     const scale = abyssScale(data, run.abyss!.depth);
     const norm = stageNorm(data, own?.id ?? run.stageId);
     const shadow = enc.node.type === 'elite' && run.relics.some((id) => data.relics.get(id)?.rule === 'reveal_map') ? data.balance.abyss.shadowEliteDmg : 1;
+    const boss = enc.node.type === 'boss' && enc.module.id !== data.balance.abyss.nemesisModule ? data.balance.abyss.bossDmgMul : 1;
     const haun = run.roster.find((r) => r.id === 'haun')!;
     return {
       world: own?.world ?? run.abyss!.world,
@@ -388,7 +389,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       manaRule: mana ?? own?.mana ?? stage.mana,
       // 서약 '두꺼운 살'
       enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1),
-      enemyDmgScale: scale.dmg * norm.dmg * shadow,
+      enemyDmgScale: scale.dmg * norm.dmg * shadow * boss,
       relics: run.relics,
       potions: run.potions,
       partyMax: data.balance.abyss.partyMax,

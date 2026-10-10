@@ -436,7 +436,7 @@ export const nemesisEncounter = (data: GameData, ab: AbyssState) => ab.loops.fil
 
 /**
  * 전투의 적마다 덧붙이는 것: 접사(엘리트는 굽이에 따라 1~2개, 깊은 굽이에서는 일반 적에도), 숙적 성장
- * (격노가 enrageStep씩 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks)
+ * (격노가 enrageStep씩 빨라지고 흐름 포식 스택 +1, knotFrom번째부터 매듭 knotStacks. 첫 만남은 옅은 잔향 — 격노가 늦고 덜 먹는다)
  */
 export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, node: Pick<MapNode, 'id'>, enemies: string[]): (EnemyMod | undefined)[] {
   const ab = run.abyss!;
@@ -451,6 +451,8 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
       const traits = [];
       if (def.traits.some((t) => t.status === 'flow_eater')) traits.push({ status: 'flow_eater', stacks: n });
       if (def.traits.some((t) => t.status === 'knot')) traits.push({ status: 'knot', stacks: n >= cfg.nemesis.knotFrom ? cfg.nemesis.knotStacks : 1 });
+      const faint = n === 1 ? cfg.nemesis.faint : undefined;
+      if (faint) return { traits, enrageShift: -faint.enrageDelay, feedMul: faint.feedMul };
       return { traits, enrageShift: cfg.nemesis.enrageStep * (n - 1) };
     }
     const count =
