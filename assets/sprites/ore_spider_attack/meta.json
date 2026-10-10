@@ -1,0 +1,36 @@
+{
+  "id": "ore_spider_attack",
+  "type": "character-anim",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    128
+  ],
+  "fit": "pad",
+  "frames": 6,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "hit": 4
+  },
+  "blend": "normal",
+  "facing": "left",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "f21a1188d4d45f85",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.548
+}
