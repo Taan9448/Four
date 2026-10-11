@@ -15,8 +15,11 @@ import {
   createRun,
   createRunAt,
   enterNode,
+  discardSuspended,
   finishReplay,
+  restoreParty,
   startReplay,
+  suspendReplay,
   type Difficulty,
   gainXp,
   xpToNext,
@@ -28,6 +31,7 @@ import {
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { initAudio, playBgm, sfx } from '../render/audio';
+import { toast } from '../render/fx';
 import { moodFor, type Mood } from '../render/music';
 import { BattleView } from './battle-view';
 import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
@@ -278,7 +282,16 @@ export class App {
   private show(el: HTMLElement): void {
     this.root.replaceChildren(el);
     window.scrollTo(0, 0);
+    // 화면이 바뀐 뒤 띄울 알림(자유 여정: 멈춰 두었다·동료가 돌아왔다)
+    if (this.notices.length) {
+      const box = h('div', { class: 'toasts' });
+      el.appendChild(box);
+      for (const text of this.notices.splice(0)) toast(box, text, 'support', 2600);
+    }
   }
+
+  /** 다음 화면에 띄울 알림 */
+  private notices: string[] = [];
 
   /**
    * 지도 밖 화면(선택지·보상·스테이지 끝·엔딩)의 뒷배경: 지금 스테이지의 전투 배경을 어둡게 깐다(GAME_DESIGN 13절).
@@ -523,6 +536,9 @@ export class App {
         onCodex: () => this.codex('cards', () => this.map()),
         onTitle: () => this.title(),
         highlightParty: firstMate || overFull,
+        // 자유 여정(다시 하는 중): 이 스테이지를 멈춰 두고 전체 지도로 / 다른 장소로
+        onWorldMap: run.replayOf ? () => this.toWorld() : undefined,
+        onSwitchStage: run.replayOf ? (stageId) => this.toWorld(stageId) : undefined,
       }),
     );
     if (firstMate || overFull) openPartyGuide(data, run);
@@ -673,23 +689,47 @@ export class App {
     return options;
   }
 
-  /** 클리어 지도: 마친 런의 여정 띠에서 스테이지를 골라 마지막 파티로 다시 한다(GAME_DESIGN 2절) */
+  /** 클리어 지도 = 자유 여정: 큰 세계 지도에서 장소를 눌러 그곳을 걷는다. 멈춰 둔 곳은 이어서(GAME_DESIGN 2절) */
   private hub(): void {
     const run = this.run!;
     playBgm('title');
+    // 캠페인을 마치면 이야기로 떠난 동료(카일·보른)가 돌아온다. 옛 저장도 여기서 한 번 맞춘다
+    const back = restoreParty(data, run);
+    if (back.length) {
+      if (this.persist) saveRun(this.slot, run);
+      this.notices.push(`${back.join('·')} — 다시 일행에 섰다`);
+    }
     this.show(
       hubView(data, run, {
-        onReplay: async (stageId) => {
-          const st = data.stages.find((s) => s.id === stageId)!;
-          if (!(await confirmDialog(`${placeName(st, run)} 다시 하기`, '마지막에 클리어한 파티·덱·유물로 이 스테이지를 처음부터 다시 한다. 결과는 이 저장에 남지 않고 이긴 횟수만 남는다.', '다시 하기'))) return;
+        onStage: (stageId) => {
           this.run = startReplay(data, run, stageId);
           this.map();
+        },
+        onDiscard: async (stageId) => {
+          const st = data.stages.find((s) => s.id === stageId)!;
+          if (!(await confirmDialog(`${placeName(st, run)} — 멈춘 길 버리기`, '멈춰 둔 진행을 버린다. 그동안 얻은 카드는 남는다. 다음에 누르면 처음부터 걷는다.', '버리기'))) return;
+          discardSuspended(run, stageId);
+          if (this.persist) saveRun(this.slot, run);
+          this.hub();
         },
         onShowDeck: () => this.showCards(),
         onCodex: () => this.codex('cards', () => this.hub()),
         onTitle: () => this.title(),
       }),
     );
+  }
+
+  /**
+   * 자유 여정: 다시 하던 스테이지를 지금 자리에 멈춰 두고 전체 지도로(stageId가 있으면 곧장 그 장소로).
+   * 멈춘 진행은 클리어한 런에 남아(저장도 된다) 그 장소를 다시 누르면 이어진다
+   */
+  private toWorld(stageId?: string): void {
+    const run = this.run!;
+    const here = data.stages.find((s) => s.id === run.stageId)!;
+    const hub = suspendReplay(run);
+    this.notices.push(`${placeName(here, hub)} — 이 자리에 멈춰 두었다. 다시 누르면 이어진다`);
+    this.run = stageId ? startReplay(data, hub, stageId) : hub;
+    this.map();
   }
 
   /** 보스를 넘은 뒤: 보스 모듈의 장면 글(outro)을 보여 주고 다음 스테이지로 */

@@ -5,7 +5,7 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
-import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, ownerKey, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
+import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
 import {
   abyssAddCard,
   abyssEnemyMods,
@@ -82,6 +82,10 @@ export interface RunState {
   replays: Record<string, number>;
   /** 스테이지 다시 하기 중이면 돌아갈 클리어한 런(결과는 그 런에 남기지 않는다. 이긴 횟수만) */
   replayOf: RunState | null;
+  /** 클리어한 런(자유 여정, 2026-10-11): 다시 하다 전체 지도로 나간 스테이지의 진행(스테이지 id → 그 런). 그 장소를 다시 누르면 이어진다 */
+  suspended?: Record<string, RunState>;
+  /** 이야기로 일행을 떠난 동료의 마지막 상태(캠페인을 마치면 이 상태로 돌아온다) */
+  departed?: RosterEntry[];
   /** 결과 화면 통계 */
   stats: RunStats;
   /** 심연 런(GAME_DESIGN 16절). 없으면 캠페인 */
@@ -246,12 +250,24 @@ function buildMap(data: GameData, run: RunState): StageMap {
  * 스테이지 다시 하기(2026-10-08): 캠페인을 마친 런(hub)의 마지막 파티·덱·유물·물약·골드·레벨 그대로 stageId를 처음부터.
  * 다시 하는 런은 hub를 replayOf로 품고, 끝나면(이기든 지든) hub로 돌아간다. 다시 한 결과는 hub에 남기지 않는다(이긴 횟수만)
  */
-export function startReplay(data: GameData, hub: RunState, stageId: string): RunState {
+export function startReplay(data: GameData, hub: RunState, stageId: string, opts: { fresh?: boolean } = {}): RunState {
   if (hub.status !== 'complete') throw new Error('캠페인을 마친 런에서만 다시 할 수 있다');
   const stage = playableStages(data).find((s) => s.id === stageId);
   if (!stage) throw new Error(`다시 할 수 없는 스테이지: ${stageId}`);
-  const run: RunState = structuredClone({ ...hub, replayOf: null });
-  run.replayOf = structuredClone({ ...hub, replayOf: null });
+  // 돌아갈 클리어한 런: 이 스테이지를 뺀 나머지 멈춘 진행은 그대로 품는다(저장하면 함께 남는다)
+  const { [stageId]: paused, ...others } = hub.suspended ?? {};
+  const back: RunState = structuredClone({ ...hub, replayOf: null, suspended: others });
+  if (paused && !opts.fresh) {
+    // 멈춘 진행을 이어서: 그동안 다른 곳에서 얻은 카드·편성 저장 칸은 클리어한 런의 것을 함께 쓴다
+    const run: RunState = structuredClone(paused);
+    run.replayOf = back;
+    run.collection = mergeCollections(run.collection, hub.collection);
+    run.presets = structuredClone(hub.presets);
+    return run;
+  }
+  const run: RunState = structuredClone({ ...hub, replayOf: null, suspended: undefined });
+  delete run.suspended;
+  run.replayOf = back;
   run.stageId = stageId;
   run.status = 'map';
   run.position = null;
@@ -275,10 +291,67 @@ export function finishReplay(run: RunState): RunState {
   const hub = run.replayOf;
   if (!hub) throw new Error('다시 하는 중이 아니다');
   if (run.status === 'stage_clear' || run.status === 'complete') hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
-  hub.collection = structuredClone(run.collection);
+  carryBack(hub, run);
+  if (hub.suspended) delete hub.suspended[run.stageId];
+  return hub;
+}
+
+/**
+ * 자유 여정(2026-10-11): 다시 하던 스테이지를 지도에서 멈추고 클리어 지도로 나간다. 진행은 hub.suspended에 남아
+ * 그 장소를 다시 누르면 이어진다(startReplay). 얻은 카드·편성은 바로 클리어한 런에도 남긴다
+ */
+export function suspendReplay(run: RunState): RunState {
+  const hub = run.replayOf;
+  if (!hub) throw new Error('다시 하는 중이 아니다');
+  if (run.status !== 'map') throw new Error('지도에 서 있을 때만 멈출 수 있다');
+  carryBack(hub, run);
+  const paused: RunState = structuredClone({ ...run, replayOf: null });
+  delete paused.suspended;
+  hub.suspended = { ...(hub.suspended ?? {}), [run.stageId]: paused };
+  return hub;
+}
+
+/** 멈춘 진행을 버린다(그 스테이지는 다음에 처음부터) */
+export function discardSuspended(hub: RunState, stageId: string): void {
+  if (hub.suspended) delete hub.suspended[stageId];
+}
+
+/** 다시 하기에서 얻은 것 중 클리어한 런에 남기는 것: 보유 카드(더 높은 강화 단계로 합친다)·편성·편성 저장 칸 */
+function carryBack(hub: RunState, run: RunState): void {
+  hub.collection = mergeCollections(hub.collection, run.collection);
   hub.presets = structuredClone(run.presets);
   hub.loadout = structuredClone(run.loadout);
-  return hub;
+}
+
+/** 보유 카드 둘을 합친다: 어느 쪽에든 있으면 남기고, 강화 단계는 높은 쪽 */
+export function mergeCollections(a: Record<string, number>, b: Record<string, number>): Record<string, number> {
+  const out = { ...a };
+  for (const [id, lv] of Object.entries(b)) out[id] = Math.max(out[id] ?? lv, lv);
+  return out;
+}
+
+/**
+ * 캠페인을 마치면(클리어 지도를 열 때) 일행을 다시 모은다(2026-10-11 사용자 요청): 이야기로 떠난 동료(S9의 카일·보른)와
+ * 하드코어로 잃은 동료가 돌아온다. 떠날 때의 상태가 남아 있으면 그대로, 없으면 하운과 같은 레벨로. 체력은 가득. 돌아온 동료 이름
+ */
+export function restoreParty(data: GameData, run: RunState): string[] {
+  if (run.status !== 'complete' || isAbyss(run)) return [];
+  const haun = run.roster.find((r) => r.id === 'haun');
+  const back: string[] = [];
+  for (const def of data.characters.values()) {
+    if (def.role !== 'fighter' || run.roster.some((r) => r.id === def.id)) continue;
+    const kept = run.departed?.find((r) => r.id === def.id);
+    const level = kept?.level ?? haun?.level ?? 1;
+    const maxHp = kept?.maxHp ?? def.maxHp + def.hpPerLevel * (level - 1);
+    run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: kept?.xp ?? 0 });
+    grantStarters(data, run, def.id);
+    back.push(def.name);
+  }
+  if (back.length) run.loadout = recommendLoadout(data, run, run.loadout);
+  for (const r of run.roster) r.hp = r.maxHp;
+  run.fallen = [];
+  run.departed = [];
+  return back;
 }
 
 /** 보스를 넘은 뒤 다음 스테이지(원작 순서로 다음 playable). 없으면 null */
@@ -970,6 +1043,9 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         break;
       }
       case 'leave_party': {
+        // 떠난 동료의 상태를 남겨 두었다가 캠페인을 마치면 그대로 돌려놓는다(restoreParty)
+        const gone = run.roster.find((r) => r.id === e.member);
+        if (gone && !isAbyss(run)) run.departed = [...(run.departed ?? []).filter((r) => r.id !== gone.id), structuredClone(gone)];
         run.roster = run.roster.filter((r) => r.id !== e.member);
         run.selected = run.selected.filter((id) => id !== e.member);
         // 빈자리는 남은 동료로 채운다(S5: 보른·카일이 남으면 하운+엘리아)

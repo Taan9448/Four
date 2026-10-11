@@ -43,6 +43,9 @@ export interface MapViewHandlers {
   onTitle: () => void;
   /** 출전 칸을 반짝여 눈에 띄게(동료가 막 합류했을 때) */
   highlightParty?: boolean;
+  /** 자유 여정(다시 하는 중): 이 스테이지를 멈추고 전체 지도로 / 여정 띠의 다른 장소로 옮겨 간다(2026-10-11) */
+  onWorldMap?: () => void;
+  onSwitchStage?: (stageId: string) => void;
 }
 
 /**
@@ -179,12 +182,19 @@ export function openMemberInfo(data: GameData, run: RunState, id: string): void 
 
 /** 위: 여정 띠. 지나온 곳과 지금만 보이고, 들어서 보지 않은 지역은 안개, 틈은 '하늘의 금' 사건 뒤에 나타난다 */
 /** onStage: 클리어 지도처럼 장소를 눌러 고를 때(지나온 곳만) */
-export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: string) => void): HTMLElement {
+/**
+ * 여정 띠. onStage가 있으면 자유 여정(캠페인을 마친 뒤, 2026-10-11): 모든 장소가 드러나고 누르면 그곳으로 간다.
+ * world면 클리어 지도의 큰 세계 지도(같은 그림을 위아래로 더 넓게 3:1, 띠는 그 가운데 절반)
+ */
+export function journeyBand(data: GameData, run: RunState, opts: { onStage?: (stageId: string) => void; world?: boolean } = {}): HTMLElement {
+  const { onStage } = opts;
+  const free = !!onStage;
+  const hubRun = run.replayOf ?? run;
   const stages = playableStages(data).filter((st) => st.journey);
   const cur = data.stages.find((s) => s.id === run.stageId)!;
-  const reached = stages.filter((st) => st.order <= cur.order);
+  const reached = free ? stages : stages.filter((st) => st.order <= cur.order);
   const rift = run.flags.includes(RIFT_FLAG);
-  const atStart = run.visited.length === 0;
+  const atStart = run.visited.length === 0 && !free;
   const revealRift = rift && run.stageId === RIFT_REVEAL_STAGE && atStart;
   const NS = 'http://www.w3.org/2000/svg';
   const crack = document.createElementNS(NS, 'svg');
@@ -223,20 +233,26 @@ export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: s
     .map((st) => {
       const j = st.journey!;
       const here = st.id === cur.id;
-      if (onStage)
+      if (onStage) {
+        // 자유 여정: 지금 다시 하는 곳(here) · 멈춰 둔 곳(paused, 누르면 이어서) · 그 밖(누르면 처음부터)
+        const now = !!run.replayOf && here;
+        const paused = hubRun.suspended?.[st.id];
+        const wins = hubRun.replays[st.id];
+        const tip = now ? '지금 여기' : paused ? `멈춘 곳에서 이어서 — ${paused.visited.length}칸 지남` : '누르면 이곳으로 간다(처음부터)';
         return h(
           'button',
-          { class: 'stop done pick', style: `left:${j.x}%;top:${j.y}%`, onclick: () => onStage(st.id), ...tipAttrs(placeName(st, run), '눌러서 다시 하기') },
+          { class: `stop done pick${now ? ' here' : ''}${paused ? ' paused' : ''}`, style: `left:${j.x}%;top:${j.y}%`, onclick: now ? undefined : () => onStage(st.id), ...tipAttrs(placeName(st, run), wins ? `${tip}\n다시 해서 이긴 횟수 ${wins}` : tip) },
           h('i', {}),
           h('span', { class: 'stop-name' }, placeName(st, run)),
-          run.replays[st.id] ? h('small', { class: 'replays' }, `×${run.replays[st.id]}`) : null,
+          paused ? h('small', { class: 'paused-tag' }, '진행 중') : wins ? h('small', { class: 'replays' }, `×${wins}`) : null,
         );
+      }
       return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), h('span', { class: 'stop-name' }, placeName(st, run)));
     })
     .concat(
       // 틈의 심장: '하늘의 금' 뒤부터 사건 표시로(아직 들어서지 않았을 때)
       stages
-        .filter((st) => st.journey!.region === 'rift' && rift && st.order > cur.order)
+        .filter((st) => !free && st.journey!.region === 'rift' && rift && st.order > cur.order)
         .map((st) =>
           h('div', { class: 'stop event', style: `left:${st.journey!.x}%;top:${st.journey!.y}%`, ...tipAttrs('하늘의 금', '두 세계 사이에 생긴 금. 그 너머는 아무도 모른다.') }, h('i', {}), h('span', { class: 'stop-name' }, '?')),
         ),
@@ -251,9 +267,9 @@ export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: s
           const url = frameUrl(st.mapArt, 1, { realOnly: true });
           return url ? h('div', { class: 'journey-tile', style: `left:${st.journey!.x}%;top:${st.journey!.y}%;background-image:url("${url}")` }) : null;
         });
-  return h(
+  const band = h(
     'div',
-    { class: `journey${bandArt ? ' has-art' : tiles?.some(Boolean) ? ' has-tiles' : ''}`, style: bandArt },
+    { class: `journey${bandArt ? ' has-art' : tiles?.some(Boolean) ? ' has-tiles' : ''}`, style: opts.world ? '' : bandArt },
     tiles,
     crack,
     regionParts.map((p) => p.fog),
@@ -262,6 +278,8 @@ export function journeyBand(data: GameData, run: RunState, onStage?: (stageId: s
     elheimOpen ? h('span', { class: 'gate', style: `left:${GATE.x}%;top:${GATE.y}%`, ...tipAttrs('귀곡애 석문', '두 세계를 잇는 단 하나의 문') }, '귀곡애 석문') : null,
     stops,
   );
+  // 큰 세계 지도: 같은 그림(3:2)의 높이 25~75%를 3:1로 보이고, 띠(37.5~62.5%)는 그 가운데 절반에 그대로 얹는다
+  return opts.world ? h('div', { class: `world-map${bandArt ? ' has-art' : ''}`, style: bandArt }, band) : band;
 }
 
 /** 여정 띠 위에 뜨는 알림(새 지역·하늘의 금). 띠가 가로로 밀려도 보이게 띠 바깥에 둔다 */
@@ -467,7 +485,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       : null;
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
-  const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run));
+  const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run, { onStage: run.replayOf ? handlers.onSwitchStage : undefined }));
   // 두루마리 축(ui_scroll_rod, Codex 그림 3조각: 위 끝 · 가운데(늘림) · 아래 끝). 그림이 오기 전에는 CSS 축
   const rodUrls = [1, 2, 3].map((n) => frameUrl('ui_scroll_rod', n, { realOnly: true }));
   const rods = rodUrls.every(Boolean)
@@ -536,6 +554,9 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           { class: 'map-actions' },
           // 보유 카드 · 도감은 한 줄씩, 설정 · 타이틀로는 반 줄씩
           h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, run.abyss ? `덱 (${run.deck.length})` : `보유 카드 (${run.deck.length})`),
+          handlers.onWorldMap
+            ? h('button', { class: 'btn wide btn-world', onclick: handlers.onWorldMap, ...tipAttrs('전체 지도', '이 스테이지는 지금 자리에 멈춰 두고 전체 지도로 나간다. 다시 누르면 여기서 이어진다.') }, '전체 지도로')
+            : null,
           h('button', { class: 'btn wide', onclick: handlers.onCodex }, '도감'),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
