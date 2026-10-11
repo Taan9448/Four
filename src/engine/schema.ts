@@ -32,6 +32,10 @@ export const BATTLE_OPS = [
   'keep_block',
   'recall',
   'copy_card',
+  // 2파(2026-10-11): 이번 차례 적 의도 보이기(안개) · 카드 걷어 내기(잔향) · 격노 늦추기
+  'reveal_intent',
+  'purge',
+  'delay_enrage',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */

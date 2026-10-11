@@ -14,5 +14,7 @@
     "onTurnEndInHand": [{ "op": "lose_hp", "amount": 3, "target": "self" }],
     "text": "손에 든 채 턴이 끝나면 하운 체력 3을 잃는다. 내공 1을 써서 털어 낼 수 있다(소멸).",
     "flavor": "숨을 쉴 때마다 폐 깊은 곳이 따끔거렸다."
-  }
+  },
+  {"id": "status_rift_whisper", "name": "틈의 속삭임", "owner": "status", "type": "status", "rarity": "special", "pool": "status", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["unplayable"], "effects": [], "onTurnEndInHand": [{"op": "rift", "amount": 1}], "text": "쓸 수 없다. 손에 든 채 턴이 끝나면 균열 +1.", "flavor": "귀를 막아도 들렸다. 금 너머에서 누군가 이름을 불렀다."},
+  {"id": "status_blood_debt", "name": "피의 빚", "owner": "status", "type": "status", "rarity": "special", "pool": "status", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["unplayable"], "effects": [], "onTurnEndInHand": [{"op": "lose_hp", "amount": 1, "target": "self"}], "text": "쓸 수 없다. 손에 든 채 턴이 끝나면 하운 체력 1을 잃는다.", "flavor": "빌린 것은 갚아야 한다. 피로 빌렸으면 피로."}
 ]

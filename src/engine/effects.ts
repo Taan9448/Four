@@ -680,7 +680,7 @@ export function runEffects(state: BattleState, effects: Effect[], ctx: EffectCon
 }
 
 function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): void {
-  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon', 'consume_rift', 'scar', 'cost_next', 'recall', 'copy_card'].includes(effect.op);
+  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon', 'consume_rift', 'scar', 'cost_next', 'recall', 'copy_card', 'reveal_intent', 'purge', 'delay_enrage'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
     const amount = amountOf(state, effect, undefined, ctx);
@@ -761,6 +761,39 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
           state.events.push({ type: 'copy', cardId: src.cardId });
           state.log.push(`${state.data.cards.get(src.cardId)?.name ?? src.cardId}을(를) 하나 더 쥐었다.`);
         }
+        return;
+      }
+      case 'reveal_intent':
+        // 안개 속의 눈: 이번 차례에는 법칙 '안개'가 가린 적의 의도가 보인다
+        state.intentRevealTurn = state.turn;
+        state.log.push('안개 너머로 적이 무엇을 하려는지 보였다.');
+        return;
+      case 'purge': {
+        // effect.card를 손패·버린 더미·뽑을 더미에서 amount장까지(그 순서로) 소멸시킨다(잔향 먹는 금)
+        let left = Math.max(1, amount);
+        for (const pile of [state.hand, state.discard, state.draw]) {
+          for (let i = pile.length - 1; i >= 0 && left > 0; i--) {
+            if (pile[i].cardId !== effect.card) continue;
+            const [card] = pile.splice(i, 1);
+            state.exhaust.push(card);
+            state.events.push({ type: 'purge', cardId: card.cardId });
+            left--;
+          }
+        }
+        const n = Math.max(1, amount) - left;
+        if (n > 0) state.log.push(`${state.data.cards.get(effect.card ?? '')?.name ?? effect.card} ${n}장을 걷어 냈다.`);
+        return;
+      }
+      case 'delay_enrage': {
+        // 격노 늦추기: 살아 있는 적의 격노(과 법칙의 격노)가 amount턴 늦게 온다. 이미 격노했으면 지금부터 amount턴 쉰다
+        const later = (at: number) => (at >= state.turn ? at : state.turn) + amount;
+        for (const e of state.enemies) {
+          const def = state.data.enemies.get(e.defId);
+          if (e.downed || !def?.enrage) continue;
+          e.enrageAt = later(e.enrageAt ?? def.enrage.afterTurn);
+        }
+        if (state.lawEnrage) state.lawEnrage = state.lawEnrage.map((le) => ({ ...le, afterTurn: later(le.afterTurn) }));
+        state.log.push(`격노가 ${amount}턴 늦춰졌다.`);
         return;
       }
       case 'scar':

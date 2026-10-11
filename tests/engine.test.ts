@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { _internal, battleOutcome, canPlay, endTurn, incomingDamage, playCard, playCost } from '../src/engine/battle';
-import { resolveCard } from '../src/engine/state';
+import { intentHidden, resolveCard } from '../src/engine/state';
 import { cardText, cardTextParts } from '../src/engine/text';
 import { createRng } from '../src/engine/rng';
 import { battle, cards, data, give } from './helpers';
@@ -528,5 +528,29 @@ describe('새 기본 동작(카드 250장 확장 2026-10-11)', () => {
     p.block = 10;
     endTurn(s);
     expect(p.statuses.strength).toBe(1);
+  });
+
+  it('2파 기본 동작: reveal_intent(이번 차례만 안개를 걷는다) · purge(손패→버린 더미→뽑을 더미 순으로 소멸) · delay_enrage(격노·법칙 격노를 늦춘다)', () => {
+    const s = battle({ world: 'murim', enemies: ['mordecai'] });
+    const p = s.party[0];
+    s.hideIntent = true;
+    expect(intentHidden(s)).toBe(true);
+    _internal.runEffects(s, [{ op: 'reveal_intent' }], { source: p });
+    expect(intentHidden(s)).toBe(false);
+    s.turn += 1;
+    expect(intentHidden(s)).toBe(true);
+    s.hand = [];
+    give(s, 'status_rift_echo');
+    s.discard.push({ uid: 'e1', cardId: 'status_rift_echo', level: 0 }, { uid: 'e2', cardId: 'status_rift_echo', level: 0 });
+    _internal.runEffects(s, [{ op: 'purge', card: 'status_rift_echo', amount: 2 }], { source: p });
+    expect(s.hand).toHaveLength(0);
+    expect(s.discard.filter((c) => c.cardId === 'status_rift_echo')).toHaveLength(1);
+    expect(s.exhaust.filter((c) => c.cardId === 'status_rift_echo')).toHaveLength(2);
+    const boss = s.enemies[0];
+    const at = boss.enrageAt ?? data.enemies.get('mordecai')!.enrage!.afterTurn;
+    s.lawEnrage = [{ afterTurn: 8, text: 't', effects: [] }];
+    _internal.runEffects(s, [{ op: 'delay_enrage', amount: 2 }], { source: p });
+    expect(boss.enrageAt).toBe(Math.max(at, s.turn) + 2);
+    expect(s.lawEnrage[0].afterTurn).toBe(10);
   });
 });

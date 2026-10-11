@@ -66,7 +66,9 @@ describe('런 진행', () => {
     }
     expect(state.result).toBe('victory');
     applyBattleOutcome(data, run, enc, battleOutcome(state)!);
-    expect(run.scar).toBe(2);
+    // 남은 균열 × scarRatio가 상흔이 된다(편성에 따라 균열을 내리는 공격이 끼어 4에서 줄 수 있다)
+    expect(run.scar).toBe(Math.floor(state.rift * data.balance.rift.scarRatio) + (state.tally?.surgeScar ?? 0));
+    expect(run.scar).toBeGreaterThan(0);
     expect(run.status).toBe('map');
   });
 

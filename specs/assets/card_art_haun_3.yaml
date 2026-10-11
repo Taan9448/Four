@@ -1,8 +1,7 @@
 id: card_art_haun_3
 type: card-art-sheet
 summary: 진하운 카드 그림 3(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
-# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
-planned: true
+# 2026-10-11 카드 250장 확장: 그림 요청이 카드 데이터보다 먼저 나간 시트(2파에서 카드가 모두 들어와 planned를 뗐다). 칸 순서를 바꾸면 cards도 함께 바꾼다
 frames: 15
 cards:
   - haun_ironwood_split  # 철목인 가르기

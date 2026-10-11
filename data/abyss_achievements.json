@@ -31,5 +31,15 @@
   {"id": "with_born", "name": "보른과 깊이", "description": "보른과 함께 6굽이를 넘는다.", "check": {"kind": "withMate", "mate": "born", "n": 6}, "unlock": {"card": "abyss_born_iron_will"}},
   {"id": "seven_loops", "name": "일곱 굽이", "description": "심연 7굽이를 넘는다.", "check": {"kind": "cleared", "n": 7}, "unlock": {"path": "path_debt"}},
   {"id": "clean_sky", "name": "꿰맨 하늘", "description": "상흔 0인 채로 5굽이를 넘는다.", "check": {"kind": "scarZeroDepth", "n": 5}, "unlock": {"path": "path_needle"}},
-  {"id": "affix_30", "name": "이름 지우기", "description": "한 심연에서 접사 붙은 적 30을 쓰러뜨린다.", "check": {"kind": "affixKills", "n": 30}, "unlock": {"path": "path_shadow"}}
+  {"id": "affix_30", "name": "이름 지우기", "description": "한 심연에서 접사 붙은 적 30을 쓰러뜨린다.", "check": {"kind": "affixKills", "n": 30}, "unlock": {"path": "path_shadow"}},
+  {"id": "scar_10_boss", "name": "흉 위의 하늘", "description": "상흔 10 이상인 채로 굽이 보스를 쓰러뜨린다.", "check": {"kind": "bossWithScar", "n": 10}, "unlock": {"card": "abyss_common_scar_stitch"}},
+  {"id": "limping", "name": "부축하며", "description": "부상 동료를 데리고 굽이를 넘는다.", "check": {"kind": "injuredClear", "n": 1}, "unlock": {"card": "abyss_common_flesh_seal"}},
+  {"id": "clean_three", "name": "맑은 세 굽이", "description": "상흔 없이 3굽이에 이른다.", "check": {"kind": "scarZeroDepth", "n": 3}, "unlock": {"card": "abyss_common_close_all"}},
+  {"id": "one_law", "name": "첫 법칙", "description": "법칙이 걸린 굽이를 하나 넘는다.", "check": {"kind": "lawsClear", "n": 1}, "unlock": {"card": "abyss_common_dry_sky"}},
+  {"id": "two_laws", "name": "두 법칙", "description": "법칙이 걸린 굽이를 둘 넘는다.", "check": {"kind": "lawsClear", "n": 2}, "unlock": {"card": "abyss_common_fog_eye"}},
+  {"id": "third_loop", "name": "세 번째 굽이", "description": "심연 3굽이를 넘는다.", "check": {"kind": "cleared", "n": 3}, "unlock": {"card": "abyss_common_twin_moons"}},
+  {"id": "rift_deck_3", "name": "틈을 품고", "description": "덱에 틈의 카드 3장 이상을 담는다.", "check": {"kind": "riftInDeck", "n": 3}, "unlock": {"card": "abyss_common_echo_eater"}},
+  {"id": "affix_10", "name": "접사 사냥", "description": "한 심연에서 접사가 붙은 적 10마리를 쓰러뜨린다.", "check": {"kind": "affixKills", "n": 10}, "unlock": {"card": "abyss_common_knot_tie"}},
+  {"id": "elite_5", "name": "다섯 엘리트", "description": "한 심연에서 엘리트 5마리를 쓰러뜨린다.", "check": {"kind": "elites", "n": 5}, "unlock": {"card": "abyss_common_feeder_bane"}},
+  {"id": "boss_3", "name": "세 보스", "description": "한 심연에서 굽이 보스 3을 쓰러뜨린다.", "check": {"kind": "bosses", "n": 3}, "unlock": {"card": "abyss_common_enrage_delay"}}
 ]
