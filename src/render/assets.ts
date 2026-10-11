@@ -21,6 +21,8 @@ export interface SpriteMeta {
   window?: [number, number, number, number] | null;
   /** 카드 틀: 글 자리(이름 띠·글 칸·종류 판)의 실제 면 [x, y, 너비, 높이] */
   slots?: Partial<Record<'name' | 'text' | 'plaque', [number, number, number, number]>> | null;
+  /** 카드 그림 시트: 칸 n의 카드 id(n-1번째) */
+  cards?: string[];
 }
 
 export interface SpriteAsset {
@@ -50,6 +52,25 @@ const cache = new Map<string, Promise<SpriteAsset | null>>();
 
 export function hasSprite(id: string): boolean {
   return id in entries;
+}
+
+/**
+ * 카드 그림(2026-10-11, card_art_* 시트): 카드 id → 실제 그림 프레임 URL. 칸 n = 명세 cards의 n번째(manifest의 meta.cards).
+ * 실제 그림이 들어온 시트만(임시 시트는 쓰지 않는다)
+ */
+let cardArtIndex: Map<string, string> | null = null;
+export function cardArtUrl(cardId: string): string | null {
+  if (!cardArtIndex) {
+    cardArtIndex = new Map();
+    for (const [id, e] of Object.entries(entries)) {
+      if (e.meta.type !== 'card-art-sheet' || e.source !== 'sprites') continue;
+      (e.meta.cards ?? []).forEach((card, i) => {
+        const url = frameUrl(id, i + 1, { realOnly: true });
+        if (url) cardArtIndex!.set(card, url);
+      });
+    }
+  }
+  return cardArtIndex.get(cardId) ?? null;
 }
 
 export function spriteMeta(id: string): SpriteMeta | null {

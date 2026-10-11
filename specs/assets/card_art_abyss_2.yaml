@@ -1,0 +1,42 @@
+id: card_art_abyss_2
+type: card-art-sheet
+summary: 틈의 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - abyss_elia_black_fire  # 검은 불
+  - abyss_elia_borrowed_river  # 빌린 강물
+  - abyss_kyle_not_left  # 왼편이 아닌 검
+  - abyss_kyle_last_charge  # 마지막 돌격
+  - abyss_elia_ash_rain  # 재의 비
+  - abyss_elia_frozen_river  # 얼어붙은 강
+  - abyss_elia_stolen_flow  # 훔친 흐름
+  - abyss_elia_rift_barrier  # 틈의 장막
+  - abyss_elia_silver_storm  # 은빛 폭풍
+  - abyss_elia_last_seed  # 마지막 씨앗
+  - abyss_kyle_red_vow  # 붉은 맹세
+  - abyss_kyle_rush  # 돌진
+  - abyss_kyle_blood_edge  # 피 묻은 날
+  - abyss_kyle_shield_break  # 방패 깨기
+  - abyss_kyle_father_sword  # 아버지의 검
+  - abyss_kyle_endless_charge  # 끝없는 돌격
+frame_notes:
+  1: "black flames that give no light, a dark ring of scorch"  # 검은 불
+  2: "a cupped handful of blue water drawn from a crack"  # 빌린 강물
+  3: "a sword thrust forward leaving an empty glowing outline beside it"  # 왼편이 아닌 검
+  4: "a battered knight charging with a heavy dark sword"  # 마지막 돌격
+  5: "grey ash falling like rain over embers"  # 재의 비
+  6: "a river frozen mid-flow under a black crack"  # 얼어붙은 강
+  7: "blue mana pulled out of a crack in a thin stream"  # 훔친 흐름
+  8: "a curtain pulled down from a cracked sky, shapes behind it"  # 틈의 장막
+  9: "silver seeds whirling in a storm, ice flowers forming"  # 은빛 폭풍
+  10: "a glowing seed planted in a black crack, the sky splitting above"  # 마지막 씨앗
+  11: "a palm cut open, a drop of blood running down a sword"  # 붉은 맹세
+  12: "a knight slamming into a foe without a shield, both cracking"  # 돌진
+  13: "a sword edge dripping blood, heavier at the tip"  # 피 묻은 날
+  14: "a shield shattering under a downward blow"  # 방패 깨기
+  15: "a ghostly silver sword handed out from a crack"  # 아버지의 검
+  16: "a lance charging forward with endless speed lines"  # 끝없는 돌격
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

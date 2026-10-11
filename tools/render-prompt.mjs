@@ -128,6 +128,22 @@ export function renderPrompt(spec, style) {
         `Never use ${key.name} or similar hues in the icons.\n` +
         `Icons:\n${frameLines}\n${empty}${rulesFor(spec)}`
       );
+    case 'card-art-sheet':
+      // 카드 그림(2026-10-11): 칸마다 카드 한 장의 그림 창. 제목에 어울리는 주제 하나를 단순하게
+      return (
+        header +
+        pixelGrid(spec, 'Every used cell') +
+        'Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge ' +
+        '(no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame\'s art window, which hides a few pixels on every side.\n' +
+        `Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at ${lw}x${lh} pixels. ` +
+        'A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. ' +
+        `Keep the subject inside the middle ${Math.round(lw * 0.84)}x${Math.round(lh * 0.84)} pixels.\n` +
+        `Style: ${spec.style ?? style.sprite_style}.\n` +
+        paletteLine(spec, style) +
+        `Never use ${key.name} or similar hues in the pictures.\n` +
+        `Cards:\n${frameLines}\n${empty}` +
+        'Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.'
+      );
     case 'card-frame': {
       // 카드 틀(2026-10-11): 틀 한 장이 캔버스를 꽉 채운다. 그림 창은 키 색(투명 구멍), 글·이름·보석 자리는 게임이 채운다
       const L = spec.layout ?? {};

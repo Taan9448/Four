@@ -89,7 +89,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     const f = analyzed[0];
     if (f.fit === 'downscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}의 그림이 여백 포함 목표 ${T}×${TH}에 들어가지 않아 시트 전체를 줄였다(디테일 손실) — 인물이 칸을 꽉 채웠다`);
     if (f.fit === 'fill' && (Math.abs(f.native[0] / T - 1) > 0.08 || Math.abs(f.native[1] / TH - 1) > 0.08)) {
-      warnings.push(`카드 틀을 ${f.native.join('×')}에서 ${T}×${TH}로 늘이거나 줄였다 — 틀이 캔버스를 꽉 채우지 않았거나 블록이 규격과 달랐다`);
+      warnings.push(`${spec.type === 'card-frame' ? '카드 틀' : '카드 그림'}을 ${f.native.join('×')}에서 ${T}×${TH}로 늘이거나 줄였다 — 그림이 칸을 꽉 채우지 않았거나 블록이 규격과 달랐다`);
     }
     if (f.fit === 'upscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
   }
@@ -105,7 +105,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const heights = [];
   const frameContent = (d, i) => d[i + 3] > 32;
   const paletteSet = palette ? new Set(palette.map(([r, g, b]) => (r << 16) | (g << 8) | b)) : null;
-  const checkEdges = !['card-art', 'background', 'portrait', 'card-frame'].includes(spec.type);
+  const checkEdges = !['card-art', 'background', 'portrait', 'card-frame', 'card-art-sheet'].includes(spec.type);
   frames.forEach((img, i) => {
     const n = i + 1;
     if (img.width !== spec.logical[0] || img.height !== spec.logical[1]) {

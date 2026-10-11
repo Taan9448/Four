@@ -4,7 +4,7 @@ import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../
 import { cardGlossary, cardTextParts, type CardTextParts } from '../engine/text';
 import { acquirePreview } from '../engine/collection';
 import type { RunState } from '../engine/run';
-import { frameUrl, spriteMeta } from '../render/assets';
+import { cardArtUrl, frameUrl, spriteMeta } from '../render/assets';
 import { isPxCardsPreview } from './debug';
 import { tipAttrs } from './tooltip';
 import { h } from './dom';
@@ -100,6 +100,7 @@ function pixelCardView(
   const nameSize = name.length > 9 ? ' cpx-name-s' : name.length > 7 ? ' cpx-name-m' : '';
   const rarityUrl = def.rarity !== 'special' ? gem(def.rarity) : null;
   const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '武';
+  const artUrl = cardArtUrl(def.id);
   return h(
     'div',
     {
@@ -107,7 +108,12 @@ function pixelCardView(
       style: owner ? `--owner:${owner.color}` : '',
       title: opts.disabled ?? def.flavor ?? '',
     },
-    h('div', { class: 'cpx-art', style: `left:${wx - 2}px;top:${wy - 2}px;width:${ww + 4}px;height:${wh + 4}px`, 'aria-hidden': 'true' }, h('span', { class: 'cpx-seal' }, seal)),
+    // 카드 그림(card_art_*)이 들어왔으면 그림 창 아래에 꽉 채워 깐다. 없으면 주인 색 바탕에 한자 인장
+    h(
+      'div',
+      { class: 'cpx-art', style: `left:${wx - 2}px;top:${wy - 2}px;width:${ww + 4}px;height:${wh + 4}px`, 'aria-hidden': 'true' },
+      artUrl ? h('img', { class: 'cpx-art-img', src: artUrl, alt: '', draggable: 'false' }) : h('span', { class: 'cpx-seal' }, seal),
+    ),
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),

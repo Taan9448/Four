@@ -192,6 +192,20 @@ function cardFrame(W, H, spec) {
   return parts.join('');
 }
 
+/** 카드 그림 임시: 칸을 꽉 채운 색 바탕에 칸마다 다른 단순한 도형(번호를 알아보게) */
+function cardArtCell(w, h, spec, n) {
+  const color = shade(spec.placeholder?.color ?? '#3d4a63', ((n % 4) - 1.5) * 0.12);
+  const accent = spec.placeholder?.accent ?? '#f2a93b';
+  const cx = w / 2, cy = h * 0.45, r = h * 0.28;
+  const sides = 3 + ((n - 1) % 5);
+  const pts = Array.from({ length: sides }, (_, i) => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / sides;
+    return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+  }).join(' ');
+  return `<rect width="${w}" height="${h}" fill="${color}"/><rect y="${h * 0.72}" width="${w}" height="${h * 0.28}" fill="${shade(color, -0.25)}"/>
+    <polygon points="${pts}" fill="${accent}" stroke="#1d2433" stroke-width="10"/>`;
+}
+
 function illustration(w, h, spec) {
   const color = spec.placeholder?.color ?? '#3d4a63';
   return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(color, 0.3)}"/><stop offset="1" stop-color="${shade(color, -0.2)}"/></linearGradient></defs>
@@ -232,6 +246,11 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
     for (let n = 1; n <= cols * rows; n++) {
       if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
       parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${iconCell(w, h, spec, n)}</g>`);
+    }
+  } else if (spec.type === 'card-art-sheet') {
+    for (let n = 1; n <= cols * rows; n++) {
+      if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
+      parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${cardArtCell(w, h, spec, n)}</g>`);
     }
   } else if (spec.type === 'card-frame') {
     parts.push(cardFrame(W, H, spec));

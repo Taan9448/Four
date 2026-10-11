@@ -1,0 +1,42 @@
+id: card_art_born_1
+type: card-art-sheet
+summary: 보른 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - born_shield  # 몸으로 막기
+  - born_knee  # 결 따라 내리찍기
+  - born_cleave  # 드워프의 도끼
+  - born_whetstone  # 도끼 손질
+  - born_together  # 같이 가
+  - born_go_first  # 먼저 가
+  - born_durin_hammer  # 두린의 망치
+  - born_mountain_voice  # 산의 소리
+  - born_cliff  # 절벽 무너뜨리기
+  - born_dwarf_wall  # 난쟁이 벽
+  - born_axe  # 도끼질
+  - born_big_axe  # 온몸으로 내려찍기
+  - born_armor  # 갑옷 여미기
+  - born_tap  # 돌 두드리기
+  - born_carry  # 업고 가기
+  - born_shoulder  # 어깨로 들이받기
+frame_notes:
+  1: "a stout dwarf body blocking with arms wide, armor glowing hot"  # 몸으로 막기
+  2: "an axe striking the corner of a stone pillar along its grain"  # 결 따라 내리찍기
+  3: "a big dwarven axe sweeping in a wide arc"  # 드워프의 도끼
+  4: "an axe blade on a whetstone beside a small campfire"  # 도끼 손질
+  5: "a big dwarf hand gripping a smaller hand"  # 같이 가
+  6: "a war hammer smashing into a castle wall"  # 먼저 가
+  7: "a large war hammer with carved dwarven marks on its handle"  # 두린의 망치
+  8: "an ear pressed to a cave wall with sound rings"  # 산의 소리
+  9: "a cliff collapsing in big chunks of rock"  # 절벽 무너뜨리기
+  10: "a dry stone wall of neatly fitted rocks"  # 난쟁이 벽
+  11: "a two-handed axe chopping down"  # 도끼질
+  12: "an axe brought down with full body weight, the ground cracking"  # 온몸으로 내려찍기
+  13: "iron scale armor being buckled on"  # 갑옷 여미기
+  14: "the end of an axe handle tapping a rock with sound marks"  # 돌 두드리기
+  15: "a wooden wheeled chair strapped onto a dwarf back"  # 업고 가기
+  16: "a dwarf shoulder charging forward with impact lines"  # 어깨로 들이받기
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm stone and forge palette: granite grey, iron, ember orange, earth brown and red beard tones; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#6e5440', accent: '#ff8a5c' }

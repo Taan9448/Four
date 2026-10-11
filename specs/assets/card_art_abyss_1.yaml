@@ -1,0 +1,42 @@
+id: card_art_abyss_1
+type: card-art-sheet
+summary: 틈의 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - abyss_haun_rift_axe  # 틈을 가르는 도끼
+  - abyss_haun_crack_step  # 금 밟기
+  - abyss_haun_still_breath  # 흐르지 않는 숨
+  - abyss_common_stitched  # 꿰맨 자리
+  - abyss_haun_split_sky  # 하늘 가르기
+  - abyss_haun_reverse_grain  # 거스른 결
+  - abyss_haun_hollow_breath  # 빈 숨
+  - abyss_haun_shard_step  # 조각 딛기
+  - abyss_haun_thousand_cuts  # 천 번 쪼개기
+  - abyss_haun_wedge_axe  # 쐐기 도끼
+  - abyss_haun_seam_eater  # 솔기 먹는 자
+  - abyss_common_void_shard  # 허공의 조각
+  - abyss_common_borrowed_time  # 빌린 시간
+  - abyss_common_mirror_world  # 거울 세계
+  - abyss_common_tear_open  # 찢어 열기
+  - abyss_common_last_light  # 마지막 빛
+frame_notes:
+  1: "an axe splitting the sky open along a black crack"  # 틈을 가르는 도끼
+  2: "a bare foot stepping on a black crack that closes under it"  # 금 밟기
+  3: "a frozen breath swirl hanging still with a black crack through it"  # 흐르지 않는 숨
+  4: "a crude stitch of thread across a black crack in the sky"  # 꿰맨 자리
+  5: "a gold and blue slash splitting both an enemy and the sky"  # 하늘 가르기
+  6: "an axe striking against the wood grain, splinters flying backward"  # 거스른 결
+  7: "an empty chest silhouette with cold wind flowing in from a crack"  # 빈 숨
+  8: "a figure stepping onto floating stone shards over a void"  # 조각 딛기
+  9: "four rapid axe arcs over a log, a thin crack above"  # 천 번 쪼개기
+  10: "a wedge driven into wood and an axe slamming down on it"  # 쐐기 도끼
+  11: "a black crack running through a body silhouette like a passage"  # 솔기 먹는 자
+  12: "a black glass shard with a red glint, held in a cut palm"  # 허공의 조각
+  13: "an hourglass with sand flowing upward into a crack"  # 빌린 시간
+  14: "a cracked mirror showing a second figure taking a blow"  # 거울 세계
+  15: "two hands tearing the sky open, light pouring out"  # 찢어 열기
+  16: "a warm light leaking from the bottom of a black crack"  # 마지막 빛
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

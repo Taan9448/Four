@@ -1,0 +1,22 @@
+id: card_art_kyle_2
+type: card-art-sheet
+summary: 카일 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 6
+cards:
+  - kyle_formation  # 대열 맞추기
+  - kyle_joke  # 농담 한마디
+  - kyle_sword_path  # 검의 길
+  - kyle_scar_oath  # 흉터의 맹세
+  - kyle_rowen_blade  # 로웬의 검
+  - kyle_no_one_dies  # 아무도 죽지 않아
+frame_notes:
+  1: "farmers with hoes standing shoulder to shoulder in a line"  # 대열 맞추기
+  2: "a laughing knight with a raised finger and a small sweat drop"  # 농담 한마디
+  3: "a chain of sword slash lines following one after another"  # 검의 길
+  4: "a forearm with a long healed scar and a clenched fist"  # 흉터의 맹세
+  5: "the Rowen crest: a blue field with a white snowflake and a silver sword"  # 로웬의 검
+  6: "a knight standing at the front of a shield wall, arms spread wide"  # 아무도 죽지 않아
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, steel grey, deep blue and white, with warm red for the red sword and blood; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#5d6478', accent: '#a02634' }

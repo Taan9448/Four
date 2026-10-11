@@ -1,0 +1,42 @@
+id: card_art_kyle_1
+type: card-art-sheet
+summary: 카일 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - kyle_strike  # 기사의 일격
+  - kyle_guard  # 검으로 막기
+  - kyle_left_blade  # 왼편의 검
+  - kyle_ankle  # 발목 찌르기
+  - kyle_dumplings  # 만두 한 접시
+  - kyle_fun  # 그래서 재밌는 거지
+  - kyle_wing_cut  # 날개 베기
+  - kyle_red_sword  # 붉은 검
+  - kyle_hand_out  # 손 내밀기
+  - kyle_eyes_closed  # 눈을 감고
+  - kyle_shield_wall  # 방패벽
+  - kyle_forward  # 전진!
+  - kyle_cover  # 막아서기
+  - kyle_counter  # 받아치기
+  - kyle_heavy_cut  # 정면 베기
+  - kyle_shout  # 기합
+frame_notes:
+  1: "a long straight knight sword swinging down"  # 기사의 일격
+  2: "a sword held crosswise blocking a strike with sparks"  # 검으로 막기
+  3: "a sword drawn first, held ready on the left side of the picture"  # 왼편의 검
+  4: "a sword point stabbing into a giant spider leg joint"  # 발목 찌르기
+  5: "a plate of steaming dumplings"  # 만두 한 접시
+  6: "a grinning knight face with a small bandage and a raised fist"  # 그래서 재밌는 거지
+  7: "a red sword slicing through a torn bat wing"  # 날개 베기
+  8: "a red sword glowing with both fire and frost"  # 붉은 검
+  9: "a bare hand touching a hand frozen inside ice"  # 손 내밀기
+  10: "a knight with closed eyes and one glowing sword path line"  # 눈을 감고
+  11: "a row of overlapping round shields"  # 방패벽
+  12: "many shields striking the ground at once with a shockwave"  # 전진!
+  13: "a knight stepping in front with a raised arm and shield"  # 막아서기
+  14: "a sword sliding along another blade to strike the wrist"  # 받아치기
+  15: "a heavy frontal downward cut with a wide arc"  # 정면 베기
+  16: "a knight shouting with a burst of sound lines"  # 기합
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, steel grey, deep blue and white, with warm red for the red sword and blood; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#5d6478', accent: '#a02634' }

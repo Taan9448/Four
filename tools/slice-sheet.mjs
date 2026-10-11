@@ -120,6 +120,8 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
     gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
     ...(spec.type === 'card-frame' ? { window: artWindow, slots } : {}),
+    // 카드 그림: 칸 n = cards[n-1](명세가 기준. manifest는 늘 명세의 목록을 쓴다)
+    ...(spec.type === 'card-art-sheet' ? { cards: spec.cards ?? [] } : {}),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;

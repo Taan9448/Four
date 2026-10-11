@@ -1,0 +1,38 @@
+id: card_art_common_2
+type: card-art-sheet
+summary: 공용 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 14
+cards:
+  - common_smoke  # 연막
+  - common_flying_dagger  # 비도
+  - common_mana_shard  # 마나석 조각
+  - common_pressure  # 혈도 짚기
+  - common_oil_jar  # 기름 단지
+  - common_acupoint  # 점혈
+  - common_meditation  # 운기조식
+  - common_good_sword  # 손에 맞는 검
+  - common_net  # 그물 던지기
+  - common_salve  # 금창약
+  - common_four_ounces  # 사량발천근
+  - common_thousand_weight  # 천근추
+  - common_elixir  # 영약 한 알
+  - common_rebirth  # 환골탈태
+frame_notes:
+  1: "a thick grey smoke cloud spreading low over the ground"  # 연막
+  2: "three small throwing daggers flying in a row"  # 비도
+  3: "a pale blue crystal shard glowing softly"  # 마나석 조각
+  4: "two fingers pressing one point with small rings rippling out"  # 혈도 짚기
+  5: "a clay oil jar tipping over as a spark lights the spill"  # 기름 단지
+  6: "a fingertip touching a point that freezes into thin blue lines"  # 점혈
+  7: "a seated meditating silhouette inside a soft golden ring of energy"  # 운기조식
+  8: "a plain, well-balanced sword resting across an open palm"  # 손에 맞는 검
+  9: "a fishing net thrown wide open in the air"  # 그물 던지기
+  10: "a small open jar of ointment with a wooden spatula"  # 금창약
+  11: "a light hand turning aside a huge boulder along a curved arrow"  # 사량발천근
+  12: "a heavy foot stamping down and cracking the stone floor"  # 천근추
+  13: "a single glowing red pill on a small dish"  # 영약 한 알
+  14: "a glowing figure shedding a cracked outer shell in golden light"  # 환골탈태
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }

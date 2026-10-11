@@ -1,0 +1,42 @@
+id: card_art_elia_1
+type: card-art-sheet
+summary: 엘리아 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - elia_fireball  # 불덩이
+  - elia_ice_wall  # 빛의 장막
+  - elia_mana_gift  # 마나 양도
+  - elia_freeze  # 은빛 덩굴
+  - elia_mend  # 상처 막기
+  - elia_firestorm  # 불기둥
+  - elia_green_ward  # 초록 결계
+  - elia_silver_tree  # 은빛 나무
+  - elia_kindle  # 불씨 잇기
+  - elia_frost_wind  # 서리바람
+  - elia_fog_herb  # 안개초
+  - elia_ghost_fire  # 청염초
+  - elia_clinic  # 은빛 의원
+  - elia_count  # 숨 세기
+  - elia_ice_thread  # 얼음의 실
+  - elia_silver_seed  # 은빛 씨앗
+frame_notes:
+  1: "a fireball bursting from the blue stone tip of a wooden staff"  # 불덩이
+  2: "a thin shimmering wall of pale light"  # 빛의 장막
+  3: "a staff touching a back, a stream of blue light flowing in"  # 마나 양도
+  4: "silver vines wrapping around a huge clawed foot"  # 은빛 덩굴
+  5: "a softly glowing hand over a wound in green-white light"  # 상처 막기
+  6: "a tall pillar of fire rising up a canyon wall"  # 불기둥
+  7: "a green dome barrier woven from leaves"  # 초록 결계
+  8: "a small silver tree with frost on its branches"  # 은빛 나무
+  9: "a tiny ember being blown into a doubled flame"  # 불씨 잇기
+  10: "a cold gust turning flying sparks white"  # 서리바람
+  11: "a pale herb releasing a drowsy purple-grey fog"  # 안개초
+  12: "blue ghost flames floating in darkness"  # 청염초
+  13: "a bundle of medicinal herbs beside a wooden bowl"  # 은빛 의원
+  14: "five small glowing dots in a row above a closing crack"  # 숨 세기
+  15: "a silver thread of ice unspooling from melting ice"  # 얼음의 실
+  16: "a silver seed sprouting into a bright tree across a dark crack"  # 은빛 씨앗
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue, frost white and forest green, with blue for mana, orange for fire and pale cyan for frost; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3a6ea5', accent: '#dff4ff' }

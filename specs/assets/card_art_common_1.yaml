@@ -1,0 +1,42 @@
+id: card_art_common_1
+type: card-art-sheet
+summary: 공용 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - common_punch  # 주먹 지르기
+  - common_guard  # 팔 막기
+  - common_trip  # 발 걸기
+  - common_crouch  # 몸 낮추기
+  - common_deep_breath  # 심호흡
+  - common_herb  # 지혈초
+  - common_sand  # 모래 뿌리기
+  - common_sling  # 돌팔매
+  - common_jab  # 급소 찌르기
+  - common_elbow  # 팔꿈치 치기
+  - common_torch  # 횃불
+  - common_campfire  # 모닥불 쬐기
+  - common_iron_shirt  # 철포삼
+  - common_palm_wind  # 장풍
+  - common_light_step  # 경공
+  - common_ginseng  # 산삼 뿌리
+frame_notes:
+  1: "a single clenched fist thrusting forward with a short white impact burst"  # 주먹 지르기
+  2: "a cloth-wrapped forearm raised to block, a small spark where a blow lands"  # 팔 막기
+  3: "a foot sweeping low across packed earth with a small puff of dust"  # 발 걸기
+  4: "a crouching figure ducking as a dark streak flies just over its head"  # 몸 낮추기
+  5: "a long pale breath curling upward in one slow spiral"  # 심호흡
+  6: "a small green leafy herb sprig with one drop of dew"  # 지혈초
+  7: "a hand flinging an arc of tan sand grains"  # 모래 뿌리기
+  8: "a leather sling whirling a round grey stone"  # 돌팔매
+  9: "two fingers jabbing a glowing point on a shoulder"  # 급소 찌르기
+  10: "a sharp elbow strike with a short curved impact arc"  # 팔꿈치 치기
+  11: "a wooden torch with a bright orange flame"  # 횃불
+  12: "a small campfire of crossed logs with a warm glow"  # 모닥불 쬐기
+  13: "a bare torso silhouette turned to dark iron with a metal sheen"  # 철포삼
+  14: "an open palm pushing a swirling gust that sweeps fallen leaves"  # 장풍
+  15: "a foot tip resting on a single blade of grass that does not bend"  # 경공
+  16: "a gnarled wild ginseng root with a cluster of red berries"  # 산삼 뿌리
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }

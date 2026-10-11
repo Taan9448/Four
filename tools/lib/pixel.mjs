@@ -154,6 +154,8 @@ const EDGE = 1;
 export function fitFrames(natives, spec, rows = natives.map(() => 0)) {
   const [T, TH] = spec.logical;
   if (spec.type === 'card-frame') return natives.map(fillFrame(T, TH));
+  // 카드 그림: 칸을 꽉 채운 그림. 옆 칸이 스며든 가장자리 1px을 덜고 칸 크기에 맞춘다
+  if (spec.type === 'card-art-sheet') return natives.map(fillFrame(T, TH, 1));
   const grounded = spec.type === 'character-ref' || spec.type === 'character-anim';
   let imgs = natives;
   let fit = 'pad';
@@ -210,9 +212,12 @@ export function fitFrames(natives, spec, rows = natives.map(() => 0)) {
  * 카드 틀: 틀이 프레임을 꽉 채워야 게임이 이름·글·보석을 제자리에 얹는다. 그림 상자만 잘라 프레임 크기에 꼭 맞게
  * 늘이거나 줄인다(최근접). 모델이 블록을 규격대로 그렸으면 그대로('pad'), 아니면 'fill'(검증이 배율을 알린다)
  */
-const fillFrame = (T, TH) => (n) => {
-  const box = contentBox(n);
+const fillFrame = (T, TH, inset = 0) => (n) => {
+  let box = contentBox(n);
   if (!box) return { img: { data: Buffer.alloc(T * TH * 4), width: T, height: TH }, fit: 'pad', native: [n.width, n.height] };
+  if (inset && box.w > inset * 2 + 8 && box.h > inset * 2 + 8) {
+    box = { minX: box.minX + inset, minY: box.minY + inset, w: box.w - inset * 2, h: box.h - inset * 2 };
+  }
   const crop = { data: Buffer.alloc(box.w * box.h * 4), width: box.w, height: box.h };
   for (let y = 0; y < box.h; y++) n.data.copy(crop.data, y * box.w * 4, ((box.minY + y) * n.width + box.minX) * 4, ((box.minY + y) * n.width + box.minX + box.w) * 4);
   const exact = box.w === T && box.h === TH;

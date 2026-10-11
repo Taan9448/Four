@@ -1,0 +1,34 @@
+id: card_art_haun_2
+type: card-art-sheet
+summary: 진하운 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 12
+cards:
+  - haun_stop_ring  # 고리 멈추기
+  - haun_thread  # 내공의 실
+  - haun_knot_poke  # 매듭 찌르기
+  - haun_log_split  # 통나무 가르기
+  - haun_haft_block  # 도끼 자루로 받기
+  - haun_water_yoke  # 물지게
+  - haun_calluses  # 굳은살
+  - haun_ride_grain  # 결을 따라
+  - haun_wedge  # 도끼 쐐기
+  - haun_breathing  # 청운호흡
+  - haun_eighteen  # 청운십팔식 연환
+  - haun_ten_thousand  # 만 번째 장작
+frame_notes:
+  1: "a golden ring of energy frozen still beside a thin dark crack"  # 고리 멈추기
+  2: "a glowing gold thread drawn out of a ring, stitching a tear"  # 내공의 실
+  3: "a wooden stick poking a tangled knot of dark lines"  # 매듭 찌르기
+  4: "a knotted log split cleanly in half by a single axe blow"  # 통나무 가르기
+  5: "an axe handle held sideways catching a charging boar tusk"  # 도끼 자루로 받기
+  6: "a shoulder yoke carrying two sloshing water buckets"  # 물지게
+  7: "a calloused palm shaped by an axe handle"  # 굳은살
+  8: "a chain of glowing grain lines leading from one cut to the next"  # 결을 따라
+  9: "an axe blade driven like a wedge into a log, the log splitting open"  # 도끼 쐐기
+  10: "a golden breath ring circling a quiet chest silhouette"  # 청운호흡
+  11: "six quick sword arcs joined into one flowing ribbon"  # 청운십팔식 연환
+  12: "a perfectly split log falling apart in silence, the axe resting on it"  # 만 번째 장작
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }
