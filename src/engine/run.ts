@@ -477,6 +477,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.module.content.enemies ?? []),
     };
   }
+  const pilgrim = pilgrimScale(data, run);
   return {
     world: stageWorld(data, run),
     party: run.selected.map((id) => {
@@ -493,8 +494,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
-    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1),
-    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1),
+    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1) * pilgrim.hp,
+    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg,
     relics: run.relics,
     potions: run.potions,
   };
@@ -1106,6 +1107,20 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
 }
 
 /** 어려움 배율(스테이지별, 없으면 1) */
+/**
+ * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안): 클리어한 일행으로 다시 걷는 길(replayOf)만. 그 밖에는 1.
+ * 1 + max(0, 하운 레벨 − 스테이지 기준 레벨) × 레벨당 배율 + 유물 수 × relicPct, 상한 maxHp·maxDmg(어려움 배율에 곱한다)
+ */
+export function pilgrimScale(data: GameData, run: Pick<RunState, 'replayOf' | 'roster' | 'relics' | 'stageId'>): { hp: number; dmg: number } {
+  if (!run.replayOf) return { hp: 1, dmg: 1 };
+  const p = data.balance.pilgrimage;
+  const haun = run.roster.find((r) => r.id === 'haun')?.level ?? 1;
+  const over = Math.max(0, haun - (p.baseLevel[run.stageId] ?? 1));
+  const relics = run.relics.length * p.relicPct;
+  const round = (x: number) => Math.round(x * 100) / 100;
+  return { hp: round(Math.min(p.maxHp, 1 + over * p.hpPerLevel + relics)), dmg: round(Math.min(p.maxDmg, 1 + over * p.dmgPerLevel + relics)) };
+}
+
 export function hardMul(data: GameData, stageId: string): { hp: number; dmg: number } {
   return data.balance.difficulty.hard.byStage[stageId] ?? { hp: 1, dmg: 1 };
 }

@@ -32,6 +32,8 @@ export interface BattleContext {
   laws?: { id: string; name: string; glyph: string; icon?: number; description: string }[];
   /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
   introText?: string;
+  /** 순례 일행 보정 한 줄(자유 여정에서만, 이야기 글 위) */
+  pilgrimText?: string;
   /** 전투 배경 에셋 id(실제 그림이 있을 때만 쓴다) */
   background?: string;
   /** 메뉴의 "타이틀로"(abandon=false: 저장은 이 전투 직전 지도에 남는다) / "런 포기"(abandon=true). 없으면 메뉴에 안 나온다 */
@@ -233,6 +235,7 @@ export class BattleView {
       h(
         'div',
         { class: 'b-center' },
+        this.ctx.pilgrimText ? h('p', { class: 'battle-pilgrim chip' }, this.ctx.pilgrimText) : null,
         this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
         this.riftEl,
         this.ctx.laws?.length

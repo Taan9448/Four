@@ -31,6 +31,8 @@ import {
   rewardOptions,
   skipReward,
   setParty,
+  restoreParty,
+  startReplay,
   upgradeCandidates,
   type RunOptions,
   type RunState,
@@ -447,13 +449,18 @@ const partyHp = (s: BattleState) => s.party.reduce((a, p) => a + Math.max(0, p.d
 
 /** 시드 하나로 S0부터(startStage면 그 스테이지부터, createRunAt) 끝(또는 패배)까지 둔다 */
 export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT_BOT, startStage?: string, mode: RunOptions = {}): RunReport {
-  const run = startStage ? createRunAt(data, seed, startStage, mode) : createRun(data, seed, mode);
+  return driveRun(data, startStage ? createRunAt(data, seed, startStage, mode) : createRun(data, seed, mode), seed, opts);
+}
+
+/** 런을 끝(또는 패배)까지 둔다. 다시 하는 길(순례)은 그 스테이지를 넘기면(stage_clear) 끝 */
+function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions): RunReport {
   const battles: BattleRecord[] = [];
   const stageEntry: RunReport['stageEntry'] = [];
   let floor = 0;
   let entered = '';
   for (let guard = 0; guard < 500; guard++) {
     if (run.status === 'complete' || run.status === 'defeat') break;
+    if (run.status === 'stage_clear' && run.replayOf) break;
     if (run.status === 'stage_clear') {
       advanceStage(data, run);
       continue;
@@ -519,7 +526,7 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
   }
   return {
     seed,
-    result: run.status === 'complete' ? 'complete' : 'defeat',
+    result: run.status === 'complete' || (run.replayOf && run.status === 'stage_clear') ? 'complete' : 'defeat',
     stageId: run.stageId,
     floor,
     battles,
@@ -530,6 +537,23 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
   };
 }
 
+// ───────────────────────── 순례(자유 여정, GAME_DESIGN 2절) ─────────────────────────
+
+/** 봇이 캠페인을 처음부터 끝까지 둔다. 마쳤으면 그 런(클리어 지도의 런처럼 일행 4명 복구), 졌으면 null */
+export function clearCampaign(data: GameData, seed: string, opts: BotOptions = DEFAULT_BOT, mode: RunOptions = {}): RunState | null {
+  const run = createRun(data, seed, mode);
+  driveRun(data, run, seed, opts);
+  if (run.status !== 'complete') return null;
+  restoreParty(data, run);
+  return run;
+}
+
+/** 클리어 일행(hub)으로 stageId를 다시 걷는다(순례): 보스를 넘기면 complete. nth: 같은 hub로 몇 번째 걷는지(지도 시드가 달라진다) */
+export function playPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): RunReport {
+  const h = structuredClone(hub);
+  h.replays[stageId] = nth;
+  return driveRun(data, startReplay(data, h, stageId), `${hub.seed}:${stageId}:${nth}`, opts);
+}
 
 // ───────────────────────── 심연(GAME_DESIGN 16절) ─────────────────────────
 

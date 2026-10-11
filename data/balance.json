@@ -88,6 +88,14 @@
       }
     }
   },
+  "pilgrimage": {
+    "baseLevel": { "s0": 1, "s1": 2, "s2": 3, "s3": 4, "s4": 6, "s5": 6.5, "s6": 7.5, "s7": 8.5, "s8": 9.5, "s9": 10 },
+    "hpPerLevel": 0.26,
+    "dmgPerLevel": 0.18,
+    "relicPct": 0,
+    "maxHp": 3.2,
+    "maxDmg": 2.6
+  },
   "enemyTiers": { "normal": { "hp": 1.4, "dmg": 0.8 }, "elite": { "hp": 1.2, "dmg": 1.35 }, "boss": { "hp": 1.0, "dmg": 1.0 } },
   "stage": { "healOnEnter": 1 },
   "abyss": {

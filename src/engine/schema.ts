@@ -587,6 +587,20 @@ export const Balance = z
     difficulty: z
       .object({ hard: z.object({ byStage: z.record(z.string(), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict()) }).strict() })
       .strict(),
+    /**
+     * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안): 자유 여정에서 적 체력·피해 배율 =
+     * 1 + max(0, 하운 레벨 − baseLevel[스테이지]) × hpPerLevel(dmgPerLevel) + 유물 수 × relicPct, 상한 maxHp·maxDmg
+     */
+    pilgrimage: z
+      .object({
+        baseLevel: z.record(z.string(), z.number().positive()),
+        hpPerLevel: z.number().min(0),
+        dmgPerLevel: z.number().min(0),
+        relicPct: z.number().min(0),
+        maxHp: z.number().min(1),
+        maxDmg: z.number().min(1),
+      })
+      .strict(),
     /** 적 등급별 체력·피해 배율(일반은 단단하고 약하게 → 한 전투 4~6턴, GAME_DESIGN 12절) */
     enemyTiers: z
       .partialRecord(z.enum(['normal', 'elite', 'boss']), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict())

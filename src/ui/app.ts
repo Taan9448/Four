@@ -41,7 +41,7 @@ import { openDeck } from './deck-view';
 import { relicChip } from './items';
 import { h } from './dom';
 import { initDebug } from './debug';
-import { mapView, openPartyGuide, placeName } from './map-view';
+import { mapView, openPartyGuide, pilgrimLabel, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
@@ -135,7 +135,7 @@ export class App {
   /**
    * ?abyss[=시드] — 심연 시작 화면을 바로(스토리를 마치지 않아도, 확인용).
    * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
-   * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용
+   * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용. &pilgrim이면 순례 길로(일행 보정)
    */
   private sandbox(seed: string, mates: string[], moduleId = 's1_battle_shadow_wolves'): void {
     const module = data.modules.get(moduleId);
@@ -151,6 +151,12 @@ export class App {
       { op: 'gain_relic', relic: 'cloud_tea' },
     ]);
     this.run = run;
+    // &pilgrim: 클리어한 런에서 이 스테이지를 다시 걷는 길(순례)로 — 일행 보정이 걸린다
+    if (new URLSearchParams(location.search).has('pilgrim')) {
+      const hub = createRunAt(data, seed, 's9', { supportActive: true });
+      hub.status = 'complete';
+      this.run = startReplay(data, hub, module.stage);
+    }
     const node = { id: 'sandbox', floor: 0, index: 0, type: module.type, moduleId, next: [] };
     this.playScene(module.content.scene, () => this.battle({ node, module }), module.content.background);
   }
@@ -614,6 +620,7 @@ export class App {
         supportActive: run.supportActive,
         bonusText: bonus,
         introText: enc.module.content.text,
+        pilgrimText: run.replayOf ? pilgrimLabel(data, run) : undefined,
         laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
         background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
         onQuit: (abandon) => {
