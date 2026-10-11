@@ -1578,6 +1578,13 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 .unit-name { display: inline-block; padding: 1px 7px; border-radius: 7px; background: rgba(8, 10, 14, 0.62); }
 /* 폭주 예고(균열이 max-2 이상) */
 .b-rift .surge-warn { color: #ff5a5a; font-weight: 700; font-size: var(--fs-cap); }
+/* 균열 8 이상: 게이지가 붉게 고동친다 · 이 카드를 쓰면 폭주(카드에 붉은 금 테두리, 게이지에 "폭주!") */
+.b-rift.near .gauge { border-color: #ff3b3b; animation: surge-near 0.7s ease-in-out infinite alternate; }
+@keyframes surge-near { from { box-shadow: 0 0 2px rgba(255, 59, 59, 0.4); } to { box-shadow: 0 0 14px rgba(255, 59, 59, 0.95); } }
+.b-rift .surge-now { color: #fff; background: #b3121b; border-radius: 4px; padding: 0 6px; font-weight: 800; font-size: var(--fs-cap); letter-spacing: 0.05em; animation: surge-near 0.5s ease-in-out infinite alternate; }
+.card.surge-risk { outline: 3px solid #ff3b3b; outline-offset: 1px; box-shadow: 0 0 0 1px #1d0505, 0 0 18px rgba(255, 40, 40, 0.85); }
+.card.surge-risk::after { content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; z-index: 5;
+  background: linear-gradient(118deg, transparent 46%, #120303 46.5% 48%, #ff3b3b 48% 48.6%, transparent 49%) , linear-gradient(64deg, transparent 58%, #120303 58.4% 59.4%, #ff3b3b 59.4% 59.8%, transparent 60.2%); opacity: 0.9; }
 /* 전투 중 대사·경고: 손패 바로 위 띠. 누르면 닫힌다 */
 .dock-mid { position: relative; }
 .dock-mid > .toasts-center { position: absolute; top: auto; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: min(640px, 100%); z-index: 30; }
@@ -1725,3 +1732,6 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .fx-screen-red::after { background: radial-gradient(ellipse at center, transparent 40%, rgba(220, 30, 30, 0.4)); }
 @keyframes screen-flash { from { opacity: 1; } to { opacity: 0; } }
 .no-motion .impact-slash, .no-motion .fx-screen-white::after, .no-motion .fx-screen-gold::after { display: none; }
+
+/* 지도 옆 칸: 상흔이 남긴 다음 전투 시작 균열(GAME_DESIGN 7절) */
+.start-rift { margin: 4px 0 0; font-size: var(--fs-cap); color: #ff8a8a; font-weight: 700; text-align: center; cursor: help; }

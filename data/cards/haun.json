@@ -193,8 +193,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
     "tags": ["haun_rift"],
-    "effects": [{"op": "damage", "amount": 4, "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
-    "upgrade": {"growth": [2, 0], "plus4": {"name": "이음매 누르기", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "금을 밟고", "effects": [{"op": "damage", "amount": 0, "scale": {"per": "rift", "amount": 1}}]}},
+    "effects": [{"op": "damage", "amount": 4, "scale": {"per": "rift", "amount": 1, "max": 6}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "upgrade": {"growth": [2, 0], "plus4": {"name": "이음매 누르기", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "금을 밟고", "effects": [{"op": "damage", "amount": 0, "scale": {"per": "rift", "amount": 1, "max": 6}}]}},
     "flavor": "검을 뽑지 않았다. 검집 끝으로 어깨와 손목의 이음매를 눌렀을 뿐인데, 곡도가 땅에 떨어졌다."
   },
   {
@@ -236,7 +236,7 @@
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_enemies",
     "tags": ["haun_rift"],
-    "effects": [{"op": "block", "amount": 8, "target": "self", "scale": {"per": "rift", "amount": 1}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "effects": [{"op": "block", "amount": 8, "target": "self", "scale": {"per": "rift", "amount": 1, "max": 8}}, {"op": "apply_status", "status": "weak", "stacks": 1}],
     "upgrade": {"growth": [3, 0], "plus4": {"name": "흘려보낸 장력", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "자국 없이", "cost": {"neigong": 1, "mana": 0}}},
     "flavor": "청운십팔식 제십오식. 떨어지는 구름은 자국을 남기지 않는다. 장력을 흘려보내자 상대의 균형이 무너졌다."
   },

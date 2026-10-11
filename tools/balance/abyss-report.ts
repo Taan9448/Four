@@ -89,6 +89,11 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
     ]),
   );
   lines.push(...warningSection(ws));
+  // 폭주(GAME_DESIGN 7절, 2026-10-11 개편): 전투당 0.3회 이하
+  const fights = runs.flatMap((r) => r.battles);
+  const surges = fights.reduce((a, b) => a + (b.surges ?? 0), 0);
+  lines.push(`- 폭주: 전투당 **${(fights.length ? surges / fights.length : 0).toFixed(2)}회**(목표 0.3 이하) · 폭주가 난 전투 ${fmtPct(fights.length ? fights.filter((b) => (b.surges ?? 0) > 0).length / fights.length : 0)}`);
+  lines.push('');
   lines.push('## 봇 성향별');
   lines.push('');
   lines.push('| 성향 | 런 | 도달 중앙값 | 상위 10% | 5굽이 | 8굽이 | 평균 덱 |');

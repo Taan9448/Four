@@ -487,9 +487,37 @@ export const Balance = z
         decay: z.record(World, z.number().int().min(0)),
         echoThreshold: z.number().int(),
         echoCard: z.string(),
-        surgeDamage: z.number().int(),
+        /**
+         * 폭주(균열 max, GAME_DESIGN 7절 — 2026-10-11 개편): 네 가지만 한다.
+         * ① 일행 전체가 최대 체력의 surgeRatio(올림)를 잃는다(방어 무시), 하운은 surgeHaunExtra 더. surgeEscalate면 같은 전투 n번째 폭주는 ×n
+         * ② 적 전체 힘 +surgeEnemyStrength, 흐름 포식·굶주림 적은 체력 surgeEnemyHeal 회복 ③ 틈의 잔향 surgeEchoToHand장을 손패에
+         * ④ 상흔 +surgeScar. 그 뒤 균열은 surgeResetTo로
+         */
+        surgeRatio: z.number().min(0),
+        surgeHaunExtra: z.number().int().min(0),
+        surgeEscalate: z.boolean(),
+        surgeEnemyStrength: z.number().int().min(0),
+        surgeEnemyHeal: z.number().int().min(0),
+        surgeEchoToHand: z.number().int().min(0),
+        surgeScar: z.number().int().min(0),
         surgeResetTo: z.number().int(),
+        /** 전투가 끝날 때 남은 균열 × scarRatio(내림)가 상흔이 된다 */
         scarRatio: z.number(),
+        /**
+         * 상흔(두 단계): 전투 시작 균열 = ⌊상흔 / startRiftPer⌋(최대 startRiftMax). 상흔 restAt 이상이면 휴식 회복 ×restHealMul.
+         * 휴식 '꿰매기' = 상흔 -stitch · 골드 stitchGold. 폭주 없이 보스를 이기면 상흔 -bossCleanBonus
+         */
+        scar: z
+          .object({
+            startRiftPer: z.number().int().positive(),
+            startRiftMax: z.number().int().min(0),
+            restAt: z.number().int().min(0),
+            restHealMul: z.number().min(0),
+            stitch: z.number().int().min(0),
+            stitchGold: z.number().int().min(0),
+            bossCleanBonus: z.number().int().min(0),
+          })
+          .strict(),
       })
       .strict(),
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),

@@ -1,5 +1,5 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
-import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
+import { canPlay, cardCausesSurge, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { potionChip, relicChip } from './items';
 import { hasSkipTurn } from '../engine/effects';
 import { cardText, ELEMENT_LABEL } from '../engine/text';
@@ -376,15 +376,17 @@ export class BattleView {
     const hot = s.rift >= bal.rift.echoThreshold;
     clear(this.riftEl);
     this.riftEl.className = `b-rift${hot ? ' hot' : ''}`;
-    Object.entries(tipAttrs(`균열 ${s.rift} / ${bal.rift.max}`, `융합 카드를 쓰면 쌓인다. ${bal.rift.echoThreshold} 이상이면 틈의 잔향이 덱에 섞이고, ${bal.rift.max}이면 폭주한다.\n전투가 끝나면 일부가 상흔으로 남는다(지금 상흔 ${this.ctx.scar}).`, 'rift')).forEach(([k, v]) => v && this.riftEl.setAttribute(k, v));
+    Object.entries(tipAttrs(`균열 ${s.rift} / ${bal.rift.max}`, `융합 카드를 쓰면 쌓인다. ${bal.rift.echoThreshold} 이상이면 틈의 잔향이 덱에 섞이고, ${bal.rift.max}이면 폭주한다.\n폭주: 일행 체력 ${Math.round(bal.rift.surgeRatio * 100)}%(하운 +${bal.rift.surgeHaunExtra}) · 적 힘 +${bal.rift.surgeEnemyStrength} · 잔향 ${bal.rift.surgeEchoToHand}장을 손에 · 상흔 +${bal.rift.surgeScar}. 균열은 ${bal.rift.surgeResetTo}으로.\n전투가 끝나면 남은 균열의 절반이 상흔으로 남는다(지금 상흔 ${this.ctx.scar}, 상흔 ${bal.rift.scar.startRiftPer}마다 전투 시작 균열 +1).`, 'rift')).forEach(([k, v]) => v && this.riftEl.setAttribute(k, v));
     this.riftEl.append(
       h('div', { class: 'gauge' }, h('i', { style: `width:${(s.rift / bal.rift.max) * 100}%` })),
       h('span', {}, `균열 ${s.rift} / ${bal.rift.max}`),
       s.surviveTurns !== null ? h('span', { class: 'survive' }, `버티기 ${Math.min(s.turn, s.surviveTurns)} / ${s.surviveTurns}턴`) : '',
     );
     this.riftEl.querySelector('span')!.replaceChildren('균열 ', h('b', {}, s.rift), ` / ${bal.rift.max}`, hot ? h('em', {}, ' 잔향') : '');
-    // 폭주 예고: 균열이 max-2 이상이면 "다음 +N이면 폭주"(붉은 글씨)
-    if (s.rift >= bal.rift.max - 2 && s.rift < bal.rift.max) this.riftEl.append(h('span', { class: 'surge-warn' }, `다음 +${bal.rift.max - s.rift}이면 폭주`));
+    // 폭주 예고: 균열이 max-2 이상이면 게이지가 붉게 고동치고 "다음 +N이면 폭주"
+    const near = s.rift >= bal.rift.max - 2 && s.rift < bal.rift.max;
+    this.riftEl.classList.toggle('near', near);
+    if (near) this.riftEl.append(h('span', { class: 'surge-warn' }, `다음 +${bal.rift.max - s.rift}이면 폭주`));
     this.pilesEl.replaceChildren(
       medal('抽', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
       medal('棄', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
@@ -722,9 +724,16 @@ export class BattleView {
       clear(u.preview);
       u.preview.className = 'dmg-preview';
     }
+    for (const el of this.handEls.values()) el.classList.remove('surge-risk');
+    this.riftEl.querySelector('.surge-now')?.remove();
     const s = this.state;
     const i = this.selected ?? this.hovered;
     if (i === null || this.busy || s.result || !s.hand[i]) return;
+    // 이 카드를 쓰면 폭주한다: 카드에 붉은 금 테두리, 균열 게이지에 "폭주!"
+    if (cardCausesSurge(s, i)) {
+      this.handEls.get(s.hand[i].uid)?.classList.add('surge-risk');
+      this.riftEl.append(h('span', { class: 'surge-now' }, '폭주!'));
+    }
     const need = needsTarget(s, s.hand[i]);
     // 줄 피해는 아군의 받을 피해와 같은 작은 상자로(치명타는 운이라 미리 보이지 않는다)
     const show = (uid: string, v: CardPreviewHit | undefined) => {
@@ -1373,6 +1382,8 @@ export class BattleView {
     const win = s.result === 'victory';
     const t = s.tally;
     const stats: [string, number][] = [[s.survived ? '버틴 턴' : '턴', s.turn], ['준 피해', t?.damage ?? 0], ['쓰러뜨림', t?.kills ?? 0]];
+    // 폭주가 났으면 횟수와 폭주로 잃은 체력(GAME_DESIGN 7절)
+    if (t?.surges) stats.push(['폭주', t.surges], ['폭주로 잃은 체력', t.surgeHp ?? 0]);
     const haun = s.party.find((p) => p.defId === 'haun');
     // 받침이 있으면 '이', 없으면 '가'
     const iga = (name: string) => { const c = name.charCodeAt(name.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 ? '이' : '가'; };

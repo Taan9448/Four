@@ -557,9 +557,11 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             'div',
             { class: 'stage-stats' },
             h('span', tipAttrs('마나', '런 전체에서 이어지는 마나. 세계마다 차는 양이 다르다.', 'mana'), h('b', {}, `${run.mana}/${data.balance.mana.max}`), '마나'),
-            h('span', tipAttrs('상흔', '균열이 남긴 흔적.', 'rift'), h('b', {}, run.scar), '상흔'),
+            h('span', tipAttrs('상흔', scarTip(data), 'rift'), h('b', {}, run.scar), '상흔'),
             h('span', {}, h('b', {}, run.deck.length), '덱'),
           ),
+          // 상흔이 남은 만큼 다음 싸움은 금이 간 채 시작한다(GAME_DESIGN 7절)
+          startRiftLine(data, run.scar),
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
@@ -609,4 +611,17 @@ function pilgrimChallenges(data: GameData, run: RunState): HTMLElement | null {
       return h('li', { class: `ch-${state}`, ...tipAttrs(`도전 — ${c.name}`, `${c.description}\n${label}`) }, h('b', {}, mark), h('span', {}, c.name));
     }),
   );
+}
+
+/** 상흔 주석: 두 단계(GAME_DESIGN 7절) */
+function scarTip(data: GameData): string {
+  const sc = data.balance.rift.scar;
+  return `균열이 남긴 흔적. 상흔 ${sc.startRiftPer}마다 전투 시작 균열 +1(최대 ${sc.startRiftMax}).\n상흔 ${sc.restAt} 이상이면 휴식 회복 -${Math.round((1 - sc.restHealMul) * 100)}%.\n휴식의 꿰매기(상흔 -${sc.stitch}), 폭주 없이 보스를 넘기면(상흔 -${sc.bossCleanBonus}) 아문다.`;
+}
+
+/** 다음 전투 시작 균열 줄(0이면 감춘다) */
+function startRiftLine(data: GameData, scar: number): HTMLElement | null {
+  const sc = data.balance.rift.scar;
+  const n = Math.min(sc.startRiftMax, Math.floor(scar / sc.startRiftPer));
+  return n > 0 ? h('p', { class: 'start-rift', ...tipAttrs('금이 간 채 시작한다', scarTip(data), 'rift') }, `다음 전투 시작 균열 ${n}`) : null;
 }

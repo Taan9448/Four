@@ -591,6 +591,13 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     return [];
   }
   const out: string[] = [];
+  // 폭주 없이 보스를 넘기면 금이 조금 아문다(GAME_DESIGN 7절)
+  const clean = data.balance.rift.scar.bossCleanBonus;
+  if (enc.node.type === 'boss' && clean && (outcome.tally?.surges ?? 0) === 0 && run.scar > 0) {
+    const before = run.scar;
+    run.scar = Math.max(0, run.scar - clean);
+    out.push(`폭주 없이 넘긴 싸움 — 상흔 -${before - run.scar}`);
+  }
   if (isAbyss(run)) {
     // 심연: 쓰러진 채 끝난 동료는 부상(다음 굽이까지 최대 체력 감소). 보스·엘리트 수는 점수에. 이야기 clearEffects는 없다
     const ab = run.abyss!;
@@ -811,15 +818,22 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
         disabled: used >= limit ? '이번 굽이에 이미 버렸다' : run.deck.length <= 1 ? '덱이 너무 적다' : undefined,
       });
     if (Object.keys(run.abyss!.injuries).length) list.push({ label: '치료 — 부상을 모두 고친다', effects: [{ op: 'cure_injury' }], result: '상처를 싸맸다.', source: 'module' });
-    // 꿰매기: 상흔을 덜어 낸다(GAME_DESIGN 16절 — 심연에서 상흔은 자원)
-    if (run.scar > 0)
-      list.push({
-        label: '꿰매기 — 상흔 -3, 골드 60',
-        effects: [{ op: 'scar', amount: -3 }, { op: 'gain_gold', amount: -60 }],
-        result: '하늘의 금을 몇 땀 꿰맸다.',
-        source: 'module',
-        disabled: run.gold < 60 ? '골드 60 필요' : undefined,
-      });
+  }
+  // 상흔이 restAt 이상이면 휴식 회복이 준다(applyChoice) — 고르기 전에 보이게
+  if (module.type === 'rest' && run.scar >= data.balance.rift.scar.restAt) {
+    const pct = Math.round((1 - data.balance.rift.scar.restHealMul) * 100);
+    for (const c of list) if (c.effects.some((e) => e.op === 'heal_party')) c.label += ` (상흔 ${data.balance.rift.scar.restAt}+: 회복 -${pct}%)`;
+  }
+  // 꿰매기: 상흔을 덜어 낸다(GAME_DESIGN 7절 — 캠페인·심연 모두, 상흔이 있으면 휴식마다)
+  if (module.type === 'rest' && run.scar > 0) {
+    const sc = data.balance.rift.scar;
+    list.push({
+      label: `꿰매기 — 상흔 -${sc.stitch}, 골드 ${sc.stitchGold}`,
+      effects: [{ op: 'scar', amount: -sc.stitch }, { op: 'gain_gold', amount: -sc.stitchGold }],
+      result: '하늘의 금을 몇 땀 꿰맸다.',
+      source: 'module',
+      disabled: run.gold < sc.stitchGold ? `골드 ${sc.stitchGold} 필요` : undefined,
+    });
   }
   if (module.type === 'rest' && run.supportActive) {
     for (const rule of data.support.filter((r) => r.trigger === 'restOption')) {
@@ -834,8 +848,9 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
   if (choice.disabled) throw new Error(`고를 수 없는 선택지: ${choice.disabled}`);
-  // 굽이의 법칙 '무거운 발': 휴식의 회복이 줄어든다
-  const healMul = module.type === 'rest' ? lawRunMul(data, run, 'restHealMul') : 1;
+  // 굽이의 법칙 '무거운 발': 휴식의 회복이 줄어든다. 상흔이 restAt 이상이면 금 간 하늘 아래서 덜 쉬어진다
+  const sc = data.balance.rift.scar;
+  const healMul = module.type === 'rest' ? lawRunMul(data, run, 'restHealMul') * (run.scar >= sc.restAt ? sc.restHealMul : 1) : 1;
   const effects = healMul === 1 ? choice.effects : choice.effects.map((e) => (e.op === 'heal_party' ? { ...e, ratio: e.ratio !== undefined ? e.ratio * healMul : undefined, amount: e.amount !== undefined ? Math.floor(e.amount * healMul) : undefined } : e));
   const out = applyRunOps(data, run, effects, { pick });
   // 확률 결과: 노드마다 정해진 수열로 하나를 고른다(같은 시드면 같은 결과)
