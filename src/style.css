@@ -1192,7 +1192,14 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .world-map .tag { font-size: var(--fs-body); top: -30%; }
 .stop.paused i { background: var(--mana); border-color: #dff4ff; box-shadow: 0 0 0 5px rgba(143, 211, 255, 0.3); animation: pulse 1.6s infinite; }
 .stop .paused-tag { padding: 0 6px; border-radius: 8px; background: rgba(18, 50, 74, 0.9); color: #dff4ff; font-size: var(--fs-min); }
-.hub-bottom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 300px; gap: 12px; padding: 12px; align-items: start; text-align: left; }
+.hub-bottom { display: grid; grid-template-columns: minmax(0, 1fr); width: min(100% - 24px, calc(62vh * 3)); margin: 12px auto; text-align: left; }
+/* 순례 모드 위 띠(2026-10-11): 왼쪽 '순례 모드', 오른쪽 보유 카드 · 도감 · 타이틀로. 지도와 같은 너비 */
+.hub-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; width: min(100% - 24px, calc(62vh * 3)); margin: 10px auto 8px; }
+.hub-mode { display: flex; align-items: center; gap: 10px; }
+.hub-mode .seal { width: 38px; height: 38px; font-size: calc(var(--fs-title) * 0.8); }
+.hub-mode b { font: 400 calc(var(--fs-title) * 0.95)/1 var(--f-brush); letter-spacing: 0.08em; color: #f5d98c; }
+.hub-mode small { color: var(--ink-dim); font-size: var(--fs-cap); }
+.hub-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .hub-bottom > .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 12px 14px; box-shadow: inset 0 0 0 3px rgba(14, 13, 17, 0.9), inset 0 0 0 4px rgba(168, 40, 30, 0.35); }
 .hub-side .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 10px 12px; font-size: var(--fs-sub); }
 .hub-guide h3, .hub-party h3 { margin: 2px 0 6px; }
@@ -1208,7 +1215,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .stop.pick:hover { color: #fff; }
 .stop.pick:hover i { box-shadow: 0 0 0 5px rgba(226, 180, 92, 0.45); }
 .stop .replays { color: #e2b45c; font-size: var(--fs-min); }
-@media (max-width: 900px) { .hub-bottom { grid-template-columns: minmax(0, 1fr); } .hub-world .journey-wrap { width: 100%; } .world-map { width: 180%; } }
+@media (max-width: 900px) { .hub-bottom, .hub-top { width: calc(100% - 24px); } .hub-world .journey-wrap { width: 100%; } .world-map { width: 180%; } }
 
 /* 도감(2026-10-08): 위 머리(제목·탭) + 아래 판(스크롤). 못 본 칸은 ? 실루엣 */
 .codex-screen { display: flex; flex-direction: column; gap: 10px; height: calc(100vh - 20px); }
