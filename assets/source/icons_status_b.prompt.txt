@@ -1,0 +1,30 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: burn — a small orange-red flame licking up from a glowing ember
+Cell 2: chill — a pale blue snowflake with a thin frost ring around it
+Cell 3: daze — a small hand of three playing cards fanned out, one card slipping away with motion lines
+Cell 4: broken breath — a gold breath swirl cut in the middle by a dark slash
+Cell 5: thorns — a short thorny vine curled into a ring, sharp black thorns with red tips
+Cell 6: smoke screen — a thick grey cloud of smoke puffs hiding a faint silhouette
+Cell 7: unmoving one — a closed eye drawn as a calm horizontal line over a still blue circle
+Cell 8: mountain mends — a small green mountain peak with a rising heal plus sign
+Cell 9: frozen heart — a red heart sealed inside a pale blue ice crystal
+Cell 10: shadow body — a black humanoid shadow with two red dot eyes and a faint violet outline
+Cell 11: two thrones — two small dark thrones side by side, the front one empty, a red glow behind
+Cell 12: dead forest body — a bare dead tree wrapped in grey mist
+Cell 13: blood cover — a crimson veil draped over a wood-grain circle, hiding it
+Cell 14: fading blood cover — the same crimson veil but thinner and pale, half transparent, with gaps
+Cell 15: rift hunger — a black jagged crack in the shape of an open mouth with a red glint inside
+Cell 16: seam — a torn cloth edge held by three cross stitches of silver thread
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Match the actual visual size of the attached merged icons_status frame_01 through frame_12. Those symbols occupy about 34–40 native sprite pixels in a 64×64 cell, NOT 50–56 pixels. Redraw all sixteen symbols at that same reference scale: the complete symbol including tiny sparks, haze, stitches, motion marks and halos must fit within a centered 40×40 sprite-pixel box (160×160 canvas pixels per 256×256 cell). Keep the characteristic one-sprite-pixel dark navy outline and the same simple 2–3 flat tone steps as the reference. Preserve the exact sixteen cell subjects and their order. Do not add any writing; card suit shapes are fine. Cell 16 has exactly three silver cross stitches. No content approaches or crosses cell boundaries.
+Fix: The previous output had the wrong aspect ratio, 1274×1235, which the slicing tool rejects. The output image MUST be exactly SQUARE, 1024×1024 with equal width and height. Four columns and four rows of equal square 256×256 cells. Keep all sixteen complete symbols approximately 36–40 sprite pixels tall and wide, matching the attached original twelve icons. Cell 3 has exactly THREE playing cards TOTAL: TWO overlapping cards still in the hand and ONE third card slipping away, plus two small motion strokes, never a fourth card. Render all highlights and fading cloth as solid flat pixel blocks without gradients, semitransparency, antialiasing or tiny texture.
