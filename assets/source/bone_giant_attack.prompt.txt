@@ -1,0 +1,25 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Bone Giant of the rift, a hunched giant built of huge pale bones fitted together, a ribcage like a cage, dark crimson qi flowing in the gaps between the bones like veins, a skull with dim red light in the sockets. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: raises a long bone arm high
+Cell 2: the arm at its peak, crimson qi flaring
+Cell 3: leans forward to the left
+Cell 4: the bone arm crashes down to the left, bone shards and red qi bursting
+Cell 5: pulls the arm back
+Cell 6: returns to the hunched stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Actual CAMERA and finalpose failures: cells1/2/5/6 FRONTALribcage, cells3/4side. ALLsix ONLY referenceCELL2 LEFTSIDE: skullsidewithONEeye, ribs sweepBACKright undernearshoulder, spinecurvebehindright, NEVER sternum/pairedfrontalshoulders. Last6 EXACThunchedsideIDLE referenceCELL2 both longhands hangingdown andclosedjaw, notfrontal. Same99nativepx BODYheight andbone dimensions regardless bentpose. Raisedarm1/2 bendselbowcompactabove skullto fitinside512cell, nevergrowtorso or shrinklegbones. Sourcebodyhighestbackspikelocaly80, feety476; raisedfistmayreachy24, effects x24..488y24..488. Cell4crasharmDOWNLEFTwithfewsmallshards/redqiburst INSIDEowncell, NOTalongentirewidthgroundline. Cell5armretractsside,6bothhangrefSIDE. Keep6cells3x2. Height deviation34% came from armabovehead; compactbendelbow maximumwholebbox difference20%whilebodyconstant.
+
+
+Fix: STILL camera inconsistent in1/2/5: they show frontal ribs/collar crossbar and frontal skull. Use exactsidePOSEcell6asALLSIXanatomicaltemplate: SKULLsingleeye projectsLEFT, nearhugehumerusoccludes front-left ribs, upperribs arc behind shoulder toRIGHT, far arm mostlyhidden. Lift ONLYnearforearm in1/2 whilethe SAMEsidechest stays fixed, no frontalsternum. In3leanSAMEsidebody5degreesforward (previous3merelyidle),4armdownleftcompactshards,5retractsamearmONLYsideprofile. 6matchreferenceCELL2twoarmsdownoneeyesidehunch. Same99pxbodyheight:spike y80,feet476; previous6bodyheight94pxcomparedref99 — increasetorsoheightfewpixels to99 whileallhead/torso99constant. Entirehandtopat y40, armpeakmustnotstretchoversize. ALLeffects x24..480y24..488, noframe4atx512.6samecamera2notfrontal,4impactburstsmallcompact.
