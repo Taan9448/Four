@@ -1,0 +1,29 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm stone and forge palette: granite grey, iron, ember orange, earth brown and red beard tones; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a thick wooden beam propping up a cracking mine ceiling
+Cell 2: rows of small stone cairns in a dark cavern
+Cell 3: stone closing over a deep crack in a mountainside
+Cell 4: a stone block with clear layered grain lines
+Cell 5: an anvil sending out ringing sound waves
+Cell 6: a dwarf with a lantern standing at a dark new tunnel entrance
+Cell 7: a braided red beard with an iron ring
+Cell 8: a stout dwarf running with a companion on his back
+Cell 9: a dwarf hand holding out one plain sword
+Cell 10: boulders falling from a cliff edge
+Cell 11: a hammer slamming down onto an anvil, sparks flying
+Cell 12: a war hammer spinning inside a circle of motion lines
+Cell 13: a grey rock chest plate with one small ember glowing in its middle
+Cell 14: a wooden ale barrel with foam spilling over the top
+Cell 15: an unrolled map of branching mine tunnels drawn in lines, no writing
+Cell 16: a dwarf face roaring, beard bristling
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+
+Fix: Preserve exactly sixteen equal landscape pictures in a 4-by-4 grid. The previous attempt placed the LAST ROW at y752 rather than y768, contaminating the bottom of cell9 with red beard fragments from cell13 below it. Row boundaries MUST be at EXACTLY y256, y512, y768: four equal row heights256. In particular cell9 ONE plain sword in a dwarf hand has ONLY its calm earth-colored background at the bottom, never red beard fragments or a slice of another card. Cell13 begins only at y768. No picture or effect crosses into its neighbor. No gutters or dividing lines. Keep all 16 frame_notes subjects and the exact row-major order. Cell14 is a LARGE WOODEN ALE STORAGE BARREL with a broad rounded body and two iron hoops, foam over the open top, absolutely NO handle or drinking mug. Cell12 is ONE spinning blunt rectangular war hammer with a plain unmarked wooden handle: NO runes, diamonds, symbols, letters, decoration or patterns on the handle. Cell11 hammer also blunt and undecorated. Born has grey iron armor, broad dwarf shoulders and three braided RED beard strands as the attached Born1 reference, especially cells6,8,16. Cell15 contains only branching tunnel lines on a plain unrolled map, no writing or symbols. Large simple subjects, calm flat 2-3 tone backgrounds without extra props, decorative motifs, small texture noise, text or borders. Canvas1536x1024, each384x256 equals logical96x64 in aligned4x4 square source blocks.
