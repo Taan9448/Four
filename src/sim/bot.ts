@@ -348,7 +348,13 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
       const focus = botArchetype(data, run, def.owner);
       return !!focus && def.tags.includes(focus);
     };
-    return fresh.find(fits) ?? fresh.find((id) => data.cards.get(id)!.tags.length === 0 && data.cards.get(id)!.type !== 'status');
+    // 그다음 그 동료(공용은 일행)의 다른 갈래 카드, 그다음 갈래 없는 잇는 카드
+    const anyArch = (id: string) => {
+      const def = data.cards.get(id)!;
+      const owners = data.characters.has(def.owner) ? [def.owner] : run.roster.map((r) => r.id);
+      return owners.some((o) => (data.characters.get(o)?.archetypes ?? []).some((a) => def.tags.includes(a.id)));
+    };
+    return fresh.find(fits) ?? fresh.find(anyArch) ?? fresh.find((id) => data.cards.get(id)!.tags.length === 0 && data.cards.get(id)!.type !== 'status');
   }
   // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
   if (isAbyss(run) && run.deck.length >= 25 && value < RARITY_VALUE.epic) return undefined;
@@ -489,6 +495,8 @@ export interface RunReport {
   cracks?: { made: number; entered: number };
   /** 카드 통계(보고서 '카드' 절): 보상 후보로 본 수 · 고른 수 · 스테이지 편성에 든 수 · 전투에서 쓴 수 */
   cardLog?: CardLog;
+  /** 스테이지 편성 중 동료 편성 수 · 그중 갈래 보너스(같은 갈래 5장 이상)가 켜진 수 */
+  focus?: { loadouts: number; focused: number; possible: number };
 }
 
 export interface CardLog {
@@ -509,6 +517,7 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
 function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions): RunReport {
   const battles: BattleRecord[] = [];
   const log: CardLog = { offered: {}, picked: {}, loadout: {}, used: {} };
+  const focus = { loadouts: 0, focused: 0, possible: 0 };
   const bump = (rec: Record<string, number>, id: string, n = 1) => (rec[id] = (rec[id] ?? 0) + n);
   const stageEntry: RunReport['stageEntry'] = [];
   let floor = 0;
@@ -520,10 +529,18 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
       advanceStage(data, run);
       continue;
     }
-    // 스테이지 시작 편성: 추천 편성 그대로(GAME_DESIGN 9-1)
+    // 스테이지 시작 편성: '전체 추천 편성' 그대로(GAME_DESIGN 9-1 — 지난 편성을 지키지 않고 가진 카드로 새로 짠다)
     if (run.needsLoadout) {
-      setLoadout(data, run, recommendLoadout(data, run, run.loadout));
+      setLoadout(data, run, recommendLoadout(data, run));
       for (const ids of Object.values(run.loadout)) for (const id of ids) bump(log.loadout, id);
+      for (const owner of Object.keys(run.loadout)) {
+        if (!data.characters.has(owner)) continue;
+        focus.loadouts++;
+        if (run.loadoutFocus?.[owner]) focus.focused++;
+        // 보너스를 켤 수 있었나: 그 동료가 한 갈래 카드를 focusMin장 이상 가졌다
+        const owned = Object.keys(run.collection).map((id) => data.cards.get(id)).filter((d) => d?.owner === owner && (d.pool === 'starter' || d.pool === 'reward' || d.pool === 'story'));
+        if ((data.characters.get(owner)?.archetypes ?? []).some((a) => owned.filter((d) => d!.tags.includes(a.id)).length >= data.balance.loadout.focusMin)) focus.possible++;
+      }
     }
     if (entered !== run.stageId) {
       entered = run.stageId;
@@ -601,6 +618,7 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
     relics: [...run.relics],
     cracks: run.stats.cracks,
     cardLog: log,
+    focus,
   };
 }
 

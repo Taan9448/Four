@@ -95,6 +95,9 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
 function cardSection(data: GameData, runs: RunReport[]): string[] {
   const sum = (key: 'offered' | 'picked' | 'loadout' | 'used', id: string) => runs.reduce((a, r) => a + (r.cardLog?.[key][id] ?? 0), 0);
   const stages = runs.reduce((a, r) => a + r.stageEntry.length, 0);
+  const loadouts = runs.reduce((a, r) => a + (r.focus?.loadouts ?? 0), 0);
+  const focused = runs.reduce((a, r) => a + (r.focus?.focused ?? 0), 0);
+  const possible = runs.reduce((a, r) => a + (r.focus?.possible ?? 0), 0);
   const rows = [...data.cards.values()]
     .filter((c) => c.pool === 'reward' || c.pool === 'starter')
     .map((c) => {
@@ -124,6 +127,7 @@ function cardSection(data: GameData, runs: RunReport[]): string[] {
     '',
     `시작·보상 카드 ${rows.length}장. 선택률은 보상 후보로 본 횟수 중 고른 비율(봇: 희귀 이상 먼저, 없으면 모으는 갈래 태그가 맞는 카드). 편성 포함은 스테이지 편성 중 그 카드가 든 비율.`,
     `죽은 카드: 선택률 하위 15%(보상 노출 20번 이상, 선택률 ${fmt(cut)} 이하) 또는 편성에 한 번도 들지 않은 카드 — **${dead.length}장(${fmt(dead.length / Math.max(1, rows.length))})**(목표 15% 이하).`,
+    `갈래 보너스가 켜진 편성(동료 편성 중 같은 갈래 5장 이상): 켤 수 있었던 편성(한 갈래 카드를 5장 이상 가짐) 중 **${fmt(focused / Math.max(1, possible))}**(목표 60% 이상, ${focused}/${possible}) · 모든 동료 편성 중 ${fmt(focused / Math.max(1, loadouts))}(${loadouts}).`,
     '',
     '### 죽은 카드',
     '',
