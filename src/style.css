@@ -140,6 +140,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .title-foot { position: absolute; bottom: 10px; left: 0; right: 0; margin: 0; font-size: var(--fs-min); color: rgba(235, 230, 218, 0.5); }
 .seed-input { background: var(--bg2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; width: 12em; font-family: ui-monospace, monospace; }
 .support-toggle { color: var(--neigong); cursor: pointer; }
+.party-box .support-toggle { margin: 6px 0 0; padding: 6px 8px; border-radius: 4px; background: rgba(226, 180, 92, 0.08); border-left: 3px solid var(--neigong); font-size: var(--fs-sub); }
+.party-box .support-toggle .member-tag { margin-right: 4px; }
 
 /* 지도: 위 여정 띠 + 아래 두루마리 지역 지도 */
 /* 창 높이를 꽉 채운다: 위 여정 띠(전체 폭) → 아래 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸 */
@@ -248,6 +250,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(143, 211, 255, 0.05); } }
 .here-mark { position: absolute; z-index: 3; width: 56px; transform: translate(-50%, -92%); image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)); }
 .side-panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow-y: auto; }
+/* 칸은 줄어들지 않는다 — 누르는 상자(보유 장비, role=button)의 최소 높이 규칙 때문에 내용보다 작게 줄어 유물이 아래 '출전'과 겹쳤다(2026-10-11) */
+.side-panel > * { flex-shrink: 0; }
 /* 좁은 화면: 위에서 아래로 쌓고, 여정 띠와 두루마리는 가로로 밀어 본다 */
 @media (max-width: 900px) {
   .map-screen { height: auto; min-height: 0; }

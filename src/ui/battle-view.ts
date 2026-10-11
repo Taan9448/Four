@@ -597,7 +597,7 @@ export class BattleView {
     this.flown.add(inst.uid);
     sfx('tear', { volume: 0.7 });
     const tear = tearCard(el, {
-      ms: 1000 * Math.max(0.6, settings.speed),
+      ms: 850 * Math.max(0.6, settings.speed),
       toward: to,
       stage: this.tearStage(el),
       onTear: (x, y, height) => {
@@ -612,12 +612,18 @@ export class BattleView {
     await tear;
   }
 
-  /** 낸 카드를 찢는 자리: 전장(유닛 줄) 앞 가운데, 카드는 화면 높이의 40%쯤(2026-10-11 사용자 요청 — 손패 위에서 찢겨 잘 안 보이던 것) */
+  /**
+   * 낸 카드를 찢는 자리: 손패에서 골라 확대된 그 자리(2026-10-11 사용자 요청 — 전장 가운데는 너무 위였다).
+   * 카드가 1.5배쯤으로 조금 더 커지고, 아래 끝이 화면 안에 들어오게만 올린다
+   */
   private tearStage(el: HTMLElement): { x: number; y: number; height: number } | null {
-    const field = this.root.querySelector<HTMLElement>('.units')?.getBoundingClientRect();
-    if (!field || !field.width) return null;
-    const height = Math.min(innerHeight * 0.38, 320, field.height * 0.95);
-    return { x: field.left + field.width / 2, y: Math.max(height / 2 + 8, field.top + field.height * 0.5), height: Math.max(height, el.offsetHeight * 1.1) };
+    const r = el.getBoundingClientRect();
+    if (!r.width) return null;
+    const height = Math.min(el.offsetHeight * 1.5, innerHeight * 0.42);
+    const width = height * (el.offsetWidth / Math.max(1, el.offsetHeight));
+    const x = Math.min(Math.max(r.left + r.width / 2, width / 2 + 8), innerWidth - width / 2 - 8);
+    const y = Math.min(r.top + r.height / 2, innerHeight - 12 - height / 2);
+    return { x, y, height };
   }
 
   /** 턴 종료: 남길(유지) 카드를 뺀 손패를 버린 더미로 차례로 날린다 */
