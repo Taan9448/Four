@@ -489,7 +489,7 @@ export class BattleView {
     this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
     s.hand.forEach((inst, i) => {
       const check = canPlay(s, i);
-      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i });
+      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i, flavor: 'hover' });
       const off = i - mid;
       el.style.setProperty('--rot', `${off * step}deg`);
       el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
@@ -499,6 +499,16 @@ export class BattleView {
         this.onCardClick(i);
       });
       el.addEventListener('pointerdown', (e) => this.startDrag(e, i, el));
+      // 키보드: Tab으로 옮겨 다니고 Enter·Space로 고른다(포커스 링은 style.css :focus-visible)
+      el.tabIndex = 0;
+      el.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        this.onCardClick(i);
+      });
+      el.addEventListener('focus', () => this.setHover(i));
+      el.addEventListener('blur', () => this.setHover(null));
       el.addEventListener('mouseenter', () => this.setHover(i));
       el.addEventListener('mouseleave', () => this.setHover(null));
       this.handEl.appendChild(el);

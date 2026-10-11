@@ -47,7 +47,7 @@ function openCard(data: GameData, def: CardDef, best: number): void {
   const levels = h('div', { class: 'zoom-levels' });
   const owner = data.characters.get(def.owner)?.name ?? (def.owner === 'common' ? '공용' : def.owner);
   const show = (lv: number) => {
-    big.replaceChildren(cardView(data, { uid: `zoom_${def.id}`, cardId: def.id, level: lv }));
+    big.replaceChildren(cardView(data, { uid: `zoom_${def.id}`, cardId: def.id, level: lv }, { flavor: 'full' }));
     for (const b of levels.children) b.classList.toggle('on', Number((b as HTMLElement).dataset.lv) === lv);
   };
   if (best > 0) for (let lv = 0; lv <= best; lv++) levels.append(h('button', { class: 'btn btn-small', 'data-lv': lv, onclick: () => show(lv) }, lv ? `+${lv}` : '기본'));
