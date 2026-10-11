@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 32x32 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one jewel per cell for a collectible card game, all in ONE consistent pixel-art style like a set, centered in the cell, light from the upper left, 2-3 flat tone steps, 1-pixel dark outline, no background plate. Cells 1 and 2 are the big COST gems (about 28x28 sprite pixels, they sit on the top-left corner of a card and the game prints a white number on their face, so the middle of the face stays plain and a little dark). Cells 3 to 7 are small RARITY gems (about 14x14 sprite pixels, centered, the rest of the cell empty) that sit in a small setting below a card's name banner.
+Style: crisp detailed 32x32 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Use at most 12 colors.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: inner qi cost — a round gold coin-like disc (#6b3e08, #b8741a, #f2a93b, #ffe08a) with a carved cloud-scroll rim and a plain, slightly darker amber face
+Cell 2: mana cost — a faceted hexagonal blue crystal (#1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff) in a thin silver setting, the center facet plain and a little darker
+Cell 3: common — a small round pale grey-white stone (#8a90a3, #c2c6d1, #f1efe6)
+Cell 4: uncommon — a small faceted green jade gem (#2f5a3a, #6aa84f, #bfe3a0)
+Cell 5: rare — a small faceted blue sapphire (#1f3f73, #3a6ea5, #8fd3ff)
+Cell 6: epic — a small faceted purple amethyst (#3b2160, #7a4fc0, #c8a8ff)
+Cell 7: legendary — a small faceted orange-gold topaz with a single white sparkle (#b8741a, #f2a93b, #ffe08a, #ffffff)
+Cells 8 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 2 sprite pixels of empty space inside every cell edge.
