@@ -227,6 +227,8 @@ describe('데이터 검사', () => {
     // 2026-10-11: 모든 상태·유물에 아이콘 칸이 있다(그림이 오기 전에는 한 글자 배지)
     for (const s of data.statuses.values()) if (!s.icon) bad.push(`상태 ${s.id}: icon 없음`);
     for (const r of data.relics.values()) if (!r.icon) bad.push(`유물 ${r.id}: icon 없음`);
+    for (const l of data.laws.values()) if (!l.icon) bad.push(`법칙 ${l.id}: icon 없음`);
+    for (const a of data.affixes.values()) if (!a.icon) bad.push(`접사 ${a.id}: icon 없음`);
     const relicIcons = [...data.relics.values()].map((r) => r.icon);
     if (new Set(relicIcons).size !== relicIcons.length) bad.push('유물 아이콘 번호 중복');
     expect(bad).toEqual([]);

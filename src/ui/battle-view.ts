@@ -15,7 +15,7 @@ import { sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { affinityChip, elementMark, gaugeChip, INTENT_LABEL, intentIcon, statusChip } from './icons';
+import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
@@ -29,7 +29,7 @@ export interface BattleContext {
   supportActive: boolean;
   bonusText?: string;
   /** 심연 굽이의 법칙(전투 화면 가운데 위 배지) */
-  laws?: { id: string; name: string; glyph: string; description: string }[];
+  laws?: { id: string; name: string; glyph: string; icon?: number; description: string }[];
   /** 모듈 글(튜토리얼 안내·장면 묘사). 전투 화면 위에 한 줄로 */
   introText?: string;
   /** 전투 배경 에셋 id(실제 그림이 있을 때만 쓴다) */
@@ -236,7 +236,7 @@ export class BattleView {
         this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
         this.riftEl,
         this.ctx.laws?.length
-          ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, h('b', {}, l.glyph), l.name)))
+          ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name)))
           : null,
       ),
       this.logEl,

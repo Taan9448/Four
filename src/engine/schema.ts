@@ -711,6 +711,8 @@ export const LawDef = z
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
     glyph: z.string().length(1),
+    /** 아이콘 시트(icons_abyss_laws)의 칸 번호(1부터). 그림이 오기 전에는 glyph 한 글자 */
+    icon: z.number().int().positive().optional(),
     description: z.string(),
     battle: z
       .object({
@@ -738,6 +740,8 @@ export const AffixDef = z
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
     glyph: z.string().length(1),
+    /** 아이콘 시트(icons_abyss_affixes)의 칸 번호(1부터). 그림이 오기 전에는 glyph 한 글자 */
+    icon: z.number().int().positive().optional(),
     description: z.string(),
     hpMul: z.number().positive().optional(),
     traits: z.array(z.object({ status: z.string(), stacks: z.number() }).strict()).default([]),
