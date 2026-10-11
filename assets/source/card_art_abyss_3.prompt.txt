@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a heavy dark stone held in a dwarf fist
+Cell 2: a tall dwarf shadow standing behind a smaller dwarf
+Cell 3: a mine tunnel ceiling collapsing on broken pillars
+Cell 4: an arm coated in grey stone dust hardening like rock
+Cell 5: an iron gauntlet gripping a hammer, thorny spikes rising
+Cell 6: a hammer strike with echo rings reaching a black crack
+Cell 7: a glowing red heart-shaped stone beating inside a mountain
+Cell 8: a hammer with thousands of strike sparks around it
+Cells 9 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: Redraw ONE complete 4x4 eight-card sheet. Cell 6 MUST unmistakably show a WAR HAMMER, never an axe. The hammer head is a thick wide RECTANGULAR METAL BLOCK with its long axis HORIZONTAL, two blunt rectangular end faces, about 30 sprite pixels wide and 18 tall. A narrow wooden handle joins the middle underside of that rectangular block and extends down diagonally. The silhouette reads as a blocky T shape. No sharpened blade, no crescent, no thin vertical wedge, no broad cutting edge. Show the blunt hammer face hitting a small rock. Three separate round CONCENTRIC ECHO CIRCLES spread from the impact toward a red-edged black crack; no sword-slash curves. Use the exact blunt hammer head from the attached born_hammer_ref. Keep cells 1 through 8 in the original frame_notes order, two rows of complete edge-to-edge card pictures. Cells 9 through 16 must be empty solid magenta with no fragments. Keep dwarf appearances faithful to the attached born_ref, including a stocky short body and three red beard braids, no added jewelry or emblems. All backgrounds remain calm black and ink-grey with red-edged cracks, no clutter or lettering.
