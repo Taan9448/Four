@@ -24,6 +24,7 @@ function condText(data: GameData, e: Effect): string {
   if (c.riftGte !== undefined) return `균열 ${c.riftGte} 이상이면 `;
   if (c.riftLte !== undefined) return c.riftLte <= 0 ? '균열이 0이면 ' : `균열 ${c.riftLte} 이하이면 `;
   if (c.scarMin !== undefined) return `상흔 ${c.scarMin} 이상이면 `;
+  if (c.selfBlockGte !== undefined) return `방어가 ${c.selfBlockGte} 이상이면 `;
   if (c.partyHas) return `${data.characters.get(c.partyHas)?.name ?? c.partyHas} 출전 시 `;
   if (c.flag) return '';
   return '조건부: ';

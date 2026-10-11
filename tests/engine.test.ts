@@ -513,4 +513,20 @@ describe('새 기본 동작(카드 250장 확장 2026-10-11)', () => {
     playCard(s, s.hand.indexOf(copy), s.enemies[0].uid);
     expect(s.exhaust.some((c) => c.uid === copy.uid)).toBe(true);
   });
+
+  it('1파 지속 효과: 기사의 맹세(체력을 잃으면 방어 3) · 오천의 무덤(방어 10 이상으로 차례를 마치면 힘 +1)', () => {
+    const s = battle({ world: 'murim', enemies: ['test_ignis'] });
+    s.enemies[0].intent = null;
+    const p = s.party[0];
+    p.statuses.p_knight_oath = 1;
+    _internal.runEffects(s, [{ op: 'lose_hp', amount: 4, target: 'self' }], { source: p });
+    expect(p.block).toBe(3);
+    p.statuses.p_five_thousand_graves = 1;
+    p.block = 9;
+    endTurn(s);
+    expect(p.statuses.strength ?? 0).toBe(0);
+    p.block = 10;
+    endTurn(s);
+    expect(p.statuses.strength).toBe(1);
+  });
 });

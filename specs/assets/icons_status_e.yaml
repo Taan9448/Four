@@ -1,0 +1,15 @@
+id: icons_status_e
+type: icon-sheet
+summary: 상태 아이콘 48~53(카드 확장의 동료 지속 효과) — 칸 n = 상태 icon n+47
+# 칸 번호 = data/statuses.json의 icon에서 47을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-11 카드 250장 확장: 48·49는 1파(PR 2), 50~53은 2파(PR 3)에서 들어온다
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: "knight's oath — a silver knight's sword held upright before a small blue shield, point down"
+  2: "five thousand graves — a small dark granite gravestone with a tiny ember-orange rune, two smaller stones behind it"
+  3: "ugly sword — a crude, notched wooden practice sword leaning at an angle, with a small gold qi glint at its tip"
+  4: "ice mirror — a round pale-blue ice disc with a white highlight streak, framed by a thin frost ring"
+  5: "dumpling shop — a single steaming white dumpling on a small round bamboo steamer lid"
+  6: "rock heart — a granite stone in the shape of a heart with a thin ember-orange crack glowing in its center"
+placeholder: { color: '#5d6478', accent: '#ff3b3b' }

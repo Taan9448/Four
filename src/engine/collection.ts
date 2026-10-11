@@ -35,9 +35,9 @@ export function ownedEssentials(data: GameData, run: Pick<RunState, 'collection'
 /** 그 주인이 채워야 할 장수: 칸 수, 보유 카드가 모자라면 가진 만큼 */
 export const requiredFor = (data: GameData, run: Pick<RunState, 'collection'>, owner: string) => Math.min(slotsFor(data, owner), choosable(data, run, owner).length);
 
-const RARITY_SCORE: Record<string, number> = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, special: 0 };
+const RARITY_SCORE: Record<string, number> = { common: 1, uncommon: 2, rare: 3, epic: 5, legendary: 7, special: 0 };
 
-/** 추천 점수: 등급 + 강화 단계(+ 0비용 덤). 같은 점수면 이름 순(결정적) */
+/** 추천 점수: 등급(편성 점수와 같은 비율 — 상한에 맞출 때 전설이 손해 보지 않게) + 강화 단계(+ 0비용 덤). 같은 점수면 이름 순(결정적) */
 function score(data: GameData, run: Pick<RunState, 'collection'>, def: CardDef): number {
   return RARITY_SCORE[def.rarity] * 10 + (run.collection[def.id] ?? 0) * 4 + (def.cost.neigong + def.cost.mana === 0 ? 1 : 0);
 }
@@ -89,27 +89,33 @@ export function loadoutFocus(data: GameData, owner: string, ids: readonly string
 }
 
 /**
- * 점수 상한에 맞춘다: 넘으면 가장 비싼 카드를 그보다 싼(아직 안 넣은) 카드 중 가장 좋은 것으로 바꾸기를 되풀이한다.
- * 공격·그 밖은 같은 쪽 카드로 먼저 바꿔 비율을 지킨다. 지키는 카드(keep)는 마지막에 바꾼다
+ * 점수 상한에 맞춘다: 넘으면 넣은 카드 하나를 그보다 싼(아직 안 넣은) 카드로 바꾸기를 되풀이한다.
+ * 바꿀 때마다 '줄어드는 점수 1당 잃는 값'(넘친 점수까지만 센다)이 가장 작은 바꾸기를 고른다(1점 넘었다고 전설을 빼지 않게 — 고급 하나를 일반으로).
+ * 공격·그 밖은 같은 쪽 카드로 먼저 바꿔 비율을 지킨다. 지키는 카드(keep)는 다른 바꾸기가 없을 때만 바꾼다
  */
 function fitCap(data: GameData, run: Pick<RunState, 'collection'>, owner: string, ids: string[], value: (d: CardDef) => number, keep: ReadonlySet<string> = new Set()): string[] {
   const cap = capFor(data, owner);
   const def = (id: string) => data.cards.get(id)!;
   const out = [...ids];
   for (let guard = 0; guard < 40 && loadoutPoints(data, out) > cap; guard++) {
-    const order = [...out].sort((a, b) => Number(keep.has(a)) - Number(keep.has(b)) || cardPoints(data, def(b)) - cardPoints(data, def(a)) || value(def(a)) - value(def(b)));
-    let swapped = false;
-    for (const id of order) {
+    const over = loadoutPoints(data, out) - cap;
+    let best: { id: string; to: string; kept: boolean; cost: number; cut: number } | null = null;
+    for (const id of out) {
+      const pts = cardPoints(data, def(id));
       const cheaper = choosable(data, run, owner)
-        .filter((d) => !out.includes(d.id) && cardPoints(data, d) < cardPoints(data, def(id)))
+        .filter((d) => !out.includes(d.id) && cardPoints(data, d) < pts)
         .sort((a, b) => value(b) - value(a));
       const pick = cheaper.find((d) => (d.type === 'attack') === (def(id).type === 'attack')) ?? cheaper[0];
       if (!pick) continue;
-      out[out.indexOf(id)] = pick.id;
-      swapped = true;
-      break;
+      const cut = pts - cardPoints(data, pick);
+      // 넘친 만큼보다 더 깎는 점수는 버려지므로 넘친 만큼까지만 센다
+      const cost = (value(def(id)) - value(pick)) / Math.min(cut, over);
+      const kept = keep.has(id);
+      // 같은 값이면 덜 깎는 바꾸기(남는 점수를 버리지 않게)
+      if (!best || Number(kept) < Number(best.kept) || (kept === best.kept && (cost < best.cost || (cost === best.cost && cut < best.cut)))) best = { id, to: pick.id, kept, cost, cut };
     }
-    if (!swapped) break;
+    if (!best) break;
+    out[out.indexOf(best.id)] = best.to;
   }
   return out;
 }
