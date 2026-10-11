@@ -69,13 +69,15 @@ export function parseCodex(data: GameData, text: string | null): Codex {
 
 /** 런이 지금 가진 것(덱·유물·물약·동료)과 상점에 놓인 것을 적는다. 다시 하는 런은 원래 런도 */
 export function noteRun(codex: Codex, run: RunState): Codex {
-  for (const c of run.deck) codex.cards[c.cardId] = Math.max(codex.cards[c.cardId] ?? 0, c.level);
-  for (const [id, lv] of Object.entries(run.collection ?? {})) codex.cards[id] = Math.max(codex.cards[id] ?? 0, lv);
+  // 자유 여정(순례 A안): 길 안의 카드(덱·보상·상점)는 적지 않는다 — 클리어한 런(replayOf)의 보유 카드만 아래에서 적는다
+  const cards = recordsCards(run);
+  if (cards) for (const c of run.deck) codex.cards[c.cardId] = Math.max(codex.cards[c.cardId] ?? 0, c.level);
+  if (cards) for (const [id, lv] of Object.entries(run.collection ?? {})) codex.cards[id] = Math.max(codex.cards[id] ?? 0, lv);
   for (const id of run.relics) addTo(codex.relics, id);
   for (const id of run.potions) if (id) addTo(codex.potions, id);
   for (const r of run.roster) addTo(codex.people, r.id);
   // 상점에 놓인 물건도 본 것
-  for (const x of run.shop?.cards ?? []) codex.cards[x.cardId] ??= 0;
+  if (cards) for (const x of run.shop?.cards ?? []) codex.cards[x.cardId] ??= 0;
   for (const x of run.shop?.relics ?? []) addTo(codex.relics, x.relicId);
   for (const x of run.shop?.potions ?? []) addTo(codex.potions, x.potionId);
   // 심연 틈의 거래에서 들여다본 카드
@@ -85,6 +87,12 @@ export function noteRun(codex: Codex, run: RunState): Codex {
   if (run.replayOf) noteRun(codex, run.replayOf);
   return codex;
 }
+
+/**
+ * 이 런에서 본·얻은 카드를 도감에 적는가. 자유 여정(다시 하는 런)은 적지 않는다(2026-10-11 순례 A안):
+ * 길에서 얻은 카드는 그 길 안에서만이고, 심연 풀(보유 ∪ 도감)은 캠페인·심연·첫 순례 보상으로만 넓어진다
+ */
+export const recordsCards = (run: Pick<RunState, 'replayOf'>): boolean => !run.replayOf;
 
 /** 카드 하나(보상·상점에서 본 것 포함) */
 export function noteCard(codex: Codex, cardId: string, level = 0): Codex {

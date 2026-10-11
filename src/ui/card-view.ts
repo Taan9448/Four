@@ -170,6 +170,12 @@ function glossaryTip(data: GameData, inst: CardInstance | string): Record<string
  */
 export function offerCardView(data: GameData, run: RunState, cardId: string): HTMLElement {
   if (run.abyss) return cardView(data, { uid: `offer:${cardId}`, cardId, level: run.abyss.pool[cardId] ?? 0 });
+  // 자유 여정(순례): 보유 목록과 상관없이 이 길의 덱에만 들어간다(가진 카드면 가진 단계로 한 장 더)
+  if (run.replayOf) {
+    const el = cardView(data, { uid: `offer:${cardId}`, cardId, level: run.collection[cardId] ?? 0 });
+    el.prepend(h('span', { class: 'offer-badge offer-path', ...tipAttrs('이 길에서만', '순례에서 얻은 카드는 이 길의 덱에만 들어간다. 보유 카드·강화 단계는 바뀌지 않고, 클리어 지도로 돌아가면 남지 않는다.') }, '이 길에서만'));
+    return el;
+  }
   const p = acquirePreview(data, run, cardId);
   const el = cardView(data, { uid: `offer:${cardId}`, cardId, level: p.level });
   const [cls, label, tip] =

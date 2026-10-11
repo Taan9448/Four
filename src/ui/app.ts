@@ -91,7 +91,7 @@ import { hubView } from './hub-view';
 import { loadoutView } from './loadout-view';
 import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
-import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, type Codex } from '../engine/codex';
+import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, recordsCards, type Codex } from '../engine/codex';
 
 const data = gameData();
 
@@ -158,6 +158,7 @@ export class App {
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
    * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭) · loadout
+   * &pilgrim을 붙이면 클리어한 런에서 그 스테이지를 다시 걷는 길(순례)로
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     this.persist = false;
@@ -183,7 +184,13 @@ export class App {
       const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
       return this.show(this.backdrop(choiceView(data, ar, mod, () => this.map())));
     }
-    const run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
+    let run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
+    // &pilgrim: 클리어한 런에서 이 스테이지를 다시 걷는 길(순례)로 띄운다
+    if (new URLSearchParams(location.search).has('pilgrim')) {
+      const hub = createRunAt(data, 'SCREEN', 's9', { supportActive: true });
+      hub.status = 'complete';
+      run = startReplay(data, hub, stageId);
+    }
     this.run = run;
     const first = run.map.floors[0][0];
     switch (name) {
@@ -244,8 +251,8 @@ export class App {
         shown.potionLeft = claimLoot(data, run, shown.loot).potionLeft;
         // 보유 맥락 표가 셋 다 보이게: 둘째 후보는 보유 +1, 셋째는 최대 강화
         const options = rewardOptions(data, run, first.id);
-        if (options[1]) run.collection[options[1]] = 1;
-        if (options[2]) run.collection[options[2]] = data.balance.upgrade.maxLevel;
+        if (options[1] && !run.replayOf) run.collection[options[1]] = 1;
+        if (options[2] && !run.replayOf) run.collection[options[2]] = data.balance.upgrade.maxLevel;
         return this.show(this.backdrop(rewardView(data, options, () => this.map(), { run, shown })));
       }
     }
@@ -562,7 +569,7 @@ export class App {
       else {
         // 이벤트 선택지에 이름으로 나온 카드도 본 것(GAME_DESIGN 16절 — 도감 기록 기준)
         const named = (enc.module.content.choices ?? []).flatMap((c) => [...c.effects, ...(c.outcomes ?? []).flatMap((o) => o.effects)]).filter((e) => e.op === 'gain_card' && e.card);
-        if (named.length) this.note((c) => named.forEach((e) => noteCard(c, e.card!)));
+        if (named.length && recordsCards(run)) this.note((c) => named.forEach((e) => noteCard(c, e.card!)));
         const showChoice = (): void =>
           this.show(
             this.backdrop(
@@ -694,7 +701,8 @@ export class App {
 
   /** 보상으로 본 카드도 도감에 */
   private rewardSeen(options: string[]): string[] {
-    this.note((c) => options.forEach((id) => noteCard(c, id)));
+    // 자유 여정의 보상 후보는 도감에 적지 않는다(순례 A안)
+    if (this.run && recordsCards(this.run)) this.note((c) => options.forEach((id) => noteCard(c, id)));
     return options;
   }
 
