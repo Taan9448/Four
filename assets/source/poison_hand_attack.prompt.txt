@@ -1,0 +1,29 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Poison-Hand Demon Lord, an elder of the Heavenly Demon Cult's Shaanxi branch; a gaunt middle-aged man in a dark green cult robe, long fingernails painted dark blue-green with poison, dark green veins running up from the wrists. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: draws a clawed hand back, green haze gathering
+Cell 2: steps forward low
+Cell 3: the hand at full draw, nails glowing
+Cell 4: a raking claw strike to the left, a spray of green poison
+Cell 5: the poison mist drifts
+Cell 6: returns to the standing stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Pose sequencing error: cell 3 must be the FULL DRAW BACK preparation, NOT an extended strike. Draw cell 3 LEFT-FACING PROFILE with striking claw pulled BACK beside the right shoulder/hip behind the torso, elbow bent, glowing nails pointing forward ready to rake. Cell 1 also draws the claw back, cell 2 steps low, ONLY cell 4 extends the claw fully LEFT and sprays green poison. All six use the reference RIGHT-hand side-profile pose, never turn to camera, same face/robe/hair/size. Cell 5 poison drifts, cell 6 returns to side-profile claw stance. Keep hands, robe and green poison inside every cell.
+
+Fix: Boundary error: cell 4 trailing robe and hair extend past the RIGHT edge and contaminate cell 5. Contain the ENTIRE silhouette, robe, hair, feet and poison inside each own 512x512 cell. In cell 4 fold the trailing robe close behind the body instead of streaming right; shift torso slightly left inside cell, keep claw strike left but within cell. Keep ALL six profiles looking LEFT (nose left, one eye). Keep cell 3 claw fully drawn back behind shoulder; only cell 4 strikes. Do not reduce character size relative to reference, maintain baseline and consistent height.
+
+
+Fix: All six frames are the SIDE view facing left exactly like the idle sheet and cell 2 of the reference; frame 6 returns to the idle pose. STRICT PROFILE nose points LEFT and exactly ONE eye visible; same left-side narrow shoulder silhouette and robe seam as idle in all SIX cells. No 3/4 frontal chest or frontal two-eye face in 1,2,3,5,6. Bodyheight107-109spritepx, same proportions, local headtop36 and soles464, ALL six. Frame3 claw fully drawn BACK beside rear shoulder, frame4 green rakingclaw spray toleft kept withinowncell, frame5poison fades, frame6 EXACT attachedidlepose: forwardclaw bent low near waist, other hand back, shallow stance. Each figure/hair/robes/poison inside512cell x28..484 y24..488; especiallycell4trailing robe foldclose withx<=472. Render one sixframe sheet, every block4x4.
+
+Fix: The new frame6 correctly matches idle. KEEP IT. Frames3and4 still expose broad frontal chest and a backward-pointing shoulder, unlike narrow pure SIDE idle. ALLsix must show exactly SAME leftSIDE torso camera as idle, near shoulder overlaps far shoulder, near hip overlapsfarhip, only one eye. Swing ONLY arms, no camera or chest rotation. Cell3 raised rearclaw pulledback beside RIGHT shoulder but chest remains leftSIDE; cell4 extend NEAR armleft, fararm tuckedclose within chest silhouette. Cell4 robe/hair crossed RIGHT into5 again: all hair strips/righthem/rightheel/endclaw x<=460local. Fold robes DOWN rather than right. Body centeredx300, leftpoisonspray short endx40, trailingfootx404. Height107-109px allcells, soleslocaly476, bunlocaly44. Keep6 exactsameidle twohandsbentforward; cell5sameidle with fadingpoison. STRICT all6 leftSIDE silhouette, no 3/4frontal torso.

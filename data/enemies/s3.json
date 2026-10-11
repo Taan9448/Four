@@ -39,7 +39,7 @@
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gate_spear", "name": "문지기의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 13}]}, {"id": "ice_rampart", "name": "얼음 성벽", "intent": "defend", "effects": [{"op": "block", "amount": 14, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "frost_breath", "name": "얼어붙은 숨", "intent": "attack", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies", "element": "ice"}, {"op": "gain_mana", "amount": -2}]}, {"id": "stopped_night", "name": "그날 밤에 멈춘 검", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
+    "moves": [{"id": "gate_spear", "name": "문지기의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 15}]}, {"id": "ice_rampart", "name": "얼음 성벽", "intent": "defend", "effects": [{"op": "block", "amount": 14, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "frost_breath", "name": "얼어붙은 숨", "intent": "attack", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies", "element": "ice"}, {"op": "gain_mana", "amount": -2}]}, {"id": "stopped_night", "name": "그날 밤에 멈춘 검", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 7}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
     "flavor": "십 년 전 그 밤, 성문을 지키다 쓰러진 아르덴의 기사. 지금은 얼음 궁전의 문지기다. 가렛 경의 기사들은 탑에 세 번 닿았고, 세 번 다 돌아오지 못한 기사가 더 많았다.",
     "weak": ["fire"],
     "resist": ["ice"]

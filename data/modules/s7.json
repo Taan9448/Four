@@ -97,7 +97,7 @@
     "name": "분타의 정예",
     "weight": 1,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "낙안봉 꼭대기 성채를 지키는 섬서 분타의 정예.", "enemies": ["branch_elite", "blood_cultist", "branch_elite"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 삼백이 방패를 맞물린다. \"전진!\" 쿵. (적 전원 피해 5)", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}}
+    "content": {"text": "낙안봉 꼭대기 성채를 지키는 섬서 분타의 정예. (적 전원 힘 1)", "enemies": ["branch_elite", "blood_cultist", "branch_elite"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 삼백이 방패를 맞물린다. \"전진!\" 쿵. (적 전원 피해 5)", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s7_event_supply_road",
