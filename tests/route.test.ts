@@ -63,3 +63,51 @@ describe('경로 생성기', () => {
     expect([...types].sort()).toEqual(['battle', 'boss', 'elite', 'event', 'inn', 'rest', 'shop', 'story']);
   });
 });
+
+describe('폭주가 지도를 가른다(GAME_DESIGN 7절, 2026-10-11)', () => {
+  it('길 하나를 끊어도 모든 노드가 닿고 보스까지 이어진다, 裂 틈새는 지도마다 3개까지, 같은 시드면 같은 결과', async () => {
+    const { applyBattleOutcome, createRunAt, availableNodes, enterNode } = await import('../src/engine/run');
+    const { mutateMapForSurge } = await import('../src/engine/route');
+    for (const stageId of ['s3', 's6', 's8']) {
+      for (const seed of ['CR1', 'CR2', 'CR3']) {
+        const run = createRunAt(data, seed, stageId);
+        const enc = enterNode(data, run, availableNodes(run)[0].id);
+        const party = run.selected.map((id) => ({ id, hp: run.roster.find((r) => r.id === id)!.hp }));
+        const outcome = { result: 'victory' as const, survived: false, party, mana: run.mana, scarGain: 6, tally: { kills: 1, damage: 0, crits: 0, surges: 2, cards: {} } };
+        const copy = structuredClone(run);
+        applyBattleOutcome(data, run, enc, outcome);
+        applyBattleOutcome(data, copy, enc, structuredClone(outcome));
+        expect(validateMap(data, run.map)).toEqual([]);
+        expect(run.map.surges).toBe(2);
+        expect(JSON.stringify(run.map)).toBe(JSON.stringify(copy.map));
+        const cracks = run.map.floors.flat().filter((n) => n.crack);
+        expect(cracks.length).toBeGreaterThan(0);
+        for (const n of cracks) {
+          const mod = data.modules.get(n.moduleId)!;
+          expect(mod.stage).toBe('crack');
+          if (n.type === 'elite') expect(n.enemies?.length).toBeGreaterThan(0);
+        }
+        // 더 터져도 틈새는 3개까지
+        for (let i = 0; i < 6; i++) mutateMapForSurge(run.map, run.position, createRng(`x${i}`), 3, (node) => ({ moduleId: node.moduleId, type: 'event' }));
+        expect(run.map.floors.flat().filter((n) => n.crack).length).toBeLessThanOrEqual(3);
+        expect(validateMap(data, run.map)).toEqual([]);
+      }
+    }
+  });
+
+  it('틈의 짐승: 그 스테이지의 엘리트 적에 접사 하나, 이기면 상흔 -5', async () => {
+    const { applyBattleOutcome, battleSetupFor, createRunAt, splitMapBySurge } = await import('../src/engine/run');
+    const run = createRunAt(data, 'BEAST', 's6');
+    for (let i = 0; i < 6 && !run.map.floors.flat().some((n) => n.crack && n.type === 'elite'); i++) splitMapBySurge(data, run, 1, `t${i}`);
+    const node = run.map.floors.flat().find((n) => n.crack && n.type === 'elite');
+    expect(node).toBeTruthy();
+    const enc = { node: node!, module: data.modules.get(node!.moduleId)! };
+    const setup = battleSetupFor(data, run, enc);
+    expect(setup.enemies).toEqual(node!.enemies);
+    expect(setup.enemyMods?.[0]?.affixes?.length).toBe(1);
+    run.scar = 9;
+    const party = run.selected.map((id) => ({ id, hp: run.roster.find((r) => r.id === id)!.hp }));
+    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party, mana: run.mana, scarGain: 0, tally: { kills: 1, damage: 0, crits: 0, surges: 0, cards: {} } });
+    expect(run.scar).toBe(4);
+  });
+});

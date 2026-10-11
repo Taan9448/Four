@@ -19,6 +19,8 @@ import { abyssScale, loopLabel, nemesisEvery, WORLD_NAME } from '../engine/abyss
 /** 노드 표식: 두루마리 위의 한자 */
 const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
 const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', shop: '상점', boss: '보스' };
+/** 범례에만 더하는 표식: 폭주가 연 裂 틈새(GAME_DESIGN 7절) */
+const LEGEND_EXTRA: Record<string, [string, string]> = { crack: ['裂', '틈새'] };
 
 /** 세계의 틈이 나타나는 사건: S7 낙안봉을 넘은 밤의 아물지 않는 금 */
 const RIFT_FLAG = 'sky_crack';
@@ -356,6 +358,31 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       }
     }
   }
+  // 폭주가 끊은 길(GAME_DESIGN 7절): 옅은 끊긴 선 위로 검은 금. 상흔이 깊을수록 금이 굵다
+  const crackW = 2 + Math.min(run.scar, 30) * 0.12; // 화면 px(non-scaling-stroke)
+  for (const [fromId, toId] of run.map.cuts ?? []) {
+    const n = findNode(run.map, fromId);
+    const m = findNode(run.map, toId);
+    if (!n || !m) continue;
+    const a = pos(n), b = pos(m);
+    const cut = document.createElementNS(svgNS, 'line');
+    cut.setAttribute('x1', String(a.x));
+    cut.setAttribute('y1', String(a.y));
+    cut.setAttribute('x2', String(b.x));
+    cut.setAttribute('y2', String(b.y));
+    cut.setAttribute('class', 'cut');
+    svg.appendChild(cut);
+    // 끊긴 자리: 길을 가로지르는 들쭉날쭉한 금
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const zig = [-8, -5, -2, 1, 4, 8].map((dy, i) => `${(mx + (i % 2 ? 0.9 : -0.9)).toFixed(2)} ${(my + dy).toFixed(2)}`);
+    for (const [cls, sw] of [['crack-glow', crackW * 3], ['crack', crackW]] as const) {
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', `M${zig.join(' L')}`);
+      path.setAttribute('class', cls);
+      path.setAttribute('stroke-width', String(sw));
+      svg.appendChild(path);
+    }
+  }
   // 출발점(왼쪽 가장자리) → 1층
   const start = { x: 2.6, y: 50 };
   if (!run.position) {
@@ -381,6 +408,20 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     const known = visited;
     // 종류는 지나온 곳과 지금 갈 수 있는 다음 층만(2026-10-11 사용자 결정 — 그 뒤 층은 모양·색까지 감춘 ? 표식). 이름은 들어가 봐야
     // 심연의 그림자의 길: 종류가 모두 보인다(이름은 여전히 들어가 봐야)
+    // 裂 틈새: 폭주가 연 자리는 멀리서도 보인다(종류는 들어가 봐야 — 틈의 짐승 또는 틈새의 거래)
+    if (n.crack)
+      return h(
+        'button',
+        {
+          class: `node node-crack${visited ? ' done' : ''}${open ? ' open' : ''}${run.position === n.id ? ' here' : ''}`,
+          style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
+          disabled: !open,
+          'aria-label': `裂 틈새, ${n.floor}층${open ? ' — 갈 수 있다' : visited ? ' — 지나온 곳' : ''}`,
+          onclick: () => handlers.onEnter(n),
+          ...tipAttrs(`${n.floor}층 · 裂 틈새`, [visited ? mod?.name ?? '' : '폭주가 연 자리. 틈의 짐승(이기면 상흔 -5와 유물)이나 틈새의 거래(감소 카드·봉인 유물)가 있다.', open ? '갈 수 있다' : ''].filter(Boolean).join('\n'), 'rift'),
+        },
+        h('span', { class: 'node-glyph' }, '裂'),
+      );
     if (!visited && !open && !revealAll)
       return h(
         'button',
@@ -565,7 +606,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
-        h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),
+        h('div', { class: 'box legend' }, [...Object.entries(NODE_LABEL).map(([k, v]) => [k, NODE_GLYPH[k], v] as const), ...Object.entries(LEGEND_EXTRA).map(([k, [g, v]]) => [k, g, v] as const)].map(([k, g, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, g)), v))),
         h(
           'div',
           { class: 'map-actions' },

@@ -532,6 +532,8 @@ export const Balance = z
             shopStitchGold: z.number().int().min(0),
           })
           .strict(),
+        /** 폭주가 지도를 가른다: 지도마다 裂 틈새 최대 maxCracks개, 틈새가 틈의 짐승일 확률 beastChance(나머지는 틈새의 거래) */
+        map: z.object({ maxCracks: z.number().int().min(0), beastChance: z.number().min(0).max(1) }).strict(),
       })
       .strict(),
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),

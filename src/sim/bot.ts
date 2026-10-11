@@ -460,6 +460,8 @@ export interface RunReport {
   scar: number;
   /** 끝날 때 가진 유물 */
   relics: string[];
+  /** 裂 틈새: 폭주가 연 수 · 들어간 수 */
+  cracks?: { made: number; entered: number };
 }
 
 const partyHp = (s: BattleState) => s.party.reduce((a, p) => a + Math.max(0, p.downed ? 0 : p.hp), 0);
@@ -552,6 +554,7 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
     deckSize: run.deck.length,
     scar: run.scar,
     relics: [...run.relics],
+    cracks: run.stats.cracks,
   };
 }
 
@@ -593,6 +596,7 @@ export interface AbyssReport {
   deckSize: number;
   score: number;
   battles: BattleRecord[];
+  cracks?: { made: number; entered: number };
 }
 
 /** 심연 런 하나를 maxDepth 굽이까지(또는 쓰러질 때까지) 둔다 */
@@ -679,6 +683,7 @@ export function playAbyss(
     poolSize: Object.keys(ab.pool).length,
     deckSize: run.deck.length,
     score: abyssScore(data, run),
+    cracks: run.stats.cracks,
     battles,
   };
 }

@@ -164,9 +164,10 @@ describe('데이터 검사', () => {
       }
     }
     for (const m of data.modules.values()) {
-      if (m.stage !== '*' && m.stage !== 'abyss' && !data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
+      // crack: 폭주가 여는 裂 틈새(균열 개편 2026-10-11) — 틈의 짐승은 적을 지도에서(그 스테이지 엘리트) 채운다
+      if (m.stage !== '*' && m.stage !== 'abyss' && m.stage !== 'crack' && !data.stages.some((s) => s.id === m.stage)) errors.push(`${m.id}: 알 수 없는 스테이지 ${m.stage}`);
       const battle = ['battle', 'elite', 'boss'].includes(m.type);
-      if (battle && !m.content.enemies?.length) errors.push(`${m.id}: 전투 모듈에 적이 없다`);
+      if (battle && m.stage !== 'crack' && !m.content.enemies?.length) errors.push(`${m.id}: 전투 모듈에 적이 없다`);
       if (!battle && m.type !== 'shop' && !m.content.choices?.length) errors.push(`${m.id}: 선택지가 없다`);
       for (const id of m.content.enemies ?? []) if (!data.enemies.has(id)) errors.push(`${m.id}: 없는 적 ${id}`);
       for (const [i, c] of (m.content.choices ?? []).entries()) {

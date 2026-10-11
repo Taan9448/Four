@@ -2,7 +2,7 @@
 import type { GameData } from './data';
 import type { Effect, ModuleDef } from './schema';
 import { createRng } from './rng';
-import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
+import { findNode, generateStageMap, mutateMapForSurge, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
 import { acquireCard, beginStageLoadout, COMMON, setLoadout, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
@@ -102,6 +102,8 @@ export type Difficulty = 'normal' | 'hard';
 
 /** 결과 화면 통계(런 전체): 전투 집계를 더해 간다 */
 export interface RunStats {
+  /** 裂 틈새: 폭주가 연 수 · 들어간 수 */
+  cracks?: { made: number; entered: number };
   battles: number;
   turns: number;
   kills: number;
@@ -459,6 +461,7 @@ export function enterNode(data: GameData, run: RunState, nodeId: string): Encoun
   run.visited.push(node.id);
   if (node.type === 'rest') run.stats.rests = (run.stats.rests ?? 0) + 1;
   if (node.type === 'shop') run.stats.shops = (run.stats.shops ?? 0) + 1;
+  if (node.crack) (run.stats.cracks ??= { made: 0, entered: 0 }).entered += 1;
   if (module.once && !run.usedModules.includes(module.id)) run.usedModules.push(module.id);
   return { node, module };
 }
@@ -499,7 +502,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
         const r = run.roster.find((x) => x.id === id)!;
         return { id, hp: r.hp, maxHp: r.maxHp, level: r.level };
       }),
-      enemies: enc.module.content.enemies ?? [],
+      enemies: enc.node.enemies ?? enc.module.content.enemies ?? [],
       surviveTurns: enc.module.content.surviveTurns,
       deck: run.deck,
       mana: run.mana,
@@ -517,7 +520,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       partyMax: data.balance.abyss.partyMax,
       enemyHitCap: Math.max(1, Math.floor(haun.maxHp * data.balance.abyss.oneHitCap)),
       laws: run.abyss!.laws ?? [],
-      enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.module.content.enemies ?? []),
+      enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.node.enemies ?? enc.module.content.enemies ?? []),
     };
   }
   const pilgrim = pilgrimScale(data, run);
@@ -527,7 +530,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       const r = run.roster.find((x) => x.id === id)!;
       return { id, hp: r.hp, maxHp: r.maxHp, level: r.level };
     }),
-    enemies: enc.module.content.enemies ?? [],
+    enemies: enc.node.enemies ?? enc.module.content.enemies ?? [],
     surviveTurns: enc.module.content.surviveTurns,
     deck: run.deck,
     mana: run.mana,
@@ -542,7 +545,44 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg,
     relics: run.relics,
     potions: run.potions,
+    // 裂 틈의 짐승: 첫 적에 틈의 접사 하나(GAME_DESIGN 7절)
+    enemyMods: enc.node.crack && enc.node.enemies ? crackAffix(data, run, enc.node) : undefined,
   };
+}
+
+/** 틈의 짐승의 접사: 첫 적(엘리트)에 시드로 고른 접사 하나 */
+function crackAffix(data: GameData, run: RunState, node: MapNode): ({ affixes: string[] } | undefined)[] {
+  const pool = [...data.affixes.values()].filter((a) => !a.boss).map((a) => a.id);
+  const id = createRng(run.seed).fork(`crack-affix:${run.stageId}:${node.id}`).pick(pool);
+  return (node.enemies ?? []).map((_, i) => (i === 0 && id ? { affixes: [id] } : undefined));
+}
+
+/**
+ * 폭주가 지도를 가른다(GAME_DESIGN 7절): 폭주 한 번마다 앞길 하나를 끊고 裂 틈새 하나(지도마다 maxCracks개까지).
+ * 틈새는 시드로 틈의 짐승(이 스테이지 엘리트 + 접사 하나, 이기면 상흔 -5와 유물) 또는 틈새의 거래(감소 카드·봉인 유물)
+ */
+export function splitMapBySurge(data: GameData, run: RunState, surges: number, key: string): number {
+  const cfg = data.balance.rift.map;
+  const world = stageWorld(data, run);
+  const used = new Set(run.map.floors.flat().filter((n) => n.crack).map((n) => n.moduleId));
+  const crackMods = [...data.modules.values()].filter((m) => m.stage === 'crack' && (!m.conditions.world || m.conditions.world === world));
+  const elites = [...data.modules.values()].filter((m) => m.stage === run.stageId && m.type === 'elite' && m.content.enemies?.length);
+  let made = 0;
+  for (let i = 0; i < surges; i++) {
+    const rng = createRng(run.seed).fork(`surge-map:${run.stageId}:${key}:${i}`);
+    const mark = mutateMapForSurge(run.map, run.position, rng, cfg.maxCracks, () => {
+      const beast = elites.length > 0 && rng.next() < cfg.beastChance;
+      const options = crackMods.filter((m) => (beast ? m.type === 'elite' : m.type === 'event') && !used.has(m.id));
+      const mod = options.length ? rng.pick(options) : null;
+      if (!mod) return null;
+      used.add(mod.id);
+      return { moduleId: mod.id, type: mod.type, enemies: beast ? [...rng.pick(elites).content.enemies!] : undefined };
+    });
+    if (mark.crack) made += 1;
+  }
+  run.map.surges = (run.map.surges ?? 0) + surges;
+  (run.stats.cracks ??= { made: 0, entered: 0 }).made += made;
+  return made;
 }
 
 /** 전투 결과를 런에 반영한다. 이기면 모듈의 clearEffects(보스가 아니어도)를 적용하고 그 결과 메시지를 돌려준다 */
@@ -601,6 +641,11 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     run.scar = Math.max(0, run.scar - clean);
     out.push(`폭주 없이 넘긴 싸움 — 상흔 -${before - run.scar}`);
   }
+  // 폭주가 지도를 가른다(스테이지가 이어질 때만 — 보스를 넘기면 지도가 끝난다)
+  if ((outcome.tally?.surges ?? 0) > 0 && enc.node.type !== 'boss') {
+    splitMapBySurge(data, run, outcome.tally!.surges, enc.node.id);
+    out.push('폭주가 지도를 갈랐다 — 앞길 하나가 끊기고 裂 틈새가 열렸다.');
+  }
   if (isAbyss(run)) {
     // 심연: 쓰러진 채 끝난 동료는 부상(다음 굽이까지 최대 체력 감소). 보스·엘리트 수는 점수에. 이야기 clearEffects는 없다
     const ab = run.abyss!;
@@ -613,7 +658,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     if (enc.node.type === 'boss') ab.bosses += 1;
     awardBattleXp(data, run, enc.node.type);
     // 심연 모듈(틈의 짐승 등)의 clearEffects만. 캠페인 모듈의 이야기 보상은 없다
-    if (enc.module.stage === 'abyss') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
+    if (enc.module.stage === 'abyss' || enc.module.stage === 'crack') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
     out.push(...fireRunRelics(data, run, 'victory'));
     if (!outcome.tally?.surges) out.push(...fireRunRelics(data, run, 'cleanVictory'));
     trackBattle(data, run, enc.module.id, enc.node.type, outcome.tally);
