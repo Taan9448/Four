@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: a Blood Cultist, a rank-and-file follower of the Heavenly Demon Cult; a gaunt man in a dark blood-red martial robe with a blood-drop crest on the chest, a red headband, a thin heavy dark red aura clinging to the body, a broad blood-red saber. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: stands facing left, saber low, dark red aura clinging
+Cell 2: the aura thickens around the shoulders
+Cell 3: the blood-drop crest glows faintly
+Cell 4: the aura settles
+Cells 5 to 6 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: The left-side view is correct, but the previous bodies were about 106px tall while reference cell 2 is only 95px. Reduce the whole body uniformly by 0.90 to match reference CELL 2, never cell 1. Draw every full head-to-foot body exactly 95 sprite pixels /380 source pixels tall. Put the hair top at local y=84 and feet at y=464: 380px total. Include any aura above the head WITHIN that same 380px-high envelope, not extra height above it. Leave at least 80 source pixels of completely empty green above every head. The figure must visibly occupy only 74% of the cell's height, not 85% or 90%. Same narrow LEFT SIDE PROFILE with one eye, single overlapping boot silhouette, hidden far arm, headband and long blood-red robe and low broad curved saber. Use the attached reference cell2 exact slim body shape and scale, not the front view. Keep all four bodies identical in scale and position, only aura and chest crest brightness change. Blade, headband ends and aura stay inside x=44..460, y=84..464. Cells5,6 entirely green.
