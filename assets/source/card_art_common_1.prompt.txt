@@ -1,0 +1,27 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a single clenched fist thrusting forward with a short white impact burst
+Cell 2: a cloth-wrapped forearm raised to block, a small spark where a blow lands
+Cell 3: a foot sweeping low across packed earth with a small puff of dust
+Cell 4: a crouching figure ducking as a dark streak flies just over its head
+Cell 5: a long pale breath curling upward in one slow spiral
+Cell 6: a small green leafy herb sprig with one drop of dew
+Cell 7: a hand flinging an arc of tan sand grains
+Cell 8: a leather sling whirling a round grey stone
+Cell 9: two fingers jabbing a glowing point on a shoulder
+Cell 10: a sharp elbow strike with a short curved impact arc
+Cell 11: a wooden torch with a bright orange flame
+Cell 12: a small campfire of crossed logs with a warm glow
+Cell 13: a bare torso silhouette turned to dark iron with a metal sheen
+Cell 14: an open palm pushing a swirling gust that sweeps fallen leaves
+Cell 15: a foot tip resting on a single blade of grass that does not bend
+Cell 16: a gnarled wild ginseng root with a cluster of red berries
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
