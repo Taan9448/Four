@@ -1,5 +1,5 @@
 {
-  "$comment": "밸런스 목표(docs/GAME_DESIGN.md 12절·16절). 보고서(tools/balance/*-report.ts)가 이 값과 비교해 맨 위에 경고 줄을 낸다. 값은 비율(0.07 = 7%).",
+  "$comment": "밸런스 목표(docs/GAME_DESIGN.md 2절 순례·12절·16절). 보고서(tools/balance/*-report.ts)가 이 값과 비교해 맨 위에 경고 줄을 낸다. 값은 비율(0.07 = 7%).",
   "campaign": {
     "battleDefeatMax": 0.02,
     "eliteDefeat": [0.03, 0.07],
@@ -12,5 +12,10 @@
     "reach15Max": 0.02,
     "wideMedianMax": 7,
     "deck": [25, 35]
+  },
+  "pilgrimage": {
+    "normalTurns": [4, 6],
+    "partyLoss": [0.1, 0.2],
+    "bossDefeat": [0.05, 0.1]
   }
 }

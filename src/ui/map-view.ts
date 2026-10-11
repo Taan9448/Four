@@ -1,7 +1,7 @@
 // 지도 화면(GAME_DESIGN 13절): 위 = 두 세계를 잇는 여정 띠, 아래 = 지금 스테이지의 두루마리 지역 지도 + 편성·요약.
 import type { GameData } from '../engine/data';
 import { findNode, type MapNode } from '../engine/route';
-import { availableNodes, playableStages, setParty, xpToNext, type RunState } from '../engine/run';
+import { availableNodes, pilgrimScale, playableStages, setParty, xpToNext, type RunState } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { iconEl } from './icons';
@@ -525,11 +525,12 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             ? h(
                 'div',
                 { class: 'mode-badges' },
-                run.replayOf ? h('span', { class: 'mode-badge replay', ...tipAttrs('다시 하기', '마지막에 클리어한 파티로 이 스테이지만. 결과는 저장에 남지 않는다.') }, '다시 하기') : null,
+                run.replayOf ? h('span', { class: 'mode-badge replay', ...tipAttrs('순례', '클리어한 일행으로 이 스테이지를 다시 걷는다. 길에서 얻는 것은 이 길 안에서만 쓰고, 이긴 횟수만 남는다.') }, '순례') : null,
                 run.difficulty === 'hard' ? h('span', { class: 'mode-badge hard' }, '어려움') : null,
                 run.hardcore ? h('span', { class: 'mode-badge hardcore', ...tipAttrs('하드코어', `쓰러진 동료는 돌아오지 않는다.${run.fallen.length ? `\n잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}` : ''}`) }, '하드코어') : null,
               )
             : null,
+          run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼과 가진 유물 수만큼(상한 있음).') }, pilgrimLabel(data, run)) : null,
           h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
           run.abyss?.laws?.length
             ? h(
@@ -566,4 +567,11 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       ),
     ),
   );
+}
+
+/** 순례 일행 보정 한 줄(지도 오른쪽 칸·전투 시작 띠): "순례 — 적 체력 ×1.9 · 피해 ×1.6" */
+export function pilgrimLabel(data: GameData, run: RunState): string {
+  const k = pilgrimScale(data, run);
+  const x = (n: number) => `×${Number(n.toFixed(2))}`;
+  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)}`;
 }

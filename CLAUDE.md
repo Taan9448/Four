@@ -11,7 +11,7 @@
 ## 명령
 ```bash
 npm ci
-npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>], ?abyss[=시드](심연 시작)
+npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>][&pilgrim], ?abyss[=시드](심연 시작)
                             # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex|loadout[&module=<id>][&pilgrim] (화면 하나만 띄우기, &pilgrim: 순례 길로)
                             # ?screen=abyssclear|abyssend|abyssshop|abyssrest[&module=<id>] (심연 화면)
                             # &pxcards: Codex 카드 틀(card_frame_*)이 오기 전에 임시 틀로 픽셀 카드 미리 보기
@@ -19,7 +19,7 @@ npm test                    # Vitest(엔진·경로·런·데이터·에셋 도�
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
 npm run balance             # 자동 플레이 봇(수비형·공격형 동시) 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s8)
-                            # BALANCE_MODE=abyss → 심연 보고서 docs/BALANCE_ABYSS.md
+                            # BALANCE_MODE=abyss → 심연 보고서 docs/BALANCE_ABYSS.md, BALANCE_MODE=pilgrimage → 순례 docs/BALANCE_PILGRIMAGE.md
 npm run balance:human       # 도감에서 내보낸 사람 플레이 기록을 봇과 비교 (HUMAN=파일.json)
 npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s8:s8_boss_blood_hall)
 npm run build               # dist/

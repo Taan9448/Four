@@ -241,6 +241,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .stage-stats { display: flex; gap: 14px; margin-top: 8px; color: var(--ink-dim); font-size: 0.75rem; }
 .stage-stats span { cursor: help; }
 .stage-stats b { color: var(--ink); font-size: 0.95rem; margin-right: 4px; font-variant-numeric: tabular-nums; }
+.pilgrim-scale { margin: 6px 0 0; font-size: 0.8rem; color: #9fd0ff; }
+.battle-pilgrim { color: #9fd0ff; border-color: rgba(143, 211, 255, 0.45); font-size: 0.78rem; }
 .stage-summary { color: #cfcabe; line-height: 1.6; margin: 6px 0 0; font-size: 0.84rem; }
 .member { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-left: 4px solid var(--owner); margin-bottom: 4px; border-radius: 4px; background: rgba(0, 0, 0, 0.25); }
 .member.on { background: rgba(60, 70, 95, 0.45); }

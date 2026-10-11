@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { acquireCard, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
-import { createRunAt, finishReplay, startReplay, suspendReplay } from '../src/engine/run';
+import { battleSetupFor, createRunAt, enterNode, finishReplay, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
 import { deserializeRun, serializeRun } from '../src/engine/save';
 import { data } from './helpers';
 
@@ -98,5 +98,39 @@ describe('순례 — 저장 이행(5)', () => {
     expect(loaded.pilgrimRewarded).toEqual({});
     expect(loaded.challenges).toEqual({});
     expect(deserializeRun(data, serializeRun(loaded))!.run.status).toBe('complete');
+  });
+});
+
+describe('순례 — 일행 보정(2)', () => {
+  const p = data.balance.pilgrimage;
+  it('(d) 1 + 하운 레벨이 기준보다 높은 만큼 × 레벨당 + 유물 수 × relicPct, 상한 maxHp·maxDmg, 캠페인은 1', () => {
+    const hub = cleared('PIL6');
+    expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1 });
+    const run = startReplay(data, hub, 's3');
+    const haun = run.roster.find((r) => r.id === 'haun')!;
+    haun.level = 9;
+    const over = Math.max(0, 9 - p.baseLevel.s3);
+    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct) * 100) / 100;
+    expect(pilgrimScale(data, run)).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg) });
+    // 기준 레벨 이하면 유물 몫만
+    haun.level = 1;
+    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct) * 100) / 100);
+    // 상한
+    haun.level = 99;
+    run.relics = Array.from({ length: 500 }, () => 'red_thread');
+    expect(pilgrimScale(data, run)).toEqual({ hp: p.maxHp, dmg: p.maxDmg });
+  });
+
+  it('전투 배율에 곱해진다(어려움 배율과 함께)', () => {
+    const hub = cleared('PIL7');
+    const run = startReplay(data, hub, 's2');
+    run.roster.find((r) => r.id === 'haun')!.level = 10;
+    const k = pilgrimScale(data, run);
+    expect(k.hp).toBeGreaterThan(1);
+    const node = run.map.floors[0][0];
+    const enc = enterNode(data, run, node.id);
+    const stage = data.stages.find((s) => s.id === 's2')!;
+    const setup = battleSetupFor(data, run, enc);
+    expect(setup.enemyHpScale).toBeCloseTo(stage.enemyHpScale * k.hp);
   });
 });

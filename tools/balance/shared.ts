@@ -4,13 +4,14 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { GameData } from '../../src/engine/data';
 import { BOT_STYLES, playRun, type AbyssReport, type BotOptions, type BotStyle, type RunReport } from '../../src/sim/bot';
 import { playAbyssBatch } from './abyss-report';
+import { playPilgrimageBatch, type PilgrimBatch } from './pilgrimage-report';
 
 export const DIR = '.tmp/balance';
-export const MODE = process.env.BALANCE_MODE === 'abyss' ? 'abyss' : 'campaign';
+export const MODE: 'campaign' | 'abyss' | 'pilgrimage' = process.env.BALANCE_MODE === 'abyss' ? 'abyss' : process.env.BALANCE_MODE === 'pilgrimage' ? 'pilgrimage' : 'campaign';
 /** 성향 목록(BALANCE_STYLES=guard,strike). play.a·play.b가 하나씩 맡는다 */
 export const STYLES = (process.env.BALANCE_STYLES ?? 'guard,strike').split(',').filter(Boolean) as BotStyle[];
-export const SEEDS = Number(process.env.BALANCE_SEEDS ?? (MODE === 'abyss' ? 40 : 300));
-export const PREFIX = process.env.BALANCE_PREFIX ?? (MODE === 'abyss' ? 'A' : 'B');
+export const SEEDS = Number(process.env.BALANCE_SEEDS ?? (MODE === 'campaign' ? 300 : 40));
+export const PREFIX = process.env.BALANCE_PREFIX ?? (MODE === 'abyss' ? 'A' : MODE === 'pilgrimage' ? 'P' : 'B');
 // BALANCE_START=s3: 앞 스테이지를 건너뛰고 그 스테이지부터(뒤쪽 스테이지 표본을 늘릴 때. 보상·강화 없이 시작하므로 실제보다 약하다)
 export const START = process.env.BALANCE_START || undefined;
 // BALANCE_DIFFICULTY=hard · BALANCE_HARDCORE=1: 난이도·하드코어 런으로(새 런 난이도 고르기와 같다)
@@ -43,8 +44,9 @@ export function playStyle(data: GameData, slot: number): void {
   if (!style) return; // 성향이 하나뿐이면 둘째 칸은 쉰다
   const t0 = Date.now();
   const opts = botOptions(style);
-  let batch: CampaignBatch | AbyssBatch;
+  let batch: CampaignBatch | AbyssBatch | PilgrimBatch;
   if (MODE === 'abyss') batch = { style, ms: 0, ...playAbyssBatch(data, SEEDS, PREFIX, opts) };
+  else if (MODE === 'pilgrimage') batch = { style, ms: 0, runs: playPilgrimageBatch(data, SEEDS, PREFIX, opts, RUN_MODE) };
   else {
     const runs: RunReport[] = [];
     for (let i = 1; i <= SEEDS; i++) runs.push(playRun(data, `${PREFIX}${String(i).padStart(4, '0')}`, opts, START, RUN_MODE));
