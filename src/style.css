@@ -1603,8 +1603,11 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px solid var(--gold); border-bottom-width: 2px; border-radius: 4px; background: #15131a; color: #f0e4c8; font: 700 var(--fs-sub) var(--f-ui); text-align: center; }
 /* 표식에 글자 함께 */
 .medal-label { display: none; }
-.glyph-labels .medal-label { display: block; position: absolute; left: 50%; top: calc(100% + 7px); transform: translateX(-50%); font: 700 var(--fs-min)/1 var(--f-ui); color: #e8dcc0; white-space: nowrap; text-shadow: 0 1px 3px #000, 0 0 2px #000; pointer-events: none; }
-.glyph-labels .medal-row, .glyph-labels .medals { padding-bottom: 20px; }
+.glyph-labels .medal-label { display: block; position: absolute; left: 50%; top: calc(100% + 5px); transform: translateX(-50%); font: 700 var(--fs-min)/1 var(--f-ui); color: #e8dcc0; white-space: nowrap; text-shadow: 0 1px 3px #000, 0 0 2px #000; pointer-events: none; }
+/* 아래 여백은 바깥 줄(.medal-row)에만 — 안쪽 묶음(.medals: 抽棄滅)에도 주면 그 묶음만 위로 올라가 冊記設과 어긋났다(2026-10-11) */
+.glyph-labels .medal-row { padding-bottom: 20px; }
+/* 글자가 붙으면 숫자 배지는 오른쪽 위로(아래 글자를 가리지 않게) */
+.glyph-labels .medal i { bottom: auto; top: -5px; }
 /* 색각 보정: 등급 보석 모양 · 상태 이름표 모양 */
 .cpx-rshape { display: none; }
 .color-assist .cpx-rshape { display: grid; place-items: center; position: absolute; z-index: 3; left: 48px; top: 85px; width: 32px; height: 32px; font-size: 13px; font-weight: 900; color: #fff; text-shadow: 0 0 2px #000, 0 0 3px #000, 1px 1px 0 #000; pointer-events: none; }
