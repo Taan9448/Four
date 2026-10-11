@@ -10,6 +10,8 @@ export interface Settings {
   speed: number;
   /** 영웅·전설 카드 컷인 */
   cutIn: boolean;
+  /** 화면 연출: 시작 화면 움직임 · 영웅·전설 카드의 빛(2026-10-11). 끄면 문서에 no-motion */
+  motion: boolean;
   /** 쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다 */
   confirmEndTurn: boolean;
   /** 피격·폭주 때 화면 흔들림 세기(0 끄기 · 0.5 약하게 · 1 보통) */
@@ -32,7 +34,7 @@ export const SHAKES: { value: number; label: string }[] = [
   { value: 1, label: '보통' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8 };
+const DEFAULTS: Settings = { speed: 1, cutIn: true, motion: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8 };
 
 const volume = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : d);
 
@@ -48,6 +50,7 @@ function load(): Settings {
     return {
       speed: SPEEDS.some((s) => s.value === raw.speed) ? raw.speed! : DEFAULTS.speed,
       cutIn: typeof raw.cutIn === 'boolean' ? raw.cutIn : DEFAULTS.cutIn,
+      motion: typeof raw.motion === 'boolean' ? raw.motion : DEFAULTS.motion,
       confirmEndTurn: typeof raw.confirmEndTurn === 'boolean' ? raw.confirmEndTurn : DEFAULTS.confirmEndTurn,
       shake: readShake(raw.shake),
       master: volume(raw.master, DEFAULTS.master),
@@ -61,9 +64,10 @@ function load(): Settings {
 
 export const settings: Settings = load();
 
-/** 화면 전체에 걸리는 설정(흔들림 세기 → 연출 모듈, 소리 크기 → 소리 모듈) */
+/** 화면 전체에 걸리는 설정(흔들림 세기 → 연출 모듈, 소리 크기 → 소리 모듈, 화면 연출 → 문서 no-motion) */
 export function applySettings(): void {
   setShakeScale(settings.shake);
+  document.documentElement.classList.toggle('no-motion', !settings.motion);
   setVolumes(settings);
 }
 
@@ -88,7 +92,7 @@ export function settingsForm(): HTMLElement {
         ),
       ),
     );
-  const toggle = (key: 'cutIn' | 'confirmEndTurn', label: string, hint: string) =>
+  const toggle = (key: 'cutIn' | 'motion' | 'confirmEndTurn', label: string, hint: string) =>
     h(
       'label',
       { class: 'setting-row setting-toggle' },
@@ -124,6 +128,7 @@ export function settingsForm(): HTMLElement {
     slider('sfx', '효과음', '타격·카드·버튼 소리'),
     h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), radios('speed', '전투 속도', SPEEDS)),
     toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
+    toggle('motion', '화면 연출', '시작 화면의 빛·안개·꽃잎, 영웅·전설 카드의 빛'),
     toggle('confirmEndTurn', '턴 종료 확인', '쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다'),
     h('div', { class: 'setting-row' }, h('span', {}, '화면 흔들림', h('small', {}, '피격·폭주 때 흔들리는 세기')), radios('shake', '화면 흔들림', SHAKES)),
     h(
