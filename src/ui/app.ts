@@ -787,6 +787,10 @@ export class App {
               this.map();
             },
           }),
+        onResume: (stageId) => {
+          this.run = startReplay(data, run, stageId);
+          this.map();
+        },
         onDiscard: async (stageId) => {
           const st = data.stages.find((s) => s.id === stageId)!;
           if (!(await confirmDialog(`${placeName(st, run)} — 멈춘 길 버리기`, '멈춰 둔 진행을 버린다. 그 길에서 얻은 카드·골드·유물도 함께 사라진다. 다음에 누르면 처음부터 걷는다.', '버리기'))) return;

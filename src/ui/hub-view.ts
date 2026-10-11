@@ -3,7 +3,6 @@
 import type { GameData } from '../engine/data';
 import { playableStages, type RunState } from '../engine/run';
 import { h } from './dom';
-import { inventoryBox } from './items';
 import { journeyBand, placeName } from './map-view';
 import { installTooltips } from './tooltip';
 import { openOverlay } from './overlay';
@@ -12,6 +11,8 @@ import { challengeDone, challengeUnlockName, pilgrimRewardDue, stageChallenges }
 export interface HubHandlers {
   /** 장소를 눌렀다: 멈춰 둔 진행이 있으면 이어서, 없으면 처음부터 */
   onStage: (stageId: string) => void;
+  /** 멈춰 둔 길을 바로 이어 걷는다(창 없이) */
+  onResume: (stageId: string) => void;
   /** 멈춰 둔 진행을 버린다 */
   onDiscard: (stageId: string) => void;
   onShowDeck: () => void;
@@ -21,13 +22,26 @@ export interface HubHandlers {
 
 export function hubView(data: GameData, run: RunState, handlers: HubHandlers): HTMLElement {
   installTooltips();
-  const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
   const mode = [run.difficulty === 'hard' ? '어려움' : '보통', run.hardcore ? '하드코어' : ''].filter(Boolean).join(' · ');
   const paused = playableStages(data).filter((st) => run.suspended?.[st.id]);
   const wins = Object.values(run.replays).reduce((a, n) => a + n, 0);
+  // 순례 모드(2026-10-11 사용자 요청): 위 왼쪽에 '순례 모드', 오른쪽에 보유 카드 · 도감 · 타이틀로.
+  // 아래는 '어디로 갈까' 한 칸만, 지도와 같은 너비(일행·보유 장비 칸은 뺐다 — 일행은 길의 출전 칸, 장비는 보유 카드 창에서 본다)
   return h(
     'section',
     { class: 'screen map-screen hub-screen' },
+    h(
+      'div',
+      { class: 'hub-top' },
+      h('div', { class: 'hub-mode' }, h('span', { class: 'seal', 'aria-hidden': 'true' }, '巡'), h('b', {}, '순례 모드'), h('small', {}, mode)),
+      h(
+        'div',
+        { class: 'hub-actions' },
+        h('button', { class: 'btn btn-primary', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
+        h('button', { class: 'btn', onclick: handlers.onCodex }, '도감'),
+        h('button', { class: 'btn', onclick: handlers.onTitle }, '타이틀로'),
+      ),
+    ),
     h(
       'div',
       { class: 'journey-area hub-world' },
@@ -45,7 +59,7 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
         h(
           'p',
           { class: 'hint' },
-          '장소를 누르면 지금 일행으로 그곳을 다시 걷는다. 길에서 얻는 것은 그 길 안에서만 쓰고, 처음 다시 넘긴 스테이지마다 놓친 카드 하나를 줍는다. 도전을 이루면 틈의 카드·길·칭호가 열린다. 걷다가 "전체 지도로"를 누르면 그 자리에 멈춰 두고 다른 곳으로 갈 수 있다.',
+          '장소를 누르면 지금 일행으로 그곳을 다시 걷는다. 길에서 얻는 것은 그 길 안에서만 쓰고, 처음 다시 넘긴 스테이지마다 놓친 카드 하나를 줍는다. 도전을 이루면 틈의 카드·길·칭호가 열린다. 걷다가 "전체 지도로"를 누르면 그 자리에 멈춰 두고 다른 곳으로 갈 수 있다. 순례에서는 하운도 쉴 수 있다 — 네 명 중 3명을 길의 출전 칸에서 고른다.',
         ),
         paused.length
           ? h(
@@ -59,31 +73,13 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
                   { class: 'hub-paused-row' },
                   h('b', {}, placeName(st, run)),
                   h('small', {}, `${p.visited.length}칸 지남`),
-                  h('button', { class: 'btn btn-small btn-primary', onclick: () => handlers.onStage(st.id) }, '이어서'),
+                  // 이어서: 창 없이 바로 그 자리에서(2026-10-11 사용자 요청)
+                  h('button', { class: 'btn btn-small btn-primary', onclick: () => handlers.onResume(st.id) }, '이어서'),
                   h('button', { class: 'btn btn-small', onclick: () => handlers.onDiscard(st.id) }, '버리기'),
                 );
               }),
             )
           : null,
-      ),
-      h(
-        'div',
-        { class: 'box hub-party' },
-        h('h3', {}, '일행'),
-        fighters.map((r) => h('div', { class: 'hub-member' }, h('span', {}, data.characters.get(r.id)?.name ?? r.id), h('small', {}, `Lv ${r.level} · 최대 체력 ${r.maxHp}`))),
-        h('p', { class: 'hint' }, `전투에는 하운을 포함해 ${data.balance.party.max}명까지 나선다(지도의 출전 칸에서 고른다).`),
-      ),
-      h(
-        'div',
-        { class: 'hub-side' },
-        inventoryBox(data, run.gold, run.potions, run.relics),
-        h(
-          'div',
-          { class: 'map-actions' },
-          h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
-          h('button', { class: 'btn', onclick: handlers.onCodex }, '도감'),
-          h('button', { class: 'btn', onclick: handlers.onTitle }, '타이틀로'),
-        ),
       ),
     ),
   );
