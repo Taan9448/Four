@@ -1,0 +1,50 @@
+{
+  "id": "card_art_common_2",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 14,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 14,
+  "sourceHash": "b37bf3d3a9a6d875",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.83,
+  "cards": [
+    "common_smoke",
+    "common_flying_dagger",
+    "common_mana_shard",
+    "common_pressure",
+    "common_oil_jar",
+    "common_acupoint",
+    "common_meditation",
+    "common_good_sword",
+    "common_net",
+    "common_salve",
+    "common_four_ounces",
+    "common_thousand_weight",
+    "common_elixir",
+    "common_rebirth"
+  ]
+}
