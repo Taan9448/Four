@@ -26,6 +26,10 @@ function condText(data: GameData, e: Effect): string {
   if (c.scarMin !== undefined) return `상흔 ${c.scarMin} 이상이면 `;
   if (c.selfBlockGte !== undefined) return `방어가 ${c.selfBlockGte} 이상이면 `;
   if (c.partyHas) return `${data.characters.get(c.partyHas)?.name ?? c.partyHas} 출전 시 `;
+  if (c.world) {
+    const names: Record<string, string> = { elheim: '엘하임', murim: '무림', nocturna: '노크투르나', rift: '틈' };
+    return `${[c.world].flat().map((w) => names[w] ?? w).join('·')}에서는 `;
+  }
   if (c.flag) return '';
   return '조건부: ';
 }
@@ -129,6 +133,12 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       return `${pre}소멸한 카드 ${Math.max(1, n)}장을 손패로`;
     case 'copy_card':
       return `${pre}손패의 카드 ${Math.max(1, n)}장 복제(이번 전투만)`;
+    case 'reveal_intent':
+      return `${pre}이번 차례 적의 의도가 보인다(안개를 걷는다)`;
+    case 'purge':
+      return `${pre}'${data.cards.get(e.card ?? '')?.name ?? e.card}' ${Math.max(1, n)}장까지 소멸(손패·버린 더미·뽑을 더미)`;
+    case 'delay_enrage':
+      return `${pre}적의 격노 ${n}턴 늦추기`;
     default:
       return e.op;
   }

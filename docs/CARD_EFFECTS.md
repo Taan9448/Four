@@ -31,6 +31,9 @@
 | `keep_block` | — | 자신 | 대상에 상태 `block_kept`: 다음 차례가 시작될 때 그 아군의 방어가 사라지지 않는다(한 번). 규칙 유물 keep_block(바위 부적)과 같은 자리에서 처리 |
 | `recall` | amount?, filter? | — | 소멸 더미에서 무작위(filter로 거름) 카드 amount(기본 1)장을 손패로 |
 | `copy_card` | amount?, filter? | — | 손패의 무작위(상태 카드 제외, filter로 거름) 카드를 복제해 손패에. 복제는 이번 전투에서만 있고 내면 소멸 |
+| `reveal_intent` | — | — | 이번 차례에는 굽이의 법칙 '안개'가 가린 적의 의도가 보인다(안개 속의 눈, 2파) |
+| `purge` | card, amount? | — | `card` 카드를 손패 → 버린 더미 → 뽑을 더미 순으로 amount(기본 1)장까지 소멸시킨다(잔향 먹는 금) |
+| `delay_enrage` | amount | — | 살아 있는 적의 격노와 법칙 '서두르는 자'의 격노가 amount턴 늦게 온다. 이미 격노했으면 지금부터 amount턴 쉰다(격노 늦추기) |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.

@@ -4,7 +4,7 @@ import { potionChip, relicChip } from './items';
 import { hasSkipTurn } from '../engine/effects';
 import { cardText, ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
-import { resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
+import { intentHidden, resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
@@ -656,7 +656,7 @@ export class BattleView {
     u.intent.style.display = view ? '' : 'none';
     if (!view) return;
     // 굽이의 법칙 '안개': 의도가 보이지 않는다
-    if (s.hideIntent) {
+    if (intentHidden(s)) {
       u.intent.append(h('span', { class: 'intent-fog' }, '?'));
       u.intent.setAttribute('aria-label', `${enemy.name}의 의도: 안개에 가려 보이지 않음`);
       Object.entries(tipAttrs('안개', '짙은 안개 때문에 이 적이 무엇을 할지 보이지 않는다.')).forEach(([k, v]) => v !== undefined && u.intent.setAttribute(k, v));
@@ -697,7 +697,7 @@ export class BattleView {
 
   /** 아군 머리 위: 이번 적 턴에 받을 피해(방어를 뺀 값). 쓰러질 피해면 진하게 */
   private renderIncoming(u: Unit, v: IncomingView | undefined): void {
-    if (this.state.hideIntent) v = undefined;
+    if (intentHidden(this.state)) v = undefined;
     u.intent.style.display = v && v.raw > 0 ? '' : 'none';
     if (!v || v.raw === 0) return;
     u.intent.className = `incoming${v.lethal ? ' lethal' : ''}${v.hpLoss === 0 ? ' safe' : ''}`;

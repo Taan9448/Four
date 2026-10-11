@@ -71,6 +71,7 @@ export type BattleEvent =
   | { type: 'recall'; cardId: string }
   | { type: 'focus'; member: string; arch?: string }
   | { type: 'copy'; cardId: string }
+  | { type: 'purge'; cardId: string }
   | { type: 'scar'; delta: number }
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'relic'; relicId: string; name: string }
@@ -131,6 +132,8 @@ export interface BattleState {
   /** 심연 굽이의 법칙: 손패 수 덮어쓰기, 적 의도 감추기(화면만), 모든 적의 격노 */
   handSize?: number;
   hideIntent?: boolean;
+  /** 안개 속의 눈(reveal_intent)을 쓴 차례: 이 차례에는 hideIntent여도 의도가 보인다 */
+  intentRevealTurn?: number;
   lawEnrage?: { afterTurn: number; text: string; effects: Effect[] }[];
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
@@ -241,4 +244,9 @@ export function spritesFor(def: CharacterDef, flags: readonly string[]): Record<
   let sprites = { ...def.sprites };
   for (const o of def.outfits) if (flags.includes(o.flag)) sprites = { ...sprites, ...o.sprites };
   return sprites;
+}
+
+/** 굽이의 법칙 '안개'로 적 의도가 가려졌는가(안개 속의 눈을 쓴 차례에는 보인다) */
+export function intentHidden(state: BattleState): boolean {
+  return !!state.hideIntent && state.intentRevealTurn !== state.turn;
 }
