@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: an Ice Wolf of frozen Arden, a large wolf with a translucent body of ice, blue mana frozen inside it like veins, a faint hexagonal lattice pattern across the ice, frost mane, pale glowing blue eyes. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: low stance facing left, frost breath drifting
+Cell 2: the blue veins inside the ice pulse
+Cell 3: the head lifts a little, frost mane bristling
+Cell 4: settles back down
+Cells 5 to 6 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: ALL FOUR frames must use ONLY the strict LEFT SIDE profile from reference CELL 2 and the attached single side sprite; never use cell 1's 3/4 view, including frame 4. Frame 4 returns to the SAME left-side stance as frame 1. Keep a CONSTANT body scale and total body height about 94 sprite pixels =376 source pixels, with ear tip at local y=84 and paws at y=459 in each 512px cell. Do NOT crouch frame 1 shorter or lift frame 3 much higher; frame 3 head rises only 1-2 sprite pixels. Every frame has the same long torso, four paws, icy mane and tail; only breath, inner blue vein brightness and tiny head motion change. Keep every tail inside x=472, leftmost breath inside x=40, no part touches or crosses x=512 or y=512. Frame 4 goes in bottom LEFT and is identical in viewpoint and scale to frame 1; cells 5-6 remain pure magenta.
+Fix: The last sheet still has a tail fragment in the LEFT edge of cell 2 from cell 1, and body height is only 82 instead of the required 94 sprite pixels. Correct both actual defects. Uniformly ENLARGE each whole wolf by exactly 94/82 =1.146 at the same pixel-block scale, including head, torso and paws, then center it inside its OWN cell. Required wolf bbox: approximately 480 source pixels wide by 376 source pixels high, x=16..495, ear-tip y=84 and paws y=459. Reference SIZE has priority over generic 10-sprite-pixel margins: narrow margins are acceptable; do not shrink the wolf to make space for breath. Breath is only two tiny 4px icy blocks above the muzzle at x>=8, not a large cloud left of the wolf. Absolutely nothing touches or crosses x=512 or y=512. Check all four rightmost tails: stop at x<=495 in local cell coordinates. Cell 4 uses the EXACT same left-side body stance as cell 1. No stray fragment at left edge of any cell.
