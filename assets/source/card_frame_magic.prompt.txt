@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art game card frame, 1024x1536 px, portrait.
+PIXEL GRID: The whole image is a 128x192 pixel-art sprite scaled up exactly 8x. Draw ONLY with solid square blocks of exactly 8x8 px aligned to a 8 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+(128x192 sprite pixels in total; below, x and y are sprite pixels counted from 0 at the top-left.)
+What it is: the frame of a MAGIC (Elheim) card: deep blue leather over silver-steel, silver filigree, a rune circle and small blue crystals
+An EMPTY card frame for a collectible fantasy card game, in the spirit of chunky, ornate, sculpted card frames with thick bevelled borders, jewel sockets and a ribbon banner across the middle. The game prints the name, rules text, cost and rarity on top later, so the frame carries NO text and NO numbers.
+Size: the card fills the WHOLE canvas edge to edge (all 128x192 sprite pixels); only the tiny cut-off corners outside its outline are magenta.
+Layout (keep these places exactly; the game aligns text to them):
+- ART WINDOW: x 16-111, y 12-81 (96x70), an opening filled with flat magenta #FF00FF (it becomes a transparent hole the card picture shows through). Its shape: a pointed gothic arch: the top rises to a soft point and the sides run straight down to a flat bottom, like a cathedral window. A 3-5 px carved rim runs around it.
+- COST SOCKET: a plain dark round socket about 26 px across centered at (14, 14), where the game sets the cost gem. Keep the socket face flat and dark.
+- NAME BANNER: x 4-123, y 78-95 (120x18), a horizontal banner lying across the bottom edge of the art window, wider than the window, its face plain (a deep blue cloth ribbon (#1f3f73,).
+- RARITY SOCKET: a small empty round setting about 12 px across centered at (64, 101), right below the banner.
+- TEXT BOX: x 12-115, y 108-173 (104x66), a calm flat panel (pale silver-blue vellum (#dff4ff,) with at most a faint texture near its edges; its middle stays plain so small dark text is easy to read.
+- TYPE PLAQUE: x 32-95, y 178-189 (64x12), a small plain tab on the bottom border.
+- Everything else is the frame body: deep blue leather (#1f3f73, #2b2b3a) over polished silver-steel (#5d6478, #8a90a3, #c2c6d1, #f1efe6) with a dark navy outer edge (#1d2433); fine silver filigree in the corners; a thin ring of magic-circle marks (abstract dots and arcs, no letters) engraved around the art window rim; four small faceted blue crystals (#4fb4ff, #8fd3ff, #dff4ff) set in the side borders
+Style: crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone steps per material, bevelled silver and leather read clearly, no anti-aliasing, no gradients, no dithering noise, no blur; front view, perfectly flat, symmetric left to right, light from the upper left, no perspective, no drop shadow.
+Palette: use at most 24 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta, pink or purple in the frame.
+Rules: no text, no letters, no numbers, no runes that read as letters, no signature, no watermark, no picture inside the art window.
