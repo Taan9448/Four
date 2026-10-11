@@ -43,6 +43,7 @@ import { h } from './dom';
 import { initDebug } from './debug';
 import { mapView, openPartyGuide, placeName } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
+import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import {
@@ -313,6 +314,7 @@ export class App {
    * 메뉴 버튼은 모두 같은 크기(이어하기 · 새로 시작 · 불러오기 · 설정). 저장은 3칸. 시드는 주소의 ?seed=로만(확인용)
    */
   private title(): void {
+    installTooltips();
     const last = lastSlot(data);
     const anySaved = listSlots(data).some((x) => x.saved);
     const abyssSaved = loadAbyss(data);
@@ -350,9 +352,14 @@ export class App {
                   h('small', {}, abyssSaved ? loopLabel(abyssSaved.run.abyss!) : `바늘구멍만 한 문 너머${readProfile().abyssBestDepth ? ` · 최고 ${readProfile().abyssBestDepth}굽이` : ''}`),
                 )
               : null,
-            h('button', { class: 'btn', onclick: () => this.codex() }, '도감', h('small', {}, '본 카드 · 적 · 장면')),
-            h('button', { class: 'btn', onclick: () => this.openSettings() }, '설정', h('small', {}, '소리 · 속도 · 연출')),
           ),
+        ),
+        // 도감·설정은 오른쪽 아래 둥근 표식으로(2026-10-11 사용자 요청: 가운데 메뉴는 이어하기·새로 시작·불러오기·심연만)
+        h(
+          'div',
+          { class: 'title-corner' },
+          h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
+          h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
       ),
