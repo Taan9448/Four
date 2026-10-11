@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
 import { bbox, columnCenter, countColors, faceSlots, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
-import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
+import { cellHasContent, cellRects, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
 
@@ -58,9 +58,11 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const illustration = spec.track === 'illustration';
   const keyed = keyOut(sheet.raw, spec);
   const cells = spec.grid[0] * spec.grid[1];
+  // 카드 그림 시트는 실제 그림 경계로 칸을 나눈다(자르기 도구와 같은 칸)
+  const rectOf = cellRects(keyed, spec, sheet.raw);
   if (fallback !== 3) {
     for (let n = 1; n <= cells; n++) {
-      const filled = cellHasContent(keyed, spec, n);
+      const filled = cellHasContent(keyed, spec, n, undefined, rectOf);
       if (n <= expectFrames && !filled) errors.push(`${n}번 칸이 비어 있다(프레임 수 부족)`);
       if (n > expectFrames && filled) errors.push(`${n}번 칸에 그림이 있다(빈 칸이어야 함)`);
     }
@@ -71,7 +73,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   let frameCells = [];
   if (!illustration) {
     if (fallback === 2) frameCells = [1, 2, 3];
-    else if (fallback === 3) for (let n = 1; n <= cells; n++) { if (cellHasContent(keyed, spec, n)) frameCells.push(n); }
+    else if (fallback === 3) for (let n = 1; n <= cells; n++) { if (cellHasContent(keyed, spec, n, undefined, rectOf)) frameCells.push(n); }
     else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
   }
   if (frameCells.length) {

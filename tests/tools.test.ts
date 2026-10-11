@@ -393,6 +393,61 @@ describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
   });
 });
 
+describe('카드 그림 칸 경계 감지(2026-10-11, #866·#869·#872)', () => {
+  /** 모델이 그린 꼴: 줄 높이를 rowH로 늘여 그린 시트(칸마다 단색 + 가로 줄무늬), 나머지는 마젠타 */
+  async function stretchedSheet(frames: number, rowH: number[]) {
+    const W = 1536, H = 1024;
+    const buf = Buffer.alloc(W * H * 4);
+    for (let i = 0; i < W * H; i++) buf.set([255, 0, 255, 255], i * 4);
+    const ys = rowH.reduce<number[]>((a, h) => [...a, a[a.length - 1] + h], [0]);
+    for (let n = 0; n < frames; n++) {
+      const col = n % 4, row = Math.floor(n / 4);
+      const color = [40 + n * 37, 200 - n * 23, 60 + ((n * 53) % 150)];
+      for (let y = ys[row]; y < ys[row + 1]; y++)
+        for (let x = col * 384; x < (col + 1) * 384; x++) buf.set([...color.map((c) => (y % 40 < 4 ? c / 2 : c)), 255], (y * W + x) * 4);
+    }
+    return { png: await sharp(buf, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer(), ys };
+  }
+
+  it('늘어난 줄(290px)의 실제 경계를 찾아, 5번 칸 위 끝에 윗줄이 섞이지 않고 빈 칸은 비어 있다', async () => {
+    const spec = loadSpec('card_art_born_2');
+    const { png, ys } = await stretchedSheet(5, [290, 286]);
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source(spec.id), png);
+    const { prepareSheet } = await import('../tools/lib/image.mjs');
+    const { cellHasContent, cellRects, tileLayout } = await import('../tools/lib/pixel.mjs');
+    const sheet = await prepareSheet(p.source(spec.id), spec);
+    const keyed = keyOut(sheet.raw, spec);
+    const at = tileLayout(keyed, spec);
+    expect(at(1)).toMatchObject({ x: 0, y: 0, w: 384, h: ys[1] });
+    expect(at(5)).toMatchObject({ x: 0, y: ys[1], h: ys[2] - ys[1] });
+    const rectOf = cellRects(keyed, spec);
+    for (let n = 6; n <= 16; n++) expect(cellHasContent(keyed, spec, n, undefined, rectOf), `${n}번 칸`).toBe(false);
+    await sliceSheet(spec, { src: p.source(spec.id), outDir: p.sprites(spec.id) });
+    // 5번 프레임의 맨 위·맨 아래 줄에 1번 칸에만 있는 색(윗줄이 스며든 것)이 없다
+    const px = async (n: number) => {
+      const { data, info } = await sharp(join(p.sprites(spec.id), `frame_0${n}.png`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const at = (x: number, y: number) => { const i = (y * info.width + x) * 4; return `${data[i]},${data[i + 1]},${data[i + 2]}`; };
+      return { info, at, all: new Set(Array.from({ length: info.width * info.height }, (_, k) => at(k % info.width, Math.floor(k / info.width)))) };
+    };
+    const f1 = await px(1), f5 = await px(5);
+    const only1 = [...f1.all].filter((c) => !f5.all.has(c));
+    expect(only1.length).toBeGreaterThan(0);
+    for (const y of [0, f5.info.height - 1]) for (let x = 0; x < f5.info.width; x++) expect(only1, `(${x},${y})`).not.toContain(f5.at(x, y));
+  });
+
+  it('규격대로 그린 시트(256px 줄)는 규격 격자 그대로 나눈다', async () => {
+    const spec = loadSpec('card_art_born_1');
+    const { png } = await stretchedSheet(16, [256, 256, 256, 256]);
+    const { keyOut: ko } = await import('../tools/lib/image.mjs');
+    const { tileLayout } = await import('../tools/lib/pixel.mjs');
+    const { data, info } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
+    const at = tileLayout(ko({ data, width: info.width, height: info.height }, spec), spec);
+    for (const n of [1, 6, 11, 16]) expect(at(n)).toMatchObject({ x: ((n - 1) % 4) * 384, y: Math.floor((n - 1) / 4) * 256, w: 384, h: 256 });
+  });
+});
+
 describe('저장소의 실제 명세와 임시 시트', () => {
   it('모든 명세가 규칙에 맞다', () => {
     const errors = listSpecIds().flatMap((id) => checkSpecShape(loadSpec(id)).map((e) => `${id}: ${e}`));
