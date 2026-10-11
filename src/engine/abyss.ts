@@ -150,19 +150,19 @@ export function unlockSource(data: GameData): Map<string, AchievementDef> {
   return out;
 }
 
-/** 열린 틈의 카드: 업적이 걸리지 않은 것(처음부터) + 이룬 업적이 연 것 */
-export function unlockedRift(data: GameData, achieved: readonly string[]): string[] {
+/** 열린 틈의 카드: 업적이 걸리지 않은 것(처음부터) + 이룬 업적이 연 것 + 순례 도전이 연 것(opened, GAME_DESIGN 2절) */
+export function unlockedRift(data: GameData, achieved: readonly string[], opened: readonly string[] = []): string[] {
   const src = unlockSource(data);
   return riftCards(data)
-    .filter((c) => !src.has(c.id) || achieved.includes(src.get(c.id)!.id))
+    .filter((c) => !src.has(c.id) || achieved.includes(src.get(c.id)!.id) || opened.includes(c.id))
     .map((c) => c.id);
 }
 
-/** 열린 길 */
-export function unlockedPaths(data: GameData, achieved: readonly string[]): string[] {
+/** 열린 길(순례 도전이 연 길 포함) */
+export function unlockedPaths(data: GameData, achieved: readonly string[], opened: readonly string[] = []): string[] {
   const src = unlockSource(data);
   return abyssPaths(data)
-    .filter((r) => !src.has(r.id) || achieved.includes(src.get(r.id)!.id))
+    .filter((r) => !src.has(r.id) || achieved.includes(src.get(r.id)!.id) || opened.includes(r.id))
     .map((r) => r.id);
 }
 
@@ -798,9 +798,11 @@ export interface AbyssMeta {
   oathCleared: number;
   /** 일일 심연: 날짜(yyyymmdd) → 그날 최고 기록 */
   daily: Record<string, { score: number; cleared: number; ended: boolean }>;
+  /** 순례 도전으로 연 틈의 카드·길 id(심연 업적과 따로, 저장 칸과 상관없이) */
+  opened: string[];
 }
 
-export const emptyAbyssMeta = (): AbyssMeta => ({ achievements: [], deaths: {}, oathCleared: -1, daily: {} });
+export const emptyAbyssMeta = (): AbyssMeta => ({ achievements: [], deaths: {}, oathCleared: -1, daily: {}, opened: [] });
 
 /** 깨졌거나 옛 기록도 받아 준다. 데이터에 없는 업적은 버린다 */
 export function parseAbyssMeta(data: GameData, text: string | null): AbyssMeta {
@@ -811,6 +813,7 @@ export function parseAbyssMeta(data: GameData, text: string | null): AbyssMeta {
     m.achievements = Array.isArray(raw.achievements) ? [...new Set(raw.achievements.filter((id) => typeof id === 'string' && data.achievements.has(id)))] : [];
     for (const [d, n] of Object.entries(raw.deaths ?? {})) if (Number(n) > 0) m.deaths[d] = Number(n);
     m.oathCleared = Number.isFinite(Number(raw.oathCleared)) ? Math.max(-1, Number(raw.oathCleared)) : -1;
+    m.opened = Array.isArray(raw.opened) ? [...new Set(raw.opened.filter((id) => typeof id === 'string' && (data.cards.has(id) || data.relics.has(id))))] : [];
     for (const [d, r] of Object.entries(raw.daily ?? {}))
       if (r && typeof r === 'object') m.daily[d] = { score: Number(r.score) || 0, cleared: Number(r.cleared) || 0, ended: !!r.ended };
   } catch {

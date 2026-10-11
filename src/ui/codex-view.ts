@@ -13,7 +13,7 @@ import { cardView } from './card-view';
 import { h } from './dom';
 import { iconEl } from './icons';
 import { potionChip, relicChip } from './items';
-import type { Profile } from './storage';
+import { mainTitle, setMainTitle, type Profile } from './storage';
 import { installTooltips } from './tooltip';
 import { confirmDialog, openOverlay } from './overlay';
 
@@ -359,7 +359,7 @@ function scenesTab(data: GameData, codex: Codex, onPlay: (id: string) => void): 
 /** 심연 탭(3차): 기록 · 굽이별 멈춘 횟수 · 일일 · 업적 · 틈의 카드 40칸 · 법칙·접사(만난 것만) */
 function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMeta): HTMLElement {
   const src = unlockSource(data);
-  const open = unlockedRift(data, meta.achievements);
+  const open = unlockedRift(data, meta.achievements, meta.opened);
   const rift = riftCards(data);
   const order = [...data.characters.keys(), 'common'];
   rift.sort((a, b) => order.indexOf(a.owner) - order.indexOf(b.owner) || ['rare', 'epic', 'legendary'].indexOf(a.rarity) - ['rare', 'epic', 'legendary'].indexOf(b.rarity));
@@ -486,6 +486,7 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
     'div',
     {},
     section('기록', null, h('dl', { class: 'codex-stats' }, rows.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, String(v))]))),
+    titlesSection(data, profile),
     runLogSection(),
     section(
       '채운 칸',
@@ -497,6 +498,28 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
       ),
     ),
   );
+}
+
+/**
+ * 칭호(순례 도전, GAME_DESIGN 2절): 얻은 칭호를 누르면 대표 칭호(시작 화면 저장 칸 요약 끝에 붙는다). 못 얻은 칭호는 어느 도전인지만
+ */
+function titlesSection(data: GameData, profile: Profile): HTMLElement {
+  const all = [...data.challenges.values()].filter((c) => c.unlock.title);
+  const list = h('div', { class: 'codex-titles' });
+  const draw = () => {
+    const main = mainTitle();
+    list.replaceChildren(
+      ...all.map((c) => {
+        const t = c.unlock.title!;
+        const stage = data.stages.find((st) => st.id === c.stage)?.name ?? c.stage;
+        return profile.titles.includes(t)
+          ? h('button', { class: `title-chip${t === main ? ' on' : ''}`, title: t === main ? '대표 칭호' : '누르면 대표 칭호로', onclick: () => (setMainTitle(t), draw()) }, `「${t}」`)
+          : h('span', { class: 'title-chip locked', title: `${stage} — 도전 「${c.name}」` }, `? ${stage} · ${c.name}`);
+      }),
+    );
+  };
+  draw();
+  return section('칭호', `${profile.titles.length} / ${all.length}`, h('div', {}, h('p', { class: 'hint' }, '순례(클리어 뒤 자유 여정)의 도전으로 얻는다. 누른 칭호가 시작 화면 저장 칸에 붙는다.'), list));
 }
 
 /** owned: 지금 런의 보유 카드(지도에서 열었을 때) — 카드 칸에 보유 여부·강화 단계 */
@@ -529,7 +552,7 @@ export function codexView(
               : tab === 'scenes'
                 ? scenesTab(data, codex, (id) => handlers.onPlayScene(id, 'scenes'))
                 : tab === 'abyss'
-                  ? abyssTab(data, codex, profile, meta ?? { achievements: [], deaths: {}, oathCleared: -1, daily: {} })
+                  ? abyssTab(data, codex, profile, meta ?? { achievements: [], deaths: {}, oathCleared: -1, daily: {}, opened: [] })
                   : statsTab(data, codex, profile);
     body.replaceChildren(content);
     body.scrollTop = 0;

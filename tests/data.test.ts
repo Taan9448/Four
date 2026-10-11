@@ -322,6 +322,32 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
+  it('(e) 순례 도전(GAME_DESIGN 2절): S1~S9 스테이지마다 3개(27개), 조건마다 필요한 값, 여는 것은 하나(틈의 카드·길·칭호), 중복 없음', () => {
+    const bad: string[] = [];
+    const list = [...data.challenges.values()];
+    const stages = playableStages(data).filter((s) => s.id !== 's0');
+    for (const st of stages) if (list.filter((c) => c.stage === st.id).length !== 3) bad.push(`${st.id}: 도전이 3개가 아니다`);
+    if (list.length !== 27) bad.push(`도전 ${list.length}개(27개여야)`);
+    const seen = new Set<string>();
+    for (const c of list) {
+      if (!stages.some((s) => s.id === c.stage)) bad.push(`${c.id}: 순례할 수 없는 스테이지 ${c.stage}`);
+      const k = c.check;
+      if (['withoutMate', 'onlyWith'].includes(k.kind) && data.characters.get(k.mate ?? '')?.role !== 'fighter') bad.push(`${c.id}: mate가 동료가 아니다`);
+      if (['noKeyword', 'keywordMax', 'bossKeywordPlays'].includes(k.kind) && !k.keyword) bad.push(`${c.id}: keyword가 없다`);
+      if (k.kind === 'noType' && !k.cardType) bad.push(`${c.id}: cardType이 없다`);
+      if (['matesMax', 'keywordMax', 'bossTurnsMax', 'bossGrain', 'bossKeywordPlays'].includes(k.kind) && k.n === undefined) bad.push(`${c.id}: n이 없다`);
+      const u = [c.unlock.card, c.unlock.path, c.unlock.title].filter(Boolean);
+      if (u.length !== 1) bad.push(`${c.id}: 여는 것이 하나가 아니다`);
+      if (c.unlock.card && data.cards.get(c.unlock.card)?.pool !== 'abyss') bad.push(`${c.id}: ${c.unlock.card}는 틈의 카드가 아니다`);
+      if (c.unlock.path && data.relics.get(c.unlock.path)?.rarity !== 'path') bad.push(`${c.id}: ${c.unlock.path}는 길이 아니다`);
+      for (const id of u) {
+        if (seen.has(id!)) bad.push(`${c.id}: ${id}를 두 도전이 연다`);
+        seen.add(id!);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
   it('balance: 세계별 마나·균열 규칙이 모든 세계에 정의돼 있다', () => {
     for (const w of ['murim', 'elheim', 'nocturna', 'rift'] as const) {
       expect(data.balance.mana.worlds[w]).toBeDefined();

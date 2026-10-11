@@ -834,6 +834,34 @@ export const AchievementDef = z
   })
   .strict();
 export type AchievementDef = z.infer<typeof AchievementDef>;
+
+/**
+ * 순례 도전(GAME_DESIGN 2절, 2026-10-11 A안): 자유 여정에서 그 스테이지 보스를 넘길 때 한 번 판정한다. 스테이지마다 3개(S0 제외).
+ * 심연 업적과 같은 꼴(check·unlock). check.kind — 동료: withoutMate mate가 한 번도 싸우지 않음 · matesMax 싸운 동료(하운 제외) n명 이하 ·
+ * onlyWith 하운과 mate 둘만 싸움 / 덱(보스를 넘길 때): noKeyword keyword 카드 없음 · noType cardType 카드 없음 · keywordMax keyword 카드 n장 이하 /
+ * 과정: noSurge 폭주 없음 · noRest 휴식 칸 안 감 · noShop 상점 칸 안 감 · noDowned 전투가 끝날 때 쓰러진 동료 없음 /
+ * 보스전: bossTurnsMax n턴 안에 · bossGrain 결 노출 n번 이상 터뜨림 · bossKeywordPlays keyword 카드 n장 이상 냄.
+ * unlock — card 틈의 카드(심연 업적과 별도로 연다) · path 심연의 길 · title 칭호. 카드·골드 보상은 없다(농장 금지)
+ */
+export const ChallengeDef = z
+  .object({
+    id: z.string().regex(/^[a-z0-9_]+$/),
+    stage: z.string(),
+    name: z.string(),
+    description: z.string(),
+    check: z
+      .object({
+        kind: z.enum(['withoutMate', 'matesMax', 'onlyWith', 'noKeyword', 'noType', 'keywordMax', 'noSurge', 'noRest', 'noShop', 'noDowned', 'bossTurnsMax', 'bossGrain', 'bossKeywordPlays']),
+        n: z.number().int().min(0).optional(),
+        mate: z.string().optional(),
+        keyword: Keyword.optional(),
+        cardType: z.enum(['attack', 'skill', 'power']).optional(),
+      })
+      .strict(),
+    unlock: z.object({ card: z.string().optional(), path: z.string().optional(), title: z.string().optional() }).strict(),
+  })
+  .strict();
+export type ChallengeDef = z.infer<typeof ChallengeDef>;
 export type NodeType = z.infer<typeof NodeType>;
 
 export const StageDef = z

@@ -5,6 +5,7 @@ import type { RunState } from '../engine/run';
 import { deserializeRun, serializeRun, type LoadedRun } from '../engine/save';
 import { noteRun, parseCodex, type Codex } from '../engine/codex';
 import { parseAbyssMeta, type AbyssMeta } from '../engine/abyss';
+import type { ChallengeDef } from '../engine/schema';
 
 /** 저장 칸 수(2026-10-08: 1칸 → 3칸). 칸마다 키가 따로이고, 옛 단일 저장(cheonoe.run)은 1번 칸으로 옮긴다 */
 export const SLOT_COUNT = 3;
@@ -78,6 +79,9 @@ export interface Profile {
   abyssRuns: number;
   abyssBestDepth: number;
   abyssBestScore: number;
+  /** 순례 도전으로 얻은 칭호(얻은 순서) · 대표 칭호(시작 화면 저장 칸 요약에, 도감 '기록'에서 바꾼다. 없으면 마지막에 얻은 것) */
+  titles: string[];
+  title?: string;
 }
 
 export function readProfile(): Profile {
@@ -91,10 +95,44 @@ export function readProfile(): Profile {
       abyssRuns: num(raw.abyssRuns),
       abyssBestDepth: num(raw.abyssBestDepth),
       abyssBestScore: num(raw.abyssBestScore),
+      titles: Array.isArray(raw.titles) ? [...new Set(raw.titles.filter((t): t is string => typeof t === 'string'))] : [],
+      title: typeof raw.title === 'string' ? raw.title : undefined,
     };
   } catch {
-    return { clears: 0, hardClears: 0, hardcoreClears: 0, abyssRuns: 0, abyssBestDepth: 0, abyssBestScore: 0 };
+    return { clears: 0, hardClears: 0, hardcoreClears: 0, abyssRuns: 0, abyssBestDepth: 0, abyssBestScore: 0, titles: [] };
   }
+}
+
+/** 대표 칭호: 고른 것(가진 칭호일 때) 또는 마지막에 얻은 것 */
+export function mainTitle(p: Profile = readProfile()): string | undefined {
+  return p.title && p.titles.includes(p.title) ? p.title : p.titles[p.titles.length - 1];
+}
+
+/** 저장 칸 요약 끝에 붙는 대표 칭호(마친 런·순례 길만): " · 「틈을 꿰맨 순례자」" 또는 "" */
+export function slotTitle(run: Pick<RunState, 'status' | 'replayOf'>): string {
+  const title = run.status === 'complete' || run.replayOf ? mainTitle() : undefined;
+  return title ? ` · 「${title}」` : '';
+}
+
+/** 대표 칭호를 바꾼다(도감 '기록') */
+export function setMainTitle(title: string): void {
+  const p = readProfile();
+  if (!p.titles.includes(title)) return;
+  p.title = title;
+  writeStore(PROFILE_KEY, JSON.stringify(p));
+}
+
+/**
+ * 순례 도전을 이뤘을 때(GAME_DESIGN 2절): 칭호는 프로필에, 틈의 카드·길은 심연 기록(opened)에 — 저장 칸과 상관없이 남는다
+ */
+export function recordChallenges(data: GameData, fresh: readonly ChallengeDef[]): void {
+  if (!fresh.length) return;
+  const p = readProfile();
+  for (const c of fresh) if (c.unlock.title && !p.titles.includes(c.unlock.title)) p.titles.push(c.unlock.title);
+  writeStore(PROFILE_KEY, JSON.stringify(p));
+  const meta = readAbyssMeta(data);
+  for (const c of fresh) for (const id of [c.unlock.card, c.unlock.path]) if (id && !meta.opened.includes(id)) meta.opened.push(id);
+  writeAbyssMeta(meta);
 }
 
 /** 심연 기록: 시작(started) 또는 끝(넘은 굽이·점수). 최고 기록이면 갈아 쓴다 */

@@ -1,9 +1,12 @@
 // 순례(자유 여정 개편, 2026-10-11 사용자 결정 A안): 길에서 얻은 것은 그 길 안에서만
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { acquireCard, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
 import { battleSetupFor, createRunAt, enterNode, finishReplay, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
 import { deserializeRun, serializeRun } from '../src/engine/save';
+import { challengeMet, challengeState, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../src/engine/pilgrimage';
+import { unlockedPaths, unlockedRift } from '../src/engine/abyss';
+import { mainTitle, readAbyssMeta, readProfile, recordChallenges, setMainTitle, slotTitle } from '../src/ui/storage';
 import { data } from './helpers';
 
 const cleared = (seed = 'PIL') => {
@@ -132,5 +135,124 @@ describe('순례 — 일행 보정(2)', () => {
     const stage = data.stages.find((s) => s.id === 's2')!;
     const setup = battleSetupFor(data, run, enc);
     expect(setup.enemyHpScale).toBeCloseTo(stage.enemyHpScale * k.hp);
+  });
+});
+
+describe('순례 — 첫 순례 보상(1-2)', () => {
+  it('(b) 스테이지당 1회, 고른 카드는 보유에 영구로, 보스 열쇠(essential) 카드는 후보에 없다', () => {
+    const hub = cleared('PIL8');
+    const offers = pilgrimRewardOptions(data, hub, 's2');
+    expect(offers.length).toBe(3);
+    for (const o of offers) {
+      const d = data.cards.get(o.cardId)!;
+      expect(d.essential).toBeFalsy();
+      if (o.kind === 'card') expect(hub.collection[o.cardId]).toBeUndefined();
+    }
+    // 같은 시드면 같은 후보
+    expect(pilgrimRewardOptions(data, hub, 's2')).toEqual(offers);
+    const run = startReplay(data, hub, 's2');
+    run.status = 'stage_clear';
+    expect(pilgrimRewardDue(run.replayOf!, 's2')).toBe(true);
+    const pick = offers.find((o) => o.kind === 'card')!;
+    claimPilgrimReward(data, run.replayOf!, 's2', pick);
+    const back = finishReplay(run);
+    expect(back.collection[pick.cardId]).toBe(0);
+    expect(pilgrimRewardDue(back, 's2')).toBe(false);
+    // 다음 길에서도 남고, 다시 받지 않는다
+    const again = startReplay(data, back, 's2');
+    expect(again.collection[pick.cardId]).toBe(0);
+    expect(pilgrimRewardDue(again.replayOf!, 's2')).toBe(false);
+  });
+
+  it('건너뛰어도 1회는 쓰고, 보상 풀이 다 차면 이야기 카드 → 가진 카드 강화 순으로 채운다', () => {
+    const hub = cleared('PIL9');
+    claimPilgrimReward(data, hub, 's1', null);
+    expect(pilgrimRewardDue(hub, 's1')).toBe(false);
+    // 보상 카드를 전부 가졌으면 이야기 카드·강화로
+    for (const d of data.cards.values()) if (d.pool === 'reward') hub.collection[d.id] ??= 0;
+    const offers = pilgrimRewardOptions(data, hub, 's3');
+    expect(offers.length).toBe(3);
+    expect(offers.every((o) => o.kind === 'upgrade' || data.cards.get(o.cardId)!.pool === 'story')).toBe(true);
+    const up = offers.find((o) => o.kind === 'upgrade');
+    if (up) {
+      const lv = hub.collection[up.cardId];
+      claimPilgrimReward(data, hub, 's3', up);
+      expect(hub.collection[up.cardId]).toBe(lv + 1);
+    }
+  });
+});
+
+describe('순례 — 도전(3)', () => {
+  it('보스를 넘긴 길에서 한 번 판정해 클리어한 런에 적고, 이미 이룬 것은 다시 내지 않는다', () => {
+    const hub = cleared('PIL10');
+    const run = startReplay(data, hub, 's8');
+    run.status = 'stage_clear';
+    run.stats.surges = 0;
+    run.stats.fought = ['haun', 'kyle'];
+    run.stats.boss = { turns: 9, grain: 0, cards: {} };
+    const fresh = settleChallenges(data, run).map((c) => c.id);
+    expect(fresh).toContain('s8_dojin');
+    expect(fresh).toContain('s8_two_not_three');
+    expect(fresh).not.toContain('s8_blood_hall');
+    expect(settleChallenges(data, run)).toEqual([]);
+    expect(finishReplay(run).challenges?.s8).toEqual(fresh);
+  });
+
+  it('조건별 판정: 동료·덱·과정·보스전', () => {
+    const hub = cleared('PIL11');
+    const run = startReplay(data, hub, 's1');
+    const met = (id: string) => challengeMet(data, run, data.challenges.get(id)!);
+    run.stats.fought = ['haun', 'kyle', 'born'];
+    expect(met('s1_branch')).toBe(true);
+    run.stats.fought.push('elia');
+    expect(met('s1_branch')).toBe(false);
+    run.stats.fought = ['haun', 'kyle'];
+    expect(met('s3_home_sword')).toBe(true);
+    expect(met('s4_two_hammers')).toBe(false);
+    run.deck = run.deck.filter((c) => data.cards.get(c.cardId)!.type !== 'power');
+    expect(met('s1_bare_heart')).toBe(true);
+    run.stats.rests = 1;
+    expect(met('s3_frozen_road')).toBe(false);
+    run.stats.boss = { turns: 5, grain: 6, cards: { haun_cheonoe: 1 } };
+    expect(met('s5_wedge_first')).toBe(true);
+    expect(met('s6_grain_reader')).toBe(true);
+    expect(met('s2_ride_flow')).toBe(data.cards.get('haun_cheonoe')!.keywords.includes('fusion'));
+    // 지도 칸 상태: 출전 중인 동료로 미리 '깨짐'
+    run.stats.fought = ['haun'];
+    run.selected = ['haun', 'elia'];
+    expect(challengeState(data, run, data.challenges.get('s1_branch')!)).toBe('broken');
+    expect(challengeState(data, run, data.challenges.get('s5_wedge_first')!)).toBe('open');
+  });
+});
+
+describe('순례 — 칭호(3-2)', () => {
+  const mem = new Map<string, string>();
+  beforeEach(() => {
+    mem.clear();
+    (globalThis as { localStorage?: unknown }).localStorage = {
+      getItem: (k: string) => mem.get(k) ?? null,
+      setItem: (k: string, v: string) => void mem.set(k, v),
+      removeItem: (k: string) => void mem.delete(k),
+    };
+  });
+
+  it('(g) 칭호는 프로필에 남고 저장 칸 요약 끝에 대표 칭호가 붙는다. 틈의 카드·길은 심연 기록에 열린다', () => {
+    const hub = cleared('PIL12');
+    expect(slotTitle(hub)).toBe('');
+    const pick = ['s9_rift_walker', 's9_stitched_sky', 's1_branch', 's1_no_one_falls'].map((id) => data.challenges.get(id)!);
+    recordChallenges(data, pick);
+    const p = readProfile();
+    expect(p.titles).toEqual(['틈을 꿰맨 순례자', '은빛 숲의 순례자']);
+    expect(mainTitle()).toBe('은빛 숲의 순례자');
+    expect(slotTitle(hub)).toBe(' · 「은빛 숲의 순례자」');
+    setMainTitle('틈을 꿰맨 순례자');
+    expect(slotTitle(hub)).toBe(' · 「틈을 꿰맨 순례자」');
+    // 캠페인 중인 런에는 붙지 않는다
+    expect(slotTitle({ status: 'map', replayOf: null })).toBe('');
+    const meta = readAbyssMeta(data);
+    expect(meta.opened).toEqual(['path_shadow', 'abyss_haun_shard_step']);
+    expect(unlockedRift(data, [], meta.opened)).toContain('abyss_haun_shard_step');
+    expect(unlockedRift(data, [])).not.toContain('abyss_haun_shard_step');
+    expect(unlockedPaths(data, [], meta.opened)).toContain('path_shadow');
   });
 });
