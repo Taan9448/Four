@@ -39,7 +39,17 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   const run = file.run;
   migrate(data, run);
   if (run.replayOf) migrate(data, run.replayOf);
+  for (const hub of [run, run.replayOf]) if (hub) keepValidSuspended(data, hub);
   return isValidRun(data, run) ? { run, savedAt: Number(file.savedAt) || 0 } : null;
+}
+
+/** 자유 여정에서 멈춘 진행: 데이터가 바뀌어 맞지 않는 것만 버린다(클리어한 런 전체를 버리지 않는다) */
+function keepValidSuspended(data: GameData, hub: RunState): void {
+  if (!hub.suspended) return;
+  for (const [stageId, paused] of Object.entries(hub.suspended)) {
+    migrate(data, paused);
+    if (paused.stageId !== stageId || paused.status !== 'map' || paused.replayOf || !isValidRun(data, paused)) delete hub.suspended[stageId];
+  }
 }
 
 /** 옛 저장을 지금 형식으로 채운다(없는 칸만) */

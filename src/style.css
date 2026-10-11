@@ -1031,18 +1031,36 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .end-unlock { color: #f2d48f; }
 .loot-notes { margin-top: 8px; }
 .loot-notes li.fallen { color: #ff8a7a; }
-.hub-local { grid-template-columns: minmax(0, 1fr) 300px; }
-.hub-list { margin: 0 7px; padding: 20px 24px; overflow-y: auto; text-align: left; }
-.hub-stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-.hub-stage { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; text-align: left; }
-.hub-stage small { color: var(--ink-dim); font-weight: 400; }
+/* 자유 여정(2026-10-11): 큰 세계 지도 = journey_band 그림의 높이 25~75%(3:1), 띠(37.5~62.5%)는 그 가운데 절반. 화면 높이에 맞춰 폭을 줄인다 */
+.hub-world .journey-wrap { width: min(100%, calc(62vh * 3)); margin: 0 auto; }
+.world-map { position: relative; aspect-ratio: 3 / 1; width: 100%; background: radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e4d6b6, #d6c59f); }
+.world-map.has-art { background-size: 100% auto; background-position: center; }
+.world-map > .journey { position: absolute; left: 0; right: 0; top: 25%; height: 50%; aspect-ratio: auto; overflow: visible; }
+.world-map > .journey.has-art { background: none; }
+.world-map .stop { font-size: 0.95rem; font-weight: 600; }
+.world-map .stop i { width: 16px; height: 16px; }
+.world-map .stop-name { padding: 1px 8px; border-radius: 10px; background: rgba(16, 13, 10, 0.72); }
+.world-map .stop.pick:hover .stop-name { background: rgba(122, 78, 18, 0.92); }
+.world-map .tag { font-size: 1.05rem; top: -30%; }
+.stop.paused i { background: var(--mana); border-color: #dff4ff; box-shadow: 0 0 0 5px rgba(143, 211, 255, 0.3); animation: pulse 1.6s infinite; }
+.stop .paused-tag { padding: 0 6px; border-radius: 8px; background: rgba(18, 50, 74, 0.9); color: #dff4ff; font-size: 0.7rem; }
+.hub-bottom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 300px; gap: 12px; padding: 12px; align-items: start; text-align: left; }
+.hub-bottom > .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 12px 14px; box-shadow: inset 0 0 0 3px rgba(14, 13, 17, 0.9), inset 0 0 0 4px rgba(168, 40, 30, 0.35); }
+.hub-side .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 10px 12px; font-size: 0.85rem; }
+.hub-guide h3, .hub-party h3 { margin: 2px 0 6px; }
+.hub-paused { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.hub-paused h4 { margin: 0; font-size: 0.85rem; color: var(--ink-dim); }
+.hub-paused-row { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px; }
+.hub-paused-row small { color: var(--ink-dim); }
+.hub-side { display: flex; flex-direction: column; gap: 10px; }
+.btn-world { border-color: rgba(143, 211, 255, 0.55); }
 .hub-member { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; }
 .hub-member small { color: var(--ink-dim); }
 .stop.pick { background: none; border: 0; font: inherit; cursor: pointer; }
 .stop.pick:hover { color: #fff; }
 .stop.pick:hover i { box-shadow: 0 0 0 5px rgba(226, 180, 92, 0.45); }
 .stop .replays { color: #e2b45c; font-size: 0.7rem; }
-@media (max-width: 900px) { .hub-local { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .hub-bottom { grid-template-columns: minmax(0, 1fr); } .hub-world .journey-wrap { width: 100%; } .world-map { width: 180%; } }
 
 /* 도감(2026-10-08): 위 머리(제목·탭) + 아래 판(스크롤). 못 본 칸은 ? 실루엣 */
 .codex-screen { display: flex; flex-direction: column; gap: 10px; height: calc(100vh - 20px); }

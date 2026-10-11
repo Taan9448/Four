@@ -1,4 +1,5 @@
-// 클리어 지도(2026-10-08): 캠페인을 마친 런의 여정 띠. 지나온 스테이지를 눌러 마지막 파티로 다시 한다(결과는 남지 않고 이긴 횟수만).
+// 클리어 지도 = 자유 여정(2026-10-08, 2026-10-11 개편): 캠페인을 마친 런의 큰 세계 지도. 장소를 누르면 마지막 파티로 그 스테이지를 하고,
+// 하다가 '전체 지도로' 나가면 그 자리에 멈춰 두었다가 다시 누르면 이어진다(결과는 남지 않고 이긴 횟수·얻은 카드만).
 import type { GameData } from '../engine/data';
 import { playableStages, type RunState } from '../engine/run';
 import { h } from './dom';
@@ -7,7 +8,10 @@ import { journeyBand, placeName } from './map-view';
 import { installTooltips } from './tooltip';
 
 export interface HubHandlers {
-  onReplay: (stageId: string) => void;
+  /** 장소를 눌렀다: 멈춰 둔 진행이 있으면 이어서, 없으면 처음부터 */
+  onStage: (stageId: string) => void;
+  /** 멈춰 둔 진행을 버린다 */
+  onDiscard: (stageId: string) => void;
   onShowDeck: () => void;
   onCodex: () => void;
   onTitle: () => void;
@@ -15,44 +19,61 @@ export interface HubHandlers {
 
 export function hubView(data: GameData, run: RunState, handlers: HubHandlers): HTMLElement {
   installTooltips();
-  const stages = playableStages(data);
   const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
   const mode = [run.difficulty === 'hard' ? '어려움' : '보통', run.hardcore ? '하드코어' : ''].filter(Boolean).join(' · ');
+  const paused = playableStages(data).filter((st) => run.suspended?.[st.id]);
+  const wins = Object.values(run.replays).reduce((a, n) => a + n, 0);
   return h(
     'section',
     { class: 'screen map-screen hub-screen' },
-    h('div', { class: 'journey-area' }, h('div', { class: 'journey-wrap' }, journeyBand(data, run, handlers.onReplay)), h('div', { class: 'banner banner-hub' }, '천외귀환 — 다시 걸을 길을 고른다')),
     h(
       'div',
-      { class: 'local hub-local' },
+      { class: 'journey-area hub-world' },
+      h('div', { class: 'journey-wrap' }, journeyBand(data, run, { onStage: handlers.onStage, world: true })),
+      h('div', { class: 'banner banner-hub' }, '자유 여정 — 가고 싶은 곳을 누른다'),
+    ),
+    h(
+      'div',
+      { class: 'hub-bottom' },
       h(
         'div',
-        { class: 'hub-list panel' },
-        h('header', { class: 'panel-head' }, h('span', { class: 'seal' }, '還'), h('div', {}, h('div', { class: 'choice-kind' }, `클리어 · ${mode}`), h('h2', {}, '스테이지 다시 하기'))),
-        h('p', { class: 'choice-text' }, '위 여정 띠의 장소나 아래 목록을 누르면, 마지막에 클리어한 파티·덱·유물로 그 스테이지를 처음부터 다시 한다. 다시 한 결과는 이 저장에 남지 않고 이긴 횟수만 남는다.'),
+        { class: 'box hub-guide' },
+        h('div', { class: 'choice-kind' }, `클리어 · ${mode}${wins ? ` · 다시 해서 이긴 횟수 ${wins}` : ''}`),
+        h('h3', {}, '어디로 갈까'),
         h(
-          'div',
-          { class: 'hub-stages' },
-          stages.map((st) =>
-            h(
-              'button',
-              { class: 'btn hub-stage', onclick: () => handlers.onReplay(st.id) },
-              h('b', {}, placeName(st, run)),
-              h('small', {}, run.replays[st.id] ? `다시 해서 이긴 횟수 ${run.replays[st.id]}` : '아직 다시 하지 않음'),
-            ),
-          ),
+          'p',
+          { class: 'hint' },
+          '지도의 장소를 누르면 지금 일행·덱·유물로 그곳을 처음부터 걷는다. 걷다가 지도 화면의 "전체 지도로"를 누르면 그 자리에 멈춰 두고 다른 곳으로 갈 수 있고, 멈춘 곳을 다시 누르면 이어진다. 얻은 카드와 이긴 횟수는 남고, 골드·유물·레벨은 그 길 안에서만 쓴다.',
         ),
+        paused.length
+          ? h(
+              'div',
+              { class: 'hub-paused' },
+              h('h4', {}, '멈춰 둔 길'),
+              paused.map((st) => {
+                const p = run.suspended![st.id];
+                return h(
+                  'div',
+                  { class: 'hub-paused-row' },
+                  h('b', {}, placeName(st, run)),
+                  h('small', {}, `${p.visited.length}칸 지남`),
+                  h('button', { class: 'btn btn-small btn-primary', onclick: () => handlers.onStage(st.id) }, '이어서'),
+                  h('button', { class: 'btn btn-small', onclick: () => handlers.onDiscard(st.id) }, '버리기'),
+                );
+              }),
+            )
+          : null,
       ),
       h(
-        'aside',
-        { class: 'side-panel' },
-        h(
-          'div',
-          { class: 'box' },
-          h('h3', {}, '마지막 파티'),
-          fighters.map((r) => h('div', { class: 'hub-member' }, h('span', {}, data.characters.get(r.id)?.name ?? r.id), h('small', {}, `Lv ${r.level} · 최대 체력 ${r.maxHp}`))),
-          run.fallen.length ? h('p', { class: 'hint' }, `잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}`) : null,
-        ),
+        'div',
+        { class: 'box hub-party' },
+        h('h3', {}, '일행'),
+        fighters.map((r) => h('div', { class: 'hub-member' }, h('span', {}, data.characters.get(r.id)?.name ?? r.id), h('small', {}, `Lv ${r.level} · 최대 체력 ${r.maxHp}`))),
+        h('p', { class: 'hint' }, `전투에는 하운을 포함해 ${data.balance.party.max}명까지 나선다(지도의 출전 칸에서 고른다).`),
+      ),
+      h(
+        'div',
+        { class: 'hub-side' },
         inventoryBox(data, run.gold, run.potions, run.relics),
         h(
           'div',
