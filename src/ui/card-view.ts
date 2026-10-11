@@ -101,6 +101,7 @@ function pixelCardView(
   const rarityUrl = def.rarity !== 'special' ? gem(def.rarity) : null;
   const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '武';
   const artUrl = cardArtUrl(def.id);
+  const shine = def.rarity === 'epic' || def.rarity === 'legendary';
   return h(
     'div',
     {
@@ -114,6 +115,9 @@ function pixelCardView(
       { class: 'cpx-art', style: `left:${wx - 2}px;top:${wy - 2}px;width:${ww + 4}px;height:${wh + 4}px`, 'aria-hidden': 'true' },
       artUrl ? h('img', { class: 'cpx-art-img', src: artUrl, alt: '', draggable: 'false' }) : h('span', { class: 'cpx-seal' }, seal),
     ),
+    // 영웅·전설의 움직임(2026-10-11): 테두리 빛(어디서나) · 그림 창 광택 · 전설은 금빛 티끌(손패·보상·크게 보기에서만, CSS)
+    shine ? h('span', { class: 'cpx-glow', 'aria-hidden': 'true' }) : null,
+    shine ? h('span', { class: 'cpx-sheen', style: `left:${wx}px;top:${wy}px;width:${ww}px;height:${wh}px`, 'aria-hidden': 'true' }) : null,
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
@@ -125,6 +129,7 @@ function pixelCardView(
     ),
     fitText(h('div', { class: `cpx-text${textSize}${parts.keywords.length ? ' cpx-has-kw' : ''}`, style: at(slots?.text, 2), ...glossaryTip(data, inst) }, ...textBlocks(parts, true))),
     h('div', { class: 'cpx-plaque', style: at(slots?.plaque) }, `${owner?.name ?? (def.owner === 'status' ? '상태' : '공용')} · ${TYPE_LABEL[def.type] ?? ''}`),
+    ...(def.rarity === 'legendary' ? [0, 1, 2, 3].map((i) => h('i', { class: 'cpx-spark', style: `left:${18 + i * 26 + (i % 2) * 6}px;top:${170 - (i % 2) * 20}px;animation-delay:${i * 0.9}s`, 'aria-hidden': 'true' })) : []),
   );
 }
 

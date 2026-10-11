@@ -46,6 +46,7 @@ import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
+import { titleStage } from './title-fx';
 import {
   campaignCollection,
   clearAbyss,
@@ -324,7 +325,8 @@ export class App {
       h(
         'section',
         { class: `screen title-screen${url ? ' has-art' : ''}` },
-        h('div', { class: 'title-bg', style: url ? `background-image:url("${url}")` : '' }),
+        // 그림이 있으면 그 위에 움직임 층(하늘의 금·불티·운해·꽃잎·마나 알갱이·달무리·느린 확대, 2026-10-11)
+        h('div', { class: 'title-bg' }, url ? titleStage(url) : null),
         h(
           'div',
           { class: 'title-center' },

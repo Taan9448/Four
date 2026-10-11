@@ -54,7 +54,31 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 /* 시작 화면: 세계관 그림 한 장 + 가운데 메뉴 */
 .title-screen { position: relative; min-height: calc(100vh - 20px); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); display: grid; place-items: center; text-align: center; isolation: isolate; }
-.title-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center; }
+.title-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center; overflow: hidden; container-type: size; }
+/* 시작 화면 움직임(2026-10-11 사용자 결정, 8층): 그림(3:2)과 층을 한 묶음으로 화면에 꽉 채운다(cover). 자리는 그림 기준 비율 */
+.title-stage { position: absolute; left: 50%; top: 50%; width: max(100cqw, 150cqh); height: max(100cqh, 66.667cqw); translate: -50% -50%; transform-origin: 50% 45%; animation: title-zoom 32s ease-in-out infinite alternate; }
+@keyframes title-zoom { from { transform: scale(1); } to { transform: scale(1.045) translate(-0.6%, -0.4%); } }
+.title-art { position: absolute; inset: 0; background: center / 100% 100% no-repeat; }
+.title-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* 하늘의 금: 붉은 빛이 숨쉬다 가끔 번쩍 */
+.title-crack { position: absolute; left: 47.5%; width: 5%; top: -2%; height: 62%; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse 50% 52% at 50% 42%, rgba(255, 70, 50, 0.85), rgba(255, 40, 40, 0.25) 45%, transparent 72%); filter: blur(6px); animation: title-crack 4.2s ease-in-out infinite; }
+@keyframes title-crack { 0%, 100% { opacity: 0.18; } 45% { opacity: 0.55; } 50% { opacity: 0.95; } 53% { opacity: 0.4; } 60% { opacity: 0.62; } }
+/* 두 달의 달무리 */
+.title-moon { position: absolute; border-radius: 50%; aspect-ratio: 1; pointer-events: none; mix-blend-mode: screen; animation: title-moon 7s ease-in-out infinite; }
+.title-moon.a { left: 73.5%; top: 2.5%; width: 12%; background: radial-gradient(circle, rgba(230, 240, 255, 0.55), rgba(180, 210, 255, 0.18) 45%, transparent 70%); }
+.title-moon.b { left: 85.7%; top: 3.7%; width: 7%; background: radial-gradient(circle, rgba(140, 200, 255, 0.6), rgba(90, 160, 255, 0.2) 45%, transparent 70%); animation-delay: -3.5s; }
+@keyframes title-moon { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
+/* 운해: 아래 구름 띠 두 겹이 반대로 흐른다 */
+.title-mist { position: absolute; left: -30%; width: 160%; pointer-events: none; background: radial-gradient(ellipse 18% 55% at 20% 50%, rgba(255, 252, 244, 0.32), transparent 70%), radial-gradient(ellipse 22% 60% at 55% 55%, rgba(255, 252, 244, 0.26), transparent 70%), radial-gradient(ellipse 16% 50% at 85% 45%, rgba(225, 235, 255, 0.28), transparent 70%); filter: blur(4px); }
+.title-mist.a { top: 52%; height: 22%; animation: title-drift 46s linear infinite; }
+.title-mist.b { top: 66%; height: 26%; animation: title-drift 70s linear infinite reverse; }
+@keyframes title-drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+/* 제목: 7초마다 금빛이 글자를 훑는다 */
+.title-screen.has-art h1 { background: linear-gradient(100deg, #f4ecd8 40%, #ffe7a3 48%, #fff6dc 50%, #ffe7a3 52%, #f4ecd8 60%) 0 0 / 300% 100% no-repeat; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 18px rgba(0, 0, 0, 0.6)); animation: title-sweep 7s ease-in-out infinite; background-position: 100% 0; }
+@keyframes title-sweep { 0%, 55% { background-position: 100% 0; } 85%, 100% { background-position: 0% 0; } }
+.no-motion .title-stage, .no-motion .title-stage *, .no-motion .title-screen h1 { animation: none !important; }
+.no-motion .title-crack, .no-motion .title-moon, .no-motion .title-mist { display: none; }
+@media (prefers-reduced-motion: reduce) { .title-stage, .title-stage *, .title-screen h1 { animation: none !important; } .title-crack, .title-moon, .title-mist { display: none; } }
 /* 그림이 오기 전: 왼쪽 무림(새벽 금빛) · 오른쪽 엘하임(밤, 두 달) · 가운데 하늘의 금 */
 .title-screen:not(.has-art) .title-bg {
   background:
@@ -718,6 +742,31 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .t-elheim .cpx-text { color: #1d2433; }
 .cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; text-align: center; font-size: 7.5px; line-height: 1; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
 .card-px.t-status .cpx-frame { filter: grayscale(0.85) brightness(0.72); }
+/* 영웅·전설 움직임(2026-10-11 사용자 결정): 테두리 빛은 어디서나 숨쉰다. 그림 창 광택·보석 반짝임·금빛 티끌은 손패·보상·크게 보기에서만
+   (보유 카드·도감 목록처럼 카드가 많은 곳에서 한꺼번에 반짝이지 않게). 설정의 '화면 연출'을 끄면(no-motion) 움직임 없이 지금 빛만 */
+.cpx-glow { position: absolute; inset: 0; z-index: 0; border-radius: 4px; pointer-events: none; }
+.card-px.rarity-epic .cpx-glow { animation: cpx-glow-epic 4s ease-in-out infinite; }
+.card-px.rarity-legendary .cpx-glow { animation: cpx-glow-leg 3.2s ease-in-out infinite; }
+@keyframes cpx-glow-epic { 0%, 100% { box-shadow: 0 0 2px rgba(160, 122, 214, 0); } 50% { box-shadow: 0 0 14px rgba(185, 150, 239, 0.7); } }
+@keyframes cpx-glow-leg { 0%, 100% { box-shadow: 0 0 2px rgba(255, 200, 90, 0); } 50% { box-shadow: 0 0 18px rgba(255, 200, 90, 0.8); } }
+.cpx-sheen { position: absolute; z-index: 1; overflow: hidden; pointer-events: none; display: none; }
+.cpx-sheen::before { content: ''; position: absolute; }
+.cpx-spark { position: absolute; z-index: 5; width: 3px; height: 3px; background: #ffe08a; box-shadow: 0 0 3px #ffd166; pointer-events: none; opacity: 0; display: none; }
+:is(.hand, .reward-cards, .zoom-card) .card-px .cpx-sheen, :is(.hand, .reward-cards, .zoom-card) .card-px .cpx-spark { display: block; }
+.card-px.rarity-legendary .cpx-sheen::before { top: -20%; bottom: -20%; width: 34%; left: -50%; transform: skewX(-18deg); background: linear-gradient(90deg, transparent, rgba(255, 236, 170, 0.75), rgba(255, 255, 240, 0.9), rgba(255, 236, 170, 0.75), transparent); mix-blend-mode: screen; animation: cpx-shine 4s ease-in-out infinite; }
+@keyframes cpx-shine { 0%, 45% { left: -50%; } 75%, 100% { left: 130%; } }
+.card-px.rarity-epic .cpx-sheen::before { inset: -30%; background: linear-gradient(115deg, transparent 38%, rgba(200, 168, 255, 0.45) 48%, rgba(240, 225, 255, 0.55) 50%, rgba(200, 168, 255, 0.45) 52%, transparent 62%); mix-blend-mode: screen; animation: cpx-sheen 6s ease-in-out infinite; }
+@keyframes cpx-sheen { 0%, 55% { transform: translateX(-60%); } 90%, 100% { transform: translateX(60%); } }
+:is(.hand, .reward-cards, .zoom-card) .card-px.rarity-legendary img.cpx-rarity { animation: cpx-gem-leg 2.4s ease-in-out infinite; }
+:is(.hand, .reward-cards, .zoom-card) .card-px.rarity-epic img.cpx-rarity { animation: cpx-gem-epic 3s ease-in-out infinite; }
+@keyframes cpx-gem-leg { 0%, 100% { filter: drop-shadow(0 0 1px rgba(255, 220, 120, 0.6)); } 50% { filter: drop-shadow(0 0 4px rgba(255, 230, 140, 1)) brightness(1.25); } }
+@keyframes cpx-gem-epic { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 3px rgba(200, 160, 255, 0.95)) brightness(1.2); } }
+.card-px .cpx-spark { animation: cpx-rise 3.6s linear infinite; }
+@keyframes cpx-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 80% { opacity: 0.8; } 100% { transform: translateY(-120px); opacity: 0; } }
+.card-px.card-disabled .cpx-sheen, .card-px.card-disabled .cpx-spark { display: none; }
+.no-motion .cpx-glow, .no-motion .cpx-sheen, .no-motion .cpx-spark { display: none !important; }
+.no-motion .card-px img.cpx-rarity { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cpx-glow, .cpx-sheen, .cpx-spark { display: none !important; } .card-px img.cpx-rarity { animation: none; } }
 
 /* 영웅·전설 컷인 */
 .cutin { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(5, 7, 12, 0.72); cursor: pointer; animation: cutin-fade 0.18s ease-out; overflow: hidden; }
