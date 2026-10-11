@@ -6,6 +6,7 @@ import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choice
 import { swappableCards } from '../engine/collection';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
+import { chipKind } from './overlay';
 import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
 import { potionChip, relicChip } from './items';
@@ -53,8 +54,10 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
         ? h(
             'div',
             { class: 'choice-result' },
+            h('p', { class: 'pop-eyebrow' }, '결 과'),
             resultText ? h('p', { class: 'result-text' }, resultText) : null,
-            result.length ? h('ul', { class: 'gains' }, result.map((r) => h('li', {}, r))) : null,
+            // 얻고 잃은 것을 색 칩으로(2026-10-11 결과 팝업 목업)
+            result.length ? h('div', { class: 'pop-chips gains' }, result.map((r) => h('span', { class: `pop-chip ${chipKind(r)}` }, r))) : null,
             module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : null,
             h('button', { class: 'btn btn-primary', onclick: onDone }, '지도로'),
           )

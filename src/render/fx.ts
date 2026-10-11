@@ -123,8 +123,10 @@ export function flyClone(el: HTMLElement, to: DOMRect, opts: FlyOptions = {}, fr
 
 export interface TearOptions {
   ms?: number;
-  /** 찢기 전에 이쪽(대상)으로 조금 다가간다 */
+  /** 찢기 전에 이쪽(대상)으로 조금 기운다 */
   toward?: DOMRect | null;
+  /** 찢는 자리(화면 좌표의 카드 가운데)와 그때의 카드 높이(px). 없으면 제자리에서 조금 떠오른다 */
+  stage?: { x: number; y: number; height: number } | null;
   /** 찢어지는 순간(화면 좌표의 솔기 가운데·카드 높이) — 그림 이펙트를 겹치는 자리 */
   onTear?: (x: number, y: number, height: number) => void;
 }
@@ -140,7 +142,7 @@ const TEAR_EDGE: [number, number][] = Array.from({ length: 25 }, (_, i) => {
 });
 
 /**
- * 낸 카드 찢기(2026-10-09 다듬음): 복제본이 대상 쪽으로 떠올라 달아오르고, 잠깐 팽팽하게 버틴 뒤
+ * 낸 카드 찢기(2026-10-09 다듬음, 2026-10-11 손패의 확대 자리에서): 복제본이 골라 확대된 자리(stage)에서 조금 더 커져 달아오르고, 잠깐 팽팽하게 버틴 뒤
  * 위쪽부터 톱니 선을 따라 벌어져(아래 끝을 축으로 돈다) 두 조각이 되어 좌우로 떨어지며 사라진다.
  * 찢긴 단면에는 밝은 종이 섬유 선이 보이고, 종잇조각·먹 방울이 튄다. 원본은 건드리지 않는다.
  */
@@ -158,11 +160,14 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   const cy = rect.top + rect.height / 2;
   const reduce = reducedMotion();
   const ms = (opts.ms ?? 700) * (reduce ? 0.5 : 1);
-  // 떠오르는 자리: 위로 조금 + 대상 쪽으로 1/5
   const t = opts.toward;
-  const dx = t ? (t.left + t.width / 2 - cx) * 0.2 : 0;
-  const dy = (t ? (t.top + t.height / 2 - cy) * 0.12 : 0) - 46;
-  const S = scale * 1.06;
+  const st = opts.stage;
+  // 찢는 자리: stage(대상 쪽으로 아주 살짝 기울게), 없으면 제자리 위로 조금 + 대상 쪽으로 1/5
+  const dx = st ? st.x - cx + (t ? (t.left + t.width / 2 - st.x) * 0.04 : 0) : t ? (t.left + t.width / 2 - cx) * 0.2 : 0;
+  const dy = st ? st.y - cy : (t ? (t.top + t.height / 2 - cy) * 0.12 : 0) - 46;
+  const S = st ? Math.max(scale * 1.06, st.height / hgt) : scale * 1.06;
+  // 키프레임 시점: 날아와 자리 잡기 → 팽팽하게 버팀 → 벌어짐. 정면으로 나올 때는 날아오는 몫과 보여 주는 몫을 늘린다
+  const at = st ? { arrive: 0.2, hold: 0.36, open: 0.45, wide: 0.62, fall: 0.8 } : { arrive: 0.18, hold: 0.27, open: 0.38, wide: 0.58, fall: 0.78 };
   // 모든 키프레임이 같은 함수 목록을 쓰게 해 부드럽게 잇는다. 뒤의 translateY(50%) rotate translateY(-50%)는 "아래 끝을 축으로 돌기"
   const tf = (x: number, y: number, r: number, sc: number, open: number) =>
     `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${r}deg) scale(${sc}) translateY(50%) rotate(${open}deg) translateY(-50%)`;
@@ -181,19 +186,19 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
     );
     document.body.appendChild(g);
     // 섬유 선은 찢어지기 시작할 때부터 보인다
-    g.querySelector('.tear-edge')?.animate([{ opacity: 0 }, { opacity: 0, offset: 0.28 }, { opacity: 1, offset: 0.36 }, { opacity: 1 }], { duration: ms, fill: 'forwards' });
+    g.querySelector('.tear-edge')?.animate([{ opacity: 0 }, { opacity: 0, offset: at.hold + 0.01 }, { opacity: 1, offset: at.open - 0.02 }, { opacity: 1 }], { duration: ms, fill: 'forwards' });
     const side = k === 0 ? -1 : 1;
     const glow = 'drop-shadow(0 0 10px rgba(255, 213, 138, 0.75))';
     const anim = g.animate(
       [
         { transform: tf(0, 0, rot, scale, 0), filter: 'brightness(1)', opacity: 1 },
-        { transform: tf(dx, dy, 0, S, 0), filter: `brightness(1.08) ${glow}`, opacity: 1, offset: 0.18 },
+        { transform: tf(dx, dy, 0, S, 0), filter: `brightness(1.08) ${glow}`, opacity: 1, offset: at.arrive },
         // 팽팽하게 버티는 순간(살짝 떨림)
-        { transform: tf(dx + side * 0.8, dy, side * -1.2, S * 1.02, 0), filter: `brightness(1.15) ${glow}`, opacity: 1, offset: 0.27 },
+        { transform: tf(dx + side * 0.8, dy, side * -1.2, S * 1.02, 0), filter: `brightness(1.15) ${glow}`, opacity: 1, offset: at.hold },
         // 위쪽부터 벌어진다
-        { transform: tf(dx + side * 3, dy, 0, S, side * 8), filter: 'brightness(1.05)', opacity: 1, offset: 0.38 },
-        { transform: tf(dx + side * 20, dy + 10, side * 5, S, side * 16), filter: 'brightness(1)', opacity: 1, offset: 0.58 },
-        { transform: tf(dx + side * 38, dy + 52, side * 11, S * 0.97, side * 21), filter: 'brightness(0.92)', opacity: 0.9, offset: 0.78 },
+        { transform: tf(dx + side * 3, dy, 0, S, side * 8), filter: 'brightness(1.05)', opacity: 1, offset: at.open },
+        { transform: tf(dx + side * 20, dy + 10, side * 5, S, side * 16), filter: 'brightness(1)', opacity: 1, offset: at.wide },
+        { transform: tf(dx + side * 38, dy + 52, side * 11, S * 0.97, side * 21), filter: 'brightness(0.92)', opacity: 0.9, offset: at.fall },
         // 떨어지며 사라진다
         { transform: tf(dx + side * 52, dy + 115, side * 16, S * 0.94, side * 25), filter: 'brightness(0.8)', opacity: 0 },
       ],
@@ -205,7 +210,7 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
     );
   });
   // 찢기는 순간: 그림 이펙트 + 종잇조각·먹 방울(위로 튀었다가 떨어진다)
-  const tearAt = ms * 0.34;
+  const tearAt = ms * (at.open - 0.04);
   const sx = cx + dx;
   const sy = cy + dy;
   const bits: Promise<void>[] = [];
@@ -234,7 +239,7 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   }
   // 조각이 떨어지는 동안 다음 연출(피해)이 이어지게, 벌어진 직후에 끝낸다(조각은 스스로 사라진다)
   void Promise.all([...halves, ...bits]);
-  return sleep(ms * 0.5);
+  return sleep(ms * (at.open + 0.12));
 }
 
 /** 새로 들어온 요소(뽑은 카드)를 from 사각형에서 제자리로 끌어온다. 요소의 transform과 겹치지 않게 translate·scale 속성을 쓴다 */

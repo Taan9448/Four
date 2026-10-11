@@ -200,6 +200,15 @@ export function alive<T extends Combatant>(list: T[]): T[] {
   return list.filter((c) => !c.downed);
 }
 
+/**
+ * 일행의 앞장: 하운, 하운이 출전하지 않았으면(순례 자유 편성, 2026-10-11) 맨 앞 동료.
+ * 공용 카드·물약·전투 시작 효과의 출처. standing이면 쓰러지지 않은 이 중에서
+ */
+export function leader(state: BattleState, standing = false): Combatant {
+  const list = standing ? alive(state.party) : state.party;
+  return list.find((p) => p.defId === 'haun') ?? list[0] ?? state.party[0];
+}
+
 export function findCombatant(state: BattleState, uid: string): Combatant | undefined {
   return state.party.find((c) => c.uid === uid) ?? state.enemies.find((c) => c.uid === uid);
 }

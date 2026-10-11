@@ -16,7 +16,7 @@ import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
 import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon, statusChip } from './icons';
-import { confirmDialog, openOverlay } from './overlay';
+import { confirmDialog, openOverlay, popPanel } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
 import { runTour, tourSeen } from './tour';
@@ -597,8 +597,9 @@ export class BattleView {
     this.flown.add(inst.uid);
     sfx('tear', { volume: 0.7 });
     const tear = tearCard(el, {
-      ms: 700 * Math.max(0.6, settings.speed),
+      ms: 850 * Math.max(0.6, settings.speed),
       toward: to,
+      stage: this.tearStage(el),
       onTear: (x, y, height) => {
         if (spriteSource('fx_card_tear') !== 'sprites') return;
         const size = height * 1.25;
@@ -609,6 +610,23 @@ export class BattleView {
     });
     el.style.visibility = 'hidden';
     await tear;
+  }
+
+  /**
+   * 낸 카드를 찢는 자리(2026-10-11 사용자 요청 세 번째): 고른 카드가 그 가로 자리에서 캐릭터가 서 있는 높이까지
+   * 올라와 1.5배쯤으로 커진 뒤 찢어진다(전장 가운데는 너무 위, 손패 자리는 너무 아래였다)
+   */
+  private tearStage(el: HTMLElement): { x: number; y: number; height: number } | null {
+    const r = el.getBoundingClientRect();
+    if (!r.width) return null;
+    const height = Math.min(el.offsetHeight * 1.5, innerHeight * 0.42);
+    const width = height * (el.offsetWidth / Math.max(1, el.offsetHeight));
+    const x = Math.min(Math.max(r.left + r.width / 2, width / 2 + 8), innerWidth - width / 2 - 8);
+    // 캐릭터 그림(아군·적 스프라이트)의 가운데 높이
+    const sprites = [...this.root.querySelectorAll<HTMLElement>('.unit:not(.down) .sprite-wrap')].map((e) => e.getBoundingClientRect()).filter((b) => b.height);
+    const charY = sprites.length ? sprites.reduce((a, b) => a + b.top + b.height / 2, 0) / sprites.length : r.top;
+    const y = Math.min(Math.max(charY, height / 2 + 8), innerHeight - 12 - height / 2);
+    return { x, y, height };
   }
 
   /** 턴 종료: 남길(유지) 카드를 뺀 손패를 버린 더미로 차례로 날린다 */
@@ -1343,20 +1361,30 @@ export class BattleView {
     overlay.remove();
   }
 
+  /** 전투 결과 팝업(2026-10-11 목업): 勝 이겼다 · 守 버텼다 · 敗 쓰러졌다 + 턴 · 준 피해 · 처치 */
   private showResult(): void {
-    const win = this.state.result === 'victory';
+    const s = this.state;
+    const win = s.result === 'victory';
+    const t = s.tally;
+    const stats: [string, number][] = [[s.survived ? '버틴 턴' : '턴', s.turn], ['준 피해', t?.damage ?? 0], ['쓰러뜨림', t?.kills ?? 0]];
+    const haun = s.party.find((p) => p.defId === 'haun');
+    // 받침이 있으면 '이', 없으면 '가'
+    const iga = (name: string) => { const c = name.charCodeAt(name.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 ? '이' : '가'; };
+    const cause = haun ? h('p', { class: 'pop-cause' }, `${haun.name}${iga(haun.name)} `, h('b', {}, t?.haunHitBy ?? '알 수 없는 것'), '에 쓰러졌다.') : h('p', { class: 'pop-cause' }, '출전한 일행이 모두 쓰러졌다.');
+    const go = h('button', { class: 'btn btn-primary', onclick: () => this.finish() }, win ? '계속' : '결과 보기');
     const overlay = h(
       'div',
       { class: `result-overlay ${win ? 'win' : 'lose'}` },
-      h(
-        'div',
-        { class: 'result-box' },
-        h('h2', {}, this.state.survived ? '버텼다' : win ? '승리' : '패배'),
-        h('p', {}, this.state.survived ? `${this.state.turn}턴을 버텼다.` : win ? '결을 따라, 날을 얹었다.' : '하운이 쓰러졌다.'),
-        h('button', { class: 'btn btn-primary', onclick: () => this.finish() }, '계속'),
+      popPanel(
+        s.survived
+          ? { seal: '守', eyebrow: '전투 결과', title: '버텼다', tone: 'win', lead: `${s.turn}턴, 끝까지 자리를 지켰다.`, stats, actions: [go] }
+          : win
+            ? { seal: '勝', sealKind: 'solid', eyebrow: '전투 승리', title: '이겼다', tone: 'win', lead: '결을 따라, 날을 얹었다.', stats, actions: [go] }
+            : { seal: '敗', sealKind: 'muted', eyebrow: '전투 패배', title: '쓰러졌다', tone: 'lose', lead: cause, stats, actions: [go] },
       ),
     );
     this.root.appendChild(overlay);
+    requestAnimationFrame(() => go.focus());
   }
 
   /** report=false: 결과를 넘기지 않고 화면만 정리(메뉴에서 나갈 때) */

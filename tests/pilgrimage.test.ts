@@ -256,3 +256,40 @@ describe('순례 — 칭호(3-2)', () => {
     expect(unlockedPaths(data, [], meta.opened)).toContain('path_shadow');
   });
 });
+
+describe('순례 — 자유 편성(2026-10-11 사용자 요청: 하운 고정 해제)', () => {
+  it('캠페인은 하운 고정, 순례는 네 명 중 누구든(하운 빼고도) 최대 인원까지', async () => {
+    const { setParty } = await import('../src/engine/run');
+    const campaign = createRunAt(data, 'FREE1', 's3');
+    const mate = campaign.roster.find((r) => r.id !== 'haun')!.id;
+    expect(() => setParty(data, campaign, [mate])).toThrow();
+    const run = startReplay(data, cleared('FREE2'), 's2');
+    const others = run.roster.filter((r) => r.id !== 'haun' && data.characters.get(r.id)?.role === 'fighter').map((r) => r.id);
+    expect(others.length).toBeGreaterThanOrEqual(3);
+    setParty(data, run, others.slice(0, data.balance.party.max));
+    expect(run.selected).not.toContain('haun');
+    expect(() => setParty(data, run, [])).toThrow();
+    // 저장해도 그대로
+    expect(deserializeRun(data, serializeRun(run))!.run.selected).toEqual(run.selected);
+  });
+
+  it('하운 없이 전투: 하운 카드는 덱에서 빠지고, 공용 카드는 앞장이 쓰며, 모두 쓰러져야 진다', async () => {
+    const { setParty } = await import('../src/engine/run');
+    const { createBattle, cardOwner } = await import('../src/engine/battle');
+    const { loseHp } = await import('../src/engine/effects');
+    const run = startReplay(data, cleared('FREE3'), 's2');
+    const others = run.roster.filter((r) => r.id !== 'haun' && data.characters.get(r.id)?.role === 'fighter').map((r) => r.id).slice(0, 2);
+    setParty(data, run, others);
+    const enc = enterNode(data, run, run.map.floors[0][0].id);
+    const state = createBattle(data, battleSetupFor(data, run, enc));
+    expect(state.party.map((p) => p.defId)).toEqual(others);
+    const all = [...state.draw, ...state.hand, ...state.discard];
+    expect(all.some((c) => data.cards.get(c.cardId)?.owner === 'haun')).toBe(false);
+    const common = all.find((c) => data.cards.get(c.cardId)?.owner === 'common');
+    if (common) expect(cardOwner(state, common)?.defId).toBe(others[0]);
+    loseHp(state, state.party[0], 9999);
+    expect(state.result).toBeFalsy();
+    loseHp(state, state.party[1], 9999);
+    expect(state.result).toBe('defeat');
+  });
+});
