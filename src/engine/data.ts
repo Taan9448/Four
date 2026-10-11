@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   Balance,
   AchievementDef,
+  ChallengeDef,
   AffixDef,
   CardDef,
   CharacterDef,
@@ -30,6 +31,7 @@ import lawsJson from '../../data/abyss_laws.json';
 import affixesJson from '../../data/abyss_affixes.json';
 import oathsJson from '../../data/abyss_oaths.json';
 import achievementsJson from '../../data/abyss_achievements.json';
+import challengesJson from '../../data/pilgrimage_challenges.json';
 
 const cardFiles = import.meta.glob('../../data/cards/*.json', { eager: true, import: 'default' });
 const moduleFiles = import.meta.glob('../../data/modules/*.json', { eager: true, import: 'default' });
@@ -55,6 +57,8 @@ export interface GameData {
   /** 심연 3차: 서약(단계 순)·업적 */
   oaths: OathDef[];
   achievements: Map<string, AchievementDef>;
+  /** 순례 도전(스테이지마다 3개, GAME_DESIGN 2절) */
+  challenges: Map<string, ChallengeDef>;
 }
 
 function byId<T extends { id: string }>(items: T[], label: string): Map<string, T> {
@@ -100,6 +104,7 @@ export function loadGameData(): GameData {
     affixes: byId(parse(z.array(AffixDef), affixesJson, 'data/abyss_affixes.json'), 'affixes'),
     oaths: parse(z.array(OathDef), oathsJson, 'data/abyss_oaths.json').sort((a, b) => a.level - b.level),
     achievements: byId(parse(z.array(AchievementDef), achievementsJson, 'data/abyss_achievements.json'), 'achievements'),
+    challenges: byId(parse(z.array(ChallengeDef), challengesJson, 'data/pilgrimage_challenges.json'), 'challenges'),
   };
 }
 

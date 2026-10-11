@@ -2,6 +2,7 @@
 import type { GameData } from '../engine/data';
 import { findNode, type MapNode } from '../engine/route';
 import { availableNodes, pilgrimScale, playableStages, setParty, xpToNext, type RunState } from '../engine/run';
+import { challengeDone, challengeState, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { iconEl } from './icons';
@@ -240,12 +241,19 @@ export function journeyBand(data: GameData, run: RunState, opts: { onStage?: (st
         const paused = hubRun.suspended?.[st.id];
         const wins = hubRun.replays[st.id];
         const tip = now ? '지금 여기' : paused ? `멈춘 곳에서 이어서 — ${paused.visited.length}칸 지남` : '누르면 이곳으로 간다(처음부터)';
+        // 순례: 첫 순례 보상을 받았으면 금빛 점, 도전 이룬 수 n/3
+        const rewarded = !pilgrimRewardDue(hubRun, st.id);
+        const chs = stageChallenges(data, st.id);
+        const chDone = chs.filter((c) => challengeDone(hubRun, c)).length;
+        const more = [wins ? `다시 해서 이긴 횟수 ${wins}` : '', rewarded ? '첫 순례 보상 받음' : '', chs.length ? `도전 ${chDone}/${chs.length}` : ''].filter(Boolean).join(' · ');
         return h(
           'button',
-          { class: `stop done pick${now ? ' here' : ''}${paused ? ' paused' : ''}`, style: `left:${j.x}%;top:${j.y}%`, onclick: now ? undefined : () => onStage(st.id), ...tipAttrs(placeName(st, run), wins ? `${tip}\n다시 해서 이긴 횟수 ${wins}` : tip) },
+          { class: `stop done pick${now ? ' here' : ''}${paused ? ' paused' : ''}`, style: `left:${j.x}%;top:${j.y}%`, onclick: now ? undefined : () => onStage(st.id), ...tipAttrs(placeName(st, run), more ? `${tip}\n${more}` : tip) },
           h('i', {}),
+          rewarded ? h('b', { class: 'pilgrim-dot', 'aria-label': '첫 순례 보상 받음' }) : null,
           h('span', { class: 'stop-name' }, placeName(st, run)),
           paused ? h('small', { class: 'paused-tag' }, '진행 중') : wins ? h('small', { class: 'replays' }, `×${wins}`) : null,
+          opts.world && chs.length ? h('small', { class: `challenge-tag${chDone === chs.length ? ' all' : ''}` }, `${chDone}/${chs.length}`) : null,
         );
       }
       return h('div', { class: `stop ${here ? 'here' : 'done'}`, style: `left:${j.x}%;top:${j.y}%`, ...tipAttrs(placeName(st, run), here ? '지금 여기' : '지나온 곳') }, h('i', {}), h('span', { class: 'stop-name' }, placeName(st, run)));
@@ -530,6 +538,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
                 run.hardcore ? h('span', { class: 'mode-badge hardcore', ...tipAttrs('하드코어', `쓰러진 동료는 돌아오지 않는다.${run.fallen.length ? `\n잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}` : ''}`) }, '하드코어') : null,
               )
             : null,
+          run.replayOf ? pilgrimChallenges(data, run) : null,
           run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼과 가진 유물 수만큼(상한 있음).') }, pilgrimLabel(data, run)) : null,
           h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
           run.abyss?.laws?.length
@@ -574,4 +583,26 @@ export function pilgrimLabel(data: GameData, run: RunState): string {
   const k = pilgrimScale(data, run);
   const x = (n: number) => `×${Number(n.toFixed(2))}`;
   return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)}`;
+}
+
+const CH_STATE: Record<string, [string, string]> = {
+  done: ['✓', '이미 이룸'],
+  ok: ['○', '지키는 중'],
+  broken: ['✕', '이번 길에서는 깨짐'],
+  open: ['◇', '보스전에서 판정'],
+};
+
+/** 다시 걷는 스테이지의 도전 3개와 이번 길의 상태(지도 오른쪽 칸). 동료·덱 조건은 지금 출전·덱으로 미리 본다 */
+function pilgrimChallenges(data: GameData, run: RunState): HTMLElement | null {
+  const list = stageChallenges(data, run.stageId);
+  if (!list.length) return null;
+  return h(
+    'ul',
+    { class: 'pilgrim-challenges' },
+    list.map((c) => {
+      const state = challengeState(data, run, c);
+      const [mark, label] = CH_STATE[state];
+      return h('li', { class: `ch-${state}`, ...tipAttrs(`도전 — ${c.name}`, `${c.description}\n${label}`) }, h('b', {}, mark), h('span', {}, c.name));
+    }),
+  );
 }

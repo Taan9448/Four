@@ -112,6 +112,12 @@ export interface RunStats {
   deathCause?: string;
   /** 전투마다 한 줄(사람 플레이 통계 내보내기 — 봇 보고서와 같은 칸) */
   log?: BattleLog[];
+  /** 순례 도전 판정(길마다 새로, GAME_DESIGN 2절): 싸운 동료 · 전투가 끝날 때 쓰러져 있던 동료 수 · 들른 휴식·상점 칸 · 이긴 보스전(턴·결 노출·낸 카드) */
+  fought?: string[];
+  downed?: number;
+  rests?: number;
+  shops?: number;
+  boss?: { turns: number; grain: number; cards: Record<string, number> };
 }
 
 /** 전투 한 번의 기록. 체력은 출전 멤버 합(전/후)과 최대 체력 합 */
@@ -416,6 +422,8 @@ export function enterNode(data: GameData, run: RunState, nodeId: string): Encoun
   const module = data.modules.get(node.moduleId)!;
   run.position = node.id;
   run.visited.push(node.id);
+  if (node.type === 'rest') run.stats.rests = (run.stats.rests ?? 0) + 1;
+  if (node.type === 'shop') run.stats.shops = (run.stats.shops ?? 0) + 1;
   if (module.once && !run.usedModules.includes(module.id)) run.usedModules.push(module.id);
   return { node, module };
 }
@@ -533,6 +541,9 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     haunBefore,
     haunAfter: after('haun'),
   });
+  st.fought = [...new Set([...(st.fought ?? []), ...fought.map((r) => r.id)])];
+  st.downed = (st.downed ?? 0) + (outcome.downed ?? []).filter((id) => id !== 'haun').length;
+  if (enc.node.type === 'boss' && outcome.result === 'victory') st.boss = { turns: outcome.turns ?? 0, grain: outcome.tally?.grain ?? 0, cards: { ...(outcome.tally?.cards ?? {}) } };
   if (outcome.tally) {
     st.kills += outcome.tally.kills;
     st.damage += outcome.tally.damage;

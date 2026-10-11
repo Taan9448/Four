@@ -9,6 +9,7 @@ import { h } from './dom';
 import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
 import { potionChip, relicChip } from './items';
+import type { PilgrimOffer } from '../engine/pilgrimage';
 
 const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', shop: '상점', story: '이야기' };
 /** 판 머리의 붉은 낙관(지도 노드와 같은 한자) */
@@ -297,6 +298,35 @@ export function bossLootView(data: GameData, run: RunState, shown: LootShown, on
         }),
       ),
       h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: onDone }, choices.length ? '고르지 않고 넘어가기' : '계속')),
+    ),
+  );
+}
+
+/**
+ * 순례의 보상(GAME_DESIGN 2절): 자유 여정에서 그 스테이지를 처음 다시 넘겼을 때 한 번 — 후보 중 하나를 보유 카드에 영구로.
+ * 보스 전리품 화면과 같은 틀(낙관 巡). 건너뛰어도 그 스테이지의 1회는 쓴다
+ */
+export function pilgrimRewardView(data: GameData, hub: RunState, offers: PilgrimOffer[], onPick: (pick: PilgrimOffer | null) => void): HTMLElement {
+  return h(
+    'section',
+    { class: 'screen reward-screen backdrop' },
+    h(
+      'div',
+      { class: 'choice-box panel reward-box pilgrim-reward' },
+      panelHead('巡', '순례', '순례의 보상'),
+      h('p', { class: 'choice-text' }, '이 길을 처음 다시 걸었다. 놓친 것 하나를 줍는다. 고른 카드는 보유 카드에 영구로 남는다.'),
+      h(
+        'div',
+        { class: 'reward-cards' },
+        offers.map((o) => {
+          const lv = hub.collection[o.cardId] ?? 0;
+          const el = cardView(data, { uid: `pilgrim:${o.cardId}`, cardId: o.cardId, level: o.kind === 'upgrade' ? lv + 1 : 0 });
+          el.prepend(h('span', { class: `offer-badge ${o.kind === 'card' ? 'offer-new' : 'offer-up'}` }, o.kind === 'card' ? '새 카드 · 영구' : `보유 +${lv} → +${lv + 1}`));
+          el.addEventListener('click', () => onPick(o));
+          return el;
+        }),
+      ),
+      h('div', { class: 'panel-actions' }, h('button', { class: 'btn', onclick: () => onPick(null) }, offers.length ? '두고 간다' : '계속')),
     ),
   );
 }

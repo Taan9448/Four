@@ -34,7 +34,7 @@ import { initAudio, playBgm, sfx } from '../render/audio';
 import { toast } from '../render/fx';
 import { moodFor, type Mood } from '../render/music';
 import { BattleView } from './battle-view';
-import { bossLootView, choiceView, levelUpView, rewardView, type LootShown } from './choice-view';
+import { bossLootView, choiceView, levelUpView, pilgrimRewardView, rewardView, type LootShown } from './choice-view';
 import { claimLoot, openShop, rollLoot } from '../engine/economy';
 import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
@@ -47,6 +47,7 @@ import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import { titleStage } from './title-fx';
+import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
   campaignCollection,
   clearAbyss,
@@ -58,6 +59,8 @@ import {
   readProfile,
   readAbyssMeta,
   recordAbyss,
+  recordChallenges,
+  slotTitle,
   recordClear,
   saveAbyss,
   writeAbyssMeta,
@@ -87,7 +90,7 @@ import {
   updateAbyssMeta,
   WORLD_NAME,
 } from '../engine/abyss';
-import { hubView } from './hub-view';
+import { hubView, placeDialog } from './hub-view';
 import { loadoutView } from './loadout-view';
 import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
@@ -102,8 +105,10 @@ function slotSummary(run: RunState): string {
   const where = run.status === 'stage_clear' ? '보스를 넘음' : floor ? `${floor}층` : '출발 전';
   const haun = run.roster.find((r) => r.id === 'haun');
   const mode = `${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`;
-  if (run.status === 'complete') return `클리어${mode}${haun ? ` · Lv ${haun.level}` : ''}`;
-  return `${run.replayOf ? '다시 하기 — ' : ''}${placeName(stage, run)} · ${where}${haun ? ` · Lv ${haun.level}` : ''}${mode}`;
+  // 마친 런(클리어 지도·순례 길)은 끝에 대표 칭호(순례 도전, 도감 '기록'에서 바꾼다)
+  const tail = slotTitle(run);
+  if (run.status === 'complete') return `클리어${mode}${haun ? ` · Lv ${haun.level}` : ''}${tail}`;
+  return `${run.replayOf ? '순례 — ' : ''}${placeName(stage, run)} · ${where}${haun ? ` · Lv ${haun.level}` : ''}${mode}${tail}`;
 }
 
 /** 스테이지 끝 화면 머리의 세계 이름 */
@@ -163,7 +168,7 @@ export class App {
 
   /**
    * ?screen=<이름>[&module=<모듈·장면 id>][&stage=s2] — 화면 하나를 바로 띄운다(UI 확인용, 저장 안 함).
-   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭) · loadout
+   * reward · choice(module: 이벤트·휴식·여관 모듈) · scene(module: 장면 id) · clear · win · lose · deck · levelup · shop · bossloot · hub · codex(module: 탭) · loadout · pilgrim(순례의 보상)
    * &pilgrim을 붙이면 클리어한 런에서 그 스테이지를 다시 걷는 길(순례)로
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
@@ -240,11 +245,20 @@ export class App {
         done.status = 'complete';
         done.flags.push('ui:ending_seen');
         done.replays = { s1: 2, s5: 1 };
+        // 순례 표식이 보이게: 첫 보상 받은 곳(금빛 점)·이룬 도전(n/3)
+        done.pilgrimRewarded = { s1: true, s5: true };
+        done.challenges = { s1: ['s1_branch', 's1_no_one_falls'], s5: ['s5_wedge_first'] };
         this.run = done;
         return this.hub();
       }
       case 'codex':
         return this.codex((id as CodexTab | undefined) ?? 'cards');
+      case 'pilgrim': {
+        // 순례의 보상(클리어한 런에서 이 스테이지를 처음 다시 넘겼을 때)
+        const hub = createRunAt(data, 'SCREEN', 's9', { supportActive: true });
+        hub.status = 'complete';
+        return this.show(this.backdrop(pilgrimRewardView(data, hub, pilgrimRewardOptions(data, hub, stageId), () => this.title())));
+      }
       case 'bossloot': {
         const loot = rollLoot(data, run, { ...first, type: 'boss' });
         return this.show(this.backdrop(bossLootView(data, run, { loot, potionLeft: claimLoot(data, run, loot).potionLeft }, () => this.map())));
@@ -725,13 +739,35 @@ export class App {
     }
     this.show(
       hubView(data, run, {
-        onStage: (stageId) => {
-          this.run = startReplay(data, run, stageId);
-          this.map();
-        },
+        // 장소를 누르면 작은 창(이긴 횟수·첫 순례 보상·도전 3개) → 출발(지금 편성 그대로) · 편성부터 · 이어서
+        onStage: (stageId) =>
+          placeDialog(data, run, stageId, {
+            onGo: () => {
+              this.run = startReplay(data, run, stageId);
+              try {
+                setLoadout(data, this.run, this.run.loadout);
+              } catch {
+                /* 편성에 문제가 있으면 편성 화면부터 */
+              }
+              this.map();
+            },
+            onLoadout: () => {
+              this.run = startReplay(data, run, stageId);
+              this.map();
+            },
+            onResume: () => {
+              this.run = startReplay(data, run, stageId);
+              this.map();
+            },
+            onDiscard: () => {
+              discardSuspended(run, stageId);
+              this.run = startReplay(data, run, stageId);
+              this.map();
+            },
+          }),
         onDiscard: async (stageId) => {
           const st = data.stages.find((s) => s.id === stageId)!;
-          if (!(await confirmDialog(`${placeName(st, run)} — 멈춘 길 버리기`, '멈춰 둔 진행을 버린다. 그동안 얻은 카드는 남는다. 다음에 누르면 처음부터 걷는다.', '버리기'))) return;
+          if (!(await confirmDialog(`${placeName(st, run)} — 멈춘 길 버리기`, '멈춰 둔 진행을 버린다. 그 길에서 얻은 카드·골드·유물도 함께 사라진다. 다음에 누르면 처음부터 걷는다.', '버리기'))) return;
           discardSuspended(run, stageId);
           if (this.persist) saveRun(this.slot, run);
           this.hub();
@@ -756,6 +792,44 @@ export class App {
     this.map();
   }
 
+  /**
+   * 순례 길에서 보스를 넘겼을 때 한 번: 도전을 판정해 클리어한 런에 적고, 여는 것(칭호·틈의 카드·길)은 저장 칸과 상관없는 기록에 남긴다.
+   * 끝 화면에 넣을 "도전 「…」 — …이(가) 열렸다" 목록(없으면 null)
+   */
+  private pilgrimNews(run: RunState): HTMLElement | null {
+    if (!run.replayOf) return null;
+    const fresh = settleChallenges(data, run);
+    if (this.persist) recordChallenges(data, fresh);
+    if (!fresh.length) return null;
+    return h(
+      'ul',
+      { class: 'gains pilgrim-news' },
+      fresh.map((c) => h('li', {}, `도전 「${c.name}」 — ${challengeUnlockName(data, c)}${c.unlock.title ? '을 얻었다' : '이(가) 열렸다'}`)),
+    );
+  }
+
+  /** 순례 길을 마친다: 이겼고 이 스테이지의 첫 순례 보상이 남았으면 '순례의 보상'을 거쳐, 클리어 지도로 */
+  private endPilgrimage(run: RunState): void {
+    const hub = run.replayOf!;
+    const won = run.status === 'stage_clear' || run.status === 'complete';
+    const back = () => {
+      this.run = finishReplay(run);
+      this.map();
+    };
+    if (!won || !pilgrimRewardDue(hub, run.stageId)) return back();
+    const offers = pilgrimRewardOptions(data, hub, run.stageId);
+    this.show(
+      this.backdrop(
+        pilgrimRewardView(data, hub, offers, (pick) => {
+          this.notices.push(claimPilgrimReward(data, hub, run.stageId, pick));
+          // 보유에 든 카드는 도감에 실물로
+          if (pick) this.note((c) => noteCard(c, pick.cardId, hub.collection[pick.cardId] ?? 0));
+          back();
+        }),
+      ),
+    );
+  }
+
   /** 보스를 넘은 뒤: 보스 모듈의 장면 글(outro)을 보여 주고 다음 스테이지로 */
   private stageClear(): void {
     const run = this.run!;
@@ -764,6 +838,7 @@ export class App {
     // 끝 장면을 이미 보여 줬으면 장면 글은 생략
     const outro = boss?.content.outroScene ? undefined : boss?.content.outro;
     const next = nextStage(data, run);
+    const news = this.pilgrimNews(run);
     this.show(
       this.backdrop(
         h(
@@ -778,6 +853,7 @@ export class App {
             h('div', { class: 'end-sub' }, '— 끝 —'),
             outro ? h('p', { class: 'outro' }, outro) : null,
             this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
+            news,
             run.scar > 0
               ? h(
                   'p',
@@ -792,9 +868,9 @@ export class App {
                 class: 'btn btn-primary btn-large',
                 onclick: () => {
                   this.clearMessages = [];
-                  // 다시 하기는 이 스테이지만: 클리어 지도로 돌아간다
-                  if (run.replayOf) this.run = finishReplay(run);
-                  else advanceStage(data, run);
+                  // 다시 하기는 이 스테이지만: (처음 다시 넘겼으면 순례의 보상 뒤) 클리어 지도로 돌아간다
+                  if (run.replayOf) return this.endPilgrimage(run);
+                  advanceStage(data, run);
                   this.map();
                 },
               },
@@ -819,8 +895,8 @@ export class App {
     const counts = poolByOwner(data, pool);
     const meta = readAbyssMeta(data);
     const profile = readProfile();
-    const openPaths = unlockedPaths(data, meta.achievements);
-    const openRift = unlockedRift(data, meta.achievements);
+    const openPaths = unlockedPaths(data, meta.achievements, meta.opened);
+    const openRift = unlockedRift(data, meta.achievements, meta.opened);
     const maxOath = oathMax(data, profile.abyssBestDepth, meta.oathCleared);
     let oath = Math.min(maxOath, presetOath ?? 0);
     const mates = new Set<string>(presetMates ?? ['elia']);
@@ -990,8 +1066,8 @@ export class App {
       paths,
       oath,
       pool: this.abyssPoolNow(),
-      unlocked: unlockedRift(data, meta.achievements),
-      unlockedPaths: unlockedPaths(data, meta.achievements),
+      unlocked: unlockedRift(data, meta.achievements, meta.opened),
+      unlockedPaths: unlockedPaths(data, meta.achievements, meta.opened),
     });
     this.persist = true;
     recordAbyss({ started: true });
@@ -1007,7 +1083,7 @@ export class App {
       paths: plan.paths,
       oath: plan.oath,
       pool: this.abyssPoolNow(),
-      unlocked: unlockedRift(data, readAbyssMeta(data).achievements),
+      unlocked: unlockedRift(data, readAbyssMeta(data).achievements, readAbyssMeta(data).opened),
       daily: { date: seed.slice(1), laws: plan.laws },
     });
     this.persist = true;
@@ -1170,6 +1246,7 @@ export class App {
     const last = data.stages.find((s) => s.id === run.stageId)!;
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;
+    const news = win ? this.pilgrimNews(run) : null;
     playBgm(finale ? 'ending' : win ? 'title' : null);
     this.show(
       this.backdrop(
@@ -1190,6 +1267,7 @@ export class App {
                   ? '지금 만들어진 이야기는 여기까지다. 다음 이야기는 이후 작업.'
                   : '하운이 쓰러졌다.',
             ),
+            news,
             h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`),
             this.runStats(run, win),
             finale && readProfile().clears === 1 && this.persist ? h('p', { class: 'end-unlock' }, '새 런에서 난이도(어려움)와 하드코어를 고를 수 있게 되었다.') : null,
@@ -1203,7 +1281,7 @@ export class App {
                     {
                       class: 'btn btn-primary btn-large',
                       onclick: () => {
-                        if (run.replayOf) this.run = finishReplay(run);
+                        if (run.replayOf) return this.endPilgrimage(run);
                         this.map();
                       },
                     },

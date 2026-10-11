@@ -6,6 +6,8 @@ import { h } from './dom';
 import { inventoryBox } from './items';
 import { journeyBand, placeName } from './map-view';
 import { installTooltips } from './tooltip';
+import { openOverlay } from './overlay';
+import { challengeDone, challengeUnlockName, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
 
 export interface HubHandlers {
   /** 장소를 눌렀다: 멈춰 둔 진행이 있으면 이어서, 없으면 처음부터 */
@@ -43,7 +45,7 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
         h(
           'p',
           { class: 'hint' },
-          '지도의 장소를 누르면 지금 일행·덱·유물로 그곳을 처음부터 걷는다. 걷다가 지도 화면의 "전체 지도로"를 누르면 그 자리에 멈춰 두고 다른 곳으로 갈 수 있고, 멈춘 곳을 다시 누르면 이어진다. 길에서 얻는 카드·골드·유물·레벨은 그 길 안에서만 쓰고, 이긴 횟수만 남는다.',
+          '장소를 누르면 지금 일행으로 그곳을 다시 걷는다. 길에서 얻는 것은 그 길 안에서만 쓰고, 처음 다시 넘긴 스테이지마다 놓친 카드 하나를 줍는다. 도전을 이루면 틈의 카드·길·칭호가 열린다. 걷다가 "전체 지도로"를 누르면 그 자리에 멈춰 두고 다른 곳으로 갈 수 있다.',
         ),
         paused.length
           ? h(
@@ -85,4 +87,62 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
       ),
     ),
   );
+}
+
+/**
+ * 장소를 눌렀을 때의 작은 창(순례, GAME_DESIGN 2절): 이긴 횟수 · 첫 순례 보상 · 도전 3개(이룬 것 표시) · [출발](기본 초점) [편성부터].
+ * 멈춰 둔 길이 있으면 [이어서] [버리고 처음부터]
+ */
+export function placeDialog(
+  data: GameData,
+  hub: RunState,
+  stageId: string,
+  handlers: { onGo: () => void; onLoadout: () => void; onResume: () => void; onDiscard: () => void },
+): void {
+  const st = data.stages.find((s) => s.id === stageId)!;
+  const paused = hub.suspended?.[stageId];
+  const list = stageChallenges(data, stageId);
+  const done = list.filter((c) => challengeDone(hub, c)).length;
+  const act = (fn: () => void) => () => {
+    ov.close();
+    fn();
+  };
+  const main = paused
+    ? h('button', { class: 'btn btn-primary', onclick: act(handlers.onResume) }, '이어서', h('small', {}, `${paused.visited.length}칸 지남`))
+    : h('button', { class: 'btn btn-primary', onclick: act(handlers.onGo) }, '출발', h('small', {}, '지금 편성 그대로'));
+  const ov = openOverlay(
+    placeName(st, hub),
+    h(
+      'div',
+      { class: 'place-dialog' },
+      h(
+        'p',
+        { class: 'place-stats' },
+        h('span', {}, `이긴 횟수 ×${hub.replays[stageId] ?? 0}`),
+        h('span', { class: pilgrimRewardDue(hub, stageId) ? 'place-reward due' : 'place-reward got' }, pilgrimRewardDue(hub, stageId) ? '첫 순례 보상 남음' : '첫 순례 보상 받음'),
+        h('span', {}, `도전 ${done}/${list.length}`),
+      ),
+      h(
+        'ul',
+        { class: 'challenge-list' },
+        list.map((c) =>
+          h(
+            'li',
+            { class: challengeDone(hub, c) ? 'done' : '' },
+            h('b', {}, `${challengeDone(hub, c) ? '✓' : '·'} ${c.name}`),
+            h('span', {}, c.description),
+            h('small', {}, challengeUnlockName(data, c)),
+          ),
+        ),
+      ),
+      h(
+        'div',
+        { class: 'confirm-actions' },
+        paused ? h('button', { class: 'btn', onclick: act(handlers.onDiscard) }, '버리고 처음부터') : h('button', { class: 'btn', onclick: act(handlers.onLoadout) }, '편성부터'),
+        main,
+      ),
+    ),
+  );
+  // Enter 한 번으로 간다
+  requestAnimationFrame(() => main.focus());
 }
