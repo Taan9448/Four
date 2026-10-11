@@ -1,0 +1,42 @@
+{
+  "id": "card_art_kyle_2",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 6,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "e7bcf7830b6ff792",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "kyle_formation",
+    "kyle_joke",
+    "kyle_sword_path",
+    "kyle_scar_oath",
+    "kyle_rowen_blade",
+    "kyle_no_one_dies"
+  ]
+}

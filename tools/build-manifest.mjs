@@ -19,6 +19,8 @@ export function buildManifest(root = ROOT) {
       const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
       // 카드 틀: 글 자리를 재기 전에 자른 그림은 명세에 잰 값(slots)을 쓴다
       if (meta.type === 'card-frame' && !meta.slots) meta.slots = loadSpec(id, root).slots ?? null;
+      // 카드 그림: 어느 칸이 어느 카드인지는 늘 명세(cards)를 따른다(다시 자르지 않고 순서를 고칠 수 있게)
+      if (meta.type === 'card-art-sheet') meta.cards = loadSpec(id, root).cards ?? [];
       assets[id] = { source, dir: `assets/${source}/${id}`, meta };
       break;
     }

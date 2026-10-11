@@ -356,6 +356,43 @@ describe('카드 틀(card-frame, 2026-10-11)', () => {
   });
 });
 
+describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
+  it('상태 카드를 뺀 모든 카드가 카드 그림 시트 하나에 한 번씩 있고, 칸 수·메모 수가 맞는다', async () => {
+    const { gameData } = await import('../src/engine/data');
+    const data = gameData();
+    const seen = new Map<string, string>();
+    for (const id of listSpecIds().filter((x) => x.startsWith('card_art_'))) {
+      const spec = loadSpec(id);
+      expect(spec.type, id).toBe('card-art-sheet');
+      expect(spec.cards.length, id).toBe(spec.frames);
+      expect(Object.keys(spec.frame_notes).length, id).toBe(spec.frames);
+      for (const card of spec.cards) {
+        expect(data.cards.has(card), `${id}: ${card}`).toBe(true);
+        expect(seen.has(card), `${card}: ${seen.get(card)}와 ${id}에 두 번`).toBe(false);
+        seen.set(card, id);
+      }
+    }
+    const missing = [...data.cards.values()].filter((c) => c.pool !== 'status' && !seen.has(c.id)).map((c) => c.id);
+    expect(missing).toEqual([]);
+  });
+
+  it('칸을 꽉 채운 그림을 96×64로 자르고, meta에 칸의 카드 목록을 남긴다', async () => {
+    const spec = loadSpec('card_art_born_2');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source(spec.id), await renderSheet(spec));
+    const meta = await sliceSheet(spec, { src: p.source(spec.id), outDir: p.sprites(spec.id) });
+    expect(meta).toMatchObject({ frameW: 96, frameH: 64, frames: spec.frames, cards: spec.cards });
+    const { data } = await sharp(join(p.sprites(spec.id), 'frame_01.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(data[3]).toBe(255); // 모서리까지 그림(투명 여백 없음)
+    const prompt = promptFor('card_art_born_2');
+    expect(prompt).toContain('96x64 pixel-art sprite scaled up exactly 4x');
+    expect(prompt).toContain('FILLS THE WHOLE CELL');
+    expect(prompt).toContain('Cells 6 to 16 are completely empty magenta');
+    expect(prompt).not.toMatch(/[가-힣]/); // 그림 모델이 글자를 그리지 않게 한글을 넣지 않는다
+  });
+});
+
 describe('저장소의 실제 명세와 임시 시트', () => {
   it('모든 명세가 규칙에 맞다', () => {
     const errors = listSpecIds().flatMap((id) => checkSpecShape(loadSpec(id)).map((e) => `${id}: ${e}`));

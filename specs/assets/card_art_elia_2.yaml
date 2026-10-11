@@ -1,0 +1,22 @@
+id: card_art_elia_2
+type: card-art-sheet
+summary: 엘리아 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 6
+cards:
+  - elia_staff  # 지팡이 휘두르기
+  - elia_cold_breath  # 찬 숨결
+  - elia_poultice  # 약초 찜질
+  - elia_sprout  # 은빛 새싹
+  - elia_frost_bloom  # 서리꽃
+  - elia_silien_song  # 실리엔의 노래
+frame_notes:
+  1: "a wooden staff swung like a club with a swoosh"  # 지팡이 휘두르기
+  2: "a white frosty breath blown from an open palm"  # 찬 숨결
+  3: "a cloth wrap of green herbs tied around a forearm"  # 약초 찜질
+  4: "a tiny silver sprout curling up from the ground"  # 은빛 새싹
+  5: "a ring of white frost flowers blooming on the ground"  # 서리꽃
+  6: "two clasped hands with glowing notes and a forest glow behind"  # 실리엔의 노래
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue, frost white and forest green, with blue for mana, orange for fire and pale cyan for frost; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3a6ea5', accent: '#dff4ff' }

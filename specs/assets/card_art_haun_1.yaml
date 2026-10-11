@@ -1,0 +1,42 @@
+id: card_art_haun_1
+type: card-art-sheet
+summary: 진하운 카드 그림 1 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 16
+cards:
+  - haun_chop  # 장작 패기
+  - haun_step  # 발 디딤
+  - haun_read_grain  # 결 읽기
+  - haun_breath  # 숨 고르기
+  - haun_cloud_form  # 청운십팔식
+  - haun_waterwheel  # 물레방아
+  - haun_byeogun  # 벽운단하
+  - haun_cheonoe  # 천외귀운
+  - haun_unhae  # 운해귀종
+  - haun_place_blade  # 날 얹기
+  - haun_blue_edge  # 푸른 검광
+  - haun_ride_flow  # 흐름에 올라타기
+  - haun_scabbard  # 검집
+  - haun_chulsu  # 청운출수
+  - haun_biun  # 비운천리
+  - haun_nakun  # 낙운무흔
+frame_notes:
+  1: "an axe splitting a log on a chopping block, wood chips flying"  # 장작 패기
+  2: "a straw sandal stepping into a footprint on packed earth"  # 발 디딤
+  3: "close-up of wood grain with one glowing gold line running along it"  # 결 읽기
+  4: "three short breath puffs and one long breath puff in a row"  # 숨 고르기
+  5: "a thin sword tracing two flowing cloud-shaped arcs"  # 청운십팔식
+  6: "a wooden waterwheel turning in a river, blue light in the water"  # 물레방아
+  7: "a slash of mixed gold and blue light cutting through clouds over a peak"  # 벽운단하
+  8: "a great swirl of clouds flowing back into the sky as a crack closes"  # 천외귀운
+  9: "a sea of clouds settling smooth and flat, scattered sand sinking back"  # 운해귀종
+  10: "an axe blade resting lightly on a wood knot, a thin seam of light opening"  # 날 얹기
+  11: "a granite boulder split by one straight blue line of sword light"  # 푸른 검광
+  12: "a small figure riding a rushing current of blue light"  # 흐름에 올라타기
+  13: "the tip of a black scabbard pressing a wrist joint, a curved blade dropping"  # 검집
+  14: "a sword point rising and blooming upward like a cloud"  # 청운출수
+  15: "a light cloud gliding, a faint figure slipping behind it"  # 비운천리
+  16: "a cloud falling onto still water without leaving a ripple"  # 낙운무흔
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }

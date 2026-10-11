@@ -1,0 +1,20 @@
+id: card_art_born_2
+type: card-art-sheet
+summary: 보른 카드 그림 2 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 5
+cards:
+  - born_payback  # 되갚기
+  - born_like_mountain  # 산처럼
+  - born_stomp  # 땅 구르기
+  - born_kazdum_song  # 카즈둠의 노래
+  - born_brother  # 두린의 동생
+frame_notes:
+  1: "an axe handle swinging back right after a hit"  # 되갚기
+  2: "a dwarf standing firm like a mountain, axe at rest"  # 산처럼
+  3: "a heavy boot stomping with shockwave rings in the ground"  # 땅 구르기
+  4: "hammers striking anvils in rhythm inside a mine, music notes"  # 카즈둠의 노래
+  5: "a dwarf at the front of a line with a taller brother shadow behind"  # 두린의 동생
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm stone and forge palette: granite grey, iron, ember orange, earth brown and red beard tones; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#6e5440', accent: '#ff8a5c' }

@@ -1,0 +1,26 @@
+id: card_art_abyss_3
+type: card-art-sheet
+summary: 틈의 카드 그림 3 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 사용자 요청: 카드 제목과 어울리게, 잡다한 것 없이 심플하게. 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 8
+cards:
+  - abyss_born_swallow_mountain  # 산을 삼키다
+  - abyss_born_durin_shadow  # 두린의 그림자
+  - abyss_born_cave_in  # 무너지는 갱도
+  - abyss_born_stone_skin  # 돌 살갗
+  - abyss_born_iron_will  # 쇠의 뜻
+  - abyss_born_hammer_echo  # 망치의 메아리
+  - abyss_born_mountain_heart  # 산의 심장
+  - abyss_born_five_thousand  # 오천 번의 망치
+frame_notes:
+  1: "a heavy dark stone held in a dwarf fist"  # 산을 삼키다
+  2: "a tall dwarf shadow standing behind a smaller dwarf"  # 두린의 그림자
+  3: "a mine tunnel ceiling collapsing on broken pillars"  # 무너지는 갱도
+  4: "an arm coated in grey stone dust hardening like rock"  # 돌 살갗
+  5: "an iron gauntlet gripping a hammer, thorny spikes rising"  # 쇠의 뜻
+  6: "a hammer strike with echo rings reaching a black crack"  # 망치의 메아리
+  7: "a glowing red heart-shaped stone beating inside a mountain"  # 산의 심장
+  8: "a hammer with thousands of strike sparks around it"  # 오천 번의 망치
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }
