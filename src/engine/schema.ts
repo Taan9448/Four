@@ -167,7 +167,8 @@ export type UpgradeSkill = z.infer<typeof UpgradeSkill>;
 
 /** 장면에만 나오는 화자(동료가 아닌 인물). 반신 그림 에셋은 <id>_stand */
 /** lore: 도감의 인물 설명(처음 만난 때 하운이 아는 만큼, GAME_DESIGN 14절) */
-export const SpeakerDef = z.object({ id: z.string(), name: z.string(), color: z.string(), lore: z.string().optional() }).strict();
+/** title: 도감 인물 칸의 한 줄 역할(예: 청운문 장문인) */
+export const SpeakerDef = z.object({ id: z.string(), name: z.string(), title: z.string().optional(), color: z.string(), lore: z.string().optional() }).strict();
 export type SpeakerDef = z.infer<typeof SpeakerDef>;
 
 /**

@@ -110,7 +110,7 @@ function isValidRun(data: GameData, run: RunState): boolean {
   if (!run.visited.every((id) => nodeIds.has(id))) return false;
   if (!run.roster.length || !run.roster.every((r) => data.characters.has(r.id))) return false;
   const rosterIds = new Set(run.roster.map((r) => r.id));
-  if (!run.selected.includes('haun') || !run.selected.every((id) => rosterIds.has(id))) return false;
+  if ((!run.selected.includes('haun') && !run.replayOf) || !run.selected.length || !run.selected.every((id) => rosterIds.has(id))) return false;
   if (!run.deck.every((c) => data.cards.has(c.cardId) && typeof c.uid === 'string')) return false;
   if (!run.usedModules.every((id) => data.modules.has(id))) return false;
   if (!run.relics.every((id) => data.relics.has(id))) return false;

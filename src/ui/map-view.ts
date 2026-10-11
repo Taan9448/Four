@@ -169,7 +169,7 @@ export function openMemberInfo(data: GameData, run: RunState, id: string): void 
             stat('레벨', `Lv ${r.level}`),
             stat('체력', `${r.hp} / ${r.maxHp}`),
             stat('경험치', next === null ? '최대 레벨' : `${r.xp} / ${next}`),
-            stat('출전', id === 'haun' ? '항상' : run.selected.includes(id) ? '출전 중' : '쉼'),
+            stat('출전', id === 'haun' && !run.replayOf ? '항상' : run.selected.includes(id) ? '출전 중' : '쉼'),
             stat('치명타', `${Math.round((def.crit ?? data.balance.crit.chance) * 100)}%`),
           ),
           h('p', { class: 'member-desc' }, def.description),
@@ -418,6 +418,19 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
   const partyMax = run.abyss ? data.balance.abyss.partyMax : data.balance.party.max;
   const full = run.selected.length >= partyMax;
+  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
+  const wangJoined = run.flags.includes('support:wang');
+  const support = wangJoined
+    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, h('span', { class: 'member-tag' }, '지원'), ' 왕일검 - 일행을 돕는다')
+    : isDebug()
+      ? h(
+          'label',
+          { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다.' },
+          h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
+          ' 왕일검 지원(디버그)',
+        )
+      : null;
+
   const partyBox = h(
     'div',
     { class: `box party-box${handlers.highlightParty ? ' guide-pulse' : ''}` },
@@ -433,7 +446,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           type: 'checkbox',
           checked,
           // 자리가 가득 차면 쉬는 동료는 먼저 한 명을 빼야 고를 수 있다
-          disabled: r.id === 'haun' || !!run.abyss || (!checked && full),
+          // 하운은 고정(순례에서는 하운도 쉴 수 있다 — 2026-10-11). 마지막 한 명은 뺄 수 없다
+          disabled: (r.id === 'haun' && !run.replayOf) || !!run.abyss || (!checked && full) || (checked && run.selected.length === 1),
           onchange: (e: Event) => {
             const on = (e.target as HTMLInputElement).checked;
             const next = on ? [...run.selected, r.id] : run.selected.filter((x) => x !== r.id);
@@ -446,7 +460,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           },
         }),
         h('span', { class: 'member-name' }, def.name),
-        r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
+        r.id === 'haun' && !run.replayOf ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
         h('span', { class: 'member-lv', title: xpToNext(data, r.level) === null ? '최대 레벨' : `경험치 ${r.xp} / ${xpToNext(data, r.level)}` }, `Lv ${r.level}`),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),
@@ -468,30 +482,21 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
       );
     }),
+    // 왕일검(지원)은 출전 목록 바로 아래(2026-10-11 사용자 요청)
+    support,
     h(
       'p',
       { class: 'hint' },
       run.abyss
         ? '심연에서는 모두 출전한다. 쓰러진 채 전투가 끝난 동료는 다음 굽이까지 부상(최대 체력 감소).'
         : fighters.length > data.balance.party.max && full
-        ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.`
-        : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
+        ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.${run.replayOf ? ' 순례에서는 하운도 쉴 수 있습니다.' : ''}`
+        : run.replayOf
+          ? `순례에서는 하운도 쉴 수 있다 — 네 명 중 최대 ${data.balance.party.max}명. 하운이 빠지면 출전한 모두가 쓰러져야 진다. 출전하지 않은 동료의 카드는 전투 덱에서 빠진다.`
+          : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
     ),
     fighters.length > 1 && !run.abyss ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );
-
-  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
-  const wangJoined = run.flags.includes('support:wang');
-  const support = wangJoined
-    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, '왕일검 — 청운호흡으로 일행을 돕는다')
-    : isDebug()
-      ? h(
-          'label',
-          { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다.' },
-          h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
-          ' 왕일검 지원(디버그)',
-        )
-      : null;
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
   const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run, { onStage: run.replayOf ? handlers.onSwitchStage : undefined }));
@@ -558,7 +563,6 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
-        support,
         h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),
         h(
           'div',
