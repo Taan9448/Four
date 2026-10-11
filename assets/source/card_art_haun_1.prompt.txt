@@ -1,0 +1,28 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: an axe splitting a log on a chopping block, wood chips flying
+Cell 2: a straw sandal stepping into a footprint on packed earth
+Cell 3: close-up of wood grain with one glowing gold line running along it
+Cell 4: three short breath puffs and one long breath puff in a row
+Cell 5: a thin sword tracing two flowing cloud-shaped arcs
+Cell 6: a wooden waterwheel turning in a river, blue light in the water
+Cell 7: a slash of mixed gold and blue light cutting through clouds over a peak
+Cell 8: a great swirl of clouds flowing back into the sky as a crack closes
+Cell 9: a sea of clouds settling smooth and flat, scattered sand sinking back
+Cell 10: an axe blade resting lightly on a wood knot, a thin seam of light opening
+Cell 11: a granite boulder split by one straight blue line of sword light
+Cell 12: a small figure riding a rushing current of blue light
+Cell 13: the tip of a black scabbard pressing a wrist joint, a curved blade dropping
+Cell 14: a sword point rising and blooming upward like a cloud
+Cell 15: a light cloud gliding, a faint figure slipping behind it
+Cell 16: a cloud falling onto still water without leaving a ripple
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: The previous sheet had busy scenery and the wrong action in cell 13. Redraw with much simpler backgrounds: each cell has ONLY two or three large calm flat color bands in parchment beige, ochre, pine green or ink grey. No distant mountain chains, no trees, no rocks, no landscape detail unless the frame note explicitly requires that exact peak, boulder or river. No repeating wood texture except cells 3 and 10 where wood grain is the subject. The main specified subject alone is large; leave the rest quiet. Cell 13 MUST show the rounded end of a plain BLACK SCABBARD physically pressing into the wrist joint of a bare hand; a separate curved blade is visibly dropping away below that wrist. Do NOT depict a hand gripping a sword hilt, or a sword being drawn. Cell 15 is just ONE faint figure behind ONE cloud, no extra figures. Preserve all 16 frame_notes in row-major order and fill every rectangular cell with its own flat background edge to edge; no gutters, no decorative borders.
