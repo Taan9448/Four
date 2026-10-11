@@ -175,7 +175,7 @@ export function settingsForm(): HTMLElement {
     h(
       'div',
       { class: 'setting-row' },
-      h('span', {}, '안내 다시 보기', h('small', {}, '전투 기본·속성 안내를 다음 전투에서 다시 띄운다')),
+      h('span', {}, '안내 다시 보기', h('small', {}, '전투 기본·속성·첫 폭주·균열과 상흔 안내를 다시 띄운다')),
       h(
         'button',
         {

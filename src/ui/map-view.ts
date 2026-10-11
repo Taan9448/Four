@@ -320,6 +320,9 @@ function scrollToHere(wrap: HTMLElement, selector: string): void {
   });
 }
 
+/** 지도마다 이미 그린 끊긴 길 수(새 금만 그어지는 연출을 하려고) */
+const drawnCuts = new Map<string, number>();
+
 export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers): HTMLElement {
   installTooltips();
   const stage = data.stages.find((s) => s.id === run.stageId)!;
@@ -360,7 +363,11 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   }
   // 폭주가 끊은 길(GAME_DESIGN 7절): 옅은 끊긴 선 위로 검은 금. 상흔이 깊을수록 금이 굵다
   const crackW = 2 + Math.min(run.scar, 30) * 0.12; // 화면 px(non-scaling-stroke)
-  for (const [fromId, toId] of run.map.cuts ?? []) {
+  // 새로 끊긴 길(지난번 지도를 그린 뒤 생긴 것)은 금이 그어지는 연출
+  const cutKey = `${run.seed}:${run.stageId}`;
+  const drawn = drawnCuts.get(cutKey) ?? (run.map.cuts?.length ?? 0);
+  drawnCuts.set(cutKey, run.map.cuts?.length ?? 0);
+  for (const [ci, [fromId, toId]] of (run.map.cuts ?? []).entries()) {
     const n = findNode(run.map, fromId);
     const m = findNode(run.map, toId);
     if (!n || !m) continue;
@@ -378,8 +385,9 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     for (const [cls, sw] of [['crack-glow', crackW * 3], ['crack', crackW]] as const) {
       const path = document.createElementNS(svgNS, 'path');
       path.setAttribute('d', `M${zig.join(' L')}`);
-      path.setAttribute('class', cls);
+      path.setAttribute('class', `${cls}${ci >= drawn ? ' fresh' : ''}`);
       path.setAttribute('stroke-width', String(sw));
+      path.setAttribute('pathLength', '1');
       svg.appendChild(path);
     }
   }

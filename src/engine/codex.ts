@@ -10,6 +10,8 @@ export interface CodexStats {
   defeats: number;
   /** 쓰러뜨린 적 수(전투에서 이긴 그 적들) */
   kills: number;
+  /** 겪은 균열 폭주 수(도감 '균열과 폭주'가 열린다) */
+  surges?: number;
 }
 
 export interface Codex {
@@ -124,7 +126,8 @@ export function noteEnemiesSeen(codex: Codex, enemyIds: readonly string[]): Code
  * 전투가 끝났을 때. victory면 그 전투의 적(변신한 모습·불려 나온 적 포함)을 이긴 것으로 센다.
  * 끝에서 처음 보는 적(변신·소환)도 만난 것으로 적는다
  */
-export function noteBattleEnd(codex: Codex, enemyIds: readonly string[], victory: boolean, moves: Record<string, string[]> = {}): Codex {
+export function noteBattleEnd(codex: Codex, enemyIds: readonly string[], victory: boolean, moves: Record<string, string[]> = {}, surges = 0): Codex {
+  if (surges > 0) codex.stats.surges = (codex.stats.surges ?? 0) + surges;
   for (const [id, ms] of Object.entries(moves)) for (const m of ms) addTo((codex.moves[id] ??= []), m);
   for (const id of new Set(enemyIds)) {
     const e = (codex.enemies[id] ??= { seen: 1, defeated: 0 });

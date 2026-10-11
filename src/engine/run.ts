@@ -545,6 +545,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg,
     relics: run.relics,
     potions: run.potions,
+    surgeDamageMul: enc.module.content.surgeTutorial ? 0.5 : undefined,
     // 裂 틈의 짐승: 첫 적에 틈의 접사 하나(GAME_DESIGN 7절)
     enemyMods: enc.node.crack && enc.node.enemies ? crackAffix(data, run, enc.node) : undefined,
   };

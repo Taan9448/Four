@@ -1745,3 +1745,14 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .node.node-crack.open { animation: crack-pulse 1.2s ease-in-out infinite alternate; }
 @keyframes crack-pulse { from { box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.4), 0 0 6px rgba(255, 40, 40, 0.3); } to { box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.9), 0 0 16px rgba(255, 40, 40, 0.7); } }
 @media (prefers-reduced-motion: reduce) { .node.node-crack.open { animation: none; } }
+/* 첫 폭주 안내(GAME_DESIGN 7절) */
+.surge-guide { text-align: left; max-width: 34rem; margin: 0 auto; }
+.surge-guide ol { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
+.surge-guide li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; font-size: var(--fs-body); line-height: 1.45; }
+.surge-guide .sg-glyph { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 4px; background: #2a0c0c; color: #ff6b6b; font-family: var(--f-brush); border: 1px solid #b3121b; }
+.surge-guide .sg-foot { margin: 4px 0 0; font-size: var(--fs-cap); color: var(--muted, #b9a98c); }
+.map-lines path.crack.fresh, .map-lines path.crack-glow.fresh { stroke-dasharray: 1; stroke-dashoffset: 1; animation: crack-draw 0.9s 0.3s ease-out forwards; }
+@keyframes crack-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .map-lines path.fresh { animation: none; stroke-dashoffset: 0; } }
+.surge-pop .pop { width: min(600px, calc(100vw - 32px)); max-width: none; }
+.surge-pop .pop-title { white-space: nowrap; font-size: clamp(1.3rem, 5vw, 2rem); }
