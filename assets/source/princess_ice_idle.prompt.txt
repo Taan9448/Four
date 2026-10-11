@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: a tall pillar of clear ice standing behind the throne; frozen inside it a young princess with golden hair braided up and a sky-blue dress, eyes closed, one hand reaching forward as if to catch someone; at her reaching fingertip a tiny point where all the hexagonal ice lines meet; an object, she does not move. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: the ice pillar stands still, cold mist at its base
+Cell 2: the hexagonal lines in the ice glint faintly
+Cell 3: a tiny point of light shows at the princess's fingertip
+Cell 4: the light fades
+Cells 5 to 6 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: DIRECTION ERROR: the supplied reference CELL 2 happens to face RIGHT, and the previous sheet also faced RIGHT. The specification facing:left and user require LEFT. In ALL FOUR cells horizontally MIRROR the entire reference cell 2 subject WITHIN its own cell: the frozen princess's nose and reaching fingertips must point LEFT, the braided golden hair bun goes on the RIGHT behind her head. Strict SIDE PROFILE with ONE closed eye, no front or three-quarter view. The THIRD attached image is the current sheet; preserve its same fixed pillar design, height, colors, sky-blue gown, golden braided updo and encased frozen pose, but flip each complete pillar and princess to LEFT within its own cell. Do not swap cells or move the character between cells. Keep one immobile pillar at the exact same local x and y in all four cells: same outer ice silhouette, same frozen woman pose, same ice-line layout; only hard-pixel cold mist in cell 1, glints along hexagonal lines in cell 2, tiny fingertip light in cell 3, and faded light in cell 4 vary. Reference pillar height is 123 sprite pixels; current 118-120 is within 5%, preserve that scale or aim 121-123. Put pillar top at local y=16, bottom y=495, and keep every ice point INSIDE the cell; tiny mist stays above/beside the base, not below it. Cells 5 and 6 stay pure magenta. No change to the princess's arms, dress or head pose between frames; she never moves.
