@@ -1,0 +1,40 @@
+{
+  "id": "card_frame_magic",
+  "type": "card-frame",
+  "frameW": 128,
+  "frameH": 192,
+  "track": "pixel",
+  "pixelScale": 8,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    192
+  ],
+  "fit": "pad",
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "a24b2add17be9536",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1024,
+    1536
+  ],
+  "gridPurity": 0.774,
+  "window": [
+    17,
+    13,
+    94,
+    67
+  ]
+}
