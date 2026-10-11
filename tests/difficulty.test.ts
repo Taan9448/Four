@@ -1,6 +1,6 @@
 // 난이도·하드코어·스테이지 다시 하기(2026-10-08)
 import { describe, expect, it } from 'vitest';
-import { applyBattleOutcome, applyRunOps, battleSetupFor, createRun, createRunAt, finishReplay, startReplay, type Encounter } from '../src/engine/run';
+import { applyBattleOutcome, applyRunOps, battleSetupFor, createRun, createRunAt, discardSuspended, finishReplay, mergeCollections, restoreParty, startReplay, suspendReplay, type Encounter } from '../src/engine/run';
 import { deserializeRun, serializeRun } from '../src/engine/save';
 import { createBattle, endTurn } from '../src/engine/battle';
 import { createRng } from '../src/engine/rng';
@@ -90,6 +90,92 @@ describe('스테이지 다시 하기', () => {
     const replay = startReplay(data, hub, 's4');
     const loaded = deserializeRun(data, serializeRun(replay))!;
     expect(loaded.run.replayOf?.status).toBe('complete');
+  });
+});
+
+describe('자유 여정(2026-10-11)', () => {
+  const cleared = () => {
+    const hub = createRunAt(data, 'FREE', 's9');
+    hub.status = 'complete';
+    return hub;
+  };
+
+  it('캠페인을 마치면 이야기로 떠난 동료가 떠날 때의 상태로 돌아와 4명이 된다', () => {
+    const run = createRunAt(data, 'PARTY', 's9');
+    const kyle = run.roster.find((r) => r.id === 'kyle')!;
+    kyle.level = 7;
+    kyle.maxHp = 88;
+    applyRunOps(data, run, [{ op: 'leave_party', member: 'kyle' }, { op: 'leave_party', member: 'born' }]);
+    expect(run.roster.map((r) => r.id)).toEqual(['haun', 'elia']);
+    expect(restoreParty(data, run)).toEqual([]); // 캠페인 중에는 돌아오지 않는다
+    run.status = 'complete';
+    expect(restoreParty(data, run).length).toBe(2);
+    expect(run.roster.map((r) => r.id).sort()).toEqual(['born', 'elia', 'haun', 'kyle']);
+    expect(run.roster.find((r) => r.id === 'kyle')).toMatchObject({ level: 7, maxHp: 88, hp: 88 });
+    expect(Object.keys(run.loadout)).toEqual(expect.arrayContaining(['kyle', 'born']));
+    expect(restoreParty(data, run)).toEqual([]); // 한 번만
+  });
+
+  it('하드코어로 잃은 동료도 클리어 뒤에는 하운의 레벨로 돌아온다', () => {
+    const run = cleared();
+    run.roster = run.roster.filter((r) => r.id !== 'born');
+    run.fallen = ['born'];
+    restoreParty(data, run);
+    expect(run.fallen).toEqual([]);
+    expect(run.roster.find((r) => r.id === 'born')!.level).toBe(run.roster.find((r) => r.id === 'haun')!.level);
+  });
+
+  it('다시 하다 멈추면 진행이 남고, 그 장소를 다시 누르면 그 자리에서 이어진다', () => {
+    const hub = cleared();
+    const a = startReplay(data, hub, 's1');
+    a.visited = [a.map.floors[0][0].id];
+    a.position = a.map.floors[0][0].id;
+    a.gold = 5;
+    const back = suspendReplay(a);
+    expect(back.status).toBe('complete');
+    expect(back.suspended?.s1?.position).toBe(a.position);
+    expect(back.gold).toBe(hub.gold); // 그 길의 골드는 그 길 안에서만
+    // 다른 곳을 걷는 동안에도 멈춘 진행은 남는다(저장되는 hub 안에)
+    const b = startReplay(data, back, 's3');
+    expect(b.replayOf?.suspended?.s1).toBeTruthy();
+    expect(b.suspended).toBeUndefined();
+    const hub2 = suspendReplay(b);
+    expect(Object.keys(hub2.suspended!).sort()).toEqual(['s1', 's3']);
+    const again = startReplay(data, hub2, 's1');
+    expect(again.position).toBe(a.position);
+    expect(again.gold).toBe(5);
+    expect(again.replayOf?.suspended?.s1).toBeUndefined();
+    expect(again.replayOf?.suspended?.s3).toBeTruthy();
+    // 처음부터 다시(fresh)는 멈춘 진행을 버린다
+    expect(startReplay(data, hub2, 's1', { fresh: true }).position).toBeNull();
+    discardSuspended(hub2, 's3');
+    expect(hub2.suspended?.s3).toBeUndefined();
+  });
+
+  it('여러 길에서 얻은 카드는 합쳐 남는다(강화 단계는 높은 쪽)', () => {
+    expect(mergeCollections({ a: 1, b: 0 }, { b: 2, c: 0 })).toEqual({ a: 1, b: 2, c: 0 });
+    const hub = cleared();
+    const a = startReplay(data, hub, 's1');
+    const b = startReplay(data, hub, 's2');
+    a.collection.extra_a = 0;
+    const mid = suspendReplay(a);
+    b.replayOf = structuredClone(mid);
+    b.collection.extra_b = 1;
+    b.status = 'stage_clear';
+    const end = finishReplay(b);
+    expect(end.collection.extra_a).toBe(0);
+    expect(end.collection.extra_b).toBe(1);
+    expect(end.replays.s2).toBe(1);
+  });
+
+  it('멈춘 진행은 저장에서 살아남고, 데이터가 맞지 않는 것만 버린다', () => {
+    const hub = cleared();
+    const back = suspendReplay(startReplay(data, hub, 's2'));
+    back.suspended!.s5 = structuredClone({ ...back.suspended!.s2, stageId: 's5' }); // 지도와 스테이지가 어긋난 진행
+    const loaded = deserializeRun(data, serializeRun(back))!.run;
+    expect(Object.keys(loaded.suspended!)).toEqual(['s2']);
+    const playing = startReplay(data, loaded, 's4');
+    expect(deserializeRun(data, serializeRun(playing))!.run.replayOf?.suspended?.s2).toBeTruthy();
   });
 });
 

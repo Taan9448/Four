@@ -1,0 +1,28 @@
+id: card_frame_fusion
+type: card-frame
+summary: >-
+  the frame of a FUSION card that uses both inner qi and mana: the left half is the martial arts frame (lacquered wood, brass, hanji)
+  and the right half is the magic frame (blue leather, silver), joined by a gold seam, crowned with gold
+# 무공 틀과 같은 layout에 비용 자리만 둘(왼쪽 내공 · 오른쪽 마나)
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14], [113, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+window_shape: an upright oval with a flat bottom
+banner: a deep indigo ribbon (#1d2433, #1f3f73) edged with gold (#f2a93b, #ffe08a) and with gold-capped ends
+text_panel: warm off-white hanji paper (#f1efe6, #e0cfae), the same on both halves
+symmetric: false
+frame_notes:
+  1: >-
+    the border is split by a vertical seam running down the middle of the card: LEFT of the seam is dark lacquered wood (#2a1d16,
+    #4a3426) with brass cloud-scroll fittings (#b8741a, #f2a93b); RIGHT of the seam is deep blue leather (#1f3f73) with silver
+    filigree (#8a90a3, #c2c6d1) and a small blue crystal (#4fb4ff); the seam itself is a bright gold strip (#f2a93b, #ffe08a)
+    that is visible above the art window and below the text box; a small gold crest shaped like a sun disk over a crescent moon
+    sits on the top border between the two cost sockets; the outer edge is dark (#0b0b10)
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, wood, brass, leather and silver read clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#f2a93b', panel: '#f1efe6', banner: '#1f3f73' }

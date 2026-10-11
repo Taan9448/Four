@@ -119,13 +119,42 @@ export function renderPrompt(spec, style) {
         `Each cell is exactly ${cw}x${ch} px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.\n` +
         pixelGrid(spec, 'Every cell') +
         `Background: flat solid ${key.name} ${key.hex} in every cell.\n` +
-        `Subject: one game status icon per cell, a single bold symbol centered in the cell, about ${Math.round(lw * 0.75)}x${Math.round(lh * 0.75)} sprite pixels, readable when shown at 28x28 px on screen. ` +
-        'All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.\n' +
+        (spec.subject
+          ? `Subject: ${spec.subject}\n`
+          : `Subject: one game status icon per cell, a single bold symbol centered in the cell, about ${Math.round(lw * 0.75)}x${Math.round(lh * 0.75)} sprite pixels, readable when shown at 28x28 px on screen. ` +
+            'All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.\n') +
         `Style: ${style.sprite_style.replace(/\d+x\d+ pixel art/, `${lw}x${lh} pixel art`)}.\n` +
         paletteLine(spec, style) +
         `Never use ${key.name} or similar hues in the icons.\n` +
         `Icons:\n${frameLines}\n${empty}${rulesFor(spec)}`
       );
+    case 'card-frame': {
+      // 카드 틀(2026-10-11): 틀 한 장이 캔버스를 꽉 채운다. 그림 창은 키 색(투명 구멍), 글·이름·보석 자리는 게임이 채운다
+      const L = spec.layout ?? {};
+      const box = (r) => `x ${r[0]}-${r[0] + r[2] - 1}, y ${r[1]}-${r[1] + r[3] - 1} (${r[2]}x${r[3]})`;
+      const sockets = (L.cost ?? []).map(([x, y]) => `(${x}, ${y})`).join(' and ');
+      return (
+        `Create ONE PNG pixel-art game card frame, ${W}x${H} px, portrait.\n` +
+        pixelGrid(spec, 'The whole image') +
+        `(${lw}x${lh} sprite pixels in total; below, x and y are sprite pixels counted from 0 at the top-left.)\n` +
+        `What it is: ${spec.summary ?? ''}\n` +
+        'An EMPTY card frame for a collectible fantasy card game, in the spirit of chunky, ornate, sculpted card frames with thick bevelled borders, ' +
+        'jewel sockets and a ribbon banner across the middle. The game prints the name, rules text, cost and rarity on top later, so the frame carries NO text and NO numbers.\n' +
+        `Size: the card fills the WHOLE canvas edge to edge (all ${lw}x${lh} sprite pixels); only the tiny cut-off corners outside its outline are ${key.name}.\n` +
+        'Layout (keep these places exactly; the game aligns text to them):\n' +
+        (L.art ? `- ART WINDOW: ${box(L.art)}, an opening filled with flat ${key.name} ${key.hex} (it becomes a transparent hole the card picture shows through). Its shape: ${spec.window_shape ?? 'a rounded arch'}. A 3-5 px carved rim runs around it.\n` : '') +
+        (L.cost?.length ? `- COST SOCKET${L.cost.length > 1 ? 'S' : ''}: a plain dark round socket about 26 px across centered at ${sockets}, where the game sets the cost gem. Keep the socket face flat and dark.\n` : '') +
+        (L.name ? `- NAME BANNER: ${box(L.name)}, a horizontal banner lying across the bottom edge of the art window, wider than the window, its face plain (${spec.banner ?? 'a ribbon'}).\n` : '') +
+        (L.rarity ? `- RARITY SOCKET: a small empty round setting about 12 px across centered at (${L.rarity[0]}, ${L.rarity[1]}), right below the banner.\n` : '') +
+        (L.text ? `- TEXT BOX: ${box(L.text)}, a calm flat panel (${spec.text_panel ?? 'light parchment'}) with at most a faint texture near its edges; its middle stays plain so small dark text is easy to read.\n` : '') +
+        (L.plaque ? `- TYPE PLAQUE: ${box(L.plaque)}, a small plain tab on the bottom border.\n` : '') +
+        `- Everything else is the frame body: ${notes(1)}\n` +
+        `Style: ${spec.style ?? style.sprite_style}; front view, perfectly flat, symmetric left to right${spec.symmetric === false ? ' except where described' : ''}, light from the upper left, no perspective, no drop shadow.\n` +
+        paletteLine(spec, style) +
+        `Never use ${key.name}, pink or purple in the frame.\n` +
+        'Rules: no text, no letters, no numbers, no runes that read as letters, no signature, no watermark, no picture inside the art window.'
+      );
+    }
     case 'key-art':
     case 'map-art':
       // 화면 그림: 시작 화면·여정 띠·지역 지도. 화풍은 명세의 style로 바꿀 수 있다(지역 지도 = 먹 그림)

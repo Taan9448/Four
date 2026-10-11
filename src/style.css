@@ -655,6 +655,42 @@ h1, h2, h3 { font-family: var(--f-head); }
 /* 상태·저주 */
 .t-status { background: linear-gradient(165deg, #3a3340, #241f2a); color: #ddd; border: 2px solid #5a4a66; border-radius: 4px; }
 
+/* 픽셀 카드(하스스톤형, 2026-10-11): Codex 틀 card_frame_*(128×192 픽셀, 1배) 위에 글을 얹는다. 자리는 명세 layout과 같다
+   — 그림 창 16,12 96×70(실제 자리는 meta.window) · 비용 자리 (14,14)/(113,14) · 이름 띠 4,78 120×18 · 등급 보석 (64,101) · 글 칸 12,108 104×66 · 종류 판 32,178 64×12 */
+.card.card-px { width: 128px; height: 192px; min-height: 0; padding: 0; display: block; background: none; border: 0; border-radius: 4px; color: #231d15; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.rarity-epic { box-shadow: 0 0 12px rgba(142, 91, 208, 0.6), 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.rarity-legendary { box-shadow: 0 0 14px rgba(242, 169, 59, 0.65), 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.card-selected { box-shadow: 0 0 0 3px var(--mana), 0 12px 24px rgba(0, 0, 0, 0.6); }
+.cpx-frame { position: absolute; left: 0; top: 0; width: 128px; height: 192px; z-index: 1; image-rendering: pixelated; pointer-events: none; }
+.cpx-art { position: absolute; z-index: 0; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--owner, #8a90a3) 55%, #f1efe6), color-mix(in srgb, var(--owner, #8a90a3) 70%, #0b0b10)); }
+.cpx-seal { font-family: var(--f-brush); font-size: 40px; line-height: 1; color: rgba(255, 255, 255, 0.4); text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25); }
+.cpx-cost { position: absolute; z-index: 2; top: -2px; width: 32px; height: 32px; display: grid; place-items: center; background: center / 32px 32px no-repeat; image-rendering: pixelated; font-family: var(--f-head); font-weight: 800; font-size: 16px; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px -1px 0 #0b0b10, 1px -1px 0 #0b0b10, -1px 1px 0 #0b0b10; }
+.cpx-cost-l { left: -2px; }
+.cpx-cost-r { left: 97px; }
+.cpx-cost-css { width: 26px; height: 26px; top: 1px; border: 2px solid #1d2433; border-radius: 50%; }
+.cpx-cost-css.cpx-cost-l { left: 1px; }
+.cpx-cost-css.cpx-cost-r { left: 100px; }
+.cpx-cost-css.cpx-cost-neigong { background: radial-gradient(circle at 35% 30%, #ffe08a, #b8741a); }
+.cpx-cost-css.cpx-cost-mana { background: radial-gradient(circle at 35% 30%, #dff4ff, #3a6ea5); border-radius: 30%; }
+.cpx-name { position: absolute; z-index: 2; left: 8px; top: 78px; width: 112px; height: 18px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; font-family: var(--f-head); font-weight: 800; font-size: 10.5px; color: #231d15; }
+.cpx-name-m { font-size: 9.5px; }
+.cpx-name-s { font-size: 8.5px; letter-spacing: -0.02em; }
+.t-murim .cpx-name, .t-status .cpx-name { font-family: var(--f-brush); font-weight: 400; font-size: 11.5px; }
+.t-murim .cpx-name-m, .t-status .cpx-name-m { font-size: 10.5px; }
+.t-murim .cpx-name-s, .t-status .cpx-name-s { font-size: 9.5px; }
+.t-elheim .cpx-name, .t-fusion .cpx-name { color: #f2f6ff; text-shadow: 0 1px 0 #0b0b10; }
+.t-fusion .cpx-name { color: #ffe9b8; }
+.cpx-name .card-level { color: inherit; opacity: 0.85; }
+img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 32px; height: 32px; image-rendering: pixelated; pointer-events: none; }
+.card-px .gem.cpx-rarity { z-index: 2; left: 59px; top: 96px; right: auto; }
+.cpx-text { position: absolute; z-index: 2; left: 14px; top: 110px; width: 100px; height: 62px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-align: center; white-space: pre-line; font-size: 10px; line-height: 1.25; color: #231d15; }
+.cpx-text-m { font-size: 9px; }
+.cpx-text-s { font-size: 8.5px; line-height: 1.2; }
+.cpx-text-xs { font-size: 7.5px; line-height: 1.18; letter-spacing: -0.02em; }
+.t-elheim .cpx-text { color: #1d2433; }
+.cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; overflow: hidden; white-space: nowrap; text-align: center; font-size: 7.5px; line-height: 12px; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
+.card-px.t-status .cpx-frame { filter: grayscale(0.85) brightness(0.72); }
+
 /* 영웅·전설 컷인 */
 .cutin { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(5, 7, 12, 0.72); cursor: pointer; animation: cutin-fade 0.18s ease-out; overflow: hidden; }
 .cutin.out { opacity: 0; transition: opacity 0.18s; }
@@ -858,6 +894,7 @@ h1, h2, h3 { font-family: var(--f-head); }
   .hand .card:hover:not(.card-disabled) { transform: none; }
   .hand .card.card-selected { transform: translateY(-12px); }
   .card { width: 108px; min-height: 152px; padding: 6px 6px 4px; }
+  .card.card-px { width: 128px; height: 192px; padding: 0; zoom: 0.85; }
   .card-name, .t-murim .card-name, .t-fusion .card-name { font-size: 0.86rem; }
   .card-text { font-size: 0.68rem; }
   .card-flavor { display: none; }
@@ -994,18 +1031,36 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .end-unlock { color: #f2d48f; }
 .loot-notes { margin-top: 8px; }
 .loot-notes li.fallen { color: #ff8a7a; }
-.hub-local { grid-template-columns: minmax(0, 1fr) 300px; }
-.hub-list { margin: 0 7px; padding: 20px 24px; overflow-y: auto; text-align: left; }
-.hub-stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-.hub-stage { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; text-align: left; }
-.hub-stage small { color: var(--ink-dim); font-weight: 400; }
+/* 자유 여정(2026-10-11): 큰 세계 지도 = journey_band 그림의 높이 25~75%(3:1), 띠(37.5~62.5%)는 그 가운데 절반. 화면 높이에 맞춰 폭을 줄인다 */
+.hub-world .journey-wrap { width: min(100%, calc(62vh * 3)); margin: 0 auto; }
+.world-map { position: relative; aspect-ratio: 3 / 1; width: 100%; background: radial-gradient(rgba(120, 95, 55, 0.08) 1px, transparent 1px) 0 0 / 6px 6px, linear-gradient(#e4d6b6, #d6c59f); }
+.world-map.has-art { background-size: 100% auto; background-position: center; }
+.world-map > .journey { position: absolute; left: 0; right: 0; top: 25%; height: 50%; aspect-ratio: auto; overflow: visible; }
+.world-map > .journey.has-art { background: none; }
+.world-map .stop { font-size: 0.95rem; font-weight: 600; }
+.world-map .stop i { width: 16px; height: 16px; }
+.world-map .stop-name { padding: 1px 8px; border-radius: 10px; background: rgba(16, 13, 10, 0.72); }
+.world-map .stop.pick:hover .stop-name { background: rgba(122, 78, 18, 0.92); }
+.world-map .tag { font-size: 1.05rem; top: -30%; }
+.stop.paused i { background: var(--mana); border-color: #dff4ff; box-shadow: 0 0 0 5px rgba(143, 211, 255, 0.3); animation: pulse 1.6s infinite; }
+.stop .paused-tag { padding: 0 6px; border-radius: 8px; background: rgba(18, 50, 74, 0.9); color: #dff4ff; font-size: 0.7rem; }
+.hub-bottom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 300px; gap: 12px; padding: 12px; align-items: start; text-align: left; }
+.hub-bottom > .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 12px 14px; box-shadow: inset 0 0 0 3px rgba(14, 13, 17, 0.9), inset 0 0 0 4px rgba(168, 40, 30, 0.35); }
+.hub-side .box { background: linear-gradient(rgba(23, 21, 26, 0.92), rgba(13, 12, 16, 0.92)); border: 1px solid rgba(201, 162, 74, 0.45); border-radius: 4px; padding: 10px 12px; font-size: 0.85rem; }
+.hub-guide h3, .hub-party h3 { margin: 2px 0 6px; }
+.hub-paused { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.hub-paused h4 { margin: 0; font-size: 0.85rem; color: var(--ink-dim); }
+.hub-paused-row { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px; }
+.hub-paused-row small { color: var(--ink-dim); }
+.hub-side { display: flex; flex-direction: column; gap: 10px; }
+.btn-world { border-color: rgba(143, 211, 255, 0.55); }
 .hub-member { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; }
 .hub-member small { color: var(--ink-dim); }
 .stop.pick { background: none; border: 0; font: inherit; cursor: pointer; }
 .stop.pick:hover { color: #fff; }
 .stop.pick:hover i { box-shadow: 0 0 0 5px rgba(226, 180, 92, 0.45); }
 .stop .replays { color: #e2b45c; font-size: 0.7rem; }
-@media (max-width: 900px) { .hub-local { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .hub-bottom { grid-template-columns: minmax(0, 1fr); } .hub-world .journey-wrap { width: 100%; } .world-map { width: 180%; } }
 
 /* 도감(2026-10-08): 위 머리(제목·탭) + 아래 판(스크롤). 못 본 칸은 ? 실루엣 */
 .codex-screen { display: flex; flex-direction: column; gap: 10px; height: calc(100vh - 20px); }
