@@ -164,6 +164,19 @@ describe('편성 점수 상한·갈래 보너스(카드 250장 확장 2026-10-11
     }
   });
 
+  it('상한을 조금 넘으면 전설을 빼지 않고 싼 쪽을 바꾼다(줄어드는 점수 1당 잃는 값이 작은 바꾸기)', async () => {
+    const { recommendFor, loadoutPoints } = await import('../src/engine/collection');
+    const run = createRunAt(data, 'CAP3', 's8');
+    const commons = [...data.cards.values()].filter((c) => c.owner === 'common' && c.pool !== 'abyss' && !c.essential);
+    const legend = commons.find((c) => c.rarity === 'legendary')!;
+    run.collection = {};
+    run.collection[legend.id] = 0;
+    for (const c of commons.filter((c) => c.rarity === 'uncommon' || c.rarity === 'common')) run.collection[c.id] = 0;
+    const lo = recommendFor(data, run, 'common');
+    expect(loadoutPoints(data, lo)).toBeLessThanOrEqual(17);
+    expect(lo).toContain(legend.id);
+  });
+
   it('갈래 보너스: 같은 갈래 5장이면 켜지고(출발 편성), 출전한 그 동료를 출처로 전투 시작 효과', async () => {
     const { loadoutFocus } = await import('../src/engine/collection');
     const { battleSetupFor, enterNode, availableNodes } = await import('../src/engine/run');
