@@ -23,14 +23,14 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 8,
-  "sourceHash": "aae777f2c6cbdc46",
+  "sourceHash": "e78cc065dd644809",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.752,
+  "gridPurity": 0.713,
   "cards": [
     "abyss_born_swallow_mountain",
     "abyss_born_durin_shadow",
