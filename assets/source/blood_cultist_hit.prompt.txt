@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: a Blood Cultist, a rank-and-file follower of the Heavenly Demon Cult; a gaunt man in a dark blood-red martial robe with a blood-drop crest on the chest, a red headband, a thin heavy dark red aura clinging to the body, a broad blood-red saber. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: struck, recoils, the red aura breaking apart
+Cell 2: staggers back
+Cell 3: recovers, the aura gathering again
+Cells 4 to 6 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Preserve the LEFT SIDE profiles and poses of the attached third image, but reduce the body's current 100/98/102 sprite pixel height to the reference cell2 body height95px. Make every body's hair-to-boot span380 source pixels, all three same scale: hair top local y=88 and feet local y=468. Reduce current figures by only about 6%, not a large shrink. The third figure in particular must no longer be102px tall. Keep all three heads at exactly the same local y=88, upright full length legs, and feet y=468. Disconnected aura fragments may extend a little above the body, but body itself95px. Same one eye, hidden far shoulder/arm, narrow overlapping profile boots, black hair, red headband, long dark blood-red robe, broad curved red saber. Firstcell small shoulder recoil, secondcell mild stagger, thirdcell EXACT referenceCELL2 idle stance with saberlow. No turn towards front. Empty bottom row and all pixels inside own cell with 40px side borders. First image exact side reference; second original full ref; third is the earlier side-view sheet to correct its size.
