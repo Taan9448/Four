@@ -89,6 +89,8 @@ export interface RunState {
   /** 순례(2026-10-11 A안): 첫 순례 보상을 받은 스테이지 · 이룬 순례 도전(스테이지 id → 도전 id) */
   pilgrimRewarded?: Record<string, boolean>;
   challenges?: Record<string, string[]>;
+  /** 이번 스테이지(심연은 굽이)를 시작할 때의 모습 — 끝 화면의 '얻은 것'·'상흔 +N'(2026-10-11 UI/UX 3-2) */
+  stageStart?: StageStart;
   /** 결과 화면 통계 */
   stats: RunStats;
   /** 심연 런(GAME_DESIGN 16절). 없으면 캠페인 */
@@ -106,6 +108,8 @@ export interface RunStats {
   damage: number;
   crits: number;
   surges: number;
+  /** 균열 폭주로 잃은 체력(아군 합, 옛 저장은 없음) */
+  surgeHp?: number;
   /** 카드 id → 쓴 횟수 */
   cards: Record<string, number>;
   /** 진 런: 어디서 무엇에 쓰러졌나 */
@@ -133,6 +137,28 @@ export interface BattleLog {
   hpMax: number;
   haunBefore: number;
   haunAfter: number;
+}
+
+export interface StageStart {
+  relics: string[];
+  scar: number;
+  levels: Record<string, number>;
+}
+
+/** 스테이지·굽이를 시작할 때 적어 둔다(끝 화면이 이번에 얻은 유물·레벨·상흔을 비교한다) */
+export function markStageStart(run: RunState): void {
+  run.stageStart = { relics: [...run.relics], scar: run.scar, levels: Object.fromEntries(run.roster.map((r) => [r.id, r.level])) };
+}
+
+/** 이번 스테이지에 얻은 것: 카드(stageGains)·유물·레벨업·상흔 변화 */
+export function stageGainsSummary(data: GameData, run: RunState): { cards: string[]; relics: string[]; levels: { name: string; from: number; to: number }[]; scarDelta: number } {
+  const st = run.stageStart;
+  const cards = run.stageGains.map((id) => data.cards.get(id)?.name ?? id);
+  const relics = run.relics.filter((id) => !st?.relics.includes(id)).map((id) => data.relics.get(id)?.name ?? id);
+  const levels = st
+    ? run.roster.filter((r) => st.levels[r.id] !== undefined && r.level > st.levels[r.id]).map((r) => ({ name: data.characters.get(r.id)?.name ?? r.id, from: st.levels[r.id], to: r.level }))
+    : [];
+  return { cards, relics, levels, scarDelta: st ? run.scar - st.scar : 0 };
 }
 
 export function emptyStats(): RunStats {
@@ -218,6 +244,7 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
   // 새 캠페인의 첫 스테이지(S0 프롤로그)는 편성 화면 없이 추천 편성으로 바로 출발한다(2026-10-11 사용자 결정). 편성은 S1부터
   if (run.stageId === playableStages(data)[0]?.id) setLoadout(data, run, run.loadout);
   run.map = buildMap(data, run);
+  markStageStart(run);
   return run;
 }
 
@@ -295,6 +322,7 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   run.seed = `${hub.seed}~${stageId}~${(hub.replays[stageId] ?? 0) + 1}`;
   beginStageLoadout(data, run);
   run.map = buildMap(data, run);
+  markStageStart(run);
   return run;
 }
 
@@ -383,6 +411,7 @@ export function advanceStage(data: GameData, run: RunState): boolean {
   // 심연: 끝이 없다. 다음 굽이로
   if (isAbyss(run)) {
     advanceLoop(data, run);
+    markStageStart(run);
     return true;
   }
   const next = nextStage(data, run);
@@ -397,6 +426,7 @@ export function advanceStage(data: GameData, run: RunState): boolean {
   beginStageLoadout(data, run);
   run.map = buildMap(data, run);
   run.status = 'map';
+  markStageStart(run);
   return true;
 }
 
@@ -551,6 +581,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     st.damage += outcome.tally.damage;
     st.crits += outcome.tally.crits;
     st.surges += outcome.tally.surges;
+    st.surgeHp = (st.surgeHp ?? 0) + (outcome.tally.surgeHp ?? 0);
     for (const [id, n] of Object.entries(outcome.tally.cards)) st.cards[id] = (st.cards[id] ?? 0) + n;
   }
   if (outcome.result === 'defeat') {
