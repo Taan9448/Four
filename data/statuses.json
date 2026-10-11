@@ -45,5 +45,7 @@
   { "id": "seal", "icon": 44, "name": "봉인", "kind": "buff", "description": "균열이 오를 때 스택 하나가 1을 막고 사라진다(일행 누구의 봉인이든).", "glyph": "封", "decay": 0, "special": "seal" },
   { "id": "p_count_gold", "icon": 45, "name": "금을 세다", "kind": "buff", "description": "차례가 끝날 때마다 균열 -1, 그때 균열이 0이면 카드 1장(스택마다).", "glyph": "數", "decay": 0, "triggers": [{ "on": "turnEnd", "effects": [{ "op": "rift", "amount": -1 }, { "op": "draw", "amount": 1, "condition": { "riftLte": 0 } }] }] },
   { "id": "cost_down", "icon": 46, "name": "가벼운 다음 수", "kind": "buff", "description": "다음에 내는 카드의 내공 비용이 스택만큼 줄어든다(0 아래로 가지 않는다). 카드 한 장을 내면 사라지고, 차례가 끝나도 사라진다.", "glyph": "輕", "decay": 99 },
-  { "id": "block_kept", "icon": 47, "name": "남는 방어", "kind": "buff", "description": "다음 차례가 시작될 때 이 아군의 방어가 사라지지 않는다(한 번).", "glyph": "留", "decay": 0 }
+  { "id": "block_kept", "icon": 47, "name": "남는 방어", "kind": "buff", "description": "다음 차례가 시작될 때 이 아군의 방어가 사라지지 않는다(한 번).", "glyph": "留", "decay": 0 },
+  {"id": "p_knight_oath", "icon": 48, "name": "기사의 맹세", "kind": "buff", "description": "체력을 잃을 때마다 방어 3(스택마다).", "glyph": "誓", "decay": 0, "triggers": [{"on": "hpLost", "effects": [{"op": "block", "amount": 3, "target": "self"}]}]},
+  {"id": "p_five_thousand_graves", "icon": 49, "name": "오천의 무덤", "kind": "buff", "description": "차례가 끝날 때 방어가 10 이상이면 힘 +1(스택마다).", "glyph": "塚", "decay": 0, "triggers": [{"on": "turnEnd", "condition": {"selfBlockGte": 10}, "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}]}
 ]

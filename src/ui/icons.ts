@@ -18,8 +18,8 @@ export function sheetIconEl(sheets: [string, number][], icon: number | undefined
   return iconEl(id, icon ? icon - first + 1 : undefined, glyph, cls);
 }
 
-/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~ icons_status_d(2026-10-11) */
-const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44]];
+/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~ icons_status_e(2026-10-11) */
+const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48]];
 
 export function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: string): HTMLElement {
   const url = frame ? frameUrl(sheet, frame, { realOnly: true }) : null;

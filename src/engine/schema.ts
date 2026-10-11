@@ -86,6 +86,8 @@ export const Condition = z
     hpRatioLte: z.number(),
     flag: z.string(),
     scarMin: z.number(),
+    /** 효과를 일으킨 쪽의 방어가 이만큼 이상(카드 250장 확장) */
+    selfBlockGte: z.number(),
     floorRange: z.tuple([z.number(), z.number()]),
     /** 선택지: 골드가 이만큼 있어야 고를 수 있다(모자라면 흐리게 보인다) */
     goldGte: z.number(),
@@ -286,7 +288,7 @@ export const StatusDef = z
     description: z.string(),
     /** 아이콘 그림이 없을 때 표시할 한 글자(한자) */
     glyph: z.string().length(1),
-    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~ icons_status_d(src/ui/icons.ts) */
+    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~47 icons_status_d, 48~ icons_status_e(src/ui/icons.ts) */
     icon: z.number().int().positive().optional(),
     /** 턴마다 줄어드는 스택 수. 0이면 줄지 않는다. */
     decay: z.number().int().min(0),

@@ -57,6 +57,8 @@ export function checkCondition(
   }
   if (cond.flag !== undefined && !state.flags.includes(cond.flag)) return false;
   if (cond.scarMin !== undefined && state.scar < cond.scarMin) return false;
+  // 효과를 일으킨 쪽의 방어가 이만큼 이상(오천의 무덤: 차례 끝에 방어가 남아 있으면)
+  if (cond.selfBlockGte !== undefined && (ctx.source?.block ?? 0) < cond.selfBlockGte) return false;
   // floorRange는 경로 생성용 조건이라 전투에서는 항상 참
   return true;
 }

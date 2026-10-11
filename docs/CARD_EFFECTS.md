@@ -36,7 +36,7 @@
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
 - `times`: 연타 횟수(`damage`).
 - `oncePerBattle`: 이 효과는 한 전투에 한 번만(카드마다, 조건이 맞아 실제로 일어난 때부터 센다 — 은빛 바느질의 상흔 -1).
-- `condition`: `riftGte`, `riftLte`, `targetHasStatus`, `targetStatusGte: [status, n]`, `world`, `partyHas`, `turnMod: [n, r]`, `enemyId`, `hpRatioLte`, `flag`, `scarMin`. 대상이 있는 동작은 대상마다 검사한다.
+- `condition`: `riftGte`, `riftLte`, `targetHasStatus`, `targetStatusGte: [status, n]`, `world`, `partyHas`, `turnMod: [n, r]`, `enemyId`, `hpRatioLte`, `flag`, `scarMin`, `selfBlockGte`(출처 — 지속 효과면 가진 쪽 — 의 방어가 N 이상). 대상이 있는 동작은 대상마다 검사한다.
 - `scale`: `{ per, status?, amount, max? }` → 기본값 + ⌊amount × per⌋(max가 있으면 더하는 값의 상한). `apply_status`·`reveal_grain`·`taunt`의 스택에도 걸린다.
   - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수 · `consumed` 이 카드가 `consume_rift`로 소비한 균열
   - 예: 결을 따라 `{"op":"damage","amount":4,"scale":{"per":"targetStatus","status":"grain","amount":3}}`, 산처럼 `{"op":"damage","amount":0,"scale":{"per":"block","amount":0.5}}`, 불씨 잇기(화상 두 배) `{"op":"apply_status","status":"burn","stacks":0,"scale":{"per":"targetStatus","status":"burn","amount":1}}`
