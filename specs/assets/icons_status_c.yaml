@@ -1,0 +1,23 @@
+id: icons_status_c
+type: icon-sheet
+summary: 상태 아이콘 29~43(카드로 켜는 지속 효과·굽이 법칙) — 칸 n = 상태 icon n+28
+# 칸 번호 = data/statuses.json의 icon에서 28을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 지속 효과(심법)는 모두 작은 금빛 원형 테두리 안의 기호로 통일
+frames: 15
+baseline: 0.5
+frame_notes:
+  1: "grain-seeing eye — an open eye whose iris is wood-grain rings, inside a thin gold ring"
+  2: "water wheel — a small wooden water wheel with blue water drops, inside a thin gold ring"
+  3: "spreading wildfire — three small flames in a row growing larger, inside a thin gold ring"
+  4: "frosted branch — a silver tree branch with white frost and a tiny shield shape at its base, inside a thin gold ring"
+  5: "sword rhythm — a sword with two short beat marks beside it like a drum rhythm, inside a thin gold ring"
+  6: "taste of blood — a red droplet above a clenched fist, inside a thin gold ring"
+  7: "voice of the mountain — a grey mountain peak with a small shield in front, inside a thin gold ring"
+  8: "payback — a round shield with a curved arrow bouncing back from it, inside a thin gold ring"
+  9: "unflowing breath — a breath swirl frozen still with a black crack through it, inside a thin red-black ring"
+  10: "Durin's shadow — a dwarven war hammer casting a long dark shadow, inside a thin red-black ring"
+  11: "rift hunger of Haun — a black crack swallowing a small gold orb, inside a thin red-black ring"
+  12: "last seed — a single silver seed sprouting a tiny leaf over a black crack, inside a thin red-black ring"
+  13: "endless charge — a lance tip with speed lines charging forward, inside a thin red-black ring"
+  14: "five thousand hammers — a stack of many small hammer-strike sparks around a hammer head, inside a thin red-black ring"
+  15: "law: price of blood — a red coin with a blood drop stamped on it, inside a thin dark crimson ring"
+placeholder: { color: '#f2a93b', accent: '#5a1020' }

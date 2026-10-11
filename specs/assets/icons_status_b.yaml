@@ -1,0 +1,24 @@
+id: icons_status_b
+type: icon-sheet
+summary: 상태 아이콘 13~28(전투 상태·보스 특성) — 칸 n = 상태 icon n+12
+# 칸 번호 = data/statuses.json의 icon에서 12를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. icons_status(1~12)와 같은 화풍·크기로
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "burn — a small orange-red flame licking up from a glowing ember"
+  2: "chill — a pale blue snowflake with a thin frost ring around it"
+  3: "daze — a small hand of three playing cards fanned out, one card slipping away with motion lines"
+  4: "broken breath — a gold breath swirl cut in the middle by a dark slash"
+  5: "thorns — a short thorny vine curled into a ring, sharp black thorns with red tips"
+  6: "smoke screen — a thick grey cloud of smoke puffs hiding a faint silhouette"
+  7: "unmoving one — a closed eye drawn as a calm horizontal line over a still blue circle"
+  8: "mountain mends — a small green mountain peak with a rising heal plus sign"
+  9: "frozen heart — a red heart sealed inside a pale blue ice crystal"
+  10: "shadow body — a black humanoid shadow with two red dot eyes and a faint violet outline"
+  11: "two thrones — two small dark thrones side by side, the front one empty, a red glow behind"
+  12: "dead forest body — a bare dead tree wrapped in grey mist"
+  13: "blood cover — a crimson veil draped over a wood-grain circle, hiding it"
+  14: "fading blood cover — the same crimson veil but thinner and pale, half transparent, with gaps"
+  15: "rift hunger — a black jagged crack in the shape of an open mouth with a red glint inside"
+  16: "seam — a torn cloth edge held by three cross stitches of silver thread"
+placeholder: { color: '#d07a3a', accent: '#3a6ea5' }

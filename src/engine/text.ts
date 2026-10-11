@@ -166,6 +166,23 @@ export function skillText(data: GameData, skill: UpgradeSkill, cardTarget?: stri
   return `★${skill.name}: ${parts.join(', ')}`;
 }
 
+/** 카드 문구를 나눠서: 키워드(카드 위 배지로) · 본문 · 열린 특수 스킬(+4·+5, 따로 한 줄씩). 2026-10-11 사용자 요청 */
+export interface CardTextParts {
+  keywords: { key: string; label: string }[];
+  body: string;
+  skills: { level: number; name: string; text: string }[];
+}
+
+const KEYWORD_ORDER = ['fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
+
+export function cardTextParts(data: GameData, inst: CardInstance | string): CardTextParts {
+  const card = resolveCard(data, inst);
+  const keywords = KEYWORD_ORDER.filter((k) => card.keywords.includes(k)).map((k) => ({ key: k, label: KEYWORD_LABEL[k] }));
+  const body = card.level === 0 && card.def.text ? card.def.text : card.baseEffects.map((e) => describeEffect(data, e, card.def.target)).join('. ');
+  const skills = card.skills.map((sk, i) => ({ level: 4 + i, name: sk.name, text: skillText(data, sk, card.def.target).replace(/^★[^:]*: /, '') }));
+  return { keywords, body, skills };
+}
+
 /** 카드 문구. 강화 단계의 수치를 반영하고, 열린 특수 스킬은 줄을 바꿔 ★로 붙인다 */
 export function cardText(data: GameData, inst: CardInstance | string): string {
   const card = resolveCard(data, inst);

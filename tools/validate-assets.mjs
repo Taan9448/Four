@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as gifencModule from 'gifenc';
 import sharp from 'sharp';
-import { bbox, columnCenter, countColors, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
+import { bbox, columnCenter, countColors, faceSlots, keyOut, keyResidual, loadRaw, magentaCast, prepareSheet } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, PADDING, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -187,6 +187,17 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       if (Math.hypot(dx, dy) > 6) warnings.push(`그림 창 가운데가 명세 자리에서 (${dx.toFixed(0)}, ${dy.toFixed(0)})px 벗어났다`);
       if (Math.abs(win[2] / want[2] - 1) > 0.2 || Math.abs(win[3] / want[3] - 1) > 0.2) {
         warnings.push(`그림 창 크기 ${win[2]}×${win[3]}(명세 ${want[2]}×${want[3]})`);
+      }
+    }
+    // 글 자리: 잰 면이 meta(또는 명세 slots)와 같아야 게임의 글이 가운데에 온다
+    if (spec.layout) {
+      const found = faceSlots(frames[0], spec.layout);
+      const known = meta.slots ?? spec.slots;
+      for (const key of ['name', 'text', 'plaque']) {
+        const f = found[key];
+        if (!f || f[2] < spec.layout[key][2] * 0.4 || f[3] < spec.layout[key][3] * 0.4) warnings.push(`${key} 자리의 면을 찾지 못했다 — 글이 놓일 자리는 한 가지 색의 넓은 면이어야 한다`);
+        else if (!known?.[key]) warnings.push(`${key} 자리가 meta.json에 없다 — main을 받아 assets:slice로 다시 자르세요`);
+        else if (f.some((v, i) => Math.abs(v - known[key][i]) > 2)) warnings.push(`${key} 자리(${f.join(',')})가 기록(${known[key].join(',')})과 다르다 — 다시 자르세요`);
       }
     }
   }

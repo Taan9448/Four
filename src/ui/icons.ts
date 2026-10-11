@@ -9,6 +9,18 @@ const INTENT_FRAME: Record<string, number> = { attack: 1, defend: 2, buff: 3, de
 const INTENT_GLYPH: Record<string, string> = { attack: '攻', defend: '守', buff: '強', debuff: '咒', special: '奇', block: '盾' };
 export const INTENT_LABEL: Record<string, string> = { attack: '공격', defend: '방어', buff: '강화', debuff: '약화', special: '특수' };
 
+/**
+ * 번호가 여러 시트에 이어지는 아이콘(상태·유물·물약): [시트 id, 첫 번호] 목록에서 번호가 첫 번호 이상인 마지막 시트의
+ * (icon - 첫 번호 + 1)칸. 그림이 없으면 한 글자 배지
+ */
+export function sheetIconEl(sheets: [string, number][], icon: number | undefined, glyph: string, cls: string): HTMLElement {
+  const [id, first] = [...sheets].reverse().find(([, f]) => (icon ?? 0) >= f) ?? sheets[0];
+  return iconEl(id, icon ? icon - first + 1 : undefined, glyph, cls);
+}
+
+/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~ icons_status_c(2026-10-11) */
+const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29]];
+
 export function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: string): HTMLElement {
   const url = frame ? frameUrl(sheet, frame, { realOnly: true }) : null;
   return url
@@ -23,7 +35,7 @@ export function iconEl(sheet: string, frame: number | undefined, glyph: string, 
 export function statusChip(data: GameData, id: string, stacks: number): HTMLElement {
   const def = data.statuses.get(id);
   const kind = def?.kind ?? 'buff';
-  const el = h('span', { class: `status-chip chip-${kind}` }, iconEl('icons_status', def?.icon, def?.glyph ?? '?', `status-icon status-${kind}`), h('span', { class: 'st-name' }, def?.name ?? id), stacks > 1 || (stacks === 1 && kind !== 'trait') ? h('b', {}, stacks) : '');
+  const el = h('span', { class: `status-chip chip-${kind}` }, sheetIconEl(STATUS_SHEETS, def?.icon, def?.glyph ?? '?', `status-icon status-${kind}`), h('span', { class: 'st-name' }, def?.name ?? id), stacks > 1 || (stacks === 1 && kind !== 'trait') ? h('b', {}, stacks) : '');
   const kindLabel = kind === 'debuff' ? '해로운 상태' : kind === 'trait' ? '특성' : '이로운 상태';
   Object.entries(tipAttrs(`${def?.name ?? id}${stacks > 1 ? ` ${stacks}` : ''}`, `${def?.description ?? ''}\n${kindLabel}${def && def.decay > 0 ? ' · 턴마다 줄어든다' : ''}`, kind)).forEach(
     ([k, v]) => v && el.setAttribute(k, v),

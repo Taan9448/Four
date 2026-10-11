@@ -406,3 +406,67 @@ export function innerHole(img, alphaMin = 128) {
   }
   return best && { x: best.x, y: best.y, w: best.w, h: best.h, area: best.n };
 }
+
+/**
+ * 카드 틀의 글 자리(이름 띠·글 칸·종류 판)의 실제 면: 명세 layout 상자 안 여러 곳에서 같은 색으로 이어진 면을 찾아 합친다
+ * (융합 틀처럼 반반 다른 재질도 하나로). 틀은 좌우 대칭이라 가로는 카드 가운데에 맞춰 좁은 쪽 폭으로 줄인다.
+ * @param {{ data: Buffer, width: number, height: number }} img
+ * @param {Record<string, [number, number, number, number]>} layout
+ * @returns {Record<string, [number, number, number, number]>}
+ */
+export function faceSlots(img, layout) {
+  const { data, width: W, height: H } = img;
+  const out = {};
+  for (const key of ['name', 'text', 'plaque']) {
+    const box = layout[key];
+    if (!box) continue;
+    const [x, y, w, h] = box;
+    const regions = [];
+    for (const fx of [0.3, 0.5, 0.7]) {
+      const sx = Math.round(x + w * fx);
+      let best = null;
+      for (let sy = y; sy < y + h; sy++) {
+        const r = floodSimilar(data, W, H, sx, sy, [x - 8, y - 8, x + w + 8, y + h + 8]);
+        if (r && (!best || r.n > best.n)) best = r;
+      }
+      if (best) regions.push(best);
+    }
+    if (!regions.length) continue;
+    const top = Math.max(...regions.map((r) => r.n));
+    const keep = regions.filter((r) => r.n >= top * 0.25);
+    const x0 = Math.min(...keep.map((r) => r.x0)), x1 = Math.max(...keep.map((r) => r.x1));
+    const y0 = Math.min(...keep.map((r) => r.y0)), y1 = Math.max(...keep.map((r) => r.y1));
+    const half = Math.min(W / 2 - x0, x1 + 1 - W / 2);
+    out[key] = [Math.round(W / 2 - half), y0, Math.round(half * 2), y1 - y0 + 1];
+  }
+  return out;
+}
+
+/** (sx, sy)와 비슷한 색(합 차이 < 60)으로 이어진 불투명 면. 범위 [x0, y0, x1, y1] 밖으로는 번지지 않는다 */
+function floodSimilar(data, W, H, sx, sy, [bx0, by0, bx1, by1]) {
+  const i0 = (sy * W + sx) * 4;
+  if (sx < 0 || sy < 0 || sx >= W || sy >= H || data[i0 + 3] < 200) return null;
+  const near = (p) => data[p * 4 + 3] > 200 && Math.abs(data[p * 4] - data[i0]) + Math.abs(data[p * 4 + 1] - data[i0 + 1]) + Math.abs(data[p * 4 + 2] - data[i0 + 2]) < 60;
+  const seen = new Uint8Array(W * H);
+  const stack = [sy * W + sx];
+  seen[stack[0]] = 1;
+  let n = 0, x0 = W, y0 = H, x1 = -1, y1 = -1;
+  while (stack.length) {
+    const p = stack.pop();
+    n++;
+    const px = p % W, py = (p - px) / W;
+    if (px < x0) x0 = px;
+    if (px > x1) x1 = px;
+    if (py < y0) y0 = py;
+    if (py > y1) y1 = py;
+    for (const [qx, qy] of [[px - 1, py], [px + 1, py], [px, py - 1], [px, py + 1]]) {
+      if (qx < Math.max(0, bx0) || qy < Math.max(0, by0) || qx > Math.min(W - 1, bx1) || qy > Math.min(H - 1, by1)) continue;
+      const q = qy * W + qx;
+      if (!seen[q] && near(q)) {
+        seen[q] = 1;
+        stack.push(q);
+      }
+    }
+  }
+  return { n, x0, y0, x1, y1 };
+}

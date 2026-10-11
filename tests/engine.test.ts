@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { battleOutcome, canPlay, endTurn, incomingDamage, playCard } from '../src/engine/battle';
 import { resolveCard } from '../src/engine/state';
-import { cardText } from '../src/engine/text';
+import { cardText, cardTextParts } from '../src/engine/text';
 import { createRng } from '../src/engine/rng';
 import { battle, cards, data, give } from './helpers';
 
@@ -58,6 +58,20 @@ describe('효과 해석기와 자원', () => {
     expect(cardText(data, 'haun_nakun')).toBe('방어 8 (균열 1당 +1). 적 전체에게 약화 1 부여');
     // 명시한 아군 대상(부작용)도 글에 드러난다
     expect(cardText(data, 'abyss_elia_black_fire')).toContain('아군 전체에게 화상 1 부여');
+  });
+
+  it('카드 글을 키워드 배지·본문·특수 스킬로 나눈다(2026-10-11)', () => {
+    const fusion = cardTextParts(data, 'haun_byeogun');
+    expect(fusion.keywords.map((k) => k.key)).toContain('fusion');
+    expect(fusion.body).not.toContain('융합');
+    expect(fusion.body).toContain('균열 +3');
+    // +5: 열린 특수 스킬 두 줄은 본문과 따로(★ 없이 이름·내용), 키워드를 더하는 스킬은 배지에도
+    const id = [...data.cards.values()].find((d) => d.upgrade?.plus5.addKeywords.length)!.id;
+    const top = cardTextParts(data, { uid: 'x', cardId: id, level: 5 });
+    expect(top.skills.map((sk) => sk.level)).toEqual([4, 5]);
+    expect(top.skills[1].text).not.toMatch(/^★/);
+    expect(top.keywords.map((k) => k.key)).toEqual(expect.arrayContaining(data.cards.get(id)!.upgrade!.plus5.addKeywords));
+    expect(cardTextParts(data, { uid: 'y', cardId: id, level: 3 }).skills).toEqual([]);
   });
 });
 

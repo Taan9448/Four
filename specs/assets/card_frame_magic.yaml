@@ -10,6 +10,8 @@ layout:
   rarity: [64, 101]
   text: [12, 108, 104, 66]
   plaque: [32, 178, 64, 12]
+# 납품된 그림(2026-10-11 머지)에서 잰 글 자리 [x, y, 너비, 높이] — 그 뒤에 자른 그림은 meta.json slots를 쓴다(tools/build-manifest.mjs)
+slots: { name: [12, 80, 104, 19], text: [14, 109, 100, 55], plaque: [36, 174, 56, 11] }
 window_shape: >-
   a pointed gothic arch: the top rises to a soft point and the sides run straight down to a flat bottom, like a cathedral window
 banner: a deep blue cloth ribbon (#1f3f73, #3a6ea5) with silver-capped folded ends
