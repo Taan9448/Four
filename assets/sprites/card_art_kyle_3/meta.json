@@ -1,0 +1,52 @@
+{
+  "id": "card_art_kyle_3",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    63
+  ],
+  "fit": "fill",
+  "frames": 16,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 16,
+  "sourceHash": "dac959db2860a3f1",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.844,
+  "cards": [
+    "kyle_slay_father",
+    "kyle_knight_oath",
+    "kyle_white_snowflake",
+    "kyle_princess_ice",
+    "kyle_returned_blade",
+    "kyle_double_cut",
+    "kyle_point_turn",
+    "kyle_command",
+    "kyle_rowen_step",
+    "kyle_shadow_bridge",
+    "kyle_heart_fire",
+    "kyle_raise_shield",
+    "kyle_charge_order",
+    "kyle_dumpling_shop",
+    "kyle_bluff",
+    "kyle_dawn_drill"
+  ]
+}
