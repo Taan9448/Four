@@ -1434,6 +1434,7 @@ img.vn-portrait, img.cutin-portrait {
 /* 보상·상점 카드의 보유 맥락 표(새 카드 / 보유 +1 → +2 / 최대 → 골드) */
 .offer-badge { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); z-index: 3; white-space: nowrap; padding: 1px 7px; border-radius: 9px; font-size: 10px; font-weight: 700; line-height: 15px; letter-spacing: -0.02em; border: 1px solid rgba(0, 0, 0, 0.6); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); pointer-events: auto; }
 .offer-new { background: #2f7d4a; color: #eaffef; }
+.offer-path { background: #3d4459; color: #e6e9f2; }
 .offer-up { background: #e2b45c; color: #2a1a06; }
 .offer-max { background: #5b5248; color: #f3e6c4; }
 .shop-cards .card { margin-top: 8px; }

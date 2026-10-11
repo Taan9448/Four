@@ -152,20 +152,15 @@ describe('자유 여정(2026-10-11)', () => {
     expect(hub2.suspended?.s3).toBeUndefined();
   });
 
-  it('여러 길에서 얻은 카드는 합쳐 남는다(강화 단계는 높은 쪽)', () => {
+  it('멈춰 둔 길에서 얻은 카드는 그 길에만 남고, 이어서 걸으면 다시 쓸 수 있다', () => {
     expect(mergeCollections({ a: 1, b: 0 }, { b: 2, c: 0 })).toEqual({ a: 1, b: 2, c: 0 });
     const hub = cleared();
     const a = startReplay(data, hub, 's1');
-    const b = startReplay(data, hub, 's2');
     a.collection.extra_a = 0;
     const mid = suspendReplay(a);
-    b.replayOf = structuredClone(mid);
-    b.collection.extra_b = 1;
-    b.status = 'stage_clear';
-    const end = finishReplay(b);
-    expect(end.collection.extra_a).toBe(0);
-    expect(end.collection.extra_b).toBe(1);
-    expect(end.replays.s2).toBe(1);
+    expect(mid.collection.extra_a).toBeUndefined();
+    expect(mid.suspended?.s1?.collection.extra_a).toBe(0);
+    expect(startReplay(data, mid, 's1').collection.extra_a).toBe(0);
   });
 
   it('멈춘 진행은 저장에서 살아남고, 데이터가 맞지 않는 것만 버린다', () => {

@@ -91,14 +91,15 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     expect(loadoutProblems(data, run, back)).toEqual([]);
   });
 
-  it('다시 하기에서 얻은 카드도 클리어한 런에 남는다', () => {
+  it('다시 하기(순례)에서 얻은 카드는 그 길 안에서만 쓰고 클리어한 런에는 남지 않는다(2026-10-11 A안)', () => {
     const hub = createRunAt(data, 'COL6', 's9');
     hub.status = 'complete';
     const replay = startReplay(data, hub, 's1');
     const card = [...data.cards.values()].find((c) => c.pool === 'reward' && hub.collection[c.id] === undefined && hub.roster.some((r) => r.id === c.owner))!;
     acquireCard(data, replay, card.id);
+    expect(replay.deck.some((c) => c.cardId === card.id)).toBe(true);
     replay.status = 'defeat';
-    expect(finishReplay(replay).collection[card.id]).toBe(0);
+    expect(finishReplay(replay).collection[card.id]).toBeUndefined();
   });
 
   it('옛 저장(덱만)은 덱을 보유 목록으로 바꾸고 이번 스테이지는 그 덱으로 이어 간다', () => {

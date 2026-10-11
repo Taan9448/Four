@@ -5,7 +5,9 @@ import { emptyStats, type RunState } from './run';
 import { collectionFromDeck, grantStarters, loadoutOwners, recommendLoadout } from './collection';
 
 // 2: 10스테이지 개편(2026-10-08) — 스테이지 id의 뜻이 바뀌어 옛 저장은 버린다
-export const SAVE_VERSION = 2;
+// 3: 순례(2026-10-11 A안) — 첫 순례 보상·도전 기록을 더한다. 2는 이행해서 읽는다(다시 하기로 이미 얻은 카드는 그대로 둔다)
+export const SAVE_VERSION = 3;
+const READABLE = [2, 3];
 
 interface SaveFile {
   version: number;
@@ -35,7 +37,7 @@ export function deserializeRun(data: GameData, text: string | null | undefined):
   } catch {
     return null;
   }
-  if (!file || file.version !== SAVE_VERSION || !file.run) return null;
+  if (!file || !READABLE.includes(file.version) || !file.run) return null;
   const run = file.run;
   migrate(data, run);
   if (run.replayOf) migrate(data, run.replayOf);
@@ -75,6 +77,9 @@ function migrate(data: GameData, run: RunState): void {
   run.replays ??= {};
   run.stats ??= emptyStats();
   run.replayOf ??= null;
+  // 순례(저장 3): 첫 순례 보상·도전 기록
+  run.pilgrimRewarded ??= {};
+  run.challenges ??= {};
   // 보유 카드·편성 도입(2026-10-08, GAME_DESIGN 9-1) 전 저장: 지금 덱을 보유 목록으로, 시작 카드를 받고, 추천 편성.
   // 이번 스테이지는 지금 덱 그대로 이어 가고 다음 스테이지부터 편성한다
   if (!run.collection) {

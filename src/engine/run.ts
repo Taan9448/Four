@@ -86,6 +86,9 @@ export interface RunState {
   suspended?: Record<string, RunState>;
   /** 이야기로 일행을 떠난 동료의 마지막 상태(캠페인을 마치면 이 상태로 돌아온다) */
   departed?: RosterEntry[];
+  /** 순례(2026-10-11 A안): 첫 순례 보상을 받은 스테이지 · 이룬 순례 도전(스테이지 id → 도전 id) */
+  pilgrimRewarded?: Record<string, boolean>;
+  challenges?: Record<string, string[]>;
   /** 결과 화면 통계 */
   stats: RunStats;
   /** 심연 런(GAME_DESIGN 16절). 없으면 캠페인 */
@@ -198,6 +201,8 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     fallen: [],
     replays: {},
     replayOf: null,
+    pilgrimRewarded: {},
+    challenges: {},
     stats: emptyStats(),
   };
   // 하운과 공용의 시작 카드(각 10장)를 받고, 첫 스테이지 편성으로
@@ -258,7 +263,7 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   const { [stageId]: paused, ...others } = hub.suspended ?? {};
   const back: RunState = structuredClone({ ...hub, replayOf: null, suspended: others });
   if (paused && !opts.fresh) {
-    // 멈춘 진행을 이어서: 그동안 다른 곳에서 얻은 카드·편성 저장 칸은 클리어한 런의 것을 함께 쓴다
+    // 멈춘 진행을 이어서: 그 길에서 얻은 카드는 그 길에 그대로, 그사이 클리어한 런에 들어온 카드(첫 순례 보상)도 함께 쓴다
     const run: RunState = structuredClone(paused);
     run.replayOf = back;
     run.collection = mergeCollections(run.collection, hub.collection);
@@ -275,6 +280,8 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   run.shop = null;
   run.levelLog = [];
   run.pendingUpgrades = [];
+  // 이 길의 기록(순례 도전 판정용 전투 집계). 클리어한 런의 기록은 그대로 둔다
+  run.stats = emptyStats();
   for (const r of run.roster) r.hp = r.maxHp;
   // 같은 시드라도 다시 할 때마다 다른 지도가 나오게 시드에 횟수를 붙인다
   run.seed = `${hub.seed}~${stageId}~${(hub.replays[stageId] ?? 0) + 1}`;
@@ -285,7 +292,8 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
 
 /**
  * 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올린다.
- * 보유 카드(얻은 카드·강화)와 편성 저장 칸은 이기든 지든 hub에 남긴다(GAME_DESIGN 9-1)
+ * 순례(2026-10-11 A안): 길에서 얻은 카드·강화·카드 바꾸기·골드·유물·물약·레벨은 그 길 안에서만 — hub의 보유 카드·편성은 그대로.
+ * 남기는 것은 이긴 횟수와 편성 저장 칸뿐(저장 칸은 불러올 때 가지지 않은 카드를 걸러 낸다)
  */
 export function finishReplay(run: RunState): RunState {
   const hub = run.replayOf;
@@ -297,8 +305,8 @@ export function finishReplay(run: RunState): RunState {
 }
 
 /**
- * 자유 여정(2026-10-11): 다시 하던 스테이지를 지도에서 멈추고 클리어 지도로 나간다. 진행은 hub.suspended에 남아
- * 그 장소를 다시 누르면 이어진다(startReplay). 얻은 카드·편성은 바로 클리어한 런에도 남긴다
+ * 자유 여정(2026-10-11): 다시 하던 스테이지를 지도에서 멈추고 클리어 지도로 나간다. 진행(그 길의 덱·골드·유물·얻은 카드)은
+ * hub.suspended에 남아 그 장소를 다시 누르면 이어진다(startReplay). 클리어한 런에는 편성 저장 칸만 남긴다
  */
 export function suspendReplay(run: RunState): RunState {
   const hub = run.replayOf;
@@ -316,11 +324,9 @@ export function discardSuspended(hub: RunState, stageId: string): void {
   if (hub.suspended) delete hub.suspended[stageId];
 }
 
-/** 다시 하기에서 얻은 것 중 클리어한 런에 남기는 것: 보유 카드(더 높은 강화 단계로 합친다)·편성·편성 저장 칸 */
+/** 다시 하기에서 클리어한 런에 남기는 것: 편성 저장 칸만(순례 A안 — 보유 카드·편성은 그대로) */
 function carryBack(hub: RunState, run: RunState): void {
-  hub.collection = mergeCollections(hub.collection, run.collection);
   hub.presets = structuredClone(run.presets);
-  hub.loadout = structuredClone(run.loadout);
 }
 
 /** 보유 카드 둘을 합친다: 어느 쪽에든 있으면 남기고, 강화 단계는 높은 쪽 */

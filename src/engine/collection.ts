@@ -173,12 +173,18 @@ export function acquirePreview(data: GameData, run: RunState, cardId: string): A
 }
 
 /**
- * 카드를 얻는다(보상·상점·이벤트·이야기). 처음이면 보유 목록과 이번 스테이지 덱에, 이미 있으면 +1 강화(덱에 없으면 이번 스테이지 덱에도),
+ * 카드를 얻는다(보상·상점·이벤트·이야기). 자유 여정은 덱에만(위). 처음이면 보유 목록과 이번 스테이지 덱에, 이미 있으면 +1 강화(덱에 없으면 이번 스테이지 덱에도),
  * 최대 강화면 골드. 결과 문구
  */
 export function acquireCard(data: GameData, run: RunState, cardId: string): string {
   const def = data.cards.get(cardId);
   if (!def) throw new Error(`알 수 없는 카드: ${cardId}`);
+  // 자유 여정(순례 A안, 2026-10-11): 보유 목록·강화 단계는 그대로 두고 이 길의 덱에만 한 장 더(심연과 같은 규칙, 가진 카드면 가진 단계로)
+  if (run.replayOf) {
+    if (!run.stageGains.includes(cardId)) run.stageGains.push(cardId);
+    run.deck.push(newInstance(run, cardId));
+    return `카드 획득(이 길에서만): ${def.name}${run.collection[cardId] ? ` +${run.collection[cardId]}` : ''}`;
+  }
   const inDeck = run.deck.some((c) => c.cardId === cardId);
   const addToDeck = () => {
     if (!run.stageGains.includes(cardId)) run.stageGains.push(cardId);
