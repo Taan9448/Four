@@ -87,8 +87,8 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
           'div',
           { class: `deck-card loadout-card${on ? ' on' : ''}${full ? ' full' : ''}`, onclick: () => toggle(d.id), title: on ? '눌러서 빼기' : full ? '칸이 가득 찼다 — 먼저 한 장을 빼기' : '눌러서 넣기' },
           cardView(data, { uid: `lo_${d.id}`, cardId: d.id, level: run.collection[d.id] ?? 0 }, { selected: on }),
-          // 편성 점수 배지(왼쪽 위)
-          h('span', { class: `loadout-pts pts-${cardPoints(data, d)}`, ...tipAttrs(`편성 ${cardPoints(data, d)}점`, '등급마다 점수. 동료 24점 · 공용 17점까지.') }, String(cardPoints(data, d))),
+          // 편성 점수 배지(위 가운데 — 왼쪽 위는 비용 자리)
+          h('span', { class: `loadout-pts pts-${cardPoints(data, d)}`, ...tipAttrs(`편성 ${cardPoints(data, d)}점`, '등급마다 점수. 동료 24점 · 공용 17점까지.') }, `${cardPoints(data, d)}점`),
           on ? h('span', { class: 'loadout-check' }, '✓') : null,
           run.stageGains.includes(d.id) ? h('span', { class: 'loadout-new', ...tipAttrs('이번 스테이지에 얻은 카드', '편성과 상관없이 이 스테이지가 끝날 때까지 덱에 들어간다.') }, '새') : null,
           d.tags.length

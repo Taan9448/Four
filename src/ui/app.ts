@@ -770,7 +770,7 @@ export class App {
         [
           { target: '.loadout-tabs', title: '편성이란', text: `동료마다 ${data.balance.loadout.perCharacter}장 + 공용 ${data.balance.loadout.common}장을 보유 카드에서 골라 이번 스테이지의 덱을 짠다. 탭에는 채운 수와 갈래(아키타입)별 장수.` },
           { target: '.loadout-grid', title: '카드 고르기', text: '누르면 넣고, 다시 누르면 뺀다. 같은 카드는 한 장만.' },
-          { target: '.loadout-bar', title: '점수 상한', text: `카드마다 등급 점수(왼쪽 위 배지). 동료 ${data.balance.loadout.cap.perCharacter}점 · 공용 ${data.balance.loadout.cap.common}점까지 — 센 카드를 넣으면 나머지는 싼 카드로 채운다. 같은 갈래 카드 ${data.balance.loadout.focusMin}장이면 그 갈래의 전투 시작 보너스(✓).` },
+          { target: '.loadout-bar', title: '점수 상한', text: `카드마다 등급 점수(카드 위 배지). 동료 ${data.balance.loadout.cap.perCharacter}점 · 공용 ${data.balance.loadout.cap.common}점까지 — 센 카드를 넣으면 나머지는 싼 카드로 채운다. 같은 갈래 카드 ${data.balance.loadout.focusMin}장이면 그 갈래의 전투 시작 보너스(✓).` },
           { target: '.loadout-actions', title: '추천을 눌러도 된다', text: '"전체 추천 편성"이 알아서 채운다. 다음 스테이지부터는 "지난 편성 그대로 출발" 한 번이면 된다.' },
         ],
         { id: 'loadout', once: true },
