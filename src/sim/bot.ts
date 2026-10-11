@@ -228,7 +228,7 @@ function relicDownside(data: GameData, id: string): number {
   return d;
 }
 
-/** 균열을 올리는 덱에서 감소 카드에 더하는 값(고급 감소 카드가 보상 기준 6을 넘게) */
+/** 균열을 올리는 덱에서 감소 카드에 더하는(아닌 덱에서는 빼는) 값(고급 감소 카드가 보상 기준 6을 넘게) */
 const REDUCE_BONUS = 3;
 
 const RARITY_VALUE: Record<string, number> = { common: 2, uncommon: 4, rare: 6, epic: 9, legendary: 12, special: -10 };
@@ -314,7 +314,8 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
 function decideReward(data: GameData, run: RunState, options: string[], opts: BotOptions): string | undefined {
   // 균열을 올리는 카드가 2장 이상인 덱은 균열 감소 카드(숨 세기 갈래)에 값을 더 준다(폭주는 비용)
   const fusionDeck = run.deck.filter((c) => data.cards.get(c.cardId)?.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) > 0)).length >= 2;
-  const worth = (def: CardDef) => cardValue(def) + (fusionDeck && isReduceCard(def) ? REDUCE_BONUS : 0);
+  // 균열을 올리지 않는 덱에서 감소 카드는 거의 일하지 않는다(등급만 보고 집지 않게)
+  const worth = (def: CardDef) => cardValue(def) + (isReduceCard(def) ? (fusionDeck ? REDUCE_BONUS : -REDUCE_BONUS - 1) : 0);
   const score = (id: string) => {
     const def = data.cards.get(id)!;
     return worth(def) * 10 + lean(def, opts);
