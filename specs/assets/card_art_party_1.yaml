@@ -1,0 +1,23 @@
+id: card_art_party_1
+type: card-art-sheet
+summary: 카일·보른 카드 그림(확장 나머지) — 칸 1~3 카일, 4~6 보른 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 6
+cards:
+  - kyle_sword_care  # 검 손질
+  - kyle_knight_pride  # 기사의 긍지
+  - kyle_stand_firm  # 막아서다
+  - born_horn_ram  # 뿔 들이받기
+  - born_back_to_back  # 등을 맞대고
+  - born_mountain_silence  # 산의 침묵
+frame_notes:
+  1: "a cloth polishing a steel sword blade"  # 검 손질
+  2: "a dented knight breastplate standing upright, one small cut glinting"  # 기사의 긍지
+  3: "a knight with shield and arm spread wide across a black crack"  # 막아서다
+  4: "a horned dwarf helmet ramming forward"  # 뿔 들이받기
+  5: "two warriors standing back to back, an axe and a sword raised"  # 등을 맞대고
+  6: "a silent snowy mountain peak under a still sky"  # 산의 침묵
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cells 1-3 use a cool steel palette: moonlit silver, steel grey, deep blue and white with warm red accents; cells 4-6 use a warm stone and forge palette: granite grey, iron, ember orange, earth brown and red beard tones; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#5d6478', accent: '#ff8a5c' }

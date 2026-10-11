@@ -1,0 +1,31 @@
+id: card_art_abyss_4
+type: card-art-sheet
+summary: 틈의 카드 그림 4(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 10
+cards:
+  - abyss_common_scar_stitch  # 상흔을 꿰다
+  - abyss_common_flesh_seal  # 살로 막는 봉인
+  - abyss_common_close_all  # 전부 닫기
+  - abyss_common_dry_sky  # 마른 하늘 아래
+  - abyss_common_fog_eye  # 안개 속의 눈
+  - abyss_common_twin_moons  # 두 달 아래
+  - abyss_common_echo_eater  # 메아리 삼키기
+  - abyss_common_knot_tie  # 매듭 묶기
+  - abyss_common_feeder_bane  # 포식자 베기
+  - abyss_common_enrage_delay  # 격노 늦추기
+frame_notes:
+  1: "a needle stitching a black crack shut with red thread"  # 상흔을 꿰다
+  2: "an open hand pressed flat against a black crack, red cracks running up the arm"  # 살로 막는 봉인
+  3: "a fist slamming a black crack shut, red drops flying"  # 전부 닫기
+  4: "a cracked dry sky over parched ground, one blue mana drop falling"  # 마른 하늘 아래
+  5: "a single open eye glowing through thick grey fog"  # 안개 속의 눈
+  6: "two moons, one pale and one red, hanging in a black void"  # 두 달 아래
+  7: "echo rings being sucked into a black crack"  # 메아리 삼키기
+  8: "a red thread tied into a tight double knot across a black crack"  # 매듭 묶기
+  9: "a blade cutting through a dark maw that drinks blue light"  # 포식자 베기
+  10: "a heavy iron chain wrapped around a glowing red eye"  # 격노 늦추기
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

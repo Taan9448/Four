@@ -1,0 +1,31 @@
+id: card_art_common_3
+type: card-art-sheet
+summary: 공용 카드 그림 3(확장) — 공용 8장 + 엘리아 무림 약초 2장 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 10
+cards:
+  - common_branch_sword  # 나뭇가지와 검
+  - common_strike_together  # 동시에 치다
+  - common_sword_on_barrier  # 결계 위의 검
+  - common_count_together  # 넷이서 세자
+  - common_silver_bell_inn  # 은종 여관
+  - common_pull_wedge  # 쐐기를 뽑다
+  - common_deep_inhale  # 깊은 숨
+  - common_seal_charm  # 봉인 부적 조각
+  - elia_blue_herb_bundle  # 청염초 다발
+  - elia_fog_herb_smoke  # 안개초 연기
+frame_notes:
+  1: "a wooden branch and a steel sword crossed in an X"  # 나뭇가지와 검
+  2: "an axe and a dwarf hammer striking the same point at once, one big spark"  # 동시에 치다
+  3: "a silver sword resting on top of a glowing blue dome barrier"  # 결계 위의 검
+  4: "four hands stacked on top of each other"  # 넷이서 세자
+  5: "a small silver bell hanging over a warm lit inn doorway"  # 은종 여관
+  6: "a hand pulling a black wedge out of a crack, gold light leaking out"  # 쐐기를 뽑다
+  7: "one large calm breath puff flowing in a long curve with a gold sparkle"  # 깊은 숨
+  8: "a torn paper talisman strip with one round red stamp mark and no writing"  # 봉인 부적 조각
+  9: "a bundle of herbs with small blue flame-shaped leaves, tied with string"  # 청염초 다발
+  10: "a smoldering herb bundle in a clay dish releasing thick white smoke"  # 안개초 연기
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }

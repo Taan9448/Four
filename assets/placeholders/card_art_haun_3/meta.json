@@ -1,0 +1,51 @@
+{
+  "id": "card_art_haun_3",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 15,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 15,
+  "sourceHash": "a0a358884d0462b0",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "haun_ironwood_split",
+    "haun_hold_breath",
+    "haun_read_crack",
+    "haun_roof_lesson",
+    "haun_ugly_sword",
+    "haun_vertical_cut",
+    "haun_rest_blade",
+    "haun_campaign_wood",
+    "haun_cheongun_night",
+    "haun_bare_hand",
+    "haun_ladle",
+    "haun_whole_bucket",
+    "haun_send_back",
+    "haun_honed_edge",
+    "haun_turn_flow"
+  ]
+}
