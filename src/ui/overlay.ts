@@ -30,24 +30,72 @@ export function openOverlay(title: string, body: HTMLElement, opts: { onClose?: 
   return { el, close };
 }
 
-/** 예/아니오 확인 창 */
+/**
+ * 결과·확인 팝업(2026-10-11 사용자 확정 목업): 옻칠 판 + 금테 + 안쪽 붉은 실선 + 모서리 금장,
+ * 위 가운데에 걸쳐 찍는 낙관(종류: 勝 승리 · 守 버팀 · 敗 패배 · 事 사건 · 昇 레벨업 · 終 스테이지 끝 · 問 확인),
+ * 작은 띄어쓴 머리말, 붓글씨 제목(이기면 금빛 · 지면 잿빛), 한 줄 이야기, 숫자 집계 또는 색 칩, 버튼
+ */
+export interface PopOpts {
+  seal: string;
+  /** 낙관 색: 붉은 테(기본) · 붉은 바탕 · 회색 · 금 */
+  sealKind?: 'line' | 'solid' | 'muted' | 'gold';
+  eyebrow?: string;
+  title: string;
+  tone?: 'win' | 'lose' | 'plain';
+  lead?: string | HTMLElement | null;
+  stats?: [string, string | number][];
+  /** 얻은 것(up) · 잃은 것(down) · 골드·카드(gold) · 마나(mana) */
+  chips?: { text: string; kind: 'up' | 'down' | 'gold' | 'mana' }[];
+  actions: HTMLElement[];
+}
+
+export function popPanel(o: PopOpts): HTMLElement {
+  const spaced = (t: string) => [...t.replace(/\s+/g, '')].join(' ');
+  return h(
+    'div',
+    { class: 'pop', role: 'dialog', 'aria-modal': 'true', 'aria-label': o.title },
+    ...['tl', 'tr', 'bl', 'br'].map((c) => h('i', { class: `pop-corner ${c}`, 'aria-hidden': 'true' })),
+    h('span', { class: `pop-seal${o.sealKind && o.sealKind !== 'line' ? ` ${o.sealKind}` : ''}`, 'aria-hidden': 'true' }, o.seal),
+    o.eyebrow ? h('p', { class: 'pop-eyebrow' }, spaced(o.eyebrow)) : null,
+    h('h2', { class: `pop-title${o.tone && o.tone !== 'plain' ? ` ${o.tone}` : ''}` }, o.title),
+    o.lead ? (typeof o.lead === 'string' ? h('p', { class: 'pop-lead' }, o.lead) : o.lead) : null,
+    o.stats?.length ? h('div', { class: 'pop-stats' }, o.stats.map(([label, v]) => h('span', {}, h('b', {}, String(v)), label))) : null,
+    o.chips?.length ? h('div', { class: 'pop-chips' }, o.chips.map((c) => h('span', { class: `pop-chip ${c.kind}` }, c.text))) : null,
+    h('div', { class: 'pop-actions' }, ...o.actions),
+  );
+}
+
+/** 결과 한 줄을 칩 색으로: 잃은 것(−·잃·상흔 +) · 골드 · 마나 · 그 밖은 얻은 것 */
+export function chipKind(text: string): 'up' | 'down' | 'gold' | 'mana' {
+  if (/(^|\s)[-−]\d|잃|상흔 \+|부상|저주/.test(text)) return 'down';
+  if (/골드|카드|유물|물약/.test(text)) return 'gold';
+  if (/마나|내공/.test(text)) return 'mana';
+  return 'up';
+}
+
+/** 예/아니오 확인 창(결과 팝업과 같은 판, 낙관 問). 바깥을 누르거나 Esc면 취소 */
 export function confirmDialog(title: string, message: string, okLabel: string): Promise<boolean> {
   return new Promise((resolve) => {
     let answer = false;
-    const ov = openOverlay(
-      title,
-      h(
-        'div',
-        { class: 'confirm' },
-        h('p', {}, message),
-        h(
-          'div',
-          { class: 'confirm-actions' },
-          h('button', { class: 'btn', onclick: () => ov.close() }, '취소'),
-          h('button', { class: 'btn btn-danger', onclick: () => ((answer = true), ov.close()) }, okLabel),
-        ),
-      ),
-      { onClose: () => resolve(answer) },
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        close();
+      }
+    };
+    const close = () => {
+      document.removeEventListener('keydown', onKey, true);
+      el.remove();
+      resolve(answer);
+    };
+    const ok = h('button', { class: 'btn btn-danger', onclick: () => ((answer = true), close()) }, okLabel);
+    const el = h(
+      'div',
+      { class: 'overlay pop-overlay', onclick: (e: Event) => e.target === el && close() },
+      popPanel({ seal: '問', sealKind: 'solid', eyebrow: '확인', title, tone: 'lose', lead: message, actions: [h('button', { class: 'btn', onclick: () => close() }, '취소'), ok] }),
     );
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(el);
+    requestAnimationFrame(() => ok.focus());
   });
 }
