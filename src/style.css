@@ -1410,11 +1410,11 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 
 /* 결과 화면 통계 */
 .run-stats { width: min(640px, 100%); display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; text-align: left; }
-.rs-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.rs-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .rs-cell { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border: 1px solid rgba(226, 180, 92, 0.35); border-radius: 6px; background: rgba(0, 0, 0, 0.35); }
 .rs-cell b { font-size: calc(var(--fs-body) * 1.26); color: #f4ecd8; }
 .rs-cell small { color: var(--ink-dim); font-size: var(--fs-min); }
-.rs-death { margin: 0; color: #ffb4a8; }
+.rs-death { margin: 0 0 4px; color: #ffb4a8; font-weight: 700; font-size: var(--fs-body); }
 .rs-top h3 { margin: 0 0 4px; font-size: var(--fs-body); color: #e2b45c; }
 .rs-top ol { margin: 0; padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
 .rs-top li span { margin-right: 6px; }
@@ -1577,3 +1577,14 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
   body:has(.screen.battle) .tour-bubble { left: 8px !important; right: 8px !important; top: auto !important; bottom: 40vh !important; width: auto !important; max-width: none !important; transform: none !important; }
 }
 
+/* 스테이지·굽이 끝: 얻은 것 표 · 다음 굽이 법칙(2026-10-11 UI/UX 3-2) */
+.stage-gains { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 10px auto 6px; max-width: 520px; text-align: left; font-size: var(--fs-body); }
+.stage-gains dt { color: #e2b45c; font-family: var(--f-head); font-weight: 800; }
+.stage-gains dd { margin: 0; color: var(--ink); }
+.next-laws { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 8px 0; color: var(--ink-dim); font-size: var(--fs-sub); }
+/* 심연 시작: 동료 반신 그림 · 서약 줄 전체를 눌러 고른다(2026-10-11 UI/UX 3-4) */
+.abyss-mate { position: relative; overflow: hidden; }
+.abyss-mate-pic { display: block; height: 96px; margin: -4px 0 2px; }
+.abyss-mate-pic img { height: 100%; width: auto; image-rendering: pixelated; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); }
+.abyss-oaths li.on, .abyss-oaths li.pickable { cursor: pointer; }
+.abyss-oaths li.pickable:hover { border-color: rgba(185, 150, 239, 0.6); }

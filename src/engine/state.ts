@@ -144,6 +144,8 @@ export interface BattleTally {
   damage: number;
   crits: number;
   surges: number;
+  /** 균열 폭주로 잃은 체력(아군 합) */
+  surgeHp?: number;
   cards: Record<string, number>;
   haunHitBy?: string;
   /** 심연 업적: 터뜨린 결 노출 수, 쓰러뜨린 접사 붙은 적 수 */
