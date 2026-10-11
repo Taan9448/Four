@@ -1,0 +1,28 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: an axe splitting a dark iron-wood training dummy along one glowing gold grain line
+Cell 2: a hand over a mouth, one small breath puff frozen still in the air
+Cell 3: a narrowed eye looking at a thin gold seam on a grey stone wall
+Cell 4: two small figures sitting on a tiled roof under a night sky with a faint thin crack
+Cell 5: a crude, lumpy hand-forged sword lying on a wooden bench
+Cell 6: one tall vertical slash of gold and blue light splitting a flame in two
+Cell 7: an axe edge resting on a log, several gold cracks spreading from the touch point
+Cell 8: a small bundle of firewood tied with rope beside a travel pack
+Cell 9: a mountain sect gate under a full moon between dark pine silhouettes
+Cell 10: a bare hand gripping a sword blade, a small gold glow at the palm
+Cell 11: a wooden water ladle flinging a splash of water that glitters blue
+Cell 12: a whole wooden water bucket swung forward, a big wave of blue water pouring out
+Cell 13: an axe swing pushing a thin black crack back shut with gold light
+Cell 14: an axe blade on a whetstone, sparks and one bright honed edge
+Cell 15: a stream of mixed gold and blue light turning back on itself in a spiral
+Cells 16 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: Correct two actual subject mistakes while preserving the other thirteen used paintings, exact cell order, palette, pixel scale and full-sheet layout. Cell 1 must depict the IRON-WOOD TRAINING DUMMY rather than an ordinary firewood stump: a dark tall cylindrical upright trunk with three short thick wooden training arms protruding at staggered heights and a square stone pedestal, split along ONE glowing gold grain line by a woodcutting axe. No face or humanoid armor. Cell 5 must show the ugly crude hand-forged sword: an uneven, slightly lumpy dull grey iron blade, plain rough dark wooden grip and small crude dark iron guard; no gold trim, no shiny decorative guard, no jewel or ornament. It lies horizontally on the simple wood bench. Keep one bold focus and quiet flat background; no additional props. All other cards stay as specified, especially the two seated roof figures, bare hand gripping blade, ladle, bucket and gold-blue spiral. Keep cell16 completely magenta. ONE complete 1536x1024 sheet, 4x4 cells, no text, borders or gaps.
