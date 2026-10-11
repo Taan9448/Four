@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: the Black Wind Captain of the Heavenly Demon Cult's Shaanxi branch; a lean hard man in black martial robes and a black hood pushed back, three sword scars across the face, a curved saber in one hand, the other palm wrapped in black wind. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: stands, saber low, the black robe stirring in the wind
+Cell 2: the black wind around the palm swirls
+Cell 3: eyes narrow
+Cell 4: settles back
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+
+Fix: Responding to PR #785 review and the user's explicit 2x2 layout instruction. Four complete poses MUST be centered in FOUR equal square quadrants on ONE square sheet: top-left cell1, top-right cell2, bottom-left cell3, bottom-right cell4. Exactly TWO figures per row; NEVER a strip of three/four figures, NEVER a 3x2 layout. Cell4 MUST contain the full settled idle pose. The entire saber, robe hems, shoes, hair and black wind remain within their OWN quadrant with at least 12 sprite pixels (48 source px) of clean magenta at LEFT and RIGHT boundaries. No detached saber or wind fragments anywhere near a cell edge. Match the merged ATTACK final frame and HIT recovery frame body scale: full body from highest hair to soles about100 sprite pixels, consistent in all four poses, not85px. Each 512px cell has top hair near source y60 and feet near source y460, full body about400px tall. Match reference CELL2 LEFT PROFILE only: one visible eye, nose left; same black hair, pushed-back hood, scarred face, long black martial robe, curved saber held low toward LEFT, other hand black wind. Keep the hand-swirl contained around the right-of-body hand as seen in the reference. Subtle idle changes only: robe stirring; palm wind swirl; eyes narrowing; settles back. The attached attack frame06 is the target body proportions and low-saber idle stance. No new decoration, lettering, gold, jewellery or weapon.
