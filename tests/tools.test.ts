@@ -9,7 +9,7 @@ import { checkOwnership } from '../tools/check-ownership.mjs';
 import { renderSheet } from '../tools/make-placeholder.mjs';
 import { loadPromptData, promptFor, renderPrompt } from '../tools/render-prompt.mjs';
 import { sliceSheet } from '../tools/slice-sheet.mjs';
-import { columnCenter, dropEdgeSlivers, keyOut, magentaCast, nearestColor, shiftX, shiftXY } from '../tools/lib/image.mjs';
+import { columnCenter, dropEdgeSlivers, innerHole, keyOut, magentaCast, nearestColor, shiftX, shiftXY } from '../tools/lib/image.mjs';
 import { checkSpecShape, listSpecIds, loadSpec, paths, ROOT } from '../tools/lib/specs.mjs';
 import { loadStyleData } from '../tools/lib/style.mjs';
 import { artBranchAsset, validateAsset, validateSheet } from '../tools/validate-assets.mjs';
@@ -287,6 +287,72 @@ describe('자르기 → 검증', () => {
     const m = buildManifest(root);
     expect(m.assets.fixture_attack.source).toBe('sprites');
     expect(m.assets.fixture_other.source).toBe('placeholders');
+  });
+});
+
+describe('카드 틀(card-frame, 2026-10-11)', () => {
+  const ids = ['card_frame_murim', 'card_frame_magic', 'card_frame_fusion'];
+
+  it('틀 3종은 같은 자리(layout)를 쓴다 — 비용 자리만 융합이 둘', () => {
+    const [murim, ...rest] = ids.map((id) => loadSpec(id).layout);
+    for (const l of rest) expect({ ...l, cost: null }).toEqual({ ...murim, cost: null });
+    expect(loadSpec('card_frame_fusion').layout.cost).toHaveLength(2);
+  });
+
+  it('틀을 128×192에 꽉 채워 자르고, 그림 창(안쪽 투명 구멍)의 자리를 meta.window에 남긴다', async () => {
+    const spec = loadSpec('card_frame_magic');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    writeFileSync(p.source(spec.id), await renderSheet(spec));
+    const meta = await sliceSheet(spec, { src: p.source(spec.id), outDir: p.sprites(spec.id) });
+    expect(meta).toMatchObject({ frameW: 128, frameH: 192, fit: 'pad', track: 'pixel' });
+    const [x, y, w, h] = meta.window as number[];
+    const [ax, ay, aw] = spec.layout.art;
+    expect([x, y, w]).toEqual([ax, ay, aw]);
+    expect(h).toBeLessThanOrEqual(spec.layout.art[3]); // 이름 띠가 창 아래를 덮는다
+    const { data } = await sharp(join(p.sprites(spec.id), 'frame_01.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(data[3]).toBe(0); // 모서리는 바깥(투명)
+    expect(data[(96 * 128 + 2) * 4 + 3]).toBe(255); // 왼쪽 테두리는 불투명
+  });
+
+  it('모델이 틀을 캔버스보다 작게(여백을 두고) 그려도 그림 상자를 128×192로 늘여 자리를 맞추고 경고한다', async () => {
+    const spec = loadSpec('card_frame_murim');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    // 원래 시트를 가운데로 90%만큼 줄여 마젠타 여백을 둔다(블록 8 → 7.2)
+    const full = await renderSheet(spec);
+    const small = await sharp(full).resize(922, 1382, { kernel: 'nearest' }).png().toBuffer();
+    const sheet = await sharp({ create: { width: 1024, height: 1536, channels: 4, background: '#FF00FF' } }).composite([{ input: small, left: 51, top: 77 }]).png().toBuffer();
+    writeFileSync(p.source(spec.id), sheet);
+    const meta = await sliceSheet(spec, { src: p.source(spec.id), outDir: p.sprites(spec.id) });
+    expect([meta.frameW, meta.frameH]).toEqual([128, 192]);
+    const [x, y, w] = meta.window as number[];
+    expect(Math.abs(x - 16)).toBeLessThanOrEqual(2);
+    expect(Math.abs(y - 12)).toBeLessThanOrEqual(2);
+    expect(Math.abs(w - 96)).toBeLessThanOrEqual(3);
+  });
+
+  it('innerHole: 가장자리와 이어진 투명은 바깥, 막힌 투명 중 가장 큰 덩어리가 창', () => {
+    const W = 20, H = 20;
+    const img = { data: Buffer.alloc(W * H * 4), width: W, height: H };
+    for (let y = 2; y < 18; y++) for (let x = 2; x < 18; x++) img.data[(y * W + x) * 4 + 3] = 255;
+    for (let y = 5; y < 10; y++) for (let x = 5; x < 15; x++) img.data[(y * W + x) * 4 + 3] = 0; // 창 10×5
+    img.data[(15 * W + 15) * 4 + 3] = 0; // 작은 구멍 1px
+    expect(innerHole(img)).toMatchObject({ x: 5, y: 5, w: 10, h: 5 });
+  });
+
+  it('프롬프트: 128×192 격자, 창·이름 띠·글 칸 자리, 글자 금지', () => {
+    const text = promptFor('card_frame_fusion');
+    expect(text).toContain('128x192 pixel-art sprite scaled up exactly 8x');
+    expect(text).toContain('ART WINDOW: x 16-111, y 12-81 (96x70)');
+    expect(text).toContain('COST SOCKETS');
+    expect(text).toContain('(14, 14) and (113, 14)');
+    expect(text).toContain('TEXT BOX: x 12-115, y 108-173');
+    expect(text).toContain('no text');
+    const gems = promptFor('card_gems');
+    expect(gems).toContain('32x32 pixel-art sprite scaled up exactly 8x');
+    expect(gems).toContain('COST gems');
+    expect(gems).not.toContain('status icon');
   });
 });
 

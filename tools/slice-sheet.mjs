@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { bbox, cellRect, columnCenter, dropEdgeSlivers, extract, fileHash, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
+import { bbox, cellRect, columnCenter, dropEdgeSlivers, extract, fileHash, innerHole, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -38,7 +38,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
   } else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
 
   const fileOf = (i) => join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`);
-  let grid = null, puritySum = 0, natives = [], fits = new Set();
+  let grid = null, puritySum = 0, natives = [], fits = new Set(), artWindow = null;
   if (illustration) {
     for (const [i, n] of frameCells.entries()) {
       // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
@@ -80,6 +80,11 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
       puritySum += f.purity;
       natives.push(f.native);
       fits.add(f.fit);
+      // 카드 틀: 그림 창(안쪽 투명 구멍)의 자리를 meta에 남겨 게임이 카드 그림을 그 아래에 깐다
+      if (spec.type === 'card-frame' && i === 0) {
+        const hole = innerHole(f.img);
+        artWindow = hole && [hole.x, hole.y, hole.w, hole.h];
+      }
       writeFileSync(fileOf(i), await toPng(f.img));
     }
   }
@@ -112,6 +117,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     sourceSize: sheet.original,
     /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
     gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
+    ...(spec.type === 'card-frame' ? { window: artWindow } : {}),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;

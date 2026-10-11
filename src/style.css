@@ -655,6 +655,42 @@ h1, h2, h3 { font-family: var(--f-head); }
 /* 상태·저주 */
 .t-status { background: linear-gradient(165deg, #3a3340, #241f2a); color: #ddd; border: 2px solid #5a4a66; border-radius: 4px; }
 
+/* 픽셀 카드(하스스톤형, 2026-10-11): Codex 틀 card_frame_*(128×192 픽셀, 1배) 위에 글을 얹는다. 자리는 명세 layout과 같다
+   — 그림 창 16,12 96×70(실제 자리는 meta.window) · 비용 자리 (14,14)/(113,14) · 이름 띠 4,78 120×18 · 등급 보석 (64,101) · 글 칸 12,108 104×66 · 종류 판 32,178 64×12 */
+.card.card-px { width: 128px; height: 192px; min-height: 0; padding: 0; display: block; background: none; border: 0; border-radius: 4px; color: #231d15; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.rarity-epic { box-shadow: 0 0 12px rgba(142, 91, 208, 0.6), 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.rarity-legendary { box-shadow: 0 0 14px rgba(242, 169, 59, 0.65), 0 8px 18px rgba(0, 0, 0, 0.55); }
+.card-px.card-selected { box-shadow: 0 0 0 3px var(--mana), 0 12px 24px rgba(0, 0, 0, 0.6); }
+.cpx-frame { position: absolute; left: 0; top: 0; width: 128px; height: 192px; z-index: 1; image-rendering: pixelated; pointer-events: none; }
+.cpx-art { position: absolute; z-index: 0; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--owner, #8a90a3) 55%, #f1efe6), color-mix(in srgb, var(--owner, #8a90a3) 70%, #0b0b10)); }
+.cpx-seal { font-family: var(--f-brush); font-size: 40px; line-height: 1; color: rgba(255, 255, 255, 0.4); text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25); }
+.cpx-cost { position: absolute; z-index: 2; top: -2px; width: 32px; height: 32px; display: grid; place-items: center; background: center / 32px 32px no-repeat; image-rendering: pixelated; font-family: var(--f-head); font-weight: 800; font-size: 16px; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px -1px 0 #0b0b10, 1px -1px 0 #0b0b10, -1px 1px 0 #0b0b10; }
+.cpx-cost-l { left: -2px; }
+.cpx-cost-r { left: 97px; }
+.cpx-cost-css { width: 26px; height: 26px; top: 1px; border: 2px solid #1d2433; border-radius: 50%; }
+.cpx-cost-css.cpx-cost-l { left: 1px; }
+.cpx-cost-css.cpx-cost-r { left: 100px; }
+.cpx-cost-css.cpx-cost-neigong { background: radial-gradient(circle at 35% 30%, #ffe08a, #b8741a); }
+.cpx-cost-css.cpx-cost-mana { background: radial-gradient(circle at 35% 30%, #dff4ff, #3a6ea5); border-radius: 30%; }
+.cpx-name { position: absolute; z-index: 2; left: 8px; top: 78px; width: 112px; height: 18px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; font-family: var(--f-head); font-weight: 800; font-size: 10.5px; color: #231d15; }
+.cpx-name-m { font-size: 9.5px; }
+.cpx-name-s { font-size: 8.5px; letter-spacing: -0.02em; }
+.t-murim .cpx-name, .t-status .cpx-name { font-family: var(--f-brush); font-weight: 400; font-size: 11.5px; }
+.t-murim .cpx-name-m, .t-status .cpx-name-m { font-size: 10.5px; }
+.t-murim .cpx-name-s, .t-status .cpx-name-s { font-size: 9.5px; }
+.t-elheim .cpx-name, .t-fusion .cpx-name { color: #f2f6ff; text-shadow: 0 1px 0 #0b0b10; }
+.t-fusion .cpx-name { color: #ffe9b8; }
+.cpx-name .card-level { color: inherit; opacity: 0.85; }
+img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 32px; height: 32px; image-rendering: pixelated; pointer-events: none; }
+.card-px .gem.cpx-rarity { z-index: 2; left: 59px; top: 96px; right: auto; }
+.cpx-text { position: absolute; z-index: 2; left: 14px; top: 110px; width: 100px; height: 62px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-align: center; white-space: pre-line; font-size: 10px; line-height: 1.25; color: #231d15; }
+.cpx-text-m { font-size: 9px; }
+.cpx-text-s { font-size: 8.5px; line-height: 1.2; }
+.cpx-text-xs { font-size: 7.5px; line-height: 1.18; letter-spacing: -0.02em; }
+.t-elheim .cpx-text { color: #1d2433; }
+.cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; overflow: hidden; white-space: nowrap; text-align: center; font-size: 7.5px; line-height: 12px; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
+.card-px.t-status .cpx-frame { filter: grayscale(0.85) brightness(0.72); }
+
 /* 영웅·전설 컷인 */
 .cutin { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(5, 7, 12, 0.72); cursor: pointer; animation: cutin-fade 0.18s ease-out; overflow: hidden; }
 .cutin.out { opacity: 0; transition: opacity 0.18s; }
@@ -858,6 +894,7 @@ h1, h2, h3 { font-family: var(--f-head); }
   .hand .card:hover:not(.card-disabled) { transform: none; }
   .hand .card.card-selected { transform: translateY(-12px); }
   .card { width: 108px; min-height: 152px; padding: 6px 6px 4px; }
+  .card.card-px { width: 128px; height: 192px; padding: 0; zoom: 0.85; }
   .card-name, .t-murim .card-name, .t-fusion .card-name { font-size: 0.86rem; }
   .card-text { font-size: 0.68rem; }
   .card-flavor { display: none; }

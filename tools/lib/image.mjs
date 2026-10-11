@@ -366,3 +366,43 @@ export function dropEdgeSlivers(img, alphaMin = 24) {
   }
   return removed;
 }
+
+/**
+ * 카드 틀의 그림 창: 바깥(가장자리에서 이어진 투명)과 떨어진 안쪽 투명 구멍 중 가장 큰 것의 상자.
+ * 게임은 카드 그림을 이 자리에 맞춰 틀 아래에 깐다. 없으면 null
+ */
+export function innerHole(img, alphaMin = 128) {
+  const { data, width: W, height: H } = img;
+  const clear = (i) => data[i * 4 + 3] < alphaMin;
+  const seen = new Uint8Array(W * H);
+  const flood = (start) => {
+    const stack = [start];
+    seen[start] = 1;
+    let n = 0, minX = W, minY = H, maxX = -1, maxY = -1;
+    while (stack.length) {
+      const i = stack.pop();
+      n++;
+      const x = i % W, y = (i - x) / W;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      for (const j of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1]) {
+        if (j >= 0 && !seen[j] && clear(j)) {
+          seen[j] = 1;
+          stack.push(j);
+        }
+      }
+    }
+    return { n, x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  };
+  for (let x = 0; x < W; x++) for (const y of [0, H - 1]) if (!seen[y * W + x] && clear(y * W + x)) flood(y * W + x);
+  for (let y = 0; y < H; y++) for (const x of [0, W - 1]) if (!seen[y * W + x] && clear(y * W + x)) flood(y * W + x);
+  let best = null;
+  for (let i = 0; i < W * H; i++) {
+    if (seen[i] || !clear(i)) continue;
+    const hole = flood(i);
+    if (!best || hole.n > best.n) best = hole;
+  }
+  return best && { x: best.x, y: best.y, w: best.w, h: best.h, area: best.n };
+}

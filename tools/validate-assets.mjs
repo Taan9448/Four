@@ -88,6 +88,9 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
     // 배율은 시트 공통이라 한 번만 알린다
     const f = analyzed[0];
     if (f.fit === 'downscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}의 그림이 여백 포함 목표 ${T}×${TH}에 들어가지 않아 시트 전체를 줄였다(디테일 손실) — 인물이 칸을 꽉 채웠다`);
+    if (f.fit === 'fill' && (Math.abs(f.native[0] / T - 1) > 0.08 || Math.abs(f.native[1] / TH - 1) > 0.08)) {
+      warnings.push(`카드 틀을 ${f.native.join('×')}에서 ${T}×${TH}로 늘이거나 줄였다 — 틀이 캔버스를 꽉 채우지 않았거나 블록이 규격과 달랐다`);
+    }
     if (f.fit === 'upscale') warnings.push(`모델이 그린 해상도 ${f.native.join('×')}가 목표의 절반 이하라 정수배 확대했다(픽셀이 굵어짐)`);
   }
 
@@ -102,7 +105,7 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const heights = [];
   const frameContent = (d, i) => d[i + 3] > 32;
   const paletteSet = palette ? new Set(palette.map(([r, g, b]) => (r << 16) | (g << 8) | b)) : null;
-  const checkEdges = !['card-art', 'background', 'portrait'].includes(spec.type);
+  const checkEdges = !['card-art', 'background', 'portrait', 'card-frame'].includes(spec.type);
   frames.forEach((img, i) => {
     const n = i + 1;
     if (img.width !== spec.logical[0] || img.height !== spec.logical[1]) {
@@ -171,6 +174,21 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
       const cy = (box.minY + box.maxY + 1) / 2 - img.height / 2;
       if (Math.abs(cx) > 1 || Math.abs(cy) > 1) warnings.push(`프레임 ${i + 1}: 가운데에서 (${cx.toFixed(1)}, ${cy.toFixed(1)})px 벗어났다 — main을 받아 assets:slice로 다시 자르세요`);
     });
+  }
+
+  // 5-3) 카드 틀: 그림 창(안쪽 투명 구멍)이 명세의 자리(layout.art)에 있어야 게임이 카드 그림을 맞춰 깐다
+  if (spec.type === 'card-frame' && frames.length) {
+    const want = spec.layout?.art;
+    const win = meta.window;
+    if (!win) errors.push('그림 창(틀 안쪽의 투명 구멍)이 없다 — 창 안은 키 색으로 비워야 한다');
+    else if (want) {
+      const dx = win[0] + win[2] / 2 - (want[0] + want[2] / 2);
+      const dy = win[1] + win[3] / 2 - (want[1] + want[3] / 2);
+      if (Math.hypot(dx, dy) > 6) warnings.push(`그림 창 가운데가 명세 자리에서 (${dx.toFixed(0)}, ${dy.toFixed(0)})px 벗어났다`);
+      if (Math.abs(win[2] / want[2] - 1) > 0.2 || Math.abs(win[3] / want[3] - 1) > 0.2) {
+        warnings.push(`그림 창 크기 ${win[2]}×${win[3]}(명세 ${want[2]}×${want[3]})`);
+      }
+    }
   }
 
   // 6) 바운딩 박스 높이 편차(대체 단계 1에서만). 1px 흔들림은 허용
