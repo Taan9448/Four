@@ -379,9 +379,9 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     const open = avail.has(n.id);
     // 들어가 본 노드만 이름이 보인다(보스 이름·이야기 제목은 가서 안다, GAME_DESIGN 14절)
     const known = visited;
-    // 종류는 지나온 곳만. 갈 수 있는 갈림길도 들어가 봐야 안다 — 모양·색까지 감춘 ? 표식(2026-10-08 사용자 결정)
+    // 종류는 지나온 곳과 지금 갈 수 있는 다음 층만(2026-10-11 사용자 결정 — 그 뒤 층은 모양·색까지 감춘 ? 표식). 이름은 들어가 봐야
     // 심연의 그림자의 길: 종류가 모두 보인다(이름은 여전히 들어가 봐야)
-    if (!visited && !revealAll)
+    if (!visited && !open && !revealAll)
       return h(
         'button',
         {
@@ -400,7 +400,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         class: `node node-${n.type}${visited ? ' done' : ''}${open ? ' open' : ''}${run.position === n.id ? ' here' : ''}`,
         style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
         disabled: !open,
-        'aria-label': `${n.floor}층 ${NODE_LABEL[n.type]}`,
+        'aria-label': `${NODE_LABEL[n.type]}, ${n.floor}층${open ? ' — 갈 수 있다' : visited ? ' — 지나온 곳' : ''}`,
         onclick: () => handlers.onEnter(n),
         ...tipAttrs(`${n.floor}층 · ${NODE_LABEL[n.type]}`, [known ? mod?.name ?? '' : '', open ? '갈 수 있다' : visited ? '지나온 곳' : ''].filter(Boolean).join('\n')),
       },

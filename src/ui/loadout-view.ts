@@ -40,6 +40,16 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
   const archName = new Map([...data.characters.values()].flatMap((c) => c.archetypes.map((a) => [a.id, a] as const)));
   const ownerName = (o: string) => (o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o));
   const root = h('section', { class: 'screen loadout-screen' });
+  /** 그 주인의 편성에 든 아키타입별 장수(0장은 뺀다) */
+  const archCounts = (o: string) =>
+    (data.characters.get(o)?.archetypes ?? [])
+      .map((a) => [a.name, (draft[o] ?? []).filter((id) => data.cards.get(id)?.tags.includes(a.id)).length] as const)
+      .filter(([, n]) => n > 0)
+      .map(([name, n]) => `${name} ${n}`);
+  // 지난 편성 그대로(모자란 칸만 추천으로): 바뀐 것이 없으면 이 버튼이 기본 초점
+  const keep = recommendLoadout(data, run, run.loadout);
+  const keepSame = owners.every((o) => JSON.stringify(keep[o] ?? []) === JSON.stringify(run.loadout[o] ?? []));
+  const keepOk = !handlers.onCancel && Object.values(run.loadout).some((l) => l.length) && loadoutProblems(data, run, keep).length === 0;
 
   const render = () => {
     const need = requiredFor(data, run, tab);
@@ -110,7 +120,7 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
         'header',
         { class: 'loadout-head panel' },
         h('span', { class: 'seal' }, '編'),
-        h('div', { class: 'loadout-title' }, h('h2', {}, '편성'), h('small', {}, title)),
+        h('div', { class: 'loadout-title' }, h('h2', {}, '편성'), h('small', {}, title), h('p', { class: 'loadout-hint' }, '이번 스테이지에 얻는 카드는 편성과 상관없이 덱에 들어간다. 다음 편성부터 고른다.')),
         h(
           'nav',
           { class: 'codex-tabs loadout-tabs' },
@@ -119,7 +129,8 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
               'button',
               { class: `codex-tab${o === tab ? ' on' : ''}${(draft[o]?.length ?? 0) === requiredFor(data, run, o) ? ' done' : ''}`, onclick: () => ((tab = o), render()) },
               ownerName(o),
-              h('small', {}, `${draft[o]?.length ?? 0}/${requiredFor(data, run, o)}`),
+              // 채운 수 · 아키타입 집중도("진하운 8/8 · 결 노출 5 · 균열 2")
+              h('small', {}, [`${draft[o]?.length ?? 0}/${requiredFor(data, run, o)}`, ...archCounts(o)].join(' · ')),
               o !== COMMON && !run.selected.includes(o) ? h('em', { class: 'rest-tag' }, '쉼') : null,
             ),
           ),
@@ -173,6 +184,9 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
             h('button', { class: 'btn', onclick: () => (Object.assign(draft, recommendLoadout(data, run)), render()) }, '전체 추천 편성'),
             handlers.onShowCollection ? h('button', { class: 'btn', onclick: handlers.onShowCollection }, '보유 카드 전체 보기') : null,
             problems.length ? h('ul', { class: 'loadout-problems' }, problems.map((p) => h('li', {}, p))) : null,
+            keepOk
+              ? h('button', { class: 'btn btn-large loadout-keep', onclick: () => handlers.onConfirm(structuredClone(keep)) }, '지난 편성 그대로 출발', h('small', {}, keepSame ? '바뀐 것 없음' : '새로 생긴 칸만 추천으로'))
+              : null,
             h('button', { class: 'btn btn-primary btn-large', disabled: problems.length > 0, onclick: () => handlers.onConfirm(structuredClone(draft)) }, handlers.onCancel ? '이 편성으로 바꾸기' : '이 편성으로 출발'),
             handlers.onCancel ? h('button', { class: 'btn', onclick: handlers.onCancel }, '바꾸지 않고 돌아가기') : null,
           ),
@@ -181,5 +195,6 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
     );
   };
   render();
+  if (keepOk && keepSame) requestAnimationFrame(() => root.querySelector<HTMLElement>('.loadout-keep')?.focus());
   return root;
 }

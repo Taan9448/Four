@@ -2,7 +2,7 @@
 // 탭: 카드 · 적 · 유물·물약 · 인물 · 장면(다시 보기 + 장면 그림) · 심연(3차) · 기록
 // 카드 칸은 3단계: ? (모름) → 윤곽(본 적 있음: 심연 풀에 들어간다) → 실물(보유: 강화 단계)
 import { clearRunLog, exportRunLog, readRunLog, RUN_LOG_MAX } from './run-log';
-import { codexCards, codexPeople, codexProgress, type Codex } from '../engine/codex';
+import { codexCards, codexPeople, codexProgress, type Codex, type CodexProgress } from '../engine/codex';
 import type { GameData } from '../engine/data';
 import { riftCards, unlockedRift, unlockName, unlockSource, oathMax, type AbyssMeta } from '../engine/abyss';
 import { intentBadges } from '../engine/battle';
@@ -179,15 +179,32 @@ function section(title: string, note: string | null, ...body: (HTMLElement | HTM
   return h('section', { class: 'codex-section' }, h('h3', {}, title, note ? h('small', {}, note) : null), ...body);
 }
 
+/** 카드 탭 거르기(2026-10-11 UI/UX 4-1) — 탭을 다시 열어도 유지 */
+type CardFilter = 'all' | 'owned' | 'seen' | 'unseen';
+const CARD_FILTERS: { id: CardFilter; label: string }[] = [
+  { id: 'all', label: '전체' },
+  { id: 'owned', label: '보유만' },
+  { id: 'seen', label: '본 것만' },
+  { id: 'unseen', label: '아직 못 봄' },
+];
+let cardFilter: CardFilter = 'all';
+/** 접힌 주인(캐릭터 · 공용) */
+const folded = new Set<string>();
+
 function cardsTab(data: GameData, codex: Codex, owned?: Record<string, number>): HTMLElement {
   const cards = codexCards(data);
   const order = [...data.characters.keys(), 'common'];
   const rank = (owner: string) => (order.includes(owner) ? order.indexOf(owner) : order.length);
   const owners = [...new Set(cards.map((c) => c.owner))].sort((a, b) => rank(a) - rank(b));
   const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'special'];
+  // 보유는 지도에서 연 도감(지금 런)에만 있다
+  if (!owned && cardFilter === 'owned') cardFilter = 'all';
+  const isSeen = (def: CardDef) => def.id in codex.cards || owned?.[def.id] !== undefined;
+  const keep = (def: CardDef) =>
+    cardFilter === 'all' ? true : cardFilter === 'owned' ? owned?.[def.id] !== undefined : cardFilter === 'seen' ? isSeen(def) : !isSeen(def);
   const tile = (def: CardDef) => {
     const have = owned?.[def.id];
-    if (!(def.id in codex.cards) && have === undefined) return h('div', { class: `codex-card unknown rarity-${def.rarity}` }, h('span', {}, '?'));
+    if (!isSeen(def)) return h('div', { class: `codex-card unknown rarity-${def.rarity}`, 'aria-label': '아직 못 본 카드' }, h('span', {}, '?'));
     // 실물(보유: 보유 강화 단계) · 윤곽(본 적만 있음)
     const real = !owned || have !== undefined;
     const level = have ?? codex.cards[def.id] ?? 0;
@@ -198,24 +215,56 @@ function cardsTab(data: GameData, codex: Codex, owned?: Record<string, number>):
       owned ? h('span', { class: `codex-own${real ? ' on' : ''}` }, real ? `보유${have ? ` +${have}` : ''}` : '윤곽 · 본 적 있음') : null,
     );
   };
-  return h(
-    'div',
-    {},
-    owners.map((owner) => {
+  const root = h('div', {});
+  const draw = () => {
+    const bar = h(
+      'div',
+      { class: 'codex-filter', role: 'radiogroup', 'aria-label': '카드 거르기' },
+      CARD_FILTERS.filter((f) => f.id !== 'owned' || owned).map((f) =>
+        h('button', { class: `btn btn-small${cardFilter === f.id ? ' on' : ''}`, role: 'radio', 'aria-checked': String(cardFilter === f.id), onclick: () => ((cardFilter = f.id), draw()) }, f.label),
+      ),
+      h('span', { class: 'codex-filter-gap' }),
+      h('button', { class: 'btn btn-small', onclick: () => (owners.forEach((o) => folded.add(o)), draw()) }, '모두 접기'),
+      h('button', { class: 'btn btn-small', onclick: () => (folded.clear(), draw()) }, '모두 펼치기'),
+    );
+    const groups = owners.map((owner) => {
       const list = cards.filter((c) => c.owner === owner).sort((a, b) => rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity) || a.name.localeCompare(b.name, 'ko'));
-      const seen = list.filter((c) => c.id in codex.cards || owned?.[c.id] !== undefined).length;
+      const seen = list.filter(isSeen).length;
       const name = data.characters.get(owner)?.name ?? '공용';
       const have = owned ? list.filter((c) => owned[c.id] !== undefined).length : null;
-      return section(name, `${seen} / ${list.length}${have !== null ? ` · 보유 ${have}` : ''}`, h('div', { class: 'deck-cards' }, list.map(tile)));
-    }),
-    h(
-      'p',
-      { class: 'hint' },
-      owned
-        ? '칸은 세 단계: ? 모름 → 윤곽(보상·상점·사건에서 본 카드. 심연의 보상에 +0으로 나온다) → 실물(보유. 보유한 강화 단계로 심연에 나온다).'
-        : '가지거나 보상·상점에서 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.',
-    ),
-  );
+      const shown = list.filter(keep);
+      const open = !folded.has(owner);
+      return h(
+        'section',
+        { class: `codex-section codex-owner${open ? '' : ' folded'}` },
+        h(
+          'h3',
+          {},
+          h(
+            'button',
+            { class: 'codex-fold', 'aria-expanded': String(open), onclick: () => (open ? folded.add(owner) : folded.delete(owner), draw()) },
+            h('span', { class: 'codex-fold-mark', 'aria-hidden': 'true' }, open ? '▾' : '▸'),
+            name,
+          ),
+          h('small', {}, `${seen} / ${list.length}${have !== null ? ` · 보유 ${have}` : ''}`),
+        ),
+        open ? (shown.length ? h('div', { class: 'deck-cards' }, shown.map(tile)) : h('p', { class: 'hint' }, '이 거르기에 맞는 카드가 없다.')) : null,
+      );
+    });
+    root.replaceChildren(
+      bar,
+      ...groups,
+      h(
+        'p',
+        { class: 'hint' },
+        owned
+          ? '칸은 세 단계: ? 모름 → 윤곽(보상·상점·사건에서 본 카드. 심연의 보상에 +0으로 나온다) → 실물(보유. 보유한 강화 단계로 심연에 나온다).'
+          : '가지거나 보상·상점에서 본 카드가 채워진다. 카드는 본 적 있는 가장 높은 강화 단계로 보인다.',
+      ),
+    );
+  };
+  draw();
+  return root;
 }
 
 function enemiesTab(data: GameData, codex: Codex): HTMLElement {
@@ -538,8 +587,25 @@ export function codexView(
   const total = prog.reduce((a, p) => a + p.total, 0);
   const body = h('div', { class: 'codex-body' });
   const tabs = h('nav', { class: 'codex-tabs', role: 'tablist' });
+  const pct = (a: number, b: number) => (b ? Math.floor((100 * a) / b) : 0);
+  // 머리: 지금 탭의 채움(크게) + 전체(작게) — 2026-10-11 UI/UX 4-1
+  const tabProg = h('b', { class: 'codex-tabprog' });
+  const tabCount = (tab: CodexTab): { seen: number; total: number; label: string } | null => {
+    const of = (...labels: string[]) => prog.filter((p) => labels.includes(p.label));
+    const sum = (ps: CodexProgress[], label: string) => (ps.length ? { seen: ps.reduce((a, p) => a + p.seen, 0), total: ps.reduce((a, p) => a + p.total, 0), label } : null);
+    if (tab === 'items') return sum(of('유물', '물약'), '유물·물약');
+    if (tab === 'abyss') return meta ? { seen: meta.achievements.length, total: data.achievements.size, label: '심연 업적' } : null;
+    const t = TABS.find((x) => x.id === tab)!;
+    return sum(of(t.label), t.label);
+  };
   const select = (tab: CodexTab) => {
-    for (const b of tabs.children) b.classList.toggle('on', (b as HTMLElement).dataset.tab === tab);
+    for (const b of tabs.children) {
+      const on = (b as HTMLElement).dataset.tab === tab;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+    }
+    const c = tabCount(tab);
+    tabProg.textContent = c ? `${c.label} ${c.seen} / ${c.total} (${pct(c.seen, c.total)}%)` : '';
     const content =
       tab === 'cards'
         ? cardsTab(data, codex, owned)
@@ -558,13 +624,15 @@ export function codexView(
     body.scrollTop = 0;
   };
   for (const t of TABS) {
-    const p = prog.find((x) => x.label === t.label || (t.id === 'items' && x.label === '유물'));
     tabs.append(
       h(
         'button',
         { class: 'codex-tab', role: 'tab', 'data-tab': t.id, onclick: () => select(t.id) },
         t.label,
-        p && t.id !== 'items' ? h('small', {}, `${p.seen}/${p.total}`) : t.id === 'abyss' && meta ? h('small', {}, `${meta.achievements.length}/${data.achievements.size}`) : null,
+        (() => {
+          const c = tabCount(t.id);
+          return c ? h('small', {}, `${c.seen}/${c.total}`) : null;
+        })(),
       ),
     );
   }
@@ -575,7 +643,7 @@ export function codexView(
       'header',
       { class: 'codex-head panel' },
       h('span', { class: 'seal' }, '錄'),
-      h('div', { class: 'codex-title' }, h('h2', {}, '도감'), h('small', {}, `채운 칸 ${seen} / ${total} (${total ? Math.floor((100 * seen) / total) : 0}%)`)),
+      h('div', { class: 'codex-title' }, h('h2', {}, '도감'), tabProg, h('small', { class: 'codex-total' }, `전체 ${seen} / ${total} (${pct(seen, total)}%)`)),
       tabs,
       h('button', { class: 'btn', onclick: handlers.onBack }, '돌아가기'),
     ),

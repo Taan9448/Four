@@ -10,6 +10,7 @@ import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
 import { potionChip, relicChip } from './items';
 import type { PilgrimOffer } from '../engine/pilgrimage';
+import { describeChoice } from '../engine/text';
 
 const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', shop: '상점', story: '이야기' };
 /** 판 머리의 붉은 낙관(지도 노드와 같은 한자) */
@@ -77,8 +78,10 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                   },
                 },
                 h('span', { class: 'choice-mark' }, '▸'),
-                h('span', {}, c.label),
+                h('span', { class: 'choice-label' }, c.label),
                 c.disabled ? h('small', { class: 'choice-why' }, c.disabled) : null,
+                // 무엇이 되는지 오른쪽 끝에 금빛으로(체력 +30% · 카드 1장 강화(고름) …)
+                describeChoice(data, c) ? h('small', { class: 'choice-sum' }, describeChoice(data, c)) : null,
               ),
             ),
             // 여관: 편성 바꾸기(선택지와 따로, 고르기 전에)

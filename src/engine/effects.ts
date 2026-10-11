@@ -538,7 +538,12 @@ export function changeRift(state: BattleState, delta: number): void {
     state.events.push({ type: 'surge' });
     if (state.tally) state.tally.surges += 1;
     state.log.push('균열 폭주! 하늘이 갈라진다.');
-    for (const p of alive(state.party)) loseHp(state, p, bal.surgeDamage);
+    // 폭주로 잃은 체력(결과 화면)
+    for (const p of alive(state.party)) {
+      const hp = p.hp;
+      loseHp(state, p, bal.surgeDamage);
+      if (state.tally) state.tally.surgeHp = (state.tally.surgeHp ?? 0) + Math.max(0, hp - Math.max(0, p.hp));
+    }
     const v = state.rift;
     state.rift = bal.surgeResetTo;
     state.events.push({ type: 'rift', value: state.rift, delta: state.rift - v });

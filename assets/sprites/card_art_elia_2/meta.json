@@ -1,0 +1,42 @@
+{
+  "id": "card_art_elia_2",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 6,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "630ccc624d822b38",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.826,
+  "cards": [
+    "elia_staff",
+    "elia_cold_breath",
+    "elia_poultice",
+    "elia_sprout",
+    "elia_frost_bloom",
+    "elia_silien_song"
+  ]
+}
