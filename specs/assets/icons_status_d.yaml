@@ -1,0 +1,13 @@
+id: icons_status_d
+type: icon-sheet
+summary: 상태 아이콘 44~47(봉인·금을 세다·카드 확장의 새 상태) — 칸 n = 상태 icon n+43
+# 칸 번호 = data/statuses.json의 icon에서 43을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-11 균열 개편(봉인 seal · 금을 세다 p_count_gold)과 카드 250장 확장(cost_down · block_kept, 상태는 카드 PR 1에서 들어온다)
+frames: 4
+baseline: 0.5
+frame_notes:
+  1: "seal — a round paper talisman with a red stamp pressed over a short black crack, the crack stopped at the stamp edge"
+  2: "counting the cracks — a slender hand with three raised fingers beside a thin gold crack, inside a thin gold ring"
+  3: "cost down — a small gold coin-shaped qi orb with a downward arrow beside it"
+  4: "kept block — a grey shield with a small silver lock clasp on its rim"
+placeholder: { color: '#5d6478', accent: '#ff3b3b' }

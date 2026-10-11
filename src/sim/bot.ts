@@ -5,7 +5,7 @@
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
-import { buyCard, buyPotion, buyRelic, buyRemove, buySwap, claimLoot, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
 import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
 import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
@@ -228,6 +228,9 @@ function relicDownside(data: GameData, id: string): number {
   return d;
 }
 
+/** 균열을 올리는 덱에서 감소 카드에 더하는 값(고급 감소 카드가 보상 기준 6을 넘게) */
+const REDUCE_BONUS = 3;
+
 const RARITY_VALUE: Record<string, number> = { common: 2, uncommon: 4, rare: 6, epic: 9, legendary: 12, special: -10 };
 
 function cardValue(def: CardDef): number {
@@ -309,13 +312,16 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
 
 /** 보상: 가장 값진 카드(등급 → 공격 우선). 값이 낮거나 덱이 크면 건너뛴다 */
 function decideReward(data: GameData, run: RunState, options: string[], opts: BotOptions): string | undefined {
+  // 균열을 올리는 카드가 2장 이상인 덱은 균열 감소 카드(숨 세기 갈래)에 값을 더 준다(폭주는 비용)
+  const fusionDeck = run.deck.filter((c) => data.cards.get(c.cardId)?.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) > 0)).length >= 2;
+  const worth = (def: CardDef) => cardValue(def) + (fusionDeck && isReduceCard(def) ? REDUCE_BONUS : 0);
   const score = (id: string) => {
     const def = data.cards.get(id)!;
-    return cardValue(def) * 10 + lean(def, opts);
+    return worth(def) * 10 + lean(def, opts);
   };
   const best = [...options].sort((a, b) => score(b) - score(a))[0];
   if (!best) return undefined;
-  const value = cardValue(data.cards.get(best)!);
+  const value = worth(data.cards.get(best)!);
   // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 값이 기준 이상이면 늘 가진다
   if (value < opts.minRewardValue) return undefined;
   // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
@@ -352,6 +358,8 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     if (uid && run.gold >= price && price <= REMOVAL_GOLD + 10 * (run.deck.length - LEAN_DECK)) buyRemove(data, run, uid);
   };
   removeFirst();
+  // 상흔이 깊은 상점: 꿰매기(상흔 1 = 런 점수 8)가 값보다 크면 먼저
+  if (shop.scarred && !shop.stitchUsed && run.gold >= data.balance.rift.scar.shopStitchGold + 30) buyStitch(data, run);
   const bigDeck = isAbyss(run) && run.deck.length >= LEAN_DECK;
   shop.cards.forEach((c, i) => {
     if (c.sold || run.gold < c.price) return;

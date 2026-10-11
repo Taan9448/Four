@@ -3,6 +3,7 @@ import type { GameData } from './data';
 import type { Effect, Element, MoveDef, World, WorldMana } from './schema';
 import type { Rng } from './rng';
 import {
+  addEcho,
   addStatus,
   changeRift,
   checkCondition,
@@ -16,7 +17,6 @@ import {
   fireSupport,
   hasSkipTurn,
   loseHp,
-  newCard,
   previewDamage,
   previewDamageOn,
   runEffects,
@@ -55,6 +55,8 @@ export interface BattleSetup {
   supportActive: boolean;
   flags?: string[];
   scar?: number;
+  /** 폭주 체력 손실 배율(첫 폭주 안내 전투 ½) */
+  surgeDamageMul?: number;
   /** 모듈 보너스 등 전투 시작 효과 */
   startEffects?: Effect[];
   /** 이 턴 수를 버티면 승리(모듈 content.surviveTurns) */
@@ -151,6 +153,8 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
 
   state.enemyHpScale = setup.enemyHpScale ?? 1;
+  // 폭주 체력 손실 배율: 첫 폭주 안내 전투(모듈 surgeTutorial)·규칙 유물 surge_half(바늘쌈)
+  state.surgeDamageMul = (setup.surgeDamageMul ?? 1) * (hasRule(state, 'surge_half') ? 0.5 : 1);
   state.critRng = setup.rng.fork('crit');
   state.enemyDmgScale = setup.enemyDmgScale ?? 1;
   if (setup.enemyHitCap) state.enemyHitCap = setup.enemyHitCap;
@@ -459,6 +463,7 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   state.events.push({ type: 'card', cardId: inst.cardId, sourceUid: owner.uid });
   if (state.tally) state.tally.cards[inst.cardId] = (state.tally.cards[inst.cardId] ?? 0) + 1;
   state.log.push(`${owner.name}: ${card.def.name}${isFusion(card) ? ' [융합]' : ''}`);
+  state.consumed = 0;
   runEffects(state, card.effects, { source: owner, card, chosenUid: targetUid });
   // 파워(지속 효과): 아군·적이 가진 상태 중 '카드를 낸 뒤' 발동
   fireSideTriggers(state, [...state.party, ...state.enemies], 'cardPlayed', { card, cardOwnerUid: owner.uid });
@@ -488,6 +493,7 @@ export function cloneBattle(s: BattleState): BattleState {
     events: [],
     log: [],
     supportUsed: [...s.supportUsed],
+    onceUsed: s.onceUsed ? [...s.onceUsed] : undefined,
     relicCounters: s.relicCounters ? { ...s.relicCounters } : undefined,
     tally: s.tally ? { ...s.tally, cards: { ...s.tally.cards }, moves: s.tally.moves ? Object.fromEntries(Object.entries(s.tally.moves).map(([k, v]) => [k, [...v]])) : undefined } : undefined,
     potions: [...s.potions],
@@ -605,8 +611,7 @@ export function endTurn(state: BattleState): void {
   // 균열: 세계별 감쇠 뒤, 임계치 이상이면 틈의 잔향
   const decay = bal.rift.decay[state.world];
   if (decay > 0 && state.rift > 0) changeRift(state, -decay);
-  if (state.rift >= bal.rift.echoThreshold && !hasRule(state, 'no_echo')) {
-    state.discard.push(newCard(state, bal.rift.echoCard));
+  if (state.rift >= bal.rift.echoThreshold && addEcho(state, 'discard')) {
     state.events.push({ type: 'echo' });
     state.log.push('틈의 잔향이 덱에 섞였다.');
   }

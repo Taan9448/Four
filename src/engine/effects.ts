@@ -96,6 +96,9 @@ export function amountOf(state: BattleState, effect: Effect, target: Combatant |
       case 'enemies':
         per = alive(state.enemies).length;
         break;
+      case 'consumed':
+        per = state.consumed ?? 0;
+        break;
     }
     let add = Math.floor(sc.amount * per);
     if (sc.max !== undefined) add = Math.min(add, sc.max);
@@ -528,6 +531,23 @@ export function setResult(state: BattleState, result: 'victory' | 'defeat'): voi
 
 export function changeRift(state: BattleState, delta: number): void {
   const bal = state.data.balance.rift;
+  // 봉인(seal): 균열이 오를 때 스택 하나가 1을 막고 사라진다(일행 누구의 봉인이든, 앞자리부터)
+  if (delta > 0) {
+    let blocked = 0;
+    for (const p of alive(state.party)) {
+      while (delta > 0 && (p.statuses.seal ?? 0) > 0) {
+        p.statuses.seal -= 1;
+        if (!p.statuses.seal) delete p.statuses.seal;
+        delta -= 1;
+        blocked += 1;
+      }
+    }
+    if (blocked) {
+      state.events.push({ type: 'sealed', amount: blocked });
+      state.log.push(`봉인이 금 ${blocked}을 막았다.`);
+    }
+    if (delta <= 0) return;
+  }
   const before = state.rift;
   state.rift = Math.max(0, Math.min(bal.max, state.rift + delta));
   if (state.rift === before) return;
@@ -572,17 +592,25 @@ function surge(state: BattleState): void {
     }
   }
   // ③ 틈의 잔향을 손패에(가득 차면 버린 더미)
-  for (let i = 0; i < bal.surgeEchoToHand; i++) {
-    const c = newCard(state, bal.echoCard);
-    if (state.hand.length < state.data.balance.maxHand) state.hand.push(c);
-    else state.discard.push(c);
-  }
+  for (let i = 0; i < bal.surgeEchoToHand; i++) addEcho(state, 'hand');
   if (bal.surgeEchoToHand) state.events.push({ type: 'echo' });
   // ④ 상흔(전투 결과에 더한다)
   if (state.tally) state.tally.surgeScar = (state.tally.surgeScar ?? 0) + bal.surgeScar;
   const v = state.rift;
   state.rift = bal.surgeResetTo;
   state.events.push({ type: 'rift', value: state.rift, delta: state.rift - v });
+}
+
+/** 틈의 잔향 한 장(손패 · 버린 더미). 규칙 유물 half_echo면 두 장에 한 장만 들어온다. 들어왔으면 true */
+export function addEcho(state: BattleState, to: 'hand' | 'discard'): boolean {
+  if (hasRule(state, 'half_echo')) {
+    state.echoSkips = (state.echoSkips ?? 0) + 1;
+    if (state.echoSkips % 2 === 1) return false;
+  }
+  const c = newCard(state, state.data.balance.rift.echoCard);
+  if (to === 'hand' && state.hand.length < state.data.balance.maxHand) state.hand.push(c);
+  else state.discard.push(c);
+  return true;
 }
 
 // ───────────────────────── 카드 더미 ─────────────────────────
@@ -629,12 +657,17 @@ export function runEffects(state: BattleState, effects: Effect[], ctx: EffectCon
     if (!BATTLE_OP_SET.has(effect.op)) {
       throw new Error(`런 단위 동작 "${effect.op}"은 전투에서 쓸 수 없다`);
     }
+    if (effect.oncePerBattle) {
+      const key = `${ctx.card?.def.id ?? ''}:${effect.op}`;
+      if ((state.onceUsed ??= []).includes(key)) continue;
+      if (checkCondition(state, effect.condition, ctx)) state.onceUsed.push(key);
+    }
     applyEffect(state, effect, ctx);
   }
 }
 
 function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): void {
-  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon'].includes(effect.op);
+  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon', 'consume_rift', 'scar'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
     const amount = amountOf(state, effect, undefined, ctx);
@@ -675,6 +708,23 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       }
       case 'rift':
         changeRift(state, amount);
+        return;
+      case 'consume_rift': {
+        // 균열 소비: amount가 있으면 그만큼까지, 없으면 전부. 소비한 양은 뒤 효과의 scale per consumed
+        const n = Math.min(state.rift, effect.amount ?? state.rift);
+        state.consumed = n;
+        if (n > 0) {
+          changeRift(state, -n);
+          state.log.push(`균열 ${n}을 소비했다.`);
+        }
+        return;
+      }
+      case 'scar':
+        // 전투 중 상흔(은빛 바느질 -1 · 틈의 카드의 대가 +2): 전투 결과의 상흔에 더한다
+        if (state.tally) state.tally.surgeScar = (state.tally.surgeScar ?? 0) + amount;
+        state.scar = Math.max(0, state.scar + amount);
+        state.events.push({ type: 'scar', delta: amount });
+        state.log.push(`상흔 ${amount >= 0 ? '+' : ''}${amount}`);
         return;
       case 'neigong_max':
         // 이번 전투에서 턴마다 차는 내공(마지막 한 땀: 팔 년 내공을 실로 뽑는다)

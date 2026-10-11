@@ -1735,3 +1735,5 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 
 /* 지도 옆 칸: 상흔이 남긴 다음 전투 시작 균열(GAME_DESIGN 7절) */
 .start-rift { margin: 4px 0 0; font-size: var(--fs-cap); color: #ff8a8a; font-weight: 700; text-align: center; cursor: help; }
+/* 상흔 20 이상의 상점(GAME_DESIGN 7절) */
+.shop-scarred { margin: 0 0 6px; padding: 4px 8px; border-left: 3px solid #b3121b; background: rgba(179, 18, 27, 0.12); color: #ffb0b0; font-size: var(--fs-cap); }

@@ -65,6 +65,8 @@ export type BattleEvent =
   | { type: 'surge'; count?: number }
   | { type: 'neigong_max'; value: number }
   | { type: 'echo' }
+  | { type: 'sealed'; amount: number }
+  | { type: 'scar'; delta: number }
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'relic'; relicId: string; name: string }
   | { type: 'potion'; potionId: string; name: string }
@@ -139,8 +141,14 @@ export interface BattleState {
   noCrit?: boolean;
   /** 이 전투에서 일어난 폭주 수(n번째 폭주의 체력 손실 ×n) */
   surgeCount?: number;
-  /** 폭주 체력 손실 배율(첫 폭주 안내 전투 ½ 등) */
+  /** 폭주 체력 손실 배율(첫 폭주 안내 전투 ½ · 바늘쌈 ½) */
   surgeDamageMul?: number;
+  /** 이 카드가 consume_rift로 소비한 균열(카드를 낼 때마다 0으로) */
+  consumed?: number;
+  /** 규칙 유물 half_echo: 들어오려던 잔향 수 */
+  echoSkips?: number;
+  /** 한 전투에 한 번만인 효과(카드 id:동작)를 이미 쓴 것 */
+  onceUsed?: string[];
 }
 
 export interface BattleTally {

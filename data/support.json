@@ -7,9 +7,9 @@
   },
   {
     "id": "wang_firewood", "source": "wang", "name": "부스러기 쓸어 담기",
-    "description": "전투당 1회, 균열이 7 이상이 되는 순간 균열 -3. \"저 하늘의 금은 제가 낸 부스러기입니다.\" \"제가가 아니라, 우리가예요.\"",
-    "trigger": "riftChanged", "condition": { "riftGte": 7 }, "oncePerBattle": true,
-    "effects": [ { "op": "rift", "amount": -3 } ]
+    "description": "전투당 1회, 균열이 9에 이르는 순간 균열 -2. \"참아라, 하운아.\" 폭주 한 걸음 앞에서 사형이 숨을 고르게 한다.",
+    "trigger": "riftChanged", "condition": { "riftGte": 9 }, "oncePerBattle": true,
+    "effects": [ { "op": "rift", "amount": -2 } ]
   },
   {
     "id": "wang_dojin", "source": "wang", "name": "도진아",

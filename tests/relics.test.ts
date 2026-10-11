@@ -1,9 +1,9 @@
 // 유물 확장(C단계): 새 발동 시점·규칙 유물·물약 칸
 import { describe, expect, it } from 'vitest';
 import { endTurn, playCard } from '../src/engine/battle';
-import { changeRift, loseHp } from '../src/engine/effects';
+import { addEcho, changeRift, loseHp } from '../src/engine/effects';
 import { openShop } from '../src/engine/economy';
-import { createRunAt, gainRelic } from '../src/engine/run';
+import { createRunAt, fireRunRelics, gainRelic } from '../src/engine/run';
 import { battle, cards, data, give } from './helpers';
 
 const big = (s: ReturnType<typeof battle>) => {
@@ -25,14 +25,30 @@ describe('유물 발동 시점', () => {
     expect(block()).toBe(b0 + 5 + 3);
   });
 
-  it('riftChanged: 균열이 오를 때마다(금 간 종: 적 모두 피해 2)', () => {
-    const s = battle({ relics: ['rift_bell'] });
-    big(s);
-    const hp = s.enemies[0].hp;
-    changeRift(s, 2);
-    expect(s.enemies[0].hp).toBe(hp - 2);
-    changeRift(s, -1);
-    expect(s.enemies[0].hp).toBe(hp - 2);
+  it('cleanVictory: 폭주 없이 이긴 전투(금 간 종 상흔 -1 · 나무 염주 일행 체력 3), 봉인 두루마리는 잔향 두 장에 한 장', () => {
+    const run = createRunAt(data, 'CLEAN', 's2');
+    run.relics = ['rift_bell', 'wooden_bead'];
+    run.scar = 4;
+    run.roster[0].hp = 10;
+    fireRunRelics(data, run, 'cleanVictory');
+    expect(run.scar).toBe(3);
+    expect(run.roster[0].hp).toBe(13);
+    const s = battle({ relics: ['sealed_scroll'] });
+    s.hand = [];
+    for (let i = 0; i < 4; i++) addEcho(s, 'hand');
+    expect(s.hand.filter((c) => c.cardId === 'status_rift_echo')).toHaveLength(2);
+  });
+
+  it('봉인: 균열이 오를 때 스택 하나가 1을 막는다 · 실패(전투 시작 봉인 1) · 바늘쌈(폭주 체력 손실 절반)', () => {
+    const s = battle({ relics: ['thread_spool'] });
+    expect(s.party[0].statuses.seal).toBe(1);
+    changeRift(s, 3);
+    expect(s.rift).toBe(2);
+    expect(s.party[0].statuses.seal).toBeUndefined();
+    const n = battle({ relics: ['needle_case'], party: [{ id: 'haun', hp: 60, maxHp: 60 }] });
+    n.rift = 9;
+    changeRift(n, 1);
+    expect(n.party[0].hp).toBe(60 - Math.floor((6 + 5) * 0.5));
   });
 
   it('allyDowned: 동료가 쓰러질 때(불사조의 재는 한 번만)', () => {

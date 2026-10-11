@@ -55,7 +55,8 @@ describe('데이터 검사', () => {
       const both = c.cost.neigong > 0 && c.cost.mana > 0;
       if (fusion !== both) errors.push(`${c.id}: 융합 키워드와 비용(내공+마나)이 맞지 않는다`);
       if (fusion && c.owner !== 'haun') errors.push(`${c.id}: 융합(내공+마나 동시 소모)은 하운 전용이다`);
-      if (fusion && !c.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) > 0)) errors.push(`${c.id}: 융합 카드는 균열을 올려야 한다`);
+      // 융합은 균열을 올린다. 예외: 균열을 거두는 융합(흐름을 돌리다 — consume_rift, 균열 개편 2026-10-11)
+      if (fusion && !c.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) > 0) || e.op === 'consume_rift')) errors.push(`${c.id}: 융합 카드는 균열을 올려야 한다`);
     }
     expect(errors).toEqual([]);
   });
@@ -106,7 +107,7 @@ describe('데이터 검사', () => {
 
   it('유물·물약: 전투 발동은 전투 동작, 런 발동(pickup·victory·rest·shopEnter)은 런 동작만 쓴다. passive는 rule이 있다. 수량 목표(유물 60~80·물약 20~25)', () => {
     const errors: string[] = [];
-    const runTriggers = new Set(['pickup', 'victory', 'rest', 'shopEnter']);
+    const runTriggers = new Set(['pickup', 'victory', 'cleanVictory', 'rest', 'shopEnter']);
     for (const r of data.relics.values()) {
       errors.push(...checkEffects(`유물 ${r.id}`, r.effects, runTriggers.has(r.trigger) ? runOps : battleOps));
       if (r.trigger === 'passive' && !r.rule) errors.push(`${r.id}: passive 유물은 rule이 있어야 한다`);
