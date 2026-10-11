@@ -190,8 +190,8 @@
     "pool": "starter",
     "cost": {"neigong": 0, "mana": 0},
     "target": "none",
-    "effects": [{"op": "rift", "amount": -2}, {"op": "draw", "amount": 1}],
-    "upgrade": {"growth": [0, 1], "plus4": {"name": "넷이서 세자", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "말 안 해도 돼요", "addKeywords": ["retain"]}},
+    "effects": [{"op": "draw", "amount": 1, "condition": {"riftGte": 2}}, {"op": "rift", "amount": -2}],
+    "upgrade": {"growth": [1, 0], "plus4": {"name": "넷이서 세자", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "말 안 해도 돼요", "addKeywords": ["retain"]}},
     "flavor": "다섯 번. …하일론에서는 한 번이었어요. 실바렌에서는 세 번."
   },
   {
@@ -309,5 +309,9 @@
     "effects": [{"op": "heal", "amount": 8, "target": "all_allies"}, {"op": "block", "amount": 8, "target": "all_allies"}],
     "upgrade": {"growth": [2, 2], "plus4": {"name": "은빛 머리칼", "effects": [{"op": "gain_mana", "amount": 2}]}, "plus5": {"name": "땅까지 닿는 노래", "effects": [{"op": "draw", "amount": 2}]}},
     "flavor": "실바렌의 결계 앞에서 어머니와 손을 맞잡고 부르던 엘프의 노래. 엘리아는 처음으로 그 노래를 끝까지 불렀다."
-  }
+  },
+  {"id": "elia_silver_stitch", "name": "은빛 바느질", "owner": "elia", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 0, "mana": 1}, "target": "ally", "effects": [{"op": "rift", "amount": -3}, {"op": "heal", "amount": 3, "target": "ally"}, {"op": "scar", "amount": -1, "condition": {"scarMin": 5}, "oncePerBattle": true}], "upgrade": {"growth": [0, 2, 0], "plus4": {"name": "촘촘한 땀", "effects": [{"op": "block", "amount": 4, "target": "ally"}]}, "plus5": {"name": "실은 남는다", "addKeywords": ["retain"]}}, "flavor": "은빛 실 한 가닥. 하늘의 금도 옷깃처럼 꿰맬 수 있다고, 엘리아는 믿었다."},
+  {"id": "elia_count_gold", "name": "금을 세다", "owner": "elia", "type": "power", "rarity": "rare", "pool": "reward", "cost": {"neigong": 0, "mana": 2}, "target": "self", "keywords": ["exhaust"], "effects": [{"op": "apply_status", "status": "p_count_gold", "stacks": 1, "target": "self"}, {"op": "rift", "amount": -1}, {"op": "block", "amount": 2, "target": "self"}], "upgrade": {"growth": [0, 0, 2], "plus4": {"name": "함께 센다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "익숙한 숫자", "cost": {"neigong": 0, "mana": 1}}}, "flavor": "하나, 둘, 셋. 금이 아물 때까지 숨을 센다. 첫눈의 개울가에서 배운 셈."},
+  {"id": "elia_one_stitch", "name": "한 땀", "owner": "elia", "type": "skill", "rarity": "epic", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["exhaust"], "castLine": {"speaker": "elia", "face": "resolve", "text": "한 땀이면 돼. 다 닫아."}, "effects": [{"op": "consume_rift"}, {"op": "block", "amount": 0, "target": "all_allies", "scale": {"per": "consumed", "amount": 2}}], "upgrade": {"growth": [0, 2], "plus4": {"name": "매듭짓기", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "남은 실", "effects": [{"op": "gain_mana", "amount": 1}]}}, "flavor": "마지막 한 땀은 언제나 가장 길다. 벌어진 하늘이 한 번에 닫혔다."},
+  {"id": "elia_sealing_hand", "name": "봉인의 손", "owner": "elia", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 0, "mana": 1}, "target": "self", "effects": [{"op": "apply_status", "status": "seal", "stacks": 2, "target": "self"}], "upgrade": {"growth": [1], "plus4": {"name": "감싸는 손", "effects": [{"op": "block", "amount": 4, "target": "self"}]}, "plus5": {"name": "가벼운 손", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "손바닥에 옅은 원이 떠올랐다. 금이 벌어지려다 멈칫했다."}
 ]

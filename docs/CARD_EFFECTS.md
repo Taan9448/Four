@@ -4,7 +4,7 @@
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(17개)
+## 1. 전투 기본 동작(19개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -25,13 +25,16 @@
 | `neigong_max` | amount | — | 이번 전투에서 턴마다 차는 내공 증감(내공의 실: 팔 년 내공을 실로 뽑는다). 0 아래로 내려가지 않는다 |
 | `summon` | enemy, count | — | 적 편에 적을 세운다(`balance.maxEnemies`까지, 스테이지·등급 배율 적용). 그 차례에는 쉬고 다음 차례부터 행동한다 |
 | `lose_hp` | amount | 자신 | 체력 잃기(방어 무시, 피의 값). '체력을 잃었을 때' 발동을 부른다 |
+| `consume_rift` | amount? | — | 균열 소비(2026-10-11 숨 세기 갈래): amount가 있으면 그만큼까지, 없으면 전부 내린다. 소비한 양은 같은 카드의 뒤 효과 `scale.per: consumed`가 쓴다(벼린 날 · 흐름을 돌리다 · 한 땀). 균열을 올리지 않는 융합(흐름을 돌리다)은 이 동작이 있어야 한다 |
+| `scar` | amount | — | 전투 중 상흔 증감(은빛 바느질 -1, 틈의 카드의 대가 +2). 전투 결과의 상흔에 더한다. 런 동작 `scar`와 같은 이름 |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
 - `times`: 연타 횟수(`damage`).
+- `oncePerBattle`: 이 효과는 한 전투에 한 번만(카드마다, 조건이 맞아 실제로 일어난 때부터 센다 — 은빛 바느질의 상흔 -1).
 - `condition`: `riftGte`, `riftLte`, `targetHasStatus`, `targetStatusGte: [status, n]`, `world`, `partyHas`, `turnMod: [n, r]`, `enemyId`, `hpRatioLte`, `flag`, `scarMin`. 대상이 있는 동작은 대상마다 검사한다.
 - `scale`: `{ per, status?, amount, max? }` → 기본값 + ⌊amount × per⌋(max가 있으면 더하는 값의 상한). `apply_status`·`reveal_grain`·`taunt`의 스택에도 걸린다.
-  - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수
+  - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수 · `consumed` 이 카드가 `consume_rift`로 소비한 균열
   - 예: 결을 따라 `{"op":"damage","amount":4,"scale":{"per":"targetStatus","status":"grain","amount":3}}`, 산처럼 `{"op":"damage","amount":0,"scale":{"per":"block","amount":0.5}}`, 불씨 잇기(화상 두 배) `{"op":"apply_status","status":"burn","stacks":0,"scale":{"per":"targetStatus","status":"burn","amount":1}}`
   - 카드 문구는 꼬리말을 자동으로 붙인다: "피해 4 (대상의 결 노출 1당 +3)", "피해 (자신의 방어 2당 +1)".
 
@@ -122,10 +125,12 @@
 | daze | 어지러움 | 자기 턴 끝 -1 | 발동: 차례 시작에 손패에서 무작위 1장 버리기(스택과 상관없이 1장, `perStack: false` — 그림자 조각) |
 | breath_broken | 끊긴 숨 | 자기 턴 끝 -1 | 발동: 차례 시작에 하운의 카드 1장 버리기(곽도진의 청운의 박자를 흐트리다) |
 | thorns | 가시 | 없음 | 발동: 공격을 맞을 때마다 때린 쪽에게 피해 1(스택마다) — 바위 골렘·용암 핏줄의 골렘·호법 |
+| seal | 봉인 | 없음(쓰면 소모) | special `seal`: 균열이 오를 때 스택 하나가 1을 막고 사라진다. 일행 누구의 봉인이든 앞자리부터 쓴다(균열 개편 2026-10-11 — 봉인의 손·막아서다·봉인 부적 조각·실패) |
+| p_count_gold | 금을 세다 | 없음 | 발동: 차례 끝에 균열 -1, 그때 균열이 0이면 카드 1장 |
 | frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
-`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, chill)은 엔진이 메커니즘으로 처리한다.
+`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, chill, seal)은 엔진이 메커니즘으로 처리한다.
 
 ## 4-1. 상태 발동(파워)
 

@@ -136,12 +136,12 @@ describe('심연 3차 — 서약', () => {
 });
 
 describe('심연 3차 — 해금·업적', () => {
-  it('틈의 카드 40장(하운 10·엘리아 8·카일 8·보른 8·공용 6): 처음 10장, 업적 30개가 하나씩 연다. 길은 3종이 처음부터', () => {
+  it('틈의 카드 43장(하운 10·엘리아 8·카일 8·보른 8·공용 9): 처음 13장(감소형 3장 포함), 업적 30개가 하나씩 연다. 길은 3종이 처음부터', () => {
     const all = riftCards(data);
-    expect(all.length).toBe(40);
+    expect(all.length).toBe(43);
     const by = (o: string) => all.filter((c) => c.owner === o).length;
-    expect([by('haun'), by('elia'), by('kyle'), by('born'), by('common')]).toEqual([10, 8, 8, 8, 6]);
-    expect(unlockedRift(data, []).length).toBe(10);
+    expect([by('haun'), by('elia'), by('kyle'), by('born'), by('common')]).toEqual([10, 8, 8, 8, 9]);
+    expect(unlockedRift(data, []).length).toBe(13);
     expect(unlockedPaths(data, []).sort()).toEqual(['path_mountain', 'path_river', 'path_woodcutter']);
     const ach = [...data.achievements.values()];
     expect(ach.length).toBe(33);
@@ -151,7 +151,7 @@ describe('심연 3차 — 해금·업적', () => {
     const opened = ach.map((a) => a.unlock.card ?? a.unlock.path);
     expect(new Set(opened).size).toBe(33);
     for (const id of opened) expect(data.cards.has(id!) || data.relics.get(id!)?.rarity === 'path').toBe(true);
-    expect(unlockedRift(data, ach.map((a) => a.id)).length).toBe(40);
+    expect(unlockedRift(data, ach.map((a) => a.id)).length).toBe(43);
     // 길 후보는 열린 길에서만
     for (const seed of ['P1', 'P2', 'P3']) expect(pathOffer(data, seed, unlockedPaths(data, [])).every((p) => ['path_mountain', 'path_river', 'path_woodcutter'].includes(p))).toBe(true);
     // 열린 틈의 카드만 보상에

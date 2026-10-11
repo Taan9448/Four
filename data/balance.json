@@ -27,7 +27,7 @@
     "surgeScar": 3,
     "surgeResetTo": 3,
     "scarRatio": 0.5,
-    "scar": { "startRiftPer": 5, "startRiftMax": 4, "restAt": 10, "restHealMul": 0.8, "stitch": 3, "stitchGold": 60, "bossCleanBonus": 5 }
+    "scar": { "startRiftPer": 5, "startRiftMax": 4, "restAt": 10, "restHealMul": 0.8, "stitch": 3, "stitchGold": 60, "bossCleanBonus": 5, "shopAt": 20, "shopPriceMul": 1.2, "shopStitch": 5, "shopStitchGold": 80 }
   },
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,

@@ -174,6 +174,9 @@ export interface ShopState {
   /** 이 상점에서 카드 바꾸기·강화를 이미 썼다(상점마다 한 번) */
   swapUsed: boolean;
   upgradeUsed: boolean;
+  /** 상흔 shopAt 이상일 때 연 상점: 값이 오르고, 꿰매기를 판다(GAME_DESIGN 7절) */
+  scarred?: boolean;
+  stitchUsed?: boolean;
 }
 
 export interface LevelUp {
@@ -553,7 +556,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     if (r) r.hp = Math.max(0, Math.min(r.maxHp, p.hp));
   }
   run.mana = outcome.mana;
-  run.scar += outcome.scarGain;
+  run.scar = Math.max(0, run.scar + outcome.scarGain);
   if (outcome.potions) run.potions = [...outcome.potions];
   // 결과 화면 통계
   const st = (run.stats ??= emptyStats());
@@ -612,6 +615,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     // 심연 모듈(틈의 짐승 등)의 clearEffects만. 캠페인 모듈의 이야기 보상은 없다
     if (enc.module.stage === 'abyss') out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
     out.push(...fireRunRelics(data, run, 'victory'));
+    if (!outcome.tally?.surges) out.push(...fireRunRelics(data, run, 'cleanVictory'));
     trackBattle(data, run, enc.module.id, enc.node.type, outcome.tally);
     if (enc.node.type === 'boss') {
       run.status = 'stage_clear';
@@ -632,6 +636,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
   awardBattleXp(data, run, enc.node.type);
   out.push(...applyRunOps(data, run, enc.module.content.clearEffects ?? []));
   out.push(...fireRunRelics(data, run, 'victory'));
+  if (!outcome.tally?.surges) out.push(...fireRunRelics(data, run, 'cleanVictory'));
   if (enc.node.type === 'boss') run.status = 'stage_clear';
   return out;
 }
@@ -639,7 +644,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
 // ───────────────────────── 유물·물약(런) ─────────────────────────
 
 /** 전투 밖 trigger(victory·rest·shopEnter)의 유물 효과를 런에 적용한다 */
-export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' | 'rest' | 'shopEnter'): string[] {
+export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' | 'cleanVictory' | 'rest' | 'shopEnter'): string[] {
   const out: string[] = [];
   for (const id of run.relics) {
     const relic = data.relics.get(id);

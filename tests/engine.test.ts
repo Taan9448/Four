@@ -347,15 +347,43 @@ describe('왕일검 지원 규칙', () => {
     expect(s.neigong).toBe(3);
   });
 
-  it('부스러기 쓸어 담기: 전투당 1회, 균열 7 이상이 되면 -3', () => {
+  it('참아라, 하운아(왕일검): 전투당 1회, 균열이 9에 이르면 -2 — 폭주 한 걸음 앞에서', () => {
     const s = battle({ supportActive: true, enemies: ['test_ignis'] });
-    s.rift = 5;
+    s.rift = 6;
     playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);
-    expect(s.rift).toBe(5);
+    expect(s.rift).toBe(7);
     s.neigong = 5;
     s.mana = 10;
     playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);
-    expect(s.rift).toBe(8);
+    // 두 번째는 막지 않는다: 7 + 3 = 10 → 폭주 → 3
+    expect(s.events.some((e) => e.type === 'surge')).toBe(true);
+    expect(s.rift).toBe(3);
+  });
+
+  it('균열 소비(consume_rift)와 소비 비례: 벼린 날 · 흐름을 돌리다 · 한 땀, 은빛 바느질의 상흔 -1은 전투당 한 번', () => {
+    const s = battle({ enemies: ['test_ignis'], party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'elia', hp: 42, maxHp: 42 }] });
+    const e = s.enemies[0];
+    e.hp = e.maxHp = 500;
+    s.rift = 5;
+    playCard(s, give(s, 'haun_honed_edge'), e.uid);
+    expect(s.rift).toBe(2);
+    expect(e.hp).toBe(500 - (6 + 9));
+    s.rift = 6;
+    s.neigong = 5;
+    s.mana = 5;
+    playCard(s, give(s, 'haun_turn_flow'), e.uid);
+    expect(s.rift).toBe(0);
+    expect(e.hp).toBe(500 - 15 - 24);
+    s.rift = 4;
+    playCard(s, give(s, 'elia_one_stitch'));
+    expect(s.rift).toBe(0);
+    expect(s.party[1].block).toBe(8);
+    s.scar = 6;
+    s.mana = 5;
+    playCard(s, give(s, 'elia_silver_stitch'), s.party[1].uid);
+    playCard(s, give(s, 'elia_silver_stitch'), s.party[1].uid);
+    expect(s.scar).toBe(5);
+    expect(s.tally?.surgeScar).toBe(-1);
   });
 
   it('도진아: 곽도진의 체력이 절반 이하가 되면 1턴 기절', () => {

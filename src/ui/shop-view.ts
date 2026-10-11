@@ -1,7 +1,7 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
@@ -59,6 +59,8 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
         h('div', { class: 'shop-purse' }, goldChip(run.gold)),
       ),
       h('p', { class: 'choice-text' }, module.content.text ?? ''),
+      // 상흔이 깊으면: '틈 냄새가 나는 손님' — 값이 오르고, 감소 카드 한 장과 꿰매기(GAME_DESIGN 7절)
+      shop.scarred ? h('p', { class: 'shop-scarred' }, `틈 냄새가 나는 손님 — 상흔 ${data.balance.rift.scar.shopAt} 이상이라 값이 ${Math.round((data.balance.rift.scar.shopPriceMul - 1) * 100)}% 올랐다. 대신 금을 꿰매 주겠단다.`) : '',
       h('h3', { class: 'shop-h' }, '카드'),
       h(
         'div',
@@ -160,6 +162,16 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
                   '고르기',
                 ),
           ),
+          shop.scarred
+            ? h(
+                'div',
+                { class: `shop-line${shop.stitchUsed ? ' sold' : ''}` },
+                h('span', { class: 'service-glyph' }, '縫'),
+                h('div', { class: 'shop-desc' }, h('b', {}, '꿰매기'), h('small', {}, `하늘의 금을 꿰맨다. 상흔 -${data.balance.rift.scar.shopStitch}(지금 ${run.scar}).`)),
+                price(data.balance.rift.scar.shopStitchGold, !!shop.stitchUsed),
+                shop.stitchUsed ? null : h('button', { class: 'btn btn-small', disabled: run.gold < data.balance.rift.scar.shopStitchGold, onclick: () => result(buyStitch(data, run)) }, '꿰매기'),
+              )
+            : null,
           h(
             'div',
             { class: `shop-line${shop.upgradeUsed ? ' sold' : ''}` },

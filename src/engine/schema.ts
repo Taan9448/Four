@@ -24,6 +24,9 @@ export const BATTLE_OPS = [
   'neigong_max',
   'lose_hp',
   'summon',
+  // 균열 개편(2026-10-11): 균열 소비(소비한 양은 scale per consumed) · 전투 중 상흔(전투 결과에 더한다, 런 동작 scar와 같은 이름)
+  'consume_rift',
+  'scar',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -89,11 +92,12 @@ export type Condition = z.infer<typeof Condition>;
 /**
  * 비례 수치: 기본값 + amount × per(소수면 내림). max가 있으면 더하는 값이 그 이상 커지지 않는다.
  * per — rift 균열 · hand 손패 수 · mana 마나 · targetStatus 대상의 status 스택 · selfStatus 자신의 status 스택 ·
- * cardsPlayed 이번 턴에 이 카드 전에 낸 카드 수 · block 자신의 방어 · missingHp 자신이 잃은 체력 · enemies 살아 있는 적 수
+ * cardsPlayed 이번 턴에 이 카드 전에 낸 카드 수 · block 자신의 방어 · missingHp 자신이 잃은 체력 · enemies 살아 있는 적 수 ·
+ * consumed 이 카드가 consume_rift로 소비한 균열
  */
 export const Scale = z
   .object({
-    per: z.enum(['rift', 'targetStatus', 'hand', 'mana', 'selfStatus', 'cardsPlayed', 'block', 'missingHp', 'enemies']),
+    per: z.enum(['rift', 'targetStatus', 'hand', 'mana', 'selfStatus', 'cardsPlayed', 'block', 'missingHp', 'enemies', 'consumed']),
     status: z.string().optional(),
     amount: z.number(),
     max: z.number().optional(),
@@ -136,6 +140,8 @@ export const Effect = z
     /** upgrade_card: 사람이 강화할 카드를 고른다(휴식 노드의 수련) */
     choose: z.boolean().optional(),
     condition: Condition.optional(),
+    /** 이 효과는 한 전투에 한 번만(카드마다 — 은빛 바느질의 상흔 -1) */
+    oncePerBattle: z.boolean().optional(),
     scale: Scale.optional(),
   })
   .strict();
@@ -275,7 +281,7 @@ export const StatusDef = z
     description: z.string(),
     /** 아이콘 그림이 없을 때 표시할 한 글자(한자) */
     glyph: z.string().length(1),
-    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~ icons_status_c(src/ui/icons.ts) */
+    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~ icons_status_d(src/ui/icons.ts) */
     icon: z.number().int().positive().optional(),
     /** 턴마다 줄어드는 스택 수. 0이면 줄지 않는다. */
     decay: z.number().int().min(0),
@@ -294,7 +300,7 @@ export const StatusDef = z
       .default({}),
     /** 엔진이 직접 처리하는 메커니즘(카드 개별 코드가 아님) */
     special: z
-      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'chill'])
+      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'chill', 'seal'])
       .optional(),
     triggers: z.array(StatusTrigger).default([]),
   })
@@ -428,9 +434,9 @@ export const RelicDef = z
     flavor: z.string().optional(),
     /**
      * 전투: battleStart · turnStart · turnEnd · enemyDowned · allyDowned(동료가 쓰러질 때) · cardPlayed(카드를 낸 뒤, cardType·keyword·every로 거른다) ·
-     * riftChanged(균열이 오를 때). 런: pickup(얻는 순간) · victory · rest · shopEnter(상점에 처음 들어설 때). passive: 효과 없이 rule만
+     * riftChanged(균열이 오를 때). 런: pickup(얻는 순간) · victory · cleanVictory(폭주 없이 이긴 전투) · rest · shopEnter(상점에 처음 들어설 때). passive: 효과 없이 rule만
      */
-    trigger: z.enum(['battleStart', 'turnStart', 'turnEnd', 'enemyDowned', 'allyDowned', 'cardPlayed', 'riftChanged', 'pickup', 'victory', 'rest', 'shopEnter', 'passive']),
+    trigger: z.enum(['battleStart', 'turnStart', 'turnEnd', 'enemyDowned', 'allyDowned', 'cardPlayed', 'riftChanged', 'pickup', 'victory', 'cleanVictory', 'rest', 'shopEnter', 'passive']),
     condition: Condition.default({}),
     oncePerBattle: z.boolean().default(false),
     /** cardPlayed 거르기: 카드 유형·키워드, every: 이 전투에서 맞는 카드 n장째마다 */
@@ -438,8 +444,11 @@ export const RelicDef = z
     keyword: Keyword.optional(),
     every: z.number().int().positive().optional(),
     /** 규칙을 바꾸는 유물(엔진이 처리, 수치는 balance.relicRules) */
-    /** reveal_map 지도의 ? 노드가 모두 보이고 엘리트 피해 ×balance.abyss.shadowEliteDmg · needle 심연 상점 지우기 무료·보상 카드 2장(심연 길) */
-    rule: z.enum(['keep_block', 'retain_one', 'no_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount', 'reveal_map', 'needle']).optional(),
+    /**
+     * reveal_map 지도의 ? 노드가 모두 보이고 엘리트 피해 ×balance.abyss.shadowEliteDmg · needle 심연 상점 지우기 무료·보상 카드 2장(심연 길) ·
+     * half_echo 틈의 잔향이 두 장에 한 장만 들어온다 · surge_half 폭주 체력 손실 절반
+     */
+    rule: z.enum(['keep_block', 'retain_one', 'half_echo', 'hand_plus_one', 'crit_heavy', 'fusion_calm', 'shop_discount', 'reveal_map', 'needle', 'surge_half']).optional(),
     effects: z.array(Effect).default([]),
     shop: z.boolean().default(true),
   })
@@ -505,7 +514,7 @@ export const Balance = z
         scarRatio: z.number(),
         /**
          * 상흔(두 단계): 전투 시작 균열 = ⌊상흔 / startRiftPer⌋(최대 startRiftMax). 상흔 restAt 이상이면 휴식 회복 ×restHealMul.
-         * 휴식 '꿰매기' = 상흔 -stitch · 골드 stitchGold. 폭주 없이 보스를 이기면 상흔 -bossCleanBonus
+         * 휴식 '꿰매기' = 상흔 -stitch · 골드 stitchGold. 폭주 없이 보스를 이기면 상흔 -bossCleanBonus. 상흔 shopAt 이상이면 상점 단계
          */
         scar: z
           .object({
@@ -516,6 +525,11 @@ export const Balance = z
             stitch: z.number().int().min(0),
             stitchGold: z.number().int().min(0),
             bossCleanBonus: z.number().int().min(0),
+            /** 상흔 shopAt 이상: 상점 값 ×shopPriceMul('틈 냄새가 나는 손님'), 감소 카드 한 장 보장, 상점 꿰매기(상흔 -shopStitch · 골드 shopStitchGold, 상점마다 한 번) */
+            shopAt: z.number().int().min(0),
+            shopPriceMul: z.number().min(1),
+            shopStitch: z.number().int().min(0),
+            shopStitchGold: z.number().int().min(0),
           })
           .strict(),
       })

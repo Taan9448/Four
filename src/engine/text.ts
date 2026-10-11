@@ -22,6 +22,8 @@ function condText(data: GameData, e: Effect): string {
   if (!c) return '';
   if (c.targetHasStatus) return `대상이 ${data.statuses.get(c.targetHasStatus)?.name ?? c.targetHasStatus} 상태면 `;
   if (c.riftGte !== undefined) return `균열 ${c.riftGte} 이상이면 `;
+  if (c.riftLte !== undefined) return c.riftLte <= 0 ? '균열이 0이면 ' : `균열 ${c.riftLte} 이하이면 `;
+  if (c.scarMin !== undefined) return `상흔 ${c.scarMin} 이상이면 `;
   if (c.partyHas) return `${data.characters.get(c.partyHas)?.name ?? c.partyHas} 출전 시 `;
   if (c.flag) return '';
   return '조건부: ';
@@ -35,6 +37,7 @@ const SCALE_LABEL: Record<string, string> = {
   block: '자신의 방어 1당',
   missingHp: '자신이 잃은 체력 1당',
   enemies: '적 1명당',
+  consumed: '소비한 균열 1당',
 };
 
 /** 비례 수치 꼬리말: "(결 노출 1스택당 +3)" / 방어의 절반이면 "(자신의 방어 2당 +1)" */
@@ -113,6 +116,10 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       return `${pre}도발`;
     case 'add_card':
       return `${pre}'${data.cards.get(e.card ?? '')?.name ?? e.card}' 추가`;
+    case 'consume_rift':
+      return `${pre}균열을 ${e.amount !== undefined ? `${e.amount}까지 ` : '모두 '}소비`;
+    case 'scar':
+      return `${pre}상흔 ${n >= 0 ? '+' : ''}${n}`;
     default:
       return e.op;
   }

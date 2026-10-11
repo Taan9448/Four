@@ -1,0 +1,10 @@
+id: icons_relics_g
+type: icon-sheet
+summary: 유물 아이콘 71~72(균열 개편의 바늘쌈·실패) — 칸 n = 유물 icon n+70
+# 칸 번호 = data/relics.json의 icon에서 70을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 2
+baseline: 0.5
+frame_notes:
+  1: "needle case — a small rolled cloth pouch tied with string, several silver needle tips peeking out of the top"
+  2: "thread spool — a wooden spool wound with shining silver thread, a loose end curling away"
+placeholder: { color: '#8a90a3', accent: '#dff4ff' }

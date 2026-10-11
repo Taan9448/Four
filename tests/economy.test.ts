@@ -161,3 +161,26 @@ describe('저장', () => {
     expect(loaded.run.potions).toHaveLength(data.balance.economy.potionSlots);
   });
 });
+
+describe('상흔 20의 상점(GAME_DESIGN 7절, 2026-10-11 개편)', () => {
+  it('값 +20%, 균열 감소 카드 한 장 보장, 꿰매기(상흔 -5 · 골드 80, 상점마다 한 번)', async () => {
+    const { buyStitch, isReduceCard } = await import('../src/engine/economy');
+    const calm = createRunAt(data, 'SHOPSCAR', 's3');
+    const deep = createRunAt(data, 'SHOPSCAR', 's3');
+    deep.scar = 22;
+    const a = openShop(data, calm, 'n1');
+    const b = openShop(data, deep, 'n1');
+    expect(a.scarred).toBe(false);
+    expect(b.scarred).toBe(true);
+    expect(b.cards.some((c) => isReduceCard(data.cards.get(c.cardId)!))).toBe(true);
+    // 같은 자리의 카드는 같고 값은 1.2배 언저리(5골드 반올림)
+    expect(b.cards[0].cardId).toBe(a.cards[0].cardId);
+    expect(b.cards[0].price).toBeGreaterThanOrEqual(Math.floor(a.cards[0].price * 1.1));
+    deep.gold = 200;
+    expect(buyStitch(data, deep).ok).toBe(true);
+    expect(deep.scar).toBe(17);
+    expect(deep.gold).toBe(120);
+    expect(buyStitch(data, deep).ok).toBe(false);
+    expect(buyStitch(data, calm).ok).toBe(false);
+  });
+});

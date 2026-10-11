@@ -410,5 +410,7 @@
     "effects": [{"op": "neigong_max", "amount": 1}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "heal", "amount": 8}],
     "upgrade": {"growth": [0, 0, 3], "plus4": {"name": "벌모세수", "effects": [{"op": "draw", "amount": 2}]}, "plus5": {"name": "새 뼈, 새 숨", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "뼈를 바꾸고 태를 벗는다(換骨奪胎). 전설로만 전하는 일이, 하운의 몸 안에서 조용히 일어났다."
-  }
+  },
+  {"id": "common_deep_inhale", "name": "깊은 숨", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "self", "keywords": ["exhaust"], "effects": [{"op": "rift", "amount": -1}, {"op": "gain_neigong", "amount": 1}, {"op": "block", "amount": 2, "target": "self"}], "upgrade": {"growth": [0, 0, 2], "plus4": {"name": "길게 내쉰다", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "숨을 아끼다", "removeKeywords": ["exhaust"]}}, "flavor": "세 번 짧게, 한 번 길게. 긴 숨이 금을 하나 덮었다."},
+  {"id": "common_seal_charm", "name": "봉인 부적 조각", "owner": "common", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}, {"op": "draw", "amount": 1}], "upgrade": {"growth": [1, 0], "plus4": {"name": "성한 조각", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "가벼운 종이", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "찢어진 부적의 끄트머리. 붉은 인장 하나가 아직 살아 있다."}
 ]

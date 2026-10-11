@@ -1,5 +1,6 @@
 // 경제(2026-10-08): 전투 전리품(골드·물약·유물)과 상점. 모두 시드로 정해진다(같은 시드·같은 노드면 같은 결과).
 import type { GameData } from './data';
+import type { CardDef } from './schema';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
@@ -92,7 +93,10 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
   const rng = createRng(run.seed).fork(`shop:${run.stageId}:${nodeId}`);
   // 상점에 처음 들어설 때 유물(shopEnter), 규칙 유물 shop_discount면 진열 가격이 싸다
   fireRunRelics(data, run, 'shopEnter');
-  const discount = run.relics.some((id) => data.relics.get(id)?.rule === 'shop_discount') ? data.balance.relicRules.shopDiscount : 1;
+  // 상흔 shopAt 이상: '틈 냄새가 나는 손님' — 값이 오른다
+  const sc = data.balance.rift.scar;
+  const scarred = run.scar >= sc.shopAt;
+  const discount = (run.relics.some((id) => data.relics.get(id)?.rule === 'shop_discount') ? data.balance.relicRules.shopDiscount : 1) * (scarred ? sc.shopPriceMul : 1);
   const priced = (r: Rng, base: number, jitter: number) => Math.max(5, Math.round((jitterPrice(r, base, jitter) * discount) / 5) * 5);
   // 카드: 합류한 동료(쉬는 동료 포함)와 공용의 보상 카드, 전투 보상과 같은 등급 가중치
   const owners = new Set(run.roster.map((r) => r.id));
@@ -109,6 +113,14 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
     const def = pickByTier(rng, cardPool, weights)!;
     cardPool.splice(cardPool.indexOf(def), 1);
     cards.push({ cardId: def.id, price: priced(rng, sh.cardPrice[def.rarity]!, sh.jitter), sold: false });
+  }
+  // 상흔 shopAt 이상: 균열 감소 카드 한 장은 반드시(없으면 마지막 칸을 바꾼다)
+  if (scarred && cards.length && !cards.some((c) => isReduceCard(data.cards.get(c.cardId)!))) {
+    const reduce = cardPool.filter((c) => isReduceCard(c));
+    if (reduce.length) {
+      const def = rng.pick(reduce);
+      cards[cards.length - 1] = { cardId: def.id, price: priced(rng, sh.cardPrice[def.rarity]!, sh.jitter), sold: false };
+    }
   }
   if (abyss) {
     const rift = abyssShopRift(data, run);
@@ -129,7 +141,7 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
     if (!def) break;
     potions.push({ potionId: def.id, price: priced(rng, sh.potionPrice[def.rarity], sh.jitter), sold: false });
   }
-  run.shop = { nodeId, cards, relics, potions, swapUsed: false, upgradeUsed: false };
+  run.shop = { nodeId, cards, relics, potions, swapUsed: false, upgradeUsed: false, scarred };
   return run.shop;
 }
 
@@ -216,6 +228,25 @@ export function buyRemove(data: GameData, run: RunState, uid: string): BuyResult
   run.abyss!.removals += 1;
   run.deck = run.deck.filter((x) => x.uid !== uid);
   return { ok: true, message: `카드 지우기: ${data.cards.get(c.cardId)!.name}` };
+}
+
+/** 균열 감소 카드(숨 세기 갈래): 균열을 내리거나 · 소비하거나 · 봉인을 거는 카드 */
+export function isReduceCard(def: CardDef): boolean {
+  return def.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) < 0) || e.op === 'consume_rift' || (e.op === 'apply_status' && e.status === 'seal'));
+}
+
+/** 상점 꿰매기(상흔 shopAt 이상일 때 연 상점, 상점마다 한 번): 상흔 -shopStitch */
+export function buyStitch(data: GameData, run: RunState): BuyResult {
+  const shop = shopOf(run);
+  const sc = data.balance.rift.scar;
+  if (!shop.scarred) return { ok: false, reason: '상흔이 깊을 때만' };
+  if (shop.stitchUsed) return { ok: false, reason: '이 상점에서는 이미 꿰맸다' };
+  const fail = pay(run, sc.shopStitchGold);
+  if (fail) return fail;
+  shop.stitchUsed = true;
+  const before = run.scar;
+  run.scar = Math.max(0, run.scar - sc.shopStitch);
+  return { ok: true, message: `꿰매기: 상흔 -${before - run.scar}` };
 }
 
 export function buyUpgrade(data: GameData, run: RunState, uid: string): BuyResult {
