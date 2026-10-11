@@ -165,6 +165,33 @@ function iconCell(w, h, spec, n) {
     <circle cx="${cx}" cy="${cy}" r="${r * 0.3 + (n % 3) * 6}" fill="${accent}" stroke="#1d2433" stroke-width="8"/>`;
 }
 
+/** 카드 틀 임시 그림: 명세 layout대로 틀·그림 창(키 색 구멍)·이름 띠·보석 자리·글 칸을 그린다(Codex가 볼 배치 안내도 겸함) */
+function cardFrame(W, H, spec) {
+  const s = spec.pixel_scale;
+  const L = spec.layout ?? {};
+  const key = CHROMA[spec.chroma]?.hex ?? '#FF00FF';
+  const ph = spec.placeholder ?? {};
+  const body = ph.color ?? '#4a3426', rim = ph.accent ?? '#b8741a', panel = ph.panel ?? '#e0cfae', banner = ph.banner ?? '#a02634';
+  const r = (b, fill, extra = '') => `<rect x="${b[0] * s}" y="${b[1] * s}" width="${b[2] * s}" height="${b[3] * s}" fill="${fill}"${extra}/>`;
+  const parts = [`<rect width="${W}" height="${H}" fill="${body}"/>`, `<rect x="${3 * s}" y="${3 * s}" width="${W - 6 * s}" height="${H - 6 * s}" fill="none" stroke="${rim}" stroke-width="${2 * s}"/>`];
+  // 모서리 3px은 바깥(키 색)
+  for (const [x, y] of [[0, 0], [W, 0], [0, H], [W, H]]) {
+    const dx = x ? -1 : 1, dy = y ? -1 : 1;
+    parts.push(`<polygon points="${x},${y} ${x + dx * 3 * s},${y} ${x},${y + dy * 3 * s}" fill="${key}"/>`);
+  }
+  if (L.art) {
+    const [x, y, w, h] = L.art.map((v) => v * s);
+    parts.push(`<rect x="${x - 3 * s}" y="${y - 3 * s}" width="${w + 6 * s}" height="${h + 6 * s}" rx="${(w + 6 * s) / 2.4}" fill="${rim}"/>`);
+    parts.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w / 2.6}" fill="${key}"/>`);
+  }
+  if (L.text) parts.push(r([L.text[0] - 2, L.text[1] - 2, L.text[2] + 4, L.text[3] + 4], rim), r(L.text, panel));
+  if (L.plaque) parts.push(r(L.plaque, rim));
+  if (L.name) parts.push(r(L.name, banner, ` stroke="${rim}" stroke-width="${2 * s}"`));
+  if (L.rarity) parts.push(`<circle cx="${L.rarity[0] * s}" cy="${L.rarity[1] * s}" r="${6 * s}" fill="${rim}"/><circle cx="${L.rarity[0] * s}" cy="${L.rarity[1] * s}" r="${4 * s}" fill="#1d2433"/>`);
+  for (const [cx, cy] of L.cost ?? []) parts.push(`<circle cx="${cx * s}" cy="${cy * s}" r="${13 * s}" fill="${rim}"/><circle cx="${cx * s}" cy="${cy * s}" r="${10 * s}" fill="#1d2433"/>`);
+  return parts.join('');
+}
+
 function illustration(w, h, spec) {
   const color = spec.placeholder?.color ?? '#3d4a63';
   return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(color, 0.3)}"/><stop offset="1" stop-color="${shade(color, -0.2)}"/></linearGradient></defs>
@@ -206,6 +233,8 @@ export function sheetSvg(spec, { skipCells = [], extraCells = [] } = {}) {
       if (!((n <= spec.frames && !skipCells.includes(n)) || extraCells.includes(n))) continue;
       parts.push(`<g transform="translate(${((n - 1) % cols) * w} ${Math.floor((n - 1) / cols) * h})">${iconCell(w, h, spec, n)}</g>`);
     }
+  } else if (spec.type === 'card-frame') {
+    parts.push(cardFrame(W, H, spec));
   } else if (spec.track === 'illustration' || spec.type === 'background') {
     parts.push(illustration(W, H, spec));
   } else {

@@ -17,6 +17,8 @@ export interface SpriteMeta {
   fallbackLevel: number;
   virtualFrames?: number;
   placeholder?: boolean;
+  /** 카드 틀: 그림 창(안쪽 투명 구멍)의 자리 [x, y, 너비, 높이] */
+  window?: [number, number, number, number] | null;
 }
 
 export interface SpriteAsset {
@@ -46,6 +48,10 @@ const cache = new Map<string, Promise<SpriteAsset | null>>();
 
 export function hasSprite(id: string): boolean {
   return id in entries;
+}
+
+export function spriteMeta(id: string): SpriteMeta | null {
+  return entries[id]?.meta ?? null;
 }
 
 export function spriteSource(id: string): 'sprites' | 'placeholders' | null {

@@ -1,0 +1,26 @@
+id: card_frame_murim
+type: card-frame
+summary: >-
+  the frame of a MARTIAL ARTS (murim) card: hanji paper and ink, dark lacquered wood, brass cloud-scroll fittings and a red seal
+# 카드 틀 3종(무공·마법·융합)은 같은 layout을 쓴다(그림 128×192 격자 좌표: x, y, 너비, 높이). 게임(src/style.css .card-px)이 이 자리에 글을 얹는다
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+window_shape: >-
+  a round moon gate: the top is a half circle and the sides run straight down to a flat bottom, like the round opening of an
+  East Asian garden wall
+banner: a pale rolled paper scroll (hanji, #f1efe6 and #e0cfae) with short dark wooden rollers at both ends
+text_panel: warm off-white hanji paper (#f1efe6, #e0cfae)
+frame_notes:
+  1: >-
+    dark lacquered wood (#2a1d16, #4a3426, #6e5440) with an ink-black outer edge (#0b0b10); brass-gold fittings (#b8741a, #f2a93b,
+    #ffe08a) on all four corners shaped like East Asian cloud scrolls (xiangyun); a thin gold line inset along the whole border;
+    a small square red seal stamp (#a02634) set into the border at the lower right, abstract, with no readable character
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, carved wood and bevelled metal read clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#4a3426', accent: '#b8741a', panel: '#f1efe6', banner: '#e0cfae' }

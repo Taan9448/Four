@@ -14,6 +14,7 @@ npm ci
 npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s2], ?sandbox[=kyle,born][&module=<모듈 id>], ?abyss[=시드](심연 시작)
                             # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex|loadout[&module=<id>] (화면 하나만 띄우기)
                             # ?screen=abyssclear|abyssend|abyssshop|abyssrest[&module=<id>] (심연 화면)
+                            # &pxcards: Codex 카드 틀(card_frame_*)이 오기 전에 임시 틀로 픽셀 카드 미리 보기
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
