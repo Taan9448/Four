@@ -8,6 +8,7 @@ depends_on: [bone_giant_ref]
 reference: assets/source/bone_giant_ref.png
 facing: left
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 뼈 거인 내리치기: 팔을 치켜든 칸1·2와 내려찍은 칸4의 높이 차(2026-10-11 검토)
 frame_notes:
   1: "raises a long bone arm high"
   2: "the arm at its peak, crimson qi flaring"
