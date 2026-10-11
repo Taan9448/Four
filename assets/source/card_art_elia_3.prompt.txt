@@ -1,0 +1,29 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue, frost white and forest green, with blue for mana, orange for fire and pale cyan for frost; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: two moons, silver and pale blue, side by side over a dark forest
+Cell 2: a slender hand pointing at a fine gold crack in the night sky
+Cell 3: two dome barriers one inside the other, blue and silver rings
+Cell 4: a swirling tornado of orange fire
+Cell 5: a hand tossing one small glowing ember
+Cell 6: a small heap of glowing coals being raked together
+Cell 7: a hanging curtain of grey ash with orange sparks drifting
+Cell 8: a path of frost spreading across dark ground
+Cell 9: a hexagonal ice mirror reflecting one cold light
+Cell 10: a block of ice shattering into sharp shards
+Cell 11: a blue mana crystal encased in frost
+Cell 12: a bridge of blue light spanning the gap of a broken stone stair
+Cell 13: a silver needle and thread stitching a crack in the sky
+Cell 14: one single silver stitch closing a black crack completely
+Cell 15: an open palm pushing a glowing round blue seal made of plain rings
+Cell 16: a river splitting into two streams around a glowing raised hand
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+
+Fix: Preserve all sixteen card subjects, order, composition, pixel style and colors from the current sheet, but correct CELL14 (one stitch): it must show ONE unmistakable short SILVER stitch across a SHORT BLACK crack, its two dark edges pulled completely together. Draw one thick pale-silver horizontal/diagonal thread loop bridging the black seam, like one sewing stitch. The sky around it is deep blue. No gold lightning or long open golden zigzag crack continuing above/below the stitch; no big starburst or beam substituting for a stitch; no needle in14 (the needle belongs to13). One bold silver stitch and a short CLOSED black seam, readable at96×64. Also simplify CELL9: one hexagonal ice mirror with exactly ONE cold reflected light spot; remove the additional moon reflection so it does not contain two light sources. All other cells remain as their current successful subjects. Fire4–7 is orange, frost8–12 pale cyan, needle/thread13–14 silver, cool deep-blue backgrounds. No text, no extra ornaments or small props. Exact1536×1024 full4×4 sheet,384×256 per tile, every tile filled with its own background and all subjects within their tile. Same4×4px blocks and2–3 flat shade steps as the original attached card_art_elia_1.
