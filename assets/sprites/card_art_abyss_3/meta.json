@@ -8,7 +8,7 @@
   "gridDetected": false,
   "nativeSize": [
     94,
-    62
+    63
   ],
   "fit": "fill",
   "frames": 8,
@@ -23,14 +23,14 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 8,
-  "sourceHash": "e78cc065dd644809",
+  "sourceHash": "aae777f2c6cbdc46",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.713,
+  "gridPurity": 0.746,
   "cards": [
     "abyss_born_swallow_mountain",
     "abyss_born_durin_shadow",
