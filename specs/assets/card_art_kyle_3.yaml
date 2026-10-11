@@ -1,0 +1,43 @@
+id: card_art_kyle_3
+type: card-art-sheet
+summary: 카일 카드 그림 3(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 16
+cards:
+  - kyle_slay_father  # 아버지를 베다
+  - kyle_knight_oath  # 기사의 맹세
+  - kyle_white_snowflake  # 흰 눈송이
+  - kyle_princess_ice  # 왕녀의 얼음
+  - kyle_returned_blade  # 되돌린 검
+  - kyle_double_cut  # 두 번 베기
+  - kyle_point_turn  # 검끝 돌리기
+  - kyle_command  # 구령
+  - kyle_rowen_step  # 로웬의 보법
+  - kyle_shadow_bridge  # 그림자 다리
+  - kyle_heart_fire  # 심장의 불
+  - kyle_raise_shield  # 방패 들기
+  - kyle_charge_order  # 돌격 명령
+  - kyle_dumpling_shop  # 기사의 만두집
+  - kyle_bluff  # 허풍
+  - kyle_dawn_drill  # 새벽 수련
+frame_notes:
+  1: "a red sword stuck in the ground before a fallen crowned helmet"  # 아버지를 베다
+  2: "a sword held point-down before a kneeling knight, hand on the hilt"  # 기사의 맹세
+  3: "a white snowflake falling onto a red drop of blood"  # 흰 눈송이
+  4: "a small crown made of ice melting into water drops"  # 왕녀의 얼음
+  5: "a sword deflecting a magic bolt back the way it came"  # 되돌린 검
+  6: "two parallel silver slash lines"  # 두 번 베기
+  7: "a sword tip twirling in a small bright circle"  # 검끝 돌리기
+  8: "a raised gauntlet fist giving a signal"  # 구령
+  9: "a knight boot mid-step with light footprints behind it"  # 로웬의 보법
+  10: "a knight bracing alone on a narrow bridge as a giant shadow falls over him"  # 그림자 다리
+  11: "a red sword blade burning with flame from the hilt"  # 심장의 불
+  12: "a round knight shield raised high"  # 방패 들기
+  13: "a sword pointed forward with a banner streaming behind it"  # 돌격 명령
+  14: "a small steaming dumpling stall with a sword hung over its sign board"  # 기사의 만두집
+  15: "a knight puffing out his chest with a big grin"  # 허풍
+  16: "a sword practice swing in front of a rising sun"  # 새벽 수련
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, steel grey, deep blue and white, with warm red for the red sword and blood; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#5d6478', accent: '#a02634' }

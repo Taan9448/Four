@@ -1,0 +1,52 @@
+{
+  "id": "card_art_born_3",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 16,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 16,
+  "sourceHash": "a5c94312f1b7628d",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "born_prop_tunnel",
+    "born_five_thousand_graves",
+    "born_mountain_fills",
+    "born_stone_grain",
+    "born_anvil_ring",
+    "born_next_tunnel",
+    "born_braid_beard",
+    "born_piggyback",
+    "born_one_sword",
+    "born_rockfall",
+    "born_anvil_smash",
+    "born_hammer_spin",
+    "born_rock_heart",
+    "born_ale_barrel",
+    "born_mine_map",
+    "born_growl"
+  ]
+}

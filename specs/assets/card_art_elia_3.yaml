@@ -1,0 +1,43 @@
+id: card_art_elia_3
+type: card-art-sheet
+summary: 엘리아 카드 그림 3(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 16
+cards:
+  - elia_two_moons  # 두 개의 달
+  - elia_count_gold  # 금을 세다
+  - elia_layer_ward  # 결계 겹치기
+  - elia_fire_tempest  # 화염 폭풍
+  - elia_ember_toss  # 불씨 던지기
+  - elia_rake_embers  # 숯 긁어모으기
+  - elia_ash_veil  # 재의 장막
+  - elia_frost_road  # 서리 길
+  - elia_ice_mirror  # 얼음 거울
+  - elia_shatter  # 깨뜨리기
+  - elia_frozen_mana  # 얼어붙은 마나
+  - elia_bridge  # 다리 놓기
+  - elia_silver_stitch  # 은빛 바느질
+  - elia_one_stitch  # 한 땀
+  - elia_sealing_hand  # 봉인의 손
+  - elia_part_river  # 강물을 나누다
+frame_notes:
+  1: "two moons, silver and pale blue, side by side over a dark forest"  # 두 개의 달
+  2: "a slender hand pointing at a fine gold crack in the night sky"  # 금을 세다
+  3: "two dome barriers one inside the other, blue and silver rings"  # 결계 겹치기
+  4: "a swirling tornado of orange fire"  # 화염 폭풍
+  5: "a hand tossing one small glowing ember"  # 불씨 던지기
+  6: "a small heap of glowing coals being raked together"  # 숯 긁어모으기
+  7: "a hanging curtain of grey ash with orange sparks drifting"  # 재의 장막
+  8: "a path of frost spreading across dark ground"  # 서리 길
+  9: "a hexagonal ice mirror reflecting one cold light"  # 얼음 거울
+  10: "a block of ice shattering into sharp shards"  # 깨뜨리기
+  11: "a blue mana crystal encased in frost"  # 얼어붙은 마나
+  12: "a bridge of blue light spanning the gap of a broken stone stair"  # 다리 놓기
+  13: "a silver needle and thread stitching a crack in the sky"  # 은빛 바느질
+  14: "one single silver stitch closing a black crack completely"  # 한 땀
+  15: "an open palm pushing a glowing round blue seal made of plain rings"  # 봉인의 손
+  16: "a river splitting into two streams around a glowing raised hand"  # 강물을 나누다
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue, frost white and forest green, with blue for mana, orange for fire and pale cyan for frost; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3a6ea5', accent: '#dff4ff' }

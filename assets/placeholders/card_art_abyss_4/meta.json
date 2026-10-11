@@ -1,0 +1,46 @@
+{
+  "id": "card_art_abyss_4",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 10,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 10,
+  "sourceHash": "a3a365e09735958c",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "abyss_common_scar_stitch",
+    "abyss_common_flesh_seal",
+    "abyss_common_close_all",
+    "abyss_common_dry_sky",
+    "abyss_common_fog_eye",
+    "abyss_common_twin_moons",
+    "abyss_common_echo_eater",
+    "abyss_common_knot_tie",
+    "abyss_common_feeder_bane",
+    "abyss_common_enrage_delay"
+  ]
+}

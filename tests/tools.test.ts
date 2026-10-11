@@ -367,7 +367,8 @@ describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
       expect(spec.cards.length, id).toBe(spec.frames);
       expect(Object.keys(spec.frame_notes).length, id).toBe(spec.frames);
       for (const card of spec.cards) {
-        expect(data.cards.has(card), `${id}: ${card}`).toBe(true);
+        // planned: 카드 데이터보다 그림 요청이 먼저 나간 시트(2026-10-11 카드 250장 확장). 카드가 다 들어오면 플래그를 지운다
+        if (!spec.planned) expect(data.cards.has(card), `${id}: ${card}`).toBe(true);
         expect(seen.has(card), `${card}: ${seen.get(card)}와 ${id}에 두 번`).toBe(false);
         seen.set(card, id);
       }

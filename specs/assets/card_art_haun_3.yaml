@@ -1,0 +1,41 @@
+id: card_art_haun_3
+type: card-art-sheet
+summary: 진하운 카드 그림 3(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 15
+cards:
+  - haun_ironwood_split  # 철목인 가르기
+  - haun_hold_breath  # 숨 죽이기
+  - haun_read_crack  # 틈 읽기
+  - haun_roof_lesson  # 지붕 위의 수업
+  - haun_ugly_sword  # 못생긴 검
+  - haun_vertical_cut  # 세로 가르기
+  - haun_rest_blade  # 얹은 날
+  - haun_campaign_wood  # 원정의 장작
+  - haun_cheongun_night  # 청운귀의 밤
+  - haun_bare_hand  # 맨손으로 잡기
+  - haun_ladle  # 한 바가지
+  - haun_whole_bucket  # 물동이째
+  - haun_send_back  # 돌려보내기
+  - haun_honed_edge  # 벼린 날
+  - haun_turn_flow  # 흐름을 돌리다
+frame_notes:
+  1: "an axe splitting a dark iron-wood training dummy along one glowing gold grain line"  # 철목인 가르기
+  2: "a hand over a mouth, one small breath puff frozen still in the air"  # 숨 죽이기
+  3: "a narrowed eye looking at a thin gold seam on a grey stone wall"  # 틈 읽기
+  4: "two small figures sitting on a tiled roof under a night sky with a faint thin crack"  # 지붕 위의 수업
+  5: "a crude, lumpy hand-forged sword lying on a wooden bench"  # 못생긴 검
+  6: "one tall vertical slash of gold and blue light splitting a flame in two"  # 세로 가르기
+  7: "an axe edge resting on a log, several gold cracks spreading from the touch point"  # 얹은 날
+  8: "a small bundle of firewood tied with rope beside a travel pack"  # 원정의 장작
+  9: "a mountain sect gate under a full moon between dark pine silhouettes"  # 청운귀의 밤
+  10: "a bare hand gripping a sword blade, a small gold glow at the palm"  # 맨손으로 잡기
+  11: "a wooden water ladle flinging a splash of water that glitters blue"  # 한 바가지
+  12: "a whole wooden water bucket swung forward, a big wave of blue water pouring out"  # 물동이째
+  13: "an axe swing pushing a thin black crack back shut with gold light"  # 돌려보내기
+  14: "an axe blade on a whetstone, sparks and one bright honed edge"  # 벼린 날
+  15: "a stream of mixed gold and blue light turning back on itself in a spiral"  # 흐름을 돌리다
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8f7a63', accent: '#f2a93b' }

@@ -1,0 +1,43 @@
+id: card_art_born_3
+type: card-art-sheet
+summary: 보른 카드 그림 3(확장) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-11 카드 250장 확장: 카드 데이터보다 그림 요청이 먼저 나간 시트다(planned). 카드 id는 이 목록을 그대로 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+planned: true
+frames: 16
+cards:
+  - born_prop_tunnel  # 갱도 받치기
+  - born_five_thousand_graves  # 오천의 무덤
+  - born_mountain_fills  # 산이 메운다
+  - born_stone_grain  # 돌의 결
+  - born_anvil_ring  # 모루 소리
+  - born_next_tunnel  # 다음 갱도
+  - born_braid_beard  # 수염 땋기
+  - born_piggyback  # 업고 달리기
+  - born_one_sword  # 검 한 자루
+  - born_rockfall  # 낙석
+  - born_anvil_smash  # 모루 내리찍기
+  - born_hammer_spin  # 망치 돌리기
+  - born_rock_heart  # 바위 심장
+  - born_ale_barrel  # 맥주 한 통
+  - born_mine_map  # 갱도 지도
+  - born_growl  # 으르렁
+frame_notes:
+  1: "a thick wooden beam propping up a cracking mine ceiling"  # 갱도 받치기
+  2: "rows of small stone cairns in a dark cavern"  # 오천의 무덤
+  3: "stone closing over a deep crack in a mountainside"  # 산이 메운다
+  4: "a stone block with clear layered grain lines"  # 돌의 결
+  5: "an anvil sending out ringing sound waves"  # 모루 소리
+  6: "a dwarf with a lantern standing at a dark new tunnel entrance"  # 다음 갱도
+  7: "a braided red beard with an iron ring"  # 수염 땋기
+  8: "a stout dwarf running with a companion on his back"  # 업고 달리기
+  9: "a dwarf hand holding out one plain sword"  # 검 한 자루
+  10: "boulders falling from a cliff edge"  # 낙석
+  11: "a hammer slamming down onto an anvil, sparks flying"  # 모루 내리찍기
+  12: "a war hammer spinning inside a circle of motion lines"  # 망치 돌리기
+  13: "a grey rock chest plate with one small ember glowing in its middle"  # 바위 심장
+  14: "a wooden ale barrel with foam spilling over the top"  # 맥주 한 통
+  15: "an unrolled map of branching mine tunnels drawn in lines, no writing"  # 갱도 지도
+  16: "a dwarf face roaring, beard bristling"  # 으르렁
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm stone and forge palette: granite grey, iron, ember orange, earth brown and red beard tones; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#6e5440', accent: '#ff8a5c' }
