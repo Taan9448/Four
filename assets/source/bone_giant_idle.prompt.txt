@@ -1,0 +1,26 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: the Bone Giant of the rift, a hunched giant built of huge pale bones fitted together, a ribcage like a cage, dark crimson qi flowing in the gaps between the bones like veins, a skull with dim red light in the sockets. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: hunched, bones creaking, crimson qi flowing
+Cell 2: the ribcage rises
+Cell 3: the red light in the skull brightens
+Cell 4: settles
+Cells 5 to 6 are completely empty green.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Actual CAMERA failure: all4usedrefFRONTALcell1 instead of SIDEcell2. Draw ONLY theLEFTSIDEbonegiantfromreferenceCELL2 inEVERY4: hunchedspinearchright, skullatupperLEFT with ONLYONEvisible red eye socket, narrowPROFILEribcage with ribs sweepingtoBACKright, near shoulder/forearminfront, same sidelegs andhugehands. Nevershowfrontalribsternum or symmetricaltwoeyes/shoulders. SameBODYHEIGHTandboneproportions asrefCELL2; sameface/ribcountcolorcreamandbrownshadow, crimsonqi in gaps. Smallribcageliftin2andredoneeyebrightenin3only,4settlesnotrotates. ALLfourin3x2cell1/2/3top,4bottomLEFT,5/6emptygreen, allbitsinsidecell.
+
+Fix: Measured reference SIDE height99px; previous output107-110px was too large. Target99px (396sourcepixels) inALL4, highestspikeatlocaly80 andbottomfoot476, identicalhugebones/headdimensions. Reference-size body wins generic96px/margin rules.
+
+
+Fix: All4are nowcorrectsameSIDEcamera. Measuredheight104px exceedsreference99px±5%; target100px, highestbackspike localy80, lowestfeetlocaly480, total400sourcepx. Earlier outputhighestspike y48 not80. Reserve TOP80sourcepx entirelyGREEN in EACH512cell. Keep every head/rib/hand/foot same relativeproportions, no artistic cameraorpose changes. Use correctly3x2layout:1lefttop,2middletop,3righttop,4LEFTBOTTOM,5/6emptygreen. EXACT4pxsquareblocks, samecolormatches. Micro riblift1pxnative atcell2 and eye brightenscell3,4originalhunch.

@@ -1,0 +1,25 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: a Demon Cult Guardian, a guardian-protector of the Heavenly Demon Cult; a broad middle-aged martial artist in a long dark crimson robe with black trim, a shaved head with a topknot, both palms blood-red, dark red qi curling up from the hands. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: draws the red palm back to the hip
+Cell 2: steps forward to the left, qi gathering
+Cell 3: pushes the palm forward
+Cell 4: the blood-red palm strikes at full reach to the left, a red qi burst
+Cell 5: the burst fades
+Cell 6: returns to the palm stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Session requirements from the user: Reference CELL 2 (top-right) is the ONLY permitted camera view for every pose: strict LEFT PROFILE, one eye, one cheek, nose pointing LEFT; do not rotate torso or head toward viewer. The attached frame_02 shows the authoritative body and idle stance. Same bald scalp/topknot, clean-shaven face, dark crimson robe with black trim, blood-red palms, simple belt and cloth shoes. Keep exactly the reference's body height of 92 sprite pixels: FULL BODY from topknot to soles is about 368 source pixels, not 400-450, on a 512px cell. The full body occupies 72% of the cell HEIGHT, not 80% or more. Feet baseline source y=460; topknot source y=92. Body height must stay within 5% through all six poses. Reaching palms and red qi may extend horizontally but stay inside cell boundaries; do not grow the body to fill the canvas. Every frame remains left profile and the FINAL frame is the same palm-forward idle stance of reference cell 2. Do not add a weapon, crest, jewellery, new clothing or other decoration. Keep all hands, cloth hems, feet and qi within their own cells.
+
+
+Fix: In the previous result frame 4 crossed its RIGHT cell border with a trailing robe hem, leaving a detached red cloth fragment at the lower LEFT of frame 5. This is a hard cell-boundary error. Keep EVERY entire figure, trailing robe hem, red qi burst, hand and foot at least 12 sprite pixels from ALL cell boundaries. There must be NO detached cloth fragments anywhere. Move attacking figures slightly toward the center so both qi and rear robe stay completely contained. Make the full head-to-foot body smaller: precisely 92 sprite pixels including topknot, no more than 96, same in all frames. Keep strict LEFT profile, not front or 3/4; frame 6 returns reference cell 2 idle posture. Preserve all original palette and clothing requirements.

@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: an Ice Wolf of frozen Arden, a large wolf with a translucent body of ice, blue mana frozen inside it like veins, a faint hexagonal lattice pattern across the ice, frost mane, pale glowing blue eyes. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: preparation: stands in the exact left-facing side-view idle stance of reference sheet cell 2, claws grip, jaws closed
+Cell 2: impact: the same wolf at the same body height in left-facing side-view, raised neck, opens and snaps ice fangs left, one front paw slightly raised, a small cluster of frost shards beside the muzzle
+Cell 3: recovery: exactly resumes the reference cell 2 left-facing side-view idle stance with jaws closed
+Cells 4-6: completely empty flat magenta #FF00FF
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Fallback level 2 after two full-sheet retries left body-size differences between frames (76-91px versus reference side height 94px). Draw ONLY the three full-body key poses in top-row cells 1,2,3. Bottom row is pure magenta with absolutely no drawing. All three must have identical wolf body height 94 sprite pixels, 376 source pixels: LOCAL y=80 highest ear and y=455 lowest paw. Use ONLY reference CELL 2 strict LEFT SIDE profile and match the proportions, leg lengths, mane, lattice and blue veins exactly. Never shrink the preparation or landing pose. All three are mostly upright with tall extended legs; cell 2 uses the jaw and one front paw to show attack without flattening the torso. Keep the muzzle, body, all paws and the tail INSIDE local x=24..488. Tuck the tail DOWNWARD alongside the hind leg, not stretched right across the boundary. Shards occupy a tiny cluster inside x=24..80, y=150..220. No part in cell 4,5 or 6. Clear hard 4x4 square blocks.
