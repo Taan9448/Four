@@ -239,7 +239,8 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   }
   // 조각이 떨어지는 동안 다음 연출(피해)이 이어지게, 벌어진 직후에 끝낸다(조각은 스스로 사라진다)
   void Promise.all([...halves, ...bits]);
-  return sleep(ms * (at.open + 0.12));
+  // 찢어진 직후 바로 공격·피격이 이어지게(조각은 스스로 사라진다)
+  return sleep(ms * (at.open + 0.03));
 }
 
 /** 새로 들어온 요소(뽑은 카드)를 from 사각형에서 제자리로 끌어온다. 요소의 transform과 겹치지 않게 translate·scale 속성을 쓴다 */
@@ -279,6 +280,32 @@ export function floatOver(layer: HTMLElement, target: HTMLElement, text: string,
   const lr = layer.getBoundingClientRect();
   const tr = target.getBoundingClientRect();
   floatText(layer, tr.left - lr.left + tr.width / 2, tr.top - lr.top + tr.height * 0.3, text, kind);
+}
+
+/**
+ * 맞은 자리의 충격(2026-10-11 사용자 요청 — 타격감): 하얀 충격 고리 + 비스듬한 베기 줄, 세면 화면이 한 번 번쩍.
+ * 타격 멈춤 동안에도 돈다(.impact는 멈추지 않는다). 운영체제 '움직임 줄이기'면 고리만
+ */
+export function impact(layer: HTMLElement, target: HTMLElement, strength: 'light' | 'heavy' | 'crit', tone: 'white' | 'gold' | 'red' | 'blue' = 'white', dir = 1): void {
+  const lr = layer.getBoundingClientRect();
+  const tr = target.getBoundingClientRect();
+  const x = tr.left - lr.left + tr.width / 2;
+  const y = tr.top - lr.top + tr.height * 0.45;
+  const size = Math.max(70, Math.min(tr.width, tr.height) * (strength === 'light' ? 0.8 : strength === 'heavy' ? 1.05 : 1.3));
+  const add = (cls: string, ms: number, extra: Partial<CSSStyleDeclaration> = {}) => {
+    const el = document.createElement('i');
+    el.className = `impact ${cls} impact-${tone} impact-${strength}`;
+    Object.assign(el.style, { left: `${x}px`, top: `${y}px`, width: `${size}px`, height: `${size}px`, ...extra });
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), ms);
+  };
+  add('impact-ring', 360);
+  if (!reducedMotion()) add('impact-slash', 260, { transform: `translate(-50%, -50%) rotate(${dir > 0 ? -28 : 28}deg)` });
+}
+
+/** 화면 전체가 한 번 번쩍(큰 피해·치명타·처치) */
+export function screenFlash(field: HTMLElement, tone: 'white' | 'gold' | 'red' = 'white'): void {
+  restartAnimation(field, `fx-screen-${tone}`, 200);
 }
 
 /** hold: 사라지기 시작할 때까지(ms). 기본 1.6초 */

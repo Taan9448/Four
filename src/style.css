@@ -626,7 +626,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 .fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 7; }
 .fx-canvas { position: absolute; image-rendering: pixelated; }
-.float-text { position: absolute; transform: translate(-50%, 0); font-weight: 800; font-size: var(--fs-title); text-shadow: 0 2px 4px #000, 0 0 2px #000; animation: float-up 1s ease-out forwards; white-space: nowrap; }
+.float-text { position: absolute; z-index: 6; transform: translate(-50%, 0); font-weight: 800; font-size: calc(var(--fs-title) * 1.15); text-shadow: 0 2px 4px #000, 0 0 2px #000; animation: float-up 1s ease-out forwards; white-space: nowrap; }
 .float-damage { color: #fff; }
 .float-crit { color: var(--unha); font-size: calc(var(--fs-title) * 1.25); }
 .float-block { color: var(--mana); font-size: var(--fs-body); }
@@ -651,7 +651,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 @keyframes float-up { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 10% { opacity: 1; transform: translate(-50%, -4px) scale(1.4); } 22% { transform: translate(-50%, -8px) scale(1); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -64px) scale(0.95); } }
 
 /* 타격 멈춤: 전투 장면의 CSS 애니메이션을 잠깐 세운다(떠오르는 숫자는 그대로) */
-.hitstop .b-scene *:not(.float-text) { animation-play-state: paused !important; }
+.hitstop .b-scene *:not(.float-text):not(.impact) { animation-play-state: paused !important; }
 /* 날아가는 카드(복제본) */
 .card-ghost { position: fixed; pointer-events: none; z-index: 900; transition: none; will-change: transform, opacity; }
 .fx-flash-white .sprite-wrap, .fx-flash-blue .sprite-wrap { animation: flash-w 0.22s; }
@@ -1688,3 +1688,23 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 @keyframes pop-ink { from { opacity: 0; width: 20%; } to { opacity: 1; width: 120%; } }
 .no-motion .pop, .no-motion .pop-seal, .no-motion .pop-title::before { animation: none; }
 @media (prefers-reduced-motion: reduce) { .pop, .pop-seal, .pop-title::before { animation: none; } }
+
+/* ───────── 타격감(2026-10-11 사용자 요청): 충격 고리 · 베기 줄 · 화면 번쩍 ───────── */
+.impact { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, -50%); border-radius: 50%; }
+.impact-ring { border: 3px solid var(--impact, #fff); box-shadow: 0 0 18px var(--impact, #fff), inset 0 0 14px var(--impact, #fff); animation: impact-ring 0.34s ease-out forwards; }
+.impact-heavy.impact-ring, .impact-crit.impact-ring { border-width: 5px; }
+.impact-slash { border-radius: 2px; height: 6px !important; background: linear-gradient(90deg, transparent, var(--impact, #fff) 35%, #fff 50%, var(--impact, #fff) 65%, transparent); box-shadow: 0 0 12px var(--impact, #fff); animation: impact-slash 0.24s ease-out forwards; }
+.impact-crit.impact-slash { height: 10px !important; }
+.impact-white { --impact: rgba(255, 250, 235, 0.95); }
+.impact-gold { --impact: rgba(255, 205, 90, 0.95); }
+.impact-red { --impact: rgba(255, 90, 70, 0.9); }
+.impact-blue { --impact: rgba(140, 210, 255, 0.95); }
+@keyframes impact-ring { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2); } 60% { opacity: 0.9; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25); } }
+@keyframes impact-slash { 0% { opacity: 0; width: 10%; } 30% { opacity: 1; } 100% { opacity: 0; width: 125%; } }
+.b-scene.fx-screen-white, .b-scene.fx-screen-gold, .b-scene.fx-screen-red { position: relative; }
+.fx-screen-white::after, .fx-screen-gold::after, .fx-screen-red::after { content: ''; position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: screen-flash 0.2s ease-out forwards; }
+.fx-screen-white::after { background: rgba(255, 252, 240, 0.22); }
+.fx-screen-gold::after { background: rgba(255, 210, 110, 0.26); }
+.fx-screen-red::after { background: radial-gradient(ellipse at center, transparent 40%, rgba(220, 30, 30, 0.4)); }
+@keyframes screen-flash { from { opacity: 1; } to { opacity: 0; } }
+.no-motion .impact-slash, .no-motion .fx-screen-white::after, .no-motion .fx-screen-gold::after { display: none; }

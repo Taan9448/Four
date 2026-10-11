@@ -5,7 +5,7 @@ import { hasSkipTurn } from '../engine/effects';
 import { cardText, ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
-import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, tearCard, toast } from '../render/fx';
+import { flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
@@ -1027,12 +1027,18 @@ export class BattleView {
             this.refresh();
             if (ev.amount > 0) {
               // 세기: 피해가 클수록, 치명타·처치면 가장 세게. 맞은 쪽은 공격 반대편으로 밀린다
-              const power = ev.crit || kill ? 1 : Math.min(0.85, 0.25 + ev.amount / 28);
+              // (2026-10-11 사용자 요청 — 타격감이 약했다: 작은 피해도 화면이 조금 흔들리고, 맞은 자리에 충격 고리·베기 줄)
+              const big = ev.crit || kill;
+              const power = big ? 1 : Math.min(0.9, 0.45 + ev.amount / 30);
               const dir = u.c.side === 'enemy' ? 1 : -1;
+              const strength = big ? 'crit' : heavy ? 'heavy' : 'light';
+              const tone = u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : ev.grain ? 'blue' : ev.element === 'fire' ? 'gold' : 'white';
+              impact(this.fxLayer, u.el, strength, tone, dir);
               shake(u.el, power, dir);
-              if (ev.crit || kill || ev.amount >= 20) shake(this.field, power * 0.45, dir);
-              // 타격 멈춤: 보통 55ms, 큰 피해 90ms, 치명타·처치 120ms(빠른 속도면 줄인다)
-              await hitStop((ev.crit || kill ? 120 : heavy ? 90 : 55) * Math.max(0.5, settings.speed));
+              shake(this.field, power * (big ? 0.7 : heavy ? 0.5 : 0.3), dir);
+              if (big || heavy) screenFlash(this.field, u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : 'white');
+              // 타격 멈춤: 보통 70ms, 큰 피해 110ms, 치명타·처치 150ms(빠른 속도면 줄인다)
+              await hitStop((big ? 150 : heavy ? 110 : 70) * Math.max(0.5, settings.speed));
             }
           }
           if (ev.absorbed) this.refresh();
