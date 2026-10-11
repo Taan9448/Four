@@ -14,6 +14,7 @@ import {
   battleSetupFor,
   createRun,
   createRunAt,
+  splitMapBySurge,
   enterNode,
   discardSuspended,
   finishReplay,
@@ -517,6 +518,12 @@ export class App {
       : createRun(data, seed, { supportActive: support, ...mode });
     this.persist = true;
     this.note((c) => (c.stats.runs += 1));
+    // ?seed=…&surge=N(확인용): 시작 지도에 폭주 N번의 흔적(끊긴 길·裂 틈새)과 상흔 3N
+    const surge = Number(new URLSearchParams(location.search).get('surge') ?? 0);
+    if (surge > 0) {
+      splitMapBySurge(data, this.run, surge, 'debug');
+      this.run.scar += surge * data.balance.rift.surgeScar;
+    }
     // 주소창의 ?seed=…(디버그 시작)를 지운다: 새로고침하면 타이틀의 "이어하기"로 돌아온다
     if (location.search) history.replaceState(null, '', location.pathname);
     this.map();

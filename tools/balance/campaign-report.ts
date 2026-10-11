@@ -104,7 +104,10 @@ function surgeSummary(runs: RunReport[]): string[] {
   const withS = visits.filter((v) => v.surged);
   const without = visits.filter((v) => !v.surged);
   const ratio = rate(without) > 0 ? rate(withS) / rate(without) : 0;
+  const made = runs.reduce((a, r) => a + (r.cracks?.made ?? 0), 0);
+  const entered = runs.reduce((a, r) => a + (r.cracks?.entered ?? 0), 0);
   return [
+    `- 裂 틈새: 런당 ${(made / Math.max(1, runs.length)).toFixed(2)}곳 열림 · 들어간 비율 ${pct(entered, made)}`,
     `- 폭주: 런당 **${perRun.toFixed(2)}회**(목표 0.5~1) · 폭주가 난 스테이지 ${withS.length}곳 패배 ${pct(withS.filter((v) => v.lost).length, withS.length)} / 안 난 스테이지 패배 ${pct(without.filter((v) => v.lost).length, without.length)} → **${ratio.toFixed(1)}배**(목표 2배 이하, 4배를 넘으면 상흔→시작 균열을 약하게)`,
   ];
 }

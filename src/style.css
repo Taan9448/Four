@@ -1737,3 +1737,11 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .start-rift { margin: 4px 0 0; font-size: var(--fs-cap); color: #ff8a8a; font-weight: 700; text-align: center; cursor: help; }
 /* 상흔 20 이상의 상점(GAME_DESIGN 7절) */
 .shop-scarred { margin: 0 0 6px; padding: 4px 8px; border-left: 3px solid #b3121b; background: rgba(179, 18, 27, 0.12); color: #ffb0b0; font-size: var(--fs-cap); }
+/* 폭주가 가른 지도(GAME_DESIGN 7절): 끊긴 길 · 검은 금 · 裂 틈새 */
+.map-lines line.cut { stroke: rgba(120, 20, 20, 0.35); stroke-dasharray: 1 5; stroke-width: 1.2; }
+.map-lines path.crack { fill: none; stroke: #120606; stroke-linejoin: miter; stroke-linecap: square; vector-effect: non-scaling-stroke; }
+.map-lines path.crack-glow { fill: none; stroke: rgba(220, 40, 40, 0.35); stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.node.node-crack { --seal: #120606; --seal-bg: #2a0c0c; --seal-ink: #ff6b6b; box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.55), 0 0 12px rgba(255, 40, 40, 0.45); }
+.node.node-crack.open { animation: crack-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes crack-pulse { from { box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.4), 0 0 6px rgba(255, 40, 40, 0.3); } to { box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.9), 0 0 16px rgba(255, 40, 40, 0.7); } }
+@media (prefers-reduced-motion: reduce) { .node.node-crack.open { animation: none; } }

@@ -11,12 +11,20 @@ export interface MapNode {
   type: NodeType;
   moduleId: string;
   next: string[];
+  /** 裂 틈새(폭주가 연 노드, GAME_DESIGN 7절): 엘리트(틈의 짐승) 또는 사건(틈새의 거래) */
+  crack?: boolean;
+  /** 틈의 짐승: 이 스테이지 엘리트 모듈에서 빌려 온 적(모듈의 적 대신) */
+  enemies?: string[];
 }
 
 export interface StageMap {
   stageId: string;
   /** floors[0]이 1층. 마지막 층은 보스 */
   floors: MapNode[][];
+  /** 폭주가 끊은 길(from, to) — 지도에 검은 금으로 그린다 */
+  cuts?: [string, string][];
+  /** 이 스테이지(지도)에서 일어난 폭주 수 */
+  surges?: number;
 }
 
 export interface RouteContext {
@@ -214,8 +222,11 @@ export function validateMap(data: GameData, map: StageMap, stageOverride?: Stage
   if (boss.length !== 1 || boss[0].type !== 'boss') errors.push('마지막 층은 보스 하나여야 한다');
 
   // 모든 노드가 1층에서 도달 가능하고, 보스까지 갈 수 있어야 한다
+  // 폭주가 끊은 길(cuts)도 길로 센다: 끊겨 갈 수 없게 된 곳은 오류가 아니다
+  const cutFrom = new Map<string, string[]>();
+  for (const [a, b] of map.cuts ?? []) cutFrom.set(a, [...(cutFrom.get(a) ?? []), b]);
   const reachable = new Set<string>(map.floors[0].map((n) => n.id));
-  for (const floor of map.floors) for (const n of floor) if (reachable.has(n.id)) n.next.forEach((x) => reachable.add(x));
+  for (const floor of map.floors) for (const n of floor) if (reachable.has(n.id)) [...n.next, ...(cutFrom.get(n.id) ?? [])].forEach((x) => reachable.add(x));
   for (const n of all) if (!reachable.has(n.id)) errors.push(`${n.id}: 도달 불가`);
   const reachesBoss = new Set<string>([boss[0].id]);
   for (let f = map.floors.length - 2; f >= 0; f--) {
@@ -230,7 +241,8 @@ export function validateMap(data: GameData, map: StageMap, stageOverride?: Stage
   const pinnedFloors = new Set(stage.pinned.map((p) => p.floor));
   for (const n of all) {
     // 고정 노드(원작의 정해진 전투, 예: S5 1층 그림자의 밤)는 이른 엘리트 제한을 받지 않는다
-    if (n.type === 'elite' && n.floor < data.balance.route.eliteMinFloor && !pinnedFloors.has(n.floor)) errors.push(`${n.id}: 너무 이른 엘리트`);
+    // 裂 틈새(폭주가 연 틈의 짐승)는 이른 층에도 나올 수 있다
+    if (n.type === 'elite' && !n.crack && n.floor < data.balance.route.eliteMinFloor && !pinnedFloors.has(n.floor)) errors.push(`${n.id}: 너무 이른 엘리트`);
     if (n.type === 'rest' && n.next.some((x) => byId.get(x)?.type === 'rest')) errors.push(`${n.id}: 휴식 연속`);
     if (n.floor <= stage.floors && !n.moduleId) errors.push(`${n.id}: 모듈 없음`);
     for (const x of n.next) {
@@ -244,7 +256,8 @@ export function validateMap(data: GameData, map: StageMap, stageOverride?: Stage
     for (const n of floor) {
       const parents = (map.floors[n.floor - 2] ?? []).filter((p) => p.next.includes(n.id));
       const before = Math.max(0, ...parents.map((p) => run.get(p.id) ?? 0));
-      const r = isCalm(n.type) ? before + 1 : 0;
+      // 裂 틈새는 폭주가 나중에 연 자리라 연속 규칙에서 뺀다(틈의 거래도 쉬어 가는 곳이 아니다)
+      const r = isCalm(n.type) && !n.crack ? before + 1 : 0;
       run.set(n.id, r);
       if (r > data.balance.route.maxCalmRun && !pinnedFloors.has(n.floor) && !stage.forcedTypes[String(n.floor)]) errors.push(`${n.id}: 전투 없는 노드 ${r}연속`);
     }
@@ -258,4 +271,70 @@ export function validateMap(data: GameData, map: StageMap, stageOverride?: Stage
     }
   }
   return errors;
+}
+
+/** 폭주가 지도에 남기는 것(GAME_DESIGN 7절): 끊은 길 하나와 裂 틈새 하나 */
+export interface SurgeMark {
+  cut?: [string, string];
+  crack?: string;
+}
+
+/**
+ * 폭주가 지도를 가른다(균열 개편 2026-10-11): 지금 자리에서 앞으로 갈 수 있는 길 하나를 끊고(모든 노드가 여전히 닿고 보스까지 이어지게 —
+ * 갈래가 2개 이상인 노드에서, 들어오는 길이 2개 이상인 노드로 가는 길만), 앞의 전투·사건 노드 하나를 裂 틈새로 바꾼다(지도마다 maxCracks개까지).
+ * pickCrack은 틈새 노드의 모듈·적을 고른다(없으면 틈새를 만들지 않는다). 모두 시드 rng로
+ */
+export function mutateMapForSurge(
+  map: StageMap,
+  position: string | null,
+  rng: Rng,
+  maxCracks: number,
+  pickCrack: (node: MapNode) => { moduleId: string; type: NodeType; enemies?: string[] } | null,
+): SurgeMark {
+  const all = map.floors.flat();
+  const byId = new Map(all.map((n) => [n.id, n]));
+  const here = position ? byId.get(position) : undefined;
+  // 지금 자리에서 앞으로 닿는 노드
+  const reach = () => {
+    const seen = new Set<string>();
+    const queue = here ? [...here.next] : map.floors[0].map((n) => n.id);
+    while (queue.length) {
+      const id = queue.shift()!;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      queue.push(...byId.get(id)!.next);
+    }
+    return seen;
+  };
+  let ahead = reach();
+  const parents = (id: string) => all.filter((n) => n.next.includes(id));
+  const mark: SurgeMark = {};
+  // 끊을 길: 갈래가 둘 이상인 노드에서(그 노드는 여전히 앞으로 간다). 들어오는 길이 둘 이상인 노드로 가는 길을 먼저 —
+  // 없으면 아무 갈래나 끊고, 그 너머는 '끊겨 갈 수 없는 곳'이 된다(보스까지의 길은 늘 남는다)
+  const forks = all.filter((n) => (n.id === here?.id || ahead.has(n.id)) && n.next.length >= 2);
+  const soft = forks.flatMap((n) => n.next.filter((to) => byId.get(to)!.type !== 'boss' && parents(to).length >= 2).map((to) => [n.id, to] as [string, string]));
+  const edges = soft.length ? soft : forks.flatMap((n) => n.next.filter((to) => byId.get(to)!.type !== 'boss').map((to) => [n.id, to] as [string, string]));
+  if (edges.length) {
+    const [from, to] = rng.pick(edges);
+    const n = byId.get(from)!;
+    n.next = n.next.filter((x) => x !== to);
+    (map.cuts ??= []).push([from, to]);
+    mark.cut = [from, to];
+    ahead = reach();
+  }
+  const made = all.filter((n) => n.crack).length;
+  // 한 층에 하나뿐인 노드(고정 이야기·전투, 피할 수 없는 길목)는 바꾸지 않는다
+  const candidates = all.filter((n) => ahead.has(n.id) && !n.crack && (n.type === 'battle' || n.type === 'event') && map.floors[n.floor - 1].length > 1);
+  if (made < maxCracks && candidates.length) {
+    const node = rng.pick(candidates);
+    const pick = pickCrack(node);
+    if (pick) {
+      node.crack = true;
+      node.type = pick.type;
+      node.moduleId = pick.moduleId;
+      if (pick.enemies) node.enemies = pick.enemies;
+      mark.crack = node.id;
+    }
+  }
+  return mark;
 }

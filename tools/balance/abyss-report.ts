@@ -92,6 +92,9 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   // 폭주(GAME_DESIGN 7절, 2026-10-11 개편): 전투당 0.3회 이하
   const fights = runs.flatMap((r) => r.battles);
   const surges = fights.reduce((a, b) => a + (b.surges ?? 0), 0);
+  const cm = runs.reduce((a, r) => a + (r.cracks?.made ?? 0), 0);
+  const ce = runs.reduce((a, r) => a + (r.cracks?.entered ?? 0), 0);
+  lines.push(`- 裂 틈새: 런당 ${(cm / Math.max(1, runs.length)).toFixed(2)}곳 열림 · 들어간 비율 ${cm ? fmtPct(ce / cm) : '-'}`);
   lines.push(`- 폭주: 전투당 **${(fights.length ? surges / fights.length : 0).toFixed(2)}회**(목표 0.3 이하) · 폭주가 난 전투 ${fmtPct(fights.length ? fights.filter((b) => (b.surges ?? 0) > 0).length / fights.length : 0)}`);
   lines.push('');
   lines.push('## 봇 성향별');
