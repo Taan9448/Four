@@ -23,6 +23,7 @@ npm run balance             # 자동 플레이 봇(수비형·공격형 동시) 
 npm run balance:human       # 도감에서 내보낸 사람 플레이 기록을 봇과 비교 (HUMAN=파일.json)
 npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s8:s8_boss_blood_hall)
 npm run build               # dist/
+npm run ux:check            # 화면 점검(Playwright, CI 밖): 모든 ?screen= 화면 × PC·휴대폰 × 글자 보통·크게 → 작은 글자·버튼·가로 스크롤·겹침·콘솔 오류 표 (UX_SCREENS, UX_SHOTS, UX_OUT)
 npm run assets:placeholder -- <id> | --all
 npm run assets:prompt -- <id>
 npm run assets:slice -- <id> [--fallback 2|3] [--placeholder]
