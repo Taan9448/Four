@@ -47,6 +47,7 @@ import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import { titleStage } from './title-fx';
+import { runTour } from './tour';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
   campaignCollection,
@@ -718,6 +719,16 @@ export class App {
         }),
       ),
     );
+    // 처음 여는 편성 화면(새 캠페인은 S1 출발 전)에서 한 번: 편성이란(2026-10-11 UI/UX 2-1)
+    if (!inn)
+      runTour(
+        [
+          { target: '.loadout-tabs', title: '편성이란', text: `동료마다 ${data.balance.loadout.perCharacter}장 + 공용 ${data.balance.loadout.common}장을 보유 카드에서 골라 이번 스테이지의 덱을 짠다. 탭에는 채운 수와 갈래(아키타입)별 장수.` },
+          { target: '.loadout-grid', title: '카드 고르기', text: '누르면 넣고, 다시 누르면 뺀다. 같은 카드는 한 장만.' },
+          { target: '.loadout-actions', title: '추천을 눌러도 된다', text: '"전체 추천 편성"이 알아서 채운다. 다음 스테이지부터는 "지난 편성 그대로 출발" 한 번이면 된다.' },
+        ],
+        { id: 'loadout', once: true },
+      );
   }
 
   /** 보상으로 본 카드도 도감에 */

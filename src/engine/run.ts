@@ -5,7 +5,7 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
-import { acquireCard, beginStageLoadout, COMMON, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
+import { acquireCard, beginStageLoadout, COMMON, setLoadout, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
 import {
   abyssAddCard,
   abyssEnemyMods,
@@ -215,6 +215,8 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
   grantStarters(data, run, 'haun');
   grantStarters(data, run, COMMON);
   beginStageLoadout(data, run);
+  // 새 캠페인의 첫 스테이지(S0 프롤로그)는 편성 화면 없이 추천 편성으로 바로 출발한다(2026-10-11 사용자 결정). 편성은 S1부터
+  if (run.stageId === playableStages(data)[0]?.id) setLoadout(data, run, run.loadout);
   run.map = buildMap(data, run);
   return run;
 }

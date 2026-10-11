@@ -20,10 +20,13 @@ import { data } from './helpers';
 const deckIds = (run: { deck: { cardId: string }[] }) => run.deck.map((c) => c.cardId);
 
 describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
-  it('런은 하운·공용 시작 카드로 시작하고, 편성 화면을 띄운다. 추천 편성은 규칙을 지킨다', () => {
+  it('런은 하운·공용 시작 카드로 시작하고, S0은 편성 화면 없이 추천 편성으로 출발한다(2026-10-11). 추천 편성은 규칙을 지킨다', () => {
     const run = createRun(data, 'COL1');
     for (const id of [...starterCards(data, 'haun'), ...starterCards(data, COMMON)]) expect(run.collection[id]).toBe(0);
-    expect(run.needsLoadout).toBe(true);
+    expect(run.stageId).toBe('s0');
+    expect(run.needsLoadout).toBe(false);
+    // S1부터는 편성 화면
+    expect(createRun(data, 'COL1b', { stageId: 's1' }).needsLoadout).toBe(true);
     expect(loadoutOwners(data, run)).toEqual(['haun', COMMON]);
     expect(loadoutProblems(data, run, run.loadout)).toEqual([]);
     setLoadout(data, run, run.loadout);
@@ -112,5 +115,18 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     expect(loaded.needsLoadout).toBe(false);
     expect(loaded.deck).toEqual(run.deck);
     expect(loadoutProblems(data, loaded, loaded.loadout)).toEqual([]);
+  });
+});
+
+describe('선택지 요약(2026-10-11 UI/UX 2-4)', () => {
+  it('휴식·사건 선택지의 효과를 짧게 적는다', async () => {
+    const { describeChoice, describeRunEffect } = await import('../src/engine/text');
+    expect(describeRunEffect(data, { op: 'heal_party', ratio: 0.3 })).toBe('체력 +30%');
+    expect(describeRunEffect(data, { op: 'upgrade_card', choose: true })).toBe('카드 1장 강화(고름)');
+    expect(describeRunEffect(data, { op: 'upgrade_card', count: 2, filter: { costNeigongGte: 1 } })).toBe('내공 카드 2장 무작위 강화');
+    expect(describeChoice(data, { effects: [{ op: 'scar', amount: -3 }, { op: 'gain_gold', amount: -60 }] })).toBe('상흔 -3 · 골드 -60');
+    expect(describeChoice(data, { effects: [{ op: 'set_flag', flag: 'x' }] })).toBe('');
+    // 모든 사건·휴식·여관 모듈의 선택지가 요약을 만든다(이야기 표시만 있는 선택지 말고)
+    for (const m of data.modules.values()) for (const c of m.content.choices ?? []) expect(typeof describeChoice(data, c)).toBe('string');
   });
 });
