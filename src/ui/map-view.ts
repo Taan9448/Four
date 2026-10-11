@@ -421,7 +421,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
   const wangJoined = run.flags.includes('support:wang');
   const support = wangJoined
-    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, h('span', { class: 'member-tag' }, '지원'), ' 왕일검 — 청운호흡으로 일행을 돕는다')
+    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, h('span', { class: 'member-tag' }, '지원'), ' 왕일검 - 일행을 돕는다')
     : isDebug()
       ? h(
           'label',

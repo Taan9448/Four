@@ -852,8 +852,6 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .toast-danger { border-color: var(--danger); color: var(--danger); }
 .toast-out { opacity: 0; transform: translateY(-8px); }
 .result-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.55); z-index: 10; }
-.result-box { background: var(--paper); color: var(--paper-ink); padding: 20px 40px; border-radius: 12px; text-align: center; }
-.result-overlay.lose .result-box { background: #3a2a2a; color: var(--ink); }
 
 /* 에셋 미리보기(tools/preview.html) */
 .preview { display: grid; grid-template-columns: 240px 1fr; gap: 16px; }
@@ -1646,3 +1644,44 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 @media (max-width: 600px) {
   .world-map button.stop { min-height: var(--tap); justify-content: center; }
 }
+
+/* ───────── 결과·확인 팝업(2026-10-11 사용자 확정 목업) ─────────
+   옻칠 판 + 금테 + 안쪽 붉은 실선 + 모서리 금장, 위에 걸친 낙관, 붓글씨 제목, 색 칩 */
+.result-overlay { background: radial-gradient(ellipse at center, rgba(5, 6, 9, 0.45), rgba(5, 6, 9, 0.85)); }
+.pop { position: relative; width: min(86vw, 340px); padding: 30px 24px 20px; text-align: center; color: var(--ink); background: linear-gradient(#17151a, #0e0d11); border: 1px solid #c9a24a; border-radius: 3px; box-shadow: inset 0 0 0 4px #0e0d11, inset 0 0 0 5px rgba(168, 40, 30, 0.6), 0 18px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.6); animation: pop-in 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.pop-corner { position: absolute; width: 14px; height: 14px; border: 2px solid #f5d98c; opacity: 0.85; pointer-events: none; }
+.pop-corner.tl { top: -3px; left: -3px; border-right: 0; border-bottom: 0; }
+.pop-corner.tr { top: -3px; right: -3px; border-left: 0; border-bottom: 0; }
+.pop-corner.bl { bottom: -3px; left: -3px; border-right: 0; border-top: 0; }
+.pop-corner.br { bottom: -3px; right: -3px; border-left: 0; border-top: 0; }
+.pop-seal { position: absolute; top: -24px; left: 50%; margin-left: -24px; display: grid; place-items: center; width: 48px; height: 48px; border: 2px solid #c8372a; border-radius: 4px; color: #e5463a; background: #1a0d0d; font: 400 calc(var(--fs-title) * 1.05)/1 var(--f-brush); transform: rotate(-5deg); box-shadow: inset 0 0 0 2px rgba(200, 55, 42, 0.25), 0 4px 10px rgba(0, 0, 0, 0.5); animation: pop-stamp 0.5s 0.18s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.pop-seal.solid { background: #c8372a; color: #fbe9dd; border-color: #e45a4a; }
+.pop-seal.muted { border-color: #6b6f7a; color: #9ea2ad; background: #15161b; }
+.pop-seal.gold { border-color: #c9a24a; color: #f5d98c; background: #1b160c; }
+.pop-eyebrow { margin: 0 0 2px; font-size: var(--fs-min); letter-spacing: 0.3em; color: var(--ink-dim); }
+.pop-title { position: relative; isolation: isolate; margin: 6px 0 8px; font: 400 calc(var(--fs-title) * 1.35)/1.15 var(--f-brush); letter-spacing: 0.08em; color: var(--ink); text-wrap: balance; }
+.pop-title::before { content: ''; position: absolute; left: 50%; top: 55%; width: 120%; height: 62%; transform: translate(-50%, -50%); z-index: -1; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(226, 180, 92, 0.2), transparent 70%); filter: blur(2px); animation: pop-ink 0.7s 0.1s ease-out both; }
+.pop-title.win { color: #f5d98c; text-shadow: 0 0 18px rgba(245, 217, 140, 0.35); }
+.pop-title.lose { color: #d6c8c4; }
+.pop-title.lose::before { background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(168, 40, 30, 0.25), transparent 70%); }
+.pop-lead { margin: 0 0 12px; font: 400 var(--fs-body)/1.6 var(--f-head); text-wrap: balance; }
+.pop-cause { margin: 0 0 12px; font-size: var(--fs-sub); color: var(--ink-dim); }
+.pop-cause b { color: #ff9b9b; font-weight: 600; }
+.pop-stats { display: flex; justify-content: center; gap: 18px; margin: 0 0 6px; font-size: var(--fs-cap); color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.pop-stats b { display: block; font: 600 calc(var(--fs-body) * 1.2)/1.2 var(--f-ui); color: var(--ink); }
+.pop-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 4px 0 8px; padding: 0; }
+.pop-chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: var(--fs-cap); font-weight: 600; border: 1px solid; }
+.pop-chip.up { color: #7fc79a; border-color: rgba(127, 199, 154, 0.5); background: rgba(127, 199, 154, 0.08); }
+.pop-chip.down { color: #ff9b9b; border-color: rgba(255, 155, 155, 0.45); background: rgba(255, 155, 155, 0.07); }
+.pop-chip.gold { color: var(--neigong); border-color: rgba(242, 169, 59, 0.5); background: rgba(242, 169, 59, 0.08); }
+.pop-chip.mana { color: var(--mana); border-color: rgba(143, 211, 255, 0.45); background: rgba(143, 211, 255, 0.07); }
+.pop-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.pop-actions .btn { min-width: 110px; }
+.choice-result .pop-eyebrow { text-align: left; }
+.choice-result .pop-chips { justify-content: flex-start; margin: 10px 0 14px; }
+.pop-chips.gains { border-left: 0; background: none; padding: 0; color: inherit; line-height: 1.4; }
+@keyframes pop-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes pop-stamp { 0% { opacity: 0; transform: rotate(-5deg) scale(1.9); } 60% { opacity: 1; transform: rotate(-5deg) scale(0.92); } 100% { transform: rotate(-5deg) scale(1); } }
+@keyframes pop-ink { from { opacity: 0; width: 20%; } to { opacity: 1; width: 120%; } }
+.no-motion .pop, .no-motion .pop-seal, .no-motion .pop-title::before { animation: none; }
+@media (prefers-reduced-motion: reduce) { .pop, .pop-seal, .pop-title::before { animation: none; } }
