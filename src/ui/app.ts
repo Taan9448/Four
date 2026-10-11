@@ -50,7 +50,7 @@ import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import { titleStage } from './title-fx';
-import { runTour } from './tour';
+import { runTour, tourSeen } from './tour';
 import { iconEl } from './icons';
 import { loadPortrait } from '../render/portrait';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
@@ -180,6 +180,12 @@ export class App {
    */
   private screen(name: string, id: string | undefined, stageId: string): void {
     this.persist = false;
+    // ?screen=surgeguide — 첫 폭주 안내 창(GAME_DESIGN 7절)
+    if (name === 'surgeguide') {
+      this.title();
+      void import('./battle-view').then(({ openSurgeGuide }) => openSurgeGuide(data));
+      return;
+    }
     if (name.startsWith('abyss')) {
       // 심연 화면 확인: abyssclear(굽이를 넘음) · abyssend(멈춤) · abyssshop(상점) · abyssrest(휴식)
       const seed = 'SCREEN';
@@ -597,6 +603,27 @@ export class App {
       }),
     );
     if (firstMate || overFull) openPartyGuide(data, run);
+    else this.riftNotices(run);
+  }
+
+  /**
+   * 균열·폭주를 이야기 뒤에 짚는 한 번짜리 안내(GAME_DESIGN 7절): 첫눈의 개울가 뒤 '균열', 경계의 금 뒤 '상흔',
+   * 폭주가 처음 지도를 가른 뒤 끊긴 길과 裂 틈새. 브라우저마다 한 번(설정의 '안내 다시 보기'로 다시)
+   */
+  private riftNotices(run: RunState): void {
+    const sc = data.balance.rift.scar;
+    if (run.usedModules.includes('s1_story_first_snow') && !tourSeen('notice-rift'))
+      return runTour([{ title: '균열', text: `융합 카드(내공과 마나를 함께 쓰는 카드)를 쓰면 하늘에 금이 간다. 전투의 균열이 ${data.balance.rift.max}이 되면 터진다 — 폭주.` }], { id: 'notice-rift' });
+    if (run.flags.includes('rift_known') && !tourSeen('notice-scar'))
+      return runTour([{ title: '상흔', text: `전투가 끝날 때 남은 균열과 폭주가 상흔으로 남는다. 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(최대 ${sc.startRiftMax}). 휴식의 꿰매기, 폭주 없이 넘긴 보스, 裂 틈새로 덜어 낸다.` }], { id: 'notice-scar' });
+    if (run.map.cuts?.length && !tourSeen('notice-surge-map'))
+      return runTour(
+        [
+          { target: '.map-lines', title: '길이 끊겼다', text: '폭주가 지도를 갈랐다. 검은 금이 그어진 길로는 더 갈 수 없다.' },
+          { target: '.node-crack', title: '裂 틈새', text: '폭주가 연 자리. 들어가면 상흔을 덜 수 있다 — 틈의 짐승을 이기거나, 틈새의 거래에서.' },
+        ],
+        { id: 'notice-surge-map' },
+      );
   }
 
   private enter(node: MapNode): void {
@@ -668,7 +695,7 @@ export class App {
         const outcome = battleOutcome(final)!;
         // 전투가 끝나면 장소의 곡으로(지면 엔딩 화면이 멈춘다)
         playBgm(outcome.result === 'victory' ? moodFor(stage.world) : null);
-        this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory', final.tally?.moves));
+        this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory', final.tally?.moves, final.tally?.surges ?? 0));
         this.clearMessages = applyBattleOutcome(data, run, enc, outcome);
         if (run.status === 'defeat') return this.map();
         // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다

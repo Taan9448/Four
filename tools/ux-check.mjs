@@ -13,7 +13,7 @@ const SCREENS = [
   ['map', '?seed=UXCHK'],
   ['battle', '?sandbox&seed=UXCHK'],
   ['abyss', '?abyss=UXCHK'],
-  ...['reward', 'choice', 'scene', 'clear', 'win', 'lose', 'deck', 'levelup', 'shop', 'bossloot', 'hub', 'codex', 'loadout', 'pilgrim', 'abyssclear', 'abyssend', 'abyssshop', 'abyssrest'].map((s) => [s, `?screen=${s}&seed=UXCHK`]),
+  ...['reward', 'choice', 'scene', 'clear', 'win', 'lose', 'deck', 'levelup', 'shop', 'bossloot', 'hub', 'codex', 'loadout', 'pilgrim', 'abyssclear', 'abyssend', 'abyssshop', 'abyssrest', 'surgeguide'].map((s) => [s, `?screen=${s}&seed=UXCHK`]),
 ];
 const VIEWPORTS = [
   { tag: 'PC', width: 1440, height: 900, btn: 36 },

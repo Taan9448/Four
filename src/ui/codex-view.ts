@@ -564,6 +564,7 @@ function statsTab(data: GameData, codex: Codex, profile: Profile): HTMLElement {
     'div',
     {},
     section('기록', null, h('dl', { class: 'codex-stats' }, rows.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, String(v))]))),
+    riftSection(data, codex),
     titlesSection(data, profile),
     runLogSection(),
     section(
@@ -687,4 +688,18 @@ function moveSummary(data: GameData, m: EnemyDef['moves'][number]): string[] {
   const out: string[] = [];
   for (const e of m.effects) if (e.op === 'damage') out.push(`피해 ${e.amount ?? 0}${(e.times ?? 1) > 1 ? `×${e.times}` : ''}${e.target === 'all_enemies' ? ' 전체' : ''}`);
   return [...out, ...intentBadges(data, m.effects)];
+}
+
+/** 균열과 폭주(GAME_DESIGN 7절): 첫 폭주를 겪은 뒤에 열린다 */
+function riftSection(data: GameData, codex: Codex): HTMLElement | null {
+  if (!codex.stats.surges) return null;
+  const b = data.balance.rift;
+  const sc = b.scar;
+  const lines = [
+    `균열: 융합 카드(내공과 마나를 함께)를 쓰면 하늘에 금이 간다. 차례 끝에 세계마다 아문다(엘하임 -${b.decay.elheim} · 마왕성 -${b.decay.nocturna} · 무림·틈 0). ${b.echoThreshold} 이상이면 틈의 잔향이 덱에 섞인다.`,
+    `폭주(균열 ${b.max}): ① 일행 모두 최대 체력 ${Math.round(b.surgeRatio * 100)}%(하운 +${b.surgeHaunExtra}, 같은 전투 n번째는 ×n) ② 적 모두 힘 +${b.surgeEnemyStrength}, 흐름을 먹는 적은 체력 ${b.surgeEnemyHeal} ③ 틈의 잔향 ${b.surgeEchoToHand}장을 손에 ④ 상흔 +${b.surgeScar}, 지도의 앞길 하나가 끊기고 裂 틈새가 열린다. 균열은 ${b.surgeResetTo}으로.`,
+    `상흔: 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(최대 ${sc.startRiftMax}). ${sc.restAt} 이상이면 휴식 회복 -${Math.round((1 - sc.restHealMul) * 100)}%, ${sc.shopAt} 이상이면 상점 값 +${Math.round((sc.shopPriceMul - 1) * 100)}%(대신 꿰매기를 판다).`,
+    `막는 법: 숨 세기 같은 감소 카드 · 봉인(스택마다 균열 상승 1을 막음) · 휴식의 꿰매기 · 지도의 裂 틈새 · 폭주 없이 넘긴 보스(상흔 -${sc.bossCleanBonus}).`,
+  ];
+  return section('균열과 폭주', `겪은 폭주 ${codex.stats.surges}번`, h('div', { class: 'codex-rift' }, lines.map((t) => h('p', {}, t))));
 }

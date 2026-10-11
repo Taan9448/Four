@@ -993,6 +993,8 @@ export const ModuleDef = z
         bonus: z.object({ condition: Condition, text: z.string(), effects: z.array(Effect) }).strict().optional(),
         /** 이 턴 수를 버티면 승리하는 전투(이길 수 없는 전투) */
         surviveTurns: z.number().int().positive().optional(),
+        /** 첫 폭주 연습(S2 이그니스, GAME_DESIGN 7절): 이 전투의 폭주 체력 손실은 절반 */
+        surgeTutorial: z.boolean().optional(),
         /** 보스 모듈: 스테이지를 마친 뒤 보여 줄 장면 글 */
         outro: z.string().optional(),
         /** 전투 배경 에셋 id(생략하면 스테이지 배경) */

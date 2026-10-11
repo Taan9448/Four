@@ -99,3 +99,35 @@ export function confirmDialog(title: string, message: string, okLabel: string): 
     requestAnimationFrame(() => ok.focus());
   });
 }
+
+/**
+ * 첫 폭주 안내(GAME_DESIGN 7절, 균열 개편 2026-10-11): 폭주 연출 뒤 전투를 멈추고 네 가지와 막는 법을 보인다. [알았다]로 닫는다
+ * lines: [글자, 설명] — 작은 낙관 아이콘과 한 줄
+ */
+export function surgeGuide(lines: [string, string][], foot: string[]): Promise<void> {
+  return new Promise((resolve) => {
+    const close = () => {
+      document.removeEventListener('keydown', onKey, true);
+      el.remove();
+      resolve();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.stopPropagation();
+        e.preventDefault();
+        close();
+      }
+    };
+    const ok = h('button', { class: 'btn btn-primary', onclick: () => close() }, '알았다');
+    const list = h(
+      'div',
+      { class: 'surge-guide' },
+      h('ol', {}, lines.map(([g, t]) => h('li', {}, h('span', { class: 'sg-glyph', 'aria-hidden': 'true' }, g), h('span', {}, t)))),
+      foot.map((t) => h('p', { class: 'sg-foot' }, t)),
+    );
+    const el = h('div', { class: 'overlay pop-overlay surge-pop' }, popPanel({ seal: '裂', sealKind: 'solid', eyebrow: '첫 폭주', title: '폭주 — 하늘이 터졌다', tone: 'lose', lead: list, actions: [ok] }));
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(el);
+    requestAnimationFrame(() => ok.focus());
+  });
+}

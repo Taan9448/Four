@@ -16,7 +16,7 @@ import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
 import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon, statusChip } from './icons';
-import { confirmDialog, openOverlay, popPanel } from './overlay';
+import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
 import { settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
 import { runTour, tourSeen } from './tour';
@@ -1090,14 +1090,29 @@ export class BattleView {
           }
           await this.wait(80);
           break;
-        case 'surge':
-          this.alert('균열 폭주! 하늘이 갈라진다', 'danger');
+        case 'surge': {
           void this.rift.surge();
           sfx('surge');
           shake(this.field, 1);
           flash(this.field, 'red');
           await this.wait(350);
+          // 첫 폭주(브라우저마다 한 번): 멈추고 네 가지와 막는 법 → 잔향·적의 힘·균열 게이지를 차례로 짚는다. 그다음부터는 짧은 띠만
+          const b = this.data.balance.rift;
+          const n = ev.count ?? 1;
+          if (!tourSeen('surge-guide')) {
+            this.refresh();
+            await openSurgeGuide(this.data);
+            runTour(
+              [
+                { target: this.handEls.get(this.state.hand.find((c) => c.cardId === b.echoCard)?.uid ?? '') ?? '.hand', title: '틈의 잔향', text: '손에 든 채 턴을 끝내면 균열 +1. 내공 1을 써서 털어 내면(소멸) 사라진다.' },
+                { target: '.unit-enemy .chip-buff, .unit-enemy .status-chip', title: '적의 힘 +1', text: '폭주할 때마다 적 모두의 공격이 1씩 세진다. 이 전투가 끝날 때까지 남는다.' },
+                { target: '.b-rift', title: '균열 게이지', text: `균열은 ${b.surgeResetTo}으로 돌아왔다. 8이 넘으면 게이지가 붉게 고동치고, 쓰면 폭주하는 카드는 붉은 금 테두리가 붙는다.` },
+              ],
+              { id: 'surge-guide' },
+            );
+          } else this.alert(`폭주${n > 1 ? ` ×${n}` : ''} — 체력 ${Math.round(b.surgeRatio * 100) * n}% · 힘 +${b.surgeEnemyStrength} · 잔향 ${b.surgeEchoToHand} · 상흔 +${b.surgeScar}`, 'danger');
           break;
+        }
         case 'echo':
           this.alert('틈의 잔향이 덱에 섞였다', 'danger');
           break;
@@ -1424,5 +1439,19 @@ function medal(glyph: string, label: string, body: string, onclick: () => void, 
     h('b', {}, glyph),
     count === undefined ? null : h('i', {}, count),
     MEDAL_SHORT[glyph] ? h('small', { class: 'medal-label', 'aria-hidden': 'true' }, MEDAL_SHORT[glyph]) : null,
+  );
+}
+
+/** 첫 폭주 안내 창(GAME_DESIGN 7절): 네 가지 + 균열이 돌아오는 값 + 막는 법. ?screen=surgeguide로도 본다 */
+export function openSurgeGuide(data: GameData): Promise<void> {
+  const b = data.balance.rift;
+  return surgeGuide(
+    [
+      ['血', `일행 모두 최대 체력의 ${Math.round(b.surgeRatio * 100)}%를 잃는다(하운은 ${b.surgeHaunExtra} 더). 같은 전투에서 또 터지면 ×2, ×3.`],
+      ['力', `적 모두 힘 +${b.surgeEnemyStrength}. 흐름을 먹는 적은 체력 ${b.surgeEnemyHeal}을 채운다.`],
+      ['響', `틈의 잔향 ${b.surgeEchoToHand}장이 손에 들어온다. 든 채 턴을 끝내면 균열 +1 — 내공 1로 털어 낼 수 있다.`],
+      ['裂', `상흔 +${b.surgeScar}. 지도로 돌아가면 앞길 하나가 끊기고 裂 틈새가 열린다.`],
+    ],
+    [`균열은 ${b.surgeResetTo}으로 돌아온다.`, '막는 법: 숨 세기 같은 감소 카드 · 봉인 · 휴식의 꿰매기 · 지도의 裂 틈새'],
   );
 }
