@@ -7,7 +7,7 @@
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
 import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
 import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
-import { focusArchetype, recommendLoadout, setLoadout, starterCards } from '../engine/collection';
+import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
 export { cloneBattle };
 import type { GameData } from '../engine/data';
@@ -310,6 +310,18 @@ function decideChoice(data: GameData, run: RunState, enc: { module: Parameters<t
   return best;
 }
 
+/**
+ * 이 런에서 봇이 그 동료에게 모으는 갈래: 시드와 동료 이름으로 두 갈래 중 하나(사람마다 고르는 갈래가 다르다).
+ * 늘 '가진 카드로 가장 강한 갈래'만 따르면 시작 카드가 많은 갈래만 모여 다른 갈래 카드가 죽은 카드로 잡힌다(카드 2파)
+ */
+function botArchetype(data: GameData, run: RunState, owner: string): string | null {
+  const arcs = data.characters.get(owner)?.archetypes ?? [];
+  if (!arcs.length) return null;
+  let h = 0;
+  for (const ch of run.seed + owner) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return arcs[h % arcs.length].id;
+}
+
 /** 보상: 가장 값진 카드(등급 → 공격 우선). 값이 낮거나 덱이 크면 건너뛴다 */
 function decideReward(data: GameData, run: RunState, options: string[], opts: BotOptions): string | undefined {
   // 균열을 올리는 카드가 2장 이상인 덱은 균열 감소 카드(숨 세기 갈래)에 값을 더 준다(폭주는 비용)
@@ -324,16 +336,16 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   if (!best) return undefined;
   const value = worth(data.cards.get(best)!);
   // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 희귀 이상(값이 기준 이상)이 먼저,
-  // 없으면 아직 없는 카드 중 그 주인이 모으는 갈래(아키타입) 태그가 맞는 카드(공용 카드는 일행 누구의 갈래든) —
+  // 없으면 아직 없는 카드 중 그 주인에게 봇이 모으는 갈래(botArchetype) 태그가 맞는 카드(공용 카드는 일행 누구의 갈래든) —
   // 그것도 없으면 갈래 태그가 없는 잇는 카드(어느 갈래에도 들어간다). 다른 갈래의 일반·고급은 넘긴다(카드 250장 확장)
   if (value < opts.minRewardValue) {
     if (isAbyss(run)) return undefined;
-    const partyFocus = new Set(run.roster.map((r) => focusArchetype(data, run, r.id)).filter((f): f is string => !!f));
+    const partyFocus = new Set(run.roster.map((r) => botArchetype(data, run, r.id)).filter((f): f is string => !!f));
     const fresh = options.filter((id) => !(id in run.collection)).sort((a, b) => score(b) - score(a));
     const fits = (id: string) => {
       const def = data.cards.get(id)!;
       if (!data.characters.has(def.owner)) return def.tags.some((t) => partyFocus.has(t));
-      const focus = focusArchetype(data, run, def.owner);
+      const focus = botArchetype(data, run, def.owner);
       return !!focus && def.tags.includes(focus);
     };
     return fresh.find(fits) ?? fresh.find((id) => data.cards.get(id)!.tags.length === 0 && data.cards.get(id)!.type !== 'status');
