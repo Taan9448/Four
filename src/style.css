@@ -1214,7 +1214,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .codex-section { margin-bottom: 18px; }
 .codex-section h3 { margin: 4px 0 10px; font-size: calc(var(--fs-body) * 1.16); border-bottom: 1px solid var(--line); padding-bottom: 4px; }
 .codex-section h3 small { margin-left: 10px; color: var(--ink-dim); font-family: var(--f-ui); font-weight: 400; font-size: var(--fs-cap); }
-.codex-card.unknown { width: 77px; min-height: 108px; display: grid; place-items: center; border-radius: 6px; border: 1px dashed rgba(160, 175, 200, 0.3); background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 8px, transparent 8px 16px); color: rgba(235, 230, 218, 0.25); font-family: var(--f-brush); font-size: calc(var(--fs-title) * 0.95); }
+.codex-card.unknown { width: calc(128px * var(--cpx-zoom)); height: calc(192px * var(--cpx-zoom)); flex: 0 0 auto; box-sizing: border-box; display: grid; place-items: center; border-radius: 6px; border: 1px dashed rgba(160, 175, 200, 0.3); background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 8px, transparent 8px 16px); color: rgba(235, 230, 218, 0.25); font-family: var(--f-brush); font-size: calc(var(--fs-title) * 1.5); }
 .codex-card.unknown.rarity-epic { border-color: rgba(178, 120, 255, 0.4); }
 .codex-card.unknown.rarity-legendary { border-color: rgba(226, 180, 92, 0.5); }
 .codex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
@@ -1230,7 +1230,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .codex-portrait { width: 110px; height: 130px; display: grid; place-items: center; border-radius: 4px; background: linear-gradient(color-mix(in srgb, var(--who, #888) 30%, #10131a), #0c0e13); font-family: var(--f-brush); font-size: calc(var(--fs-title) * 1.38); color: rgba(255, 255, 255, 0.55); overflow: hidden; }
 .codex-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .codex-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
-.codex-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: rgba(0, 0, 0, 0.2); }
+.codex-item { display: flex; gap: 10px; align-items: flex-start; min-height: 64px; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: rgba(0, 0, 0, 0.2); }
 .codex-item b { display: block; font-size: var(--fs-body); }
 .codex-item small { color: var(--ink-dim); font-size: var(--fs-cap); line-height: 1.4; }
 .codex-item.unknown { opacity: 0.4; }
@@ -1464,7 +1464,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .abyss-daily { margin-top: 6px; padding-top: 10px; border-top: 1px dashed rgba(150, 110, 210, 0.35); }
 .codex-card.outline .card { filter: grayscale(0.85) brightness(0.75); opacity: 0.8; }
 .codex-card.outline { outline: 2px dashed rgba(220, 210, 190, 0.3); outline-offset: 3px; border-radius: 6px; }
-.codex-card.unknown.locked { width: 128px; min-height: 180px; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px; font-size: calc(var(--fs-title) * 1.12); text-align: center; }
+.codex-card.unknown.locked { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 8px; font-size: calc(var(--fs-title) * 1.12); text-align: center; }
 .codex-lock { font-family: var(--f-body, inherit); font-size: var(--fs-min); line-height: 1.35; color: rgba(225, 215, 240, 0.65); }
 .codex-lock b { color: #d9c7f2; }
 .codex-achievements { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
