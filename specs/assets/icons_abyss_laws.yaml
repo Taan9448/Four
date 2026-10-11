@@ -1,0 +1,17 @@
+id: icons_abyss_laws
+type: icon-sheet
+summary: 심연 굽이의 법칙 아이콘 9종 — 칸 n = data/abyss_laws.json의 icon n
+# 칸 번호 = 법칙의 icon. 순서를 바꾸면 데이터도 함께 바꾼다. 모든 법칙은 같은 틀: 검붉은 테두리의 둥근 패 안에 기호 하나
+frames: 9
+baseline: 0.5
+frame_notes:
+  1: "dry sky — a cracked dry earth disc under an empty sky with no blue light, inside a thin dark crimson ring"
+  2: "two moons — two moons side by side, one silver and one pale blue, inside a thin dark crimson ring"
+  3: "echo — a black crack with two faint copies of it fading behind, like an echo, inside a thin dark crimson ring"
+  4: "price of blood — a red coin stamped with a blood drop, inside a thin dark crimson ring"
+  5: "grain revealed — an open eye whose iris shows glowing wood-grain lines, inside a thin dark crimson ring"
+  6: "hunger — a dark open maw swallowing a small gold orb, inside a thin dark crimson ring"
+  7: "heavy feet — a heavy iron weight chained to a foot, a small gold coin beside it, inside a thin dark crimson ring"
+  8: "fog — a thick grey fog bank hiding a faint silhouette, inside a thin dark crimson ring"
+  9: "the hasty — an hourglass with sand pouring fast and a small red flame, inside a thin dark crimson ring"
+placeholder: { color: '#4b3a6b', accent: '#ff3b3b' }

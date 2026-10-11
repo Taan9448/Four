@@ -11,6 +11,7 @@ import { frameUrl } from '../render/assets';
 import { loadPortrait } from '../render/portrait';
 import { cardView } from './card-view';
 import { h } from './dom';
+import { iconEl } from './icons';
 import { potionChip, relicChip } from './items';
 import type { Profile } from './storage';
 import { installTooltips } from './tooltip';
@@ -372,7 +373,7 @@ function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMet
     ['열린 서약', `${oathMax(data, profile.abyssBestDepth, meta.oathCleared)} / ${data.oaths.length}단계`],
     ['이룬 업적', `${meta.achievements.length} / ${data.achievements.size}`],
   ];
-  const named = (glyph: string, name: string, text: string) => h('div', { class: 'codex-item' }, h('span', { class: 'relic-chip abyss-glyph' }, glyph), h('div', {}, h('b', {}, name), h('small', {}, text)));
+  const named = (glyph: string | HTMLElement, name: string, text: string) => h('div', { class: 'codex-item' }, h('span', { class: 'relic-chip abyss-glyph' }, glyph), h('div', {}, h('b', {}, name), h('small', {}, text)));
   const unknown = () => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???'), h('small', {}, '심연에서 만나면 적힌다')));
   return h(
     'div',
@@ -421,12 +422,12 @@ function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMet
     section(
       '굽이의 법칙',
       `${(codex.laws ?? []).length} / ${data.laws.size}`,
-      h('div', { class: 'codex-items' }, [...data.laws.values()].map((l) => ((codex.laws ?? []).includes(l.id) ? named(l.glyph, l.name, l.description) : unknown()))),
+      h('div', { class: 'codex-items' }, [...data.laws.values()].map((l) => ((codex.laws ?? []).includes(l.id) ? named(iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name, l.description) : unknown()))),
     ),
     section(
       '접사',
       `${(codex.affixes ?? []).length} / ${data.affixes.size}`,
-      h('div', { class: 'codex-items' }, [...data.affixes.values()].map((a) => ((codex.affixes ?? []).includes(a.id) ? named(a.glyph, a.name, a.description) : unknown()))),
+      h('div', { class: 'codex-items' }, [...data.affixes.values()].map((a) => ((codex.affixes ?? []).includes(a.id) ? named(iconEl('icons_abyss_affixes', a.icon, a.glyph, 'law-icon'), a.name, a.description) : unknown()))),
     ),
   );
 }

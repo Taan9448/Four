@@ -1,0 +1,16 @@
+id: icons_abyss_affixes
+type: icon-sheet
+summary: 심연 적 접사 아이콘 8종 — 칸 n = data/abyss_affixes.json의 icon n
+# 칸 번호 = 접사의 icon. 순서를 바꾸면 데이터도 함께 바꾼다. 법칙 아이콘(icons_abyss_laws)과 같은 크기·외곽선, 테두리 없이 기호만
+frames: 8
+baseline: 0.5
+frame_notes:
+  1: "tough — a thick stone shield with a large plus sign"
+  2: "swift — a pair of quick feet with speed lines"
+  3: "venomous — a fang dripping a green poison drop"
+  4: "shadow-bound — a dark smoky silhouette with two red dot eyes"
+  5: "glutton — an open jaw biting into a blue mana crystal"
+  6: "spiteful — a spiked shield with a curved arrow bouncing back"
+  7: "blood-covered — a crimson veil draped over a wood-grain disc"
+  8: "echoing — a falling figure leaving a black crack echo behind"
+placeholder: { color: '#5a1020', accent: '#c2c6d1' }

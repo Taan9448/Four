@@ -4,6 +4,7 @@ import { findNode, type MapNode } from '../engine/route';
 import { availableNodes, playableStages, setParty, xpToNext, type RunState } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
+import { iconEl } from './icons';
 import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
@@ -534,7 +535,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             ? h(
                 'div',
                 { class: 'law-badges' },
-                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, h('b', {}, l!.glyph), l!.name)),
+                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, iconEl('icons_abyss_laws', l!.icon, l!.glyph, 'law-icon'), l!.name)),
               )
             : null,
           h(

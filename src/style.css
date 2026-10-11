@@ -1403,3 +1403,7 @@ img.vn-portrait, img.cutin-portrait {
 
 /* 도감 기록 탭: 플레이 기록 내보내기 */
 .runlog-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+/* 심연 법칙·접사 아이콘(icons_abyss_laws·_affixes, 2026-10-11). 그림이 오기 전에는 한 글자 */
+.icon.law-icon { display: inline-grid; place-items: center; width: 18px; height: 18px; font: 400 0.95rem/1 var(--f-brush); color: #e6d9fb; }
+.icon.law-icon.has-art img { width: 100%; height: 100%; image-rendering: pixelated; }
+.abyss-glyph .icon.law-icon { width: 30px; height: 30px; font-size: 1.2rem; }
