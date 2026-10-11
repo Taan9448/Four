@@ -429,6 +429,10 @@ h1, h2, h3 { font-family: var(--f-head); }
 .b-hud-right { justify-self: end; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .medal-row { display: flex; gap: 8px; align-items: center; }
 .b-hud-right .b-relics { justify-content: flex-end; max-width: 280px; }
+/* 유물 칸은 표식 줄과 같은 너비로, 왼쪽 끝을 첫 표식(抽)의 왼쪽 끝에 맞춘다(2026-10-11 사용자 요청).
+   width 0 + min-width 100%: 유물이 많아도 칸이 표식 줄보다 넓어지지 않고 줄을 바꾼다 */
+.b-hud-right { align-items: stretch; }
+.b-hud-right .b-relics { box-sizing: border-box; width: 0; min-width: 100%; max-width: none; justify-content: flex-start; }
 /* 오른쪽 위 둥근 표식(抽 棄 滅 冊 設): 한자 + 붉은 숫자 배지 */
 .medals { display: flex; gap: 8px; }
 .medal { position: relative; width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 40% 35%, #232736, #0c0d12 72%); border: 1.5px solid #c9a24f; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(201, 162, 79, 0.12); color: #f5d98c; font: 400 calc(var(--fs-body) * 1.26)/1 var(--f-brush); cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
@@ -1638,7 +1642,8 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .b-hud { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .b-hud-left { min-width: 0; }
   .b-stage { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .b-hud-right { justify-self: stretch; flex-direction: row-reverse; justify-content: space-between; align-items: center; }
+  /* 휴대폰도 표식 줄 아래 같은 너비(유물이 많으면 왼쪽 좁은 칸에 세로로 길게 쌓였다) */
+  .b-hud-right { justify-self: end; flex-direction: column; align-items: stretch; }
   .unit-enemy .intent { max-width: 100%; }
 }
 
