@@ -77,6 +77,9 @@ export class BattleView {
   private aimEl!: HTMLElement;
   private deckMedal!: HTMLElement;
   private logEl!: HTMLElement;
+  private logMedal!: HTMLElement;
+  /** 휴대폰: 손패 위 "◀ 5장 ▶" */
+  private handHint!: HTMLElement;
   private pilesEl!: HTMLElement;
   private riftEl!: HTMLElement;
   private turnEl!: HTMLElement;
@@ -226,6 +229,8 @@ export class BattleView {
             { class: 'medal-row' },
             this.pilesEl,
             (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
+            // 전투 기록: 기본은 숨김, 누르면 반투명 판 위에(2026-10-11 UI/UX 2-2)
+            (this.logMedal = medal('記', '전투 기록', '최근 일어난 일 다섯 줄을 보이고 숨긴다', () => this.toggleLog())),
             medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
           ),
           this.state.relics.length ? this.relicEl : null,
@@ -236,7 +241,7 @@ export class BattleView {
         'div',
         { class: 'b-center' },
         this.ctx.pilgrimText ? h('p', { class: 'battle-pilgrim chip' }, this.ctx.pilgrimText) : null,
-        this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
+        this.ctx.introText ? this.introEl() : null,
         this.riftEl,
         this.ctx.laws?.length
           ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name)))
@@ -251,7 +256,8 @@ export class BattleView {
         'div',
         { class: 'dock' },
         h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl), this.resEl),
-        h('div', { class: 'dock-mid' }, this.handEl),
+        // 전투 중 대사·경고 띠는 손패 바로 위(this.alerts)
+        h('div', { class: 'dock-mid' }, this.alerts, (this.handHint = h('div', { class: 'hand-hint', 'aria-hidden': 'true' })), this.handEl),
         h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E')),
       ),
       this.fxLayer,
@@ -259,7 +265,7 @@ export class BattleView {
 
     document.addEventListener('keydown', this.onKey);
     installTooltips();
-    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts, this.alerts);
+    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts);
   }
 
   private spriteFor(c: Combatant, anim: string): string | null {
@@ -372,6 +378,8 @@ export class BattleView {
       s.surviveTurns !== null ? h('span', { class: 'survive' }, `버티기 ${Math.min(s.turn, s.surviveTurns)} / ${s.surviveTurns}턴`) : '',
     );
     this.riftEl.querySelector('span')!.replaceChildren('균열 ', h('b', {}, s.rift), ` / ${bal.rift.max}`, hot ? h('em', {}, ' 잔향') : '');
+    // 폭주 예고: 균열이 max-2 이상이면 "다음 +N이면 폭주"(붉은 글씨)
+    if (s.rift >= bal.rift.max - 2 && s.rift < bal.rift.max) this.riftEl.append(h('span', { class: 'surge-warn' }, `다음 +${bal.rift.max - s.rift}이면 폭주`));
     this.pilesEl.replaceChildren(
       medal('抽', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
       medal('棄', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
@@ -487,6 +495,7 @@ export class BattleView {
     const mid = (n - 1) / 2;
     const step = n > 1 ? Math.min(5, 36 / (n - 1)) : 0;
     this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
+    this.handHint.textContent = n ? `◀ ${n}장 ▶` : '';
     s.hand.forEach((inst, i) => {
       const check = canPlay(s, i);
       const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i, flavor: 'hover' });
@@ -632,7 +641,7 @@ export class BattleView {
     u.intent.classList.toggle('skipped', skip);
     u.intent.append(
       intentIcon(view.intent.kind),
-      h('span', {}, view.intent.name),
+      h('span', { class: 'intent-name' }, view.intent.name),
       dmg ? h('b', {}, dmg) : '',
       d?.element ? elementMark(d.element) : '',
       // 공격 말고 하는 일의 핵심 수치(방어·강화·약화·카드·소환)
@@ -1157,9 +1166,30 @@ export class BattleView {
     }
   }
 
-  /** 전투 연출 대기(설정의 전투 속도 배율) */
+  /**
+   * 전투 이야기 글(가운데 위): 첫 턴 2.5초 뒤 한 줄 칩으로 접힌다. 누르면 펼치고 다시 누르면 접는다.
+   * 움직임 줄이기·화면 연출 끔이면 처음부터 접힌 채(2026-10-11 UI/UX 2-2)
+   */
+  private introEl(): HTMLElement {
+    const el = h('p', { class: 'battle-intro chip', role: 'button', tabindex: '0', title: '눌러서 펼치기·접기' }, this.ctx.introText!);
+    const toggle = () => el.classList.toggle('collapsed');
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggle()));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('no-motion')) el.classList.add('collapsed');
+    else setTimeout(() => el.classList.add('collapsed'), 2500);
+    return el;
+  }
+
+  /** 전투 기록 판 보이기·숨기기(기본 숨김) */
+  private toggleLog(): void {
+    const on = this.logEl.classList.toggle('on');
+    this.logMedal.classList.toggle('on', on);
+  }
+
+  /** 전투 중 이야기 대사·경고: 손패 바로 위 띠. 3초 뒤 또는 누르면 닫힌다(의도·받을 피해 예고를 가리지 않게) */
   private alert(text: string, kind: 'support' | 'danger'): void {
-    toast(this.alerts, text, kind, Math.min(7000, 1800 + text.length * 45));
+    const el = toast(this.alerts, text, kind, 3000);
+    el.addEventListener('click', () => el.remove());
   }
 
   private wait(ms: number): Promise<void> {
