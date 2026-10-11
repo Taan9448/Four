@@ -224,18 +224,106 @@ const fillFrame = (T, TH, inset = 0) => (n) => {
   return { img: exact ? crop : resampleNearest(crop, T / box.w, TH / box.h), fit: exact ? 'pad' : 'fill', native: [box.w, box.h] };
 };
 
+/**
+ * 카드 그림 시트의 실제 칸 경계(2026-10-11, #866·#869·#872): 이미지 모델은 칸 높이(256px)를 지키지 못하고
+ * 그림 줄을 276~290px로 늘이거나(일부 칸만 쓰는 시트) 한 줄을 9px 일찍 시작한다. 칸을 꽉 채운 그림이라 칸 사이에
+ * 틈이 없으므로, 그림이 있는 범위를 쓰는 줄 수로 나눈 자리 근처(±20%)에서 그림이 가로·세로로 끊기는 선을 찾는다.
+ * 끊김 점수 = 칸 줄(열)마다 위아래(좌우) 픽셀 차이의 평균, 그 중앙값(모든 칸이 같은 선에서 끊겨야 경계).
+ * 뚜렷한 선이 없으면 나눈 자리를 그대로 쓴다. 반환: 칸 번호(1부터)의 사각형을 내는 함수
+ */
+export function tileLayout(keyed, spec) {
+  const [C, R] = spec.grid;
+  const { data, width: W, height: H } = keyed;
+  const isContent = isContentFn(spec);
+  const used = Math.max(1, Math.min(R, Math.ceil(spec.frames / C)));
+  const px = (x, y) => (y * W + x) * 4;
+  const diff = (i, j) => {
+    const a = isContent(data, i), b = isContent(data, j);
+    if (a !== b) return 300;
+    if (!a) return 0;
+    return Math.abs(data[i] - data[j]) + Math.abs(data[i + 1] - data[j + 1]) + Math.abs(data[i + 2] - data[j + 2]);
+  };
+  // 그림이 있는 범위(줄·열의 5% 넘게 그림이 있는 곳)
+  const rowHas = (y) => { let c = 0; for (let x = 0; x < W; x += 2) if (isContent(data, px(x, y))) c++; return c / (W / 2) > 0.05; };
+  let top = 0, bottom = H;
+  while (top < H - 1 && !rowHas(top)) top++;
+  while (bottom > top + 1 && !rowHas(bottom - 1)) bottom--;
+  const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+  /** lo~hi를 n칸으로 나누는 경계들. score(v, k) = k번째 띠에서 v 자리 선의 끊김 */
+  // 그림이 캔버스를 다 채웠으면(규격 격자를 따른 시트) 규격 자리 가까이(±6%)만, 줄을 늘여 그린 시트는 넓게(±20%) 찾는다.
+  // 그림 안의 지평선·칼날 같은 긴 선을 경계로 잡지 않게, 나눈 자리에서 멀수록 점수를 깎는다
+  const cuts = (lo, hi, n, score, full) => {
+    const out = [lo];
+    const size = (hi - lo) / n;
+    for (let k = 1; k < n; k++) {
+      const e = Math.round(lo + k * size);
+      const span = Math.round(size * (full ? 0.06 : 0.2));
+      let best = e, bestS = -1;
+      const all = [];
+      for (let v = Math.max(lo + 1, e - span); v <= Math.min(hi - 1, e + span); v++) {
+        const raw = score(v);
+        all.push(raw);
+        const s = raw * (1 - (0.5 * Math.abs(v - e)) / Math.max(1, span));
+        if (s > bestS) { bestS = s; best = v; }
+      }
+      out.push(all.length && bestS > median(all) * 1.8 ? best : e);
+    }
+    out.push(hi);
+    return out;
+  };
+  // 가로 경계: 열 띠(명목 칸 너비)마다 위아래 차이 → 중앙값
+  const colBands = Array.from({ length: C }, (_, c) => [Math.round((c * W) / C), Math.round(((c + 1) * W) / C)]);
+  const fullH = top < H * 0.02 && bottom > H * 0.98 && used === R;
+  const ys = cuts(top, bottom, used, (y) =>
+    median(colBands.map(([x0, x1]) => { let s = 0, n = 0; for (let x = x0 + 4; x < x1 - 4; x += 2) { s += diff(px(x, y), px(x, y - 1)); n++; } return s / n; })),
+  fullH);
+  // 세로 경계: 찾은 줄 띠마다 좌우 차이 → 중앙값(그림이 있는 띠만)
+  const rowBands = ys.slice(0, -1).map((y0, r) => [y0, ys[r + 1]]);
+  const xs = cuts(0, W, C, (x) =>
+    median(rowBands.map(([y0, y1]) => { let s = 0, n = 0; for (let y = y0 + 4; y < y1 - 4; y += 2) { s += diff(px(x, y), px(x - 1, y)); n++; } return n ? s / n : 0; })),
+  true);
+  const restH = (H - bottom) / Math.max(1, R - used);
+  return (n) => {
+    const col = (n - 1) % C, row = Math.floor((n - 1) / C);
+    const x = xs[col], w = xs[col + 1] - x;
+    if (row < used) return { x, y: ys[row], w, h: ys[row + 1] - ys[row] };
+    // 쓰지 않는 줄: 그림 아래 남은 자리를 고르게(빈 칸 검사용)
+    const y = Math.round(bottom + (row - used) * restH);
+    return { x, y, w, h: Math.max(1, Math.round(bottom + (row - used + 1) * restH) - y) };
+  };
+}
+
+/** 카드 그림 칸을 프레임 비율(3:2)로 가운데에서 자른다 — 늘어난 줄을 그대로 늘이면 그림이 납작해진다 */
+function aspectCrop(rect, [T, TH]) {
+  const want = TH / T;
+  if (rect.h / rect.w > want) {
+    const h = Math.round(rect.w * want);
+    return { ...rect, y: rect.y + Math.round((rect.h - h) / 2), h };
+  }
+  const w = Math.round(rect.h / want);
+  return { ...rect, x: rect.x + Math.round((rect.w - w) / 2), w };
+}
+
+/** 칸 번호 → 원본 사각형. 카드 그림 시트는 실제 그림 경계로, 그 밖은 규격 격자로 */
+export function cellRects(keyed, spec, raw = keyed) {
+  if (spec.type !== 'card-art-sheet') return (n) => cellRect(spec, n, raw);
+  const at = tileLayout(keyed, spec);
+  return (n) => at(n);
+}
+
 export function processPixelSheet(raw, spec, palette, cells) {
   const keyed = keyOut(raw, spec);
   const grid = detectGrid(keyed, spec);
-  const sampled = cells.map((n) => sampleCell(keyed, cellRect(spec, n, raw), grid, spec, palette));
+  const rectOf = cellRects(keyed, spec, raw);
+  const sampled = cells.map((n) => sampleCell(keyed, spec.type === 'card-art-sheet' ? aspectCrop(rectOf(n), spec.logical) : rectOf(n), grid, spec, palette));
   const fitted = fitFrames(sampled.map((s) => s.img), spec, cells.map((n) => Math.floor((n - 1) / spec.grid[0])));
   const frames = cells.map((n, i) => ({ n, img: fitted[i].img, purity: sampled[i].purity, native: fitted[i].native, fit: fitted[i].fit }));
   return { grid, frames, keyed };
 }
 
 /** 칸에 그림이 있는지(원본 해상도 기준) */
-export function cellHasContent(keyed, spec, n, minRatio = 0.005) {
-  const rect = cellRect(spec, n, keyed);
+export function cellHasContent(keyed, spec, n, minRatio = 0.005, rectOf = cellRects(keyed, spec)) {
+  const rect = rectOf(n);
   const cell = extract(keyed, rect);
   const isContent = isContentFn(spec);
   let c = 0;

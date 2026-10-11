@@ -146,7 +146,11 @@ function openPerson(data: GameData, id: string): void {
   openOverlay(name, h('div', { class: 'zoom zoom-person' }, faces, h(
         'div',
         { class: 'zoom-right' },
-        ch ? h('div', { class: 'zoom-kind' }, ch.title) : null,
+        personTitle(data, id) ? h('div', { class: 'zoom-kind' }, personTitle(data, id)) : null,
+        facts([
+          ['구분', ch ? '동료' : '이야기 인물'],
+          ['처음 만나는 곳', data.stages.find((s) => s.id === personStages(data).get(id))?.name ?? ''],
+        ]),
         ch?.lore || sp?.lore || ch?.description ? h('p', { class: 'zoom-text zoom-lore' }, ch?.lore ?? sp?.lore ?? ch?.description ?? '') : null,
       )), { wide: true });
 }
@@ -315,7 +319,8 @@ function enemiesTab(data: GameData, codex: Codex): HTMLElement {
 function itemsTab(data: GameData, codex: Codex): HTMLElement {
   const row = (chip: HTMLElement, name: string, text: string, open: () => void) =>
     h('div', { class: 'codex-item zoomable', title: '눌러서 크게 보기', onclick: open }, chip, h('div', {}, h('b', {}, name), h('small', {}, text)));
-  const unknown = () => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???')));
+  // 못 본 칸도 본 칸과 같은 두 줄(이름 · 설명) — 크기가 같아야 칸이 고르게 선다
+  const unknown = (what: string) => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???'), h('small', {}, `아직 보지 못한 ${what}`)));
   const relics = [...data.relics.values()];
   const potions = [...data.potions.values()];
   return h(
@@ -327,36 +332,60 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
       h('div', { class: 'codex-items' }, relics.map((r) =>
           codex.relics.includes(r.id)
             ? row(relicChip(data, r.id), r.name, r.description, () => openItem(relicChip(data, r.id, 'huge'), r.name, `${RARITY_LABEL[r.rarity]} 유물`, r.description, r.flavor))
-            : unknown(),
+            : unknown('유물'),
         )),
     ),
     section(
       '물약',
       `${codex.potions.length} / ${potions.length}`,
       h('div', { class: 'codex-items' }, potions.map((p) =>
-          codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description, () => openItem(potionChip(data, p.id, { extra: 'huge' }), p.name, `${RARITY_LABEL[p.rarity]} 물약`, p.description)) : unknown(),
+          codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description, () => openItem(potionChip(data, p.id, { extra: 'huge' }), p.name, `${RARITY_LABEL[p.rarity]} 물약`, p.description)) : unknown('물약'),
         )),
     ),
   );
 }
 
+/** 인물 id → 처음 나오는 스테이지(장면 대사 순서대로) */
+function personStages(data: GameData): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const st of data.stages)
+    for (const [id, sc] of data.scenes) if (stageOfScene(data, id) === st.id) for (const l of sc.lines) if (l.speaker && !out.has(l.speaker)) out.set(l.speaker, st.id);
+  return out;
+}
+
+const personName = (data: GameData, id: string) => data.characters.get(id)?.name ?? data.speakers.get(id)?.name ?? id;
+const personTitle = (data: GameData, id: string) => data.characters.get(id)?.title ?? data.speakers.get(id)?.title ?? '';
+
+/** 인물 탭(2026-10-11 사용자 요청 — 설명 보강): 동료 · 이야기 인물로 나누고, 칸마다 역할과 처음 만나는 곳 */
 function peopleTab(data: GameData, codex: Codex): HTMLElement {
   const people = codexPeople(data);
-  return section(
-    '인물',
-    `${people.filter((id) => codex.people.includes(id)).length} / ${people.length}`,
-    h(
+  const where = personStages(data);
+  const stageName = (id: string) => data.stages.find((s) => s.id === where.get(id))?.name;
+  const cell = (id: string) => {
+    const meet = stageName(id);
+    if (!codex.people.includes(id))
+      return h('div', { class: 'codex-person unknown' }, h('div', { class: 'codex-portrait' }, '?'), h('b', {}, '???'), h('small', {}, meet ? `${meet}에서 만난다` : '이야기에서 만난다'));
+    const ch = data.characters.get(id);
+    const sp = data.speakers.get(id);
+    const pic = h('div', { class: 'codex-portrait', style: `--who:${ch?.color ?? sp?.color ?? '#888'}` }, h('span', {}, personName(data, id).slice(0, 1)));
+    void loadPortrait(id).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: '' })));
+    return h(
       'div',
-      { class: 'codex-grid people' },
-      people.map((id) => {
-        if (!codex.people.includes(id)) return h('div', { class: 'codex-person unknown' }, h('div', { class: 'codex-portrait' }, '?'), h('b', {}, '???'));
-        const ch = data.characters.get(id);
-        const sp = data.speakers.get(id);
-        const pic = h('div', { class: 'codex-portrait', style: `--who:${ch?.color ?? sp?.color ?? '#888'}` }, h('span', {}, (ch?.name ?? sp?.name ?? id).slice(0, 1)));
-        void loadPortrait(id).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: '' })));
-        return h('div', { class: 'codex-person zoomable', title: '눌러서 크게 보기', onclick: () => openPerson(data, id) }, pic, h('b', {}, ch?.name ?? sp?.name ?? id), ch ? h('small', {}, ch.title) : null);
-      }),
-    ),
+      { class: 'codex-person zoomable', title: '눌러서 크게 보기 — 세 표정과 소개', onclick: () => openPerson(data, id) },
+      pic,
+      h('b', {}, personName(data, id)),
+      h('small', {}, personTitle(data, id) || (meet ? `${meet}에서 만남` : '')),
+    );
+  };
+  const party = people.filter((id) => data.characters.has(id));
+  const others = people.filter((id) => !data.characters.has(id));
+  const seen = (ids: string[]) => ids.filter((id) => codex.people.includes(id)).length;
+  return h(
+    'div',
+    {},
+    h('p', { class: 'hint codex-intro' }, '이야기 장면에 나온 인물이 채워진다. 칸을 누르면 반신 그림의 세 표정(기본 · 결의 · 놀람)과 소개를 본다. 못 만난 칸에는 처음 만나는 곳이 적혀 있다.'),
+    section('동료', `${seen(party)} / ${party.length} — 함께 싸우거나 돕는 일행`, h('div', { class: 'codex-grid people' }, party.map(cell))),
+    section('이야기 인물', `${seen(others)} / ${others.length} — 길에서 만난 사람들과 적`, h('div', { class: 'codex-grid people' }, others.map(cell))),
   );
 }
 

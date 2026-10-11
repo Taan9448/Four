@@ -52,3 +52,9 @@ describe('도감·설정·접근성(2026-10-11 UI/UX 4단계)', () => {
     for (const f of readdirSync('.github/workflows')) expect(readFileSync(`.github/workflows/${f}`, 'utf8')).not.toContain('ux:check');
   });
 });
+
+describe('도감 인물(2026-10-11 사용자 요청)', () => {
+  it('이야기 인물은 모두 한 줄 역할(title)이 있다', () => {
+    for (const sp of data.speakers.values()) expect(sp.title, sp.id).toBeTruthy();
+  });
+});
