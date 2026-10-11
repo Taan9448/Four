@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: a three-headed hound from the rift, larger than a horse; burning orange-red scales instead of fur, three dog heads with glowing yellow eyes on necks that join into one thick neck, small flames flickering between the scales, a long spiked tail. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: crouches, the three heads pulled back
+Cell 2: springs forward to the left
+Cell 3: the three jaws open wide
+Cell 4: the three heads bite at full reach to the left, sparks and embers bursting
+Cell 5: lands, the heads shaking
+Cell 6: returns to standing
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+User-required continuity: Use ONLY the LEFT SIDE profile in the upper-right cell of the FIRST reference image. The SECOND attached image is the existing idle sheet: match its body size and LEFT SIDE view; Cell 6 returns to that standing idle pose. All three heads point LEFT, overlapping and vertically staggered as in the side reference; do NOT turn any head or torso toward the viewer or the right. Body height in sprite pixels is about 84, matching the reference side cell, not the taller front pose. Keep the anatomical size unchanged throughout the bite; paws, tail, ears, jaws and sparks remain comfortably INSIDE each 512x512 cell. Keep the FULL sheet exactly 1536x1024, 3 columns by 2 rows, SIX occupied cells.
+Fix: The previous Cell 4 hind paw crossed the RIGHT boundary x=512 into Cell 5, leaving an extra red foot fragment at the lower-left of Cell 5. This is a real cell-boundary error. Keep ALL of Cell 4, including all four paws, its tail and sparks, within LOCAL x=32..480, y=40..472. Fold its rear legs inward and curl its tail inward rather than shrinking its BODY. Cell 5 contains ONLY its own complete hound and its own sparks; no extra detached paw or other sliver at its left edge. Likewise contain every pose in its own 512x512 cell. The recovered body in Cell 6 is correctly sized, about 84 sprite pixels tall: preserve that height and the same body proportions in all six cells. Preserve all three LEFT-FACING profile heads and the return to the attached idle in Cell 6.
