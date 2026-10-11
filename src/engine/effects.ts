@@ -10,6 +10,7 @@ import {
   type Combatant,
   type EnemyState,
   type ResolvedCard,
+  leader,
 } from './state';
 
 export interface EffectContext {
@@ -177,7 +178,7 @@ function defaultTarget(effect: Effect, ctx: EffectContext): NonNullable<Effect['
 export function resolveTargets(state: BattleState, effect: Effect, ctx: EffectContext): Combatant[] {
   const target = effect.target ?? defaultTarget(effect, ctx);
   const { own, opposing } = sidesOf(state, ctx.source);
-  const haun = state.party.find((p) => p.defId === 'haun') ?? state.party[0];
+  const haun = leader(state);
   const chosen = ctx.chosenUid ? findCombatant(state, ctx.chosenUid) : undefined;
   switch (target) {
     case 'self':
@@ -463,7 +464,8 @@ function knockOut(state: BattleState, target: Combatant): void {
   if (target.side === 'party') {
     state.events.push({ type: 'downed', uid: target.uid });
     state.log.push(`${target.name}이(가) 쓰러졌다.`);
-    if (target.defId === 'haun') setResult(state, 'defeat');
+    // 하운이 쓰러지면 패배. 하운이 출전하지 않은 순례에서는 모두 쓰러져야 패배
+    if (target.defId === 'haun' || (!state.party.some((p) => p.defId === 'haun') && !alive(state.party).length)) setResult(state, 'defeat');
     else fireRelics(state, 'allyDowned');
   } else {
     state.events.push({ type: 'death', uid: target.uid });
@@ -514,7 +516,7 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   enemy.intent = null;
   state.events.push({ type: 'transform', uid: enemy.uid, from, into: into.id, text: t.text });
   state.log.push(`${from} → ${into.name}: ${t.text}`);
-  const haun = alive(state.party).find((p) => p.defId === 'haun');
+  const haun = leader(state, true);
   if (t.partyEffects.length && haun) runEffects(state, t.partyEffects, { source: haun });
 }
 

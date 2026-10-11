@@ -530,6 +530,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     mana: run.mana,
     rng: createRng(run.seed).fork(`battle:${run.stageId}:${enc.node.id}`),
     supportActive: run.supportActive,
+    haunOptional: !!run.replayOf,
     flags: run.flags,
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
@@ -754,7 +755,9 @@ export function applyLevelUpgrade(data: GameData, run: RunState, uid: string | n
 
 export function setParty(data: GameData, run: RunState, ids: string[]): void {
   const unique = [...new Set(ids)];
-  if (!unique.includes('haun')) throw new Error('하운은 항상 출전한다');
+  // 순례(클리어 뒤 자유 여정)에서는 하운도 쉴 수 있다 — 네 명 중 마음대로(2026-10-11 사용자 요청)
+  if (!unique.includes('haun') && !run.replayOf) throw new Error('하운은 항상 출전한다');
+  if (!unique.length) throw new Error('한 명은 출전해야 한다');
   const max = isAbyss(run) ? data.balance.abyss.partyMax : data.balance.party.max;
   if (unique.length > max) throw new Error(`출전은 최대 ${max}명`);
   for (const id of unique) {

@@ -169,7 +169,7 @@ export function openMemberInfo(data: GameData, run: RunState, id: string): void 
             stat('레벨', `Lv ${r.level}`),
             stat('체력', `${r.hp} / ${r.maxHp}`),
             stat('경험치', next === null ? '최대 레벨' : `${r.xp} / ${next}`),
-            stat('출전', id === 'haun' ? '항상' : run.selected.includes(id) ? '출전 중' : '쉼'),
+            stat('출전', id === 'haun' && !run.replayOf ? '항상' : run.selected.includes(id) ? '출전 중' : '쉼'),
             stat('치명타', `${Math.round((def.crit ?? data.balance.crit.chance) * 100)}%`),
           ),
           h('p', { class: 'member-desc' }, def.description),
@@ -446,7 +446,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           type: 'checkbox',
           checked,
           // 자리가 가득 차면 쉬는 동료는 먼저 한 명을 빼야 고를 수 있다
-          disabled: r.id === 'haun' || !!run.abyss || (!checked && full),
+          // 하운은 고정(순례에서는 하운도 쉴 수 있다 — 2026-10-11). 마지막 한 명은 뺄 수 없다
+          disabled: (r.id === 'haun' && !run.replayOf) || !!run.abyss || (!checked && full) || (checked && run.selected.length === 1),
           onchange: (e: Event) => {
             const on = (e.target as HTMLInputElement).checked;
             const next = on ? [...run.selected, r.id] : run.selected.filter((x) => x !== r.id);
@@ -459,7 +460,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           },
         }),
         h('span', { class: 'member-name' }, def.name),
-        r.id === 'haun' ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
+        r.id === 'haun' && !run.replayOf ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
         h('span', { class: 'member-lv', title: xpToNext(data, r.level) === null ? '최대 레벨' : `경험치 ${r.xp} / ${xpToNext(data, r.level)}` }, `Lv ${r.level}`),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),
@@ -489,8 +490,10 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
       run.abyss
         ? '심연에서는 모두 출전한다. 쓰러진 채 전투가 끝난 동료는 다음 굽이까지 부상(최대 체력 감소).'
         : fighters.length > data.balance.party.max && full
-        ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.`
-        : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
+        ? `자리가 가득 찼습니다(최대 ${data.balance.party.max}명). 쉬는 동료를 넣으려면 먼저 출전 중인 동료 한 명의 체크를 푸세요.${run.replayOf ? ' 순례에서는 하운도 쉴 수 있습니다.' : ''}`
+        : run.replayOf
+          ? `순례에서는 하운도 쉴 수 있다 — 네 명 중 최대 ${data.balance.party.max}명. 하운이 빠지면 출전한 모두가 쓰러져야 진다. 출전하지 않은 동료의 카드는 전투 덱에서 빠진다.`
+          : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
     ),
     fighters.length > 1 && !run.abyss ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );

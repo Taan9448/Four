@@ -32,6 +32,7 @@ import {
   type Combatant,
   type EnemyState,
   type Intent,
+  leader,
 } from './state';
 
 export interface PartySlot {
@@ -64,6 +65,8 @@ export interface BattleSetup {
   enemyHpScale?: number;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale) */
   enemyDmgScale?: number;
+  /** 순례(클리어 뒤 자유 여정): 하운도 쉴 수 있다. 하운이 없으면 모두 쓰러져야 패배 */
+  haunOptional?: boolean;
   /** 가진 유물 id */
   relics?: string[];
   /** 물약 칸(빈 칸 null) */
@@ -84,7 +87,7 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   if (setup.party.length === 0 || setup.party.length > partyMax) {
     throw new Error(`출전 인원은 1~${partyMax}명이어야 한다`);
   }
-  if (!setup.party.some((p) => p.id === 'haun')) throw new Error('하운은 항상 출전한다');
+  if (!setup.haunOptional && !setup.party.some((p) => p.id === 'haun')) throw new Error('하운은 항상 출전한다');
 
   const party: Combatant[] = setup.party.map((p, i) => {
     const def = data.characters.get(p.id);
@@ -158,9 +161,9 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   fireSupport(state, 'battleStart', {});
   fireRelics(state, 'battleStart');
   if (setup.startEffects?.length) {
-    runEffects(state, setup.startEffects, { source: party.find((p) => p.defId === 'haun')! });
+    runEffects(state, setup.startEffects, { source: leader(state) });
   }
-  for (const l of laws) if (l.battle.startEffects.length) runEffects(state, l.battle.startEffects, { source: party.find((p) => p.defId === 'haun')! });
+  for (const l of laws) if (l.battle.startEffects.length) runEffects(state, l.battle.startEffects, { source: leader(state) });
   startPlayerTurn(state);
   return state;
 }
@@ -413,8 +416,8 @@ export function cardOwner(state: BattleState, inst: CardInstance): Combatant | u
   const owner = state.data.cards.get(inst.cardId)?.owner;
   const member = state.party.find((p) => p.defId === owner);
   if (member) return member;
-  // 공용 카드는 하운이 쓴다. 출전하지 않은 동료의 카드는 주인이 없다.
-  return owner && state.data.characters.has(owner) ? undefined : state.party.find((p) => p.defId === 'haun');
+  // 공용 카드는 하운(없으면 앞장)이 쓴다. 출전하지 않은 동료의 카드는 주인이 없다.
+  return owner && state.data.characters.has(owner) ? undefined : leader(state);
 }
 
 export function needsTarget(state: BattleState, inst: CardInstance): 'enemy' | 'ally' | null {
@@ -545,7 +548,7 @@ export function usePotion(state: BattleState, slot: number, targetUid?: string):
   if (!def) return { ok: false, reason: '빈 칸' };
   if (def.target === 'enemy' && !alive(state.enemies).some((e) => e.uid === targetUid)) return { ok: false, reason: '대상을 골라야 한다' };
   if (def.target === 'ally' && !alive(state.party).some((p) => p.uid === targetUid)) return { ok: false, reason: '아군 대상을 골라야 한다' };
-  const haun = state.party.find((p) => p.defId === 'haun')!;
+  const haun = leader(state, true);
   state.potions[slot] = null;
   state.events.push({ type: 'potion', potionId: def.id, name: def.name });
   state.log.push(`물약: ${def.name}`);
@@ -559,7 +562,7 @@ export function endTurn(state: BattleState): void {
   if (state.result) return;
   const bal = state.data.balance;
   // 손에 든 채 턴이 끝나면 아픈 카드(독기 등): 하운을 출처로
-  const haun = alive(state.party).find((p) => p.defId === 'haun');
+  const haun = leader(state, true);
   for (const c of [...state.hand]) {
     const fx = state.data.cards.get(c.cardId)?.onTurnEndInHand;
     if (fx?.length && haun && !state.result) runEffects(state, fx, { source: haun });
