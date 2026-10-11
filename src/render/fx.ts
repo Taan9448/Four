@@ -142,7 +142,7 @@ const TEAR_EDGE: [number, number][] = Array.from({ length: 25 }, (_, i) => {
 });
 
 /**
- * 낸 카드 찢기(2026-10-09 다듬음, 2026-10-11 정면으로): 복제본이 전장 앞 가운데(stage)로 크게 날아와 달아오르고, 잠깐 팽팽하게 버틴 뒤
+ * 낸 카드 찢기(2026-10-09 다듬음, 2026-10-11 손패의 확대 자리에서): 복제본이 골라 확대된 자리(stage)에서 조금 더 커져 달아오르고, 잠깐 팽팽하게 버틴 뒤
  * 위쪽부터 톱니 선을 따라 벌어져(아래 끝을 축으로 돈다) 두 조각이 되어 좌우로 떨어지며 사라진다.
  * 찢긴 단면에는 밝은 종이 섬유 선이 보이고, 종잇조각·먹 방울이 튄다. 원본은 건드리지 않는다.
  */
@@ -162,12 +162,12 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   const ms = (opts.ms ?? 700) * (reduce ? 0.5 : 1);
   const t = opts.toward;
   const st = opts.stage;
-  // 찢는 자리: 전장 앞 가운데(대상 쪽으로 살짝 기울게), 없으면 제자리 위로 조금 + 대상 쪽으로 1/5
-  const dx = st ? st.x - cx + (t ? (t.left + t.width / 2 - st.x) * 0.08 : 0) : t ? (t.left + t.width / 2 - cx) * 0.2 : 0;
+  // 찢는 자리: stage(대상 쪽으로 아주 살짝 기울게), 없으면 제자리 위로 조금 + 대상 쪽으로 1/5
+  const dx = st ? st.x - cx + (t ? (t.left + t.width / 2 - st.x) * 0.04 : 0) : t ? (t.left + t.width / 2 - cx) * 0.2 : 0;
   const dy = st ? st.y - cy : (t ? (t.top + t.height / 2 - cy) * 0.12 : 0) - 46;
   const S = st ? Math.max(scale * 1.06, st.height / hgt) : scale * 1.06;
   // 키프레임 시점: 날아와 자리 잡기 → 팽팽하게 버팀 → 벌어짐. 정면으로 나올 때는 날아오는 몫과 보여 주는 몫을 늘린다
-  const at = st ? { arrive: 0.26, hold: 0.4, open: 0.48, wide: 0.64, fall: 0.82 } : { arrive: 0.18, hold: 0.27, open: 0.38, wide: 0.58, fall: 0.78 };
+  const at = st ? { arrive: 0.2, hold: 0.36, open: 0.45, wide: 0.62, fall: 0.8 } : { arrive: 0.18, hold: 0.27, open: 0.38, wide: 0.58, fall: 0.78 };
   // 모든 키프레임이 같은 함수 목록을 쓰게 해 부드럽게 잇는다. 뒤의 translateY(50%) rotate translateY(-50%)는 "아래 끝을 축으로 돌기"
   const tf = (x: number, y: number, r: number, sc: number, open: number) =>
     `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${r}deg) scale(${sc}) translateY(50%) rotate(${open}deg) translateY(-50%)`;
