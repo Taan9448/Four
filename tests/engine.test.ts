@@ -55,7 +55,7 @@ describe('효과 해석기와 자원', () => {
     expect(cardText(data, 'haun_byeogun')).toContain('균열 +3');
     for (const id of data.cards.keys()) expect(cardText(data, id).length).toBeGreaterThan(0);
     // 대상 이름은 엔진 규칙과 같다: 적 전체 카드라도 방어는 자신에게, 상태는 적 전체에게
-    expect(cardText(data, 'haun_nakun')).toBe('방어 8 (균열 1당 +1). 적 전체에게 약화 1 부여');
+    expect(cardText(data, 'haun_nakun')).toBe('방어 8 (균열 1당 +1, 최대 +8). 적 전체에게 약화 1 부여');
     // 명시한 아군 대상(부작용)도 글에 드러난다
     expect(cardText(data, 'abyss_elia_black_fire')).toContain('아군 전체에게 화상 1 부여');
   });
@@ -100,8 +100,22 @@ describe('균열', () => {
     endTurn(s);
     const all = [...s.draw, ...s.discard, ...s.hand].map((c) => c.cardId);
     expect(all).toContain('status_rift_echo');
-    const echo = s.hand.findIndex((c) => c.cardId === 'status_rift_echo');
-    if (echo >= 0) expect(canPlay(s, echo).ok).toBe(false);
+  });
+
+  it('틈의 잔향: 손에 든 채 턴이 끝나면 균열 +1, 내공 1로 털어 낼 수 있다(소멸)', () => {
+    const s = battle({ world: 'murim', enemies: ['test_ignis'] });
+    s.enemies[0].intent = null;
+    s.hand = [];
+    const i = give(s, 'status_rift_echo');
+    give(s, 'status_rift_echo');
+    expect(canPlay(s, i).ok).toBe(true);
+    const nb = s.neigong;
+    playCard(s, i);
+    expect(s.neigong).toBe(nb - 1);
+    expect(s.exhaust.map((c) => c.cardId)).toContain('status_rift_echo');
+    s.rift = 1;
+    endTurn(s);
+    expect(s.rift).toBe(2);
   });
 
   it('균열이 최대치에 이르면 폭주: 파티 전원 피해, 균열은 초기화값으로', () => {
@@ -113,9 +127,26 @@ describe('균열', () => {
     const i = give(s, 'haun_byeogun');
     playCard(s, i, s.enemies[0].uid);
     expect(s.events.some((e) => e.type === 'surge')).toBe(true);
-    expect(s.rift).toBe(5);
-    expect(s.party[0].hp).toBe(55);
-    expect(s.party[1].hp).toBe(37);
+    // ① 최대 체력 10%(올림), 하운은 5 더 ② 적 힘 +1 ③ 잔향 2장을 손패에 ④ 상흔 +3, 균열은 3으로
+    expect(s.rift).toBe(3);
+    expect(s.party[0].hp).toBe(60 - 6 - 5);
+    expect(s.party[1].hp).toBe(42 - 5);
+    expect(s.enemies[0].statuses.strength).toBe(1);
+    expect(s.hand.filter((c) => c.cardId === 'status_rift_echo')).toHaveLength(2);
+    expect(s.tally?.surgeScar).toBe(3);
+    // 같은 전투의 두 번째 폭주는 ×2
+    s.neigong = 9;
+    s.mana = 9;
+    s.rift = 8;
+    playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);
+    expect(s.party[1].hp).toBe(42 - 5 - 10);
+    expect(s.tally?.surges).toBe(2);
+  });
+
+  it('상흔이 남은 만큼 금이 간 채 시작한다(상흔 ÷ 5, 최대 4)', () => {
+    expect(battle({ scar: 0 }).rift).toBe(0);
+    expect(battle({ scar: 12 }).rift).toBe(2);
+    expect(battle({ scar: 40 }).rift).toBe(4);
   });
 
   it('전투가 끝나면 남은 균열의 절반이 상흔이 된다', () => {

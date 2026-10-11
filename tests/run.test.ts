@@ -125,3 +125,38 @@ describe('런 진행', () => {
     expect(JSON.stringify(createRun(data, 'SAME').map)).toBe(JSON.stringify(createRun(data, 'SAME').map));
   });
 });
+
+describe('상흔 두 단계(GAME_DESIGN 7절, 2026-10-11 개편)', () => {
+  const rest = data.modules.get('s1_rest_campfire')!;
+  it('상흔이 있으면 휴식에 꿰매기(상흔 -3, 골드 60), 상흔 10 이상이면 회복 -20%', () => {
+    const run = createRun(data, 'SCAR1', { stageId: 's1' });
+    expect(choicesFor(data, run, rest).some((c) => c.label.startsWith('꿰매기'))).toBe(false);
+    run.scar = 12;
+    run.gold = 100;
+    const list = choicesFor(data, run, rest);
+    const stitch = list.findIndex((c) => c.label.startsWith('꿰매기'));
+    expect(stitch).toBeGreaterThan(-1);
+    expect(list.find((c) => c.effects.some((e) => e.op === 'heal_party'))!.label).toContain('회복 -20%');
+    applyChoice(data, run, rest, stitch);
+    expect(run.scar).toBe(9);
+    expect(run.gold).toBe(40);
+    // 회복 감소: 상흔 10 이상이면 30% 회복이 24%로
+    const haun = run.roster[0];
+    run.scar = 10;
+    haun.hp = 1;
+    applyChoice(data, run, rest, 0);
+    expect(haun.hp).toBe(1 + Math.floor(haun.maxHp * 0.3 * 0.8));
+  });
+
+  it('폭주 없이 보스를 이기면 상흔 -5, 폭주가 있었으면 그대로(+폭주 상흔)', () => {
+    for (const surges of [0, 1]) {
+      const run = createRun(data, `SCAR2${surges}`, { stageId: 's1' });
+      run.scar = 8;
+      const boss = run.map.floors.flat().find((n) => n.type === 'boss')!;
+      const enc = { node: boss, module: data.modules.get(boss.moduleId!)! };
+      const party = run.selected.map((id) => ({ id, hp: run.roster.find((r) => r.id === id)!.hp }));
+      applyBattleOutcome(data, run, enc as never, { result: 'victory', survived: false, party, mana: run.mana, scarGain: surges * 3, tally: { kills: 1, damage: 0, crits: 0, surges, cards: {} } });
+      expect(run.scar).toBe(surges ? 11 : 3);
+    }
+  });
+});

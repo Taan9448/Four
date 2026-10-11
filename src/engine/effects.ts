@@ -536,20 +536,53 @@ export function changeRift(state: BattleState, delta: number): void {
     fireSupport(state, 'riftChanged', {});
     fireRelics(state, 'riftChanged');
   }
-  if (state.rift >= bal.max) {
-    state.events.push({ type: 'surge' });
-    if (state.tally) state.tally.surges += 1;
-    state.log.push('균열 폭주! 하늘이 갈라진다.');
-    // 폭주로 잃은 체력(결과 화면)
-    for (const p of alive(state.party)) {
-      const hp = p.hp;
-      loseHp(state, p, bal.surgeDamage);
-      if (state.tally) state.tally.surgeHp = (state.tally.surgeHp ?? 0) + Math.max(0, hp - Math.max(0, p.hp));
-    }
-    const v = state.rift;
-    state.rift = bal.surgeResetTo;
-    state.events.push({ type: 'rift', value: state.rift, delta: state.rift - v });
+  if (state.rift >= bal.max) surge(state);
+}
+
+/**
+ * 폭주(GAME_DESIGN 7절, 2026-10-11 개편): ① 일행 체력 손실(방어 무시, ×n) ② 적 힘 +1·포식자 회복 ③ 잔향을 손패에 ④ 상흔. 균열은 surgeResetTo로
+ * 보스 격노·기절·즉사 같은 것은 더하지 않는다
+ */
+function surge(state: BattleState): void {
+  const bal = state.data.balance.rift;
+  state.surgeCount = (state.surgeCount ?? 0) + 1;
+  const n = bal.surgeEscalate ? state.surgeCount : 1;
+  state.events.push({ type: 'surge', count: state.surgeCount });
+  if (state.tally) state.tally.surges += 1;
+  state.log.push(`균열 폭주${n > 1 ? ` ×${n}` : ''}! 하늘이 갈라진다.`);
+  // ① 일행 전체: 최대 체력의 surgeRatio(올림) + 하운 surgeHaunExtra, n번째 폭주는 ×n
+  const mul = state.surgeDamageMul ?? 1;
+  for (const p of alive(state.party)) {
+    const base = Math.ceil(p.maxHp * bal.surgeRatio) + (p.defId === 'haun' ? bal.surgeHaunExtra : 0);
+    const amount = Math.max(1, Math.floor(base * n * mul));
+    const hp = p.hp;
+    loseHp(state, p, amount);
+    if (state.tally) state.tally.surgeHp = (state.tally.surgeHp ?? 0) + Math.max(0, hp - Math.max(0, p.hp));
+    if (state.result) return;
   }
+  // ② 적 전체 힘, 흐름을 먹는 적(흐름 포식·틈의 굶주림)은 체력을 채운다
+  for (const e of alive(state.enemies)) {
+    if (bal.surgeEnemyStrength) addStatus(state, e, 'strength', bal.surgeEnemyStrength);
+    if (bal.surgeEnemyHeal && (e.statuses.flow_eater > 0 || hasSpecial(state, e, 'hungry'))) {
+      const healed = Math.min(e.maxHp - e.hp, bal.surgeEnemyHeal);
+      if (healed > 0) {
+        e.hp += healed;
+        state.events.push({ type: 'heal', targetUid: e.uid, amount: healed });
+      }
+    }
+  }
+  // ③ 틈의 잔향을 손패에(가득 차면 버린 더미)
+  for (let i = 0; i < bal.surgeEchoToHand; i++) {
+    const c = newCard(state, bal.echoCard);
+    if (state.hand.length < state.data.balance.maxHand) state.hand.push(c);
+    else state.discard.push(c);
+  }
+  if (bal.surgeEchoToHand) state.events.push({ type: 'echo' });
+  // ④ 상흔(전투 결과에 더한다)
+  if (state.tally) state.tally.surgeScar = (state.tally.surgeScar ?? 0) + bal.surgeScar;
+  const v = state.rift;
+  state.rift = bal.surgeResetTo;
+  state.events.push({ type: 'rift', value: state.rift, delta: state.rift - v });
 }
 
 // ───────────────────────── 카드 더미 ─────────────────────────

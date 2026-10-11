@@ -117,7 +117,8 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     neigongMax: laws.find((l) => l.battle.neigongPerTurn)?.battle.neigongPerTurn ?? bal.neigongPerTurn,
     manaRule: worldMana,
     mana: Math.max(0, Math.min(bal.mana.max, startMana)),
-    rift: 0,
+    // 상흔이 남은 만큼 금이 간 채로 시작한다(상흔 ÷ startRiftPer, 최대 startRiftMax)
+    rift: Math.min(data.balance.rift.scar.startRiftMax, Math.floor((setup.scar ?? 0) / data.balance.rift.scar.startRiftPer)),
     party,
     enemies,
     draw: [],
@@ -532,6 +533,18 @@ export function previewCard(state: BattleState, handIndex: number, targetUid?: s
   return out;
 }
 
+/** 이 카드를 쓰면 균열이 폭주하는가(손패 미리 알리기, GAME_DESIGN 7절). 대상을 고르는 카드는 첫 적(또는 아군)을 노린 셈으로 본다 */
+export function cardCausesSurge(state: BattleState, handIndex: number): boolean {
+  const inst = state.hand[handIndex];
+  if (!inst || !canPlay(state, handIndex).ok) return false;
+  const need = needsTarget(state, inst);
+  const target = need === 'enemy' ? alive(state.enemies)[0]?.uid : need === 'ally' ? alive(state.party)[0]?.uid : undefined;
+  const c = cloneBattle(state);
+  c.noCrit = true;
+  if (!playCard(c, handIndex, target).ok) return false;
+  return c.events.some((e) => e.type === 'surge');
+}
+
 // ───────────────────────── 물약 ─────────────────────────
 
 /** 물약이 대상을 고르는가 */
@@ -712,7 +725,7 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
     survived: state.survived,
     party: state.party.map((p) => ({ id: p.defId, hp: p.downed ? bal.party.reviveHp : p.hp })),
     mana: state.mana,
-    scarGain: Math.floor(state.rift * bal.rift.scarRatio),
+    scarGain: Math.floor(state.rift * bal.rift.scarRatio) + (state.tally?.surgeScar ?? 0),
     potions: [...state.potions],
     downed: state.party.filter((p) => p.downed).map((p) => p.defId),
     tally: state.tally,

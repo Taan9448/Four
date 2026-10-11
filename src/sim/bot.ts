@@ -120,10 +120,16 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
     if (!e.statuses.knot) continue;
     v += e.statuses.knot_exposed ? 30 : 8 * Math.min(e.statuses.grain ?? 0, knotAt);
   }
-  // 균열은 전투가 끝나면 상흔이 되고, 잔향 카드는 덱을 더럽힌다
+  // 균열은 전투가 끝나면 상흔이 되고, 잔향 카드는 덱을 더럽힌다(손에 든 잔향은 턴 끝에 균열 +1)
+  // 폭주는 비용이다(2026-10-11 개편): 8 이상은 위험, 폭주 한 번 -40, 상흔이 될 몫(남은 균열 절반 + 폭주 상흔) 1당 -1
+  const rb = data.balance.rift;
   v -= s.rift * 2;
-  const echo = data.balance.rift.echoCard;
+  if (!s.result && s.rift >= rb.max - 2) v -= 15;
+  v -= 40 * (s.surgeCount ?? 0);
+  v -= Math.floor(s.rift * rb.scarRatio) + (s.tally?.surgeScar ?? 0);
+  const echo = rb.echoCard;
   for (const pile of [s.draw, s.hand, s.discard]) for (const c of pile) if (c.cardId === echo) v -= 4;
+  for (const c of s.hand) if (c.cardId === echo) v -= 3;
   // 무림·틈은 마나가 전투 사이로 이월된다(아껴 둔 마나에 값)
   const carry = s.manaRule.battleStart === 'carry';
   v += s.mana * (carry ? 2 : 0.2);
@@ -416,6 +422,8 @@ export interface BattleRecord {
   haunBefore: number;
   haunAfter: number;
   rift: number;
+  /** 이 전투의 균열 폭주 수 */
+  surges?: number;
   /** 변신(모르데카이 → 찢긴 경계 등)이 일어난 턴(없으면 undefined) */
   transformTurn?: number;
 }
@@ -496,6 +504,7 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
         haunBefore,
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
+        surges: state.tally?.surges ?? 0,
       });
       applyBattleOutcome(data, run, enc, outcome);
       if (outcome.result === 'victory') {
@@ -624,6 +633,7 @@ export function playAbyss(
         haunBefore,
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
+        surges: state.tally?.surges ?? 0,
         transformTurn: transformTurn(state),
       });
       applyBattleOutcome(data, run, enc, outcome);

@@ -32,6 +32,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   lines.push('');
   lines.push(`- 완주(에필로그까지): **${wins(runs)}/${runs.length} (${pct(wins(runs), runs.length)})** — ${batches.map((b) => `${BOT_STYLE_NAME[b.style]} ${pct(wins(b.runs), b.runs.length)}`).join(' · ')}`);
   lines.push(`- 평균 덱 ${f1(avg(runs.map((r) => r.deckSize)))}장 · 평균 상흔 ${f1(avg(runs.map((r) => r.scar)))}`);
+  lines.push(...surgeSummary(runs));
   lines.push('');
 
   lines.push('## 스테이지별');
@@ -61,8 +62,8 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   lines.push('');
   lines.push('체력 손실은 출전 멤버 최대 체력 합 대비. 패배율이 높거나 손실이 큰 전투가 벽이다.');
   lines.push('');
-  lines.push(`| 전투 | 유형 | 횟수 | 패배 | ${names.map((n) => `패배(${n})`).join(' | ')} | 평균 턴 | 시작 하운 체력 | 파티 체력 손실 | 하운 체력 손실 | 끝날 때 균열 |`);
-  lines.push(`|---|---|---:|---:|${names.map(() => '---:|').join('')}---:|---:|---:|---:|---:|`);
+  lines.push(`| 전투 | 유형 | 횟수 | 패배 | ${names.map((n) => `패배(${n})`).join(' | ')} | 평균 턴 | 시작 하운 체력 | 파티 체력 손실 | 하운 체력 손실 | 끝날 때 균열 | 폭주 |`);
+  lines.push(`|---|---|---:|---:|${names.map(() => '---:|').join('')}---:|---:|---:|---:|---:|---:|`);
   const all = runs.flatMap((r) => r.battles);
   const byModule = new Map<string, typeof all>();
   for (const b of all) byModule.set(b.moduleId, [...(byModule.get(b.moduleId) ?? []), b]);
@@ -79,11 +80,33 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
       return pct(mine.filter((b) => b.result === 'defeat').length, mine.length);
     });
     lines.push(
-      `| ${data.modules.get(id)!.name} \`${id}\` | ${bs[0].type} | ${bs.length} | ${defeats ? `**${defeats} (${pct(defeats, bs.length)})**` : 0} | ${perStyle.join(' | ')} | ${f1(avg(bs.map((b) => b.turns)))} | ${f1(avg(bs.map((b) => b.haunBefore)))} | ${pct(lost * 100, 100)} | ${pct(haunLost * 100, 100)} | ${f1(avg(bs.map((b) => b.rift)))} |`,
+      `| ${data.modules.get(id)!.name} \`${id}\` | ${bs[0].type} | ${bs.length} | ${defeats ? `**${defeats} (${pct(defeats, bs.length)})**` : 0} | ${perStyle.join(' | ')} | ${f1(avg(bs.map((b) => b.turns)))} | ${f1(avg(bs.map((b) => b.haunBefore)))} | ${pct(lost * 100, 100)} | ${pct(haunLost * 100, 100)} | ${f1(avg(bs.map((b) => b.rift)))} | ${avg(bs.map((b) => b.surges ?? 0)).toFixed(2)} |`,
     );
   }
   lines.push('');
   return lines.join('\n');
+}
+
+/**
+ * 폭주(GAME_DESIGN 7절, 2026-10-11 개편): 런당 횟수(목표 0.5~1), 폭주가 난 스테이지에서 진 비율 vs 안 난 스테이지(목표 2배 이하)
+ */
+function surgeSummary(runs: RunReport[]): string[] {
+  const perRun = avg(runs.map((r) => r.battles.reduce((a, b) => a + (b.surges ?? 0), 0)));
+  const visits: { surged: boolean; lost: boolean }[] = [];
+  for (const r of runs) {
+    const stages = [...new Set(r.battles.map((b) => b.stageId))];
+    for (const st of stages) {
+      const bs = r.battles.filter((b) => b.stageId === st);
+      visits.push({ surged: bs.some((b) => (b.surges ?? 0) > 0), lost: bs.some((b) => b.result === 'defeat') });
+    }
+  }
+  const rate = (xs: typeof visits) => (xs.length ? xs.filter((v) => v.lost).length / xs.length : 0);
+  const withS = visits.filter((v) => v.surged);
+  const without = visits.filter((v) => !v.surged);
+  const ratio = rate(without) > 0 ? rate(withS) / rate(without) : 0;
+  return [
+    `- 폭주: 런당 **${perRun.toFixed(2)}회**(목표 0.5~1) · 폭주가 난 스테이지 ${withS.length}곳 패배 ${pct(withS.filter((v) => v.lost).length, withS.length)} / 안 난 스테이지 패배 ${pct(without.filter((v) => v.lost).length, without.length)} → **${ratio.toFixed(1)}배**(목표 2배 이하, 4배를 넘으면 상흔→시작 균열을 약하게)`,
+  ];
 }
 
 /** 목표 밖: 완주율, 일반 전투 패배, 엘리트 패배(3~7%), 스테이지별 보스 패배 상한. 표본이 30번 미만인 전투는 보지 않는다 */

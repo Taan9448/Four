@@ -62,7 +62,7 @@ export type BattleEvent =
   | { type: 'heal'; targetUid: string; amount: number }
   | { type: 'status'; targetUid: string; status: string; stacks: number }
   | { type: 'rift'; value: number; delta: number }
-  | { type: 'surge' }
+  | { type: 'surge'; count?: number }
   | { type: 'neigong_max'; value: number }
   | { type: 'echo' }
   | { type: 'support'; ruleId: string; name: string }
@@ -137,6 +137,10 @@ export interface BattleState {
   triggerDepth?: number;
   /** 치명타를 굴리지 않는다: 피해 미리보기 복제(미래의 운을 화면에 흘리지 않게)·수치 시험 */
   noCrit?: boolean;
+  /** 이 전투에서 일어난 폭주 수(n번째 폭주의 체력 손실 ×n) */
+  surgeCount?: number;
+  /** 폭주 체력 손실 배율(첫 폭주 안내 전투 ½ 등) */
+  surgeDamageMul?: number;
 }
 
 export interface BattleTally {
@@ -146,6 +150,8 @@ export interface BattleTally {
   surges: number;
   /** 균열 폭주로 잃은 체력(아군 합) */
   surgeHp?: number;
+  /** 폭주로 쌓인 상흔(전투 결과에 더한다) */
+  surgeScar?: number;
   cards: Record<string, number>;
   haunHitBy?: string;
   /** 심연 업적: 터뜨린 결 노출 수, 쓰러뜨린 접사 붙은 적 수 */
