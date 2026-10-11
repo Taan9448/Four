@@ -1,0 +1,42 @@
+{
+  "id": "card_art_party_1",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 6,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "81ffb05c92d86a84",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.767,
+  "cards": [
+    "kyle_sword_care",
+    "kyle_knight_pride",
+    "kyle_stand_firm",
+    "born_horn_ram",
+    "born_back_to_back",
+    "born_mountain_silence"
+  ]
+}
