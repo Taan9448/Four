@@ -1,0 +1,26 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; warm martial-arts world palette: beige parchment, ochre, pine green and ink black, with gold for inner qi and pale blue for mana; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a golden ring of energy frozen still beside a thin dark crack
+Cell 2: a glowing gold thread drawn out of a ring, stitching a tear
+Cell 3: a wooden stick poking a tangled knot of dark lines
+Cell 4: a knotted log split cleanly in half by a single axe blow
+Cell 5: an axe handle held sideways catching a charging boar tusk
+Cell 6: a shoulder yoke carrying two sloshing water buckets
+Cell 7: a calloused palm shaped by an axe handle
+Cell 8: a chain of glowing grain lines leading from one cut to the next
+Cell 9: an axe blade driven like a wedge into a log, the log splitting open
+Cell 10: a golden breath ring circling a quiet chest silhouette
+Cell 11: six quick sword arcs joined into one flowing ribbon
+Cell 12: a perfectly split log falling apart in silence, the axe resting on it
+Cells 13 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: Cell 11 currently reads as only three broad loops. It MUST show exactly SIX distinct short curved sword-slash arcs joined by ONE flowing ribbon. Arrange six individually countable gold/pale-blue curved strokes evenly along a gently waving path, not three loops and not a spiral, with a single plain thin sword as the cause. Each of the SIX strokes must be visually separate and easy to count at 96x64. Keep cell 6's water yoke and two buckets large but remove scenery and extra beams: only the yoke and buckets on a two-tone calm background. In all cells use only two or three large flat background color bands, no landscape trees, ground noise, pebbles or tiny texture. Preserve the exact 12 frame_notes in order. The entire fourth row, cells 13 to 16, must remain solid empty magenta. Match the attached card_art_haun_1 sheet's flat shading and warm muted martial palette; no text or borders.
+Fix: Edit the attached CURRENT twelve-card sheet, changing ONLY cell 5. Keep all other used cells and all four empty magenta cells exactly as they are, especially the six countable arcs in cell 11. Cell 5 must show a plain axe's long wooden handle held HORIZONTALLY across the middle of the cell, catching the incoming boar tusk. The handle is horizontal, not vertical or diagonal. The boar's tusk comes from the left and impacts the horizontal shaft. A hand on the right grips that horizontal shaft; the simple iron axe head may appear at its far right end. Keep it one close-up action, no extra props or landscape. Do not change the 4x4 sheet dimensions, row-major order, complete edge-to-edge backgrounds or blank last row. Retain the second attached card_art_haun_1 sheet's warm muted pixel style.
