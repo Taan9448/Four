@@ -1,0 +1,24 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid green #00FF00 in every cell. No floor, no cast shadow, no vignette.
+Subject: an Elite of the cult's Shaanxi branch, bodyguard of the branch lord; a tall broad warrior in dark crimson lamellar armor over a black robe, a blood-drop crest on the chest plate, a red-glowing left palm and a heavy dao blade in the right hand. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use green or similar hues on the character.
+Frames:
+Cell 1: raises the heavy dao blade
+Cell 2: steps forward to the left
+Cell 3: swings the blade down hard
+Cell 4: the dao strikes at full reach to the left, a red trail behind the blade
+Cell 5: follows through
+Cell 6: returns to the guard stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Session requirements from the user: Only the LEFT PROFILE of reference CELL 2 is permitted, matching the attached frame_02 exactly: one visible eye, left-pointing nose, identical black tied-back hair, dark crimson lamellar armor over black robe, blood-drop chest crest, glowing LEFT palm and heavy curved dao in RIGHT hand. Keep full BODY height 102 sprite pixels (408 source px), within +/-5% in every pose; body never shrinks to fit extended weapons. Feet source y=460. Frame 1 raise the dao near head level, do NOT stand taller or point the weapon outside the cell. All head angles and torsos remain LEFT side view throughout the swing; no facing viewer, no 3/4 view. Make the swing compact enough that the ENTIRE blade, red trail, robe hems, ponytail, palms and feet stay at least 12 sprite pixels inside each of the six cells. Frame 4 blade strikes at full reach to LEFT with short red trail entirely INSIDE cell 4; no blade or robe fragment may enter cell 5. Frame 6 returns to reference cell 2 blade-forward guard stance with the same idle body scale. Keep exactly the same face, clothing, weapon and proportions in all six frames. No added decoration.
+
+Fix: Validation failed with height variation 21%. Previous cell heights were 108/92/101/84/86/87 sprite pixels; frames 4-6 became too short. Keep the same UPRIGHT body height 100-104 sprite pixels in ALL six frames, including full-reach strike and follow-through. Do NOT crouch, squat, shrink the legs, lower the top of the head, or shrink the final idle frame. Feet at source y=460; top hair at source y=52 consistently. Only arms and legs move, torso stays upright throughout, head stays same size and height. Frame 4 uses an upright horizontal reach to the LEFT, with the robe trailing behind but fully contained. Frame 6 must exactly reproduce attached reference frame_02 full upright guard and tall proportions. Frame 1 blade raised near head level, not extending above it. ALL dao blade tips, red trails and trailing robe hems stay at least 12 sprite pixels inside each cell. Keep same LEFT SIDE PROFILE in every pose.
