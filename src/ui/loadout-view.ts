@@ -2,8 +2,13 @@
 // 위: 주인 탭(채운 수/칸), 가운데: 그 주인의 보유 카드(누르면 넣고 뺌), 오른쪽: 늘 들어가는 카드·저장 칸·추천·출발.
 import type { GameData } from '../engine/data';
 import {
+  archetypeCounts,
+  capFor,
+  cardPoints,
   choosable,
   COMMON,
+  loadoutFocus,
+  loadoutPoints,
   loadoutOwners,
   loadoutProblems,
   loadPreset,
@@ -40,12 +45,15 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
   const archName = new Map([...data.characters.values()].flatMap((c) => c.archetypes.map((a) => [a.id, a] as const)));
   const ownerName = (o: string) => (o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o));
   const root = h('section', { class: 'screen loadout-screen' });
-  /** 그 주인의 편성에 든 아키타입별 장수(0장은 뺀다) */
-  const archCounts = (o: string) =>
-    (data.characters.get(o)?.archetypes ?? [])
-      .map((a) => [a.name, (draft[o] ?? []).filter((id) => data.cards.get(id)?.tags.includes(a.id)).length] as const)
+  /** 그 주인의 편성에 든 아키타입별 장수(0장은 뺀다). 갈래 보너스가 켜진 갈래에는 ✓ */
+  const archCounts = (o: string) => {
+    const focus = loadoutFocus(data, o, draft[o] ?? []);
+    return Object.entries(archetypeCounts(data, o, draft[o] ?? []))
       .filter(([, n]) => n > 0)
-      .map(([name, n]) => `${name} ${n}`);
+      .map(([id, n]) => `${archName.get(id)?.name ?? id} ${n}${id === focus ? ' ✓' : ''}`);
+  };
+  /** 점수 상한을 맞추느라 바꿨다는 알림(추천·불러오기) */
+  let notice = '';
   // 지난 편성 그대로(모자란 칸만 추천으로): 바뀐 것이 없으면 이 버튼이 기본 초점
   const keep = recommendLoadout(data, run, run.loadout);
   const keepSame = owners.every((o) => JSON.stringify(keep[o] ?? []) === JSON.stringify(run.loadout[o] ?? []));
@@ -60,6 +68,8 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
       (a, b) => RARITY_RANK[a.rarity] - RARITY_RANK[b.rarity] || (run.collection[b.id] ?? 0) - (run.collection[a.id] ?? 0) || a.name.localeCompare(b.name, 'ko'),
     );
     const problems = loadoutProblems(data, run, draft);
+    const tabPts = loadoutPoints(data, draft[tab] ?? []);
+    const tabFocus = tab === COMMON ? null : loadoutFocus(data, tab, draft[tab] ?? []);
     const toggle = (id: string) => {
       const list = draft[tab] ?? (draft[tab] = []);
       const i = list.indexOf(id);
@@ -77,6 +87,8 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
           'div',
           { class: `deck-card loadout-card${on ? ' on' : ''}${full ? ' full' : ''}`, onclick: () => toggle(d.id), title: on ? '눌러서 빼기' : full ? '칸이 가득 찼다 — 먼저 한 장을 빼기' : '눌러서 넣기' },
           cardView(data, { uid: `lo_${d.id}`, cardId: d.id, level: run.collection[d.id] ?? 0 }, { selected: on }),
+          // 편성 점수 배지(왼쪽 위)
+          h('span', { class: `loadout-pts pts-${cardPoints(data, d)}`, ...tipAttrs(`편성 ${cardPoints(data, d)}점`, '등급마다 점수. 동료 24점 · 공용 17점까지.') }, String(cardPoints(data, d))),
           on ? h('span', { class: 'loadout-check' }, '✓') : null,
           run.stageGains.includes(d.id) ? h('span', { class: 'loadout-new', ...tipAttrs('이번 스테이지에 얻은 카드', '편성과 상관없이 이 스테이지가 끝날 때까지 덱에 들어간다.') }, '새') : null,
           d.tags.length
@@ -105,7 +117,12 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
               disabled: !p,
               onclick: () => {
                 const loaded = loadPreset(data, run, i);
-                if (loaded) Object.assign(draft, loaded);
+                if (loaded) {
+                  // 저장한 편성이 점수 상한을 넘으면 싼 카드로 바꿔 채운다
+                  const over = loadoutProblems(data, run, loaded).some((x) => x.includes('상한'));
+                  Object.assign(draft, over ? recommendLoadout(data, run, loaded) : loaded);
+                  notice = over ? `저장 ${i + 1}이 점수 상한을 넘어 일부를 싼 카드로 바꿔 채웠다.` : '';
+                }
                 render();
               },
             },
@@ -129,8 +146,14 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
               'button',
               { class: `codex-tab${o === tab ? ' on' : ''}${(draft[o]?.length ?? 0) === requiredFor(data, run, o) ? ' done' : ''}`, onclick: () => ((tab = o), render()) },
               ownerName(o),
-              // 채운 수 · 아키타입 집중도("진하운 8/8 · 결 노출 5 · 균열 2")
-              h('small', {}, [`${draft[o]?.length ?? 0}/${requiredFor(data, run, o)}`, ...archCounts(o)].join(' · ')),
+              // 채운 수 · 점수/상한 · 아키타입 집중도("진하운 8/8 · 22/24점 · 결 노출 5 ✓")
+              h(
+                'small',
+                {},
+                `${draft[o]?.length ?? 0}/${requiredFor(data, run, o)} · `,
+                h('span', { class: loadoutPoints(data, draft[o] ?? []) > capFor(data, o) ? 'pts-over' : '' }, `${loadoutPoints(data, draft[o] ?? [])}/${capFor(data, o)}점`),
+                archCounts(o).length ? ` · ${archCounts(o).join(' · ')}` : '',
+              ),
               o !== COMMON && !run.selected.includes(o) ? h('em', { class: 'rest-tag' }, '쉼') : null,
             ),
           ),
@@ -145,11 +168,22 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
           h(
             'div',
             { class: 'loadout-bar' },
-            h('b', {}, `${ownerName(tab)} — ${picked.size}/${need}장`),
-            h('small', {}, `보유 ${cards.length}장 중에서 고른다. 같은 카드는 한 장만.`),
-            h('button', { class: 'btn btn-small', onclick: () => ((draft[tab] = recommendFor(data, run, tab)), render()) }, `${ownerName(tab)} 추천`),
+            h('b', {}, `${ownerName(tab)} — ${picked.size}/${need}장 · `, h('span', { class: tabPts > capFor(data, tab) ? 'pts-over' : '' }, `${tabPts}/${capFor(data, tab)}점`)),
+            h('small', { ...tipAttrs('편성 점수', `카드 등급마다 점수(일반 1 · 고급 2 · 희귀 3 · 영웅 5 · 전설 7, 열쇠 카드 0). 동료는 ${data.balance.loadout.cap.perCharacter}점, 공용은 ${data.balance.loadout.cap.common}점까지 — 센 카드를 넣으면 나머지는 싼 카드로 채운다. 강화 단계는 세지 않는다.`) }, `보유 ${cards.length}장 중에서 고른다. 같은 카드는 한 장만. 점수 상한 ${capFor(data, tab)}.`),
+            h('button', { class: 'btn btn-small', onclick: () => ((draft[tab] = recommendFor(data, run, tab)), (notice = ''), render()) }, `${ownerName(tab)} 추천`),
             h('button', { class: 'btn btn-small', onclick: () => ((draft[tab] = []), render()) }, '모두 빼기'),
           ),
+          // 갈래 보너스: 같은 갈래 focusMin장 이상이면 그 갈래의 전투 시작 효과
+          archetypes.length
+            ? h(
+                'p',
+                { class: `focus-line${tabFocus ? ' on' : ''}` },
+                tabFocus
+                  ? `갈래 보너스 ✓ ${archName.get(tabFocus)?.name} — ${archName.get(tabFocus)?.focus?.text ?? ''}`
+                  : `같은 갈래 카드 ${data.balance.loadout.focusMin}장이면 갈래 보너스: ${archetypes.map((a) => `${a.name}(${a.focus?.text ?? ''})`).join(' · ')}`,
+              )
+            : null,
+          notice ? h('p', { class: 'loadout-notice' }, notice) : null,
           archetypes.length
             ? h(
                 'div',
@@ -181,7 +215,7 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
           h(
             'div',
             { class: 'box loadout-actions' },
-            h('button', { class: 'btn', onclick: () => (Object.assign(draft, recommendLoadout(data, run)), render()) }, '전체 추천 편성'),
+            h('button', { class: 'btn', onclick: () => (Object.assign(draft, recommendLoadout(data, run)), (notice = ''), render()) }, '전체 추천 편성'),
             handlers.onShowCollection ? h('button', { class: 'btn', onclick: handlers.onShowCollection }, '보유 카드 전체 보기') : null,
             problems.length ? h('ul', { class: 'loadout-problems' }, problems.map((p) => h('li', {}, p))) : null,
             keepOk

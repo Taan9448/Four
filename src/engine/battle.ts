@@ -57,6 +57,8 @@ export interface BattleSetup {
   scar?: number;
   /** 폭주 체력 손실 배율(첫 폭주 안내 전투 ½) */
   surgeDamageMul?: number;
+  /** 갈래 보너스: 그 동료를 출처로 전투 시작에 일어나는 일 */
+  focusEffects?: { member: string; arch?: string; effects: Effect[] }[];
   /** 모듈 보너스 등 전투 시작 효과 */
   startEffects?: Effect[];
   /** 이 턴 수를 버티면 승리(모듈 content.surviveTurns) */
@@ -168,6 +170,13 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   if (setup.startEffects?.length) {
     runEffects(state, setup.startEffects, { source: leader(state) });
   }
+  for (const f of setup.focusEffects ?? []) {
+    const member = state.party.find((p) => p.defId === f.member && !p.downed);
+    if (member) {
+      runEffects(state, f.effects, { source: member });
+      state.events.push({ type: 'focus', member: f.member, arch: f.arch });
+    }
+  }
   for (const l of laws) if (l.battle.startEffects.length) runEffects(state, l.battle.startEffects, { source: leader(state) });
   startPlayerTurn(state);
   return state;
@@ -185,7 +194,12 @@ function startPlayerTurn(state: BattleState): void {
   }
   // 첫 차례에는 전투 시작 때 얻은 방어(유물·모듈 보너스)를 지우지 않는다. 규칙 유물 keep_block이면 일부가 남는다
   const keep = hasRule(state, 'keep_block') ? bal.relicRules.keepBlockRatio : 0;
-  if (state.turn > 1) for (const p of state.party) p.block = Math.floor(p.block * keep);
+  // 남는 방어(block_kept, keep_block 카드)가 있는 아군은 방어가 그대로 남고 상태가 사라진다
+  if (state.turn > 1)
+    for (const p of state.party) {
+      if (p.statuses.block_kept) delete p.statuses.block_kept;
+      else p.block = Math.floor(p.block * keep);
+    }
   applyTurnStartStatuses(state, state.party);
   if (state.result) return;
   drawCards(state, (state.handSize ?? bal.handSize) + (hasRule(state, 'hand_plus_one') ? 1 : 0));
@@ -439,9 +453,17 @@ export function canPlay(state: BattleState, handIndex: number): PlayCheck {
   const owner = cardOwner(state, inst);
   if (!owner || owner.downed) return { ok: false, reason: '카드 주인이 쓰러졌다' };
   if (hasSkipTurn(state, owner)) return { ok: false, reason: `${owner.name}이(가) 움직일 수 없다` };
-  if (state.neigong < card.cost.neigong) return { ok: false, reason: '내공 부족' };
-  if (state.mana < card.cost.mana) return { ok: false, reason: '마나 부족' };
+  const cost = playCost(state, inst);
+  if (state.neigong < cost.neigong) return { ok: false, reason: '내공 부족' };
+  if (state.mana < cost.mana) return { ok: false, reason: '마나 부족' };
   return { ok: true };
+}
+
+/** 지금 이 카드를 낼 때 드는 비용: 일행의 cost_down(가벼운 다음 수) 스택만큼 내공이 준다(0 아래로 가지 않는다) */
+export function playCost(state: BattleState, inst: CardInstance): { neigong: number; mana: number } {
+  const card = resolveCard(state.data, inst);
+  const down = alive(state.party).reduce((a, p) => a + (p.statuses.cost_down ?? 0), 0);
+  return { neigong: Math.max(0, card.cost.neigong - down), mana: card.cost.mana };
 }
 
 export function playCard(state: BattleState, handIndex: number, targetUid?: string): PlayCheck {
@@ -457,8 +479,11 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
     return { ok: false, reason: '아군 대상을 골라야 한다' };
   }
   const owner = cardOwner(state, inst)!;
-  state.neigong -= card.cost.neigong;
-  state.mana -= card.cost.mana;
+  const cost = playCost(state, inst);
+  state.neigong -= cost.neigong;
+  state.mana -= cost.mana;
+  // 가벼운 다음 수(cost_down)는 카드 한 장에 다 쓰인다
+  for (const p of state.party) delete p.statuses.cost_down;
   state.hand.splice(handIndex, 1);
   state.events.push({ type: 'card', cardId: inst.cardId, sourceUid: owner.uid });
   if (state.tally) state.tally.cards[inst.cardId] = (state.tally.cards[inst.cardId] ?? 0) + 1;
@@ -471,7 +496,7 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   // 규칙 유물 fusion_calm: 융합의 균열을 1 덜 올린다
   if (isFusion(card) && hasRule(state, 'fusion_calm')) changeRift(state, -1);
   state.cardsPlayed = (state.cardsPlayed ?? 0) + 1;
-  if (card.keywords.includes('exhaust') || card.def.type === 'power') state.exhaust.push(inst);
+  if (card.keywords.includes('exhaust') || card.def.type === 'power' || inst.temp) state.exhaust.push(inst);
   else state.discard.push(inst);
   return { ok: true };
 }
@@ -739,4 +764,4 @@ export function battleOutcome(state: BattleState): BattleOutcome | null {
 }
 
 /** 테스트·디버그용: 엔진 내부 도우미를 다시 내보낸다 */
-export const _internal = { addStatus, dealDamage, changeRift, checkCondition, drawCards };
+export const _internal = { addStatus, dealDamage, changeRift, checkCondition, drawCards, runEffects };

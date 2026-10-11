@@ -50,6 +50,8 @@ export interface RunState {
   collection: Record<string, number>;
   /** 편성: 주인(동료 id·'common') → 카드 id */
   loadout: Loadout;
+  /** 갈래 보너스(출발 편성 기준): 동료 id → 켜진 아키타입 id(GAME_DESIGN 9-1) */
+  loadoutFocus?: Record<string, string>;
   /** 편성 저장 칸(balance.loadout.presets개, 빈 칸 null) */
   presets: (Loadout | null)[];
   /** 스테이지를 시작하기 전 편성 화면을 띄워야 한다 */
@@ -216,6 +218,7 @@ export function createRun(data: GameData, seed: string, opts: RunOptions = {}): 
     deck: [],
     collection: {},
     loadout: {},
+    loadoutFocus: {},
     presets: Array.from({ length: data.balance.loadout.presets }, () => null),
     needsLoadout: true,
     stageGains: [],
@@ -546,9 +549,19 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     relics: run.relics,
     potions: run.potions,
     surgeDamageMul: enc.module.content.surgeTutorial ? 0.5 : undefined,
+    focusEffects: focusEffectsFor(data, run),
     // 裂 틈의 짐승: 첫 적에 틈의 접사 하나(GAME_DESIGN 7절)
     enemyMods: enc.node.crack && enc.node.enemies ? crackAffix(data, run, enc.node) : undefined,
   };
+}
+
+/** 갈래 보너스(GAME_DESIGN 9-1): 출전한 동료 중 출발 편성에서 갈래가 켜진 동료의 전투 시작 효과(그 동료를 출처로) */
+export function focusEffectsFor(data: GameData, run: RunState): { member: string; arch: string; effects: Effect[] }[] {
+  return run.selected.flatMap((id) => {
+    const arch = run.loadoutFocus?.[id];
+    const focus = arch ? data.characters.get(id)?.archetypes.find((a) => a.id === arch)?.focus : undefined;
+    return focus ? [{ member: id, arch: arch!, effects: focus.effects }] : [];
+  });
 }
 
 /** 틈의 짐승의 접사: 첫 적(엘리트)에 시드로 고른 접사 하나 */

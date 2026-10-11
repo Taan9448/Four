@@ -120,6 +120,14 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       return `${pre}균열을 ${e.amount !== undefined ? `${e.amount}까지 ` : '모두 '}소비`;
     case 'scar':
       return `${pre}상흔 ${n >= 0 ? '+' : ''}${n}`;
+    case 'cost_next':
+      return `${pre}다음 카드 내공 비용 -${n}`;
+    case 'keep_block':
+      return `${pre}${tgt && tgt !== '자신' ? `${tgt}의 ` : ''}방어가 다음 차례까지 남는다`;
+    case 'recall':
+      return `${pre}소멸한 카드 ${Math.max(1, n)}장을 손패로`;
+    case 'copy_card':
+      return `${pre}손패의 카드 ${Math.max(1, n)}장 복제(이번 전투만)`;
     default:
       return e.op;
   }

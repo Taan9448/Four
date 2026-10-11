@@ -105,6 +105,18 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
+  it('카드 250장 확장 규칙: 심법은 소멸·대상 자신, 틈의 카드는 대가(균열+·상흔·체력·소멸)가 있다, 갈래마다 보너스 효과, 편성 점수 표', () => {
+    const errors: string[] = [];
+    for (const c of data.cards.values()) {
+      if (c.type === 'power' && (!c.keywords.includes('exhaust') || c.target !== 'self')) errors.push(`${c.id}: 심법은 소멸·대상 자신`);
+      const costed = c.keywords.includes('exhaust') || c.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) > 0) || (e.op === 'scar' && (e.amount ?? 0) > 0) || e.op === 'lose_hp');
+      if (c.pool === 'abyss' && !costed) errors.push(`${c.id}: 틈의 카드는 대가가 있어야 한다`);
+    }
+    for (const ch of data.characters.values()) for (const a of ch.archetypes) if (ch.role === 'fighter' && !a.focus) errors.push(`${a.id}: 갈래 보너스(focus) 없음`);
+    for (const r of ['common', 'uncommon', 'rare', 'epic', 'legendary']) if (data.balance.loadout.points[r] === undefined) errors.push(`편성 점수 ${r} 없음`);
+    expect(errors).toEqual([]);
+  });
+
   it('유물·물약: 전투 발동은 전투 동작, 런 발동(pickup·victory·rest·shopEnter)은 런 동작만 쓴다. passive는 rule이 있다. 수량 목표(유물 60~80·물약 20~25)', () => {
     const errors: string[] = [];
     const runTriggers = new Set(['pickup', 'victory', 'cleanVictory', 'rest', 'shopEnter']);

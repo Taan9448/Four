@@ -7,7 +7,7 @@
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
 import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
 import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
-import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
+import { focusArchetype, recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
 export { cloneBattle };
 import type { GameData } from '../engine/data';
@@ -323,8 +323,19 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   const best = [...options].sort((a, b) => score(b) - score(a))[0];
   if (!best) return undefined;
   const value = worth(data.cards.get(best)!);
-  // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 값이 기준 이상이면 늘 가진다
-  if (value < opts.minRewardValue) return undefined;
+  // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 희귀 이상(값이 기준 이상)이 먼저,
+  // 없으면 그 주인이 모으는 갈래(아키타입) 태그가 맞는 카드 — 일반·고급도 갈래를 채우러 고른다(카드 250장 확장)
+  if (value < opts.minRewardValue) {
+    if (isAbyss(run)) return undefined;
+    const match = [...options]
+      .filter((id) => {
+        const def = data.cards.get(id)!;
+        const focus = data.characters.has(def.owner) ? focusArchetype(data, run, def.owner) : null;
+        return !!focus && def.tags.includes(focus) && !(id in run.collection);
+      })
+      .sort((a, b) => score(b) - score(a))[0];
+    return match;
+  }
   // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
   if (isAbyss(run) && run.deck.length >= 25 && value < RARITY_VALUE.epic) return undefined;
   return best;
@@ -462,6 +473,15 @@ export interface RunReport {
   relics: string[];
   /** 裂 틈새: 폭주가 연 수 · 들어간 수 */
   cracks?: { made: number; entered: number };
+  /** 카드 통계(보고서 '카드' 절): 보상 후보로 본 수 · 고른 수 · 스테이지 편성에 든 수 · 전투에서 쓴 수 */
+  cardLog?: CardLog;
+}
+
+export interface CardLog {
+  offered: Record<string, number>;
+  picked: Record<string, number>;
+  loadout: Record<string, number>;
+  used: Record<string, number>;
 }
 
 const partyHp = (s: BattleState) => s.party.reduce((a, p) => a + Math.max(0, p.downed ? 0 : p.hp), 0);
@@ -474,6 +494,8 @@ export function playRun(data: GameData, seed: string, opts: BotOptions = DEFAULT
 /** 런을 끝(또는 패배)까지 둔다. 다시 하는 길(순례)은 그 스테이지를 넘기면(stage_clear) 끝 */
 function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions): RunReport {
   const battles: BattleRecord[] = [];
+  const log: CardLog = { offered: {}, picked: {}, loadout: {}, used: {} };
+  const bump = (rec: Record<string, number>, id: string, n = 1) => (rec[id] = (rec[id] ?? 0) + n);
   const stageEntry: RunReport['stageEntry'] = [];
   let floor = 0;
   let entered = '';
@@ -485,7 +507,10 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
       continue;
     }
     // 스테이지 시작 편성: 추천 편성 그대로(GAME_DESIGN 9-1)
-    if (run.needsLoadout) setLoadout(data, run, recommendLoadout(data, run, run.loadout));
+    if (run.needsLoadout) {
+      setLoadout(data, run, recommendLoadout(data, run, run.loadout));
+      for (const ids of Object.values(run.loadout)) for (const id of ids) bump(log.loadout, id);
+    }
     if (entered !== run.stageId) {
       entered = run.stageId;
       const haun = run.roster.find((r) => r.id === 'haun')!;
@@ -528,9 +553,15 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
       while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
       run.levelLog = [];
+      for (const [id, n] of Object.entries(outcome.tally?.cards ?? {})) bump(log.used, id, n);
       if (run.status === 'map') {
-        const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
-        if (card) addCard(data, run, card);
+        const options = rewardOptions(data, run, enc.node.id);
+        options.forEach((id) => bump(log.offered, id));
+        const card = decideReward(data, run, options, opts);
+        if (card) {
+          bump(log.picked, card);
+          addCard(data, run, card);
+        }
       }
     } else if (enc.module.type === 'inn' && run.stageGains.length) {
       // 여관: 이번 스테이지에 얻은 카드까지 넣어 추천 편성으로 다시 짠 뒤 선택지
@@ -555,6 +586,7 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
     scar: run.scar,
     relics: [...run.relics],
     cracks: run.stats.cracks,
+    cardLog: log,
   };
 }
 

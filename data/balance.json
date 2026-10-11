@@ -53,7 +53,7 @@
   },
   "party": { "max": 3, "reviveHp": 1 },
   "upgrade": { "maxLevel": 5, "statLevels": 3 },
-  "loadout": { "perCharacter": 8, "common": 8, "presets": 3, "maxedGold": 25 },
+  "loadout": { "perCharacter": 8, "common": 8, "presets": 3, "maxedGold": 25, "points": { "common": 1, "uncommon": 2, "rare": 3, "epic": 5, "legendary": 7, "special": 0 }, "cap": { "perCharacter": 24, "common": 17 }, "focusMin": 5 },
   "rewards": {
     "cardChoices": 3,
     "rarityWeights": {

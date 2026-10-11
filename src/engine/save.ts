@@ -2,12 +2,13 @@
 // 브라우저 저장소(localStorage)는 UI가 맡는다. 여기는 순수 함수만.
 import type { GameData } from './data';
 import { emptyStats, type RunState } from './run';
-import { collectionFromDeck, grantStarters, loadoutOwners, recommendLoadout } from './collection';
+import { collectionFromDeck, grantStarters, loadoutFocus, loadoutOwners, loadoutProblems, recommendLoadout } from './collection';
 
 // 2: 10스테이지 개편(2026-10-08) — 스테이지 id의 뜻이 바뀌어 옛 저장은 버린다
 // 3: 순례(2026-10-11 A안) — 첫 순례 보상·도전 기록을 더한다. 2는 이행해서 읽는다(다시 하기로 이미 얻은 카드는 그대로 둔다)
-export const SAVE_VERSION = 3;
-const READABLE = [2, 3];
+// 4: 편성 점수 상한·갈래 보너스(2026-10-11 카드 250장 확장) — 상한을 넘는 옛 편성은 추천으로 다시 채운다
+export const SAVE_VERSION = 4;
+const READABLE = [2, 3, 4];
 
 interface SaveFile {
   version: number;
@@ -93,6 +94,15 @@ function migrate(data: GameData, run: RunState): void {
   run.needsLoadout ??= false;
   run.stageGains ??= [];
   for (const id of Object.keys(run.collection)) if (!data.cards.has(id)) delete run.collection[id];
+  // 편성 점수 상한(저장 4): 넘는 주인이 있으면 지킬 수 있는 카드는 남기고 추천으로 다시 채운다. 갈래 보너스도 다시 센다
+  if (loadoutProblems(data, run, run.loadout).some((p) => p.includes('상한'))) run.loadout = recommendLoadout(data, run, run.loadout);
+  if (!run.loadoutFocus) {
+    run.loadoutFocus = {};
+    for (const owner of loadoutOwners(data, run)) {
+      const f = owner === 'common' ? null : loadoutFocus(data, owner, run.loadout[owner] ?? []);
+      if (f) run.loadoutFocus[owner] = f;
+    }
+  }
 }
 
 function isValidRun(data: GameData, run: RunState): boolean {

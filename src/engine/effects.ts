@@ -613,6 +613,17 @@ export function addEcho(state: BattleState, to: 'hand' | 'discard'): boolean {
   return true;
 }
 
+/** 카드 거르기(filter: owner · pool · costNeigongGte) */
+function cardMatches(state: BattleState, cardId: string, filter: Effect['filter']): boolean {
+  const def = state.data.cards.get(cardId);
+  if (!def) return false;
+  if (!filter) return true;
+  if (filter.owner !== undefined && def.owner !== filter.owner) return false;
+  if (filter.pool !== undefined && def.pool !== filter.pool) return false;
+  if (filter.costNeigongGte !== undefined && def.cost.neigong < filter.costNeigongGte) return false;
+  return true;
+}
+
 // ───────────────────────── 카드 더미 ─────────────────────────
 
 export function newCard(state: BattleState, cardId: string, level = 0): CardInstance {
@@ -667,7 +678,7 @@ export function runEffects(state: BattleState, effects: Effect[], ctx: EffectCon
 }
 
 function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): void {
-  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon', 'consume_rift', 'scar'].includes(effect.op);
+  const needsTarget = !['gain_neigong', 'gain_mana', 'draw', 'discard', 'rift', 'add_card', 'neigong_max', 'summon', 'consume_rift', 'scar', 'cost_next', 'recall', 'copy_card'].includes(effect.op);
   if (!needsTarget) {
     if (!checkCondition(state, effect.condition, ctx)) return;
     const amount = amountOf(state, effect, undefined, ctx);
@@ -716,6 +727,37 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
         if (n > 0) {
           changeRift(state, -n);
           state.log.push(`균열 ${n}을 소비했다.`);
+        }
+        return;
+      }
+      case 'cost_next':
+        // 다음에 내는 카드의 내공 비용 -N(가벼운 다음 수, 카드를 낸 사람에게)
+        if (ctx.source) addStatus(state, ctx.source, 'cost_down', amount);
+        return;
+      case 'recall': {
+        // 소멸 더미에서 카드 amount(기본 1)장을 손패로(filter로 거른다, 무작위)
+        for (let i = 0; i < Math.max(1, amount); i++) {
+          if (state.hand.length >= state.data.balance.maxHand) break;
+          const idxs = state.exhaust.map((_, j) => j).filter((j) => cardMatches(state, state.exhaust[j].cardId, effect.filter));
+          if (!idxs.length) break;
+          const [card] = state.exhaust.splice(state.rng.pick(idxs), 1);
+          state.hand.push(card);
+          state.events.push({ type: 'recall', cardId: card.cardId });
+          state.log.push(`${state.data.cards.get(card.cardId)?.name ?? card.cardId}을(를) 되찾았다.`);
+        }
+        return;
+      }
+      case 'copy_card': {
+        // 손패의 카드 하나를 복제해 손패에(이번 전투에서만, 내면 소멸). 상태 카드는 빼고 filter로 거른다
+        for (let i = 0; i < Math.max(1, amount); i++) {
+          if (state.hand.length >= state.data.balance.maxHand) break;
+          const pool = state.hand.filter((c) => state.data.cards.get(c.cardId)?.type !== 'status' && cardMatches(state, c.cardId, effect.filter));
+          if (!pool.length) break;
+          const src = state.rng.pick(pool);
+          const copy = { ...newCard(state, src.cardId, src.level), temp: true };
+          state.hand.push(copy);
+          state.events.push({ type: 'copy', cardId: src.cardId });
+          state.log.push(`${state.data.cards.get(src.cardId)?.name ?? src.cardId}을(를) 하나 더 쥐었다.`);
         }
         return;
       }
@@ -777,6 +819,10 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
         break;
       case 'lose_hp':
         loseHp(state, target, amount);
+        break;
+      case 'keep_block':
+        // 이번 차례에 얻은 방어가 다음 차례 시작에 사라지지 않는다(한 번)
+        addStatus(state, target, 'block_kept', 1);
         break;
       case 'remove_status':
         if (!effect.status) throw new Error('remove_status: status 필요');

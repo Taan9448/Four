@@ -51,6 +51,8 @@ export interface CardInstance {
   cardId: string;
   /** 강화 단계 0~5 */
   level: number;
+  /** 이번 전투에서만 생긴 복제(copy_card): 내면 소멸 */
+  temp?: boolean;
 }
 
 export type BattleEvent =
@@ -66,6 +68,9 @@ export type BattleEvent =
   | { type: 'neigong_max'; value: number }
   | { type: 'echo' }
   | { type: 'sealed'; amount: number }
+  | { type: 'recall'; cardId: string }
+  | { type: 'focus'; member: string; arch?: string }
+  | { type: 'copy'; cardId: string }
   | { type: 'scar'; delta: number }
   | { type: 'support'; ruleId: string; name: string }
   | { type: 'relic'; relicId: string; name: string }

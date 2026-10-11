@@ -1756,3 +1756,13 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 @media (prefers-reduced-motion: reduce) { .map-lines path.fresh { animation: none; stroke-dashoffset: 0; } }
 .surge-pop .pop { width: min(600px, calc(100vw - 32px)); max-width: none; }
 .surge-pop .pop-title { white-space: nowrap; font-size: clamp(1.3rem, 5vw, 2rem); }
+/* 편성 점수·갈래 보너스(카드 250장 확장) */
+.pts-over { color: #ff5a5a; font-weight: 700; }
+.loadout-card { position: relative; }
+.loadout-pts { position: absolute; left: -4px; top: -4px; z-index: 6; min-width: 20px; height: 20px; padding: 0 4px; display: grid; place-items: center; border-radius: 10px; font-size: var(--fs-cap); font-weight: 800; color: #1d1408; background: #e8d3a0; border: 1px solid #6b4a2a; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
+.loadout-pts.pts-3 { background: #8fd3ff; }
+.loadout-pts.pts-5 { background: #c8a8ff; }
+.loadout-pts.pts-7 { background: #ffd36b; }
+.focus-line { margin: 4px 0 6px; font-size: var(--fs-cap); color: var(--muted, #b9a98c); }
+.focus-line.on { color: #9fe3a0; font-weight: 700; }
+.loadout-notice { margin: 2px 0 6px; font-size: var(--fs-cap); color: #ffcf7a; }
