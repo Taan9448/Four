@@ -1281,7 +1281,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .loadout-actions { display: flex; flex-direction: column; gap: 8px; }
 .loadout-problems { margin: 0; padding-left: 18px; color: var(--danger); font-size: 0.8rem; text-align: left; }
 .choice-loadout { border-color: #8fd3ff; }
-.codex-own { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 8px; background: rgba(16, 13, 10, 0.85); border: 1px solid var(--line); color: var(--ink-dim); font-size: 0.7rem; white-space: nowrap; }
+.codex-own { position: absolute; z-index: 6; bottom: -9px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 8px; background: rgba(16, 13, 10, 0.85); border: 1px solid var(--line); color: var(--ink-dim); font-size: 0.7rem; white-space: nowrap; }
 .codex-own.on { border-color: #e2b45c; color: #e6c36a; }
 @media (max-width: 900px) { .loadout-body { grid-template-columns: minmax(0, 1fr); } }
 
