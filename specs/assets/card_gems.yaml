@@ -1,0 +1,25 @@
+id: card_gems
+type: icon-sheet
+summary: 카드 보석 7종 — 칸1 내공 비용 · 칸2 마나 비용 · 칸3~7 등급(일반·고급·희귀·영웅·전설)
+# 카드 틀(card_frame_*)과 같은 픽셀 크기: 칸마다 32×32 격자 × 8배. 게임은 1배로 틀 위에 얹는다(비용 숫자는 게임이 쓴다)
+draw: [32, 32]
+logical: [32, 32]
+frames: 7
+baseline: 0.5
+palette: free
+max_colors: 12
+subject: >-
+  one jewel per cell for a collectible card game, all in ONE consistent pixel-art style like a set, centered in the cell, light from
+  the upper left, 2-3 flat tone steps, 1-pixel dark outline, no background plate. Cells 1 and 2 are the big COST gems (about 28x28
+  sprite pixels, they sit on the top-left corner of a card and the game prints a white number on their face, so the middle of the
+  face stays plain and a little dark). Cells 3 to 7 are small RARITY gems (about 14x14 sprite pixels, centered, the rest of the
+  cell empty) that sit in a small setting below a card's name banner.
+frame_notes:
+  1: "inner qi cost — a round gold coin-like disc (#6b3e08, #b8741a, #f2a93b, #ffe08a) with a carved cloud-scroll rim and a plain, slightly darker amber face"
+  2: "mana cost — a faceted hexagonal blue crystal (#1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff) in a thin silver setting, the center facet plain and a little darker"
+  3: "common — a small round pale grey-white stone (#8a90a3, #c2c6d1, #f1efe6)"
+  4: "uncommon — a small faceted green jade gem (#2f5a3a, #6aa84f, #bfe3a0)"
+  5: "rare — a small faceted blue sapphire (#1f3f73, #3a6ea5, #8fd3ff)"
+  6: "epic — a small faceted purple amethyst (#3b2160, #7a4fc0, #c8a8ff)"
+  7: "legendary — a small faceted orange-gold topaz with a single white sparkle (#b8741a, #f2a93b, #ffe08a, #ffffff)"
+placeholder: { color: '#f2a93b', accent: '#3a6ea5' }

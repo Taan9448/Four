@@ -1,0 +1,25 @@
+id: card_frame_magic
+type: card-frame
+summary: >-
+  the frame of a MAGIC (Elheim) card: deep blue leather over silver-steel, silver filigree, a rune circle and small blue crystals
+# 무공 틀(card_frame_murim)과 같은 layout. 셋 중 하나를 바꾸면 셋 다 바꾼다(tests/tools.test.ts가 본다)
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+window_shape: >-
+  a pointed gothic arch: the top rises to a soft point and the sides run straight down to a flat bottom, like a cathedral window
+banner: a deep blue cloth ribbon (#1f3f73, #3a6ea5) with silver-capped folded ends
+text_panel: pale silver-blue vellum (#dff4ff, #c2c6d1)
+frame_notes:
+  1: >-
+    deep blue leather (#1f3f73, #2b2b3a) over polished silver-steel (#5d6478, #8a90a3, #c2c6d1, #f1efe6) with a dark navy outer
+    edge (#1d2433); fine silver filigree in the corners; a thin ring of magic-circle marks (abstract dots and arcs, no letters)
+    engraved around the art window rim; four small faceted blue crystals (#4fb4ff, #8fd3ff, #dff4ff) set in the side borders
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled silver and leather read clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#1f3f73', accent: '#c2c6d1', panel: '#dff4ff', banner: '#3a6ea5' }

@@ -23,6 +23,8 @@ const SHEETS = {
   background: { canvas: [1536, 1024], grid: [1, 1], draw: [384, 256], logical: [384, 256] }, // 4배(전투 배경은 픽셀)
   // 아이콘 시트: 4×4칸에 아이콘 하나씩(최대 16), 칸 256 = 64 격자 × 4배. 화면에서는 24~32px로 줄여 쓴다
   'icon-sheet': { canvas: [1024, 1024], grid: [4, 4], draw: [64, 64], logical: [64, 64] },
+  // 카드 틀(2026-10-11): 세로 한 장 = 128×192 격자 × 8배. 틀이 프레임을 꽉 채우고, 그림 창은 키 색(투명 구멍)
+  'card-frame': { canvas: [1024, 1536], grid: [1, 1], draw: [128, 192], logical: [128, 192] },
 };
 
 /** 일러스트 유형: 캔버스와 게임에서 쓸 출력 크기 */
@@ -62,6 +64,8 @@ export function typeDefaults(type, size = 'large') {
       return { ...SHEETS[type], track: 'pixel', chroma: 'none', blend: 'normal', max_colors: 32, ...one };
     case 'icon-sheet':
       return { ...SHEETS[type], track: 'pixel', chroma: 'magenta', blend: 'normal', max_colors: 12, fps: 1, loop: false };
+    case 'card-frame':
+      return { ...SHEETS[type], track: 'pixel', chroma: 'magenta', blend: 'normal', max_colors: 24, ...one };
     default:
       return null;
   }
@@ -88,7 +92,7 @@ export const PADDING = 0.08;
 
 /** 하위 호환·문서용: 유형별 기본 규격(small) */
 export const TYPE_DEFAULTS = Object.fromEntries(
-  ['character-anim', 'character-ref', 'fx', 'background', 'icon-sheet', ...ILLUSTRATION_TYPES].map((t) => [t, typeDefaults(t)]),
+  ['character-anim', 'character-ref', 'fx', 'background', 'icon-sheet', 'card-frame', ...ILLUSTRATION_TYPES].map((t) => [t, typeDefaults(t)]),
 );
 
 export const paths = (root = ROOT) => ({
