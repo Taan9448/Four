@@ -30,7 +30,20 @@ export function cardWorld(card: ResolvedCard): CardWorld {
   return def.owner === 'haun' || def.owner === 'common' ? 'murim' : 'elheim';
 }
 
-export function cardView(data: GameData, inst: CardInstance | string, opts: { disabled?: string; selected?: boolean } = {}): HTMLElement {
+/**
+ * flavor(2026-10-11 UI/UX 1단계): 플레이버 글은 카드를 크게 볼 때만 — 'hover' 손패(올리거나 고르면 카드 위에) · 'full' 크게 보기(도감·상세).
+ * 없으면(목록·편성·상점·보상 = compact) 그리지 않는다. 카드 틀 높이는 그대로
+ */
+/** 색각 보정의 등급 모양(일반 ◇ 고급 △ 희귀 ○ 영웅 ☆ 전설 ✦) */
+const RARITY_SHAPE: Record<string, string> = { common: '◇', uncommon: '△', rare: '○', epic: '☆', legendary: '✦' };
+
+export interface CardViewOpts {
+  disabled?: string;
+  selected?: boolean;
+  flavor?: 'hover' | 'full';
+}
+
+export function cardView(data: GameData, inst: CardInstance | string, opts: CardViewOpts = {}): HTMLElement {
   const card = resolveCard(data, inst);
   const def = card.def;
   const owner = data.characters.get(def.owner);
@@ -44,14 +57,14 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
     {
       class: `card t-${world} card-${def.type} rarity-${def.rarity}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
-      title: opts.disabled ?? def.flavor ?? '',
+      title: opts.disabled ?? '',
     },
     def.rarity !== 'special' ? h('span', { class: `gem gem-${def.rarity}`, 'aria-hidden': 'true' }) : null,
     h('div', { class: 'card-cost', 'aria-label': `내공 ${card.cost.neigong} 마나 ${card.cost.mana}` }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), zero ? h('span', { class: 'pip-zero' }, '0') : null),
     h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
     h('div', { class: 'card-text', ...glossaryTip(data, inst) }, ...textBlocks(cardTextParts(data, inst))),
-    def.flavor ? h('div', { class: 'card-flavor' }, def.flavor) : null,
+    def.flavor && opts.flavor ? h('div', { class: `card-flavor${opts.flavor === 'hover' ? ' flavor-hover' : ''}` }, def.flavor) : null,
     world === 'murim' ? h('span', { class: 'seal', 'aria-hidden': 'true' }, def.seal ?? SEAL_BY_TYPE[def.type] ?? '武') : null,
     world === 'elheim' ? h('span', { class: 'circle', 'aria-hidden': 'true' }) : null,
   );
@@ -67,7 +80,7 @@ function pixelCardView(
   card: ResolvedCard,
   world: CardWorld,
   frame: string,
-  opts: { disabled?: string; selected?: boolean },
+  opts: CardViewOpts,
 ): HTMLElement {
   const def = card.def;
   const owner = data.characters.get(def.owner);
@@ -107,8 +120,10 @@ function pixelCardView(
     {
       class: `card card-px t-${world} card-${def.type} rarity-${def.rarity}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
-      title: opts.disabled ?? def.flavor ?? '',
+      title: opts.disabled ?? '',
     },
+    // 손패: 올리거나 고르면 카드 위에 플레이버 글(크게 보기는 부르는 쪽이 카드 아래에 따로)
+    def.flavor && opts.flavor === 'hover' ? h('div', { class: 'cpx-flavor', 'aria-hidden': 'true' }, def.flavor) : null,
     // 카드 그림(card_art_*)이 들어왔으면 그림 창 아래에 꽉 채워 깐다. 없으면 주인 색 바탕에 한자 인장
     h(
       'div',
@@ -121,6 +136,8 @@ function pixelCardView(
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
+    // 색각 보정: 등급 보석 위에 모양(설정에서 켤 때만 보인다)
+    def.rarity !== 'special' ? h('span', { class: 'cpx-rshape', 'aria-hidden': 'true' }, RARITY_SHAPE[def.rarity] ?? '') : null,
     rarityUrl ? h('img', { class: 'cpx-rarity', src: rarityUrl, alt: RARITY_LABEL[def.rarity] ?? '' }) : def.rarity !== 'special' ? h('span', { class: `cpx-rarity gem gem-${def.rarity}`, 'aria-label': RARITY_LABEL[def.rarity] }) : null,
     // 키워드(소멸·융합 등)는 글 칸 위 테두리에 걸친 배지로, 본문에는 넣지 않는다
     // 왼쪽에 두 개까지, 넘치면 오른쪽(가운데는 등급 보석 자리)
@@ -138,7 +155,7 @@ function fitText(el: HTMLElement): HTMLElement {
   requestAnimationFrame(() => {
     if (!el.isConnected) return;
     let size = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollHeight > el.clientHeight + 1 && size > 6.5) {
+    while (el.scrollHeight > el.clientHeight + 1 && size > 8) {
       size -= 0.5;
       el.style.fontSize = `${size}px`;
     }

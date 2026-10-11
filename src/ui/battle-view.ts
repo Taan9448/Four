@@ -2,9 +2,9 @@
 import { canPlay, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { potionChip, relicChip } from './items';
 import { hasSkipTurn } from '../engine/effects';
-import { ELEMENT_LABEL } from '../engine/text';
+import { cardText, ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
-import { resolveCard, spritesFor, type BattleEvent, type BattleState, type Combatant, type EnemyState } from '../engine/state';
+import { resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
 import { flash, floatOver, flyClone, flyIn, hitStop, shake, sleep, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
@@ -77,6 +77,9 @@ export class BattleView {
   private aimEl!: HTMLElement;
   private deckMedal!: HTMLElement;
   private logEl!: HTMLElement;
+  private logMedal!: HTMLElement;
+  /** 휴대폰: 손패 위 "◀ 5장 ▶" */
+  private handHint!: HTMLElement;
   private pilesEl!: HTMLElement;
   private riftEl!: HTMLElement;
   private turnEl!: HTMLElement;
@@ -162,6 +165,8 @@ export class BattleView {
         { target: '.hand .card', title: '줄 피해 미리보기', text: '카드에 마우스를 올리거나 고르면, 맞을 적 위에 들어갈 피해가 뜬다. 힘·약화·취약·방어·약점이 모두 계산된 값이다.' },
         { target: '.b-rift', title: '균열', text: '내공과 마나를 함께 쓰는 융합 카드를 쓰면 쌓인다. 너무 쌓이면 틈의 잔향이 덱에 섞이고, 가득 차면 폭주한다.' },
         { target: '.btn-endturn', title: '턴 종료', text: '쓸 카드를 다 썼으면 턴을 끝낸다(단축키 E). 그다음 적이 움직인다.' },
+        // 다섯 표식(2026-10-11 UI/UX 4-3)
+        { target: '.medal-row', title: '다섯 표식', text: '抽 뽑을 더미 · 棄 버린 더미 · 滅 소멸한 카드 · 冊 이번 전투의 덱 전체 · 設 메뉴와 설정. 記는 전투 기록을 보이고 숨긴다. 설정의 "표식에 글자 함께"를 켜면 아래에 이름이 붙는다.' },
       ],
       { id: 'battle-basics', once: true, onDone: elements },
     );
@@ -226,6 +231,8 @@ export class BattleView {
             { class: 'medal-row' },
             this.pilesEl,
             (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
+            // 전투 기록: 기본은 숨김, 누르면 반투명 판 위에(2026-10-11 UI/UX 2-2)
+            (this.logMedal = medal('記', '전투 기록', '최근 일어난 일 다섯 줄을 보이고 숨긴다', () => this.toggleLog())),
             medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
           ),
           this.state.relics.length ? this.relicEl : null,
@@ -236,7 +243,7 @@ export class BattleView {
         'div',
         { class: 'b-center' },
         this.ctx.pilgrimText ? h('p', { class: 'battle-pilgrim chip' }, this.ctx.pilgrimText) : null,
-        this.ctx.introText ? h('p', { class: 'battle-intro chip' }, this.ctx.introText) : null,
+        this.ctx.introText ? this.introEl() : null,
         this.riftEl,
         this.ctx.laws?.length
           ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name)))
@@ -251,7 +258,8 @@ export class BattleView {
         'div',
         { class: 'dock' },
         h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl), this.resEl),
-        h('div', { class: 'dock-mid' }, this.handEl),
+        // 전투 중 대사·경고 띠는 손패 바로 위(this.alerts)
+        h('div', { class: 'dock-mid' }, this.alerts, (this.handHint = h('div', { class: 'hand-hint', 'aria-hidden': 'true' })), this.handEl),
         h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E')),
       ),
       this.fxLayer,
@@ -259,7 +267,7 @@ export class BattleView {
 
     document.addEventListener('keydown', this.onKey);
     installTooltips();
-    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts, this.alerts);
+    return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts);
   }
 
   private spriteFor(c: Combatant, anim: string): string | null {
@@ -308,7 +316,7 @@ export class BattleView {
       intent,
       h('div', { class: 'sprite-wrap' }, canvas),
       h('div', { class: 'unit-name' }, c.name, c.side === 'party' && c.level ? h('small', { class: 'unit-lv' }, ` Lv${c.level}`) : ''),
-      h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar' }, hp, hpText)),
+      h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar', role: 'progressbar', 'aria-label': `${c.name} 체력`, 'aria-valuemin': '0' }, hp, hpText)),
       statuses,
     );
     const unit: Unit = { c, el, player, hp, hpText, block, statuses, intent, preview };
@@ -330,6 +338,9 @@ export class BattleView {
       const maxHp = shown?.maxHp ?? c.maxHp;
       u.hp.style.width = `${Math.max(0, (hp / maxHp) * 100)}%`;
       u.hpText.textContent = `${Math.max(0, hp)} / ${maxHp}`;
+      const bar = u.hpText.parentElement!;
+      bar.setAttribute('aria-valuemax', String(maxHp));
+      bar.setAttribute('aria-valuenow', String(Math.max(0, hp)));
       u.block.textContent = c.block > 0 ? String(c.block) : '';
       u.block.style.display = c.block > 0 ? '' : 'none';
       if (c.block > 0) Object.entries(tipAttrs(`방어 ${c.block}`, '받는 피해를 먼저 막는다. 자기 턴이 시작되면 사라진다.')).forEach(([k, v]) => v && u.block.setAttribute(k, v));
@@ -372,6 +383,8 @@ export class BattleView {
       s.surviveTurns !== null ? h('span', { class: 'survive' }, `버티기 ${Math.min(s.turn, s.surviveTurns)} / ${s.surviveTurns}턴`) : '',
     );
     this.riftEl.querySelector('span')!.replaceChildren('균열 ', h('b', {}, s.rift), ` / ${bal.rift.max}`, hot ? h('em', {}, ' 잔향') : '');
+    // 폭주 예고: 균열이 max-2 이상이면 "다음 +N이면 폭주"(붉은 글씨)
+    if (s.rift >= bal.rift.max - 2 && s.rift < bal.rift.max) this.riftEl.append(h('span', { class: 'surge-warn' }, `다음 +${bal.rift.max - s.rift}이면 폭주`));
     this.pilesEl.replaceChildren(
       medal('抽', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
       medal('棄', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
@@ -487,9 +500,10 @@ export class BattleView {
     const mid = (n - 1) / 2;
     const step = n > 1 ? Math.min(5, 36 / (n - 1)) : 0;
     this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
+    this.handHint.textContent = n ? `◀ ${n}장 ▶` : '';
     s.hand.forEach((inst, i) => {
       const check = canPlay(s, i);
-      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i });
+      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i, flavor: 'hover' });
       const off = i - mid;
       el.style.setProperty('--rot', `${off * step}deg`);
       el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
@@ -499,6 +513,18 @@ export class BattleView {
         this.onCardClick(i);
       });
       el.addEventListener('pointerdown', (e) => this.startDrag(e, i, el));
+      // 키보드: Tab으로 옮겨 다니고 Enter·Space로 고른다(포커스 링은 style.css :focus-visible)
+      el.tabIndex = 0;
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', this.cardLabel(inst, check.ok ? undefined : check.reason));
+      el.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        this.onCardClick(i);
+      });
+      el.addEventListener('focus', () => this.setHover(i));
+      el.addEventListener('blur', () => this.setHover(null));
       el.addEventListener('mouseenter', () => this.setHover(i));
       el.addEventListener('mouseleave', () => this.setHover(null));
       this.handEl.appendChild(el);
@@ -612,6 +638,7 @@ export class BattleView {
     // 굽이의 법칙 '안개': 의도가 보이지 않는다
     if (s.hideIntent) {
       u.intent.append(h('span', { class: 'intent-fog' }, '?'));
+      u.intent.setAttribute('aria-label', `${enemy.name}의 의도: 안개에 가려 보이지 않음`);
       Object.entries(tipAttrs('안개', '짙은 안개 때문에 이 적이 무엇을 할지 보이지 않는다.')).forEach(([k, v]) => v !== undefined && u.intent.setAttribute(k, v));
       return;
     }
@@ -622,7 +649,7 @@ export class BattleView {
     u.intent.classList.toggle('skipped', skip);
     u.intent.append(
       intentIcon(view.intent.kind),
-      h('span', {}, view.intent.name),
+      h('span', { class: 'intent-name' }, view.intent.name),
       dmg ? h('b', {}, dmg) : '',
       d?.element ? elementMark(d.element) : '',
       // 공격 말고 하는 일의 핵심 수치(방어·강화·약화·카드·소환)
@@ -637,6 +664,15 @@ export class BattleView {
       skip ? '움직이지 못해 이번 차례에는 행동하지 않는다.' : '',
     ].filter(Boolean);
     Object.entries(tipAttrs(view.intent.name, body.join('\n'), view.intent.kind)).forEach(([k, v]) => v !== undefined && u.intent.setAttribute(k, v));
+    // 화면 낭독기: "형의 검 9 → 진하운"
+    u.intent.setAttribute('aria-label', [`${enemy.name}의 의도: ${view.intent.name}`, dmg, d?.all ? '→ 아군 전체' : target ? `→ ${target.name}` : '', skip ? '(행동 못 함)' : ''].filter(Boolean).join(' '));
+  }
+
+  /** 손패 카드 낭독 문구: 이름 · 비용 · 효과(못 쓰면 그 까닭) */
+  private cardLabel(inst: CardInstance, blocked?: string): string {
+    const card = resolveCard(this.data, inst);
+    const cost = card.cost.neigong + card.cost.mana === 0 ? '비용 없음' : [card.cost.neigong ? `내공 ${card.cost.neigong}` : '', card.cost.mana ? `마나 ${card.cost.mana}` : ''].filter(Boolean).join(' ');
+    return [card.def.name + (inst.level ? ` +${inst.level}` : ''), cost, cardText(this.data, inst).replace(/\n/g, ' '), blocked ? `쓸 수 없음: ${blocked}` : ''].filter(Boolean).join(', ');
   }
 
   /** 아군 머리 위: 이번 적 턴에 받을 피해(방어를 뺀 값). 쓰러질 피해면 진하게 */
@@ -1147,9 +1183,30 @@ export class BattleView {
     }
   }
 
-  /** 전투 연출 대기(설정의 전투 속도 배율) */
+  /**
+   * 전투 이야기 글(가운데 위): 첫 턴 2.5초 뒤 한 줄 칩으로 접힌다. 누르면 펼치고 다시 누르면 접는다.
+   * 움직임 줄이기·화면 연출 끔이면 처음부터 접힌 채(2026-10-11 UI/UX 2-2)
+   */
+  private introEl(): HTMLElement {
+    const el = h('p', { class: 'battle-intro chip', role: 'button', tabindex: '0', title: '눌러서 펼치기·접기' }, this.ctx.introText!);
+    const toggle = () => el.classList.toggle('collapsed');
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggle()));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('no-motion')) el.classList.add('collapsed');
+    else setTimeout(() => el.classList.add('collapsed'), 2500);
+    return el;
+  }
+
+  /** 전투 기록 판 보이기·숨기기(기본 숨김) */
+  private toggleLog(): void {
+    const on = this.logEl.classList.toggle('on');
+    this.logMedal.classList.toggle('on', on);
+  }
+
+  /** 전투 중 이야기 대사·경고: 손패 바로 위 띠. 3초 뒤 또는 누르면 닫힌다(의도·받을 피해 예고를 가리지 않게) */
   private alert(text: string, kind: 'support' | 'danger'): void {
-    toast(this.alerts, text, kind, Math.min(7000, 1800 + text.length * 45));
+    const el = toast(this.alerts, text, kind, 3000);
+    el.addEventListener('click', () => el.remove());
   }
 
   private wait(ms: number): Promise<void> {
@@ -1173,39 +1230,34 @@ export class BattleView {
       this.finish(false);
       quit!(abandon);
     };
-    const menu = openOverlay(
-      '메뉴',
-      h(
-        'div',
-        { class: 'menu' },
-        settingsForm(),
-        quit
-          ? h(
-              'div',
-              { class: 'menu-actions' },
-              h(
+    // 네 줄 메뉴: 이어하기 / 설정(2단계) / 타이틀로 / 런 포기(붉은 옻칠, 확인 창) — 2026-10-11 UI/UX 4-2
+    const body = h('div', { class: 'menu' });
+    const main = () =>
+      body.replaceChildren(
+        h(
+          'div',
+          { class: 'menu-list' },
+          h('button', { class: 'btn btn-primary btn-large', onclick: () => menu.close() }, '이어하기'),
+          h('button', { class: 'btn btn-large', onclick: settingsPage }, '설정'),
+          quit ? h('button', { class: 'btn btn-large', title: '진행은 이 전투에 들어오기 직전의 지도에서 이어집니다', onclick: () => leave(false) }, '타이틀로', h('small', {}, '이 전투 직전 지도에서 이어진다')) : null,
+          quit
+            ? h(
                 'button',
                 {
-                  class: 'btn',
-                  title: '진행은 이 전투에 들어오기 직전의 지도에서 이어집니다',
-                  onclick: () => leave(false),
-                },
-                '타이틀로',
-              ),
-              h(
-                'button',
-                {
-                  class: 'btn btn-danger',
+                  class: 'btn btn-large btn-danger menu-abandon',
                   onclick: async () => {
                     if (await confirmDialog('런 포기', '지금 런을 끝내고 저장을 지웁니다. 되돌릴 수 없습니다.', '포기')) leave(true);
                   },
                 },
                 '런 포기',
-              ),
-            )
-          : null,
-      ),
-    );
+              )
+            : null,
+        ),
+      );
+    const settingsPage = () => body.replaceChildren(h('button', { class: 'btn btn-small menu-back', onclick: main }, '← 메뉴로'), settingsForm());
+    main();
+    const menu = openOverlay('메뉴', body);
+    requestAnimationFrame(() => body.querySelector<HTMLElement>('.menu-list .btn-primary')?.focus());
   }
 
   private idle(u: Unit): void {
@@ -1317,11 +1369,15 @@ export class BattleView {
 
 
 /** 오른쪽 위 둥근 표식: 한자 한 글자 + 숫자 배지(count가 없으면 배지 없음). 이름·설명은 주석(툴팁)으로 */
+/** 표식 아래 작은 글자(설정 '표식에 글자 함께') */
+const MEDAL_SHORT: Record<string, string> = { 抽: '뽑을', 棄: '버림', 滅: '소멸', 冊: '덱', 記: '기록', 設: '설정' };
+
 function medal(glyph: string, label: string, body: string, onclick: () => void, count?: number): HTMLElement {
   return h(
     'button',
     { class: 'medal', 'aria-label': count === undefined ? label : `${label} ${count}`, onclick, ...tipAttrs(count === undefined ? label : `${label} ${count}`, body) },
     h('b', {}, glyph),
     count === undefined ? null : h('i', {}, count),
+    MEDAL_SHORT[glyph] ? h('small', { class: 'medal-label', 'aria-hidden': 'true' }, MEDAL_SHORT[glyph]) : null,
   );
 }

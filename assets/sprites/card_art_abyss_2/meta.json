@@ -1,0 +1,52 @@
+{
+  "id": "card_art_abyss_2",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 16,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 16,
+  "sourceHash": "18d6b45fe4baf2e7",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.827,
+  "cards": [
+    "abyss_elia_black_fire",
+    "abyss_elia_borrowed_river",
+    "abyss_kyle_not_left",
+    "abyss_kyle_last_charge",
+    "abyss_elia_ash_rain",
+    "abyss_elia_frozen_river",
+    "abyss_elia_stolen_flow",
+    "abyss_elia_rift_barrier",
+    "abyss_elia_silver_storm",
+    "abyss_elia_last_seed",
+    "abyss_kyle_red_vow",
+    "abyss_kyle_rush",
+    "abyss_kyle_blood_edge",
+    "abyss_kyle_shield_break",
+    "abyss_kyle_father_sword",
+    "abyss_kyle_endless_charge"
+  ]
+}

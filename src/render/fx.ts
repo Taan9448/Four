@@ -277,11 +277,12 @@ export function floatOver(layer: HTMLElement, target: HTMLElement, text: string,
 }
 
 /** hold: 사라지기 시작할 때까지(ms). 기본 1.6초 */
-export function toast(container: HTMLElement, text: string, kind: 'support' | 'info' | 'danger' = 'info', hold = 1600): void {
+export function toast(container: HTMLElement, text: string, kind: 'support' | 'info' | 'danger' = 'info', hold = 1600): HTMLElement {
   const el = document.createElement('div');
   el.className = `toast toast-${kind}`;
   el.textContent = text;
   container.appendChild(el);
   setTimeout(() => el.classList.add('toast-out'), hold);
   setTimeout(() => el.remove(), hold + 500);
+  return el;
 }
