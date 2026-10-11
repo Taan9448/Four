@@ -418,6 +418,19 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   const fighters = run.roster.filter((r) => data.characters.get(r.id)?.role === 'fighter');
   const partyMax = run.abyss ? data.balance.abyss.partyMax : data.balance.party.max;
   const full = run.selected.length >= partyMax;
+  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
+  const wangJoined = run.flags.includes('support:wang');
+  const support = wangJoined
+    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, h('span', { class: 'member-tag' }, '지원'), ' 왕일검 — 청운호흡으로 일행을 돕는다')
+    : isDebug()
+      ? h(
+          'label',
+          { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다.' },
+          h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
+          ' 왕일검 지원(디버그)',
+        )
+      : null;
+
   const partyBox = h(
     'div',
     { class: `box party-box${handlers.highlightParty ? ' guide-pulse' : ''}` },
@@ -468,6 +481,8 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
       );
     }),
+    // 왕일검(지원)은 출전 목록 바로 아래(2026-10-11 사용자 요청)
+    support,
     h(
       'p',
       { class: 'hint' },
@@ -479,19 +494,6 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
     ),
     fighters.length > 1 && !run.abyss ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );
-
-  // S3 폐사찰 재회에서 합류하면 지원은 늘 켜져 있다. 그 전에는 ?debug에서만 토글(합류 전 이름이 드러나지 않게)
-  const wangJoined = run.flags.includes('support:wang');
-  const support = wangJoined
-    ? h('p', { class: 'support-toggle joined', title: data.characters.get('wang')?.description }, '왕일검 — 청운호흡으로 일행을 돕는다')
-    : isDebug()
-      ? h(
-          'label',
-          { class: 'support-toggle', title: '원래 S3(혈로)에서 합류합니다.' },
-          h('input', { type: 'checkbox', checked: run.supportActive, onchange: (e: Event) => handlers.onToggleSupport((e.target as HTMLInputElement).checked) }),
-          ' 왕일검 지원(디버그)',
-        )
-      : null;
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
   const journeyWrap = h('div', { class: 'journey-wrap' }, run.abyss ? depthBand(data, run) : journeyBand(data, run, { onStage: run.replayOf ? handlers.onSwitchStage : undefined }));
@@ -558,7 +560,6 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
-        support,
         h('div', { class: 'box legend' }, Object.entries(NODE_LABEL).map(([k, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, NODE_GLYPH[k])), v))),
         h(
           'div',
