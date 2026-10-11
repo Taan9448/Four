@@ -23,14 +23,14 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 5,
-  "sourceHash": "7d7317845be04000",
+  "sourceHash": "dcb04e67f3ed7578",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.763,
+  "gridPurity": 0.753,
   "cards": [
     "born_payback",
     "born_like_mountain",
