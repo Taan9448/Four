@@ -4,7 +4,7 @@
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(19개)
+## 1. 전투 기본 동작(23개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -27,6 +27,10 @@
 | `lose_hp` | amount | 자신 | 체력 잃기(방어 무시, 피의 값). '체력을 잃었을 때' 발동을 부른다 |
 | `consume_rift` | amount? | — | 균열 소비(2026-10-11 숨 세기 갈래): amount가 있으면 그만큼까지, 없으면 전부 내린다. 소비한 양은 같은 카드의 뒤 효과 `scale.per: consumed`가 쓴다(벼린 날 · 흐름을 돌리다 · 한 땀). 균열을 올리지 않는 융합(흐름을 돌리다)은 이 동작이 있어야 한다 |
 | `scar` | amount | — | 전투 중 상흔 증감(은빛 바느질 -1, 틈의 카드의 대가 +2). 전투 결과의 상흔에 더한다. 런 동작 `scar`와 같은 이름 |
+| `cost_next` | amount | — | 다음에 내는 카드의 내공 비용 -N(0 아래로 가지 않음, 카드 250장 확장). 카드를 낸 사람에게 상태 `cost_down`(스택 N) — 일행 누구든 다음 카드 한 장에 다 쓰이고, 차례가 끝나면 사라진다 |
+| `keep_block` | — | 자신 | 대상에 상태 `block_kept`: 다음 차례가 시작될 때 그 아군의 방어가 사라지지 않는다(한 번). 규칙 유물 keep_block(바위 부적)과 같은 자리에서 처리 |
+| `recall` | amount?, filter? | — | 소멸 더미에서 무작위(filter로 거름) 카드 amount(기본 1)장을 손패로 |
+| `copy_card` | amount?, filter? | — | 손패의 무작위(상태 카드 제외, filter로 거름) 카드를 복제해 손패에. 복제는 이번 전투에서만 있고 내면 소멸 |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
@@ -127,6 +131,8 @@
 | thorns | 가시 | 없음 | 발동: 공격을 맞을 때마다 때린 쪽에게 피해 1(스택마다) — 바위 골렘·용암 핏줄의 골렘·호법 |
 | seal | 봉인 | 없음(쓰면 소모) | special `seal`: 균열이 오를 때 스택 하나가 1을 막고 사라진다. 일행 누구의 봉인이든 앞자리부터 쓴다(균열 개편 2026-10-11 — 봉인의 손·막아서다·봉인 부적 조각·실패) |
 | p_count_gold | 금을 세다 | 없음 | 발동: 차례 끝에 균열 -1, 그때 균열이 0이면 카드 1장 |
+| cost_down | 가벼운 다음 수 | 차례 끝 전부 | 다음에 내는 카드의 내공 비용 -스택(카드 한 장에 다 쓰임, `cost_next`) |
+| block_kept | 남는 방어 | 쓰면 사라짐 | 다음 차례 시작에 방어가 그대로 남는다(`keep_block`) |
 | frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { battleOutcome, canPlay, endTurn, incomingDamage, playCard } from '../src/engine/battle';
+import { _internal, battleOutcome, canPlay, endTurn, incomingDamage, playCard, playCost } from '../src/engine/battle';
 import { resolveCard } from '../src/engine/state';
 import { cardText, cardTextParts } from '../src/engine/text';
 import { createRng } from '../src/engine/rng';
@@ -475,5 +475,42 @@ describe('받을 피해 예고', () => {
     const m = incomingDamage(s);
     const per = 7 + (s.enemies[0].statuses.strength ?? 0);
     for (const p of s.party) expect(m.get(p.uid)!.raw).toBe(per);
+  });
+});
+
+describe('새 기본 동작(카드 250장 확장 2026-10-11)', () => {
+  it('cost_next: 다음 카드 내공 비용 -N(0 아래로 가지 않음), 한 장에 다 쓰인다', () => {
+    const s = battle({ enemies: ['test_ignis'] });
+    s.neigong = 1;
+    _internal.drawCards(s, 0);
+    const owner = s.party[0];
+    owner.statuses.cost_down = 1;
+    const i = give(s, 'haun_byeogun'); // 내공 1 · 마나 2
+    expect(playCost(s, s.hand[i]).neigong).toBe(0);
+    s.mana = 5;
+    playCard(s, i, s.enemies[0].uid);
+    expect(s.neigong).toBe(1);
+    expect(owner.statuses.cost_down).toBeUndefined();
+  });
+
+  it('keep_block: 다음 차례에도 방어가 남는다(한 번) · recall: 소멸한 카드를 손패로 · copy_card: 복제는 내면 소멸', () => {
+    const s = battle({ world: 'murim', enemies: ['test_ignis'] });
+    s.enemies[0].intent = null;
+    const p = s.party[0];
+    p.block = 9;
+    p.statuses.block_kept = 1;
+    endTurn(s);
+    expect(p.block).toBe(9);
+    expect(p.statuses.block_kept).toBeUndefined();
+    s.hand = [];
+    s.exhaust.push({ uid: 'x1', cardId: 'haun_chop', level: 0 });
+    _internal.runEffects(s, [{ op: 'recall', amount: 1 }], { source: p });
+    expect(s.hand.map((c) => c.cardId)).toEqual(['haun_chop']);
+    _internal.runEffects(s, [{ op: 'copy_card', amount: 1 }], { source: p });
+    expect(s.hand).toHaveLength(2);
+    const copy = s.hand.find((c) => c.temp)!;
+    expect(copy.cardId).toBe('haun_chop');
+    playCard(s, s.hand.indexOf(copy), s.enemies[0].uid);
+    expect(s.exhaust.some((c) => c.uid === copy.uid)).toBe(true);
   });
 });

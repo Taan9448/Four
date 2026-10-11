@@ -130,3 +130,56 @@ describe('선택지 요약(2026-10-11 UI/UX 2-4)', () => {
     for (const m of data.modules.values()) for (const c of m.content.choices ?? []) expect(typeof describeChoice(data, c)).toBe('string');
   });
 });
+
+describe('편성 점수 상한·갈래 보너스(카드 250장 확장 2026-10-11)', () => {
+  it('점수는 등급(일반 1 · 고급 2 · 희귀 3 · 영웅 5 · 전설 7), 열쇠 카드 0, 상한을 넘으면 문제', async () => {
+    const { cardPoints, loadoutPoints, loadoutProblems, capFor } = await import('../src/engine/collection');
+    const pts = (rarity: string) => cardPoints(data, { ...[...data.cards.values()][0], rarity: rarity as never, essential: undefined });
+    expect(['common', 'uncommon', 'rare', 'epic', 'legendary'].map(pts)).toEqual([1, 2, 3, 5, 7]);
+    const key = [...data.cards.values()].find((c) => c.essential);
+    if (key) expect(cardPoints(data, key)).toBe(0);
+    expect(capFor(data, 'haun')).toBe(24);
+    expect(capFor(data, 'common')).toBe(17);
+    // 하운이 비싼 카드를 다 가진 런: 상한을 넘는 편성은 문제
+    const run = createRunAt(data, 'CAP1', 's8');
+    const haunCards = [...data.cards.values()].filter((c) => c.owner === 'haun' && (c.pool === 'reward' || c.pool === 'story') && !c.essential);
+    for (const c of haunCards) run.collection[c.id] = 0;
+    const pricey = haunCards.sort((a, b) => cardPoints(data, b) - cardPoints(data, a)).slice(0, 8).map((c) => c.id);
+    expect(loadoutPoints(data, pricey)).toBeGreaterThan(24);
+    const bad = { ...run.loadout, haun: pricey };
+    expect(loadoutProblems(data, run, bad).some((p) => p.includes('상한 24'))).toBe(true);
+  });
+
+  it('추천 편성은 상한을 지키고 공격 3/8 · 그 밖 1/4을 지킨다(봇도 같은 함수)', async () => {
+    const { recommendLoadout, loadoutPoints, loadoutProblems } = await import('../src/engine/collection');
+    const run = createRunAt(data, 'CAP2', 's8');
+    for (const c of data.cards.values()) if ((c.pool === 'reward' || c.pool === 'story') && !c.essential) run.collection[c.id] = 0;
+    const lo = recommendLoadout(data, run);
+    expect(loadoutProblems(data, run, lo)).toEqual([]);
+    for (const [owner, ids] of Object.entries(lo)) {
+      expect(loadoutPoints(data, ids), owner).toBeLessThanOrEqual(owner === 'common' ? 17 : 24);
+      if (owner === 'common') continue;
+      expect(ids.filter((id) => data.cards.get(id)!.type === 'attack').length, owner).toBeGreaterThanOrEqual(3);
+      expect(ids.filter((id) => data.cards.get(id)!.type !== 'attack').length, owner).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('갈래 보너스: 같은 갈래 5장이면 켜지고(출발 편성), 출전한 그 동료를 출처로 전투 시작 효과', async () => {
+    const { loadoutFocus } = await import('../src/engine/collection');
+    const { battleSetupFor, enterNode, availableNodes } = await import('../src/engine/run');
+    const { createBattle } = await import('../src/engine/battle');
+    const grain = [...data.cards.values()].filter((c) => c.owner === 'haun' && c.tags.includes('haun_grain')).map((c) => c.id);
+    expect(loadoutFocus(data, 'haun', grain.slice(0, 4))).toBeNull();
+    expect(loadoutFocus(data, 'haun', grain.slice(0, 5))).toBe('haun_grain');
+    const run = createRunAt(data, 'FOCUS', 's3');
+    run.loadoutFocus = { born: 'born_iron' };
+    run.selected = ['haun', 'born'];
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    const setup = battleSetupFor(data, run, enc);
+    expect(setup.focusEffects).toEqual([{ member: 'born', arch: 'born_iron', effects: data.characters.get('born')!.archetypes.find((a) => a.id === 'born_iron')!.focus!.effects }]);
+    if (setup.enemies.length) {
+      const s = createBattle(data, setup);
+      expect(s.party.find((p) => p.defId === 'born')!.block).toBeGreaterThanOrEqual(6);
+    }
+  });
+});

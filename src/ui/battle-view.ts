@@ -1113,6 +1113,19 @@ export class BattleView {
           } else this.alert(`폭주${n > 1 ? ` ×${n}` : ''} — 체력 ${Math.round(b.surgeRatio * 100) * n}% · 힘 +${b.surgeEnemyStrength} · 잔향 ${b.surgeEchoToHand} · 상흔 +${b.surgeScar}`, 'danger');
           break;
         }
+        case 'focus': {
+          // 갈래 보너스(편성): 전투 시작 효과
+          const m = this.data.characters.get(ev.member);
+          const arch = m?.archetypes.find((a) => a.id === ev.arch);
+          this.alert(`갈래 보너스 — ${m?.name ?? ev.member}${arch?.focus ? ` · ${arch.focus.text.replace(/^전투 시작: /, '')}` : ''}`, 'support');
+          break;
+        }
+        case 'recall':
+          this.alert(`되찾았다 — ${this.data.cards.get(ev.cardId)?.name ?? ev.cardId}`, 'support');
+          break;
+        case 'copy':
+          this.alert(`한 장 더 — ${this.data.cards.get(ev.cardId)?.name ?? ev.cardId}`, 'support');
+          break;
         case 'echo':
           this.alert('틈의 잔향이 덱에 섞였다', 'danger');
           break;

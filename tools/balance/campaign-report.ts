@@ -84,7 +84,58 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
     );
   }
   lines.push('');
+  lines.push(...cardSection(data, runs));
   return lines.join('\n');
+}
+
+/**
+ * 카드(카드 250장 확장, 죽은 카드 찾기): 카드마다 보상 후보로 본 수 · 고른 수 · 선택률 · 스테이지 편성에 든 비율 · 전투에서 쓴 수 · 그 카드를 가진 런의 완주율.
+ * 선택률 하위 15%와 편성 포함 0%를 '죽은 카드'로 따로. 시작·보상 카드만(이야기·틈·상태 카드 제외)
+ */
+function cardSection(data: GameData, runs: RunReport[]): string[] {
+  const sum = (key: 'offered' | 'picked' | 'loadout' | 'used', id: string) => runs.reduce((a, r) => a + (r.cardLog?.[key][id] ?? 0), 0);
+  const stages = runs.reduce((a, r) => a + r.stageEntry.length, 0);
+  const rows = [...data.cards.values()]
+    .filter((c) => c.pool === 'reward' || c.pool === 'starter')
+    .map((c) => {
+      const offered = sum('offered', c.id);
+      const picked = sum('picked', c.id);
+      const holders = runs.filter((r) => (r.cardLog?.picked[c.id] ?? 0) > 0 || (r.cardLog?.loadout[c.id] ?? 0) > 0);
+      return {
+        c,
+        offered,
+        picked,
+        rate: offered ? picked / offered : 0,
+        loadout: stages ? sum('loadout', c.id) / stages : 0,
+        used: sum('used', c.id),
+        win: holders.length ? holders.filter((r) => r.result === 'complete').length / holders.length : 0,
+        holders: holders.length,
+      };
+    });
+  const rewardRows = rows.filter((r) => r.c.pool === 'reward' && r.offered >= 20).sort((a, b) => a.rate - b.rate);
+  const cut = rewardRows[Math.floor(rewardRows.length * 0.15)]?.rate ?? 0;
+  const dead = rows.filter((r) => (r.c.pool === 'reward' && r.offered >= 20 && r.rate <= cut) || r.loadout === 0);
+  const owner = (id: string) => (id === 'common' ? '공용' : (data.characters.get(id)?.name ?? id));
+  const fmt = (x: number) => `${Math.round(x * 100)}%`;
+  const row = (r: (typeof rows)[number]) => `| ${r.c.name} \`${r.c.id}\` | ${owner(r.c.owner)} | ${r.c.rarity} | ${r.offered} | ${r.picked} | ${fmt(r.rate)} | ${fmt(r.loadout)} | ${r.used} | ${r.holders ? fmt(r.win) : '-'} |`;
+  const head = ['| 카드 | 주인 | 등급 | 보상 노출 | 선택 | 선택률 | 편성 포함(스테이지당) | 전투 사용 | 가진 런 완주 |', '|---|---|---|---:|---:|---:|---:|---:|---:|'];
+  return [
+    '## 카드',
+    '',
+    `시작·보상 카드 ${rows.length}장. 선택률은 보상 후보로 본 횟수 중 고른 비율(봇: 희귀 이상 먼저, 없으면 모으는 갈래 태그가 맞는 카드). 편성 포함은 스테이지 편성 중 그 카드가 든 비율.`,
+    `죽은 카드: 선택률 하위 15%(보상 노출 20번 이상, 선택률 ${fmt(cut)} 이하) 또는 편성에 한 번도 들지 않은 카드 — **${dead.length}장(${fmt(dead.length / Math.max(1, rows.length))})**(목표 15% 이하).`,
+    '',
+    '### 죽은 카드',
+    '',
+    ...head,
+    ...dead.sort((a, b) => a.loadout - b.loadout || a.rate - b.rate).map(row),
+    '',
+    '### 많이 쓰인 카드(전투 사용 상위 20)',
+    '',
+    ...head,
+    ...[...rows].sort((a, b) => b.used - a.used).slice(0, 20).map(row),
+    '',
+  ];
 }
 
 /**

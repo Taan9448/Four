@@ -27,6 +27,11 @@ export const BATTLE_OPS = [
   // 균열 개편(2026-10-11): 균열 소비(소비한 양은 scale per consumed) · 전투 중 상흔(전투 결과에 더한다, 런 동작 scar와 같은 이름)
   'consume_rift',
   'scar',
+  // 카드 250장 확장(2026-10-11): 다음 카드 비용 줄이기 · 방어 남기기 · 소멸한 카드 되찾기 · 손패 복제
+  'cost_next',
+  'keep_block',
+  'recall',
+  'copy_card',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -395,7 +400,19 @@ export const CharacterDef = z
     /** 도감의 긴 소개(합류했을 때 아는 만큼) */
     lore: z.string().optional(),
     /** 아키타입 2개(GAME_DESIGN 9-2): 카드의 tags가 이 id를 쓴다 */
-    archetypes: z.array(z.object({ id: z.string(), name: z.string(), text: z.string() }).strict()).default([]),
+    archetypes: z
+      .array(
+        z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            text: z.string(),
+            /** 갈래 보너스(편성에 그 갈래 카드 focusMin장 이상): 전투 시작 효과(그 동료를 출처로) */
+            focus: z.object({ text: z.string(), effects: z.array(Effect).min(1) }).strict().optional(),
+          })
+          .strict(),
+      )
+      .default([]),
   })
   .strict();
 export type CharacterDef = z.infer<typeof CharacterDef>;
@@ -578,6 +595,11 @@ export const Balance = z
         common: z.number().int().positive(),
         presets: z.number().int().min(0),
         maxedGold: z.number().int().min(0),
+        /** 편성 점수(카드 250장 확장): 등급마다 점수, 주인마다 상한. 강화 단계는 세지 않고 열쇠 카드는 0 */
+        points: z.record(z.string(), z.number().int().min(0)),
+        cap: z.object({ perCharacter: z.number().int().positive(), common: z.number().int().positive() }).strict(),
+        /** 갈래 보너스: 같은 아키타입 태그 카드가 이만큼 이상이면 그 갈래의 전투 시작 효과가 켜진다 */
+        focusMin: z.number().int().positive(),
       })
       .strict(),
     rewards: z

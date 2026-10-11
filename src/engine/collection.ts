@@ -59,6 +59,61 @@ export function focusArchetype(data: GameData, run: Pick<RunState, 'collection'>
   return best;
 }
 
+/** 편성 점수(카드 250장 확장): 등급 점수, 열쇠 카드 0. 강화 단계는 세지 않는다 */
+export function cardPoints(data: GameData, def: CardDef): number {
+  if (def.essential) return 0;
+  return data.balance.loadout.points[def.rarity] ?? 0;
+}
+
+/** 주인의 편성 점수 상한(동료 24 · 공용 17) */
+export const capFor = (data: GameData, owner: string) => (owner === COMMON ? data.balance.loadout.cap.common : data.balance.loadout.cap.perCharacter);
+
+/** 카드 목록의 편성 점수 합 */
+export function loadoutPoints(data: GameData, ids: readonly string[]): number {
+  return ids.reduce((a, id) => a + (data.cards.has(id) ? cardPoints(data, data.cards.get(id)!) : 0), 0);
+}
+
+/** 편성에서 이 주인의 같은 갈래 카드 수(갈래 id → 장수) */
+export function archetypeCounts(data: GameData, owner: string, ids: readonly string[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const a of data.characters.get(owner)?.archetypes ?? []) out[a.id] = ids.filter((id) => data.cards.get(id)?.tags.includes(a.id)).length;
+  return out;
+}
+
+/** 갈래 보너스가 켜지는 갈래(같은 갈래 카드 focusMin장 이상, 둘 다면 많은 쪽 — 같으면 앞의 갈래). 없으면 null */
+export function loadoutFocus(data: GameData, owner: string, ids: readonly string[]): string | null {
+  const counts = archetypeCounts(data, owner, ids);
+  let best: string | null = null;
+  for (const [id, n] of Object.entries(counts)) if (n >= data.balance.loadout.focusMin && (best === null || n > counts[best])) best = id;
+  return best;
+}
+
+/**
+ * 점수 상한에 맞춘다: 넘으면 가장 비싼 카드를 그보다 싼(아직 안 넣은) 카드 중 가장 좋은 것으로 바꾸기를 되풀이한다.
+ * 공격·그 밖은 같은 쪽 카드로 먼저 바꿔 비율을 지킨다. 지키는 카드(keep)는 마지막에 바꾼다
+ */
+function fitCap(data: GameData, run: Pick<RunState, 'collection'>, owner: string, ids: string[], value: (d: CardDef) => number, keep: ReadonlySet<string> = new Set()): string[] {
+  const cap = capFor(data, owner);
+  const def = (id: string) => data.cards.get(id)!;
+  const out = [...ids];
+  for (let guard = 0; guard < 40 && loadoutPoints(data, out) > cap; guard++) {
+    const order = [...out].sort((a, b) => Number(keep.has(a)) - Number(keep.has(b)) || cardPoints(data, def(b)) - cardPoints(data, def(a)) || value(def(a)) - value(def(b)));
+    let swapped = false;
+    for (const id of order) {
+      const cheaper = choosable(data, run, owner)
+        .filter((d) => !out.includes(d.id) && cardPoints(data, d) < cardPoints(data, def(id)))
+        .sort((a, b) => value(b) - value(a));
+      const pick = cheaper.find((d) => (d.type === 'attack') === (def(id).type === 'attack')) ?? cheaper[0];
+      if (!pick) continue;
+      out[out.indexOf(id)] = pick.id;
+      swapped = true;
+      break;
+    }
+    if (!swapped) break;
+  }
+  return out;
+}
+
 /**
  * 추천 편성(한 주인): 점수 높은 카드부터, 공격과 그 밖(방어·기술·심법)이 한쪽으로 쏠리지 않게
  * (칸의 3/8 이상은 공격, 1/4 이상은 공격 아닌 카드 — 가진 카드가 허락하는 만큼).
@@ -79,7 +134,7 @@ export function recommendFor(data: GameData, run: Pick<RunState, 'collection'>, 
     pick.add(d.id);
   }
   // 정렬 순서(점수 높은 순)로 돌려준다
-  return sorted.filter((d) => pick.has(d.id)).slice(0, n).map((d) => d.id);
+  return fitCap(data, run, owner, sorted.filter((d) => pick.has(d.id)).slice(0, n).map((d) => d.id), value);
 }
 
 /** 추천 편성(모든 주인). keep: 이미 고른 편성 중 유효한 것은 남기고 모자란 칸만 채운다 */
@@ -90,7 +145,10 @@ export function recommendLoadout(data: GameData, run: Pick<RunState, 'collection
     const valid = new Set(choosable(data, run, owner).map((d) => d.id));
     const kept = [...new Set((keep?.[owner] ?? []).filter((id) => valid.has(id)))].slice(0, n);
     const fill = recommendFor(data, run, owner).filter((id) => !kept.includes(id));
-    out[owner] = [...kept, ...fill].slice(0, n);
+    const focus = focusArchetype(data, run, owner);
+    const value = (d: CardDef) => score(data, run, d) + (focus && d.tags.includes(focus) ? FOCUS_BONUS : 0);
+    // 지킨 카드와 채운 카드를 합쳐 점수 상한에 맞춘다(넘으면 채운 카드부터 싼 것으로)
+    out[owner] = fitCap(data, run, owner, [...kept, ...fill].slice(0, n), value, new Set(kept));
   }
   return out;
 }
@@ -107,6 +165,8 @@ export function loadoutProblems(data: GameData, run: Pick<RunState, 'collection'
     const bad = ids.filter((id) => !valid.has(id));
     if (bad.length) problems.push(`${name}: 고를 수 없는 카드 ${bad.join(', ')}`);
     if (ids.length !== need) problems.push(`${name}: ${need}장을 골라야 한다(지금 ${ids.length}장)`);
+    const pts = loadoutPoints(data, ids);
+    if (pts > capFor(data, owner)) problems.push(`${name} 편성 ${pts}점 — 상한 ${capFor(data, owner)}`);
   }
   return problems;
 }
@@ -137,6 +197,15 @@ export function setLoadout(data: GameData, run: RunState, loadout: Loadout): voi
   if (problems.length) throw new Error(problems.join('\n'));
   run.loadout = structuredClone(loadout);
   run.needsLoadout = false;
+  // 갈래 보너스는 출발 편성으로 정한다(스테이지 중에 얻은 카드는 세지 않는다)
+  run.loadoutFocus = Object.fromEntries(
+    loadoutOwners(data, run)
+      .filter((o) => o !== COMMON)
+      .flatMap((o) => {
+        const f = loadoutFocus(data, o, loadout[o] ?? []);
+        return f ? [[o, f]] : [];
+      }),
+  );
   buildStageDeck(data, run);
 }
 
