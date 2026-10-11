@@ -324,17 +324,19 @@ function decideReward(data: GameData, run: RunState, options: string[], opts: Bo
   if (!best) return undefined;
   const value = worth(data.cards.get(best)!);
   // 얻은 카드는 보유 목록에 영구로 남는다(GAME_DESIGN 9-1): 희귀 이상(값이 기준 이상)이 먼저,
-  // 없으면 그 주인이 모으는 갈래(아키타입) 태그가 맞는 카드 — 일반·고급도 갈래를 채우러 고른다(카드 250장 확장)
+  // 없으면 아직 없는 카드 중 그 주인이 모으는 갈래(아키타입) 태그가 맞는 카드(공용 카드는 일행 누구의 갈래든) —
+  // 그것도 없으면 갈래 태그가 없는 잇는 카드(어느 갈래에도 들어간다). 다른 갈래의 일반·고급은 넘긴다(카드 250장 확장)
   if (value < opts.minRewardValue) {
     if (isAbyss(run)) return undefined;
-    const match = [...options]
-      .filter((id) => {
-        const def = data.cards.get(id)!;
-        const focus = data.characters.has(def.owner) ? focusArchetype(data, run, def.owner) : null;
-        return !!focus && def.tags.includes(focus) && !(id in run.collection);
-      })
-      .sort((a, b) => score(b) - score(a))[0];
-    return match;
+    const partyFocus = new Set(run.roster.map((r) => focusArchetype(data, run, r.id)).filter((f): f is string => !!f));
+    const fresh = options.filter((id) => !(id in run.collection)).sort((a, b) => score(b) - score(a));
+    const fits = (id: string) => {
+      const def = data.cards.get(id)!;
+      if (!data.characters.has(def.owner)) return def.tags.some((t) => partyFocus.has(t));
+      const focus = focusArchetype(data, run, def.owner);
+      return !!focus && def.tags.includes(focus);
+    };
+    return fresh.find(fits) ?? fresh.find((id) => data.cards.get(id)!.tags.length === 0 && data.cards.get(id)!.type !== 'status');
   }
   // 심연: 덱에 바로 들어가므로 25장이 넘으면 영웅 이상만
   if (isAbyss(run) && run.deck.length >= 25 && value < RARITY_VALUE.epic) return undefined;
