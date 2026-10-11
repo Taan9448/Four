@@ -683,12 +683,34 @@ h1, h2, h3 { font-family: var(--f-head); }
 .cpx-name .card-level { color: inherit; opacity: 0.85; }
 img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 32px; height: 32px; image-rendering: pixelated; pointer-events: none; }
 .card-px .gem.cpx-rarity { z-index: 2; left: 59px; top: 96px; right: auto; }
-.cpx-text { position: absolute; z-index: 2; left: 14px; top: 110px; width: 100px; height: 62px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-align: center; white-space: pre-line; font-size: 10px; line-height: 1.25; color: #231d15; }
+.cpx-text { position: absolute; z-index: 2; left: 14px; top: 110px; width: 100px; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden; text-align: center; white-space: pre-line; font-size: 10px; line-height: 1.25; color: #231d15; }
+.cpx-text { justify-content: safe center; }
+.cpx-text.cpx-has-kw { padding-top: 4px; }
+.cpx-text .card-body { width: 100%; }
+/* 강화 +4·+5로 열린 특수 스킬: 금빛 점선 아래 따로 한 줄(본문과 섞지 않는다) */
+.card-skill { width: 100%; padding-top: 1px; border-top: 1px dashed rgba(184, 116, 26, 0.7); font-size: 0.92em; line-height: 1.2; color: #5a3a08; }
+.card-skill b { color: #9a5d0c; }
+.t-elheim:not(.card-px) .card-skill, .t-status:not(.card-px) .card-skill { color: #ffe2a8; border-top-color: rgba(255, 213, 138, 0.6); }
+.t-elheim:not(.card-px) .card-skill b, .t-status:not(.card-px) .card-skill b { color: #ffd58a; }
+.t-elheim .cpx-text .card-skill { color: #3a2a08; }
+/* 키워드 배지(소멸·융합·유지·선천·실): 본문 대신 따로. 픽셀 카드는 글 칸 위 테두리에 걸친다 */
+.cpx-kws { position: absolute; z-index: 3; top: 103px; display: flex; gap: 2px; pointer-events: none; }
+.cpx-kws-l { left: 16px; }
+.cpx-kws-r { right: 16px; }
+.card-kws { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; margin-bottom: 2px; }
+.kw { display: inline-block; padding: 0 4px; border: 1px solid #0b0b10; border-radius: 3px; font-size: 7.5px; line-height: 10px; font-weight: 800; color: #fff; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); background: #5d6478; white-space: nowrap; }
+.card:not(.card-px) .kw { font-size: 0.62rem; line-height: 1.35; }
+.kw-exhaust { background: #5d6478; }
+.kw-fusion { background: linear-gradient(90deg, #b8741a 50%, #3a6ea5 50%); }
+.kw-retain { background: #2f5a3a; }
+.kw-innate { background: #4b3a6b; }
+.kw-thread { background: #a02634; }
+.kw-unplayable { background: #2b2b3a; }
 .cpx-text-m { font-size: 9px; }
 .cpx-text-s { font-size: 8.5px; line-height: 1.2; }
 .cpx-text-xs { font-size: 7.5px; line-height: 1.18; letter-spacing: -0.02em; }
 .t-elheim .cpx-text { color: #1d2433; }
-.cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; overflow: hidden; white-space: nowrap; text-align: center; font-size: 7.5px; line-height: 12px; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
+.cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; text-align: center; font-size: 7.5px; line-height: 1; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
 .card-px.t-status .cpx-frame { filter: grayscale(0.85) brightness(0.72); }
 
 /* 영웅·전설 컷인 */
@@ -1184,6 +1206,9 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .zoom-card { width: 230px; display: flex; justify-content: center; }
 .zoom-card .card { width: 230px; min-height: 324px; padding: 14px 14px 10px; gap: 6px; font-size: 1.15rem; cursor: default; }
 .zoom-card .card:hover { transform: none; }
+/* 픽셀 카드는 2배로(그림 픽셀이 고르게) */
+.zoom-card:has(.card-px) { width: auto; }
+.zoom-card .card.card-px { width: 128px; height: 192px; min-height: 0; padding: 0; zoom: 2; }
 .zoom-card .card .card-name { font-size: 1.25rem; }
 .zoom-card .card .card-text { font-size: 1rem; line-height: 1.5; }
 .zoom-card .card .card-flavor { font-size: 0.85rem; }

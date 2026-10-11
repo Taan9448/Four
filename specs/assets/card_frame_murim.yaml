@@ -10,6 +10,8 @@ layout:
   rarity: [64, 101]
   text: [12, 108, 104, 66]
   plaque: [32, 178, 64, 12]
+# 납품된 그림(2026-10-11 머지)에서 잰 글 자리 [x, y, 너비, 높이] — 그 뒤에 자른 그림은 meta.json slots를 쓴다(tools/build-manifest.mjs)
+slots: { name: [10, 81, 108, 15], text: [13, 110, 102, 57], plaque: [34, 174, 60, 12] }
 window_shape: >-
   a round moon gate: the top is a half circle and the sides run straight down to a flat bottom, like the round opening of an
   East Asian garden wall

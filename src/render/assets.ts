@@ -19,6 +19,8 @@ export interface SpriteMeta {
   placeholder?: boolean;
   /** 카드 틀: 그림 창(안쪽 투명 구멍)의 자리 [x, y, 너비, 높이] */
   window?: [number, number, number, number] | null;
+  /** 카드 틀: 글 자리(이름 띠·글 칸·종류 판)의 실제 면 [x, y, 너비, 높이] */
+  slots?: Partial<Record<'name' | 'text' | 'plaque', [number, number, number, number]>> | null;
 }
 
 export interface SpriteAsset {

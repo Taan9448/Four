@@ -1,7 +1,7 @@
 // 카드 한 장의 DOM. 틀은 출신 세계로 나눈다(GAME_DESIGN 13절): 무공(한지·먹·낙관) / 마법(엘하임: 청색 양피지·은테·마법진) / 융합(내공+마나).
 import type { GameData } from '../engine/data';
 import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../engine/state';
-import { cardGlossary, cardText } from '../engine/text';
+import { cardGlossary, cardTextParts, type CardTextParts } from '../engine/text';
 import { acquirePreview } from '../engine/collection';
 import type { RunState } from '../engine/run';
 import { frameUrl, spriteMeta } from '../render/assets';
@@ -50,7 +50,7 @@ export function cardView(data: GameData, inst: CardInstance | string, opts: { di
     h('div', { class: 'card-cost', 'aria-label': `내공 ${card.cost.neigong} 마나 ${card.cost.mana}` }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), zero ? h('span', { class: 'pip-zero' }, '0') : null),
     h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
-    h('div', { class: 'card-text', ...glossaryTip(data, inst) }, cardText(data, inst)),
+    h('div', { class: 'card-text', ...glossaryTip(data, inst) }, ...textBlocks(cardTextParts(data, inst))),
     def.flavor ? h('div', { class: 'card-flavor' }, def.flavor) : null,
     world === 'murim' ? h('span', { class: 'seal', 'aria-hidden': 'true' }, def.seal ?? SEAL_BY_TYPE[def.type] ?? '武') : null,
     world === 'elheim' ? h('span', { class: 'circle', 'aria-hidden': 'true' }) : null,
@@ -90,8 +90,12 @@ function pixelCardView(
       String(n),
     );
   };
-  const text = cardText(data, inst);
-  const textSize = text.length > 72 ? ' cpx-text-xs' : text.length > 54 ? ' cpx-text-s' : text.length > 36 ? ' cpx-text-m' : '';
+  const parts = cardTextParts(data, inst);
+  // 글씨 크기: 본문과 특수 스킬을 합친 길이로(특수 스킬 줄은 한 줄 몫을 더 친다)
+  const len = parts.body.length + parts.skills.reduce((a, sk) => a + sk.name.length + sk.text.length + 10, 0);
+  const textSize = len > 72 ? ' cpx-text-xs' : len > 54 ? ' cpx-text-s' : len > 36 ? ' cpx-text-m' : '';
+  const slots = spriteMeta(FRAME_ID[world])?.slots;
+  const at = (b: number[] | undefined, pad = 0) => (b ? `left:${b[0] + pad}px;top:${b[1] + pad}px;width:${b[2] - pad * 2}px;height:${b[3] - pad * 2}px` : '');
   const name = def.name + (card.level ? ` +${card.level}` : '');
   const nameSize = name.length > 9 ? ' cpx-name-s' : name.length > 7 ? ' cpx-name-m' : '';
   const rarityUrl = def.rarity !== 'special' ? gem(def.rarity) : null;
@@ -106,11 +110,41 @@ function pixelCardView(
     h('div', { class: 'cpx-art', style: `left:${wx - 2}px;top:${wy - 2}px;width:${ww + 4}px;height:${wh + 4}px`, 'aria-hidden': 'true' }, h('span', { class: 'cpx-seal' }, seal)),
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     ...costs.map(costEl),
-    h('div', { class: `cpx-name${nameSize}` }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
+    h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
     rarityUrl ? h('img', { class: 'cpx-rarity', src: rarityUrl, alt: RARITY_LABEL[def.rarity] ?? '' }) : def.rarity !== 'special' ? h('span', { class: `cpx-rarity gem gem-${def.rarity}`, 'aria-label': RARITY_LABEL[def.rarity] }) : null,
-    h('div', { class: `cpx-text${textSize}`, ...glossaryTip(data, inst) }, text),
-    h('div', { class: 'cpx-plaque' }, `${owner?.name ?? (def.owner === 'status' ? '상태' : '공용')} · ${TYPE_LABEL[def.type] ?? ''}`),
+    // 키워드(소멸·융합 등)는 글 칸 위 테두리에 걸친 배지로, 본문에는 넣지 않는다
+    // 왼쪽에 두 개까지, 넘치면 오른쪽(가운데는 등급 보석 자리)
+    ...[parts.keywords.slice(0, 2), parts.keywords.slice(2)].map((list, i) =>
+      list.length ? h('div', { class: `cpx-kws cpx-kws-${i ? 'r' : 'l'}`, style: slots?.text ? `top:${slots.text[1] - 5}px` : '' }, ...list.map((k) => h('span', { class: `kw kw-${k.key}` }, k.label))) : null,
+    ),
+    fitText(h('div', { class: `cpx-text${textSize}${parts.keywords.length ? ' cpx-has-kw' : ''}`, style: at(slots?.text, 2), ...glossaryTip(data, inst) }, ...textBlocks(parts, true))),
+    h('div', { class: 'cpx-plaque', style: at(slots?.plaque) }, `${owner?.name ?? (def.owner === 'status' ? '상태' : '공용')} · ${TYPE_LABEL[def.type] ?? ''}`),
   );
+}
+
+/** 글 칸에 넘치면 글씨를 0.5px씩 줄인다(화면에 붙은 뒤 한 번. 길이로 고른 크기에서 시작) */
+function fitText(el: HTMLElement): HTMLElement {
+  requestAnimationFrame(() => {
+    if (!el.isConnected) return;
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollHeight > el.clientHeight + 1 && size > 6.5) {
+      size -= 0.5;
+      el.style.fontSize = `${size}px`;
+    }
+  });
+  return el;
+}
+
+/**
+ * 카드 글: 본문과 강화로 열린 특수 스킬(★, 금빛 줄로 따로). pixel이 아니면(CSS 틀) 키워드 배지도 글 위에 붙인다
+ */
+function textBlocks(parts: CardTextParts, pixel = false): HTMLElement[] {
+  const out: (HTMLElement | null)[] = [
+    !pixel && parts.keywords.length ? h('div', { class: 'card-kws' }, ...parts.keywords.map((k) => h('span', { class: `kw kw-${k.key}` }, k.label))) : null,
+    parts.body ? h('div', { class: 'card-body' }, parts.body) : null,
+    ...parts.skills.map((sk) => h('div', { class: 'card-skill' }, h('b', {}, `★${sk.name}`), h('span', {}, ` ${sk.text}`))),
+  ];
+  return out.filter((x): x is HTMLElement => !!x);
 }
 
 /** 카드 글 위에 마우스를 올리면 용어 풀이(키워드·상태·속성) */

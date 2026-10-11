@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { bbox, cellRect, columnCenter, dropEdgeSlivers, extract, fileHash, innerHole, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
+import { bbox, cellRect, columnCenter, dropEdgeSlivers, extract, faceSlots, fileHash, innerHole, keyOut, prepareSheet, shiftX, shiftXY, toPng } from './lib/image.mjs';
 import { cellHasContent, processPixelSheet } from './lib/pixel.mjs';
 import { loadSpec, paths, ROOT } from './lib/specs.mjs';
 import { paletteFor } from './lib/style.mjs';
@@ -38,7 +38,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
   } else frameCells = Array.from({ length: spec.frames }, (_, i) => i + 1);
 
   const fileOf = (i) => join(outDir, `frame_${String(i + 1).padStart(2, '0')}.png`);
-  let grid = null, puritySum = 0, natives = [], fits = new Set(), artWindow = null;
+  let grid = null, puritySum = 0, natives = [], fits = new Set(), artWindow = null, slots = null;
   if (illustration) {
     for (const [i, n] of frameCells.entries()) {
       // 일러스트: 픽셀화 없이 게임용 출력 크기로만 줄인다
@@ -84,6 +84,8 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
       if (spec.type === 'card-frame' && i === 0) {
         const hole = innerHole(f.img);
         artWindow = hole && [hole.x, hole.y, hole.w, hole.h];
+        // 글 자리(이름 띠·글 칸·종류 판)의 실제 면: 게임이 글을 그 가운데에 얹는다
+        slots = spec.layout ? faceSlots(f.img, spec.layout) : null;
       }
       writeFileSync(fileOf(i), await toPng(f.img));
     }
@@ -117,7 +119,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     sourceSize: sheet.original,
     /** 픽셀 격자 일치도(1에 가까울수록 깨끗한 픽셀 아트) */
     gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
-    ...(spec.type === 'card-frame' ? { window: artWindow } : {}),
+    ...(spec.type === 'card-frame' ? { window: artWindow, slots } : {}),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;

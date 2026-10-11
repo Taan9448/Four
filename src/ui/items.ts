@@ -2,16 +2,13 @@
 import type { GameData } from '../engine/data';
 import { h } from './dom';
 import { tipAttrs } from './tooltip';
-import { iconEl } from './icons';
+import { sheetIconEl } from './icons';
 import { openOverlay } from './overlay';
 
 /** 아이콘 번호 → 시트: [시트 id, 첫 번호]. 번호가 첫 번호 이상인 마지막 시트의 (icon - 첫 번호 + 1)칸 */
-const RELIC_SHEETS: [string, number][] = [['icons_relics', 1], ['icons_relics_b', 17], ['icons_relics_c', 25], ['icons_relics_d', 41], ['icons_relics_e', 57]];
+const RELIC_SHEETS: [string, number][] = [['icons_relics', 1], ['icons_relics_b', 17], ['icons_relics_c', 25], ['icons_relics_d', 41], ['icons_relics_e', 57], ['icons_relics_f', 65]];
 const POTION_SHEETS: [string, number][] = [['icons_potions', 1], ['icons_potions_b', 14]];
-const sheetIcon = (sheets: [string, number][], icon: number | undefined, glyph: string) => {
-  const [id, first] = [...sheets].reverse().find(([, f]) => (icon ?? 0) >= f) ?? sheets[0];
-  return iconEl(id, icon ? icon - first + 1 : undefined, glyph, 'item-icon');
-};
+const sheetIcon = (sheets: [string, number][], icon: number | undefined, glyph: string) => sheetIconEl(sheets, icon, glyph, 'item-icon');
 const relicIcon = (icon: number | undefined, glyph: string) => sheetIcon(RELIC_SHEETS, icon, glyph);
 
 const RELIC_RARITY: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', boss: '보스' };

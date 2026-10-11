@@ -5,7 +5,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { listSpecIds, paths, ROOT } from './lib/specs.mjs';
+import { listSpecIds, loadSpec, paths, ROOT } from './lib/specs.mjs';
 
 /** @returns {{ generatedBy: string, assets: Record<string, { source: 'sprites' | 'placeholders', dir: string, meta: any }> }} */
 export function buildManifest(root = ROOT) {
@@ -16,7 +16,10 @@ export function buildManifest(root = ROOT) {
     for (const [source, dir] of [['sprites', p.sprites(id)], ['placeholders', p.placeholders(id)]]) {
       const metaPath = join(dir, 'meta.json');
       if (!existsSync(metaPath)) continue;
-      assets[id] = { source, dir: `assets/${source}/${id}`, meta: JSON.parse(readFileSync(metaPath, 'utf8')) };
+      const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
+      // 카드 틀: 글 자리를 재기 전에 자른 그림은 명세에 잰 값(slots)을 쓴다
+      if (meta.type === 'card-frame' && !meta.slots) meta.slots = loadSpec(id, root).slots ?? null;
+      assets[id] = { source, dir: `assets/${source}/${id}`, meta };
       break;
     }
   }

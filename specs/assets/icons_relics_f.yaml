@@ -1,0 +1,14 @@
+id: icons_relics_f
+type: icon-sheet
+summary: 유물 아이콘 65~70(심연의 길 6종) — 칸 n = 유물 icon n+64
+# 칸 번호 = data/relics.json의 icon에서 64를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: "woodcutter's path — a small woodcutter's axe stuck in a log showing clear wood grain, a tiny dawn sun behind"
+  2: "river's path — a winding blue river ribbon flowing down toward a wave, small light motes above"
+  3: "mountain's path — a green-grey mountain peak with a red heart-shaped stone at its foot"
+  4: "debt's path — a small pouch of gold coins tied with a black thread to a dark faceless shadow hand"
+  5: "needle's path — a single silver needle with a thread trailing into a neat stitch"
+  6: "shadow's path — a dark road splitting into many faint paths, a single eye-shaped glint at the end"
+placeholder: { color: '#8a90a3', accent: '#4b3a6b' }

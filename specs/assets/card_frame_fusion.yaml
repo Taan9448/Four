@@ -11,6 +11,8 @@ layout:
   rarity: [64, 101]
   text: [12, 108, 104, 66]
   plaque: [32, 178, 64, 12]
+# 납품된 그림(2026-10-11 머지)에서 잰 글 자리 [x, y, 너비, 높이] — 그 뒤에 자른 그림은 meta.json slots를 쓴다(tools/build-manifest.mjs)
+slots: { name: [8, 81, 112, 13], text: [13, 109, 102, 56], plaque: [33, 172, 62, 11] }
 window_shape: an upright oval with a flat bottom
 banner: a deep indigo ribbon (#1d2433, #1f3f73) edged with gold (#f2a93b, #ffe08a) and with gold-capped ends
 text_panel: warm off-white hanji paper (#f1efe6, #e0cfae), the same on both halves
