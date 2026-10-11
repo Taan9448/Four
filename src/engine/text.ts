@@ -198,6 +198,8 @@ export function cardGlossary(data: GameData, inst: CardInstance | string): strin
   const out: string[] = [];
   for (const k of card.keywords) if (KEYWORD_HELP[k]) out.push(KEYWORD_HELP[k]);
   if (card.def.type === 'power') out.push('심법 — 한 번 쓰면 소멸하고, 지속 효과가 전투가 끝날 때까지 남는다.');
+  // 무공 카드의 낙관(그림이 없을 때 그림 창, 옛 틀의 오른쪽 아래): 종류 표시(2026-10-11 UI/UX 4-3)
+  if (card.def.owner === 'haun' || card.def.owner === 'common') out.push('낙관 — 武 공격 · 技 기술 · 心 심법. 카드 종류를 붓 도장으로 찍은 것.');
   const statuses = new Set<string>();
   const elements = new Set<string>();
   for (const e of card.effects) {

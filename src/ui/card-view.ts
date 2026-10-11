@@ -34,6 +34,9 @@ export function cardWorld(card: ResolvedCard): CardWorld {
  * flavor(2026-10-11 UI/UX 1단계): 플레이버 글은 카드를 크게 볼 때만 — 'hover' 손패(올리거나 고르면 카드 위에) · 'full' 크게 보기(도감·상세).
  * 없으면(목록·편성·상점·보상 = compact) 그리지 않는다. 카드 틀 높이는 그대로
  */
+/** 색각 보정의 등급 모양(일반 ◇ 고급 △ 희귀 ○ 영웅 ☆ 전설 ✦) */
+const RARITY_SHAPE: Record<string, string> = { common: '◇', uncommon: '△', rare: '○', epic: '☆', legendary: '✦' };
+
 export interface CardViewOpts {
   disabled?: string;
   selected?: boolean;
@@ -133,6 +136,8 @@ function pixelCardView(
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
+    // 색각 보정: 등급 보석 위에 모양(설정에서 켤 때만 보인다)
+    def.rarity !== 'special' ? h('span', { class: 'cpx-rshape', 'aria-hidden': 'true' }, RARITY_SHAPE[def.rarity] ?? '') : null,
     rarityUrl ? h('img', { class: 'cpx-rarity', src: rarityUrl, alt: RARITY_LABEL[def.rarity] ?? '' }) : def.rarity !== 'special' ? h('span', { class: `cpx-rarity gem gem-${def.rarity}`, 'aria-label': RARITY_LABEL[def.rarity] }) : null,
     // 키워드(소멸·융합 등)는 글 칸 위 테두리에 걸친 배지로, 본문에는 넣지 않는다
     // 왼쪽에 두 개까지, 넘치면 오른쪽(가운데는 등급 보석 자리)
