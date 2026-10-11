@@ -19,7 +19,14 @@ function show(el: HTMLElement): void {
   t.replaceChildren();
   const title = el.dataset.tipTitle;
   if (title) t.appendChild(h('b', { class: `tooltip-title${el.dataset.tipKind ? ` tip-${el.dataset.tipKind}` : ''}` }, title));
-  for (const line of (el.dataset.tip ?? '').split('\n')) if (line) t.appendChild(h('span', {}, line));
+  // 줄 표시: '---' 나눔 선 · '## ' 작은 머리말 · '★' 특수 스킬(금빛)
+  for (const line of (el.dataset.tip ?? '').split('\n')) {
+    if (!line) continue;
+    if (line === '---') t.appendChild(h('i', { class: 'tip-sep', 'aria-hidden': 'true' }));
+    else if (line.startsWith('## ')) t.appendChild(h('span', { class: 'tip-head' }, line.slice(3)));
+    else t.appendChild(h('span', { class: line.startsWith('★') ? 'tip-skill' : '' }, line));
+  }
+  t.classList.toggle('wide', el.dataset.tipKind === 'card');
   t.classList.add('on');
   // 대상 위쪽 가운데, 화면 밖으로 나가면 안쪽으로
   const r = el.getBoundingClientRect();

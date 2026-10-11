@@ -687,6 +687,11 @@ h1, h2, h3 { font-family: var(--f-head); }
 .tooltip { position: fixed; z-index: 90; max-width: 260px; display: flex; flex-direction: column; gap: 3px; padding: 8px 11px; border-radius: 8px; background: rgba(12, 14, 20, 0.96); border: 1px solid var(--line-glass); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55); font-size: var(--fs-cap); line-height: 1.5; color: var(--ink); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity 0.12s, transform 0.12s; }
 .tooltip.on { opacity: 1; transform: none; }
 .tooltip-title { font-family: var(--f-head); font-size: var(--fs-body); }
+/* 카드 설명 주석(2026-10-11): 전체 설명 → 나눔 선 → 용어 */
+.tooltip.wide { max-width: 320px; }
+.tooltip .tip-skill { color: #f2d48f; }
+.tooltip .tip-head { margin-top: 1px; font-size: var(--fs-min); letter-spacing: 0.2em; color: var(--ink-dim); }
+.tooltip .tip-sep { display: block; height: 1px; margin: 4px 0 2px; background: linear-gradient(90deg, transparent, rgba(201, 162, 74, 0.6), transparent); }
 .tooltip span { color: #cfcabe; }
 .tip-debuff, .tip-attack, .tip-rift { color: #ff9a9a; }
 .tip-buff { color: #a8e6b5; }

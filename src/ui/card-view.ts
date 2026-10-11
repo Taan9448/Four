@@ -176,9 +176,21 @@ function textBlocks(parts: CardTextParts, pixel = false): HTMLElement[] {
 }
 
 /** 카드 글 위에 마우스를 올리면 용어 풀이(키워드·상태·속성) */
+/**
+ * 카드 글에 마우스를 올리면: 카드 전체 설명(키워드 · 본문 · 강화로 열린 ★특수 스킬) → 용어 풀이.
+ * +4·+5 특수 스킬이 붙으면 글 칸에 다 담기지 않아 글씨가 작아지므로 여기서 온전히 읽는다(2026-10-11 사용자 요청)
+ */
 function glossaryTip(data: GameData, inst: CardInstance | string): Record<string, string | undefined> {
-  const lines = cardGlossary(data, inst);
-  return lines.length ? tipAttrs('용어', lines.join('\n')) : {};
+  const card = resolveCard(data, inst);
+  const parts = cardTextParts(data, inst);
+  const terms = cardGlossary(data, inst);
+  const lines = [
+    parts.keywords.length ? `[${parts.keywords.map((k) => k.label).join(' · ')}]` : '',
+    ...parts.body.split('\n'),
+    ...parts.skills.map((sk) => `★${sk.name}(+${sk.level}) ${sk.text}`),
+    ...(terms.length ? ['---', '## 용어', ...terms] : []),
+  ].filter(Boolean);
+  return tipAttrs(`${card.def.name}${card.level ? ` +${card.level}` : ''}`, lines.join('\n'), 'card');
 }
 
 /**
