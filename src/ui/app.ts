@@ -19,6 +19,8 @@ import {
   finishReplay,
   restoreParty,
   startReplay,
+  stageGainsSummary,
+  markStageStart,
   suspendReplay,
   type Difficulty,
   gainXp,
@@ -47,6 +49,9 @@ import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, settingsForm } from './settings';
 import { titleStage } from './title-fx';
+import { runTour } from './tour';
+import { iconEl } from './icons';
+import { loadPortrait } from '../render/portrait';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
   campaignCollection,
@@ -86,6 +91,7 @@ import {
   riftCards,
   unlockedPaths,
   unlockedRift,
+  planLoop,
   unlockName,
   updateAbyssMeta,
   WORLD_NAME,
@@ -213,6 +219,12 @@ export class App {
         return this.playScene(id ?? [...data.scenes.keys()][0], () => this.map());
       case 'clear':
         run.status = 'stage_clear';
+        // 끝 화면의 '얻은 것'이 보이게: 이번 스테이지에 카드 2장·유물 1개·레벨업·상흔 +2
+        markStageStart(run);
+        run.stageGains.push(...rewardOptions(data, run, first.id).slice(0, 2));
+        run.relics.push([...data.relics.values()].find((r) => r.rarity === 'common' && !run.relics.includes(r.id))!.id);
+        run.roster[0].level += 1;
+        run.scar += 2;
         return this.stageClear();
       case 'win':
       case 'lose':
@@ -718,6 +730,16 @@ export class App {
         }),
       ),
     );
+    // 처음 여는 편성 화면(새 캠페인은 S1 출발 전)에서 한 번: 편성이란(2026-10-11 UI/UX 2-1)
+    if (!inn)
+      runTour(
+        [
+          { target: '.loadout-tabs', title: '편성이란', text: `동료마다 ${data.balance.loadout.perCharacter}장 + 공용 ${data.balance.loadout.common}장을 보유 카드에서 골라 이번 스테이지의 덱을 짠다. 탭에는 채운 수와 갈래(아키타입)별 장수.` },
+          { target: '.loadout-grid', title: '카드 고르기', text: '누르면 넣고, 다시 누르면 뺀다. 같은 카드는 한 장만.' },
+          { target: '.loadout-actions', title: '추천을 눌러도 된다', text: '"전체 추천 편성"이 알아서 채운다. 다음 스테이지부터는 "지난 편성 그대로 출발" 한 번이면 된다.' },
+        ],
+        { id: 'loadout', once: true },
+      );
   }
 
   /** 보상으로 본 카드도 도감에 */
@@ -830,6 +852,38 @@ export class App {
     );
   }
 
+  /** 스테이지·굽이 끝 화면의 '얻은 것' 표: 카드 · 유물 · 레벨업(없으면 null) */
+  private stageGainsEl(run: RunState): HTMLElement | null {
+    const g = stageGainsSummary(data, run);
+    const rows: [string, string][] = [
+      ['카드', g.cards.join(' · ')],
+      ['유물', g.relics.join(' · ')],
+      ['레벨', g.levels.map((l) => `${l.name} ${l.from} → ${l.to}`).join(' · ')],
+    ];
+    const shown = rows.filter(([, v]) => v);
+    if (!shown.length) return null;
+    return h('dl', { class: 'stage-gains' }, shown.flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)]));
+  }
+
+  /** 심연 굽이 끝: 다음 굽이에 걸릴 법칙(없으면 null) */
+  private nextLawsEl(run: RunState): HTMLElement | null {
+    const ab = run.abyss!;
+    const laws = planLoop(data, ab, ab.depth + 1).laws.map((id) => data.laws.get(id)).filter((l): l is NonNullable<typeof l> => !!l);
+    if (!laws.length) return h('p', { class: 'next-laws' }, '다음 굽이에는 법칙이 걸리지 않는다.');
+    return h(
+      'div',
+      { class: 'next-laws' },
+      h('span', {}, '다음 굽이의 법칙'),
+      h('div', { class: 'law-badges' }, laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name))),
+    );
+  }
+
+  /** "이번 스테이지 상흔 +N → " */
+  private scarDeltaText(run: RunState): string {
+    const d = stageGainsSummary(data, run).scarDelta;
+    return d ? `이번에 상흔 ${d > 0 ? '+' : ''}${d} → ` : '';
+  }
+
   /** 보스를 넘은 뒤: 보스 모듈의 장면 글(outro)을 보여 주고 다음 스테이지로 */
   private stageClear(): void {
     const run = this.run!;
@@ -853,13 +907,15 @@ export class App {
             h('div', { class: 'end-sub' }, '— 끝 —'),
             outro ? h('p', { class: 'outro' }, outro) : null,
             this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
+            // 이번 스테이지에 얻은 것(카드·유물·레벨업, 2026-10-11 UI/UX 3-2)
+            this.stageGainsEl(run),
             news,
             run.scar > 0
               ? h(
                   'p',
                   { class: 'scar-reveal' },
                   // '하늘의 금'을 보기 전에는 그 말을 쓰지 않는다(GAME_DESIGN 14절)
-                  run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`,
+                  `${this.scarDeltaText(run)}${run.flags.includes('sky_crack') ? `지금까지 쌓인 상흔 ${run.scar} — 하늘의 금이 그만큼 벌어졌다.` : `엉킨 흐름이 남긴 상흔 ${run.scar}.`}`,
                 )
               : null,
             h(
@@ -912,6 +968,17 @@ export class App {
     // 서약 목록은 열린 단계와 다음 한 단계만, 나머지 잠긴 단계는 접어 둔다(문을 넘는 단추가 위로 오게)
     let showAllOaths = false;
     const hiddenOaths = () => data.oaths.filter((o) => o.level > maxOath + 1).length;
+    // 동료 반신 그림은 한 번만 불러 두고 다시 그릴 때 그대로 쓴다
+    const faces = new Map<string, HTMLElement>();
+    const mateFace = (id: string) => {
+      let el = faces.get(id);
+      if (!el) {
+        const box = h('span', { class: 'abyss-mate-pic', 'aria-hidden': 'true' });
+        void loadPortrait(id).then((img) => img && box.replaceChildren(h('img', { src: img.src, alt: '' })));
+        faces.set(id, (el = box));
+      }
+      return el;
+    };
     const render = () => {
       const mods = oathMods(data, oath);
       const mateMax = Math.min(fighters.length, mods.maxMates ?? fighters.length);
@@ -944,6 +1011,8 @@ export class App {
                   render();
                 },
               }),
+              // 반신 그림(2026-10-11 UI/UX 3-4)
+              mateFace(c.id),
               h('b', {}, c.name),
               h('small', {}, `${c.archetypes.map((a) => a.name).join(' · ')} — 심연 풀 ${counts[c.id] ?? 0}장`),
               (counts[c.id] ?? 0) < data.balance.abyss.narrowPool
@@ -1004,7 +1073,11 @@ export class App {
           data.oaths.filter((o) => showAllOaths || o.level <= Math.max(oath, maxOath) + 1).map((o) =>
             h(
               'li',
-              { class: o.level <= oath ? 'on' : o.level > maxOath ? 'locked' : '' },
+              {
+                class: o.level <= oath ? 'on' : o.level > maxOath ? 'locked' : 'pickable',
+                // 열린 단계는 줄 전체를 눌러 고른다(같은 단계를 다시 누르면 한 단계 아래로)
+                onclick: o.level <= maxOath ? () => ((oath = oath === o.level ? o.level - 1 : o.level), render()) : undefined,
+              },
               h('span', { class: 'abyss-oath-glyph' }, o.glyph),
               h('b', {}, o.level > maxOath ? `${o.level}단계 — 잠김` : `${o.level}. ${o.name}`),
               h('small', {}, o.level > maxOath ? (o.level === maxOath + 1 ? `${o.level + data.balance.abyss.oath.depthOffset}굽이를 넘거나, 서약 ${o.level - 1}단계로 ${data.balance.abyss.oath.stepDepth}굽이를 넘으면 열린다` : '') : o.description),
@@ -1128,7 +1201,10 @@ export class App {
             h('p', { class: 'outro' }, (ab.depth + 1) % every === 0 ? '다음 굽이 끝에서 익숙한 목소리가 울린다. 숙적이 기다린다.' : '틈은 더 깊이 이어진다. 다음 굽이로 내려가면 상처가 조금 아문다.'),
             unlocks.length ? h('ul', { class: 'gains end-unlock' }, ...unlocks.map((m) => h('li', {}, m))) : null,
             this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
-            h('p', { class: 'hint' }, `점수 ${abyssScore(data, run)} · 보스 ${ab.bosses} · 엘리트 ${ab.elites} · 덱 ${run.deck.length}장 · 상흔 ${run.scar}`),
+            // 스테이지 끝과 같은 틀: 얻은 것 · 상흔 · 다음 굽이의 법칙 예고(2026-10-11 UI/UX 3-2)
+            this.stageGainsEl(run),
+            this.nextLawsEl(run),
+            h('p', { class: 'hint' }, `점수 ${abyssScore(data, run)} · 보스 ${ab.bosses} · 엘리트 ${ab.elites} · 덱 ${run.deck.length}장 · ${this.scarDeltaText(run)}상흔 ${run.scar}`),
             h(
               'button',
               {
@@ -1208,20 +1284,25 @@ export class App {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
     const cell = (label: string, value: string | number) => h('div', { class: 'rs-cell' }, h('b', {}, String(value)), h('small', {}, label));
+    const empty = !st || (st.battles + st.turns + st.kills + st.damage + st.crits + st.surges === 0);
     return h(
       'div',
       { class: 'run-stats panel' },
-      h(
-        'div',
-        { class: 'rs-grid' },
-        cell('전투', st?.battles ?? 0),
-        cell('턴', st?.turns ?? 0),
-        cell('처치', st?.kills ?? 0),
-        cell('준 피해', (st?.damage ?? 0).toLocaleString('ko-KR')),
-        cell('치명타', st?.crits ?? 0),
-        cell('균열 폭주', st?.surges ?? 0),
-      ),
-      !win && st?.deathCause ? h('p', { class: 'rs-death' }, `쓰러진 곳: ${st.deathCause}`) : null,
+      // 맨 위 한 줄: 쓰러진 곳(모듈 — 마지막으로 때린 적·행동)
+      !win && st?.deathCause ? h('p', { class: 'rs-death' }, `쓰러진 곳 — ${st.deathCause}`) : null,
+      empty
+        ? h('p', { class: 'rs-empty hint' }, '기록 없음')
+        : h(
+            'div',
+            { class: 'rs-grid' },
+            cell('전투', st.battles),
+            cell('턴', st.turns),
+            cell('처치', st.kills),
+            cell('준 피해', st.damage.toLocaleString('ko-KR')),
+            cell('치명타', st.crits),
+            cell('균열 폭주', st.surges),
+            cell('폭주로 잃은 체력', st.surgeHp ?? 0),
+          ),
       top.length
         ? h(
             'div',

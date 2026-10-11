@@ -118,6 +118,70 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
   }
 }
 
+/**
+ * 런 단위 동작(RUN_OPS — 사건·휴식·여관·틈의 거래 선택지)의 짧은 요약(2026-10-11 UI/UX 2-4): 선택지 오른쪽 끝에 보인다.
+ * 이야기 표시(set_flag)처럼 보여 줄 것이 없으면 ''
+ */
+export function describeRunEffect(data: GameData, e: Effect): string {
+  const n = e.amount ?? 0;
+  const sign = (x: number) => (x >= 0 ? `+${x}` : `${x}`);
+  const count = e.count ?? 1;
+  const whose = e.filter?.owner ? `${e.filter.owner === 'common' ? '공용' : (data.characters.get(e.filter.owner)?.name ?? e.filter.owner)} ` : '';
+  const kind = e.filter?.costNeigongGte !== undefined ? '내공 ' : '';
+  switch (e.op) {
+    case 'heal_party':
+      if (e.ratio !== undefined) return `체력 ${e.ratio >= 0 ? '+' : ''}${Math.round(e.ratio * 100)}%`;
+      return `체력 ${sign(n)}`;
+    case 'upgrade_card':
+      return e.choose ? `카드 ${count}장 강화(고름)` : `${whose}${kind}카드 ${count}장 무작위 강화`;
+    case 'remove_card':
+      return e.choose ? `카드 ${count}장 빼기(고름)` : `${whose}카드 ${count}장 무작위로 빠짐`;
+    case 'gain_card':
+      return `카드 「${data.cards.get(e.card ?? '')?.name ?? e.card}」${count > 1 ? ` ×${count}` : ''}`;
+    case 'gain_random_card':
+      return `무작위 카드 ${count}장`;
+    case 'swap_card':
+      return '카드 한 장 바꾸기(고름)';
+    case 'sell_card':
+      return `카드 한 장 넘기기 · 골드 +${n}`;
+    case 'gain_gold':
+      return n <= -9999 ? '골드 모두' : `골드 ${sign(n)}`;
+    case 'scar':
+      return n <= -99 ? '상흔 모두 지움' : `상흔 ${sign(n)}`;
+    case 'gain_run_mana':
+      return `마나 ${sign(n)}`;
+    case 'gain_max_hp':
+      return `최대 체력 ${sign(n)}`;
+    case 'gain_relic':
+      return e.relic ? `유물 「${data.relics.get(e.relic)?.name ?? e.relic}」` : '무작위 유물';
+    case 'gain_potion':
+      return `물약 「${data.potions.get(e.potion ?? '')?.name ?? e.potion}」`;
+    case 'gain_potion_slot':
+      return `물약 칸 +${e.amount ?? 1}`;
+    case 'join_party':
+      return `${data.characters.get(e.member ?? '')?.name ?? e.member} 합류`;
+    case 'leave_party':
+      return `${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈`;
+    case 'gain_abyss_card':
+      return '틈의 카드 1장';
+    case 'reveal_unseen_card':
+      return '못 본 카드 하나 엿보기';
+    case 'injure':
+      return '동료 하나 부상';
+    case 'cure_injury':
+      return '부상 치료';
+    default:
+      return '';
+  }
+}
+
+/** 선택지 하나의 요약: 효과들을 " · "로. 운에 맡기는 선택지(outcomes)는 "결과 n가지 중 하나" */
+export function describeChoice(data: GameData, c: { effects: Effect[]; outcomes?: { effects: Effect[] }[] }): string {
+  const parts = c.effects.map((e) => describeRunEffect(data, e)).filter(Boolean);
+  if (c.outcomes?.length) parts.push(`결과 ${c.outcomes.length}가지 중 하나`);
+  return parts.join(' · ');
+}
+
 /** 키워드 풀이(카드 용어 주석) */
 export const KEYWORD_HELP: Record<string, string> = {
   exhaust: '소멸 — 쓰면 이번 전투에서는 덱으로 돌아오지 않는다.',
@@ -134,6 +198,8 @@ export function cardGlossary(data: GameData, inst: CardInstance | string): strin
   const out: string[] = [];
   for (const k of card.keywords) if (KEYWORD_HELP[k]) out.push(KEYWORD_HELP[k]);
   if (card.def.type === 'power') out.push('심법 — 한 번 쓰면 소멸하고, 지속 효과가 전투가 끝날 때까지 남는다.');
+  // 무공 카드의 낙관(그림이 없을 때 그림 창, 옛 틀의 오른쪽 아래): 종류 표시(2026-10-11 UI/UX 4-3)
+  if (card.def.owner === 'haun' || card.def.owner === 'common') out.push('낙관 — 武 공격 · 技 기술 · 心 심법. 카드 종류를 붓 도장으로 찍은 것.');
   const statuses = new Set<string>();
   const elements = new Set<string>();
   for (const e of card.effects) {

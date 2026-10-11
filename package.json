@@ -25,11 +25,13 @@
     "assets:prompt": "node tools/render-prompt.mjs",
     "assets:status": "node tools/asset-status.mjs",
     "assets:manifest": "node tools/build-manifest.mjs",
-    "check:ownership": "node tools/check-ownership.mjs"
+    "check:ownership": "node tools/check-ownership.mjs",
+    "ux:check": "node tools/build-manifest.mjs && node tools/ux-check.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
     "gifenc": "^1.0.3",
+    "playwright-core": "^1.56.1",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",

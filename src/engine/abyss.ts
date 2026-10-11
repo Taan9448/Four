@@ -7,7 +7,7 @@ import { createRng } from './rng';
 import { generateStageMap, type MapNode } from './route';
 import type { EnemyMod } from './effects';
 import type { CardInstance } from './state';
-import { createRun, emptyStats, gainRelic, type RunState } from './run';
+import { createRun, emptyStats, gainRelic, markStageStart, type RunState } from './run';
 import { COMMON, ownerKey } from './collection';
 
 export interface AbyssState {
@@ -319,6 +319,7 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
   for (const p of paths) gainRelic(data, run, p);
   trackTick(data, run);
   beginLoop(data, run, 1);
+  markStageStart(run);
   return run;
 }
 

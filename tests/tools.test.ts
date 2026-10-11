@@ -596,3 +596,38 @@ describe('배포본 WebP 변환(vite-webp)', () => {
     expect(await plugin.load.call(ctx, join(dir, 'assets/placeholders/cg_x/frame_01.png?url'))).toBe('export default "";');
   });
 });
+
+describe('글자 크기 토큰(2026-10-11 UI/UX 개선 1단계)', () => {
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // 가장 안쪽 규칙 { … } 마다(미디어 쿼리 안도)
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({ sel: m[1].trim(), body: m[2] }));
+  const sizes = rules.flatMap((r) =>
+    [...r.body.matchAll(/(?:font-size:\s*([^;]+)|(?<![-\w])font:\s*([^;]+))/g)].map((m) => ({ sel: r.sel, value: (m[1] ?? m[2]).trim() })),
+  );
+
+  it('토큰 다섯 단계가 :root에 있고 가장 작은 것이 0.72rem 이상이다', () => {
+    const root = rules.find((r) => r.sel === ':root' && r.body.includes('--fs-min'))!;
+    for (const t of ['--fs-title', '--fs-body', '--fs-sub', '--fs-cap', '--fs-min']) expect(root.body).toContain(t);
+    expect(Number(/--fs-min:\s*([\d.]+)rem/.exec(root.body)![1])).toBeGreaterThanOrEqual(0.72);
+  });
+
+  it('font-size에 0.72rem 미만 rem이 없고, px는 픽셀 카드 안(카드 격자 단위, × --cpx-zoom)에서 8px 이상만', () => {
+    const bad: string[] = [];
+    for (const { sel, value: raw } of sizes) {
+      // font 줄임꼴의 줄 높이(/16px)는 글자 크기가 아니다
+      const value = raw.replace(/\/\s*[\d.]+(px|rem|em)?/g, '');
+      for (const m of value.matchAll(/(\d*\.?\d+)rem/g)) if (Number(m[1]) < 0.72) bad.push(`${sel}: ${value}`);
+      for (const m of value.matchAll(/(\d*\.?\d+)px/g)) {
+        const pixelCard = /\.cpx-|\.kw\b|\.card-px|\.offer-badge/.test(sel);
+        if (!pixelCard || Number(m[1]) < 8) bad.push(`${sel}: ${value}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('픽셀 카드는 --cpx-zoom(1.15배 이상)으로 키워 카드 안 본문 10px이 11.5px 이상으로 보인다', () => {
+    const zooms = [...css.matchAll(/--cpx-zoom:\s*([\d.]+)/g)].map((m) => Number(m[1]));
+    expect(zooms.length).toBeGreaterThan(0);
+    for (const z of zooms) expect(z * 10).toBeGreaterThanOrEqual(11.5);
+  });
+});
