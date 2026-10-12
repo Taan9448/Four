@@ -20,7 +20,13 @@ export function buildManifest(root = ROOT) {
       // 카드 틀: 글 자리를 재기 전에 자른 그림은 명세에 잰 값(slots)을 쓴다
       if (meta.type === 'card-frame' && !meta.slots) meta.slots = loadSpec(id, root).slots ?? null;
       // 카드 그림: 어느 칸이 어느 카드인지는 늘 명세(cards)를 따른다(다시 자르지 않고 순서를 고칠 수 있게)
-      if (meta.type === 'card-art-sheet') meta.cards = loadSpec(id, root).cards ?? [];
+      if (meta.type === 'card-art-sheet') {
+        const spec = loadSpec(id, root);
+        meta.cards = spec.cards ?? [];
+        // 다시 그림 시트(redraws): 효과가 바뀐 카드의 새 그림. 옛 시트의 같은 카드보다 먼저 쓴다
+        if (spec.redraws) meta.redraws = true;
+        else delete meta.redraws;
+      }
       assets[id] = { source, dir: `assets/${source}/${id}`, meta };
       break;
     }

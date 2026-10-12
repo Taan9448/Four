@@ -85,12 +85,12 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
-  it('아키타입(9-2): 싸우는 동료는 아키타입 2개, 카드 태그는 주인의 것(공용은 아무 동료의 것), 아키타입마다 보유할 수 있는 카드 4장 이상', () => {
+  it('아키타입(9-2): 싸우는 동료는 아키타입 2~3개(엘리아만 3개: 화상·냉기·감전), 카드 태그는 주인의 것(공용은 아무 동료의 것), 아키타입마다 보유할 수 있는 카드 4장 이상', () => {
     const errors: string[] = [];
     const all = new Map<string, string>();
     for (const ch of data.characters.values()) {
       if (ch.role !== 'fighter') continue;
-      if (ch.archetypes.length !== 2) errors.push(`${ch.id}: 아키타입 ${ch.archetypes.length}개(2개여야 한다)`);
+      if (ch.archetypes.length < 2 || ch.archetypes.length > 3) errors.push(`${ch.id}: 아키타입 ${ch.archetypes.length}개(2~3개여야 한다)`);
       for (const a of ch.archetypes) all.set(a.id, ch.id);
     }
     const count = new Map<string, number>();
@@ -106,7 +106,7 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
-  it('카드 250장 확장 규칙: 심법은 소멸·대상 자신, 틈의 카드는 대가(균열+·상흔·체력·소멸)가 있다, 갈래마다 보너스 효과와 카드 12장 이상, 편성 점수 표', () => {
+  it('카드 250장 확장 규칙: 심법은 소멸·대상 자신, 틈의 카드는 대가(균열+·상흔·체력·소멸)가 있다, 갈래마다 보너스 효과와 카드 12장 이상(갈래 3개인 동료는 9장), 편성 점수 표', () => {
     const errors: string[] = [];
     for (const c of data.cards.values()) {
       if (c.type === 'power' && (!c.keywords.includes('exhaust') || c.target !== 'self')) errors.push(`${c.id}: 심법은 소멸·대상 자신`);
@@ -114,11 +114,13 @@ describe('데이터 검사', () => {
       if (c.pool === 'abyss' && !costed) errors.push(`${c.id}: 틈의 카드는 대가가 있어야 한다`);
     }
     for (const ch of data.characters.values()) for (const a of ch.archetypes) if (ch.role === 'fighter' && !a.focus) errors.push(`${a.id}: 갈래 보너스(focus) 없음`);
-    // 2파 뒤: 갈래마다 시작·보상 카드(공용 카드의 태그 포함) 12장 이상
+    // 2파 뒤: 갈래마다 시작·보상 카드(공용 카드의 태그 포함) 12장 이상.
+    // 3파(번개, 2026-10-12): 갈래가 셋인 엘리아는 카드를 셋으로 나누므로 9장 이상
     for (const ch of data.characters.values())
       for (const a of ch.archetypes) {
+        const min = ch.archetypes.length >= 3 ? 9 : 12;
         const n = [...data.cards.values()].filter((c) => (c.pool === 'starter' || c.pool === 'reward') && c.tags.includes(a.id)).length;
-        if (n < 12) errors.push(`${a.id}: 시작·보상 카드 ${n}장(12장 이상)`);
+        if (n < min) errors.push(`${a.id}: 시작·보상 카드 ${n}장(${min}장 이상)`);
       }
     for (const r of ['common', 'uncommon', 'rare', 'epic', 'legendary']) if (data.balance.loadout.points[r] === undefined) errors.push(`편성 점수 ${r} 없음`);
     expect(errors).toEqual([]);

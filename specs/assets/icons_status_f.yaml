@@ -1,0 +1,12 @@
+id: icons_status_f
+type: icon-sheet
+summary: 상태 아이콘 54~56(번개 갈래의 감전·마비·먹구름) — 칸 n = 상태 icon n+53
+# 칸 번호 = data/statuses.json의 icon에서 53을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-12 엘리아 3속성(번개) 확장
+frames: 3
+baseline: 0.5
+frame_notes:
+  1: "shock — a small pale-yellow zigzag spark with two tiny sparks beside it"
+  2: "paralyze — a stiff grey figure outline crossed by a thin yellow zigzag"
+  3: "storm cloud — a small dark grey cloud with a tiny yellow lightning bolt below it"
+placeholder: { color: '#5d6478', accent: '#f3e58a' }

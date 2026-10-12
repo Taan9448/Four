@@ -88,3 +88,26 @@ describe('대가형 사건', () => {
     expect(data.relics.get(run.relics.at(-1)!)!.rarity).not.toBe('boss');
   });
 });
+
+describe('번개 갈래 스토리(2026-10-12)', () => {
+  const wall = () => mod('s5_event_wedged_wall');
+  const idx = (run: ReturnType<typeof createRunAt>) => choicesFor(data, run, wall()).findIndex((c) => c.label.includes('쐐기의 번개'));
+
+  it('쐐기 박힌 벽: 엘리아가 출전했으면 보랏빛 번개를 얻고 깃발이 선다. 이미 가졌으면 강화 +1', () => {
+    const run = createRunAt(data, 'VIOLET', 's5');
+    if (!run.selected.includes('elia')) run.selected = ['haun', 'elia'];
+    const i = idx(run);
+    expect(i).toBeGreaterThanOrEqual(0);
+    expect(applyChoice(data, run, wall(), i).join(' ')).toContain('보랏빛 번개');
+    expect(run.flags).toContain('violet_lightning');
+    expect(run.collection.elia_violet_lightning).toBe(0);
+    expect(applyChoice(data, run, wall(), i).join(' ')).toContain('강화');
+    expect(run.collection.elia_violet_lightning).toBe(1);
+  });
+
+  it('엘리아가 출전하지 않았으면 그 선택지는 나오지 않는다', () => {
+    const run = createRunAt(data, 'VIOLET', 's5');
+    run.selected = run.selected.filter((r) => r !== 'elia');
+    expect(idx(run)).toBe(-1);
+  });
+});

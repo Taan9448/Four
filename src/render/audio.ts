@@ -12,6 +12,7 @@ export type Sfx =
   | 'crit'
   | 'fire'
   | 'ice'
+  | 'lightning'
   | 'block'
   | 'heal'
   | 'status'
@@ -238,6 +239,12 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
     case 'ice':
       for (const [i, hz] of [2600, 3500, 4400].entries()) tone('sine', hz, t + i * 0.03, 0.3, 0.1, out);
       burst(t, 0.15, 0.2, out, { type: 'highpass', hz: 5000 });
+      break;
+    case 'lightning':
+      // 치직: 짧은 고역 잡음 두 번 + 높은 딸깍
+      burst(t, 0.08, 0.6, out, { type: 'highpass', hz: 3200 });
+      burst(t + 0.05, 0.06, 0.45, out, { type: 'bandpass', hz: 6000, q: 1.5 });
+      tone('square', 3200, t, 0.03, 0.12, out);
       break;
     case 'block':
       // 막는 소리: 둔탁한 나무 + 쇠
