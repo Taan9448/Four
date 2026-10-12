@@ -3,6 +3,7 @@ import { endTurn, playCard } from "../src/engine/battle";
 import { addStatus, dealDamage } from "../src/engine/effects";
 import { createRng } from "../src/engine/rng";
 import { resolveCard } from "../src/engine/state";
+import { cardGlossary } from "../src/engine/text";
 import { battle, data, give } from "./helpers";
 
 const bal = data.balance;
@@ -175,6 +176,11 @@ describe("번개(감전·마비·전도)", () => {
     expect(haun.statuses.shock).toBeUndefined();
   });
 
+  it("번개 카드 주석에 전도와 마비가 나온다", () => {
+    const g = cardGlossary(data, "elia_staff").join("\n");
+    expect(g).toContain("전도");
+    expect(g).toContain("마비");
+  });
 });
 
 describe("치명타", () => {
