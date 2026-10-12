@@ -181,6 +181,8 @@ export function normalizeSpec(raw) {
     depends_on: raw.depends_on ?? [],
     frame_notes: raw.frame_notes ?? {},
     reference: raw.reference ?? null,
+    /** 기준 시트와 다른 크기로 그려야 할 때 한 줄(예: 옷장 보른 동작은 원래 전투 동작 크기) */
+    size_note: raw.size_note ?? null,
   };
 }
 

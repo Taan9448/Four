@@ -1,0 +1,36 @@
+{
+  "id": "fx_hit_slash",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 10.687,
+  "gridDetected": true,
+  "nativeSize": [
+    48,
+    48
+  ],
+  "fit": "upscale",
+  "frames": 5,
+  "fps": 15,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 3
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 5,
+  "sourceHash": "089a51da79bb0b9a",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.518
+}

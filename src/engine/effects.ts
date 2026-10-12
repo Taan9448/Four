@@ -1,6 +1,6 @@
 // 효과 해석기. 카드·적 행동·지원 규칙의 효과는 모두 여기서 기본 동작의 조합으로만 해석된다.
 // 카드별 개별 코드는 두지 않는다. 기본 동작 목록은 docs/CARD_EFFECTS.md 참고.
-import { BATTLE_OPS, type Condition, type Effect, type Element, type RelicDef, type StatusTrigger, type SupportRule } from './schema';
+import { BATTLE_OPS, ELEMENTS, type Condition, type Effect, type Element, type RelicDef, type StatusTrigger, type SupportRule } from './schema';
 import {
   alive,
   findCombatant,
@@ -218,6 +218,13 @@ export function hasSpecial(state: BattleState, c: Combatant, special: string): b
   return Object.entries(c.statuses).some(([id, n]) => n > 0 && state.data.statuses.get(id)?.special === special);
 }
 
+/** 이 상태를 싣는 속성의 임계(냉기 → 빙결, 감전 → 마비). 없으면 undefined */
+function elementThreshold(state: BattleState, status: string): { at: number; bossAt: number; into: string } | undefined {
+  const el = state.data.balance.elements;
+  for (const k of ELEMENTS) if (el[k].status === status) return el[k].threshold;
+  return undefined;
+}
+
 export function addStatus(state: BattleState, target: Combatant, status: string, stacks: number): void {
   if (!state.data.statuses.has(status)) throw new Error(`알 수 없는 상태: ${status}`);
   // 피의 덮개(천마혈공): 결이 피에 덮여 드러나지 않는다
@@ -226,20 +233,31 @@ export function addStatus(state: BattleState, target: Combatant, status: string,
     state.log.push(`${target.name}: 피가 결을 덮었다.`);
     return;
   }
+  // 교차 잠금 금지: 빙결 중에는 감전이, 마비 중에는 냉기가 쌓이지 않는다(statuses[].blockedBy)
+  if (stacks > 0) {
+    const blocker = state.data.statuses.get(status)!.blockedBy.find((b) => (target.statuses[b] ?? 0) > 0);
+    if (blocker) {
+      state.events.push({ type: 'status', targetUid: target.uid, status, stacks: 0 });
+      state.log.push(`${target.name}: ${statusName(state, blocker)} 상태라 ${statusName(state, status)}이(가) 스며들지 않는다.`);
+      return;
+    }
+  }
   const next = (target.statuses[status] ?? 0) + stacks;
   if (next <= 0) delete target.statuses[status];
   else target.statuses[status] = next;
   state.events.push({ type: 'status', targetUid: target.uid, status, stacks });
   if (stacks > 0) state.log.push(`${target.name}: ${statusName(state, status)} ${stacks > 0 ? '+' : ''}${stacks}`);
-  // 냉기: 임계치(보스는 더 높다)에 이르면 얼어붙는다 — 냉기를 비우고 빙결 1
-  if (stacks > 0 && state.data.statuses.get(status)?.special === 'chill') {
-    const el = state.data.balance.elements;
-    const boss = target.side === 'enemy' && state.data.enemies.get(target.defId)?.tier === 'boss';
-    if ((target.statuses[status] ?? 0) >= (boss ? el.bossFreezeAt : el.freezeAt)) {
-      delete target.statuses[status];
-      state.events.push({ type: 'status', targetUid: target.uid, status, stacks: 0 });
-      state.log.push(`${target.name}이(가) 얼어붙었다.`);
-      addStatus(state, target, el.freezeStatus, 1);
+  // 속성 임계: 냉기·감전이 at(보스는 bossAt)에 이르면 비우고 빙결·마비 1(balance.elements[].threshold)
+  if (stacks > 0) {
+    const th = elementThreshold(state, status);
+    if (th) {
+      const boss = target.side === 'enemy' && state.data.enemies.get(target.defId)?.tier === 'boss';
+      if ((target.statuses[status] ?? 0) >= (boss ? th.bossAt : th.at)) {
+        delete target.statuses[status];
+        state.events.push({ type: 'status', targetUid: target.uid, status, stacks: 0 });
+        state.log.push(`${target.name}: ${statusName(state, th.into)}에 걸렸다.`);
+        addStatus(state, target, th.into, 1);
+      }
     }
   }
   // 매듭: 결 노출이 임계치에 이르면 매듭이 드러난다
@@ -347,6 +365,9 @@ export function dealDamage(
   const affinity = elementAffinity(state, target, element);
   if (affinity === 'weak') dmg *= bal.elements.weakMultiplier;
   else if (affinity === 'resist') dmg *= bal.elements.resistMultiplier;
+  // 전도: 냉기가 붙은 적에게 번개는 더 들어간다(냉기는 남는다)
+  const conducted = isConducted(state, target, element);
+  if (conducted) dmg *= bal.elements[element!].conduct!.multiplier;
   // 치명타: 아군 카드의 피해 한 번마다 굴린다(미리보기 복제·수치 시험에서는 굴리지 않는다)
   let crit = false;
   // 치명타는 따로 떼어 둔 수열(critRng)로 굴려, 미리보기(굴리지 않음)와 실제의 다른 무작위(무작위 대상 등)가 어긋나지 않게 한다.
@@ -398,10 +419,12 @@ export function dealDamage(
     element,
     weak: affinity === 'weak',
     resisted: affinity === 'resist',
+    conducted,
   });
   state.log.push(
     `${source?.name ?? '?'} → ${target.name} 피해 ${hpLoss}${blocked ? ` (방어 ${blocked})` : ''}${grain ? ' [결]' : ''}${crit ? ' [치명]' : ''}${affinity === 'weak' ? ' [약점]' : affinity === 'resist' ? ' [내성]' : ''}`,
   );
+  if (conducted) state.log.push(`${target.name}: 젖은 몸에 번개가 튀었다(×${bal.elements[element!].conduct!.multiplier}).`);
   if (hpLoss > 0 || blocked > 0) applyElement(state, target, element);
   if (target.hp <= 0) {
     knockOut(state, target);
@@ -434,18 +457,29 @@ export function critChance(state: BattleState, c: Combatant): number {
   return base + ((c.level ?? 1) - 1) * state.data.balance.leveling.critPerLevel;
 }
 
+/** 전도: 이 속성에 conduct가 있고 대상에 그 상태(냉기)가 붙어 있는가 */
+export function isConducted(state: BattleState, target: Combatant, element: Element | undefined): boolean {
+  if (!element) return false;
+  const c = state.data.balance.elements[element].conduct;
+  return !!c && (target.statuses[c.ifTargetHas] ?? 0) > 0;
+}
+
 /**
- * 속성 상태 붙이기: 화염 → 화상, 냉기 → 냉기(쌓이면 빙결). 내성이 있으면 붙지 않는다.
- * 상극: 화염은 냉기를 녹이고, 냉기는 화상을 끈다
+ * 속성 상태 붙이기: 화염 → 화상, 냉기 → 냉기(쌓이면 빙결), 번개 → 감전(쌓이면 마비). 내성이 있으면 붙지 않는다.
+ * 상극(balance.elements.opposites): 화염은 냉기를 녹이고, 냉기는 화상을 끈다. 번개는 아무것도 지우지 않는다
  */
 function applyElement(state: BattleState, target: Combatant, element: Element | undefined): void {
   if (!element || target.downed || elementAffinity(state, target, element) === 'resist') return;
   const el = state.data.balance.elements;
-  const opposite = el[element === 'fire' ? 'ice' : 'fire'].status;
-  if ((target.statuses[opposite] ?? 0) > 0) {
-    delete target.statuses[opposite];
-    state.events.push({ type: 'status', targetUid: target.uid, status: opposite, stacks: 0 });
-    state.log.push(`${target.name}: ${element === 'fire' ? '냉기가 녹았다' : '불이 꺼졌다'}.`);
+  for (const pair of el.opposites) {
+    if (!pair.includes(element)) continue;
+    const other = pair[0] === element ? pair[1] : pair[0];
+    const opposite = el[other].status;
+    if ((target.statuses[opposite] ?? 0) > 0) {
+      delete target.statuses[opposite];
+      state.events.push({ type: 'status', targetUid: target.uid, status: opposite, stacks: 0 });
+      state.log.push(`${target.name}: ${statusName(state, opposite)}이(가) 사라졌다.`);
+    }
   }
   addStatus(state, target, el[element].status, el[element].stacks);
 }
