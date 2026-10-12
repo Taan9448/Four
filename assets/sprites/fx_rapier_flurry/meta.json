@@ -4,13 +4,13 @@
   "frameW": 160,
   "frameH": 160,
   "track": "pixel",
-  "pixelScale": 9.655,
-  "gridDetected": true,
+  "pixelScale": 4,
+  "gridDetected": false,
   "nativeSize": [
-    54,
-    53
+    128,
+    128
   ],
-  "fit": "upscale",
+  "fit": "pad",
   "frames": 5,
   "fps": 15,
   "loop": false,
@@ -32,5 +32,5 @@
     1536,
     1024
   ],
-  "gridPurity": 0.416
+  "gridPurity": 0.654
 }
