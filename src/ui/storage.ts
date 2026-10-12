@@ -6,6 +6,7 @@ import { deserializeRun, serializeRun, type LoadedRun } from '../engine/save';
 import { noteRun, parseCodex, type Codex } from '../engine/codex';
 import { parseAbyssMeta, type AbyssMeta } from '../engine/abyss';
 import type { ChallengeDef } from '../engine/schema';
+import { parseWardrobe, unlockSkins, type SkinEvent, type Wardrobe } from '../engine/wardrobe';
 
 /** 저장 칸 수(2026-10-08: 1칸 → 3칸). 칸마다 키가 따로이고, 옛 단일 저장(cheonoe.run)은 1번 칸으로 옮긴다 */
 export const SLOT_COUNT = 3;
@@ -199,4 +200,17 @@ export function updateCodex(data: GameData, fn: (codex: Codex) => void): void {
   const codex = readCodex(data);
   fn(codex);
   writeStore(CODEX_KEY, JSON.stringify(codex));
+}
+
+// ───────── 옷장(저장 칸과 상관없이 하나, 2026-10-12): src/engine/wardrobe.ts ─────────
+const WARDROBE_KEY = 'cheonoe.wardrobe';
+export const readWardrobe = (data: GameData): Wardrobe => parseWardrobe(data, readStore(WARDROBE_KEY));
+export const writeWardrobe = (w: Wardrobe) => writeStore(WARDROBE_KEY, JSON.stringify(w));
+
+/** 옷장을 여는 일을 적고, 새로 연 세트의 이름을 돌려준다 */
+export function recordSkinEvent(data: GameData, ev: SkinEvent): string[] {
+  const w = readWardrobe(data);
+  const fresh = unlockSkins(data, w, ev);
+  if (fresh.length) writeWardrobe(w);
+  return fresh.map((id) => data.skins.sets.find((s) => s.id === id)!.name);
 }

@@ -16,6 +16,8 @@ export interface HubHandlers {
   /** 멈춰 둔 진행을 버린다 */
   onDiscard: (stageId: string) => void;
   onShowDeck: () => void;
+  /** 옷장(순례·심연, 2026-10-12): 도감 왼쪽 */
+  onWardrobe: () => void;
   onCodex: () => void;
   onTitle: () => void;
 }
@@ -38,6 +40,7 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
         'div',
         { class: 'hub-actions' },
         h('button', { class: 'btn btn-primary', onclick: handlers.onShowDeck }, `보유 카드 (${run.deck.length})`),
+        h('button', { class: 'btn', onclick: handlers.onWardrobe }, '옷장'),
         h('button', { class: 'btn', onclick: handlers.onCodex }, '도감'),
         h('button', { class: 'btn', onclick: handlers.onTitle }, '타이틀로'),
       ),

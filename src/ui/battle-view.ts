@@ -11,6 +11,8 @@ import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, spriteSource } from '../render/assets';
 import { cardFx } from '../engine/fx-rules';
+import { skinSpriteId } from '../engine/wardrobe';
+import { skinReady } from './wardrobe-view';
 import { SpritePlayer } from '../render/sprite-player';
 import { sfx } from '../render/audio';
 import { cardView } from './card-view';
@@ -37,6 +39,8 @@ export interface BattleContext {
   pilgrimText?: string;
   /** 전투 배경 에셋 id(실제 그림이 있을 때만 쓴다) */
   background?: string;
+  /** 옷장(순례·심연): 동료 id → 입은 세트. 세 그림이 모두 실제로 왔을 때만 입는다 */
+  skins?: Record<string, string>;
   /** 메뉴의 "타이틀로"(abandon=false: 저장은 이 전투 직전 지도에 남는다) / "런 포기"(abandon=true). 없으면 메뉴에 안 나온다 */
   onQuit?: (abandon: boolean) => void;
 }
@@ -278,6 +282,9 @@ export class BattleView {
       if (!def) return null;
       // 복장(못생긴 검·두린의 망치)은 실제 그림이 들어온 뒤에만 쓴다(임시 그림보다 기본 복장의 실제 그림이 낫다)
       const pick = (s: Record<string, string>) => s[anim] ?? (anim === 'skill' ? s.attack : undefined);
+      // 옷장 세트(순례·심연)가 가장 먼저
+      const skin = this.ctx.skins?.[c.defId];
+      if (skin && skinReady(skin, c.defId)) return skinSpriteId(skin, c.defId, anim === 'skill' ? 'attack' : anim);
       const outfit = pick(spritesFor(def, this.state.flags));
       return (outfit && spriteSource(outfit) === 'sprites' ? outfit : pick(def.sprites)) ?? null;
     }

@@ -37,8 +37,10 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
 
   lines.push('## 스테이지별');
   lines.push('');
-  lines.push(`| 스테이지 | 도달 | 통과 | 통과율 | ${names.map((n) => `통과율(${n})`).join(' | ')} | 여기서 패배 | 들어설 때 하운 체력 | 들어설 때 덱 | 들어설 때 하운 레벨 |`);
-  lines.push(`|---|---:|---:|---:|${names.map(() => '---:|').join('')}---:|---:|---:|---:|`);
+  lines.push(`| 스테이지 | 도달 | 통과 | 통과율 | ${names.map((n) => `통과율(${n})`).join(' | ')} | 여기서 패배 | 패배 위치(전체 패배 중) | 들어설 때 하운 체력 | 들어설 때 덱 | 들어설 때 하운 레벨 |`);
+  lines.push(`|---|---:|---:|---:|${names.map(() => '---:|').join('')}---:|---:|---:|---:|---:|`);
+  // 패배 위치: 모든 패배 중 이 스테이지에서 진 비율(어려움 목표: 한 스테이지 35% 이하 — 2026-10-12)
+  const allDeaths = runs.filter((r) => r.result === 'defeat').length;
   const pass = (rs: RunReport[], id: string) => {
     const reached = rs.filter((r) => r.stageEntry.some((e) => e.stageId === id));
     const died = reached.filter((r) => r.result === 'defeat' && r.stageId === id).length;
@@ -53,7 +55,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
       return pct(x.reached.length - x.died, x.reached.length);
     });
     lines.push(
-      `| ${st.name} (${st.id}) | ${reached.length} | ${reached.length - died} | ${pct(reached.length - died, reached.length)} | ${perStyle.join(' | ')} | ${died} | ${pct(avg(entry.map((e) => e.haunRatio)) * 100, 100)} | ${f1(avg(entry.map((e) => e.deck)))} | ${f1(avg(entry.map((e) => e.haunLevel)))} |`,
+      `| ${st.name} (${st.id}) | ${reached.length} | ${reached.length - died} | ${pct(reached.length - died, reached.length)} | ${perStyle.join(' | ')} | ${died} | ${died ? pct(died, allDeaths) : '—'} | ${pct(avg(entry.map((e) => e.haunRatio)) * 100, 100)} | ${f1(avg(entry.map((e) => e.deck)))} | ${f1(avg(entry.map((e) => e.haunLevel)))} |`,
     );
   }
   lines.push('');
@@ -222,6 +224,15 @@ function campaignTargets(data: GameData, runs: RunReport[], stageIds: string[]):
     if (max === undefined || !boss) continue;
     const r = rate(boss[1]);
     rows.push({ label: `보스 패배 ${st.toUpperCase()} ${data.modules.get(boss[0])?.name ?? ''}`, target: `${fmtPct(max)} 이하`, now: fmtPct(r), ok: r <= max });
+  }
+  // 패배가 한 스테이지에 몰리지 않게(어려움 목표, 2026-10-12)
+  const deaths = runs.filter((r) => r.result === 'defeat');
+  if (deaths.length) {
+    const by = new Map<string, number>();
+    for (const r of deaths) by.set(r.stageId, (by.get(r.stageId) ?? 0) + 1);
+    const [st, n] = [...by].sort((a, b) => b[1] - a[1])[0];
+    const share = n / deaths.length;
+    rows.push({ label: '패배가 가장 몰린 스테이지(전체 패배 중)', target: `${fmtPct(t.lossShareMax)} 이하`, now: `${fmtPct(share)} ${st.toUpperCase()}`, ok: share <= t.lossShareMax });
   }
   return targetTable(rows);
 }

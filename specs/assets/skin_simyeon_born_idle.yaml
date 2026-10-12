@@ -1,0 +1,14 @@
+id: skin_simyeon_born_idle
+type: character-anim
+character: skin_simyeon_born
+summary: "보른 옷장 「심연을 걷는 자」 대기 4프레임"
+depends_on: [skin_simyeon_born_ref]
+reference: assets/source/skin_simyeon_born_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "planted wide stance, hammer head resting on the ground"
+  2: "slow breath in, chest and beard braids rise"
+  3: "breath held, both hands on the haft"
+  4: "breath out, shoulders settle"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#9b5cff' }

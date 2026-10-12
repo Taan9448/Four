@@ -109,6 +109,26 @@
 | kyle | 카일 로웬 | 금발, 장난기 있는 얼굴, 호리호리. 온몸 은빛 판금, 어깨·무릎의 둥근 쇠판, 가슴의 로웬 문장(푸른 바탕·흰 눈송이·은빛 검), 긴 양날 검 | magenta | large |
 | born | 보른(S1~S3, 도끼) | 작고 다부진 드워프(사람 키의 약 70%), 문짝 같은 어깨, 굵은 팔뚝, **얼굴 절반을 덮은 붉은 수염을 세 갈래로 땋음**, 자기 키만 한 양손 도끼. **방패 없음** | magenta | large |
 | born_hammer | 보른(S4~, 두린의 망치) | 같은 인물(붉은 수염은 그을려 끝이 조금 짧다). 드워프 문자가 새겨진 손잡이의 큰 전투 망치 | magenta | large |
+| skin_cheongun_haun | 진하운 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_haun` | magenta | large |
+| skin_cheongun_elia | 엘리아 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_elia` | magenta | large |
+| skin_cheongun_kyle | 카일 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_kyle` | magenta | large |
+| skin_cheongun_born | 보른 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_born` | magenta | large |
+| skin_cheonma_haun | 진하운 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_haun` | green | large |
+| skin_cheonma_elia | 엘리아 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_elia` | green | large |
+| skin_cheonma_kyle | 카일 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_kyle` | green | large |
+| skin_cheonma_born | 보른 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_born` | green | large |
+| skin_bulmyeol_haun | 진하운 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_haun` | magenta | large |
+| skin_bulmyeol_elia | 엘리아 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_elia` | magenta | large |
+| skin_bulmyeol_kyle | 카일 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_kyle` | magenta | large |
+| skin_bulmyeol_born | 보른 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_born` | magenta | large |
+| skin_simyeon_haun | 진하운 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_haun` | green | large |
+| skin_simyeon_elia | 엘리아 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_elia` | green | large |
+| skin_simyeon_kyle | 카일 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_kyle` | green | large |
+| skin_simyeon_born | 보른 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_born` | green | large |
+| skin_sullye_haun | 진하운 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_haun` | magenta | large |
+| skin_sullye_elia | 엘리아 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_elia` | magenta | large |
+| skin_sullye_kyle | 카일 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_kyle` | magenta | large |
+| skin_sullye_born | 보른 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_born` | magenta | large |
 | wang | 왕일검(S6~) | 낫처럼 굽은 등, 흐릿한 눈 속의 날카로운 빛, 숱 적은 흰 머리. **다리가 없어 바퀴 달린 나무 의자에 앉고 무릎에 담요**(초상화만) | none | portrait |
 | wang_cook | 왕 노인(S0) | 같은 인물이 두 다리가 있을 때: 낫처럼 굽은 등, 오른 다리를 절며 지팡이, 낡은 회갈색 주방 옷과 앞치마(초상화만) | none | portrait |
 | kwak_dojin | 곽도진 | 마른 몸, 단정히 빗어 넘긴 흰머리, 이마 주름, 서른 살처럼 맑고 차가운 눈, 흰 학창의, 소나무 결 무늬 송문고검 | magenta | large |
@@ -208,6 +228,100 @@ subjects:
     Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
     door, thick forearms; a slightly singed red beard braided into three braids; a heavy two-handed war hammer
     whose handle is carved with dwarven runes (his late brother Durin's hammer); no shield
+  skin_cheongun_haun: >-
+    Jin Haun, a lean, wiry young East Asian swordsman; long straight black hair falling past the shoulders with
+    long bangs partly covering sharp, calm black eyes; pale skin; wearing the formal robes of a Cheongun sect
+    disciple: a white long robe with sky-blue lapels and silver cloud embroidery at the hems and sleeves, a blue
+    sash with a small jade pendant, a white ribbon tying his long hair high; holding a narrow straight sword with
+    a silver guard, a white scabbard with silver fittings at the hip
+  skin_cheongun_elia: >-
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey
+    eyes with a faint green tint; wearing a white mage robe with sky-blue trims and silver leaf embroidery, a
+    short light-blue hooded cape, a thin silver circlet; holding a long pale wooden staff whose blue stone is set
+    in a silver crescent frame
+  skin_cheongun_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; wearing polished silver plate armor with blue
+    enamel trims and a white fur collar, a long blue cape bearing the Rowen crest (a white snowflake over a silver
+    sword); holding a long straight double-edged sword with a sapphire pommel
+  skin_cheongun_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing
+    dwarven ceremonial armor of blue-grey steel with silver knotwork, his three beard braids clasped with silver
+    rings; holding a heavy two-handed war hammer whose head is inlaid with blue runes
+  skin_cheonma_haun: >-
+    Jin Haun, a lean, wiry young East Asian swordsman; long straight black hair falling past the shoulders with
+    long bangs partly covering sharp, calm black eyes; pale skin; wearing a black martial robe with a crimson
+    inner lining and gold-thread dragon motifs at the collar, a long crimson sash trailing behind, black leather
+    bracers with gold studs, his hair tied high with a crimson cord; holding a narrow straight sword whose edge
+    has a faint red sheen
+  skin_cheonma_elia: >-
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey
+    eyes with a faint green tint; wearing a deep crimson sorceress robe with a black vest and gold trims, a black
+    hood lined with crimson; holding a long black wooden staff topped with a red crystal held in gold claws
+  skin_cheonma_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; wearing blackened steel plate armor with gold
+    filigree edges, a crimson cape and a crimson plume at one shoulder; holding a long straight double-edged sword
+    with a gold crossguard
+  skin_cheonma_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing black
+    iron dwarven armor with gold-banded pauldrons and a crimson tabard, his beard braids bound with gold rings;
+    holding a heavy two-handed war hammer of black iron with gold runes
+  skin_bulmyeol_haun: >-
+    Jin Haun, a lean, wiry young East Asian swordsman; long straight black hair falling past the shoulders with
+    long bangs partly covering sharp, calm black eyes; pale skin; wearing gleaming black-and-gold lamellar armor
+    over a white robe, a golden phoenix motif across the chest, a long white-and-gold scarf flowing behind, a
+    golden hairpin in his tied hair; holding a narrow straight sword with a radiant gold blade
+  skin_bulmyeol_elia: >-
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey
+    eyes with a faint green tint; wearing a white-and-gold high mage gown with flowing translucent gold-white
+    sleeves and a golden circlet; holding a long white wooden staff topped with a radiant gold star crystal
+  skin_bulmyeol_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; wearing golden-white plate armor with a sunburst
+    crest on the chest, a white cape lined with gold, a gold circlet instead of a helmet; holding a gleaming gold-
+    edged long sword
+  skin_bulmyeol_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing golden
+    dwarven warplate engraved with glowing runes, gold-braided beard braids with jewel clasps; holding a heavy
+    two-handed war hammer with a golden head and glowing runes
+  skin_simyeon_haun: >-
+    Jin Haun, a lean, wiry young East Asian swordsman; long straight black hair falling past the shoulders with
+    long bangs partly covering sharp, calm black eyes; pale skin; wearing a dark violet-black long coat with
+    silver crack-shaped embroidery that glows faintly violet, a tattered black cloak, his long hair loose; holding
+    a narrow straight sword with a black blade and a violet glowing edge
+  skin_simyeon_elia: >-
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey
+    eyes with a faint green tint; wearing a deep indigo-black robe with silver star-and-crack patterns, a hood
+    with a violet glowing lining; holding a long staff of twisted black wood with a violet crystal floating inside
+    a ring at the top
+  skin_simyeon_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; wearing dark gunmetal plate armor whose seams glow
+    violet like cracks, a tattered black cape; holding a black long sword with a violet glowing fuller
+  skin_simyeon_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing dark
+    gunmetal dwarven plate with violet glowing rune-cracks, beard braids with black iron rings; holding a heavy
+    two-handed war hammer of black stone with violet crack-light
+  skin_sullye_haun: >-
+    Jin Haun, a lean, wiry young East Asian swordsman; long straight black hair falling past the shoulders with
+    long bangs partly covering sharp, calm black eyes; pale skin; wearing a cream-white traveller's robe with
+    ochre trims, a wide bamboo hat hanging on his back by a cord, a small travelling satchel and wooden prayer
+    beads around the wrist; holding a narrow straight sword whose hilt is wrapped in white cloth
+  skin_sullye_elia: >-
+    Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey
+    eyes with a faint green tint; wearing a cream-white pilgrim cloak with gold-embroidered leaves and tiny silver
+    bells along the hem, a satchel of scrolls; holding a long wooden staff tied with a white ribbon and a small
+    bell under the blue stone
+  skin_sullye_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; wearing light silver half-plate over a cream
+    tunic, a sandy-ochre travelling cloak and a scallop-shell pilgrim badge on the chest; holding a long straight
+    double-edged sword
+  skin_sullye_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing a
+    sturdy sand-coloured travelling coat over chainmail, an ochre hood, wooden beads woven into his beard braids;
+    holding a heavy two-handed war hammer with a leather-wrapped haft
   wang: >-
     Wang Ilgeom, the old former first disciple of the Cheongun sect who hid for forty years as a kitchen elder;
     back bent like a sickle, thin white hair tied back, deep wrinkles, hazy eyes hiding a sharp glint, a worn

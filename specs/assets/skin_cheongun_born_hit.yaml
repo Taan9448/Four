@@ -1,0 +1,12 @@
+id: skin_cheongun_born_hit
+type: character-anim
+character: skin_cheongun_born
+summary: "보른 옷장 「청운의 귀환」 피격 3프레임"
+depends_on: [skin_cheongun_born_ref]
+reference: assets/source/skin_cheongun_born_ref.png
+facing: right
+frame_notes:
+  1: "blow lands on his shoulder, he grunts but holds"
+  2: "slides back a step, hammer haft braced"
+  3: "straightens, stern glare forward"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#4fb4ff' }

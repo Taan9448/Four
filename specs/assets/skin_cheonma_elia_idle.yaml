@@ -1,0 +1,14 @@
+id: skin_cheonma_elia_idle
+type: character-anim
+character: skin_cheonma_elia
+summary: "엘리아 옷장 「천마를 넘어」 대기 4프레임"
+depends_on: [skin_cheonma_elia_ref]
+reference: assets/source/skin_cheonma_elia_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "standing calmly, staff upright in the right hand, tiny motes of light drifting around the blue stone"
+  2: "hair and cloak sway slightly, motes rise"
+  3: "the blue stone brightens, motes gather into it"
+  4: "the stone dims, motes scatter softly"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#d1263a' }

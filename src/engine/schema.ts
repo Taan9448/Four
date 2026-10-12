@@ -303,6 +303,26 @@ export const FxRules = z
 export type FxRules = z.infer<typeof FxRules>;
 
 /**
+ * 옷장(data/skins.json, 2026-10-12): 세트마다 네 동료의 옷. 여는 조건 — campaignClear(difficulty: hard면 어려움으로) ·
+ * hardcoreClear · abyssDepth(심연 depth굽이를 넘김) · pilgrimStage(순례로 그 스테이지를 넘김)
+ */
+export const SkinUnlock = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('campaignClear'), difficulty: z.enum(['normal', 'hard']).optional() }).strict(),
+  z.object({ kind: z.literal('hardcoreClear') }).strict(),
+  z.object({ kind: z.literal('abyssDepth'), depth: z.number().int().positive() }).strict(),
+  z.object({ kind: z.literal('pilgrimStage'), stage: z.string() }).strict(),
+]);
+export type SkinUnlock = z.infer<typeof SkinUnlock>;
+export const SkinData = z
+  .object({
+    $comment: z.string().optional(),
+    sets: z.array(z.object({ id: z.string(), name: z.string(), description: z.string(), unlock: SkinUnlock }).strict()),
+    characters: z.array(z.string()),
+  })
+  .strict();
+export type SkinData = z.infer<typeof SkinData>;
+
+/**
  * 상태의 발동(지속 효과·파워, CARD_EFFECTS 4-1): 가진 쪽에게 일이 생길 때마다 effects가 그 쪽을 출처로 일어난다.
  * on — turnStart 그 편 차례 시작(뽑은 뒤) · turnEnd 그 편 차례 끝 · cardPlayed 아군이 카드를 낸 뒤 ·
  * attacked 공격을 맞았을 때(방어로 다 막아도) · hpLost 체력을 잃었을 때(자해·화상 포함)

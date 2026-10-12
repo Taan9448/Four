@@ -1,0 +1,13 @@
+id: skin_bulmyeol_born_idle
+type: character-anim
+character: skin_bulmyeol_born
+summary: "보른 옷장 「불멸」 대기 4프레임"
+depends_on: [skin_bulmyeol_born_ref]
+reference: assets/source/skin_bulmyeol_born_ref.png
+facing: right
+frame_notes:
+  1: "planted wide stance, hammer head resting on the ground"
+  2: "slow breath in, chest and beard braids rise"
+  3: "breath held, both hands on the haft"
+  4: "breath out, shoulders settle"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#ffd25a' }

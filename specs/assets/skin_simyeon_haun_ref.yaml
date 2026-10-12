@@ -1,0 +1,12 @@
+id: skin_simyeon_haun_ref
+type: character-ref
+character: skin_simyeon_haun
+summary: "진하운 옷장 「심연을 걷는 자」 기준 시트(3/4 정면 + 오른쪽 측면)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose in the new outfit, holding the narrow straight sword; the same face, hair, body proportions and height as the attached reference sheet, only the clothes and weapon details change"
+  2: "full body, side view facing right, the same outfit and proportions, standing ready with the narrow straight sword lowered"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#9b5cff' }

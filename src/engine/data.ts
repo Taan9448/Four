@@ -9,6 +9,7 @@ import {
   CharacterDef,
   EnemyDef,
   FxRules,
+  SkinData,
   LawDef,
   ModuleDef,
   OathDef,
@@ -34,6 +35,7 @@ import oathsJson from '../../data/abyss_oaths.json';
 import achievementsJson from '../../data/abyss_achievements.json';
 import challengesJson from '../../data/pilgrimage_challenges.json';
 import fxJson from '../../data/fx.json';
+import skinsJson from '../../data/skins.json';
 
 const cardFiles = import.meta.glob('../../data/cards/*.json', { eager: true, import: 'default' });
 const moduleFiles = import.meta.glob('../../data/modules/*.json', { eager: true, import: 'default' });
@@ -63,6 +65,8 @@ export interface GameData {
   challenges: Map<string, ChallengeDef>;
   /** 이펙트 규칙(카드 특성 → 이펙트, data/fx.json) */
   fx: FxRules;
+  /** 옷장 세트(data/skins.json) */
+  skins: SkinData;
 }
 
 function byId<T extends { id: string }>(items: T[], label: string): Map<string, T> {
@@ -110,6 +114,7 @@ export function loadGameData(): GameData {
     achievements: byId(parse(z.array(AchievementDef), achievementsJson, 'data/abyss_achievements.json'), 'achievements'),
     challenges: byId(parse(z.array(ChallengeDef), challengesJson, 'data/pilgrimage_challenges.json'), 'challenges'),
     fx: parse(FxRules, fxJson, 'data/fx.json'),
+    skins: parse(SkinData, skinsJson, 'data/skins.json'),
   };
 }
 
