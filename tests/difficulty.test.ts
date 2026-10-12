@@ -13,7 +13,7 @@ const encounter = (stage: string): Encounter => {
 };
 
 describe('난이도', () => {
-  it('어려움은 스테이지별 적 체력·공격력 배율을 곱한다(뒤 스테이지일수록 세다)', () => {
+  it('어려움은 스테이지별 적 체력·공격력 배율을 곱한다(중반이 가장 무겁다 — 2026-10-12)', () => {
     const normal = createRunAt(data, 'D', 's3');
     const hard = createRunAt(data, 'D', 's3', { difficulty: 'hard' });
     const enc = encounter('s3');
@@ -22,7 +22,13 @@ describe('난이도', () => {
     expect(b.enemyHpScale).toBeCloseTo(a.enemyHpScale! * data.balance.difficulty.hard.byStage.s3.hp);
     expect(b.enemyDmgScale).toBeCloseTo(a.enemyDmgScale! * data.balance.difficulty.hard.byStage.s3.dmg);
     const by = data.balance.difficulty.hard.byStage;
-    expect(by.s9.hp).toBeGreaterThan(by.s0.hp);
+    // 중반(S2~S5)이 앞(S0~S1)·뒤(S6~S9)보다 같거나 무겁다
+    for (const mid of ['s2', 's3', 's4', 's5'] as const)
+      for (const other of ['s0', 's1', 's6', 's7', 's8', 's9'] as const) {
+        expect(by[mid].hp).toBeGreaterThanOrEqual(by[other].hp);
+        expect(by[mid].dmg).toBeGreaterThanOrEqual(by[other].dmg);
+      }
+    expect(by.s3.hp).toBeGreaterThan(by.s0.hp);
   });
 
   it('하드코어: 전투가 끝날 때 쓰러져 있던 동료는 떠나고 다시 합류하지 않는다', () => {
