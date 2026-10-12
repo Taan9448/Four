@@ -1,0 +1,11 @@
+id: cg_kyle_bridge
+type: story-cg
+character: kyle_red
+summary: 장면 일러스트 — 그림자 다리 — 혼자 남아 그림자 수백을 막아서는 카일(S9, 4권 8장)
+# 2026-10-12 D2: 그림 없던 절정 장면(s9_scene_kyle_stays)
+frame_notes:
+  1: >-
+    Inside the world's rift, a void of drifting dark fragments and slow wind like the breath of a giant lung. A long narrow bridge of hardened shadow, black and light-swallowing, stretches across the void. At the near end of the bridge Kyle Rowen, the blond young knight in silver plate armor, stands alone with his back to the viewer turned three-quarters, his crimson-bladed long sword raised in guard, eyes closed and smiling, a small silver snowflake necklace at his throat. Before him hundreds of shadow wraiths with black wedge-carved daggers rise from the bridge like smoke. Far behind him, two small figures — a lean swordsman in grey and a silver-haired mage — run hand in hand into the darkness at the far end.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#120f1c' }
