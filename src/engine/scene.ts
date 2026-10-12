@@ -44,8 +44,8 @@ export const autoAdvanceDelay = (text: string) => Math.max(1200, [...text].lengt
  * 처음 보는 장면은 절대 건너뛰지 않는다. 자동으로 건너뛰는 것은 설정이 켜져 있고, 순례·심연이거나 캠페인을 한 번 마친 뒤일 때만 —
  * 캠페인 1회차는 '이미 본 장면 · 건너뛰기' 단추만 띄운다
  */
-export function sceneSkip(opts: { seen: boolean; setting: boolean; mode: 'campaign' | 'pilgrimage' | 'abyss'; clears: number }): { button: boolean; auto: boolean } {
-  if (!opts.seen) return { button: false, auto: false };
+export function sceneSkip(opts: { seen: boolean; setting: boolean; mode: 'campaign' | 'pilgrimage' | 'abyss'; clears: number }): { auto: boolean } {
+  if (!opts.seen) return { auto: false };
   const repeat = opts.mode !== 'campaign' || opts.clears > 0;
-  return { button: true, auto: opts.setting && repeat };
+  return { auto: opts.setting && repeat };
 }

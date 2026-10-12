@@ -23,10 +23,16 @@ const ART_WINDOW: [number, number, number, number] = [16, 12, 96, 70];
 export type CardWorld = 'murim' | 'elheim' | 'fusion' | 'status';
 
 /** 카드 틀: 내공·마나를 함께 들면 융합, 하운·공용은 무공, 엘하임 동료는 마법, 상태·저주는 따로 */
+/**
+ * 카드 틀 색은 비용으로 정한다(2026-10-12 사용자 결정): 내공만 = 노랑(무공 틀), 마나만 = 파랑(마법 틀), 둘 다 = 반반(융합 틀).
+ * 비용 0인 카드만 주인으로 가른다(하운·공용 = 무공, 그 밖 = 마법)
+ */
 export function cardWorld(card: ResolvedCard): CardWorld {
   const def = card.def;
   if (def.owner === 'status' || def.pool === 'status') return 'status';
   if (isFusion(card)) return 'fusion';
+  if (card.cost.mana > 0) return 'elheim';
+  if (card.cost.neigong > 0) return 'murim';
   return def.owner === 'haun' || def.owner === 'common' ? 'murim' : 'elheim';
 }
 

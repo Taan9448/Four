@@ -1873,7 +1873,6 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .potion-chip .potion-arm-hint { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%) scale(0.8); white-space: nowrap; background: rgba(14, 10, 12, 0.95); color: #ffe3a6; border: 1px solid #c9a24a; border-radius: 6px; padding: 2px 8px; font-size: var(--fs-cap); pointer-events: none; }
 /* 장면 편의(B3): 자동 진행 켜짐 · 이미 본 장면 건너뛰기 */
 .vn-controls .btn.on { border-color: var(--mana); background: #26354a; }
-.vn-seen-skip { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 6; }
 /* 전투 단축키 표식(2026-10-12 B8): 키보드가 없는 기기에서는 숨긴다 */
 @media (pointer: coarse) { .medal-help { display: none; } }
 

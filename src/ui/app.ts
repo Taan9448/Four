@@ -721,7 +721,7 @@ export class App {
     if (skip.auto) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     playBgm(mood ?? moodFor(scene.world ?? stage?.world));
-    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags, skip }));
+    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
   private battle(enc: Encounter): void {
