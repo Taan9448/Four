@@ -4,6 +4,7 @@ import type { GameData } from './data';
 import type { CardDef } from './schema';
 import type { CardInstance } from './state';
 import type { RunState } from './run';
+import { measurePilgrimScale } from './pilgrim-scale';
 
 /** 편성: 주인(동료 id 또는 'common') → 카드 id 목록 */
 export type Loadout = Record<string, string[]>;
@@ -240,6 +241,8 @@ export function setLoadout(data: GameData, run: RunState, loadout: Loadout): voi
       }),
   );
   buildStageDeck(data, run);
+  // 순례: 출발 편성으로 일행 보정을 고정한다(2026-10-12 보정식 세 항)
+  if (run.replayOf) run.pilgrimScale = measurePilgrimScale(data, run);
 }
 
 /** 스테이지를 시작할 때: 이번 스테이지에 얻은 카드를 비우고, 편성을 다시 고르게 한다(모자란 칸은 추천으로 미리 채움) */

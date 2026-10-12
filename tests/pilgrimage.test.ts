@@ -1,8 +1,8 @@
 // 순례(자유 여정 개편, 2026-10-11 사용자 결정 A안): 길에서 얻은 것은 그 길 안에서만
 import { beforeEach, describe, expect, it } from 'vitest';
-import { acquireCard, upgradeOwned } from '../src/engine/collection';
+import { acquireCard, setLoadout, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
-import { battleSetupFor, createRunAt, enterNode, finishReplay, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
+import { battleSetupFor, createRunAt, enterNode, finishReplay, measurePilgrimScale, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
 import { deserializeRun, serializeRun } from '../src/engine/save';
 import { challengeMet, challengeState, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../src/engine/pilgrimage';
 import { unlockedPaths, unlockedRift } from '../src/engine/abyss';
@@ -106,22 +106,41 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 1 + 하운 레벨이 기준보다 높은 만큼 × 레벨당 + 유물 수 × relicPct, 상한 maxHp·maxDmg, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
-    expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1 });
+    expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
     const haun = run.roster.find((r) => r.id === 'haun')!;
     haun.level = 9;
     const over = Math.max(0, 9 - p.baseLevel.s3);
-    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct) * 100) / 100;
-    expect(pilgrimScale(data, run)).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg) });
-    // 기준 레벨 이하면 유물 몫만
+    // 출발 편성(열쇠 카드 제외)의 평균 강화
+    const cards = Object.values(run.loadout).flat().filter((id) => !data.cards.get(id)?.essential);
+    for (const id of cards) run.collection[id] = 2;
+    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100;
+    const k = pilgrimScale(data, run);
+    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, upgrade: 2 });
+    // 기준 레벨 이하면 유물·강화 몫만
     haun.level = 1;
-    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct) * 100) / 100);
+    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100);
     // 상한
     haun.level = 99;
     run.relics = Array.from({ length: 500 }, () => 'red_thread');
-    expect(pilgrimScale(data, run)).toEqual({ hp: p.maxHp, dmg: p.maxDmg });
+    expect(pilgrimScale(data, run)).toMatchObject({ hp: p.maxHp, dmg: p.maxDmg });
+  });
+
+  it('출발 편성을 정하면 보정을 고정한다 — 길에서 레벨·유물·강화가 늘어도 그대로, 저장을 거쳐도 그대로', () => {
+    const hub = cleared('PIL6B');
+    const run = startReplay(data, hub, 's4');
+    setLoadout(data, run, run.loadout);
+    const fixed = structuredClone(run.pilgrimScale!);
+    expect(fixed).toEqual(measurePilgrimScale(data, run));
+    run.roster.find((r) => r.id === 'haun')!.level += 5;
+    run.relics.push('red_thread', 'red_thread');
+    for (const id of Object.keys(run.collection)) run.collection[id] = 3;
+    expect(pilgrimScale(data, run)).toEqual(fixed);
+    expect(deserializeRun(data, serializeRun(run))!.run.pilgrimScale).toEqual(fixed);
+    // 클리어한 런으로 돌아가면 남지 않는다
+    expect(finishReplay(run).pilgrimScale).toBeUndefined();
   });
 
   it('전투 배율에 곱해진다(어려움 배율과 함께)', () => {
