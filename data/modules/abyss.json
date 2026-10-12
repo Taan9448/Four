@@ -44,7 +44,7 @@
     "content": {
       "text": "얼굴 없는 그림자가 검은 금이 간 카드 한 장을 내민다. \"틈 너머에서 주워 온 것이다. 몸으로 값을 치러라.\"",
       "choices": [
-        { "label": "틈의 카드 한 장(희귀 이상)을 받는다 — 동료 모두 최대 체력 -8", "effects": [{ "op": "gain_abyss_card" }, { "op": "gain_max_hp", "amount": -8 }], "result": "카드를 쥐자 손끝이 차갑게 식었다." },
+        { "label": "틈의 카드 한 장(희귀 이상)을 받는다 — 동료 모두 최대 체력 -80", "effects": [{ "op": "gain_abyss_card" }, { "op": "gain_max_hp", "amount": -80 }], "result": "카드를 쥐자 손끝이 차갑게 식었다." },
         { "label": "본 적 없는 카드 하나를 들여다본다 — 골드 40", "condition": { "goldGte": 40 }, "effects": [{ "op": "gain_gold", "amount": -40 }, { "op": "reveal_unseen_card" }], "result": "그림자의 손바닥 위로 낯선 초식이 잠깐 비쳤다." },
         { "label": "지나간다", "effects": [], "result": "그림자는 카드를 거두었다." }
       ]
@@ -143,7 +143,7 @@
         { "label": "엘리아의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "elia" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "elia", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
         { "label": "카일의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "kyle" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "kyle", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
         { "label": "보른의 시작 카드 4장을 틈에 바친다 — 틈의 카드 한 장", "condition": { "partyHas": "born" }, "effects": [{ "op": "remove_card", "count": 4, "filter": { "owner": "born", "pool": "starter" } }, { "op": "gain_abyss_card" }], "result": "익숙한 초식이 그림자 속으로 녹아 사라졌다." },
-        { "label": "아무것도 내놓지 않는다 — 동료 모두 최대 체력 +10", "effects": [{ "op": "gain_max_hp", "amount": 10 }], "result": "그림자들이 흩어지고, 발밑이 조금 단단해졌다." }
+        { "label": "아무것도 내놓지 않는다 — 동료 모두 최대 체력 +100", "effects": [{ "op": "gain_max_hp", "amount": 100 }], "result": "그림자들이 흩어지고, 발밑이 조금 단단해졌다." }
       ]
     }
   }

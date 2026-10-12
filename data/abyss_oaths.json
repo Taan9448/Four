@@ -13,5 +13,5 @@
   { "level": 12, "name": "틈의 손", "glyph": "隙", "description": "전투 보상 후보에 틈의 카드가 반드시 한 장 섞인다. 고르지 않을 수는 있다.", "mods": { "riftInReward": true } },
   { "level": 13, "name": "닫힌 마음", "glyph": "閉", "description": "심법(파워) 카드가 보상·상점·시작 덱에 나오지 않는다.", "mods": { "noPowers": true } },
   { "level": 14, "name": "둘만의 길", "glyph": "二", "description": "동료는 한 명만 데려갈 수 있다.", "mods": { "maxMates": 1 } },
-  { "level": 15, "name": "하운의 맹세", "glyph": "誓", "description": "하운의 최대 체력이 50이다.", "mods": { "haunMaxHp": 50 } }
+  { "level": 15, "name": "하운의 맹세", "glyph": "誓", "description": "하운의 최대 체력이 50이다.", "mods": { "haunMaxHp": 500 } }
 ]
