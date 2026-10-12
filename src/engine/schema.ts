@@ -787,6 +787,8 @@ export const Balance = z
         /** 세계 → 그 세계의 지도에 쓸 스테이지(모듈·적·배경·마나 규칙), 보스 모듈 */
         worlds: z.record(World, z.object({ stages: z.array(z.string()).min(1), bosses: z.array(z.string()) }).strict()),
         firstWorlds: z.array(World).min(1),
+        /** 보스가 처음 나올 수 있는 굽이(2026-10-12: 2굽이 바르가스 사망 집중 → 3굽이부터). 보스가 모두 막힌 세계는 그 굽이 후보에서 빠진다 */
+        bossMinDepth: z.record(z.string(), z.number().int().min(1)).default({}),
         riftFrom: z.number().int().positive(),
         score: z.object({ depth: z.number(), boss: z.number(), elite: z.number(), hp: z.number() }).strict(),
         // ── 2차(변동성) ──

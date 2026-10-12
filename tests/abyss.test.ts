@@ -408,3 +408,14 @@ describe('심연 2차', () => {
     expect(b.enemies[0].statuses.blood_cover_fading).toBe(2);
   });
 });
+
+describe('보스 하한(2026-10-12 A2)', () => {
+  it('바르가스는 bossMinDepth(3) 전 굽이에는 나오지 않는다', () => {
+    const min = data.balance.abyss.bossMinDepth.s5_boss_vargas;
+    expect(min).toBe(3);
+    for (let i = 0; i < 60; i++) {
+      const run = start(`VARG${i}`, ['elia', 'kyle']);
+      for (let d = 1; d < min; d++) expect(planLoop(data, run.abyss!, d).boss).not.toBe('s5_boss_vargas');
+    }
+  });
+});

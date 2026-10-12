@@ -682,9 +682,20 @@ function scarTip(data: GameData): string {
   const crackAt = data.balance.rift.map.scarCrackAt;
   return (
     `균열이 남긴 흔적. 상흔 ${sc.startRiftPer}마다 전투 시작 균열 +1(${startRiftMaxText(data)}).\n상흔 ${sc.restAt} 이상이면 휴식 회복 -${Math.round((1 - sc.restHealMul) * 100)}%.` +
+    `\n상흔 ${sc.shopAt} 이상이면 상점 값 +${Math.round((sc.shopPriceMul - 1) * 100)}%, 대신 균열 감소 카드가 반드시 나오고 꿰매기(-${sc.shopStitch}, ${sc.shopStitchGold}금)를 판다.` +
     (crackAt !== undefined ? `\n상흔 ${crackAt} 이상으로 새 지도에 들어서면 지도가 한 번 갈라진다(裂 틈새 하나).` : '') +
     `\n휴식의 꿰매기(상흔 -${sc.stitch}), 폭주 없이 보스를 넘기면(상흔 -${sc.bossCleanBonus}) 아문다.`
   );
+}
+
+/** 지금 상흔으로 걸린 효과 배지(2026-10-12 A5): 휴식 'rest' → "상흔 N · 회복 -20%", 상점 'shop' → "상흔 N · 값 +20%". 조건 미달이면 null */
+export function scarBadge(data: GameData, scar: number, where: 'rest' | 'shop'): HTMLElement | null {
+  const sc = data.balance.rift.scar;
+  if (where === 'rest' && scar >= sc.restAt)
+    return h('span', { class: 'scar-badge', ...tipAttrs('상흔', scarTip(data), 'rift') }, `상흔 ${scar} · 회복 -${Math.round((1 - sc.restHealMul) * 100)}%`);
+  if (where === 'shop' && scar >= sc.shopAt)
+    return h('span', { class: 'scar-badge', ...tipAttrs('상흔', scarTip(data), 'rift') }, `상흔 ${scar} · 값 +${Math.round((sc.shopPriceMul - 1) * 100)}%`);
+  return null;
 }
 
 /** 다음 전투 시작 균열 줄(0이면 감춘다) */
