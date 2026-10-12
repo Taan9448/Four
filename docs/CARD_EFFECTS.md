@@ -72,8 +72,8 @@
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
   "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다)
-  "tags": ["haun_rift"],
-  "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 공용은 아무 동료의 것
+  "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 동료 카드는 그 동료의 갈래 하나 또는 비움(잇는 카드), 공용은 아무 동료의 것
+  "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'·'틈의 속삭임'·'피의 빚'
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
   "upgrade": {                          // 강화 +1~+5(상태 카드 제외 필수)
     "growth": [4, 0],                   //   +1~+3: 단계마다 effects[i]의 amount(없으면 stacks)에 더할 값. 효과 수와 같아야 한다
@@ -95,6 +95,10 @@
 - +1~+3(`balance.upgrade.statLevels`): `growth`만큼 수치가 오른다. 비용·키워드·효과 수는 그대로.
 - +4·+5: `plus4`, `plus5` 특수 스킬이 차례로 붙는다. 카드 문구에 `★이름: 설명` 줄로 보인다.
 - 휴식의 수련(`upgrade_card` + `"choose": true`)은 사람이 강화할 카드를 고른다(강화 뒤 모습으로 미리 보기). 이벤트의 강화는 무작위.
+
+**갈래 규칙**(`data:check`가 검사, 카드 250장 확장)
+- 갈래마다 시작·보상 카드(공용 카드의 태그 포함) **12장 이상**. 심법(power)은 소멸·대상 자신. 틈의 카드는 대가(균열 + · 상흔 + · 체력 잃기 · 소멸) 하나는 반드시. 영웅·전설은 `castLine` 필수.
+- 편성 점수: 등급 점수(`balance.loadout.points`) — 동료 24 · 공용 17까지. 같은 갈래 5장 이상이면 그 갈래의 전투 시작 효과(`characters[].archetypes[].focus`).
 
 **등급 규칙**(`data:check`가 검사)
 - 시작 카드(`pool: starter`)는 일반·고급 — 동료가 합류할 때(공용은 런을 시작할 때) 10장씩 보유 카드가 된다(GAME_DESIGN 9-1).

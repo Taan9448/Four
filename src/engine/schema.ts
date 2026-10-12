@@ -720,7 +720,7 @@ export const Balance = z
         shadowEliteDmg: z.number().positive(),
         needleRewardChoices: z.number().int().positive(),
         unseenCardPrice: z.number().int().min(0),
-        /** 시작 화면: 동료의 심연 풀이 이 장수보다 적으면 '좁음' 경고 */
+        /** 시작 화면: 동료의 심연 풀이 이 장수보다 적으면 '좁음' 경고(카드 250장 확장 뒤 20 — 봇 보고서의 '좁은 풀'도 이 기준) */
         narrowPool: z.number().int().min(0).default(15),
         /** 세계 → 그 세계의 지도에 쓸 스테이지(모듈·적·배경·마나 규칙), 보스 모듈 */
         worlds: z.record(World, z.object({ stages: z.array(z.string()).min(1), bosses: z.array(z.string()) }).strict()),

@@ -177,6 +177,20 @@ describe('편성 점수 상한·갈래 보너스(카드 250장 확장 2026-10-11
     expect(lo).toContain(legend.id);
   });
 
+  it('추천 편성: 한 갈래 카드가 5장 이상이면 그 갈래 5장을 먼저 담아 갈래 보너스가 켜진다(상한 안에서)', async () => {
+    const { recommendFor, loadoutFocus, loadoutPoints, choosable } = await import('../src/engine/collection');
+    const run = createRunAt(data, 'FOCUS2', 's8');
+    for (const c of data.cards.values()) if (c.pool === 'reward' && !c.essential) run.collection[c.id] = 0;
+    for (const owner of ['haun', 'elia', 'kyle', 'born']) {
+      const lo = recommendFor(data, run, owner);
+      expect(loadoutPoints(data, lo)).toBeLessThanOrEqual(24);
+      const owned = choosable(data, run, owner);
+      const canFocus = data.characters.get(owner)!.archetypes.some((a) => owned.filter((d) => d.tags.includes(a.id)).length >= 5);
+      expect(canFocus, owner).toBe(true);
+      expect(loadoutFocus(data, owner, lo), owner).not.toBeNull();
+    }
+  });
+
   it('갈래 보너스: 같은 갈래 5장이면 켜지고(출발 편성), 출전한 그 동료를 출처로 전투 시작 효과', async () => {
     const { loadoutFocus } = await import('../src/engine/collection');
     const { battleSetupFor, enterNode, availableNodes } = await import('../src/engine/run');

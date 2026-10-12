@@ -5,12 +5,23 @@ import { BOT_STYLE_NAME, playAbyss, type AbyssReport, type BotOptions } from '..
 import type { AbyssBatch } from './shared';
 import { fmtPct, outside, TARGETS, targetTable, warningSection } from './warnings';
 
-/** 봇용 풀: narrow = 캠페인 한 번 마친 저장 어림(시작 카드 + 보상 카드 절반, +0~1), wide = 전부 본 저장(+2) */
+/**
+ * 봇용 풀: narrow = '좁은 풀'(카드 250장 확장: 동료마다 심연 풀 balance.abyss.narrowPool장 미만 — 시작 카드 + 보상 카드 절반을
+ * 그 아래로 자른 것, +0~1), wide = 전부 본 저장(+2)
+ */
 export function botPool(data: GameData, kind: 'narrow' | 'wide'): Record<string, number> {
   const rewards = [...data.cards.values()].filter((c) => c.pool === 'reward' && !c.essential);
   const collection: Record<string, number> = {};
   if (kind === 'wide') for (const c of rewards) collection[c.id] = 2;
-  else rewards.forEach((c, i) => i % 2 === 0 && (collection[c.id] = i % 4 === 0 ? 1 : 0));
+  else {
+    const starters = (owner: string) => [...data.cards.values()].filter((c) => c.pool === 'starter' && c.owner === owner).length;
+    const taken: Record<string, number> = {};
+    rewards.forEach((c, i) => {
+      if (i % 2 !== 0 || (taken[c.owner] ?? 0) >= data.balance.abyss.narrowPool - 1 - starters(c.owner)) return;
+      taken[c.owner] = (taken[c.owner] ?? 0) + 1;
+      collection[c.id] = i % 4 === 0 ? 1 : 0;
+    });
+  }
   return abyssPool(data, collection, []);
 }
 
@@ -22,7 +33,7 @@ const OATHS = [0, 3, 6, 10, 15];
 /** 봇 한 성향으로 심연 표본을 둔다: 풀 2종 × 동료 조합, 서약 단계별 */
 export function playAbyssBatch(data: GameData, seeds: number, prefix: string, opts: BotOptions, maxDepth = MAX_DEPTH): Omit<AbyssBatch, 'style' | 'ms'> {
   const runs: AbyssBatch['runs'] = [];
-  // 좁은 풀 = 처음 심연(업적 없음: 틈의 카드 10장), 넓은 풀 = 다 연 저장(틈의 카드 40장)
+  // 좁은 풀 = 처음 심연(업적 없음: 틈의 카드 10장, 동료마다 풀 narrowPool장 미만), 넓은 풀 = 다 연 저장(틈의 카드 50장)
   const fresh = unlockedRift(data, []);
   for (const pool of ['narrow', 'wide'] as const) {
     const p = botPool(data, pool);
