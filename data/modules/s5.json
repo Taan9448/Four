@@ -149,7 +149,7 @@
     "weight": 2,
     "tags": ["scar"],
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "회랑의 벽에 검은 쐐기가 박혀 있다. 엉킨 결이 비틀리며 허공을 갉아먹는다. 그 자리만 공기가 아지랑이처럼 일그러져 있다. 경계가 얇다.", "choices": [{"label": "엉킨 결을 들여다본다", "result": "쇠의 결과 결 잃은 마나가 반대로 꼬여 있었다. 하운의 카드 2장을 강화했다(+1). 상흔 +1.", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "보른이 쐐기가 박힌 돌의 결을 친다", "condition": {"partyHas": "born"}, "result": "쐐기가 튀어나왔다. 뭉툭한 끝에 한스의 표식이 있었다. 출전 동료 전원 체력 50 회복.", "effects": [{"op": "heal_party", "amount": 50}]}, {"label": "손대지 않고 지나간다", "result": "출전 동료 전원 체력 30 회복.", "effects": [{"op": "heal_party", "amount": 30}]}]}
+    "content": {"text": "회랑의 벽에 검은 쐐기가 박혀 있다. 엉킨 결이 비틀리며 허공을 갉아먹는다. 그 자리만 공기가 아지랑이처럼 일그러져 있다. 경계가 얇다.", "choices": [{"label": "엉킨 결을 들여다본다", "result": "쇠의 결과 결 잃은 마나가 반대로 꼬여 있었다. 하운의 카드 2장을 강화했다(+1). 상흔 +1.", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "보른이 쐐기가 박힌 돌의 결을 친다", "condition": {"partyHas": "born"}, "result": "쐐기가 튀어나왔다. 뭉툭한 끝에 한스의 표식이 있었다. 출전 동료 전원 체력 50 회복.", "effects": [{"op": "heal_party", "amount": 50}]}, {"label": "엘리아가 쐐기의 번개를 읽는다", "condition": {"partyHas": "elia"}, "result": "\"…이것도 결이에요. 마나가 뒤틀린 결.\" 손끝에서 보랏빛이 튀었다. (보랏빛 번개를 얻었다)", "effects": [{"op": "set_flag", "flag": "violet_lightning"}, {"op": "gain_card", "card": "elia_violet_lightning"}]}, {"label": "손대지 않고 지나간다", "result": "출전 동료 전원 체력 30 회복.", "effects": [{"op": "heal_party", "amount": 30}]}]}
   },
   {
     "id": "s5_event_silver_seeds",

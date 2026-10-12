@@ -361,7 +361,7 @@ export const StatusDef = z
     description: z.string(),
     /** 아이콘 그림이 없을 때 표시할 한 글자(한자) */
     glyph: z.string().length(1),
-    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~47 icons_status_d, 48~ icons_status_e(src/ui/icons.ts) */
+    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~47 icons_status_d, 48~53 icons_status_e, 54~ icons_status_f(src/ui/icons.ts) */
     icon: z.number().int().positive().optional(),
     /** 턴마다 줄어드는 스택 수. 0이면 줄지 않는다. */
     decay: z.number().int().min(0),
