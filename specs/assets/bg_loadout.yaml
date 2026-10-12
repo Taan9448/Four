@@ -1,0 +1,13 @@
+id: bg_loadout
+type: background
+summary: "화면 배경 — 편성(출발 전 여관 방, 동료 넷의 무기와 펼친 카드)"
+# 2026-10-12: 편성 화면 뒤에 어둡게 깔린다(app.backdrop, 밝기 42%). 가운데는 카드 격자·패널이 덮으므로 차분하게, 볼거리는 네 가장자리에
+frame_notes:
+  1: >-
+    A small second-floor room of a wuxia-world inn at night, seen from the doorway: on the left wall a wooden weapon rack holding a
+    woodcutter's axe, a slender longsword with a red-wrapped hilt, a pale wooden mage staff and a heavy dwarf war hammer, with
+    two travel packs and a bedroll on the floor below it. On the right a paper-lattice window with a full moon and a hanging
+    oil lamp giving warm amber light. In the lower middle a low wooden table seen from slightly above, covered with a few spread
+    blank cards, a rolled map and a brush stand. The back wall and floor are plain dark wood so the middle stays calm.
+    Warm browns and amber lamplight, deep blue night in the window, small touches of red and silver.
+placeholder: { color: '#2a2119' }

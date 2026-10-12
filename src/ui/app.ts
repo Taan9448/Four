@@ -203,7 +203,7 @@ export class App {
       if (name === 'abyssshop') {
         ar.gold = 300;
         const shop = data.modules.get('abyss_shop')!;
-        return this.show(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map())));
+        return this.show(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map()), 'bg_shop'));
       }
       const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
       return this.show(this.backdrop(choiceView(data, ar, mod, () => this.map())));
@@ -256,7 +256,7 @@ export class App {
         // 보유 맥락 표가 보이게: 진열 첫 카드는 보유 +2
         const shelf = openShop(data, run, first.id).cards[0];
         if (shelf) run.collection[shelf.cardId] = 2;
-        return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map())));
+        return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map()), 'bg_shop'));
       }
       case 'hub': {
         // 캠페인을 마친 런의 클리어 지도
@@ -347,8 +347,10 @@ export class App {
    */
   private backdrop(el: HTMLElement, art?: string): HTMLElement {
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
-    const url = frameUrl(art ?? stage?.background, 1, { realOnly: true });
+    // 화면 전용 그림(편성 bg_loadout · 상점 bg_shop)이 아직 없으면 스테이지 배경으로
+    const url = (art ? frameUrl(art, 1, { realOnly: true }) : null) ?? frameUrl(stage?.background, 1, { realOnly: true });
     el.classList.add('backdrop', `world-${stage?.world ?? 'murim'}`);
+    if (art === 'bg_loadout' || art === 'bg_shop') el.classList.add(art === 'bg_shop' ? 'mood-shop' : 'mood-loadout');
     if (url) {
       el.classList.add('has-art');
       el.style.setProperty('--backdrop', `url("${url}")`);
@@ -631,7 +633,7 @@ export class App {
     const enc = enterNode(data, run, node.id);
     const go = () => {
       if (isBattle(enc)) this.battle(enc);
-      else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background));
+      else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background ?? 'bg_shop'));
       else {
         // 이벤트 선택지에 이름으로 나온 카드도 본 것(GAME_DESIGN 16절 — 도감 기록 기준)
         const named = (enc.module.content.choices ?? []).flatMap((c) => [...c.effects, ...(c.outcomes ?? []).flatMap((o) => o.effects)]).filter((e) => e.op === 'gain_card' && e.card);
@@ -762,13 +764,14 @@ export class App {
           onCancel: inn,
           onShowCollection: () => this.showCards(),
         }),
+        'bg_loadout',
       ),
     );
     // 처음 여는 편성 화면(새 캠페인은 S1 출발 전)에서 한 번: 편성이란(2026-10-11 UI/UX 2-1)
     if (!inn)
       runTour(
         [
-          { target: '.loadout-tabs', title: '편성이란', text: `동료마다 ${data.balance.loadout.perCharacter}장 + 공용 ${data.balance.loadout.common}장을 보유 카드에서 골라 이번 스테이지의 덱을 짠다. 탭에는 채운 수와 갈래(아키타입)별 장수.` },
+          { target: '.loadout-roster', title: '편성이란', text: `동료마다 ${data.balance.loadout.perCharacter}장 + 공용 ${data.balance.loadout.common}장을 보유 카드에서 골라 이번 스테이지의 덱을 짠다. 칸마다 채운 장수 · 점수 막대 · 갈래 보너스가 보인다.` },
           { target: '.loadout-grid', title: '카드 고르기', text: '누르면 넣고, 다시 누르면 뺀다. 같은 카드는 한 장만.' },
           { target: '.loadout-bar', title: '점수 상한', text: `카드마다 등급 점수(카드 위 배지). 동료 ${data.balance.loadout.cap.perCharacter}점 · 공용 ${data.balance.loadout.cap.common}점까지 — 센 카드를 넣으면 나머지는 싼 카드로 채운다. 같은 갈래 카드 ${data.balance.loadout.focusMin}장이면 그 갈래의 전투 시작 보너스(✓).` },
           { target: '.loadout-actions', title: '추천을 눌러도 된다', text: '"전체 추천 편성"이 알아서 채운다. 다음 스테이지부터는 "지난 편성 그대로 출발" 한 번이면 된다.' },
