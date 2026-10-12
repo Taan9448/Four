@@ -39,7 +39,7 @@ function pickCard(data: GameData, title: string, cards: CardInstance[], onPick: 
 export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeId: string, onDone: () => void): HTMLElement {
   const shop = openShop(data, run, nodeId);
   const toasts = h('div', { class: 'toasts' });
-  const box = h('div', { class: 'choice-box panel shop-box' });
+  const box = h('div', { class: 'shop-layout' });
   const result = (r: BuyResult) => {
     toast(toasts, r.ok ? r.message : r.reason, r.ok ? 'support' : 'danger');
     if (r.ok) sfx('coin');
@@ -50,17 +50,23 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
   const render = () => {
     const swapCost = swapPrice(data, run);
     const upCost = data.balance.economy.shop.upgradePrice;
-    box.replaceChildren(
+    // 편성 화면과 같은 틀(2026-10-12): 위 머리말(이름·글·가진 골드) · 왼쪽 진열대(카드 · 유물 · 물약) · 오른쪽 옆단(손질 · 내 물약 칸 · 떠나기)
+    const head = h(
+      'header',
+      { class: 'shop-head panel' },
+      h('span', { class: 'seal' }, '市'),
       h(
-        'header',
-        { class: 'panel-head' },
-        h('span', { class: 'seal' }, '市'),
-        h('div', {}, h('div', { class: 'choice-kind' }, '상점'), h('h2', {}, module.name)),
-        h('div', { class: 'shop-purse' }, goldChip(run.gold)),
+        'div',
+        { class: 'shop-title' },
+        h('div', { class: 'choice-kind' }, '상점'),
+        h('h2', {}, module.name),
+        module.content.text ? h('p', { class: 'shop-text' }, module.content.text) : null,
+        // 상흔이 깊으면: '틈 냄새가 나는 손님' — 값이 오르고, 감소 카드 한 장과 꿰매기(GAME_DESIGN 7절)
+        shop.scarred ? h('p', { class: 'shop-scarred' }, `틈 냄새가 나는 손님 — 상흔 ${data.balance.rift.scar.shopAt} 이상이라 값이 ${Math.round((data.balance.rift.scar.shopPriceMul - 1) * 100)}% 올랐다. 대신 금을 꿰매 주겠단다.`) : null,
       ),
-      h('p', { class: 'choice-text' }, module.content.text ?? ''),
-      // 상흔이 깊으면: '틈 냄새가 나는 손님' — 값이 오르고, 감소 카드 한 장과 꿰매기(GAME_DESIGN 7절)
-      shop.scarred ? h('p', { class: 'shop-scarred' }, `틈 냄새가 나는 손님 — 상흔 ${data.balance.rift.scar.shopAt} 이상이라 값이 ${Math.round((data.balance.rift.scar.shopPriceMul - 1) * 100)}% 올랐다. 대신 금을 꿰매 주겠단다.`) : '',
+      h('div', { class: 'shop-purse', 'aria-label': `가진 골드 ${run.gold}` }, h('small', {}, '가진 골드'), goldChip(run.gold)),
+    );
+    const cardShelf = [
       h('h3', { class: 'shop-h' }, '카드'),
       h(
         'div',
@@ -76,7 +82,8 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           );
         }),
       ),
-      h(
+    ];
+    const goods = h(
         'div',
         { class: 'shop-row' },
         h(
@@ -113,11 +120,11 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
               item.sold ? null : h('button', { class: 'btn btn-small', disabled: run.gold < item.price || full, title: full ? '물약 칸이 가득하다' : '', onclick: () => result(buyPotion(data, run, i)) }, '사기'),
             );
           }),
-          h('div', { class: 'shop-potions-own' }, h('small', {}, '내 물약 칸'), run.potions.map((p) => potionChip(data, p))),
         ),
-        h(
+    );
+    const services = h(
           'div',
-          { class: 'shop-col' },
+          { class: 'shop-services panel' },
           h('h3', { class: 'shop-h' }, '손질(상점마다 한 번)'),
           run.abyss
             ? h(
@@ -190,11 +197,23 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
                   '고르기',
                 ),
           ),
+    );
+    box.replaceChildren(
+      head,
+      h(
+        'div',
+        { class: 'shop-body' },
+        h('div', { class: 'shop-main panel' }, ...cardShelf, goods),
+        h(
+          'aside',
+          { class: 'shop-side' },
+          services,
+          h('div', { class: 'shop-own panel' }, h('h3', { class: 'shop-h' }, '내 물약 칸'), h('div', { class: 'shop-potions-own' }, run.potions.map((p) => potionChip(data, p)))),
+          h('button', { class: 'btn btn-primary shop-leave', onclick: onDone }, '떠나기'),
         ),
       ),
-      h('div', { class: 'panel-actions' }, h('button', { class: 'btn btn-primary', onclick: onDone }, '떠나기')),
     );
   };
   render();
-  return h('section', { class: 'screen choice-screen backdrop choice-shop' }, box, toasts);
+  return h('section', { class: 'screen shop-screen' }, box, toasts);
 }
