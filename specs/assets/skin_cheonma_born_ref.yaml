@@ -1,0 +1,12 @@
+id: skin_cheonma_born_ref
+type: character-ref
+character: skin_cheonma_born
+summary: "보른 옷장 「천마를 넘어」 기준 시트(3/4 정면 + 오른쪽 측면)"
+depends_on: [born_hammer_ref]
+reference: assets/source/born_hammer_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose in the new outfit, holding the heavy two-handed war hammer; the same face, hair, body proportions and height as the attached reference sheet, only the clothes and weapon details change"
+  2: "full body, side view facing right, the same outfit and proportions, standing ready with the heavy two-handed war hammer lowered"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#d1263a' }

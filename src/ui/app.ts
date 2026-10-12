@@ -62,6 +62,9 @@ import {
   listSlots,
   loadAbyss,
   readCodex,
+  readWardrobe,
+  recordSkinEvent,
+  writeWardrobe,
   readProfile,
   readAbyssMeta,
   recordAbyss,
@@ -101,6 +104,8 @@ import { hubView, placeDialog } from './hub-view';
 import { loadoutView } from './loadout-view';
 import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
+import { wardrobeView } from './wardrobe-view';
+import { battleSkins } from '../engine/wardrobe';
 import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, recordsCards, type Codex } from '../engine/codex';
 
 const data = gameData();
@@ -272,6 +277,11 @@ export class App {
       }
       case 'codex':
         return this.codex((id as CodexTab | undefined) ?? 'cards');
+      case 'wardrobe': {
+        // 옷장: 모든 세트를 연 채로(저장하지 않는다)
+        const w = { unlocked: data.skins.sets.map((s) => s.id), equipped: { haun: data.skins.sets[0].id } as Record<string, string> };
+        return this.show(this.backdrop(wardrobeView(data, w, { onBack: () => this.title(), onSave: () => {} }), 'bg_loadout'));
+      }
       case 'pilgrim': {
         // 순례의 보상(클리어한 런에서 이 스테이지를 처음 다시 넘겼을 때)
         const hub = createRunAt(data, 'SCREEN', 's9', { supportActive: true });
@@ -300,6 +310,19 @@ export class App {
   /** 도감에 적는다(저장하는 런만: 샌드박스·화면 확인은 적지 않는다) */
   private note(fn: (codex: Codex) => void): void {
     if (this.persist) updateCodex(data, fn);
+  }
+
+  /** 옷장(2026-10-12): 순례·심연에서 입는 옷. back: 돌아갈 화면(기본 시작 화면) */
+  private wardrobe(from?: () => void): void {
+    if (!from) playBgm('title');
+    const back = from ?? (() => this.title());
+    this.show(this.backdrop(wardrobeView(data, readWardrobe(data), { onBack: () => back(), onSave: (w) => this.persist && writeWardrobe(w) }), 'bg_loadout'));
+  }
+
+  /** 옷장을 여는 일(캠페인·심연·순례): 새로 연 옷은 다음 화면에 알린다 */
+  private skinNews(ev: Parameters<typeof recordSkinEvent>[1]): string[] {
+    if (!this.persist) return [];
+    return recordSkinEvent(data, ev).map((name) => `옷장에 새 옷 — 「${name}」`);
   }
 
   /** 도감 화면. 본 장면을 다시 보면 끝나고 같은 탭으로 돌아온다. back: 돌아갈 화면(기본 시작 화면, 지도에서 열면 지도) */
@@ -340,6 +363,8 @@ export class App {
 
   /** 다음 화면에 띄울 알림 */
   private notices: string[] = [];
+  /** 끝 화면에 띄울 알림(엔딩 장면을 건너서) */
+  private pendingNews: string[] = [];
 
   /**
    * 지도 밖 화면(선택지·보상·스테이지 끝·엔딩)의 뒷배경: 지금 스테이지의 전투 배경을 어둡게 깐다(GAME_DESIGN 13절).
@@ -408,6 +433,10 @@ export class App {
         h(
           'div',
           { class: 'title-corner' },
+          // 옷장(2026-10-12): 도감 왼쪽. 캠페인을 한 번 마쳤거나 연 옷이 있으면
+          readProfile().clears > 0 || readWardrobe(data).unlocked.length
+            ? h('button', { class: 'medal title-medal', 'aria-label': '옷장', ...tipAttrs('옷장', '순례·심연에서 네 동료가 입는 옷'), onclick: () => this.wardrobe() }, h('b', {}, '衣'), h('span', {}, '옷장'))
+            : null,
           h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
         ),
@@ -576,6 +605,7 @@ export class App {
         recordClear(run);
         saveRun(this.slot, run);
       }
+      this.pendingNews.push(...this.skinNews({ kind: 'campaignClear', difficulty: run.difficulty, hardcore: run.hardcore }));
       const last = data.stages.find((s) => s.id === run.stageId)!;
       return this.playScene(last.endingScene, () => this.end(true), undefined, 'ending');
     }
@@ -597,6 +627,7 @@ export class App {
         onShowDeck: () => this.showCards(),
         onSettings: () => this.openSettings(),
         onCodex: () => this.codex('cards', () => this.map()),
+        onWardrobe: run.abyss || run.replayOf ? () => this.wardrobe(() => this.map()) : undefined,
         onTitle: () => this.title(),
         highlightParty: firstMate || overFull,
         // 자유 여정(다시 하는 중): 이 스테이지를 멈춰 두고 전체 지도로 / 다른 장소로
@@ -685,6 +716,7 @@ export class App {
         pilgrimText: run.replayOf ? pilgrimLabel(data, run) : undefined,
         laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
         background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
+        skins: battleSkins(readWardrobe(data), run),
         onQuit: (abandon) => {
           if (abandon && this.persist) {
             if (run.abyss) clearAbyss();
@@ -838,6 +870,7 @@ export class App {
         },
         onShowDeck: () => this.showCards(),
         onCodex: () => this.codex('cards', () => this.hub()),
+        onWardrobe: () => this.wardrobe(() => this.hub()),
         onTitle: () => this.title(),
       }),
     );
@@ -864,11 +897,15 @@ export class App {
     if (!run.replayOf) return null;
     const fresh = settleChallenges(data, run);
     if (this.persist) recordChallenges(data, fresh);
-    if (!fresh.length) return null;
+    // 순례로 스테이지를 넘기면 옷장이 열릴 수 있다(순례의 끝 — S9)
+    const won = run.status === 'stage_clear' || run.status === 'complete';
+    const skins = won ? this.skinNews({ kind: 'pilgrimStage', stage: run.stageId }) : [];
+    if (!fresh.length && !skins.length) return null;
     return h(
       'ul',
       { class: 'gains pilgrim-news' },
       fresh.map((c) => h('li', {}, `도전 「${c.name}」 — ${challengeUnlockName(data, c)}${c.unlock.title ? '을 얻었다' : '이(가) 열렸다'}`)),
+      skins.map((t) => h('li', {}, t)),
     );
   }
 
@@ -1228,6 +1265,7 @@ export class App {
     const run = this.run!;
     const ab = run.abyss!;
     if (this.persist) recordAbyss({ cleared: ab.depth, score: abyssScore(data, run) });
+    this.notices.push(...this.skinNews({ kind: 'abyssDepth', depth: ab.depth }));
     const unlocks = this.abyssRecord(false);
     const every = nemesisEvery(data, ab);
     this.show(
@@ -1370,6 +1408,7 @@ export class App {
     // 엔딩 장면이 있는 스테이지까지 왔으면 이야기의 끝, 아니면 지금 만들어진 범위의 끝
     const finale = win && !!last.endingScene;
     const news = win ? this.pilgrimNews(run) : null;
+    this.notices.push(...this.pendingNews.splice(0));
     playBgm(finale ? 'ending' : win ? 'title' : null);
     this.show(
       this.backdrop(

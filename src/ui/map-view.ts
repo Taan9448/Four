@@ -43,6 +43,8 @@ export interface MapViewHandlers {
   onShowDeck: () => void;
   onSettings: () => void;
   /** 도감(돌아오면 지도) */
+  /** 옷장(순례·심연, 2026-10-12): 도감 왼쪽 */
+  onWardrobe?: () => void;
   onCodex: () => void;
   /** 타이틀로(런은 저장돼 있어 "이어하기"로 돌아온다) */
   onTitle: () => void;
@@ -624,6 +626,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           handlers.onWorldMap
             ? h('button', { class: 'btn wide btn-world', onclick: handlers.onWorldMap, ...tipAttrs('전체 지도', '이 스테이지는 지금 자리에 멈춰 두고 전체 지도로 나간다. 다시 누르면 여기서 이어진다.') }, '전체 지도로')
             : null,
+          handlers.onWardrobe ? h('button', { class: 'btn wide', onclick: handlers.onWardrobe }, '옷장') : null,
           h('button', { class: 'btn wide', onclick: handlers.onCodex }, '도감'),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),

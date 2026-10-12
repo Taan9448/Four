@@ -1,0 +1,13 @@
+id: skin_simyeon_kyle_hit
+type: character-anim
+character: skin_simyeon_kyle
+summary: "카일 옷장 「심연을 걷는 자」 피격 3프레임"
+depends_on: [skin_simyeon_kyle_ref]
+reference: assets/source/skin_simyeon_kyle_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: struck, head snapped back, armor plates rattling
+  2: stumbling back, sword arm lowered
+  3: steadying, gritting teeth, sword raised again
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#9b5cff' }

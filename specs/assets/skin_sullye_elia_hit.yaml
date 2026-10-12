@@ -1,0 +1,12 @@
+id: skin_sullye_elia_hit
+type: character-anim
+character: skin_sullye_elia
+summary: "엘리아 옷장 「순례의 끝」 피격 3프레임"
+depends_on: [skin_sullye_elia_ref]
+reference: assets/source/skin_sullye_elia_ref.png
+facing: right
+frame_notes:
+  1: "struck, head turned away, hair and hood whipping"
+  2: "stumbling back, the staff raised across the face"
+  3: "steadying, a thin crack-like shimmer of a broken barrier fading"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#e2c27a' }
