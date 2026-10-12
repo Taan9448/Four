@@ -1127,25 +1127,55 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .b-items { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .b-potions { padding: 6px 8px 3px; border-radius: 16px; background: rgba(10, 12, 16, 0.55); }
 /* 상점 */
-.shop-box { max-width: 1040px; text-align: left; }
-.shop-box .panel-head { position: relative; }
-.shop-purse { margin-left: auto; font-size: calc(var(--fs-body) * 1.16); }
 .shop-h { margin: 14px 0 8px; font-size: var(--fs-body); color: #e2b45c; letter-spacing: 0.08em; }
 .shop-cards { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 .shop-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .shop-item.sold, .shop-line.sold { opacity: 0.4; filter: saturate(0.3); }
-.shop-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.shop-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .shop-line { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dashed rgba(201, 162, 74, 0.2); }
 .shop-desc { display: flex; flex-direction: column; min-width: 0; }
 .shop-desc small { color: var(--ink-dim); font-size: var(--fs-min); line-height: 1.35; }
 .price { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: #f2d48f; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .price.short { color: #ff8a7a; }
 .service-glyph { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 4px; border: 2px solid #8a6a1e; color: #e2b45c; font-family: var(--f-brush); }
-.shop-potions-own { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: var(--ink-dim); }
+.shop-potions-own { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pick-grid { max-height: 70vh; overflow-y: auto; }
 .pick-grid .card { cursor: pointer; }
 .pick-grid .card:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px #e2b45c, 0 10px 20px rgba(0, 0, 0, 0.5); }
 @media (max-width: 900px) { .shop-row { grid-template-columns: minmax(0, 1fr); } }
+/* 상점 틀(2026-10-12, 편성 화면과 같은 짜임): 머리말 · 진열대 | 옆단(손질 · 내 물약 칸 · 떠나기) */
+.shop-screen { display: flex; flex-direction: column; align-items: stretch; place-items: stretch; min-height: calc(100vh - 20px); }
+.shop-layout { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 1280px; margin: 0 auto; text-align: left; }
+.shop-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; }
+.shop-title { flex: 1; min-width: 0; }
+.shop-title h2 { margin: 0; font-family: var(--f-brush); font-weight: 400; font-size: calc(var(--fs-title) * 1.12); letter-spacing: 0.06em; }
+.shop-text { margin: 4px 0 0; font-size: var(--fs-cap); color: var(--ink-dim); }
+.shop-head .shop-scarred { margin: 6px 0 0; }
+.shop-purse { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding: 6px 14px; border-radius: 10px; border: 1px solid rgba(226, 180, 92, 0.4); background: rgba(16, 13, 10, 0.7); font-size: calc(var(--fs-body) * 1.25); }
+.shop-purse small { font-size: var(--fs-min); color: var(--ink-dim); }
+.shop-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 10px; min-height: 0; }
+.shop-main { padding: 12px 18px 16px; overflow-y: auto; }
+.shop-main > .shop-h:first-child { margin-top: 4px; }
+.shop-cards { justify-content: flex-start; gap: 16px; padding-top: 4px; }
+.shop-side { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 10px; align-self: start; }
+.shop-services, .shop-own { padding: 10px 14px; }
+.shop-services .shop-h, .shop-own .shop-h { margin-top: 2px; }
+.shop-leave { min-height: 52px; font-size: calc(var(--fs-body) * 1.1); }
+@media (max-width: 900px) {
+  .shop-body { grid-template-columns: minmax(0, 1fr); }
+  .shop-cards { justify-content: center; }
+  .shop-side { position: static; }
+}
+@media (max-width: 600px) {
+  .shop-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px 10px; padding: 10px 12px; }
+  .shop-head .seal { width: 36px; height: 36px; font-size: 1.1rem; }
+  .shop-title { display: contents; }
+  .shop-title .choice-kind { display: none; }
+  .shop-title h2 { grid-column: 2; font-size: var(--fs-title); }
+  .shop-text, .shop-head .shop-scarred { grid-column: 1 / -1; }
+  .shop-purse { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; margin-left: 0; }
+  .shop-main { padding: 10px 12px 14px; }
+}
 /* 전리품 */
 .loot { margin: 4px 0 10px; }
 .loot-items { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 8px 12px; border-left: 3px solid #c9a24a; background: rgba(201, 162, 74, 0.08); }
