@@ -641,10 +641,13 @@ h1, h2, h3 { font-family: var(--f-head); }
 .float-critical { color: #ffd36b; font-size: calc(var(--fs-title) * 1.44); text-shadow: 0 0 10px rgba(255, 190, 60, 0.8), 0 2px 4px #000; }
 .float-weak { color: #9fe0ff; font-size: var(--fs-body); margin-top: -26px; }
 .float-resist { color: #b9b4a8; font-size: var(--fs-body); margin-top: -26px; }
+/* 전도: 냉기 위에 번개 — 번개색 테두리 꼬리표 */
+.float-conduct { color: #f3e58a; font-size: var(--fs-body); margin-top: 18px; padding: 0 4px; border: 1px solid #e0c84a; border-radius: 4px; background: rgba(60, 52, 8, 0.7); }
 /* 속성 표시(의도·약점 이름표) */
 .el-mark { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-family: var(--f-brush); font-size: var(--fs-min); line-height: 1; border: 1.5px solid; }
 .el-fire { color: #ffb070; border-color: #ff7a3c; background: rgba(90, 24, 8, 0.85); }
 .el-ice { color: #bfe9ff; border-color: #7cc8f2; background: rgba(12, 36, 60, 0.85); }
+.el-lightning { color: #f3e58a; border-color: #e0c84a; background: rgba(60, 52, 8, 0.85); }
 .chip-weak { background: rgba(10, 40, 60, 0.92); border-color: #7cc8f2; color: #d4f0ff; }
 .chip-knot { background: rgba(20, 44, 70, 0.92); border-color: #8fd3ff; color: #e2f5ff; font-weight: 700; }
 .chip-enrage { background: rgba(70, 12, 12, 0.92); border-color: #ff6a5a; color: #ffd6d0; font-weight: 700; }
@@ -1475,6 +1478,9 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .backdrop.mood-shop::after { background: radial-gradient(ellipse at 50% 0%, rgba(255, 176, 92, 0.2), transparent 50%), radial-gradient(ellipse at center, rgba(12, 8, 6, 0.15), rgba(12, 8, 6, 0.8) 85%); }
 .backdrop.mood-loadout:not(.has-art)::before { background: radial-gradient(ellipse at 20% 12%, rgba(242, 169, 59, 0.16), transparent 55%), linear-gradient(#2a2119 0%, #1d1712 60%, #15100c 100%); }
 .backdrop.mood-shop:not(.has-art)::before { background: radial-gradient(ellipse at 50% 10%, rgba(242, 160, 70, 0.2), transparent 55%), linear-gradient(#2c2018 0%, #1e1611 60%, #140f0b 100%); }
+/* 휴식(2026-10-12 사용자 요청): 밤 숲 모닥불 — 아래 가운데에서 번지는 불빛 */
+.backdrop.mood-rest::after { background: radial-gradient(ellipse at 50% 95%, rgba(255, 150, 70, 0.24), transparent 50%), radial-gradient(ellipse at center, rgba(8, 8, 12, 0.15), rgba(8, 8, 12, 0.8) 85%); }
+.backdrop.mood-rest:not(.has-art)::before { background: radial-gradient(ellipse at 50% 92%, rgba(242, 140, 60, 0.22), transparent 55%), linear-gradient(#1c1a24 0%, #15141b 60%, #0e0d12 100%); }
 @media (max-width: 600px) {
   .loadout-roster { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .lo-mate { min-height: 56px; padding: 7px 9px; }
@@ -1873,7 +1879,6 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .potion-chip .potion-arm-hint { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%) scale(0.8); white-space: nowrap; background: rgba(14, 10, 12, 0.95); color: #ffe3a6; border: 1px solid #c9a24a; border-radius: 6px; padding: 2px 8px; font-size: var(--fs-cap); pointer-events: none; }
 /* 장면 편의(B3): 자동 진행 켜짐 · 이미 본 장면 건너뛰기 */
 .vn-controls .btn.on { border-color: var(--mana); background: #26354a; }
-.vn-seen-skip { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 6; }
 /* 전투 단축키 표식(2026-10-12 B8): 키보드가 없는 기기에서는 숨긴다 */
 @media (pointer: coarse) { .medal-help { display: none; } }
 

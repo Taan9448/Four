@@ -23,6 +23,8 @@ export interface SpriteMeta {
   slots?: Partial<Record<'name' | 'text' | 'plaque', [number, number, number, number]>> | null;
   /** 카드 그림 시트: 칸 n의 카드 id(n-1번째) */
   cards?: string[];
+  /** 카드 그림 시트: 효과가 바뀐 카드의 다시 그림(옛 시트의 같은 카드보다 먼저 쓴다) */
+  redraws?: boolean;
 }
 
 export interface SpriteAsset {
@@ -56,14 +58,15 @@ export function hasSprite(id: string): boolean {
 
 /**
  * 카드 그림(2026-10-11, card_art_* 시트): 카드 id → 실제 그림 프레임 URL. 칸 n = 명세 cards의 n번째(manifest의 meta.cards).
- * 실제 그림이 들어온 시트만(임시 시트는 쓰지 않는다)
+ * 실제 그림이 들어온 시트만(임시 시트는 쓰지 않는다). redraws 시트의 칸이 옛 시트의 같은 카드보다 앞선다
  */
 let cardArtIndex: Map<string, string> | null = null;
 export function cardArtUrl(cardId: string): string | null {
   if (!cardArtIndex) {
     cardArtIndex = new Map();
-    for (const [id, e] of Object.entries(entries)) {
-      if (e.meta.type !== 'card-art-sheet' || e.source !== 'sprites') continue;
+    // 다시 그림 시트(redraws)를 나중에 넣어 옛 그림을 덮는다(2026-10-12 번개 전환 카드)
+    const sheets = Object.entries(entries).filter(([, e]) => e.meta.type === 'card-art-sheet' && e.source === 'sprites');
+    for (const [id, e] of [...sheets.filter(([, e]) => !e.meta.redraws), ...sheets.filter(([, e]) => e.meta.redraws)]) {
       (e.meta.cards ?? []).forEach((card, i) => {
         const url = frameUrl(id, i + 1, { realOnly: true });
         if (url) cardArtIndex!.set(card, url);

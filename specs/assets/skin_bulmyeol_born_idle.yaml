@@ -5,6 +5,7 @@ summary: "보른 옷장 「불멸」 대기 4프레임"
 depends_on: [skin_bulmyeol_born_ref]
 reference: assets/source/skin_bulmyeol_born_ref.png
 facing: right
+size_note: "IMPORTANT size: draw Born SMALLER than in the attached reference sheet, at the same on-screen size as his normal battle animations (born_hammer_idle/attack/hit): about 70 px tall from the top of the head to the soles in the 160 px frame, about 87% of the reference sheet figure; keep the same proportions, only scale the whole figure down"
 frame_notes:
   1: "planted wide stance, hammer head resting on the ground"
   2: "slow breath in, chest and beard braids rise"

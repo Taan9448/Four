@@ -361,6 +361,7 @@ describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
     const { gameData } = await import('../src/engine/data');
     const data = gameData();
     const seen = new Map<string, string>();
+    const redrawn = new Set<string>();
     for (const id of listSpecIds().filter((x) => x.startsWith('card_art_'))) {
       const spec = loadSpec(id);
       expect(spec.type, id).toBe('card-art-sheet');
@@ -369,10 +370,15 @@ describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
       for (const card of spec.cards) {
         // planned: 카드 데이터보다 그림 요청이 먼저 나간 시트(2026-10-11 카드 250장 확장). 카드가 다 들어오면 플래그를 지운다
         if (!spec.planned) expect(data.cards.has(card), `${id}: ${card}`).toBe(true);
-        expect(seen.has(card), `${card}: ${seen.get(card)}와 ${id}에 두 번`).toBe(false);
-        seen.set(card, id);
+        // 다시 그림 시트(redraws)는 효과가 바뀐 카드를 옛 시트와 겹쳐 둘 수 있다. 그 밖의 겹침은 안 된다
+        if (spec.redraws) redrawn.add(card);
+        else {
+          expect(seen.has(card), `${card}: ${seen.get(card)}와 ${id}에 두 번`).toBe(false);
+          seen.set(card, id);
+        }
       }
     }
+    for (const card of redrawn) if (!seen.has(card)) seen.set(card, 'redraws');
     const missing = [...data.cards.values()].filter((c) => c.pool !== 'status' && !seen.has(c.id)).map((c) => c.id);
     expect(missing).toEqual([]);
   });
@@ -502,6 +508,10 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(map).not.toContain('animated feature film');
     expect(promptFor('journey_band')).toContain('Do not draw any crack');
     expect(promptFor('bg_rift')).toContain('ground line (where feet stand) at about 62%');
+    // 옷장 보른 동작은 기준 시트가 아니라 원래 전투 동작 크기(2026-10-12 사용자 결정)
+    expect(promptFor('skin_cheongun_born_idle')).toContain('about 70 px tall');
+    expect(promptFor('skin_cheongun_born_idle')).not.toContain('exactly as tall as in the attached reference sheet');
+    expect(promptFor('skin_cheongun_kyle_idle')).toContain('exactly as tall as in the attached reference sheet');
   });
 });
 
