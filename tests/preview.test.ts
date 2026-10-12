@@ -9,14 +9,14 @@ describe('피해 미리보기', () => {
     haun.statuses.strength = 2;
     const [a, b] = s.enemies;
     a.statuses.vulnerable = 2;
-    b.block = 3;
+    b.block = 30;
     const i = give(s, 'haun_chop');
     const onA = previewCard(s, i, a.uid).get(a.uid)!;
     const onB = previewCard(s, i, b.uid).get(b.uid)!;
     // 원본 그대로
     expect(a.hp).toBe(a.maxHp);
     expect(s.hand[i].cardId).toBe('haun_chop');
-    expect(onB.blocked).toBe(3);
+    expect(onB.blocked).toBe(30);
     expect(onA.hpLoss).toBeGreaterThan(onB.hpLoss);
     const before = a.hp;
     playCard(s, i, a.uid);
@@ -42,7 +42,7 @@ describe('미리보기와 실제의 무작위', () => {
     for (let i = 0; i < 60; i++) {
       const s = battle({ enemies: ['test_wolf', 'test_wolf', 'test_wolf'], rng: createRng(`RT${i}`) });
       s.noCrit = false;
-      for (const e of s.enemies) e.hp = e.maxHp = 999;
+      for (const e of s.enemies) e.hp = e.maxHp = 9999;
       s.hand.push({ uid: 'rx', cardId: 'kyle_eyes_closed', level: 5 });
       s.party.push({ ...s.party[0], uid: 'pk', defId: 'kyle', name: '카일' });
       const idx = s.hand.length - 1;

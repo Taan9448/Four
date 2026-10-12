@@ -206,7 +206,7 @@ describe('편성 점수 상한·갈래 보너스(카드 250장 확장 2026-10-11
     expect(setup.focusEffects).toEqual([{ member: 'born', arch: 'born_iron', effects: data.characters.get('born')!.archetypes.find((a) => a.id === 'born_iron')!.focus!.effects }]);
     if (setup.enemies.length) {
       const s = createBattle(data, setup);
-      expect(s.party.find((p) => p.defId === 'born')!.block).toBeGreaterThanOrEqual(6);
+      expect(s.party.find((p) => p.defId === 'born')!.block).toBeGreaterThanOrEqual(60);
     }
   });
 });

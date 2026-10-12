@@ -17,6 +17,8 @@
   "pilgrimage": {
     "normalTurns": [4, 6],
     "partyLoss": [0.1, 0.2],
-    "bossDefeat": [0.05, 0.1]
+    "bossDefeat": [0.05, 0.12],
+    "win": [0.8, 0.9],
+    "holdGapMax": 0.05
   }
 }

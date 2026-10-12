@@ -72,7 +72,7 @@ describe('대가형 사건', () => {
     const before = new Set(Object.keys(run.collection));
     const hp = run.roster.find((r) => r.id === 'haun')!.hp;
     applyChoice(data, run, mod('any_event_blood_price'), 0);
-    expect(run.roster.find((r) => r.id === 'haun')!.hp).toBe(hp - 8);
+    expect(run.roster.find((r) => r.id === 'haun')!.hp).toBe(hp - 80);
     const got = Object.keys(run.collection).filter((x) => !before.has(x));
     const changed = got.length ? got : Object.keys(run.collection);
     const def = data.cards.get(changed[0])!;

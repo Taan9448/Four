@@ -9,8 +9,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "ally",
     "tags": ["born_iron"],
-    "effects": [{"op": "block", "amount": 7, "target": "ally"}],
-    "upgrade": {"growth": [3], "plus4": {"name": "드워프의 어깨", "effects": [{"op": "block", "amount": 4, "target": "self"}]}, "plus5": {"name": "앞에 선다", "effects": [{"op": "taunt", "target": "self"}]}},
+    "effects": [{"op": "block", "amount": 70, "target": "ally"}],
+    "upgrade": {"growth": [30], "plus4": {"name": "드워프의 어깨", "effects": [{"op": "block", "amount": 40, "target": "self"}]}, "plus5": {"name": "앞에 선다", "effects": [{"op": "taunt", "target": "self"}]}},
     "flavor": "방패 대신 몸으로 엘리아를 막았다. 그의 갑옷이 녹아내렸다."
   },
   {
@@ -22,8 +22,8 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 6}, {"op": "apply_status", "status": "weak", "stacks": 1}],
-    "upgrade": {"growth": [2, 0], "plus4": {"name": "이음매", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "주저앉히다", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1}]}},
+    "effects": [{"op": "damage", "amount": 60}, {"op": "apply_status", "status": "weak", "stacks": 1}],
+    "upgrade": {"growth": [20, 0], "plus4": {"name": "이음매", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "주저앉히다", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1}]}},
     "flavor": "\"돌에도 결이 있다. 드워프는 다 안다.\" 돌기둥 귀퉁이가 깨끗하게 떨어져 나갔다."
   },
   {
@@ -35,8 +35,8 @@
     "pool": "starter",
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_enemies",
-    "effects": [{"op": "damage", "amount": 6}],
-    "upgrade": {"growth": [2], "plus4": {"name": "대열 앞에서", "effects": [{"op": "block", "amount": 5, "target": "self"}]}, "plus5": {"name": "짓이기다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}},
+    "effects": [{"op": "damage", "amount": 60}],
+    "upgrade": {"growth": [20], "plus4": {"name": "대열 앞에서", "effects": [{"op": "block", "amount": 50, "target": "self"}]}, "plus5": {"name": "짓이기다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}},
     "flavor": "보른이 그 맨 앞에서 도끼를 휘둘렀다. 드워프의 도끼와 소림의 곤봉이 나란히 대열을 짓이겼다."
   },
   {
@@ -48,8 +48,8 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
-    "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}, {"op": "block", "amount": 4}],
-    "upgrade": {"growth": [0, 2], "plus4": {"name": "벼린 날", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "몇 시진이고", "effects": [{"op": "draw", "amount": 1}]}},
+    "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}, {"op": "block", "amount": 40}],
+    "upgrade": {"growth": [0, 20], "plus4": {"name": "벼린 날", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "몇 시진이고", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "모닥불 앞에 나란히 앉아 몇 시진이고 아무 말 없이 도끼를 손질했다."
   },
   {
@@ -62,8 +62,8 @@
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_allies",
     "tags": ["born_iron"],
-    "effects": [{"op": "block", "amount": 6, "target": "all_allies"}],
-    "upgrade": {"growth": [2], "plus4": {"name": "같이 왔어", "effects": [{"op": "heal", "amount": 3, "target": "all_allies"}]}, "plus5": {"name": "돌아가면", "addKeywords": ["retain"]}},
+    "effects": [{"op": "block", "amount": 60, "target": "all_allies"}],
+    "upgrade": {"growth": [20], "plus4": {"name": "같이 왔어", "effects": [{"op": "heal", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "돌아가면", "addKeywords": ["retain"]}},
     "flavor": "\"이번만큼은—\" \"같이 가.\" 보른이 말을 잘랐다."
   },
   {
@@ -77,8 +77,8 @@
     "cost": {"neigong": 2, "mana": 0},
     "target": "self",
     "tags": ["born_taunt"],
-    "effects": [{"op": "taunt", "target": "self"}, {"op": "block", "amount": 15}],
-    "upgrade": {"growth": [0, 4], "plus4": {"name": "망치를 내리찍다", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, "plus5": {"name": "따라갈게", "effects": [{"op": "damage", "amount": 8, "target": "all_enemies"}]}},
+    "effects": [{"op": "taunt", "target": "self"}, {"op": "block", "amount": 150}],
+    "upgrade": {"growth": [0, 40], "plus4": {"name": "망치를 내리찍다", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}]}, "plus5": {"name": "따라갈게", "effects": [{"op": "damage", "amount": 80, "target": "all_enemies"}]}},
     "flavor": "그는 낙안봉 성벽 한가운데로 걸어가 형의 망치를 내리찍었다. 그리고 돌아보지 않고 말했다. \"먼저 가.\""
   },
   {
@@ -91,8 +91,8 @@
     "cost": {"neigong": 2, "mana": 0},
     "target": "enemy",
     "castLine": {"speaker": "born", "face": "resolve", "text": "두린의 동생. 보른. 카즈둠을 돌려받으러 왔다."},
-    "effects": [{"op": "dispel"}, {"op": "damage", "amount": 14}],
-    "upgrade": {"growth": [0, 4], "plus4": {"name": "산과의 이음매", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 2}]}, "plus5": {"name": "다음 갱도는 네가 파라", "effects": [{"op": "block", "amount": 6, "target": "self"}]}},
+    "effects": [{"op": "dispel"}, {"op": "damage", "amount": 140}],
+    "upgrade": {"growth": [0, 40], "plus4": {"name": "산과의 이음매", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 2}]}, "plus5": {"name": "다음 갱도는 네가 파라", "effects": [{"op": "block", "amount": 60, "target": "self"}]}},
     "flavor": "망치 손잡이에 새긴 글씨: '보른, 다음 갱도는 네가 파라.' 보른이 처음으로 소리 내어 울었다."
   },
   {
@@ -106,8 +106,8 @@
     "target": "self",
     "keywords": ["exhaust"],
     "tags": ["born_iron"],
-    "effects": [{"op": "apply_status", "status": "p_mountain_body", "stacks": 1, "target": "self"}, {"op": "block", "amount": 4}],
-    "upgrade": {"growth": [0, 3], "plus4": {"name": "숨 쉰다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "산이 숨 쉬는 자리", "cost": {"neigong": 0, "mana": 0}}},
+    "effects": [{"op": "apply_status", "status": "p_mountain_body", "stacks": 1, "target": "self"}, {"op": "block", "amount": 40}],
+    "upgrade": {"growth": [0, 30], "plus4": {"name": "숨 쉰다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "산이 숨 쉬는 자리", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "보른이 동굴 벽에 귀를 댔다. \"…숨 쉰다.\" 그 뒤로 보른은 산처럼 서 있었다."
   },
   {
@@ -121,8 +121,8 @@
     "target": "all_enemies",
     "keywords": ["exhaust"],
     "castLine": {"speaker": "born", "face": "neutral", "text": "산은 정면으로 안 무너진다."},
-    "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "stun", "stacks": 1}],
-    "upgrade": {"growth": [3, 0], "plus4": {"name": "며칠 전에 쳐 둔 결", "cost": {"neigong": 2, "mana": 0}}, "plus5": {"name": "골짜기를 가두다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}},
+    "effects": [{"op": "damage", "amount": 80}, {"op": "apply_status", "status": "stun", "stacks": 1}],
+    "upgrade": {"growth": [30, 0], "plus4": {"name": "며칠 전에 쳐 둔 결", "cost": {"neigong": 2, "mana": 0}}, "plus5": {"name": "골짜기를 가두다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}},
     "flavor": "보른이 사흘 전에 두드려 둔 절벽이 결대로 무너져 내렸다. 계곡 입구가 막혔다."
   },
   {
@@ -135,8 +135,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_allies",
     "tags": ["born_iron"],
-    "effects": [{"op": "block", "amount": 4, "target": "all_allies"}],
-    "upgrade": {"growth": [2], "plus4": {"name": "물길", "effects": [{"op": "heal", "amount": 2, "target": "all_allies"}]}, "plus5": {"name": "회반죽 없이", "addKeywords": ["retain"]}},
+    "effects": [{"op": "block", "amount": 40, "target": "all_allies"}],
+    "upgrade": {"growth": [20], "plus4": {"name": "물길", "effects": [{"op": "heal", "amount": 20, "target": "all_allies"}]}, "plus5": {"name": "회반죽 없이", "addKeywords": ["retain"]}},
     "flavor": "회반죽 한 줌 쓰지 않은 돌벽이 흑풍장을 받아 냈다. \"돌은 원래 서로 기대고 싶어 한다.\""
   },
   {
@@ -148,8 +148,8 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 7}],
-    "upgrade": {"growth": [3], "plus4": {"name": "굵은 팔뚝", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "한 번 더 찍는다", "effects": [{"op": "damage", "amount": 5}]}},
+    "effects": [{"op": "damage", "amount": 70}],
+    "upgrade": {"growth": [30], "plus4": {"name": "굵은 팔뚝", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "한 번 더 찍는다", "effects": [{"op": "damage", "amount": 50}]}},
     "flavor": "자기 키만 한 도끼를, 보른은 장작 패듯 가볍게 휘둘렀다."
   },
   {
@@ -161,8 +161,8 @@
     "pool": "starter",
     "cost": {"neigong": 2, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "damage", "amount": 14}],
-    "upgrade": {"growth": [4], "plus4": {"name": "바위째", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "드워프의 무게", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1}]}},
+    "effects": [{"op": "damage", "amount": 140}],
+    "upgrade": {"growth": [40], "plus4": {"name": "바위째", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "드워프의 무게", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1}]}},
     "flavor": "드워프의 도끼질에는 요령이 없다. 온몸의 무게를 날 끝 한 점에 싣는 것뿐."
   },
   {
@@ -175,8 +175,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "self",
     "tags": ["born_iron"],
-    "effects": [{"op": "block", "amount": 6}],
-    "upgrade": {"growth": [3], "plus4": {"name": "녹아내린 갑옷 대신", "effects": [{"op": "heal", "amount": 2}]}, "plus5": {"name": "드워프의 쇠", "addKeywords": ["retain"]}},
+    "effects": [{"op": "block", "amount": 60}],
+    "upgrade": {"growth": [30], "plus4": {"name": "녹아내린 갑옷 대신", "effects": [{"op": "heal", "amount": 20}]}, "plus5": {"name": "드워프의 쇠", "addKeywords": ["retain"]}},
     "flavor": "녹아내린 갑옷 대신 대장간의 쇠미늘을 걸쳤다. \"가볍다. 마음에 안 든다.\""
   },
   {
@@ -188,8 +188,8 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
-    "effects": [{"op": "reveal_grain", "stacks": 1}, {"op": "block", "amount": 4}],
-    "upgrade": {"growth": [0, 2], "plus4": {"name": "귀를 대다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "갈라질 자리", "effects": [{"op": "reveal_grain", "stacks": 1}]}},
+    "effects": [{"op": "reveal_grain", "stacks": 1}, {"op": "block", "amount": 40}],
+    "upgrade": {"growth": [0, 20], "plus4": {"name": "귀를 대다", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "갈라질 자리", "effects": [{"op": "reveal_grain", "stacks": 1}]}},
     "flavor": "보른이 도끼 자루 끝으로 바위를 똑똑 두드렸다. 소리가 달라지는 자리가 있었다."
   },
   {
@@ -201,8 +201,8 @@
     "pool": "starter",
     "cost": {"neigong": 1, "mana": 0},
     "target": "ally",
-    "effects": [{"op": "block", "amount": 6, "target": "ally"}, {"op": "remove_status", "status": "weak", "target": "ally"}],
-    "upgrade": {"growth": [3, 0], "plus4": {"name": "가볍다", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "내려놓지 않는다", "addKeywords": ["retain"]}},
+    "effects": [{"op": "block", "amount": 60, "target": "ally"}, {"op": "remove_status", "status": "weak", "target": "ally"}],
+    "upgrade": {"growth": [30, 0], "plus4": {"name": "가볍다", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "내려놓지 않는다", "addKeywords": ["retain"]}},
     "flavor": "보른은 왕 노인의 의자를 통째로 등에 업었다. \"가볍다.\" 아무도 믿지 않았다."
   },
   {
@@ -215,8 +215,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
     "tags": ["born_iron"],
-    "effects": [{"op": "damage", "amount": 5}, {"op": "block", "amount": 5}],
-    "upgrade": {"growth": [1, 2], "plus4": {"name": "드워프는 넘어지지 않는다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "한 걸음 더", "effects": [{"op": "damage", "amount": 4}]}},
+    "effects": [{"op": "damage", "amount": 50}, {"op": "block", "amount": 50}],
+    "upgrade": {"growth": [10, 20], "plus4": {"name": "드워프는 넘어지지 않는다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "한 걸음 더", "effects": [{"op": "damage", "amount": 40}]}},
     "flavor": "하운의 가슴께에 오는 키. 그 높이에서 들이받으면 누구든 무릎이 꺾였다."
   },
   {
@@ -230,8 +230,8 @@
     "target": "self",
     "keywords": ["exhaust"],
     "tags": ["born_taunt"],
-    "effects": [{"op": "apply_status", "status": "p_payback", "stacks": 1, "target": "self"}, {"op": "taunt", "stacks": 1, "target": "self"}, {"op": "block", "amount": 5, "target": "self"}],
-    "upgrade": {"growth": [0, 0, 2], "plus4": {"name": "한 대에 한 대", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "먼저 치게 둔다", "cost": {"neigong": 0, "mana": 0}}},
+    "effects": [{"op": "apply_status", "status": "p_payback", "stacks": 1, "target": "self"}, {"op": "taunt", "stacks": 1, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}],
+    "upgrade": {"growth": [0, 0, 20], "plus4": {"name": "한 대에 한 대", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "먼저 치게 둔다", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "\"먼저 쳐.\" 보른은 그렇게만 말했다. 맞은 만큼, 도끼 자루가 돌아갔다."
   },
   {
@@ -244,8 +244,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
     "tags": ["born_iron"],
-    "effects": [{"op": "block", "amount": 4}, {"op": "damage", "amount": 0, "scale": {"per": "block", "amount": 0.5}}],
-    "upgrade": {"growth": [2, 2], "plus4": {"name": "무게를 싣다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "산이 움직인다", "cost": {"neigong": 0, "mana": 0}}},
+    "effects": [{"op": "block", "amount": 40}, {"op": "damage", "amount": 0, "scale": {"per": "block", "amount": 0.5}}],
+    "upgrade": {"growth": [20, 20], "plus4": {"name": "무게를 싣다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "산이 움직인다", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "막는 것과 치는 것이 드워프에게는 같은 동작이었다. 쌓은 무게가 그대로 도끼에 실렸다."
   },
   {
@@ -258,8 +258,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_enemies",
     "tags": ["born_taunt"],
-    "effects": [{"op": "damage", "amount": 4}, {"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "taunt", "stacks": 1, "target": "self"}],
-    "upgrade": {"growth": [1, 0, 0], "plus4": {"name": "돌이 떨린다", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "갱도의 메아리", "effects": [{"op": "block", "amount": 4, "target": "self"}]}},
+    "effects": [{"op": "damage", "amount": 40}, {"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "taunt", "stacks": 1, "target": "self"}],
+    "upgrade": {"growth": [10, 0, 0], "plus4": {"name": "돌이 떨린다", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "갱도의 메아리", "effects": [{"op": "block", "amount": 40, "target": "self"}]}},
     "flavor": "보른이 발을 굴렀다. 갱도에서 자란 드워프의 발소리에, 땅이 먼저 대답했다."
   },
   {
@@ -272,8 +272,8 @@
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_allies",
     "keywords": ["exhaust"],
-    "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}, {"op": "block", "amount": 4, "target": "all_allies"}],
-    "upgrade": {"growth": [0, 2], "plus4": {"name": "망치 박자", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "돌려받으러 간다", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}},
+    "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}, {"op": "block", "amount": 40, "target": "all_allies"}],
+    "upgrade": {"growth": [0, 20], "plus4": {"name": "망치 박자", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "돌려받으러 간다", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}},
     "flavor": "드워프들은 갱도에서 망치 박자에 맞춰 노래했다. 보른이 낮게 흥얼거리자, 일행의 걸음이 그 박자를 따라갔다."
   },
   {
@@ -288,27 +288,27 @@
     "keywords": ["exhaust"],
     "tags": ["born_taunt"],
     "castLine": {"speaker": "born", "face": "resolve", "text": "형은 늘 앞에 섰다. 이제 내가 선다."},
-    "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies"}, {"op": "block", "amount": 10, "target": "all_allies"}, {"op": "taunt", "target": "self"}],
-    "upgrade": {"growth": [0, 3, 0], "plus4": {"name": "갱도의 끝에서", "effects": [{"op": "draw", "amount": 2}]}, "plus5": {"name": "형의 망치", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}]}},
+    "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_allies"}, {"op": "block", "amount": 100, "target": "all_allies"}, {"op": "taunt", "target": "self"}],
+    "upgrade": {"growth": [0, 30, 0], "plus4": {"name": "갱도의 끝에서", "effects": [{"op": "draw", "amount": 2}]}, "plus5": {"name": "형의 망치", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}]}},
     "flavor": "형 두린은 늘 대열 맨 앞에 섰다. 보른은 그 자리에 서서, 처음으로 뒤를 돌아보았다."
   },
-  {"id": "born_mountain_silence", "name": "산의 침묵", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "target": "self"}, {"op": "block", "amount": 8, "target": "self"}, {"op": "rift", "amount": -1}], "upgrade": {"growth": [0, 3, 0], "plus4": {"name": "묵직한 침묵", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "산은 움직이지 않는다", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}]}}, "flavor": "산은 대답하지 않는다. 그래서 하늘도 잠시 숨을 죽였다."},
-  {"id": "born_prop_tunnel", "name": "갱도 받치기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 10, "target": "self"}, {"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}], "upgrade": {"growth": [3, 0], "plus4": {"name": "두 개의 받침", "effects": [{"op": "block", "amount": 4, "target": "all_allies"}]}, "plus5": {"name": "무너지지 않는 갱도", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}]}}, "flavor": "갈라지는 천장 아래 굵은 들보를 받쳤다. 산도, 하늘의 금도 잠시 멈췄다."},
-  {"id": "born_five_thousand_graves", "name": "오천의 무덤", "owner": "born", "type": "power", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_iron"], "effects": [{"op": "apply_status", "status": "p_five_thousand_graves", "stacks": 1, "target": "self"}, {"op": "block", "amount": 4, "target": "self"}], "upgrade": {"growth": [0, 3], "plus4": {"name": "돌무덤의 이름", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 애도", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "카즈둠 아래 오천 개의 돌무덤. 보른은 그 이름을 하나씩 외웠다."},
-  {"id": "born_mountain_fills", "name": "산이 메운다", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "heal", "amount": 5, "target": "self"}, {"op": "block", "amount": 5, "target": "self"}], "upgrade": {"growth": [1, 2], "plus4": {"name": "돌의 숨", "effects": [{"op": "heal", "amount": 3, "target": "self"}]}, "plus5": {"name": "산의 품", "effects": [{"op": "keep_block", "target": "self"}]}}, "flavor": "고르몬이 쓰러진 자리, 산은 스스로 금을 메웠다. 보른의 상처도 그랬다."},
-  {"id": "born_next_tunnel", "name": "다음 갱도", "owner": "born", "type": "skill", "rarity": "legendary", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_taunt"], "castLine": {"speaker": "born", "face": "resolve", "text": "다음 갱도는, 내가 먼저 들어간다."}, "effects": [{"op": "taunt", "stacks": 2, "target": "self"}, {"op": "block", "amount": 25, "target": "self"}], "upgrade": {"growth": [0, 5], "plus4": {"name": "등불", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "끝나지 않는 갱도", "effects": [{"op": "keep_block", "target": "self"}]}}, "flavor": "등불 하나를 들고 어두운 갱도 입구에 섰다. 형이 그랬던 것처럼."},
-  {"id": "born_braid_beard", "name": "수염 땋기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "draw", "amount": 2}, {"op": "block", "amount": 3, "target": "self"}], "upgrade": {"growth": [0, 0, 2], "plus4": {"name": "쇠고리", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "싸움 전의 의식", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "싸움 전에 드워프는 수염을 땋는다. 붉은 수염에 쇠고리 하나."},
-  {"id": "born_piggyback", "name": "업고 달리기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "ally", "tags": ["born_taunt"], "effects": [{"op": "block", "amount": 8, "target": "ally"}, {"op": "taunt", "stacks": 1, "target": "ally"}], "upgrade": {"growth": [3, 0], "plus4": {"name": "튼튼한 등", "effects": [{"op": "block", "amount": 4, "target": "self"}]}, "plus5": {"name": "달리는 산", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "왕일검을 업고 산길을 달렸다. 등 위의 노인이 웃었다. \"이놈, 무겁지 않으냐.\""},
-  {"id": "born_one_sword", "name": "검 한 자루", "owner": "born", "type": "skill", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "ally", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "ally"}, {"op": "block", "amount": 4, "target": "ally"}], "upgrade": {"growth": [0, 2], "plus4": {"name": "제일 좋은 검", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "ally"}]}, "plus5": {"name": "건네는 손", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "아무도 안 산, 이 집에서 제일 좋은 검. 보른은 그것을 하운에게 내밀었다."},
-  {"id": "born_stone_grain", "name": "돌의 결", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 6, "target": "self"}, {"op": "keep_block", "target": "self"}], "upgrade": {"growth": [2, 0], "plus4": {"name": "겹친 결", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "결을 아는 손", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "돌에도 결이 있다. 결을 따라 쌓은 벽은 다음 날에도 서 있다."},
-  {"id": "born_anvil_ring", "name": "모루 소리", "owner": "born", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "all_enemies", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 0, "scale": {"per": "block", "amount": 0.5, "max": 20}}], "upgrade": {"growth": [2], "plus4": {"name": "울리는 모루", "effects": [{"op": "block", "amount": 5, "target": "self"}]}, "plus5": {"name": "작은 모루", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "모루를 내리치자 소리가 갱도를 따라 퍼졌다. 그 소리에 바위가 떨었다."},
-  {"id": "born_rockfall", "name": "낙석", "owner": "born", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "damage", "amount": 10}], "upgrade": {"growth": [0, 3], "plus4": {"name": "큰 바위", "effects": [{"op": "block", "amount": 4, "target": "self"}]}, "plus5": {"name": "무너지는 절벽", "effects": [{"op": "damage", "amount": 4}]}}, "flavor": "\"이쪽이다!\" 적이 돌아본 순간, 절벽 위의 바위가 쏟아졌다."},
-  {"id": "born_anvil_smash", "name": "모루 내리찍기", "owner": "born", "type": "attack", "rarity": "common", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 10}, {"op": "block", "amount": 5, "target": "self"}], "upgrade": {"growth": [2, 1], "plus4": {"name": "불꽃", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "익숙한 망치", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "망치가 모루를 내리쳤다. 불꽃이 사방으로 튀었다."},
-  {"id": "born_hammer_spin", "name": "망치 돌리기", "owner": "born", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "all_enemies", "tags": ["born_taunt"], "effects": [{"op": "damage", "amount": 6}], "upgrade": {"growth": [2], "plus4": {"name": "두 바퀴", "effects": [{"op": "damage", "amount": 3}]}, "plus5": {"name": "회오리", "effects": [{"op": "block", "amount": 4, "target": "self"}]}}, "flavor": "망치를 머리 위로 돌렸다. 가까이 있던 것은 모두 날아갔다."},
-  {"id": "born_rock_heart", "name": "바위 심장", "owner": "born", "type": "power", "rarity": "epic", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_iron"], "castLine": {"speaker": "born", "face": "resolve", "text": "산은 무너지지 않는다."}, "effects": [{"op": "apply_status", "status": "p_rock_heart", "stacks": 1, "target": "self"}, {"op": "block", "amount": 6, "target": "self"}], "upgrade": {"growth": [0, 3], "plus4": {"name": "불씨 하나", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 돌", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "가슴 깊은 곳에 작은 불씨 하나. 산이 보른에게 남긴 심장이었다."},
-  {"id": "born_ale_barrel", "name": "맥주 한 통", "owner": "born", "type": "skill", "rarity": "epic", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "keywords": ["exhaust"], "castLine": {"speaker": "born", "face": "resolve", "text": "한 잔씩 돌려!"}, "effects": [{"op": "heal", "amount": 6, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}], "upgrade": {"growth": [2, 0], "plus4": {"name": "거품", "effects": [{"op": "block", "amount": 4, "target": "all_allies"}]}, "plus5": {"name": "한 통 더", "removeKeywords": ["exhaust"]}}, "flavor": "통 뚜껑을 열자 거품이 넘쳤다. 그날 밤 웃음소리가 갱도 끝까지 울렸다."},
-  {"id": "born_mine_map", "name": "갱도 지도", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["exhaust"], "effects": [{"op": "draw", "amount": 2}], "upgrade": {"growth": [1], "plus4": {"name": "아는 길", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "외운 지도", "removeKeywords": ["exhaust"]}}, "flavor": "글자 하나 없는 지도. 보른은 갈래길 하나하나를 손가락으로 짚었다."},
-  {"id": "born_growl", "name": "으르렁", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "block", "amount": 3, "target": "self"}], "upgrade": {"growth": [0, 2], "plus4": {"name": "곤두선 수염", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "울리는 목소리", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "수염이 곤두섰다. 으르렁 소리에 적들이 모두 보른을 보았다."},
-  {"id": "born_horn_ram", "name": "뿔 들이받기", "owner": "born", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "enemy", "tags": ["born_taunt"], "effects": [{"op": "damage", "amount": 8}, {"op": "apply_status", "status": "p_payback", "stacks": 1, "target": "self"}], "upgrade": {"growth": [3, 0], "plus4": {"name": "두 개의 뿔", "effects": [{"op": "block", "amount": 4, "target": "self"}]}, "plus5": {"name": "굽히지 않는 목", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}}, "flavor": "뿔 달린 투구를 숙이고 그대로 들이받았다."},
-  {"id": "born_back_to_back", "name": "등을 맞대고", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 4, "target": "all_allies"}, {"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}], "upgrade": {"growth": [2, 0], "plus4": {"name": "맞댄 등", "effects": [{"op": "block", "amount": 3, "target": "self"}]}, "plus5": {"name": "둘이서", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "도끼와 검이 등을 맞댔다. 앞만 보면 되었다."}
+  {"id": "born_mountain_silence", "name": "산의 침묵", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "target": "self"}, {"op": "block", "amount": 80, "target": "self"}, {"op": "rift", "amount": -1}], "upgrade": {"growth": [0, 30, 0], "plus4": {"name": "묵직한 침묵", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "산은 움직이지 않는다", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}]}}, "flavor": "산은 대답하지 않는다. 그래서 하늘도 잠시 숨을 죽였다."},
+  {"id": "born_prop_tunnel", "name": "갱도 받치기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 100, "target": "self"}, {"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}], "upgrade": {"growth": [30, 0], "plus4": {"name": "두 개의 받침", "effects": [{"op": "block", "amount": 40, "target": "all_allies"}]}, "plus5": {"name": "무너지지 않는 갱도", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}]}}, "flavor": "갈라지는 천장 아래 굵은 들보를 받쳤다. 산도, 하늘의 금도 잠시 멈췄다."},
+  {"id": "born_five_thousand_graves", "name": "오천의 무덤", "owner": "born", "type": "power", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_iron"], "effects": [{"op": "apply_status", "status": "p_five_thousand_graves", "stacks": 1, "target": "self"}, {"op": "block", "amount": 40, "target": "self"}], "upgrade": {"growth": [0, 30], "plus4": {"name": "돌무덤의 이름", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 애도", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "카즈둠 아래 오천 개의 돌무덤. 보른은 그 이름을 하나씩 외웠다."},
+  {"id": "born_mountain_fills", "name": "산이 메운다", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "heal", "amount": 50, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}], "upgrade": {"growth": [10, 20], "plus4": {"name": "돌의 숨", "effects": [{"op": "heal", "amount": 30, "target": "self"}]}, "plus5": {"name": "산의 품", "effects": [{"op": "keep_block", "target": "self"}]}}, "flavor": "고르몬이 쓰러진 자리, 산은 스스로 금을 메웠다. 보른의 상처도 그랬다."},
+  {"id": "born_next_tunnel", "name": "다음 갱도", "owner": "born", "type": "skill", "rarity": "legendary", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_taunt"], "castLine": {"speaker": "born", "face": "resolve", "text": "다음 갱도는, 내가 먼저 들어간다."}, "effects": [{"op": "taunt", "stacks": 2, "target": "self"}, {"op": "block", "amount": 250, "target": "self"}], "upgrade": {"growth": [0, 50], "plus4": {"name": "등불", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "끝나지 않는 갱도", "effects": [{"op": "keep_block", "target": "self"}]}}, "flavor": "등불 하나를 들고 어두운 갱도 입구에 섰다. 형이 그랬던 것처럼."},
+  {"id": "born_braid_beard", "name": "수염 땋기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "draw", "amount": 2}, {"op": "block", "amount": 30, "target": "self"}], "upgrade": {"growth": [0, 0, 20], "plus4": {"name": "쇠고리", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "싸움 전의 의식", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "싸움 전에 드워프는 수염을 땋는다. 붉은 수염에 쇠고리 하나."},
+  {"id": "born_piggyback", "name": "업고 달리기", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "ally", "tags": ["born_taunt"], "effects": [{"op": "block", "amount": 80, "target": "ally"}, {"op": "taunt", "stacks": 1, "target": "ally"}], "upgrade": {"growth": [30, 0], "plus4": {"name": "튼튼한 등", "effects": [{"op": "block", "amount": 40, "target": "self"}]}, "plus5": {"name": "달리는 산", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "왕일검을 업고 산길을 달렸다. 등 위의 노인이 웃었다. \"이놈, 무겁지 않으냐.\""},
+  {"id": "born_one_sword", "name": "검 한 자루", "owner": "born", "type": "skill", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "ally", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "ally"}, {"op": "block", "amount": 40, "target": "ally"}], "upgrade": {"growth": [0, 20], "plus4": {"name": "제일 좋은 검", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "ally"}]}, "plus5": {"name": "건네는 손", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "아무도 안 산, 이 집에서 제일 좋은 검. 보른은 그것을 하운에게 내밀었다."},
+  {"id": "born_stone_grain", "name": "돌의 결", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 60, "target": "self"}, {"op": "keep_block", "target": "self"}], "upgrade": {"growth": [20, 0], "plus4": {"name": "겹친 결", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "결을 아는 손", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "돌에도 결이 있다. 결을 따라 쌓은 벽은 다음 날에도 서 있다."},
+  {"id": "born_anvil_ring", "name": "모루 소리", "owner": "born", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "all_enemies", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 0, "scale": {"per": "block", "amount": 0.5, "max": 200}}], "upgrade": {"growth": [20], "plus4": {"name": "울리는 모루", "effects": [{"op": "block", "amount": 50, "target": "self"}]}, "plus5": {"name": "작은 모루", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "모루를 내리치자 소리가 갱도를 따라 퍼졌다. 그 소리에 바위가 떨었다."},
+  {"id": "born_rockfall", "name": "낙석", "owner": "born", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "damage", "amount": 100}], "upgrade": {"growth": [0, 30], "plus4": {"name": "큰 바위", "effects": [{"op": "block", "amount": 40, "target": "self"}]}, "plus5": {"name": "무너지는 절벽", "effects": [{"op": "damage", "amount": 40}]}}, "flavor": "\"이쪽이다!\" 적이 돌아본 순간, 절벽 위의 바위가 쏟아졌다."},
+  {"id": "born_anvil_smash", "name": "모루 내리찍기", "owner": "born", "type": "attack", "rarity": "common", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 100}, {"op": "block", "amount": 50, "target": "self"}], "upgrade": {"growth": [20, 10], "plus4": {"name": "불꽃", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "익숙한 망치", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "망치가 모루를 내리쳤다. 불꽃이 사방으로 튀었다."},
+  {"id": "born_hammer_spin", "name": "망치 돌리기", "owner": "born", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "all_enemies", "tags": ["born_taunt"], "effects": [{"op": "damage", "amount": 60}], "upgrade": {"growth": [20], "plus4": {"name": "두 바퀴", "effects": [{"op": "damage", "amount": 30}]}, "plus5": {"name": "회오리", "effects": [{"op": "block", "amount": 40, "target": "self"}]}}, "flavor": "망치를 머리 위로 돌렸다. 가까이 있던 것은 모두 날아갔다."},
+  {"id": "born_rock_heart", "name": "바위 심장", "owner": "born", "type": "power", "rarity": "epic", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "keywords": ["exhaust"], "tags": ["born_iron"], "castLine": {"speaker": "born", "face": "resolve", "text": "산은 무너지지 않는다."}, "effects": [{"op": "apply_status", "status": "p_rock_heart", "stacks": 1, "target": "self"}, {"op": "block", "amount": 60, "target": "self"}], "upgrade": {"growth": [0, 30], "plus4": {"name": "불씨 하나", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 돌", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "가슴 깊은 곳에 작은 불씨 하나. 산이 보른에게 남긴 심장이었다."},
+  {"id": "born_ale_barrel", "name": "맥주 한 통", "owner": "born", "type": "skill", "rarity": "epic", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "keywords": ["exhaust"], "castLine": {"speaker": "born", "face": "resolve", "text": "한 잔씩 돌려!"}, "effects": [{"op": "heal", "amount": 60, "target": "all_allies"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}], "upgrade": {"growth": [20, 0], "plus4": {"name": "거품", "effects": [{"op": "block", "amount": 40, "target": "all_allies"}]}, "plus5": {"name": "한 통 더", "removeKeywords": ["exhaust"]}}, "flavor": "통 뚜껑을 열자 거품이 넘쳤다. 그날 밤 웃음소리가 갱도 끝까지 울렸다."},
+  {"id": "born_mine_map", "name": "갱도 지도", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "none", "tags": ["born_iron"], "keywords": ["exhaust"], "effects": [{"op": "draw", "amount": 2}, {"op": "block", "amount": 30, "target": "self"}], "upgrade": {"growth": [1, 0], "plus4": {"name": "아는 길", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "외운 지도", "removeKeywords": ["exhaust"]}}, "flavor": "글자 하나 없는 지도. 보른은 갈래길 하나하나를 손가락으로 짚었다."},
+  {"id": "born_growl", "name": "으르렁", "owner": "born", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "self", "tags": ["born_taunt"], "effects": [{"op": "taunt", "stacks": 1, "target": "self"}, {"op": "block", "amount": 30, "target": "self"}], "upgrade": {"growth": [0, 20], "plus4": {"name": "곤두선 수염", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "울리는 목소리", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "수염이 곤두섰다. 으르렁 소리에 적들이 모두 보른을 보았다."},
+  {"id": "born_horn_ram", "name": "뿔 들이받기", "owner": "born", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "enemy", "tags": ["born_taunt"], "effects": [{"op": "damage", "amount": 80}, {"op": "apply_status", "status": "p_payback", "stacks": 1, "target": "self"}], "upgrade": {"growth": [30, 0], "plus4": {"name": "두 개의 뿔", "effects": [{"op": "block", "amount": 40, "target": "self"}]}, "plus5": {"name": "굽히지 않는 목", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}}, "flavor": "뿔 달린 투구를 숙이고 그대로 들이받았다."},
+  {"id": "born_back_to_back", "name": "등을 맞대고", "owner": "born", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 40, "target": "all_allies"}, {"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}], "upgrade": {"growth": [20, 0], "plus4": {"name": "맞댄 등", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "둘이서", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "도끼와 검이 등을 맞댔다. 앞만 보면 되었다."}
 ]

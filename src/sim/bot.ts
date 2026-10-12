@@ -88,25 +88,28 @@ export const BOT_STYLE_NAME: Record<BotStyle, string> = { guard: '수비형', st
 
 // ───────────────────────── 전투 ─────────────────────────
 
+/** 체력 단위(2026-10-12 데미지·체력 10배): 체력 1점의 값은 예전 체력 1점의 1/10. 점수의 다른 값(승리·상태·균열…)과 맞추려고 체력 항을 이것으로 나눈다 */
+export const HP_UNIT = 10;
+
 /** 전투 상태 점수(클수록 좋다). 턴을 끝낸 뒤(다음 턴 시작)나 전투가 끝난 상태에서 잰다 */
 export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): number {
   if (s.result === 'defeat') return -1e6;
   const data = s.data;
   let v = s.result === 'victory' ? 5000 : 0;
   // 하운이 쓰러지면 패배이므로 하운의 체력을 두 배로 친다
-  for (const p of s.party) v += p.downed ? -120 : p.hp * (p.defId === 'haun' ? opts.haunHpWeight : 1);
+  for (const p of s.party) v += p.downed ? -120 : (p.hp / HP_UNIT) * (p.defId === 'haun' ? opts.haunHpWeight : 1);
   // 변신이 남은 적(뼈 거인·셀리아스 등)은 다음 모습의 체력까지 친다. 안 그러면 처치하면 체력이 '늘어나' 보여 봇이 마무리를 미룬다
   const phaseHp = (e: (typeof s.enemies)[number]) => {
     const into = data.enemies.get(data.enemies.get(e.defId)?.transform?.into ?? '');
     return into ? Math.round(into.maxHp * (s.enemyHpScale ?? 1)) : 0;
   };
-  for (const e of alive(s.enemies)) v -= (e.hp + phaseHp(e)) * opts.enemyHpWeight * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
+  for (const e of alive(s.enemies)) v -= ((e.hp + phaseHp(e)) / HP_UNIT) * opts.enemyHpWeight * (1 + opts.strengthWeight * (e.statuses.strength ?? 0)) + 20;
   if (opts.threatWeight && !s.result) {
     const haun = s.party.find((p) => p.defId === 'haun');
     for (const e of alive(s.enemies)) {
       const view = describeIntent(s, e);
       if (!view?.damage || !haun) continue;
-      if (view.damage.all || view.intent.targetUid === haun.uid) v -= opts.threatWeight * view.damage.perHit * view.damage.times;
+      if (view.damage.all || view.intent.targetUid === haun.uid) v -= (opts.threatWeight * view.damage.perHit * view.damage.times) / HP_UNIT;
     }
   }
   const kind = (id: string) => data.statuses.get(id)?.kind;
@@ -219,11 +222,11 @@ function relicDownside(data: GameData, id: string): number {
   if (!r) return 99;
   let d = 0;
   for (const e of r.effects) {
-    if (e.op === 'lose_hp') d += (e.amount ?? 0) * (r.trigger === 'turnStart' ? 1 : 0.3);
+    if (e.op === 'lose_hp') d += ((e.amount ?? 0) / HP_UNIT) * (r.trigger === 'turnStart' ? 1 : 0.3);
     if (e.op === 'rift' && (e.amount ?? 0) > 0) d += e.amount!;
     if (e.op === 'apply_status' && (e.status === 'weak' || e.status === 'vulnerable') && e.target !== 'all_enemies' && e.target !== 'enemy') d += 1;
     if (e.op === 'add_card' && data.cards.get(e.card ?? '')?.type === 'status') d += e.count ?? 1;
-    if (e.op === 'gain_max_hp' && (e.amount ?? 0) < 0) d += -e.amount! / 3;
+    if (e.op === 'gain_max_hp' && (e.amount ?? 0) < 0) d += -e.amount! / HP_UNIT / 3;
   }
   return d;
 }
@@ -256,7 +259,7 @@ export const REMOVAL_GOLD = 60;
 /** 런 상태 점수(선택지 비교용) */
 export function scoreRun(data: GameData, run: RunState): number {
   let v = 0;
-  for (const r of run.roster) v += 25 + r.hp * (r.id === 'haun' ? 2 : 1);
+  for (const r of run.roster) v += 25 + (r.hp / HP_UNIT) * (r.id === 'haun' ? 2 : 1);
   if (run.supportActive) v += 25;
   for (const c of run.deck) {
     const def = data.cards.get(c.cardId)!;

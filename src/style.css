@@ -460,7 +460,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .hp-bar { position: relative; flex: 1; height: 15px; background: rgba(0, 0, 0, 0.65); border-radius: 99px; overflow: hidden; border: 1px solid #000; }
 .hp-fill { height: 100%; background: linear-gradient(#e06a6a, #a83232); transition: width 0.25s; }
 .unit-party .hp-fill { background: linear-gradient(#7fdc8e, #3d8f4b); }
-.hp-text { position: absolute; inset: 0; font-size: var(--fs-cap); font-weight: 700; text-align: center; line-height: 14px; -webkit-text-stroke: 0.3px #000; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+.hp-text { position: absolute; inset: 0; font-size: var(--fs-cap); font-weight: 700; text-align: center; line-height: 14px; -webkit-text-stroke: 0.3px #000; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; letter-spacing: -0.02em; }
 /* 방어: 체력 막대 왼쪽의 방패 */
 .block-badge { flex: 0 0 auto; min-width: 26px; height: 26px; margin: -7px 0; display: grid; place-items: center; padding: 0 4px 3px; font-size: var(--fs-cap); font-weight: 700; color: #eaf6ff; background: linear-gradient(#4c8fc4, #1f3f73); clip-path: polygon(50% 0, 100% 14%, 92% 66%, 50% 100%, 8% 66%, 0 14%); text-shadow: 0 1px 1px #000; cursor: help; }
 .statuses { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; min-height: 26px; margin-top: 5px; width: max(100%, 150px); }
@@ -949,6 +949,21 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .setting-options { display: flex; gap: 4px; }
 .setting-option { padding: 4px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
 .setting-option:has(input:checked) { border-color: var(--mana); background: #26354a; }
+/* 2026-10-12 편의: 두 확인을 한 줄에 · 안내 하나씩 되돌리기 · 저장 백업 · 빌드 줄 */
+.setting-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 16px; }
+.setting-block { display: flex; flex-direction: column; gap: 8px; }
+.setting-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.setting-note { color: var(--gold, #e2b45c); font-size: var(--fs-cap); }
+.tour-reset-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 12px; }
+.tour-reset-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.backup-box:empty { display: none; }
+.backup-box { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.25); }
+.backup-box p { margin: 4px 0; }
+.backup-slots { margin: 4px 0; padding-left: 18px; }
+.backup-error { color: #ff8a7a; }
+.backup-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.setting-foot { margin: 4px 0 0; color: var(--ink-dim); font-size: var(--fs-cap); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .deck-view { display: flex; flex-direction: column; gap: 16px; }
 .deck-group h3 { margin: 0 0 8px; font-size: var(--fs-body); }
 .deck-group h3 small { color: var(--ink-dim); font-weight: 400; }
@@ -1852,6 +1867,48 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .codex-single { padding: 10px 12px 16px; }
 }
 .codex-cardgrid { row-gap: 22px; padding-bottom: 8px; }
+
+/* 물약 확인(2026-10-12 B4): 첫 누름에 칩이 커지고 "다시 누르면 사용" */
+.potion-chip.arming { transform: scale(1.25); z-index: 3; box-shadow: 0 0 0 2px #e2b45c, 0 0 14px rgba(226, 180, 92, 0.8); position: relative; }
+.potion-chip .potion-arm-hint { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%) scale(0.8); white-space: nowrap; background: rgba(14, 10, 12, 0.95); color: #ffe3a6; border: 1px solid #c9a24a; border-radius: 6px; padding: 2px 8px; font-size: var(--fs-cap); pointer-events: none; }
+/* 장면 편의(B3): 자동 진행 켜짐 · 이미 본 장면 건너뛰기 */
+.vn-controls .btn.on { border-color: var(--mana); background: #26354a; }
+.vn-seen-skip { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 6; }
+/* 전투 단축키 표식(2026-10-12 B8): 키보드가 없는 기기에서는 숨긴다 */
+@media (pointer: coarse) { .medal-help { display: none; } }
+
+/* 보상·상점·이벤트의 '보유 카드 (N)'(2026-10-12 B2): 화면 오른쪽 위 고정 · 보유 카드 창의 '보유 중 +L' */
+.cards-corner { position: fixed; top: 12px; right: 12px; z-index: 20; }
+.deck-card { position: relative; }
+.deck-card.marked .card { outline: 2px solid #e2b45c; outline-offset: 2px; }
+.deck-mark { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); white-space: nowrap; background: #4a3612; color: #ffe3a6; border: 1px solid #e2b45c; border-radius: 6px; padding: 1px 8px; font-size: var(--fs-cap); z-index: 2; }
+
+/* B6: 시작 화면 구석 빌드 · 지도의 '저장됨' 표식 */
+.title-build { position: absolute; left: 12px; top: 8px; color: var(--ink-dim); opacity: 0.6; font-size: var(--fs-min); z-index: 2; }
+.saved-mark { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 30; padding: 3px 12px; border-radius: 999px; background: rgba(14, 10, 12, 0.85); border: 1px solid rgba(226, 180, 92, 0.6); color: #ffe3a6; font-size: var(--fs-cap); pointer-events: none; animation: saved-fade 1.5s ease-out forwards; }
+@keyframes saved-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+/*
+ * 휴대폰 가로(2026-10-12 B7): 높이가 낮은 가로 화면에서 전투가 깨지지 않게 — 화면 높이에 맞추고,
+ * 손패는 작게 한 줄, 자원·물약은 왼쪽 세로 띠, 턴 종료는 오른쪽 세로 띠. 적 의도 아이콘 크기는 그대로.
+ * 지도·보상·상점은 세로 스크롤만(가로 스크롤 없음)
+ */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --unit-h: 104px; --tap: 44px; }
+  .b-scene { --dock-h: 118px; height: calc(100vh - 8px); min-height: 0; }
+  .units { top: 44px; }
+  .dock { grid-template-columns: 120px minmax(0, 1fr) 96px; padding: 0 1% 6px; }
+  .dock-left { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .dock-left .b-items { flex-direction: row; }
+  .hand { --overlap: -18px; flex-wrap: nowrap; }
+  .hand .card { zoom: 0.62; }
+  /* 쉬는 손패는 작은 그림(0.62), 고른 카드는 원래 크기(--cpx-zoom)로 아래에서 솟아 글을 읽게 한다 */
+  .hand .card:hover:not(.card-disabled), .hand .card.card-selected { zoom: var(--cpx-zoom); transform: translateY(-6px); }
+  .b-scene.aiming .hand .card.card-selected { zoom: var(--cpx-zoom); transform: translateY(-6px); }
+  .endturn { transform: scale(0.8); transform-origin: 100% 100%; }
+  .battle-intro, .b-center .chip { max-width: 60vw; }
+  .btn, .codex-tab, .setting-option, .member, button.choice { min-height: var(--tap); }
+  body { overflow-x: hidden; }
+}
 /* 옷장(2026-10-12): 편성 화면과 같은 짜임 — 머리 판 · 동료 줄 · 미리 보기 + 옷 목록 */
 .wardrobe-screen { display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-height: calc(100vh - 20px); max-width: 1180px; margin: 0 auto; width: 100%; }
 .wd-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -1879,3 +1936,19 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .wd-canvas { width: 180px; height: 180px; }
 }
 .wd-head, .wd-preview, .wd-list { padding: 16px 20px; }
+/* 보상 행선지(2026-10-12 A1): 한 줄 안내 + 주인별 편성 점수 막대 */
+.reward-dest { margin: 2px 0 6px; color: var(--ink-dim); font-size: var(--fs-cap); }
+.reward-dest p { margin: 0 0 4px; }
+.reward-points { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.reward-pts { display: inline-flex; align-items: center; gap: 6px; }
+.reward-pts .lo-meter { display: inline-block; width: 60px; }
+.reward-pts small { font-size: var(--fs-min); }
+/* 상흔 효과 배지(2026-10-12 A5): 휴식·상점 머리 */
+.scar-badge { display: inline-block; margin: 4px 0; padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(255, 59, 59, 0.6); background: rgba(90, 16, 32, 0.6); color: #ffd0c8; font-size: var(--fs-cap); }
+/* 도감 '용어' 탭(2026-10-12 C2) */
+.glossary-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sub); }
+.glossary-table th, .glossary-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.glossary-table tbody th { white-space: nowrap; color: #f0c86a; }
+.glossary-table tbody th .status-chip, .glossary-table tbody th .st-chip { margin-right: 6px; vertical-align: middle; }
+.glossary-num { color: var(--ink-dim); font-size: var(--fs-cap); }
+@media (max-width: 640px) { .glossary-table thead { display: none; } .glossary-table tr { display: block; padding: 6px 0; border-bottom: 1px solid var(--line); } .glossary-table th, .glossary-table td { display: block; border: 0; padding: 2px 4px; } }

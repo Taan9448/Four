@@ -7,7 +7,7 @@
     "weight": 1,
     "once": false,
     "conditions": {"floorRange": [2, 7]},
-    "content": {"text": "길가에 천막 하나. 병에 담긴 것은 약이라기엔 너무 붉었다. 약장수가 웃으며 잔을 내민다. \"피 한 사발이면 쓸 만한 것을 드리지요. 두 사발이면 더 좋은 것을.\"", "choices": [{"label": "피 한 사발 — 출전 동료 체력 -8 → 희귀 이상 카드 1장", "effects": [{"op": "heal_party", "amount": -8}, {"op": "gain_random_card", "rarity": ["rare", "epic"]}], "result": "잔이 차자 약장수가 보따리를 풀었다."}, {"label": "두 사발 — 출전 동료 체력 -16 → 유물 1개", "effects": [{"op": "heal_party", "amount": -16}, {"op": "gain_relic", "rarity": ["uncommon", "rare"]}], "result": "약장수가 처음으로 웃음을 거두고 상자를 열었다."}, {"label": "지나친다", "effects": [], "result": "등 뒤에서 약장수가 혀를 찼다."}]}
+    "content": {"text": "길가에 천막 하나. 병에 담긴 것은 약이라기엔 너무 붉었다. 약장수가 웃으며 잔을 내민다. \"피 한 사발이면 쓸 만한 것을 드리지요. 두 사발이면 더 좋은 것을.\"", "choices": [{"label": "피 한 사발 — 출전 동료 체력 -80 → 희귀 이상 카드 1장", "effects": [{"op": "heal_party", "amount": -80}, {"op": "gain_random_card", "rarity": ["rare", "epic"]}], "result": "잔이 차자 약장수가 보따리를 풀었다."}, {"label": "두 사발 — 출전 동료 체력 -160 → 유물 1개", "effects": [{"op": "heal_party", "amount": -160}, {"op": "gain_relic", "rarity": ["uncommon", "rare"]}], "result": "약장수가 처음으로 웃음을 거두고 상자를 열었다."}, {"label": "지나친다", "effects": [], "result": "등 뒤에서 약장수가 혀를 찼다."}]}
   },
   {
     "id": "any_event_wandering_master",
@@ -37,7 +37,7 @@
     "weight": 1,
     "once": false,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "무너진 사당 안쪽, 검은 금이 간 함 하나. 뚜껑 틈으로 차가운 바람이 새어 나온다. 열면 무언가를 얻겠지만, 금도 함께 따라 나올 것 같다.", "choices": [{"label": "금째로 연다 — 상흔 +2 → 유물 1개", "effects": [{"op": "scar", "amount": 2}, {"op": "gain_relic"}], "result": "뚜껑이 열리자 금이 손등을 타고 기어올랐다. 함 안에는 낡았지만 단단한 것이 있었다."}, {"label": "피로 봉인을 푼다 — 동료 모두 최대 체력 -4 → 영웅 카드 1장", "effects": [{"op": "gain_max_hp", "amount": -4}, {"op": "gain_random_card", "rarity": ["epic"]}], "result": "봉인이 피를 마시고 조용해졌다."}, {"label": "건드리지 않는다", "effects": [], "result": "사당을 나서는 내내 등 뒤가 서늘했다."}]}
+    "content": {"text": "무너진 사당 안쪽, 검은 금이 간 함 하나. 뚜껑 틈으로 차가운 바람이 새어 나온다. 열면 무언가를 얻겠지만, 금도 함께 따라 나올 것 같다.", "choices": [{"label": "금째로 연다 — 상흔 +2 → 유물 1개", "effects": [{"op": "scar", "amount": 2}, {"op": "gain_relic"}], "result": "뚜껑이 열리자 금이 손등을 타고 기어올랐다. 함 안에는 낡았지만 단단한 것이 있었다."}, {"label": "피로 봉인을 푼다 — 동료 모두 최대 체력 -40 → 영웅 카드 1장", "effects": [{"op": "gain_max_hp", "amount": -40}, {"op": "gain_random_card", "rarity": ["epic"]}], "result": "봉인이 피를 마시고 조용해졌다."}, {"label": "건드리지 않는다", "effects": [], "result": "사당을 나서는 내내 등 뒤가 서늘했다."}]}
   },
   {
     "id": "any_event_dice_house",

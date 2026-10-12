@@ -142,14 +142,14 @@ describe('심연', () => {
     const s6 = battleSetupFor(data, run, enc);
     expect(s6.enemyHpScale!).toBeGreaterThan(s1.enemyHpScale!);
     expect(s6.enemyDmgScale!).toBeGreaterThan(s1.enemyDmgScale!);
-    expect(s6.enemyHitCap).toBe(Math.floor(70 * data.balance.abyss.oneHitCap));
+    expect(s6.enemyHitCap).toBe(Math.floor(700 * data.balance.abyss.oneHitCap));
   });
 
   it('제거: 휴식의 쉬고 버리기(회복 + 고른 카드, 굽이마다 한 번), 상점 지우기는 쓸수록 비싸다', () => {
     const run = start('C1', ['elia']);
     const rest = [...data.modules.values()].find((m) => m.type === 'rest' && m.stage === 's1')!;
     const haun = run.roster.find((r) => r.id === 'haun')!;
-    haun.hp = 20;
+    haun.hp = 200;
     const choices = choicesFor(data, run, rest);
     const i = choices.findIndex((c) => c.label.startsWith('쉬고 버리기'));
     expect(i).toBeGreaterThanOrEqual(0);
@@ -157,7 +157,7 @@ describe('심연', () => {
     const target = run.deck[3];
     applyChoice(data, run, rest, i, target.uid);
     expect(run.deck.some((c) => c.uid === target.uid)).toBe(false);
-    expect(haun.hp).toBeGreaterThan(20);
+    expect(haun.hp).toBeGreaterThan(200);
     // 같은 굽이에서는 다시 못 쓰고, 다음 굽이에서는 다시 쓴다
     expect(choicesFor(data, run, rest)[i].disabled).toBe('이번 굽이에 이미 버렸다');
     run.abyss!.depth += 1;
@@ -197,7 +197,7 @@ describe('심연', () => {
     const max = kyle.maxHp;
     applyRunOps(data, run, [{ op: 'injure' }]);
     const injured = run.roster.find((r) => r.id in run.abyss!.injuries)!;
-    expect(injured.maxHp).toBeLessThan(injured.id === kyle.id ? max : 999);
+    expect(injured.maxHp).toBeLessThan(injured.id === kyle.id ? max : 9999);
     run.status = 'stage_clear';
     advanceLoop(data, run);
     expect(run.abyss!.injuries).toEqual({});
@@ -406,5 +406,16 @@ describe('심연 2차', () => {
     const enc = enterNode(data, run, availableNodes(run)[0].id);
     const b = createBattle(data, { ...battleSetupFor(data, run, enc), enemies: ['sa_mugyeol_echo'], enemyMods: [undefined] });
     expect(b.enemies[0].statuses.blood_cover_fading).toBe(2);
+  });
+});
+
+describe('보스 하한(2026-10-12 A2)', () => {
+  it('바르가스는 bossMinDepth(3) 전 굽이에는 나오지 않는다', () => {
+    const min = data.balance.abyss.bossMinDepth.s5_boss_vargas;
+    expect(min).toBe(3);
+    for (let i = 0; i < 60; i++) {
+      const run = start(`VARG${i}`, ['elia', 'kyle']);
+      for (let d = 1; d < min; d++) expect(planLoop(data, run.abyss!, d).boss).not.toBe('s5_boss_vargas');
+    }
   });
 });

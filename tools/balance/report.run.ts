@@ -19,5 +19,5 @@ it('밸런스: 보고서', () => {
   const out = process.env.BALANCE_OUT ?? (MODE === 'abyss' ? 'docs/BALANCE_ABYSS.md' : MODE === 'pilgrimage' ? 'docs/BALANCE_PILGRIMAGE.md' : 'docs/BALANCE_REPORT.md');
   if (out !== '-') writeFileSync(out, text + '\n');
   // 요약을 콘솔에도(vitest가 삼키지 않게 stderr)
-  process.stderr.write(`\n${text.split(MODE === 'abyss' ? '\n## 동료 조합별' : MODE === 'pilgrimage' ? '\n## 봇 성향별' : '\n## 전투별')[0]}\n`);
+  process.stderr.write(`\n${text.split(MODE === 'abyss' ? '\n## 동료 조합별' : MODE === 'pilgrimage' ? '\n## 보유 상태별' : '\n## 전투별')[0]}\n`);
 });

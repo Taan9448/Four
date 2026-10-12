@@ -79,7 +79,7 @@
     "name": "그림자 망령",
     "weight": 3,
     "conditions": {"floorRange": [3, 9]},
-    "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 8)", "effects": [{"op": "damage", "amount": 8, "target": "random_enemy"}]}}
+    "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 80)", "effects": [{"op": "damage", "amount": 80, "target": "random_enemy"}]}}
   },
   {
     "id": "s9_battle_glass_tower",
@@ -166,7 +166,7 @@
     "name": "떠다니는 조각들",
     "weight": 3,
     "conditions": {"floorRange": [3, 9]},
-    "content": {"text": "청운산 전각과 똑같은 기와지붕의 반쪽. 흑요석 첨탑의 꼭대기. 거대한 나선형 조개껍데기. 별처럼 빛나는 모래가 담긴 그릇. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다. 삼천 년 동안.", "choices": [{"label": "기와지붕 아래서 숨을 고른다", "effects": [{"op": "heal_party", "amount": 8}], "result": "청운산의 지붕. 잠깐, 고향 냄새가 났다. (출전 동료 전원 체력 8 회복)"}, {"label": "별처럼 빛나는 모래를 들여다본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "모래알 하나하나에 결이 있었다. (고른 카드 1장 강화 +1)"}, {"label": "무거운 것을 조각 위에 내려놓는다", "effects": [{"op": "upgrade_card", "count": 1}], "result": "흐르지 않는 곳에서는 가벼울수록 오래 간다. (카드 1장 강화)"}]}
+    "content": {"text": "청운산 전각과 똑같은 기와지붕의 반쪽. 흑요석 첨탑의 꼭대기. 거대한 나선형 조개껍데기. 별처럼 빛나는 모래가 담긴 그릇. 경계가 갈라질 때마다 이곳으로 떨어져 내린 것들이다. 삼천 년 동안.", "choices": [{"label": "기와지붕 아래서 숨을 고른다", "effects": [{"op": "heal_party", "amount": 80}], "result": "청운산의 지붕. 잠깐, 고향 냄새가 났다. (출전 동료 전원 체력 80 회복)"}, {"label": "별처럼 빛나는 모래를 들여다본다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "모래알 하나하나에 결이 있었다. (고른 카드 1장 강화 +1)"}, {"label": "무거운 것을 조각 위에 내려놓는다", "effects": [{"op": "upgrade_card", "count": 1}], "result": "흐르지 않는 곳에서는 가벼울수록 오래 간다. (카드 1장 강화)"}]}
   },
   {
     "id": "s9_event_hungry_gaze",
@@ -176,7 +176,7 @@
     "weight": 2,
     "tags": ["scar"],
     "conditions": {"floorRange": [6, 9]},
-    "content": {"text": "틈의 가장 깊은 곳에서 무언가가 보고 있다. 눈은 보이지 않는다. 그러나 굶주린 시선이 느껴진다. 흐르는 것의 냄새를 찾는.", "choices": [{"label": "숨을 죽이고 흐름을 숨긴다", "effects": [{"op": "heal_party", "amount": 6}], "result": "시선이 일행을 놓쳤다. 흐르지 않는 자는 볼 수 없다. (출전 동료 전원 체력 6 회복)"}, {"label": "힘을 실어 길을 연다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "시선이 일행을 쫓는다. 베면 먹는다. (하운의 카드 2장 강화 +1, 상흔 +1)"}]}
+    "content": {"text": "틈의 가장 깊은 곳에서 무언가가 보고 있다. 눈은 보이지 않는다. 그러나 굶주린 시선이 느껴진다. 흐르는 것의 냄새를 찾는.", "choices": [{"label": "숨을 죽이고 흐름을 숨긴다", "effects": [{"op": "heal_party", "amount": 60}], "result": "시선이 일행을 놓쳤다. 흐르지 않는 자는 볼 수 없다. (출전 동료 전원 체력 60 회복)"}, {"label": "힘을 실어 길을 연다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "시선이 일행을 쫓는다. 베면 먹는다. (하운의 카드 2장 강화 +1, 상흔 +1)"}]}
   },
   {
     "id": "s9_event_cloud_road",

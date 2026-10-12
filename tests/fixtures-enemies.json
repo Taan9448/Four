@@ -3,7 +3,7 @@
   "id": "test_wolf",
   "name": "그림자늑대",
   "hitFx": "fx_claw",
-  "maxHp": 22,
+  "maxHp": 220,
   "sprite": null,
   "pattern": "random",
   "moves": [
@@ -16,7 +16,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 6
+      "amount": 60
      }
     ]
    },
@@ -34,7 +34,7 @@
      },
      {
       "op": "block",
-      "amount": 4,
+      "amount": 40,
       "target": "self"
      }
     ]
@@ -46,7 +46,7 @@
   "id": "test_wolf_alpha",
   "name": "그림자늑대 우두머리",
   "hitFx": "fx_claw",
-  "maxHp": 52,
+  "maxHp": 520,
   "sprite": null,
   "tint": "saturate(1.6) brightness(0.8)",
   "scale": 1.2,
@@ -61,7 +61,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 5,
+      "amount": 50,
       "times": 2
      }
     ]
@@ -87,7 +87,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 9
+      "amount": 90
      },
      {
       "op": "apply_status",
@@ -102,7 +102,7 @@
   "id": "test_ignis",
   "name": "화염군주 이그니스",
   "hitFx": "fx_hit_fire",
-  "maxHp": 120,
+  "maxHp": 1200,
   "sprite": null,
   "scale": 2,
   "tier": "boss",
@@ -115,7 +115,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 7,
+      "amount": 70,
       "target": "all_enemies"
      }
     ]
@@ -128,7 +128,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 15
+      "amount": 150
      }
     ]
    },
@@ -139,7 +139,7 @@
     "effects": [
      {
       "op": "block",
-      "amount": 14,
+      "amount": 140,
       "target": "self"
      },
      {
@@ -156,7 +156,7 @@
  {
   "id": "test_wraith",
   "name": "그림자 망령",
-  "maxHp": 30,
+  "maxHp": 300,
   "sprite": null,
   "color": "#2a2633",
   "pattern": "cycle",
@@ -175,7 +175,7 @@
     "effects": [
      {
       "op": "damage",
-      "amount": 7
+      "amount": 70
      }
     ]
    },
@@ -198,7 +198,7 @@
 {
   "id": "test_ember",
   "name": "시험용 불티",
-  "maxHp": 60,
+  "maxHp": 600,
   "sprite": null,
   "pattern": "cycle",
   "weak": [
@@ -216,7 +216,7 @@
       "effects": [
         {
           "op": "damage",
-          "amount": 4,
+          "amount": 40,
           "element": "fire"
         }
       ]
@@ -226,7 +226,7 @@
 {
   "id": "test_ember_boss",
   "name": "시험용 불의 왕",
-  "maxHp": 200,
+  "maxHp": 2000,
   "sprite": null,
   "tier": "boss",
   "pattern": "cycle",
@@ -242,7 +242,7 @@
       "effects": [
         {
           "op": "damage",
-          "amount": 4,
+          "amount": 40,
           "element": "fire"
         }
       ]

@@ -14,7 +14,7 @@
     "name": "보급 수레 호위",
     "weight": 2,
     "conditions": {"floorRange": [2, 5]},
-    "content": {"text": "진무관의 호법들에게 쌀과 무기를 실어 나르는 수레. 호위가 칼을 뽑는다.", "enemies": ["blood_cultist", "cult_guardian"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일의 방패벽이 산길에서 수레를 막는다. (아군 전원 방어 6)", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}}
+    "content": {"text": "진무관의 호법들에게 쌀과 무기를 실어 나르는 수레. 호위가 칼을 뽑는다.", "enemies": ["blood_cultist", "cult_guardian"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일의 방패벽이 산길에서 수레를 막는다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}}
   },
   {
     "id": "s7_battle_jinmu_watch",
@@ -88,7 +88,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 6, 취약 1)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "gain_card", "card": "born_together"}]}
+    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "text": "소림의 탑림. 검푸른 독 손톱의 독수마군이 혈교도와 함께 진을 쳤다. 독은 손톱 끝에서 손목의 경맥으로 흐른다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 대열을 짓이긴다. 쾅, 쾅, 쾅. (적 전원 피해 60, 취약 1)", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "gain_card", "card": "born_together"}]}
   },
   {
     "id": "s7_elite_branch_guard",
@@ -97,7 +97,7 @@
     "name": "분타의 정예",
     "weight": 1,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "낙안봉 꼭대기 성채를 지키는 섬서 분타의 정예. (적 전원 힘 1)", "enemies": ["branch_elite", "blood_cultist", "branch_elite"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 삼백이 방패를 맞물린다. \"전진!\" 쿵. (적 전원 피해 5)", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "낙안봉 꼭대기 성채를 지키는 섬서 분타의 정예. (적 전원 힘 1)", "enemies": ["branch_elite", "blood_cultist", "branch_elite"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 삼백이 방패를 맞물린다. \"전진!\" 쿵. (적 전원 피해 50)", "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s7_event_supply_road",
@@ -107,7 +107,7 @@
     "once": true,
     "weight": 3,
     "conditions": {"floorRange": [2, 5]},
-    "content": {"text": "왕일검의 지도에 그려진 붉은 선. 청운산에서 무당으로, 진무관을 봉쇄한 호법 셋에게 쌀과 무기가 흘러가는 길. 개방의 거지들이 보급 수레의 일정을 알려 주었다.", "choices": [{"label": "카일의 방패벽이 수레를 막는다", "condition": {"partyHas": "kyle"}, "result": "산길에서 수레가 멈췄다. 아무도 다치지 않았다. 보급이 끊겼다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "보른이 산길을 지운다", "condition": {"partyHas": "born"}, "result": "산길의 절벽이 결대로 무너져 길을 아예 지웠다. 보급이 끊겼다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "거지들에게 수레 일정을 묻는다", "result": "수레는 다시 오지 않았다. 보급이 끊겼다. 출전 동료 전원 체력 5 회복", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "heal_party", "amount": 5}]}]}
+    "content": {"text": "왕일검의 지도에 그려진 붉은 선. 청운산에서 무당으로, 진무관을 봉쇄한 호법 셋에게 쌀과 무기가 흘러가는 길. 개방의 거지들이 보급 수레의 일정을 알려 주었다.", "choices": [{"label": "카일의 방패벽이 수레를 막는다", "condition": {"partyHas": "kyle"}, "result": "산길에서 수레가 멈췄다. 아무도 다치지 않았다. 보급이 끊겼다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "보른이 산길을 지운다", "condition": {"partyHas": "born"}, "result": "산길의 절벽이 결대로 무너져 길을 아예 지웠다. 보급이 끊겼다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "거지들에게 수레 일정을 묻는다", "result": "수레는 다시 오지 않았다. 보급이 끊겼다. 출전 동료 전원 체력 50 회복", "effects": [{"op": "set_flag", "flag": "wudang_supply"}, {"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s7_event_disciples",
@@ -167,7 +167,7 @@
     "once": true,
     "weight": 3,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "개방의 거지가 소식을 가져왔다. 화산의 낙안봉에 마교의 섬서 분타가 있다고. 그 분타주가 아이들의 피를 받는다고. 그리고 그 분타주가, 교주의 오른팔이라고.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -4, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -4}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "화산에서 온 여제자에게 길을 묻는다", "result": "열여덟, 얼굴에 칼자국이 있는 매설이 서쪽 절벽을 짚었다. \"화산파만 아는 길이 있어요.\" 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+    "content": {"text": "개방의 거지가 소식을 가져왔다. 화산의 낙안봉에 마교의 섬서 분타가 있다고. 그 분타주가 아이들의 피를 받는다고. 그리고 그 분타주가, 교주의 오른팔이라고.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -40, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -40}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "화산에서 온 여제자에게 길을 묻는다", "result": "열여덟, 얼굴에 칼자국이 있는 매설이 서쪽 절벽을 짚었다. \"화산파만 아는 길이 있어요.\" 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   },
   {
     "id": "s7_event_jo_report",
@@ -177,7 +177,7 @@
     "once": true,
     "weight": 1,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"scene": "s7_scene_jo_report", "text": "그 무렵 천마봉에서 있었던 일을, 하운은 알지 못했다. 청운맹의 야영지에는 모닥불이 타고 있었다.", "choices": [{"label": "모닥불 곁에서 쉰다", "result": "출전 동료 전원 체력 8 회복", "effects": [{"op": "heal_party", "amount": 8}]}, {"label": "검집을 손질한다", "result": "카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"scene": "s7_scene_jo_report", "text": "그 무렵 천마봉에서 있었던 일을, 하운은 알지 못했다. 청운맹의 야영지에는 모닥불이 타고 있었다.", "choices": [{"label": "모닥불 곁에서 쉰다", "result": "출전 동료 전원 체력 80 회복", "effects": [{"op": "heal_party", "amount": 80}]}, {"label": "검집을 손질한다", "result": "카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s7_rest_dojo_wall",
@@ -219,7 +219,7 @@
     "stage": "s7",
     "type": "boss",
     "name": "낙안봉",
-    "content": {"scene": "s7_scene_nakan", "outroScene": "s7_scene_unhealed", "text": "분타의 지하 통로. 등 뒤에 아이 서른. 혈수마군의 피가 결을 덮어 결 노출이 붙지 않는다(피의 덮개). 천외귀운만이 덮개를 벗긴다 — 마나를 물동이째 쏟아야 한다.", "enemies": ["branch_elite", "hyeolsu", "branch_elite"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 아이들을 감싸 안고, 마나를 아끼며 숨을 센다. (아군 전원 방어 6)", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "sky_crack"}, {"op": "scar", "amount": 1}]}
+    "content": {"scene": "s7_scene_nakan", "outroScene": "s7_scene_unhealed", "text": "분타의 지하 통로. 등 뒤에 아이 서른. 혈수마군의 피가 결을 덮어 결 노출이 붙지 않는다(피의 덮개). 천외귀운만이 덮개를 벗긴다 — 마나를 물동이째 쏟아야 한다.", "enemies": ["branch_elite", "hyeolsu", "branch_elite"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 아이들을 감싸 안고, 마나를 아끼며 숨을 센다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "sky_crack"}, {"op": "scar", "amount": 1}]}
   },
   {"id": "s7_shop", "stage": "s7", "type": "shop", "name": "강나루 약방", "weight": 1, "content": {"text": "나룻배가 닿는 곳마다 약방 깃발이 섰다. 늙은 약사가 말린 약재를 저울에 달며 하운의 낯빛을 살폈다."}}
 ]

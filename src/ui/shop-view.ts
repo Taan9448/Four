@@ -8,6 +8,7 @@ import { upgradeCandidates, type RunState } from '../engine/run';
 import type { CardInstance } from '../engine/state';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
+import { scarBadge } from './map-view';
 import { goldChip, potionChip, relicChip } from './items';
 import { openOverlay } from './overlay';
 import { toast } from '../render/fx';
@@ -61,6 +62,8 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
         h('div', { class: 'choice-kind' }, '상점'),
         h('h2', {}, module.name),
         module.content.text ? h('p', { class: 'shop-text' }, module.content.text) : null,
+        // 지금 상흔으로 걸린 효과(2026-10-12 A5)
+        scarBadge(data, run.scar, 'shop'),
         // 상흔이 깊으면: '틈 냄새가 나는 손님' — 값이 오르고, 감소 카드 한 장과 꿰매기(GAME_DESIGN 7절)
         shop.scarred ? h('p', { class: 'shop-scarred' }, `틈 냄새가 나는 손님 — 상흔 ${data.balance.rift.scar.shopAt} 이상이라 값이 ${Math.round((data.balance.rift.scar.shopPriceMul - 1) * 100)}% 올랐다. 대신 금을 꿰매 주겠단다.`) : null,
       ),

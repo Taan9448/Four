@@ -52,3 +52,22 @@ describe('저장·이어하기', () => {
     expect(deserializeRun(data, serializeRun(run))).not.toBeNull();
   });
 });
+
+describe('저장 5 — 데미지·체력 10배(2026-10-12)', () => {
+  it('저장 4 이하의 체력·최대 체력·전투 기록은 10배로 읽는다(지금 저장은 그대로)', () => {
+    const run = createRun(data, 'HPX10');
+    const haun = run.roster[0];
+    haun.hp = 55;
+    haun.maxHp = 70;
+    run.stats.damage = 123;
+    const old = JSON.parse(serializeRun(run, 1));
+    old.version = 4;
+    const loaded = deserializeRun(data, JSON.stringify(old))!;
+    expect(loaded.run.roster[0].hp).toBe(550);
+    expect(loaded.run.roster[0].maxHp).toBe(700);
+    expect(loaded.run.stats.damage).toBe(1230);
+    const same = deserializeRun(data, serializeRun(run, 1))!;
+    expect(same.run.roster[0].hp).toBe(55);
+    expect(SAVE_VERSION).toBe(5);
+  });
+});
