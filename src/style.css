@@ -1644,6 +1644,9 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
   .hand-hint { display: block; }
   /* 휴대폰: 손패 윗부분(카드 그림 위)에 겹쳐 띄운다 — 유닛·의도를 가리지 않게 */
   .dock-mid > .toasts-center { bottom: auto; top: 18px; width: calc(100% - 12px); }
+  /* 대사 띠가 떠 있는 동안 손패 힌트는 띠 위(띠가 힌트 줄 아래에서 시작한다) */
+  .dock-mid.strip-on > .hand-hint { position: relative; z-index: 31; line-height: 18px; }
+  .dock-mid.strip-on > .toasts-center { top: 22px; }
   .dock-mid > .toasts-center .toast { font-size: var(--fs-sub); padding: 6px 12px; }
   /* 의도 이름표 두 줄: 넘치면 말줄임(옆 적과 겹치지 않게) */
   .intent, .incoming { max-width: 100%; }

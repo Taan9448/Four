@@ -12,6 +12,8 @@ const SCREENS = [
   ['title', ''],
   ['map', '?seed=UXCHK'],
   ['battle', '?sandbox&seed=UXCHK'],
+  // 대사 띠를 띄우고 손패 카드 주석을 연 전투: 툴팁 ↔ 대사 띠, 손패 힌트 ↔ 대사 띠를 따로 잰다
+  ['battle-strip', '?sandbox&seed=UXCHK'],
   ['abyss', '?abyss=UXCHK'],
   ...['reward', 'choice', 'scene', 'clear', 'win', 'lose', 'deck', 'levelup', 'shop', 'bossloot', 'hub', 'codex', 'loadout', 'pilgrim', 'abyssclear', 'abyssend', 'abyssshop', 'abyssrest', 'surgeguide'].map((s) => [s, `?screen=${s}&seed=UXCHK`]),
 ];
@@ -130,6 +132,60 @@ function measure({ minText, minBtn }) {
   };
 }
 
+/** 대사 띠와 겹치면 안 되는 것(브라우저에서 돈다): 떠 있는 툴팁, 손패 힌트 */
+function stripPairs() {
+  const strip = document.querySelector('.dock-mid > .toasts-center');
+  if (!strip || !strip.childElementCount) return ['대사 띠가 뜨지 않음'];
+  const sb = strip.getBoundingClientRect();
+  const hit = (el) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    if (r.width < 1 || r.height < 1 || cs.display === 'none' || cs.visibility === 'hidden' || !el.textContent?.trim()) return false;
+    return Math.min(r.right, sb.right) - Math.max(r.left, sb.left) > 2 && Math.min(r.bottom, sb.bottom) - Math.max(r.top, sb.top) > 2;
+  };
+  const out = [];
+  const tip = document.querySelector('.tooltip.on');
+  if (!tip) out.push('툴팁이 뜨지 않음');
+  else if (hit(tip)) out.push('툴팁 ↔ 대사 띠');
+  if (hit(document.querySelector('.hand-hint'))) out.push('손패 힌트 ↔ 대사 띠');
+  return out;
+}
+
+/** 전투에 대사 띠(3초짜리 경고와 같은 모양)를 띄우고 손패 첫 카드의 주석을 연다 */
+async function openStrip(page, mobile) {
+  await page.evaluate(() => {
+    const strip = document.querySelector('.dock-mid > .toasts-center');
+    const el = document.createElement('div');
+    el.className = 'toast toast-support';
+    el.textContent = '"하운, 지금이야. 금이 벌어지기 전에." — 점검용 대사 띠, 손패 바로 위에 뜬다';
+    strip?.appendChild(el);
+  });
+  // 손패 가운데 카드의 주석: PC는 마우스 올림, 휴대폰은 누름(눌러 고르기까지는 하지 않는다 — 고르면 손패가 다시 그려진다)
+  // 손패 가운데 카드 글의 주석. PC는 실제 마우스를 올린다(올리면 카드가 떠오르므로 두 번 — 떠오른 자리의 글 위로),
+  // 휴대폰은 누름만 보낸다(눌러 고르면 손패가 다시 그려져 주석이 닫힌다)
+  const center = () =>
+    page.evaluate(() => {
+      const cards = [...document.querySelectorAll('.dock-mid [data-tip-kind=card]')];
+      const r = cards[Math.floor(cards.length / 2)]?.getBoundingClientRect();
+      return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+    });
+  if (mobile) {
+    await page.evaluate(() => {
+      const cards = [...document.querySelectorAll('.dock-mid [data-tip-kind=card]')];
+      cards[Math.floor(cards.length / 2)]?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+    });
+  } else {
+    for (let k = 0; k < 3; k++) {
+      const p = await center();
+      if (!p) return;
+      await page.mouse.move(p.x, p.y, { steps: 3 });
+      await page.waitForTimeout(350);
+    }
+  }
+  await page.waitForTimeout(300);
+}
+
 async function settle(page) {
   await page.waitForTimeout(1500);
   // 장면(대화)은 넘기고, 첫 안내는 건너뛴다
@@ -169,7 +225,10 @@ try {
     try {
       await page.goto(base + query, { waitUntil: 'domcontentloaded', timeout: 60000 });
       await settle(page);
+      if (name === 'battle-strip') await openStrip(page, !!vp.mobile);
+      const pairs = name === 'battle-strip' ? await page.evaluate(stripPairs) : [];
       const m = await page.evaluate(measure, { minText: MIN_TEXT, minBtn: vp.btn });
+      m.overlaps = [...pairs, ...m.overlaps];
       if (shots) await page.screenshot({ path: join(shots, `${name}-${vp.width}-${font.scale === 1 ? 'n' : 'l'}.png`) });
       return { name, vp: vp.tag, font: font.tag, ...m, errors: [...new Set(errors)] };
     } catch (e) {

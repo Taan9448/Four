@@ -179,7 +179,8 @@ export class BattleView {
     this.resEl = h('div', { class: 'b-res' });
     this.fxLayer = h('div', { class: 'fx-layer' });
     this.toasts = h('div', { class: 'toasts' });
-    this.alerts = h('div', { class: 'toasts toasts-center' });
+    // 대사 띠: 툴팁이 피해 가고(data-tip-avoid), 떠 있는 동안 손패 힌트는 띠 위로(.strip-on)
+    this.alerts = h('div', { class: 'toasts toasts-center', 'data-tip-avoid': '' });
     this.handEl = h('div', { class: 'hand' });
     this.logEl = h('div', { class: 'log', 'aria-live': 'polite' });
     this.pilesEl = h('div', { class: 'medals' });
@@ -259,7 +260,7 @@ export class BattleView {
         { class: 'dock' },
         h('div', { class: 'dock-left' }, h('div', { class: 'b-items' }, this.potionEl), this.resEl),
         // 전투 중 대사·경고 띠는 손패 바로 위(this.alerts)
-        h('div', { class: 'dock-mid' }, this.alerts, (this.handHint = h('div', { class: 'hand-hint', 'aria-hidden': 'true' })), this.handEl),
+        this.watchStrip(h('div', { class: 'dock-mid' }, this.alerts, (this.handHint = h('div', { class: 'hand-hint', 'aria-hidden': 'true' })), this.handEl)),
         h('div', { class: 'endturn' }, this.turnEl, this.endBtn, h('small', { class: 'key-hint' }, 'E')),
       ),
       this.fxLayer,
@@ -1262,6 +1263,13 @@ export class BattleView {
   private toggleLog(): void {
     const on = this.logEl.classList.toggle('on');
     this.logMedal.classList.toggle('on', on);
+  }
+
+  /** 대사 띠가 떠 있는 동안 dock-mid에 strip-on(휴대폰: 손패 힌트를 띠 위로) */
+  private watchStrip(mid: HTMLElement): HTMLElement {
+    const sync = () => mid.classList.toggle('strip-on', this.alerts.childElementCount > 0);
+    new MutationObserver(sync).observe(this.alerts, { childList: true });
+    return mid;
   }
 
   /** 전투 중 이야기 대사·경고: 손패 바로 위 띠. 3초 뒤 또는 누르면 닫힌다(의도·받을 피해 예고를 가리지 않게) */

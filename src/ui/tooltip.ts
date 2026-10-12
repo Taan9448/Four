@@ -34,8 +34,16 @@ function show(el: HTMLElement): void {
   const th = t.offsetHeight;
   const left = Math.min(Math.max(8, r.left + r.width / 2 - tw / 2), window.innerWidth - tw - 8);
   const above = r.top - th - 8;
+  let top = above >= 8 ? above : r.bottom + 8;
+  // 피할 띠(전투 대사 띠 등, data-tip-avoid): 떠 있으면 그 위로 올린다(2026-10-12)
+  for (const a of document.querySelectorAll<HTMLElement>('[data-tip-avoid]')) {
+    if (!a.childElementCount) continue;
+    const b = a.getBoundingClientRect();
+    if (b.height < 1 || left + tw <= b.left || left >= b.right || top + th <= b.top || top >= b.bottom) continue;
+    top = Math.max(8, b.top - th - 8);
+  }
   t.style.left = `${left}px`;
-  t.style.top = `${above >= 8 ? above : r.bottom + 8}px`;
+  t.style.top = `${top}px`;
 }
 
 function hide(): void {
