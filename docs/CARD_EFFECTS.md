@@ -55,7 +55,7 @@
 3. 틈의 굶주림(`hungry`): 카드 비용 내공이 2 이상이면 × 0.5
 4. 무형: 비용이 내공만이면 × 0.5
 5. 결 노출: 아군 공격이면 1스택 소모, × 1.5, 방어 무시
-5a. 속성(`damage`의 `element`: fire | ice): 적의 `weak`이면 × `elements.weakMultiplier`(1.5), `resist`면 × `resistMultiplier`(0.5)
+5a. 속성(`damage`의 `element`: fire | ice | lightning): 적의 `weak`이면 × `elements.weakMultiplier`(1.5), `resist`면 × `resistMultiplier`(0.5). **전도**(2026-10-12): 속성에 `conduct`가 있고 대상에 `conduct.ifTargetHas` 상태가 1 이상이면 × `conduct.multiplier`(번개: 냉기가 붙은 대상 × 1.5, 냉기는 소모하지 않는다). 약점·내성과 곱한다. damage 이벤트에 `conducted: true`
 5b. 치명타: 아군 **카드**의 피해 한 번마다 시드 RNG로 굴린다. 확률은 `characters[].crit`(없으면 `balance.crit.chance`), 배율 `balance.crit.multiplier`(1.5). 피해 미리보기 복제·시험(`state.noCrit`)에서는 굴리지 않는다
 6. × 대상 취약(1.5)·받는 피해 보정(얼음 속 심장 0.2 등) → 내림
 7. 흐름 포식: 내공·마나 비용이 있는 카드면 피해 대신 그만큼 최대 HP·HP 증가
@@ -108,10 +108,23 @@
 - 영웅·전설은 `castLine`이 있어야 한다. 쓸 때마다 화면이 어두워지고, 화자의 반신 그림(`<화자>_stand`의 표정 프레임)과 대사가 나온 뒤 스킬이 나간다(약 1.5초, 클릭하면 건너뜀).
 - 전투 보상 후보는 노드 유형별 등급 가중치(`balance.rewards.rarityWeights`)로 등급을 먼저 뽑고, 그 등급에서 카드를 고른다.
 
-9. **속성 상태**(`balance.elements`): 화염 → 화상(`burn`) 1, 냉기 → 냉기(`chill`) 1. 대상이 그 속성에 내성이면 붙지 않는다.
-   상극: 화염은 대상의 냉기를 녹이고(지운다), 냉기는 화상을 끈다. 냉기가 `freezeAt`(3, 보스는 `bossFreezeAt` 5)에 이르면 냉기를 비우고 `freezeStatus`(빙결) 1.
+9. **속성 상태**(`balance.elements.<속성>`): 화염 → 화상(`burn`) 1, 냉기 → 냉기(`chill`) 1, 번개 → 감전(`shock`) 1. 대상이 그 속성에 내성이면 붙지 않는다.
+   상극은 `opposites` 쌍만(화염↔냉기): 화염은 대상의 냉기를 녹이고(지운다), 냉기는 화상을 끈다. 번개는 아무것도 지우지 않고 지워지지도 않는다.
+   **임계**(`threshold`): 그 상태가 `at`(보스는 `bossAt`)에 이르면 비우고 `into` 상태 1 — 냉기 3(보스 5) → 빙결(`bind`), 감전 3(보스 5) → 마비(`paralyze`). 옛 `freezeAt`·`bossFreezeAt`·`freezeStatus`와 special `chill`은 이 데이터로 옮겼다.
 
-카드 문구는 속성 피해를 "화염 피해 9(화상 1)"처럼 자동으로 쓴다. 적 의도 옆에는 炎(화염)·冷(냉기) 표시, 적 이름 아래에는 '약점 냉기'·'내성 화염' 이름표가 붙는다.
+```json
+"elements": {
+  "fire":      { "status": "burn",  "stacks": 1 },
+  "ice":       { "status": "chill", "stacks": 1, "threshold": { "at": 3, "bossAt": 5, "into": "bind" } },
+  "lightning": { "status": "shock", "stacks": 1, "threshold": { "at": 3, "bossAt": 5, "into": "paralyze" },
+                 "conduct": { "ifTargetHas": "chill", "multiplier": 1.5 } },
+  "opposites": [["fire", "ice"]],
+  "weakMultiplier": 1.5,
+  "resistMultiplier": 0.5
+}
+```
+
+카드 문구는 속성 피해를 "화염 피해 9(화상 1)"·"번개 피해 6(감전 1)"처럼 자동으로 쓰고, 전도가 있는 속성의 카드 주석에는 "전도 — 냉기가 붙은 적에게 번개 피해 ×1.5"를 덧붙인다. 적 의도 옆에는 炎(화염)·冷(냉기)·雷(번개) 표시, 적 이름 아래에는 '약점 냉기'·'내성 화염' 이름표가 붙는다.
 
 ## 4. 상태(`data/statuses.json`)
 
@@ -133,7 +146,10 @@
 | still | 흐르지 않는 자 | 라운드 끝 -1 | 적이 이 아군을 노리지 못한다(special `unseen`). 다른 아군이 없으면 헛손질 |
 | seam | 꿰맬 자리 | 특성 | 실(thread) 카드의 피해만 받는다 |
 | burn | 화상 | 자기 턴 끝 -1 | 턴 시작마다 스택×2 HP 손실. 냉기 공격에 꺼진다 |
-| chill | 냉기 | 없음 | special `chill`: 3스택(보스 5)이면 빙결 1로 바뀐다. 화염 공격에 녹는다 |
+| chill | 냉기 | 없음 | 임계(`elements.ice.threshold`): 3스택(보스 5)이면 빙결 1로 바뀐다. 화염 공격에 녹는다. `blockedBy: ["paralyze"]` — 마비 중엔 쌓이지 않는다 |
+| shock | 감전 | 자기 턴 끝 -1 | 임계(`elements.lightning.threshold`): 3스택(보스 5)이면 마비 1로 바뀐다. `blockedBy: ["bind"]` — 빙결 중엔 쌓이지 않는다 |
+| paralyze | 마비 | 자기 턴 끝 -1 | 행동 불가(`skipTurn`, 빙결과 같다) |
+| p_storm_cloud | 먹구름 | 없음 | 발동: 차례 시작에 무작위 적 하나에 감전 1(스택마다) |
 | mountain_regen | 산이 메운다 | 없음 | 차례 시작마다 스택×4 회복(`turnStartDamagePerStack` 음수 = 회복) |
 | daze | 어지러움 | 자기 턴 끝 -1 | 발동: 차례 시작에 손패에서 무작위 1장 버리기(스택과 상관없이 1장, `perStack: false` — 그림자 조각) |
 | breath_broken | 끊긴 숨 | 자기 턴 끝 -1 | 발동: 차례 시작에 하운의 카드 1장 버리기(곽도진의 청운의 박자를 흐트리다) |
@@ -145,7 +161,8 @@
 | frozen_heart / shadow_body / blood_veil / dead_forest | 얼음 속 심장 / 그림자 몸 / 두 옥좌 / 죽은 숲의 몸 | 없음 | 받는 피해 ×0.2 / ×0.25 / ×0.5 / ×0.6 (짝·처치·dispel로 풀리는 보스 기믹) |
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
-`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, chill, seal)은 엔진이 메커니즘으로 처리한다.
+`blockedBy`(선택, 2026-10-12): 대상이 이 상태들 중 하나를 갖고 있으면 그 상태는 쌓이지 않는다(교차 잠금 금지 — 빙결 중 감전, 마비 중 냉기).
+`special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, seal)은 엔진이 메커니즘으로 처리한다. 냉기의 임계는 special이 아니라 `balance.elements`의 `threshold`다.
 
 ## 4-1. 상태 발동(파워)
 
@@ -186,7 +203,7 @@
 `moves[]`의 `effects`는 카드와 같은 기본 동작을 쓴다. `pattern: cycle`(순서대로) 또는 `random`(가중치, 같은 행동 3연속 금지).
 `targeting`: random | lowest_hp | highest_hp | haun. `sprite`가 있으면 `<sprite>_idle / _attack / _hit` 에셋을 쓰고, 없으면 실루엣으로 대신한다.
 
-- `weak` / `resist`: 속성 약점·내성 배열(fire | ice). 예: 불의 정령·이그니스 `weak: ["ice"], resist: ["fire"]`, 아르덴의 얼음 적 `weak: ["fire"], resist: ["ice"]`.
+- `weak` / `resist`: 속성 약점·내성 배열(fire | ice | lightning). 예: 불의 정령·이그니스 `weak: ["ice"], resist: ["fire"]`, 아르덴의 얼음 기사 `weak: ["fire", "lightning"], resist: ["ice"]`, 바위 골렘 `resist: ["lightning"]`.
 - `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
 - `tier`: normal | elite | boss. `balance.enemyTiers[tier]`의 체력(`hp`)·피해(`dmg`) 배율이 스테이지 배율(`stages[].enemyHpScale`·`enemyDmgScale`, 어려움이면 `balance.difficulty.hard.byStage`)과 함께 곱해진다(GAME_DESIGN 12절). 의도·받을 피해 예고에도 같이 걸린다.
 - 행동(`moves[]`)의 `condition`: 이 조건일 때만 고른다(검사 대상은 그 적 자신 — 예: `{ "hpRatioLte": 0.5 }` 체력 절반 아래). 순서대로(cycle)면 조건이 맞지 않는 행동은 건너뛴다. `oncePerBattle: true`면 한 전투에 한 번만(소환).

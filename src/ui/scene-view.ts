@@ -23,13 +23,13 @@ interface Slot {
 /** background: 장면 뒤 배경 에셋 id(장면의 background가 우선). 실제 그림이 있을 때만 어둡게 깐다 */
 /**
  * 글자 속도·자동 진행·본 장면 건너뛰기(2026-10-12 B3): settings.textSpeed · autoAdvance · skipSeenScenes.
- * skip.button이면 머리에 '이미 본 장면 · 건너뛰기'(자동으로 넘기는 것은 부르는 쪽이 engine/scene.ts sceneSkip으로 정한다)
+ * 이미 본 장면을 자동으로 넘기는 것은 부르는 쪽이 engine/scene.ts sceneSkip으로 정한다(건너뛰기 단추는 장면 화면의 기본 '건너뛰기' 하나 — 2026-10-12 사용자 결정)
  */
 export function sceneView(
   data: GameData,
   scene: SceneDef,
   onDone: () => void,
-  opts: { background?: string; flags?: readonly string[]; skip?: { button: boolean } } = {},
+  opts: { background?: string; flags?: readonly string[] } = {},
 ): HTMLElement {
   const bgUrl = frameUrl(scene.background ?? opts.background, 1, { realOnly: true });
   const slots: Record<Side, Slot> = {
@@ -213,7 +213,6 @@ export function sceneView(
       h('button', { class: 'btn', onclick: stop(finish) }, '건너뛰기'),
     ),
     logEl,
-    opts.skip?.button ? h('button', { class: 'btn vn-seen-skip', onclick: stop(finish) }, '이미 본 장면 · 건너뛰기') : null,
   );
   next();
   return root;

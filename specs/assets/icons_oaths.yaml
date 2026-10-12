@@ -1,0 +1,24 @@
+id: icons_oaths
+type: icon-sheet
+summary: 심연 서약 아이콘 15칸 — 칸 n = 서약 n단계(data/abyss_oaths.json의 level)
+# 2026-10-12 D3: 그림이 오기 전에는 한자(厚空眠眼阻裂法囊傷仇重隙閉二誓). 단계 순서를 바꾸면 이 칸도 함께 바꾼다
+# 심연 화면의 검보라 바탕 위에 놓이므로 옅은 보라·은빛 위주로
+frames: 15
+baseline: 0.5
+frame_notes:
+  1: "thick flesh — a bulging armored shoulder plate with thick padding, pale violet"
+  2: "empty pouch — an empty cloth coin pouch hanging open, a single coin falling out"
+  3: "shallow sleep — a small campfire burning low and half out, a thin crescent moon above it"
+  4: "narrow eye — a narrowed eye looking at only two small cards"
+  5: "the one who blocks — a horned demon mask standing in the middle of a narrow road"
+  6: "split sky — a jagged violet crack across a dark sky with five small scar marks beneath it"
+  7: "law of the first bend — a small stone tablet with a carved rule line and a curved road"
+  8: "light burden — a small belt with only two potion bottles"
+  9: "unhealing wound — a bandaged arm with a red stain still seeping through"
+  10: "near nemesis — a shadowy horned silhouette waiting just around a bend of the road"
+  11: "doubled name — a demon mask with two glowing runes on its forehead"
+  12: "hand of the rift — a dark violet hand reaching out of a crack holding a single card"
+  13: "closed heart — a small heart shape wrapped in chains and a padlock"
+  14: "a road for two — two small footprints side by side on a narrow path"
+  15: "Haun's oath — a narrow plain sword planted upright with a white cloth tied around its grip, a small cracked heart beside it"
+placeholder: { color: '#2a1f3d', accent: '#d9c7f2' }

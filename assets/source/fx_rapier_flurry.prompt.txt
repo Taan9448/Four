@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: one thin bright gold-white thrust line pierces from the left toward the center
+Cell 2: three thrust lines at different heights pierce to the center at once, small star sparks at each tip
+Cell 3: five thrust lines fan in toward the center, a bright white star burst where they meet
+Cell 4: the lines vanish leaving small star sparks scattering
+Cell 5: a few gold motes fading
+Cells 6 to 6 are completely black.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Final correction of impact registration. All five active cells share the EXACT same focal point at the geometric CENTER of their 512px squares: local x=256,y=256. The first two attempts incorrectly put frame 1's tip near x=370 then x=316, while the fading stars were at x=256. Do NOT place the impact to the right. Draw all rays only in the LEFT HALF of the cell, starting at x=64, and STOP at x=256. Frame 1 one very thin horizontal gold-white ray ends at the exact center. Frame 2 exactly three fine rays from upper-left,left,lower-left meet at exact center. Frame 3 exactly five fine rays meet at exact center, small white central burst. Frame 4 lines vanish, a few small stars spread symmetrically around same center. Frame 5 dim gold motes around same center. Keep whole composition in the central portion with wide black margin, no thick beam barrel, no weapon. Rigid square 4px blocks, flat discrete fills, max 8 colors; cell 6 black.

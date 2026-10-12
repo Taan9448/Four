@@ -1,0 +1,36 @@
+id: card_art_lightning
+type: card-art-sheet
+summary: 번개 갈래 카드 그림(엘리아 감전 연쇄) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-12 엘리아 3속성(번개) 확장: 새 카드 4장 + 효과가 번개로 바뀐 카드 8장의 다시 그림.
+# redraws: 이 시트의 칸은 옛 시트(card_art_elia_1~3·common_3·abyss_2)의 같은 카드 그림보다 먼저 쓴다. 칸 순서를 바꾸면 cards도 함께 바꾼다
+redraws: true
+frames: 12
+cards:
+  - elia_discharge  # 방전
+  - elia_thunderbolt  # 낙뢰
+  - elia_violet_lightning  # 보랏빛 번개
+  - common_thunder_charm  # 벼락 부적
+  - elia_staff  # 정전기 지팡이(옛 지팡이 휘두르기)
+  - elia_sprout  # 불꽃 튀김(옛 은빛 새싹)
+  - elia_fog_herb  # 저린 풀(옛 안개초)
+  - elia_part_river  # 먹구름(옛 강물을 나누다)
+  - elia_layer_ward  # 연쇄 번개(옛 결계 겹치기)
+  - elia_fog_herb_smoke  # 천둥(옛 안개초 연기)
+  - abyss_elia_borrowed_river  # 빌린 번개(옛 빌린 강물)
+  - abyss_elia_stolen_flow  # 훔친 번개(옛 훔친 흐름)
+frame_notes:
+  1: "a stiff, frozen beast silhouette hit by a burst of pale yellow lightning released all at once"  # 방전
+  2: "a single huge white-yellow lightning bolt striking down from a dark cloud onto the ground"  # 낙뢰
+  3: "a jagged violet lightning bolt coiling around a black castle spire under a dark sky"  # 보랏빛 번개
+  4: "a paper talisman with a red ink seal crackling with small yellow sparks"  # 벼락 부적
+  5: "a wooden staff with a blue stone at its tip, tiny yellow static sparks jumping off the stone"  # 정전기 지팡이
+  6: "fingertips flicking a few small violet sparks into the air"  # 불꽃 튀김
+  7: "a sprig of pale green herb with tiny yellow sparks around its leaves"  # 저린 풀
+  8: "a low, dark storm cloud with a faint flicker of lightning inside"  # 먹구름
+  9: "one lightning bolt forking into three branches across dark ground"  # 연쇄 번개
+  10: "a rolling dark thundercloud with a bright flash at its center over hills"  # 천둥
+  11: "a lightning bolt reaching out of a black crack in the sky"  # 빌린 번개
+  12: "a hand pulling a small violet lightning bolt out of a black crack, the hand scratched"  # 훔친 번개
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue and violet night, with pale yellow and violet for lightning; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3c3410', accent: '#f3e58a' }

@@ -1,0 +1,11 @@
+id: cg_cliff_kwak
+type: story-cg
+character: haun
+summary: 장면 일러스트 — 귀곡애 — 절벽 끝에 몰린 하운과 숲 경계의 곽도진(S0, 1권)
+# 2026-10-12 D2: 그림 없던 절정 장면(s0_scene_cliff)
+frame_notes:
+  1: >-
+    Dusk at the eastern edge of Gwigokae cliff: the forest ends abruptly at a sheer drop where a landslide has swept away the old animal path; wind howls up the cliff face and a sea of cloud churns far below. Jin Haun, a lean seventeen-year-old servant in his grey outfit with cloth-wrapped hands and a woodcutting axe, stands with his back to the edge, facing the trees. At the forest's border stands the sect leader Kwak Dojin, a tall, dignified middle-aged swordsman in an immaculate white crane-feather robe (hakchangui) without a single leaf on it, a long sword at his hip, perfectly calm, his eyes cold. The space between them is empty and tense; fallen leaves swirl in the wind.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2b3448' }
