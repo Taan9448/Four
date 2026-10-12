@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1024x1024 px. Grid: 2 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing a sturdy sand-coloured travelling coat over chainmail, an ochre hood, wooden beads woven into his beard braids; holding a heavy two-handed war hammer with a leather-wrapped haft.
+This is the reference sheet for this character: both drawn cells show the SAME character at the SAME scale.
+In sprite pixels: the character is about 96 px tall, the lowest pixel of the feet is on row 115 of 128 (counting from 1 at the top), horizontally centered.
+Seen in the whole cell: the figure fills only about three quarters of the cell height, about 1/7 of the cell stays empty above the head and a thin empty strip stays below the feet. Never let the figure fill the cell from top to bottom.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Never use magenta or similar hues on the character.
+Cell 1: full body, three-quarter front view, calm upright standing pose in the new outfit, holding the heavy two-handed war hammer; the same face, hair, body proportions and height as the attached reference sheet, only the clothes and weapon details change
+Cell 2: full body, side view facing right, the same outfit and proportions, standing ready with the heavy two-handed war hammer lowered
+Cells 3 to 4 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Match the FIRST reference's exact short dwarf stature: the current 89/88-pixel figures are too tall versus the original 81/80. Reduce total body height by about nine percent, keeping the original face, hair, stocky proportions and short legs. Also replace the three metallic gold beard clasps with ROUND MATTE BROWN WOODEN BEADS woven into the red beard braids, as the pilgrim outfit requires. Preserve the sand coat over chainmail, ochre hood and leather-wrapped hammer haft. Keep both complete figures in the upper cells and all lower cells pure #FF00FF.
+Fix: Keep the now-correct 81/80-pixel stature and all other artwork unchanged. The three red beard braids STILL have rectangular GOLD METAL RINGS; remove those three gold rectangular bands entirely. At those exact positions draw ROUND DARK-BROWN WOODEN BEADS with simple brown wood grain and NO gold/yellow shine, each pierced by a red braid. Several small dark wooden beads may be strung along each braid. These are wooden prayer beads, not metallic clasps. Preserve the original red hair/face, sand coat, chainmail, ochre hood, leather haft and empty magenta lower cells.
+
