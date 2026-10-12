@@ -56,7 +56,9 @@ export function renderPrompt(spec, style) {
       ? `Size: ${spec.size_note}. Use that same height in every cell; never shrink or enlarge the character for a pose. `
       : `Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. `) +
     `The lowest pixel of the feet stays on the same row in every cell, horizontally centered. ` +
-    `Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character.\n`;
+    `Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character. ` +
+    // 2026-10-12: 옷장 엘리아 공격의 불덩이가 칸 끝에서 잘리고 다음 칸으로 넘어갔다(Taan9448/Four#1078)
+    `Projectiles, sword trails, sparks and dust also end inside the cell margin: a fireball or slash is drawn whole before the cell edge, never cut off and never spilling into the next cell.\n`;
 
   switch (spec.type) {
     case 'character-anim':
