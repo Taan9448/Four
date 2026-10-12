@@ -1,0 +1,15 @@
+id: fx_rift_cleave
+type: fx
+summary: "하운 균열 갈래 — 검붉은 금을 가르는 도끼질 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+chroma: magenta
+frame_notes:
+  1: "a short dark red line of light appears at the upper right of the cell, the start of a heavy downward chop"
+  2: "a thick crescent of dark crimson light sweeps down from upper right to lower left like an axe swing"
+  3: "the full crescent at maximum brightness, and along its path the air splits into a black crack with a red glowing rim"
+  4: "the crescent fades while the black crack remains, red sparks spraying out of it"
+  5: "the black crack narrows to a thin red seam in the same place, sparks falling"
+  6: "only a faint red seam and a few sparks remain in the same place"
+placeholder: { accent: '#ff3b3b' }

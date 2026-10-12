@@ -10,6 +10,7 @@ import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, spriteSource } from '../render/assets';
+import { cardFx } from '../engine/fx-rules';
 import { SpritePlayer } from '../render/sprite-player';
 import { sfx } from '../render/audio';
 import { cardView } from './card-view';
@@ -1001,8 +1002,11 @@ export class BattleView {
         case 'card': {
           this.lastCard = ev.cardId;
           sfx('card');
-          const line = resolveCard(this.data, ev.cardId).def.castLine;
-          if (line && settings.cutIn) await this.cutIn(ev.cardId, line);
+          const def = resolveCard(this.data, ev.cardId).def;
+          if (def.castLine && settings.cutIn) await this.cutIn(ev.cardId, def.castLine);
+          // 피해 없는 카드(기술·파워): 쓴 사람 위에 시전 이펙트(data/fx.json castFx)
+          const cast = def.type !== 'attack' && ev.sourceUid ? this.realFx(cardFx(this.data, def).castFx) : null;
+          if (cast) void this.playFx(cast, ev.sourceUid!);
           break;
         }
         case 'attack':
@@ -1068,6 +1072,7 @@ export class BattleView {
           const sh = this.shown.get(ev.targetUid);
           if (sh) sh.hp = Math.min(sh.maxHp, sh.hp + ev.amount);
           if (u) floatOver(this.fxLayer, u.el, `+${ev.amount}`, 'heal');
+          if (u && ev.amount > 0) this.playEventFx('heal', ev.targetUid);
           sfx('heal');
           this.refresh();
           await this.wait(100);
@@ -1077,6 +1082,9 @@ export class BattleView {
           const u = this.units.get(ev.targetUid);
           if (u && ev.stacks > 0) {
             floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
+            // 상태 이펙트: 독 → 독구름, 해로운 상태 → 보랏빛 문양, 이로운 상태 → 금빛 화살표(data/fx.json events)
+            const kind = this.data.statuses.get(ev.status)?.kind;
+            this.playEventFx(ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff', ev.targetUid);
             sfx('status', { volume: 0.6 });
           }
           if (ev.status === 'knot_exposed' && ev.stacks > 0) this.alert('매듭이 드러났다 — 날 얹기!', 'support');
@@ -1346,7 +1354,8 @@ export class BattleView {
       hitResolve();
       this.idle(u);
     });
-    if (card?.fx) for (const t of targetUids) void this.playFx(card.fx, t);
+    const fx = card ? this.realFx(cardFx(this.data, card).fx) : null;
+    if (fx) for (const t of targetUids) void this.playFx(fx, t);
     await Promise.race([hit, this.wait(900)]);
   }
 
@@ -1362,8 +1371,28 @@ export class BattleView {
     if (!src) return null;
     if (src.side === 'enemy') return this.data.enemies.get(src.defId)?.hitFx ?? 'fx_hit_strike';
     const card = this.lastCard ? resolveCard(this.data, this.lastCard).def : null;
-    if (card?.fx) return null;
-    return card?.hitFx ?? 'fx_hit_strike';
+    if (!card) return 'fx_hit_strike';
+    const rule = cardFx(this.data, card);
+    if (this.realFx(rule.fx)) return null;
+    return this.realFx(rule.hitFx) ?? card.hitFx ?? 'fx_hit_strike';
+  }
+
+  /**
+   * 이펙트 규칙(data/fx.json)이 고른 그림은 실제 그림이 왔을 때만 쓴다 — 임시 그림이면 지금처럼(fx 없음 · 카드 hitFx · fx_hit_strike)
+   */
+  private realFx(id: string | undefined): string | null {
+    return id && spriteSource(id) === 'sprites' ? id : null;
+  }
+
+  /** 카드와 상관없이 회복·이로운 상태·해로운 상태·독에 겹치는 이펙트. 같은 자리에 0.4초 안에 두 번은 겹치지 않는다 */
+  private eventFxAt = new Map<string, number>();
+  private playEventFx(kind: 'heal' | 'buff' | 'debuff' | 'poison', targetUid: string): void {
+    const id = this.realFx(this.data.fx.events[kind]);
+    if (!id) return;
+    const now = performance.now();
+    if ((this.eventFxAt.get(targetUid) ?? -1e9) > now - 400) return;
+    this.eventFxAt.set(targetUid, now);
+    void this.playFx(id, targetUid);
   }
 
   private async playFx(fxId: string, targetUid: string): Promise<void> {

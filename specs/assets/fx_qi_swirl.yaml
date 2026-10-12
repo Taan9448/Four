@@ -1,0 +1,14 @@
+id: fx_qi_swirl
+type: fx
+summary: "대상 없는 기술 — 내공·마나 소용돌이 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "two small motes, one warm gold and one cool blue, appear at the center"
+  2: "the motes circle each other leaving short trails"
+  3: "a full swirl of gold and blue trails spiraling around the center, like a yin-yang spiral of light"
+  4: "the swirl tightens toward the center"
+  5: "the swirl collapses into a small bright point"
+  6: "a soft fading glow"
+placeholder: { accent: '#7fd0ff' }

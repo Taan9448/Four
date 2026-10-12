@@ -1,0 +1,13 @@
+id: fx_wide_sweep
+type: fx
+summary: "적 전체 공격 — 가로로 쓸기 5프레임"
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a thin white line of light appears at the left edge at mid height"
+  2: "it stretches into a wide flat horizontal arc across most of the cell"
+  3: "the full-width arc at maximum brightness, a white core and a pale gold outer band, wind streaks around it"
+  4: "the arc thins and splits into wind streaks"
+  5: "a few faint streaks and motes"
+placeholder: { accent: '#ffffff' }

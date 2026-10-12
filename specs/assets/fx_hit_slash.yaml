@@ -1,0 +1,13 @@
+id: fx_hit_slash
+type: fx
+summary: "하운 기본 피격 — 도끼 베임 5프레임"
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a short white line appears at the upper right of the center"
+  2: "a short heavy diagonal cut line from upper right to lower left, white core and pale gold edge"
+  3: "the cut line at full brightness with a small burst of white chips at its middle"
+  4: "the cut line fades, chips flying outward"
+  5: "a faint diagonal afterimage"
+placeholder: { accent: '#e9e4d4' }

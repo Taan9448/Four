@@ -1,0 +1,27 @@
+{
+  "$comment": "이펙트 규칙(GAME_DESIGN 13절, 2026-10-12): 카드에 fx·hitFx가 없으면 위에서부터 처음 맞는 규칙이 칸(fx·hitFx·castFx)마다 정한다. 그림이 아직 임시면 지금처럼(fx 없음·fx_hit_strike) 보인다.",
+  "events": {
+    "heal": "fx_heal_light",
+    "buff": "fx_buff_rise",
+    "debuff": "fx_debuff_curse",
+    "poison": "fx_poison_cloud"
+  },
+  "rules": [
+    { "when": { "pool": "abyss", "type": "attack" }, "fx": "fx_void_rend", "note": "틈의 카드 — 검보라 허공 찢기" },
+    { "when": { "element": "fire" }, "fx": "fx_fire_burst", "hitFx": "fx_hit_fire", "note": "화염 — 불길 폭발" },
+    { "when": { "element": "ice" }, "fx": "fx_ice_spikes", "hitFx": "fx_hit_ice", "note": "냉기 — 얼음 가시" },
+    { "when": { "tag": "haun_rift", "type": "attack" }, "fx": "fx_rift_cleave", "note": "하운 균열 갈래 — 검붉은 금을 가르는 도끼" },
+    { "when": { "tag": "haun_grain", "type": "attack" }, "fx": "fx_grain_thread", "note": "하운 결 갈래 — 푸른 결 실이 끊긴다" },
+    { "when": { "tag": "kyle_blood", "type": "attack" }, "fx": "fx_blood_crescent", "note": "카일 피 갈래 — 붉은 초승달 베기" },
+    { "when": { "tag": "kyle_swift", "type": "attack" }, "fx": "fx_rapier_flurry", "note": "카일 쾌검 갈래 — 연속 찌르기" },
+    { "when": { "tag": "born_iron", "type": "attack" }, "fx": "fx_hammer_quake", "note": "보른 강철 갈래 — 땅을 울리는 일격" },
+    { "when": { "target": "all_enemies", "type": "attack" }, "fx": "fx_wide_sweep", "note": "적 전체 공격 — 가로로 쓸기" },
+    { "when": { "owner": "haun" }, "hitFx": "fx_hit_slash", "note": "하운 기본 — 도끼 베임" },
+    { "when": { "owner": "kyle" }, "hitFx": "fx_hit_pierce", "note": "카일 기본 — 찌름 불꽃" },
+    { "when": { "owner": "born" }, "hitFx": "fx_hit_blunt", "note": "보른 기본 — 둔탁한 먼지" },
+    { "when": { "owner": "elia" }, "hitFx": "fx_hit_arcane", "note": "엘리아 기본 — 은빛 마력" },
+    { "when": { "tag": "born_taunt" }, "castFx": "fx_taunt_roar", "note": "보른 도발 갈래 — 주황 고함 고리" },
+    { "when": { "type": "power" }, "castFx": "fx_power_aura", "note": "파워 — 쓴 사람의 기운이 피어오른다" },
+    { "when": { "type": "skill", "target": "none" }, "castFx": "fx_qi_swirl", "note": "뽑기·내공·마나 같은 대상 없는 기술 — 기운 소용돌이" }
+  ]
+}

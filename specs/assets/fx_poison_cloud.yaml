@@ -1,0 +1,14 @@
+id: fx_poison_cloud
+type: fx
+summary: "독 — 끓는 초록 독구름 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a few small green bubbles rise at the bottom center"
+  2: "the bubbles grow into a small sickly green cloud"
+  3: "the green cloud at full size with darker green swirls and bubbles popping on its surface"
+  4: "the cloud thins and spreads sideways"
+  5: "a few green bubbles and a thin green haze"
+  6: "one or two fading bubbles"
+placeholder: { accent: '#7ad13a' }

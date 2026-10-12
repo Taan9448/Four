@@ -1,0 +1,13 @@
+id: fx_hit_ice
+type: fx
+summary: "냉기 피격 — 얼음 조각이 튄다 5프레임"
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small white-blue spark in the center of the cell"
+  2: "it bursts into a ring of pale blue ice crystals"
+  3: "the ice crystals at full size, sharp shards pointing outward, frost mist around"
+  4: "the shards break apart and drift outward"
+  5: "a few frost sparkles fading"
+placeholder: { accent: '#8fe3ff' }

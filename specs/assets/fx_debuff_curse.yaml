@@ -1,0 +1,14 @@
+id: fx_debuff_curse
+type: fx
+summary: "해로운 상태 — 보랏빛 문양이 가라앉는다 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small dim purple rune appears above the center of the cell"
+  2: "the rune grows into a ring of purple glyphs turning slowly"
+  3: "the glyph ring at full size, dark purple chains of light hanging down from it"
+  4: "the ring and chains sink downward and darken"
+  5: "the glyphs crumble into dark purple flakes sinking"
+  6: "a few dark flakes at the bottom"
+placeholder: { accent: '#a35cff' }

@@ -1,0 +1,14 @@
+id: fx_buff_rise
+type: fx
+summary: "이로운 상태 — 금빛 화살표가 솟는다 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a thin gold ring appears on the ground at the bottom center"
+  2: "small gold upward chevrons rise from the ring"
+  3: "a column of gold chevrons and sparks rising to the middle of the cell, the ring at full brightness"
+  4: "the chevrons reach the top half and start to fade"
+  5: "a few gold sparks near the top"
+  6: "one or two faint sparks"
+placeholder: { accent: '#ffd25a' }

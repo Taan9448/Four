@@ -1,0 +1,14 @@
+id: fx_hammer_quake
+type: fx
+summary: "보른 강철 갈래 — 땅을 울리는 일격 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a heavy grey-brown impact shadow appears at the bottom center"
+  2: "a bright white-gold impact flash on the ground, the first ring of a shockwave"
+  3: "a wide shockwave ring spreads along the ground, cracked earth lines and stone chips flying up"
+  4: "the stone chips at the highest point, dust clouds rolling outward"
+  5: "stone chips falling, dust settling"
+  6: "a low dust haze and a few small stones on the ground"
+placeholder: { accent: '#c9a24a' }

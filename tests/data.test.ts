@@ -1,4 +1,5 @@
 // `npm run data:check` — data/ 폴더의 스키마와 상호 참조를 검사한다.
+import { fxRuleIds } from '../src/engine/fx-rules';
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
@@ -223,6 +224,7 @@ describe('데이터 검사', () => {
       if (c.hitFx && !specIds.has(c.hitFx)) missing.push(`${c.id}: hitFx ${c.hitFx}`);
     }
     for (const en of data.enemies.values()) if (en.hitFx && !specIds.has(en.hitFx)) missing.push(`${en.id}: hitFx ${en.hitFx}`);
+    for (const id of fxRuleIds(data)) if (!specIds.has(id)) missing.push(`data/fx.json: ${id}`);
     for (const st of data.stages) {
       for (const id of [st.background, st.mapArt]) if (id && !specIds.has(id)) missing.push(`${st.id}: ${id}`);
     }

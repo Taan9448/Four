@@ -1,0 +1,13 @@
+id: fx_hit_blunt
+type: fx
+summary: "보른 기본 피격 — 둔탁한 먼지 5프레임"
+frames: 5
+fps: 15
+events: { impact: 2 }
+frame_notes:
+  1: "a round grey-brown impact flash in the center"
+  2: "a thick round shock ring with dust puffing outward"
+  3: "the dust cloud at full size, round and heavy, a few small stones"
+  4: "the dust thins and drifts down"
+  5: "a faint dust haze"
+placeholder: { accent: '#b08a5a' }

@@ -1,0 +1,13 @@
+id: fx_taunt_roar
+type: fx
+summary: "보른 도발 — 주황 고함 고리 5프레임"
+frames: 5
+fps: 15
+events: { impact: 2 }
+frame_notes:
+  1: "a small orange burst at the center as if from a shout"
+  2: "two concentric orange rings expand outward with short motion lines"
+  3: "three rings at full size, the outer ring thick and bright, sound-wave strokes around"
+  4: "the rings fade as they expand toward the edges"
+  5: "a faint outer ring at the edge of the cell"
+placeholder: { accent: '#ff9d3a' }
