@@ -5,6 +5,7 @@
     "type": "boss",
     "name": "모르데카이의 잔향",
     "content": {
+      "scene": "abyss_scene_nemesis",
       "text": "닫힌 줄 알았던 틈 너머, 같은 목소리가 더 깊은 곳에서 울린다. 흐름을 실은 공격은 먹힌다. 숨을 멈추고 결을 읽어 매듭을 드러내고, 날을 얹어라.",
       "enemies": ["mordecai"],
       "background": "bg_rift",

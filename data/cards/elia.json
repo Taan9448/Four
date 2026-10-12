@@ -149,6 +149,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_enemies",
+    "tags": ["elia_frost"],
     "effects": [{"op": "apply_status", "status": "weak", "stacks": 2}],
     "upgrade": {"growth": [1], "plus4": {"name": "달이끼 가루", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "깊은 잠", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}},
     "flavor": "사람들은 독 안개라고 수군거렸다. 그냥 졸음이 쏟아지는 풀이었을 뿐인데."
@@ -177,7 +178,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "ally",
-    "effects": [{"op": "heal", "amount": 60, "target": "ally"}, {"op": "draw", "amount": 1}],
+    "effects": [{"op": "heal", "amount": 70, "target": "ally"}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [20, 0], "plus4": {"name": "약초 한 줌", "effects": [{"op": "heal", "amount": 20, "target": "all_allies"}]}, "plus5": {"name": "계곡의 의원", "addKeywords": ["retain"]}},
     "flavor": "마나가 없어도 약초는 있었다. 계곡에 열린 '은빛 의원'에는 날마다 사람이 줄을 섰다."
   },
@@ -327,5 +328,5 @@
   {"id": "elia_shatter", "name": "깨뜨리기", "owner": "elia", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 0, "mana": 2}, "target": "enemy", "tags": ["elia_frost"], "effects": [{"op": "damage", "amount": 80, "element": "ice"}, {"op": "damage", "amount": 80, "condition": {"targetHasStatus": "bind"}}], "upgrade": {"growth": [20, 20], "plus4": {"name": "산산조각", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "얼음 망치", "cost": {"neigong": 0, "mana": 1}}}, "flavor": "얼어붙은 것은 단단하다. 그리고 단단한 것은 깨진다."},
   {"id": "elia_part_river", "name": "강물을 나누다", "owner": "elia", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 0, "mana": 3}, "target": "ally", "tags": ["elia_frost"], "effects": [{"op": "heal", "amount": 60, "target": "ally"}, {"op": "draw", "amount": 1}], "upgrade": {"growth": [20, 0], "plus4": {"name": "고요한 물", "effects": [{"op": "block", "amount": 50, "target": "ally"}]}, "plus5": {"name": "작은 물길", "cost": {"neigong": 0, "mana": 2}}}, "flavor": "엘리아가 손을 들자 강물이 둘로 갈라졌다. 그 사이로 다친 이를 데려왔다."},
   {"id": "elia_blue_herb_bundle", "name": "청염초 다발", "owner": "elia", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["elia_burn"], "effects": [{"op": "apply_status", "status": "burn", "stacks": 2, "target": "all_enemies"}], "upgrade": {"growth": [1], "plus4": {"name": "마른 다발", "effects": [{"op": "block", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "한 줌 더", "effects": [{"op": "apply_status", "status": "burn", "stacks": 1, "target": "all_enemies"}]}}, "flavor": "푸른 불꽃 모양의 잎을 한 다발 묶었다. 무림의 약초는 무림의 불이 된다."},
-  {"id": "elia_fog_herb_smoke", "name": "안개초 연기", "owner": "elia", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["elia_burn"], "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 30, "target": "all_allies"}], "upgrade": {"growth": [0, 20], "plus4": {"name": "짙은 연기", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}, "plus5": {"name": "젖은 다발", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "토기 접시 위의 안개초가 하얀 연기를 뿜었다. 적의 눈이 흐려졌다."}
+  {"id": "elia_fog_herb_smoke", "name": "안개초 연기", "owner": "elia", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["elia_burn"], "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 40, "target": "all_allies"}], "upgrade": {"growth": [0, 20], "plus4": {"name": "짙은 연기", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}, "plus5": {"name": "젖은 다발", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "토기 접시 위의 안개초가 하얀 연기를 뿜었다. 적의 눈이 흐려졌다."}
 ]

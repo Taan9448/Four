@@ -37,6 +37,25 @@ export function resetTours(): void {
   writeStore(SEEN_KEY, null);
 }
 
+/** 설정에서 하나씩 되돌릴 수 있는 안내(id · 이름) — 2026-10-12 B5 */
+export const TOUR_LIST: { id: string; label: string }[] = [
+  { id: 'battle-basics', label: '전투 기본' },
+  { id: 'battle-elements', label: '속성' },
+  { id: 'notice-rift', label: '균열' },
+  { id: 'notice-scar', label: '상흔' },
+  { id: 'notice-surge-map', label: '끊긴 길 · 裂 틈새' },
+  { id: 'loadout', label: '편성' },
+  { id: 'surge-guide', label: '첫 폭주' },
+  { id: 'battle-rift-heart', label: '틈의 심장' },
+  { id: 'pilgrim-intro', label: '순례' },
+  { id: 'abyss-intro', label: '심연' },
+];
+
+/** 안내 하나만 다시 띄우게(본 기록에서 뺀다) */
+export function resetTour(id: string): void {
+  writeStore(SEEN_KEY, JSON.stringify(seenList().filter((x) => x !== id)));
+}
+
 let active: { close: () => void } | null = null;
 
 /**
