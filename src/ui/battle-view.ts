@@ -156,8 +156,12 @@ export class BattleView {
       runTour(
         [
           { target: '.unit-enemy .chip-weak, .unit-enemy .chip-resist', title: '속성 — 약점과 내성', text: `적 이름 아래 이름표. 약점 속성의 공격은 ${Math.round((bal.elements.weakMultiplier - 1) * 100)}% 더 들어가고, 내성 속성은 ${Math.round((1 - bal.elements.resistMultiplier) * 100)}% 덜 들어가며 상태도 붙지 않는다.` },
-          { target: '.unit-enemy .intent', title: '속성 공격', text: `의도 옆 炎은 화염, 冷은 냉기 공격.\n화염에 맞으면 화상(차례 시작마다 피해), 냉기에 맞으면 냉기가 쌓이고 ${bal.elements.freezeAt}이 되면(보스는 ${bal.elements.bossFreezeAt}) 얼어붙어 한 차례 쉰다.` },
-          { target: '.hand', title: '상극과 치명타', text: '화염은 냉기를 녹이고, 냉기는 화상을 끈다. 불의 정령에게는 냉기 카드(엘리아의 서리 바늘·서리바람)를.\n아군의 공격은 가끔 치명타(1.5배)가 터진다. 확률은 피해 미리보기에 적힌다.' },
+          {
+            target: '.unit-enemy .intent',
+            title: '속성 공격',
+            text: `炎 화염 → 화상(차례 시작마다 피해).\n冷 냉기 → ${bal.elements.ice.threshold?.at}이면 빙결(보스 ${bal.elements.ice.threshold?.bossAt}), 한 차례 쉰다.\n雷 번개 → 감전(차례마다 1 가라앉음), ${bal.elements.lightning.threshold?.at}이면 마비(보스 ${bal.elements.lightning.threshold?.bossAt}).\n냉기가 붙은 적에게 번개는 ${bal.elements.lightning.conduct?.multiplier ?? 1}배.`,
+          },
+          { target: '.hand', title: '상극과 치명타', text: '화염은 냉기를 녹이고, 냉기는 화상을 끈다. 번개는 아무것도 지우지 않지만, 얼어붙은 적에겐 감전이, 마비된 적에겐 냉기가 쌓이지 않는다.\n아군의 공격은 가끔 치명타(1.5배)가 터진다. 확률은 피해 미리보기에 적힌다.' },
         ],
         { id: 'battle-elements', once: true },
       );
@@ -1078,11 +1082,12 @@ export class BattleView {
             floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : heavy ? 'heavy' : 'damage');
             if (ev.weak) floatOver(this.fxLayer, u.el, '약점!', 'weak');
             else if (ev.resisted) floatOver(this.fxLayer, u.el, '내성', 'resist');
+            if (ev.conducted) floatOver(this.fxLayer, u.el, '전도!', 'conduct');
             if (ev.blocked) floatOver(this.fxLayer, u.el, `막음 ${ev.blocked}`, 'block');
             // 이 피해로 쓰러지는가(엔진은 피해 바로 뒤에 쓰러짐 이벤트를 남긴다)
             const kill = events.slice(idx + 1, idx + 4).some((e) => (e.type === 'downed' || e.type === 'death') && e.uid === ev.targetUid);
             sfx(ev.amount <= 0 ? 'block' : ev.crit || kill ? 'crit' : ev.amount >= 150 ? 'hit_heavy' : 'hit', { pan });
-            if (ev.amount > 0 && (ev.element === 'fire' || ev.element === 'ice')) sfx(ev.element, { pan, volume: 0.7 });
+            if (ev.amount > 0 && ev.element) sfx(ev.element, { pan, volume: 0.7 });
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);
             if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then(() => this.idle(u));
