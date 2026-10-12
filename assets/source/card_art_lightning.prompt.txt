@@ -1,0 +1,26 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; cool fantasy world palette: moonlit silver, deep blue and violet night, with pale yellow and violet for lightning; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a stiff, frozen beast silhouette hit by a burst of pale yellow lightning released all at once
+Cell 2: a single huge white-yellow lightning bolt striking down from a dark cloud onto the ground
+Cell 3: a jagged violet lightning bolt coiling around a black castle spire under a dark sky
+Cell 4: a paper talisman with a red ink seal crackling with small yellow sparks
+Cell 5: a wooden staff with a blue stone at its tip, tiny yellow static sparks jumping off the stone
+Cell 6: fingertips flicking a few small violet sparks into the air
+Cell 7: a sprig of pale green herb with tiny yellow sparks around its leaves
+Cell 8: a low, dark storm cloud with a faint flicker of lightning inside
+Cell 9: one lightning bolt forking into three branches across dark ground
+Cell 10: a rolling dark thundercloud with a bright flash at its center over hills
+Cell 11: a lightning bolt reaching out of a black crack in the sky
+Cell 12: a hand pulling a small violet lightning bolt out of a black crack, the hand scratched
+Cells 13 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+
+Fix: Correct visible neighboring-cell slivers at the top of output cells 5-7 and preserve violet hue. This must be an EXACT 1536x1024 raster with tile boundaries at x=0,384,768,1152,1536 and y=0,256,512,768,1024. First 3 rows only, EXACTLY 12 independent edge-to-edge illustrations; entire fourth row pure magenta. Do not stretch rows, overlap leaves, hands, clouds or ground bands across a boundary. Each used tile has its OWN flat dark-blue background all the way to its edges, no borders or empty gaps. Keep the main subject within the central 81x54 logical area, leaving background around it but NO frame. Use ONLY flat square 4px blocks, keep backgrounds simple. VIOLET bolts in cells 3,6,12 use a wide #6b4fa3 band with #d4b8ff pale-lavender highlights and #4b3a6b edge; avoid neon saturated pink-purple which the magenta key neutralizes. Only a few white highlight blocks, do not turn violet lightning white-blue. Pale-yellow bolts elsewhere. Preserve exact card order and all subject descriptions; red talisman seal abstract, no letters or writing anywhere.
