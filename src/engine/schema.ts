@@ -732,6 +732,8 @@ export const Balance = z
         hpPerLevel: z.number().min(0),
         dmgPerLevel: z.number().min(0),
         relicPct: z.number().min(0),
+        /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 1당(2026-10-12 보정식 세 항) */
+        upgradePct: z.number().min(0).default(0),
         maxHp: z.number().min(1),
         maxDmg: z.number().min(1),
       })
