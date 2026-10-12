@@ -339,7 +339,8 @@ export class BattleView {
       const hp = shown?.hp ?? c.hp;
       const maxHp = shown?.maxHp ?? c.maxHp;
       u.hp.style.width = `${Math.max(0, (hp / maxHp) * 100)}%`;
-      u.hpText.textContent = `${Math.max(0, hp)} / ${maxHp}`;
+      // 10배 단위(2026-10-12): 세·네 자리가 칸에 들어가게 띄어 쓰지 않는다
+      u.hpText.textContent = `${Math.max(0, hp)}/${maxHp}`;
       const bar = u.hpText.parentElement!;
       bar.setAttribute('aria-valuemax', String(maxHp));
       bar.setAttribute('aria-valuenow', String(Math.max(0, hp)));

@@ -460,7 +460,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .hp-bar { position: relative; flex: 1; height: 15px; background: rgba(0, 0, 0, 0.65); border-radius: 99px; overflow: hidden; border: 1px solid #000; }
 .hp-fill { height: 100%; background: linear-gradient(#e06a6a, #a83232); transition: width 0.25s; }
 .unit-party .hp-fill { background: linear-gradient(#7fdc8e, #3d8f4b); }
-.hp-text { position: absolute; inset: 0; font-size: var(--fs-cap); font-weight: 700; text-align: center; line-height: 14px; -webkit-text-stroke: 0.3px #000; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+.hp-text { position: absolute; inset: 0; font-size: var(--fs-cap); font-weight: 700; text-align: center; line-height: 14px; -webkit-text-stroke: 0.3px #000; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; letter-spacing: -0.02em; }
 /* 방어: 체력 막대 왼쪽의 방패 */
 .block-badge { flex: 0 0 auto; min-width: 26px; height: 26px; margin: -7px 0; display: grid; place-items: center; padding: 0 4px 3px; font-size: var(--fs-cap); font-weight: 700; color: #eaf6ff; background: linear-gradient(#4c8fc4, #1f3f73); clip-path: polygon(50% 0, 100% 14%, 92% 66%, 50% 100%, 8% 66%, 0 14%); text-shadow: 0 1px 1px #000; cursor: help; }
 .statuses { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; min-height: 26px; margin-top: 5px; width: max(100%, 150px); }
