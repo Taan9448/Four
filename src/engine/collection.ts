@@ -50,10 +50,12 @@ export function focusArchetype(data: GameData, run: Pick<RunState, 'collection'>
   const archetypes = data.characters.get(owner)?.archetypes ?? [];
   let best: string | null = null;
   let bestV = 0;
+  // 보너스를 켤 수 있는(카드가 focusMin장 이상인) 갈래를 먼저, 그다음 카드 점수 합
+  const enough = (id: string) => choosable(data, run, owner).filter((d) => d.tags.includes(id)).length >= data.balance.loadout.focusMin;
   for (const a of archetypes) {
     const v = choosable(data, run, owner)
       .filter((d) => d.tags.includes(a.id))
-      .reduce((sum, d) => sum + score(data, run, d), 0);
+      .reduce((sum, d) => sum + score(data, run, d), 0) + (enough(a.id) ? 10000 : 0);
     if (v > bestV) [best, bestV] = [a.id, v];
   }
   return best;
@@ -91,12 +93,13 @@ export function loadoutFocus(data: GameData, owner: string, ids: readonly string
 /**
  * 점수 상한에 맞춘다: 넘으면 넣은 카드 하나를 그보다 싼(아직 안 넣은) 카드로 바꾸기를 되풀이한다.
  * 바꿀 때마다 '줄어드는 점수 1당 잃는 값'(넘친 점수까지만 센다)이 가장 작은 바꾸기를 고른다(1점 넘었다고 전설을 빼지 않게 — 고급 하나를 일반으로).
- * 공격·그 밖은 같은 쪽 카드로 먼저 바꿔 비율을 지킨다. 지키는 카드(keep)는 다른 바꾸기가 없을 때만 바꾼다
+ * 같은 갈래 태그 → 공격·그 밖이 같은 쪽 카드로 먼저 바꿔 갈래 보너스와 비율을 지킨다. 지키는 카드(keep)는 다른 바꾸기가 없을 때만 바꾼다
  */
 function fitCap(data: GameData, run: Pick<RunState, 'collection'>, owner: string, ids: string[], value: (d: CardDef) => number, keep: ReadonlySet<string> = new Set()): string[] {
   const cap = capFor(data, owner);
   const def = (id: string) => data.cards.get(id)!;
   const out = [...ids];
+  const kept = new Set(keep);
   for (let guard = 0; guard < 40 && loadoutPoints(data, out) > cap; guard++) {
     const over = loadoutPoints(data, out) - cap;
     let best: { id: string; to: string; kept: boolean; cost: number; cut: number } | null = null;
@@ -105,17 +108,22 @@ function fitCap(data: GameData, run: Pick<RunState, 'collection'>, owner: string
       const cheaper = choosable(data, run, owner)
         .filter((d) => !out.includes(d.id) && cardPoints(data, d) < pts)
         .sort((a, b) => value(b) - value(a));
-      const pick = cheaper.find((d) => (d.type === 'attack') === (def(id).type === 'attack')) ?? cheaper[0];
+      // 같은 갈래(태그) → 같은 쪽(공격·그 밖) 순으로 바꿀 카드를 고른다(갈래 보너스와 비율을 지키게)
+      const sameTag = (d: CardDef) => d.tags.some((t) => def(id).tags.includes(t));
+      const sameSide = (d: CardDef) => (d.type === 'attack') === (def(id).type === 'attack');
+      const pick = cheaper.find((d) => sameTag(d) && sameSide(d)) ?? cheaper.find(sameTag) ?? cheaper.find(sameSide) ?? cheaper[0];
       if (!pick) continue;
       const cut = pts - cardPoints(data, pick);
       // 넘친 만큼보다 더 깎는 점수는 버려지므로 넘친 만큼까지만 센다
       const cost = (value(def(id)) - value(pick)) / Math.min(cut, over);
-      const kept = keep.has(id);
+      const isKept = kept.has(id);
       // 같은 값이면 덜 깎는 바꾸기(남는 점수를 버리지 않게)
-      if (!best || Number(kept) < Number(best.kept) || (kept === best.kept && (cost < best.cost || (cost === best.cost && cut < best.cut)))) best = { id, to: pick.id, kept, cost, cut };
+      if (!best || Number(isKept) < Number(best.kept) || (isKept === best.kept && (cost < best.cost || (cost === best.cost && cut < best.cut)))) best = { id, to: pick.id, kept: isKept, cost, cut };
     }
     if (!best) break;
     out[out.indexOf(best.id)] = best.to;
+    // 지키는 카드를 바꿨으면 그 자리에 든 카드도 지킨다(갈래 핵심이 다음 바꾸기에서 다른 갈래로 밀리지 않게)
+    if (best.kept) kept.add(best.to);
   }
   return out;
 }
@@ -123,24 +131,43 @@ function fitCap(data: GameData, run: Pick<RunState, 'collection'>, owner: string
 /**
  * 추천 편성(한 주인): 점수 높은 카드부터, 공격과 그 밖(방어·기술·심법)이 한쪽으로 쏠리지 않게
  * (칸의 3/8 이상은 공격, 1/4 이상은 공격 아닌 카드 — 가진 카드가 허락하는 만큼).
- * 동료는 가장 강한 아키타입의 카드에 가산점을 준다
+ * 동료는 가장 강한 아키타입의 카드에 가산점을 주고, 그 갈래 카드가 focusMin장 이상이면 좋은 것 focusMin장을 먼저 담아 갈래 보너스를 켠다
  */
 export function recommendFor(data: GameData, run: Pick<RunState, 'collection'>, owner: string): string[] {
   const n = requiredFor(data, run, owner);
   const focus = focusArchetype(data, run, owner);
   const value = (d: CardDef) => score(data, run, d) + (focus && d.tags.includes(focus) ? FOCUS_BONUS : 0);
   const sorted = choosable(data, run, owner).sort((a, b) => value(b) - value(a) || a.id.localeCompare(b.id));
-  const attacks = sorted.filter((d) => d.type === 'attack');
-  const others = sorted.filter((d) => d.type !== 'attack');
-  const minAtk = Math.min(attacks.length, Math.ceil((n * 3) / 8));
-  const minOther = Math.min(others.length, Math.ceil(n / 4));
-  const pick = new Set<string>([...attacks.slice(0, minAtk), ...others.slice(0, minOther)].map((d) => d.id));
+  // 갈래 핵심: 가장 강한 갈래의 카드가 focusMin장 이상이면 그 갈래의 좋은 카드 focusMin장을 먼저 담는다(갈래 보너스가 켜지게)
+  const focusMin = data.balance.loadout.focusMin;
+  const focusCards = focus ? sorted.filter((d) => d.tags.includes(focus)) : [];
+  // 남은 칸을 가장 싼 카드(1점)로 채워도 상한 안에 들도록 좋은 것부터 담는다
+  const core: CardDef[] = [];
+  if (focusCards.length >= focusMin && n >= focusMin) {
+    const cap = capFor(data, owner);
+    let pts = 0;
+    for (const d of focusCards) {
+      if (core.length >= focusMin) break;
+      const rest = n - core.length - 1;
+      if (pts + cardPoints(data, d) + rest > cap) continue;
+      core.push(d);
+      pts += cardPoints(data, d);
+    }
+    if (core.length < focusMin) core.length = 0;
+  }
+  const pick = new Set<string>(core.map((d) => d.id));
+  const isAtk = (d: CardDef) => d.type === 'attack';
+  const minAtk = Math.min(sorted.filter(isAtk).length, Math.ceil((n * 3) / 8));
+  const minOther = Math.min(sorted.filter((d) => !isAtk(d)).length, Math.ceil(n / 4));
+  const count = (f: (d: CardDef) => boolean) => sorted.filter((d) => pick.has(d.id) && f(d)).length;
+  for (const d of sorted) if (isAtk(d) && !pick.has(d.id) && count(isAtk) < minAtk) pick.add(d.id);
+  for (const d of sorted) if (!isAtk(d) && !pick.has(d.id) && count((x) => !isAtk(x)) < minOther) pick.add(d.id);
   for (const d of sorted) {
     if (pick.size >= n) break;
     pick.add(d.id);
   }
-  // 정렬 순서(점수 높은 순)로 돌려준다
-  return fitCap(data, run, owner, sorted.filter((d) => pick.has(d.id)).slice(0, n).map((d) => d.id), value);
+  // 정렬 순서(점수 높은 순)로 돌려준다. 상한에 맞출 때 갈래 핵심은 마지막에 바꾼다
+  return fitCap(data, run, owner, sorted.filter((d) => pick.has(d.id)).slice(0, n).map((d) => d.id), value, new Set(core.map((d) => d.id)));
 }
 
 /** 추천 편성(모든 주인). keep: 이미 고른 편성 중 유효한 것은 남기고 모자란 칸만 채운다 */

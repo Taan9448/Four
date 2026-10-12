@@ -138,26 +138,34 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
         { class: 'loadout-head panel' },
         h('span', { class: 'seal' }, '編'),
         h('div', { class: 'loadout-title' }, h('h2', {}, '편성'), h('small', {}, title), h('p', { class: 'loadout-hint' }, '이번 스테이지에 얻는 카드는 편성과 상관없이 덱에 들어간다. 다음 편성부터 고른다.')),
-        h(
-          'nav',
-          { class: 'codex-tabs loadout-tabs' },
-          owners.map((o) =>
-            h(
-              'button',
-              { class: `codex-tab${o === tab ? ' on' : ''}${(draft[o]?.length ?? 0) === requiredFor(data, run, o) ? ' done' : ''}`, onclick: () => ((tab = o), render()) },
-              ownerName(o),
-              // 채운 수 · 점수/상한 · 아키타입 집중도("진하운 8/8 · 22/24점 · 결 노출 5 ✓")
-              h(
-                'small',
-                {},
-                `${draft[o]?.length ?? 0}/${requiredFor(data, run, o)} · `,
-                h('span', { class: loadoutPoints(data, draft[o] ?? []) > capFor(data, o) ? 'pts-over' : '' }, `${loadoutPoints(data, draft[o] ?? [])}/${capFor(data, o)}점`),
-                archCounts(o).length ? ` · ${archCounts(o).join(' · ')}` : '',
-              ),
-              o !== COMMON && !run.selected.includes(o) ? h('em', { class: 'rest-tag' }, '쉼') : null,
-            ),
-          ),
-        ),
+      ),
+      // 동료 줄: 주인마다 한 칸(이름 · 채운 장수 · 점수 막대 · 갈래 보너스). 칸 폭이 같아 줄이 흐트러지지 않는다
+      h(
+        'nav',
+        { class: 'loadout-roster', 'aria-label': '편성할 주인' },
+        owners.map((o) => {
+          const n = draft[o]?.length ?? 0;
+          const need = requiredFor(data, run, o);
+          const pts = loadoutPoints(data, draft[o] ?? []);
+          const cap = capFor(data, o);
+          const focus = o === COMMON ? null : loadoutFocus(data, o, draft[o] ?? []);
+          const resting = o !== COMMON && !run.selected.includes(o);
+          const arch = archCounts(o);
+          return h(
+            'button',
+            {
+              class: `lo-mate${o === tab ? ' on' : ''}${n === need ? ' done' : ''}${pts > cap ? ' over' : ''}${resting ? ' resting' : ''}`,
+              'aria-pressed': String(o === tab),
+              onclick: () => ((tab = o), render()),
+            },
+            h('span', { class: 'lo-mate-top' }, h('b', {}, ownerName(o)), resting ? h('em', { class: 'rest-tag' }, '쉼') : null, h('span', { class: 'lo-mate-count' }, `${n}/${need}장`)),
+            h('span', { class: 'lo-meter', ...tipAttrs('편성 점수', `${pts}/${cap}점 — 상한 ${cap}`) }, h('i', { style: `width:${Math.min(100, Math.round((pts / Math.max(1, cap)) * 100))}%` })),
+            h('small', { class: `lo-mate-pts${pts > cap ? ' pts-over' : ''}` }, `${pts}/${cap}점`),
+            o === COMMON
+              ? h('small', { class: 'lo-mate-arch' }, '공용 카드')
+              : h('small', { class: `lo-mate-arch${focus ? ' on' : ''}` }, focus ? `✓ ${archName.get(focus)?.name ?? focus}` : arch.length ? arch.join(' · ') : '갈래 카드 없음'),
+          );
+        }),
       ),
       h(
         'div',

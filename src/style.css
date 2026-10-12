@@ -1378,13 +1378,10 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .scroll-paper { position: absolute; inset: 0; z-index: 0; border-radius: 4px; background-size: cover; background-position: center; mix-blend-mode: multiply; opacity: 0.9; pointer-events: none; }
 
 /* 편성(2026-10-08, GAME_DESIGN 9-1) */
-.loadout-screen { display: flex; flex-direction: column; gap: 10px; min-height: calc(100vh - 20px); }
+.loadout-screen { display: flex; flex-direction: column; align-items: stretch; place-items: stretch; gap: 10px; min-height: calc(100vh - 20px); }
 .loadout-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex-wrap: wrap; }
 .loadout-title h2 { margin: 0; font-family: var(--f-brush); font-weight: 400; font-size: calc(var(--fs-title) * 1.12); letter-spacing: 0.06em; }
 .loadout-title small { color: var(--ink-dim); }
-.loadout-tabs .codex-tab.done { border-color: rgba(125, 220, 138, 0.6); }
-.loadout-tabs .codex-tab.done small { color: var(--heal); }
-.loadout-tabs .rest-tag { margin-left: 6px; font-style: normal; font-size: var(--fs-min); color: #e6c36a; }
 .loadout-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 10px; min-height: 0; }
 .loadout-main { padding: 14px 18px; text-align: left; overflow-y: auto; }
 .loadout-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 12px; }
@@ -1395,7 +1392,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .loadout-card.on .card { box-shadow: 0 0 0 3px #e2b45c, 0 10px 22px rgba(0, 0, 0, 0.6); }
 .loadout-card.full .card { opacity: 0.45; filter: saturate(0.5); }
 .loadout-check { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: #e2b45c; color: #1a1408; font-weight: 800; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
-.loadout-tags { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; white-space: nowrap; }
+.loadout-tags { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; gap: 3px; white-space: nowrap; }
 .arch-tag { font-style: normal; padding: 1px 6px; border-radius: 8px; background: #3b2a4a; color: #f1e3ff; font-size: var(--fs-min); font-weight: 700; border: 1px solid #8a6aa8; }
 .arch-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
 .arch-filter .btn.on { background: #e2b45c; color: #1a1408; }
@@ -1414,6 +1411,34 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .codex-own { position: absolute; z-index: 6; bottom: -9px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 8px; background: rgba(16, 13, 10, 0.85); border: 1px solid var(--line); color: var(--ink-dim); font-size: var(--fs-min); white-space: nowrap; }
 .codex-own.on { border-color: #e2b45c; color: #e6c36a; }
 @media (max-width: 900px) { .loadout-body { grid-template-columns: minmax(0, 1fr); } }
+/* 동료 줄(2026-10-12): 주인마다 같은 폭의 칸 — 이름 · 장수 · 점수 막대 · 갈래 보너스 */
+.loadout-roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.lo-mate { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 5px 8px; min-height: 64px; padding: 9px 12px; text-align: left; color: var(--ink); cursor: pointer; border-radius: 10px; border: 1px solid rgba(226, 180, 92, 0.28); background: linear-gradient(180deg, rgba(34, 27, 19, 0.92), rgba(16, 13, 10, 0.92)); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); transition: border-color 0.15s, transform 0.15s; }
+.lo-mate:hover { border-color: rgba(226, 180, 92, 0.6); transform: translateY(-1px); }
+.lo-mate.on { border-color: #e2b45c; background: linear-gradient(180deg, rgba(74, 54, 26, 0.95), rgba(36, 27, 15, 0.95)); box-shadow: inset 0 0 0 1px rgba(226, 180, 92, 0.6), 0 0 16px rgba(226, 180, 92, 0.22); }
+.lo-mate-top { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.lo-mate-top b { font-size: var(--fs-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lo-mate-top .rest-tag { margin: 0; font-style: normal; font-size: var(--fs-min); color: #e6c36a; }
+.lo-mate-count { margin-left: auto; font-size: var(--fs-cap); color: var(--ink-dim); white-space: nowrap; }
+.lo-mate.done .lo-mate-count { color: var(--heal); }
+.lo-meter { height: 6px; border-radius: 3px; overflow: hidden; background: rgba(255, 255, 255, 0.1); }
+.lo-meter i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #b88a3e, #f0c86a); }
+.lo-mate.over .lo-meter i { background: var(--danger); }
+.lo-mate-pts { font-size: var(--fs-cap); color: var(--ink-dim); white-space: nowrap; }
+.lo-mate-arch { grid-column: 1 / -1; font-size: var(--fs-cap); color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lo-mate-arch.on { color: var(--heal); }
+.lo-mate.resting { opacity: 0.82; }
+/* 점수 배지(위)·갈래 꼬리표(아래)가 위아래 카드와 겹치지 않게 줄 간격을 띄운다 */
+.loadout-grid { row-gap: 30px; padding-top: 12px; padding-bottom: 10px; }
+/* 화면 분위기(편성 = 여관 방의 등잔 · 상점 = 노점의 등불): 전용 그림 위에도, 그림이 오기 전에도 따뜻한 빛 */
+.backdrop.mood-loadout::after { background: radial-gradient(ellipse at 18% 8%, rgba(255, 190, 110, 0.16), transparent 45%), radial-gradient(ellipse at center, rgba(10, 8, 6, 0.2), rgba(10, 8, 6, 0.82) 85%); }
+.backdrop.mood-shop::after { background: radial-gradient(ellipse at 50% 0%, rgba(255, 176, 92, 0.2), transparent 50%), radial-gradient(ellipse at center, rgba(12, 8, 6, 0.15), rgba(12, 8, 6, 0.8) 85%); }
+.backdrop.mood-loadout:not(.has-art)::before { background: radial-gradient(ellipse at 20% 12%, rgba(242, 169, 59, 0.16), transparent 55%), linear-gradient(#2a2119 0%, #1d1712 60%, #15100c 100%); }
+.backdrop.mood-shop:not(.has-art)::before { background: radial-gradient(ellipse at 50% 10%, rgba(242, 160, 70, 0.2), transparent 55%), linear-gradient(#2c2018 0%, #1e1611 60%, #140f0b 100%); }
+@media (max-width: 600px) {
+  .loadout-roster { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .lo-mate { min-height: 56px; padding: 7px 9px; }
+}
 
 @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 90, 74, 0.6); } 50% { box-shadow: 0 0 0 4px rgba(255, 90, 74, 0); } }
 
@@ -1564,7 +1589,6 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 .loadout-hint { margin: 2px 0 0; font-size: var(--fs-cap); color: var(--ink-dim); }
 .loadout-keep { display: flex; flex-direction: column; align-items: center; }
 .loadout-keep small { font-size: var(--fs-cap); font-weight: 400; opacity: 0.8; }
-.loadout-tabs .codex-tab small { white-space: nowrap; }
 
 /* ───────── 전투 화면 위계(2026-10-11 UI/UX 2-2·2-3) ───────── */
 /* 이야기 글: 2.5초 뒤 한 줄 칩으로 접힌다(누르면 펼침) */

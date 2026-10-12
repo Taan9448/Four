@@ -1,0 +1,13 @@
+id: bg_shop
+type: background
+summary: "화면 배경 — 상점(등불 걸린 떠돌이 상인의 가게, 물약·약초·부적·유물)"
+# 2026-10-12: 상점 화면 뒤에 어둡게 깔린다(app.backdrop, 밝기 42%). 가운데는 상품 패널이 덮으므로 차분하게, 볼거리는 네 가장자리에
+frame_notes:
+  1: >-
+    The cramped interior of a travelling merchant's shop at night where the wuxia world and a western fantasy world meet: on the
+    left tall wooden shelves crowded with glass potion bottles in red, blue and green, bundles of dried herbs and ginseng roots,
+    and stacked scrolls; on the right a wall of small curios on hooks (paper talismans, a brass compass, an old dagger, a jade
+    pendant, a small rune stone). A row of red paper lanterns hangs across the top giving warm orange light. In the lower middle
+    a worn wooden counter with a brass balance scale and a few coins; the wall behind the counter is plain and dim so the middle
+    stays calm. Warm orange and brown with jewel-colored glints from the bottles.
+placeholder: { color: '#2c2018' }

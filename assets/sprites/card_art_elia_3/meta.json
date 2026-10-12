@@ -1,0 +1,52 @@
+{
+  "id": "card_art_elia_3",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 16,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 16,
+  "sourceHash": "21f4fee3d6f259c4",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.83,
+  "cards": [
+    "elia_two_moons",
+    "elia_count_gold",
+    "elia_layer_ward",
+    "elia_fire_tempest",
+    "elia_ember_toss",
+    "elia_rake_embers",
+    "elia_ash_veil",
+    "elia_frost_road",
+    "elia_ice_mirror",
+    "elia_shatter",
+    "elia_frozen_mana",
+    "elia_bridge",
+    "elia_silver_stitch",
+    "elia_one_stitch",
+    "elia_sealing_hand",
+    "elia_part_river"
+  ]
+}

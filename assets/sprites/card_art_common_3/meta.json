@@ -1,0 +1,46 @@
+{
+  "id": "card_art_common_3",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 10,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 10,
+  "sourceHash": "4faf80406dfd9462",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.834,
+  "cards": [
+    "common_branch_sword",
+    "common_strike_together",
+    "common_sword_on_barrier",
+    "common_count_together",
+    "common_silver_bell_inn",
+    "common_pull_wedge",
+    "common_deep_inhale",
+    "common_seal_charm",
+    "elia_blue_herb_bundle",
+    "elia_fog_herb_smoke"
+  ]
+}
