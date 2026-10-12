@@ -1,14 +1,22 @@
-// 옷장(GAME_DESIGN 13-2절, 2026-10-12 사용자 요청): 스토리를 마친 뒤 순례·심연에서 네 동료가 입는 옷을 고른다.
+// 옷장(GAME_DESIGN 13-2절, 2026-10-12 사용자 요청): 스토리를 마친 뒤 순례·심연에서 네 동료가 입는 옷을 고른다(카일 '은빛 기사검'은 처음부터·캠페인에서도).
 // 위: 머리 판, 동료 줄(이름·입은 옷), 아래: 미리 보기(대기 그림) + 세트 목록(원래 옷 + 연 세트 · 잠긴 세트는 여는 조건).
 import type { GameData } from '../engine/data';
-import { equipSkin, SKIN_ANIMS, skinSpriteId, unlockText, type Wardrobe } from '../engine/wardrobe';
+import { spritesFor } from '../engine/state';
+import { equipSkin, SKIN_ANIMS, skinFits, skinSpriteId, unlockText, type Wardrobe } from '../engine/wardrobe';
 import { spriteSource } from '../render/assets';
 import { SpritePlayer } from '../render/sprite-player';
 import { h } from './dom';
 
 /** 세트의 세 그림(대기·공격·피격)이 모두 실제 그림인가 — 아니면 원래 옷을 입는다 */
-export function skinReady(setId: string, charId: string): boolean {
-  return SKIN_ANIMS.every((a) => spriteSource(skinSpriteId(setId, charId, a)) === 'sprites');
+export function skinReady(data: GameData, setId: string, charId: string): boolean {
+  return SKIN_ANIMS.every((a) => spriteSource(skinSpriteId(data, setId, charId, a)) === 'sprites');
+}
+
+/** 원래 옷의 대기 그림: 늘 입는 복장(flag 없는 outfits, 카일 붉은 검)이 실제 그림으로 왔으면 그것 */
+function baseIdle(data: GameData, charId: string): string {
+  const def = data.characters.get(charId)!;
+  const outfit = spritesFor(def, []).idle;
+  return outfit && spriteSource(outfit) === 'sprites' ? outfit : def.sprites.idle;
 }
 
 export interface WardrobeHandlers {
@@ -39,17 +47,21 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
     );
     // 미리 보기: 입은 세트의 대기 그림(그림이 아직이면 원래 옷)
     const worn = wardrobe.equipped[tab];
-    const ready = worn ? skinReady(worn, tab) : true;
+    const ready = worn ? skinReady(data, worn, tab) : true;
     const canvas = h('canvas', { class: 'wd-canvas', width: 160, height: 160 }) as HTMLCanvasElement;
     player?.stop();
     player = new SpritePlayer(canvas);
-    void player.play(worn && ready ? skinSpriteId(worn, tab, 'idle') : data.characters.get(tab)!.sprites.idle, { loop: true });
+    void player.play(worn && ready ? skinSpriteId(data, worn, tab, 'idle') : baseIdle(data, tab), { loop: true });
     preview.replaceChildren(
       ...[
         canvas,
         h('h3', {}, `${data.characters.get(tab)!.name} — ${setName(worn)}`),
         worn && !ready ? h('p', { class: 'wd-note' }, '그림 준비 중 — 그림이 오면 바로 이 옷을 입는다. 그때까지는 원래 옷.') : null,
-        h('p', { class: 'wd-note' }, '순례·심연에서 입는다. 캠페인(이야기)에서는 원래 옷.'),
+        h(
+          'p',
+          { class: 'wd-note' },
+          worn && data.skins.sets.find((s) => s.id === worn)?.anyMode ? '캠페인·순례·심연 어디서나 입는다.' : '순례·심연에서 입는다. 캠페인(이야기)에서는 원래 옷.',
+        ),
       ].filter((x): x is NonNullable<typeof x> => !!x),
     );
     const row = (id: string | null) => {
@@ -64,7 +76,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
           { class: 'wd-item-text' },
           h('b', {}, set ? set.name : '원래 옷'),
           h('small', {}, set ? (open ? set.description : `🔒 ${unlockText(data, set.unlock)}`) : '이야기의 옷 그대로'),
-          set && open && !skinReady(set.id, tab) ? h('em', { class: 'wd-pending' }, '그림 준비 중') : null,
+          set && open && !skinReady(data, set.id, tab) ? h('em', { class: 'wd-pending' }, '그림 준비 중') : null,
         ),
         h(
           'button',
@@ -72,7 +84,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
             class: `btn btn-small${on ? ' btn-primary' : ''}`,
             disabled: !open || on,
             onclick: () => {
-              equipSkin(wardrobe, tab, id);
+              equipSkin(data, wardrobe, tab, id);
               handlers.onSave(wardrobe);
               draw();
             },
@@ -81,7 +93,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
         ),
       );
     };
-    list.replaceChildren(h('h3', {}, '옷'), row(null), ...data.skins.sets.map((s) => row(s.id)));
+    list.replaceChildren(h('h3', {}, '옷'), row(null), ...data.skins.sets.filter((s) => skinFits(data, s.id, tab)).map((s) => row(s.id)));
   };
   draw();
   const opened = wardrobe.unlocked.length;

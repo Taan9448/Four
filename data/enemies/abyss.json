@@ -2,6 +2,7 @@
   {
     "id": "sa_mugyeol_echo",
     "name": "사무결의 잔향",
+    "hitFx": "fx_blood_crescent",
     "lore": "틈 너머에 남은 교주의 잔향. 천마혈공의 피는 이제 결을 오래 덮지 못한다. 덮개는 곧 옅어지고, 잔향은 세 턴마다 다시 피를 두른다. 그 사이로 결이 잠깐 드러난다.",
     "maxHp": 1900,
     "sprite": "sa_mugyeol",
@@ -21,6 +22,7 @@
   {
     "id": "rift_beast",
     "name": "틈의 짐승",
+    "hitFx": "fx_claw",
     "sprite": "rift_beast",
     "scale": 1.3,
     "lore": "상흔이 벌려 놓은 금의 냄새를 맡고 굽이를 따라 내려오는 짐승. 쌓인 상흔만큼 더 깊은 곳에서 기어 나온다. 이기면 그 몸에 박혀 있던 틈의 조각을 거둔다.",

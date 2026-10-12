@@ -1,11 +1,11 @@
 // 카드 문구 자동 생성. 카드 JSON에 text가 없으면 효과로부터 만든다.
 import type { GameData } from './data';
-import type { Effect, UpgradeSkill } from './schema';
+import type { Effect, Element, UpgradeSkill } from './schema';
 import { resolveCard, type CardInstance } from './state';
 import { defaultTargetFor } from './effects';
 
 /** 속성 이름(카드 문구·의도·약점 표시) */
-export const ELEMENT_LABEL: Record<string, string> = { fire: '화염', ice: '냉기' };
+export const ELEMENT_LABEL: Record<string, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
 
 const TARGET_LABEL: Record<string, string> = {
   self: '자신',
@@ -237,8 +237,13 @@ export function cardGlossary(data: GameData, inst: CardInstance | string): strin
     if (e.element) elements.add(e.element);
   }
   for (const el of elements) {
-    const rider = data.balance.elements[el as 'fire' | 'ice'];
+    const rider = data.balance.elements[el as Element];
     statuses.add(rider.status);
+    if (rider.threshold) statuses.add(rider.threshold.into);
+    // 전도: "냉기가 붙은 적에게 ×1.5"
+    if (rider.conduct) {
+      out.push(`전도 — ${data.statuses.get(rider.conduct.ifTargetHas)?.name ?? rider.conduct.ifTargetHas}가 붙은 적에게 ${ELEMENT_LABEL[el]} 피해 ×${rider.conduct.multiplier}(${data.statuses.get(rider.conduct.ifTargetHas)?.name ?? ''}는 남는다).`);
+    }
   }
   for (const id of statuses) {
     const st = data.statuses.get(id);

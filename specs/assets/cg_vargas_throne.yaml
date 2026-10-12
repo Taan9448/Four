@@ -1,0 +1,11 @@
+id: cg_vargas_throne
+type: story-cg
+character: haun_sword
+summary: 장면 일러스트 — 왕좌의 방 — 쐐기 수백 개가 박힌 잠든 문 앞의 마왕 바르가스(S5, 2권 11장)
+# 2026-10-12 D2: 그림 없던 절정 장면(s5_scene_throne)
+frame_notes:
+  1: >-
+    The throne room of the demon castle Nocturna, black obsidian walls, a shattered tall window showing a burning battlefield and violet lightning coiling around the spires outside. The Demon King Vargas stands in the middle of the hall, not on his throne: three times a man's height, torn bat wings, seven twisted horns rising like a crown. Before him, on a round obsidian dais, stands a huge stone gate carved with wave-like letters, its whole frame bristling with hundreds of black iron wedges that warp the air around them like heat haze; its palm-shaped hollow is empty. In the foreground, small against the scale of the room, Jin Haun in his grey outfit with the narrow plain sword lowered faces the demon king, Elia with her staff and Kyle with his crimson-bladed sword behind him.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1b1724' }

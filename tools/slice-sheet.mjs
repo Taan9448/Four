@@ -121,7 +121,7 @@ export async function sliceSheet(spec, { src, outDir, fallback = 1, placeholder 
     gridPurity: illustration ? null : Number((puritySum / frameCells.length).toFixed(3)),
     ...(spec.type === 'card-frame' ? { window: artWindow, slots } : {}),
     // 카드 그림: 칸 n = cards[n-1](명세가 기준. manifest는 늘 명세의 목록을 쓴다)
-    ...(spec.type === 'card-art-sheet' ? { cards: spec.cards ?? [] } : {}),
+    ...(spec.type === 'card-art-sheet' ? { cards: spec.cards ?? [], ...(spec.redraws ? { redraws: true } : {}) } : {}),
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 2) + '\n');
   return meta;

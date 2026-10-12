@@ -1,0 +1,18 @@
+id: icons_nodes
+type: icon-sheet
+summary: 지도 노드 아이콘 9칸(이야기·전투·엘리트·사건·휴식·여관·상점·보스·틈새) — 두루마리 지도의 붉은 도장 안에 들어간다
+# 2026-10-12 D3: 칸 순서는 src/ui/map-view.ts의 NODE_ICON과 같다. 그림이 오기 전에는 한자(史戰精事休宿市王裂)
+# 크림색 양피지 위 붉은 도장 테두리 안에 놓이므로, 바탕 없이 진한 먹색·붉은색 위주의 단순한 실루엣으로
+frames: 9
+baseline: 0.5
+frame_notes:
+  1: "story — an open scroll with a few ink brush strokes, a small tassel hanging from the roller"
+  2: "battle — two crossed swords, dark steel blades and dark red grips"
+  3: "elite — a horned demon skull mask in dark red with glowing eye slits"
+  4: "event — a question-mark shaped curl of ink smoke rising from a small ink stone"
+  5: "rest — a small campfire with three logs and an orange flame"
+  6: "inn — a small hanging paper lantern with a wooden inn sign below it"
+  7: "shop — a round copper coin with a square hole stacked on a small cloth pouch"
+  8: "boss — a jagged black crown with a red gem, ominous"
+  9: "rift crack — a jagged black crack in the sky glowing faint violet at its edges"
+placeholder: { color: '#f6ecd4', accent: '#a8281e' }

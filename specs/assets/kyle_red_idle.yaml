@@ -1,0 +1,13 @@
+id: kyle_red_idle
+type: character-anim
+character: kyle_red
+summary: 카일(붉은 검) 대기 4프레임
+depends_on: [kyle_red_ref]
+reference: assets/source/kyle_red_ref.png
+facing: right
+frame_notes:
+  1: ready knight stance, sword held forward in both hands, weight on the back foot
+  2: shoulders rise slightly, tabard sways
+  3: rolls the shoulders, sword tip lifts a little
+  4: settles back, light grin, tabard settling
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }
