@@ -1,0 +1,14 @@
+id: fx_blood_crescent
+type: fx
+summary: "카일 피 갈래 — 붉은 초승달 베기 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a thin crimson line of light appears at the left edge of the cell at mid height"
+  2: "it grows into a sharp crimson crescent sweeping horizontally to the right, bulging upward"
+  3: "the full crimson crescent at maximum brightness with a white core, small blood-red droplets flung from its tip"
+  4: "the crescent thins, droplets falling in arcs"
+  5: "a fading crimson trail in the same place, droplets near the bottom"
+  6: "a faint crimson afterimage and two or three droplets"
+placeholder: { accent: '#d1263a' }

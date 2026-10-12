@@ -1,0 +1,14 @@
+id: fx_ice_spikes
+type: fx
+summary: "냉기 공격 — 얼음 가시가 솟는다 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a pale blue frost circle spreads on the ground at the bottom center"
+  2: "three sharp ice spikes start to rise from the frost circle"
+  3: "the ice spikes at full height, pointing up and slightly outward, white highlights, pale blue body, deep blue edges"
+  4: "the spikes crack, white cracks running through them"
+  5: "the spikes shatter into small ice shards flying outward"
+  6: "a few ice shards and frost sparkles fading on the ground"
+placeholder: { accent: '#8fe3ff' }

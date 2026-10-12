@@ -1,0 +1,14 @@
+id: fx_power_aura
+type: fx
+summary: "파워 — 기운이 피어오른다 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a faint white-gold glow on the ground at the bottom center"
+  2: "tall flames of pale gold aura rise around an empty center like a standing figure outline"
+  3: "the aura at full height, bright white-gold edges flickering upward, small sparks"
+  4: "the aura settles lower and steadier"
+  5: "the aura fades to a soft glow at the bottom with rising sparks"
+  6: "a few sparks rising"
+placeholder: { accent: '#ffe9a8' }

@@ -1,0 +1,14 @@
+id: fx_grain_thread
+type: fx
+summary: "하운 결 갈래 — 푸른 결 실이 끊긴다 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "several thin pale blue threads become visible, stretched horizontally across the cell like wood grain"
+  2: "the threads glow brighter and tighten"
+  3: "a bright white-blue cut crosses the threads diagonally, and the threads snap at the cut"
+  4: "the snapped thread ends curl back like springs, blue sparks at each break"
+  5: "the curled thread ends fade, small blue motes drifting"
+  6: "a few faint blue motes remain"
+placeholder: { accent: '#4fb4ff' }

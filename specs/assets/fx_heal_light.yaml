@@ -1,0 +1,14 @@
+id: fx_heal_light
+type: fx
+summary: "회복 — 은녹빛 빛 알갱이 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a few soft pale green motes appear at the bottom of the cell"
+  2: "the motes rise in a gentle column, a faint soft cross of light forming in the center"
+  3: "the soft cross of pale green-white light at full brightness, motes rising around it"
+  4: "the cross fades, motes still rising"
+  5: "the motes reach the top and dim"
+  6: "two or three faint motes at the top"
+placeholder: { accent: '#9cf0b0' }

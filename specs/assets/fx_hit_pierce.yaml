@@ -1,0 +1,12 @@
+id: fx_hit_pierce
+type: fx
+summary: "카일 기본 피격 — 찌름 불꽃 4프레임"
+frames: 4
+fps: 15
+events: { impact: 2 }
+frame_notes:
+  1: "a tiny bright point in the center of the cell"
+  2: "a sharp four-point star of gold-white light with thin long rays"
+  3: "the star shrinks while two small sparks fly off"
+  4: "a single fading mote"
+placeholder: { accent: '#f6e7b4' }

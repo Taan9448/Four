@@ -1,0 +1,13 @@
+id: fx_rapier_flurry
+type: fx
+summary: "카일 쾌검 갈래 — 연속 찌르기 5프레임"
+frames: 5
+fps: 15
+events: { impact: 2 }
+frame_notes:
+  1: "one thin bright gold-white thrust line pierces from the left toward the center"
+  2: "three thrust lines at different heights pierce to the center at once, small star sparks at each tip"
+  3: "five thrust lines fan in toward the center, a bright white star burst where they meet"
+  4: "the lines vanish leaving small star sparks scattering"
+  5: "a few gold motes fading"
+placeholder: { accent: '#f6e7b4' }

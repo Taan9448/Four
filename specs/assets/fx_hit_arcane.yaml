@@ -1,0 +1,13 @@
+id: fx_hit_arcane
+type: fx
+summary: "엘리아 기본 피격 — 은빛 마력 5프레임"
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small silver-blue glowing point in the center"
+  2: "it expands into a ring of silver runes, a soft star in the middle"
+  3: "the rune ring at full size, glowing silver-blue, small sparkles around it"
+  4: "the runes break into sparkles drifting outward"
+  5: "a few silver sparkles fading"
+placeholder: { accent: '#cfd8ff' }

@@ -266,6 +266,43 @@ export const CardDef = z
 export type CardDef = z.infer<typeof CardDef>;
 
 /**
+ * 이펙트 규칙(data/fx.json, 2026-10-12): 카드에 fx·hitFx가 없으면 카드 특성(주인·갈래 태그·속성·유형·대상·풀)으로 고른다.
+ * 규칙은 위에서부터, 칸(fx·hitFx·castFx)마다 처음 맞는 규칙이 정한다. events는 카드와 상관없이 회복·이로운 상태·해로운 상태·독·방어에 겹친다
+ */
+export const FxWhen = z
+  .object({
+    owner: z.string(),
+    tag: z.string(),
+    element: z.enum(['fire', 'ice']),
+    type: z.enum(['attack', 'skill', 'power', 'status']),
+    target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
+    pool: z.string(),
+  })
+  .partial()
+  .strict();
+export const FxRules = z
+  .object({
+    $comment: z.string().optional(),
+    events: z.object({ heal: z.string(), buff: z.string(), debuff: z.string(), poison: z.string(), block: z.string() }).partial().strict(),
+    rules: z.array(
+      z
+        .object({
+          when: FxWhen,
+          /** 공격 연출 중 대상 위(검광·불길 — 있으면 피격 이펙트는 겹치지 않는다) */
+          fx: z.string().optional(),
+          /** 피해마다 맞은 자리 */
+          hitFx: z.string().optional(),
+          /** 피해 없는 카드(기술·파워)를 쓸 때 쓴 사람 위 */
+          castFx: z.string().optional(),
+          note: z.string().optional(),
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+export type FxRules = z.infer<typeof FxRules>;
+
+/**
  * 상태의 발동(지속 효과·파워, CARD_EFFECTS 4-1): 가진 쪽에게 일이 생길 때마다 effects가 그 쪽을 출처로 일어난다.
  * on — turnStart 그 편 차례 시작(뽑은 뒤) · turnEnd 그 편 차례 끝 · cardPlayed 아군이 카드를 낸 뒤 ·
  * attacked 공격을 맞았을 때(방어로 다 막아도) · hpLost 체력을 잃었을 때(자해·화상 포함)

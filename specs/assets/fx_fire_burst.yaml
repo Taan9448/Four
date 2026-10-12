@@ -1,0 +1,14 @@
+id: fx_fire_burst
+type: fx
+summary: "화염 공격 — 큰 불길 폭발 6프레임"
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a bright yellow spark gathers in the lower center of the cell"
+  2: "it swells into a round ball of orange fire with a yellow-white core"
+  3: "the fireball bursts at full size into a tall flame column with licking tongues reaching the top of the cell"
+  4: "the flame column breaks into rising tongues and scattering embers"
+  5: "embers and small flames rising, dark red smoke starting"
+  6: "a few glowing embers and a wisp of grey smoke drifting upward"
+placeholder: { accent: '#ff8a1e' }
