@@ -1,0 +1,12 @@
+id: kyle_red_ref
+type: character-ref
+character: kyle_red
+summary: 카일(붉은 검) 기준 시트(3/4 정면 + 오른쪽 측면) — 기본 전투 그림
+# 2026-10-12 사용자 요청: 원작에서 S2에 한스가 이그니스의 심장으로 벼린 붉은 검을 기본으로 든다. 은빛 검(kyle_*)은 옷장 '은빛 기사검'
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, confident upright stance with a light grin, the crimson-bladed long sword held point-down in front with both hands on the hilt; the same face, hair, armor, body proportions and height as the attached reference sheet, only the sword blade changes to deep glowing crimson"
+  2: "full body, side view facing right, same armor and tabard, the crimson-bladed sword held ready at the right side"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }

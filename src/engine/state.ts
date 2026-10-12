@@ -242,7 +242,7 @@ export function statusName(state: BattleState, id: string): string {
 /** 복장: 런 플래그에 맞는 스프라이트 세트(뒤에 적힌 복장이 우선, 빠진 키는 기본 sprites) */
 export function spritesFor(def: CharacterDef, flags: readonly string[]): Record<string, string> {
   let sprites = { ...def.sprites };
-  for (const o of def.outfits) if (flags.includes(o.flag)) sprites = { ...sprites, ...o.sprites };
+  for (const o of def.outfits) if (!o.flag || flags.includes(o.flag)) sprites = { ...sprites, ...o.sprites };
   return sprites;
 }
 

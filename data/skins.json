@@ -1,11 +1,12 @@
 {
-  "$comment": "옷장(GAME_DESIGN 13-2절, 2026-10-12 사용자 요청): 스토리를 마친 뒤 순례·심연에서 입는 옷. 세트마다 네 동료의 옷, 그림 id는 skin_<세트>_<동료>_idle·attack·hit(세 장이 모두 실제 그림일 때만 입는다).",
+  "$comment": "옷장(GAME_DESIGN 13-2절, 2026-10-12 사용자 요청): 스토리를 마친 뒤 순례·심연에서 입는 옷. 세트마다 네 동료의 옷, 그림 id는 skin_<세트>_<동료>_idle·attack·hit(세 장이 모두 실제 그림일 때만 입는다). 은빛 기사검(2026-10-12): 카일만, 처음부터 열림, 옛 기본 그림 kyle_*를 그대로 쓰고 캠페인에서도 입는다(기본은 붉은 검 kyle_red_*).",
   "sets": [
     { "id": "cheongun", "name": "청운의 귀환", "description": "청운문 제자의 흰 도포와 은빛 구름 자수. 처음 캠페인을 마친 날의 옷.", "unlock": { "kind": "campaignClear" } },
     { "id": "cheonma", "name": "천마를 넘어", "description": "검은 무복에 진홍 안감, 금실 용 무늬. 어려움으로 캠페인을 마치면.", "unlock": { "kind": "campaignClear", "difficulty": "hard" } },
     { "id": "bulmyeol", "name": "불멸", "description": "흑금 갑주와 흰 금빛 목도리. 하드코어로 캠페인을 마치면.", "unlock": { "kind": "hardcoreClear" } },
     { "id": "simyeon", "name": "심연을 걷는 자", "description": "검보라 장포에 틈 모양 은빛 자수가 희미하게 빛난다. 심연 5굽이를 넘으면.", "unlock": { "kind": "abyssDepth", "depth": 5 } },
-    { "id": "sullye", "name": "순례의 끝", "description": "크림빛 순례 망토, 대삿갓과 염주. 순례로 세계의 틈을 넘으면.", "unlock": { "kind": "pilgrimStage", "stage": "s9" } }
+    { "id": "sullye", "name": "순례의 끝", "description": "크림빛 순례 망토, 대삿갓과 염주. 순례로 세계의 틈을 넘으면.", "unlock": { "kind": "pilgrimStage", "stage": "s9" } },
+    { "id": "silver_sword", "name": "은빛 기사검", "description": "붉은 검을 벼리기 전, 로웬 가문의 은빛 양날 검. 캠페인·순례·심연 어디서나 들 수 있다.", "unlock": { "kind": "always" }, "characters": ["kyle"], "sprites": { "kyle": "kyle" }, "anyMode": true }
   ],
   "characters": ["haun", "elia", "kyle", "born"]
 }

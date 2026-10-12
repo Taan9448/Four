@@ -292,9 +292,9 @@ export class BattleView {
       if (!def) return null;
       // 복장(못생긴 검·두린의 망치)은 실제 그림이 들어온 뒤에만 쓴다(임시 그림보다 기본 복장의 실제 그림이 낫다)
       const pick = (s: Record<string, string>) => s[anim] ?? (anim === 'skill' ? s.attack : undefined);
-      // 옷장 세트(순례·심연)가 가장 먼저
+      // 옷장 세트(순례·심연, anyMode 세트는 캠페인에서도)가 가장 먼저
       const skin = this.ctx.skins?.[c.defId];
-      if (skin && skinReady(skin, c.defId)) return skinSpriteId(skin, c.defId, anim === 'skill' ? 'attack' : anim);
+      if (skin && skinReady(this.data, skin, c.defId)) return skinSpriteId(this.data, skin, c.defId, anim === 'skill' ? 'attack' : anim);
       const outfit = pick(spritesFor(def, this.state.flags));
       return (outfit && spriteSource(outfit) === 'sprites' ? outfit : pick(def.sprites)) ?? null;
     }

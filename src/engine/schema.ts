@@ -323,12 +323,29 @@ export const SkinUnlock = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('hardcoreClear') }).strict(),
   z.object({ kind: z.literal('abyssDepth'), depth: z.number().int().positive() }).strict(),
   z.object({ kind: z.literal('pilgrimStage'), stage: z.string() }).strict(),
+  /** 처음부터 열려 있다(카일 '은빛 기사검' 등 기본 그림의 다른 모습) */
+  z.object({ kind: z.literal('always') }).strict(),
 ]);
 export type SkinUnlock = z.infer<typeof SkinUnlock>;
 export const SkinData = z
   .object({
     $comment: z.string().optional(),
-    sets: z.array(z.object({ id: z.string(), name: z.string(), description: z.string(), unlock: SkinUnlock }).strict()),
+    sets: z.array(
+      z
+        .object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string(),
+          unlock: SkinUnlock,
+          /** 이 세트를 입을 수 있는 동료(없으면 characters 전부) */
+          characters: z.array(z.string()).optional(),
+          /** 동료 → 그림 접두사(그림 id = <접두사>_<idle|attack|hit>). 없으면 skin_<세트>_<동료> */
+          sprites: z.record(z.string(), z.string()).optional(),
+          /** 캠페인(이야기)에서도 입는다(기본은 순례·심연에서만) */
+          anyMode: z.boolean().optional(),
+        })
+        .strict(),
+    ),
     characters: z.array(z.string()),
   })
   .strict();
@@ -464,8 +481,8 @@ export const CharacterDef = z
     maxHp: z.number().int().positive(),
     color: z.string(),
     sprites: z.record(z.string(), z.string()).default({}),
-    /** 복장: 런 플래그가 서면 sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 예: 하운 '못생긴 검' */
-    outfits: z.array(z.object({ flag: z.string(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
+    /** 복장: 런 플래그가 서면(flag가 없으면 늘) sprites 대신 쓸 스프라이트 세트(뒤에 적힌 것이 우선). 실제 그림이 들어온 것만 쓴다. 예: 하운 '못생긴 검', 카일 '붉은 검' */
+    outfits: z.array(z.object({ flag: z.string().optional(), sprites: z.record(z.string(), z.string()) }).strict()).default([]),
     /** 전투 화면의 스프라이트 배율(그림마다 프레임 안 키가 달라 동료끼리 키를 맞출 때). 기본 1 */
     scale: z.number().positive().default(1),
     /** 치명타 확률(0~1). 없으면 balance.crit.chance */
