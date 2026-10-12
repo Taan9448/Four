@@ -1,0 +1,13 @@
+id: skin_cheongun_haun_idle
+type: character-anim
+character: skin_cheongun_haun
+summary: "진하운 옷장 「청운의 귀환」 대기 4프레임"
+depends_on: [skin_cheongun_haun_ref]
+reference: assets/source/skin_cheongun_haun_ref.png
+facing: right
+frame_notes:
+  1: "relaxed ready stance, sword held low in the right hand with the point down, knees slightly bent, inhaling"
+  2: "same stance, chest slightly raised, short breath in"
+  3: "same stance, chest at highest point, short breath held"
+  4: "same stance, long breath out, shoulders relaxed, hair and jacket hem settling, a small warm gold glow (about 6x6 sprite pixels) on the lower belly"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

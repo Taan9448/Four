@@ -1,0 +1,13 @@
+id: skin_simyeon_born_hit
+type: character-anim
+character: skin_simyeon_born
+summary: "보른 옷장 「심연을 걷는 자」 피격 3프레임"
+depends_on: [skin_simyeon_born_ref]
+reference: assets/source/skin_simyeon_born_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "blow lands on his shoulder, he grunts but holds"
+  2: "slides back a step, hammer haft braced"
+  3: "straightens, stern glare forward"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#9b5cff' }

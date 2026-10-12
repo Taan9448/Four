@@ -1,0 +1,11 @@
+id: skin_bulmyeol_kyle_ref
+type: character-ref
+character: skin_bulmyeol_kyle
+summary: "카일 옷장 「불멸」 기준 시트(3/4 정면 + 오른쪽 측면)"
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose in the new outfit, holding the long straight double-edged sword; the same face, hair, body proportions and height as the attached reference sheet, only the clothes and weapon details change"
+  2: "full body, side view facing right, the same outfit and proportions, standing ready with the long straight double-edged sword lowered"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#ffd25a' }

@@ -1,0 +1,12 @@
+id: skin_bulmyeol_kyle_hit
+type: character-anim
+character: skin_bulmyeol_kyle
+summary: "카일 옷장 「불멸」 피격 3프레임"
+depends_on: [skin_bulmyeol_kyle_ref]
+reference: assets/source/skin_bulmyeol_kyle_ref.png
+facing: right
+frame_notes:
+  1: struck, head snapped back, armor plates rattling
+  2: stumbling back, sword arm lowered
+  3: steadying, gritting teeth, sword raised again
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#ffd25a' }

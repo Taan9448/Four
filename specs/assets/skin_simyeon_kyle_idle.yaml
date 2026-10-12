@@ -1,0 +1,14 @@
+id: skin_simyeon_kyle_idle
+type: character-anim
+character: skin_simyeon_kyle
+summary: "카일 옷장 「심연을 걷는 자」 대기 4프레임"
+depends_on: [skin_simyeon_kyle_ref]
+reference: assets/source/skin_simyeon_kyle_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: ready knight stance, sword held forward in both hands, weight on the back foot
+  2: shoulders rise slightly, tabard sways
+  3: rolls the shoulders, sword tip lifts a little
+  4: settles back, light grin, tabard settling
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#9b5cff' }

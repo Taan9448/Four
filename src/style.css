@@ -1852,3 +1852,30 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .codex-single { padding: 10px 12px 16px; }
 }
 .codex-cardgrid { row-gap: 22px; padding-bottom: 8px; }
+/* 옷장(2026-10-12): 편성 화면과 같은 짜임 — 머리 판 · 동료 줄 · 미리 보기 + 옷 목록 */
+.wardrobe-screen { display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-height: calc(100vh - 20px); max-width: 1180px; margin: 0 auto; width: 100%; }
+.wd-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.wd-head h2 { margin: 0; }
+.wd-roster { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.wd-mate { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 56px; padding: 8px 12px; text-align: left; color: var(--ink); cursor: pointer; border-radius: 10px; border: 1px solid rgba(226, 180, 92, 0.28); background: linear-gradient(180deg, rgba(34, 27, 19, 0.92), rgba(16, 13, 10, 0.92)); }
+.wd-mate small { color: var(--ink-dim); font-size: var(--fs-cap); }
+.wd-mate.on { border-color: #e2b45c; background: linear-gradient(180deg, rgba(74, 54, 26, 0.95), rgba(36, 27, 15, 0.95)); box-shadow: inset 0 0 0 1px rgba(226, 180, 92, 0.6); }
+.wd-body { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 10px; flex: 1; }
+.wd-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.wd-canvas { width: 240px; height: 240px; image-rendering: pixelated; }
+.wd-preview h3 { margin: 4px 0 0; }
+.wd-note { margin: 0; color: var(--ink-dim); font-size: var(--fs-cap); }
+.wd-list { display: flex; flex-direction: column; gap: 8px; }
+.wd-list h3 { margin: 0 0 4px; }
+.wd-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0, 0, 0, 0.25); }
+.wd-item.on { border-color: #e2b45c; box-shadow: inset 0 0 0 1px rgba(226, 180, 92, 0.5); }
+.wd-item.locked { opacity: 0.6; }
+.wd-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wd-item-text small { color: var(--ink-dim); font-size: var(--fs-cap); }
+.wd-pending { font-style: normal; font-size: var(--fs-cap); color: #e6c36a; }
+@media (max-width: 720px) {
+  .wd-roster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wd-body { grid-template-columns: 1fr; }
+  .wd-canvas { width: 180px; height: 180px; }
+}
+.wd-head, .wd-preview, .wd-list { padding: 16px 20px; }
