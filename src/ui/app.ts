@@ -52,7 +52,7 @@ import { applySettings, BUILD_SHORT, settings, settingsForm } from './settings';
 import { sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
-import { iconEl } from './icons';
+import { artOrGlyph, iconEl } from './icons';
 import { loadPortrait } from '../render/portrait';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
@@ -1222,7 +1222,7 @@ export class App {
                 // 열린 단계는 줄 전체를 눌러 고른다(같은 단계를 다시 누르면 한 단계 아래로)
                 onclick: o.level <= maxOath ? () => ((oath = oath === o.level ? o.level - 1 : o.level), render()) : undefined,
               },
-              h('span', { class: 'abyss-oath-glyph' }, o.glyph),
+              artOrGlyph('icons_oaths', o.level, o.glyph, 'abyss-oath-glyph'),
               h('b', {}, o.level > maxOath ? `${o.level}단계 — 잠김` : `${o.level}. ${o.name}`),
               h('small', {}, o.level > maxOath ? (o.level === maxOath + 1 ? `${o.level + data.balance.abyss.oath.depthOffset}굽이를 넘거나, 서약 ${o.level - 1}단계로 ${data.balance.abyss.oath.stepDepth}굽이를 넘으면 열린다` : '') : o.description),
             ),
