@@ -1,0 +1,18 @@
+id: card_art_status
+type: card-art-sheet
+summary: 상태·저주 카드 그림 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 쓸모없이 손을 막는 카드라 어둡고 불길하게
+# 2026-10-12 D4: 전투 중 덱에 끼어드는 상태 카드 4장(pool status). 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 4
+cards:
+  - status_rift_echo  # 틈의 잔향
+  - status_miasma  # 독기
+  - status_rift_whisper  # 틈의 속삭임
+  - status_blood_debt  # 피의 빚
+frame_notes:
+  1: "a black crack hanging in the air with a cold violet wind blowing out of it, dust and leaves pulled in"  # 틈의 잔향
+  2: "a sickly green poisonous mist curling over dark ground, a few dead leaves in it"  # 독기
+  3: "a black crack in the sky with faint pale lips at its edge, as if whispering, thin violet sound ripples"  # 틈의 속삭임
+  4: "a dark red blood seal stamped on a torn paper promissory note, drops of blood dripping from it"  # 피의 빚
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark, ominous palette: near-black violet, sickly green and dark blood red on a deep shadowed background; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#1a1420', accent: '#a35cff' }
