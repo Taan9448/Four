@@ -4,7 +4,7 @@ summary: "틈의 카드 — 검보라 허공 찢기 6프레임"
 frames: 6
 fps: 15
 events: { impact: 3 }
-chroma: magenta
+chroma: green
 frame_notes:
   1: "a thin black-violet hairline crack appears diagonally across the center of the cell"
   2: "the crack tears open into a jagged black rift with a violet glowing rim, from upper left to lower right"

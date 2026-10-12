@@ -213,7 +213,7 @@ export class App {
         return this.show(this.withCards(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map()), 'bg_shop')));
       }
       const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
-      return this.show(this.withCards(this.backdrop(choiceView(data, ar, mod, () => this.map()))));
+      return this.show(this.withCards(this.backdrop(choiceView(data, ar, mod, () => this.map()), mod.type === 'rest' ? 'bg_rest' : undefined)));
     }
     let run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
     // &pilgrim: 클리어한 런에서 이 스테이지를 다시 걷는 길(순례)로 띄운다
@@ -227,7 +227,7 @@ export class App {
     switch (name) {
       case 'choice': {
         const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'rest')!;
-        return this.show(this.withCards(this.backdrop(choiceView(data, run, module, () => this.map()))));
+        return this.show(this.withCards(this.backdrop(choiceView(data, run, module, () => this.map()), module.content.background ?? (module.type === 'rest' ? 'bg_rest' : undefined))));
       }
       case 'scene':
         return this.playScene(id ?? [...data.scenes.keys()][0], () => this.map());
@@ -374,10 +374,11 @@ export class App {
    */
   private backdrop(el: HTMLElement, art?: string): HTMLElement {
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
-    // 화면 전용 그림(편성 bg_loadout · 상점 bg_shop)이 아직 없으면 스테이지 배경으로
+    // 화면 전용 그림(편성 bg_loadout · 상점 bg_shop · 휴식 bg_rest)이 아직 없으면 스테이지 배경으로
     const url = (art ? frameUrl(art, 1, { realOnly: true }) : null) ?? frameUrl(stage?.background, 1, { realOnly: true });
     el.classList.add('backdrop', `world-${stage?.world ?? 'murim'}`);
-    if (art === 'bg_loadout' || art === 'bg_shop') el.classList.add(art === 'bg_shop' ? 'mood-shop' : 'mood-loadout');
+    const mood = ({ bg_loadout: 'mood-loadout', bg_shop: 'mood-shop', bg_rest: 'mood-rest' } as Record<string, string>)[art ?? ''];
+    if (mood) el.classList.add(mood);
     if (url) {
       el.classList.add('has-art');
       el.style.setProperty('--backdrop', `url("${url}")`);
@@ -694,7 +695,7 @@ export class App {
             this.withCards(
               this.backdrop(
                 choiceView(data, run, enc.module, () => this.map(), enc.module.type === 'inn' ? { onEditLoadout: () => this.loadout(showChoice) } : {}),
-                enc.module.content.background,
+                enc.module.content.background ?? (enc.module.type === 'rest' ? 'bg_rest' : undefined),
               ),
             ),
           );

@@ -502,6 +502,10 @@ describe('저장소의 실제 명세와 임시 시트', () => {
     expect(map).not.toContain('animated feature film');
     expect(promptFor('journey_band')).toContain('Do not draw any crack');
     expect(promptFor('bg_rift')).toContain('ground line (where feet stand) at about 62%');
+    // 옷장 보른 동작은 기준 시트가 아니라 원래 전투 동작 크기(2026-10-12 사용자 결정)
+    expect(promptFor('skin_cheongun_born_idle')).toContain('about 70 px tall');
+    expect(promptFor('skin_cheongun_born_idle')).not.toContain('exactly as tall as in the attached reference sheet');
+    expect(promptFor('skin_cheongun_kyle_idle')).toContain('exactly as tall as in the attached reference sheet');
   });
 });
 
