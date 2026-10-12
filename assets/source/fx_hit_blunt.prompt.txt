@@ -5,7 +5,7 @@ PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw 
 Background: flat solid black #000000 in every cell.
 Subject: a glowing visual effect only; no character, no ground, no background elements.
 Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
-Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
 Frames:
 Cell 1: a round grey-brown impact flash in the center
 Cell 2: a thick round shock ring with dust puffing outward
@@ -15,3 +15,5 @@ Cell 5: a faint dust haze
 Cells 6 to 6 are completely black.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Claude needs-fix: preserve the good frame-1 flash and frame-2 shock ring. Frame 3 and 4 dust currently covers almost the entire 160px frame and hides the enemy; reduce the cloud to a diameter BELOW 110 sprite pixels (maximum 300 source pixels) and break up its outer edge with generous black gaps. Do not draw a solid opaque wall of dust. Aim for sparse disconnected puffs with plenty of visible black space, low coverage, no dense full-cell fill. Keep all stages registered at the same local center (256,256), with any downward drift kept small inside the same field. Frame 5 must be a faint haze of separated pale brown and grey-brown points matching frame 4, NOT dark navy thick lines or a jagged crack. Use bright pale-brown/grey-brown dots, dim through reduced size/count not by switching hue to navy. If a center core is visible use pale cream rather than a dark navy hole. No stones as scenery, no person/weapon/floor/background. Crisp uniform square blocks, no blur/anti-aliasing, max 9 flat colors. Cell 6 pure black; all five active effects well within borders.
