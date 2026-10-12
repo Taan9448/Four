@@ -5,6 +5,9 @@ import { createRng } from './rng';
 import { findNode, generateStageMap, mutateMapForSurge, type MapNode, type StageMap } from './route';
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
+import { measurePilgrimScale, type PilgrimScale } from './pilgrim-scale';
+export type { PilgrimScale } from './pilgrim-scale';
+export { measurePilgrimScale } from './pilgrim-scale';
 import { acquireCard, beginStageLoadout, COMMON, setLoadout, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
 import {
   abyssAddCard,
@@ -91,6 +94,8 @@ export interface RunState {
   /** 순례(2026-10-11 A안): 첫 순례 보상을 받은 스테이지 · 이룬 순례 도전(스테이지 id → 도전 id) */
   pilgrimRewarded?: Record<string, boolean>;
   challenges?: Record<string, string[]>;
+  /** 순례 일행 보정: 출발 편성을 정할 때 고정한 값(GAME_DESIGN 2절, 2026-10-12 보정식 세 항). 없으면 그때그때 센다 */
+  pilgrimScale?: PilgrimScale;
   /** 이번 스테이지(심연은 굽이)를 시작할 때의 모습 — 끝 화면의 '얻은 것'·'상흔 +N'(2026-10-11 UI/UX 3-2) */
   stageStart?: StageStart;
   /** 결과 화면 통계 */
@@ -1261,17 +1266,14 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
 
 /** 어려움 배율(스테이지별, 없으면 1) */
 /**
- * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안): 클리어한 일행으로 다시 걷는 길(replayOf)만. 그 밖에는 1.
- * 1 + max(0, 하운 레벨 − 스테이지 기준 레벨) × 레벨당 배율 + 유물 수 × relicPct, 상한 maxHp·maxDmg(어려움 배율에 곱한다)
+ * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-12 보정식 세 항): 클리어한 일행으로 다시 걷는 길(replayOf)만. 그 밖에는 1.
+ * 1 + max(0, 하운 레벨 − 기준 레벨) × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한 maxHp·maxDmg(어려움 배율에 곱한다).
+ * 출발 편성을 정하면(setLoadout) run.pilgrimScale에 고정한다 — 길에서 레벨·유물·강화가 늘어도 그 길의 적은 그대로
  */
-export function pilgrimScale(data: GameData, run: Pick<RunState, 'replayOf' | 'roster' | 'relics' | 'stageId'>): { hp: number; dmg: number } {
-  if (!run.replayOf) return { hp: 1, dmg: 1 };
-  const p = data.balance.pilgrimage;
-  const haun = run.roster.find((r) => r.id === 'haun')?.level ?? 1;
-  const over = Math.max(0, haun - (p.baseLevel[run.stageId] ?? 1));
-  const relics = run.relics.length * p.relicPct;
-  const round = (x: number) => Math.round(x * 100) / 100;
-  return { hp: round(Math.min(p.maxHp, 1 + over * p.hpPerLevel + relics)), dmg: round(Math.min(p.maxDmg, 1 + over * p.dmgPerLevel + relics)) };
+export function pilgrimScale(data: GameData, run: Pick<RunState, 'replayOf' | 'roster' | 'relics' | 'stageId' | 'loadout' | 'collection'> & { pilgrimScale?: PilgrimScale }): PilgrimScale {
+  if (!run.replayOf) return { hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 };
+  if (run.pilgrimScale) return run.pilgrimScale;
+  return measurePilgrimScale(data, run);
 }
 
 export function hardMul(data: GameData, stageId: string): { hp: number; dmg: number } {

@@ -12,10 +12,10 @@ describe("속성 상성(화염·냉기)", () => {
     const s = battle({ enemies: ["test_ember", "test_ember"] });
     const haun = s.party[0];
     const [a, b] = s.enemies;
-    dealDamage(s, haun, a, 10, { source: haun }, "ice");
-    dealDamage(s, haun, b, 10, { source: haun }, "fire");
-    expect(a.maxHp - a.hp).toBe(Math.floor(10 * bal.elements.weakMultiplier));
-    expect(b.maxHp - b.hp).toBe(Math.floor(10 * bal.elements.resistMultiplier));
+    dealDamage(s, haun, a, 100, { source: haun }, "ice");
+    dealDamage(s, haun, b, 100, { source: haun }, "fire");
+    expect(a.maxHp - a.hp).toBe(Math.floor(100 * bal.elements.weakMultiplier));
+    expect(b.maxHp - b.hp).toBe(Math.floor(100 * bal.elements.resistMultiplier));
     expect(a.statuses.chill).toBe(1);
     expect(b.statuses.burn).toBeUndefined();
   });
@@ -30,8 +30,8 @@ describe("속성 상성(화염·냉기)", () => {
       targetUid: haun.uid,
     };
     const before = haun.hp;
-    endTurn(s); // 불티 4 + 화상 1 → 다음 차례 시작에 화상 피해
-    expect(before - haun.hp).toBe(4 + 2);
+    endTurn(s); // 불티 40 + 화상 1 → 다음 차례 시작에 화상 피해 20
+    expect(before - haun.hp).toBe(40 + 20);
   });
 
   it(`냉기가 ${bal.elements.freezeAt} 쌓이면 얼어붙고(빙결), 보스는 ${bal.elements.bossFreezeAt}에서 얼어붙는다`, () => {
@@ -74,7 +74,7 @@ describe("치명타", () => {
     const run = (seed: string) => {
       const s = battle({ enemies: ["test_wolf"], rng: createRng(seed) });
       s.noCrit = false;
-      s.enemies[0].hp = s.enemies[0].maxHp = 9999;
+      s.enemies[0].hp = s.enemies[0].maxHp = 99999;
       const hits: boolean[] = [];
       for (let i = 0; i < 60; i++) {
         s.neigong = 9;
@@ -92,7 +92,7 @@ describe("치명타", () => {
 
   it("미리보기·시험 상태(noCrit)에서는 굴리지 않는다", () => {
     const s = battle({ enemies: ["test_wolf"] });
-    s.enemies[0].hp = s.enemies[0].maxHp = 9999;
+    s.enemies[0].hp = s.enemies[0].maxHp = 99999;
     for (let i = 0; i < 40; i++) {
       s.neigong = 9;
       playCard(s, give(s, "haun_chop"), s.enemies[0].uid);

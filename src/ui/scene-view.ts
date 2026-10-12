@@ -1,7 +1,8 @@
 // 비주얼 노벨 장면: 좌우 반신 그림 + 아래 대화창. 클릭·스페이스·엔터로 다음 줄, 건너뛰기, 지난 대사 기록.
 // 표정은 적지 않으면 유지되고(src/engine/scene.ts), 같은 인물의 표정이 바뀔 때는 겹쳐서 천천히 바꾼다.
 import type { GameData } from '../engine/data';
-import { sceneFaces } from '../engine/scene';
+import { autoAdvanceDelay, sceneFaces, TEXT_MS_PER_CHAR } from '../engine/scene';
+import { settings, TEXT_SPEEDS, update } from './settings';
 import type { Face, SceneDef, SceneLine } from '../engine/schema';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
@@ -20,7 +21,16 @@ interface Slot {
 }
 
 /** background: 장면 뒤 배경 에셋 id(장면의 background가 우선). 실제 그림이 있을 때만 어둡게 깐다 */
-export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, opts: { background?: string; flags?: readonly string[] } = {}): HTMLElement {
+/**
+ * 글자 속도·자동 진행·본 장면 건너뛰기(2026-10-12 B3): settings.textSpeed · autoAdvance · skipSeenScenes.
+ * skip.button이면 머리에 '이미 본 장면 · 건너뛰기'(자동으로 넘기는 것은 부르는 쪽이 engine/scene.ts sceneSkip으로 정한다)
+ */
+export function sceneView(
+  data: GameData,
+  scene: SceneDef,
+  onDone: () => void,
+  opts: { background?: string; flags?: readonly string[]; skip?: { button: boolean } } = {},
+): HTMLElement {
   const bgUrl = frameUrl(scene.background ?? opts.background, 1, { realOnly: true });
   const slots: Record<Side, Slot> = {
     left: { el: h('div', { class: 'vn-slot vn-left' }), speaker: null, face: null },
@@ -35,6 +45,39 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
   const titleEl = h('div', { class: 'vn-title' });
   let index = -1;
   let finished = false;
+  // 글자 찍기: typing 중에 누르면 그 줄을 다 보이고, 다 보인 뒤 누르면 다음 줄
+  let typing: number | null = null;
+  let autoTimer: number | null = null;
+  const clearTimers = () => {
+    if (typing !== null) clearInterval(typing);
+    if (autoTimer !== null) clearTimeout(autoTimer);
+    typing = autoTimer = null;
+  };
+  // 자동 진행: 줄이 다 보이면 잠시 뒤 다음 줄. 마지막 줄(뒤에 선택지·전투가 이어진다)에서는 기다린다
+  const scheduleAuto = () => {
+    if (!settings.autoAdvance || finished || index >= scene.lines.length - 1) return;
+    autoTimer = window.setTimeout(() => ((autoTimer = null), next()), autoAdvanceDelay(scene.lines[index].text));
+  };
+  const showText = (text: string) => {
+    clearTimers();
+    const ms = TEXT_MS_PER_CHAR[settings.textSpeed];
+    const chars = [...text];
+    if (!ms || chars.length < 2) {
+      textEl.textContent = text;
+      return scheduleAuto();
+    }
+    let n = 0;
+    textEl.textContent = '';
+    typing = window.setInterval(() => {
+      n += 1;
+      textEl.textContent = chars.slice(0, n).join('');
+      if (n >= chars.length) {
+        clearInterval(typing!);
+        typing = null;
+        scheduleAuto();
+      }
+    }, ms);
+  };
 
   const faces = sceneFaces(scene);
   const sideOf = (l: SceneLine): Side => l.side ?? (l.speaker === 'haun' ? 'left' : 'right');
@@ -62,12 +105,19 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
   const finish = () => {
     if (finished) return;
     finished = true;
+    clearTimers();
     document.removeEventListener('keydown', onKey);
     onDone();
   };
 
   const next = () => {
     if (!logEl.classList.contains('hidden')) return void logEl.classList.add('hidden');
+    if (typing !== null) {
+      // 찍는 중: 이 줄을 다 보인다
+      clearTimers();
+      textEl.textContent = scene.lines[index].text;
+      return scheduleAuto();
+    }
     index += 1;
     if (index >= scene.lines.length) return finish();
     const line = scene.lines[index];
@@ -96,7 +146,7 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
     nameEl.textContent = nameOf(line);
     nameEl.classList.toggle('hidden', !line.speaker);
     if (line.speaker) nameEl.style.setProperty('--owner', speakerInfo(data, line.speaker).color);
-    textEl.textContent = line.text;
+    showText(line.text);
     textEl.classList.toggle('narration', !line.speaker);
     box.classList.remove('vn-in');
     void box.offsetWidth; // 줄마다 짧은 등장 효과를 다시 건다
@@ -110,6 +160,34 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
       next();
     } else if (e.key === 'Escape') finish();
   };
+  // 화면 아무 곳이나 누르면 자동 진행은 꺼진다(그 누름은 다음 줄로)
+  const tap = () => {
+    if (settings.autoAdvance) {
+      update({ autoAdvance: false });
+      syncAuto();
+    }
+    next();
+  };
+  const autoBtn = h('button', { class: 'btn', 'aria-pressed': 'false' }, '자동');
+  const speedBtn = h('button', { class: 'btn' });
+  const syncAuto = () => {
+    autoBtn.setAttribute('aria-pressed', String(settings.autoAdvance));
+    autoBtn.classList.toggle('on', settings.autoAdvance);
+    speedBtn.textContent = `글자 ${TEXT_SPEEDS.find((t) => t.value === settings.textSpeed)?.label ?? '보통'}`;
+  };
+  autoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    update({ autoAdvance: !settings.autoAdvance });
+    syncAuto();
+    if (settings.autoAdvance && typing === null && autoTimer === null) scheduleAuto();
+    else if (!settings.autoAdvance && autoTimer !== null) clearTimeout(autoTimer), (autoTimer = null);
+  });
+  speedBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    update({ textSpeed: settings.textSpeed === 3 ? 1 : ((settings.textSpeed + 1) as 2 | 3) });
+    syncAuto();
+  });
+  syncAuto();
   document.addEventListener('keydown', onKey);
 
   const stop = (fn: () => void) => (e: Event) => {
@@ -118,7 +196,7 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
   };
   const root = h(
     'section',
-    { class: `screen scene-screen world-${scene.world ?? 'murim'}${bgUrl ? ' has-bg' : ''}`, onclick: () => next() },
+    { class: `screen scene-screen world-${scene.world ?? 'murim'}${bgUrl ? ' has-bg' : ''}`, onclick: tap },
     h('div', { class: 'vn-bg', style: bgUrl ? `background-image:url("${bgUrl}")` : '' }),
     cgEl,
     h('div', { class: 'vn-rift-line' }),
@@ -129,10 +207,13 @@ export function sceneView(data: GameData, scene: SceneDef, onDone: () => void, o
     h(
       'div',
       { class: 'vn-controls' },
+      speedBtn,
+      autoBtn,
       h('button', { class: 'btn', onclick: stop(() => logEl.classList.toggle('hidden')) }, '기록'),
       h('button', { class: 'btn', onclick: stop(finish) }, '건너뛰기'),
     ),
     logEl,
+    opts.skip?.button ? h('button', { class: 'btn vn-seen-skip', onclick: stop(finish) }, '이미 본 장면 · 건너뛰기') : null,
   );
   next();
   return root;

@@ -50,12 +50,12 @@ describe('효과 해석기와 자원', () => {
   });
 
   it('카드 문구를 효과로부터 만든다', () => {
-    expect(cardText(data, 'haun_chop')).toBe('피해 6');
+    expect(cardText(data, 'haun_chop')).toBe('피해 60');
     expect(cardText(data, 'haun_byeogun')).toContain('융합');
     expect(cardText(data, 'haun_byeogun')).toContain('균열 +3');
     for (const id of data.cards.keys()) expect(cardText(data, id).length).toBeGreaterThan(0);
     // 대상 이름은 엔진 규칙과 같다: 적 전체 카드라도 방어는 자신에게, 상태는 적 전체에게
-    expect(cardText(data, 'haun_nakun')).toBe('방어 8 (균열 1당 +1, 최대 +8). 적 전체에게 약화 1 부여');
+    expect(cardText(data, 'haun_nakun')).toBe('방어 80 (균열 1당 +10, 최대 +80). 적 전체에게 약화 1 부여');
     // 명시한 아군 대상(부작용)도 글에 드러난다
     expect(cardText(data, 'abyss_elia_black_fire')).toContain('아군 전체에게 화상 1 부여');
   });
@@ -121,16 +121,16 @@ describe('균열', () => {
   it('균열이 최대치에 이르면 폭주: 파티 전원 피해, 균열은 초기화값으로', () => {
     const s = battle({
       enemies: ['test_ignis'],
-      party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'elia', hp: 42, maxHp: 42 }],
+      party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'elia', hp: 420, maxHp: 420 }],
     });
     s.rift = 8;
     const i = give(s, 'haun_byeogun');
     playCard(s, i, s.enemies[0].uid);
     expect(s.events.some((e) => e.type === 'surge')).toBe(true);
-    // ① 최대 체력 10%(올림), 하운은 5 더 ② 적 힘 +1 ③ 잔향 2장을 손패에 ④ 상흔 +3, 균열은 3으로
+    // ① 최대 체력 10%(올림), 하운은 50 더 ② 적 힘 +1 ③ 잔향 2장을 손패에 ④ 상흔 +3, 균열은 3으로
     expect(s.rift).toBe(3);
-    expect(s.party[0].hp).toBe(60 - 6 - 5);
-    expect(s.party[1].hp).toBe(42 - 5);
+    expect(s.party[0].hp).toBe(600 - 60 - 50);
+    expect(s.party[1].hp).toBe(420 - 42);
     expect(s.enemies[0].statuses.strength).toBe(1);
     expect(s.hand.filter((c) => c.cardId === 'status_rift_echo')).toHaveLength(2);
     expect(s.tally?.surgeScar).toBe(3);
@@ -139,7 +139,7 @@ describe('균열', () => {
     s.mana = 9;
     s.rift = 8;
     playCard(s, give(s, 'haun_byeogun'), s.enemies[0].uid);
-    expect(s.party[1].hp).toBe(42 - 5 - 10);
+    expect(s.party[1].hp).toBe(420 - 42 - 84);
     expect(s.tally?.surges).toBe(2);
   });
 
@@ -152,7 +152,7 @@ describe('균열', () => {
   it('전투가 끝나면 남은 균열의 절반이 상흔이 된다', () => {
     const s = battle();
     s.rift = 5;
-    wolf(s).hp = 1;
+    wolf(s).hp = 10;
     const i = give(s, 'haun_chop');
     playCard(s, i, wolf(s).uid);
     expect(battleOutcome(s)).toMatchObject({ result: 'victory', scarGain: 2 });
@@ -163,12 +163,12 @@ describe('결 읽기와 특수 상태', () => {
   it('결 노출은 1스택을 소모해 피해 +50%, 방어 무시', () => {
     const s = battle({ enemies: ['test_ignis'] });
     const boss = s.enemies[0];
-    boss.block = 20;
+    boss.block = 200;
     playCard(s, give(s, 'haun_read_grain'), boss.uid);
     expect(boss.statuses.grain).toBe(2);
     playCard(s, give(s, 'haun_chop'), boss.uid);
-    expect(boss.hp).toBe(120 - 9);
-    expect(boss.block).toBe(20);
+    expect(boss.hp).toBe(1200 - 90);
+    expect(boss.block).toBe(200);
     expect(boss.statuses.grain).toBe(1);
   });
 
@@ -176,9 +176,9 @@ describe('결 읽기와 특수 상태', () => {
     const s = battle({ enemies: ['test_wraith'] });
     const w = s.enemies[0];
     playCard(s, give(s, 'haun_chop'), w.uid);
-    expect(w.hp).toBe(30 - 3);
+    expect(w.hp).toBe(300 - 30);
     playCard(s, give(s, 'haun_byeogun'), w.uid);
-    expect(w.hp).toBe(30 - 3 - 18);
+    expect(w.hp).toBe(300 - 30 - 180);
   });
 
   it('흐름 포식: 흐름을 쓴 카드의 피해를 먹고, 매듭이 드러나면 날 얹기가 통한다', () => {
@@ -186,8 +186,8 @@ describe('결 읽기와 특수 상태', () => {
     const m = s.enemies[0];
     const base = data.enemies.get('mordecai')!.maxHp;
     playCard(s, give(s, 'haun_chop'), m.uid);
-    expect(m.hp).toBe(base + 6);
-    expect(m.maxHp).toBe(base + 6);
+    expect(m.hp).toBe(base + 60);
+    expect(m.maxHp).toBe(base + 60);
     s.neigong = 10;
     playCard(s, give(s, 'haun_read_grain'), m.uid);
     expect(m.statuses.knot_exposed).toBeUndefined();
@@ -195,23 +195,23 @@ describe('결 읽기와 특수 상태', () => {
     expect(m.statuses.knot_exposed).toBe(1);
     const before = m.hp;
     playCard(s, give(s, 'haun_place_blade'), m.uid);
-    // 3 ×1.5(결) + 40 ×1.5(결) — 비용 0 카드라 흡수되지 않는다
-    expect(before - m.hp).toBe(4 + 60);
+    // 30 ×1.5(결) + 400 ×1.5(결) — 비용 0 카드라 흡수되지 않는다
+    expect(before - m.hp).toBe(45 + 600);
   });
 });
 
 describe('파티', () => {
   const duo = [
-    { id: 'haun', hp: 60, maxHp: 60 },
-    { id: 'elia', hp: 42, maxHp: 42 },
+    { id: 'haun', hp: 600, maxHp: 600 },
+    { id: 'elia', hp: 420, maxHp: 420 },
   ];
 
   it('출전은 최대 3명이고 하운은 반드시 출전한다', () => {
-    expect(() => battle({ party: [{ id: 'elia', hp: 1, maxHp: 1 }] })).toThrow();
+    expect(() => battle({ party: [{ id: 'elia', hp: 10, maxHp: 10 }] })).toThrow();
     expect(() =>
       battle({ party: ['haun', 'elia', 'kyle', 'born'].map((id) => ({ id, hp: 10, maxHp: 10 })) }),
     ).toThrow();
-    expect(() => battle({ party: [{ id: 'haun', hp: 1, maxHp: 1 }, { id: 'wang', hp: 1, maxHp: 1 }] })).toThrow();
+    expect(() => battle({ party: [{ id: 'haun', hp: 10, maxHp: 10 }, { id: 'wang', hp: 10, maxHp: 10 }] })).toThrow();
   });
 
   it('출전하지 않은 동료의 카드는 덱에서 빠진다', () => {
@@ -233,10 +233,10 @@ describe('파티', () => {
     expect(s.events.some((e) => e.type === 'dead_draw')).toBe(true);
   });
 
-  it('하운이 쓰러지면 패배, 동료는 전투 후 체력 1로 복귀', () => {
+  it('하운이 쓰러지면 패배, 동료는 전투 후 체력 10으로 복귀', () => {
     const s = battle({ party: duo });
-    s.party[1].hp = 1;
-    s.party[0].hp = 1;
+    s.party[1].hp = 10;
+    s.party[0].hp = 10;
     s.enemies[0].intent = { moveId: 'bite', name: '물어뜯기', kind: 'attack', targetUid: s.party[1].uid };
     endTurn(s);
     expect(s.party[1].downed).toBe(true);
@@ -245,18 +245,18 @@ describe('파티', () => {
     s.party[0].block = 0;
     endTurn(s);
     expect(s.result).toBe('defeat');
-    expect(battleOutcome(s)!.party.find((p) => p.id === 'elia')!.hp).toBe(1);
+    expect(battleOutcome(s)!.party.find((p) => p.id === 'elia')!.hp).toBe(10);
   });
 
   it('얼음 벽은 지정한 아군에게 방어를 준다', () => {
     const s = battle({ party: duo });
     playCard(s, give(s, 'elia_ice_wall'), s.party[0].uid);
-    expect(s.party[0].block).toBe(7);
+    expect(s.party[0].block).toBe(70);
     expect(s.party[1].block).toBe(0);
   });
 
   it('왼편의 검(선천)은 첫 손패에 반드시 들어온다', () => {
-    const party = [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }];
+    const party = [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'kyle', hp: 520, maxHp: 520 }];
     const filler = Array.from({ length: 12 }, () => 'haun_chop');
     for (const seed of ['a', 'b', 'c', 'd']) {
       const s = battle({ party, deck: cards(...filler, 'kyle_left_blade'), rng: createRng(seed) });
@@ -264,41 +264,41 @@ describe('파티', () => {
     }
   });
 
-  it('날개 베기: 카일이 먼저 체력 4를 잃고, 잃은 체력 4당 피해 +1(최대 +15)로 벤 뒤 약화', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 32, maxHp: 52 }], enemies: ['test_wolf_alpha'] });
+  it('날개 베기: 카일이 먼저 체력 40을 잃고, 잃은 체력 4당 피해 +1(최대 +150)로 벤 뒤 약화', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'kyle', hp: 320, maxHp: 520 }], enemies: ['test_wolf_alpha'] });
     const before = wolf(s).hp;
     playCard(s, give(s, 'kyle_wing_cut'), wolf(s).uid);
-    expect(before - wolf(s).hp).toBe(12 + 6); // 잃은 체력 24 → +6
+    expect(before - wolf(s).hp).toBe(120 + 60); // 잃은 체력 240 → +60
     expect(wolf(s).statuses.weak).toBe(2);
-    expect(s.party[1].hp).toBe(28);
-    expect(s.party[0].hp).toBe(60);
+    expect(s.party[1].hp).toBe(280);
+    expect(s.party[0].hp).toBe(600);
   });
 
   it('먼저 가: 보른이 도발하면 다른 동료를 노리던 공격이 보른에게 간다', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'born', hp: 70, maxHp: 70 }] });
+    const s = battle({ party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'born', hp: 700, maxHp: 700 }] });
     s.enemies[0].intent = { moveId: 'bite', name: '물어뜯기', kind: 'attack', targetUid: s.party[0].uid };
     playCard(s, give(s, 'born_go_first'));
-    expect(s.party[1].block).toBe(15);
+    expect(s.party[1].block).toBe(150);
     endTurn(s);
-    expect(s.party[0].hp).toBe(60);
-    expect(s.party[1].block).toBeLessThan(15);
+    expect(s.party[0].hp).toBe(600);
+    expect(s.party[1].block).toBeLessThan(150);
   });
 
   it('같이 가: 출전한 아군 전원에게 방어', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'born', hp: 70, maxHp: 70 }] });
+    const s = battle({ party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'born', hp: 700, maxHp: 700 }] });
     playCard(s, give(s, 'born_together'));
-    expect(s.party.map((p) => p.block)).toEqual([6, 6]);
+    expect(s.party.map((p) => p.block)).toEqual([60, 60]);
   });
 
   it('카드 강화: +1~+3은 수치만, +4·+5는 특수 스킬이 붙는다', () => {
     const at = (level: number) => resolveCard(data, { uid: 'x', cardId: 'haun_chop', level });
-    expect(at(0).effects).toEqual([{ op: 'damage', amount: 6 }]);
-    expect(at(3).effects).toEqual([{ op: 'damage', amount: 15 }]);
+    expect(at(0).effects).toEqual([{ op: 'damage', amount: 60 }]);
+    expect(at(3).effects).toEqual([{ op: 'damage', amount: 150 }]);
     expect(at(3).skills).toEqual([]);
     expect(at(4).skills.map((s) => s.name)).toEqual(['결 따라 패기']);
     expect(at(5).effects.map((e) => e.op)).toEqual(['damage', 'reveal_grain', 'damage']);
     expect(at(9).level).toBe(5);
-    expect(cardText(data, { uid: 'x', cardId: 'haun_chop', level: 5 })).toBe('피해 15\n★결 따라 패기: 결 노출 1\n★두 번째 도끼질: 피해 6');
+    expect(cardText(data, { uid: 'x', cardId: 'haun_chop', level: 5 })).toBe('피해 150\n★결 따라 패기: 결 노출 1\n★두 번째 도끼질: 피해 60');
     // 키워드·비용 변화
     expect(resolveCard(data, { uid: 'y', cardId: 'haun_breath', level: 5 }).keywords).not.toContain('exhaust');
     expect(resolveCard(data, { uid: 'z', cardId: 'haun_read_grain', level: 4 }).cost).toEqual({ neigong: 0, mana: 0 });
@@ -309,8 +309,8 @@ describe('파티', () => {
     s.hand.push({ uid: 'up5', cardId: 'haun_chop', level: 5 });
     const before = wolf(s).hp;
     playCard(s, s.hand.length - 1, wolf(s).uid);
-    // 15 + 결 노출 1 → 두 번째 도끼질 6 ×1.5(결) = 9
-    expect(before - wolf(s).hp).toBe(15 + 9);
+    // 150 + 결 노출 1 → 두 번째 도끼질 60 ×1.5(결) = 90
+    expect(before - wolf(s).hp).toBe(150 + 90);
   });
 
   it('빙결된 적은 행동하지 못한다', () => {
@@ -327,8 +327,8 @@ describe('파티', () => {
 describe('왕일검 지원 규칙', () => {
   it('청운호흡 박자: 4턴마다 내공 +1, 카드 1장 추가', () => {
     const s = battle({ supportActive: true, enemies: ['test_ignis'], deck: cards(...Array(14).fill('haun_chop')) });
-    s.party[0].hp = 9999;
-    s.party[0].maxHp = 9999;
+    s.party[0].hp = 99999;
+    s.party[0].maxHp = 99999;
     const handSizes: number[] = [];
     const neigong: number[] = [];
     for (let t = 1; t <= 8; t++) {
@@ -361,23 +361,23 @@ describe('왕일검 지원 규칙', () => {
   });
 
   it('균열 소비(consume_rift)와 소비 비례: 벼린 날 · 흐름을 돌리다 · 한 땀, 은빛 바느질의 상흔 -1은 전투당 한 번', () => {
-    const s = battle({ enemies: ['test_ignis'], party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'elia', hp: 42, maxHp: 42 }] });
+    const s = battle({ enemies: ['test_ignis'], party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'elia', hp: 420, maxHp: 420 }] });
     const e = s.enemies[0];
-    e.hp = e.maxHp = 500;
+    e.hp = e.maxHp = 5000;
     s.rift = 5;
     playCard(s, give(s, 'haun_honed_edge'), e.uid);
     expect(s.rift).toBe(2);
-    expect(e.hp).toBe(500 - (6 + 9));
+    expect(e.hp).toBe(5000 - (60 + 90));
     s.rift = 6;
     s.neigong = 5;
     s.mana = 5;
     playCard(s, give(s, 'haun_turn_flow'), e.uid);
     expect(s.rift).toBe(0);
-    expect(e.hp).toBe(500 - 15 - 24);
+    expect(e.hp).toBe(5000 - 150 - 240);
     s.rift = 4;
     playCard(s, give(s, 'elia_one_stitch'));
     expect(s.rift).toBe(0);
-    expect(s.party[1].block).toBe(8);
+    expect(s.party[1].block).toBe(80);
     s.scar = 6;
     s.mana = 5;
     playCard(s, give(s, 'elia_silver_stitch'), s.party[1].uid);
@@ -389,7 +389,7 @@ describe('왕일검 지원 규칙', () => {
   it('도진아: 곽도진의 체력이 절반 이하가 되면 1턴 기절', () => {
     const s = battle({ supportActive: true, enemies: ['kwak_dojin'] });
     const kwak = s.enemies[0];
-    kwak.hp = Math.floor(kwak.maxHp / 2) + 5; // 장작 패기(6) 한 번이면 절반 이하
+    kwak.hp = Math.floor(kwak.maxHp / 2) + 50; // 장작 패기(60) 한 번이면 절반 이하
     playCard(s, give(s, 'haun_chop'), kwak.uid);
     expect(kwak.statuses.stun).toBe(1);
     const hp = s.party[0].hp;
@@ -417,8 +417,8 @@ describe('결정성', () => {
 
 describe('받을 피해 예고', () => {
   const party = [
-    { id: 'haun', hp: 60, maxHp: 60 },
-    { id: 'elia', hp: 10, maxHp: 42 },
+    { id: 'haun', hp: 600, maxHp: 600 },
+    { id: 'elia', hp: 100, maxHp: 420 },
   ];
   const aim = (s: ReturnType<typeof battle>, i: number, moveId: string, targetUid: string | null) => {
     const e = s.enemies[i];
@@ -431,11 +431,11 @@ describe('받을 피해 예고', () => {
     const [haun, elia] = s.party;
     aim(s, 0, 'bite', haun.uid);
     aim(s, 1, 'bite', haun.uid);
-    haun.block = 5;
+    haun.block = 50;
     const v = incomingDamage(s).get(haun.uid)!;
-    expect(v.raw).toBe(12);
-    expect(v.blocked).toBe(5);
-    expect(v.hpLoss).toBe(7);
+    expect(v.raw).toBe(120);
+    expect(v.blocked).toBe(50);
+    expect(v.hpLoss).toBe(70);
     expect(v.lethal).toBe(false);
     expect(v.hits).toHaveLength(2);
     expect(incomingDamage(s).has(elia.uid)).toBe(false);
@@ -449,10 +449,10 @@ describe('받을 피해 예고', () => {
     s.enemies[0].statuses.strength = 2;
     elia.statuses.vulnerable = 1;
     let m = incomingDamage(s);
-    expect(m.get(haun.uid)!.raw).toBe(8);
-    expect(m.get(elia.uid)!.raw).toBe(9);
+    expect(m.get(haun.uid)!.raw).toBe(80);
+    expect(m.get(elia.uid)!.raw).toBe(90);
     expect(m.get(elia.uid)!.lethal).toBe(false);
-    elia.hp = 9;
+    elia.hp = 90;
     expect(incomingDamage(s).get(elia.uid)!.lethal).toBe(true);
 
     s.enemies[1].statuses.stun = 1;
@@ -461,7 +461,7 @@ describe('받을 피해 예고', () => {
 
     haun.statuses.taunt = 1;
     m = incomingDamage(s);
-    expect(m.get(haun.uid)!.raw).toBe(8 + 6);
+    expect(m.get(haun.uid)!.raw).toBe(80 + 60);
     expect(m.has(elia.uid)).toBe(false);
     delete haun.statuses.taunt;
 
@@ -473,7 +473,7 @@ describe('받을 피해 예고', () => {
     const s = battle({ party, enemies: ['test_ignis'] });
     aim(s, 0, 'flame_wave', null);
     const m = incomingDamage(s);
-    const per = 7 + (s.enemies[0].statuses.strength ?? 0);
+    const per = 70 + (s.enemies[0].statuses.strength ?? 0) * 10;
     for (const p of s.party) expect(m.get(p.uid)!.raw).toBe(per);
   });
 });
@@ -497,10 +497,10 @@ describe('새 기본 동작(카드 250장 확장 2026-10-11)', () => {
     const s = battle({ world: 'murim', enemies: ['test_ignis'] });
     s.enemies[0].intent = null;
     const p = s.party[0];
-    p.block = 9;
+    p.block = 90;
     p.statuses.block_kept = 1;
     endTurn(s);
-    expect(p.block).toBe(9);
+    expect(p.block).toBe(90);
     expect(p.statuses.block_kept).toBeUndefined();
     s.hand = [];
     s.exhaust.push({ uid: 'x1', cardId: 'haun_chop', level: 0 });
@@ -514,18 +514,18 @@ describe('새 기본 동작(카드 250장 확장 2026-10-11)', () => {
     expect(s.exhaust.some((c) => c.uid === copy.uid)).toBe(true);
   });
 
-  it('1파 지속 효과: 기사의 맹세(체력을 잃으면 방어 3) · 오천의 무덤(방어 10 이상으로 차례를 마치면 힘 +1)', () => {
+  it('1파 지속 효과: 기사의 맹세(체력을 잃으면 방어 30) · 오천의 무덤(방어 100 이상으로 차례를 마치면 힘 +1)', () => {
     const s = battle({ world: 'murim', enemies: ['test_ignis'] });
     s.enemies[0].intent = null;
     const p = s.party[0];
     p.statuses.p_knight_oath = 1;
-    _internal.runEffects(s, [{ op: 'lose_hp', amount: 4, target: 'self' }], { source: p });
-    expect(p.block).toBe(3);
+    _internal.runEffects(s, [{ op: 'lose_hp', amount: 40, target: 'self' }], { source: p });
+    expect(p.block).toBe(30);
     p.statuses.p_five_thousand_graves = 1;
-    p.block = 9;
+    p.block = 90;
     endTurn(s);
     expect(p.statuses.strength ?? 0).toBe(0);
-    p.block = 10;
+    p.block = 100;
     endTurn(s);
     expect(p.statuses.strength).toBe(1);
   });

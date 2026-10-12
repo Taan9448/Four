@@ -113,7 +113,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [2, 5], "flag": "silien_seed", "partyHas": "elia"},
-    "content": {"text": "엘리아가 품에서 은빛 씨앗을 꺼내 손바닥에 올렸다. 실리엔이 떠나는 날 쥐여 준 것. 언제든 돌아올 곳이 있다는 뜻의. 얼어붙은 공기 속에서도 씨앗은 희미하게 따뜻했다.", "choices": [{"label": "씨앗에 귀를 기울인다", "condition": {"partyHas": "elia"}, "result": "엘리아의 입술에서 엘프의 말이 흘러나왔다. 실바렌의 결계 앞에서 어머니와 손을 맞잡고 노래하던 그 목소리. 씨앗이 아주 조금 움직였다. 은빛 나무를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_silver_tree"}]}, {"label": "다시 품에 넣어 둔다", "result": "\"아직은 아니에요.\" 엘리아가 씨앗을 품에 넣었다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}]}
+    "content": {"text": "엘리아가 품에서 은빛 씨앗을 꺼내 손바닥에 올렸다. 실리엔이 떠나는 날 쥐여 준 것. 언제든 돌아올 곳이 있다는 뜻의. 얼어붙은 공기 속에서도 씨앗은 희미하게 따뜻했다.", "choices": [{"label": "씨앗에 귀를 기울인다", "condition": {"partyHas": "elia"}, "result": "엘리아의 입술에서 엘프의 말이 흘러나왔다. 실바렌의 결계 앞에서 어머니와 손을 맞잡고 노래하던 그 목소리. 씨앗이 아주 조금 움직였다. 은빛 나무를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_silver_tree"}]}, {"label": "다시 품에 넣어 둔다", "result": "\"아직은 아니에요.\" 엘리아가 씨앗을 품에 넣었다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}]}
   },
   {
     "id": "s3_event_frozen_farm",
@@ -122,7 +122,7 @@
     "name": "얼음 속의 농가",
     "weight": 2,
     "conditions": {"floorRange": [2, 5]},
-    "content": {"text": "들판 전체가 거울처럼 매끄러운 얼음으로 덮여 있고, 그 아래로 풀과 나무와 집들이 그대로 갇혀 있다. 얼음 속의 농가는 굴뚝에서 연기가 피어오르는 모양 그대로 멈춰 있다.", "choices": [{"label": "얼음의 결을 손가락으로 쓸어 본다", "result": "아주 작은 육각형들이 끝없이 이어진 결. 벌집처럼, 눈송이처럼. 너무 촘촘해서, 한 곳이 깨지면 모든 곳이 함께 깨질 것 같았다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "처마 밑에서 눈보라를 피한다", "result": "출전 동료 전원 체력 6 회복", "effects": [{"op": "heal_party", "amount": 6}]}]}
+    "content": {"text": "들판 전체가 거울처럼 매끄러운 얼음으로 덮여 있고, 그 아래로 풀과 나무와 집들이 그대로 갇혀 있다. 얼음 속의 농가는 굴뚝에서 연기가 피어오르는 모양 그대로 멈춰 있다.", "choices": [{"label": "얼음의 결을 손가락으로 쓸어 본다", "result": "아주 작은 육각형들이 끝없이 이어진 결. 벌집처럼, 눈송이처럼. 너무 촘촘해서, 한 곳이 깨지면 모든 곳이 함께 깨질 것 같았다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "처마 밑에서 눈보라를 피한다", "result": "출전 동료 전원 체력 60 회복", "effects": [{"op": "heal_party", "amount": 60}]}]}
   },
   {
     "id": "s3_event_horn",
@@ -141,7 +141,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [7, 7]},
-    "content": {"text": "탑의 계단은 끝이 없었다. 위로 올라갈수록 추워졌다. 엘리아의 손끝에 피운 불꽃이 점점 작아져, 마지막에는 겨우 반딧불만 했다. 그녀의 입술이 파랗게 질렸다.", "choices": [{"label": "엘리아의 손을 잡고 내공을 흘려보낸다", "condition": {"partyHas": "elia"}, "result": "아랫배의 고리를 돌려, 따뜻한 내공을 그녀의 손으로 흘려보냈다. 엘리아가 놀라 그를 보았다가, 손을 빼지 않았다. (엘리아의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}]}, {"label": "숨을 고르며 한 계단씩 오른다", "result": "세 번 짧게, 한 번 길게. (출전 동료 전원 체력 5 회복)", "effects": [{"op": "heal_party", "amount": 5}]}]}
+    "content": {"text": "탑의 계단은 끝이 없었다. 위로 올라갈수록 추워졌다. 엘리아의 손끝에 피운 불꽃이 점점 작아져, 마지막에는 겨우 반딧불만 했다. 그녀의 입술이 파랗게 질렸다.", "choices": [{"label": "엘리아의 손을 잡고 내공을 흘려보낸다", "condition": {"partyHas": "elia"}, "result": "아랫배의 고리를 돌려, 따뜻한 내공을 그녀의 손으로 흘려보냈다. 엘리아가 놀라 그를 보았다가, 손을 빼지 않았다. (엘리아의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}]}, {"label": "숨을 고르며 한 계단씩 오른다", "result": "세 번 짧게, 한 번 길게. (출전 동료 전원 체력 50 회복)", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s3_event_frozen_banquet",
@@ -151,7 +151,7 @@
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [7, 7]},
-    "content": {"text": "연회장에는 잔을 든 귀족들이, 부엌에는 냄비를 젓는 요리사들이 얼음 속에 멈춰 있다. 하운은 그 사이를 걸으며 청운산을 생각했다. 연무장의 제자들, 주방의 잡역들. 그들도 지금 어딘가에서 이렇게 멈춰 있을까.", "choices": [{"label": "얼음 속 얼굴들을 하나하나 본다", "condition": {"partyHas": "kyle"}, "result": "엘리아가 입을 막았다. 보른이 고개를 돌렸다. 카일은 고개를 돌리지 않았다. 마치 그 얼굴들을 모두 기억하려는 것처럼. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "청운산의 부엌을 떠올린다", "result": "솥을 닦고 장작을 패던 손. 그 손이 지금 검을 쥐고 있다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "조용히 지나간다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}]}
+    "content": {"text": "연회장에는 잔을 든 귀족들이, 부엌에는 냄비를 젓는 요리사들이 얼음 속에 멈춰 있다. 하운은 그 사이를 걸으며 청운산을 생각했다. 연무장의 제자들, 주방의 잡역들. 그들도 지금 어딘가에서 이렇게 멈춰 있을까.", "choices": [{"label": "얼음 속 얼굴들을 하나하나 본다", "condition": {"partyHas": "kyle"}, "result": "엘리아가 입을 막았다. 보른이 고개를 돌렸다. 카일은 고개를 돌리지 않았다. 마치 그 얼굴들을 모두 기억하려는 것처럼. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "청운산의 부엌을 떠올린다", "result": "솥을 닦고 장작을 패던 손. 그 손이 지금 검을 쥐고 있다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "조용히 지나간다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s3_event_frozen_library",

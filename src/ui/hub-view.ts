@@ -5,6 +5,7 @@ import { playableStages, type RunState } from '../engine/run';
 import { h } from './dom';
 import { journeyBand, placeName } from './map-view';
 import { installTooltips } from './tooltip';
+import { modeTipAttrs } from './difficulty-text';
 import { openOverlay } from './overlay';
 import { challengeDone, challengeUnlockName, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
 
@@ -35,7 +36,7 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
     h(
       'div',
       { class: 'hub-top' },
-      h('div', { class: 'hub-mode' }, h('span', { class: 'seal', 'aria-hidden': 'true' }, '巡'), h('b', {}, '순례 모드'), h('small', {}, mode)),
+      h('div', { class: 'hub-mode' }, h('span', { class: 'seal', 'aria-hidden': 'true' }, '巡'), h('b', {}, '순례 모드'), h('small', modeTipAttrs(data, run), mode)),
       h(
         'div',
         { class: 'hub-actions' },
