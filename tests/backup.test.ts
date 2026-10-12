@@ -73,11 +73,11 @@ describe('장면 편의(B3)', () => {
   it('처음 보는 장면은 어떤 설정에서도 건너뛰지 않는다', async () => {
     const { sceneSkip, autoAdvanceDelay } = await import('../src/engine/scene');
     for (const mode of ['campaign', 'pilgrimage', 'abyss'] as const)
-      for (const setting of [true, false]) expect(sceneSkip({ seen: false, setting, mode, clears: 3 })).toEqual({ button: false, auto: false });
-    // 캠페인 1회차는 단추만, 순례·다회차는 설정이 켜져 있으면 자동
-    expect(sceneSkip({ seen: true, setting: true, mode: 'campaign', clears: 0 })).toEqual({ button: true, auto: false });
-    expect(sceneSkip({ seen: true, setting: true, mode: 'pilgrimage', clears: 0 })).toEqual({ button: true, auto: true });
-    expect(sceneSkip({ seen: true, setting: false, mode: 'pilgrimage', clears: 1 })).toEqual({ button: true, auto: false });
+      for (const setting of [true, false]) expect(sceneSkip({ seen: false, setting, mode, clears: 3 })).toEqual({ auto: false });
+    // 캠페인 1회차는 자동으로 넘기지 않고, 순례·다회차는 설정이 켜져 있으면 자동
+    expect(sceneSkip({ seen: true, setting: true, mode: 'campaign', clears: 0 })).toEqual({ auto: false });
+    expect(sceneSkip({ seen: true, setting: true, mode: 'pilgrimage', clears: 0 })).toEqual({ auto: true });
+    expect(sceneSkip({ seen: true, setting: false, mode: 'pilgrimage', clears: 1 })).toEqual({ auto: false });
     expect(autoAdvanceDelay('짧다')).toBe(1200);
     expect(autoAdvanceDelay('가'.repeat(30))).toBe(30 * 40 + 600);
   });

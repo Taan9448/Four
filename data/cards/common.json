@@ -420,5 +420,19 @@
   {"id": "common_silver_bell_inn", "name": "은종 여관", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "keywords": ["exhaust"], "effects": [{"op": "heal", "amount": 40, "target": "all_allies"}], "upgrade": {"growth": [10], "plus4": {"name": "따뜻한 수프", "effects": [{"op": "block", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "단골손님", "removeKeywords": ["exhaust"]}}, "flavor": "은종이 달린 문을 열면 장작 연기 냄새. 하일론의 저녁은 늘 이 냄새였다."},
   {"id": "common_strike_together", "name": "동시에 치다", "owner": "common", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 80}, {"op": "damage", "amount": 70, "condition": {"partyHas": "born"}}], "upgrade": {"growth": [20, 20], "plus4": {"name": "불꽃 하나", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "맞춘 숨", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "도끼와 망치가 한 점을 동시에 쳤다. 불꽃이 하나만 튀었다."},
   {"id": "common_count_together", "name": "넷이서 세자", "owner": "common", "type": "skill", "rarity": "epic", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["exhaust"], "castLine": {"speaker": "haun", "face": "resolve", "text": "하나, 둘, 셋, 넷."}, "effects": [{"op": "rift", "amount": -1}, {"op": "rift", "amount": -1, "condition": {"partyHas": "elia"}}, {"op": "rift", "amount": -1, "condition": {"partyHas": "kyle"}}, {"op": "rift", "amount": -1, "condition": {"partyHas": "born"}}, {"op": "draw", "amount": 1}], "upgrade": {"growth": [0, 0, 0, 0, 1], "plus4": {"name": "포갠 손", "effects": [{"op": "block", "amount": 40, "target": "all_allies"}]}, "plus5": {"name": "다섯째 손", "effects": [{"op": "rift", "amount": -1}]}}, "flavor": "네 개의 손이 포개졌다. \"하나, 둘, 셋, 넷.\" 금이 하나씩 닫혔다."},
-  {"id": "common_pull_wedge", "name": "쐐기를 뽑다", "owner": "common", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "all_enemies", "tags": ["haun_rift"], "effects": [{"op": "block", "amount": 40, "target": "self"}, {"op": "damage", "amount": 50, "condition": {"riftGte": 3}}, {"op": "rift", "amount": -3, "condition": {"riftGte": 3}}], "upgrade": {"growth": [0, 20, 0], "plus4": {"name": "금빛 틈", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "깊은 쐐기", "effects": [{"op": "block", "amount": 40, "target": "self"}]}}, "flavor": "금에 박힌 검은 쐐기를 잡아 뽑았다. 틈새로 금빛이 새어 나왔다."}
+  {"id": "common_pull_wedge", "name": "쐐기를 뽑다", "owner": "common", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "all_enemies", "tags": ["haun_rift"], "effects": [{"op": "block", "amount": 40, "target": "self"}, {"op": "damage", "amount": 50, "condition": {"riftGte": 3}}, {"op": "rift", "amount": -3, "condition": {"riftGte": 3}}], "upgrade": {"growth": [0, 20, 0], "plus4": {"name": "금빛 틈", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "깊은 쐐기", "effects": [{"op": "block", "amount": 40, "target": "self"}]}}, "flavor": "금에 박힌 검은 쐐기를 잡아 뽑았다. 틈새로 금빛이 새어 나왔다."},
+  {
+    "id": "common_thunder_charm",
+    "name": "벼락 부적",
+    "owner": "common",
+    "type": "attack",
+    "rarity": "common",
+    "pool": "reward",
+    "cost": {"neigong": 1, "mana": 0},
+    "target": "enemy",
+    "tags": ["elia_shock"],
+    "effects": [{"op": "damage", "amount": 40, "element": "lightning"}],
+    "upgrade": {"growth": [20], "plus4": {"name": "번지는 뇌", "effects": [{"op": "apply_status", "status": "shock", "stacks": 1}]}, "plus5": {"name": "손때 묻은 부적", "cost": {"neigong": 0, "mana": 0}}},
+    "flavor": "무림의 뇌(雷) 자 부적. 엘리아가 보더니 '이것도 결이네요' 했다."
+  }
 ]

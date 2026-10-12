@@ -59,7 +59,7 @@ export type BattleEvent =
   | { type: 'turn'; turn: number }
   | { type: 'card'; cardId: string; sourceUid: string | null }
   | { type: 'attack'; sourceUid: string; targetUids: string[] }
-  | { type: 'damage'; sourceUid: string | null; targetUid: string; amount: number; blocked: number; grain: boolean; absorbed: boolean; crit?: boolean; element?: Element; weak?: boolean; resisted?: boolean }
+  | { type: 'damage'; sourceUid: string | null; targetUid: string; amount: number; blocked: number; grain: boolean; absorbed: boolean; crit?: boolean; element?: Element; weak?: boolean; resisted?: boolean; conducted?: boolean }
   | { type: 'block'; targetUid: string; amount: number }
   | { type: 'heal'; targetUid: string; amount: number }
   | { type: 'status'; targetUid: string; status: string; stacks: number }

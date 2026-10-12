@@ -1,0 +1,10 @@
+id: icons_potions_c
+type: icon-sheet
+summary: 물약 아이콘 24(번개 갈래의 뇌전병) — 칸 n = 물약 icon n+23
+# 칸 번호 = data/potions.json의 icon에서 23을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 물약 아이콘(icons_potions*)과 같은 화풍·크기
+# 2026-10-12 엘리아 3속성(번개) 확장
+frames: 1
+baseline: 0.5
+frame_notes:
+  1: "thunder flask — a small round glass flask filled with pale yellow liquid, a tiny lightning spark inside, cork stopper"
+placeholder: { color: '#5a4a7a', accent: '#f3e58a' }
