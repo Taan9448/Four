@@ -1,0 +1,21 @@
+id: bg_rest
+type: background
+summary: "화면 배경 — 휴식(밤 숲속 빈터, 모닥불 둘레에 모여 쉬는 동료 넷)"
+# 2026-10-12 사용자 요청: 휴식 화면 뒤에 어둡게 깔린다(app.backdrop, 밝기 42%). 가운데 위는 휴식 패널이 덮으므로 차분하게,
+# 모닥불과 네 동료는 아래쪽 가운데와 양옆 아래에 둔다
+frame_notes:
+  1: >-
+    A quiet forest clearing at night where the wuxia world and a western fantasy world meet, seen from a little above and in
+    front. In the lower middle a crackling campfire of stacked logs with warm orange sparks rising, a small iron pot hanging
+    over it. Around the fire, seated low and drawn small (each about one sixth of the image height), the four companions rest
+    together: on the left, Jin Haun, a lean young East Asian swordsman with long straight black hair and long bangs in a plain
+    grey knee-length jacket, sitting cross-legged with a plain thin sword laid across his knees, eyes half closed; next to him
+    Elia, a half-elf mage woman with silver hair tied back and slightly pointed ears, in a grey hooded travelling cloak,
+    hugging her knees with a long wooden staff topped with a blue stone leaning on her shoulder; on the right, Kyle Rowen, a
+    blond slim young knight in silver plate armor with a blue cape, leaning back on one elbow with his longsword stuck in the
+    ground beside him, grinning; next to him Born, a very stocky red-bearded dwarf with three braids, sitting on a log and
+    resting his big two-handed rune war hammer against it, warming his hands. Bedrolls and travel packs lie behind them. Tall
+    dark pine and birch trees frame both sides, with a starry deep-blue night sky and a pale moon at the top. The upper middle
+    of the image is plain dark sky and tree shadow so the middle stays calm. Warm firelight on faces and the ground, cool blue
+    night around the edges.
+placeholder: { color: '#1c1a1f' }

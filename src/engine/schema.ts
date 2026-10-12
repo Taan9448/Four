@@ -117,8 +117,20 @@ export const Scale = z
 export type Scale = z.infer<typeof Scale>;
 
 /** 속성(2026-10-08): 피해에 실려 상태를 붙이고(화염 → 화상, 냉기 → 냉기), 적의 약점·내성에 따라 피해가 달라진다 */
-export const Element = z.enum(['fire', 'ice']);
+export const Element = z.enum(['fire', 'ice', 'lightning']);
 export type Element = z.infer<typeof Element>;
+export const ELEMENTS = Element.options;
+
+/** 속성 하나가 싣는 상태(balance.elements.<속성>) */
+export const ElementRider = z
+  .object({
+    status: z.string(),
+    stacks: z.number().int().positive(),
+    threshold: z.object({ at: z.number().int().positive(), bossAt: z.number().int().positive(), into: z.string() }).strict().optional(),
+    conduct: z.object({ ifTargetHas: z.string(), multiplier: z.number().positive() }).strict().optional(),
+  })
+  .strict();
+export type ElementRider = z.infer<typeof ElementRider>;
 
 export const Effect = z
   .object({
@@ -349,7 +361,7 @@ export const StatusDef = z
     description: z.string(),
     /** 아이콘 그림이 없을 때 표시할 한 글자(한자) */
     glyph: z.string().length(1),
-    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~47 icons_status_d, 48~ icons_status_e(src/ui/icons.ts) */
+    /** 상태 아이콘 번호(1부터): 1~12 icons_status, 13~28 icons_status_b, 29~43 icons_status_c, 44~47 icons_status_d, 48~53 icons_status_e, 54~ icons_status_f(src/ui/icons.ts) */
     icon: z.number().int().positive().optional(),
     /** 턴마다 줄어드는 스택 수. 0이면 줄지 않는다. */
     decay: z.number().int().min(0),
@@ -368,9 +380,11 @@ export const StatusDef = z
       .default({}),
     /** 엔진이 직접 처리하는 메커니즘(카드 개별 코드가 아님) */
     special: z
-      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'chill', 'seal'])
+      .enum(['grain', 'taunt', 'incorporeal', 'flow_eater', 'knot', 'knot_exposed', 'blood_cover', 'hungry', 'unseen', 'seam', 'seal'])
       .optional(),
     triggers: z.array(StatusTrigger).default([]),
+    /** 대상이 이 상태들 중 하나를 갖고 있으면 쌓이지 않는다(빙결 중 감전·마비 중 냉기: 교차 잠금 금지) */
+    blockedBy: z.array(z.string()).default([]),
   })
   .strict();
 export type StatusDef = z.infer<typeof StatusDef>;
@@ -623,16 +637,20 @@ export const Balance = z
       .strict(),
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),
     incorporealMultiplier: z.number(),
-    /** 속성: 실리는 상태와 스택, 약점·내성 배율, 냉기가 몇 스택이면 얼어붙는가(보스는 bossFreezeAt) */
+    /**
+     * 속성(2026-10-12 번개 추가): 속성마다 실리는 상태와 스택.
+     * threshold: 그 상태가 at(보스는 bossAt) 스택에 이르면 비우고 into 상태 1(냉기 → 빙결, 감전 → 마비).
+     * conduct: 대상에 ifTargetHas 상태가 있으면 이 속성 피해 ×multiplier(그 상태는 소모하지 않는다).
+     * opposites: 서로 지우는 속성 쌍(화염↔냉기). 쌍에 없는 속성은 아무것도 지우지 않는다
+     */
     elements: z
       .object({
-        fire: z.object({ status: z.string(), stacks: z.number().int().positive() }).strict(),
-        ice: z.object({ status: z.string(), stacks: z.number().int().positive() }).strict(),
+        fire: ElementRider,
+        ice: ElementRider,
+        lightning: ElementRider,
+        opposites: z.array(z.tuple([Element, Element])),
         weakMultiplier: z.number(),
         resistMultiplier: z.number(),
-        freezeAt: z.number().int().positive(),
-        bossFreezeAt: z.number().int().positive(),
-        freezeStatus: z.string(),
       })
       .strict(),
     /** 치명타: 아군 카드의 피해 한 번마다 굴린다(캐릭터의 crit이 확률을 덮어쓴다) */

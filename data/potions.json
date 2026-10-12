@@ -21,5 +21,6 @@
   {"id": "ring_pill", "icon": 20, "name": "고리 단약", "rarity": "rare", "glyph": "丹", "target": "none", "effects": [{"op": "neigong_max", "amount": 1}], "description": "이번 전투에서 차례마다 차는 내공 +1."},
   {"id": "blood_draught", "icon": 21, "name": "피의 물약", "rarity": "uncommon", "glyph": "血", "target": "ally", "effects": [{"op": "lose_hp", "target": "ally", "amount": 60}, {"op": "apply_status", "target": "ally", "status": "strength", "stacks": 3}], "description": "아군 하나가 체력 60을 잃고 힘 +3."},
   {"id": "freeze_bomb", "icon": 22, "name": "빙결탄", "rarity": "rare", "glyph": "凍", "target": "enemy", "effects": [{"op": "apply_status", "target": "enemy", "status": "bind", "stacks": 1}], "description": "적 하나를 얼려 다음 행동을 막는다(빙결 1)."},
-  {"id": "swift_pill", "icon": 23, "name": "경공환", "rarity": "common", "glyph": "輕", "target": "none", "effects": [{"op": "block", "target": "all_allies", "amount": 60}, {"op": "draw", "amount": 1}], "description": "아군 모두 방어 60, 카드 1장."}
+  {"id": "swift_pill", "icon": 23, "name": "경공환", "rarity": "common", "glyph": "輕", "target": "none", "effects": [{"op": "block", "target": "all_allies", "amount": 60}, {"op": "draw", "amount": 1}], "description": "아군 모두 방어 60, 카드 1장."},
+  {"id": "thunder_flask", "icon": 24, "name": "뇌전병", "rarity": "common", "glyph": "電", "target": "enemy", "effects": [{"op": "damage", "target": "enemy", "amount": 80, "element": "lightning"}, {"op": "apply_status", "target": "enemy", "status": "shock", "stacks": 1}], "description": "적 하나에게 번개 피해 80, 감전 1 추가."}
 ]

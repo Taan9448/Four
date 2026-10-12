@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Frames:
+Cell 1: a short white line appears at the upper right of the center
+Cell 2: a short heavy diagonal cut line from upper right to lower left, white core and pale gold edge
+Cell 3: the cut line at full brightness with a small burst of white chips at its middle
+Cell 4: the cut line fades, chips flying outward
+Cell 5: a faint diagonal afterimage
+Cells 6 to 6 are completely black.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Correct the 48% pixel-grid purity failure. Use rigid identical 4x4 source-pixel squares aligned to one shared straight 4px grid, hard flat color blocks without any softened edges or subpixel detail. Do not imitate the reference's coarse 44x44 resolution; this sheet has 128x128 logical pixels per cell. The common slash track midpoint must be local (256,256) in every frame. Cell 1 is the short upper-right portion of that same fixed track; cells 2-5 grow and fade along the same diagonal, never translate the track. Use 7 flat palette colors total, white and pale gold core with muted outer bands. Last afterimage remains visibly colored, not almost black. Keep all particles within a 40px source-pixel border and leave cell 6 completely black.

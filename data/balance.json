@@ -33,13 +33,15 @@
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,
   "elements": {
-    "fire": { "status": "burn", "stacks": 1 },
-    "ice":  { "status": "chill", "stacks": 1 },
+    "fire":      { "status": "burn",  "stacks": 1 },
+    "ice":       { "status": "chill", "stacks": 1,
+                   "threshold": { "at": 3, "bossAt": 5, "into": "bind" } },
+    "lightning": { "status": "shock", "stacks": 1,
+                   "threshold": { "at": 3, "bossAt": 5, "into": "paralyze" },
+                   "conduct": { "ifTargetHas": "chill", "multiplier": 1.5 } },
+    "opposites": [["fire", "ice"]],
     "weakMultiplier": 1.5,
-    "resistMultiplier": 0.5,
-    "freezeAt": 3,
-    "bossFreezeAt": 5,
-    "freezeStatus": "bind"
+    "resistMultiplier": 0.5
   },
   "crit": { "chance": 0.08, "multiplier": 1.5 },
   "leveling": {

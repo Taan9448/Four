@@ -1,0 +1,49 @@
+{
+  "id": "card_art_lightning",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 12,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 12,
+  "sourceHash": "789a4c0fdc10d5f7",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "elia_discharge",
+    "elia_thunderbolt",
+    "elia_violet_lightning",
+    "common_thunder_charm",
+    "elia_staff",
+    "elia_sprout",
+    "elia_fog_herb",
+    "elia_part_river",
+    "elia_layer_ward",
+    "elia_fog_herb_smoke",
+    "abyss_elia_borrowed_river",
+    "abyss_elia_stolen_flow"
+  ],
+  "redraws": true
+}
