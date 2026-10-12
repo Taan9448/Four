@@ -147,7 +147,7 @@
 
 ## 5. 프롬프트·팔레트 데이터
 
-도구가 이 블록을 읽습니다. 영어로 씁니다. `palette`는 전투(픽셀) 마스터 팔레트(32색)로, 자르기 도구가 모든 픽셀을 이 중 가장 가까운 색으로 맞춥니다.
+도구가 이 블록을 읽습니다. 영어로 씁니다. `palette`는 전투(픽셀) 마스터 팔레트(35색 — 2026-10-12 사용자 결정으로 밝은 보라 3단계 `#6b4fa3`·`#a35cff`·`#d4b8ff` 추가: 저주·틈 이펙트의 보라가 은회색으로 바뀌던 문제)로, 자르기 도구가 모든 픽셀을 이 중 가장 가까운 색으로 맞춥니다.
 `illustration_style`은 이야기 갈래(card-art, portrait, story-cg, character-sheet, character-standing) 프롬프트에 들어갑니다.
 
 <!-- prompt-data -->
@@ -199,6 +199,9 @@ palette:
   - '#8fd3ff'
   - '#dff4ff'
   - '#4b3a6b'
+  - '#6b4fa3'
+  - '#a35cff'
+  - '#d4b8ff'
 subjects:
   haun: >-
     Jin Haun, a lean, wiry seventeen-year-old East Asian woodcutter, a lowly servant of the Cheongun sect, with a
