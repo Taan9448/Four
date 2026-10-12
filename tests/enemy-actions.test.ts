@@ -6,7 +6,7 @@ import { EnemyDef } from '../src/engine/schema';
 import { battle, cards, data, give } from './helpers';
 
 const def = (o: Record<string, unknown>) => {
-  const e = EnemyDef.parse({ maxHp: 100, pattern: 'cycle', ...o });
+  const e = EnemyDef.parse({ maxHp: 1000, pattern: 'cycle', ...o });
   data.enemies.set(e.id, e);
   return e;
 };
@@ -17,7 +17,7 @@ describe('적 행동', () => {
       id: 't_caller', name: '부르는 자',
       moves: [
         { id: 'call', name: '부른다', intent: 'special', oncePerBattle: true, effects: [{ op: 'summon', enemy: 'test_wolf', count: 9 }] },
-        { id: 'wait', name: '기다린다', intent: 'defend', effects: [{ op: 'block', amount: 1 }] },
+        { id: 'wait', name: '기다린다', intent: 'defend', effects: [{ op: 'block', amount: 10 }] },
       ],
     });
     const s = battle({ enemies: ['t_caller'] });
@@ -39,26 +39,26 @@ describe('적 행동', () => {
     def({
       id: 't_rage', name: '분노',
       moves: [
-        { id: 'rage', name: '분노', intent: 'attack', condition: { hpRatioLte: 0.5 }, effects: [{ op: 'damage', amount: 1 }] },
-        { id: 'calm', name: '침착', intent: 'defend', effects: [{ op: 'block', amount: 1 }] },
+        { id: 'rage', name: '분노', intent: 'attack', condition: { hpRatioLte: 0.5 }, effects: [{ op: 'damage', amount: 10 }] },
+        { id: 'calm', name: '침착', intent: 'defend', effects: [{ op: 'block', amount: 10 }] },
       ],
     });
     const s = battle({ enemies: ['t_rage'] });
     expect(s.enemies[0].intent?.moveId).toBe('calm');
     endTurn(s);
     expect(s.enemies[0].intent?.moveId).toBe('calm');
-    s.enemies[0].hp = 40;
+    s.enemies[0].hp = 400;
     endTurn(s);
     expect(s.enemies[0].intent?.moveId).toBe('rage');
   });
 
-  it('독기: 손에 든 채 턴이 끝나면 하운 체력 3, 내공 1로 털어 내면(소멸) 아프지 않다', () => {
+  it('독기: 손에 든 채 턴이 끝나면 하운 체력 30, 내공 1로 털어 내면(소멸) 아프지 않다', () => {
     const s = battle({ deck: cards('haun_step', 'haun_step', 'haun_step', 'haun_step', 'haun_step', 'haun_step') });
     for (const e of s.enemies) e.intent = null;
     give(s, 'status_miasma');
     const hp = s.party[0].hp;
     endTurn(s);
-    expect(s.party[0].hp).toBe(hp - 3);
+    expect(s.party[0].hp).toBe(hp - 30);
     for (const e of s.enemies) e.intent = null;
     const i = give(s, 'status_miasma');
     expect(playCard(s, i).ok).toBe(true);
@@ -70,7 +70,7 @@ describe('적 행동', () => {
 
   it('끊긴 숨: 차례 시작에 하운의 카드만 버린다', () => {
     const s = battle({
-      party: [{ id: 'haun', hp: 60, maxHp: 60 }, { id: 'kyle', hp: 52, maxHp: 52 }],
+      party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'kyle', hp: 520, maxHp: 520 }],
       deck: cards('haun_chop', 'kyle_strike', 'kyle_strike', 'kyle_strike', 'kyle_strike', 'kyle_strike', 'kyle_guard', 'kyle_guard', 'kyle_guard', 'kyle_guard'),
     });
     for (const e of s.enemies) e.intent = null;
@@ -85,12 +85,12 @@ describe('적 행동', () => {
     expect(s.hand).toHaveLength(4);
   });
 
-  it('가시: 공격을 맞을 때마다 때린 쪽이 스택만큼 피해를 입는다', () => {
+  it('가시: 공격을 맞을 때마다 때린 쪽이 스택 × 10만큼 피해를 입는다', () => {
     const s = battle();
-    for (const e of s.enemies) e.hp = e.maxHp = 999;
+    for (const e of s.enemies) e.hp = e.maxHp = 9999;
     addStatus(s, s.enemies[0], 'thorns', 2);
     const hp = s.party[0].hp;
     playCard(s, give(s, 'haun_cloud_form'), s.enemies[0].uid);
-    expect(s.party[0].hp).toBe(hp - 2 * 2);
+    expect(s.party[0].hp).toBe(hp - 2 * 2 * 10);
   });
 });

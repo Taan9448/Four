@@ -5,7 +5,7 @@
     "type": "story",
     "name": "붉은 평원",
     "once": true,
-    "content": {"scene": "s2_scene_red_plain", "text": "서쪽으로 가는 길은 온통 붉었다. 녹슨 쇠의 붉음, 마른 피의 붉음. 피난민 행렬이 동쪽으로 멀어진다. 붉은 먼지가 일었다가 가라앉았다.", "choices": [{"label": "\"구할게.\"", "result": "토마가 고개를 끄덕이고 수레를 향해 달려갔다. 하운은 그 약속을 지고 서쪽으로 걷는다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "heal_party", "amount": 6}]}, {"label": "카일과 새벽 대련을 한 번 더 한다", "condition": {"partyHas": "kyle"}, "result": "\"오늘은 결이 보일 거야!\" 서른 합째, 카일의 목검이 다시 하운이 힘을 넘기는 이음매를 노리고 들어왔다. (카일의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아와 숨을 맞춘다", "condition": {"partyHas": "elia"}, "result": "세 번 짧게, 한 번 길게. 엘리아가 그 박자에 맞춰, 조용히, 같이 숨을 쉬었다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+    "content": {"scene": "s2_scene_red_plain", "text": "서쪽으로 가는 길은 온통 붉었다. 녹슨 쇠의 붉음, 마른 피의 붉음. 피난민 행렬이 동쪽으로 멀어진다. 붉은 먼지가 일었다가 가라앉았다.", "choices": [{"label": "\"구할게.\"", "result": "토마가 고개를 끄덕이고 수레를 향해 달려갔다. 하운은 그 약속을 지고 서쪽으로 걷는다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "heal_party", "amount": 60}]}, {"label": "카일과 새벽 대련을 한 번 더 한다", "condition": {"partyHas": "kyle"}, "result": "\"오늘은 결이 보일 거야!\" 서른 합째, 카일의 목검이 다시 하운이 힘을 넘기는 이음매를 노리고 들어왔다. (카일의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아와 숨을 맞춘다", "condition": {"partyHas": "elia"}, "result": "세 번 짧게, 한 번 길게. 엘리아가 그 박자에 맞춰, 조용히, 같이 숨을 쉬었다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
   },
   {
     "id": "s2_boss_ignis",
@@ -113,7 +113,7 @@
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [2, 3]},
-    "content": {"text": "행렬에서 처진 수레 한 대. 갈비뼈가 드러난 소가 붉은 풀밭에 주저앉았다. 수레 위에는 붉은 재에 덮인 아이 둘과 노인 하나. 화로에서 쫓겨난 사람들이다. 쓸모가 없다고.", "choices": [{"label": "평원 토끼를 구워 함께 먹는다", "result": "아이들의 얼굴에서 눈만 하얗게 빛났다. 노인이 처음으로 웃었다. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}, {"label": "짐을 덜어 수레에 실어 하일론으로 보낸다", "result": "하일론으로 가면 길드의 보호를 받을 수 있을 것이다. 짐이 가벼워졌다. (몸이 가벼워졌다 — 카드 1장이 강화됐다)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "행렬에서 처진 수레 한 대. 갈비뼈가 드러난 소가 붉은 풀밭에 주저앉았다. 수레 위에는 붉은 재에 덮인 아이 둘과 노인 하나. 화로에서 쫓겨난 사람들이다. 쓸모가 없다고.", "choices": [{"label": "평원 토끼를 구워 함께 먹는다", "result": "아이들의 얼굴에서 눈만 하얗게 빛났다. 노인이 처음으로 웃었다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}, {"label": "짐을 덜어 수레에 실어 하일론으로 보낸다", "result": "하일론으로 가면 길드의 보호를 받을 수 있을 것이다. 짐이 가벼워졌다. (몸이 가벼워졌다 — 카드 1장이 강화됐다)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s2_event_ash_wind",
@@ -122,7 +122,7 @@
     "name": "화산재 바람",
     "weight": 2,
     "conditions": {"floorRange": [2, 5]},
-    "content": {"text": "바람이 협곡에서 이쪽으로 분다. 풀잎을 손으로 쓸면 손바닥에 붉은 가루가 묻어난다. 밤이 되면 지평선의 연기 아래가 희미하게 붉게 빛났다. 땅속에서 불이 숨을 쉬는 것처럼.", "choices": [{"label": "바람을 등지고 걷는다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}, {"label": "붉은 가루가 흘러가는 길을 읽는다", "result": "바람에도 결이 있었다. 협곡이 숨을 쉬는 쪽이 보였다. (카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "바람이 협곡에서 이쪽으로 분다. 풀잎을 손으로 쓸면 손바닥에 붉은 가루가 묻어난다. 밤이 되면 지평선의 연기 아래가 희미하게 붉게 빛났다. 땅속에서 불이 숨을 쉬는 것처럼.", "choices": [{"label": "바람을 등지고 걷는다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}, {"label": "붉은 가루가 흘러가는 길을 읽는다", "result": "바람에도 결이 있었다. 협곡이 숨을 쉬는 쪽이 보였다. (카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s2_event_ore_cart",
@@ -132,7 +132,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "협곡을 내려다보는 절벽 위 바위틈. 화로 앞 노예들의 발목 사슬은 모두 큰 화로와 이어져 있다. 사슬을 하나 끊으면 묶인 사람에게 불이 흘러 들어간다. \"안으로 들어가야 한다.\" 보른이 말했다.", "choices": [{"label": "\"내가 들어간다.\" 보른이 먼저 걸어 내려간다", "condition": {"partyHas": "born"}, "result": "보른은 도끼를 바닥에 던지고 양손을 들었다. 빈 갑옷이 그의 발목에 사슬을 채웠다. 그는 한 번도 뒤를 돌아보지 않았다. \"우리 사람들이 저기 있다.\" (이그니스와 싸울 때 보른이 큰 화로를 친다)", "effects": [{"op": "set_flag", "flag": "s2_born_inside"}]}, {"label": "광석 수레 바닥, 흑철 원석 사이에 몸을 묻는다", "result": "무겁고, 날카롭고, 뜨거웠다. 옷이 그을렸다. 광석 틈으로 화로들이 지나갔다. 덜컹, 덜컹. (출전 동료 전원 체력 5 손실, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -5}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 신호를 정한다 — \"푸른빛이 보이면.\"", "condition": {"partyHas": "elia"}, "result": "하운이 검을 반쯤 뽑아 보였다. 엘리아는 절벽 위에 남아, 신호가 오면 협곡 반대편 끝에서 큰불을 일으키기로 했다. 불기둥을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_firestorm"}]}]}
+    "content": {"text": "협곡을 내려다보는 절벽 위 바위틈. 화로 앞 노예들의 발목 사슬은 모두 큰 화로와 이어져 있다. 사슬을 하나 끊으면 묶인 사람에게 불이 흘러 들어간다. \"안으로 들어가야 한다.\" 보른이 말했다.", "choices": [{"label": "\"내가 들어간다.\" 보른이 먼저 걸어 내려간다", "condition": {"partyHas": "born"}, "result": "보른은 도끼를 바닥에 던지고 양손을 들었다. 빈 갑옷이 그의 발목에 사슬을 채웠다. 그는 한 번도 뒤를 돌아보지 않았다. \"우리 사람들이 저기 있다.\" (이그니스와 싸울 때 보른이 큰 화로를 친다)", "effects": [{"op": "set_flag", "flag": "s2_born_inside"}]}, {"label": "광석 수레 바닥, 흑철 원석 사이에 몸을 묻는다", "result": "무겁고, 날카롭고, 뜨거웠다. 옷이 그을렸다. 광석 틈으로 화로들이 지나갔다. 덜컹, 덜컹. (출전 동료 전원 체력 50 손실, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -50}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 신호를 정한다 — \"푸른빛이 보이면.\"", "condition": {"partyHas": "elia"}, "result": "하운이 검을 반쯤 뽑아 보였다. 엘리아는 절벽 위에 남아, 신호가 오면 협곡 반대편 끝에서 큰불을 일으키기로 했다. 불기둥을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_firestorm"}]}]}
   },
   {
     "id": "s2_event_furnaces",
@@ -142,7 +142,7 @@
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "절벽 사이의 바닥은 검게 굳은 용암이었고, 그 위로 거대한 화로들이 줄지어 서 있었다. 망치 소리가 협곡 벽에 부딪혀 끝없이 메아리쳤다. 쾅, 쾅, 쾅. 쉬지 않고. 밤낮없이.", "choices": [{"label": "카일과 함께 센다", "condition": {"partyHas": "kyle"}, "result": "\"화로가 서른둘. 화로마다 사람이 열에서 스물. 감시하는 놈들은 빈 갑옷이 백쯤. 그리고 저기.\" 협곡 가장 안쪽, 흰 불길의 큰 화로와 절벽을 깎은 빈 옥좌. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아가 마나의 흐름을 읽는다", "condition": {"partyHas": "elia"}, "result": "\"마법 사슬이에요. 모든 사슬이 큰 화로와 이어져 있어요. 협곡 더 깊은 곳에서 무언가 큰 마나가 꿈틀거려요.\" 엘리아가 실바렌에서 어머니와 펼쳤던 결계를 손끝으로 되짚었다. 초록 결계를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_green_ward"}]}, {"label": "바위틈에 엎드려 밤을 기다린다", "result": "출전 동료 전원 체력 6 회복", "effects": [{"op": "heal_party", "amount": 6}]}]}
+    "content": {"text": "절벽 사이의 바닥은 검게 굳은 용암이었고, 그 위로 거대한 화로들이 줄지어 서 있었다. 망치 소리가 협곡 벽에 부딪혀 끝없이 메아리쳤다. 쾅, 쾅, 쾅. 쉬지 않고. 밤낮없이.", "choices": [{"label": "카일과 함께 센다", "condition": {"partyHas": "kyle"}, "result": "\"화로가 서른둘. 화로마다 사람이 열에서 스물. 감시하는 놈들은 빈 갑옷이 백쯤. 그리고 저기.\" 협곡 가장 안쪽, 흰 불길의 큰 화로와 절벽을 깎은 빈 옥좌. (카일의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아가 마나의 흐름을 읽는다", "condition": {"partyHas": "elia"}, "result": "\"마법 사슬이에요. 모든 사슬이 큰 화로와 이어져 있어요. 협곡 더 깊은 곳에서 무언가 큰 마나가 꿈틀거려요.\" 엘리아가 실바렌에서 어머니와 펼쳤던 결계를 손끝으로 되짚었다. 초록 결계를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_green_ward"}]}, {"label": "바위틈에 엎드려 밤을 기다린다", "result": "출전 동료 전원 체력 60 회복", "effects": [{"op": "heal_party", "amount": 60}]}]}
   },
   {
     "id": "s2_event_hans_anvil",
@@ -153,7 +153,7 @@
     "once": true,
     "tags": ["scar"],
     "conditions": {"floorRange": [6, 7]},
-    "content": {"scene": "s2_scene_hans_anvil", "text": "가장 큰 모루 앞의 사내가 망치를 내리칠 때마다 쇠를 들여다본다. 아주 짧게, 그러나 정확히. 그가 두드리는 것은 사람 팔뚝만 한 검은 쐐기였다. 몸통에 물결처럼 흐르는 문자가 새겨지고 있다.", "choices": [{"label": "쐐기의 표면을 손가락으로 쓸어 본다", "result": "엉켜 있었다. 쇠의 결 위로, 결을 잃은 마나가 반대 방향으로 감겨 소용돌이쳤다. 그가 검을 내리친 자리의 허공에 검은 금이 그어질 때 손끝에 남던 감각과 똑같았다. 손가락이 떨렸다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "\"토마도 그렇게 말했습니다.\"", "condition": {"flag": "promise_toma"}, "result": "한스의 입가가 아주 조금 올라갔다. 이 년 만에 처음 웃는 것처럼 어색한 웃음이었다. 그가 망치 소리에 섞어 검 다루는 법 하나를 일러 주었다. (고른 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "망치 소리에 묻혀 물러난다", "result": "출전 동료 전원 체력 5 회복", "effects": [{"op": "heal_party", "amount": 5}]}]}
+    "content": {"scene": "s2_scene_hans_anvil", "text": "가장 큰 모루 앞의 사내가 망치를 내리칠 때마다 쇠를 들여다본다. 아주 짧게, 그러나 정확히. 그가 두드리는 것은 사람 팔뚝만 한 검은 쐐기였다. 몸통에 물결처럼 흐르는 문자가 새겨지고 있다.", "choices": [{"label": "쐐기의 표면을 손가락으로 쓸어 본다", "result": "엉켜 있었다. 쇠의 결 위로, 결을 잃은 마나가 반대 방향으로 감겨 소용돌이쳤다. 그가 검을 내리친 자리의 허공에 검은 금이 그어질 때 손끝에 남던 감각과 똑같았다. 손가락이 떨렸다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "\"토마도 그렇게 말했습니다.\"", "condition": {"flag": "promise_toma"}, "result": "한스의 입가가 아주 조금 올라갔다. 이 년 만에 처음 웃는 것처럼 어색한 웃음이었다. 그가 망치 소리에 섞어 검 다루는 법 하나를 일러 주었다. (고른 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "망치 소리에 묻혀 물러난다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s2_event_old_dwarf",
@@ -163,7 +163,7 @@
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [6, 7], "partyHas": "born"},
-    "content": {"text": "화로의 불길이 가장 뜨거운 자리. 수염이 하얗게 세고 한쪽 눈이 먼 늙은 드워프가 망치를 쥔 채 떨고 있다. 망치 소리 사이로 드워프의 말이 들린다. 하운은 알아듣지 못했다. 그러나 그 이름만은 알아들었다. 두린.", "choices": [{"label": "보른이 고개를 든다", "condition": {"partyHas": "born"}, "result": "늙은 드워프의 멀지 않은 한쪽 눈에서 눈물이 흘렀다. 눈물은 화로의 열기에 금세 말라 버렸다. 그가 쥐고 있던 대장장이의 망치를 보른의 손에 쥐여 주었다. (보른의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "망치 소리에 숨을 맞춘다", "result": "세 번 짧게, 한 번 길게. 쾅, 쾅, 쾅. (출전 동료 전원 체력 6 회복)", "effects": [{"op": "heal_party", "amount": 6}]}]}
+    "content": {"text": "화로의 불길이 가장 뜨거운 자리. 수염이 하얗게 세고 한쪽 눈이 먼 늙은 드워프가 망치를 쥔 채 떨고 있다. 망치 소리 사이로 드워프의 말이 들린다. 하운은 알아듣지 못했다. 그러나 그 이름만은 알아들었다. 두린.", "choices": [{"label": "보른이 고개를 든다", "condition": {"partyHas": "born"}, "result": "늙은 드워프의 멀지 않은 한쪽 눈에서 눈물이 흘렀다. 눈물은 화로의 열기에 금세 말라 버렸다. 그가 쥐고 있던 대장장이의 망치를 보른의 손에 쥐여 주었다. (보른의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "망치 소리에 숨을 맞춘다", "result": "세 번 짧게, 한 번 길게. 쾅, 쾅, 쾅. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}]}
   },
   {
     "id": "s2_rest_red_camp",

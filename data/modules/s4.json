@@ -101,7 +101,7 @@
     "name": "오므라드는 동굴",
     "weight": 1,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다. (적 전원 힘 1)", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +8)", "effects": [{"op": "block", "amount": 8, "target": "self"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다. (적 전원 힘 1)", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +80)", "effects": [{"op": "block", "amount": 80, "target": "self"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s4_event_wall_left",
@@ -111,7 +111,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [2, 2], "partyHas": "born"},
-    "content": {"text": "보른이 벽의 문자를 손가락으로 쓸며 읽었다. \"'여기서 왼쪽 벽이 약하다. 보른, 기대지 마라.'\"", "choices": [{"label": "오른쪽 벽에 붙어 걷는다", "result": "아무도 왼쪽 벽에 기대지 않았다. 출전 동료 전원 체력 6 회복.", "effects": [{"op": "heal_party", "amount": 6}]}, {"label": "약한 벽의 결을 짚어 본다", "result": "바위의 결 위를 무겁고 느린 결이 짓누르고 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+    "content": {"text": "보른이 벽의 문자를 손가락으로 쓸며 읽었다. \"'여기서 왼쪽 벽이 약하다. 보른, 기대지 마라.'\"", "choices": [{"label": "오른쪽 벽에 붙어 걷는다", "result": "아무도 왼쪽 벽에 기대지 않았다. 출전 동료 전원 체력 60 회복.", "effects": [{"op": "heal_party", "amount": 60}]}, {"label": "약한 벽의 결을 짚어 본다", "result": "바위의 결 위를 무겁고 느린 결이 짓누르고 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
   },
   {
     "id": "s4_event_wall_ceiling",
@@ -121,7 +121,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [3, 3], "partyHas": "born"},
-    "content": {"text": "\"'여기서 천장이 낮다. 보른, 머리 조심.'\" 보른이 그 문자 앞에서 한참 서 있다가 몸을 낮췄다.", "choices": [{"label": "보른의 걸음을 따라 몸을 낮춘다", "result": "형이 남긴 길이었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "카일이 장난처럼 머리를 감싼다", "condition": {"partyHas": "kyle"}, "result": "보른의 수염이 아주 조금 움직였다. 출전 동료 전원 체력 5 회복.", "effects": [{"op": "heal_party", "amount": 5}]}]}
+    "content": {"text": "\"'여기서 천장이 낮다. 보른, 머리 조심.'\" 보른이 그 문자 앞에서 한참 서 있다가 몸을 낮췄다.", "choices": [{"label": "보른의 걸음을 따라 몸을 낮춘다", "result": "형이 남긴 길이었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "카일이 장난처럼 머리를 감싼다", "condition": {"partyHas": "kyle"}, "result": "보른의 수염이 아주 조금 움직였다. 출전 동료 전원 체력 50 회복.", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s4_event_wall_almost",
@@ -169,7 +169,7 @@
     "name": "찌그러진 갑옷 더미",
     "weight": 2,
     "conditions": {"floorRange": [6, 8]},
-    "content": {"text": "바위가 정확히, 마치 계산된 것처럼 무너져 있었다. 그 아래 찌그러진 빈 갑옷들. 산의 매듭을 쳐서 산을 무너뜨린 자의 솜씨였다.", "choices": [{"label": "갑옷 사이에서 드워프의 끌을 찾는다", "result": "무너진 바위가 어깨를 긁었다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 4 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -4}]}, {"label": "묵념하고 지나간다", "result": "출전 동료 전원 체력 5 회복.", "effects": [{"op": "heal_party", "amount": 5}]}]}
+    "content": {"text": "바위가 정확히, 마치 계산된 것처럼 무너져 있었다. 그 아래 찌그러진 빈 갑옷들. 산의 매듭을 쳐서 산을 무너뜨린 자의 솜씨였다.", "choices": [{"label": "갑옷 사이에서 드워프의 끌을 찾는다", "result": "무너진 바위가 어깨를 긁었다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 40 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -40}]}, {"label": "묵념하고 지나간다", "result": "출전 동료 전원 체력 50 회복.", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s4_event_narrowing",
@@ -178,7 +178,7 @@
     "name": "좁혀 드는 갱도",
     "weight": 2,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "천장이 낮아졌다. 벽이 좁혀 들었다. 산이 조금씩, 주먹을 쥐듯이 오므라들고 있었다.", "choices": [{"label": "보른이 바위의 결로 길을 연다", "condition": {"partyHas": "born"}, "result": "돌이 결을 따라 비켜났다. 출전 동료 전원 체력 6 회복, 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "heal_party", "amount": 6}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "벽 사이를 밀고 나간다", "result": "바위에 쓸린 상처가 남았다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 5 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -5}]}]}
+    "content": {"text": "천장이 낮아졌다. 벽이 좁혀 들었다. 산이 조금씩, 주먹을 쥐듯이 오므라들고 있었다.", "choices": [{"label": "보른이 바위의 결로 길을 연다", "condition": {"partyHas": "born"}, "result": "돌이 결을 따라 비켜났다. 출전 동료 전원 체력 60 회복, 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "heal_party", "amount": 60}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "벽 사이를 밀고 나간다", "result": "바위에 쓸린 상처가 남았다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 50 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -50}]}]}
   },
   {
     "id": "s4_rest_drinkable",

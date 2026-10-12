@@ -21,7 +21,7 @@ export function cards(...ids: string[]): CardInstance[] {
 export function battle(overrides: Partial<BattleSetup> = {}): BattleState {
   const s = createBattle(data, {
     world: 'elheim',
-    party: [{ id: 'haun', hp: 60, maxHp: 60 }],
+    party: [{ id: 'haun', hp: 600, maxHp: 600 }],
     enemies: ['test_wolf'],
     deck: cards('haun_chop', 'haun_chop', 'haun_step', 'haun_step', 'haun_read_grain'),
     mana: 10,

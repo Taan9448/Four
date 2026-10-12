@@ -103,29 +103,29 @@ describe('상점', () => {
 describe('유물', () => {
   it('전투 시작·차례 시작에 효과가 일어난다', () => {
     const s = battle({ relics: ['iron_bracer', 'moon_pendant'] });
-    // 전투 시작 방어 5 + 첫 차례 시작 방어 3
-    expect(s.party[0].block).toBe(8);
+    // 전투 시작 방어 50 + 첫 차례 시작 방어 30
+    expect(s.party[0].block).toBe(80);
     expect(s.events.some((e) => e.type === 'relic' && e.relicId === 'iron_bracer')).toBe(true);
   });
 
   it('적이 쓰러질 때 효과가 일어난다', () => {
-    const s = battle({ relics: ['blood_oath'], party: [{ id: 'haun', hp: 40, maxHp: 60 }] });
-    _internal.dealDamage(s, s.party[0], s.enemies[0], 999, { source: s.party[0] });
+    const s = battle({ relics: ['blood_oath'], party: [{ id: 'haun', hp: 400, maxHp: 600 }] });
+    _internal.dealDamage(s, s.party[0], s.enemies[0], 99999, { source: s.party[0] });
     expect(s.result).toBe('victory');
-    expect(s.party[0].hp).toBe(43);
+    expect(s.party[0].hp).toBe(430);
   });
 
   it('얻는 순간·이긴 뒤·휴식 뒤 효과', () => {
     const run = createRunAt(data, 'RELIC', 's2');
     const hp = run.roster.map((r) => r.maxHp);
     gainRelic(data, run, 'silver_leaf');
-    expect(run.roster.map((r) => r.maxHp)).toEqual(hp.map((x) => x + 6));
+    expect(run.roster.map((r) => r.maxHp)).toEqual(hp.map((x) => x + 60));
     gainRelic(data, run, 'herb_pouch');
-    for (const r of run.roster) r.hp = 10;
+    for (const r of run.roster) r.hp = 100;
     const module = [...data.modules.values()].find((m) => m.stage === 's2' && m.type === 'battle')!;
     const enc: Encounter = { node: node('battle'), module: { ...module, content: { ...module.content, clearEffects: [] } } };
-    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: 10 })), mana: run.mana, scarGain: 0 });
-    expect(run.roster.find((r) => r.id === 'haun')!.hp).toBe(14);
+    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: 100 })), mana: run.mana, scarGain: 0 });
+    expect(run.roster.find((r) => r.id === 'haun')!.hp).toBe(140);
     gainRelic(data, run, 'cloud_tea');
     const rest = data.modules.get('s2_rest_red_camp')!;
     const before = run.roster.find((r) => r.id === 'haun')!.hp;
@@ -145,7 +145,7 @@ describe('물약', () => {
     expect(enemy.hp).toBeLessThan(hp);
     expect(s.potions[0]).toBeNull();
     expect(usePotion(s, 0, enemy.uid).ok).toBe(false); // 빈 칸
-    _internal.dealDamage(s, s.party[0], enemy, 999, { source: s.party[0] });
+    _internal.dealDamage(s, s.party[0], enemy, 99999, { source: s.party[0] });
     expect(battleOutcome(s)!.potions).toEqual([null, 'wound_salve', null]);
   });
 });

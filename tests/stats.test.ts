@@ -34,7 +34,7 @@ describe('결과 화면 통계', () => {
 
   it('지면 어디서 무엇에 쓰러졌는지 남는다. 옛 저장에는 빈 통계가 붙는다', () => {
     const s = battle();
-    loseHp(s, s.party[0], 999);
+    loseHp(s, s.party[0], 9999);
     const run = createRunAt(data, 'STAT2', 's3');
     const e = enc();
     applyBattleOutcome(data, run, e, battleOutcome(s)!);
@@ -49,7 +49,7 @@ describe('결과 화면 통계', () => {
 describe('의도 이름표·도감의 기술 기록', () => {
   it('적 행동의 피해 말고 하는 일을 짧은 이름표로(방어·강화·카드·소환)', async () => {
     const { intentBadges } = await import('../src/engine/battle');
-    expect(intentBadges(data, [{ op: 'block', amount: 12 }, { op: 'apply_status', status: 'strength', stacks: 2, target: 'self' }])).toEqual(['방어 12', '힘 +2']);
+    expect(intentBadges(data, [{ op: 'block', amount: 120 }, { op: 'apply_status', status: 'strength', stacks: 2, target: 'self' }])).toEqual(['방어 120', '힘 +2']);
     expect(intentBadges(data, [{ op: 'add_card', card: 'status_miasma', to: 'discard' }, { op: 'summon', enemy: 'test_wolf', count: 2 }])).toEqual(['독기 +1', `소환: ${data.enemies.get('test_wolf')!.name} ×2`]);
   });
 
@@ -63,7 +63,7 @@ describe('의도 이름표·도감의 기술 기록', () => {
 
   it('전투 집계는 적이 쓴 행동을 적 id마다 모은다', () => {
     const s = battle();
-    for (const e of s.enemies) e.hp = e.maxHp = 999;
+    for (const e of s.enemies) e.hp = e.maxHp = 9999;
     const move = s.enemies[0].intent!.moveId;
     endTurn(s);
     expect(s.tally!.moves![s.enemies[0].defId]).toContain(move);

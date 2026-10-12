@@ -37,7 +37,7 @@
     "name": "첫 굽이의 물결",
     "weight": 3,
     "conditions": {"floorRange": [3, 5]},
-    "content": {"text": "계단마다 횃불이 타오른다. 혈교도의 첫 물결이 굽이를 타고 쏟아져 내려온다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"전진!\" 쿵. 방패벽이 첫 물결을 받아 낸다. (아군 전원 방어 6)", "effects": [{"op": "block", "amount": 6, "target": "all_allies"}]}}
+    "content": {"text": "계단마다 횃불이 타오른다. 혈교도의 첫 물결이 굽이를 타고 쏟아져 내려온다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"전진!\" 쿵. 방패벽이 첫 물결을 받아 낸다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}}
   },
   {
     "id": "s8_battle_vajra",
@@ -55,7 +55,7 @@
     "name": "태극검진의 왼편",
     "weight": 3,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "왼편 절벽에서 혈교도가 뛰어내리고, 위에서는 활시위 소리가 난다. 무당의 도사들이 원을 그리며 칼끝을 흘린다.", "enemies": ["blood_cultist", "stair_archer"], "bonus": {"condition": {"flag": "formation_taiji"}, "text": "태극검진이 측면을 흘린다. (하운 방어 10)", "effects": [{"op": "block", "amount": 10, "target": "self"}]}}
+    "content": {"text": "왼편 절벽에서 혈교도가 뛰어내리고, 위에서는 활시위 소리가 난다. 무당의 도사들이 원을 그리며 칼끝을 흘린다.", "enemies": ["blood_cultist", "stair_archer"], "bonus": {"condition": {"flag": "formation_taiji"}, "text": "태극검진이 측면을 흘린다. (하운 방어 100)", "effects": [{"op": "block", "amount": 100, "target": "self"}]}}
   },
   {
     "id": "s8_battle_arrow_rain",
@@ -64,7 +64,7 @@
     "name": "화살 비",
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "위쪽 굽이에서 화살이 쏟아진다. 방패에 꽂히는 소리가 빗소리 같다.", "enemies": ["stair_archer", "stair_archer", "stair_archer"], "bonus": {"condition": {"flag": "formation_shield"}, "text": "방패벽이 방패를 하늘로 들어 맞물린다. (아군 전원 방어 8)", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}]}}
+    "content": {"text": "위쪽 굽이에서 화살이 쏟아진다. 방패에 꽂히는 소리가 빗소리 같다.", "enemies": ["stair_archer", "stair_archer", "stair_archer"], "bonus": {"condition": {"flag": "formation_shield"}, "text": "방패벽이 방패를 하늘로 들어 맞물린다. (아군 전원 방어 80)", "effects": [{"op": "block", "amount": 80, "target": "all_allies"}]}}
   },
   {
     "id": "s8_battle_guardians",
@@ -102,7 +102,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "장로 하나가 계단 위에 버티고, 그 등 뒤에서 궁수가 시위를 당긴다.", "enemies": ["stair_archer", "stair_elder"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 그쪽으로 방패벽을 튼다. (아군 전원 방어 8)", "effects": [{"op": "block", "amount": 8, "target": "all_allies"}]}}
+    "content": {"text": "장로 하나가 계단 위에 버티고, 그 등 뒤에서 궁수가 시위를 당긴다.", "enemies": ["stair_archer", "stair_elder"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 그쪽으로 방패벽을 튼다. (아군 전원 방어 80)", "effects": [{"op": "block", "amount": 80, "target": "all_allies"}]}}
   },
   {
     "id": "s8_elite_guardian_trio",
@@ -171,7 +171,7 @@
     "name": "화살 맞은 매화검수",
     "weight": 2,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "막지 못한 화살이 대열에 박혔다. 화산의 매화검수 하나가 계단에 쓰러져 있다. 방패벽이 그 앞을 덮는다.", "choices": [{"label": "상처를 싸매 준다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "매화검수가 이를 악물고 일어섰다. 답례로 매화검의 검로 하나를 보여 주었다. (고른 카드 1장 강화 +1)"}, {"label": "방패 뒤로 옮기고 길을 서두른다", "effects": [{"op": "heal_party", "amount": 6}], "result": "그믐이 지나기 전에 혈전에 닿아야 한다. (출전 동료 전원 체력 6 회복)"}]}
+    "content": {"text": "막지 못한 화살이 대열에 박혔다. 화산의 매화검수 하나가 계단에 쓰러져 있다. 방패벽이 그 앞을 덮는다.", "choices": [{"label": "상처를 싸매 준다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "매화검수가 이를 악물고 일어섰다. 답례로 매화검의 검로 하나를 보여 주었다. (고른 카드 1장 강화 +1)"}, {"label": "방패 뒤로 옮기고 길을 서두른다", "effects": [{"op": "heal_party", "amount": 60}], "result": "그믐이 지나기 전에 혈전에 닿아야 한다. (출전 동료 전원 체력 60 회복)"}]}
   },
   {
     "id": "s8_event_naan_crack",

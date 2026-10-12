@@ -1,5 +1,7 @@
 # CARD_EFFECTS — 효과 기본 동작과 카드 JSON 스키마
 
+> **2026-10-12 체력·피해 10배:** 이 문서의 예시 수치(피해 4·방어 5 등)는 옛 단위다. 지금 데이터는 체력 단위 수치가 모두 10배(스택·턴·균열·마나는 그대로)다 — `docs/GAME_DESIGN.md` 6절.
+
 카드·적 행동·지원 규칙의 효과는 모두 아래 **기본 동작의 조합**으로만 표현한다. 카드별 개별 코드는 금지한다.
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.

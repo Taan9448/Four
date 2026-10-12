@@ -47,7 +47,7 @@
     "name": "고블린 무리 소탕",
     "weight": 2,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "길드 의뢰판의 단골, 고블린 무리 소탕. 낮에는 카일과 검을 겨루고, 저녁에는 보른과 의뢰를 나갔다. 하운이 위험할 때면 언제나 그의 등 뒤에 보른의 도끼가 있었다.", "enemies": ["goblin", "goblin", "goblin"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 도끼가 하운의 등 뒤를 지킨다. (하운 방어 +6)", "effects": [{"op": "block", "amount": 6, "target": "self"}]}}
+    "content": {"text": "길드 의뢰판의 단골, 고블린 무리 소탕. 낮에는 카일과 검을 겨루고, 저녁에는 보른과 의뢰를 나갔다. 하운이 위험할 때면 언제나 그의 등 뒤에 보른의 도끼가 있었다.", "enemies": ["goblin", "goblin", "goblin"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 도끼가 하운의 등 뒤를 지킨다. (하운 방어 +60)", "effects": [{"op": "block", "amount": 60, "target": "self"}]}}
   },
   {
     "id": "s1_battle_swamp_toads",
@@ -74,7 +74,7 @@
     "name": "그림자늑대 무리",
     "weight": 2,
     "conditions": {"floorRange": [6, 8]},
-    "content": {"text": "낮은 으르렁거림이 사방에서 들렸다. 붉은 점들이 빈터를 둥글게 에워쌌다.", "enemies": ["shadow_wolf", "shadow_wolf", "shadow_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"피하고, 보고, 베고!\" 카일이 가장 먼저 검을 뽑는다. (하운 방어 +6)", "effects": [{"op": "block", "amount": 6, "target": "self"}]}}
+    "content": {"text": "낮은 으르렁거림이 사방에서 들렸다. 붉은 점들이 빈터를 둥글게 에워쌌다.", "enemies": ["shadow_wolf", "shadow_wolf", "shadow_wolf"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"피하고, 보고, 베고!\" 카일이 가장 먼저 검을 뽑는다. (하운 방어 +60)", "effects": [{"op": "block", "amount": 60, "target": "self"}]}}
   },
   {
     "id": "s1_battle_dead_forest",
@@ -101,7 +101,7 @@
     "name": "옛 은광의 광석거미",
     "once": true,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "은빛 숲 북쪽 가장자리, 옛 은광. 광부 세 명 실종. D등급, 보수 은화 사십. 갱도 천장을 뒤덮은 흰 실 사이에 사람 크기의 고치 셋이 매달려 있었다. 어둠 속에서 여덟 개의 붉은 점이 반짝였다. — 은빛 껍질은 큰 방어를 두른다. 결을 드러내면 방어를 무시한다.", "enemies": ["ore_spider"], "bonus": {"condition": {"partyHas": "born"}, "text": "\"돌에도 결이 있다.\" 보른이 갱도 벽의 결에 도끼를 내리찍자 천장 바위가 결을 따라 미끄러져 떨어졌다. (광석거미 피해 10, 기절 1)", "effects": [{"op": "damage", "amount": 10, "target": "all_enemies"}, {"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "은빛 숲 북쪽 가장자리, 옛 은광. 광부 세 명 실종. D등급, 보수 은화 사십. 갱도 천장을 뒤덮은 흰 실 사이에 사람 크기의 고치 셋이 매달려 있었다. 어둠 속에서 여덟 개의 붉은 점이 반짝였다. — 은빛 껍질은 큰 방어를 두른다. 결을 드러내면 방어를 무시한다.", "enemies": ["ore_spider"], "bonus": {"condition": {"partyHas": "born"}, "text": "\"돌에도 결이 있다.\" 보른이 갱도 벽의 결에 도끼를 내리찍자 천장 바위가 결을 따라 미끄러져 떨어졌다. (광석거미 피해 100, 기절 1)", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}, {"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s1_elite_armor_ranks",
@@ -119,7 +119,7 @@
     "name": "모험가 길드",
     "once": true,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "종탑 옆 이층 돌집, 하일론의 모험가 길드. 접수대의 아가씨가 검은 머리, 검은 눈, 처음 보는 회색 잡역복을 보고 눈을 동그랗게 떴다. 이 세계의 글자를 몰라, 엘리아가 대신 철자를 불러 주었다. \"F등급 모험가 증표예요.\" \"우리 파티는 C등급이다!\" 카일이 자랑스럽게 말했다.", "choices": [{"label": "F등급 동판을 받는다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "의뢰를 마칠 때마다 점수가 쌓이고, 점수가 차면 등급이 올라간다고 했다. 하운의 기본 카드 1장을 강화했다(+1)."}, {"label": "접수대 아가씨의 말을 기다린다", "condition": {"partyHas": "kyle"}, "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}], "result": "\"D등급이요, 카일 씨. 지난달 의뢰 실패로 강등되셨잖아요.\" 카일의 얼굴이 빨개졌다. 엘리아가 웃음을 참으며 고개를 돌렸다. 카일의 카드 1장을 강화했다(+1)."}, {"label": "의뢰판 앞에서 머리를 맞댄다", "effects": [{"op": "heal_party", "amount": 6}], "result": "고블린 무리 소탕, 약초 채집, 상단 호위, 실종된 양 찾기. 보른이 의뢰서 하나를 손가락으로 짚었다. \"이거.\" 출전 동료 전원 체력 6 회복"}]}
+    "content": {"text": "종탑 옆 이층 돌집, 하일론의 모험가 길드. 접수대의 아가씨가 검은 머리, 검은 눈, 처음 보는 회색 잡역복을 보고 눈을 동그랗게 떴다. 이 세계의 글자를 몰라, 엘리아가 대신 철자를 불러 주었다. \"F등급 모험가 증표예요.\" \"우리 파티는 C등급이다!\" 카일이 자랑스럽게 말했다.", "choices": [{"label": "F등급 동판을 받는다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun", "pool": "starter"}}], "result": "의뢰를 마칠 때마다 점수가 쌓이고, 점수가 차면 등급이 올라간다고 했다. 하운의 기본 카드 1장을 강화했다(+1)."}, {"label": "접수대 아가씨의 말을 기다린다", "condition": {"partyHas": "kyle"}, "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}], "result": "\"D등급이요, 카일 씨. 지난달 의뢰 실패로 강등되셨잖아요.\" 카일의 얼굴이 빨개졌다. 엘리아가 웃음을 참으며 고개를 돌렸다. 카일의 카드 1장을 강화했다(+1)."}, {"label": "의뢰판 앞에서 머리를 맞댄다", "effects": [{"op": "heal_party", "amount": 60}], "result": "고블린 무리 소탕, 약초 채집, 상단 호위, 실종된 양 찾기. 보른이 의뢰서 하나를 손가락으로 짚었다. \"이거.\" 출전 동료 전원 체력 60 회복"}]}
   },
   {
     "id": "s1_event_roof_mana",
@@ -155,7 +155,7 @@
     "name": "촛불",
     "once": true,
     "conditions": {"floorRange": [5, 6]},
-    "content": {"text": "촛불 하나를 피우는 데 사흘이 걸렸다. 손끝에 마나를 모으려 할 때마다, 마나는 손끝으로 가지 않고 아랫배의 고리로 빨려 들어갔다. \"마나는 쥐어짜는 게 아니라 떠 담는 거예요. 지금 당신 얼굴은 장작을 패는 얼굴이에요.\"", "choices": [{"label": "손끝으로 마나를 밀어 보낸다", "effects": [{"op": "heal_party", "amount": 6}], "result": "불은 붙지 않고 촛농만 흘러내렸다. \"장작 소년, 초를 패는 건 처음 보네!\" 카일이 배를 잡고 웃었다. 출전 동료 전원 체력 6 회복"}, {"label": "고리를 따라 흐르는 기운에 마나를 얹는다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "장작에 도끼를 얹듯이. 화르륵. 촛불이 아니었다. 불기둥이 하운의 키만큼 치솟았다가 사그라들었다. \"…촛불이라고 했는데요.\" 엘리아가 웃음을 터뜨렸다. 처음 보는 웃음이었다. 하운의 카드 2장을 강화했다(+1)."}]}
+    "content": {"text": "촛불 하나를 피우는 데 사흘이 걸렸다. 손끝에 마나를 모으려 할 때마다, 마나는 손끝으로 가지 않고 아랫배의 고리로 빨려 들어갔다. \"마나는 쥐어짜는 게 아니라 떠 담는 거예요. 지금 당신 얼굴은 장작을 패는 얼굴이에요.\"", "choices": [{"label": "손끝으로 마나를 밀어 보낸다", "effects": [{"op": "heal_party", "amount": 60}], "result": "불은 붙지 않고 촛농만 흘러내렸다. \"장작 소년, 초를 패는 건 처음 보네!\" 카일이 배를 잡고 웃었다. 출전 동료 전원 체력 60 회복"}, {"label": "고리를 따라 흐르는 기운에 마나를 얹는다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "장작에 도끼를 얹듯이. 화르륵. 촛불이 아니었다. 불기둥이 하운의 키만큼 치솟았다가 사그라들었다. \"…촛불이라고 했는데요.\" 엘리아가 웃음을 터뜨렸다. 처음 보는 웃음이었다. 하운의 카드 2장을 강화했다(+1)."}]}
   },
   {
     "id": "s1_event_sleeping_gate",
@@ -173,7 +173,7 @@
     "name": "하일론 장터",
     "once": true,
     "conditions": {"floorRange": [4, 5]},
-    "content": {"text": "주먹만 한 푸른 열매, 빛을 내는 돌, 날개가 넷 달린 새를 담은 새장. 사람들의 머리카락은 금색, 갈색, 붉은색이었고, 검은 머리는 하운 하나뿐이었다. 귀가 길고 눈빛이 차가운 엘프 하나가 엘리아를 힐끗 보았다. 엘리아는 망토의 두건을 조금 더 깊이 눌러썼다.", "choices": [{"label": "엘리아 곁에서 걷는다", "condition": {"partyHas": "elia"}, "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "사람마다 목에 걸린 가시가 하나씩은 있는 법이었다. 하운은 아무것도 묻지 않았다. 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "빛을 내는 돌을 들여다본다", "effects": [{"op": "gain_run_mana", "amount": 3}], "result": "돌 속에서 빛 알갱이가 천천히 돌았다. 마나 +3"}, {"label": "카일이 건넨 빵을 먹는다", "effects": [{"op": "heal_party", "amount": 8}], "result": "거칠고 담백한 맛이었다. 출전 동료 전원 체력 8 회복"}]}
+    "content": {"text": "주먹만 한 푸른 열매, 빛을 내는 돌, 날개가 넷 달린 새를 담은 새장. 사람들의 머리카락은 금색, 갈색, 붉은색이었고, 검은 머리는 하운 하나뿐이었다. 귀가 길고 눈빛이 차가운 엘프 하나가 엘리아를 힐끗 보았다. 엘리아는 망토의 두건을 조금 더 깊이 눌러썼다.", "choices": [{"label": "엘리아 곁에서 걷는다", "condition": {"partyHas": "elia"}, "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "사람마다 목에 걸린 가시가 하나씩은 있는 법이었다. 하운은 아무것도 묻지 않았다. 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "빛을 내는 돌을 들여다본다", "effects": [{"op": "gain_run_mana", "amount": 3}], "result": "돌 속에서 빛 알갱이가 천천히 돌았다. 마나 +3"}, {"label": "카일이 건넨 빵을 먹는다", "effects": [{"op": "heal_party", "amount": 80}], "result": "거칠고 담백한 맛이었다. 출전 동료 전원 체력 80 회복"}]}
   },
   {
     "id": "s1_event_daily_spar",
@@ -200,7 +200,7 @@
     "name": "검은 깃 화살",
     "once": true,
     "conditions": {"floorRange": [8, 8]},
-    "content": {"text": "파발로 온 엘프의 어깨에는 아직 검은 깃 화살이 박혀 있었다. 엘리아가 화살을 뽑고 상처를 치유해 주었다. 탈리온이라는 그 엘프는 그 뒤로 엘리아를 보지 않았다. 고맙다는 말도 하지 않았다.", "choices": [{"label": "탈리온의 걸음을 본다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "그러나 그는 엘리아의 반걸음 뒤에서 달렸다. 앞서지 않고. 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "화살촉을 살핀다", "effects": [{"op": "heal_party", "amount": 8}], "result": "검은 깃, 검은 쇠. 마왕군의 화살이었다. 보른이 말없이 도끼날을 손가락으로 쓸었다. 출전 동료 전원 체력 8 회복"}]}
+    "content": {"text": "파발로 온 엘프의 어깨에는 아직 검은 깃 화살이 박혀 있었다. 엘리아가 화살을 뽑고 상처를 치유해 주었다. 탈리온이라는 그 엘프는 그 뒤로 엘리아를 보지 않았다. 고맙다는 말도 하지 않았다.", "choices": [{"label": "탈리온의 걸음을 본다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "그러나 그는 엘리아의 반걸음 뒤에서 달렸다. 앞서지 않고. 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "화살촉을 살핀다", "effects": [{"op": "heal_party", "amount": 80}], "result": "검은 깃, 검은 쇠. 마왕군의 화살이었다. 보른이 말없이 도끼날을 손가락으로 쓸었다. 출전 동료 전원 체력 80 회복"}]}
   },
   {
     "id": "s1_rest_campfire",
@@ -242,7 +242,7 @@
     "stage": "s1",
     "type": "boss",
     "name": "실바렌 — 그림자 군단장",
-    "content": {"scene": "s1_scene_silvaren", "outroScene": "s1_scene_silver_child", "background": "bg_silvaren", "text": "\"인간. 아니. 인간의 냄새가 아니다. 이 세계의 냄새가 아니다. 너는 무엇이냐.\" \"장작 패는 사람입니다.\" — 죽은 숲: 마나 0에서 시작해 차례마다 2씩 돌아온다. 군단장은 검은 구름 아래에서 연기가 다시 뭉친다(받는 피해 감소). 결계가 살아나면 걷힌다. 군단장이 쓰러지면 빈 갑옷도 무너진다.", "enemies": ["empty_armor", "veilak", "empty_armor"], "mana": {"battleStart": 0, "perTurn": 2}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 죽은 숲의 땅에 도끼를 내리찍었다. 언 땅이 결을 따라 쩍 갈라졌다. \"길이다.\" (적 전체 피해 6)", "effects": [{"op": "damage", "amount": 6, "target": "all_enemies"}]}, "clearEffects": [{"op": "set_flag", "flag": "silien_seed"}]}
+    "content": {"scene": "s1_scene_silvaren", "outroScene": "s1_scene_silver_child", "background": "bg_silvaren", "text": "\"인간. 아니. 인간의 냄새가 아니다. 이 세계의 냄새가 아니다. 너는 무엇이냐.\" \"장작 패는 사람입니다.\" — 죽은 숲: 마나 0에서 시작해 차례마다 2씩 돌아온다. 군단장은 검은 구름 아래에서 연기가 다시 뭉친다(받는 피해 감소). 결계가 살아나면 걷힌다. 군단장이 쓰러지면 빈 갑옷도 무너진다.", "enemies": ["empty_armor", "veilak", "empty_armor"], "mana": {"battleStart": 0, "perTurn": 2}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 죽은 숲의 땅에 도끼를 내리찍었다. 언 땅이 결을 따라 쩍 갈라졌다. \"길이다.\" (적 전체 피해 60)", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}]}, "clearEffects": [{"op": "set_flag", "flag": "silien_seed"}]}
   },
   {"id": "s1_shop", "stage": "s1", "type": "shop", "name": "은빛 숲 행상", "weight": 1, "content": {"text": "은빛 숲 가장자리에 덮개 친 수레가 서 있다. 귀가 뾰족한 행상이 하운의 옷차림을 위아래로 훑었다. \"이 숲에선 처음 보는 차림이군. 동전만 진짜면 상관없지.\""}}
 ]

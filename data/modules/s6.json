@@ -40,7 +40,7 @@
     "name": "교세 수레 길",
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "운곡촌에서 청운산으로 교세를 실어 나르는 수레 길. 호송하는 혈위대와 흑풍대.", "enemies": ["blood_guard", "black_wind"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"큰 성을 치려면 먼저 보급로를 끊으라고.\" 카일이 수레 앞을 막아선다. (아군 전원 방어 5)", "effects": [{"op": "block", "amount": 5, "target": "all_allies"}]}}
+    "content": {"text": "운곡촌에서 청운산으로 교세를 실어 나르는 수레 길. 호송하는 혈위대와 흑풍대.", "enemies": ["blood_guard", "black_wind"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"큰 성을 치려면 먼저 보급로를 끊으라고.\" 카일이 수레 앞을 막아선다. (아군 전원 방어 50)", "effects": [{"op": "block", "amount": 50, "target": "all_allies"}]}}
   },
   {
     "id": "s6_battle_village_raid",
@@ -76,7 +76,7 @@
     "name": "청운산 아래",
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 혈위대와 흑풍대가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 4)", "effects": [{"op": "damage", "amount": 4, "target": "all_enemies"}]}}
+    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 혈위대와 흑풍대가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 40)", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_elite_black_wind_captain",
@@ -85,7 +85,7 @@
     "name": "첫 토벌",
     "once": true,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"scene": "s6_scene_first_raid", "outroScene": "s6_scene_first_raid_after", "text": "새벽 안개 속, 난쟁이 벽 앞. 칼자국 세 줄의 흑풍대주가 곡도를 뽑는다. 하운은 검을 뽑지 않는다.", "enemies": ["black_wind", "black_wind_captain"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 백이 한 걸음씩 나아간다. \"전진!\" 쿵. (적 전원 피해 5, 아군 전원 방어 4)", "effects": [{"op": "damage", "amount": 5, "target": "all_enemies"}, {"op": "block", "amount": 4, "target": "all_allies"}]}}
+    "content": {"scene": "s6_scene_first_raid", "outroScene": "s6_scene_first_raid_after", "text": "새벽 안개 속, 난쟁이 벽 앞. 칼자국 세 줄의 흑풍대주가 곡도를 뽑는다. 하운은 검을 뽑지 않는다.", "enemies": ["black_wind", "black_wind_captain"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 백이 한 걸음씩 나아간다. \"전진!\" 쿵. (적 전원 피해 50, 아군 전원 방어 40)", "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}, {"op": "block", "amount": 40, "target": "all_allies"}]}}
   },
   {
     "id": "s6_elite_guard_two_hundred",
@@ -123,7 +123,7 @@
     "name": "셋째 조항",
     "weight": 2,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "일곱 마을이 교세를 내지 않기 시작했다. 마을 사람들은 셋째 조항을 잊었다. 아무도 서로를 고하지 않았다. 대신 서로에게 알렸다. 혈교도가 어느 길로 오는지, 몇 명인지.", "choices": [{"label": "마을 사람들이 알려 준 길로 간다", "result": "혈교도가 오지 않는 길이었다. 출전 동료 전원 체력 8 회복", "effects": [{"op": "heal_party", "amount": 8}]}, {"label": "쌀을 지고 온 사람들을 맞는다", "result": "스무 마을의 사람들이 밤마다 계곡으로 찾아왔다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "일곱 마을이 교세를 내지 않기 시작했다. 마을 사람들은 셋째 조항을 잊었다. 아무도 서로를 고하지 않았다. 대신 서로에게 알렸다. 혈교도가 어느 길로 오는지, 몇 명인지.", "choices": [{"label": "마을 사람들이 알려 준 길로 간다", "result": "혈교도가 오지 않는 길이었다. 출전 동료 전원 체력 80 회복", "effects": [{"op": "heal_party", "amount": 80}]}, {"label": "쌀을 지고 온 사람들을 맞는다", "result": "스무 마을의 사람들이 밤마다 계곡으로 찾아왔다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_event_nahan_staff",
@@ -173,7 +173,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "개방의 거지가 소식을 가져왔다. 이번 보름, 청운산 연무장에서 석두를 친다고. 서른여섯 번째 보름이라 특별히 백 대라고. 청운귀가 보러 온다니까.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -4, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -4}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "담장 너머의 구령을 떠올린다", "result": "오 년 동안 후원 장작더미 앞에서 들은 구령. '청운십팔식'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_cloud_form"}]}]}
+    "content": {"text": "개방의 거지가 소식을 가져왔다. 이번 보름, 청운산 연무장에서 석두를 친다고. 서른여섯 번째 보름이라 특별히 백 대라고. 청운귀가 보러 온다니까.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -40, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -40}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "담장 너머의 구령을 떠올린다", "result": "오 년 동안 후원 장작더미 앞에서 들은 구령. '청운십팔식'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_cloud_form"}]}]}
   },
   {
     "id": "s6_rest_valley_spring",
@@ -215,7 +215,7 @@
     "stage": "s6",
     "type": "boss",
     "name": "보름의 연무장",
-    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장. 보름달 아래 혈위대가 줄지어 섰다. 조명각의 검에 청운의 내공과 마교의 마기가 엉켜 있다. 그가 무릎을 꿇으면 혈위대도 무기를 내린다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "주춧돌이 갈라진 산문으로 방패벽이 걸어 들어온다. \"전진!\" 쿵. (혈위대 전원 약화 1, 아군 전원 방어 5)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 5, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
+    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장. 보름달 아래 혈위대가 줄지어 섰다. 조명각의 검에 청운의 내공과 마교의 마기가 엉켜 있다. 그가 무릎을 꿇으면 혈위대도 무기를 내린다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "주춧돌이 갈라진 산문으로 방패벽이 걸어 들어온다. \"전진!\" 쿵. (혈위대 전원 약화 1, 아군 전원 방어 50)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
   },
   {"id": "s6_shop", "stage": "s6", "type": "shop", "name": "운곡 전장(錢莊)", "weight": 1, "content": {"text": "교세소 뒷골목의 낡은 전장. 주인은 하운의 얼굴을 알아보는 듯했지만 아무 말 없이 주판알만 튕겼다."}}
 ]
