@@ -122,19 +122,22 @@ function cardSection(data: GameData, runs: RunReport[]): string[] {
   const dead = rows.filter((r) => (r.c.pool === 'reward' && r.offered >= 20 && r.rate <= cut) || r.loadout === 0);
   const owner = (id: string) => (id === 'common' ? '공용' : (data.characters.get(id)?.name ?? id));
   const fmt = (x: number) => `${Math.round(x * 100)}%`;
-  const row = (r: (typeof rows)[number]) => `| ${r.c.name} \`${r.c.id}\` | ${owner(r.c.owner)} | ${r.c.rarity} | ${r.offered} | ${r.picked} | ${fmt(r.rate)} | ${fmt(r.loadout)} | ${r.used} | ${r.holders ? fmt(r.win) : '-'} |`;
-  const head = ['| 카드 | 주인 | 등급 | 보상 노출 | 선택 | 선택률 | 편성 포함(스테이지당) | 전투 사용 | 가진 런 완주 |', '|---|---|---|---:|---:|---:|---:|---:|---:|'];
+  // 시작 카드(collection.grantStarters가 주는 pool 'starter')는 보상으로 나오지 않아 선택률이 없다 — 따로 센다(2026-10-12 A4)
+  const starter = (r: (typeof rows)[number]) => r.c.pool === 'starter';
+  const row = (r: (typeof rows)[number]) => `| ${r.c.name} \`${r.c.id}\` | ${owner(r.c.owner)} | ${r.c.rarity} | ${starter(r) ? '시작' : '—'} | ${r.offered} | ${r.picked} | ${fmt(r.rate)} | ${fmt(r.loadout)} | ${r.used} | ${r.holders ? fmt(r.win) : '-'} |`;
+  const head = ['| 카드 | 주인 | 등급 | 시작 카드 | 보상 노출 | 선택 | 선택률 | 편성 포함(스테이지당) | 전투 사용 | 가진 런 완주 |', '|---|---|---|---|---:|---:|---:|---:|---:|---:|'];
+  const deadReward = dead.filter((r) => !starter(r));
   return [
     '## 카드',
     '',
     `시작·보상 카드 ${rows.length}장. 선택률은 보상 후보로 본 횟수 중 고른 비율(봇: 희귀 이상 먼저, 없으면 모으는 갈래 태그가 맞는 카드). 편성 포함은 스테이지 편성 중 그 카드가 든 비율.`,
-    `죽은 카드: 선택률 하위 15%(보상 노출 20번 이상, 선택률 ${fmt(cut)} 이하) 또는 편성에 한 번도 들지 않은 카드 — **${dead.length}장(${fmt(dead.length / Math.max(1, rows.length))})**(목표 15% 이하).`,
+    `죽은 카드: 선택률 하위 15%(보상 노출 20번 이상, 선택률 ${fmt(cut)} 이하) 또는 편성에 한 번도 들지 않은 카드 — **${dead.length}장(${fmt(dead.length / Math.max(1, rows.length))})**(목표 15% 이하) — **시작 카드 제외 ${deadReward.length}장**(시작 카드 ${dead.length - deadReward.length}장은 편성에서 밀려난 것).`,
     `갈래 보너스가 켜진 편성(동료 편성 중 같은 갈래 5장 이상): 켤 수 있었던 편성(한 갈래 카드를 5장 이상 가짐) 중 **${fmt(focused / Math.max(1, possible))}**(목표 60% 이상, ${focused}/${possible}) · 모든 동료 편성 중 ${fmt(focused / Math.max(1, loadouts))}(${loadouts}).`,
     '',
     '### 죽은 카드',
     '',
     ...head,
-    ...dead.sort((a, b) => a.loadout - b.loadout || a.rate - b.rate).map(row),
+    ...dead.sort((a, b) => Number(starter(a)) - Number(starter(b)) || a.loadout - b.loadout || a.rate - b.rate).map(row),
     '',
     '### 많이 쓰인 카드(전투 사용 상위 20)',
     '',

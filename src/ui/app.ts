@@ -48,7 +48,8 @@ import { mapView, openPartyGuide, pilgrimLabel, placeName, startRiftMaxText } fr
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
-import { applySettings, settingsForm } from './settings';
+import { applySettings, BUILD_SHORT, settings, settingsForm } from './settings';
+import { sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
 import { iconEl } from './icons';
@@ -105,6 +106,7 @@ import { loadoutView } from './loadout-view';
 import { COMMON, loadoutOwners, setLoadout } from '../engine/collection';
 import { codexView, type CodexTab } from './codex-view';
 import { wardrobeView } from './wardrobe-view';
+import { HARDCORE_TEXT, hardText, modeTipAttrs } from './difficulty-text';
 import { battleSkins } from '../engine/wardrobe';
 import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, recordsCards, type Codex } from '../engine/codex';
 
@@ -208,10 +210,10 @@ export class App {
       if (name === 'abyssshop') {
         ar.gold = 300;
         const shop = data.modules.get('abyss_shop')!;
-        return this.show(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map()), 'bg_shop'));
+        return this.show(this.withCards(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map()), 'bg_shop')));
       }
       const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
-      return this.show(this.backdrop(choiceView(data, ar, mod, () => this.map())));
+      return this.show(this.withCards(this.backdrop(choiceView(data, ar, mod, () => this.map()))));
     }
     let run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
     // &pilgrim: 클리어한 런에서 이 스테이지를 다시 걷는 길(순례)로 띄운다
@@ -225,7 +227,7 @@ export class App {
     switch (name) {
       case 'choice': {
         const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'rest')!;
-        return this.show(this.backdrop(choiceView(data, run, module, () => this.map())));
+        return this.show(this.withCards(this.backdrop(choiceView(data, run, module, () => this.map()))));
       }
       case 'scene':
         return this.playScene(id ?? [...data.scenes.keys()][0], () => this.map());
@@ -261,7 +263,7 @@ export class App {
         // 보유 맥락 표가 보이게: 진열 첫 카드는 보유 +2
         const shelf = openShop(data, run, first.id).cards[0];
         if (shelf) run.collection[shelf.cardId] = 2;
-        return this.show(this.backdrop(shopView(data, run, module, first.id, () => this.map()), 'bg_shop'));
+        return this.show(this.withCards(this.backdrop(shopView(data, run, module, first.id, () => this.map()), 'bg_shop')));
       }
       case 'hub': {
         // 캠페인을 마친 런의 클리어 지도
@@ -302,7 +304,7 @@ export class App {
         const options = rewardOptions(data, run, first.id);
         if (options[1] && !run.replayOf) run.collection[options[1]] = 1;
         if (options[2] && !run.replayOf) run.collection[options[2]] = data.balance.upgrade.maxLevel;
-        return this.show(this.backdrop(rewardView(data, options, () => this.map(), { run, shown })));
+        return this.show(this.withCards(this.backdrop(rewardView(data, options, () => this.map(), { run, shown }))));
       }
     }
   }
@@ -441,6 +443,7 @@ export class App {
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
+        h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),
       ),
     );
   }
@@ -461,15 +464,14 @@ export class App {
         h('b', {}, title),
         h('small', {}, text),
       );
-    const hard = data.balance.difficulty.hard;
     let started = false;
     const ov = openOverlay(
       '난이도',
       h(
         'div',
         { class: 'diff-pick' },
-        h('div', { class: 'diff-cards' }, card('normal', '보통', '처음 마친 그 길 그대로.'), card('hard', '어려움', `적 체력·공격력이 앞 스테이지 ×${hard.byStage.s0?.hp ?? 1}·×${hard.byStage.s0?.dmg ?? 1}에서 끝 ×${hard.byStage.s9?.hp ?? 1}·×${hard.byStage.s9?.dmg ?? 1}까지 오른다. 끝까지 가는 사람이 드물다.`)),
-        h('label', { class: 'diff-hardcore' }, hardcore, h('span', {}, h('b', {}, '하드코어'), h('small', {}, '전투가 끝날 때 쓰러져 있던 동료는 다시 일어나지 않는다. 수치는 그대로.'))),
+        h('div', { class: 'diff-cards' }, card('normal', '보통', '처음 마친 그 길 그대로.'), card('hard', '어려움', hardText(data))),
+        h('label', { class: 'diff-hardcore' }, hardcore, h('span', {}, h('b', {}, '하드코어'), h('small', {}, HARDCORE_TEXT))),
         h('div', { class: 'confirm-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ((started = true), ov.close(), begin(difficulty, hardcore.checked)) }, '시작')),
       ),
       { onClose: () => !started && this.title(), wide: true },
@@ -544,7 +546,8 @@ export class App {
   }
 
   private openSettings(): void {
-    openOverlay('설정', settingsForm());
+    // 설정의 '용어 보기' → 도감 '용어' 탭(2026-10-12 C2)
+    const ov = openOverlay('설정', settingsForm({ onGlossary: () => (ov.close(), this.codex('glossary')) }));
   }
 
   /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
@@ -635,8 +638,25 @@ export class App {
         onSwitchStage: run.replayOf ? (stageId) => this.toWorld(stageId) : undefined,
       }),
     );
+    // 저장 표식(2026-10-12 B6): 지도에 설 때 자동 저장했으면 머리에 '저장됨' 1.5초
+    if (this.persist) {
+      const mark = h('div', { class: 'saved-mark', role: 'status' }, '저장됨');
+      this.root.appendChild(mark);
+      setTimeout(() => mark.remove(), 1500);
+    }
     if (firstMate || overFull) openPartyGuide(data, run);
-    else this.riftNotices(run);
+    else if (run.abyss && !tourSeen('abyss-intro')) {
+      // 심연 첫 진입 안내(2026-10-12 C1)
+      const every = nemesisEvery(data, run.abyss);
+      runTour(
+        [
+          { title: '심연', text: '심연은 끝이 없다. 굽이마다 법칙이 바뀌고 적이 강해진다.' },
+          { title: '심연의 카드', text: '여기서 얻은 카드는 도감에만 기록되고 보유 카드로 돌아가지 않는다. 틈의 카드는 심연에서만 만난다.' },
+          { title: '숙적', text: `숙적 모르데카이의 잔향이 ${every}·${every * 2}·${every * 3}굽이에 기다린다.` },
+        ],
+        { id: 'abyss-intro', once: true },
+      );
+    } else this.riftNotices(run);
   }
 
   /**
@@ -664,33 +684,44 @@ export class App {
     const enc = enterNode(data, run, node.id);
     const go = () => {
       if (isBattle(enc)) this.battle(enc);
-      else if (enc.module.type === 'shop') this.show(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background ?? 'bg_shop'));
+      else if (enc.module.type === 'shop') this.show(this.withCards(this.backdrop(shopView(data, run, enc.module, enc.node.id, () => this.map()), enc.module.content.background ?? 'bg_shop')));
       else {
         // 이벤트 선택지에 이름으로 나온 카드도 본 것(GAME_DESIGN 16절 — 도감 기록 기준)
         const named = (enc.module.content.choices ?? []).flatMap((c) => [...c.effects, ...(c.outcomes ?? []).flatMap((o) => o.effects)]).filter((e) => e.op === 'gain_card' && e.card);
         if (named.length && recordsCards(run)) this.note((c) => named.forEach((e) => noteCard(c, e.card!)));
         const showChoice = (): void =>
           this.show(
-            this.backdrop(
-              choiceView(data, run, enc.module, () => this.map(), enc.module.type === 'inn' ? { onEditLoadout: () => this.loadout(showChoice) } : {}),
-              enc.module.content.background,
+            this.withCards(
+              this.backdrop(
+                choiceView(data, run, enc.module, () => this.map(), enc.module.type === 'inn' ? { onEditLoadout: () => this.loadout(showChoice) } : {}),
+                enc.module.content.background,
+              ),
             ),
           );
         showChoice();
       }
     };
     // 장면이 있는 노드는 비주얼 노벨 장면을 먼저 재생한다(심연에는 이야기 장면이 없다)
-    this.playScene(run.abyss ? undefined : enc.module.content.scene, go, enc.module.content.background);
+    // 심연에는 캠페인 이야기 장면이 없다 — 심연 모듈에 적힌 장면(숙적의 등장 대사 등)만
+    this.playScene(run.abyss && enc.module.stage !== 'abyss' ? undefined : enc.module.content.scene, go, enc.module.content.background);
   }
 
   /** 장면 id가 있으면 재생하고 끝나면 then, 없으면 바로 then. 배경은 background(모듈 배경) → 지금 스테이지의 전투 배경 */
   private playScene(id: string | undefined, then: () => void, background?: string, mood?: Mood): void {
     const scene = id ? data.scenes.get(id) : undefined;
     if (!scene) return then();
+    // 본 장면 건너뛰기(2026-10-12 B3): 기록하기 전에 '이미 본 장면'인지 본다. 처음 보는 장면은 늘 보여 준다
+    const skip = sceneSkip({
+      seen: readCodex(data).scenes.includes(scene.id),
+      setting: settings.skipSeenScenes,
+      mode: this.run?.mode === 'abyss' ? 'abyss' : this.run?.replayOf ? 'pilgrimage' : 'campaign',
+      clears: readProfile().clears,
+    });
     this.note((c) => noteScene(data, c, scene.id));
+    if (skip.auto) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     playBgm(mood ?? moodFor(scene.world ?? stage?.world));
-    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
+    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags, skip }));
   }
 
   private battle(enc: Encounter): void {
@@ -742,17 +773,19 @@ export class App {
           run.abyss ? undefined : enc.module.content.outroScene,
           () =>
             this.show(
-              this.backdrop(
-                rewardView(
-                  data,
-                  this.rewardSeen(rewardOptions(data, run, enc.node.id)),
-                  (cardId) => {
-                    if (cardId) addCard(data, run, cardId);
-                    this.map();
-                  },
-                  { run, shown },
+              this.withCards(
+                this.backdrop(
+                  rewardView(
+                    data,
+                    this.rewardSeen(rewardOptions(data, run, enc.node.id)),
+                    (cardId) => {
+                      if (cardId) addCard(data, run, cardId);
+                      this.map();
+                    },
+                    { run, shown },
+                  ),
+                  enc.module.content.background,
                 ),
-                enc.module.content.background,
               ),
             ),
           enc.module.content.background,
@@ -763,9 +796,9 @@ export class App {
   }
 
   /** 보유 카드 보기: 이번 스테이지 덱 + 주인별 보유 카드(강화 단계 그대로) */
-  private showCards(): void {
+  private showCards(mark?: ReadonlySet<string>): void {
     const run = this.run!;
-    if (run.abyss) return openDeck(data, `덱 ${run.deck.length}장`, [{ label: loopLabel(run.abyss), cards: run.deck }]);
+    if (run.abyss) return void openDeck(data, `덱 ${run.deck.length}장`, [{ label: loopLabel(run.abyss), cards: run.deck }], mark);
     const owned = (owner: string) =>
       Object.entries(run.collection)
         .filter(([id]) => {
@@ -774,10 +807,32 @@ export class App {
         })
         .map(([cardId, level]) => ({ uid: `own_${cardId}`, cardId, level }));
     const name = (o: string) => (o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o));
-    openDeck(data, `보유 카드 ${Object.keys(run.collection).length}장`, [
-      { label: '이번 스테이지 덱', cards: run.deck },
-      ...loadoutOwners(data, run).map((o) => ({ label: `보유 — ${name(o)}`, cards: owned(o) })),
-    ]);
+    openDeck(
+      data,
+      `보유 카드 ${Object.keys(run.collection).length}장`,
+      [{ label: '이번 스테이지 덱', cards: run.deck }, ...loadoutOwners(data, run).map((o) => ({ label: `보유 — ${name(o)}`, cards: owned(o) }))],
+      mark,
+    );
+  }
+
+  /**
+   * 보상·상점·이벤트 화면 오른쪽 위에 '보유 카드 (N)'(심연은 '덱 (N)')(2026-10-12 B2). 누르면 보유 카드 창 —
+   * 지금 화면에 보이는 카드(후보)와 같은 카드에 '보유 중 +L'
+   */
+  private withCards(el: HTMLElement): HTMLElement {
+    const run = this.run;
+    if (!run) return el;
+    const n = run.abyss ? run.deck.length : Object.keys(run.collection).length;
+    const btn = h(
+      'button',
+      {
+        class: 'btn btn-small cards-corner',
+        onclick: () => this.showCards(new Set([...el.querySelectorAll<HTMLElement>('[data-card-id]')].map((c) => c.dataset.cardId!))),
+      },
+      run.abyss ? `덱 (${n})` : `보유 카드 (${n})`,
+    );
+    el.appendChild(btn);
+    return el;
   }
 
   /** 편성 화면. inn: 여관에서 바꾸기(돌아갈 곳) */
@@ -873,6 +928,15 @@ export class App {
         onWardrobe: () => this.wardrobe(() => this.hub()),
         onTitle: () => this.title(),
       }),
+    );
+    // 순례 첫 진입 안내(2026-10-12 C1)
+    runTour(
+      [
+        { title: '순례', text: '순례는 클리어한 길을 다시 걷는 것. 적은 레벨에 맞춰 강해진다.' },
+        { title: '순례의 보상', text: '각 스테이지를 처음 다시 넘길 때 한 번만 보상이 보유 카드에 영구로 남는다. 그 뒤의 보상은 이번 순례에서만 쓰고 사라진다.' },
+        { title: '도전과 칭호', text: '스테이지마다 도전 과제가 있다. 이룬 도전과 칭호는 도감의 기록에서 본다.' },
+      ],
+      { id: 'pilgrim-intro', once: true },
     );
   }
 
@@ -1430,7 +1494,12 @@ export class App {
                   : '하운이 쓰러졌다.',
             ),
             news,
-            h('p', { class: 'hint' }, `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`),
+            h(
+              'p',
+              { class: 'hint' },
+              `시드 ${run.seed} · 상흔 ${run.scar} · 덱 ${run.deck.length}장`,
+              run.difficulty === 'hard' || run.hardcore ? h('span', modeTipAttrs(data, run), `${run.difficulty === 'hard' ? ' · 어려움' : ''}${run.hardcore ? ' · 하드코어' : ''}`) : null,
+            ),
             this.runStats(run, win),
             finale && readProfile().clears === 1 && this.persist ? h('p', { class: 'end-unlock' }, '새 런에서 난이도(어려움)와 하드코어를 고를 수 있게 되었다.') : null,
             h(

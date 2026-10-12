@@ -30,7 +30,8 @@ function stacks(data: GameData, cards: CardInstance[]): { inst: CardInstance; co
   });
 }
 
-export function deckGroupsView(data: GameData, groups: CardGroup[]): HTMLElement {
+/** mark: 이 카드 id들(지금 화면의 보상·상점 후보)에 '보유 중 +L' 배지 */
+export function deckGroupsView(data: GameData, groups: CardGroup[], mark?: ReadonlySet<string>): HTMLElement {
   return h(
     'div',
     { class: 'deck-view' },
@@ -44,7 +45,13 @@ export function deckGroupsView(data: GameData, groups: CardGroup[]): HTMLElement
               'div',
               { class: 'deck-cards' },
               stacks(data, g.cards).map(({ inst, count }) =>
-                h('div', { class: 'deck-card' }, cardView(data, inst), count > 1 ? h('span', { class: 'deck-count' }, `×${count}`) : null),
+                h(
+                  'div',
+                  { class: `deck-card${mark?.has(inst.cardId) ? ' marked' : ''}` },
+                  cardView(data, inst),
+                  count > 1 ? h('span', { class: 'deck-count' }, `×${count}`) : null,
+                  mark?.has(inst.cardId) ? h('span', { class: 'deck-mark' }, `보유 중 +${inst.level}`) : null,
+                ),
               ),
             )
           : h('p', { class: 'hint' }, '없음'),
@@ -53,6 +60,6 @@ export function deckGroupsView(data: GameData, groups: CardGroup[]): HTMLElement
   );
 }
 
-export function openDeck(data: GameData, title: string, groups: CardGroup[]): void {
-  openOverlay(title, deckGroupsView(data, groups), { wide: true });
+export function openDeck(data: GameData, title: string, groups: CardGroup[], mark?: ReadonlySet<string>): { close: () => void; el: HTMLElement } {
+  return openOverlay(title, deckGroupsView(data, groups, mark), { wide: true });
 }
