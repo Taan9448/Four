@@ -27,8 +27,8 @@
     "surgeScar": 3,
     "surgeResetTo": 3,
     "scarRatio": 0.5,
-    "scar": { "startRiftPer": 5, "startRiftMax": 4, "restAt": 10, "restHealMul": 0.8, "stitch": 3, "stitchGold": 60, "bossCleanBonus": 5, "shopAt": 20, "shopPriceMul": 1.2, "shopStitch": 5, "shopStitchGold": 80 },
-    "map": { "maxCracks": 3, "beastChance": 0.5 }
+    "scar": { "startRiftPer": 5, "startRiftMax": { "murim": 4, "elheim": 4, "nocturna": 4, "rift": 2 }, "restAt": 10, "restHealMul": 0.8, "stitch": 3, "stitchGold": 60, "bossCleanBonus": 8, "bossClearScar": { "s8": 5 }, "shopAt": 20, "shopPriceMul": 1.2, "shopStitch": 5, "shopStitchGold": 80 },
+    "map": { "maxCracks": 3, "beastChance": 0.5, "scarCrackAt": 8 }
   },
   "grain": { "damageBonus": 0.5, "ignoreBlock": true, "knotThreshold": 3 },
   "incorporealMultiplier": 0.5,

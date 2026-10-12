@@ -7,7 +7,7 @@ import { createRng } from './rng';
 import { generateStageMap, type MapNode } from './route';
 import type { EnemyMod } from './effects';
 import type { CardInstance } from './state';
-import { createRun, emptyStats, gainRelic, markStageStart, type RunState } from './run';
+import { crackMapByScar, createRun, emptyStats, gainRelic, markStageStart, type RunState } from './run';
 import { COMMON, ownerKey } from './collection';
 
 export interface AbyssState {
@@ -434,6 +434,7 @@ export function beginLoop(data: GameData, run: RunState, depth: number): void {
     eligible: (mod, _floor, used) => abyssEligible(data, plan.world, roster, mod, used),
     scarWeight: data.balance.abyss.scarWeightPerPoint,
   });
+  crackMapByScar(data, run);
 }
 
 /** 숙적을 몇 번째 만나는가(지금 굽이 포함) */

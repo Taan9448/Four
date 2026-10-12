@@ -285,6 +285,12 @@ export function createRunAt(data: GameData, seed: string, stageId: string, opts:
   return run;
 }
 
+/** 받침 있는 낱말 뒤 '을', 없으면 '를' */
+function josaEulReul(word: string): string {
+  const c = word.charCodeAt(word.length - 1) - 0xac00;
+  return c >= 0 && c <= 11171 && c % 28 !== 0 ? '을' : '를';
+}
+
 function buildMap(data: GameData, run: RunState): StageMap {
   return generateStageMap(data, run.stageId, createRng(run.seed).fork(`map:${run.stageId}`), {
     scar: run.scar,
@@ -330,6 +336,7 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   run.seed = `${hub.seed}~${stageId}~${(hub.replays[stageId] ?? 0) + 1}`;
   beginStageLoadout(data, run);
   run.map = buildMap(data, run);
+  crackMapByScar(data, run);
   markStageStart(run);
   return run;
 }
@@ -433,6 +440,7 @@ export function advanceStage(data: GameData, run: RunState): boolean {
   for (const r of run.roster) r.hp = Math.min(r.maxHp, r.hp + Math.floor(r.maxHp * data.balance.stage.healOnEnter));
   beginStageLoadout(data, run);
   run.map = buildMap(data, run);
+  crackMapByScar(data, run);
   run.status = 'map';
   markStageStart(run);
   return true;
@@ -575,7 +583,7 @@ function crackAffix(data: GameData, run: RunState, node: MapNode): ({ affixes: s
  * 폭주가 지도를 가른다(GAME_DESIGN 7절): 폭주 한 번마다 앞길 하나를 끊고 裂 틈새 하나(지도마다 maxCracks개까지).
  * 틈새는 시드로 틈의 짐승(이 스테이지 엘리트 + 접사 하나, 이기면 상흔 -5와 유물) 또는 틈새의 거래(감소 카드·봉인 유물)
  */
-export function splitMapBySurge(data: GameData, run: RunState, surges: number, key: string): number {
+export function splitMapBySurge(data: GameData, run: RunState, surges: number, key: string, countSurges = true): number {
   const cfg = data.balance.rift.map;
   const world = stageWorld(data, run);
   const used = new Set(run.map.floors.flat().filter((n) => n.crack).map((n) => n.moduleId));
@@ -594,9 +602,21 @@ export function splitMapBySurge(data: GameData, run: RunState, surges: number, k
     });
     if (mark.crack) made += 1;
   }
-  run.map.surges = (run.map.surges ?? 0) + surges;
+  if (countSurges) run.map.surges = (run.map.surges ?? 0) + surges;
   (run.stats.cracks ??= { made: 0, entered: 0 }).made += made;
   return made;
+}
+
+/**
+ * 상흔이 깊으면(balance.rift.map.scarCrackAt 이상) 새 지도에 들어선 직후 한 번 갈라진다 — 폭주 한 번과 같은 규칙으로
+ * 앞길 하나가 끊기고 그 세계의 裂 틈새 하나가 열린다(GAME_DESIGN 7절, 2026-10-12). 캠페인·순례·심연 모두
+ */
+export function crackMapByScar(data: GameData, run: RunState): boolean {
+  const at = data.balance.rift.map.scarCrackAt;
+  if (at === undefined || run.scar < at) return false;
+  splitMapBySurge(data, run, 1, 'scar', false);
+  run.map.scarCrack = true;
+  return true;
 }
 
 /** 전투 결과를 런에 반영한다. 이기면 모듈의 clearEffects(보스가 아니어도)를 적용하고 그 결과 메시지를 돌려준다 */
@@ -654,6 +674,13 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
     const before = run.scar;
     run.scar = Math.max(0, run.scar - clean);
     out.push(`폭주 없이 넘긴 싸움 — 상흔 -${before - run.scar}`);
+  }
+  // 그 스테이지 보스를 넘기면 폭주 여부와 상관없이 상흔이 덜린다(S8 혈전 — 틈 세계로 넘어가기 전, 2026-10-12)
+  const cleared = data.balance.rift.scar.bossClearScar[run.stageId] ?? 0;
+  if (enc.node.type === 'boss' && !isAbyss(run) && cleared && run.scar > 0) {
+    const before = run.scar;
+    run.scar = Math.max(0, run.scar - cleared);
+    out.push(`${enc.module.name}${josaEulReul(enc.module.name)} 넘어 상흔 -${before - run.scar}`);
   }
   // 폭주가 지도를 가른다(스테이지가 이어질 때만 — 보스를 넘기면 지도가 끝난다)
   if ((outcome.tally?.surges ?? 0) > 0 && enc.node.type !== 'boss') {

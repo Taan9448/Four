@@ -32,7 +32,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   lines.push('');
   lines.push(`- 완주(에필로그까지): **${wins(runs)}/${runs.length} (${pct(wins(runs), runs.length)})** — ${batches.map((b) => `${BOT_STYLE_NAME[b.style]} ${pct(wins(b.runs), b.runs.length)}`).join(' · ')}`);
   lines.push(`- 평균 덱 ${f1(avg(runs.map((r) => r.deckSize)))}장 · 평균 상흔 ${f1(avg(runs.map((r) => r.scar)))}`);
-  lines.push(...surgeSummary(runs));
+  lines.push(...surgeSummary(data, runs));
   lines.push('');
 
   lines.push('## 스테이지별');
@@ -145,7 +145,7 @@ function cardSection(data: GameData, runs: RunReport[]): string[] {
 /**
  * 폭주(GAME_DESIGN 7절, 2026-10-11 개편): 런당 횟수(목표 0.5~1), 폭주가 난 스테이지에서 진 비율 vs 안 난 스테이지(목표 2배 이하)
  */
-function surgeSummary(runs: RunReport[]): string[] {
+function surgeSummary(data: GameData, runs: RunReport[]): string[] {
   const perRun = avg(runs.map((r) => r.battles.reduce((a, b) => a + (b.surges ?? 0), 0)));
   const visits: { surged: boolean; lost: boolean }[] = [];
   for (const r of runs) {
@@ -161,8 +161,15 @@ function surgeSummary(runs: RunReport[]): string[] {
   const ratio = rate(without) > 0 ? rate(withS) / rate(without) : 0;
   const made = runs.reduce((a, r) => a + (r.cracks?.made ?? 0), 0);
   const entered = runs.reduce((a, r) => a + (r.cracks?.entered ?? 0), 0);
+  // 틈새 전투(틈의 짐승): crack 모듈의 전투
+  const crackFights = runs.reduce((a, r) => a + r.battles.filter((b) => data.modules.get(b.moduleId)?.stage === 'crack').length, 0);
+  // 스테이지별 폭주(런당): S2 이그니스 첫 폭주 목표 0.6~1.0
+  const byStage = new Map<string, number>();
+  for (const b of runs.flatMap((r) => r.battles)) byStage.set(b.stageId, (byStage.get(b.stageId) ?? 0) + (b.surges ?? 0));
+  const stageLine = [...byStage].filter(([, n]) => n > 0).map(([st, n]) => `${st.toUpperCase()} ${(n / Math.max(1, runs.length)).toFixed(2)}`).join(' · ');
   return [
-    `- 裂 틈새: 런당 ${(made / Math.max(1, runs.length)).toFixed(2)}곳 열림 · 들어간 비율 ${pct(entered, made)}`,
+    `- 裂 틈새: 런당 ${(made / Math.max(1, runs.length)).toFixed(2)}곳 열림 · 들어간 비율 ${pct(entered, made)} · 틈새 전투 런당 **${(crackFights / Math.max(1, runs.length)).toFixed(2)}번**(목표 0.3 이상)`,
+    `- 스테이지별 폭주(런당): ${stageLine || '없음'}`,
     `- 폭주: 런당 **${perRun.toFixed(2)}회**(목표 0.5~1) · 폭주가 난 스테이지 ${withS.length}곳 패배 ${pct(withS.filter((v) => v.lost).length, withS.length)} / 안 난 스테이지 패배 ${pct(without.filter((v) => v.lost).length, without.length)} → **${ratio.toFixed(1)}배**(목표 2배 이하, 4배를 넘으면 상흔→시작 균열을 약하게)`,
   ];
 }

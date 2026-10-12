@@ -25,6 +25,8 @@ export interface StageMap {
   cuts?: [string, string][];
   /** 이 스테이지(지도)에서 일어난 폭주 수 */
   surges?: number;
+  /** 상흔이 깊어 들어서자마자 갈라진 지도(scarCrackAt) */
+  scarCrack?: boolean;
 }
 
 export interface RouteContext {
