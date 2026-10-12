@@ -198,7 +198,7 @@ describe('원작 보스 기믹', () => {
 
   it('S9를 이기면 캠페인이 끝난다(에필로그)', () => {
     const run = createRunAt(data, 'FIN', 's9');
-    const outcome: BattleOutcome = { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: 10 })), mana: 0, scarGain: 0 };
+    const outcome: BattleOutcome = { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: 100 })), mana: 0, scarGain: 0 };
     applyBattleOutcome(data, run, bossEnc('s9'), outcome);
     expect(run.status).toBe('stage_clear');
     expect(advanceStage(data, run)).toBe(false);

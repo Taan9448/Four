@@ -437,7 +437,7 @@ export const CharacterDef = z
     /** 치명타 확률(0~1). 없으면 balance.crit.chance */
     crit: z.number().min(0).max(1).optional(),
     /** 레벨이 오를 때마다 늘어나는 최대 체력(balance.leveling) */
-    hpPerLevel: z.number().int().min(0).default(4),
+    hpPerLevel: z.number().int().min(0).default(40),
     joinsAt: z.string(),
     description: z.string(),
     /** 도감의 긴 소개(합류했을 때 아는 만큼) */

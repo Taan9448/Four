@@ -48,19 +48,19 @@ describe('난이도', () => {
     const mate = run.selected.find((id) => id !== 'haun')!;
     const before = run.roster.filter((r) => run.selected.includes(r.id)).reduce((a, r) => a + r.hp, 0);
     const enc = encounter('s3');
-    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: id === mate ? 1 : 50 })), mana: run.mana, scarGain: 0, downed: [mate], turns: 4 });
+    applyBattleOutcome(data, run, enc, { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: id === mate ? 10 : 500 })), mana: run.mana, scarGain: 0, downed: [mate], turns: 4 });
     const log = run.stats!.log!;
     expect(log).toHaveLength(1);
-    expect(log[0]).toMatchObject({ stageId: 's3', moduleId: enc.module.id, type: 'battle', result: 'victory', turns: 4, hpBefore: before, haunAfter: 50 });
-    expect(log[0].hpAfter).toBe(50 * (run.selected.length - 1)); // 쓰러진 동료는 0으로 센다
+    expect(log[0]).toMatchObject({ stageId: 's3', moduleId: enc.module.id, type: 'battle', result: 'victory', turns: 4, hpBefore: before, haunAfter: 500 });
+    expect(log[0].hpAfter).toBe(500 * (run.selected.length - 1)); // 쓰러진 동료는 0으로 센다
     expect(deserializeRun(data, serializeRun(run))!.run.stats!.log).toEqual(log);
   });
 
-  it('하드코어가 아니면 쓰러진 동료는 체력 1로 돌아온다', () => {
+  it('하드코어가 아니면 쓰러진 동료는 체력 10으로 돌아온다', () => {
     const run = createRunAt(data, 'HC', 's3');
     const mate = run.selected.find((id) => id !== 'haun')!;
-    applyBattleOutcome(data, run, encounter('s3'), { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: id === mate ? 1 : 50 })), mana: run.mana, scarGain: 0, downed: [mate] });
-    expect(run.roster.find((r) => r.id === mate)!.hp).toBe(1);
+    applyBattleOutcome(data, run, encounter('s3'), { result: 'victory', survived: false, party: run.selected.map((id) => ({ id, hp: id === mate ? 10 : 500 })), mana: run.mana, scarGain: 0, downed: [mate] });
+    expect(run.roster.find((r) => r.id === mate)!.hp).toBe(10);
   });
 });
 
@@ -104,14 +104,14 @@ describe('자유 여정(2026-10-11)', () => {
     const run = createRunAt(data, 'PARTY', 's9');
     const kyle = run.roster.find((r) => r.id === 'kyle')!;
     kyle.level = 7;
-    kyle.maxHp = 88;
+    kyle.maxHp = 880;
     applyRunOps(data, run, [{ op: 'leave_party', member: 'kyle' }, { op: 'leave_party', member: 'born' }]);
     expect(run.roster.map((r) => r.id)).toEqual(['haun', 'elia']);
     expect(restoreParty(data, run)).toEqual([]); // 캠페인 중에는 돌아오지 않는다
     run.status = 'complete';
     expect(restoreParty(data, run).length).toBe(2);
     expect(run.roster.map((r) => r.id).sort()).toEqual(['born', 'elia', 'haun', 'kyle']);
-    expect(run.roster.find((r) => r.id === 'kyle')).toMatchObject({ level: 7, maxHp: 88, hp: 88 });
+    expect(run.roster.find((r) => r.id === 'kyle')).toMatchObject({ level: 7, maxHp: 880, hp: 880 });
     expect(Object.keys(run.loadout)).toEqual(expect.arrayContaining(['kyle', 'born']));
     expect(restoreParty(data, run)).toEqual([]); // 한 번만
   });
@@ -177,7 +177,7 @@ describe('자유 여정(2026-10-11)', () => {
 describe('적 등급 배율·격노(GAME_DESIGN 12절)', () => {
   const setup = (enemies: string[]) => ({
     world: 'elheim' as const,
-    party: [{ id: 'haun', hp: 60, maxHp: 60 }],
+    party: [{ id: 'haun', hp: 600, maxHp: 600 }],
     enemies,
     deck: cards('haun_step', 'haun_step', 'haun_step', 'haun_step', 'haun_step'),
     mana: 0,
@@ -205,8 +205,8 @@ describe('적 등급 배율·격노(GAME_DESIGN 12절)', () => {
     data.enemies.set(
       'test_enrage',
       EnemyDef.parse({
-        id: 'test_enrage', name: '격노 시험', maxHp: 999, pattern: 'cycle',
-        moves: [{ id: 'wait', name: '기다림', intent: 'buff', effects: [{ op: 'block', amount: 1 }] }],
+        id: 'test_enrage', name: '격노 시험', maxHp: 9999, pattern: 'cycle',
+        moves: [{ id: 'wait', name: '기다림', intent: 'buff', effects: [{ op: 'block', amount: 10 }] }],
         enrage: { afterTurn: 3, text: '격노했다', effects: [{ op: 'apply_status', status: 'strength', stacks: 2, target: 'self' }] },
       }),
     );

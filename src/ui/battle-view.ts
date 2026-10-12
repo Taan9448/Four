@@ -1025,14 +1025,14 @@ export class BattleView {
             // 소리: 맞은 쪽 자리(적 오른쪽, 일행 왼쪽)에서. 막혀서 0이면 막는 소리
             const pan = u.c.side === 'enemy' ? 0.35 : -0.35;
             // 치명타는 금빛 큰 숫자, 결은 푸른 숫자. 약점·내성은 작은 글자를 하나 더
-            const heavy = ev.amount >= 15;
+            const heavy = ev.amount >= 150;
             floatOver(this.fxLayer, u.el, ev.crit ? `치명 ${ev.amount}!` : ev.grain ? `${ev.amount}!` : String(ev.amount), ev.crit ? 'critical' : ev.grain ? 'crit' : heavy ? 'heavy' : 'damage');
             if (ev.weak) floatOver(this.fxLayer, u.el, '약점!', 'weak');
             else if (ev.resisted) floatOver(this.fxLayer, u.el, '내성', 'resist');
             if (ev.blocked) floatOver(this.fxLayer, u.el, `막음 ${ev.blocked}`, 'block');
             // 이 피해로 쓰러지는가(엔진은 피해 바로 뒤에 쓰러짐 이벤트를 남긴다)
             const kill = events.slice(idx + 1, idx + 4).some((e) => (e.type === 'downed' || e.type === 'death') && e.uid === ev.targetUid);
-            sfx(ev.amount <= 0 ? 'block' : ev.crit || kill ? 'crit' : ev.amount >= 15 ? 'hit_heavy' : 'hit', { pan });
+            sfx(ev.amount <= 0 ? 'block' : ev.crit || kill ? 'crit' : ev.amount >= 150 ? 'hit_heavy' : 'hit', { pan });
             if (ev.amount > 0 && (ev.element === 'fire' || ev.element === 'ice')) sfx(ev.element, { pan, volume: 0.7 });
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);
@@ -1043,7 +1043,7 @@ export class BattleView {
               // 세기: 피해가 클수록, 치명타·처치면 가장 세게. 맞은 쪽은 공격 반대편으로 밀린다
               // (2026-10-11 사용자 요청 — 타격감이 약했다: 작은 피해도 화면이 조금 흔들리고, 맞은 자리에 충격 고리·베기 줄)
               const big = ev.crit || kill;
-              const power = big ? 1 : Math.min(0.9, 0.45 + ev.amount / 30);
+              const power = big ? 1 : Math.min(0.9, 0.45 + ev.amount / 300);
               const dir = u.c.side === 'enemy' ? 1 : -1;
               const strength = big ? 'crit' : heavy ? 'heavy' : 'light';
               const tone = u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : ev.grain ? 'blue' : ev.element === 'fire' ? 'gold' : 'white';

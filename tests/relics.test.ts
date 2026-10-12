@@ -7,11 +7,11 @@ import { createRunAt, fireRunRelics, gainRelic } from '../src/engine/run';
 import { battle, cards, data, give } from './helpers';
 
 const big = (s: ReturnType<typeof battle>) => {
-  for (const e of s.enemies) e.hp = e.maxHp = 999;
+  for (const e of s.enemies) e.hp = e.maxHp = 9999;
 };
 
 describe('유물 발동 시점', () => {
-  it('cardPlayed + every: 공격 카드 3장째마다(숫돌 기름: 방어 3)', () => {
+  it('cardPlayed + every: 공격 카드 3장째마다(숫돌 기름: 방어 30)', () => {
     const s = battle({ relics: ['whetstone_oil'] });
     big(s);
     s.neigong = 9;
@@ -20,19 +20,19 @@ describe('유물 발동 시점', () => {
     playCard(s, give(s, 'haun_chop'), s.enemies[0].uid);
     playCard(s, give(s, 'haun_step'));
     playCard(s, give(s, 'haun_chop'), s.enemies[0].uid);
-    expect(block()).toBe(b0 + 5);
+    expect(block()).toBe(b0 + 50);
     playCard(s, give(s, 'haun_chop'), s.enemies[0].uid);
-    expect(block()).toBe(b0 + 5 + 3);
+    expect(block()).toBe(b0 + 50 + 30);
   });
 
-  it('cleanVictory: 폭주 없이 이긴 전투(금 간 종 상흔 -1 · 나무 염주 일행 체력 3), 봉인 두루마리는 잔향 두 장에 한 장', () => {
+  it('cleanVictory: 폭주 없이 이긴 전투(금 간 종 상흔 -1 · 나무 염주 일행 체력 30), 봉인 두루마리는 잔향 두 장에 한 장', () => {
     const run = createRunAt(data, 'CLEAN', 's2');
     run.relics = ['rift_bell', 'wooden_bead'];
     run.scar = 4;
-    run.roster[0].hp = 10;
+    run.roster[0].hp = 100;
     fireRunRelics(data, run, 'cleanVictory');
     expect(run.scar).toBe(3);
-    expect(run.roster[0].hp).toBe(13);
+    expect(run.roster[0].hp).toBe(130);
     const s = battle({ relics: ['sealed_scroll'] });
     s.hand = [];
     for (let i = 0; i < 4; i++) addEcho(s, 'hand');
@@ -45,22 +45,22 @@ describe('유물 발동 시점', () => {
     changeRift(s, 3);
     expect(s.rift).toBe(2);
     expect(s.party[0].statuses.seal).toBeUndefined();
-    const n = battle({ relics: ['needle_case'], party: [{ id: 'haun', hp: 60, maxHp: 60 }] });
+    const n = battle({ relics: ['needle_case'], party: [{ id: 'haun', hp: 600, maxHp: 600 }] });
     n.rift = 9;
     changeRift(n, 1);
-    expect(n.party[0].hp).toBe(60 - Math.floor((6 + 5) * 0.5));
+    expect(n.party[0].hp).toBe(600 - Math.floor((60 + 50) * 0.5));
   });
 
   it('allyDowned: 동료가 쓰러질 때(불사조의 재는 한 번만)', () => {
-    const s = battle({ relics: ['phoenix_ash'], party: [{ id: 'haun', hp: 30, maxHp: 60 }, { id: 'kyle', hp: 5, maxHp: 52 }, { id: 'born', hp: 5, maxHp: 70 }] });
-    loseHp(s, s.party[1], 99);
-    expect(s.party[0].hp).toBe(42);
+    const s = battle({ relics: ['phoenix_ash'], party: [{ id: 'haun', hp: 300, maxHp: 600 }, { id: 'kyle', hp: 50, maxHp: 520 }, { id: 'born', hp: 50, maxHp: 700 }] });
+    loseHp(s, s.party[1], 990);
+    expect(s.party[0].hp).toBe(420);
     expect(s.party[0].statuses.strength).toBe(2);
-    loseHp(s, s.party[2], 99);
-    expect(s.party[0].hp).toBe(42);
+    loseHp(s, s.party[2], 990);
+    expect(s.party[0].hp).toBe(420);
   });
 
-  it('turnEnd: 차례가 끝날 때(쇠 어깨받이: 방어 4가 적의 차례에 남는다)', () => {
+  it('turnEnd: 차례가 끝날 때(쇠 어깨받이: 방어 40이 적의 차례에 남는다)', () => {
     const s = battle({ relics: ['iron_shoulder'] });
     for (const e of s.enemies) e.intent = null;
     endTurn(s);
@@ -72,9 +72,9 @@ describe('규칙 유물', () => {
   it('keep_block: 차례가 바뀌어도 방어의 절반이 남는다', () => {
     const s = battle({ relics: ['stone_skin_amulet'] });
     for (const e of s.enemies) e.intent = null;
-    s.party[0].block = 10;
+    s.party[0].block = 100;
     endTurn(s);
-    expect(s.party[0].block).toBe(Math.floor(10 * data.balance.relicRules.keepBlockRatio));
+    expect(s.party[0].block).toBe(Math.floor(100 * data.balance.relicRules.keepBlockRatio));
   });
 
   it('hand_plus_one: 한 장 더 뽑고, 천근의 짐은 독기 2장을 섞는다', () => {

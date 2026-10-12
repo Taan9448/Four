@@ -52,7 +52,7 @@ describe('레벨', () => {
   });
 
   it('레벨마다 치명타 확률이 오른다', () => {
-    const s = battle({ party: [{ id: 'haun', hp: 60, maxHp: 60, level: 5 }] });
+    const s = battle({ party: [{ id: 'haun', hp: 600, maxHp: 600, level: 5 }] });
     const base = data.characters.get('haun')!.crit!;
     expect(critChance(s, s.party[0])).toBeCloseTo(base + 4 * lv.critPerLevel);
   });

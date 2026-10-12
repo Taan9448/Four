@@ -57,14 +57,14 @@ describe('심연 3차 — 서약', () => {
     expect(oathMax(data, 40)).toBe(15);
   });
 
-  it('시작에 걸리는 서약: 골드 0 · 상흔 5 · 물약 칸 2 · 동료 1명 · 하운 최대 체력 50 · 심법 없는 시작 덱', () => {
+  it('시작에 걸리는 서약: 골드 0 · 상흔 5 · 물약 칸 2 · 동료 1명 · 하운 최대 체력 500 · 심법 없는 시작 덱', () => {
     const run = start('O15', ['elia'], { oath: 15 });
     expect(run.abyss!.oath).toBe(15);
     expect(run.gold).toBe(pathPicks(data, 1).gold + (run.relics.includes('path_debt') ? 150 : 0));
     expect(run.scar).toBe(5 + (run.relics.includes('path_debt') ? 3 : 0));
     expect(run.potions.length).toBe(2);
     const haun = run.roster.find((r) => r.id === 'haun')!;
-    expect(haun.maxHp).toBe(50 + (run.relics.includes('path_mountain') ? 15 : 0));
+    expect(haun.maxHp).toBe(500 + (run.relics.includes('path_mountain') ? 150 : 0));
     expect(run.deck.some((c) => data.cards.get(c.cardId)!.type === 'power')).toBe(false);
     expect(() => start('O15', ['elia', 'kyle'], { oath: 15 })).toThrow();
     // 서약이 없으면 시작 덱에 심법이 있을 수 있다(하운 시작 카드의 심법)
