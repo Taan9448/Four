@@ -1249,16 +1249,14 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 
 /* 도감(2026-10-08): 위 머리(제목·탭) + 아래 판(스크롤). 못 본 칸은 ? 실루엣 */
 .codex-screen { display: flex; flex-direction: column; gap: 10px; height: calc(100vh - 20px); }
-.codex-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex-wrap: wrap; }
+.codex-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; }
 .codex-title h2 { margin: 0; font-family: var(--f-brush); font-weight: 400; font-size: calc(var(--fs-title) * 1.12); letter-spacing: 0.06em; }
 .codex-title small { color: var(--ink-dim); }
-.codex-tabs { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; justify-content: center; }
 .codex-tab { background: none; border: 1px solid var(--line-glass); color: var(--ink-dim); border-radius: 3px; padding: 6px 12px; cursor: pointer; font-family: var(--f-head); font-weight: 700; }
 .codex-tab small { margin-left: 6px; font-family: var(--f-ui); font-weight: 400; font-size: var(--fs-min); opacity: 0.8; }
 .codex-tab:hover { color: var(--ink); border-color: #c9a24a; }
 .codex-tab.on { color: #f4ecd8; border-color: #e2b45c; background: rgba(201, 162, 74, 0.14); }
-.codex-panel { flex: 1; min-height: 0; padding: 0; }
-.codex-body { height: 100%; overflow-y: auto; padding: 14px 22px 22px; text-align: left; }
+.codex-body { flex: 1; min-height: 0; overflow-y: auto; text-align: left; }
 .codex-section { margin-bottom: 18px; }
 .codex-section h3 { margin: 4px 0 10px; font-size: calc(var(--fs-body) * 1.16); border-bottom: 1px solid var(--line); padding-bottom: 4px; }
 .codex-section h3 small { margin-left: 10px; color: var(--ink-dim); font-family: var(--f-ui); font-weight: 400; font-size: var(--fs-cap); }
@@ -1296,9 +1294,6 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 @media (max-width: 700px) {
   .codex-head { gap: 10px; padding: 10px 12px; }
   .codex-title { flex: 1; }
-  .codex-tabs { order: 3; flex-basis: 100%; justify-content: flex-start; gap: 4px; }
-  .codex-tab { padding: 5px 8px; font-size: var(--fs-sub); }
-  .codex-body { padding: 10px 12px 16px; }
   .codex-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .codex-items { grid-template-columns: minmax(0, 1fr); }
 }
@@ -1697,16 +1692,9 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .codex-title { display: flex; flex-direction: column; gap: 2px; }
 .codex-tabprog { color: var(--gold); font-size: var(--fs-sub); font-weight: 600; }
 .codex-total { font-size: var(--fs-min); }
-.codex-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; }
+.codex-filter { padding: 10px 12px; }
+.codex-filter-btns { display: flex; flex-wrap: wrap; gap: 6px; }
 .codex-filter .btn.on { border-color: var(--gold); color: var(--gold); background: rgba(226, 180, 92, 0.12); }
-.codex-filter-gap { flex: 1; }
-.codex-fold { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); }
-.codex-fold:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.codex-fold-mark { color: var(--gold); width: 1em; }
-.codex-owner.folded h3 { margin-bottom: 4px; }
-@media (max-width: 600px) {
-  .codex-filter-gap { flex-basis: 100%; height: 0; }
-}
 
 /* 휴대폰: 적 이름이 이웃과 겹치지 않게 칸 너비 안에서 줄을 바꾼다(ux:check (d), 2026-10-11) */
 @media (max-width: 600px) {
@@ -1820,3 +1808,44 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .focus-line { margin: 4px 0 6px; font-size: var(--fs-cap); color: var(--muted, #b9a98c); }
 .focus-line.on { color: #9fe3a0; font-weight: 700; }
 .loadout-notice { margin: 2px 0 6px; font-size: var(--fs-cap); color: #ffcf7a; }
+
+/* 도감 틀(2026-10-12, 편성·상점과 같은 짜임): 머리말 · 분류 줄 · 왼쪽 묶음 목록 | 가운데 고른 묶음. 상세는 지금처럼 창 */
+.codex-total { flex: 1; max-width: 420px; display: grid; gap: 4px; }
+.codex-total small { color: var(--ink-dim); font-size: var(--fs-min); }
+.codex-back { margin-left: auto; }
+.codex-roster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.codex-roster .lo-mate { min-height: 52px; font-family: var(--f-ui); font-weight: 400; color: var(--ink); }
+.codex-split { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 10px; align-items: start; }
+.codex-side { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; }
+.codex-groups { padding: 10px 12px; }
+.codex-side-h { margin: 0 0 8px; font-size: var(--fs-body); color: var(--gold); letter-spacing: 0.08em; }
+.codex-group-list { display: flex; flex-direction: column; gap: 4px; }
+.codex-group { display: grid; gap: 5px; min-height: var(--tap); padding: 7px 10px; border-radius: 8px; border: 1px solid transparent; background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.codex-group:hover { border-color: rgba(226, 180, 92, 0.4); }
+.codex-group.on { border-color: var(--gold); background: rgba(74, 54, 26, 0.6); }
+.codex-group-top { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.codex-group-top b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.codex-group-top small { margin-left: auto; color: var(--ink-dim); font-size: var(--fs-min); white-space: nowrap; }
+.codex-group.done .codex-group-top small { color: var(--heal); }
+.codex-main { padding: 12px 18px 18px; min-width: 0; }
+.codex-main-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.codex-main-head b { font-size: calc(var(--fs-body) * 1.2); }
+.codex-main-head small { color: var(--ink-dim); font-size: var(--fs-cap); }
+.codex-single { padding: 14px 22px 22px; }
+.codex-foot { margin-top: 14px; }
+@media (max-width: 900px) {
+  .codex-roster { display: flex; overflow-x: auto; scrollbar-width: thin; }
+  .codex-roster .lo-mate { flex: 0 0 auto; min-width: 112px; }
+  .codex-split { grid-template-columns: minmax(0, 1fr); }
+  .codex-side { position: static; }
+  .codex-group-list { flex-direction: row; overflow-x: auto; scrollbar-width: thin; }
+  .codex-group { flex: 0 0 auto; min-width: 120px; border-color: rgba(226, 180, 92, 0.22); }
+  .codex-groups { padding: 8px 10px; }
+  .codex-groups .codex-side-h { display: none; }
+}
+@media (max-width: 700px) {
+  .codex-total { display: none; }
+  .codex-main { padding: 10px 12px 14px; }
+  .codex-single { padding: 10px 12px 16px; }
+}
+.codex-cardgrid { row-gap: 22px; padding-bottom: 8px; }
