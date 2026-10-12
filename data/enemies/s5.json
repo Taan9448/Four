@@ -2,6 +2,7 @@
   {
     "id": "shadow_assassin",
     "name": "그림자 암살자",
+    "hitFx": "fx_hit_pierce",
     "lore": "마왕의 사천왕 가운데 마지막, 베일락의 주인. 카즈둠 옛 왕의 망루에 달빛이 끊긴 밤, 바닥의 그림자에서 가늘고 긴 형상으로 솟아올랐다. 그림자는 빛이 없는 자리이고, 없는 것에는 결이 없다. 하운의 검이 그 몸을 그대로 통과한다. 그림자를 바꿔 가며 나타나도 칼은 하나, 칼이 오는 길도 하나다. 진짜 몸은 따로 있다.",
     "maxHp": 660,
     "sprite": "shadow_assassin",
@@ -24,11 +25,13 @@
     "color": "#0d0b12",
     "pattern": "cycle",
     "moves": [{"id": "swallow_light", "name": "빛을 삼킨다", "intent": "defend", "effects": [{"op": "block", "amount": 80, "target": "self"}]}, {"id": "cast_shadow", "name": "그림자를 드리운다", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}],
-    "flavor": "들보 위, 달빛이 끊긴 자리에 매달린 주먹만 한 검은 수정. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다."
+    "flavor": "들보 위, 달빛이 끊긴 자리에 매달린 주먹만 한 검은 수정. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다.",
+    "resist": ["lightning"]
   },
   {
     "id": "shadow_assassin_fading",
     "name": "꺼져 가는 그림자",
+    "hitFx": "fx_hit_pierce",
     "lore": "둘로 갈라진 검은 수정의 반쪽에서, 꺼져 가는 그림자가 마지막 목소리를 흘린다. 마왕이 벨칸의 쐐기 천 개를 잠든 문들마다 박고 있다고. 공허의 열쇠로 모든 문을 한꺼번에 열려 한다고. 닫힌 세계는 썩으니 다른 세계의 흐름을 들여야 하고, 하운이 그 증거라고. 그리고 모든 문이 열리면, 네 세계의 문도 열리겠지.",
     "maxHp": 140,
     "sprite": "shadow_assassin",
@@ -42,6 +45,7 @@
   {
     "id": "shadow_fragment",
     "name": "그림자",
+    "hitFx": "fx_hit_slash",
     "lore": "그림자 암살자가 다스리던 그림자의 잔당. 노크투르나의 넷째 회랑을 지키며, 바닥과 벽의 그림자를 옮겨 다니다 발밑에서 솟아오른다. 몸에는 결이 없고 칼날만 실체다. 흩어졌다가도 다른 그림자에서 다시 일어선다. 카일은 그림자를 보지 않고 눈을 감은 채 칼의 결만 따라간다. 내공만 실은 칼은 그림자를 스칠 뿐이다.",
     "maxHp": 360,
     "sprite": "shadow_fragment",
@@ -55,19 +59,22 @@
   {
     "id": "wedge",
     "name": "쐐기",
+    "hitFx": "fx_hit_arcane",
     "lore": "벨칸 협곡의 노예들이 두드려 마왕성으로 보낸 검은 쐐기. 팔뚝만 한 몸통의 한쪽은 뭉툭하고 한쪽은 바늘이며, 잠든 문과 같은 물결 문자가 새겨져 있다. 쇠의 결과 쇠가 아닌 무언가의 결이 반대로 꼬여 경계를 갉아먹는다. 여는 물건이 아니라 찢는 물건이라고 한스는 말했다. 하나를 뽑을 때마다 허공의 금이 조금 가라앉는다.",
     "maxHp": 240,
     "sprite": "wedge",
     "silhouette": "object",
     "color": "#16141a",
     "pattern": "cycle",
-    "moves": [{"id": "tangle", "name": "엉킨 결", "intent": "special", "effects": [{"op": "rift", "amount": 1}]}],
+    "moves": [{"id": "tangle", "name": "엉킨 결", "intent": "special", "effects": [{"op": "rift", "amount": 1}]}, {"id": "violet_bolt", "name": "보랏빛 번개", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 60, "element": "lightning"}]}],
     "deathEffects": [{"op": "rift", "amount": -2}],
-    "flavor": "팔뚝만 한 검은 쐐기. 한쪽은 뭉툭하고 한쪽은 바늘이다. 쇠의 결과 결 잃은 마나가 반대로 꼬여 경계를 갉아먹는다. 뭉툭한 끝에 작은 표식 하나 — 한스의 표식."
+    "flavor": "팔뚝만 한 검은 쐐기. 한쪽은 뭉툭하고 한쪽은 바늘이다. 쇠의 결과 결 잃은 마나가 반대로 꼬여 경계를 갉아먹는다. 뭉툭한 끝에 작은 표식 하나 — 한스의 표식.",
+    "resist": ["lightning"]
   },
   {
     "id": "obsidian_door",
     "name": "쐐기 박힌 흑요석 문",
+    "hitFx": "fx_rift_tear",
     "lore": "노크투르나 일곱째 회랑의 끝을 막은 흑요석의 문. 다른 회랑과 달리 수문장도 마물도 없었다. 문 표면에는 물결 같은 문자가 새겨져 있고, 문틀에 박힌 검은 쐐기 일곱 개가 주위의 허공을 아지랑이처럼 일그러뜨린다. 그롬의 말로는 이 성은 원래 삼천 년 전 고대 드워프들의 요새였다. 문 너머에서 무언가가 기다린다.",
     "maxHp": 620,
     "sprite": "obsidian_door",
@@ -76,12 +83,14 @@
     "scale": 1.4,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 120, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}],
-    "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다."
+    "moves": [{"id": "gnaw", "name": "허공을 갉는 결", "intent": "attack", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}]}, {"id": "obsidian", "name": "흑요석", "intent": "defend", "effects": [{"op": "block", "amount": 120, "target": "self"}]}, {"id": "wave_letters", "name": "깨어나는 물결 문자", "intent": "debuff", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "rift", "amount": 1}]}, {"id": "spire_bolt", "name": "첨탑의 번개", "intent": "attack", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies", "element": "lightning"}]}],
+    "flavor": "일곱째 회랑의 끝. 물결 같은 문자가 새겨진 흑요석의 문, 문틀에 박힌 검은 쐐기 일곱 개. 문 너머에서 무언가가 기다린다.",
+    "resist": ["lightning"]
   },
   {
     "id": "vargas",
     "name": "마왕 바르가스",
+    "hitFx": "fx_hit_arcane",
     "lore": "엘하임의 마왕. 삼천 년 전 세계의 문을 닫은 고대인 가운데 하나로, 닫힌 세계에서 흐름이 고이고 썩어 가는 것을 지켜보았다. 삼십 년 전 얼음 바다 밑에서 잠든 그의 귀에, 경계 너머 수천 개의 목소리가 문을 열라고 속삭였다. 그 뒤로 그는 천 개의 쐐기를 박고 하운을 기다렸다. 숨결 하나에 바닥과 갑옷이 녹고, 방 안의 엉킨 마나가 모두 그에게로 빨려 든다.",
     "maxHp": 2180,
     "sprite": "vargas",

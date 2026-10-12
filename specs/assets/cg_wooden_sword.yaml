@@ -1,0 +1,11 @@
+id: cg_wooden_sword
+type: story-cg
+character: haun_sword
+summary: 장면 일러스트 — 돌아오는 검 — 수레 의자 위 왕일검의 목검과 가라앉는 모래(S8, 3권 12장)
+# 2026-10-12 D2: 그림 없던 절정 장면(s8_scene_returning_sword)
+frame_notes:
+  1: >-
+    Night in a small sandy yard behind the Cheongun training ground, lit by a single lantern and a full moon. An old swordsman with no legs, Wang Ilgeom — thin, white-haired, a long white beard, in a faded grey robe — sits in a wooden wheelchair holding a plain wooden practice sword, moving it with impossible lightness as if he were running across the yard. Around him the sand of the yard is settling: every grain sinking back into place in soft concentric ripples, dents filling and clumps loosening, silent and calm. Jin Haun in his grey outfit kneels at the edge of the yard watching with wide eyes, his narrow plain sword laid across his knees; a crack of black sky glimmers faintly far above.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#20263a' }

@@ -1,0 +1,11 @@
+id: cg_mordecai
+type: story-cg
+character: haun_sword
+summary: 장면 일러스트 — 지옥왕 모르데카이 — 쐐기 칠백 개의 등뼈와 두 세계의 팔(S9, 4권 9장)
+# 2026-10-12 D2: 그림 없던 절정 장면(s9_scene_mordecai)
+frame_notes:
+  1: >-
+    The heart of the world's rift: a colossal shapeless being looms over a few floating rock fragments — the Hell King Mordecai. His spine is made of hundreds of black iron wedges bound together, points turned inward. One arm is a river of flowing silver mana, the other a coil of golden ring-shaped qi; legs, wings and horns of nameless worlds' energies branch from his body. In the center of his chest a tangled heart of blue and black light pulses. Tiny before him on a cracked fragment, Jin Haun in his grey outfit with the narrow plain sword stands with eyes closed and perfectly still, Elia the silver-haired half-elf mage beside him gripping his sleeve. Dark violet and black void, silver and gold light from the monster's arms.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#0f0b18' }
