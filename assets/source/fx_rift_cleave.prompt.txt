@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. Never use magenta, pink or purple in the effect.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: a short dark red line of light appears at the upper right of the cell, the start of a heavy downward chop
+Cell 2: a thick crescent of dark crimson light sweeps down from upper right to lower left like an axe swing
+Cell 3: the full crescent at maximum brightness, and along its path the air splits into a black crack with a red glowing rim
+Cell 4: the crescent fades while the black crack remains, red sparks spraying out of it
+Cell 5: the black crack narrows to a thin red seam in the same place, sparks falling
+Cell 6: only a faint red seam and a few sparks remain in the same place
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: Resolve the 43% grid-purity failure without changing the animation track. Every colored pixel must be a flat solid 4x4 source square on the identical 4px lattice; this is 128x128 logical pixel art, NOT a coarse 46x46 icon. Fine stepped square edges, no aliasing or smoothing, six to eight solid palette colors, no pink or purple in the effect. One curved diagonal crescent path centered around local (256,256), running upper right to lower left, with a black jagged split ON that same curve. Never draw a crossing X crack. In frames 3-6 keep exactly the same fixed crack curve, thinning and dimming until the final red seam. Frame 4 crescent fades; 5-6 crescent absent. Preserve generous 48px source margins on every side; flat magenta background. No glyphs, character, axe, ground or background elements.
