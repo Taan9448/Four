@@ -341,11 +341,14 @@ export function planLoop(data: GameData, ab: AbyssState, depth: number): { world
   ];
   if (depth % nemesisEvery(data, ab) === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages), laws };
   const all = Object.keys(cfg.worlds) as World[];
-  let worlds = depth === 1 ? cfg.firstWorlds : all.filter((w) => w !== prev?.world && (w !== 'rift' || depth >= cfg.riftFrom));
-  if (!worlds.length) worlds = all;
+  // 보스 하한(bossMinDepth): 아직 나올 수 없는 보스는 빼고, 보스가 모두 막힌 세계는 이 굽이 후보에서 뺀다(보스 없는 세계는 다른 세계 보스를 쓴다)
+  const ready = (b: string) => depth >= (cfg.bossMinDepth[b] ?? 1);
+  const open = (w: World) => !cfg.worlds[w].bosses.length || cfg.worlds[w].bosses.some(ready);
+  let worlds = depth === 1 ? cfg.firstWorlds : all.filter((w) => w !== prev?.world && (w !== 'rift' || depth >= cfg.riftFrom) && open(w));
+  if (!worlds.length) worlds = all.filter(open).length ? all.filter(open) : all;
   const world = rng.pick(worlds);
-  const own = cfg.worlds[world].bosses;
-  const everyBoss = all.flatMap((w) => cfg.worlds[w].bosses);
+  const own = cfg.worlds[world].bosses.filter(ready);
+  const everyBoss = all.flatMap((w) => cfg.worlds[w].bosses).filter(ready);
   const base = own.length ? own : everyBoss;
   const bosses = base.filter((b) => b !== prev?.boss);
   return { world, boss: rng.pick(bosses.length ? bosses : base), stageId: rng.pick(cfg.worlds[world].stages), laws };

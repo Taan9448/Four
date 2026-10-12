@@ -144,6 +144,7 @@
       "rift": { "stages": ["s9"], "bosses": [] }
     },
     "firstWorlds": ["murim", "elheim"],
+    "bossMinDepth": { "s5_boss_vargas": 3 },
     "riftFrom": 3,
     "score": { "depth": 100, "boss": 50, "elite": 20, "hp": 50 },
     "lawsAt": [[2, 1], [5, 2], [9, 3]],

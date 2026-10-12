@@ -1,0 +1,10 @@
+[
+  {
+    "id": "abyss_scene_nemesis",
+    "world": "rift",
+    "background": "bg_rift",
+    "lines": [
+      { "speaker": "mordecai", "face": "neutral", "text": "\"또 왔구나, 이방인. 닫았다고 믿은 문은 — 늘 한 굽이 아래에서 다시 열린다.\"" }
+    ]
+  }
+]

@@ -12,6 +12,7 @@ import { loadPortrait } from '../render/portrait';
 import { cardView } from './card-view';
 import { h } from './dom';
 import { startRiftMaxText } from './map-view';
+import { glossaryTab } from './glossary-view';
 import { iconEl } from './icons';
 import { potionChip, relicChip } from './items';
 import { mainTitle, setMainTitle, type Profile } from './storage';
@@ -24,7 +25,7 @@ export interface CodexHandlers {
   onPlayScene: (sceneId: string, tab: CodexTab) => void;
 }
 
-export type CodexTab = 'cards' | 'enemies' | 'items' | 'people' | 'scenes' | 'abyss' | 'stats';
+export type CodexTab = 'cards' | 'enemies' | 'items' | 'people' | 'scenes' | 'abyss' | 'stats' | 'glossary';
 const TABS: { id: CodexTab; label: string }[] = [
   { id: 'cards', label: '카드' },
   { id: 'enemies', label: '적' },
@@ -33,6 +34,7 @@ const TABS: { id: CodexTab; label: string }[] = [
   { id: 'scenes', label: '장면' },
   { id: 'abyss', label: '심연' },
   { id: 'stats', label: '기록' },
+  { id: 'glossary', label: '용어' },
 ];
 
 // ───────── 눌러서 크게 보기(2026-10-08) ─────────
@@ -681,6 +683,7 @@ export function codexView(
     const sum = (ps: CodexProgress[], label: string) => (ps.length ? { seen: ps.reduce((a, p) => a + p.seen, 0), total: ps.reduce((a, p) => a + p.total, 0), label } : null);
     if (tab === 'items') return sum(of('유물', '물약'), '유물·물약');
     if (tab === 'abyss') return meta ? { seen: meta.achievements.length, total: data.achievements.size, label: '심연 업적' } : null;
+    if (tab === 'glossary') return null;
     const t = TABS.find((x) => x.id === tab)!;
     return sum(of(t.label), t.label);
   };
@@ -705,7 +708,9 @@ export function codexView(
                 ? scenesTab(data, codex, (id) => handlers.onPlayScene(id, 'scenes'))
                 : tab === 'abyss'
                   ? abyssTab(data, codex, profile, meta ?? { achievements: [], deaths: {}, oathCleared: -1, daily: {}, opened: [] })
-                  : statsTab(data, codex, profile);
+                  : tab === 'glossary'
+                    ? glossaryTab(data)
+                    : statsTab(data, codex, profile);
     // 묶음이 있는 탭은 왼쪽 목록 + 가운데(codex-split), 심연·기록은 한 패널
     body.replaceChildren(content.classList.contains('codex-split') || content.classList.contains('codex-tabroot') ? content : h('div', { class: 'codex-main panel codex-single' }, content));
     body.scrollTop = 0;

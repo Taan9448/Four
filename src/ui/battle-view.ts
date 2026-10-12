@@ -1,4 +1,5 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
+import { scarStartRift } from '../engine/battle';
 import { canPlay, cardCausesSurge, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { potionChip, relicChip } from './items';
 import { hasSkipTurn } from '../engine/effects';
@@ -20,7 +21,7 @@ import { openDeck } from './deck-view';
 import { clear, h } from './dom';
 import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
-import { settings, settingsForm } from './settings';
+import { openShortcuts, settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
 import { runTour, tourSeen } from './tour';
 
@@ -93,6 +94,9 @@ export class BattleView {
   private selected: number | null = null;
   /** 대상을 고르는 중인 물약 칸 */
   private potionSel: number | null = null;
+  /** 물약 확인(설정 confirmPotion): 대상 없는 물약의 첫 누름 — 2초 안에 다시 누르면 쓴다 */
+  private potionArm: number | null = null;
+  private potionArmTimer: number | null = null;
   private relicEl!: HTMLElement;
   private potionEl!: HTMLElement;
   /** 마우스를 올린 손패 카드(피해 미리보기) */
@@ -240,6 +244,8 @@ export class BattleView {
             // 전투 기록: 기본은 숨김, 누르면 반투명 판 위에(2026-10-11 UI/UX 2-2)
             (this.logMedal = medal('記', '전투 기록', '최근 일어난 일 다섯 줄을 보이고 숨긴다', () => this.toggleLog())),
             medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
+            // 단축키 표(키보드가 없는 기기에서는 CSS로 숨긴다 — pointer: coarse)
+            h('button', { class: 'medal medal-help', 'aria-label': '단축키', onclick: () => openShortcuts(), ...tipAttrs('단축키', '1~0 카드 · E 턴 종료 · Esc 취소 · Tab/←→ 대상 · Enter/Space 확정 · D 덱 보기') }, h('b', {}, '?')),
           ),
           this.state.relics.length ? this.relicEl : null,
         ),
@@ -416,9 +422,14 @@ export class BattleView {
     const worldName: Record<string, string> = { murim: '무림: 이월, 회복 없음', elheim: '엘하임: 시작에 가득, 턴마다 +2', nocturna: '마왕성', rift: '틈: 턴마다 줄어든다' };
     // 물약 칸: 누르면 쓴다(대상을 고르는 물약은 누른 뒤 대상을 누른다)
     clear(this.potionEl);
-    s.potions.forEach((id, i) =>
-      this.potionEl.appendChild(potionChip(this.data, id, { onClick: id && !this.busy && !s.result ? () => this.onPotion(i) : undefined, extra: this.potionSel === i ? 'selected' : '' })),
-    );
+    s.potions.forEach((id, i) => {
+      const chip = potionChip(this.data, id, {
+        onClick: id && !this.busy && !s.result ? () => this.onPotion(i) : undefined,
+        extra: this.potionSel === i ? 'selected' : this.potionArm === i ? 'arming' : '',
+      });
+      if (this.potionArm === i) chip.appendChild(h('small', { class: 'potion-arm-hint', role: 'status' }, '다시 누르면 사용'));
+      this.potionEl.appendChild(chip);
+    });
     // 반반 체력구: 왼쪽 금빛 = 내공, 오른쪽 푸른빛 = 마나. 차오른 높이가 남은 양(틀은 Codex 그림 ui_orb_frame, 없으면 CSS 고리)
     // 가득 차도 물결 수면이 보이게 높이의 80%까지만 채운다(액체가 담긴 느낌)
     const pct = (n: number, max: number) => `${Math.round(Math.max(0, Math.min(1, max > 0 ? n / max : 0)) * 80)}%`;
@@ -772,6 +783,15 @@ export class BattleView {
    * 단축키: 1~9·0 손패 고르기 · Tab/←→ 대상 바꾸기 · Enter/Space 고른 대상에 쓰기 · E 턴 종료 · Esc 취소
    */
   private onKey = (e: KeyboardEvent) => {
+    // D: 이번 전투의 카드 창 열기·닫기(2026-10-12 B8)
+    if ((e.key === 'd' || e.key === 'D') && !(e.target as HTMLElement | null)?.closest?.('input, textarea')) {
+      if (this.pilesOverlay?.el.isConnected) {
+        this.pilesOverlay.close();
+        this.pilesOverlay = null;
+        return;
+      }
+      if (!document.querySelector('.overlay, .tour') && !this.state.result) return this.showPiles();
+    }
     if (document.querySelector('.overlay, .tour')) return; // 창·안내가 떠 있으면 전투 단축키를 받지 않는다
     if ((e.target as HTMLElement | null)?.closest?.('input, textarea')) return;
     if (e.key === 'Escape') {
@@ -924,12 +944,29 @@ export class BattleView {
     const need = potionTarget(this.state, slot);
     if (!need) {
       this.potionSel = null;
+      // 물약 확인: 첫 누름은 칩을 키우고 "다시 누르면 사용"(2초 뒤 풀림), 두 번째 누름에 쓴다
+      if (settings.confirmPotion && this.potionArm !== slot) {
+        this.potionArm = slot;
+        if (this.potionArmTimer !== null) clearTimeout(this.potionArmTimer);
+        this.potionArmTimer = window.setTimeout(() => {
+          this.potionArm = this.potionArmTimer = null;
+          this.refresh();
+        }, 2000);
+        return this.refresh();
+      }
+      this.disarmPotion();
       return void this.act(() => usePotion(this.state, slot));
     }
+    this.disarmPotion();
     const pool = (need === 'enemy' ? this.state.enemies : this.state.party).filter((c) => !c.downed);
     if (pool.length === 1) return void this.act(() => usePotion(this.state, slot, pool[0].uid));
     this.potionSel = slot;
     this.refresh();
+  }
+
+  private disarmPotion(): void {
+    if (this.potionArmTimer !== null) clearTimeout(this.potionArmTimer);
+    this.potionArm = this.potionArmTimer = null;
   }
 
   private onUnitClick(c: Combatant): void {
@@ -1005,6 +1042,10 @@ export class BattleView {
           if (ev.turn > 1) {
             toast(this.toasts, `${ev.turn}턴`, 'info');
             sfx('turn');
+          } else {
+            // 상흔이 시작 균열을 올렸으면 첫 턴에 한 번 알린다(2026-10-12 A5)
+            const m = scarStartRift(this.data, this.ctx.scar, this.state.world);
+            if (m > 0) toast(this.toasts, `상흔 ${this.ctx.scar} → 시작 균열 +${m}`, 'danger', 2400);
           }
           break;
         case 'card': {
@@ -1298,9 +1339,11 @@ export class BattleView {
     return sleep(ms * settings.speed);
   }
 
+  /** D 키·冊 표식: 이번 전투의 카드 창(D는 다시 누르면 닫는다) */
+  private pilesOverlay: { close: () => void; el: HTMLElement } | null = null;
   private showPiles(): void {
     const s = this.state;
-    openDeck(this.data, '이번 전투의 카드', [
+    this.pilesOverlay = openDeck(this.data, '이번 전투의 카드', [
       { label: '손패', cards: s.hand },
       { label: '뽑을 더미', cards: s.draw, hint: ' — 순서는 감춤' },
       { label: '버린 더미', cards: s.discard },
