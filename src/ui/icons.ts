@@ -18,8 +18,8 @@ export function sheetIconEl(sheets: [string, number][], icon: number | undefined
   return iconEl(id, icon ? icon - first + 1 : undefined, glyph, cls);
 }
 
-/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~ icons_status_e(2026-10-11) */
-const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48]];
+/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~53 icons_status_e(2026-10-11) · 54~ icons_status_f(2026-10-12 번개) */
+const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48], ['icons_status_f', 54]];
 
 export function iconEl(sheet: string, frame: number | undefined, glyph: string, cls: string): HTMLElement {
   const url = frame ? frameUrl(sheet, frame, { realOnly: true }) : null;
@@ -43,9 +43,9 @@ export function statusChip(data: GameData, id: string, stacks: number): HTMLElem
   return el;
 }
 
-/** 속성 표시: 화염 炎(붉은 주황) · 냉기 冷(하늘색) */
-const ELEMENT_GLYPH: Record<string, string> = { fire: '炎', ice: '冷' };
-const ELEMENT_NAME: Record<string, string> = { fire: '화염', ice: '냉기' };
+/** 속성 표시: 화염 炎(붉은 주황) · 냉기 冷(하늘색) · 번개 雷(노란빛) */
+const ELEMENT_GLYPH: Record<string, string> = { fire: '炎', ice: '冷', lightning: '雷' };
+const ELEMENT_NAME: Record<string, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
 export function elementMark(element: string): HTMLElement {
   return h('span', { class: `el-mark el-${element}`, title: ELEMENT_NAME[element] ?? element }, ELEMENT_GLYPH[element] ?? '?');
 }

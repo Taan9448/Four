@@ -116,7 +116,9 @@ export function scoreBattle(s: BattleState, opts: BotOptions = DEFAULT_BOT): num
   for (const p of alive(s.party)) for (const [id, n] of Object.entries(p.statuses)) v += kind(id) === 'buff' ? 2 * n : kind(id) === 'debuff' ? -2 * n : 0;
   // 파워(발동 상태)는 전투가 끝날 때까지 값을 낸다: 한 수 앞만 보는 봇이 미리 깔아 두게
   for (const p of alive(s.party)) for (const [id, n] of Object.entries(p.statuses)) if (data.statuses.get(id)?.triggers.length) v += POWER_VALUE * n;
-  for (const e of alive(s.enemies)) for (const [id, n] of Object.entries(e.statuses)) v += kind(id) === 'debuff' ? 2 * n : kind(id) === 'buff' ? -2 * n : 0;
+  // 감전은 차례마다 가라앉으므로 스택당 값을 낮춘다(1.5). 마비는 빙결과 같은 값. 빙결 중이면 감전이 쌓이지 않으므로(blockedBy) 값도 생기지 않는다
+  const shock = data.balance.elements.lightning.status;
+  for (const e of alive(s.enemies)) for (const [id, n] of Object.entries(e.statuses)) v += kind(id) === 'debuff' ? (id === shock ? 1.5 : 2) * n : kind(id) === 'buff' ? -2 * n : 0;
   // 매듭(모르데카이): 결 노출을 문턱까지 쌓아 매듭을 드러내는 준비에 값을 준다(한 수 앞만 보는 봇이 준비 동작을 버리지 않게)
   const knotAt = data.balance.grain.knotThreshold;
   for (const e of alive(s.enemies)) {

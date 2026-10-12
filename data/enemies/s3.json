@@ -25,7 +25,7 @@
     "pattern": "cycle",
     "moves": [{"id": "ice_blade", "name": "얼음 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 100, "element": "ice"}]}, {"id": "ice_shield", "name": "얼음 방패", "intent": "defend", "effects": [{"op": "block", "amount": 100, "target": "self"}]}, {"id": "frozen_strike", "name": "얼어붙은 일격", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 70, "element": "ice"}, {"op": "apply_status", "status": "weak", "stacks": 1}]}],
     "flavor": "얼음으로 된 갑옷. 아니, 갑옷 안의 몸까지 얼음이다. 셀리아스는 얼어붙은 자들을 부린다. 투명한 얼음 속에 눈을 감은 얼굴이 비친다.",
-    "weak": ["fire"],
+    "weak": ["fire", "lightning"],
     "resist": ["ice"]
   },
   {
@@ -41,7 +41,7 @@
     "pattern": "cycle",
     "moves": [{"id": "gate_spear", "name": "문지기의 창", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 150}]}, {"id": "ice_rampart", "name": "얼음 성벽", "intent": "defend", "effects": [{"op": "block", "amount": 140, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, {"id": "frost_breath", "name": "얼어붙은 숨", "intent": "attack", "effects": [{"op": "damage", "amount": 50, "target": "all_enemies", "element": "ice"}, {"op": "gain_mana", "amount": -2}]}, {"id": "stopped_night", "name": "그날 밤에 멈춘 검", "intent": "debuff", "targeting": "random", "effects": [{"op": "damage", "amount": 70}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}]}],
     "flavor": "십 년 전 그 밤, 성문을 지키다 쓰러진 아르덴의 기사. 지금은 얼음 궁전의 문지기다. 가렛 경의 기사들은 탑에 세 번 닿았고, 세 번 다 돌아오지 못한 기사가 더 많았다.",
-    "weak": ["fire"],
+    "weak": ["fire", "lightning"],
     "resist": ["ice"]
   },
   {
@@ -72,7 +72,7 @@
     "pattern": "cycle",
     "moves": [{"id": "rowen_blade", "name": "로웬의 검", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 130}]}, {"id": "rowen_shield", "name": "로웬의 방패", "intent": "defend", "effects": [{"op": "block", "amount": 120, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_allies"}]}, {"id": "father_strike", "name": "아버지의 일격", "intent": "attack", "targeting": "highest_hp", "effects": [{"op": "damage", "amount": 70, "times": 2}]}],
     "flavor": "남쪽 성문 가운데 선 얼음 기사. 눈동자가 없다. 푸른 마나가 얼어붙은 빛만 있다. 그날 밤 성문으로 달려간 기사, 카일의 아버지.",
-    "weak": ["fire"],
+    "weak": ["fire", "lightning"],
     "resist": ["ice"]
   },
   {
