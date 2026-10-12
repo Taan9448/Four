@@ -379,4 +379,16 @@ describe('데이터 검사', () => {
     }
     expect(data.cards.has(data.balance.rift.echoCard)).toBe(true);
   });
+  it('공격하는 적은 모두 피격 이펙트(hitFx)가 있고, 그 이펙트는 명세가 있다(2026-10-12 D1)', async () => {
+    const { readdirSync } = await import('node:fs');
+    const specs = new Set(readdirSync('specs/assets').map((f) => f.replace(/\.yaml$/, '')));
+    const errors: string[] = [];
+    for (const e of data.enemies.values()) {
+      if (e.id.startsWith('test_')) continue;
+      const attacks = e.moves.some((m) => m.effects.some((x) => x.op === 'damage'));
+      if (attacks && !e.hitFx) errors.push(`${e.id}: hitFx 없음`);
+      if (e.hitFx && !specs.has(e.hitFx)) errors.push(`${e.id}: 명세 없는 이펙트 ${e.hitFx}`);
+    }
+    expect(errors).toEqual([]);
+  });
 });
