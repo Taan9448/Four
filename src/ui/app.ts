@@ -748,7 +748,7 @@ export class App {
         pilgrimText: run.replayOf ? pilgrimLabel(data, run) : undefined,
         laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
         background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
-        skins: battleSkins(readWardrobe(data), run),
+        skins: battleSkins(data, readWardrobe(data), run),
         onQuit: (abandon) => {
           if (abandon && this.persist) {
             if (run.abyss) clearAbyss();
