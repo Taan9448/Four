@@ -1475,6 +1475,9 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .backdrop.mood-shop::after { background: radial-gradient(ellipse at 50% 0%, rgba(255, 176, 92, 0.2), transparent 50%), radial-gradient(ellipse at center, rgba(12, 8, 6, 0.15), rgba(12, 8, 6, 0.8) 85%); }
 .backdrop.mood-loadout:not(.has-art)::before { background: radial-gradient(ellipse at 20% 12%, rgba(242, 169, 59, 0.16), transparent 55%), linear-gradient(#2a2119 0%, #1d1712 60%, #15100c 100%); }
 .backdrop.mood-shop:not(.has-art)::before { background: radial-gradient(ellipse at 50% 10%, rgba(242, 160, 70, 0.2), transparent 55%), linear-gradient(#2c2018 0%, #1e1611 60%, #140f0b 100%); }
+/* 휴식(2026-10-12 사용자 요청): 밤 숲 모닥불 — 아래 가운데에서 번지는 불빛 */
+.backdrop.mood-rest::after { background: radial-gradient(ellipse at 50% 95%, rgba(255, 150, 70, 0.24), transparent 50%), radial-gradient(ellipse at center, rgba(8, 8, 12, 0.15), rgba(8, 8, 12, 0.8) 85%); }
+.backdrop.mood-rest:not(.has-art)::before { background: radial-gradient(ellipse at 50% 92%, rgba(242, 140, 60, 0.22), transparent 55%), linear-gradient(#1c1a24 0%, #15141b 60%, #0e0d12 100%); }
 @media (max-width: 600px) {
   .loadout-roster { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
   .lo-mate { min-height: 56px; padding: 7px 9px; }
