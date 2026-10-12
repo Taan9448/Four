@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b.
+Frames:
+Cell 1: a small dim purple rune appears above the center of the cell
+Cell 2: the rune grows into a ring of purple glyphs turning slowly
+Cell 3: the glyph ring at full size, dark purple chains of light hanging down from it
+Cell 4: the ring and chains sink downward and darken
+Cell 5: the glyphs crumble into dark purple flakes sinking
+Cell 6: a few dark flakes at the bottom
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+
+Fix: PIXEL GRID VALIDATION ERROR42%: previous result used oversized irregular10.6pxblocks. Make this a FINER128x128pixel effect percell with rigid4x4sourcepixel blocks, like a game sprite enlarged4x, NOT a chunky48x48pixel icon enlarged10x. Fill each colored block entirely with ONE flat color. All edges are hard square steps onone4pxgrid, no differentlysized fragments, no translucent/smooth glow, no gradients or softbands. Each ring is built from a thin4pxpixel core andtwo4pxflatbands, rather than large10pxjaggedtiles. Referenceimages show effect shape andpalette, do not copy their display enlargement. Keep WHITE orlightgrey highlights, mutedviolet #4b3a6b andblue-grey #3d4459 flattones; <=12colors. Allsix effects share centralaxisx256 andsamefieldorigin(256,256); ringandchains descend asdescribed without moving to anothercell. Purpleglyphs mustbe ABSTRACT GEOMETRIC marks, notlettersorwords. Rings andglowingchains only, noobjects orfloor. Cell6 clearlycontainsa few purplefallingflakes withenoughopaque pixelarea to countasdrawn, notemptydots, stillwellawayfromcellborders. Pureblackbackground,1536x1024,3x2 equal512pxcells,40pxinside-edgeclearance. Preserve all six specified phases.

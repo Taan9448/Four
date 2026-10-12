@@ -1,0 +1,12 @@
+id: kyle_red_hit
+type: character-anim
+character: kyle_red
+summary: 카일(붉은 검) 피격 3프레임
+depends_on: [kyle_red_ref]
+reference: assets/source/kyle_red_ref.png
+facing: right
+frame_notes:
+  1: struck, head snapped back, armor plates rattling
+  2: stumbling back, sword arm lowered
+  3: steadying, gritting teeth, sword raised again
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }

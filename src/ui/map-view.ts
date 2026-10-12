@@ -6,7 +6,7 @@ import { scarStartRift } from '../engine/battle';
 import { challengeDone, challengeState, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
-import { iconEl } from './icons';
+import { artOrGlyph, iconEl } from './icons';
 import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
@@ -22,6 +22,9 @@ const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite:
 const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', shop: '상점', boss: '보스' };
 /** 범례에만 더하는 표식: 폭주가 연 裂 틈새(GAME_DESIGN 7절) */
 const LEGEND_EXTRA: Record<string, [string, string]> = { crack: ['裂', '틈새'] };
+/** 노드 아이콘 시트(icons_nodes, 2026-10-12): 칸 순서. 그림이 오기 전에는 한자 */
+const NODE_ICON = ['story', 'battle', 'elite', 'event', 'rest', 'inn', 'shop', 'boss', 'crack'];
+const nodeMark = (kind: string, glyph: string) => artOrGlyph('icons_nodes', NODE_ICON.indexOf(kind) + 1, glyph, 'node-glyph');
 
 /** 세계의 틈이 나타나는 사건: S7 낙안봉을 넘은 밤의 아물지 않는 금 */
 const RIFT_FLAG = 'sky_crack';
@@ -431,7 +434,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           onclick: () => handlers.onEnter(n),
           ...tipAttrs(`${n.floor}층 · 裂 틈새`, [visited ? mod?.name ?? '' : '폭주가 연 자리. 틈의 짐승(이기면 상흔 -5와 유물)이나 틈새의 거래(감소 카드·봉인 유물)가 있다.', open ? '갈 수 있다' : ''].filter(Boolean).join('\n'), 'rift'),
         },
-        h('span', { class: 'node-glyph' }, '裂'),
+        nodeMark('crack', '裂'),
       );
     if (!visited && !open && !revealAll)
       return h(
@@ -456,7 +459,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         onclick: () => handlers.onEnter(n),
         ...tipAttrs(`${n.floor}층 · ${NODE_LABEL[n.type]}`, [known ? mod?.name ?? '' : '', open ? '갈 수 있다' : visited ? '지나온 곳' : ''].filter(Boolean).join('\n')),
       },
-      h('span', { class: 'node-glyph' }, NODE_GLYPH[n.type]),
+      nodeMark(n.type, NODE_GLYPH[n.type]),
     );
   });
 
@@ -617,7 +620,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         ),
         inventoryBox(data, run.gold, run.potions, run.relics),
         partyBox,
-        h('div', { class: 'box legend' }, [...Object.entries(NODE_LABEL).map(([k, v]) => [k, NODE_GLYPH[k], v] as const), ...Object.entries(LEGEND_EXTRA).map(([k, [g, v]]) => [k, g, v] as const)].map(([k, g, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, h('span', { class: 'node-glyph' }, g)), v))),
+        h('div', { class: 'box legend' }, [...Object.entries(NODE_LABEL).map(([k, v]) => [k, NODE_GLYPH[k], v] as const), ...Object.entries(LEGEND_EXTRA).map(([k, [g, v]]) => [k, g, v] as const)].map(([k, g, v]) => h('span', {}, h('b', { class: `node node-${k} mini` }, nodeMark(k, g)), v))),
         h(
           'div',
           { class: 'map-actions' },

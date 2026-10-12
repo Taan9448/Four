@@ -52,7 +52,7 @@ import { applySettings, BUILD_SHORT, settings, settingsForm } from './settings';
 import { sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
-import { iconEl } from './icons';
+import { artOrGlyph, iconEl } from './icons';
 import { loadPortrait } from '../render/portrait';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
@@ -213,7 +213,7 @@ export class App {
         return this.show(this.withCards(this.backdrop(shopView(data, ar, shop, ar.map.floors[0][0].id, () => this.map()), 'bg_shop')));
       }
       const mod = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === ar.stageId && m.type === 'rest')!;
-      return this.show(this.withCards(this.backdrop(choiceView(data, ar, mod, () => this.map()))));
+      return this.show(this.withCards(this.backdrop(choiceView(data, ar, mod, () => this.map()), mod.type === 'rest' ? 'bg_rest' : undefined)));
     }
     let run = createRunAt(data, 'SCREEN', stageId, { supportActive: true });
     // &pilgrim: 클리어한 런에서 이 스테이지를 다시 걷는 길(순례)로 띄운다
@@ -227,7 +227,7 @@ export class App {
     switch (name) {
       case 'choice': {
         const module = data.modules.get(id ?? '') ?? [...data.modules.values()].find((m) => m.stage === stageId && m.type === 'rest')!;
-        return this.show(this.withCards(this.backdrop(choiceView(data, run, module, () => this.map()))));
+        return this.show(this.withCards(this.backdrop(choiceView(data, run, module, () => this.map()), module.content.background ?? (module.type === 'rest' ? 'bg_rest' : undefined))));
       }
       case 'scene':
         return this.playScene(id ?? [...data.scenes.keys()][0], () => this.map());
@@ -374,10 +374,11 @@ export class App {
    */
   private backdrop(el: HTMLElement, art?: string): HTMLElement {
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
-    // 화면 전용 그림(편성 bg_loadout · 상점 bg_shop)이 아직 없으면 스테이지 배경으로
+    // 화면 전용 그림(편성 bg_loadout · 상점 bg_shop · 휴식 bg_rest)이 아직 없으면 스테이지 배경으로
     const url = (art ? frameUrl(art, 1, { realOnly: true }) : null) ?? frameUrl(stage?.background, 1, { realOnly: true });
     el.classList.add('backdrop', `world-${stage?.world ?? 'murim'}`);
-    if (art === 'bg_loadout' || art === 'bg_shop') el.classList.add(art === 'bg_shop' ? 'mood-shop' : 'mood-loadout');
+    const mood = ({ bg_loadout: 'mood-loadout', bg_shop: 'mood-shop', bg_rest: 'mood-rest' } as Record<string, string>)[art ?? ''];
+    if (mood) el.classList.add(mood);
     if (url) {
       el.classList.add('has-art');
       el.style.setProperty('--backdrop', `url("${url}")`);
@@ -694,7 +695,7 @@ export class App {
             this.withCards(
               this.backdrop(
                 choiceView(data, run, enc.module, () => this.map(), enc.module.type === 'inn' ? { onEditLoadout: () => this.loadout(showChoice) } : {}),
-                enc.module.content.background,
+                enc.module.content.background ?? (enc.module.type === 'rest' ? 'bg_rest' : undefined),
               ),
             ),
           );
@@ -721,7 +722,7 @@ export class App {
     if (skip.auto) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     playBgm(mood ?? moodFor(scene.world ?? stage?.world));
-    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags, skip }));
+    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
   private battle(enc: Encounter): void {
@@ -747,7 +748,7 @@ export class App {
         pilgrimText: run.replayOf ? pilgrimLabel(data, run) : undefined,
         laws: (run.abyss?.laws ?? []).map((id) => data.laws.get(id)!).filter(Boolean),
         background: enc.module.content.background ?? (run.abyss ? own.background : stage.background),
-        skins: battleSkins(readWardrobe(data), run),
+        skins: battleSkins(data, readWardrobe(data), run),
         onQuit: (abandon) => {
           if (abandon && this.persist) {
             if (run.abyss) clearAbyss();
@@ -1221,7 +1222,7 @@ export class App {
                 // 열린 단계는 줄 전체를 눌러 고른다(같은 단계를 다시 누르면 한 단계 아래로)
                 onclick: o.level <= maxOath ? () => ((oath = oath === o.level ? o.level - 1 : o.level), render()) : undefined,
               },
-              h('span', { class: 'abyss-oath-glyph' }, o.glyph),
+              artOrGlyph('icons_oaths', o.level, o.glyph, 'abyss-oath-glyph'),
               h('b', {}, o.level > maxOath ? `${o.level}단계 — 잠김` : `${o.level}. ${o.name}`),
               h('small', {}, o.level > maxOath ? (o.level === maxOath + 1 ? `${o.level + data.balance.abyss.oath.depthOffset}굽이를 넘거나, 서약 ${o.level - 1}단계로 ${data.balance.abyss.oath.stepDepth}굽이를 넘으면 열린다` : '') : o.description),
             ),

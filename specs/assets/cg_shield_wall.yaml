@@ -1,0 +1,11 @@
+id: cg_shield_wall
+type: story-cg
+character: kyle_red
+summary: 장면 일러스트 — 낙안봉 골짜기 — 삼천을 받아 내는 방패벽 삼백과 카일(S7, 3권 9장)
+# 2026-10-12 D2: 그림 없던 절정 장면(s7_scene_nakan)
+frame_notes:
+  1: >-
+    Dawn in a narrow rocky valley below Nakan peak of Mount Hua: a wall of three hundred farmers-turned-soldiers with big round wooden shields locked edge to edge, braced shoulder to shoulder, the second row pushing on the first, taking the charge of a dark tide of blood-cult fighters in black and crimson. In the middle of the wall stands Kyle Rowen, blond young knight in silver plate armor, shouting with his crimson-bladed long sword raised high, the blade glowing like embers in the grey dawn light. Banners of Wudang and Shaolin on the valley flanks; on the cliff above, a short red-bearded dwarf with a hammer looks down at a marked point in the rock. Dust, arrows, the peak's fortress far above.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3a2a22' }
