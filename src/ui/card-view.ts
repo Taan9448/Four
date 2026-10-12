@@ -2,7 +2,7 @@
 import type { GameData } from '../engine/data';
 import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../engine/state';
 import { cardGlossary, cardTextParts, type CardTextParts } from '../engine/text';
-import { acquirePreview } from '../engine/collection';
+import { acquirePreview, cardPoints } from '../engine/collection';
 import type { RunState } from '../engine/run';
 import { cardArtUrl, frameUrl, spriteMeta } from '../render/assets';
 import { isPxCardsPreview } from './debug';
@@ -44,6 +44,13 @@ export interface CardViewOpts {
 }
 
 export function cardView(data: GameData, inst: CardInstance | string, opts: CardViewOpts = {}): HTMLElement {
+  const el = cardViewInner(data, inst, opts);
+  // 화면의 카드 id(보유 카드 창이 '지금 보이는 후보'를 짚는다 — 2026-10-12 B2)
+  el.dataset.cardId = typeof inst === 'string' ? inst : inst.cardId;
+  return el;
+}
+
+function cardViewInner(data: GameData, inst: CardInstance | string, opts: CardViewOpts): HTMLElement {
   const card = resolveCard(data, inst);
   const def = card.def;
   const owner = data.characters.get(def.owner);
@@ -209,9 +216,9 @@ export function offerCardView(data: GameData, run: RunState, cardId: string): HT
   const el = cardView(data, { uid: `offer:${cardId}`, cardId, level: p.level });
   const [cls, label, tip] =
     p.kind === 'new'
-      ? ['new', '새 카드', '아직 없는 카드. 보유 카드와 이번 스테이지 덱에 들어간다.']
+      ? ['new', `새 카드 · ${cardPoints(data, data.cards.get(cardId)!)}점`, '아직 없는 카드. 보유 카드에 들어가고, 다음 편성(여관·출발 전)에서 덱에 넣을 수 있다. N점 = 편성 점수.']
       : p.kind === 'upgrade'
-        ? ['up', `보유 +${p.from} → +${p.level}`, '이미 가진 카드라 보유 카드가 +1 강화된다(보이는 모습이 강화 뒤).']
+        ? ['up', `보유 중 · 강화 +1`, `이미 가진 카드라 보유 카드가 +${p.from} → +${p.level}로 강화된다(보이는 모습이 강화 뒤).`]
         : ['max', `최대 강화 → 골드 +${p.gold}`, '이미 최대로 강화한 카드라 대신 골드를 받는다.'];
   el.prepend(h('span', { class: `offer-badge offer-${cls}`, ...tipAttrs(label, tip) }, label));
   return el;

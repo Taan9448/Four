@@ -142,7 +142,7 @@
     "target": "enemy",
     "tags": ["elia_burn"],
     "hitFx": "fx_hit_fire",
-    "effects": [{"op": "damage", "amount": 40, "element": "fire"}],
+    "effects": [{"op": "damage", "amount": 50, "element": "fire"}],
     "upgrade": {"growth": [20], "plus4": {"name": "송진", "effects": [{"op": "damage", "amount": 30, "element": "fire"}]}, "plus5": {"name": "밤길의 불", "effects": [{"op": "block", "amount": 30}]}},
     "flavor": "산짐승은 불을 무서워한다. 산짐승이 아닌 것들도 대개는 그렇다."
   },
@@ -155,7 +155,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_allies",
-    "effects": [{"op": "remove_status", "status": "chill", "target": "all_allies"}, {"op": "heal", "amount": 20, "target": "all_allies"}],
+    "effects": [{"op": "remove_status", "status": "chill", "target": "all_allies"}, {"op": "heal", "amount": 30, "target": "all_allies"}],
     "upgrade": {"growth": [0, 10], "plus4": {"name": "마른 장작", "effects": [{"op": "block", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "둘러앉다", "effects": [{"op": "remove_status", "status": "bind", "target": "all_allies"}]}},
     "flavor": "언 손을 모닥불에 녹이며, 일행은 오랜만에 아무 말도 하지 않았다."
   },
@@ -182,7 +182,7 @@
     "pool": "reward",
     "cost": {"neigong": 2, "mana": 0},
     "target": "all_enemies",
-    "effects": [{"op": "damage", "amount": 70}],
+    "effects": [{"op": "damage", "amount": 80}],
     "upgrade": {"growth": [20], "plus4": {"name": "밀려나는 바람", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "먼지가 가라앉기 전에", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "손바닥을 떠난 바람이 마당의 낙엽을 한쪽으로 쓸어 갔다. 낙엽 사이에 서 있던 자들도."
   },
@@ -210,7 +210,7 @@
     "cost": {"neigong": 0, "mana": 0},
     "target": "ally",
     "keywords": ["exhaust"],
-    "effects": [{"op": "heal", "amount": 80, "target": "ally"}],
+    "effects": [{"op": "heal", "amount": 100, "target": "ally"}],
     "upgrade": {"growth": [30], "plus4": {"name": "백 년 묵은", "effects": [{"op": "gain_neigong", "amount": 1}]}, "plus5": {"name": "잔뿌리까지", "effects": [{"op": "heal", "amount": 30, "target": "all_allies"}]}},
     "flavor": "심마니가 평생 한 번 본다는 뿌리. 아껴 두기엔 오늘이 너무 길었다."
   },
@@ -223,7 +223,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "all_enemies",
-    "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "block", "amount": 40, "target": "self"}],
+    "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "block", "amount": 60, "target": "self"}],
     "upgrade": {"growth": [0, 20], "plus4": {"name": "매운 연기", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "연기 속으로", "effects": [{"op": "draw", "amount": 1}]}},
     "flavor": "젖은 솔가지를 불에 던지자 매운 연기가 골짜기를 덮었다."
   },
@@ -250,6 +250,7 @@
     "pool": "reward",
     "cost": {"neigong": 0, "mana": 0},
     "target": "self",
+    "tags": ["haun_rift"],
     "keywords": ["exhaust"],
     "effects": [{"op": "gain_mana", "amount": 2}],
     "upgrade": {"growth": [1], "plus4": {"name": "푸른 결정", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "아직 남은 빛", "effects": [{"op": "block", "amount": 40}]}},
@@ -264,6 +265,7 @@
     "pool": "reward",
     "cost": {"neigong": 1, "mana": 0},
     "target": "enemy",
+    "tags": ["kyle_swift"],
     "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}, {"op": "apply_status", "status": "weak", "stacks": 1}, {"op": "draw", "amount": 1}],
     "upgrade": {"growth": [1, 0, 0], "plus4": {"name": "어깨 한 점", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "손끝의 감각", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "손가락 두 개로 어깨 한 점을 눌렀다. 상대의 팔이 저절로 내려갔다."
@@ -411,11 +413,11 @@
     "upgrade": {"growth": [0, 0, 30], "plus4": {"name": "벌모세수", "effects": [{"op": "draw", "amount": 2}]}, "plus5": {"name": "새 뼈, 새 숨", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "뼈를 바꾸고 태를 벗는다(換骨奪胎). 전설로만 전하는 일이, 하운의 몸 안에서 조용히 일어났다."
   },
-  {"id": "common_deep_inhale", "name": "깊은 숨", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "self", "keywords": ["exhaust"], "effects": [{"op": "rift", "amount": -1}, {"op": "gain_neigong", "amount": 1}, {"op": "block", "amount": 20, "target": "self"}], "upgrade": {"growth": [0, 0, 20], "plus4": {"name": "길게 내쉰다", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "숨을 아끼다", "removeKeywords": ["exhaust"]}}, "flavor": "세 번 짧게, 한 번 길게. 긴 숨이 금을 하나 덮었다."},
+  {"id": "common_deep_inhale", "name": "깊은 숨", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "self", "tags": ["haun_rift"], "keywords": ["exhaust"], "effects": [{"op": "rift", "amount": -1}, {"op": "gain_neigong", "amount": 1}, {"op": "block", "amount": 20, "target": "self"}], "upgrade": {"growth": [0, 0, 20], "plus4": {"name": "길게 내쉰다", "effects": [{"op": "rift", "amount": -1}]}, "plus5": {"name": "숨을 아끼다", "removeKeywords": ["exhaust"]}}, "flavor": "세 번 짧게, 한 번 길게. 긴 숨이 금을 하나 덮었다."},
   {"id": "common_seal_charm", "name": "봉인 부적 조각", "owner": "common", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "self", "effects": [{"op": "apply_status", "status": "seal", "stacks": 1, "target": "self"}, {"op": "draw", "amount": 1}], "upgrade": {"growth": [1, 0], "plus4": {"name": "성한 조각", "effects": [{"op": "block", "amount": 30, "target": "self"}]}, "plus5": {"name": "가벼운 종이", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "찢어진 부적의 끄트머리. 붉은 인장 하나가 아직 살아 있다."},
   {"id": "common_branch_sword", "name": "나뭇가지와 검", "owner": "common", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "enemy", "tags": ["kyle_swift"], "effects": [{"op": "damage", "amount": 60}, {"op": "damage", "amount": 50, "condition": {"partyHas": "kyle"}}], "upgrade": {"growth": [20, 10], "plus4": {"name": "대련", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "검의 길", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}}, "flavor": "\"그 나뭇가지로 내 검을 받았다고?\" 카일은 웃으며 다시 덤볐다."},
-  {"id": "common_sword_on_barrier", "name": "결계 위의 검", "owner": "common", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "effects": [{"op": "block", "amount": 50, "target": "all_allies"}, {"op": "block", "amount": 30, "target": "all_allies", "condition": {"partyHas": "elia"}}], "upgrade": {"growth": [20, 0], "plus4": {"name": "함께 선 자리", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 결계", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "엘리아의 결계 위로 카일의 검이 내려섰다. 둘은 말없이 등을 맞댔다."},
-  {"id": "common_silver_bell_inn", "name": "은종 여관", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "keywords": ["exhaust"], "effects": [{"op": "heal", "amount": 30, "target": "all_allies"}], "upgrade": {"growth": [10], "plus4": {"name": "따뜻한 수프", "effects": [{"op": "block", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "단골손님", "removeKeywords": ["exhaust"]}}, "flavor": "은종이 달린 문을 열면 장작 연기 냄새. 하일론의 저녁은 늘 이 냄새였다."},
+  {"id": "common_sword_on_barrier", "name": "결계 위의 검", "owner": "common", "type": "skill", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "tags": ["born_iron"], "effects": [{"op": "block", "amount": 50, "target": "all_allies"}, {"op": "block", "amount": 30, "target": "all_allies", "condition": {"partyHas": "elia"}}], "upgrade": {"growth": [20, 0], "plus4": {"name": "함께 선 자리", "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}, "plus5": {"name": "가벼운 결계", "cost": {"neigong": 0, "mana": 0}}}, "flavor": "엘리아의 결계 위로 카일의 검이 내려섰다. 둘은 말없이 등을 맞댔다."},
+  {"id": "common_silver_bell_inn", "name": "은종 여관", "owner": "common", "type": "skill", "rarity": "common", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "none", "keywords": ["exhaust"], "effects": [{"op": "heal", "amount": 40, "target": "all_allies"}], "upgrade": {"growth": [10], "plus4": {"name": "따뜻한 수프", "effects": [{"op": "block", "amount": 30, "target": "all_allies"}]}, "plus5": {"name": "단골손님", "removeKeywords": ["exhaust"]}}, "flavor": "은종이 달린 문을 열면 장작 연기 냄새. 하일론의 저녁은 늘 이 냄새였다."},
   {"id": "common_strike_together", "name": "동시에 치다", "owner": "common", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 2, "mana": 0}, "target": "enemy", "tags": ["born_iron"], "effects": [{"op": "damage", "amount": 80}, {"op": "damage", "amount": 70, "condition": {"partyHas": "born"}}], "upgrade": {"growth": [20, 20], "plus4": {"name": "불꽃 하나", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1}]}, "plus5": {"name": "맞춘 숨", "cost": {"neigong": 1, "mana": 0}}}, "flavor": "도끼와 망치가 한 점을 동시에 쳤다. 불꽃이 하나만 튀었다."},
   {"id": "common_count_together", "name": "넷이서 세자", "owner": "common", "type": "skill", "rarity": "epic", "pool": "reward", "cost": {"neigong": 0, "mana": 0}, "target": "none", "keywords": ["exhaust"], "castLine": {"speaker": "haun", "face": "resolve", "text": "하나, 둘, 셋, 넷."}, "effects": [{"op": "rift", "amount": -1}, {"op": "rift", "amount": -1, "condition": {"partyHas": "elia"}}, {"op": "rift", "amount": -1, "condition": {"partyHas": "kyle"}}, {"op": "rift", "amount": -1, "condition": {"partyHas": "born"}}, {"op": "draw", "amount": 1}], "upgrade": {"growth": [0, 0, 0, 0, 1], "plus4": {"name": "포갠 손", "effects": [{"op": "block", "amount": 40, "target": "all_allies"}]}, "plus5": {"name": "다섯째 손", "effects": [{"op": "rift", "amount": -1}]}}, "flavor": "네 개의 손이 포개졌다. \"하나, 둘, 셋, 넷.\" 금이 하나씩 닫혔다."},
   {"id": "common_pull_wedge", "name": "쐐기를 뽑다", "owner": "common", "type": "attack", "rarity": "rare", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "all_enemies", "tags": ["haun_rift"], "effects": [{"op": "block", "amount": 40, "target": "self"}, {"op": "damage", "amount": 50, "condition": {"riftGte": 3}}, {"op": "rift", "amount": -3, "condition": {"riftGte": 3}}], "upgrade": {"growth": [0, 20, 0], "plus4": {"name": "금빛 틈", "effects": [{"op": "draw", "amount": 1}]}, "plus5": {"name": "깊은 쐐기", "effects": [{"op": "block", "amount": 40, "target": "self"}]}}, "flavor": "금에 박힌 검은 쐐기를 잡아 뽑았다. 틈새로 금빛이 새어 나왔다."}

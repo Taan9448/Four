@@ -3,9 +3,11 @@ import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
 import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, skipReward, upgradeCandidates, type RunState } from '../engine/run';
-import { swappableCards } from '../engine/collection';
+import { capFor, COMMON, loadoutOwners, loadoutPoints, swappableCards } from '../engine/collection';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
+import { tipAttrs } from './tooltip';
+import { scarBadge } from './map-view';
 import { chipKind } from './overlay';
 import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
@@ -50,6 +52,8 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
       panelHead(TYPE_SEAL[module.type] ?? '事', TYPE_LABEL[module.type] ?? module.type, module.name),
       h('p', { class: 'choice-text' }, module.content.text ?? ''),
       module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : '',
+      // 지금 상흔으로 걸린 효과(2026-10-12 A5): 휴식 회복 감소
+      (module.type === 'rest' && scarBadge(data, run.scar, 'rest')) || '',
       result
         ? h(
             'div',
@@ -233,6 +237,8 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
       panelHead('賞', '전투 승리', '전리품'),
       ...(loot ? [lootLine(data, loot.run, loot.shown)] : []),
       h('p', { class: 'choice-text' }, '카드 한 장을 골라 덱에 더한다. 마음에 드는 카드가 없으면 넘어간다.'),
+      // 보상 카드의 행선지(2026-10-12 A1): 캠페인은 보유 카드로 → 다음 편성에서 덱에. 심연은 덱에 바로
+      ...(run ? [rewardDestination(data, run)] : []),
       h(
         'div',
         { class: 'reward-cards' },
@@ -268,6 +274,34 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
     );
   main();
   return h('section', { class: 'screen reward-screen backdrop' }, box);
+}
+
+/** 보상 화면 머리: 고른 카드가 어디로 가는지 한 줄 + (캠페인) 지금 편성 점수 막대 — 편성 화면과 같은 막대 */
+function rewardDestination(data: GameData, run: RunState): HTMLElement {
+  if (run.abyss) return h('p', { class: 'reward-dest' }, '고른 카드는 덱에 바로 들어간다.');
+  if (run.replayOf) return h('p', { class: 'reward-dest' }, '고른 카드는 이 순례 길의 덱에만 들어간다.');
+  const owners = loadoutOwners(data, run);
+  return h(
+    'div',
+    { class: 'reward-dest' },
+    h('p', {}, '고른 카드는 보유 카드에 들어간다. 다음 편성(여관·출발 전)에서 덱에 넣을 수 있다.'),
+    h(
+      'div',
+      { class: 'reward-points' },
+      owners.map((o) => {
+        const pts = loadoutPoints(data, run.loadout[o] ?? []);
+        const cap = capFor(data, o);
+        const name = o === COMMON ? '공용' : (data.characters.get(o)?.name ?? o);
+        return h(
+          'span',
+          { class: 'reward-pts', ...tipAttrs('편성 점수', `${name} ${pts}/${cap}점 — 상한 ${cap}`) },
+          h('b', {}, name),
+          h('span', { class: 'lo-meter' }, h('i', { style: `width:${Math.min(100, Math.round((pts / Math.max(1, cap)) * 100))}%` })),
+          h('small', {}, `${pts}/${cap}`),
+        );
+      }),
+    ),
+  );
 }
 
 /** 보스 전리품: 골드·물약을 받고, 유물 후보 중 하나를 고른다 */

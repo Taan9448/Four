@@ -516,6 +516,11 @@ describe('팔레트 맞춤', () => {
     expect(hex(nearestColor(palette, 110, 84, 64))).toBe('#6e5440');
     expect(hex(nearestColor(palette, 242, 200, 160))).toBe('#f2c8a0');
   });
+  it('밝은 보라(저주·틈 이펙트)는 은회색이 아니라 보라 계열로 붙는다(2026-10-12 팔레트 35색)', () => {
+    expect(hex(nearestColor(palette, 163, 92, 255))).toBe('#a35cff');
+    expect(hex(nearestColor(palette, 200, 170, 250))).toBe('#d4b8ff');
+    expect(hex(nearestColor(palette, 110, 80, 165))).toBe('#6b4fa3');
+  });
 });
 
 describe('폴더 소유권 검사', () => {

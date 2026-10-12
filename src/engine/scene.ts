@@ -32,3 +32,20 @@ export function fastFaceChanges(scene: SceneDef, hold = FACE_HOLD_LINES): string
   });
   return out;
 }
+
+/** 장면 글자 속도(설정 textSpeed): 한 글자에 걸리는 ms — 1 보통 40 · 2 두 배 20 · 3 즉시 0 */
+export const TEXT_MS_PER_CHAR: Record<1 | 2 | 3, number> = { 1: 40, 2: 20, 3: 0 };
+
+/** 자동 진행: 한 줄이 다 나온 뒤 기다리는 시간 = 글자 수 × 40ms + 600ms, 최소 1.2초 */
+export const autoAdvanceDelay = (text: string) => Math.max(1200, [...text].length * 40 + 600);
+
+/**
+ * 본 장면 건너뛰기(2026-10-12 B3). seen = 이 브라우저 도감에 이미 기록된 장면.
+ * 처음 보는 장면은 절대 건너뛰지 않는다. 자동으로 건너뛰는 것은 설정이 켜져 있고, 순례·심연이거나 캠페인을 한 번 마친 뒤일 때만 —
+ * 캠페인 1회차는 '이미 본 장면 · 건너뛰기' 단추만 띄운다
+ */
+export function sceneSkip(opts: { seen: boolean; setting: boolean; mode: 'campaign' | 'pilgrimage' | 'abyss'; clears: number }): { button: boolean; auto: boolean } {
+  if (!opts.seen) return { button: false, auto: false };
+  const repeat = opts.mode !== 'campaign' || opts.clears > 0;
+  return { button: true, auto: opts.setting && repeat };
+}

@@ -20,6 +20,8 @@ const SCREENS = [
 const VIEWPORTS = [
   { tag: 'PC', width: 1440, height: 900, btn: 36 },
   { tag: '휴대폰', width: 390, height: 844, btn: 44, mobile: true },
+  // 휴대폰 가로(2026-10-12 B7): 전투·지도·보상만
+  { tag: '가로', width: 844, height: 390, btn: 44, mobile: true, only: ['battle', 'map', 'reward'] },
 ];
 const FONTS = [
   { tag: '보통', scale: 1 },
@@ -209,7 +211,7 @@ const browser = await launch();
 const rows = [];
 try {
   // 페이지 여러 개를 동시에 연다(UX_JOBS, 기본 4)
-  const jobs = screens.flatMap(([name, query]) => VIEWPORTS.flatMap((vp) => FONTS.map((font) => ({ name, query, vp, font }))));
+  const jobs = screens.flatMap(([name, query]) => VIEWPORTS.filter((vp) => !vp.only || vp.only.includes(name)).flatMap((vp) => FONTS.map((font) => ({ name, query, vp, font }))));
   const one = async ({ name, query, vp, font }) => {
     const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.mobile, hasTouch: !!vp.mobile });
     const errors = [];
@@ -261,7 +263,7 @@ const lines = [
   ...rows.map((r) => `| ${r.name} | ${r.vp} | ${r.font} | ${cell(r.small)} | ${cell(r.tiny)} | ${r.hscroll ? '있음' : '—'} | ${cell(r.overlaps)} | ${cell(r.errors)} |`),
 ];
 const bad = (k) => rows.filter((r) => (Array.isArray(r[k]) ? r[k].length : r[k])).length;
-lines.push('', `화면 ${rows.length}개(${screens.length}화면 × 기기 2 × 글자 2) — 작은 글자 ${bad('small')} · 작은 버튼 ${bad('tiny')} · 가로 스크롤 ${bad('hscroll')} · 겹침 ${bad('overlaps')} · 콘솔 오류 ${bad('errors')}`);
+lines.push('', `화면 ${rows.length}개(${screens.length}화면 × 기기 2(+가로) × 글자 2) — 작은 글자 ${bad('small')} · 작은 버튼 ${bad('tiny')} · 가로 스크롤 ${bad('hscroll')} · 겹침 ${bad('overlaps')} · 콘솔 오류 ${bad('errors')}`);
 const table = lines.join('\n');
 console.log(table);
 if (process.env.UX_OUT) writeFileSync(process.env.UX_OUT, table + '\n');
