@@ -44,7 +44,7 @@ import { openDeck } from './deck-view';
 import { relicChip } from './items';
 import { h } from './dom';
 import { initDebug } from './debug';
-import { mapView, openPartyGuide, pilgrimLabel, placeName } from './map-view';
+import { mapView, openPartyGuide, pilgrimLabel, placeName, startRiftMaxText } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
@@ -617,7 +617,7 @@ export class App {
     if (run.usedModules.includes('s1_story_first_snow') && !tourSeen('notice-rift'))
       return runTour([{ title: '균열', text: `융합 카드(내공과 마나를 함께 쓰는 카드)를 쓰면 하늘에 금이 간다. 전투의 균열이 ${data.balance.rift.max}이 되면 터진다 — 폭주.` }], { id: 'notice-rift' });
     if (run.flags.includes('rift_known') && !tourSeen('notice-scar'))
-      return runTour([{ title: '상흔', text: `전투가 끝날 때 남은 균열과 폭주가 상흔으로 남는다. 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(최대 ${sc.startRiftMax}). 휴식의 꿰매기, 폭주 없이 넘긴 보스, 裂 틈새로 덜어 낸다.` }], { id: 'notice-scar' });
+      return runTour([{ title: '상흔', text: `전투가 끝날 때 남은 균열과 폭주가 상흔으로 남는다. 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(${startRiftMaxText(data)}). 휴식의 꿰매기, 폭주 없이 넘긴 보스, 裂 틈새로 덜어 낸다.` }], { id: 'notice-scar' });
     if (run.map.cuts?.length && !tourSeen('notice-surge-map'))
       return runTour(
         [

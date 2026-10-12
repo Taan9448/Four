@@ -537,17 +537,19 @@ export const Balance = z
         scarRatio: z.number(),
         /**
          * 상흔(두 단계): 전투 시작 균열 = ⌊상흔 / startRiftPer⌋(최대 startRiftMax). 상흔 restAt 이상이면 휴식 회복 ×restHealMul.
-         * 휴식 '꿰매기' = 상흔 -stitch · 골드 stitchGold. 폭주 없이 보스를 이기면 상흔 -bossCleanBonus. 상흔 shopAt 이상이면 상점 단계
+         * 휴식 '꿰매기' = 상흔 -stitch · 골드 stitchGold. 폭주 없이 보스를 이기면 상흔 -bossCleanBonus. 상흔 shopAt 이상이면 상점 단계.
+         * startRiftMax는 세계별(틈 세계는 낮게 — 2026-10-12). bossClearScar: 그 스테이지 보스를 넘기면 폭주 여부와 상관없이 상흔 -N
          */
         scar: z
           .object({
             startRiftPer: z.number().int().positive(),
-            startRiftMax: z.number().int().min(0),
+            startRiftMax: z.record(z.string(), z.number().int().min(0)),
             restAt: z.number().int().min(0),
             restHealMul: z.number().min(0),
             stitch: z.number().int().min(0),
             stitchGold: z.number().int().min(0),
             bossCleanBonus: z.number().int().min(0),
+            bossClearScar: z.record(z.string(), z.number().int().min(0)).default({}),
             /** 상흔 shopAt 이상: 상점 값 ×shopPriceMul('틈 냄새가 나는 손님'), 감소 카드 한 장 보장, 상점 꿰매기(상흔 -shopStitch · 골드 shopStitchGold, 상점마다 한 번) */
             shopAt: z.number().int().min(0),
             shopPriceMul: z.number().min(1),
@@ -555,8 +557,11 @@ export const Balance = z
             shopStitchGold: z.number().int().min(0),
           })
           .strict(),
-        /** 폭주가 지도를 가른다: 지도마다 裂 틈새 최대 maxCracks개, 틈새가 틈의 짐승일 확률 beastChance(나머지는 틈새의 거래) */
-        map: z.object({ maxCracks: z.number().int().min(0), beastChance: z.number().min(0).max(1) }).strict(),
+        /**
+         * 폭주가 지도를 가른다: 지도마다 裂 틈새 최대 maxCracks개, 틈새가 틈의 짐승일 확률 beastChance(나머지는 틈새의 거래).
+         * 상흔 scarCrackAt 이상으로 새 지도에 들어서면 지도를 만든 직후 한 번 가른다(2026-10-12)
+         */
+        map: z.object({ maxCracks: z.number().int().min(0), beastChance: z.number().min(0).max(1), scarCrackAt: z.number().int().min(0).optional() }).strict(),
       })
       .strict(),
     grain: z.object({ damageBonus: z.number(), ignoreBlock: z.boolean(), knotThreshold: z.number().int() }).strict(),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { battleOutcome, canPlay, createBattle, endTurn, playCard } from '../src/engine/battle';
+import { battleOutcome, canPlay, createBattle, endTurn, playCard, scarStartRift } from '../src/engine/battle';
 import {
+  advanceStage,
   applyBattleOutcome,
   applyChoice,
   availableNodes,
@@ -150,7 +151,7 @@ describe('상흔 두 단계(GAME_DESIGN 7절, 2026-10-11 개편)', () => {
     expect(haun.hp).toBe(1 + Math.floor(haun.maxHp * 0.3 * 0.8));
   });
 
-  it('폭주 없이 보스를 이기면 상흔 -5, 폭주가 있었으면 그대로(+폭주 상흔)', () => {
+  it('폭주 없이 보스를 이기면 상흔 -bossCleanBonus, 폭주가 있었으면 그대로(+폭주 상흔)', () => {
     for (const surges of [0, 1]) {
       const run = createRun(data, `SCAR2${surges}`, { stageId: 's1' });
       run.scar = 8;
@@ -158,7 +159,43 @@ describe('상흔 두 단계(GAME_DESIGN 7절, 2026-10-11 개편)', () => {
       const enc = { node: boss, module: data.modules.get(boss.moduleId!)! };
       const party = run.selected.map((id) => ({ id, hp: run.roster.find((r) => r.id === id)!.hp }));
       applyBattleOutcome(data, run, enc as never, { result: 'victory', survived: false, party, mana: run.mana, scarGain: surges * 3, tally: { kills: 1, damage: 0, crits: 0, surges, cards: {} } });
-      expect(run.scar).toBe(surges ? 11 : 3);
+      expect(run.scar).toBe(surges ? 11 : Math.max(0, 8 - data.balance.rift.scar.bossCleanBonus));
+    }
+  });
+
+  it('S8 혈전을 넘기면 폭주가 있었어도 상흔 -bossClearScar(2026-10-12)', () => {
+    const cut = data.balance.rift.scar.bossClearScar.s8;
+    expect(cut).toBeGreaterThan(0);
+    const run = createRun(data, 'SCAR8', { stageId: 's8' });
+    run.scar = 20;
+    const boss = run.map.floors.flat().find((n) => n.type === 'boss')!;
+    const enc = { node: boss, module: data.modules.get(boss.moduleId!)! };
+    const party = run.selected.map((id) => ({ id, hp: run.roster.find((r) => r.id === id)!.hp }));
+    const out = applyBattleOutcome(data, run, enc as never, { result: 'victory', survived: false, party, mana: run.mana, scarGain: 0, tally: { kills: 1, damage: 0, crits: 0, surges: 1, cards: {} } });
+    expect(run.scar).toBe(20 - cut);
+    expect(out).toContain(`혈전을 넘어 상흔 -${cut}`);
+  });
+
+  it('전투 시작 균열 상한은 세계별(틈 세계는 낮게)', () => {
+    const per = data.balance.rift.scar.startRiftPer;
+    const max = data.balance.rift.scar.startRiftMax;
+    expect(scarStartRift(data, per * 10, 'murim')).toBe(max.murim);
+    expect(scarStartRift(data, per * 10, 'rift')).toBe(max.rift);
+    expect(max.rift).toBeLessThan(max.murim);
+    expect(scarStartRift(data, per, 'rift')).toBe(1);
+  });
+
+  it('상흔 scarCrackAt 이상으로 다음 스테이지에 들어서면 지도가 한 번 갈라진다(폭주 수에는 안 셈)', () => {
+    const at = data.balance.rift.map.scarCrackAt!;
+    for (const scar of [at - 1, at]) {
+      const run = createRun(data, 'SCARMAP', { stageId: 's1' });
+      run.scar = scar;
+      run.status = 'stage_clear';
+      expect(advanceStage(data, run)).toBe(true);
+      const cracked = run.map.floors.flat().some((n) => n.crack);
+      expect(!!run.map.scarCrack).toBe(scar >= at);
+      expect(cracked || (run.map.cuts?.length ?? 0) > 0).toBe(scar >= at);
+      expect(run.map.surges ?? 0).toBe(0);
     }
   });
 });

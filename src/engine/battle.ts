@@ -85,6 +85,16 @@ export interface BattleSetup {
   enemyMods?: (EnemyMod | undefined)[];
 }
 
+/** 세계별 전투 시작 균열 상한(없으면 0) */
+export function startRiftCap(data: GameData, world: string): number {
+  return data.balance.rift.scar.startRiftMax[world] ?? 0;
+}
+
+/** 상흔이 남긴 전투 시작 균열: ⌊상흔 ÷ startRiftPer⌋, 최대 세계별 startRiftMax */
+export function scarStartRift(data: GameData, scar: number, world: string): number {
+  return Math.min(startRiftCap(data, world), Math.floor(scar / data.balance.rift.scar.startRiftPer));
+}
+
 export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   const bal = data.balance;
   const partyMax = setup.partyMax ?? bal.party.max;
@@ -121,8 +131,8 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     neigongMax: laws.find((l) => l.battle.neigongPerTurn)?.battle.neigongPerTurn ?? bal.neigongPerTurn,
     manaRule: worldMana,
     mana: Math.max(0, Math.min(bal.mana.max, startMana)),
-    // 상흔이 남은 만큼 금이 간 채로 시작한다(상흔 ÷ startRiftPer, 최대 startRiftMax)
-    rift: Math.min(data.balance.rift.scar.startRiftMax, Math.floor((setup.scar ?? 0) / data.balance.rift.scar.startRiftPer)),
+    // 상흔이 남은 만큼 금이 간 채로 시작한다(상흔 ÷ startRiftPer, 최대 세계별 startRiftMax)
+    rift: scarStartRift(data, setup.scar ?? 0, setup.world),
     party,
     enemies,
     draw: [],
