@@ -83,7 +83,7 @@
     "name": "용암 핏줄의 골렘",
     "weight": 2,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "용암 줄기가 산의 뿌리까지 이어진 골렘. 쿵, 심장이 뛸 때마다 몸이 붉게 뛰고, 깨진 자리를 산이 메운다.", "enemies": ["vein_golem"], "enemyScale": {"hp": 1.3}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 눈을 감고 귀를 기울인다. 무언가를 듣고 있다. (용암 핏줄 골렘 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"text": "용암 줄기가 산의 뿌리까지 이어진 골렘. 쿵, 심장이 뛸 때마다 몸이 붉게 뛰고, 깨진 자리를 산이 메운다.", "enemies": ["vein_golem"], "enemyScale": {"hp": 1.35}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 눈을 감고 귀를 기울인다. 무언가를 듣고 있다. (용암 핏줄 골렘 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s4_elite_unburied",
