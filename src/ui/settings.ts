@@ -135,39 +135,140 @@ export function update(patch: Partial<Settings>): void {
   applySettings();
 }
 
-/** 설정 항목(오버레이 안에 넣는다) */
-export function settingsForm(opts: { onGlossary?: () => void } = {}): HTMLElement {
-  const radios = (key: 'speed' | 'shake' | 'fontScale' | 'textSpeed', label: string, options: { value: number; label: string }[]) =>
+/** 설정 탭(2026-10-13 사용자 확정 목업): 항목 20줄을 한 목록에 늘어놓던 것을 여섯 묶음으로 나눈다 */
+export type SettingsTab = 'sound' | 'battle' | 'view' | 'scene' | 'help' | 'save';
+
+export const SETTINGS_TABS: { id: SettingsTab; seal: string; label: string; desc: string; lead: string; keys: (keyof Settings)[] }[] = [
+  { id: 'sound', seal: '聲', label: '소리', desc: '크기 세 가지', lead: '배경음악과 효과음을 따로 조절한다.', keys: ['master', 'bgm', 'sfx'] },
+  { id: 'battle', seal: '戰', label: '전투', desc: '속도·연출·확인', lead: '전투 화면에서만 쓰이는 설정.', keys: ['speed', 'shake', 'cutIn', 'confirmEndTurn', 'confirmPotion'] },
+  { id: 'view', seal: '畵', label: '화면', desc: '글자·움직임·보조', lead: '글자 크기와 화면 움직임, 읽기를 돕는 표시.', keys: ['fontScale', 'motion', 'glyphLabels', 'colorAssist'] },
+  { id: 'scene', seal: '幕', label: '장면', desc: '대사 속도·진행', lead: '이야기 장면의 대사가 넘어가는 방식.', keys: ['textSpeed', 'autoAdvance', 'skipSeenScenes'] },
+  { id: 'help', seal: '助', label: '도움말', desc: '안내·단축키·용어', lead: '처음 안내를 다시 보거나, 조작·용어를 찾아본다.', keys: [] },
+  { id: 'save', seal: '存', label: '저장', desc: '백업·가져오기', lead: '저장은 지도에 설 때마다 자동으로 된다. 전투·이벤트 도중 새로고침하면 그 직전 지도에서 이어진다.', keys: [] },
+];
+
+/** 마지막으로 본 탭(이번 접속 동안 기억). 전투 메뉴는 늘 「전투」로 연다 */
+let lastTab: SettingsTab = 'sound';
+
+/** 한 탭의 설정을 기본값으로 */
+export function resetTab(tab: SettingsTab): void {
+  const keys = SETTINGS_TABS.find((t) => t.id === tab)?.keys ?? [];
+  update(Object.fromEntries(keys.map((k) => [k, DEFAULTS[k]])) as Partial<Settings>);
+}
+
+let uid = 0;
+
+/** 설정 창 내용(오버레이 안에 넣는다): 왼쪽(휴대폰은 위) 탭 + 오른쪽 항목 + 바닥줄 */
+export function settingsForm(opts: { onGlossary?: () => void; tab?: SettingsTab } = {}): HTMLElement {
+  const id = `settings-${++uid}`;
+  let cur: SettingsTab = opts.tab ?? lastTab;
+  const panel = h('div', { class: 'settings-panel', role: 'tabpanel', id: `${id}-panel`, tabindex: '-1' });
+  const resetBtn = h('button', { class: 'btn btn-small', type: 'button', onclick: () => (resetTab(cur), show(cur)) }, '이 탭 기본값으로');
+  const tabs = SETTINGS_TABS.map((t, i) =>
     h(
-      'div',
-      { class: 'setting-options', role: 'radiogroup', 'aria-label': label },
+      'button',
+      {
+        class: 'settings-tab',
+        type: 'button',
+        role: 'tab',
+        id: `${id}-tab-${t.id}`,
+        'aria-controls': `${id}-panel`,
+        onclick: () => show(t.id),
+        onkeydown: (ev: Event) => {
+          const e = ev as KeyboardEvent;
+          const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+          if (!step) return;
+          e.preventDefault();
+          const next = SETTINGS_TABS[(i + step + SETTINGS_TABS.length) % SETTINGS_TABS.length].id;
+          show(next);
+          tabs[SETTINGS_TABS.findIndex((x) => x.id === next)].focus();
+        },
+      },
+      h('span', { class: 'settings-seal', 'aria-hidden': 'true' }, t.seal),
+      h('span', { class: 'settings-tab-text' }, h('b', {}, t.label), h('small', {}, t.desc)),
+    ),
+  );
+  const show = (tab: SettingsTab) => {
+    cur = tab;
+    if (!opts.tab) lastTab = tab;
+    const info = SETTINGS_TABS.find((t) => t.id === tab)!;
+    tabs.forEach((b, i) => {
+      const on = SETTINGS_TABS[i].id === tab;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+      b.tabIndex = on ? 0 : -1;
+    });
+    panel.setAttribute('aria-labelledby', `${id}-tab-${tab}`);
+    resetBtn.hidden = info.keys.length === 0;
+    panel.replaceChildren(h('p', { class: 'settings-lead' }, info.lead), ...tabRows(tab, opts).filter((x): x is HTMLElement => !!x));
+  };
+  show(cur);
+  return h(
+    'div',
+    { class: 'settings' },
+    h('div', { class: 'settings-tabs', role: 'tablist', 'aria-label': '설정 분류', 'aria-orientation': 'vertical' }, tabs),
+    panel,
+    h('div', { class: 'settings-foot' }, h('span', {}, `빌드 ${BUILD_SHORT}`, h('span', { class: 'settings-foot-note' }, ' · 바꾼 값은 바로 적용·저장된다')), resetBtn),
+  );
+}
+
+/** 이름(+ 한 줄 설명) | 조작 한 줄 */
+function row(name: string, hint: string, control: HTMLElement | HTMLElement[], tag: 'div' | 'label' = 'div'): HTMLElement {
+  return h(tag, { class: 'set-row' }, h('span', { class: 'set-label' }, h('span', { class: 'set-name' }, name), hint ? h('small', {}, hint) : null), control);
+}
+
+const head = (text: string) => h('h3', { class: 'set-head' }, text);
+
+/** 여러 개 중 하나: 한 칸에 붙은 선택 버튼(속은 진짜 라디오라 화살표 키가 그대로 된다) */
+function seg(key: 'speed' | 'shake' | 'fontScale' | 'textSpeed', name: string, hint: string, options: { value: number; label: string }[]): HTMLElement {
+  const group = `set-${key}-${++uid}`;
+  return row(
+    name,
+    hint,
+    h(
+      'span',
+      { class: 'set-seg', role: 'radiogroup', 'aria-label': name },
       options.map((o) =>
         h(
           'label',
-          { class: 'setting-option' },
-          h('input', { type: 'radio', name: key, checked: settings[key] === o.value, onchange: () => update({ [key]: o.value }) }),
-          ` ${o.label}`,
+          { class: 'set-seg-opt' },
+          h('input', { type: 'radio', name: group, class: 'visually-hidden', checked: settings[key] === o.value, onchange: () => update({ [key]: o.value }) }),
+          h('span', {}, o.label),
         ),
       ),
-    );
-  const toggle = (key: 'cutIn' | 'motion' | 'confirmEndTurn' | 'glyphLabels' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', label: string, hint: string) =>
+    ),
+  );
+}
+
+/** 켜고 끄기: 줄 전체가 스위치(속은 role=switch 체크박스) */
+function toggle(key: 'cutIn' | 'motion' | 'confirmEndTurn' | 'glyphLabels' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', name: string, hint: string): HTMLElement {
+  return row(
+    name,
+    hint,
+    [
+      h('input', { type: 'checkbox', role: 'switch', class: 'visually-hidden', checked: settings[key], onchange: (e: Event) => update({ [key]: (e.target as HTMLInputElement).checked }) }),
+      h('span', { class: 'set-switch', 'aria-hidden': 'true' }),
+    ],
+    'label',
+  );
+}
+
+function slider(key: 'master' | 'bgm' | 'sfx', name: string, hint: string): HTMLElement {
+  const inputId = `set-${key}-${++uid}`;
+  const out = h('output', { for: inputId }, `${Math.round(settings[key] * 100)}`);
+  const r = row(
+    name,
+    hint,
     h(
-      'label',
-      { class: 'setting-row setting-toggle' },
-      h('input', { type: 'checkbox', checked: settings[key], onchange: (e: Event) => update({ [key]: (e.target as HTMLInputElement).checked }) }),
-      h('span', {}, label, h('small', {}, hint)),
-    );
-  const slider = (key: 'master' | 'bgm' | 'sfx', label: string, hint: string) => {
-    const out = h('output', {}, `${Math.round(settings[key] * 100)}`);
-    return h(
-      'label',
-      { class: 'setting-row setting-volume' },
-      h('span', {}, label, h('small', {}, hint)),
+      'span',
+      { class: 'set-volume' },
       h('input', {
+        id: inputId,
         type: 'range',
         min: 0,
         max: 100,
         step: 5,
+        'aria-label': name,
         value: Math.round(settings[key] * 100),
         oninput: (e: Event) => {
           const v = Number((e.target as HTMLInputElement).value) / 100;
@@ -176,111 +277,110 @@ export function settingsForm(opts: { onGlossary?: () => void } = {}): HTMLElemen
         },
       }),
       out,
-    );
-  };
-  return h(
-    'div',
-    { class: 'settings-form' },
-    slider('master', '소리', '전체 크기(0이면 끔)'),
-    slider('bgm', '배경음악', '장소·전투마다 바뀌는 곡'),
-    slider('sfx', '효과음', '타격·카드·버튼 소리'),
-    h('div', { class: 'setting-row' }, h('span', {}, '전투 속도', h('small', {}, '연출 사이의 기다림')), radios('speed', '전투 속도', SPEEDS)),
-    toggle('cutIn', '컷인 연출', '영웅·전설 카드를 쓸 때 반신 그림과 대사'),
-    toggle('motion', '화면 연출', '시작 화면의 빛·안개·꽃잎, 영웅·전설 카드의 빛'),
-    h(
-      'div',
-      { class: 'setting-pair' },
-      toggle('confirmEndTurn', '턴 종료 확인', '쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다'),
-      toggle('confirmPotion', '물약 확인', '물약을 한 번 더 눌러야 쓴다(대상을 고르는 물약은 그대로)'),
-    ),
-    h('div', { class: 'setting-row' }, h('span', {}, '화면 흔들림', h('small', {}, '피격·폭주 때 흔들리는 세기')), radios('shake', '화면 흔들림', SHAKES)),
-    h('div', { class: 'setting-row' }, h('span', {}, '글자 크기', h('small', {}, '화면 전체 글자(크게 = 112%)')), radios('fontScale', '글자 크기', FONT_SCALES)),
-    h('div', { class: 'setting-row' }, h('span', {}, '장면 글자 속도', h('small', {}, '대사가 찍히는 빠르기(즉시 = 한 번에)')), radios('textSpeed', '장면 글자 속도', TEXT_SPEEDS)),
-    toggle('autoAdvance', '장면 자동 진행', '한 줄이 다 나오면 잠시 뒤 다음 줄로. 화면을 누르면 멈춘다. 선택지에서는 기다린다'),
-    toggle('skipSeenScenes', '본 장면 건너뛰기', '이 브라우저에서 이미 본 장면만 자동으로 넘긴다(처음 보는 장면은 늘 보여 준다)'),
-    toggle('glyphLabels', '표식에 글자 함께', '전투의 한자 표식(抽·棄·滅·冊·記·設) 아래에 뽑을·버림·소멸·덱·기록·설정'),
-    toggle('colorAssist', '색각 보정', '등급 보석에 모양(일반 ◇ 고급 △ 희귀 ○ 영웅 ☆ 전설 ✦), 상태에 ▲ 이로움 · ▼ 해로움 · ◆ 특성'),
-    h(
-      'div',
-      { class: 'setting-row' },
-      h('span', {}, '단축키', h('small', {}, '전투의 키보드 조작')),
-      h('button', { class: 'btn btn-small', onclick: () => openShortcuts() }, '단축키 안내'),
-    ),
-    tourRows(),
-    opts.onGlossary
-      ? h(
-          'div',
-          { class: 'setting-row' },
-          h('span', {}, '용어', h('small', {}, '내공·마나·균열·상흔·편성 점수… 도감의 용어 표')),
-          h('button', { class: 'btn btn-small', onclick: () => opts.onGlossary!() }, '용어 보기'),
-        )
-      : null,
-    saveRows(),
-    h(
-      'p',
-      { class: 'setting-foot' },
-      h('span', {}, `빌드 ${BUILD_SHORT}`),
-      ' · 저장: 지도에 설 때마다 자동. 전투·이벤트 도중 새로고침하면 그 직전 지도에서 이어진다.',
     ),
   );
+  r.classList.add('set-row-volume');
+  return r;
 }
 
-/** 안내 다시 보기(2026-10-12 B5): 모두 비우기 + 하나씩 되돌리기 */
-function tourRows(): HTMLElement {
+function action(name: string, hint: string, ...buttons: (HTMLElement | null)[]): HTMLElement {
+  return row(name, hint, h('span', { class: 'set-actions' }, buttons));
+}
+
+function tabRows(tab: SettingsTab, opts: { onGlossary?: () => void }): (HTMLElement | null)[] {
+  switch (tab) {
+    case 'sound':
+      return [slider('master', '전체 소리', '0이면 모든 소리가 꺼진다'), slider('bgm', '배경음악', ''), slider('sfx', '효과음', '')];
+    case 'battle':
+      return [
+        seg('speed', '전투 속도', '연출 사이 기다림', SPEEDS),
+        seg('shake', '화면 흔들림', '피격·폭주 때', SHAKES),
+        toggle('cutIn', '컷인 연출', '영웅·전설 카드의 반신 그림과 대사'),
+        head('실수 막기'),
+        toggle('confirmEndTurn', '턴 종료 전에 묻기', '쓸 수 있는 카드가 남았을 때만'),
+        toggle('confirmPotion', '물약은 두 번 눌러 쓰기', '대상을 고르는 물약은 그대로'),
+      ];
+    case 'view':
+      return [
+        seg('fontScale', '글자 크기', '크게 = 112%', FONT_SCALES),
+        toggle('motion', '배경 움직임', '시작 화면의 빛·안개, 영웅·전설 카드의 빛'),
+        head('읽기 보조'),
+        toggle('glyphLabels', '표식에 한글 함께', '抽 뽑을 · 棄 버림 · 滅 소멸 · 冊 덱 · 記 기록 · 設 설정'),
+        toggle('colorAssist', '색각 보정', '등급 보석에 ◇△○☆✦, 상태에 ▲이로움 ▼해로움 ◆특성'),
+      ];
+    case 'scene':
+      return [
+        seg('textSpeed', '대사 속도', '', TEXT_SPEEDS),
+        toggle('autoAdvance', '자동 진행', '한 줄이 끝나면 다음 줄로 · 누르면 멈춤 · 선택지에선 기다림'),
+        toggle('skipSeenScenes', '본 장면 건너뛰기', '처음 보는 장면은 늘 보여 준다'),
+      ];
+    case 'help':
+      return [
+        ...tourRows(),
+        head('찾아보기'),
+        action('단축키', '전투의 키보드 조작', h('button', { class: 'btn btn-small', type: 'button', onclick: () => openShortcuts() }, '단축키 보기')),
+        opts.onGlossary
+          ? action('용어 사전', '내공·마나·균열·상흔·편성 점수…', h('button', { class: 'btn btn-small', type: 'button', onclick: () => opts.onGlossary!() }, '도감에서 열기'))
+          : null,
+      ];
+    case 'save':
+      return saveRows();
+  }
+}
+
+/** 안내 다시 보기(2026-10-12 B5): 모두 비우기 + 하나씩 되돌리기(목록은 접어 둔다) */
+function tourRows(): HTMLElement[] {
+  const note = h('small', { class: 'setting-note', role: 'status' });
   const list = h('ul', { class: 'tour-reset-list' });
-  const draw = () =>
+  const count = h('small', {});
+  const allBtn = h(
+    'button',
+    {
+      class: 'btn btn-small',
+      type: 'button',
+      onclick: () => {
+        resetTours();
+        draw();
+        note.textContent = '다음에 해당 화면에 들어가면 안내가 다시 나온다.';
+      },
+    },
+    '모두 다시 보기',
+  ) as HTMLButtonElement;
+  const draw = () => {
+    const seen = TOUR_LIST.filter((t) => tourSeen(t.id)).length;
+    count.textContent = `본 안내 ${seen} / ${TOUR_LIST.length} · 지우면 다음에 그 화면에서 다시 나온다`;
+    allBtn.disabled = seen === 0;
     list.replaceChildren(
       ...TOUR_LIST.map((t) => {
-        const seen = tourSeen(t.id);
+        const on = tourSeen(t.id);
         return h(
           'li',
           {},
           h('span', {}, t.label),
-          h(
-            'button',
-            { class: 'btn btn-small', disabled: !seen, onclick: () => (resetTour(t.id), draw()) },
-            seen ? '다시 보기' : '다음에 나온다',
-          ),
+          h('button', { class: 'btn btn-small', type: 'button', disabled: !on, onclick: () => (resetTour(t.id), draw()) }, on ? '다시 보기' : '아직 안 봄'),
         );
       }),
     );
+  };
   draw();
-  const note = h('small', { class: 'setting-note', role: 'status' });
-  return h(
-    'div',
-    { class: 'setting-block' },
-    h(
-      'div',
-      { class: 'setting-row' },
-      h('span', {}, '안내 다시 보기', h('small', {}, '본 안내를 지우면 다음에 그 화면에 들어갈 때 다시 나온다')),
-      h(
-        'button',
-        {
-          class: 'btn btn-small',
-          onclick: () => {
-            resetTours();
-            draw();
-            note.textContent = '다음에 해당 화면에 들어가면 안내가 다시 나온다.';
-          },
-        },
-        '모두 다시',
-      ),
-    ),
+  return [
+    h('div', { class: 'set-row' }, h('span', { class: 'set-label' }, h('span', { class: 'set-name' }, '안내 다시 보기'), count), h('span', { class: 'set-actions' }, allBtn)),
     note,
-    list,
-  );
+    h('details', { class: 'set-details' }, h('summary', {}, '하나씩 고르기'), list),
+  ];
 }
 
 const when = (t: number) => (t ? new Date(t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—');
 
 /** 저장 내보내기·가져오기·되돌리기(2026-10-12 B1) */
-function saveRows(): HTMLElement {
+function saveRows(): HTMLElement[] {
   const kv = browserKV();
   const box = h('div', { class: 'backup-box', 'aria-live': 'polite' });
   const exportBtn = h(
     'button',
     {
       class: 'btn btn-small',
+      type: 'button',
       onclick: () => {
         const now = new Date();
         const blob = new Blob([JSON.stringify(exportBackup(kv, now), null, 1)], { type: 'application/json' });
@@ -290,7 +390,7 @@ function saveRows(): HTMLElement {
         setTimeout(() => (URL.revokeObjectURL(a.href), a.remove()), 1000);
       },
     },
-    '저장 내보내기',
+    '내보내기',
   );
   const input = h('input', { type: 'file', accept: '.json,application/json', class: 'visually-hidden', 'aria-label': '저장 파일 고르기' }) as HTMLInputElement;
   input.addEventListener('change', async () => {
@@ -311,11 +411,12 @@ function saveRows(): HTMLElement {
       h(
         'div',
         { class: 'backup-actions' },
-        h('button', { class: 'btn btn-small', onclick: () => box.replaceChildren() }, '그만두기'),
+        h('button', { class: 'btn btn-small', type: 'button', onclick: () => box.replaceChildren() }, '그만두기'),
         h(
           'button',
           {
             class: 'btn btn-small btn-danger',
+            type: 'button',
             onclick: () => {
               applyBackup(kv, parsed.file);
               location.reload();
@@ -326,27 +427,15 @@ function saveRows(): HTMLElement {
       ),
     );
   });
-  const undoBtn = hasUndo(kv)
-    ? h(
-        'button',
-        {
-          class: 'btn btn-small',
-          onclick: () => {
-            if (undoImport(kv)) location.reload();
-          },
-        },
-        '직전 가져오기 되돌리기',
-      )
-    : null;
-  return h(
-    'div',
-    { class: 'setting-block' },
-    h(
-      'div',
-      { class: 'setting-row' },
-      h('span', {}, '저장 백업', h('small', {}, '저장 칸·설정·도감·기록을 파일 하나로. 가져오기 전 지금 상태를 한 벌 남긴다')),
-      h('span', { class: 'setting-buttons' }, exportBtn, h('button', { class: 'btn btn-small', onclick: () => input.click() }, '저장 가져오기'), undoBtn, input),
-    ),
+  const undo = hasUndo(kv);
+  return [
+    action('저장 내보내기', '저장 칸·설정·도감·기록을 파일 하나로', exportBtn),
+    action('저장 가져오기', '덮어쓰기 전에 지금 상태를 한 벌 남긴다', h('button', { class: 'btn btn-small', type: 'button', onclick: () => input.click() }, '파일 고르기…'), input),
     box,
-  );
+    action(
+      '직전 가져오기 되돌리기',
+      undo ? '가져오기 바로 전 상태로' : '가져온 적이 없어 되돌릴 것이 없다',
+      h('button', { class: 'btn btn-small', type: 'button', disabled: !undo, onclick: () => undoImport(kv) && location.reload() }, '되돌리기'),
+    ),
+  ];
 }
