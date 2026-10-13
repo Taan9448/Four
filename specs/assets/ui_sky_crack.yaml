@@ -1,0 +1,34 @@
+id: ui_sky_crack
+type: ui-parts
+frames: 3
+summary: >-
+  the "crack in the sky" drawn over the journey band map (an East Asian ink-wash landscape) — a jagged black tear running
+  straight down from the top, with dull red light seeping out of it, in three stages that widen as the run's scars pile up
+# 2026-10-13 사용자 요청: 여정 띠 가운데 하늘의 금이 SVG 선이라 너무 단순하다 → Codex 그림으로.
+# 게임은 띠 가운데에 정사각형으로 얹고, 금(칸 높이 4~96%)이 띠 위 끝부터 띠 높이의 72%까지 오게 맞춘다.
+# 칸1 상흔 0~3 · 칸2 4~9 · 칸3 10 이상. 칸을 바꿔 끼워도 금이 튀지 않게 세 칸의 위 끝·아래 끝·가운데 줄기가 같아야 한다.
+frame_notes:
+  1: >-
+    STAGE 1 (a fresh hairline): a single thin jagged crack in the sky, black ink, running straight down from about 4% to about 96% of the
+    cell height, zigzagging gently left and right of the vertical center line in 6 or 7 sharp bends, ending in a
+    fine point. The line is narrow (about 6 to 10 px), its edges like a brushstroke torn into paper. A thin dull-red rim (2 to 3 px, painted
+    solid, not a soft blur) lines the crack, as if something burns behind the sky.
+  2: >-
+    STAGE 2 (opening): exactly the same path, same top, same bottom point and same bends as cell 1, but the crack has pulled apart into
+    a narrow black gap about 18 to 26 px wide with ragged ink edges, two or three short hairline branches splitting off sideways near the
+    upper bends, and the inside of the gap and its torn edges painted in a stronger dull-red to orange light (solid paint,
+    not a soft haze).
+  3: >-
+    STAGE 3 (gaping): exactly the same path, top, bottom point and bends again, now torn wide into a black chasm about 40 to 56 px wide
+    near the top and narrowing to the same fine point at the bottom, with more ragged branches, a few tiny dark shards drifting off its
+    edges, and the inside of the chasm filled with a deep crimson-red light, brightest near the top (painted inside the crack
+    shape, not spilling as a haze around it). Still clearly a crack, not an explosion.
+framing: >-
+  Each crack is centered in its cell and spans from about 4% to about 96% of the cell height, so the game
+  can lay any of the three over the same spot and swap them without the crack jumping. All red light stays inside or on the edge of the crack (no soft glow or
+  haze on the background, so the magenta keys out cleanly), and nothing else in the cell: no sky, no clouds, no ground, no frame. Cells 4 to 6 stay empty.
+style: >-
+  traditional East Asian ink-wash painting stroke: rich black sumi ink with dry-brush ragged edges, matching a hand-painted ink
+  landscape map; the only color is the dull red to crimson light inside the crack (use red and orange-red, never pink or violet);
+  not pixel art, no text, no symbols
+placeholder: { color: '#1a0508' }
