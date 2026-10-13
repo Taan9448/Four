@@ -280,7 +280,7 @@
     "tags": ["elia_shock"],
     "effects": [{"op": "damage", "amount": 40, "element": "lightning"}, {"op": "apply_status", "status": "shock", "stacks": 1}],
     "upgrade": {"growth": [10, 0], "plus4": {"name": "두 번 튀다", "effects": [{"op": "damage", "amount": 30, "target": "random_enemy", "element": "lightning"}]}, "plus5": {"name": "가벼운 손끝", "cost": {"neigong": 0, "mana": 0}}},
-    "flavor": "손끝을 튕기자 보랏빛 불티가 튀었다. 맞은 짐승이 털을 곤두세웠다."
+    "flavor": "손끝을 튕기자 푸르스름한 불티가 튀었다. 맞은 짐승이 털을 곤두세웠다."
   },
   {
     "id": "elia_frost_bloom",

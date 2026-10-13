@@ -67,6 +67,9 @@ export interface BattleSetup {
   manaRule?: WorldMana;
   /** 적 최대 체력 배율(스테이지 enemyHpScale) */
   enemyHpScale?: number;
+  /** 차례 끝 균열 감쇠 덮어쓰기(모듈 content.riftDecay). 생략하면 세계 기본값 */
+  riftDecay?: number;
+  riftDecayNote?: string;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale) */
   enemyDmgScale?: number;
   /** 순례(클리어 뒤 자유 여정): 하운도 쉴 수 있다. 하운이 없으면 모두 쓰러져야 패배 */
@@ -165,6 +168,10 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
   state.draw.sort((a, b) => Number(resolveCard(data, a).keywords.includes('innate')) - Number(resolveCard(data, b).keywords.includes('innate')));
 
   state.enemyHpScale = setup.enemyHpScale ?? 1;
+  if (setup.riftDecay !== undefined) {
+    state.riftDecay = setup.riftDecay;
+    if (setup.riftDecayNote) state.riftDecayNote = setup.riftDecayNote;
+  }
   // 폭주 체력 손실 배율: 첫 폭주 안내 전투(모듈 surgeTutorial)·규칙 유물 surge_half(바늘쌈)
   state.surgeDamageMul = (setup.surgeDamageMul ?? 1) * (hasRule(state, 'surge_half') ? 0.5 : 1);
   state.critRng = setup.rng.fork('crit');
@@ -277,13 +284,65 @@ function pickTarget(state: BattleState, targeting: string): Combatant | null {
   }
 }
 
+/** 이 전투의 차례 끝 균열 감쇠(모듈 content.riftDecay → 세계 기본값) */
+export function riftDecayOf(state: BattleState): number {
+  return state.riftDecay ?? state.data.balance.rift.decay[state.world];
+}
+
+function setIntent(state: BattleState, enemy: EnemyState, move: MoveDef): void {
+  const targetsParty = move.effects.some(
+    (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
+  );
+  const target = targetsParty ? pickTarget(state, move.targeting) : null;
+  enemy.intent = { moveId: move.id, name: move.name, kind: move.intent, targetUid: target?.uid ?? null };
+}
+
+/** 조건이 맞았는데 아직 끼어들지 않은 단계 기술(MoveDef.phase) */
+function duePhase(state: BattleState, enemy: EnemyState): MoveDef | undefined {
+  const def = state.data.enemies.get(enemy.defId);
+  return def?.moves.find(
+    (m) => m.phase && !enemy.phaseFired?.includes(m.id) && checkCondition(state, m.condition, { source: enemy }, enemy),
+  );
+}
+
+function firePhase(state: BattleState, enemy: EnemyState, move: MoveDef): void {
+  (enemy.phaseFired ??= []).push(move.id);
+  enemy.phasePending = move.id;
+  if (move.oncePerBattle) (enemy.usedOnce ??= []).push(move.id);
+  enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
+  setIntent(state, enemy, move);
+  state.events.push({ type: 'phase', uid: enemy.uid, moveName: move.name });
+  state.log.push(`${enemy.name}의 기색이 바뀌었다 — 다음 차례: ${move.name}`);
+}
+
+/** 단계 기술 검사(카드·물약·턴 끝 처리 뒤): 조건이 처음 맞은 적은 다음 의도를 그 행동으로 바꾼다. 의도 표시가 곧 경고다 */
+export function checkPhaseMoves(state: BattleState): void {
+  if (state.result) return;
+  for (const enemy of alive(state.enemies)) {
+    const move = duePhase(state, enemy);
+    if (move) firePhase(state, enemy, move);
+  }
+}
+
 function rollIntents(state: BattleState): void {
   for (const enemy of alive(state.enemies)) {
     const def = state.data.enemies.get(enemy.defId)!;
-    // 조건(체력 절반 아래 등)·한 번만 행동을 거른다. 모두 걸리면 조건 없는 첫 행동
+    // 끼어든 단계 기술을 아직 못 썼으면(빙결·마비로 차례를 건넜다) 그대로 다음 의도로 남긴다
+    const pending = enemy.phasePending ? def.moves.find((m) => m.id === enemy.phasePending) : undefined;
+    if (pending) {
+      setIntent(state, enemy, pending);
+      continue;
+    }
+    // 단계 기술: 적 턴 사이에 조건이 맞았으면 이번 의도로 끼어든다
+    const phase = duePhase(state, enemy);
+    if (phase) {
+      firePhase(state, enemy, phase);
+      continue;
+    }
+    // 조건(체력 절반 아래 등)·한 번만 행동을 거른다. 단계 기술은 위에서만 쓴다. 모두 걸리면 조건 없는 첫 행동
     const usable = (m: MoveDef) =>
-      !(m.oncePerBattle && enemy.usedOnce?.includes(m.id)) && checkCondition(state, m.condition, { source: enemy }, enemy);
-    let move = def.moves.find((m) => !m.condition && !m.oncePerBattle) ?? def.moves[0];
+      !m.phase && !(m.oncePerBattle && enemy.usedOnce?.includes(m.id)) && checkCondition(state, m.condition, { source: enemy }, enemy);
+    let move = def.moves.find((m) => !m.condition && !m.oncePerBattle && !m.phase) ?? def.moves[0];
     if (def.pattern === 'cycle') {
       for (let k = 0; k < def.moves.length; k++) {
         const m = def.moves[enemy.moveCursor % def.moves.length];
@@ -301,11 +360,7 @@ function rollIntents(state: BattleState): void {
     }
     if (move.oncePerBattle) (enemy.usedOnce ??= []).push(move.id);
     enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
-    const targetsParty = move.effects.some(
-      (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
-    );
-    const target = targetsParty ? pickTarget(state, move.targeting) : null;
-    enemy.intent = { moveId: move.id, name: move.name, kind: move.intent, targetUid: target?.uid ?? null };
+    setIntent(state, enemy, move);
   }
 }
 
@@ -508,6 +563,7 @@ export function playCard(state: BattleState, handIndex: number, targetUid?: stri
   state.cardsPlayed = (state.cardsPlayed ?? 0) + 1;
   if (card.keywords.includes('exhaust') || card.def.type === 'power' || inst.temp) state.exhaust.push(inst);
   else state.discard.push(inst);
+  checkPhaseMoves(state);
   return { ok: true };
 }
 
@@ -520,7 +576,7 @@ export function cloneBattle(s: BattleState): BattleState {
     rng: s.rng.clone(),
     critRng: s.critRng?.clone(),
     party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, intent: e.intent ? { ...e.intent } : null })),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),
     hand: cards(s.hand),
     discard: cards(s.discard),
@@ -607,6 +663,7 @@ export function usePotion(state: BattleState, slot: number, targetUid?: string):
   state.events.push({ type: 'potion', potionId: def.id, name: def.name });
   state.log.push(`물약: ${def.name}`);
   runEffects(state, def.effects, { source: haun, chosenUid: targetUid });
+  checkPhaseMoves(state);
   return { ok: true };
 }
 
@@ -643,8 +700,8 @@ export function endTurn(state: BattleState): void {
   if (state.result) return;
   decayStatuses(state, state.party, 'ownTurnEnd');
 
-  // 균열: 세계별 감쇠 뒤, 임계치 이상이면 틈의 잔향
-  const decay = bal.rift.decay[state.world];
+  // 균열: 감쇠(모듈이 덮어쓰면 그 값, 아니면 세계별) 뒤, 임계치 이상이면 틈의 잔향
+  const decay = riftDecayOf(state);
   if (decay > 0 && state.rift > 0) changeRift(state, -decay);
   if (state.rift >= bal.rift.echoThreshold && addEcho(state, 'discard')) {
     state.events.push({ type: 'echo' });
@@ -701,6 +758,7 @@ function enemyTurn(state: BattleState): void {
     }
     state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
     state.log.push(`${enemy.name}: ${move.name}`);
+    if (enemy.phasePending === move.id) delete enemy.phasePending;
     if (state.tally) {
       const seen = ((state.tally.moves ??= {})[enemy.defId] ??= []);
       if (!seen.includes(move.id)) seen.push(move.id);

@@ -44,6 +44,9 @@
     "choices": [ { "label": "...", "result": "...", "effects": [ /* 런 단위 동작 */ ] } ],  // 이벤트형
     "bonus": { "condition": { "partyHas": "kyle" }, "text": "...", "effects": [ /* 전투 동작 */ ] },
     "surviveTurns": 3,                 // 전투형: 이 턴 수를 버티면 승리(이길 수 없는 전투)
+    "riftDecay": 0,                    // 전투형: 차례 끝 균열 감쇠(세계 기본값 balance.rift.decay 대신). 이그니스의 화로 안은 0
+    "riftDecayNote": "화로",           // 균열 게이지 주석에 붙는 까닭(짧게)
+    "enemyScale": { "hp": 1.25, "dmg": 1.1 }, // 전투형: 이 전투 모든 적의 배율(등급·어려움·순례·심연 배율 뒤에 곱한다, 기본 1). 엘리트·일반 난이도 맞추기
     "outro": "...",                    // 보스형: 스테이지를 마친 뒤 보여 줄 장면 글(outroScene이 있으면 생략)
     "scene": "s0_scene_secret_talk",   // 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes)
     "outroScene": "s0_scene_stone_gate", // 전투형: 이긴 뒤 재생할 장면(보스는 스테이지 끝 전, 일반·엘리트는 보상 전)

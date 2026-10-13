@@ -1,5 +1,5 @@
 // 전투 화면. 엔진 상태(BattleState)를 그리고, 엔진이 남긴 이벤트를 순서대로 연출한다.
-import { scarStartRift } from '../engine/battle';
+import { riftDecayOf, scarStartRift } from '../engine/battle';
 import { canPlay, cardCausesSurge, cardOwner, describeIntent, endTurn, incomingDamage, needsTarget, playCard, potionTarget, previewCard, usePotion, type CardPreviewHit, type IncomingView } from '../engine/battle';
 import { potionChip, relicChip } from './items';
 import { hasSkipTurn } from '../engine/effects';
@@ -396,7 +396,7 @@ export class BattleView {
     const hot = s.rift >= bal.rift.echoThreshold;
     clear(this.riftEl);
     this.riftEl.className = `b-rift${hot ? ' hot' : ''}`;
-    Object.entries(tipAttrs(`균열 ${s.rift} / ${bal.rift.max}`, `융합 카드를 쓰면 쌓인다. ${bal.rift.echoThreshold} 이상이면 틈의 잔향이 덱에 섞이고, ${bal.rift.max}이면 폭주한다.\n폭주: 일행 체력 ${Math.round(bal.rift.surgeRatio * 100)}%(하운 +${bal.rift.surgeHaunExtra}) · 적 힘 +${bal.rift.surgeEnemyStrength} · 잔향 ${bal.rift.surgeEchoToHand}장을 손에 · 상흔 +${bal.rift.surgeScar}. 균열은 ${bal.rift.surgeResetTo}으로.\n전투가 끝나면 남은 균열의 절반이 상흔으로 남는다(지금 상흔 ${this.ctx.scar}, 상흔 ${bal.rift.scar.startRiftPer}마다 전투 시작 균열 +1).`, 'rift')).forEach(([k, v]) => v && this.riftEl.setAttribute(k, v));
+    Object.entries(tipAttrs(`균열 ${s.rift} / ${bal.rift.max}`, `융합 카드를 쓰면 쌓인다. ${riftDecayLine(s)}${bal.rift.echoThreshold} 이상이면 틈의 잔향이 덱에 섞이고, ${bal.rift.max}이면 폭주한다.\n폭주: 일행 체력 ${Math.round(bal.rift.surgeRatio * 100)}%(하운 +${bal.rift.surgeHaunExtra}) · 적 힘 +${bal.rift.surgeEnemyStrength} · 잔향 ${bal.rift.surgeEchoToHand}장을 손에 · 상흔 +${bal.rift.surgeScar}. 균열은 ${bal.rift.surgeResetTo}으로.\n전투가 끝나면 남은 균열의 절반이 상흔으로 남는다(지금 상흔 ${this.ctx.scar}, 상흔 ${bal.rift.scar.startRiftPer}마다 전투 시작 균열 +1).`, 'rift')).forEach(([k, v]) => v && this.riftEl.setAttribute(k, v));
     this.riftEl.append(
       h('div', { class: 'gauge' }, h('i', { style: `width:${(s.rift / bal.rift.max) * 100}%` })),
       h('span', {}, `균열 ${s.rift} / ${bal.rift.max}`),
@@ -1297,7 +1297,23 @@ export class BattleView {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, ev.moveName, 'status');
           this.lastCard = null;
+          // 단계 기술(이그니스의 '협곡의 하늘이 찢어진다' 등): 검은 틈이 그어지듯 짧게 흔들리고 붉게 번쩍인다. 폭주 연출이 바로 이어진다
+          if (u && this.data.enemies.get(u.c.defId)?.moves.some((m) => m.phase && m.name === ev.moveName)) {
+            shake(this.field, 0.8);
+            flash(this.field, 'red');
+            sfx('rift', { volume: 0.9 });
+            await this.wait(250);
+          }
           await this.wait(200);
+          break;
+        }
+        case 'phase': {
+          // 단계 기술이 다음 의도로 끼어들었다: 의도 표시가 바뀐 것을 화면 가운데에서 한 번 알린다
+          const u = this.units.get(ev.uid);
+          this.refresh();
+          this.alert(`${u?.c.name ?? '적'}의 기색이 바뀐다 — 다음 차례: ${ev.moveName}`, 'danger');
+          shake(this.field, 0.4);
+          await this.wait(400);
           break;
         }
         case 'result':
@@ -1546,6 +1562,14 @@ function medal(glyph: string, label: string, body: string, onclick: () => void, 
     count === undefined ? null : h('i', {}, count),
     MEDAL_SHORT[glyph] ? h('small', { class: 'medal-label', 'aria-hidden': 'true' }, MEDAL_SHORT[glyph]) : null,
   );
+}
+
+/** 균열 게이지 주석의 감쇠 한 줄: 차례 끝마다 균열 −N, 모듈이 덮어썼으면 그 까닭(예: 감쇠 없음(화로)) */
+function riftDecayLine(s: BattleState): string {
+  const d = riftDecayOf(s);
+  const note = s.riftDecayNote ? `(${s.riftDecayNote})` : '';
+  if (d === 0) return `이 전투는 감쇠 없음${note} — 차례가 끝나도 줄지 않는다. `;
+  return `차례 끝마다 −${d}${note}. `;
 }
 
 /** 첫 폭주 안내 창(GAME_DESIGN 7절): 네 가지 + 균열이 돌아오는 값 + 막는 법. ?screen=surgeguide로도 본다 */

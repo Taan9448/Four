@@ -504,6 +504,8 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
   const { bonus, startEffects: always = [], mana } = enc.module.content;
   const bonusOn = bonusActive(run, enc.module);
   const stage = data.stages.find((s) => s.id === run.stageId)!;
+  // 모듈별 적 배율(2026-10-13): 등급·어려움·순례·심연 배율 뒤에 곱한다
+  const modScale = { hp: enc.module.content.enemyScale?.hp ?? 1, dmg: enc.module.content.enemyScale?.dmg ?? 1 };
   if (isAbyss(run)) {
     // 심연: 모듈이 난 스테이지의 세계·마나 규칙(틈 굽이의 다른 세계 보스도 제 규칙으로), 굽이 배율. 스테이지·어려움 배율은 쓰지 않는다
     const own = data.stages.find((s) => s.id === enc.module.stage);
@@ -528,9 +530,11 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       scar: run.scar,
       startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
       manaRule: mana ?? own?.mana ?? stage.mana,
+      riftDecay: enc.module.content.riftDecay,
+      riftDecayNote: enc.module.content.riftDecayNote,
       // 서약 '두꺼운 살'
-      enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1),
-      enemyDmgScale: scale.dmg * norm.dmg * shadow * boss,
+      enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1) * modScale.hp,
+      enemyDmgScale: scale.dmg * norm.dmg * shadow * boss * modScale.dmg,
       relics: run.relics,
       potions: run.potions,
       partyMax: data.balance.abyss.partyMax,
@@ -557,8 +561,11 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     scar: run.scar,
     startEffects: [...always, ...(bonusOn ? bonus!.effects : [])],
     manaRule: mana ?? stage.mana,
-    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1) * pilgrim.hp,
-    enemyDmgScale: stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg,
+    riftDecay: enc.module.content.riftDecay,
+    riftDecayNote: enc.module.content.riftDecayNote,
+    enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1) * pilgrim.hp * modScale.hp,
+    enemyDmgScale:
+      stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg * modScale.dmg,
     relics: run.relics,
     potions: run.potions,
     surgeDamageMul: enc.module.content.surgeTutorial ? 0.5 : undefined,

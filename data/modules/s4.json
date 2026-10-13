@@ -47,7 +47,7 @@
     "name": "금맥의 광석거미",
     "weight": 2,
     "conditions": {"floorRange": [2, 6]},
-    "content": {"text": "버려진 금맥을 갉던 광석거미들이 천장에서 내려온다.", "enemies": ["ore_spider", "ore_spider"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 지팡이 끝의 빛을 높이 든다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "버려진 금맥을 갉던 광석거미가 천장에서 내려오고, 벽에서 손이 솟는다.", "enemies": ["ore_spider", "mountain_hand"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 지팡이 끝의 빛을 높이 든다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s4_battle_wall_hands",
@@ -83,7 +83,7 @@
     "name": "용암 핏줄의 골렘",
     "weight": 2,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "용암 줄기가 산의 뿌리까지 이어진 골렘. 쿵, 심장이 뛸 때마다 몸이 붉게 뛰고, 깨진 자리를 산이 메운다.", "enemies": ["vein_golem"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 눈을 감고 귀를 기울인다. 무언가를 듣고 있다. (용암 핏줄 골렘 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"text": "용암 줄기가 산의 뿌리까지 이어진 골렘. 쿵, 심장이 뛸 때마다 몸이 붉게 뛰고, 깨진 자리를 산이 메운다.", "enemies": ["vein_golem"], "enemyScale": {"hp": 1.35}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 눈을 감고 귀를 기울인다. 무언가를 듣고 있다. (용암 핏줄 골렘 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s4_elite_unburied",
@@ -92,7 +92,7 @@
     "name": "묻히지 않은 갑옷들",
     "weight": 1,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "두린의 산사태가 미처 닿지 못한 자리. 빈 갑옷 셋이 창을 겨눈 채 갱도를 지키고 있다. (적 전원 힘 1)", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 붉은 검이 쇠를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "두린의 산사태가 미처 닿지 못한 자리. 빈 갑옷 셋이 창을 겨눈 채 갱도를 지키고 있다. (적 전원 힘 1)", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "enemyScale": {"hp": 1.5, "dmg": 1.15}, "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "이그니스의 심장으로 벼린 붉은 검이 쇠를 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s4_elite_closing_cave",
@@ -101,7 +101,7 @@
     "name": "오므라드는 동굴",
     "weight": 1,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다. (적 전원 힘 1)", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +80)", "effects": [{"op": "block", "amount": 80, "target": "self"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "천장이 낮아지고 벽이 좁혀 든다. 양쪽 벽에서 손이 솟고, 그 사이로 골렘이 걸어 나온다. (적 전원 힘 1)", "enemies": ["mountain_hand", "rock_golem", "mountain_hand"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "보른의 망치가 벽의 결을 깨뜨려 돌덩이를 비껴 낸다. (하운 방어 +80)", "effects": [{"op": "block", "amount": 80, "target": "self"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s4_event_wall_left",

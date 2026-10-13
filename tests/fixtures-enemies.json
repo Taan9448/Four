@@ -318,5 +318,28 @@
       ]
     }
   ]
+},
+{
+  "id": "test_phase",
+  "name": "시험용 화로",
+  "maxHp": 400,
+  "sprite": null,
+  "pattern": "cycle",
+  "moves": [
+    { "id": "poke", "name": "찌르기", "intent": "attack", "targeting": "haun", "effects": [{ "op": "damage", "amount": 10 }] },
+    { "id": "guard", "name": "웅크리기", "intent": "defend", "effects": [{ "op": "block", "amount": 10, "target": "self" }] },
+    { "id": "tears", "name": "하늘이 찢어진다", "intent": "special", "condition": { "hpRatioLte": 0.5 }, "phase": true, "oncePerBattle": true, "effects": [{ "op": "rift", "amount": 3 }] }
+  ]
+},
+{
+  "id": "test_phase_random",
+  "name": "시험용 들불",
+  "maxHp": 400,
+  "sprite": null,
+  "pattern": "random",
+  "moves": [
+    { "id": "poke", "name": "찌르기", "intent": "attack", "targeting": "haun", "effects": [{ "op": "damage", "amount": 10 }] },
+    { "id": "tears", "name": "하늘이 찢어진다", "intent": "special", "condition": { "hpRatioLte": 0.5 }, "phase": true, "oncePerBattle": true, "effects": [{ "op": "rift", "amount": 3 }] }
+  ]
 }
 ]

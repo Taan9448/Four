@@ -64,7 +64,7 @@
     "name": "화살 비",
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "위쪽 굽이에서 화살이 쏟아진다. 방패에 꽂히는 소리가 빗소리 같다.", "enemies": ["stair_archer", "stair_archer", "stair_archer"], "bonus": {"condition": {"flag": "formation_shield"}, "text": "방패벽이 방패를 하늘로 들어 맞물린다. (아군 전원 방어 80)", "effects": [{"op": "block", "amount": 80, "target": "all_allies"}]}}
+    "content": {"text": "위쪽 굽이에서 화살이 쏟아진다. 방패에 꽂히는 소리가 빗소리 같다.", "enemies": ["stair_archer", "stair_archer", "stair_archer"], "enemyScale": {"hp": 0.6}, "bonus": {"condition": {"flag": "formation_shield"}, "text": "방패벽이 방패를 하늘로 들어 맞물린다. (아군 전원 방어 80)", "effects": [{"op": "block", "amount": 80, "target": "all_allies"}]}}
   },
   {
     "id": "s8_battle_guardians",
@@ -92,7 +92,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "장로 하나가 혈교도를 거느리고 굽이를 내려온다. 핏빛 장력이 바위를 가른다.", "enemies": ["stair_elder", "blood_cultist"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 마법 없이 흐름을 읽었다. \"여섯째 굽이 왼쪽! 장로가 내려와요!\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "장로 하나가 혈교도를 거느리고 굽이를 내려온다. 핏빛 장력이 바위를 가른다.", "enemies": ["stair_elder", "blood_cultist"], "enemyScale": {"hp": 1.2}, "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 마법 없이 흐름을 읽었다. \"여섯째 굽이 왼쪽! 장로가 내려와요!\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_elite_elder_archers",
@@ -112,7 +112,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "호법 셋이 서면 진이 된다. 핏빛 손바닥 셋이 계단을 가로막았다.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 같은 박자로 진의 이음매를 친다. 쾅, 쾅, 쾅. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "호법 셋이 서면 진이 된다. 핏빛 손바닥 셋이 계단을 가로막았다.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "enemyScale": {"hp": 1.25}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 같은 박자로 진의 이음매를 친다. 쾅, 쾅, 쾅. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_event_seokdu_axe",
