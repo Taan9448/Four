@@ -207,6 +207,7 @@
 - `hpPerScar`: 런 상흔 1마다 늘어나는 최대 체력(마지막 한 땀의 '찢긴 경계').
 - `tier`: normal | elite | boss. `balance.enemyTiers[tier]`의 체력(`hp`)·피해(`dmg`) 배율이 스테이지 배율(`stages[].enemyHpScale`·`enemyDmgScale`, 어려움이면 `balance.difficulty.hard.byStage`)과 함께 곱해진다(GAME_DESIGN 12절). 의도·받을 피해 예고에도 같이 걸린다.
 - 행동(`moves[]`)의 `condition`: 이 조건일 때만 고른다(검사 대상은 그 적 자신 — 예: `{ "hpRatioLte": 0.5 }` 체력 절반 아래). 순서대로(cycle)면 조건이 맞지 않는 행동은 건너뛴다. `oncePerBattle: true`면 한 전투에 한 번만(소환).
+- 행동의 `phase: true`(단계 기술, 2026-10-13): `condition`이 **처음 참이 되는 순간**(카드·물약을 낸 뒤, 그리고 적 차례 사이에 다음 의도를 고를 때 검사) 그 적의 **다음 의도를 이 행동으로 바꾼다**. 순서(cycle)·무작위(random) 패턴 모두에 끼어들고 한 전투에 한 번, 평소 고르기에는 끼지 않는다. 의도 표시가 곧바로 바뀌어 경고가 되고, 전투 이벤트 `phase`로 화면 가운데에 알린다. `oncePerBattle`과 함께 쓴다. 예: 이그니스 '협곡의 하늘이 찢어진다'(`hpRatioLte: 0.5`, 균열 +10 — 반드시 한 번 폭주).
 - `enrage`: `{ afterTurn, text, effects }` — 그 턴부터 이 적의 차례마다(행동 뒤) effects가 이 적을 출처로 일어난다. 그 턴에 `text`를 화면에 알리고, 적 이름 아래 '격노까지 n턴' 이름표가 보인다. 예: 모르데카이 10턴부터 힘 +3.
 - `deathEffects`: 이 적이 쓰러질 때 그 적을 출처로 일어나는 전투 동작. 예: 베일락 `[{ "op": "damage", "amount": 999, "target": "all_allies" }]`(졸개가 무너진다), 쐐기 `[{ "op": "rift", "amount": -2 }]`.
 
@@ -219,6 +220,8 @@
 ## 6. 전투 마나 규칙
 
 세계 기본값 `balance.mana.worlds[world]`(`battleStart: full | carry | 숫자`, `perTurn`)을 스테이지 `mana`, 모듈 `content.mana` 순으로 덮어쓴다(`GAME_DESIGN.md` 6절). 모듈 `content.startEffects`는 전투 시작에 언제나 일어나는 전투 동작이다(이그니스전의 '흐름에 올라타기', 모르데카이전의 '고리 멈추기'를 손패에).
+
+모듈 `content.riftDecay`(0 이상 정수)는 그 전투의 차례 끝 균열 감쇠를 세계 기본값(`balance.rift.decay[world]`) 대신 쓴다. 심연·순례에서 같은 모듈이어도 똑같다. 균열 게이지 주석이 "이 전투는 감쇠 없음(화로)"처럼 보여 주고, 까닭은 `content.riftDecayNote`. 모듈 `content.enemyScale: { hp?, dmg? }`는 그 전투 모든 적의 체력·피해에 등급·어려움·순례(심연은 굽이) 배율 뒤로 곱한다(기본 1, 화면에 따로 표시하지 않음 — 적 체력 숫자에 이미 들어간다).
 
 ## 7. 심연(GAME_DESIGN 16절)
 

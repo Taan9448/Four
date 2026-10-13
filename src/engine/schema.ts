@@ -417,6 +417,11 @@ export const MoveDef = z
     condition: Condition.optional(),
     /** 한 전투에 한 번만(소환 등) */
     oncePerBattle: z.boolean().optional(),
+    /**
+     * 단계 기술(2026-10-13): condition이 처음 참이 되는 순간(카드·물약·턴 끝 처리 뒤 검사) 이 적의 다음 의도를 이 행동으로 바꾼다.
+     * 순서(cycle)·무작위(random) 어느 패턴이든 끼어들고, 한 전투에 한 번. 평소 행동 고르기에는 끼지 않는다. oncePerBattle과 함께 쓴다
+     */
+    phase: z.boolean().optional(),
     effects: z.array(Effect),
   })
   .strict();
@@ -1130,6 +1135,12 @@ export const ModuleDef = z
         background: z.string().optional(),
         /** 이 전투의 마나 규칙(스테이지·세계 규칙보다 우선). 예: 이그니스의 협곡 장악 */
         mana: WorldMana.optional(),
+        /** 이 전투의 차례 끝 균열 감쇠(세계 기본값 balance.rift.decay 대신). 예: 이그니스의 화로 안은 0 — 금이 아물지 않는다 */
+        riftDecay: z.number().int().min(0).optional(),
+        /** 균열 게이지 주석에 붙는 감쇠 까닭(짧게, 예: 화로) */
+        riftDecayNote: z.string().optional(),
+        /** 이 전투 모든 적의 배율(등급·어려움·순례 배율 뒤에 곱한다, 기본 1). 엘리트·일반 전투 난이도 맞추기(2026-10-13) */
+        enemyScale: z.object({ hp: z.number().positive(), dmg: z.number().positive() }).partial().strict().optional(),
         /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
         scene: z.string().optional(),
         /** 전투 모듈: 이긴 뒤 재생할 장면(보스는 스테이지 끝 화면 전에, 일반·엘리트는 보상 전에) */

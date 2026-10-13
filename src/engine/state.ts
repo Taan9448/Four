@@ -33,6 +33,8 @@ export interface EnemyState extends Combatant {
   dmgMul?: number;
   /** 이 전투에서 쓴 한 번만 행동(oncePerBattle) */
   usedOnce?: string[];
+  /** 이 전투에서 이미 끼어든 단계 기술(MoveDef.phase) */
+  phaseFired?: string[];
   /** 심연 접사(data/abyss_affixes.json) */
   affixes?: string[];
   /** 격노가 시작되는 턴(숙적 성장으로 당겨지거나 옅은 잔향으로 늦춰진다. 없으면 정의의 afterTurn) */
@@ -85,6 +87,8 @@ export type BattleEvent =
   | { type: 'transform'; uid: string; from: string; into: string; text: string }
   | { type: 'skip'; uid: string }
   | { type: 'enemy_action'; uid: string; moveName: string }
+  /** 단계 기술이 다음 의도로 끼어들었다(MoveDef.phase) */
+  | { type: 'phase'; uid: string; moveName: string }
   | { type: 'dead_draw'; cardId: string }
   | { type: 'result'; result: 'victory' | 'defeat' }
   | { type: 'survived'; turns: number };
@@ -125,6 +129,10 @@ export interface BattleState {
   uidCounter: number;
   /** 적 최대 체력 배율(스테이지 enemyHpScale, 변신한 모습에도) */
   enemyHpScale?: number;
+  /** 이 전투의 차례 끝 균열 감쇠(모듈 content.riftDecay). 없으면 세계 기본값 */
+  riftDecay?: number;
+  /** 감쇠를 덮어쓴 까닭(게이지 주석) */
+  riftDecayNote?: string;
   /** 적 공격 피해 배율(스테이지 enemyDmgScale). 의도·받을 피해 예고에도 같이 걸린다 */
   enemyDmgScale?: number;
   /** 적의 피해 한 번의 상한(심연의 한 방 상한, 받을 피해 예고에도) */
