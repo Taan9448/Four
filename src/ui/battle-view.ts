@@ -1387,7 +1387,7 @@ export class BattleView {
             : null,
         ),
       );
-    const settingsPage = () => body.replaceChildren(h('button', { class: 'btn btn-small menu-back', onclick: main }, '← 메뉴로'), settingsForm());
+    const settingsPage = () => body.replaceChildren(h('button', { class: 'btn btn-small menu-back', onclick: main }, '← 메뉴로'), settingsForm({ tab: 'battle' }));
     main();
     const menu = openOverlay('메뉴', body);
     requestAnimationFrame(() => body.querySelector<HTMLElement>('.menu-list .btn-primary')?.focus());
