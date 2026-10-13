@@ -121,3 +121,20 @@ describe('모듈 적 배율(content.enemyScale)', () => {
     expect(h1).toBeCloseTo(h0 * 1.2);
   });
 });
+
+describe('단계 기술 — 차례를 건너도 사라지지 않는다', () => {
+  it('빙결·마비로 그 차례를 건너면 다음 의도로 다시 남는다', () => {
+    const s = battle({ enemies: ['test_phase'] });
+    hurt(s, 150);
+    expect(foe(s).intent?.moveId).toBe('tears');
+    foe(s).statuses.stun = 1;
+    endTurn(s);
+    expect(foe(s).intent?.moveId).toBe('tears');
+    delete foe(s).statuses.stun;
+    const before = s.rift;
+    endTurn(s);
+    expect(s.rift).toBeGreaterThan(Math.max(0, before - riftDecayOf(s)));
+    expect(foe(s).intent?.moveId).not.toBe('tears');
+    expect(foe(s).phasePending).toBeUndefined();
+  });
+});

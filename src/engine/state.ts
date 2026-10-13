@@ -35,6 +35,8 @@ export interface EnemyState extends Combatant {
   usedOnce?: string[];
   /** 이 전투에서 이미 끼어든 단계 기술(MoveDef.phase) */
   phaseFired?: string[];
+  /** 끼어들었지만 아직 쓰지 못한 단계 기술(빙결·마비로 차례를 건너면 다음 의도로 남는다) */
+  phasePending?: string;
   /** 심연 접사(data/abyss_affixes.json) */
   affixes?: string[];
   /** 격노가 시작되는 턴(숙적 성장으로 당겨지거나 옅은 잔향으로 늦춰진다. 없으면 정의의 afterTurn) */

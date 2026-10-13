@@ -307,6 +307,7 @@ function duePhase(state: BattleState, enemy: EnemyState): MoveDef | undefined {
 
 function firePhase(state: BattleState, enemy: EnemyState, move: MoveDef): void {
   (enemy.phaseFired ??= []).push(move.id);
+  enemy.phasePending = move.id;
   if (move.oncePerBattle) (enemy.usedOnce ??= []).push(move.id);
   enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
   setIntent(state, enemy, move);
@@ -326,6 +327,12 @@ export function checkPhaseMoves(state: BattleState): void {
 function rollIntents(state: BattleState): void {
   for (const enemy of alive(state.enemies)) {
     const def = state.data.enemies.get(enemy.defId)!;
+    // 끼어든 단계 기술을 아직 못 썼으면(빙결·마비로 차례를 건넜다) 그대로 다음 의도로 남긴다
+    const pending = enemy.phasePending ? def.moves.find((m) => m.id === enemy.phasePending) : undefined;
+    if (pending) {
+      setIntent(state, enemy, pending);
+      continue;
+    }
     // 단계 기술: 적 턴 사이에 조건이 맞았으면 이번 의도로 끼어든다
     const phase = duePhase(state, enemy);
     if (phase) {
@@ -569,7 +576,7 @@ export function cloneBattle(s: BattleState): BattleState {
     rng: s.rng.clone(),
     critRng: s.critRng?.clone(),
     party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, intent: e.intent ? { ...e.intent } : null })),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),
     hand: cards(s.hand),
     discard: cards(s.discard),
@@ -751,6 +758,7 @@ function enemyTurn(state: BattleState): void {
     }
     state.events.push({ type: 'enemy_action', uid: enemy.uid, moveName: move.name });
     state.log.push(`${enemy.name}: ${move.name}`);
+    if (enemy.phasePending === move.id) delete enemy.phasePending;
     if (state.tally) {
       const seen = ((state.tally.moves ??= {})[enemy.defId] ??= []);
       if (!seen.includes(move.id)) seen.push(move.id);
