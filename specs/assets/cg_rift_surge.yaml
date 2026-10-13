@@ -1,0 +1,13 @@
+id: cg_rift_surge
+type: story-cg
+character: haun_sword
+summary: 장면 일러스트 — 균열 폭주 — 하늘이 찢어져 붉은 빛이 쏟아지고 하운이 무릎을 꿇는 순간(전투 폭주 그림)
+# 2026-10-13 사용자 요청: 균열이 10이 되어 폭주할 때마다 전투 화면 전체에 2초쯤 띄우는 그림(건너뛰기 가능).
+# 어느 세계(무림·엘하임·마왕성·틈)의 전투에서도 쓰이므로 땅과 하늘은 특정 장소가 아닌 바위 전장으로 둔다.
+# 그림 위 왼쪽 아래 3분의 1에 "하늘이 터졌다"와 네 가지 칩이 얹힌다.
+frame_notes:
+  1: >-
+    The instant a rift surge erupts in the middle of a battle. The sky above a bare, rocky battlefield tears open along one huge jagged black crack that runs diagonally from the upper left toward the upper right, and from inside the crack a blinding crimson-and-violet light bursts out like a broken dam, with shards of the sky falling like broken glass and a shockwave of red light slamming down onto the ground. Thin glowing red threads, like torn stitches, drift down out of the crack. Just right of the center line in the lower half, Jin Haun — a lean young East Asian swordsman with long straight black hair and long bangs, in a plain grey knee-length jacket — is driven down onto one knee by the blast, his plain, narrow, completely unadorned sword planted point-down in the cracked ground to hold himself up, his free forearm raised against the glare, a thin line of blood at the corner of his mouth, eyes narrowed but defiant. Behind him two or three small, dim companion silhouettes stagger back in the red wind. In the far background, the dark silhouettes of monsters straighten up and their eyes flare brighter red, fed by the light. Dark, violent palette of black, deep violet and crimson, with the only warm highlight on Haun's face and blade.
+framing: >-
+  A full-screen battle cut-in shown for about two seconds; there is no dialogue box. The game overlays a title and four small labels on the lower-left third, so keep that area darker and quieter, and keep the crack in the upper part and Haun just right of center as the two focal points. On phones the game shows only the middle third of the width, so keep Haun's whole figure and the brightest point of the crack inside the central third. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2a0a12' }

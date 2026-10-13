@@ -24,6 +24,7 @@ import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
 import { openShortcuts, settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
 import { runTour, tourSeen } from './tour';
+import { surgeCut } from './surge-cut';
 
 export interface BattleContext {
   title: string;
@@ -1162,6 +1163,8 @@ export class BattleView {
           // 첫 폭주(브라우저마다 한 번): 멈추고 네 가지와 막는 법 → 잔향·적의 힘·균열 게이지를 차례로 짚는다. 그다음부터는 짧은 띠만
           const b = this.data.balance.rift;
           const n = ev.count ?? 1;
+          // 폭주 그림(설정 「폭주 그림」, 누르거나 아무 키로 건너뜀): 네 가지를 그림 위에 보여 주므로 짧은 띠를 대신한다
+          if (settings.surgeArt) await surgeCut(this.data, n);
           if (!tourSeen('surge-guide')) {
             this.refresh();
             await openSurgeGuide(this.data);
@@ -1173,7 +1176,7 @@ export class BattleView {
               ],
               { id: 'surge-guide' },
             );
-          } else this.alert(`폭주${n > 1 ? ` ×${n}` : ''} — 체력 ${Math.round(b.surgeRatio * 100) * n}% · 힘 +${b.surgeEnemyStrength} · 잔향 ${b.surgeEchoToHand} · 상흔 +${b.surgeScar}`, 'danger');
+          } else if (!settings.surgeArt) this.alert(`폭주${n > 1 ? ` ×${n}` : ''} — 체력 ${Math.round(b.surgeRatio * 100) * n}% · 힘 +${b.surgeEnemyStrength} · 잔향 ${b.surgeEchoToHand} · 상흔 +${b.surgeScar}`, 'danger');
           break;
         }
         case 'focus': {
