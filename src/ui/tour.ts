@@ -124,11 +124,11 @@ export function runTour(steps: TourStep[], opts: { id?: string; once?: boolean; 
     count.textContent = `${i + 1} / ${steps.length}`;
     prev.disabled = i === 0;
     next.textContent = i === steps.length - 1 ? '알겠다' : '다음';
-    // 말풍선은 단계마다 다시 떠오르고, 고리는 다시 맥박친다
+    // 말풍선은 단계마다 다시 떠오르고, 고리는 다시 맥박친다(클래스 이름은 결과 창의 .pop과 겹치지 않게 — 겹치면 고리가 어두운 판이 되어 대상을 덮는다)
     for (const node of [bubble, ring]) {
-      node.classList.remove('pop');
+      node.classList.remove('tour-anim');
       void node.offsetWidth;
-      node.classList.add('pop');
+      node.classList.add('tour-anim');
     }
     place();
   };

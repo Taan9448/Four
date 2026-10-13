@@ -34,7 +34,6 @@ const TABS: { id: CodexTab; label: string }[] = [
   { id: 'scenes', label: '장면' },
   { id: 'abyss', label: '심연' },
   { id: 'stats', label: '기록' },
-  { id: 'glossary', label: '용어' },
 ];
 
 // ───────── 눌러서 크게 보기(2026-10-08) ─────────
@@ -252,7 +251,7 @@ const CARD_FILTERS: { id: CardFilter; label: string }[] = [
   { id: 'all', label: '전체' },
   { id: 'owned', label: '보유만' },
   { id: 'seen', label: '본 것만' },
-  { id: 'unseen', label: '아직 못 봄' },
+  { id: 'unseen', label: '못 본 것' },
 ];
 let cardFilter: CardFilter = 'all';
 
@@ -687,7 +686,11 @@ export function codexView(
     const t = TABS.find((x) => x.id === tab)!;
     return sum(of(t.label), t.label);
   };
+  // 용어는 분류 줄이 아니라 머리의 단추(돌아가기 왼쪽, 2026-10-13)
+  const glossaryBtn = h('button', { class: 'btn codex-glossary', 'aria-pressed': 'false', onclick: () => select('glossary') }, '용어');
   const select = (tab: CodexTab) => {
+    glossaryBtn.classList.toggle('on', tab === 'glossary');
+    glossaryBtn.setAttribute('aria-pressed', String(tab === 'glossary'));
     for (const b of tabs.children) {
       const on = (b as HTMLElement).dataset.tab === tab;
       b.classList.toggle('on', on);
@@ -737,7 +740,7 @@ export function codexView(
       h('span', { class: 'seal' }, '錄'),
       h('div', { class: 'codex-title' }, h('h2', {}, '도감'), tabProg),
       h('div', { class: 'codex-total' }, h('small', {}, `전체 ${seen} / ${total} (${pct(seen, total)}%)`), h('span', { class: 'lo-meter' }, h('i', { style: `width:${pct(seen, total)}%` }))),
-      h('button', { class: 'btn codex-back', onclick: handlers.onBack }, '돌아가기'),
+      h('div', { class: 'codex-head-actions' }, glossaryBtn, h('button', { class: 'btn codex-back', onclick: handlers.onBack }, '돌아가기')),
     ),
     tabs,
     body,

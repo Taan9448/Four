@@ -1,0 +1,24 @@
+id: icons_glossary
+type: icon-sheet
+summary: 도감 용어 아이콘 14칸(내공·마나·융합·균열·폭주·상흔·속성·전도·치명타·심법·편성 점수·裂 틈새·순례 보상·심연 카드) — 용어 표 이름 왼쪽
+# 2026-10-13 사용자 요청: 용어 표에 아이콘이 있는 줄(결 노출·냉기·감전 = 상태 아이콘)과 없는 줄이 섞여 있다 → 모두 아이콘으로.
+# 칸 순서는 src/ui/glossary-view.ts의 rows(상태 아이콘을 쓰는 결 노출·냉기·빙결·감전·마비는 빼고)와 같다.
+# 이 시트가 오기 전에는 용어 표에 아이콘을 하나도 그리지 않는다(섞이지 않게). 어두운 표 위에 놓이므로 밝고 또렷한 실루엣으로.
+frames: 14
+baseline: 0.5
+frame_notes:
+  1: "neigong (inner energy) — a glowing golden ring of qi circling a small bright point, like breath gathered at the belly"
+  2: "mana — a clear blue droplet-shaped crystal with a silver glint"
+  3: "fusion — a golden qi ring and a blue mana droplet overlapping, the overlap glowing white"
+  4: "rift — a short jagged black crack with a faint red light along its edges"
+  5: "rift surge — a jagged black crack bursting open with red light, a few dark shards flying out"
+  6: "scar — a dark red jagged scar line crossed by three short black stitches"
+  7: "element — three tiny symbols in a triangle: an orange flame, a pale blue snowflake and a yellow lightning bolt"
+  8: "conduction — a yellow lightning bolt striking down onto a pale blue snowflake, small sparks where they touch"
+  9: "critical hit — a steel sword tip with a bright white-yellow four-pointed starburst at the point"
+  10: "inner method (power card) — a small white lotus with a glowing gold seal mark floating above it"
+  11: "loadout points — three small cards fanned out, the front card with a green gem in its corner"
+  12: "rift gap node — a narrow black crack opening in the air with dim red light inside, a tiny dark path leading into it"
+  13: "pilgrimage reward — a woven straw pilgrim's hat resting on top of a single card"
+  14: "abyss card — a card whose face is a deep violet swirling void with a faint white spark in the center"
+placeholder: { color: '#1a1820', accent: '#e2b45c' }

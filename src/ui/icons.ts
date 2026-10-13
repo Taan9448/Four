@@ -21,6 +21,14 @@ export function sheetIconEl(sheets: [string, number][], icon: number | undefined
 /** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~53 icons_status_e(2026-10-11) · 54~ icons_status_f(2026-10-12 번개) */
 const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48], ['icons_status_f', 54]];
 
+/** 상태 아이콘 그림 주소(실제 그림이 왔을 때만). 도감 용어 표처럼 이름표 없이 아이콘만 쓰는 자리용 */
+export function statusIconUrl(data: GameData, id: string): string | null {
+  const icon = data.statuses.get(id)?.icon;
+  if (!icon) return null;
+  const [sheet, first] = [...STATUS_SHEETS].reverse().find(([, f]) => icon >= f) ?? STATUS_SHEETS[0];
+  return frameUrl(sheet, icon - first + 1, { realOnly: true });
+}
+
 /**
  * 그림 아이콘이 왔으면 그림, 아니면 한자 그대로 — 둘레(.icon 테두리·바탕) 없이 cls 하나만(지도 노드·서약처럼 이미 모양이 있는 자리, 2026-10-12)
  */
