@@ -15,7 +15,7 @@ const SCREENS = [
   // 대사 띠를 띄우고 손패 카드 주석을 연 전투: 툴팁 ↔ 대사 띠, 손패 힌트 ↔ 대사 띠를 따로 잰다
   ['battle-strip', '?sandbox&seed=UXCHK'],
   ['abyss', '?abyss=UXCHK'],
-  ...['reward', 'choice', 'scene', 'clear', 'win', 'lose', 'deck', 'levelup', 'shop', 'bossloot', 'hub', 'codex', 'loadout', 'pilgrim', 'abyssclear', 'abyssend', 'abyssshop', 'abyssrest', 'surgeguide', 'wardrobe'].map((s) => [s, `?screen=${s}&seed=UXCHK`]),
+  ...['reward', 'choice', 'scene', 'clear', 'win', 'lose', 'deck', 'levelup', 'shop', 'bossloot', 'hub', 'codex', 'loadout', 'pilgrim', 'abyssclear', 'abyssend', 'abyssshop', 'abyssrest', 'surgeguide', 'surgecut', 'wardrobe'].map((s) => [s, `?screen=${s}&seed=UXCHK`]),
 ];
 const VIEWPORTS = [
   { tag: 'PC', width: 1440, height: 900, btn: 36 },

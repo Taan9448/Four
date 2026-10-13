@@ -193,6 +193,12 @@ export class App {
       void import('./battle-view').then(({ openSurgeGuide }) => openSurgeGuide(data));
       return;
     }
+    // ?screen=surgecut — 폭주 그림(GAME_DESIGN 7절). 확인용이라 저절로 닫히지 않는다(누르거나 키)
+    if (name === 'surgecut') {
+      this.title();
+      void import('./surge-cut').then(({ surgeCut }) => surgeCut(data, 1, { ms: 3_600_000 }));
+      return;
+    }
     if (name.startsWith('abyss')) {
       // 심연 화면 확인: abyssclear(굽이를 넘음) · abyssend(멈춤) · abyssshop(상점) · abyssrest(휴식)
       const seed = 'SCREEN';
