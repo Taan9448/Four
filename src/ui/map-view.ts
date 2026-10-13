@@ -59,7 +59,7 @@ export interface MapViewHandlers {
 }
 
 /**
- * 출전 편성 안내(동료가 처음 합류했을 때·자리가 가득 찼을 때 한 번씩, 그 뒤엔 출전 칸의 버튼으로).
+ * 출전 편성 안내(동료가 처음 합류했을 때·자리가 가득 찼을 때 한 번씩, 그 뒤엔 출전 제목 옆 ? 표식으로).
  * 팝업 한 장 대신 지도 위의 실제 칸을 하나씩 비추며 짚어 준다(투어)
  */
 export function openPartyGuide(data: GameData, run: RunState): void {
@@ -223,6 +223,10 @@ export function journeyBand(data: GameData, run: RunState, opts: { onStage?: (st
       crack.appendChild(p);
     }
   }
+  // 하늘의 금 그림(Codex ui_sky_crack, 2026-10-13): 상흔 0~3 · 4~9 · 10 이상 세 단계. 그림이 있으면 SVG 선 대신 쓴다
+  const crackStage = run.scar >= 10 ? 3 : run.scar >= 4 ? 2 : 1;
+  const crackUrl = rift ? frameUrl('ui_sky_crack', crackStage, { realOnly: true }) : null;
+  const crackEl = crackUrl ? h('img', { class: `journey-crack-art${revealRift ? ' reveal' : ''}`, src: crackUrl, alt: '' }) : crack;
   // 지역: 그 지역의 스테이지에 한 번이라도 들어섰으면 드러난다. 이번 스테이지가 그 지역의 첫 스테이지이고 막 출발했으면 안개가 걷히는 연출
   const regionParts = (Object.keys(REGIONS) as (keyof typeof REGIONS)[]).map((key) => {
     const r = REGIONS[key];
@@ -288,7 +292,7 @@ export function journeyBand(data: GameData, run: RunState, opts: { onStage?: (st
     'div',
     { class: `journey${bandArt ? ' has-art' : tiles?.some(Boolean) ? ' has-tiles' : ''}`, style: opts.world ? '' : bandArt },
     tiles,
-    crack,
+    crackEl,
     regionParts.map((p) => p.fog),
     regionParts.map((p) => p.tag),
     rift ? h('span', { class: 'tag tag-c' }, '하늘의 금') : null,
@@ -489,7 +493,15 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   const partyBox = h(
     'div',
     { class: `box party-box${handlers.highlightParty ? ' guide-pulse' : ''}` },
-    h('h3', {}, run.abyss ? `일행 (${run.selected.length})` : `출전 (${run.selected.length}/${data.balance.party.max})`),
+    h(
+      'h3',
+      { class: 'party-head' },
+      run.abyss ? `일행 (${run.selected.length})` : `출전 (${run.selected.length}/${data.balance.party.max})`,
+      // 출전 편성 안내(투어)는 제목 옆 ? 표식으로 다시 본다(2026-10-13 — 버튼 한 줄을 차지하던 것을 바꿈)
+      fighters.length > 1 && !run.abyss
+        ? h('button', { class: 'member-info party-help', type: 'button', 'aria-label': '출전 편성 안내', onclick: () => openPartyGuide(data, run), ...tipAttrs('출전 편성 안내', '누가 전투에 나가는지 고르는 법을 칸마다 짚어 준다.') }, '?')
+        : null,
+    ),
     fighters.map((r) => {
       const def = data.characters.get(r.id)!;
       const checked = run.selected.includes(r.id);
@@ -550,7 +562,6 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           ? `순례에서는 하운도 쉴 수 있다 — 네 명 중 최대 ${data.balance.party.max}명. 하운이 빠지면 출전한 모두가 쓰러져야 진다. 출전하지 않은 동료의 카드는 전투 덱에서 빠진다.`
           : '하운은 항상 출전합니다. 출전하지 않은 동료의 카드는 전투 덱에서 빠집니다.',
     ),
-    fighters.length > 1 && !run.abyss ? h('button', { class: 'btn btn-small guide-link', onclick: () => openPartyGuide(data, run) }, '출전 편성 안내') : null,
   );
 
   // 창 높이를 꽉 채운다: 위 여정 띠 → 아래 왼쪽 가로 두루마리(남은 자리 전부) + 오른쪽 좁은 칸
@@ -624,13 +635,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
         h(
           'div',
           { class: 'map-actions' },
-          // 보유 카드 · 도감은 한 줄씩, 설정 · 타이틀로는 반 줄씩
+          // 보유 카드 · 전체 지도는 한 줄씩, 옷장 · 도감과 설정 · 타이틀로는 반 줄씩(옷장이 없으면 도감이 한 줄)
           h('button', { class: 'btn btn-primary wide', onclick: handlers.onShowDeck }, run.abyss ? `덱 (${run.deck.length})` : `보유 카드 (${run.deck.length})`),
           handlers.onWorldMap
             ? h('button', { class: 'btn wide btn-world', onclick: handlers.onWorldMap, ...tipAttrs('전체 지도', '이 스테이지는 지금 자리에 멈춰 두고 전체 지도로 나간다. 다시 누르면 여기서 이어진다.') }, '전체 지도로')
             : null,
-          handlers.onWardrobe ? h('button', { class: 'btn wide', onclick: handlers.onWardrobe }, '옷장') : null,
-          h('button', { class: 'btn wide', onclick: handlers.onCodex }, '도감'),
+          handlers.onWardrobe ? h('button', { class: 'btn', onclick: handlers.onWardrobe }, '옷장') : null,
+          h('button', { class: handlers.onWardrobe ? 'btn' : 'btn wide', onclick: handlers.onCodex }, '도감'),
           h('button', { class: 'btn', onclick: handlers.onSettings }, '설정'),
           h('button', { class: 'btn', title: '런은 저장됩니다. 타이틀에서 이어하거나 새로 시작할 수 있습니다.', onclick: handlers.onTitle }, '타이틀로'),
         ),

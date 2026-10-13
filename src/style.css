@@ -172,6 +172,11 @@ h1, h2, h3 { font-family: var(--f-head); }
 .journey-crack .glow { stroke: rgba(255, 59, 59, 0.45); fill: none; vector-effect: non-scaling-stroke; animation: flicker 2.2s infinite; }
 .journey-crack.reveal path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: crack-draw 1.6s 0.4s ease-out forwards; }
 .journey-crack.reveal .glow { animation: crack-draw 1.6s 0.4s ease-out forwards, flicker 2.2s 2s infinite; }
+/* 하늘의 금 그림(ui_sky_crack): 칸 높이 4~96%의 금이 띠 위 끝부터 띠 높이 72%까지 오게(0.72 ÷ 0.92 = 78.3%) */
+.journey-crack-art { position: absolute; left: 50%; top: -3.1%; height: 78.3%; aspect-ratio: 1; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 0 4px rgba(255, 59, 59, 0.35)); }
+.journey-crack-art.reveal { animation: crack-art-draw 1.6s 0.4s ease-out both; }
+@keyframes crack-art-draw { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.no-motion .journey-crack-art.reveal { animation: none; }
 @keyframes crack-draw { to { stroke-dashoffset: 0; } }
 .stop { position: absolute; z-index: 2; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: var(--fs-min); white-space: nowrap; color: var(--ink-dim); text-shadow: 0 1px 2px #000, 0 0 4px #000; cursor: help; }
 .stop i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink-dim); background: #0b0e13; }
@@ -324,11 +329,12 @@ h1, h2, h3 { font-family: var(--f-head); }
 .member-tag { font-size: var(--fs-min); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-dim); }
 .member-tag.rest { border-color: #8a6a3a; color: #e6c36a; }
 .member input:disabled + .member-name { opacity: 0.85; }
-.guide-link { margin-top: 6px; }
 .party-box.guide-pulse { animation: guide-pulse 1.2s ease-in-out 4; box-shadow: 0 0 0 2px var(--mana); }
 @keyframes guide-pulse { 50% { box-shadow: 0 0 0 3px var(--mana), 0 0 18px rgba(143, 211, 255, 0.6); } }
 .map-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .map-actions .btn.wide { grid-column: 1 / -1; }
+.party-head { display: flex; align-items: center; gap: 2px; }
+.party-head .party-help { font-style: normal; font-family: inherit; }
 .legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 5px 8px; color: var(--ink-dim); font-size: var(--fs-cap); }
 .legend span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 .legend .node.mini { position: relative; transform: none; width: 20px; height: 20px; font-size: var(--fs-min); font-weight: 400; flex: 0 0 auto; animation: none; }
@@ -1163,18 +1169,18 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 @keyframes tour-out { to { opacity: 0; } }
 .tour-spot { position: fixed; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(4, 6, 10, 0.72); pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .tour-ring { position: fixed; border-radius: 10px; border: 2px solid #f2c45a; pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.tour-ring.pop { animation: tour-ring 1.4s 0.45s ease-out infinite; }
+.tour-ring.tour-anim { animation: tour-ring 1.4s 0.45s ease-out infinite; }
 @keyframes tour-ring { 0% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0.7); } 70% { box-shadow: 0 0 0 14px rgba(242, 196, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0); } }
 .tour.no-target .tour-ring { display: none; }
 .tour-bubble { position: fixed; padding: 14px 16px 12px; cursor: default; background: linear-gradient(#17151a, #0e0d11); color: var(--ink); border: 1px solid #c9a24a; border-radius: 4px; box-shadow: inset 0 0 0 4px #0e0d11, inset 0 0 0 5px rgba(168, 40, 30, 0.6), 0 12px 40px rgba(0, 0, 0, 0.7); transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.tour-bubble.pop { animation: tour-pop 0.4s ease-out; }
+.tour-bubble.tour-anim { animation: tour-pop 0.4s ease-out; }
 @keyframes tour-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } }
 .tour-title { font-family: var(--f-brush); font-size: calc(var(--fs-body) * 1.21); color: #f4ecd8; margin-bottom: 4px; }
 .tour-text { font-size: var(--fs-body); line-height: 1.7; color: #ddd6c6; white-space: pre-line; }
 .tour-actions { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .tour-count { margin-right: auto; font-size: var(--fs-cap); color: #c9a24a; letter-spacing: 0.1em; }
 .tour-skip { background: none; border: 0; color: var(--ink-dim); font-size: var(--fs-cap); cursor: pointer; text-decoration: underline; min-height: var(--tap); padding: 0 6px; }
-@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.pop, .tour-bubble.pop { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.tour-anim, .tour-bubble.tour-anim { animation: none; } }
 
 /* ───────── 경제(2026-10-08): 골드·유물·물약·상점·전리품 ───────── */
 .gold-chip { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: #f2d48f; font-variant-numeric: tabular-nums; }
@@ -1783,7 +1789,8 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .codex-tabprog { color: var(--gold); font-size: var(--fs-sub); font-weight: 600; }
 .codex-total { font-size: var(--fs-min); }
 .codex-filter { padding: 10px 12px; }
-.codex-filter-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.codex-filter-btns { display: flex; gap: 4px; }
+.codex-filter-btns .btn { flex: 1 1 auto; min-width: 0; padding-left: 6px; padding-right: 6px; white-space: nowrap; font-size: var(--fs-cap); }
 .codex-filter .btn.on { border-color: var(--gold); color: var(--gold); background: rgba(226, 180, 92, 0.12); }
 
 /* 휴대폰: 적 이름이 이웃과 겹치지 않게 칸 너비 안에서 줄을 바꾼다(ux:check (d), 2026-10-11) */
@@ -1902,7 +1909,8 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 /* 도감 틀(2026-10-12, 편성·상점과 같은 짜임): 머리말 · 분류 줄 · 왼쪽 묶음 목록 | 가운데 고른 묶음. 상세는 지금처럼 창 */
 .codex-total { flex: 1; max-width: 420px; display: grid; gap: 4px; }
 .codex-total small { color: var(--ink-dim); font-size: var(--fs-min); }
-.codex-back { margin-left: auto; }
+.codex-head-actions { margin-left: auto; display: flex; gap: 8px; }
+.codex-glossary.on { border-color: var(--gold); color: var(--gold); background: rgba(226, 180, 92, 0.12); }
 .codex-roster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
 .codex-roster .lo-mate { min-height: 52px; font-family: var(--f-ui); font-weight: 400; color: var(--ink); }
 .codex-split { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 10px; align-items: start; }
@@ -2020,6 +2028,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .glossary-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sub); }
 .glossary-table th, .glossary-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
 .glossary-table tbody th { white-space: nowrap; color: #f0c86a; }
+.glossary-icon { width: 24px; height: 24px; margin-right: 6px; vertical-align: -6px; image-rendering: pixelated; }
 .glossary-table tbody th .status-chip, .glossary-table tbody th .st-chip { margin-right: 6px; vertical-align: middle; }
 .glossary-num { color: var(--ink-dim); font-size: var(--fs-cap); }
 @media (max-width: 640px) { .glossary-table thead { display: none; } .glossary-table tr { display: block; padding: 6px 0; border-bottom: 1px solid var(--line); } .glossary-table th, .glossary-table td { display: block; border: 0; padding: 2px 4px; } }
