@@ -5,7 +5,7 @@
     "type": "elite",
     "name": "그림자의 밤",
     "once": true,
-    "content": {"scene": "s5_scene_shadow_night", "background": "bg_kazdum", "text": "옛 왕의 망루. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다 — 들보 위의 검은 수정.", "enemies": ["shadow_assassin", "black_crystal"], "enemyScale": {"hp": 1.15}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보여. 칼이 오는 길은 하나야.\" 카일이 눈을 감고 단검의 결을 따라간다. (검은 수정 결 노출 2·취약 1)", "effects": [{"op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}]}, "outroScene": "s5_scene_shadow_night_after"}
+    "content": {"scene": "s5_scene_shadow_night", "background": "bg_kazdum", "text": "옛 왕의 망루. 그림자에는 결이 없다. 그러나 그림자를 드리우는 것에는 결이 있다 — 들보 위의 검은 수정.", "enemies": ["shadow_assassin", "black_crystal"], "enemyScale": {"hp": 1.5}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보여. 칼이 오는 길은 하나야.\" 카일이 눈을 감고 단검의 결을 따라간다. (검은 수정 결 노출 2·취약 1)", "effects": [{"op": "apply_status", "status": "grain", "stacks": 2, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies", "condition": {"enemyId": "black_crystal"}}]}, "outroScene": "s5_scene_shadow_night_after"}
   },
   {
     "id": "s5_story_border_crack",
@@ -73,7 +73,7 @@
     "name": "넷째 회랑 — 그림자들",
     "weight": 3,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"text": "네 번째 회랑에는 그림자들이 있었다. 그림자에는 결이 없다. 칼날만 실체다.", "enemies": ["shadow_fragment", "shadow_fragment", "shadow_fragment"], "enemyScale": {"hp": 0.85}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 그림자를 보지 않고, 칼의 결만 따라간다. (적 전원 결 노출 1, 하운 방어 +50)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "self"}]}}
+    "content": {"text": "네 번째 회랑에는 그림자들이 있었다. 그림자에는 결이 없다. 칼날만 실체다.", "enemies": ["shadow_fragment", "shadow_fragment", "shadow_fragment"], "enemyScale": {"hp": 0.75}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 그림자를 보지 않고, 칼의 결만 따라간다. (적 전원 결 노출 1, 하운 방어 +50)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "self"}]}}
   },
   {
     "id": "s5_battle_armor_wolves",
@@ -100,7 +100,7 @@
     "name": "다섯째 회랑",
     "weight": 2,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"text": "불의 정령, 얼음 기사, 그림자. 세 사천왕의 잔당이 한 회랑을 함께 지킨다. 회랑마다 수문장이 있을 거라던 그롬의 말대로. (적 전원 힘 1)", "enemies": ["fire_spirit", "ice_knight", "shadow_fragment"], "enemyScale": {"hp": 1.25, "dmg": 1.1}, "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "붉은 검이 불을 삼키고 얼음을 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "불의 정령, 얼음 기사, 그림자. 세 사천왕의 잔당이 한 회랑을 함께 지킨다. 회랑마다 수문장이 있을 거라던 그롬의 말대로. (적 전원 힘 1)", "enemies": ["fire_spirit", "ice_knight", "shadow_fragment"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "bonus": {"condition": {"partyHas": "kyle", "flag": "red_sword"}, "text": "붉은 검이 불을 삼키고 얼음을 녹인다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s5_elite_corridor_warden",
@@ -119,7 +119,7 @@
     "weight": 3,
     "once": true,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "일곱 번째 회랑은 비어 있었다. 수문장도, 마물도 없었다. 다만 회랑의 끝에 흑요석의 문 하나. 문틀에 박힌 검은 쐐기마다 엉킨 결이 허공을 갉아먹는다.", "enemies": ["wedge", "obsidian_door", "wedge"], "enemyScale": {"hp": 1.25, "dmg": 1.1}, "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "\"나중에. 지금은 장작.\" 보른의 망치가 쐐기의 결이 아니라 쐐기가 박힌 돌의 결을 친다. (쐐기 전원 피해 140)", "effects": [{"op": "damage", "amount": 140, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}}
+    "content": {"text": "일곱 번째 회랑은 비어 있었다. 수문장도, 마물도 없었다. 다만 회랑의 끝에 흑요석의 문 하나. 문틀에 박힌 검은 쐐기마다 엉킨 결이 허공을 갉아먹는다.", "enemies": ["wedge", "obsidian_door", "wedge"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "bonus": {"condition": {"partyHas": "born", "flag": "durin_hammer"}, "text": "\"나중에. 지금은 장작.\" 보른의 망치가 쐐기의 결이 아니라 쐐기가 박힌 돌의 결을 친다. (쐐기 전원 피해 140)", "effects": [{"op": "damage", "amount": 140, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}}
   },
   {
     "id": "s5_event_sewer_collapse",

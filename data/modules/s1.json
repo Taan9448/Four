@@ -101,7 +101,7 @@
     "name": "옛 은광의 광석거미",
     "once": true,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "은빛 숲 북쪽 가장자리, 옛 은광. 광부 세 명 실종. D등급, 보수 은화 사십. 갱도 천장을 뒤덮은 흰 실 사이에 사람 크기의 고치 셋이 매달려 있었다. 어둠 속에서 여덟 개의 붉은 점이 반짝였다. — 은빛 껍질은 큰 방어를 두른다. 결을 드러내면 방어를 무시한다.", "enemies": ["ore_spider"], "enemyScale": {"hp": 1.25, "dmg": 1.1}, "bonus": {"condition": {"partyHas": "born"}, "text": "\"돌에도 결이 있다.\" 보른이 갱도 벽의 결에 도끼를 내리찍자 천장 바위가 결을 따라 미끄러져 떨어졌다. (광석거미 피해 100, 기절 1)", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}, {"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "은빛 숲 북쪽 가장자리, 옛 은광. 광부 세 명 실종. D등급, 보수 은화 사십. 갱도 천장을 뒤덮은 흰 실 사이에 사람 크기의 고치 셋이 매달려 있었다. 어둠 속에서 여덟 개의 붉은 점이 반짝였다. — 은빛 껍질은 큰 방어를 두른다. 결을 드러내면 방어를 무시한다.", "enemies": ["ore_spider"], "enemyScale": {"hp": 1.5, "dmg": 1.15}, "bonus": {"condition": {"partyHas": "born"}, "text": "\"돌에도 결이 있다.\" 보른이 갱도 벽의 결에 도끼를 내리찍자 천장 바위가 결을 따라 미끄러져 떨어졌다. (광석거미 피해 100, 기절 1)", "effects": [{"op": "damage", "amount": 100, "target": "all_enemies"}, {"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s1_elite_armor_ranks",
