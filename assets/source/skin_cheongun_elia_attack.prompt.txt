@@ -1,0 +1,23 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips, grey eyes with a faint green tint; wearing a white mage robe with sky-blue trims and silver leaf embroidery, a short light-blue hooded cape, a thin silver circlet; holding a long pale wooden staff whose blue stone is set in a silver crescent frame. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing right.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character. Projectiles, sword trails, sparks and dust also end inside the cell margin: a fireball or slash is drawn whole before the cell edge, never cut off and never spilling into the next cell.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: draws the staff back, motes of light streaming into the blue stone
+Cell 2: a small flame forms at the tip of the staff
+Cell 3: the flame grows into a fireball, body leaning back
+Cell 4: thrusts the staff forward, fireball released to the right
+Cell 5: staff extended, sparks trailing
+Cell 6: lowers the staff, returning to idle
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: PR #1122 LIMITED EDIT. Keep cells1,2,3,4 exactly as in the attached original sheet: same face, silver hair, light-blue cape, white-blue robe, crescent-framed blue staff stone, body size, position, poses and pixels. Edit ONLY the sparks in cell5 and the stray fleck in cell6. Collect cell5's remaining flame sparks CLOSE to the staff tip, within local x=350-420 of512px cell (delivered x~104-121), nothing beyond local x432. NO spark at the right edge. Erase ALL orange flame pixels at the LEFT edge of cell6; cell6 should have ONLY its original idle-return mage and staff, no detached motes. Keep the six boot soles aligned y143 and don't resize or move the character. Preserve the original cell4 fireball exactly.
+Fix: First repair removed cell6's foreign fleck and all boot baselines are143, keep that. ONLY cell5's sparks remain too far right (x136). Erase every detached spark in cell5 then draw exactly TWO tiny orange square motes immediately next to the staff crescent's RIGHT edge, local centers(448,145) and(452,155), each4px square, rightmost pixel x<=456 (finalx130). They must not overlap the blue crystal. Do not repaint or move the staff, Elia, or ANY pixels in cells1-4 and6. Cell6 remains entirely free of orange flecks.
+
