@@ -79,7 +79,7 @@
     "name": "그림자 망령",
     "weight": 3,
     "conditions": {"floorRange": [3, 9]},
-    "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 80)", "effects": [{"op": "damage", "amount": 80, "target": "random_enemy"}]}}
+    "content": {"text": "그림자 속에서 사람의 형상을 한 그림자들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "enemyScale": {"hp": 0.85}, "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 80)", "effects": [{"op": "damage", "amount": 80, "target": "random_enemy"}]}}
   },
   {
     "id": "s9_battle_glass_tower",
@@ -107,7 +107,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "뼈로 이루어진 거인이 세계의 조각을 밟고 일어선다. 뼈 사이로 검붉은 기운이 흐른다. 부서져도 다시 일어선다.", "enemies": ["bone_giant"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 결을 보고 거인의 정강이를 친다. 내공을 싣지 않고. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "뼈로 이루어진 거인이 세계의 조각을 밟고 일어선다. 뼈 사이로 검붉은 기운이 흐른다. 부서져도 다시 일어선다.", "enemies": ["bone_giant"], "enemyScale": {"hp": 1.25, "dmg": 1.1}, "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 결을 보고 거인의 정강이를 친다. 내공을 싣지 않고. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s9_elite_hungry_pack",
@@ -117,7 +117,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "불비늘 삼두견 무리가 조각을 건너뛰며 둘러싼다. 머리 셋이 하나의 목으로 모이는 이음매. 장작 패기다. (적 전원 힘 1)", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일은 목을, 보른은 다리를, 엘리아는 눈을. \"결국 다 장작 패기야.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
+    "content": {"text": "불비늘 삼두견 무리가 조각을 건너뛰며 둘러싼다. 머리 셋이 하나의 목으로 모이는 이음매. 장작 패기다. (적 전원 힘 1)", "enemies": ["fire_scale_hound", "fire_scale_hound", "fire_scale_hound"], "enemyScale": {"hp": 1.25, "dmg": 1.1}, "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일은 목을, 보른은 다리를, 엘리아는 눈을. \"결국 다 장작 패기야.\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "all_enemies"}]}
   },
   {
     "id": "s9_event_toma_wedge",

@@ -66,7 +66,7 @@
     "name": "호수의 벽",
     "weight": 2,
     "conditions": {"floorRange": [5, 7]},
-    "content": {"text": "호수가 통째로 솟아올라 성을 덮은 투명한 벽 아래. 깃발은 바람에 펄럭이던 모양 그대로 멈춰 있다. 얼음 기사 둘이 늑대 하나를 데리고 벽 앞을 지킨다.", "enemies": ["ice_knight", "ice_wolf", "ice_knight"]}
+    "content": {"text": "호수가 통째로 솟아올라 성을 덮은 투명한 벽 아래. 깃발은 바람에 펄럭이던 모양 그대로 멈춰 있다. 얼음 기사 둘이 늑대 하나를 데리고 벽 앞을 지킨다.", "enemies": ["ice_knight", "ice_wolf", "ice_knight"], "enemyScale": {"hp": 0.85}}
   },
   {
     "id": "s3_battle_palace_hall",
@@ -84,7 +84,7 @@
     "name": "얼음 궁전의 문지기",
     "weight": 2,
     "conditions": {"floorRange": [3, 7]},
-    "content": {"text": "그날 밤 성문을 지키다 쓰러진 기사들이 지금은 얼음 궁전의 문지기가 되어 있다. 아르덴의 문장이 새겨진 방패에 서리가 꽃처럼 피어 있다.", "enemies": ["ice_gatekeeper", "ice_wolf"]}
+    "content": {"text": "그날 밤 성문을 지키다 쓰러진 기사들이 지금은 얼음 궁전의 문지기가 되어 있다. 아르덴의 문장이 새겨진 방패에 서리가 꽃처럼 피어 있다.", "enemies": ["ice_gatekeeper", "ice_wolf"], "enemyScale": {"hp": 1.1}}
   },
   {
     "id": "s3_elite_wolf_pack",
@@ -93,7 +93,7 @@
     "name": "스무 마리의 늑대",
     "weight": 1,
     "conditions": {"floorRange": [3, 5]},
-    "content": {"text": "눈보라가 갈라지며 얼음 늑대가 사방에서 미끄러져 온다. 하나가 깨지면, 그물 전체가 무너진다. 늑대들도 그렇다.", "enemies": ["ice_wolf", "ice_wolf", "ice_wolf", "ice_wolf"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 새 도끼가 늑대 둘을 한꺼번에 박살 낸다. 그롬이 두린의 도끼와 같은 모양으로 벼린 도끼다. (늑대 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "눈보라가 갈라지며 얼음 늑대가 사방에서 미끄러져 온다. 하나가 깨지면, 그물 전체가 무너진다. 늑대들도 그렇다.", "enemies": ["ice_wolf", "ice_wolf", "ice_wolf", "ice_wolf"], "enemyScale": {"hp": 1.1}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 새 도끼가 늑대 둘을 한꺼번에 박살 낸다. 그롬이 두린의 도끼와 같은 모양으로 벼린 도끼다. (늑대 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s3_event_hideout_fire",
