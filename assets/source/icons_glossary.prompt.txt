@@ -1,0 +1,27 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: neigong (inner energy) — a glowing golden ring of qi circling a small bright point, like breath gathered at the belly
+Cell 2: mana — a clear blue droplet-shaped crystal with a silver glint
+Cell 3: fusion — a golden qi ring and a blue mana droplet overlapping, the overlap glowing white
+Cell 4: rift — a short jagged black crack with a faint red light along its edges
+Cell 5: rift surge — a jagged black crack bursting open with red light, a few dark shards flying out
+Cell 6: scar — a dark red jagged scar line crossed by three short black stitches
+Cell 7: element — three tiny symbols in a triangle: an orange flame, a pale blue snowflake and a yellow lightning bolt
+Cell 8: conduction — a yellow lightning bolt striking down onto a pale blue snowflake, small sparks where they touch
+Cell 9: critical hit — a steel sword tip with a bright white-yellow four-pointed starburst at the point
+Cell 10: inner method (power card) — a small white lotus with a glowing gold seal mark floating above it
+Cell 11: loadout points — three small cards fanned out, the front card with a green gem in its corner
+Cell 12: rift gap node — a narrow black crack opening in the air with dim red light inside, a tiny dark path leading into it
+Cell 13: pilgrimage reward — a woven straw pilgrim's hat resting on top of a single card
+Cell 14: abyss card — a card whose face is a deep violet swirling void with a faint white spark in the center
+Cells 15 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
