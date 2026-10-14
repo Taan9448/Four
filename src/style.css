@@ -686,7 +686,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .card-ghost { position: fixed; pointer-events: none; z-index: 900; transition: none; will-change: transform, opacity; }
 .fx-flash-white .sprite-wrap, .fx-flash-blue .sprite-wrap { animation: flash-w 0.22s; }
 .fx-flash-blue .sprite-wrap { animation-name: flash-b; }
-@keyframes flash-w { 30% { filter: brightness(3) saturate(0); } }
+/* 맞은 쪽 번쩍임은 색을 지우지 않는다(2026-10-14 — 색을 빼면 어두운 바위 몸의 골렘·고르몬이 회색 덩어리, 옛 임시 실루엣처럼 보였다) */
+@keyframes flash-w { 30% { filter: brightness(1.9) saturate(1.25) drop-shadow(0 0 3px rgba(255, 255, 255, 0.7)); } }
 @keyframes flash-b { 30% { filter: brightness(2) drop-shadow(0 0 12px var(--unha)); } }
 .b-scene.fx-flash-red { animation: flash-r 0.22s; }
 .b-scene.fx-flash-blue { animation: flash-field-b 0.22s; }
