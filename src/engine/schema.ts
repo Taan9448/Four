@@ -285,7 +285,7 @@ export const FxWhen = z
   .object({
     owner: z.string(),
     tag: z.string(),
-    element: z.enum(['fire', 'ice']),
+    element: Element,
     type: z.enum(['attack', 'skill', 'power', 'status']),
     target: z.enum(['enemy', 'all_enemies', 'self', 'ally', 'all_allies', 'none']),
     pool: z.string(),

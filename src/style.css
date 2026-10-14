@@ -617,7 +617,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .card-torn { box-shadow: none; }
 .tear-bit { position: fixed; z-index: 901; width: 9px; height: 7px; background: #efe4cc; border-radius: 1px; box-shadow: 0 0 4px rgba(255, 213, 138, 0.8); pointer-events: none; clip-path: polygon(0 20%, 40% 0, 100% 15%, 85% 100%, 20% 85%); }
 .tear-bit.ink { width: 6px; height: 6px; background: #14110d; border-radius: 50%; box-shadow: none; clip-path: none; }
-.fx-tear { position: fixed; z-index: 902; pointer-events: none; image-rendering: pixelated; }
+.fx-canvas.fx-tear { position: fixed; z-index: 902; pointer-events: none; image-rendering: pixelated; }
 .endturn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-bottom: 14px; justify-self: end; }
 .turn { font-family: var(--f-head); font-size: var(--fs-sub); color: var(--ink-dim); }
 /* 턴 종료: 붉은 인장. 누르면 도장 찍듯 눌린다. 쓸 카드가 없으면 맥박친다. 그림(ui_endturn)이 오면 그 그림으로 */
