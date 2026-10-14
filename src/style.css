@@ -81,7 +81,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .title-stage { position: absolute; left: 50%; top: 50%; width: max(100cqw, 150cqh); height: max(100cqh, 66.667cqw); translate: -50% -50%; transform-origin: 50% 45%; animation: title-zoom 32s ease-in-out infinite alternate; }
 @keyframes title-zoom { from { transform: scale(1); } to { transform: scale(1.045) translate(-0.6%, -0.4%); } }
 .title-art { position: absolute; inset: 0; background: center / 100% 100% no-repeat; }
-.title-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.title-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
 /* 하늘의 금: 붉은 빛이 숨쉬다 가끔 번쩍 */
 .title-crack { position: absolute; left: 47.5%; width: 5%; top: -2%; height: 62%; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse 50% 52% at 50% 42%, rgba(255, 70, 50, 0.85), rgba(255, 40, 40, 0.25) 45%, transparent 72%); filter: blur(6px); animation: title-crack 4.2s ease-in-out infinite; }
 @keyframes title-crack { 0%, 100% { opacity: 0.18; } 45% { opacity: 0.55; } 50% { opacity: 0.95; } 53% { opacity: 0.4; } 60% { opacity: 0.62; } }
@@ -183,7 +183,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .stop.done { color: var(--ink); }
 .stop.done i { background: var(--neigong); border-color: var(--neigong); }
 .stop.here { color: var(--mana); font-weight: 600; }
-.stop.here i { width: 18px; height: 18px; border-color: var(--mana); background: #12324a; box-shadow: 0 0 0 5px rgba(143, 211, 255, 0.22); animation: pulse 1.6s infinite; }
+.stop.here i { position: relative; width: 18px; height: 18px; border-color: var(--mana); background: #12324a; box-shadow: 0 0 0 5px rgba(143, 211, 255, 0.22); }
+.stop.here i::after { content: ''; position: absolute; inset: -7px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(143, 211, 255, 0.5); will-change: transform, opacity; animation: ring-out 1.6s ease-out infinite; pointer-events: none; }
 .stop.next { color: rgba(200, 205, 215, 0.5); }
 .stop.next i { border-style: dashed; border-color: rgba(200, 205, 215, 0.4); }
 .stop.event { color: #ff9a9a; font-weight: 600; }
@@ -250,12 +251,12 @@ h1, h2, h3 { font-family: var(--f-head); }
 .node.node-unknown { --seal: rgba(90, 70, 45, 0.55); --seal-ink: rgba(90, 70, 45, 0.7); --seal-bg: rgba(246, 236, 212, 0.55); border-radius: 50%; border-style: dashed; width: 26px; height: 26px; font-size: var(--fs-sub); box-shadow: none; }
 .node.node-unknown.open { --seal: #1f5f8a; --seal-ink: #1f4f78; --seal-bg: rgba(246, 236, 212, 0.95); border-style: solid; width: 32px; height: 32px; font-size: var(--fs-body); }
 .node.done { opacity: 0.45; filter: saturate(0.4); }
-.node.open { opacity: 1; cursor: pointer; animation: node-pulse 1.6s infinite; }
+.node.open { opacity: 1; cursor: pointer; }
 .node.open:hover { transform: translate(-50%, -50%) rotate(0deg) scale(1.15); z-index: 4; }
 .node.here { opacity: 1; filter: none; box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 4px rgba(226, 180, 92, 0.55); }
 .node:disabled { cursor: default; }
-@keyframes node-pulse { 0%, 100% { box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 0 rgba(226, 180, 92, 0.7); } 50% { box-shadow: inset 0 0 0 2px var(--seal-bg), inset 0 0 0 3px color-mix(in srgb, var(--seal) 70%, transparent), 0 0 0 7px rgba(226, 180, 92, 0); } }
-@keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(143, 211, 255, 0.05); } }
+/* 숨쉬는 고리(2026-10-14 렉 줄이기): box-shadow를 움직이면 큰 지도 그림을 매 프레임 다시 그렸다 → 따로 띄운 고리의 크기·투명도만 바꾼다 */
+@keyframes ring-out { 0% { transform: scale(0.86); opacity: 0.85; } 70%, 100% { transform: scale(1.18); opacity: 0; } }
 .here-mark { position: absolute; z-index: 3; width: 56px; transform: translate(-50%, -92%); image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.5)); }
 .side-panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow-y: auto; }
 /* 칸은 줄어들지 않는다 — 누르는 상자(보유 장비, role=button)의 최소 높이 규칙 때문에 내용보다 작게 줄어 유물이 아래 '출전'과 겹쳤다(2026-10-11) */
@@ -454,7 +455,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .log div:last-child { color: var(--ink); }
 
 /* 가운데: 아군(왼쪽) · 적(오른쪽) */
-.units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: calc(var(--dock-h) - 6px); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
+/* 아군·적 줄의 아래 끝은 손패 카드 윗변 위로(2026-10-14 사용자 요청 — 카드가 체력 막대 아래 상태 이름표를 덮었다). 손패 카드 높이 = 192px × 카드 배율 + 들림·여백 */
+.units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: var(--units-bottom, calc(192px * var(--cpx-zoom) + 44px)); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
 .side { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
 .side-enemy { flex-direction: row-reverse; }
 .unit { position: relative; display: flex; flex-direction: column; align-items: center; width: calc(var(--unit-h) * var(--scale) * 0.62 * var(--fit, 1)); min-width: calc(104px * var(--fit, 1)); transition: opacity 0.4s, filter 0.4s; }
@@ -563,7 +565,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .half.neigong { left: 0; --liq-hi: #ffe7a6; --liq: #f0a02c; --liq-mid: #c46a10; --liq-deep: #5e2604; --liq-glow: rgba(255, 170, 60, 0.55); }
 .half.mana { right: 0; --liq-hi: #c9eeff; --liq: #3f9be8; --liq-mid: #1d5fae; --liq-deep: #081b42; --liq-glow: rgba(90, 170, 255, 0.55); }
 .liquid { position: absolute; left: 0; right: 0; bottom: 0; height: var(--fill, 0%); transition: height 0.6s cubic-bezier(0.3, 0.7, 0.4, 1); }
-.liquid::before { content: ''; position: absolute; left: 50%; top: -3px; width: 300%; aspect-ratio: 1; margin-left: -150%; border-radius: 45%; background: var(--liq); box-shadow: 0 0 0 1.5px var(--liq-hi), 0 -2px 4px rgba(255, 255, 255, 0.25); animation: slosh 7s linear infinite; }
+.liquid::before { content: ''; position: absolute; left: 50%; top: -3px; width: 300%; aspect-ratio: 1; margin-left: -150%; border-radius: 45%; will-change: transform; background: var(--liq); box-shadow: 0 0 0 1.5px var(--liq-hi), 0 -2px 4px rgba(255, 255, 255, 0.25); animation: slosh 7s linear infinite; }
 .half.mana .liquid::before { animation-duration: 9s; animation-direction: reverse; }
 .liquid::after {
   content: ''; position: absolute; inset: 0;
@@ -573,8 +575,10 @@ h1, h2, h3 { font-family: var(--f-head); }
     radial-gradient(ellipse 60% 40% at 30% 35%, rgba(255, 255, 255, 0.22), transparent 70%) 0 0 / 200% 200%,
     radial-gradient(ellipse 55% 45% at 70% 65%, rgba(0, 0, 0, 0.3), transparent 70%) 0 0 / 200% 200%,
     linear-gradient(180deg, var(--liq) 0%, var(--liq-mid) 45%, var(--liq-deep) 100%);
-  animation: churn 9s linear infinite;
+  /* 배경 위치 애니메이션은 매 프레임 다시 그리므로 초당 15번만(2026-10-14 렉 줄이기) */
+  animation: churn 9s steps(135) infinite;
 }
+.no-motion .liquid::before, .no-motion .liquid::after { animation: none; }
 .half.empty .liquid { display: none; }
 @keyframes slosh { to { transform: rotate(360deg); } }
 /* 기포는 위로 오르고, 밝고 어두운 얼룩은 천천히 소용돌이친다 */
@@ -668,6 +672,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 /* 타격 멈춤: 전투 장면의 CSS 애니메이션을 잠깐 세운다(떠오르는 숫자는 그대로) */
 .hitstop .b-scene *:not(.float-text):not(.impact) { animation-play-state: paused !important; }
+/* 창을 떠나면 쉬기(2026-10-14, render/idle.ts): 반복 애니메이션을 모두 멈춘다 */
+.idle *, .idle *::before, .idle *::after { animation-play-state: paused !important; }
 /* 날아가는 카드(복제본) */
 .card-ghost { position: fixed; pointer-events: none; z-index: 900; transition: none; will-change: transform, opacity; }
 .fx-flash-white .sprite-wrap, .fx-flash-blue .sprite-wrap { animation: flash-w 0.22s; }
@@ -1169,8 +1175,10 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 @keyframes tour-out { to { opacity: 0; } }
 .tour-spot { position: fixed; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(4, 6, 10, 0.72); pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .tour-ring { position: fixed; border-radius: 10px; border: 2px solid #f2c45a; pointer-events: none; transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.tour-ring.tour-anim { animation: tour-ring 1.4s 0.45s ease-out infinite; }
-@keyframes tour-ring { 0% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0.7); } 70% { box-shadow: 0 0 0 14px rgba(242, 196, 90, 0); } 100% { box-shadow: 0 0 0 0 rgba(242, 196, 90, 0); } }
+.tour-ring::after { content: ''; position: absolute; inset: -2px; border-radius: 12px; box-shadow: 0 0 0 4px rgba(242, 196, 90, 0.6); opacity: 0; will-change: transform, opacity; }
+/* 맥박은 따로 띄운 고리의 크기·투명도로(2026-10-14 렉 줄이기: box-shadow를 움직이면 어두운 막 전체를 매 프레임 다시 그렸다) */
+.tour-ring.tour-anim::after { animation: tour-ring 1.4s 0.45s ease-out infinite; }
+@keyframes tour-ring { 0% { transform: scale(1); opacity: 0.9; } 70%, 100% { transform: scale(1.08); opacity: 0; } }
 .tour.no-target .tour-ring { display: none; }
 .tour-bubble { position: fixed; padding: 14px 16px 12px; cursor: default; background: linear-gradient(#17151a, #0e0d11); color: var(--ink); border: 1px solid #c9a24a; border-radius: 4px; box-shadow: inset 0 0 0 4px #0e0d11, inset 0 0 0 5px rgba(168, 40, 30, 0.6), 0 12px 40px rgba(0, 0, 0, 0.7); transition: left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .tour-bubble.tour-anim { animation: tour-pop 0.4s ease-out; }
@@ -1180,7 +1188,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .tour-actions { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .tour-count { margin-right: auto; font-size: var(--fs-cap); color: #c9a24a; letter-spacing: 0.1em; }
 .tour-skip { background: none; border: 0; color: var(--ink-dim); font-size: var(--fs-cap); cursor: pointer; text-decoration: underline; min-height: var(--tap); padding: 0 6px; }
-@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.tour-anim, .tour-bubble.tour-anim { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tour-spot, .tour-ring, .tour-bubble { transition: none; } .tour-ring.tour-anim::after, .tour-bubble.tour-anim { animation: none; } }
 
 /* ───────── 경제(2026-10-08): 골드·유물·물약·상점·전리품 ───────── */
 .gold-chip { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: #f2d48f; font-variant-numeric: tabular-nums; }
@@ -1697,7 +1705,7 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 .node { width: 36px; height: 36px; }
 .node.node-unknown { width: 30px; height: 30px; }
 .node.node-unknown.open { width: 36px; height: 36px; }
-.node.open::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
+.node.open::before { content: ''; position: absolute; inset: -6px; border-radius: 8px; box-shadow: 0 0 0 2px rgba(226, 180, 92, 0.75); will-change: transform, opacity; animation: ring-out 1.6s ease-out infinite; }
 @media (max-width: 600px) {
   .node, .node.node-unknown.open { width: 40px; height: 40px; }
   .node.node-boss { width: 52px; height: 52px; }
@@ -1974,7 +1982,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 @media (orientation: landscape) and (max-height: 500px) {
   :root { --unit-h: 104px; --tap: 44px; }
   .b-scene { --dock-h: 118px; height: calc(100vh - 8px); min-height: 0; }
-  .units { top: 44px; }
+  .units { top: 44px; --units-bottom: calc(var(--dock-h) - 6px); }
   .dock { grid-template-columns: 120px minmax(0, 1fr) 96px; padding: 0 1% 6px; }
   .dock-left { flex-direction: column; align-items: flex-start; gap: 4px; }
   .dock-left .b-items { flex-direction: row; }

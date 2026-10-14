@@ -34,6 +34,7 @@ import {
 } from '../engine/run';
 import { frameUrl } from '../render/assets';
 import { initAudio, playBgm, sfx } from '../render/audio';
+import { initIdle } from '../render/idle';
 import { toast } from '../render/fx';
 import { moodFor, type Mood } from '../render/music';
 import { BattleView } from './battle-view';
@@ -138,6 +139,7 @@ export class App {
   private slot = 1;
 
   constructor(private root: HTMLElement) {
+    initIdle();
     applySettings();
     initAudio();
     const params = new URLSearchParams(location.search);

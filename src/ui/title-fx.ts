@@ -2,6 +2,7 @@
 // 층의 자리는 그림 기준 비율(가운데 하늘의 금, 오른쪽 위 두 달)이라, 층 묶음(.title-stage)을 그림과 같은 3:2로 화면에 꽉 채운다(CSS).
 // 입자(금의 불티 · 왼쪽 매화 꽃잎 · 오른쪽 마나 알갱이와 별)는 캔버스 하나에 그린다. 화면 연출을 끄거나 '움직임 줄이기'면 그리지 않는다.
 // 장식이라 엔진의 시드 RNG가 아닌 Math.random을 쓴다(게임 결과와 무관).
+import { isIdle } from '../render/idle';
 import { h } from './dom';
 
 /** 화면 연출이 꺼졌는가(설정의 '화면 연출' → 문서에 no-motion, 또는 기기의 움직임 줄이기) */
@@ -32,7 +33,9 @@ export function titleStage(url: string): HTMLElement {
   let W = 0;
   let H = 0;
   const fit = () => {
-    const d = Math.min(2, devicePixelRatio || 1);
+    // 입자는 네모 점이라 고해상도가 필요 없다 — 화면의 절반 해상도로 그려 CSS로 키운다(pixelated). 2026-10-14 렉 줄이기:
+    // 화면 크기 캔버스를 매 프레임 지우고 다시 합성하던 것이 시작 화면 부하의 대부분이었다
+    const d = 0.5;
     W = canvas.width = Math.round(canvas.offsetWidth * d);
     H = canvas.height = Math.round(canvas.offsetHeight * d);
   };
@@ -45,15 +48,23 @@ export function titleStage(url: string): HTMLElement {
   const stars = Array.from({ length: 26 }, () => ({ x: rnd(0.58, 0.99), y: rnd(0.02, 0.3), p: rnd(0, 6.28), s: rnd(0.6, 1.4) }));
   // 그림 픽셀처럼 네모 점으로(화면 폭 1200 기준 크기)
   const dot = (x: number, y: number, s: number, color: string) => {
-    const k = Math.max(2, Math.round((s * W) / 1200));
+    if (!paint) return;
+    const k = Math.max(1, Math.round((s * W) / 1200));
     ctx.fillStyle = color;
     ctx.fillRect(Math.round(x * W), Math.round(y * H), k, k);
   };
   let t = 0;
   let drawn = false;
+  // 움직임은 매 프레임, 그리기는 두 프레임에 한 번(초당 30장)
+  let paint = true;
   const frame = () => {
     if (!stage.isConnected) {
       ro.disconnect();
+      return;
+    }
+    // 창을 떠나 쉬는 중이면 그리지 않고 드물게만 깨어난다(render/idle.ts)
+    if (isIdle()) {
+      setTimeout(() => requestAnimationFrame(frame), 250);
       return;
     }
     requestAnimationFrame(frame);
@@ -65,7 +76,8 @@ export function titleStage(url: string): HTMLElement {
     }
     t += 1;
     drawn = true;
-    ctx.clearRect(0, 0, W, H);
+    paint = t % 2 === 0;
+    if (paint) ctx.clearRect(0, 0, W, H);
     if (embers.length < 14 && Math.random() < 0.18) embers.push({ x: rnd(0.485, 0.515), y: rnd(0.12, 0.58), vy: rnd(-0.0016, -0.0008), vx: rnd(-0.0003, 0.0003), life: 1 });
     if (petals.length < 16 && Math.random() < 0.12) petals.push({ x: rnd(-0.05, 0.4), y: -0.03, vx: rnd(0.0007, 0.0016), vy: rnd(0.0009, 0.0016), r: rnd(0, 6.28), vr: rnd(-0.05, 0.05), w: rnd(0, 6.28) });
     if (motes.length < 22 && Math.random() < 0.2) motes.push({ x: rnd(0.56, 0.98), y: rnd(0.55, 1), vy: rnd(-0.0011, -0.0005), p: rnd(0, 6.28), life: 1 });

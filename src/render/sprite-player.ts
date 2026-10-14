@@ -1,6 +1,7 @@
 // <canvas> 기반 스프라이트 재생기. meta.json(프레임 수·fps·반복·이벤트 프레임)을 그대로 따른다.
 // 프레임 번호는 1부터. 이벤트(예: hit: 4)는 그 프레임에 들어서는 순간 한 번 발생한다.
 // 대체 단계 2(키 포즈 3장)는 virtualFrames 길이로 키 포즈 사이를 이동·크로스페이드로 보간한다.
+import { isIdle } from './idle';
 import { loadSprite, type SpriteAsset } from './assets';
 import { fxNow } from './fx';
 
@@ -53,8 +54,17 @@ export class SpritePlayer {
       // 연출 시계(fxNow): 타격 멈춤 동안 프레임이 멈춘다
       const start = fxNow();
       let lastFrame = 0;
+      let attached = false;
       const tick = () => {
         if (token !== this.token) return resolve();
+        // 화면에서 빠진 캔버스의 반복 재생은 끝낸다(다른 화면으로 넘어가도 돌던 대기 동작이 쌓이지 않게)
+        if (this.canvas.isConnected) attached = true;
+        else if (attached) return resolve();
+        // 창을 떠나 쉬는 중이면 반복 동작은 그리지 않고 드물게만 깨어난다(render/idle.ts)
+        if (loop && isIdle()) {
+          setTimeout(() => token === this.token && (this.raf = requestAnimationFrame(tick)), 250);
+          return;
+        }
         const elapsed = fxNow() - start;
         let n = Math.floor(elapsed / frameMs) + 1; // 1부터
         if (loop) n = ((n - 1) % total) + 1;
