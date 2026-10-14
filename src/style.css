@@ -455,11 +455,11 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 /* 가운데: 아군(왼쪽) · 적(오른쪽) */
 .units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: calc(var(--dock-h) - 6px); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
-.side { display: flex; gap: 8px; align-items: flex-end; }
+.side { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
 .side-enemy { flex-direction: row-reverse; }
-.unit { position: relative; display: flex; flex-direction: column; align-items: center; width: calc(var(--unit-h) * var(--scale) * 0.62); min-width: 104px; transition: opacity 0.4s, filter 0.4s; }
+.unit { position: relative; display: flex; flex-direction: column; align-items: center; width: calc(var(--unit-h) * var(--scale) * 0.62 * var(--fit, 1)); min-width: calc(104px * var(--fit, 1)); transition: opacity 0.4s, filter 0.4s; }
 /* 프레임 좌우의 빈 여백은 옆 유닛과 겹쳐도 되게 유닛 폭보다 넓게(가운데 정렬로 양옆으로 넘친다) */
-.sprite-wrap { position: relative; height: calc(var(--unit-h) * var(--scale)); width: calc(var(--unit-h) * var(--scale)); flex-shrink: 0; pointer-events: none; margin-top: calc(var(--unit-h) * var(--scale) * -0.08); }
+.sprite-wrap { position: relative; height: calc(var(--unit-h) * var(--scale) * var(--fit, 1)); width: calc(var(--unit-h) * var(--scale) * var(--fit, 1)); flex-shrink: 0; pointer-events: none; margin-top: calc(var(--unit-h) * var(--scale) * -0.08); }
 .sprite { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.45)); }
 /* 발밑 그림자(2026-10-09): 발(프레임 아래 10% 기준선) 밑에 옅은 타원. 쓰러지면 사라진다 */
 .sprite-wrap::before { content: ''; position: absolute; left: 50%; bottom: 6%; z-index: 0; width: 48%; height: 8%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.32) 45%, transparent 72%); pointer-events: none; }
@@ -1086,10 +1086,10 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
   .medal i { min-width: 18px; height: 17px; font-size: var(--fs-min); line-height: 15px; right: -5px; bottom: -4px; }
   .battle-intro { font-size: var(--fs-min); }
   .log { display: none; }
-  .units { position: static; min-height: calc(var(--unit-h) + 96px); gap: 4px; padding: 26px 0 0; }
+  .units { position: static; width: 100%; min-width: 0; margin: 0; min-height: calc(var(--unit-h) + 96px); gap: 4px; padding: 26px 0 0; }
   .side { gap: 2px; }
-  .unit { width: calc(var(--unit-h) * min(var(--scale), 1.15) * 0.52); min-width: 0; }
-  .sprite-wrap { height: calc(var(--unit-h) * min(var(--scale), 1.15)); width: calc(var(--unit-h) * min(var(--scale), 1.15)); }
+  .unit { width: calc(var(--unit-h) * min(var(--scale), 1.15) * 0.52 * var(--fit, 1)); min-width: 0; }
+  .sprite-wrap { height: calc(var(--unit-h) * min(var(--scale), 1.15) * var(--fit, 1)); width: calc(var(--unit-h) * min(var(--scale), 1.15) * var(--fit, 1)); }
   .unit-name { font-size: var(--fs-cap); white-space: normal; word-break: keep-all; text-align: center; line-height: 1.15; padding: 1px 4px; }
   .hp-bar { height: 14px; }
   .hp-text { font-size: var(--fs-min); line-height: 13px; }

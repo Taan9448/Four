@@ -69,6 +69,8 @@ export class BattleView {
   /** 끌어 놓기 중이던 카드(놓은 뒤 click을 한 번 막는다) */
   private dragged = false;
   private enemySide!: HTMLElement;
+  /** 아군·적 줄(둘 사이가 붙지 않게 --fit으로 줄인다) */
+  private unitsEl!: HTMLElement;
   private field!: HTMLElement;
   private fxLayer!: HTMLElement;
   private toasts!: HTMLElement;
@@ -121,6 +123,8 @@ export class BattleView {
     this.rift = new RiftOverlay(bal.max, bal.echoThreshold);
     this.root = this.build();
     this.refresh();
+    // 화면에 붙을 때·창 크기가 바뀔 때 아군·적 간격을 다시 맞춘다
+    new ResizeObserver(() => requestAnimationFrame(() => this.fitUnits())).observe(this.unitsEl);
     if (ctx.bonusText) setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
     this.startTours();
     // 시작 시 남은 이벤트(지원 규칙 등)는 기록만
@@ -267,7 +271,7 @@ export class BattleView {
           : null,
       ),
       this.logEl,
-      h('div', { class: 'units' }, partyEl, enemyEl),
+      (this.unitsEl = h('div', { class: 'units' }, partyEl, enemyEl)),
       h('div', { class: 'shade' }),
       this.aimEl,
       // 아래: 왼쪽(물약 → 자원 구슬) · 가운데(손패) · 오른쪽(턴 종료)
@@ -306,6 +310,23 @@ export class BattleView {
     const idle = `${def.sprite}_idle`;
     if (!spriteSource(id) || (spriteSource(idle) === 'sprites' && spriteSource(id) !== 'sprites')) return idle;
     return id;
+  }
+
+  /**
+   * 아군과 적 사이 간격 지키기(2026-10-14 사용자 요청 — 심연 4인 출전에서 넷째가 적에 바로 붙었다, 휴대폰은 4px):
+   * 두 줄의 본래 폭 + 최소 간격이 자리를 넘으면 유닛 폭·그림 크기를 같은 비율(--fit, 0.62까지)로 줄인다
+   */
+  private fitUnits(): void {
+    const box = this.unitsEl;
+    if (!box?.isConnected) return;
+    box.style.setProperty('--fit', '1');
+    const cs = getComputedStyle(box);
+    const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const need = [...box.querySelectorAll<HTMLElement>(':scope > .side')].reduce((a, e) => a + e.getBoundingClientRect().width, 0);
+    if (!avail || !need) return;
+    const gap = Math.max(innerWidth <= 700 ? 16 : 48, avail * 0.06);
+    const fit = Math.max(0.62, Math.min(1, (avail - gap) / need));
+    box.style.setProperty('--fit', fit.toFixed(3));
   }
 
   private makeUnit(c: Combatant): Unit {
@@ -1266,6 +1287,7 @@ export class BattleView {
           if (c && !this.units.has(c.uid)) {
             const u = this.makeUnit(c);
             this.enemySide.appendChild(u.el);
+            this.fitUnits();
             u.el.classList.add('summoned');
             floatOver(this.fxLayer, u.el, '소환', 'status');
             sfx('summon');

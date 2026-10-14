@@ -154,11 +154,20 @@ export class App {
   /**
    * ?abyss[=시드] — 심연 시작 화면을 바로(스토리를 마치지 않아도, 확인용).
    * ?sandbox[=kyle,born][&module=s5_boss_vargas] — 지도 없이 바로 전투(하운+동료(기본 엘리아), 융합 카드·왕일검 지원 포함).
-   * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용. &pilgrim이면 순례 길로(일행 보정)
+   * module이 없으면 그림자늑대 2마리. 모듈에 장면이 있으면 먼저 재생한다. 연출 확인용. &pilgrim이면 순례 길로(일행 보정),
+   * &abyss면 심연 런으로(동료 셋이면 넷이 출전 — 4인 배치 확인용)
    */
   private sandbox(seed: string, mates: string[], moduleId = 's1_battle_shadow_wolves'): void {
     const module = data.modules.get(moduleId);
     if (!module?.content.enemies?.length) throw new Error(`sandbox: 전투 모듈이 아니다: ${moduleId}`);
+    if (new URLSearchParams(location.search).has('abyss')) {
+      this.persist = false;
+      const picks = pathPicks(data, mates.length).picks;
+      this.run = createAbyssRun(data, seed, { mates, paths: pathOffer(data, seed).slice(0, picks), pool: abyssPool(data, {}, []) });
+      const node = { id: 'sandbox', floor: 0, index: 0, type: module.type, moduleId, next: [] };
+      this.battle({ node, module });
+      return;
+    }
     const run = createRun(data, seed, { stageId: module.stage, supportActive: true });
     this.persist = false;
     applyRunOps(data, run, [
