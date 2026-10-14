@@ -12,5 +12,5 @@ frame_notes:
   4: "the arcs break into short disconnected zigzag fragments jumping further outward"
   5: "a few tiny sparks and one faint blue-white flicker, almost gone"
 framing: "A round burst centered in the cell, about 70% of the cell wide at its largest."
-style: "crisp pixel-art effect: white core (#ffffff), pale yellow (#ffe46b), blue-white (#bfe6ff), deep blue outline (#2f5fb8); 2-3 flat tone steps per color, no purple, no pink, no gradients, no blur, no anti-aliasing"
-placeholder: { accent: '#ffe46b' }
+style: "crisp pixel-art effect: white core (#f1efe6), pale yellow (#ffe08a), blue-white (#dff4ff), deep blue outline (#3a6ea5); 2-3 flat tone steps per color, no purple, no pink, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ffe08a' }
