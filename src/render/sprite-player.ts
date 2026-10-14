@@ -2,7 +2,7 @@
 // 프레임 번호는 1부터. 이벤트(예: hit: 4)는 그 프레임에 들어서는 순간 한 번 발생한다.
 // 대체 단계 2(키 포즈 3장)는 virtualFrames 길이로 키 포즈 사이를 이동·크로스페이드로 보간한다.
 import { isIdle } from './idle';
-import { loadSprite, type SpriteAsset } from './assets';
+import { loadSprite, spriteSource, type SpriteAsset } from './assets';
 import { fxNow } from './fx';
 
 export interface PlayOptions {
@@ -36,6 +36,8 @@ export class SpritePlayer {
     const asset = await loadSprite(assetId);
     if (token !== this.token) return;
     if (!asset) {
+      // 실제 그림이 있는 id인데 받기에 실패했으면(일시 오류) 옛 임시 실루엣으로 바꾸지 않고 지금 그림을 그대로 둔다(2026-10-14)
+      if (assetId && spriteSource(assetId) === 'sprites' && this.canvas.width > 80) return;
       return this.playFallback(token, options);
     }
     const { meta } = asset;

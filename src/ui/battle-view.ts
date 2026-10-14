@@ -23,6 +23,7 @@ import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon,
 import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
 import { openShortcuts, settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
+import { isDebug } from './debug';
 import { runTour, tourSeen } from './tour';
 import { surgeCut } from './surge-cut';
 
@@ -123,6 +124,8 @@ export class BattleView {
     this.rift = new RiftOverlay(bal.max, bal.echoThreshold);
     this.root = this.build();
     this.refresh();
+    // ?debug: 콘솔·화면 점검에서 전투를 들여다볼 수 있게(window.__battle)
+    if (isDebug()) (window as unknown as { __battle?: unknown }).__battle = this;
     // 화면에 붙을 때·창 크기가 바뀔 때 아군·적 간격을 다시 맞춘다
     new ResizeObserver(() => requestAnimationFrame(() => this.fitUnits())).observe(this.unitsEl);
     if (ctx.bonusText) setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
@@ -313,6 +316,30 @@ export class BattleView {
   }
 
   /**
+   * 상태 이름표는 두 줄까지(2026-10-14 사용자 요청 — 상태가 늘면 캐릭터가 위로 밀려 올라갔다): 넘치면 이름을 빼고 아이콘·스택만,
+   * 그래도 넘치면 뒤에서부터 접어 +N 이름표 하나로(주석에 접힌 상태 이름)
+   */
+  private fitStatuses(box: HTMLElement): void {
+    box.classList.remove('dense');
+    const chips = [...box.children] as HTMLElement[];
+    if (chips.length < 2 || !box.isConnected) return;
+    const rows = () => new Set(chips.filter((c) => !c.hidden).map((c) => c.offsetTop)).size;
+    if (rows() <= 2) return;
+    box.classList.add('dense');
+    if (rows() <= 2) return;
+    const more = h('span', { class: 'status-chip chip-more' });
+    box.appendChild(more);
+    chips.push(more);
+    const folded: string[] = [];
+    for (let i = chips.length - 2; i > 0 && rows() > 2; i--) {
+      chips[i].hidden = true;
+      folded.unshift(chips[i].getAttribute('data-tip-title') ?? chips[i].textContent ?? '');
+      more.textContent = `+${folded.length}`;
+    }
+    Object.entries(tipAttrs(`상태 ${folded.length}개 더`, folded.join(' · '))).forEach(([k, v]) => v && more.setAttribute(k, v));
+  }
+
+  /**
    * 아군과 적 사이 간격 지키기(2026-10-14 사용자 요청 — 심연 4인 출전에서 넷째가 적에 바로 붙었다, 휴대폰은 4px):
    * 두 줄의 본래 폭 + 최소 간격이 자리를 넘으면 유닛 폭·그림 크기를 같은 비율(--fit, 0.62까지)로 줄인다
    */
@@ -409,6 +436,7 @@ export class BattleView {
           u.statuses.appendChild(chip);
         }
       }
+      this.fitStatuses(u.statuses);
       clear(u.intent);
       if (c.side === 'enemy') this.renderIntent(u, c as EnemyState);
       else this.renderIncoming(u, c.downed ? undefined : incoming.get(c.uid));
