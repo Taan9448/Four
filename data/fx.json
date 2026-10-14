@@ -6,6 +6,8 @@
     "debuff": "fx_debuff_curse",
     "poison": "fx_poison_cloud"
   },
+  "elementHit": { "lightning": "fx_hit_shock" },
+  "statusFx": { "shock": "fx_hit_shock", "paralyze": "fx_hit_shock" },
   "rules": [
     { "when": { "pool": "abyss", "type": "attack" }, "fx": "fx_void_rend", "note": "틈의 카드 — 검보라 허공 찢기" },
     { "when": { "element": "fire" }, "fx": "fx_fire_burst", "hitFx": "fx_hit_fire", "note": "화염 — 불길 폭발" },
