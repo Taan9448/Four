@@ -1,0 +1,16 @@
+id: fx_hit_shock
+type: fx
+summary: "번개 피격 — 맞은 자리에 튀는 전기 불꽃 5프레임"
+# 2026-10-14: 번개 카드의 피격 이펙트. fx_lightning_strike가 아직 없을 때도 이 그림만으로 번개임을 알게.
+frames: 5
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a small pale-yellow spark in the center of the cell"
+  2: "three or four short white-yellow zigzag arcs burst outward from the center like a spiky star"
+  3: "the electric burst at full size: a ring of crackling zigzag arcs around a white-hot center, tiny yellow sparks spraying outward in all directions"
+  4: "the arcs break into short disconnected zigzag fragments jumping further outward"
+  5: "a few tiny sparks and one faint blue-white flicker, almost gone"
+framing: "A round burst centered in the cell, about 70% of the cell wide at its largest."
+style: "crisp pixel-art effect: white core (#f1efe6), pale yellow (#ffe08a), blue-white (#dff4ff), deep blue outline (#3a6ea5); 2-3 flat tone steps per color, no purple, no pink, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ffe08a' }

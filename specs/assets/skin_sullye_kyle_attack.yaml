@@ -6,6 +6,7 @@ depends_on: [skin_sullye_kyle_ref]
 reference: assets/source/skin_sullye_kyle_ref.png
 facing: right
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 내리베기: 검을 머리 위로 치켜든 칸1~3과 낮게 베어 낸 칸4~6의 높이 차(2026-10-14 검토, 21%)
 frame_notes:
   1: sword held at the right shoulder, knees bent, weight back
   2: big step forward, sword raised beside the head

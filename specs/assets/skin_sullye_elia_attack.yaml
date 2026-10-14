@@ -6,6 +6,7 @@ depends_on: [skin_sullye_elia_ref]
 reference: assets/source/skin_sullye_elia_ref.png
 facing: right
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 불덩이 쏘기: 지팡이를 치켜든 칸1~3(불꽃이 머리 위)과 앞으로 뻗은 칸4~6의 높이 차(2026-10-14 검토, 26%)
 frame_notes:
   1: "draws the staff back, motes of light streaming into the blue stone"
   2: "a small flame forms at the tip of the staff"

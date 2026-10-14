@@ -10,6 +10,7 @@
     { "when": { "pool": "abyss", "type": "attack" }, "fx": "fx_void_rend", "note": "틈의 카드 — 검보라 허공 찢기" },
     { "when": { "element": "fire" }, "fx": "fx_fire_burst", "hitFx": "fx_hit_fire", "note": "화염 — 불길 폭발" },
     { "when": { "element": "ice" }, "fx": "fx_ice_spikes", "hitFx": "fx_hit_ice", "note": "냉기 — 얼음 가시" },
+    { "when": { "element": "lightning" }, "fx": "fx_lightning_strike", "hitFx": "fx_hit_shock", "note": "번개 — 내리꽂히는 번개(2026-10-14). 전도(냉기 붙은 적)는 battle-view가 fx_hit_conduct를 겹친다" },
     { "when": { "tag": "haun_rift", "type": "attack" }, "fx": "fx_rift_cleave", "note": "하운 균열 갈래 — 검붉은 금을 가르는 도끼" },
     { "when": { "tag": "haun_grain", "type": "attack" }, "fx": "fx_grain_thread", "note": "하운 결 갈래 — 푸른 결 실이 끊긴다" },
     { "when": { "tag": "kyle_blood", "type": "attack" }, "fx": "fx_blood_crescent", "note": "카일 피 갈래 — 붉은 초승달 베기" },

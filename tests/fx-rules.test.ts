@@ -15,6 +15,10 @@ describe('이펙트 규칙(data/fx.json)', () => {
     expect(cardFx(data, fire).fx).toBe('fx_fire_burst');
     const ice = [...data.cards.values()].find((c) => !c.hitFx && c.effects.some((e) => e.op === 'damage' && e.element === 'ice'))!;
     expect(cardFx(data, ice).hitFx).toBe('fx_hit_ice');
+    // 번개(2026-10-14): 틈의 카드가 아닌 번개 공격은 내리꽂히는 번개 + 전기 불꽃
+    const bolts = [...data.cards.values()].filter((c) => c.pool !== 'abyss' && !c.fx && !c.hitFx && c.effects.some((e) => e.op === 'damage' && e.element === 'lightning'));
+    expect(bolts.length).toBeGreaterThan(0);
+    for (const c of bolts) expect(cardFx(data, c)).toMatchObject({ fx: 'fx_lightning_strike', hitFx: 'fx_hit_shock' });
     const swift = [...data.cards.values()].find((c) => c.type === 'attack' && c.tags.includes('kyle_swift') && c.owner === 'kyle' && c.pool !== 'abyss')!;
     expect(cardFx(data, swift).fx).toBe('fx_rapier_flurry');
     expect(cardFx(data, swift).hitFx).toBe('fx_hit_pierce');
