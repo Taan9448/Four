@@ -527,7 +527,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           },
         }),
         h('span', { class: 'member-name' }, def.name),
-        r.id === 'haun' && !run.replayOf ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
+        r.id === 'haun' && !run.replayOf && !run.abyss ? h('span', { class: 'member-tag' }, '고정') : run.abyss?.injuries[r.id] ? h('span', { class: 'member-tag rest', title: `다음 굽이까지 최대 체력 -${run.abyss.injuries[r.id]}` }, '부상') : checked ? null : h('span', { class: 'member-tag rest' }, '쉼'),
         h('span', { class: 'member-lv', title: xpToNext(data, r.level) === null ? '최대 레벨' : `경험치 ${r.xp} / ${xpToNext(data, r.level)}` }, `Lv ${r.level}`),
         h('span', { class: 'member-hp' }, `${r.hp} / ${r.maxHp}`),
         h('i', { class: 'member-xp', style: `width:${xpToNext(data, r.level) === null ? 100 : Math.round((r.xp / xpToNext(data, r.level)!) * 100)}%` }),

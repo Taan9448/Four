@@ -328,6 +328,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .lv-step i { font-style: normal; color: #c9a24a; }
 .lv-gain { color: #cfe9d5; font-size: var(--fs-sub); }
 .member-tag { font-size: var(--fs-min); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-dim); }
+/* 이름·표·레벨·체력은 한 줄로(2026-10-14 사용자 요청 — 심연 일행 칸에서 '진하운'이 '진하/운'으로 꺾였다) */
+.member-name, .member-tag, .member-lv, .member-hp { white-space: nowrap; }
 .member-tag.rest { border-color: #8a6a3a; color: #e6c36a; }
 .member input:disabled + .member-name { opacity: 0.85; }
 .party-box.guide-pulse { animation: guide-pulse 1.2s ease-in-out 4; box-shadow: 0 0 0 2px var(--mana); }
@@ -456,7 +458,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 /* 가운데: 아군(왼쪽) · 적(오른쪽) */
 /* 아군·적 줄의 아래 끝은 손패 카드 윗변 위로(2026-10-14 사용자 요청 — 카드가 체력 막대 아래 상태 이름표를 덮었다). 손패 카드 높이 = 192px × 카드 배율 + 들림·여백 */
-.units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: var(--units-bottom, calc(192px * var(--cpx-zoom) + 44px)); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
+.units { position: absolute; left: 0; right: 0; max-width: 1500px; margin: 0 auto; top: 70px; bottom: var(--units-bottom, calc(192px * var(--cpx-zoom) + 44px + 56px)); z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 3%; }
 .side { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
 .side-enemy { flex-direction: row-reverse; }
 .unit { position: relative; display: flex; flex-direction: column; align-items: center; width: calc(var(--unit-h) * var(--scale) * 0.62 * var(--fit, 1)); min-width: calc(104px * var(--fit, 1)); transition: opacity 0.4s, filter 0.4s; }
@@ -474,7 +476,13 @@ h1, h2, h3 { font-family: var(--f-head); }
 .hp-text { position: absolute; inset: 0; font-size: var(--fs-cap); font-weight: 700; text-align: center; line-height: 14px; -webkit-text-stroke: 0.3px #000; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; letter-spacing: -0.02em; }
 /* 방어: 체력 막대 왼쪽의 방패 */
 .block-badge { flex: 0 0 auto; min-width: 26px; height: 26px; margin: -7px 0; display: grid; place-items: center; padding: 0 4px 3px; font-size: var(--fs-cap); font-weight: 700; color: #eaf6ff; background: linear-gradient(#4c8fc4, #1f3f73); clip-path: polygon(50% 0, 100% 14%, 92% 66%, 50% 100%, 8% 66%, 0 14%); text-shadow: 0 1px 1px #000; cursor: help; }
-.statuses { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; min-height: 26px; margin-top: 5px; width: max(100%, 150px); }
+/* 상태 이름표는 체력 막대 아래에 매달린다(2026-10-14 사용자 요청 — 상태가 늘면 캐릭터가 위로 밀려 올라갔다): 유닛 높이에 들지 않아
+   발 줄이 그대로이고, 두 줄까지만 — 넘치면 이름을 빼고 아이콘·스택만(dense), 그래도 넘치면 +N으로 접는다(battle-view fitStatuses) */
+.statuses { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-content: flex-start; margin-top: 5px; width: max(100%, 150px); }
+.statuses > [hidden] { display: none !important; }
+.statuses.dense .status-chip { padding: 1px 5px 1px 2px; }
+.statuses.dense .status-chip .st-name { display: none; }
+.status-chip.chip-more { padding: 1px 7px; background: rgba(20, 22, 30, 0.92); border-color: #8a90a3; color: #dfe3ee; }
 /* 상태 이름표: 진한 바탕 + 종류별 색 테두리(배경 그림 위에서도 읽히게) */
 .status-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 2px; border-radius: 99px; border: 1.5px solid; font-size: var(--fs-min); font-weight: 600; line-height: 1.2; white-space: nowrap; cursor: help; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
 .status-chip .icon { width: 20px; height: 20px; border: 0; background: none; font-size: var(--fs-cap); }
@@ -1092,7 +1100,8 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
   .medal i { min-width: 18px; height: 17px; font-size: var(--fs-min); line-height: 15px; right: -5px; bottom: -4px; }
   .battle-intro { font-size: var(--fs-min); }
   .log { display: none; }
-  .units { position: static; width: 100%; min-width: 0; margin: 0; min-height: calc(var(--unit-h) + 96px); gap: 4px; padding: 26px 0 0; }
+  /* 상태 이름표(두 줄까지)가 매달릴 자리를 아래에 비워 둔다 — 상태가 늘어도 손패가 밀리지 않게 */
+  .units { position: static; width: 100%; min-width: 0; margin: 0; min-height: calc(var(--unit-h) + 96px); gap: 4px; padding: 26px 0 46px; }
   .side { gap: 2px; }
   .unit { width: calc(var(--unit-h) * min(var(--scale), 1.15) * 0.52 * var(--fit, 1)); min-width: 0; }
   .sprite-wrap { height: calc(var(--unit-h) * min(var(--scale), 1.15) * var(--fit, 1)); width: calc(var(--unit-h) * min(var(--scale), 1.15) * var(--fit, 1)); }
@@ -1982,7 +1991,8 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 @media (orientation: landscape) and (max-height: 500px) {
   :root { --unit-h: 104px; --tap: 44px; }
   .b-scene { --dock-h: 118px; height: calc(100vh - 8px); min-height: 0; }
-  .units { top: 44px; --units-bottom: calc(var(--dock-h) - 6px); }
+  .units { top: 44px; --units-bottom: calc(var(--dock-h) + 66px); }
+  .statuses { width: max(100%, 64px); }
   .dock { grid-template-columns: 120px minmax(0, 1fr) 96px; padding: 0 1% 6px; }
   .dock-left { flex-direction: column; align-items: flex-start; gap: 4px; }
   .dock-left .b-items { flex-direction: row; }

@@ -113,7 +113,11 @@ export function loadSprite(id: string | null | undefined): Promise<SpriteAsset |
         meta: entry.meta,
         images: entry.meta.blend === 'lighter' ? images.map(lightToAlpha) : images,
       };
-    })().catch(() => null);
+    })().catch(() => {
+      // 한 번 실패한 그림(네트워크 끊김 등)을 끝까지 실패로 기억하지 않는다 — 다음 재생 때 다시 받는다
+      cache.delete(id);
+      return null;
+    });
     cache.set(id, p);
   }
   return p;
