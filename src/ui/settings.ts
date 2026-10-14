@@ -1,5 +1,6 @@
 // 설정: 전투 속도, 컷인, 화면 흔들림, 소리 크기. 브라우저에 저장하고 화면 전체에 바로 적용한다.
 import { h } from './dom';
+import { setIdleEnabled } from '../render/idle';
 import { readSettings, writeSettings } from './storage';
 import { resetTour, resetTours, TOUR_LIST, tourSeen } from './tour';
 import { applyBackup, backupFileName, browserKV, exportBackup, hasUndo, parseBackup, previewBackup, undoImport } from './backup';
@@ -22,6 +23,8 @@ export interface Settings {
   surgeArt: boolean;
   /** 화면 연출: 시작 화면 움직임 · 영웅·전설 카드의 빛(2026-10-11). 끄면 문서에 no-motion */
   motion: boolean;
+  /** 창을 떠나면(다른 창·가려진 탭) 장식 움직임을 쉰다(2026-10-14 — 켜 둔 채 다른 프로그램을 쓸 때 렉 줄이기) */
+  pauseUnfocused: boolean;
   /** 쓸 수 있는 카드가 남았는데 턴을 끝내려 하면 한 번 묻는다 */
   confirmEndTurn: boolean;
   /** 피격·폭주 때 화면 흔들림 세기(0 끄기 · 0.5 약하게 · 1 보통) */
@@ -69,7 +72,7 @@ export const SHAKES: { value: number; label: string }[] = [
   { value: 1, label: '보통' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, surgeArt: true, motion: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8, fontScale: 1, glyphLabels: false, colorAssist: false, textSpeed: 1, autoAdvance: false, skipSeenScenes: false, confirmPotion: true };
+const DEFAULTS: Settings = { speed: 1, cutIn: true, surgeArt: true, motion: true, pauseUnfocused: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8, fontScale: 1, glyphLabels: false, colorAssist: false, textSpeed: 1, autoAdvance: false, skipSeenScenes: false, confirmPotion: true };
 
 const volume = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : d);
 
@@ -87,6 +90,7 @@ function load(): Settings {
       cutIn: typeof raw.cutIn === 'boolean' ? raw.cutIn : DEFAULTS.cutIn,
       surgeArt: typeof raw.surgeArt === 'boolean' ? raw.surgeArt : DEFAULTS.surgeArt,
       motion: typeof raw.motion === 'boolean' ? raw.motion : DEFAULTS.motion,
+      pauseUnfocused: typeof raw.pauseUnfocused === 'boolean' ? raw.pauseUnfocused : DEFAULTS.pauseUnfocused,
       confirmEndTurn: typeof raw.confirmEndTurn === 'boolean' ? raw.confirmEndTurn : DEFAULTS.confirmEndTurn,
       shake: readShake(raw.shake),
       master: volume(raw.master, DEFAULTS.master),
@@ -126,6 +130,7 @@ export function applySettings(): void {
   setShakeScale(settings.shake);
   const root = document.documentElement;
   root.classList.toggle('no-motion', !settings.motion);
+  setIdleEnabled(settings.pauseUnfocused);
   root.classList.toggle('glyph-labels', settings.glyphLabels);
   root.classList.toggle('color-assist', settings.colorAssist);
   root.style.fontSize = settings.fontScale === 1 ? '' : `${settings.fontScale * 100}%`;
@@ -144,7 +149,7 @@ export type SettingsTab = 'sound' | 'battle' | 'view' | 'scene' | 'help' | 'save
 export const SETTINGS_TABS: { id: SettingsTab; seal: string; label: string; desc: string; lead: string; keys: (keyof Settings)[] }[] = [
   { id: 'sound', seal: '聲', label: '소리', desc: '크기 세 가지', lead: '배경음악과 효과음을 따로 조절한다.', keys: ['master', 'bgm', 'sfx'] },
   { id: 'battle', seal: '戰', label: '전투', desc: '속도·연출·확인', lead: '전투 화면에서만 쓰이는 설정.', keys: ['speed', 'shake', 'cutIn', 'surgeArt', 'confirmEndTurn', 'confirmPotion'] },
-  { id: 'view', seal: '畵', label: '화면', desc: '글자·움직임·보조', lead: '글자 크기와 화면 움직임, 읽기를 돕는 표시.', keys: ['fontScale', 'motion', 'glyphLabels', 'colorAssist'] },
+  { id: 'view', seal: '畵', label: '화면', desc: '글자·움직임·보조', lead: '글자 크기와 화면 움직임, 읽기를 돕는 표시.', keys: ['fontScale', 'motion', 'pauseUnfocused', 'glyphLabels', 'colorAssist'] },
   { id: 'scene', seal: '幕', label: '장면', desc: '대사 속도·진행', lead: '이야기 장면의 대사가 넘어가는 방식.', keys: ['textSpeed', 'autoAdvance', 'skipSeenScenes'] },
   { id: 'help', seal: '助', label: '도움말', desc: '안내·단축키·용어', lead: '처음 안내를 다시 보거나, 조작·용어를 찾아본다.', keys: [] },
   { id: 'save', seal: '存', label: '저장', desc: '백업·가져오기', lead: '저장은 지도에 설 때마다 자동으로 된다. 전투·이벤트 도중 새로고침하면 그 직전 지도에서 이어진다.', keys: [] },
@@ -244,7 +249,7 @@ function seg(key: 'speed' | 'shake' | 'fontScale' | 'textSpeed', name: string, h
 }
 
 /** 켜고 끄기: 줄 전체가 스위치(속은 role=switch 체크박스) */
-function toggle(key: 'cutIn' | 'surgeArt' | 'motion' | 'confirmEndTurn' | 'glyphLabels' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', name: string, hint: string): HTMLElement {
+function toggle(key: 'cutIn' | 'surgeArt' | 'motion' | 'pauseUnfocused' | 'confirmEndTurn' | 'glyphLabels' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', name: string, hint: string): HTMLElement {
   return row(
     name,
     hint,
@@ -307,7 +312,8 @@ function tabRows(tab: SettingsTab, opts: { onGlossary?: () => void }): (HTMLElem
     case 'view':
       return [
         seg('fontScale', '글자 크기', '크게 = 112%', FONT_SCALES),
-        toggle('motion', '배경 움직임', '시작 화면의 빛·안개, 영웅·전설 카드의 빛'),
+        toggle('motion', '배경 움직임', '시작 화면의 빛·안개, 영웅·전설 카드의 빛, 내공·마나 구슬의 물결'),
+        toggle('pauseUnfocused', '창을 떠나면 쉬기', '다른 창을 보는 동안 움직임을 멈춰 컴퓨터를 가볍게'),
         head('읽기 보조'),
         toggle('glyphLabels', '표식에 한글 함께', '抽 뽑을 · 棄 버림 · 滅 소멸 · 冊 덱 · 記 기록 · 設 설정'),
         toggle('colorAssist', '색각 보정', '등급 보석에 ◇△○☆✦, 상태에 ▲이로움 ▼해로움 ◆특성'),

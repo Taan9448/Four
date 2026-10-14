@@ -20,6 +20,9 @@ describe('폭주 그림(2026-10-13)', () => {
   it('설정 「폭주 그림」은 기본 켬이고 전투 탭에 있다', () => {
     expect(settings.surgeArt).toBe(true);
     expect(SETTINGS_TABS.find((t) => t.id === 'battle')!.keys).toContain('surgeArt');
+    // 창을 떠나면 쉬기(2026-10-14 렉 줄이기): 기본 켬, 화면 탭
+    expect(settings.pauseUnfocused).toBe(true);
+    expect(SETTINGS_TABS.find((t) => t.id === 'view')!.keys).toContain('pauseUnfocused');
   });
 
   it('그림 위 네 가지 칩은 balance.rift 값을 쓰고, 같은 전투 n번째 폭주면 체력 손실이 ×n', () => {
