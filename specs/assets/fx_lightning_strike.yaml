@@ -1,0 +1,18 @@
+id: fx_lightning_strike
+type: fx
+summary: "번개 공격 — 하늘에서 내리꽂히는 번개 6프레임(번개 카드 11장)"
+# 2026-10-14 사용자 요청: 번개 갈래(감전·마비·전도)가 생겼는데 번개 카드가 엘리아 은빛 마력·물리 타격으로 보였다.
+# 번개는 연노랑·청백. 틈의 보라(fx_void_rend)·균열의 검붉은 빛과 섞이지 않게 보라·분홍은 쓰지 않는다.
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a few thin pale-yellow sparks flicker near the top of the cell, nothing else yet"
+  2: "a thin jagged white lightning bolt forks down from the top of the cell toward the bottom center, with two hair-thin side branches"
+  3: "the strike at full brightness: one thick zigzag bolt with a white core, pale-yellow edges and a thin blue-white outline runs from the top of the cell to the bottom center, where a bright starburst of white and yellow sparks explodes"
+  4: "the bolt flickers thinner and breaks into segments; short branching arcs crawl sideways along the ground from the strike point"
+  5: "only small crackling zigzag arcs and sparks jump around the bottom center, a small dark scorch mark on the ground"
+  6: "two or three tiny pale-yellow sparks fading near the ground"
+framing: "A tall vertical strike centered in the cell: the bolt spans from the top edge to about 90% of the cell height, and the strike point is at the bottom center."
+style: "crisp pixel-art effect: white core (#ffffff), pale yellow (#ffe46b), blue-white glow (#bfe6ff) and a deep blue outline (#2f5fb8); 2-3 flat tone steps per color, no purple, no pink, no smoke clouds, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#ffe46b' }

@@ -6,11 +6,11 @@ import { hasSkipTurn } from '../engine/effects';
 import { cardText, ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { intentHidden, resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
-import { flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, tearCard, toast } from '../render/fx';
+import { cssZoom, flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
-import { frameUrl, spriteSource } from '../render/assets';
+import { frameUrl, loadSprite, spriteSource } from '../render/assets';
 import { cardFx } from '../engine/fx-rules';
 import { skinSpriteId } from '../engine/wardrobe';
 import { skinReady } from './wardrobe-view';
@@ -623,13 +623,18 @@ export class BattleView {
     if (!inst || !el) return;
     const to = this.flyTarget(handIndex, targetUid);
     this.flown.add(inst.uid);
+    // Codex 그림(fx_card_tear)이 있으면: 솔기가 터지는 프레임(events.impact)이 카드가 벌어지는 순간에 오게 앞당기고, 조각은 그림이 그린다
+    const tearFx = spriteSource('fx_card_tear') === 'sprites' ? await loadSprite('fx_card_tear') : null;
+    const lead = tearFx ? (((tearFx.meta.events.impact ?? 1) - 1) * 1000) / tearFx.meta.fps : undefined;
     sfx('tear', { volume: 0.7 });
     const tear = tearCard(el, {
       ms: 850 * Math.max(0.6, settings.speed),
       toward: to,
       stage: this.tearStage(el),
+      leadMs: lead,
+      bits: !tearFx,
       onTear: (x, y, height) => {
-        if (spriteSource('fx_card_tear') !== 'sprites') return;
+        if (!tearFx) return;
         const size = height * 1.25;
         const canvas = h('canvas', { class: 'fx-canvas fx-tear', style: `left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px` }) as HTMLCanvasElement;
         document.body.appendChild(canvas);
@@ -647,7 +652,8 @@ export class BattleView {
   private tearStage(el: HTMLElement): { x: number; y: number; height: number } | null {
     const r = el.getBoundingClientRect();
     if (!r.width) return null;
-    const height = Math.min(el.offsetHeight * 1.5, innerHeight * 0.42);
+    // 보이는 카드 높이(픽셀 카드는 zoom 1.2배)의 1.5배
+    const height = Math.min(el.offsetHeight * cssZoom(el) * 1.5, innerHeight * 0.42);
     const width = height * (el.offsetWidth / Math.max(1, el.offsetHeight));
     const x = Math.min(Math.max(r.left + r.width / 2, width / 2 + 8), innerWidth - width / 2 - 8);
     // 캐릭터 그림(아군·적 스프라이트)의 가운데 높이
@@ -856,18 +862,20 @@ export class BattleView {
       if ((need === 'enemy' && u.c.side !== 'enemy') || (need === 'ally' && u.c.side !== 'party') || !need) return null;
       return u;
     };
+    const dragZoom = cssZoom(el);
     const move = (ev: PointerEvent) => {
       if (!ghost) {
         if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 14 || !canPlay(this.state, i).ok) return;
         ghost = el.cloneNode(true) as HTMLElement;
         ghost.classList.add('card-ghost', 'card-drag');
         const r = el.getBoundingClientRect();
-        Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, pointerEvents: 'none', zIndex: '200', transform: 'none', margin: '0' });
+        Object.assign(ghost.style, { position: 'fixed', left: `${r.left / dragZoom}px`, top: `${r.top / dragZoom}px`, width: `${r.width / dragZoom}px`, pointerEvents: 'none', zIndex: '200', transform: 'none', margin: '0' });
         document.body.appendChild(ghost);
         el.classList.add('drag-source');
       }
-      ghost.style.left = `${ev.clientX - ghost.offsetWidth / 2}px`;
-      ghost.style.top = `${ev.clientY - ghost.offsetHeight * 0.4}px`;
+      // 픽셀 카드는 zoom이 걸려 있어 화면 좌표를 zoom으로 나눠 준다
+      ghost.style.left = `${ev.clientX / dragZoom - ghost.offsetWidth / 2}px`;
+      ghost.style.top = `${ev.clientY / dragZoom - ghost.offsetHeight * 0.4}px`;
       const u = unitAt(ev.clientX, ev.clientY);
       if (over && over !== u?.el) over.classList.remove('drop-target');
       over = u?.el ?? null;
@@ -1101,7 +1109,7 @@ export class BattleView {
               const power = big ? 1 : Math.min(0.9, 0.45 + ev.amount / 300);
               const dir = u.c.side === 'enemy' ? 1 : -1;
               const strength = big ? 'crit' : heavy ? 'heavy' : 'light';
-              const tone = u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : ev.grain ? 'blue' : ev.element === 'fire' ? 'gold' : 'white';
+              const tone = u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : ev.grain ? 'blue' : ev.element === 'fire' || ev.element === 'lightning' ? 'gold' : 'white';
               impact(this.fxLayer, u.el, strength, tone, dir);
               shake(u.el, power, dir);
               shake(this.field, power * (big ? 0.7 : heavy ? 0.5 : 0.3), dir);
@@ -1442,6 +1450,8 @@ export class BattleView {
     if (ev.absorbed) return null;
     if (ev.grain) return 'fx_hit_grain';
     if (ev.amount === 0 && ev.blocked > 0) return 'fx_block';
+    // 전도(냉기 붙은 적에게 번개 ×1.5): 얼음을 타고 번지는 번개 — 공격 이펙트가 있어도 겹친다(2026-10-14)
+    if (ev.conducted && this.realFx('fx_hit_conduct')) return 'fx_hit_conduct';
     const src = ev.sourceUid ? this.units.get(ev.sourceUid)?.c : undefined;
     if (!src) return null;
     if (src.side === 'enemy') return this.data.enemies.get(src.defId)?.hitFx ?? 'fx_hit_strike';

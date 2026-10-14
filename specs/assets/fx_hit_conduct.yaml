@@ -1,0 +1,17 @@
+id: fx_hit_conduct
+type: fx
+summary: "전도 피격 — 냉기 붙은 적에게 번개가 얼음을 타고 번진다 6프레임(번개 ×1.5)"
+# 2026-10-14: 전도(냉기가 붙은 적에게 번개 피해 ×1.5)가 터질 때. 얼음 조각 + 그 사이를 타고 달리는 번개로 일반 번개 피격과 구별한다.
+frames: 6
+fps: 15
+events: { impact: 3 }
+frame_notes:
+  1: "a cluster of five or six pale blue ice crystals (#8fe3ff, white highlights) sits in the center of the cell, a single yellow spark touching the top crystal"
+  2: "white-yellow lightning races down through the ice crystals, the crystals lit up from inside with yellow light"
+  3: "the conduction burst at full strength: thick zigzag arcs jump between every crystal, forming a bright crackling web across the whole cluster, white flash at the center, sparks spraying out"
+  4: "the ice crystals crack apart with white crack lines, arcs still jumping between the splitting pieces"
+  5: "the crystals shatter into small ice shards flying outward, a few short arcs flickering among them"
+  6: "a few ice shards and tiny yellow sparks fading"
+framing: "A compact cluster centered in the cell, about 60% of the cell at its largest, shards flying toward the edges at the end."
+style: "crisp pixel-art effect: pale blue ice (#8fe3ff, #d9f6ff highlights, #3a8fc4 shadow) with white core lightning (#ffffff), pale yellow (#ffe46b) and blue-white (#bfe6ff); 2-3 flat tone steps per color, no purple, no pink, no gradients, no blur, no anti-aliasing"
+placeholder: { accent: '#bfe6ff' }

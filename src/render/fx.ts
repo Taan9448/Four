@@ -82,6 +82,15 @@ export function shake(el: HTMLElement, power: number, dir = 0): void {
 }
 
 // ───────────── 카드 비행 ─────────────
+/**
+ * 요소 자체의 CSS zoom(픽셀 카드는 --cpx-zoom 1.2배). 복제본도 같은 zoom을 이어받아 left·top·translate가 그만큼 곱해지므로,
+ * 화면 좌표를 복제본에 줄 때는 이 값으로 나눈다(2026-10-14: 찢는 카드가 그림 이펙트보다 오른쪽 아래로 밀려나 있었다)
+ */
+export function cssZoom(el: Element): number {
+  const z = parseFloat(getComputedStyle(el).zoom);
+  return z > 0 ? z : 1;
+}
+
 export interface FlyOptions {
   /** 도착 크기 배율 */
   scale?: number;
@@ -102,15 +111,16 @@ export function flyClone(el: HTMLElement, to: DOMRect, opts: FlyOptions = {}, fr
   const ghost = el.cloneNode(true) as HTMLElement;
   ghost.classList.add('card-ghost');
   ghost.classList.remove('card-selected');
-  Object.assign(ghost.style, { position: 'fixed', left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`, margin: '0', transform: 'none', zIndex: '900', visibility: 'visible' });
+  const z = cssZoom(el);
+  Object.assign(ghost.style, { position: 'fixed', left: `${from.left / z}px`, top: `${from.top / z}px`, width: `${from.width / z}px`, height: `${from.height / z}px`, margin: '0', transform: 'none', zIndex: '900', visibility: 'visible' });
   document.body.appendChild(ghost);
-  const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-  const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+  const dx = (to.left + to.width / 2 - (from.left + from.width / 2)) / z;
+  const dy = (to.top + to.height / 2 - (from.top + from.height / 2)) / z;
   const s = opts.scale ?? 0.45;
   const anim = ghost.animate(
     [
       { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
-      { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 40}px) scale(${(1 + s) / 2 + 0.08}) rotate(${dx > 0 ? 6 : -6}deg)`, opacity: 1, offset: 0.45 },
+      { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 40 / z}px) scale(${(1 + s) / 2 + 0.08}) rotate(${dx > 0 ? 6 : -6}deg)`, opacity: 1, offset: 0.45 },
       { transform: `translate(${dx}px, ${dy}px) scale(${s}) rotate(0deg)`, opacity: opts.fade === false ? 1 : 0 },
     ],
     { duration: ms, delay: opts.delay ?? 0, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' },
@@ -129,6 +139,10 @@ export interface TearOptions {
   stage?: { x: number; y: number; height: number } | null;
   /** 찢어지는 순간(화면 좌표의 솔기 가운데·카드 높이) — 그림 이펙트를 겹치는 자리 */
   onTear?: (x: number, y: number, height: number) => void;
+  /** onTear를 벌어지는 순간보다 이만큼(ms) 먼저 부른다 — 그림 이펙트의 솔기가 버티는 카드 위에 먼저 서고, 터지는 프레임이 벌어지는 순간에 오게 */
+  leadMs?: number;
+  /** 종잇조각·먹 방울(CSS)을 튀길까(그림 이펙트가 조각을 그리면 끈다 — 조각이 두 겹으로 보이지 않게). 기본 true */
+  bits?: boolean;
 }
 
 /**
@@ -160,17 +174,19 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   const cy = rect.top + rect.height / 2;
   const reduce = reducedMotion();
   const ms = (opts.ms ?? 700) * (reduce ? 0.5 : 1);
+  // 아래 좌표(cx·dx…)는 모두 화면 px. 복제본 안에서는 zoom으로 나눠 쓴다
+  const z = cssZoom(el);
   const t = opts.toward;
   const st = opts.stage;
   // 찢는 자리: stage(대상 쪽으로 아주 살짝 기울게), 없으면 제자리 위로 조금 + 대상 쪽으로 1/5
   const dx = st ? st.x - cx + (t ? (t.left + t.width / 2 - st.x) * 0.04 : 0) : t ? (t.left + t.width / 2 - cx) * 0.2 : 0;
   const dy = st ? st.y - cy : (t ? (t.top + t.height / 2 - cy) * 0.12 : 0) - 46;
-  const S = st ? Math.max(scale * 1.06, st.height / hgt) : scale * 1.06;
+  const S = st ? Math.max(scale * 1.06, st.height / (hgt * z)) : scale * 1.06;
   // 키프레임 시점: 날아와 자리 잡기 → 팽팽하게 버팀 → 벌어짐. 정면으로 나올 때는 날아오는 몫과 보여 주는 몫을 늘린다
   const at = st ? { arrive: 0.2, hold: 0.36, open: 0.45, wide: 0.62, fall: 0.8 } : { arrive: 0.18, hold: 0.27, open: 0.38, wide: 0.58, fall: 0.78 };
   // 모든 키프레임이 같은 함수 목록을 쓰게 해 부드럽게 잇는다. 뒤의 translateY(50%) rotate translateY(-50%)는 "아래 끝을 축으로 돌기"
   const tf = (x: number, y: number, r: number, sc: number, open: number) =>
-    `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${r}deg) scale(${sc}) translateY(50%) rotate(${open}deg) translateY(-50%)`;
+    `translate(-50%, -50%) translate(${x / z}px, ${y / z}px) rotate(${r}deg) scale(${sc}) translateY(50%) rotate(${open}deg) translateY(-50%)`;
   const edge = TEAR_EDGE.map(([x, y]) => `${x}% ${y}%`);
   const clips = [`polygon(0 0, ${edge.join(', ')}, 0 100%)`, `polygon(${[...edge].reverse().join(', ')}, 100% 0, 100% 100%)`];
   const fiber = TEAR_EDGE.map(([x, y]) => `${x},${y}`).join(' ');
@@ -178,7 +194,7 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
     const g = el.cloneNode(true) as HTMLElement;
     g.classList.add('card-ghost', 'card-torn');
     g.classList.remove('card-selected');
-    Object.assign(g.style, { position: 'fixed', left: `${cx}px`, top: `${cy}px`, width: `${w}px`, height: `${hgt}px`, margin: '0', zIndex: '900', visibility: 'visible', clipPath: clip, transformOrigin: '50% 50%' });
+    Object.assign(g.style, { position: 'fixed', left: `${cx / z}px`, top: `${cy / z}px`, width: `${w}px`, height: `${hgt}px`, margin: '0', zIndex: '900', visibility: 'visible', clipPath: clip, transformOrigin: '50% 50%' });
     // 찢긴 단면의 종이 섬유: 같은 선을 굵게 그려 반쪽만 보이게(나머지는 잘린다)
     g.insertAdjacentHTML(
       'beforeend',
@@ -214,13 +230,14 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   const sx = cx + dx;
   const sy = cy + dy;
   const bits: Promise<void>[] = [];
-  setTimeout(() => opts.onTear?.(sx, sy, hgt * S), tearAt);
-  if (!reduce) {
+  // 그림 이펙트는 터지는 프레임이 벌어지는 순간(at.open)에 오도록 앞당겨 부른다(2026-10-14: 솔기가 조각이 다 흩어진 뒤에야 터졌다)
+  setTimeout(() => opts.onTear?.(sx, sy, hgt * S * z), Math.max(0, ms * at.open - (opts.leadMs ?? ms * 0.04)));
+  if (!reduce && opts.bits !== false) {
     for (let i = 0; i < 9; i++) {
       const side = i % 2 ? 1 : -1;
       const b = document.createElement('i');
       b.className = `tear-bit${i % 3 === 0 ? ' ink' : ''}`;
-      Object.assign(b.style, { left: `${sx}px`, top: `${sy + (i - 4) * hgt * S * 0.1}px` });
+      Object.assign(b.style, { left: `${sx}px`, top: `${sy + (i - 4) * hgt * S * z * 0.1}px` });
       document.body.appendChild(b);
       const fx = side * (30 + ((i * 37) % 46));
       const up = -14 - ((i * 29) % 22);
