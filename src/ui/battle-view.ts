@@ -11,7 +11,7 @@ import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, loadSprite, spriteSource } from '../render/assets';
-import { cardFx } from '../engine/fx-rules';
+import { cardFx, elementHitFx, statusFx } from '../engine/fx-rules';
 import { skinSpriteId } from '../engine/wardrobe';
 import { skinReady } from './wardrobe-view';
 import { SpritePlayer } from '../render/sprite-player';
@@ -1168,7 +1168,8 @@ export class BattleView {
             floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
             // 상태 이펙트: 독 → 독구름, 해로운 상태 → 보랏빛 문양, 이로운 상태 → 금빛 화살표(data/fx.json events)
             const kind = this.data.statuses.get(ev.status)?.kind;
-            this.playEventFx(ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff', ev.targetUid);
+            // 감전·마비처럼 상태마다 정한 이펙트가 있으면 그것(data/fx.json statusFx)
+            this.playEventFx(statusFx(this.data, ev.status) ?? (ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff'), ev.targetUid);
             sfx('status', { volume: 0.6 });
           }
           if (ev.status === 'knot_exposed' && ev.stacks > 0) this.alert('매듭이 드러났다 — 날 얹기!', 'support');
@@ -1474,6 +1475,12 @@ export class BattleView {
     if (ev.amount === 0 && ev.blocked > 0) return 'fx_block';
     // 전도(냉기 붙은 적에게 번개 ×1.5): 얼음을 타고 번지는 번개 — 공격 이펙트가 있어도 겹친다(2026-10-14)
     if (ev.conducted && this.realFx('fx_hit_conduct')) return 'fx_hit_conduct';
+    // 속성 피격(2026-10-14 사용자 요청 — 번개 카드 = 번개 피격): 번개 피해면 카드·물약·강화 효과·공격 이펙트와 상관없이 전기 불꽃
+    const element = this.realFx(elementHitFx(this.data, ev.element));
+    if (element) {
+      this.eventFxAt.set(ev.targetUid, performance.now());
+      return element;
+    }
     const src = ev.sourceUid ? this.units.get(ev.sourceUid)?.c : undefined;
     if (!src) return null;
     if (src.side === 'enemy') return this.data.enemies.get(src.defId)?.hitFx ?? 'fx_hit_strike';
@@ -1493,8 +1500,8 @@ export class BattleView {
 
   /** 카드와 상관없이 회복·이로운 상태·해로운 상태·독에 겹치는 이펙트. 같은 자리에 0.4초 안에 두 번은 겹치지 않는다 */
   private eventFxAt = new Map<string, number>();
-  private playEventFx(kind: 'heal' | 'buff' | 'debuff' | 'poison', targetUid: string): void {
-    const id = this.realFx(this.data.fx.events[kind]);
+  private playEventFx(kind: 'heal' | 'buff' | 'debuff' | 'poison' | (string & {}), targetUid: string): void {
+    const id = this.realFx(kind in this.data.fx.events ? this.data.fx.events[kind as 'heal'] : kind);
     if (!id) return;
     const now = performance.now();
     if ((this.eventFxAt.get(targetUid) ?? -1e9) > now - 400) return;

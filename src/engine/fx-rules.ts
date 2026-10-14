@@ -34,9 +34,20 @@ export function cardFx(data: GameData, card: CardDef): CardFx {
   return out;
 }
 
+/** 피해 속성이 정하는 피격 이펙트(data/fx.json elementHit, 2026-10-14) — 카드와 상관없이 그 속성 피해면 늘 */
+export function elementHitFx(data: GameData, element: string | undefined): string | undefined {
+  return element ? data.fx.elementHit?.[element as 'fire' | 'ice' | 'lightning'] : undefined;
+}
+
+/** 상태가 걸릴 때의 이펙트(data/fx.json statusFx) — 없으면 events.debuff·buff */
+export function statusFx(data: GameData, status: string): string | undefined {
+  return data.fx.statusFx?.[status];
+}
+
 /** 규칙과 이벤트가 쓰는 이펙트 id 전부(데이터 검사용) */
 export function fxRuleIds(data: GameData): string[] {
   const ids = new Set<string>(Object.values(data.fx.events).filter((x): x is string => !!x));
+  for (const id of [...Object.values(data.fx.elementHit ?? {}), ...Object.values(data.fx.statusFx ?? {})]) if (id) ids.add(id);
   for (const r of data.fx.rules) for (const id of [r.fx, r.hitFx, r.castFx]) if (id) ids.add(id);
   return [...ids];
 }

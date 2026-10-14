@@ -296,6 +296,10 @@ export const FxRules = z
   .object({
     $comment: z.string().optional(),
     events: z.object({ heal: z.string(), buff: z.string(), debuff: z.string(), poison: z.string(), block: z.string() }).partial().strict(),
+    /** 피해 속성 → 피격 이펙트. 카드·물약·강화 효과·적과 상관없이 그 속성 피해면 늘 맞은 자리에 겹친다(공격 이펙트가 있어도) */
+    elementHit: z.object({ fire: z.string(), ice: z.string(), lightning: z.string() }).partial().strict().optional(),
+    /** 상태 → 걸릴 때 이펙트(events.debuff·buff 대신) */
+    statusFx: z.record(z.string(), z.string()).optional(),
     rules: z.array(
       z
         .object({

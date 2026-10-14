@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardFx } from '../src/engine/fx-rules';
+import { cardFx, elementHitFx, statusFx } from '../src/engine/fx-rules';
 import { data } from './helpers';
 
 const fx = (id: string) => cardFx(data, data.cards.get(id)!);
@@ -24,6 +24,14 @@ describe('이펙트 규칙(data/fx.json)', () => {
     expect(cardFx(data, swift).hitFx).toBe('fx_hit_pierce');
     const power = [...data.cards.values()].find((c) => c.type === 'power' && !c.tags.includes('born_taunt'))!;
     expect(cardFx(data, power).castFx).toBe('fx_power_aura');
+  });
+
+  it('번개 피해는 카드와 상관없이 전기 불꽃 피격, 감전·마비가 걸리면 같은 이펙트(2026-10-14)', () => {
+    expect(elementHitFx(data, 'lightning')).toBe('fx_hit_shock');
+    expect(elementHitFx(data, undefined)).toBeUndefined();
+    expect(statusFx(data, 'shock')).toBe('fx_hit_shock');
+    expect(statusFx(data, 'paralyze')).toBe('fx_hit_shock');
+    for (const id of Object.keys(data.fx.statusFx ?? {})) expect(data.statuses.has(id), id).toBe(true);
   });
 
   it('공격 카드는 모두 공격 이펙트나 피격 이펙트 중 하나는 따로 받는다(흰 타격 별 하나로 끝나지 않는다)', () => {
