@@ -4,6 +4,7 @@ import type { CardDef } from './schema';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { forgeMax, type CardInstance } from './state';
+import { engravingOffer } from './forge';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
 import { abyssShopPool, abyssShopRift, isAbyss, relicAllowed, removePrice, runOath } from './abyss';
@@ -299,14 +300,16 @@ export function forgeChance(data: GameData, run: RunState, c: CardInstance): { c
   return { chance: Math.min(1, base * (1 + f.pity * fails)), base, fails };
 }
 
-export type ForgeResult = (BuyResult & { ok: true; success: boolean; level: number }) | (BuyResult & { ok: false });
+export type ForgeResult = (BuyResult & { ok: true; success: boolean; level: number; choices: string[] }) | (BuyResult & { ok: false });
 
 /**
  * 대강화 한 번(상점에서, 몇 번이든): price골드를 내고 성공하면 +1, 실패하면 단계 그대로 천장만 오른다.
+ * +6~+9에 오르면 각인 후보(choices)가 run.forgePending에 남는다 — chooseEngraving으로 고를 때까지 다음 대강화는 못 한다.
  * 결과는 시드·카드·단계·실패 수로 정해진다(다시 불러와도 같다)
  */
 export function buyForge(data: GameData, run: RunState, uid: string): ForgeResult {
   shopOf(run);
+  if (run.forgePending) return { ok: false, reason: '먼저 각인을 고른다' };
   const c = forgeCandidates(data, run).find((x) => x.uid === uid);
   if (!c) return { ok: false, reason: '대강화할 수 없는 카드' };
   const fail = pay(run, data.balance.upgrade.forge.price);
@@ -318,7 +321,13 @@ export function buyForge(data: GameData, run: RunState, uid: string): ForgeResul
   run.forgeFails ??= {};
   if (roll >= chance) {
     run.forgeFails[key] = fails + 1;
-    return { ok: true, success: false, level: c.level, message: `대강화 실패: ${name} +${c.level} 그대로(다음 ${Math.round(forgeChance(data, run, c).chance * 1000) / 10}%)` };
+    return {
+      ok: true,
+      success: false,
+      level: c.level,
+      choices: [],
+      message: `대강화 실패: ${name} +${c.level} 그대로(다음 ${Math.round(forgeChance(data, run, c).chance * 1000) / 10}%)`,
+    };
   }
   delete run.forgeFails[key];
   const level = c.level + 1;
@@ -327,5 +336,8 @@ export function buyForge(data: GameData, run: RunState, uid: string): ForgeResul
     run.collection[c.cardId] = level;
     for (const x of run.deck) if (x.cardId === c.cardId) x.level = level;
   }
-  return { ok: true, success: true, level, message: `대강화 성공: ${name} +${level}` };
+  const max = forgeMax(data, data.cards.get(c.cardId)!);
+  const choices = level < max ? engravingOffer(data, run, c, key) : [];
+  run.forgePending = choices.length ? { uid: c.uid, cardId: c.cardId, level, choices } : null;
+  return { ok: true, success: true, level, choices, message: level >= max ? `대강화 성공: ${name} +${level} — 각성!` : `대강화 성공: ${name} +${level} — 각인을 고른다` };
 }

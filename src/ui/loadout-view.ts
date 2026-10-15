@@ -13,6 +13,7 @@ import {
   loadoutProblems,
   loadPreset,
   ownedEssentials,
+  ownedView,
   recommendFor,
   recommendLoadout,
   requiredFor,
@@ -86,7 +87,7 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
         const el = h(
           'div',
           { class: `deck-card loadout-card${on ? ' on' : ''}${full ? ' full' : ''}`, onclick: () => toggle(d.id), title: on ? '눌러서 빼기' : full ? '칸이 가득 찼다 — 먼저 한 장을 빼기' : '눌러서 넣기' },
-          cardView(data, { uid: `lo_${d.id}`, cardId: d.id, level: run.collection[d.id] ?? 0 }, { selected: on }),
+          cardView(data, ownedView(run, d.id, `lo_${d.id}`), { selected: on }),
           // 편성 점수 배지(위 가운데 — 왼쪽 위는 비용 자리)
           h('span', { class: `loadout-pts pts-${cardPoints(data, d)}`, ...tipAttrs(`편성 ${cardPoints(data, d)}점`, '등급마다 점수. 동료 24점 · 공용 17점까지.') }, `${cardPoints(data, d)}점`),
           on ? h('span', { class: 'loadout-check' }, '✓') : null,
