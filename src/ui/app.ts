@@ -55,7 +55,7 @@ import { applySettings, BUILD_SHORT, settings, settingsForm, type SettingsTab } 
 import { sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
-import { artOrGlyph, iconEl } from './icons';
+import { artOrGlyph, lawIconEl } from './icons';
 import { loadPortrait } from '../render/portrait';
 import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
 import {
@@ -1086,7 +1086,7 @@ export class App {
       'div',
       { class: 'next-laws' },
       h('span', {}, '다음 굽이의 법칙'),
-      h('div', { class: 'law-badges' }, laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name))),
+      h('div', { class: 'law-badges' }, laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, lawIconEl(l), l.name))),
     );
   }
 

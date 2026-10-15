@@ -1,0 +1,10 @@
+id: icons_status_g
+type: icon-sheet
+summary: 상태 아이콘 57(심연 부동) — 칸 n = 상태 icon n+56
+# 칸 번호 = data/statuses.json의 icon에서 56을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-15 심연 개편: 부동(봉쇄 면역)
+frames: 1
+baseline: 0.5
+frame_notes:
+  1: "steadfast — a small grey stone pillar with a broken chain at its base"
+placeholder: { color: '#5d6478', accent: '#c2c6d1' }
