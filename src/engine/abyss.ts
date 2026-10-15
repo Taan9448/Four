@@ -671,16 +671,22 @@ export function stageNorm(data: GameData, stageId: string): { hp: number; dmg: n
   return out;
 }
 
-/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). deep.from굽이부터는 굽이마다 deep 단계만큼 오른다 */
+/**
+ * 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). 깊은 굽이 구간(deep)이 있으면 첫 구간의 from굽이부터는
+ * 굽이마다 그 구간의 단계만큼 오른다(구간마다 다음 구간 from까지)
+ */
 export function abyssScale(data: GameData, depth: number): { hp: number; dmg: number } {
   const cfg = data.balance.abyss;
-  const from = cfg.deep?.from ?? Infinity;
-  const near = Math.min(depth, from) - 1;
-  const far = Math.max(0, depth - from);
-  return {
-    hp: cfg.hpBase * (1 + cfg.hpStep * near + (cfg.deep?.hpStep ?? 0) * far),
-    dmg: cfg.dmgBase * (1 + cfg.dmgStep * near + (cfg.deep?.dmgStep ?? 0) * far),
-  };
+  const tiers = [...(cfg.deep ?? [])].sort((a, b) => a.from - b.from);
+  const near = Math.min(depth, tiers[0]?.from ?? Infinity) - 1;
+  let hp = 1 + cfg.hpStep * near;
+  let dmg = 1 + cfg.dmgStep * near;
+  tiers.forEach((t, i) => {
+    const n = Math.max(0, Math.min(depth, tiers[i + 1]?.from ?? Infinity) - t.from);
+    hp += t.hpStep * n;
+    dmg += t.dmgStep * n;
+  });
+  return { hp: cfg.hpBase * hp, dmg: cfg.dmgBase * dmg };
 }
 
 /** 점수: 넘은 굽이 × depth + 보스 × boss + 엘리트 × elite + 남은 하운 체력 비율 × hp */

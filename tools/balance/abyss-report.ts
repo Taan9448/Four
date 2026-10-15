@@ -27,7 +27,8 @@ export function botPool(data: GameData, kind: 'narrow' | 'wide'): Record<string,
 
 const MATE_SETS: string[][] = [['elia'], ['kyle'], ['born'], ['elia', 'kyle'], ['kyle', 'born'], ['elia', 'born'], ['elia', 'kyle', 'born']];
 
-export const MAX_DEPTH = 15;
+/** 봇이 내려가는 가장 깊은 굽이(2026-10-15: 20굽이 도달률을 재려고 15 → 25) */
+export const MAX_DEPTH = Number(process.env.BALANCE_MAX_DEPTH ?? 25);
 const OATHS = [0, 3, 6, 10, 15];
 
 /** 봇 한 성향으로 심연 표본을 둔다: 풀 2종 × 동료 조합, 서약 단계별 */
@@ -63,7 +64,7 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   lines.push('');
   lines.push(`\`BALANCE_MODE=abyss npm run balance\`가 만든다(손으로 고치지 않는다). 조합마다 시드 ${seeds}개(${prefix}…), 풀 2종 × 동료 조합 ${MATE_SETS.length}개, 최대 ${maxDepth}굽이. 계산 ${secs.toFixed(1)}초(성향마다 동시에).`);
   lines.push(`봇 ${batches.map((b) => BOT_STYLE_NAME[b.style]).join(' · ')}(\`src/sim/bot.ts\` BOT_STYLES)의 표본을 합친 값 = 두 성향의 평균. 성향별 숫자는 아래 '봇 성향별'.`);
-  lines.push('목표(GAME_DESIGN 16절): 도달 굽이 중앙값 4, 8굽이 10%, 12굽이 1%. 동료 수별 중앙값 차이 1굽이 안. 풀이 좁아도 4굽이.');
+  lines.push(`목표(GAME_DESIGN 16절 '심연 개편', 2026-10-15): ${TARGETS.abyss.reach.map(([d, lo, hi]) => `${d}굽이 ${fmtPct(lo)}~${fmtPct(hi)}`).join(' · ')} 도달(모든 풀·조합을 합친 값).`);
   lines.push('');
   // 경고: 숙적 비중 · 5굽이·15굽이 도달 · 넓은 풀 중앙값 · 평균 덱 · 서약이 앞 단계보다 쉬운지
   const t = TARGETS.abyss;
@@ -71,8 +72,7 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   const nemesis = bossDeaths.filter((r) => r.diedModule === data.balance.abyss.nemesisModule).length;
   const ws: (string | null)[] = [
     bossDeaths.length ? outside('숙적이 차지하는 보스 패배 비중', nemesis / bossDeaths.length, null, t.nemesisShareMax) : null,
-    outside('5굽이 도달', runs.filter((r) => r.depth >= 5).length / runs.length, t.reach5[0], t.reach5[1]),
-    outside(`${maxDepth}굽이 도달`, runs.filter((r) => r.depth >= maxDepth).length / runs.length, null, t.reach15Max),
+    ...t.reach.map(([d, lo, hi]) => outside(`${d}굽이 도달`, runs.filter((r) => r.depth >= d).length / runs.length, lo, hi)),
     outside('넓은 풀 도달 중앙값', median(runs.filter((r) => r.pool === 'wide').map((r) => r.depth)), null, t.wideMedianMax, (x) => `${x}굽이`),
     outside('평균 덱', runs.reduce((a, r) => a + r.deckSize, 0) / runs.length, t.deck[0], t.deck[1], (x) => `${x.toFixed(0)}장`),
   ];
@@ -84,16 +84,14 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
     if (b > a) ws.push(`서약 ${oath}단계가 ${prev.oath}단계보다 쉽다(도달 중앙값 ${b} > ${a}) — 단계마다 같거나 어려워야 한다`);
   });
   const nemShare = bossDeaths.length ? nemesis / bossDeaths.length : 0;
-  const r5 = runs.filter((r) => r.depth >= 5).length / runs.length;
-  const r15 = runs.filter((r) => r.depth >= maxDepth).length / runs.length;
+  const reachAt = (d: number) => runs.filter((r) => r.depth >= d).length / runs.length;
   const wideMed = median(runs.filter((r) => r.pool === 'wide').map((r) => r.depth));
   const deck = runs.reduce((a, r) => a + r.deckSize, 0) / runs.length;
   const oathOk = oathRuns.every(({ rs }, i) => !i || median(rs.map((r) => r.depth)) <= median(oathRuns[i - 1].rs.map((r) => r.depth)));
   lines.push(
     ...targetTable([
       { label: '숙적이 차지하는 보스 패배 비중', target: `${fmtPct(t.nemesisShareMax)} 이하`, now: fmtPct(nemShare), ok: nemShare <= t.nemesisShareMax },
-      { label: '5굽이 도달', target: `${fmtPct(t.reach5[0])}~${fmtPct(t.reach5[1])}`, now: fmtPct(r5), ok: r5 >= t.reach5[0] && r5 <= t.reach5[1] },
-      { label: `${maxDepth}굽이 도달`, target: `${fmtPct(t.reach15Max)} 이하`, now: fmtPct(r15), ok: r15 <= t.reach15Max },
+      ...t.reach.map(([d, lo, hi]) => ({ label: `${d}굽이 도달`, target: `${fmtPct(lo)}~${fmtPct(hi)}`, now: fmtPct(reachAt(d)), ok: reachAt(d) >= lo && reachAt(d) <= hi })),
       { label: '넓은 풀 도달 중앙값', target: `${t.wideMedianMax}굽이 이하`, now: `${wideMed}굽이`, ok: wideMed <= t.wideMedianMax },
       { label: '평균 덱', target: `${t.deck[0]}~${t.deck[1]}장`, now: `${deck.toFixed(0)}장`, ok: deck >= t.deck[0] && deck <= t.deck[1] },
       { label: '서약 단계(앞 단계보다 쉽지 않게)', target: '단계마다 같거나 어렵게', now: oathOk ? '지킴' : '거꾸로인 단계 있음', ok: oathOk },
@@ -110,21 +108,21 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   lines.push('');
   lines.push('## 봇 성향별');
   lines.push('');
-  lines.push('| 성향 | 런 | 도달 중앙값 | 상위 10% | 5굽이 | 8굽이 | 평균 덱 |');
-  lines.push('|---|---:|---:|---:|---:|---:|---:|');
+  lines.push('| 성향 | 런 | 도달 중앙값 | 상위 10% | 5굽이 | 10굽이 | 15굽이 | 평균 덱 |');
+  lines.push('|---|---:|---:|---:|---:|---:|---:|---:|');
   for (const b of batches) {
     const rs = b.runs;
-    lines.push(`| ${BOT_STYLE_NAME[b.style]} | ${rs.length} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 5)} | ${reach(rs, 8)} | ${(rs.reduce((a, r) => a + r.deckSize, 0) / rs.length).toFixed(0)} |`);
+    lines.push(`| ${BOT_STYLE_NAME[b.style]} | ${rs.length} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 5)} | ${reach(rs, 10)} | ${reach(rs, 15)} | ${(rs.reduce((a, r) => a + r.deckSize, 0) / rs.length).toFixed(0)} |`);
   }
   lines.push('');
   lines.push('## 동료 수 · 풀별');
   lines.push('');
-  lines.push('| 풀 | 동료 수 | 런 | 도달 중앙값 | 상위 10% | 3굽이 | 5굽이 | 8굽이 | 12굽이 | 평균 덱 |');
-  lines.push('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
+  lines.push('| 풀 | 동료 수 | 런 | 도달 중앙값 | 상위 10% | 3굽이 | 5굽이 | 10굽이 | 15굽이 | 20굽이 | 평균 덱 |');
+  lines.push('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
   for (const pool of ['narrow', 'wide'])
     for (const n of [1, 2, 3]) {
       const rs = runs.filter((r) => r.pool === pool && r.mates === n);
-      lines.push(`| ${pool === 'narrow' ? '좁음' : '넓음'} | ${n} | ${rs.length} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 3)} | ${reach(rs, 5)} | ${reach(rs, 8)} | ${reach(rs, 12)} | ${(rs.reduce((a, r) => a + r.deckSize, 0) / rs.length).toFixed(0)} |`);
+      lines.push(`| ${pool === 'narrow' ? '좁음' : '넓음'} | ${n} | ${rs.length} | ${median(rs.map((r) => r.depth))} | ${quant(rs.map((r) => r.depth), 0.9)} | ${reach(rs, 3)} | ${reach(rs, 5)} | ${reach(rs, 10)} | ${reach(rs, 15)} | ${reach(rs, 20)} | ${(rs.reduce((a, r) => a + r.deckSize, 0) / rs.length).toFixed(0)} |`);
     }
   lines.push('');
   lines.push('## 동료 조합별(좁은 풀)');

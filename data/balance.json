@@ -112,9 +112,9 @@
   "abyss": {
     "hpBase": 1.0,
     "dmgBase": 0.93,
-    "hpStep": 0.4,
-    "dmgStep": 0.27,
-    "deep": { "from": 6, "hpStep": 0.06, "dmgStep": 0.01 },
+    "hpStep": 0.46,
+    "dmgStep": 0.31,
+    "deep": [{ "from": 6, "hpStep": 0, "dmgStep": 0 }, { "from": 11, "hpStep": 0.9, "dmgStep": 0.32 }, { "from": 16, "hpStep": 0.3, "dmgStep": 0.1 }],
     "importMax": 2,
     "floors": 9,
     "typeWeights": { "battle": 52, "event": 18, "elite": 13, "rest": 8, "shop": 5 },

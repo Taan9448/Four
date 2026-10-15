@@ -38,15 +38,17 @@ describe('심연', () => {
     expect(abyssPool(data, { elia_fireball: 5 }, []).elia_fireball).toBe(data.balance.abyss.importMax);
   });
 
-  it('배율: deep.from굽이부터 굽이마다 더 가파르게 오른다', () => {
+  it('배율: 깊은 굽이 구간마다 그 구간의 단계만큼 오른다(구간 경계에서 이어진다)', () => {
     const ab = data.balance.abyss;
-    const deep = ab.deep!;
+    const tiers = ab.deep!;
     const at = (n: number) => abyssScale(data, n);
     expect(at(1)).toEqual({ hp: ab.hpBase, dmg: ab.dmgBase });
-    expect(at(deep.from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (deep.from - 1)));
-    expect(at(deep.from + 1).hp - at(deep.from).hp).toBeCloseTo(ab.hpBase * deep.hpStep);
-    expect(at(deep.from + 1).dmg - at(deep.from).dmg).toBeCloseTo(ab.dmgBase * deep.dmgStep);
-    expect(at(deep.from).hp - at(deep.from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+    expect(at(tiers[0].from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (tiers[0].from - 1)));
+    expect(at(tiers[0].from).hp - at(tiers[0].from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+    tiers.forEach((t) => {
+      expect(at(t.from + 1).hp - at(t.from).hp).toBeCloseTo(ab.hpBase * t.hpStep);
+      expect(at(t.from + 1).dmg - at(t.from).dmg).toBeCloseTo(ab.dmgBase * t.dmgStep);
+    });
   });
 
   it('숙적과 서약 막아선 자의 엘리트는 유물을 떨구지 않는다(골드는 그대로)', async () => {
@@ -422,12 +424,11 @@ describe('보스 하한(2026-10-12 A2)', () => {
 
 // 심연 개편(2026-10-15, GAME_DESIGN 16절 '심연 개편'): 배율 완만화 · 법칙 20개 등급 가중 · 접사 14개 · 부동
 describe('심연 개편 — 법칙·접사·배율', () => {
-  it('배율: 6굽이부터 완만해진다(15굽이 체력 ×3.5 안팎 · 피해 ×2.3 안팎)', () => {
+  it('배율: 굽이가 깊어져도 줄지 않는다(6~10굽이는 숨 고르기, 11~15굽이가 가장 가파르다)', () => {
     const at = (n: number) => abyssScale(data, n);
-    expect(at(15).hp).toBeGreaterThan(3.3);
-    expect(at(15).hp).toBeLessThan(3.8);
-    expect(at(15).dmg).toBeLessThan(2.4);
-    for (let d = 2; d <= 30; d++) expect(at(d).hp).toBeGreaterThan(at(d - 1).hp);
+    for (let d = 2; d <= 30; d++) expect(at(d).hp).toBeGreaterThanOrEqual(at(d - 1).hp);
+    expect(at(10).hp).toBeCloseTo(at(6).hp);
+    expect(at(15).hp - at(11).hp).toBeGreaterThan(at(20).hp - at(16).hp);
   });
 
   it('법칙 20개: 등급(순한·보통·가혹)이 고루 있고, 깊을수록 가혹이 많이 걸린다', async () => {
