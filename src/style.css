@@ -847,6 +847,25 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .t-elheim .cpx-text { color: #1d2433; }
 .cpx-plaque { position: absolute; z-index: 2; left: 32px; top: 178px; width: 64px; height: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; text-align: center; font-size: 9.5px; line-height: 1; color: #fff; text-shadow: 1px 1px 0 #0b0b10, -1px 0 0 #0b0b10; }
 .card-px.t-status .cpx-frame { filter: grayscale(0.85) brightness(0.72); }
+/* 대강화(+6~+10, GAME_DESIGN 16절 ⑦): 단계 글씨 · +8 은청 · +9 보라 · +10 각성 금빛 테두리. Codex 틀(card_frame_forge_*)이 오면 그 위에 겹친다 */
+.card-level-forge { color: #8fd3ff; text-shadow: 0 0 4px rgba(79, 180, 255, 0.8); }
+.cpx-forge { position: absolute; left: 0; top: 0; width: 128px; height: 192px; z-index: 2; image-rendering: pixelated; pointer-events: none; }
+.card.forge-8 { box-shadow: 0 0 0 2px #8fd3ff, 0 0 10px rgba(79, 180, 255, 0.55); }
+.card.forge-9 { box-shadow: 0 0 0 2px #a35cff, 0 0 12px rgba(163, 92, 255, 0.6); }
+.card.forge-10 { box-shadow: 0 0 0 2px #ffe08a, 0 0 16px rgba(242, 169, 59, 0.75); animation: forge-awaken 2.6s ease-in-out infinite; }
+@keyframes forge-awaken { 50% { box-shadow: 0 0 0 2px #ffe08a, 0 0 24px rgba(255, 138, 92, 0.85); } }
+.no-motion .card.forge-10 { animation: none; }
+@media (prefers-reduced-motion: reduce) { .card.forge-10 { animation: none; } }
+.forge-list { display: flex; flex-direction: column; gap: 12px; }
+.forge-note { margin: 0; font-size: var(--fs-s, 0.85rem); opacity: 0.85; }
+.forge-last { margin: 0; padding: 6px 10px; border-radius: 6px; font-weight: 700; }
+.forge-last.is-ok { background: rgba(106, 168, 79, 0.2); color: #bfe3a0; }
+.forge-last.is-fail { background: rgba(160, 38, 52, 0.22); color: #ffb0a0; }
+.forge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.forge-arrow { font-size: 1.4rem; opacity: 0.7; }
+.forge-odds { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+.forge-odds > span { font-size: 1.1rem; font-weight: 700; color: #ffe08a; }
+.forge-empty { opacity: 0.7; }
 /* 영웅·전설 움직임(2026-10-11 사용자 결정): 테두리 빛은 어디서나 숨쉰다. 그림 창 광택·보석 반짝임·금빛 티끌은 손패·보상·크게 보기에서만
    (보유 카드·도감 목록처럼 카드가 많은 곳에서 한꺼번에 반짝이지 않게). 설정의 '화면 연출'을 끄면(no-motion) 움직임 없이 지금 빛만 */
 .cpx-glow { position: absolute; inset: 0; z-index: 0; border-radius: 4px; pointer-events: none; }

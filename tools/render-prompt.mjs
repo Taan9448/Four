@@ -150,6 +150,26 @@ export function renderPrompt(spec, style) {
         'Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.'
       );
     case 'card-frame': {
+      // 겹치는 테두리(overlay, 2026-10-15 대강화 틀): 다른 틀 위에 얹는 장식 띠만. 띠 안쪽은 모두 키 색(투명)
+      if (spec.overlay) {
+        const band = spec.overlay.band ?? 8;
+        const corner = spec.overlay.corner ?? band * 2;
+        return (
+          `Create ONE PNG pixel-art card frame OVERLAY, ${W}x${H} px, portrait.\n` +
+          pixelGrid(spec, 'The whole image') +
+          `(${lw}x${lh} sprite pixels in total; below, x and y are sprite pixels counted from 0 at the top-left.)\n` +
+          `What it is: ${spec.summary ?? ''}\n` +
+          'A decorative BORDER that the game lays ON TOP of an existing card frame, so only the border band is drawn and everything inside it stays empty.\n' +
+          `- BORDER BAND: ${band} px wide along all four edges, touching the canvas edge on every side (the outline runs along the outermost sprite pixels).\n` +
+          `- CORNERS: ornaments may grow inward up to ${corner} px from each corner; keep them inside that square.\n` +
+          `- INSIDE: every pixel more than ${band} px from the edge (outside the corner squares) is flat ${key.name} ${key.hex}, which becomes transparent. Draw nothing there.\n` +
+          `- Look: ${notes(1)}\n` +
+          `Style: ${spec.style ?? style.sprite_style}; front view, perfectly flat, symmetric left to right and top to bottom, light from the upper left, no perspective, no drop shadow.\n` +
+          paletteLine(spec, style) +
+          `Never use ${key.name}, pink or purple in the border${spec.overlay.allowPurple ? ' except the violet tones listed in the palette' : ''}.\n` +
+          'Rules: no text, no letters, no numbers, no runes that read as letters, no signature, no watermark, nothing inside the border.'
+        );
+      }
       // 카드 틀(2026-10-11): 틀 한 장이 캔버스를 꽉 채운다. 그림 창은 키 색(투명 구멍), 글·이름·보석 자리는 게임이 채운다
       const L = spec.layout ?? {};
       const box = (r) => `x ${r[0]}-${r[0] + r[2] - 1}, y ${r[1]}-${r[1] + r[3] - 1} (${r[2]}x${r[3]})`;

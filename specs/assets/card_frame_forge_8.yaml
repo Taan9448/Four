@@ -1,0 +1,16 @@
+id: card_frame_forge_8
+type: card-frame
+summary: >-
+  the overlay border of a +8 FORGED card: cold blue-white steel tempered by the forge
+# 대강화 +8 카드 틀(2026-10-15, GAME_DESIGN 16절 ⑦). 무공·마법·융합 틀(card_frame_*) 위에 겹치는 테두리 띠만 그린다 — 안은 투명.
+# 게임은 src/ui/card-view.ts의 .cpx-forge로 128×192 그대로 겹친다. 그림이 오기 전에는 CSS 빛(.forge-8)만
+overlay:
+  band: 7
+  corner: 14
+frame_notes:
+  1: >-
+    bright tempered steel (#c2c6d1, #f1efe6, #8a90a3) with a thin glowing ice-blue edge line (#4fb4ff, #8fd3ff) along the inner side of the band; at each corner a small steel clasp with a tiny blue spark
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#8a90a3', accent: '#8fd3ff' }

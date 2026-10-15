@@ -13,6 +13,11 @@ const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고�
 const SEAL_BY_TYPE: Record<string, string> = { attack: '武', skill: '技', power: '心' };
 const TYPE_LABEL: Record<string, string> = { attack: '공격', skill: '기술', power: '심법', status: '상태' };
 
+/** 대강화 틀 단계(+8·+9·+10, GAME_DESIGN 16절 ⑦): 카드에 forge-8 같은 이름을 붙인다 */
+function forgeClass(card: ResolvedCard): string {
+  return card.forge >= 3 ? ` card-forged forge-${card.level}` : card.forge ? ' card-forged' : '';
+}
+
 /** 픽셀 카드 틀(Codex 그림 card_frame_*, 2026-10-11). 상태·저주는 무공 틀을 어둡게 */
 const FRAME_ID: Record<CardWorld, string> = { murim: 'card_frame_murim', elheim: 'card_frame_magic', fusion: 'card_frame_fusion', status: 'card_frame_murim' };
 /** card_gems 칸 번호: 1 내공 비용 · 2 마나 비용 · 3~7 등급 */
@@ -68,13 +73,13 @@ function cardViewInner(data: GameData, inst: CardInstance | string, opts: CardVi
   return h(
     'div',
     {
-      class: `card t-${world} card-${def.type} rarity-${def.rarity}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
+      class: `card t-${world} card-${def.type} rarity-${def.rarity}${forgeClass(card)}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
       title: opts.disabled ?? '',
     },
     def.rarity !== 'special' ? h('span', { class: `gem gem-${def.rarity}`, 'aria-hidden': 'true' }) : null,
     h('div', { class: 'card-cost', 'aria-label': `내공 ${card.cost.neigong} 마나 ${card.cost.mana}` }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), zero ? h('span', { class: 'pip-zero' }, '0') : null),
-    h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
+    h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
     h('div', { class: 'card-text', ...glossaryTip(data, inst) }, ...textBlocks(cardTextParts(data, inst))),
     def.flavor && opts.flavor ? h('div', { class: `card-flavor${opts.flavor === 'hover' ? ' flavor-hover' : ''}` }, def.flavor) : null,
@@ -128,10 +133,11 @@ function pixelCardView(
   const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '武';
   const artUrl = cardArtUrl(def.id);
   const shine = def.rarity === 'epic' || def.rarity === 'legendary';
+  const forgeFrame = card.forge >= 3 ? frameUrl(`card_frame_forge_${card.level}`, 1, { realOnly }) : null;
   return h(
     'div',
     {
-      class: `card card-px t-${world} card-${def.type} rarity-${def.rarity}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
+      class: `card card-px t-${world} card-${def.type} rarity-${def.rarity}${forgeClass(card)}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
       title: opts.disabled ?? '',
     },
@@ -147,8 +153,10 @@ function pixelCardView(
     shine ? h('span', { class: 'cpx-glow', 'aria-hidden': 'true' }) : null,
     shine ? h('span', { class: 'cpx-sheen', style: `left:${wx}px;top:${wy}px;width:${ww}px;height:${wh}px`, 'aria-hidden': 'true' }) : null,
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
+    // 대강화 +8·+9·+10 틀(Codex 그림 card_frame_forge_*, 틀 위에 겹치는 테두리). 그림이 오기 전에는 CSS 빛(forge-N)만
+    forgeFrame ? h('img', { class: 'cpx-forge', src: forgeFrame, alt: '', draggable: 'false' }) : null,
     ...costs.map(costEl),
-    h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}` }, ` +${card.level}`) : null),
+    h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
     // 색각 보정: 등급 보석 위에 모양(설정에서 켤 때만 보인다)
     def.rarity !== 'special' ? h('span', { class: 'cpx-rshape', 'aria-hidden': 'true' }, RARITY_SHAPE[def.rarity] ?? '') : null,
     rarityUrl ? h('img', { class: 'cpx-rarity', src: rarityUrl, alt: RARITY_LABEL[def.rarity] ?? '' }) : def.rarity !== 'special' ? h('span', { class: `cpx-rarity gem gem-${def.rarity}`, 'aria-label': RARITY_LABEL[def.rarity] }) : null,

@@ -1,7 +1,7 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, openShop, swappable, swapPrice, type BuyResult } from '../engine/economy';
+import { buyCard, buyForge, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeChance, openShop, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
@@ -37,6 +37,60 @@ function pickCard(data: GameData, title: string, cards: CardInstance[], onPick: 
   const ov = openOverlay(title, grid, { wide: true });
 }
 
+const pct = (p: number) => `${Math.round(p * 1000) / 10}%`;
+
+/**
+ * 대강화 창(GAME_DESIGN 16절 ⑦): 후보 카드마다 지금 모습 → 다음 모습, 성공률(천장 반영)과 실패 횟수, 시도 단추.
+ * 창은 닫지 않고 몇 번이든 시도한다. onResult: 상점 화면 갱신·알림
+ */
+function openForge(data: GameData, run: RunState, onResult: (r: ForgeResult) => void): void {
+  const price = data.balance.upgrade.forge.price;
+  const body = h('div', { class: 'forge-list' });
+  let last: ForgeResult | null = null;
+  const draw = () => {
+    const list = forgeCandidates(data, run);
+    body.replaceChildren(
+      ...(last ? [h('p', { class: `forge-last ${last.ok && last.success ? 'is-ok' : 'is-fail'}`, role: 'status' }, last.ok ? last.message : last.reason)] : []),
+      h('p', { class: 'forge-note' }, `가진 골드 ${run.gold} · 한 번에 ${price}골드. 실패해도 단계는 그대로, 실패할 때마다 그 단계 성공률이 기본값의 ${Math.round(data.balance.upgrade.forge.pity * 100)}%씩 오른다(성공하면 처음으로).`),
+      ...(list.length
+        ? list.map((c) => {
+            const { chance, base, fails } = forgeChance(data, run, c);
+            return h(
+              'div',
+              { class: 'forge-row' },
+              cardView(data, c),
+              h('span', { class: 'forge-arrow', 'aria-hidden': 'true' }, '→'),
+              cardView(data, { ...c, level: c.level + 1 }),
+              h(
+                'div',
+                { class: 'forge-odds' },
+                h('b', {}, `+${c.level} → +${c.level + 1}`),
+                h('span', {}, `성공률 ${pct(chance)}`),
+                h('small', {}, fails ? `기본 ${pct(base)} · 실패 ${fails}번` : `기본 ${pct(base)}`),
+                h(
+                  'button',
+                  {
+                    class: 'btn btn-small btn-primary',
+                    disabled: run.gold < price,
+                    onclick: () => {
+                      const r = buyForge(data, run, c.uid);
+                      last = r;
+                      onResult(r);
+                      draw();
+                    },
+                  },
+                  `시도 · ${price}골드`,
+                ),
+              ),
+            );
+          })
+        : [h('p', { class: 'forge-empty' }, '덱에 +5가 된 영웅·전설 카드가 없다.')]),
+    );
+  };
+  draw();
+  openOverlay('대강화 — 영웅·전설 카드 +6~+10', body, { wide: true });
+}
+
 export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeId: string, onDone: () => void): HTMLElement {
   const shop = openShop(data, run, nodeId);
   const toasts = h('div', { class: 'toasts' });
@@ -44,6 +98,13 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
   const result = (r: BuyResult) => {
     toast(toasts, r.ok ? r.message : r.reason, r.ok ? 'support' : 'danger');
     if (r.ok) sfx('coin');
+    render();
+  };
+  // 대강화 결과: 성공은 빛나는 알림과 레벨 소리, 실패는 붉은 알림(골드는 이미 나갔다)
+  const forged = (r: ForgeResult) => {
+    if (!r.ok) return result(r);
+    toast(toasts, r.message, r.success ? 'support' : 'danger');
+    sfx(r.success ? 'levelup' : 'discard');
     render();
   };
   const price = (n: number, sold: boolean) => h('span', { class: `price${!sold && run.gold < n ? ' short' : ''}` }, sold ? '팔림' : h('span', {}, h('i', { class: 'coin' }), String(n)));
@@ -199,6 +260,24 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
                   },
                   '고르기',
                 ),
+          ),
+          // 대강화(+6~+10): 영웅·전설 +5 카드만, 상점에서 몇 번이든
+          h(
+            'div',
+            { class: 'shop-line' },
+            h('span', { class: 'service-glyph' }, '煉'),
+            h(
+              'div',
+              { class: 'shop-desc' },
+              h('b', {}, '대강화'),
+              h('small', {}, `영웅·전설 +5 카드를 +6~+10으로. 실패해도 그대로, 실패할수록 잘 된다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
+            ),
+            price(data.balance.upgrade.forge.price, false),
+            h(
+              'button',
+              { class: 'btn btn-small', disabled: forgeCandidates(data, run).length === 0, onclick: () => openForge(data, run, forged) },
+              '고르기',
+            ),
           ),
     );
     box.replaceChildren(

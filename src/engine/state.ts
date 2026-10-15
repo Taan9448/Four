@@ -192,28 +192,65 @@ export interface ResolvedCard {
   cost: Cost;
   effects: Effect[];
   keywords: Keyword[];
-  /** 강화 단계 0~5 */
+  /** 강화 단계 0~5(대강화 카드는 10까지) */
   level: number;
-  /** 성장 적용된 기본 효과(특수 스킬 효과 제외) — 카드 문구용 */
+  /** 성장(·대강화 수치) 적용된 기본 효과(특수 스킬 효과 제외) — 카드 문구용. +9의 두 번은 effects에만 */
   baseEffects: Effect[];
   /** 열린 특수 스킬(+4, +5) */
   skills: UpgradeSkill[];
+  /** 대강화 단계 0~5(+6 = 1 … +10 = 5) */
+  forge: number;
 }
 
-/** 강화 단계를 반영한 카드. +1~+3은 수치 성장, +4·+5는 특수 스킬 */
+/** 이 카드의 강화 상한: 대강화 등급(영웅·전설)이면 +10, 아니면 +5 */
+export function forgeMax(data: GameData, def: CardDef): number {
+  const up = data.balance.upgrade;
+  return def.upgrade && up.forge.rarities.includes(def.rarity as never) ? up.maxLevel + up.forge.chance.length : up.maxLevel;
+}
+
+const BUFF_TARGETS = new Set(['self', 'ally', 'all_allies']);
+
+/** 대강화 수치 배율: 피해·방어·회복의 양(비례 양·상한 포함)과 이로운 쪽에 거는 상태 스택. 정수는 반올림 */
+function forgeScale(data: GameData, e: Effect, mul: number): Effect {
+  const m = (v: number) => (Number.isInteger(v) ? Math.round(v * mul) : v * mul);
+  if (e.op === 'damage' || e.op === 'block' || e.op === 'heal') {
+    return {
+      ...e,
+      ...(e.amount !== undefined ? { amount: m(e.amount) } : {}),
+      ...(e.scale ? { scale: { ...e.scale, amount: m(e.scale.amount), ...(e.scale.max !== undefined ? { max: m(e.scale.max) } : {}) } } : {}),
+    };
+  }
+  if (e.op === 'apply_status' && e.stacks !== undefined && e.status) {
+    const kind = data.statuses.get(e.status)?.kind;
+    const mine = BUFF_TARGETS.has(e.target ?? 'self');
+    if ((kind === 'buff' && mine) || (kind === 'debuff' && !mine)) return { ...e, stacks: m(e.stacks) };
+  }
+  return e;
+}
+
+/**
+ * 강화 단계를 반영한 카드. +1~+3은 수치 성장, +4·+5는 특수 스킬.
+ * 대강화(영웅·전설, GAME_DESIGN 16절 ⑦): +6 수치 ×numberMul · +7 비용 −1 · +8 유지 · +9 효과 두 번 · +10 각성(수치 ×awakenMul 더, 선천, 소멸 없앰)
+ */
 export function resolveCard(data: GameData, inst: CardInstance | string): ResolvedCard {
   const cardId = typeof inst === 'string' ? inst : inst.cardId;
   const def = data.cards.get(cardId);
   if (!def) throw new Error(`알 수 없는 카드: ${cardId}`);
   const up = def.upgrade;
-  const level = up ? Math.min(typeof inst === 'string' ? 0 : inst.level, data.balance.upgrade.maxLevel) : 0;
-  const steps = Math.min(level, data.balance.upgrade.statLevels);
+  const bal = data.balance.upgrade;
+  const level = up ? Math.min(typeof inst === 'string' ? 0 : inst.level, forgeMax(data, def)) : 0;
+  const forge = Math.max(0, level - bal.maxLevel);
+  const steps = Math.min(level, bal.statLevels);
+  const mul = forge >= 1 ? bal.forge.numberMul * (forge >= 5 ? bal.forge.awakenMul : 1) : 1;
+  const grown = (e: Effect) => (mul === 1 ? e : forgeScale(data, e, mul));
   const baseEffects = def.effects.map((e, i) => {
     const g = (up?.growth[i] ?? 0) * steps;
-    if (!g) return e;
-    return e.amount !== undefined ? { ...e, amount: e.amount + g } : { ...e, stacks: (e.stacks ?? 0) + g };
+    if (!g) return grown(e);
+    return grown(e.amount !== undefined ? { ...e, amount: e.amount + g } : { ...e, stacks: (e.stacks ?? 0) + g });
   });
-  const skills = up ? [up.plus4, up.plus5].slice(0, Math.max(0, level - data.balance.upgrade.statLevels)) : [];
+  const skills = (up ? [up.plus4, up.plus5].slice(0, Math.max(0, Math.min(level, bal.maxLevel) - bal.statLevels)) : []).map((sk) =>
+    mul === 1 ? sk : { ...sk, effects: sk.effects.map(grown) },
+  );
   let cost = def.cost;
   let keywords = [...def.keywords];
   for (const sk of skills) {
@@ -221,7 +258,18 @@ export function resolveCard(data: GameData, inst: CardInstance | string): Resolv
     keywords = keywords.filter((k) => !sk.removeKeywords.includes(k));
     for (const k of sk.addKeywords) if (!keywords.includes(k)) keywords.push(k);
   }
-  return { def, cost, effects: [...baseEffects, ...skills.flatMap((s) => s.effects)], keywords, level, baseEffects, skills };
+  // +7 비용 −1(내공이 있으면 내공, 없으면 마나)
+  if (forge >= 2) cost = cost.neigong > 0 ? { ...cost, neigong: cost.neigong - 1 } : cost.mana > 0 ? { ...cost, mana: cost.mana - 1 } : cost;
+  const add = (k: Keyword) => {
+    if (!keywords.includes(k)) keywords.push(k);
+  };
+  if (forge >= 3) add('retain');
+  if (forge >= 5) {
+    add('innate');
+    keywords = keywords.filter((k) => k !== 'exhaust');
+  }
+  const once = [...baseEffects, ...skills.flatMap((s) => s.effects)];
+  return { def, cost, effects: forge >= 4 ? [...once, ...once] : once, keywords, level, baseEffects, skills, forge };
 }
 
 export function isFusion(card: ResolvedCard): boolean {

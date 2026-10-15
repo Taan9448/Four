@@ -52,6 +52,8 @@ export interface RunState {
   deck: CardInstance[];
   /** 보유 카드: 카드 id → 강화 단계(같은 카드는 한 장) */
   collection: Record<string, number>;
+  /** 대강화 천장: 카드 id(심연은 카드 uid) → 지금 단계에서 실패한 횟수. 성공하면 지운다 */
+  forgeFails?: Record<string, number>;
   /** 편성: 주인(동료 id·'common') → 카드 id */
   loadout: Loadout;
   /** 갈래 보너스(출발 편성 기준): 동료 id → 켜진 아키타입 id(GAME_DESIGN 9-1) */
