@@ -453,6 +453,29 @@ describe('카드 그림 칸 경계 감지(2026-10-11, #866·#869·#872)', () => 
     const at = tileLayout(ko({ data, width: info.width, height: info.height }, spec), spec);
     for (const n of [1, 6, 11, 16]) expect(at(n)).toMatchObject({ x: ((n - 1) % 4) * 384, y: Math.floor((n - 1) / 4) * 256, w: 384, h: 256 });
   });
+
+  it('캔버스 맨 아래에 가는 테두리가 있어도 빈 줄의 칸이 캔버스 밖을 가리키지 않는다(2026-10-15 #1212)', async () => {
+    const spec = loadSpec('card_art_born_1');
+    const { png } = await stretchedSheet(10, [256, 256, 256, 256]);
+    const { keyOut: ko } = await import('../tools/lib/image.mjs');
+    const { tileLayout, cellHasContent, cellRects } = await import('../tools/lib/pixel.mjs');
+    const { data, info } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
+    // 맨 아래 두 줄에 어두운 테두리선
+    for (let y = info.height - 2; y < info.height; y++)
+      for (let x = 0; x < info.width; x++) {
+        const i = (y * info.width + x) * info.channels;
+        data[i] = 30; data[i + 1] = 36; data[i + 2] = 51;
+      }
+    const keyed = ko({ data, width: info.width, height: info.height }, { ...spec, frames: 10 });
+    const at = tileLayout(keyed, { ...spec, frames: 10 });
+    for (let n = 1; n <= 16; n++) {
+      const r = at(n);
+      expect(r.y + r.h, `${n}번 칸`).toBeLessThanOrEqual(info.height);
+      expect(r.y, `${n}번 칸`).toBeLessThan(info.height);
+    }
+    const rectOf = cellRects(keyed, { ...spec, frames: 10 });
+    expect(() => cellHasContent(keyed, { ...spec, frames: 10 }, 16, undefined, rectOf)).not.toThrow();
+  });
 });
 
 describe('저장소의 실제 명세와 임시 시트', () => {

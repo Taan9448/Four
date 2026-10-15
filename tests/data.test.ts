@@ -336,6 +336,8 @@ describe('데이터 검사', () => {
       if (c.pool !== 'abyss') continue;
       const cost = c.keywords.includes('exhaust') || c.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) > 0) || e.op === 'lose_hp' || (e.op === 'apply_status' && data.statuses.get(e.status ?? '')?.triggers.some((t) => t.effects.some((x) => x.op === 'lose_hp'))));
       if (!cost) bad.push(`${c.id}: 대가가 없다`);
+      // 2026-10-15 사용자 결정: 틈의 카드는 모두 고유(덱에 한 장만)
+      if (!c.keywords.includes('unique')) bad.push(`${c.id}: 틈의 카드는 고유여야 한다`);
       if (unlockSource(data).has(c.id) && !['rare', 'epic', 'legendary'].includes(c.rarity)) bad.push(`${c.id}: 업적으로 여는 틈의 카드는 희귀 이상이어야 한다`);
     }
     const ab = data.balance.abyss;

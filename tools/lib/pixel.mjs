@@ -287,9 +287,14 @@ export function tileLayout(keyed, spec) {
     const col = (n - 1) % C, row = Math.floor((n - 1) / C);
     const x = xs[col], w = xs[col + 1] - x;
     if (row < used) return { x, y: ys[row], w, h: ys[row + 1] - ys[row] };
-    // 쓰지 않는 줄: 그림 아래 남은 자리를 고르게(빈 칸 검사용)
-    const y = Math.round(bottom + (row - used) * restH);
-    return { x, y, w, h: Math.max(1, Math.round(bottom + (row - used + 1) * restH) - y) };
+    // 쓰지 않는 줄: 그림 아래 남은 자리를 고르게(빈 칸 검사용). 캔버스 맨 아래 테두리·가는 선 때문에 그림 범위가
+    // 끝까지 잡혀 남은 자리가 거의 없으면 규격 격자 자리로 본다(2026-10-15 #1212: y=H를 읽어 Buffer 범위 오류로 멈췄다)
+    if (restH < H / R / 2) {
+      const y = Math.min(H - 1, Math.round((row * H) / R));
+      return { x, y, w, h: Math.max(1, Math.min(H - y, Math.round(H / R))) };
+    }
+    const y = Math.min(H - 1, Math.round(bottom + (row - used) * restH));
+    return { x, y, w, h: Math.max(1, Math.min(H - y, Math.round(bottom + (row - used + 1) * restH) - y)) };
   };
 }
 
