@@ -1,0 +1,25 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: starfall talisman — a yellow paper talisman with three falling white stars around it
+Cell 2: mountain elixir — a stone gourd with a tiny green mountain shape carved on it, moss on the stopper
+Cell 3: void salt — a small black dish holding dark grey salt crystals with a red crack glow
+Cell 4: rift mirror — a small round hand mirror whose glass shows a jagged red crack
+Cell 5: elixir of return — a tall ornate golden bottle glowing with warm white light
+Cell 6: heavenly core pill — a radiant white-gold pill floating above a small jade dish, with a halo
+Cell 7: stopped sand — a tiny golden hourglass with the falling sand frozen mid-air
+Cell 8: sky breaker talisman — a large red talisman cracked in half with golden light bursting out
+Cell 9: world seam thread — a spool of glowing silver-white thread with a needle sewing a dark crack shut
+Cell 10: abyss essence — a black crystal vial holding swirling deep red and violet liquid
+Cells 11 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+
+Fix: Correct the talisman markings visible in the previous generated sheet. Cell1 and cell8 MUST have absolutely NO calligraphy, writing, letters, glyphs, runes, seals, patterned strokes or text-like symbols anywhere on their paper. Cell1 is a completely blank yellow paper strip with THREE falling white stars AROUND it; the paper itself is plain yellow with only flat shading. Cell8 is a completely blank red paper strip cracked into two pieces with gold-white light shining from the physical tear; both red paper pieces have only flat red shading, NO marks on them. Let paper color, stars and the tear convey the subject. Preserve the other eight icons' subjects, silhouettes and cell order. Keep the existing main reference's dark outline, size and simple pixel shading; keep the stronger heroic gold/white highlights. Layout exactly FOUR columns: row1 cells1,2,3,4; row2 cells5,6,7,8; row3 ONLY cells9,10 then two EMPTY magenta cells; row4 completely EMPTY magenta. Every icon is fully contained in its own cell, bright effects included. Cells11–16 solid pure #FF00FF. No symbols that resemble writing anywhere in the whole sheet. Uniform4x4 source blocks on one grid. One full square sheet, no separate icons.
