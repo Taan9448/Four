@@ -662,6 +662,8 @@ export function usePotion(state: BattleState, slot: number, targetUid?: string):
   state.potions[slot] = null;
   state.events.push({ type: 'potion', potionId: def.id, name: def.name });
   state.log.push(`물약: ${def.name}`);
+  // 균열 소비(consume_rift)의 양은 이 물약 안에서만 센다(공허의 소금)
+  state.consumed = 0;
   runEffects(state, def.effects, { source: haun, chosenUid: targetUid });
   checkPhaseMoves(state);
   return { ok: true };

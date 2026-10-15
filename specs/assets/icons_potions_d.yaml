@@ -1,0 +1,25 @@
+id: icons_potions_d
+type: icon-sheet
+summary: 물약 아이콘 25~40(물약 5등급 개편 1) — 칸 n = 물약 icon n+24
+# 칸 번호 = data/potions.json의 icon에서 24을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 물약 아이콘(icons_potions*)과 같은 화풍·크기
+# 2026-10-15 물약 5등급 개편(영웅·전설 물약은 빛이 더 강하게)
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "pine salve — a small round wooden tin of golden pine resin ointment with a cloth wrap"
+  2: "iron pellet — two heavy dark iron balls on a small leather sling pouch"
+  3: "herb broth — a small clay bowl of steaming green herbal soup"
+  4: "fog lantern — a small paper lantern glowing pale blue inside a wisp of grey fog"
+  5: "venom jar — a squat dark green ceramic jar with a toxic green drip running down from the lid"
+  6: "purifying water — a clear glass vial of sparkling water with a white lotus petal floating"
+  7: "mirror dust — a tiny silk pouch spilling glittering silver mirror flakes"
+  8: "thunder pill — a round golden pill crackling with small yellow lightning arcs"
+  9: "glacier bomb — a round bomb made of blue ice with a frosted fuse"
+  10: "hellfire oil — a black glass bottle filled with roaring red-orange fire"
+  11: "iron wall scroll — a rolled grey scroll with a steel shield emblem on the seal"
+  12: "recall incense — a stick of incense in a small bronze holder with a curling purple smoke spiral"
+  13: "execution needle — a long thin black needle with a red tassel, gleaming at the tip"
+  14: "calming bell — a small round brass bell with a soft green ribbon and quiet sound rings"
+  15: "dragon blood pill — a large crimson pill with a tiny golden dragon scale pattern"
+  16: "heaven tea — an elegant white porcelain teacup with golden steam rising like clouds"
+placeholder: { color: '#4a5a7a', accent: '#8fd3ff' }

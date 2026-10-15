@@ -74,7 +74,12 @@
     "gold": { "battle": [10, 16], "elite": [25, 35], "boss": [55, 75] },
     "potionSlots": 3,
     "potionDrop": { "battle": 0.35, "elite": 0.6, "boss": 1 },
-    "potionWeights": { "common": 60, "uncommon": 30, "rare": 10 },
+    "potionWeights": {
+      "battle": { "common": 55, "uncommon": 32, "rare": 11, "epic": 2 },
+      "elite": { "common": 25, "uncommon": 38, "rare": 27, "epic": 10 },
+      "boss": { "rare": 40, "epic": 45, "legendary": 15 },
+      "shop": { "common": 36, "uncommon": 34, "rare": 20, "epic": 10 }
+    },
     "relicWeights": {
       "elite": { "common": 42, "uncommon": 34, "rare": 18, "epic": 6 },
       "shop": { "common": 38, "uncommon": 36, "rare": 18, "epic": 8 },
@@ -87,7 +92,7 @@
       "potions": 3,
       "cardPrice": { "common": 30, "uncommon": 45, "rare": 70, "epic": 110, "legendary": 160 },
       "relicPrice": { "common": 110, "uncommon": 150, "rare": 200, "epic": 280, "legendary": 380 },
-      "potionPrice": { "common": 30, "uncommon": 45, "rare": 65 },
+      "potionPrice": { "common": 30, "uncommon": 45, "rare": 65, "epic": 95, "legendary": 140 },
       "swapPrice": 50,
       "swapStep": 25,
       "upgradePrice": 60,

@@ -1,17 +1,22 @@
 // 경제(2026-10-08): 전투 전리품(골드·물약·유물)과 상점. 모두 시드로 정해진다(같은 시드·같은 노드면 같은 결과).
 import type { GameData } from './data';
-import type { CardDef } from './schema';
+import type { CardDef, PotionDef } from './schema';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { forgeMax, type CardInstance } from './state';
 import { engravingOffer } from './forge';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
-import { abyssShopPool, abyssShopRift, isAbyss, relicAllowed, removePrice, runOath } from './abyss';
+import { abyssShopPool, abyssShopRift, isAbyss, potionAllowed, relicAllowed, removePrice, runOath } from './abyss';
 
 type Tier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 // ───────────────────────── 전리품 ─────────────────────────
+
+/** 이 런에서 나올 수 있는 물약: 심연 전용은 심연에서만(2026-10-15 물약 5등급). 등급은 출처의 가중치(potionWeights)가 고른다 */
+export function potionPool(data: GameData, run: RunState): PotionDef[] {
+  return [...data.potions.values()].filter((p) => potionAllowed(run, p));
+}
 
 export interface Loot {
   gold: number;
@@ -58,7 +63,7 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const [lo, hi] = eco.gold[kind];
   // 굽이의 법칙 '무거운 발': 골드 두 배
   const gold = Math.round(rng.int(lo, hi) * lawRunMul(data, run, 'goldMul'));
-  const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, [...data.potions.values()], eco.potionWeights)?.id ?? null) : null;
+  const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, potionPool(data, run), eco.potionWeights[kind])?.id ?? null) : null;
   let relic: string | null = null;
   let relicChoices: string[] = [];
   // 심연의 숙적·서약 '막아선 자'의 엘리트는 유물을 떨구지 않는다(2026-10-10: 숙적이 잦은 서약이 유물 때문에 봇에게 이득이던 것)
@@ -149,9 +154,9 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
     relics.push({ relicId: def.id, price: priced(rng, sh.relicPrice[def.rarity as Tier], sh.jitter), sold: false });
   }
   const potions: ShopState['potions'] = [];
-  const potionPool = [...data.potions.values()];
+  const shopPotions = potionPool(data, run);
   for (let i = 0; i < sh.potions; i++) {
-    const def = pickByTier(rng, potionPool.filter((p) => !potions.some((x) => x.potionId === p.id)), eco.potionWeights);
+    const def = pickByTier(rng, shopPotions.filter((p) => !potions.some((x) => x.potionId === p.id)), eco.potionWeights.shop);
     if (!def) break;
     potions.push({ potionId: def.id, price: priced(rng, sh.potionPrice[def.rarity], sh.jitter), sold: false });
   }
