@@ -1,0 +1,46 @@
+{
+  "id": "card_art_abyss_6",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 10,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 10,
+  "sourceHash": "956d8dfca5add2f0",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.824,
+  "cards": [
+    "abyss_haun_fog_cleave",
+    "abyss_haun_unmoved_split",
+    "abyss_haun_law_reading",
+    "abyss_elia_clear_air",
+    "abyss_elia_thornburn",
+    "abyss_elia_star_path",
+    "abyss_kyle_quick_read",
+    "abyss_kyle_iron_peel",
+    "abyss_kyle_beat_the_clock",
+    "abyss_kyle_red_line"
+  ]
+}
