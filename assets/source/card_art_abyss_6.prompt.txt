@@ -1,0 +1,23 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: an axe blade cleaving a wall of grey fog, a red eye visible behind the gap
+Cell 2: an axe splitting a stone pillar wrapped in chains that does not move
+Cell 3: glowing blue grain lines running across a black crack shaped like a written law seal
+Cell 4: a soft gust of wind clearing a sickly green poison fog
+Cell 5: a field of black thorns burning in orange fire
+Cell 6: a narrow night path lit by a line of bright stars
+Cell 7: a sharp watching eye beside a sword, faint motion lines showing an enemy shoulder moving
+Cell 8: a sword blade peeling a plate of grey iron hide off a dark beast
+Cell 9: a sword cutting through a cracking hourglass before the red sand falls
+Cell 10: a red line drawn across the ground and a sword stepping over it
+Cells 11 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: Cell3 is NOT allowed to contain a rune, letter or readable emblem. The current cyan circle with a vertical crossbar resembles a Greek letter or magic glyph: REMOVE that complete circular-cross symbol. Depict the law seal WITHOUT WRITING: a large irregular dark patch of fractured rift material, with the same jagged BLACK crack edged by small red pixels, crossed only by two or three thin winding BLUE grain veins, like natural wood grain or mineral seams. The blue veins run obliquely and unevenly, never forming a circle, a cross, straight orthogonal bars, a letter, a number, a diagram, a rune or a recognizable written sign. It should read as observing the natural grain of a law-bound rift, not reading text. Keep cards1,2,4,5,6,7,8,9,10 on their existing subjects, order, compositions, colors and pixel style. Preserve the whole1536x1024 four-by-four sheet and384x256 cells: only1-10 used,11-16 completely flat magenta with NO grid line or outer canvas border, even at the very bottom. Keep every used picture edge-to-edge with no card frame or gaps, and do not enlarge the used rows to fill the blank region. No letters, numbers or writing-like runes anywhere.
