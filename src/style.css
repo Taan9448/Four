@@ -576,21 +576,27 @@ h1, h2, h3 { font-family: var(--f-head); }
 .liquid::before { content: ''; position: absolute; left: 50%; top: -3px; width: 300%; aspect-ratio: 1; margin-left: -150%; border-radius: 45%; will-change: transform; background: var(--liq); box-shadow: 0 0 0 1.5px var(--liq-hi), 0 -2px 4px rgba(255, 255, 255, 0.25); animation: slosh 7s linear infinite; }
 .half.mana .liquid::before { animation-duration: 9s; animation-direction: reverse; }
 .liquid::after {
-  content: ''; position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 0.8px, transparent 1.4px) 3px 0 / 19px 31px,
-    radial-gradient(circle, rgba(255, 255, 255, 0.28) 0 1.1px, transparent 1.8px) 11px 13px / 23px 43px,
-    radial-gradient(ellipse 60% 40% at 30% 35%, rgba(255, 255, 255, 0.22), transparent 70%) 0 0 / 200% 200%,
-    radial-gradient(ellipse 55% 45% at 70% 65%, rgba(0, 0, 0, 0.3), transparent 70%) 0 0 / 200% 200%,
+    radial-gradient(ellipse 60% 40% at 30% 35%, rgba(255, 255, 255, 0.22), transparent 70%) 50% 50% / 200% 200%,
+    radial-gradient(ellipse 55% 45% at 70% 65%, rgba(0, 0, 0, 0.3), transparent 70%) 50% 50% / 200% 200%,
     linear-gradient(180deg, var(--liq) 0%, var(--liq-mid) 45%, var(--liq-deep) 100%);
-  /* 배경 위치 애니메이션은 매 프레임 다시 그리므로 초당 15번만(2026-10-14 렉 줄이기) */
-  animation: churn 9s steps(135) infinite;
 }
-.no-motion .liquid::before, .no-motion .liquid::after { animation: none; }
+/* 떠오르는 기포: 무늬 한 주기(96px = 32·48의 배수)만큼 위로 옮기고 되풀이한다. 배경 위치를 바꾸면 매번 다시 그리므로
+   transform으로 옮긴다(2026-10-15 렉 줄이기 — 다시 그리지 않고 합성만). 몸(::after) 위 · 유리·숫자 아래 */
+.liquid > .bubbles { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.bubbles::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: calc(100% + 96px); will-change: transform;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 0.8px, transparent 1.4px) 3px 0 / 19px 32px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.28) 0 1.1px, transparent 1.8px) 11px 13px / 23px 48px;
+  animation: rise 2.4s linear infinite;
+}
+.half.mana .bubbles::before { animation-duration: 3s; }
+.no-motion .liquid::before, .no-motion .bubbles::before { animation: none; }
 .half.empty .liquid { display: none; }
 @keyframes slosh { to { transform: rotate(360deg); } }
-/* 기포는 위로 오르고, 밝고 어두운 얼룩은 천천히 소용돌이친다 */
-@keyframes churn { to { background-position: 3px -310px, 11px -417px, 100% 100%, -100% 50%, 0 0; } }
+@keyframes rise { to { transform: translateY(-96px); } }
 .half span { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; font: 800 calc(var(--fs-title) * 1.06)/1 var(--f-head); color: #fff; text-shadow: 0 2px 3px #000, 0 0 6px rgba(0, 0, 0, 0.85); }
 .half.neigong span { padding-left: 8%; }
 .half.mana span { padding-right: 8%; }
@@ -601,7 +607,7 @@ h1, h2, h3 { font-family: var(--f-head); }
   radial-gradient(ellipse 12% 7% at 66% 16%, rgba(255, 255, 255, 0.35), transparent 80%),
   radial-gradient(ellipse 55% 16% at 50% 92%, rgba(255, 255, 255, 0.14), transparent 75%),
   radial-gradient(circle at 50% 46%, transparent 52%, rgba(0, 0, 0, 0.32) 74%, rgba(0, 0, 0, 0.7) 100%); }
-@media (prefers-reduced-motion: reduce) { .liquid::before, .liquid::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .liquid::before, .bubbles::before { animation: none; } }
 .globe-cap { display: flex; gap: 8px; font-size: var(--fs-min); white-space: nowrap; text-shadow: 0 1px 2px #000; }
 .globe-cap .ng { color: #ffd98a; font-weight: 600; }
 .globe-cap .mn { color: #8fd3ff; font-weight: 600; }

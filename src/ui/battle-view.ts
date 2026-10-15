@@ -516,13 +516,13 @@ export class BattleView {
           h(
             'div',
             { class: `half neigong${s.neigong === 0 ? ' empty' : ''}`, style: `--fill:${pct(s.neigong, s.neigongMax)}`, ...tipAttrs(`내공 ${s.neigong} / ${s.neigongMax}`, '매 턴 다시 차는 기본 비용.', 'neigong') },
-            h('i', { class: 'liquid' }),
+            h('i', { class: 'liquid' }, h('b', { class: 'bubbles' })),
             h('span', {}, s.neigong),
           ),
           h(
             'div',
             { class: `half mana${s.mana === 0 ? ' empty' : ''}`, style: `--fill:${pct(s.mana, bal.mana.max)}`, ...tipAttrs(`마나 ${s.mana} / ${bal.mana.max}`, `세계마다 차는 양이 다른 유한 자원.\n${worldName[s.world] ?? s.world}`, 'mana') },
-            h('i', { class: 'liquid' }),
+            h('i', { class: 'liquid' }, h('b', { class: 'bubbles' })),
             h('span', {}, s.mana),
           ),
           h('i', { class: 'glass' }),
