@@ -4,6 +4,7 @@
 import type { GameData } from './data';
 import type { AchievementDef, CardDef, ModuleDef, OathMods, StageDef, World } from './schema';
 import { createRng, type Rng } from './rng';
+import { trainingGold } from './training';
 import { generateStageMap, type MapNode } from './route';
 import type { EnemyMod } from './effects';
 import type { CardInstance } from './state';
@@ -254,6 +255,8 @@ export interface AbyssStart {
   oath?: number;
   /** 일일 심연: 날짜와 그날의 법칙 */
   daily?: { date: string; laws: string[] };
+  /** 수련 레벨(계정, training.ts): 시작 금화 덤. 일일 심연에도 붙는다. 생략하면 덤 없음(봇) */
+  trainingLevel?: number;
 }
 
 /** 새 심연 런: 하운 + 동료, 시작 덱, 길(시작 유물), 1굽이 */
@@ -284,7 +287,7 @@ export function createAbyssRun(data: GameData, seed: string, start: AbyssStart):
   run.selected = run.roster.map((r) => r.id);
   run.flags = [];
   run.stats = emptyStats();
-  run.gold = (mods.startGold ?? data.balance.economy.startGold) + picks.gold;
+  run.gold = (mods.startGold ?? data.balance.economy.startGold) + picks.gold + trainingGold(data, start.trainingLevel ?? 0);
   run.scar = mods.startScar ?? 0;
   if (mods.potionSlots !== undefined) run.potions = Array.from({ length: mods.potionSlots }, () => null);
   run.abyss = {

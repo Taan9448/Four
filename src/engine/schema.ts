@@ -789,6 +789,19 @@ export const Balance = z
     /** 다음 스테이지로 넘어갈 때 출전 가능 동료 회복 비율(최대 체력 기준) */
     stage: z.object({ healOnEnter: z.number().min(0).max(1) }).strict(),
     /**
+     * 수련 레벨(2026-10-15, GAME_DESIGN 16절 '심연 개편' ④): 계정 전체 1~levelMax. 레벨 L → L+1에 xpBase + xpStep × (L−1).
+     * 경험치는 이긴 전투마다(이야기·순례·심연 모두) 노드 종류별 xp. 심연 시작 금화: abyssGold.every레벨마다 amount, levelMax에 maxBonus 더
+     */
+    training: z
+      .object({
+        levelMax: z.number().int().min(2),
+        xpBase: z.number().int().positive(),
+        xpStep: z.number().int().min(0),
+        xp: z.object({ battle: z.number().int().min(0), elite: z.number().int().min(0), boss: z.number().int().min(0) }).strict(),
+        abyssGold: z.object({ every: z.number().int().positive(), amount: z.number().int().min(0), maxBonus: z.number().int().min(0) }).strict(),
+      })
+      .strict(),
+    /**
      * 심연(GAME_DESIGN 16절): 굽이 n의 적 배율 hpBase·dmgBase × (1 + step × (n-1)), 지도 층수·노드 비율, 굽이를 넘을 때 회복,
      * 숙적 굽이, 동료 수별 길 개수·골드, 시작 카드 장수, 틈의 카드가 보상에 섞일 확률, 상점 지우기 가격, 한 방 상한(하운 최대 체력 비율), 점수
      */

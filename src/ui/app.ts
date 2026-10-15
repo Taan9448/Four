@@ -70,6 +70,8 @@ import {
   recordSkinEvent,
   writeWardrobe,
   readProfile,
+  readTraining,
+  writeTraining,
   readAbyssMeta,
   recordAbyss,
   recordChallenges,
@@ -111,6 +113,7 @@ import { codexView, type CodexTab } from './codex-view';
 import { wardrobeView } from './wardrobe-view';
 import { HARDCORE_TEXT, hardText, modeTipAttrs } from './difficulty-text';
 import { battleSkins } from '../engine/wardrobe';
+import { battleXp, gainTrainingXp, trainingGold, trainingLevel } from '../engine/training';
 import { codexCards, noteAffixes, noteBattleEnd, noteCard, noteEnemiesSeen, noteItem, noteRun, noteScene, recordsCards, type Codex } from '../engine/codex';
 
 const data = gameData();
@@ -398,6 +401,33 @@ export class App {
   /** 다음 화면에 띄울 알림 */
   private notices: string[] = [];
 
+  /** 수련 경험치(이긴 전투마다, 이야기·순례·심연 모두). 레벨이 오르면 다음 화면에 알린다 */
+  private train(nodeType: string | undefined): void {
+    if (!this.persist) return;
+    const t = readTraining();
+    const { from, to } = gainTrainingXp(data, t, battleXp(data, nodeType));
+    writeTraining(t);
+    if (to <= from) return;
+    const gold = trainingGold(data, to);
+    this.notices.push(`수련 Lv.${to}${gold > trainingGold(data, from) ? ` — 심연 시작 금화 +${gold}` : ''}`);
+  }
+
+  /** 시작 화면 계정 줄 아래: 修 수련 Lv.N과 다음 레벨까지 막대 */
+  private trainingLine(): HTMLElement {
+    const t = trainingLevel(data, readTraining().xp);
+    const gold = trainingGold(data, t.level);
+    const tip = `이긴 전투마다 오른다(이야기·순례·심연, 일반 ${data.balance.training.xp.battle} · 엘리트 ${data.balance.training.xp.elite} · 보스 ${data.balance.training.xp.boss}). ${data.balance.training.abyssGold.every}레벨마다 심연 시작 금화 +${data.balance.training.abyssGold.amount}${gold ? ` — 지금 +${gold}` : ''}.`;
+    return h(
+      'div',
+      { class: 'title-training', ...tipAttrs(`수련 Lv.${t.level}`, tip) },
+      h('b', {}, '修'),
+      h('span', {}, `수련 Lv.${t.level}`),
+      t.need
+        ? h('span', { class: 'training-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(t.need), 'aria-valuenow': String(t.into), 'aria-label': `다음 레벨까지 ${t.into}/${t.need}` }, h('i', { style: `width:${Math.round((t.into / t.need) * 100)}%` }))
+        : h('small', {}, '최고 레벨'),
+    );
+  }
+
   /** 시작 화면 메뉴 위 계정 한 줄: 「● 아이디 · 로그아웃」 또는 「게스트 · 로그인」 */
   private accountLine(): HTMLElement | null {
     if (!cloudEnabled()) return null;
@@ -474,6 +504,7 @@ export class App {
           // 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인하지 않았고 이번 접속에서 게스트도 고르지 않았으면 메뉴 대신
           gate ? h('div', { class: 'title-login' }, loginPanel({ onDone: () => this.title(), onGuest: () => this.title() })) : null,
           gate ? null : this.accountLine(),
+          gate ? null : this.trainingLine(),
           gate
             ? null
             : h(
@@ -830,6 +861,7 @@ export class App {
         // 전투가 끝나면 장소의 곡으로(지면 엔딩 화면이 멈춘다)
         playBgm(outcome.result === 'victory' ? moodFor(stage.world) : null);
         this.note((c) => noteBattleEnd(c, final.enemies.map((e) => e.defId), outcome.result === 'victory', final.tally?.moves, final.tally?.surges ?? 0));
+        if (outcome.result === 'victory') this.train(enc.node.type);
         this.clearMessages = applyBattleOutcome(data, run, enc, outcome);
         if (run.status === 'defeat') return this.map();
         // 전리품: 골드·엘리트 유물·물약은 바로 받고, 칸이 가득한 물약·보스 유물은 화면에서 고른다
@@ -1166,6 +1198,7 @@ export class App {
     const openPaths = unlockedPaths(data, meta.achievements, meta.opened);
     const openRift = unlockedRift(data, meta.achievements, meta.opened);
     const maxOath = oathMax(data, profile.abyssBestDepth, meta.oathCleared);
+    const trainLv = trainingLevel(data, readTraining().xp).level;
     let oath = Math.min(maxOath, presetOath ?? 0);
     const mates = new Set<string>(presetMates ?? ['elia']);
     const offer = pathOffer(data, seed, openPaths);
@@ -1236,6 +1269,7 @@ export class App {
         h('p', { class: 'hint' }, `심연 풀: 하운 ${counts.haun ?? 0}장 · 공용 ${counts.common ?? 0}장${fighters.map((c) => ` · ${c.name} ${counts[c.id] ?? 0}장`).join('')}. 캠페인에서 보거나 얻은 카드만 보상에 나온다 — 더 보고 오면 넓어진다.`),
         h('h3', {}, `길 — ${picks.picks}개 고르기${picks.gold ? ` (덤: 골드 +${picks.gold})` : ''}`),
         h('p', { class: 'hint' }, '동료가 적을수록 길을 더 고른다(1명: 2개와 골드 100 · 2명: 1개와 골드 50 · 3명: 1개).'),
+        ...(trainingGold(data, trainLv) ? [h('p', { class: 'hint abyss-training' }, `修 수련 Lv.${trainLv} — 시작 금화 +${trainingGold(data, trainLv)}(오늘의 심연에도)`)] : []),
         h(
           'div',
           { class: 'abyss-paths' },
@@ -1353,6 +1387,7 @@ export class App {
       pool: this.abyssPoolNow(),
       unlocked: unlockedRift(data, meta.achievements, meta.opened),
       unlockedPaths: unlockedPaths(data, meta.achievements, meta.opened),
+      trainingLevel: trainingLevel(data, readTraining().xp).level,
     });
     this.persist = true;
     recordAbyss({ started: true });
@@ -1370,6 +1405,7 @@ export class App {
       pool: this.abyssPoolNow(),
       unlocked: unlockedRift(data, readAbyssMeta(data).achievements, readAbyssMeta(data).opened),
       daily: { date: seed.slice(1), laws: plan.laws },
+      trainingLevel: trainingLevel(data, readTraining().xp).level,
     });
     this.persist = true;
     recordAbyss({ started: true });
