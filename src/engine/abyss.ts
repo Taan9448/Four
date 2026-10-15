@@ -563,6 +563,11 @@ export function abyssAddCard(data: GameData, run: RunState, cardId: string): str
 }
 
 /** 이 런에 나올 수 있는 유물인가: 길은 빼고, 심연 전용은 심연에서만(2026-10-15 심연 개편 4) */
+/** 심연 전용 물약은 심연에서만 */
+export function potionAllowed(run: RunState, p: { abyss: boolean }): boolean {
+  return !p.abyss || isAbyss(run);
+}
+
 export function relicAllowed(run: RunState, r: { rarity: string; abyss: boolean }): boolean {
   return r.rarity !== 'path' && (!r.abyss || isAbyss(run));
 }

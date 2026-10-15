@@ -1,0 +1,19 @@
+id: icons_potions_e
+type: icon-sheet
+summary: 물약 아이콘 41~50(물약 5등급 개편 2, 영웅·전설) — 칸 n = 물약 icon n+40
+# 칸 번호 = data/potions.json의 icon에서 40을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 물약 아이콘(icons_potions*)과 같은 화풍·크기
+# 2026-10-15 물약 5등급 개편(영웅·전설 물약은 빛이 더 강하게)
+frames: 10
+baseline: 0.5
+frame_notes:
+  1: "starfall talisman — a yellow paper talisman with three falling white stars around it"
+  2: "mountain elixir — a stone gourd with a tiny green mountain shape carved on it, moss on the stopper"
+  3: "void salt — a small black dish holding dark grey salt crystals with a red crack glow"
+  4: "rift mirror — a small round hand mirror whose glass shows a jagged red crack"
+  5: "elixir of return — a tall ornate golden bottle glowing with warm white light"
+  6: "heavenly core pill — a radiant white-gold pill floating above a small jade dish, with a halo"
+  7: "stopped sand — a tiny golden hourglass with the falling sand frozen mid-air"
+  8: "sky breaker talisman — a large red talisman cracked in half with golden light bursting out"
+  9: "world seam thread — a spool of glowing silver-white thread with a needle sewing a dark crack shut"
+  10: "abyss essence — a black crystal vial holding swirling deep red and violet liquid"
+placeholder: { color: '#5a3a6b', accent: '#ffe08a' }

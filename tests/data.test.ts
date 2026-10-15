@@ -147,8 +147,11 @@ describe('데이터 검사', () => {
     expect(abyssOnly).toBeLessThanOrEqual(30);
     expect(relics.filter((r) => r.rarity === 'legendary' && r.shop).map((r) => r.id)).toEqual([]);
     expect(relics.filter((r) => r.rarity === 'path' && r.abyss).map((r) => r.id)).toEqual([]);
-    expect(data.potions.size).toBeGreaterThanOrEqual(20);
-    expect(data.potions.size).toBeLessThanOrEqual(25);
+    // 물약 5등급(2026-10-15): 일반 14 · 고급 12 · 희귀 10 · 영웅 8 · 전설 6, 심연 전용 8
+    const potions = [...data.potions.values()];
+    expect(['common', 'uncommon', 'rare', 'epic', 'legendary'].map((r) => potions.filter((p) => p.rarity === r).length)).toEqual([14, 12, 10, 8, 6]);
+    expect(potions.filter((p) => p.abyss).length).toBe(8);
+    expect(new Set(potions.map((p) => p.icon)).size).toBe(potions.length);
   });
 
   it('보유·편성(9-1): 싸우는 동료와 공용의 시작 카드가 편성 칸보다 많고, 필수 카드는 이야기로만 얻는다', () => {
