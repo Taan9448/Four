@@ -69,6 +69,8 @@ export function initAudio(): void {
   const unlock = () => {
     start();
     if (ctx?.state === 'suspended') void ctx.resume();
+    // 브라우저가 입력 밖의 재생을 막았으면(일부 휴대폰 브라우저) 다음 입력 때 지금 곡을 다시 튼다
+    if (playing?.media?.el.paused && !document.hidden) resumeMedia(playing);
   };
   window.addEventListener('pointerdown', unlock, { capture: true });
   window.addEventListener('keydown', unlock, { capture: true });

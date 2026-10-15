@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 class FakeAudio {
   static all: FakeAudio[] = [];
+  /** 브라우저가 입력 밖의 재생을 막는 흉내 */
+  static blocked = false;
   paused = true;
   loop = false;
   preload = '';
@@ -25,7 +27,7 @@ class FakeAudio {
   }
   load() {}
   play() {
-    if (!this.src) return Promise.reject(new Error('no source'));
+    if (!this.src || FakeAudio.blocked) return Promise.reject(new Error('not allowed'));
     this.paused = false;
     return Promise.resolve();
   }
@@ -66,6 +68,7 @@ beforeEach(() => {
   vi.resetModules();
   vi.useFakeTimers();
   FakeAudio.all = [];
+  FakeAudio.blocked = false;
   decodes = 0;
   winHandlers.clear();
   docHandlers.clear();
@@ -144,5 +147,17 @@ describe('배경음악 흘려 듣기', () => {
     m.playBgm(null);
     await vi.advanceTimersByTimeAsync(2000);
     expect(FakeAudio.all.filter((a) => !a.paused || a.getAttribute('src'))).toEqual([]);
+  });
+
+  it('브라우저가 재생을 막았으면 다음 입력 때 지금 곡을 다시 튼다', async () => {
+    const m = await audio();
+    FakeAudio.blocked = true;
+    m.playBgm('ending');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(FakeAudio.all.filter((a) => !a.paused)).toEqual([]);
+    FakeAudio.blocked = false;
+    fire(winHandlers, 'keydown');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(FakeAudio.all.filter((a) => !a.paused).map(name)).toEqual(['ending']);
   });
 });
