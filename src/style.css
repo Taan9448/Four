@@ -83,15 +83,15 @@ h1, h2, h3 { font-family: var(--f-head); }
 .title-art { position: absolute; inset: 0; background: center / 100% 100% no-repeat; }
 .title-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
 /* 하늘의 금: 붉은 빛이 숨쉬다 가끔 번쩍 */
-.title-crack { position: absolute; left: 47.5%; width: 5%; top: -2%; height: 62%; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse 50% 52% at 50% 42%, rgba(255, 70, 50, 0.85), rgba(255, 40, 40, 0.25) 45%, transparent 72%); filter: blur(6px); animation: title-crack 4.2s ease-in-out infinite; }
+.title-crack { position: absolute; left: 47.5%; width: 5%; top: -2%; height: 62%; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse 50% 52% at 50% 42%, rgba(255, 70, 50, 0.85), rgba(255, 40, 40, 0.25) 45%, transparent 78%); animation: title-crack 4.2s ease-in-out infinite; }
 @keyframes title-crack { 0%, 100% { opacity: 0.18; } 45% { opacity: 0.55; } 50% { opacity: 0.95; } 53% { opacity: 0.4; } 60% { opacity: 0.62; } }
 /* 두 달의 달무리 */
 .title-moon { position: absolute; border-radius: 50%; aspect-ratio: 1; pointer-events: none; mix-blend-mode: screen; animation: title-moon 7s ease-in-out infinite; }
 .title-moon.a { left: 73.5%; top: 2.5%; width: 12%; background: radial-gradient(circle, rgba(230, 240, 255, 0.55), rgba(180, 210, 255, 0.18) 45%, transparent 70%); }
 .title-moon.b { left: 85.7%; top: 3.7%; width: 7%; background: radial-gradient(circle, rgba(140, 200, 255, 0.6), rgba(90, 160, 255, 0.2) 45%, transparent 70%); animation-delay: -3.5s; }
 @keyframes title-moon { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
-/* 운해: 아래 구름 띠 두 겹이 반대로 흐른다 */
-.title-mist { position: absolute; left: -30%; width: 160%; pointer-events: none; background: radial-gradient(ellipse 18% 55% at 20% 50%, rgba(255, 252, 244, 0.32), transparent 70%), radial-gradient(ellipse 22% 60% at 55% 55%, rgba(255, 252, 244, 0.26), transparent 70%), radial-gradient(ellipse 16% 50% at 85% 45%, rgba(225, 235, 255, 0.28), transparent 70%); filter: blur(4px); }
+/* 운해: 아래 구름 띠 두 겹이 반대로 흐른다. 그러데이션이 이미 흐리므로 filter: blur는 걸지 않는다(2026-10-15 렉 줄이기 — 화면 폭 1.6배 층을 매 프레임 흐리던 것) */
+.title-mist { position: absolute; left: -30%; width: 160%; pointer-events: none; background: radial-gradient(ellipse 18% 55% at 20% 50%, rgba(255, 252, 244, 0.32), transparent 70%), radial-gradient(ellipse 22% 60% at 55% 55%, rgba(255, 252, 244, 0.26), transparent 70%), radial-gradient(ellipse 16% 50% at 85% 45%, rgba(225, 235, 255, 0.28), transparent 70%); }
 .title-mist.a { top: 52%; height: 22%; animation: title-drift 46s linear infinite; }
 .title-mist.b { top: 66%; height: 26%; animation: title-drift 70s linear infinite reverse; }
 @keyframes title-drift { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
