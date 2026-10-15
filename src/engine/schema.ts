@@ -799,7 +799,8 @@ export const Balance = z
         hpStep: z.number().min(0),
         dmgStep: z.number().min(0),
         /** 깊은 굽이 가속(2026-10-10, 2단계): from굽이부터는 굽이마다 hpStep·dmgStep 대신 이 값만큼 오른다 */
-        deep: z.object({ from: z.number().int().positive(), hpStep: z.number().min(0), dmgStep: z.number().min(0) }).strict().optional(),
+        /** 깊은 굽이 구간: from굽이부터 다음 구간 전까지 굽이마다 hpStep·dmgStep씩 더(2026-10-15: 구간을 여럿 둘 수 있다) */
+        deep: z.array(z.object({ from: z.number().int().positive(), hpStep: z.number().min(0), dmgStep: z.number().min(0) }).strict()).min(1).optional(),
         /** 캠페인 보유 카드를 심연 풀로 가져올 때 강화 상한(그 위는 심연 안 강화로만) */
         importMax: z.number().int().min(0).default(2),
         floors: z.number().int().positive(),
@@ -838,8 +839,13 @@ export const Balance = z
         riftFrom: z.number().int().positive(),
         score: z.object({ depth: z.number(), boss: z.number(), elite: z.number(), hp: z.number() }).strict(),
         // ── 2차(변동성) ──
-        /** 굽이의 법칙: [이 굽이부터, 개수]. 큰 굽이가 이긴다 */
+        /** 굽이의 법칙: [이 굽이부터, 개수]. 큰 굽이가 이긴다(2026-10-15: 최대 5) */
         lawsAt: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])),
+        /**
+         * 법칙 등급이 뽑힐 무게(2026-10-15 사용자 결정 — 깊을수록 가혹한 법칙): [이 굽이부터, [순한, 보통, 가혹]]. 큰 굽이가 이긴다.
+         * 자리마다 등급을 무게로 고른 뒤 그 등급에서 하나(같은 굽이에서 겹치지 않는다). 남은 법칙이 없는 등급은 건너뛴다
+         */
+        lawTiers: z.array(z.tuple([z.number().int().positive(), z.tuple([z.number().min(0), z.number().min(0), z.number().min(0)])])).min(1),
         /** 접사: 엘리트·일반 적 한 마리에 붙는 개수 [이 굽이부터, 개수] */
         affixesAt: z.object({ elite: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])), normal: z.array(z.tuple([z.number().int().positive(), z.number().int().min(0)])) }).strict(),
         /** 심연의 상흔 가중(scar 모듈이 더 자주) */
@@ -911,6 +917,8 @@ export const LawDef = z
     /** 아이콘 시트(icons_abyss_laws)의 칸 번호(1부터). 그림이 오기 전에는 glyph 한 글자 */
     icon: z.number().int().positive().optional(),
     description: z.string(),
+    /** 등급(2026-10-15): 순한(대가와 이득이 같이) · 보통 · 가혹. 깊은 굽이일수록 가혹이 잘 걸린다(balance.abyss.lawTiers) */
+    tier: z.enum(['mild', 'normal', 'harsh']).default('normal'),
     battle: z
       .object({
         startEffects: z.array(Effect).default([]),
@@ -946,6 +954,8 @@ export const AffixDef = z
     deathEffects: z.array(Effect).default([]),
     firstTurnExtra: z.number().int().min(0).optional(),
     boss: z.boolean().default(true),
+    /** 이 굽이부터 붙을 수 있다(2026-10-15: 부동처럼 센 접사는 깊은 굽이에서만) */
+    minDepth: z.number().int().positive().optional(),
   })
   .strict();
 export type AffixDef = z.infer<typeof AffixDef>;

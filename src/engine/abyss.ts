@@ -3,7 +3,7 @@
 // 보상 풀은 이 저장 칸의 보유 카드 + 도감에 기록된 카드(본 적 있는 카드)와 열린 틈의 카드. 얻은 카드는 덱에만 들어간다(보유 목록과 무관).
 import type { GameData } from './data';
 import type { AchievementDef, CardDef, ModuleDef, OathMods, StageDef, World } from './schema';
-import { createRng } from './rng';
+import { createRng, type Rng } from './rng';
 import { generateStageMap, type MapNode } from './route';
 import type { EnemyMod } from './effects';
 import type { CardInstance } from './state';
@@ -332,13 +332,7 @@ export function planLoop(data: GameData, ab: AbyssState, depth: number): { world
   // 법칙: 굽이 표(서약 '첫 굽이의 법칙'이면 최소 lawsMin) + 일일 심연의 그날 법칙(모든 굽이에)
   const fixed = ab.dailyLaws ?? [];
   const count = Math.max(scheduled(cfg.lawsAt, depth), mods.lawsMin ?? 0);
-  const laws = [
-    ...fixed,
-    ...createRng(ab.baseSeed)
-      .fork(`abyss:laws:${depth}`)
-      .shuffle([...data.laws.keys()].filter((id) => !fixed.includes(id)))
-      .slice(0, count),
-  ];
+  const laws = [...fixed, ...pickLaws(data, createRng(ab.baseSeed).fork(`abyss:laws:${depth}`), depth, count, fixed)];
   if (depth % nemesisEvery(data, ab) === 0) return { world: 'rift', boss: cfg.nemesisModule, stageId: rng.pick(cfg.worlds.rift.stages), laws };
   const all = Object.keys(cfg.worlds) as World[];
   // 보스 하한(bossMinDepth): 아직 나올 수 없는 보스는 빼고, 보스가 모두 막힌 세계는 이 굽이 후보에서 뺀다(보스 없는 세계는 다른 세계 보스를 쓴다)
@@ -356,6 +350,38 @@ export function planLoop(data: GameData, ab: AbyssState, depth: number): { world
 
 /** 숙적 굽이 간격(서약 '가까운 숙적'이면 좁다) */
 export const nemesisEvery = (data: GameData, ab: Pick<AbyssState, 'oath'>) => oathMods(data, ab.oath ?? 0).nemesisEvery ?? data.balance.abyss.nemesisEvery;
+
+const LAW_TIERS = ['mild', 'normal', 'harsh'] as const;
+/** 법칙이 덮어쓰는 전투 값(둘이 겹치면 하나만 먹으므로 함께 뽑지 않는다) */
+const overrides = (data: GameData, id: string): string[] => {
+  const b = data.laws.get(id)?.battle;
+  return b ? (['handSize', 'neigongPerTurn', 'manaPerTurn'] as const).filter((k) => b[k] !== undefined) : [];
+};
+
+/**
+ * 굽이의 법칙 count개(2026-10-15 사용자 결정): 자리마다 등급(순한·보통·가혹)을 balance.abyss.lawTiers의 무게로 고르고 그 등급에서 하나.
+ * 같은 굽이에서 겹치지 않고, 남은 법칙이 없는 등급은 건너뛴다(무게가 모두 0이면 남은 아무 등급에서). exclude: 이미 붙은 법칙(일일 심연)
+ */
+export function pickLaws(data: GameData, rng: Rng, depth: number, count: number, exclude: string[] = []): string[] {
+  let weights: [number, number, number] = [1, 1, 1];
+  for (const [from, w] of [...data.balance.abyss.lawTiers].sort((a, b) => a[0] - b[0])) if (depth >= from) weights = w;
+  const left = new Map(LAW_TIERS.map((t) => [t, rng.shuffle([...data.laws.values()].filter((l) => l.tier === t && !exclude.includes(l.id)).map((l) => l.id))]));
+  // 같은 값을 덮어쓰는 법칙(손패 수·내공·마나)은 한 굽이에 함께 걸리지 않는다
+  const taken = new Set<string>(exclude.flatMap((id) => overrides(data, id)));
+  for (const t of LAW_TIERS) left.set(t, left.get(t)!.filter((id) => !overrides(data, id).some((k) => taken.has(k))));
+  const out: string[] = [];
+  while (out.length < count) {
+    const open = LAW_TIERS.map((t, i) => ({ t, w: left.get(t)!.length ? weights[i] : 0, n: left.get(t)!.length }));
+    if (!open.some((o) => o.n)) break;
+    const pool = open.some((o) => o.w > 0) ? open.filter((o) => o.w > 0) : open.filter((o) => o.n);
+    const tier = rng.weighted(pool, (o) => o.w || 1)!.t;
+    const id = left.get(tier)!.shift()!;
+    out.push(id);
+    for (const k of overrides(data, id)) taken.add(k);
+    for (const t of LAW_TIERS) left.set(t, left.get(t)!.filter((x) => !overrides(data, x).some((k) => taken.has(k))));
+  }
+  return out;
+}
 
 /** [이 굽이부터, 개수] 표에서 depth의 개수(가장 큰 시작 굽이가 이긴다) */
 export function scheduled(table: [number, number][], depth: number): number {
@@ -473,7 +499,7 @@ export function abyssEnemyMods(data: GameData, run: RunState, moduleId: string, 
           ? scheduled(cfg.affixesAt.normal, ab.depth)
           : 0;
     if (!count) return undefined;
-    const pool = all.filter((a) => def.tier !== 'boss' || a.boss);
+    const pool = all.filter((a) => (def.tier !== 'boss' || a.boss) && ab.depth >= (a.minDepth ?? 1));
     return { affixes: rng.shuffle(pool.map((a) => a.id)).slice(0, count) };
   });
 }
@@ -645,16 +671,22 @@ export function stageNorm(data: GameData, stageId: string): { hp: number; dmg: n
   return out;
 }
 
-/** 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). deep.from굽이부터는 굽이마다 deep 단계만큼 오른다 */
+/**
+ * 지금 굽이의 적 배율(굽이 n: 기본 × (1 + step × (n-1))). 깊은 굽이 구간(deep)이 있으면 첫 구간의 from굽이부터는
+ * 굽이마다 그 구간의 단계만큼 오른다(구간마다 다음 구간 from까지)
+ */
 export function abyssScale(data: GameData, depth: number): { hp: number; dmg: number } {
   const cfg = data.balance.abyss;
-  const from = cfg.deep?.from ?? Infinity;
-  const near = Math.min(depth, from) - 1;
-  const far = Math.max(0, depth - from);
-  return {
-    hp: cfg.hpBase * (1 + cfg.hpStep * near + (cfg.deep?.hpStep ?? 0) * far),
-    dmg: cfg.dmgBase * (1 + cfg.dmgStep * near + (cfg.deep?.dmgStep ?? 0) * far),
-  };
+  const tiers = [...(cfg.deep ?? [])].sort((a, b) => a.from - b.from);
+  const near = Math.min(depth, tiers[0]?.from ?? Infinity) - 1;
+  let hp = 1 + cfg.hpStep * near;
+  let dmg = 1 + cfg.dmgStep * near;
+  tiers.forEach((t, i) => {
+    const n = Math.max(0, Math.min(depth, tiers[i + 1]?.from ?? Infinity) - t.from);
+    hp += t.hpStep * n;
+    dmg += t.dmgStep * n;
+  });
+  return { hp: cfg.hpBase * hp, dmg: cfg.dmgBase * dmg };
 }
 
 /** 점수: 넘은 굽이 × depth + 보스 × boss + 엘리트 × elite + 남은 하운 체력 비율 × hp */

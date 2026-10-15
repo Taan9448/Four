@@ -19,7 +19,7 @@ import { sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { affinityChip, elementMark, gaugeChip, iconEl, INTENT_LABEL, intentIcon, statusChip } from './icons';
+import { affinityChip, elementMark, gaugeChip, INTENT_LABEL, lawIconEl, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
 import { openShortcuts, settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
@@ -286,7 +286,7 @@ export class BattleView {
         this.ctx.introText ? this.introEl() : null,
         this.riftEl,
         this.ctx.laws?.length
-          ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name)))
+          ? h('div', { class: 'law-badges' }, this.ctx.laws.map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l.name}`, l.description, 'rift') }, lawIconEl(l), l.name)))
           : null,
       ),
       this.logEl,

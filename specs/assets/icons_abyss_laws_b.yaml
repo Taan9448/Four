@@ -1,0 +1,20 @@
+id: icons_abyss_laws_b
+type: icon-sheet
+summary: 심연 굽이의 법칙 아이콘 10~20(2026-10-15 법칙 20개 확장) — 칸 n = data/abyss_laws.json의 icon n+9
+# 칸 번호 = 법칙의 icon에서 9를 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. icons_abyss_laws와 같은 틀(검붉은 테두리의 둥근 패 안에 기호 하나)·크기·화풍
+# 등급: 칸 1~2 순한 · 3~6 보통 · 7~11 가혹(가혹은 기호에 붉은 빛을 조금 더)
+frames: 11
+baseline: 0.5
+frame_notes:
+  1: "still water — a calm round pond surface with one small ripple and a small shield shape reflected in it, inside a thin dark crimson ring"
+  2: "high tide moon — a bright full moon rising over a small wave, a tiny blue mana drop beside it, inside a thin dark crimson ring"
+  3: "thorn field — a patch of ground covered with sharp black thorns, inside a thin dark crimson ring"
+  4: "iron hide — a piece of hide plated with grey iron scales, inside a thin dark crimson ring"
+  5: "rift wind — a gust of wind carrying a thin black crack shard, inside a thin dark crimson ring"
+  6: "angry sky — a dark storm sky with a frowning cloud and a small red glow, inside a thin dark crimson ring"
+  7: "unmoving ground — a foot pinned to cracked stone by heavy chains, a faint red glow, inside a thin dark crimson ring"
+  8: "narrow path — a very narrow mountain path squeezed between two dark cliffs, inside a thin dark crimson ring"
+  9: "miasma — a sickly green fog cloud with a small skull shape, inside a thin dark crimson ring"
+  10: "rushing rift — an hourglass cracking open with sand bursting out and a red flame, inside a thin dark crimson ring"
+  11: "withered land — dry cracked earth with a single dead plant and no water, inside a thin dark crimson ring"
+placeholder: { color: '#4b3a6b', accent: '#ff3b3b' }

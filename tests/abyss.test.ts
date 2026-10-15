@@ -38,15 +38,17 @@ describe('심연', () => {
     expect(abyssPool(data, { elia_fireball: 5 }, []).elia_fireball).toBe(data.balance.abyss.importMax);
   });
 
-  it('배율: deep.from굽이부터 굽이마다 더 가파르게 오른다', () => {
+  it('배율: 깊은 굽이 구간마다 그 구간의 단계만큼 오른다(구간 경계에서 이어진다)', () => {
     const ab = data.balance.abyss;
-    const deep = ab.deep!;
+    const tiers = ab.deep!;
     const at = (n: number) => abyssScale(data, n);
     expect(at(1)).toEqual({ hp: ab.hpBase, dmg: ab.dmgBase });
-    expect(at(deep.from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (deep.from - 1)));
-    expect(at(deep.from + 1).hp - at(deep.from).hp).toBeCloseTo(ab.hpBase * deep.hpStep);
-    expect(at(deep.from + 1).dmg - at(deep.from).dmg).toBeCloseTo(ab.dmgBase * deep.dmgStep);
-    expect(at(deep.from).hp - at(deep.from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+    expect(at(tiers[0].from).hp).toBeCloseTo(ab.hpBase * (1 + ab.hpStep * (tiers[0].from - 1)));
+    expect(at(tiers[0].from).hp - at(tiers[0].from - 1).hp).toBeCloseTo(ab.hpBase * ab.hpStep);
+    tiers.forEach((t) => {
+      expect(at(t.from + 1).hp - at(t.from).hp).toBeCloseTo(ab.hpBase * t.hpStep);
+      expect(at(t.from + 1).dmg - at(t.from).dmg).toBeCloseTo(ab.dmgBase * t.dmgStep);
+    });
   });
 
   it('숙적과 서약 막아선 자의 엘리트는 유물을 떨구지 않는다(골드는 그대로)', async () => {
@@ -228,11 +230,11 @@ describe('심연', () => {
 });
 
 describe('심연 2차', () => {
-  it('법칙: 2굽이 1개 · 5굽이 2개 · 9굽이 3개, 겹치지 않는다', async () => {
+  it('법칙: 2굽이 1개 · 5굽이 2개 · 9굽이 3개 · 13굽이 4개 · 17굽이 5개(최대), 겹치지 않는다', async () => {
     const { planLoop: plan } = await import('../src/engine/abyss');
     const ab = start('L1', ['elia']).abyss!;
     expect(ab.laws).toEqual([]);
-    for (const [d, n] of [[2, 1], [4, 1], [5, 2], [8, 2], [9, 3], [14, 3]] as const) {
+    for (const [d, n] of [[2, 1], [4, 1], [5, 2], [8, 2], [9, 3], [12, 3], [13, 4], [17, 5], [30, 5]] as const) {
       const laws = plan(data, ab, d).laws;
       expect(laws.length).toBe(n);
       expect(new Set(laws).size).toBe(n);
@@ -417,5 +419,85 @@ describe('보스 하한(2026-10-12 A2)', () => {
       const run = start(`VARG${i}`, ['elia', 'kyle']);
       for (let d = 1; d < min; d++) expect(planLoop(data, run.abyss!, d).boss).not.toBe('s5_boss_vargas');
     }
+  });
+});
+
+// 심연 개편(2026-10-15, GAME_DESIGN 16절 '심연 개편'): 배율 완만화 · 법칙 20개 등급 가중 · 접사 14개 · 부동
+describe('심연 개편 — 법칙·접사·배율', () => {
+  it('배율: 굽이가 깊어져도 줄지 않는다(6~10굽이는 숨 고르기, 11~15굽이가 가장 가파르다)', () => {
+    const at = (n: number) => abyssScale(data, n);
+    for (let d = 2; d <= 30; d++) expect(at(d).hp).toBeGreaterThanOrEqual(at(d - 1).hp);
+    expect(at(10).hp).toBeCloseTo(at(6).hp);
+    expect(at(15).hp - at(11).hp).toBeGreaterThan(at(20).hp - at(16).hp);
+  });
+
+  it('법칙 20개: 등급(순한·보통·가혹)이 고루 있고, 깊을수록 가혹이 많이 걸린다', async () => {
+    const { pickLaws } = await import('../src/engine/abyss');
+    const { createRng } = await import('../src/engine/rng');
+    expect(data.laws.size).toBe(20);
+    for (const t of ['mild', 'normal', 'harsh']) expect([...data.laws.values()].some((l) => l.tier === t)).toBe(true);
+    const harshShare = (depth: number, count: number) => {
+      let harsh = 0;
+      let all = 0;
+      for (let i = 0; i < 200; i++) {
+        const laws = pickLaws(data, createRng(`H${i}`), depth, count);
+        expect(new Set(laws).size).toBe(laws.length);
+        harsh += laws.filter((id) => data.laws.get(id)!.tier === 'harsh').length;
+        all += laws.length;
+      }
+      return harsh / all;
+    };
+    // 1~4굽이는 가혹이 나오지 않는다
+    expect(harshShare(2, 1)).toBe(0);
+    expect(harshShare(9, 3)).toBeGreaterThan(harshShare(5, 2));
+    expect(harshShare(17, 5)).toBeGreaterThan(harshShare(9, 3));
+  });
+
+  it('법칙: 손패 수·내공·마나를 덮어쓰는 법칙은 한 굽이에 둘 걸리지 않는다(일일 심연 고정 법칙과도)', async () => {
+    const { pickLaws } = await import('../src/engine/abyss');
+    const { createRng } = await import('../src/engine/rng');
+    const keys = ['handSize', 'neigongPerTurn', 'manaPerTurn'] as const;
+    for (let i = 0; i < 300; i++) {
+      const fixed = i % 2 ? ['two_moons'] : [];
+      const laws = [...fixed, ...pickLaws(data, createRng(`C${i}`), 17, 5 - fixed.length, fixed)];
+      for (const k of keys) expect(laws.filter((id) => data.laws.get(id)!.battle?.[k] !== undefined).length).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('부동: 기절·빙결·마비가 걸리지 않고 냉기·감전도 쌓이지 않는다(부동의 땅 법칙)', async () => {
+    const { addStatus } = await import('../src/engine/effects');
+    const run = start('SF1', ['elia']);
+    const enc = enterNode(data, run, availableNodes(run)[0].id);
+    const b = createBattle(data, { ...battleSetupFor(data, run, enc), laws: ['unmoving'] });
+    const e = b.enemies[0];
+    expect(e.statuses.steadfast ?? 0).toBeGreaterThan(0);
+    for (const s of ['stun', 'bind', 'paralyze', 'chill', 'shock']) {
+      addStatus(b, e, s, 1);
+      expect(e.statuses[s] ?? 0).toBe(0);
+    }
+    // 약화 같은 다른 상태는 그대로 걸린다
+    addStatus(b, e, 'weak', 1);
+    expect(e.statuses.weak).toBe(1);
+  });
+
+  it('접사 14개: minDepth가 있는 접사(흔들림 없는 · 틈에서 난)는 그 굽이 전에는 붙지 않는다', async () => {
+    const { abyssEnemyMods } = await import('../src/engine/abyss');
+    expect(data.affixes.size).toBe(14);
+    const gated = [...data.affixes.values()].filter((a) => a.minDepth);
+    expect(gated.map((a) => a.id).sort()).toEqual(['rift_born', 'steadfast']);
+    const elite = [...data.enemies.values()].find((e) => e.tier === 'elite')!;
+    const seen = (depth: number) => {
+      const ids = new Set<string>();
+      for (let i = 0; i < 80; i++) {
+        const run = start(`MD${i}`, ['elia']);
+        run.abyss!.depth = depth;
+        for (const a of abyssEnemyMods(data, run, 'x', { id: `n${i}` }, [elite.id])[0]?.affixes ?? []) ids.add(a);
+      }
+      return ids;
+    };
+    const early = seen(5);
+    expect(early.has('steadfast') || early.has('rift_born')).toBe(false);
+    const deep = seen(12);
+    expect(deep.has('steadfast') && deep.has('rift_born')).toBe(true);
   });
 });

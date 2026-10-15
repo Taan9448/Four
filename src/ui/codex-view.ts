@@ -13,7 +13,7 @@ import { cardView } from './card-view';
 import { h } from './dom';
 import { startRiftMaxText } from './map-view';
 import { glossaryTab } from './glossary-view';
-import { iconEl } from './icons';
+import { affixIconEl, lawIconEl } from './icons';
 import { potionChip, relicChip } from './items';
 import { mainTitle, setMainTitle, type Profile } from './storage';
 import { installTooltips } from './tooltip';
@@ -556,12 +556,12 @@ function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMet
     section(
       '굽이의 법칙',
       `${(codex.laws ?? []).length} / ${data.laws.size}`,
-      h('div', { class: 'codex-items' }, [...data.laws.values()].map((l) => ((codex.laws ?? []).includes(l.id) ? named(iconEl('icons_abyss_laws', l.icon, l.glyph, 'law-icon'), l.name, l.description) : unknown()))),
+      h('div', { class: 'codex-items' }, [...data.laws.values()].map((l) => ((codex.laws ?? []).includes(l.id) ? named(lawIconEl(l), l.name, l.description) : unknown()))),
     ),
     section(
       '접사',
       `${(codex.affixes ?? []).length} / ${data.affixes.size}`,
-      h('div', { class: 'codex-items' }, [...data.affixes.values()].map((a) => ((codex.affixes ?? []).includes(a.id) ? named(iconEl('icons_abyss_affixes', a.icon, a.glyph, 'law-icon'), a.name, a.description) : unknown()))),
+      h('div', { class: 'codex-items' }, [...data.affixes.values()].map((a) => ((codex.affixes ?? []).includes(a.id) ? named(affixIconEl(a), a.name, a.description) : unknown()))),
     ),
   );
 }

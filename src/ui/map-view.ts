@@ -6,7 +6,7 @@ import { scarStartRift } from '../engine/battle';
 import { challengeDone, challengeState, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
-import { artOrGlyph, iconEl } from './icons';
+import { artOrGlyph, lawIconEl } from './icons';
 import { isDebug } from './debug';
 import { runTour, type TourStep } from './tour';
 import { installTooltips, tipAttrs } from './tooltip';
@@ -616,7 +616,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             ? h(
                 'div',
                 { class: 'law-badges' },
-                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, iconEl('icons_abyss_laws', l!.icon, l!.glyph, 'law-icon'), l!.name)),
+                run.abyss.laws.map((id) => data.laws.get(id)).filter(Boolean).map((l) => h('span', { class: 'law-badge', ...tipAttrs(`굽이의 법칙 — ${l!.name}`, l!.description, 'rift') }, lawIconEl(l!), l!.name)),
               )
             : null,
           h(
