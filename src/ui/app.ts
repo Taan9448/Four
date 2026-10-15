@@ -45,11 +45,13 @@ import { openDeck } from './deck-view';
 import { relicChip } from './items';
 import { h } from './dom';
 import { initDebug, isDebug } from './debug';
+import { bootCloud, cloudEnabled, cloudState, onCloudChange } from './cloud';
+import { askWhich } from './cloud-view';
 import { mapView, openPartyGuide, pilgrimLabel, placeName, startRiftMaxText } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
-import { applySettings, BUILD_SHORT, settings, settingsForm } from './settings';
+import { applySettings, BUILD_SHORT, settings, settingsForm, type SettingsTab } from './settings';
 import { sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
@@ -146,6 +148,9 @@ export class App {
     initDebug(params);
     // ?debug: 브라우저 점검(전투 재진입·곡 전환 반복, tools/perf-check.mjs)에서 앱을 직접 부른다
     if (isDebug()) Object.assign(window, { __app: this, __bgm: playBgm });
+    // 계정·클라우드 저장: 로그인에서 돌아왔거나(?code=) 로그인해 둔 적이 있으면 계정과 맞춘다(아래 화면 고르기보다 먼저 주소를 읽는다)
+    void bootCloud(params, askWhich, (text) => this.flash(text));
+    onCloudChange(() => document.querySelector('.title-account')?.classList.toggle('signed-in', Boolean(cloudState().user)));
     const seed = params.get('seed');
     if (params.has('screen')) this.screen(params.get('screen') || 'reward', params.get('module') ?? undefined, params.get('stage') ?? 's2');
     else if (params.has('sandbox'))
@@ -384,6 +389,13 @@ export class App {
 
   /** 다음 화면에 띄울 알림 */
   private notices: string[] = [];
+
+  /** 지금 화면에 바로 띄우는 알림(로그인 결과 등) */
+  private flash(text: string): void {
+    const host = (this.root.firstElementChild as HTMLElement | null) ?? this.root;
+    const box = host.querySelector<HTMLElement>(':scope > .toasts') ?? host.appendChild(h('div', { class: 'toasts' }));
+    toast(box, text, 'support', 3200);
+  }
   /** 끝 화면에 띄울 알림(엔딩 장면을 건너서) */
   private pendingNews: string[] = [];
 
@@ -461,6 +473,15 @@ export class App {
             : null,
           h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
+          // 계정(2026-10-15): 로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다 — 설정 › 저장의 계정 칸을 연다
+          cloudEnabled()
+            ? h(
+                'button',
+                { class: `medal title-medal title-account${cloudState().user ? ' signed-in' : ''}`, 'aria-label': '계정', ...tipAttrs('계정', '로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다'), onclick: () => this.openSettings('save') },
+                h('b', {}, '名'),
+                h('span', {}, '계정'),
+              )
+            : null,
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
         h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),
@@ -565,9 +586,9 @@ export class App {
     this.map();
   }
 
-  private openSettings(): void {
+  private openSettings(tab?: SettingsTab): void {
     // 설정의 '용어 보기' → 도감 '용어' 탭(2026-10-12 C2)
-    const ov = openOverlay('설정', settingsForm({ onGlossary: () => (ov.close(), this.codex('glossary')) }));
+    const ov = openOverlay('설정', settingsForm({ tab, onGlossary: () => (ov.close(), this.codex('glossary')) }));
   }
 
   /** stageId(?stage=s2): 앞 스테이지를 건너뛰고 시작(확인용, createRunAt) */
