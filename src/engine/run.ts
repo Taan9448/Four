@@ -54,6 +54,10 @@ export interface RunState {
   collection: Record<string, number>;
   /** 대강화 천장: 카드 id(심연은 카드 uid) → 지금 단계에서 실패한 횟수. 성공하면 지운다 */
   forgeFails?: Record<string, number>;
+  /** 캠페인 보유 카드의 대강화 각인: 카드 id → 각인 id(고른 순서). 심연은 카드 인스턴스의 marks */
+  engravings?: Record<string, string[]>;
+  /** 대강화에 성공해 고를 각인(상점을 떠나면 첫 후보로 새긴다) */
+  forgePending?: { uid: string; cardId: string; level: number; choices: string[] } | null;
   /** 편성: 주인(동료 id·'common') → 카드 id */
   loadout: Loadout;
   /** 갈래 보너스(출발 편성 기준): 동료 id → 켜진 아키타입 id(GAME_DESIGN 9-1) */

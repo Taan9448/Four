@@ -1,7 +1,7 @@
 // 카드 문구 자동 생성. 카드 JSON에 text가 없으면 효과로부터 만든다.
 import type { GameData } from './data';
 import type { Effect, Element, UpgradeSkill } from './schema';
-import { resolveCard, type CardInstance } from './state';
+import { resolveCard, type CardInstance, type ResolvedCard } from './state';
 import { defaultTargetFor } from './effects';
 
 /** 속성 이름(카드 문구·의도·약점 표시) */
@@ -279,19 +279,17 @@ export function skillText(data: GameData, skill: UpgradeSkill, cardTarget?: stri
   return `★${skill.name}: ${parts.join(', ')}`;
 }
 
-/** 대강화(+6~+10) 줄: 이름과 풀이. 수치는 본문에 이미 반영돼 있다 */
-export function forgeLines(data: GameData, forge: number): { level: number; name: string; text: string }[] {
-  const f = data.balance.upgrade.forge;
-  const pct = (m: number) => `${Math.round((m - 1) * 100)}%`;
-  const all = [
-    { name: '단련', text: `수치 +${pct(f.numberMul)}` },
-    { name: '경량', text: '비용 −1' },
-    { name: '보존', text: '유지 추가' },
-    { name: '쌍격', text: '효과가 두 번 일어난다' },
-    { name: '각성', text: `수치 +${pct(f.awakenMul)} 더, 선천 추가, 소멸 없앰` },
-  ];
+/** 대강화(+6~+10) 줄: 단계 수치 · 새긴 각인(◆) · 각성(★). 수치는 본문에 이미 반영돼 있다 */
+export function forgeLines(data: GameData, card: ResolvedCard): { level: number; name: string; text: string }[] {
+  if (!card.forge) return [];
   const base = data.balance.upgrade.maxLevel;
-  return all.slice(0, forge).map((x, i) => ({ level: base + 1 + i, ...x }));
+  const out = [{ level: base + card.forge, name: '대강화', text: `수치 +${Math.round(data.balance.upgrade.forge.levelMul * card.forge * 100)}%` }];
+  card.engravings.forEach((m, i) => out.push({ level: base + 1 + i, name: `◆${m.name}`, text: m.text }));
+  if (card.awakening) {
+    const leg = card.def.rarity === 'legendary' ? ` · 전설 수치 +${Math.round((data.forge.legendaryAwakenMul - 1) * 100)}%` : '';
+    out.push({ level: base + card.forge, name: `각성 · ${card.awakening.name}`, text: card.awakening.text + leg });
+  }
+  return out;
 }
 
 /** 카드 문구를 나눠서: 키워드(카드 위 배지로) · 본문 · 열린 특수 스킬(+4·+5, 따로 한 줄씩)과 대강화(+6~+10). 2026-10-11 사용자 요청 */
@@ -299,6 +297,8 @@ export interface CardTextParts {
   keywords: { key: string; label: string }[];
   body: string;
   skills: { level: number; name: string; text: string }[];
+  /** 대강화(+6~+10) 줄: 카드 앞면에는 각인 표식만 두고, 주석·크게 보기에서 읽는다 */
+  forge: { level: number; name: string; text: string }[];
 }
 
 const KEYWORD_ORDER = ['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
@@ -307,11 +307,8 @@ export function cardTextParts(data: GameData, inst: CardInstance | string): Card
   const card = resolveCard(data, inst);
   const keywords = KEYWORD_ORDER.filter((k) => card.keywords.includes(k)).map((k) => ({ key: k, label: KEYWORD_LABEL[k] }));
   const body = card.level === 0 && card.def.text ? card.def.text : card.baseEffects.map((e) => describeEffect(data, e, card.def.target)).join('. ');
-  const skills = [
-    ...card.skills.map((sk, i) => ({ level: 4 + i, name: sk.name, text: skillText(data, sk, card.def.target).replace(/^★[^:]*: /, '') })),
-    ...forgeLines(data, card.forge),
-  ];
-  return { keywords, body, skills };
+  const skills = card.skills.map((sk, i) => ({ level: 4 + i, name: sk.name, text: skillText(data, sk, card.def.target).replace(/^★[^:]*: /, '') }));
+  return { keywords, body, skills, forge: forgeLines(data, card) };
 }
 
 /** 카드 문구. 강화 단계의 수치를 반영하고, 열린 특수 스킬은 줄을 바꿔 ★로 붙인다 */
@@ -321,7 +318,7 @@ export function cardText(data: GameData, inst: CardInstance | string): string {
   const parts = card.baseEffects.map((e) => describeEffect(data, e, card.def.target));
   const kw = (['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
   const head = [...(kw.length ? [`[${kw.join('·')}]`] : []), parts.join('. ')].join(' ');
-  return [head, ...card.skills.map((s) => skillText(data, s, card.def.target)), ...forgeLines(data, card.forge).map((f) => `★${f.name}: ${f.text}`)].join('\n');
+  return [head, ...card.skills.map((s) => skillText(data, s, card.def.target)), ...forgeLines(data, card).map((f) => `★${f.name}: ${f.text}`)].join('\n');
 }
 
 /** 장면·컷인의 화자 이름과 색: 캐릭터(동료·왕일검) 또는 data/speakers.json */

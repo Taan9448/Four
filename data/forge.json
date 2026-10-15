@@ -1,0 +1,60 @@
+{
+  "$comment": "대강화 각인·각성(GAME_DESIGN 16절 ⑦, 2026-10-15 개편). +6~+9 성공마다 카드에 맞는 각인 offer개 중 하나를 골라 새긴다(같은 각인은 한 번). +10은 카드 주인의 각성. 변형 순서: 단계 수치 → 각인·각성 수치 → 동작별 배율 → 속성 → 타수 → 상태 스택 → 대가 → 비용·키워드 → 붙는 효과 → 두 번",
+  "legendaryAwakenMul": 1.2,
+  "engravings": [
+    { "id": "refine", "name": "정련", "glyph": "鍊", "text": "수치 +25%", "numberMul": 1.25 },
+    { "id": "light", "name": "경량", "glyph": "輕", "text": "비용 −1", "when": { "costMin": 1 }, "cost": -1 },
+    { "id": "keep", "name": "보존", "glyph": "存", "text": "유지(손패에 남는다)", "when": { "types": ["attack", "skill"], "without": ["retain"] }, "addKeywords": ["retain"] },
+    { "id": "first", "name": "선수", "glyph": "先", "text": "선천(첫 손패에 온다)", "when": { "without": ["innate"] }, "addKeywords": ["innate"] },
+    { "id": "flow", "name": "연환", "glyph": "環", "text": "카드 1장 뽑기", "append": [{ "op": "draw", "amount": 1 }] },
+    { "id": "calm", "name": "고요", "glyph": "靜", "text": "균열 −1", "append": [{ "op": "rift", "amount": -1 }] },
+    { "id": "breath", "name": "응축", "glyph": "氣", "text": "내공 1 얻기", "when": { "types": ["attack", "skill"] }, "append": [{ "op": "gain_neigong", "amount": 1 }] },
+    { "id": "twin", "name": "연격", "glyph": "連", "text": "첫 피해가 한 번 더 들어간다", "when": { "hasOp": ["damage"] }, "extraHits": 1 },
+    { "id": "fire", "name": "화염 각인", "glyph": "炎", "text": "속성 없는 피해에 화염", "when": { "plainDamage": true }, "element": "fire" },
+    { "id": "ice", "name": "냉기 각인", "glyph": "氷", "text": "속성 없는 피해에 냉기", "when": { "plainDamage": true }, "element": "ice" },
+    { "id": "bolt", "name": "뇌전 각인", "glyph": "雷", "text": "속성 없는 피해에 번개", "when": { "plainDamage": true }, "element": "lightning" },
+    { "id": "break", "name": "파쇄", "glyph": "破", "text": "대상에게 취약 1", "when": { "hasOp": ["damage"], "target": ["enemy"] }, "append": [{ "op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "enemy" }] },
+    { "id": "drain", "name": "흡혈", "glyph": "血", "text": "자신 체력 40 회복", "when": { "hasOp": ["damage"] }, "append": [{ "op": "heal", "amount": 40, "target": "self" }] },
+    { "id": "wall", "name": "철벽", "glyph": "壁", "text": "방어 +40%", "when": { "hasOp": ["block"] }, "opsMul": { "ops": ["block"], "mul": 1.4 } },
+    { "id": "guard", "name": "수호", "glyph": "護", "text": "모든 아군 방어 30", "when": { "types": ["skill", "power"] }, "append": [{ "op": "block", "amount": 30, "target": "all_allies" }] },
+    { "id": "deepen", "name": "심화", "glyph": "深", "text": "적에게 거는 해로운 상태 +1", "when": { "debuffs": true }, "debuffStacks": 1 },
+    { "id": "stitch", "name": "봉합", "glyph": "縫", "text": "대가(균열·체력 잃기·상흔) 절반", "when": { "hasPrice": true }, "softenPrice": true },
+    { "id": "resonance", "name": "공명", "glyph": "鳴", "text": "효과가 두 번 일어난다", "when": { "types": ["power"] }, "repeat": true },
+    { "id": "edge", "name": "예기", "glyph": "銳", "text": "피해 +30%", "when": { "hasOp": ["damage"] }, "opsMul": { "ops": ["damage"], "mul": 1.3 } }
+  ],
+  "awakenings": {
+    "haun": {
+      "id": "awaken_haun", "name": "천외귀환", "glyph": "天", "text": "균열 −2, 힘 1, 선천. 하늘 밖에서 돌아온 자의 한 수",
+      "addKeywords": ["innate"], "removeKeywords": ["exhaust"],
+      "append": [{ "op": "rift", "amount": -2 }, { "op": "apply_status", "status": "strength", "stacks": 1, "target": "self" }]
+    },
+    "elia": {
+      "id": "awaken_elia", "name": "원소의 정점", "glyph": "元", "text": "모든 적에게 화상 1 · 냉기 1 · 감전 1, 마나 1 얻기, 선천",
+      "addKeywords": ["innate"], "removeKeywords": ["exhaust"],
+      "append": [
+        { "op": "apply_status", "status": "burn", "stacks": 1, "target": "all_enemies" },
+        { "op": "apply_status", "status": "chill", "stacks": 1, "target": "all_enemies" },
+        { "op": "apply_status", "status": "shock", "stacks": 1, "target": "all_enemies" },
+        { "op": "gain_mana", "amount": 1 }
+      ]
+    },
+    "kyle": {
+      "id": "awaken_kyle", "name": "붉은 검의 맹세", "glyph": "誓", "text": "피해 +30%, 힘 1, 방어 50, 선천",
+      "addKeywords": ["innate"], "removeKeywords": ["exhaust"],
+      "opsMul": { "ops": ["damage"], "mul": 1.3 },
+      "append": [{ "op": "apply_status", "status": "strength", "stacks": 1, "target": "self" }, { "op": "block", "amount": 50, "target": "self" }]
+    },
+    "born": {
+      "id": "awaken_born", "name": "산의 심장", "glyph": "山", "text": "방어 +40%, 가시 2, 산이 메운다 1, 선천",
+      "addKeywords": ["innate"], "removeKeywords": ["exhaust"],
+      "opsMul": { "ops": ["block"], "mul": 1.4 },
+      "append": [{ "op": "apply_status", "status": "thorns", "stacks": 2, "target": "self" }, { "op": "apply_status", "status": "mountain_regen", "stacks": 1, "target": "self" }]
+    },
+    "common": {
+      "id": "awaken_common", "name": "일행의 뜻", "glyph": "同", "text": "수치 +30%, 모든 아군 방어 40, 카드 1장 뽑기, 선천",
+      "addKeywords": ["innate"], "removeKeywords": ["exhaust"],
+      "numberMul": 1.3,
+      "append": [{ "op": "block", "amount": 40, "target": "all_allies" }, { "op": "draw", "amount": 1 }]
+    }
+  }
+}

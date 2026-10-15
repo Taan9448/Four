@@ -1,9 +1,11 @@
-// 대강화 +6~+10(심연 개편 5단계, GAME_DESIGN 16절 ⑦)
+// 대강화 +6~+10(심연 개편 5단계, GAME_DESIGN 16절 ⑦) — 각인·각성(2026-10-15 개편)
 import { describe, expect, it } from 'vitest';
 import { createAbyssRun, pathOffer, pathPicks } from '../src/engine/abyss';
 import { buyForge, forgeCandidates, forgeChance, openShop } from '../src/engine/economy';
 import { createRunAt } from '../src/engine/run';
 import { forgeMax, resolveCard } from '../src/engine/state';
+import { chooseEngraving, engravingAllowed, settleEngraving } from '../src/engine/forge';
+import { ownedView } from '../src/engine/collection';
 import { cardText } from '../src/engine/text';
 import { promptFor } from '../tools/render-prompt.mjs';
 import { data } from './helpers';
@@ -24,20 +26,105 @@ describe('대강화 카드 모습', () => {
     expect(cards.filter((c) => forgeMax(data, c) > max).every((c) => f.rarities.includes(c.rarity as never))).toBe(true);
   });
 
-  it('+6 수치 ×1.2 · +7 비용 −1 · +8 유지 · +9 효과 두 번 · +10 각성', () => {
-    const five = at(epic.id, max);
+  it('단계마다 수치 +levelMul, 각인 없이도 카드는 그대로 쓸 수 있다', () => {
     const amt = (lv: number) => at(epic.id, lv).baseEffects[0].amount!;
-    expect(amt(max + 1)).toBe(Math.round(amt(max) * f.numberMul));
-    expect(at(epic.id, max + 1).cost).toEqual(five.cost);
-    expect(at(epic.id, max + 2).cost.neigong).toBe(five.cost.neigong - 1);
-    expect(at(epic.id, max + 3).keywords).toContain('retain');
-    const nine = at(epic.id, max + 4);
-    expect(nine.effects).toHaveLength(nine.baseEffects.length * 2 + nine.skills.flatMap((s) => s.effects).length * 2);
+    expect(amt(max + 1)).toBe(Math.round(amt(max) * (1 + f.levelMul)));
+    expect(amt(max + 4)).toBe(Math.round(amt(max) * (1 + f.levelMul * 4)));
+    expect(at(epic.id, max + 4).cost).toEqual(at(epic.id, max).cost);
+  });
+
+  it('각인: 정련 수치, 경량 비용, 연격 타수, 속성, 붙는 효과, 키워드', () => {
+    const mark = (marks: string[]) => resolveCard(data, { uid: 'x', cardId: epic.id, level: max + marks.length, marks });
+    const base = at(epic.id, max + 1);
+    expect(mark(['refine']).baseEffects[0].amount).toBe(Math.round(Math.round(at(epic.id, max).baseEffects[0].amount! * (1 + f.levelMul)) * 1.25));
+    expect(mark(['light']).cost.neigong).toBe(base.cost.neigong - 1);
+    expect(mark(['twin']).baseEffects[0].times).toBe((base.baseEffects[0].times ?? 1) + 1);
+    if (!base.baseEffects[0].element) expect(mark(['fire']).baseEffects[0].element).toBe('fire');
+    expect(mark(['flow']).effects.at(-1)).toEqual({ op: 'draw', amount: 1 });
+    expect(mark(['first']).keywords).toContain('innate');
+    // 단계보다 많은 각인은 무시한다(+6이면 하나)
+    expect(resolveCard(data, { uid: 'x', cardId: epic.id, level: max + 1, marks: ['refine', 'light'] }).engravings.map((m) => m.id)).toEqual(['refine']);
+    const text = cardText(data, { uid: 'x', cardId: epic.id, level: max + 1, marks: ['refine'] });
+    expect(text).toContain('◆정련');
+  });
+
+  it('+10 각성은 카드 주인마다 다르고, 전설은 수치가 더 크다', () => {
+    const owners = new Set(cards.filter((c) => forgeMax(data, c) > max).map((c) => c.owner));
+    for (const o of owners) expect(data.forge.awakenings[o], o).toBeDefined();
     const ten = at(epic.id, max + 5);
+    expect(ten.awakening?.id).toBe(data.forge.awakenings[epic.owner].id);
     expect(ten.keywords).toContain('innate');
-    expect(ten.keywords).not.toContain('exhaust');
-    expect(amt(max + 5)).toBe(Math.round(amt(max) * f.numberMul * f.awakenMul));
-    expect(cardText(data, { uid: 'x', cardId: epic.id, level: max + 5 })).toContain('★각성');
+    expect(cardText(data, { uid: 'x', cardId: epic.id, level: max + 5 })).toContain(`각성 · ${data.forge.awakenings[epic.owner].name}`);
+    const leg = cards.find((c) => c.rarity === 'legendary' && c.owner === 'common' && c.effects.some((e) => (e.op === 'block' || e.op === 'damage') && e.amount))!;
+    if (leg) {
+      const i = leg.effects.findIndex((e) => (e.op === 'block' || e.op === 'damage') && e.amount);
+      const nine = at(leg.id, max + 4).baseEffects[i].amount!;
+      const ten2 = at(leg.id, max + 5).baseEffects[i].amount!;
+      expect(ten2).toBeGreaterThan(nine * 1.3 * 1.1);
+    }
+  });
+
+  it('공명(심법)은 효과 전체가 두 번, 봉합은 대가 절반', () => {
+    const power = cards.find((c) => forgeMax(data, c) > max && c.type === 'power')!;
+    const p = resolveCard(data, { uid: 'x', cardId: power.id, level: max + 1, marks: ['resonance'] });
+    expect(p.effects.length).toBe(at(power.id, max + 1).effects.length * 2);
+    const priced = cards.find((c) => forgeMax(data, c) > max && c.effects.some((e) => e.op === 'rift' && (e.amount ?? 0) >= 2))!;
+    const i = priced.effects.findIndex((e) => e.op === 'rift' && (e.amount ?? 0) >= 2);
+    const soft = resolveCard(data, { uid: 'x', cardId: priced.id, level: max + 1, marks: ['stitch'] });
+    expect(soft.baseEffects[i].amount).toBe(Math.ceil(priced.effects[i].amount! / 2));
+  });
+});
+
+describe('각인 고르기', () => {
+  it('카드에 맞는 각인만 후보로, 고르면 새겨지고, 같은 각인은 다시 나오지 않는다', () => {
+    const power = cards.find((c) => forgeMax(data, c) > max && c.type === 'power')!;
+    const inst = { uid: 'p', cardId: power.id, level: max + 1 };
+    expect(engravingAllowed(data, inst, data.forge.engravings.find((m) => m.id === 'resonance')!)).toBe(true);
+    expect(engravingAllowed(data, { ...inst, cardId: epic.id }, data.forge.engravings.find((m) => m.id === 'resonance')!)).toBe(false);
+    expect(engravingAllowed(data, { ...inst, marks: ['resonance'] }, data.forge.engravings.find((m) => m.id === 'resonance')!)).toBe(false);
+  });
+
+  it('영웅·전설 카드는 모두 +6~+9 네 번 고를 만큼 각인 후보가 있다', () => {
+    for (const c of cards.filter((x) => forgeMax(data, x) > max)) {
+      const n = data.forge.engravings.filter((m) => engravingAllowed(data, { uid: 'x', cardId: c.id, level: max + 1 }, m)).length;
+      expect(n, c.id).toBeGreaterThanOrEqual(f.offer + 3);
+    }
+  });
+
+  it('성공하면 후보 셋이 남고, 고를 때까지 다음 시도는 막힌다. 떠나면 첫 후보로 새긴다', () => {
+    const run = createAbyssRun(data, 'ENGRAVE', { mates: ['elia', 'kyle', 'born'], paths: pathOffer(data, 'ENGRAVE').slice(0, pathPicks(data, 3).picks), pool: {} });
+    run.deck.push({ uid: 'e1', cardId: epic.id, level: max });
+    run.shop = openShop(data, run, 'n1-0');
+    run.gold = f.price * 100;
+    let r = buyForge(data, run, 'e1');
+    while (r.ok && !r.success) r = buyForge(data, run, 'e1');
+    expect(r.ok && r.choices).toHaveLength(f.offer);
+    expect(run.forgePending?.choices).toHaveLength(f.offer);
+    expect(buyForge(data, run, 'e1').ok).toBe(false);
+    const pick = run.forgePending!.choices[1];
+    expect(chooseEngraving(data, run, pick).ok).toBe(true);
+    expect(run.deck.find((c) => c.uid === 'e1')!.marks).toEqual([pick]);
+    expect(run.forgePending).toBeNull();
+    r = buyForge(data, run, 'e1');
+    while (r.ok && !r.success) r = buyForge(data, run, 'e1');
+    expect(run.forgePending!.choices).not.toContain(pick);
+    const first = run.forgePending!.choices[0];
+    settleEngraving(data, run);
+    expect(run.deck.find((c) => c.uid === 'e1')!.marks).toEqual([pick, first]);
+  });
+
+  it('캠페인: 각인은 보유 카드에 남아 다음 스테이지 덱에도 붙는다', () => {
+    const run = createRunAt(data, 'ENGRAVE2', 's3');
+    run.collection[epic.id] = max;
+    run.deck.push({ uid: 'e2', cardId: epic.id, level: max });
+    run.shop = openShop(data, run, 'n1-0');
+    run.gold = f.price * 50;
+    let r = buyForge(data, run, 'e2');
+    while (r.ok && !r.success) r = buyForge(data, run, 'e2');
+    const id = run.forgePending!.choices[0];
+    chooseEngraving(data, run, id);
+    expect(run.engravings?.[epic.id]).toEqual([id]);
+    expect(ownedView(run, epic.id, 'v').marks).toEqual([id]);
   });
 });
 
@@ -66,6 +153,7 @@ describe('대강화 시도', () => {
       const before = { level: card.level, fails: run.forgeFails?.['forge-a'] ?? 0, gold: run.gold };
       const r = buyForge(data, run, 'forge-a');
       tries++;
+      if (r.ok && r.success) settleEngraving(data, run);
       expect(r.ok).toBe(true);
       expect(run.gold).toBe(before.gold - f.price);
       if (r.ok && r.success) {
@@ -91,7 +179,12 @@ describe('대강화 시도', () => {
     };
     const a = make();
     const b = make();
-    const seq = (run: ReturnType<typeof make>) => Array.from({ length: 20 }, () => buyForge(data, run, 'forge-b')).map((r) => r.ok && r.success);
+    const seq = (run: ReturnType<typeof make>) =>
+      Array.from({ length: 20 }, () => {
+        const r = buyForge(data, run, 'forge-b');
+        settleEngraving(data, run);
+        return r.ok && r.success;
+      });
     expect(seq(a)).toEqual(seq(b));
     const poor = make();
     poor.gold = f.price - 1;
@@ -106,6 +199,7 @@ describe('대강화 시도', () => {
     run.gold = f.price * 50;
     let guard = 0;
     while (run.collection[epic.id] === max && guard++ < 50) buyForge(data, run, 'forge-c');
+    settleEngraving(data, run);
     expect(run.collection[epic.id]).toBe(max + 1);
     expect(run.deck.filter((c) => c.cardId === epic.id).every((c) => c.level === max + 1)).toBe(true);
   });

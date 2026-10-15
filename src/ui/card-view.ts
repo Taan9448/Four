@@ -2,7 +2,7 @@
 import type { GameData } from '../engine/data';
 import { isFusion, resolveCard, type CardInstance, type ResolvedCard } from '../engine/state';
 import { cardGlossary, cardTextParts, type CardTextParts } from '../engine/text';
-import { acquirePreview, cardPoints } from '../engine/collection';
+import { acquirePreview, cardPoints, ownedView } from '../engine/collection';
 import type { RunState } from '../engine/run';
 import { cardArtUrl, frameUrl, spriteMeta } from '../render/assets';
 import { isPxCardsPreview } from './debug';
@@ -16,6 +16,17 @@ const TYPE_LABEL: Record<string, string> = { attack: '공격', skill: '기술', 
 /** 대강화 틀 단계(+8·+9·+10, GAME_DESIGN 16절 ⑦): 카드에 forge-8 같은 이름을 붙인다 */
 function forgeClass(card: ResolvedCard): string {
   return card.forge >= 3 ? ` card-forged forge-${card.level}` : card.forge ? ' card-forged' : '';
+}
+
+/** 대강화 각인·각성 표식: 카드 오른쪽 위에 새긴 순서대로 한 글자씩(각성은 금빛) */
+function marksView(card: ResolvedCard): HTMLElement | null {
+  if (!card.engravings.length && !card.awakening) return null;
+  return h(
+    'div',
+    { class: 'card-marks-wrap', 'aria-label': `각인 ${card.engravings.map((m) => m.name).join('·')}${card.awakening ? ` · 각성 ${card.awakening.name}` : ''}` },
+    card.engravings.length ? h('div', { class: 'card-marks' }, ...card.engravings.map((m) => h('span', { class: 'card-mark', title: `${m.name}: ${m.text}` }, m.glyph))) : null,
+    card.awakening ? h('span', { class: 'card-mark card-mark-awaken', title: `${card.awakening.name}: ${card.awakening.text}` }, card.awakening.glyph) : null,
+  );
 }
 
 /** 픽셀 카드 틀(Codex 그림 card_frame_*, 2026-10-11). 상태·저주는 무공 틀을 어둡게 */
@@ -80,6 +91,7 @@ function cardViewInner(data: GameData, inst: CardInstance | string, opts: CardVi
     def.rarity !== 'special' ? h('span', { class: `gem gem-${def.rarity}`, 'aria-hidden': 'true' }) : null,
     h('div', { class: 'card-cost', 'aria-label': `내공 ${card.cost.neigong} 마나 ${card.cost.mana}` }, pips(card.cost.neigong, 'pip-neigong'), pips(card.cost.mana, 'pip-mana'), zero ? h('span', { class: 'pip-zero' }, '0') : null),
     h('div', { class: 'card-name' }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
+    marksView(card),
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
     h('div', { class: 'card-text', ...glossaryTip(data, inst) }, ...textBlocks(cardTextParts(data, inst))),
     def.flavor && opts.flavor ? h('div', { class: `card-flavor${opts.flavor === 'hover' ? ' flavor-hover' : ''}` }, def.flavor) : null,
@@ -155,6 +167,7 @@ function pixelCardView(
     h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
     // 대강화 +8·+9·+10 틀(Codex 그림 card_frame_forge_*, 틀 위에 겹치는 테두리). 그림이 오기 전에는 CSS 빛(forge-N)만
     forgeFrame ? h('img', { class: 'cpx-forge', src: forgeFrame, alt: '', draggable: 'false' }) : null,
+    marksView(card),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
     // 색각 보정: 등급 보석 위에 모양(설정에서 켤 때만 보인다)
@@ -209,6 +222,7 @@ function glossaryTip(data: GameData, inst: CardInstance | string): Record<string
     parts.keywords.length ? `[${parts.keywords.map((k) => k.label).join(' · ')}]` : '',
     ...parts.body.split('\n'),
     ...parts.skills.map((sk) => `★${sk.name}(+${sk.level}) ${sk.text}`),
+    ...parts.forge.map((f) => `${f.name.startsWith('◆') ? '' : '★'}${f.name}(+${f.level}) ${f.text}`),
     ...(terms.length ? ['---', '## 용어', ...terms] : []),
   ].filter(Boolean);
   return tipAttrs(`${card.def.name}${card.level ? ` +${card.level}` : ''}`, lines.join('\n'), 'card');
@@ -222,7 +236,7 @@ export function offerCardView(data: GameData, run: RunState, cardId: string): HT
   if (run.abyss) return cardView(data, { uid: `offer:${cardId}`, cardId, level: run.abyss.pool[cardId] ?? 0 });
   // 자유 여정(순례): 보유 목록과 상관없이 이 길의 덱에만 들어간다(가진 카드면 가진 단계로 한 장 더)
   if (run.replayOf) {
-    const el = cardView(data, { uid: `offer:${cardId}`, cardId, level: run.collection[cardId] ?? 0 });
+    const el = cardView(data, ownedView(run, cardId, `offer:${cardId}`));
     el.prepend(h('span', { class: 'offer-badge offer-path', ...tipAttrs('이 길에서만', '순례에서 얻은 카드는 이 길의 덱에만 들어간다. 보유 카드·강화 단계는 바뀌지 않고, 클리어 지도로 돌아가면 남지 않는다.') }, '이 길에서만'));
     return el;
   }

@@ -99,10 +99,11 @@
 - +1~+3(`balance.upgrade.statLevels`): `growth`만큼 수치가 오른다. 비용·키워드·효과 수는 그대로.
 - +4·+5: `plus4`, `plus5` 특수 스킬이 차례로 붙는다. 카드 문구에 `★이름: 설명` 줄로 보인다.
 - 휴식의 수련(`upgrade_card` + `"choose": true`)은 사람이 강화할 카드를 고른다(강화 뒤 모습으로 미리 보기). 이벤트의 강화는 무작위.
-- **대강화 +6~+10**(2026-10-15, GAME_DESIGN 16절 ⑦): 영웅·전설(`balance.upgrade.forge.rarities`)만, 상점의 대강화로만 오른다(`upgrade_card`·보상·순례 보상은 +5에서 멈춘다). 카드별 데이터 없이 공통 규칙(`resolveCard`):
-  - +6 단련: 피해·방어·회복의 양(비례 양·상한 포함)과 이로운 쪽에 거는 상태 스택(아군에 buff, 적에 debuff) ×`numberMul` 1.2, 정수는 반올림. +4·+5 특수 스킬 효과에도.
-  - +7 경량: 비용 −1(내공이 있으면 내공, 없으면 마나). +8 보존: 유지(`retain`) 추가. +9 쌍격: 효과 전체가 두 번 일어난다(문구는 한 번 + `★쌍격` 줄).
-  - +10 각성: 수치 ×`awakenMul` 1.2 더(+5 대비 ×1.44), 선천(`innate`) 추가, 소멸(`exhaust`) 없앰. 카드 문구에 `★단련`~`★각성` 줄.
+- **대강화 +6~+10**(2026-10-15, GAME_DESIGN 16절 ⑦): 영웅·전설(`balance.upgrade.forge.rarities`)만, 상점의 대강화로만 오른다(`upgrade_card`·보상·순례 보상은 +5에서 멈춘다). 카드별 데이터 없이 `data/forge.json`의 공통 변형(`resolveCard`):
+  - 단계마다 수치 ×(1 + `levelMul` × 단계). 수치 = 피해·방어·회복의 양(비례 양·상한 포함)과 이로운 쪽에 거는 상태 스택(아군에 buff, 적에 debuff), 정수는 반올림. +4·+5 특수 스킬 효과에도.
+  - 각인(카드 인스턴스 `marks`, 캠페인 보유 카드는 `run.engravings`): `when`(유형·동작·속성 없는 피해·대상·비용·키워드·대가·해로운 상태)에 맞는 카드만 받는다. 변형: `numberMul` · `opsMul`(그 동작의 양만) · `element`(속성 없는 피해에) · `extraHits`(첫 피해 타수) · `debuffStacks` · `softenPrice`(대가 절반, 올림) · `cost` · `addKeywords`/`removeKeywords` · `append`(카드 효과 뒤에 붙는 효과) · `repeat`(효과 전체 두 번).
+  - 각성(+10): `awakenings[카드 주인]`, 같은 변형. 전설은 수치 ×`legendaryAwakenMul` 더.
+  - 카드 앞면 글 칸은 본문(변형된 수치)만, 각인·각성 줄은 주석·크게 보기(`cardTextParts().forge`). 그림 위에 각인 글자 표식.
 
 **갈래 규칙**(`data:check`가 검사, 카드 250장 확장)
 - 갈래마다 시작·보상 카드(공용 카드의 태그 포함) **12장 이상**. 심법(power)은 소멸·대상 자신. 틈의 카드는 대가(균열 + · 상흔 + · 체력 잃기 · 소멸) 하나는 반드시. 영웅·전설은 `castLine` 필수.

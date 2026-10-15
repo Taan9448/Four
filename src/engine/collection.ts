@@ -205,9 +205,16 @@ export function loadoutProblems(data: GameData, run: Pick<RunState, 'collection'
   return problems;
 }
 
+/** 보유 카드를 보여 줄 카드 모습(강화 단계·대강화 각인 포함). 화면용 uid */
+export function ownedView(run: Pick<RunState, 'collection' | 'engravings'>, cardId: string, uid: string): CardInstance {
+  const marks = run.engravings?.[cardId];
+  return { uid, cardId, level: run.collection[cardId] ?? 0, ...(marks?.length ? { marks: [...marks] } : {}) };
+}
+
 function newInstance(run: RunState, cardId: string): CardInstance {
   run.counter += 1;
-  return { uid: `c${run.counter}`, cardId, level: run.collection[cardId] ?? 0 };
+  const marks = run.engravings?.[cardId];
+  return { uid: `c${run.counter}`, cardId, level: run.collection[cardId] ?? 0, ...(marks?.length ? { marks: [...marks] } : {}) };
 }
 
 /**

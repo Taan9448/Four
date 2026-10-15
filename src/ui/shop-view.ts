@@ -5,6 +5,8 @@ import { buyCard, buyForge, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, 
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
+import { ownedView } from '../engine/collection';
+import { chooseEngraving, settleEngraving } from '../engine/forge';
 import type { CardInstance } from '../engine/state';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
@@ -43,15 +45,53 @@ const pct = (p: number) => `${Math.round(p * 1000) / 10}%`;
  * 대강화 창(GAME_DESIGN 16절 ⑦): 후보 카드마다 지금 모습 → 다음 모습, 성공률(천장 반영)과 실패 횟수, 시도 단추.
  * 창은 닫지 않고 몇 번이든 시도한다. onResult: 상점 화면 갱신·알림
  */
-function openForge(data: GameData, run: RunState, onResult: (r: ForgeResult) => void): void {
+function openForge(data: GameData, run: RunState, onResult: (r: ForgeResult | null) => void): void {
   const price = data.balance.upgrade.forge.price;
   const body = h('div', { class: 'forge-list' });
   let last: ForgeResult | null = null;
   const draw = () => {
     const list = forgeCandidates(data, run);
+    const pending = run.forgePending;
+    const status = last ? [h('p', { class: `forge-last ${last.ok && last.success ? 'is-ok' : 'is-fail'}`, role: 'status' }, last.ok ? last.message : last.reason)] : [];
+    // 성공 뒤: 각인 셋 중 하나를 고른다(카드는 새긴 뒤 모습). 고를 때까지 다른 시도는 막는다
+    if (pending) {
+      const inst = run.deck.find((c) => c.uid === pending.uid) ?? { uid: pending.uid, cardId: pending.cardId, level: pending.level };
+      body.replaceChildren(
+        ...status,
+        h('p', { class: 'forge-note' }, `${data.cards.get(pending.cardId)?.name} +${pending.level} — 새길 각인을 하나 고른다(한 번 새기면 바꿀 수 없다).`),
+        h(
+          'div',
+          { class: 'engrave-choices' },
+          ...pending.choices.map((id) => {
+            const mod = data.forge.engravings.find((m) => m.id === id)!;
+            return h(
+              'div',
+              { class: 'engrave-choice' },
+              cardView(data, { ...inst, marks: [...(inst.marks ?? []), id] }),
+              h('b', { class: 'engrave-name' }, h('span', { class: 'engrave-glyph', 'aria-hidden': 'true' }, mod.glyph), mod.name),
+              h('small', {}, mod.text),
+              h(
+                'button',
+                {
+                  class: 'btn btn-small btn-primary',
+                  onclick: () => {
+                    const r = chooseEngraving(data, run, id);
+                    last = r.ok ? { ok: true, success: true, level: pending.level, choices: [], message: r.message } : r;
+                    onResult(last);
+                    draw();
+                  },
+                },
+                '새기기',
+              ),
+            );
+          }),
+        ),
+      );
+      return;
+    }
     body.replaceChildren(
-      ...(last ? [h('p', { class: `forge-last ${last.ok && last.success ? 'is-ok' : 'is-fail'}`, role: 'status' }, last.ok ? last.message : last.reason)] : []),
-      h('p', { class: 'forge-note' }, `가진 골드 ${run.gold} · 한 번에 ${price}골드. 실패해도 단계는 그대로, 실패할 때마다 그 단계 성공률이 기본값의 ${Math.round(data.balance.upgrade.forge.pity * 100)}%씩 오른다(성공하면 처음으로).`),
+      ...status,
+      h('p', { class: 'forge-note' }, `가진 골드 ${run.gold} · 한 번에 ${price}골드. 실패해도 단계는 그대로, 실패할 때마다 그 단계 성공률이 기본값의 ${Math.round(data.balance.upgrade.forge.pity * 100)}%씩 오른다(성공하면 처음으로). +6~+9는 성공할 때마다 각인을 셋 중 하나 새기고, +10은 동료마다 다른 각성.`),
       ...(list.length
         ? list.map((c) => {
             const { chance, base, fails } = forgeChance(data, run, c);
@@ -88,7 +128,7 @@ function openForge(data: GameData, run: RunState, onResult: (r: ForgeResult) => 
     );
   };
   draw();
-  openOverlay('대강화 — 영웅·전설 카드 +6~+10', body, { wide: true });
+  openOverlay('대강화 — 영웅·전설 카드 +6~+10', body, { wide: true, onClose: () => onResult(null) });
 }
 
 export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeId: string, onDone: () => void): HTMLElement {
@@ -101,7 +141,8 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
     render();
   };
   // 대강화 결과: 성공은 빛나는 알림과 레벨 소리, 실패는 붉은 알림(골드는 이미 나갔다)
-  const forged = (r: ForgeResult) => {
+  const forged = (r: ForgeResult | null) => {
+    if (!r) return render();
     if (!r.ok) return result(r);
     toast(toasts, r.message, r.success ? 'support' : 'danger');
     sfx(r.success ? 'levelup' : 'discard');
@@ -226,7 +267,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
                       pickCard(
                         data,
                         `바꿀 카드 고르기 — ${swapCost}골드`,
-                        swappable(data, run).map((id) => ({ uid: id, cardId: id, level: run.collection[id] ?? 0 })),
+                        swappable(data, run).map((id) => ownedView(run, id, id)),
                         (id) => result(buySwap(data, run, id)),
                       ),
                   },
@@ -270,13 +311,13 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
               'div',
               { class: 'shop-desc' },
               h('b', {}, '대강화'),
-              h('small', {}, `영웅·전설 +5 카드를 +6~+10으로. 실패해도 그대로, 실패할수록 잘 된다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
+              h('small', {}, `영웅·전설 +5 카드를 +6~+10으로. 성공하면 각인(셋 중 하나), +10은 동료의 각성. 실패해도 그대로, 실패할수록 잘 된다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
             ),
             price(data.balance.upgrade.forge.price, false),
             h(
               'button',
-              { class: 'btn btn-small', disabled: forgeCandidates(data, run).length === 0, onclick: () => openForge(data, run, forged) },
-              '고르기',
+              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0, onclick: () => openForge(data, run, forged) },
+              run.forgePending ? '각인 고르기' : '고르기',
             ),
           ),
     );
@@ -291,7 +332,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           { class: 'shop-side' },
           services,
           h('div', { class: 'shop-own panel' }, h('h3', { class: 'shop-h' }, '내 물약 칸'), h('div', { class: 'shop-potions-own' }, run.potions.map((p) => potionChip(data, p)))),
-          h('button', { class: 'btn btn-primary shop-leave', onclick: onDone }, '떠나기'),
+          h('button', { class: 'btn btn-primary shop-leave', onclick: () => (settleEngraving(data, run), onDone()) }, '떠나기'),
         ),
       ),
     );
