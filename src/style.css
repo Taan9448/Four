@@ -1093,9 +1093,13 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .login-hint { color: #b9b2a2; font-size: var(--fs-min); line-height: 1.4; }
 .login-msg { margin: 0; color: #ffb38a; font-size: var(--fs-min); }
 .login-submit { min-height: 44px; }
-.login-guest { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; }
-.login-guest-btn { min-height: 44px; }
-.login-guest small { color: #b9b2a2; font-size: var(--fs-min); }
+/* 게스트는 단추가 아닌 글자 한 줄(로그인을 권한다) */
+.login-guest-link { align-self: center; min-height: 36px; padding: 6px 10px; background: none; border: 0; color: #b9b2a2; font: 400 var(--fs-min)/1 var(--f-ui); letter-spacing: 0.04em; cursor: pointer; }
+.login-guest-link:hover, .login-guest-link:focus-visible { color: #f5d98c; text-decoration: underline; text-underline-offset: 3px; }
+.guest-notice { text-align: left; }
+.guest-notice p { margin: 0 0 6px; }
+.guest-notice ul { margin: 0 0 8px; padding-left: 18px; }
+.guest-notice b { color: #ffd98a; }
 /* 메뉴 위 계정 한 줄 */
 .title-account { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 14px; font-size: var(--fs-min); color: #e8dcc0; text-shadow: 0 1px 3px #000; }
 .title-account.signed-in .title-who { color: #ffd98a; }
