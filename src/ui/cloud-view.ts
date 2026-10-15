@@ -128,11 +128,16 @@ export function accountRows(): HTMLElement[] {
           h('small', {}, '로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다. 하지 않으면 이 브라우저에만 저장된다'),
         ),
       ),
-      h(
-        'div',
-        { class: 'cloud-providers' },
-        CLOUD.providers.map((p) => h('button', { class: `btn btn-small cloud-${p.id}`, type: 'button', onclick: () => signIn(p.id).catch(fail) }, p.label)),
-      ),
+      // 구글·카카오(켠 공급자만, cloud-config.ts)
+      ...(CLOUD.providers.length
+        ? [
+            h(
+              'div',
+              { class: 'cloud-providers' },
+              CLOUD.providers.map((p) => h('button', { class: `btn btn-small cloud-${p.id}`, type: 'button', onclick: () => signIn(p.id).catch(fail) }, p.label)),
+            ),
+          ]
+        : []),
       h(
         'form',
         {

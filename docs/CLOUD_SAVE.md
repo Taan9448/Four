@@ -57,7 +57,7 @@ create policy "saves: update own" on public.saves for update to authenticated us
 3. 동의 항목: 닉네임·프로필 사진(필수), **카카오계정(이메일)** — 이메일 동의는 비즈 앱 전환이 필요할 수 있다(개인 개발자도 사업자 없이 비즈 앱 전환 가능).
 4. 앱 키의 **REST API 키**(Client ID)와 보안 → **Client Secret**(코드 생성 후 활성화)을 Supabase → Providers → Kakao에 넣고 켠다.
 
-쓰지 않을 공급자는 `src/ui/cloud-config.ts`의 `providers`에서 빼면 단추가 사라진다.
+공급자를 켠 뒤 `src/ui/cloud-config.ts`의 `providers`에 그 단추를 넣으면 게임에 나타난다(2026-10-15에는 비어 있어 이메일 로그인 링크만 보인다).
 
 ## 4. 확인
 
