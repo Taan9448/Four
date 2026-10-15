@@ -556,12 +556,17 @@ export function cureInjuries(data: GameData, run: RunState): string[] {
 export function abyssAddCard(data: GameData, run: RunState, cardId: string): string {
   const def = data.cards.get(cardId);
   if (!def) throw new Error(`알 수 없는 카드: ${cardId}`);
+  // 고유(심연 개편 3): 덱에 한 장만
+  if (def.keywords.includes('unique') && run.deck.some((c) => c.cardId === cardId)) return `${def.name}은(는) 고유 카드라 덱에 한 장만 둘 수 있다`;
   run.deck.push(instance(run, cardId, run.abyss?.pool[cardId] ?? 0));
   return `카드 획득: ${def.name}${run.abyss?.pool[cardId] ? ` +${run.abyss.pool[cardId]}` : ''}`;
 }
 
-/** 이미 덱에 든 심법(파워)은 후보에서 뺀다(한 종류 1장) */
-const powerInDeck = (data: GameData, run: RunState, id: string) => data.cards.get(id)?.type === 'power' && run.deck.some((c) => c.cardId === id);
+/** 이미 덱에 든 심법(파워)·고유 카드는 후보에서 뺀다(한 종류 1장) */
+const powerInDeck = (data: GameData, run: RunState, id: string) => {
+  const d = data.cards.get(id);
+  return !!d && (d.type === 'power' || d.keywords.includes('unique')) && run.deck.some((c) => c.cardId === id);
+};
 
 /** 심연 보상 후보: 풀(합류 동료·공용) 중 등급 가중치로, 슬롯마다 riftCardChance로 열린 틈의 카드 */
 export function abyssRewardOptions(data: GameData, run: RunState, nodeId: string, nodeType: string | undefined): string[] {

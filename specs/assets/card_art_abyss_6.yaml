@@ -1,0 +1,30 @@
+id: card_art_abyss_6
+type: card-art-sheet
+summary: 심연 카드 그림 6(2026-10-15 심연 개편 3 — 체력 비율·고유 카드와 심연 기믹 대응 카드) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 칸 순서를 바꾸면 cards도 함께 바꾼다. card_art_abyss_1~4와 같은 화풍(검은 공허·붉게 깜박이는 틈)
+frames: 10
+cards:
+  - abyss_haun_fog_cleave  # 안개 가르기
+  - abyss_haun_unmoved_split  # 흔들리지 않는 것을 쪼개다
+  - abyss_haun_law_reading  # 법칙의 결
+  - abyss_elia_clear_air  # 맑은 바람
+  - abyss_elia_thornburn  # 가시 태우기
+  - abyss_elia_star_path  # 별의 길
+  - abyss_kyle_quick_read  # 눈치
+  - abyss_kyle_iron_peel  # 쇠가죽 벗기기
+  - abyss_kyle_beat_the_clock  # 재촉을 앞지르다
+  - abyss_kyle_red_line  # 붉은 선
+frame_notes:
+  1: "an axe blade cleaving a wall of grey fog, a red eye visible behind the gap"  # 안개 가르기
+  2: "an axe splitting a stone pillar wrapped in chains that does not move"  # 흔들리지 않는 것을 쪼개다
+  3: "glowing blue grain lines running across a black crack shaped like a written law seal"  # 법칙의 결
+  4: "a soft gust of wind clearing a sickly green poison fog"  # 맑은 바람
+  5: "a field of black thorns burning in orange fire"  # 가시 태우기
+  6: "a narrow night path lit by a line of bright stars"  # 별의 길
+  7: "a sharp watching eye beside a sword, faint motion lines showing an enemy shoulder moving"  # 눈치
+  8: "a sword blade peeling a plate of grey iron hide off a dark beast"  # 쇠가죽 벗기기
+  9: "a sword cutting through a cracking hourglass before the red sand falls"  # 재촉을 앞지르다
+  10: "a red line drawn across the ground and a sword stepping over it"  # 붉은 선
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

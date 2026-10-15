@@ -45,10 +45,20 @@ const SCALE_LABEL: Record<string, string> = {
   consumed: '소비한 균열 1당',
 };
 
+/** 엘리트·보스 배율 말: 0.5 → '절반' */
+const hpRatioWord = (data: GameData) => (data.balance.hpRatio.eliteBossMul === 0.5 ? '절반' : `×${data.balance.hpRatio.eliteBossMul}`);
+
 /** 비례 수치 꼬리말: "(결 노출 1스택당 +3)" / 방어의 절반이면 "(자신의 방어 2당 +1)" */
 function scaleText(data: GameData, e: Effect): string {
   const sc = e.scale;
   if (!sc) return '';
+  // 체력 비율(심연 개편 3): "(대상 최대 체력의 8%, 엘리트·보스 절반)"
+  if (sc.per === 'targetMaxHp' || sc.per === 'enemyMaxHp') {
+    const pct = `${+(sc.amount * 100).toFixed(1)}%`;
+    const whose = sc.per === 'enemyMaxHp' ? '가장 큰 적 최대 체력의' : e.op === 'damage' || e.op === 'lose_hp' ? '대상 최대 체력의' : '최대 체력의';
+    const half = sc.per === 'enemyMaxHp' || e.op === 'damage' || e.op === 'lose_hp' ? `, 엘리트·보스 ${hpRatioWord(data)}` : '';
+    return ` (${whose} ${pct}${half}${sc.max !== undefined ? `, 최대 +${sc.max}` : ''})`;
+  }
   const st = sc.status ? (data.statuses.get(sc.status)?.name ?? sc.status) : '';
   const label =
     sc.per === 'targetStatus' ? `대상의 ${st} 1당` : sc.per === 'selfStatus' ? `자신의 ${st} 1당` : (SCALE_LABEL[sc.per] ?? sc.per);
@@ -139,6 +149,11 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       return `${pre}'${data.cards.get(e.card ?? '')?.name ?? e.card}' ${Math.max(1, n)}장까지 소멸(손패·버린 더미·뽑을 더미)`;
     case 'delay_enrage':
       return `${pre}적의 격노 ${n}턴 늦추기`;
+    case 'execute': {
+      const pct = (r: number) => `${+(r * 100).toFixed(1)}%`;
+      const r = e.ratio ?? 0;
+      return `${pre}${tgt && tgt !== '적 1명' ? `${tgt} 중 ` : ''}체력이 ${pct(r)} 이하인 적 처형(엘리트·보스 ${pct(r * data.balance.hpRatio.eliteBossMul)})`;
+    }
     default:
       return e.op;
   }
@@ -216,6 +231,7 @@ export const KEYWORD_HELP: Record<string, string> = {
   fusion: '융합 — 내공과 마나를 함께 써서 균열이 오른다(하운만).',
   thread: '실 — 꿰맬 자리에 들어가는 유일한 피해.',
   unplayable: '사용 불가 — 낼 수 없다.',
+  unique: '고유 — 덱에 한 장만 둘 수 있다. 이미 가진 카드는 보상·상점에 다시 나오지 않는다.',
 };
 
 /** 카드 용어 주석: 키워드·심법·이 카드가 다루는 상태와 속성의 풀이 */
@@ -252,7 +268,7 @@ export function cardGlossary(data: GameData, inst: CardInstance | string): strin
   return out;
 }
 
-const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실' };
+const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실', unique: '고유' };
 
 /** 특수 스킬(+4·+5) 한 줄: 추가 효과·키워드 변화·비용 변화 */
 export function skillText(data: GameData, skill: UpgradeSkill, cardTarget?: string): string {
@@ -270,7 +286,7 @@ export interface CardTextParts {
   skills: { level: number; name: string; text: string }[];
 }
 
-const KEYWORD_ORDER = ['fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
+const KEYWORD_ORDER = ['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
 
 export function cardTextParts(data: GameData, inst: CardInstance | string): CardTextParts {
   const card = resolveCard(data, inst);
@@ -285,7 +301,7 @@ export function cardText(data: GameData, inst: CardInstance | string): string {
   const card = resolveCard(data, inst);
   if (card.level === 0 && card.def.text) return card.def.text;
   const parts = card.baseEffects.map((e) => describeEffect(data, e, card.def.target));
-  const kw = (['fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
+  const kw = (['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
   const head = [...(kw.length ? [`[${kw.join('·')}]`] : []), parts.join('. ')].join(' ');
   return [head, ...card.skills.map((s) => skillText(data, s, card.def.target))].join('\n');
 }

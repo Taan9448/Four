@@ -36,6 +36,8 @@ export const BATTLE_OPS = [
   'reveal_intent',
   'purge',
   'delay_enrage',
+  // 심연 개편 3(2026-10-15): 체력이 ratio 이하인 적을 처치(엘리트·보스는 balance.hpRatio.eliteBossMul배 문턱)
+  'execute',
 ] as const;
 
 /** 런 단위 동작. 이벤트·휴식·지원 규칙에서만 쓴다. */
@@ -104,11 +106,12 @@ export type Condition = z.infer<typeof Condition>;
  * 비례 수치: 기본값 + amount × per(소수면 내림). max가 있으면 더하는 값이 그 이상 커지지 않는다.
  * per — rift 균열 · hand 손패 수 · mana 마나 · targetStatus 대상의 status 스택 · selfStatus 자신의 status 스택 ·
  * cardsPlayed 이번 턴에 이 카드 전에 낸 카드 수 · block 자신의 방어 · missingHp 자신이 잃은 체력 · enemies 살아 있는 적 수 ·
- * consumed 이 카드가 consume_rift로 소비한 균열
+ * consumed 이 카드가 consume_rift로 소비한 균열 ·
+ * targetMaxHp 대상의 최대 체력 · enemyMaxHp 살아 있는 적 중 가장 큰 최대 체력(둘 다 그 적이 엘리트·보스면 balance.hpRatio.eliteBossMul배, 2026-10-15 심연 개편 3)
  */
 export const Scale = z
   .object({
-    per: z.enum(['rift', 'targetStatus', 'hand', 'mana', 'selfStatus', 'cardsPlayed', 'block', 'missingHp', 'enemies', 'consumed']),
+    per: z.enum(['rift', 'targetStatus', 'hand', 'mana', 'selfStatus', 'cardsPlayed', 'block', 'missingHp', 'enemies', 'consumed', 'targetMaxHp', 'enemyMaxHp']),
     status: z.string().optional(),
     amount: z.number(),
     max: z.number().optional(),
@@ -173,8 +176,8 @@ export type Effect = z.infer<typeof Effect>;
 export const Cost = z.object({ neigong: z.number().int().min(0), mana: z.number().int().min(0) }).strict();
 export type Cost = z.infer<typeof Cost>;
 
-/** thread: 실 카드. '꿰맬 자리'(seam) 상태의 적은 이 키워드 카드의 피해만 받는다 */
-export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable', 'thread']);
+/** thread: 실 카드. '꿰맬 자리'(seam) 상태의 적은 이 키워드 카드의 피해만 받는다. unique: 고유 — 덱에 한 장만(심연 개편 3) */
+export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable', 'thread', 'unique']);
 export type Keyword = z.infer<typeof Keyword>;
 
 export const Rarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'special']);
@@ -792,6 +795,8 @@ export const Balance = z
      * 수련 레벨(2026-10-15, GAME_DESIGN 16절 '심연 개편' ④): 계정 전체 1~levelMax. 레벨 L → L+1에 xpBase + xpStep × (L−1).
      * 경험치는 이긴 전투마다(이야기·순례·심연 모두) 노드 종류별 xp. 심연 시작 금화: abyssGold.every레벨마다 amount, levelMax에 maxBonus 더
      */
+    /** 체력 비율 효과(scale per targetMaxHp·enemyMaxHp, execute): 엘리트·보스에게는 이 배율만(2026-10-15 사용자 결정: 절반) */
+    hpRatio: z.object({ eliteBossMul: z.number().min(0).max(1) }).strict(),
     training: z
       .object({
         levelMax: z.number().int().min(2),

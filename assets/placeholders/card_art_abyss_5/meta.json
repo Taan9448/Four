@@ -1,0 +1,46 @@
+{
+  "id": "card_art_abyss_5",
+  "type": "card-art-sheet",
+  "frameW": 96,
+  "frameH": 64,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": true,
+  "nativeSize": [
+    94,
+    62
+  ],
+  "fit": "fill",
+  "frames": 10,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 10,
+  "sourceHash": "a3a365e09735958c",
+  "placeholder": true,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 1,
+  "cards": [
+    "abyss_common_seam_pierce",
+    "abyss_haun_grain_split",
+    "abyss_kyle_red_measure",
+    "abyss_elia_frost_heart",
+    "abyss_born_landslide",
+    "abyss_common_maw",
+    "abyss_haun_last_grain",
+    "abyss_born_mountain_measure",
+    "abyss_elia_moon_veil",
+    "abyss_common_deep_breath"
+  ]
+}
