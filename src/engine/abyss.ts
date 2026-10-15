@@ -562,6 +562,11 @@ export function abyssAddCard(data: GameData, run: RunState, cardId: string): str
   return `카드 획득: ${def.name}${run.abyss?.pool[cardId] ? ` +${run.abyss.pool[cardId]}` : ''}`;
 }
 
+/** 이 런에 나올 수 있는 유물인가: 길은 빼고, 심연 전용은 심연에서만(2026-10-15 심연 개편 4) */
+export function relicAllowed(run: RunState, r: { rarity: string; abyss: boolean }): boolean {
+  return r.rarity !== 'path' && (!r.abyss || isAbyss(run));
+}
+
 /** 이미 덱에 든 심법(파워)·고유 카드는 후보에서 뺀다(한 종류 1장) */
 const powerInDeck = (data: GameData, run: RunState, id: string) => {
   const d = data.cards.get(id);

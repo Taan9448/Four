@@ -21,14 +21,19 @@ describe('전리품', () => {
     expect(a.relic).toBeNull();
   });
 
-  it('엘리트는 가지지 않은 유물 하나, 보스는 보스 유물을 앞에 둔 후보', () => {
+  it('엘리트는 가지지 않은 유물 하나(전설 빼고), 보스는 영웅·전설 후보 셋(겹치지 않게). 캠페인에는 심연 전용이 나오지 않는다', () => {
     const run = createRun(data, 'LOOT');
     const elite = rollLoot(data, run, node('elite'));
     expect(elite.relic).not.toBeNull();
-    expect(data.relics.get(elite.relic!)!.rarity).not.toBe('boss');
+    expect(data.relics.get(elite.relic!)!.rarity).not.toBe('legendary');
     const boss = rollLoot(data, run, node('boss'));
     expect(boss.relicChoices).toHaveLength(data.balance.economy.bossRelicChoices);
-    expect(data.relics.get(boss.relicChoices[0])!.rarity).toBe('boss');
+    expect(new Set(boss.relicChoices).size).toBe(boss.relicChoices.length);
+    for (const id of boss.relicChoices) expect(['epic', 'legendary']).toContain(data.relics.get(id)!.rarity);
+    for (let i = 0; i < 60; i++) {
+      const r = createRun(data, `LOOT${i}`);
+      for (const id of [rollLoot(data, r, node('elite')).relic, ...rollLoot(data, r, node('boss')).relicChoices]) if (id) expect(data.relics.get(id)!.abyss, id).toBe(false);
+    }
     expect(boss.potion).not.toBeNull(); // 보스는 물약이 반드시 떨어진다
   });
 

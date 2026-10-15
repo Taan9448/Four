@@ -38,7 +38,7 @@ const TABS: { id: CodexTab; label: string }[] = [
 
 // ───────── 눌러서 크게 보기(2026-10-08) ─────────
 const TYPE_LABEL: Record<string, string> = { attack: '공격', skill: '기술', power: '심법', status: '상태' };
-const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설', special: '특수', boss: '보스' };
+const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설', special: '특수', path: '길' };
 const INTENT_LABEL: Record<string, string> = { attack: '공격', defend: '방어', buff: '강화', debuff: '약화', special: '특수' };
 
 const facts = (rows: [string, string][]) => h('dl', { class: 'zoom-facts' }, rows.filter(([, v]) => v).flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)]));
@@ -368,7 +368,9 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
     h('div', { class: 'codex-item zoomable', title: '눌러서 크게 보기', onclick: open }, chip, h('div', {}, h('b', {}, name), h('small', {}, text)));
   // 못 본 칸도 본 칸과 같은 두 줄(이름 · 설명) — 크기가 같아야 칸이 고르게 선다
   const unknown = (what: string) => h('div', { class: 'codex-item unknown' }, h('span', { class: 'relic-chip' }, '?'), h('div', {}, h('b', {}, '???'), h('small', {}, `아직 보지 못한 ${what}`)));
-  const relics = [...data.relics.values()];
+  // 등급 순(일반 → 전설 → 길), 같은 등급은 데이터 순(2026-10-15 유물 5등급)
+  const RELIC_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'path'];
+  const relics = [...data.relics.values()].sort((a, b) => RELIC_ORDER.indexOf(a.rarity) - RELIC_ORDER.indexOf(b.rarity));
   const potions = [...data.potions.values()];
   return splitTab('items', '분류', [
     {
@@ -379,7 +381,7 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
       render: () =>
       h('div', { class: 'codex-items' }, relics.map((r) =>
           codex.relics.includes(r.id)
-            ? row(relicChip(data, r.id), r.name, r.description, () => openItem(relicChip(data, r.id, 'huge'), r.name, `${RARITY_LABEL[r.rarity]} 유물`, r.description, r.flavor))
+            ? row(relicChip(data, r.id), r.name, r.description, () => openItem(relicChip(data, r.id, 'huge'), r.name, `${RARITY_LABEL[r.rarity]} 유물${r.abyss ? ' · 심연 전용' : ''}`, r.description, r.flavor))
             : unknown('유물'),
         )),
     },

@@ -547,8 +547,13 @@ export const RelicDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),
     name: z.string(),
-    /** path: 심연의 시작 유물(길). 보상·상점에 나오지 않는다 */
-    rarity: z.enum(['common', 'uncommon', 'rare', 'boss', 'path']),
+    /**
+     * 등급(2026-10-15 심연 개편 4: 카드와 같은 5등급). 일반·고급·희귀·영웅은 엘리트·상점, 영웅·전설은 보스 전리품(셋 중 하나).
+     * path: 심연의 시작 유물(길). 보상·상점에 나오지 않는다
+     */
+    rarity: z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'path']),
+    /** 심연 전용(캠페인·순례의 전리품·상점·사건에 나오지 않는다) */
+    abyss: z.boolean().default(false),
     /** 아이콘 그림이 없을 때 표시할 한 글자 */
     glyph: z.string().length(1),
     /** 유물 아이콘 시트(icons_relics)의 프레임 번호(1부터) */
@@ -739,8 +744,10 @@ export const Balance = z
         potionWeights: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
         relicWeights: z
           .object({
-            elite: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
-            shop: z.partialRecord(z.enum(['common', 'uncommon', 'rare']), z.number().min(0)),
+            elite: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+            shop: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+            /** 보스 전리품 후보(bossRelicChoices개)의 등급 가중치 */
+            boss: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
           })
           .strict(),
         bossRelicChoices: z.number().int().positive(),
@@ -750,7 +757,7 @@ export const Balance = z
             relics: z.number().int().min(0),
             potions: z.number().int().min(0),
             cardPrice: z.partialRecord(Rarity, z.number().int().positive()),
-            relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
+            relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int(), epic: z.number().int(), legendary: z.number().int() }).strict(),
             potionPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int() }).strict(),
             /** 카드 바꾸기(보유 카드 한 장 → 같은 주인의 다른 카드) 가격. 한 번 쓸 때마다 swapStep씩 비싸진다 */
             swapPrice: z.number().int().positive(),

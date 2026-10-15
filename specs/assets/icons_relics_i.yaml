@@ -1,0 +1,24 @@
+id: icons_relics_i
+type: icon-sheet
+summary: 유물 아이콘 74~89(2026-10-15 유물 5등급 확장) — 칸 n = 유물 icon n+73
+# 칸 번호 = data/relics.json의 icon에서 73을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "pine resin — a small cloth pouch dripping golden pine resin"  # 송진 주머니
+  2: "bamboo flute — a short green bamboo flute with three holes"  # 대나무 피리
+  3: "hunters snare — a rope snare loop pegged to the ground"  # 사냥꾼 올무
+  4: "salt pouch — a small tied pouch spilling coarse white salt"  # 소금 주머니
+  5: "ink stone — a dark rectangular ink stone with a pool of black ink"  # 먹 벼루
+  6: "copper mirror — a round dull copper hand mirror with a faint glint"  # 구리 거울
+  7: "abyss pebble — a smooth dark pebble with a thin red crack line"  # 틈의 조약돌
+  8: "seam thread — a spool of red thread with a needle stuck through"  # 꿰맨 실타래
+  9: "depth marker — a small stone marker post with a carved notch"  # 굽이 표지석
+  10: "rift moss — a clump of pale green moss growing on a black crack"  # 틈 이끼
+  11: "warrior sash — a red cloth martial arts sash tied in a knot"  # 무인의 띠
+  12: "scholar brush — a calligraphy brush with a dark tip and wooden handle"  # 선비의 붓
+  13: "storm bell — a small bronze bell with a tiny lightning spark"  # 폭풍 방울
+  14: "dumpling basket — a round bamboo steamer basket with three dumplings and steam"  # 만두 바구니
+  15: "lantern wick — a short glowing lantern wick in a small clay dish"  # 등불 심지
+  16: "steady stake — a thick wooden stake driven deep into the ground"  # 박힌 말뚝
+placeholder: { color: '#8a90a3', accent: '#f3e58a' }

@@ -382,7 +382,7 @@ function decideSkip(data: GameData, run: RunState): void {
 /** 상점: 유물(비싼 등급부터) → 값진 카드 → 물약 → 남으면 편성에 없는 가장 약한 카드 바꾸기 */
 function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOptions): void {
   const shop = openShop(data, run, nodeId);
-  const order = ['rare', 'uncommon', 'common'];
+  const order = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
   shop.relics
     .map((r, i) => ({ ...r, i, rank: order.indexOf(data.relics.get(r.relicId)!.rarity) }))
     .sort((a, b) => a.rank - b.rank)

@@ -1,0 +1,13 @@
+id: icons_relics_l
+type: icon-sheet
+summary: 유물 아이콘 122~126(2026-10-15 유물 5등급 확장) — 칸 n = 유물 icon n+121
+# 칸 번호 = data/relics.json의 icon에서 121을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 5
+baseline: 0.5
+frame_notes:
+  1: "world seam needle — a long silver needle with red thread stitching a crack in the sky"  # 세계를 꿰맨 바늘
+  2: "sixth sense — a closed eye with a glowing spiral above it"  # 여섯째 감각
+  3: "last light — a single bright flame flickering above an open palm"  # 마지막 빛
+  4: "undying scar — a faded scar mark glowing with soft golden light"  # 죽지 않는 흉터
+  5: "rift heart — a dark crystal heart pulsing with red rift light"  # 틈의 심장
+placeholder: { color: '#8a90a3', accent: '#f3e58a' }
