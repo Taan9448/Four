@@ -20,6 +20,7 @@ import {
   gainAbyssCard,
   injure,
   isAbyss,
+  relicAllowed,
   revealUnseenCard,
   runOath,
   stageNorm,
@@ -1241,11 +1242,14 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push(`동료 모두 최대 체력 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
         break;
       case 'gain_relic': {
-        // relic이 없으면 가지지 않은 유물 중 무작위(보스 유물 제외, rarity가 있으면 그 등급만)
+        // relic이 없으면 가지지 않은 유물 중 무작위(영웅·전설 제외 — rarity가 있으면 그 등급만. 심연 전용은 심연에서만)
         let id = e.relic;
         if (!id) {
           const pool = [...data.relics.values()].filter(
-            (r) => r.rarity !== 'boss' && r.rarity !== 'path' && !run.relics.includes(r.id) && (!e.rarity || (e.rarity as string[]).includes(r.rarity)),
+            (r) =>
+              relicAllowed(run, r) &&
+              !run.relics.includes(r.id) &&
+              (e.rarity ? (e.rarity as string[]).includes(r.rarity) : r.rarity !== 'epic' && r.rarity !== 'legendary'),
           );
           id = pool.length ? rng.pick(pool).id : undefined;
         }

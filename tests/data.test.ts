@@ -127,7 +127,7 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 
-  it('유물·물약: 전투 발동은 전투 동작, 런 발동(pickup·victory·rest·shopEnter)은 런 동작만 쓴다. passive는 rule이 있다. 수량 목표(유물 60~80·물약 20~25)', () => {
+  it('유물·물약: 전투 발동은 전투 동작, 런 발동(pickup·victory·rest·shopEnter)은 런 동작만 쓴다. passive는 rule이 있다. 수량 목표(유물 5등급 30·30·25·20·15 + 길, 심연 전용 20~30 · 물약 20~25)', () => {
     const errors: string[] = [];
     const runTriggers = new Set(['pickup', 'victory', 'cleanVictory', 'rest', 'shopEnter']);
     for (const r of data.relics.values()) {
@@ -138,8 +138,15 @@ describe('데이터 검사', () => {
     }
     for (const p of data.potions.values()) errors.push(...checkEffects(`물약 ${p.id}`, p.effects, battleOps));
     expect(errors).toEqual([]);
-    expect(data.relics.size).toBeGreaterThanOrEqual(60);
-    expect(data.relics.size).toBeLessThanOrEqual(80);
+    // 2026-10-15 심연 개편 4: 카드와 같은 5등급, 약 120개(길 제외), 그중 심연 전용 20~30. 전설은 상점에 나오지 않는다
+    const relics = [...data.relics.values()];
+    const by = (r: string) => relics.filter((x) => x.rarity === r).length;
+    expect(['common', 'uncommon', 'rare', 'epic', 'legendary'].map(by)).toEqual([30, 30, 25, 20, 15]);
+    const abyssOnly = relics.filter((r) => r.abyss).length;
+    expect(abyssOnly).toBeGreaterThanOrEqual(20);
+    expect(abyssOnly).toBeLessThanOrEqual(30);
+    expect(relics.filter((r) => r.rarity === 'legendary' && r.shop).map((r) => r.id)).toEqual([]);
+    expect(relics.filter((r) => r.rarity === 'path' && r.abyss).map((r) => r.id)).toEqual([]);
     expect(data.potions.size).toBeGreaterThanOrEqual(20);
     expect(data.potions.size).toBeLessThanOrEqual(25);
   });

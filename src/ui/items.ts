@@ -6,12 +6,12 @@ import { sheetIconEl } from './icons';
 import { openOverlay } from './overlay';
 
 /** 아이콘 번호 → 시트: [시트 id, 첫 번호]. 번호가 첫 번호 이상인 마지막 시트의 (icon - 첫 번호 + 1)칸 */
-const RELIC_SHEETS: [string, number][] = [['icons_relics', 1], ['icons_relics_b', 17], ['icons_relics_c', 25], ['icons_relics_d', 41], ['icons_relics_e', 57], ['icons_relics_f', 65], ['icons_relics_g', 71], ['icons_relics_h', 73]];
+const RELIC_SHEETS: [string, number][] = [['icons_relics', 1], ['icons_relics_b', 17], ['icons_relics_c', 25], ['icons_relics_d', 41], ['icons_relics_e', 57], ['icons_relics_f', 65], ['icons_relics_g', 71], ['icons_relics_h', 73], ['icons_relics_i', 74], ['icons_relics_j', 90], ['icons_relics_k', 106], ['icons_relics_l', 122]];
 const POTION_SHEETS: [string, number][] = [['icons_potions', 1], ['icons_potions_b', 14], ['icons_potions_c', 24]];
 const sheetIcon = (sheets: [string, number][], icon: number | undefined, glyph: string) => sheetIconEl(sheets, icon, glyph, 'item-icon');
 const relicIcon = (icon: number | undefined, glyph: string) => sheetIcon(RELIC_SHEETS, icon, glyph);
 
-const RELIC_RARITY: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', boss: '보스' };
+const RELIC_RARITY: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설', path: '길' };
 const POTION_RARITY: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀' };
 
 export function relicChip(data: GameData, id: string, extra = ''): HTMLElement {
