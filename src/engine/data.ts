@@ -11,6 +11,7 @@ import {
   FxRules,
   SkinData,
   LawDef,
+  ForgeData,
   ModuleDef,
   OathDef,
   PotionDef,
@@ -30,6 +31,7 @@ import speakersJson from '../../data/speakers.json';
 import relicsJson from '../../data/relics.json';
 import potionsJson from '../../data/potions.json';
 import lawsJson from '../../data/abyss_laws.json';
+import forgeJson from '../../data/forge.json';
 import affixesJson from '../../data/abyss_affixes.json';
 import oathsJson from '../../data/abyss_oaths.json';
 import achievementsJson from '../../data/abyss_achievements.json';
@@ -57,6 +59,8 @@ export interface GameData {
   potions: Map<string, PotionDef>;
   /** 심연: 굽이의 법칙·접사 */
   laws: Map<string, LawDef>;
+  /** 대강화 각인·각성(data/forge.json) */
+  forge: ForgeData;
   affixes: Map<string, AffixDef>;
   /** 심연 3차: 서약(단계 순)·업적 */
   oaths: OathDef[];
@@ -109,6 +113,7 @@ export function loadGameData(): GameData {
     relics: byId(parse(z.array(RelicDef), relicsJson, 'data/relics.json'), 'relics'),
     potions: byId(parse(z.array(PotionDef), potionsJson, 'data/potions.json'), 'potions'),
     laws: byId(parse(z.array(LawDef), lawsJson, 'data/abyss_laws.json'), 'laws'),
+    forge: parse(ForgeData, forgeJson, 'data/forge.json'),
     affixes: byId(parse(z.array(AffixDef), affixesJson, 'data/abyss_affixes.json'), 'affixes'),
     oaths: parse(z.array(OathDef), oathsJson, 'data/abyss_oaths.json').sort((a, b) => a.level - b.level),
     achievements: byId(parse(z.array(AchievementDef), achievementsJson, 'data/abyss_achievements.json'), 'achievements'),

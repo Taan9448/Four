@@ -709,7 +709,7 @@ export const Balance = z
     /**
      * 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬).
      * forge(대강화 +6~+10, GAME_DESIGN 16절 ⑦): rarities 카드만 상점에서 한 번에 price골드, 성공률 chance[+6..+10].
-     * 실패해도 단계는 그대로, 실패마다 그 단계 성공률 × (1 + pity × 실패 수). numberMul: +6의 수치 배율, awakenMul: +10(각성)에서 한 번 더
+     * 실패해도 단계는 그대로, 실패마다 그 단계 성공률 × (1 + pity × 실패 수). +6~+9 성공마다 각인 하나(offer개 중), +10은 각성(data/forge.json)
      */
     upgrade: z
       .object({
@@ -721,8 +721,10 @@ export const Balance = z
             rarities: z.array(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary'])),
             chance: z.array(z.number().min(0).max(1)).length(5),
             pity: z.number().min(0),
-            numberMul: z.number().positive(),
-            awakenMul: z.number().positive(),
+            /** 대강화 단계마다 수치 +levelMul(+10이면 ×(1 + 5 × levelMul)) */
+            levelMul: z.number().min(0),
+            /** 각인을 고를 때 보여 주는 후보 수 */
+            offer: z.number().int().positive(),
           })
           .strict(),
       })
@@ -953,6 +955,76 @@ export const NodeType = NodeTypeEnum;
  * 굽이의 법칙(심연, GAME_DESIGN 16절): 굽이 하나 동안 모든 전투·런에 걸리는 규칙. 전투: 시작 효과(하운을 출처로)·적 특성·
  * 손패/내공/마나 회복 덮어쓰기·의도 감추기·격노. 런: 휴식 회복·골드 배율
  */
+/**
+ * 대강화 각인·각성(data/forge.json, 2026-10-15 개편 — GAME_DESIGN 16절 ⑦). 카드별 코드 없이 카드 모습을 바꾸는 공통 변형.
+ * when: 이 각인을 받을 수 있는 카드(모두 맞아야). 변형은 resolveCard가 차례로 적용한다
+ */
+export const ForgeWhen = z
+  .object({
+    /** 카드 유형 중 하나 */
+    types: z.array(z.enum(['attack', 'skill', 'power'])),
+    /** 이 동작 중 하나라도 효과에 있다 */
+    hasOp: z.array(z.string()),
+    /** 속성 없는 피해가 있다 */
+    plainDamage: z.boolean(),
+    /** 대상: 카드 target 중 하나 */
+    target: z.array(z.string()),
+    /** 비용 합이 이 이상 */
+    costMin: z.number().int(),
+    /** 이 키워드가 없다 */
+    without: z.array(Keyword),
+    /** 대가(균열 +·자기 체력 잃기·상흔)가 있다 */
+    hasPrice: z.boolean(),
+    /** 적에게 거는 해로운 상태가 있다 */
+    debuffs: z.boolean(),
+  })
+  .partial()
+  .strict();
+export const ForgeMod = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    /** 각인 표시 한 글자 */
+    glyph: z.string().max(2),
+    /** 카드 문구 한 줄(◆이름: text) */
+    text: z.string(),
+    when: ForgeWhen.default({}),
+    /** 수치(피해·방어·회복 양, 이로운 쪽 상태 스택) 배율 */
+    numberMul: z.number().positive().optional(),
+    /** 이 동작들의 양만 배율 */
+    opsMul: z.object({ ops: z.array(z.string()), mul: z.number().positive() }).strict().optional(),
+    /** 비용 증감(내공이 있으면 내공, 없으면 마나) */
+    cost: z.number().int().optional(),
+    addKeywords: z.array(Keyword).default([]),
+    removeKeywords: z.array(Keyword).default([]),
+    /** 속성 없는 피해에 이 속성을 싣는다 */
+    element: Element.optional(),
+    /** 첫 피해 효과의 타수 + */
+    extraHits: z.number().int().positive().optional(),
+    /** 적에게 거는 해로운 상태 스택 + */
+    debuffStacks: z.number().int().positive().optional(),
+    /** 대가(균열 +·자기 체력 잃기·상흔) 절반(올림) */
+    softenPrice: z.boolean().optional(),
+    /** 효과 전체가 두 번 */
+    repeat: z.boolean().optional(),
+    /** 카드 효과 뒤에 붙는 효과 */
+    append: z.array(Effect).default([]),
+  })
+  .strict();
+export type ForgeMod = z.infer<typeof ForgeMod>;
+export const ForgeData = z
+  .object({
+    $comment: z.string().optional(),
+    /** +6~+9에서 하나씩 고르는 각인 */
+    engravings: z.array(ForgeMod),
+    /** +10 각성: 카드 주인(동료 id·common)마다 */
+    awakenings: z.record(z.string(), ForgeMod),
+    /** 전설 카드의 각성에 더하는 수치 배율 */
+    legendaryAwakenMul: z.number().positive(),
+  })
+  .strict();
+export type ForgeData = z.infer<typeof ForgeData>;
+
 export const LawDef = z
   .object({
     id: z.string().regex(/^[a-z0-9_]+$/),

@@ -3,7 +3,7 @@ import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
 import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, skipReward, upgradeCandidates, type RunState } from '../engine/run';
-import { capFor, COMMON, loadoutOwners, loadoutPoints, swappableCards } from '../engine/collection';
+import { capFor, COMMON, loadoutOwners, loadoutPoints, ownedView, swappableCards } from '../engine/collection';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
 import { tipAttrs } from './tooltip';
@@ -116,7 +116,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             'div',
             { class: 'reward-cards upgrade-cards' },
             ids.map((id) => {
-              const el = cardView(data, { uid: `own_${id}`, cardId: id, level: run.collection[id] ?? 0 });
+              const el = cardView(data, ownedView(run, id, `own_${id}`));
               el.addEventListener('click', () => render(applyChoice(data, run, module, index, id), resultText));
               return el;
             }),

@@ -403,3 +403,23 @@ describe('데이터 검사', () => {
     expect(errors).toEqual([]);
   });
 });
+
+describe('대강화 각인·각성(data/forge.json)', () => {
+  const data = loadGameData();
+  it('id가 겹치지 않고, 붙는 효과의 동작·상태가 있다. 영웅·전설 카드의 주인마다 각성이 있다', () => {
+    const errors: string[] = [];
+    const mods = [...data.forge.engravings, ...Object.values(data.forge.awakenings)];
+    const ids = mods.map((m) => m.id);
+    if (new Set(ids).size !== ids.length) errors.push('각인·각성 id 겹침');
+    for (const m of mods) {
+      for (const e of m.append) {
+        if (!(BATTLE_OPS as readonly string[]).includes(e.op)) errors.push(`${m.id}: 전투 동작이 아님 ${e.op}`);
+        if (e.status && !data.statuses.has(e.status)) errors.push(`${m.id}: 없는 상태 ${e.status}`);
+      }
+      for (const op of [...(m.opsMul?.ops ?? []), ...(m.when.hasOp ?? [])]) if (!(BATTLE_OPS as readonly string[]).includes(op)) errors.push(`${m.id}: 없는 동작 ${op}`);
+    }
+    const forged = [...data.cards.values()].filter((c) => c.upgrade && data.balance.upgrade.forge.rarities.includes(c.rarity as never));
+    for (const o of new Set(forged.map((c) => c.owner))) if (!data.forge.awakenings[o]) errors.push(`각성 없는 주인 ${o}`);
+    expect(errors).toEqual([]);
+  });
+});
