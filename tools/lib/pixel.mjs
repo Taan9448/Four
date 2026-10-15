@@ -324,7 +324,8 @@ export function processPixelSheet(raw, spec, palette, cells) {
   let sampled = sample(grid);
   // 이펙트의 가는 선·불꽃은 블록 감지를 엉뚱한 주기로 끌고 가기 쉽다(fx_rapier_flurry: 9.7px · 일치도 42%).
   // 감지한 격자로 일치도가 50% 미만이면 명세 배율로 다시 자르고 '감지 못 함'으로 둔다(검증은 경고 + 눈 확인, 2026-10-12)
-  if (spec.type === 'fx' && grid.detected && sampled.reduce((a, s) => a + s.purity, 0) / sampled.length < 0.5) {
+  // 겹치는 테두리(overlay)도 같다: 거의 빈 캔버스의 가는 띠는 블록 감지를 82px 같은 주기로 끌고 간다(card_frame_forge_10, #1236)
+  if ((spec.type === 'fx' || spec.overlay) && grid.detected && sampled.reduce((a, s) => a + s.purity, 0) / sampled.length < 0.5) {
     grid = { block: (spec.pixel_scale * raw.width) / spec.canvas[0], phaseX: 0, phaseY: 0, score: grid.score, detected: false };
     sampled = sample(grid);
   }
