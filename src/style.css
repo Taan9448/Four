@@ -1103,6 +1103,12 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 /* 메뉴 위 계정 한 줄 */
 .title-account { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 14px; font-size: var(--fs-min); color: #e8dcc0; text-shadow: 0 1px 3px #000; }
 .title-account.signed-in .title-who { color: #ffd98a; }
+/* 수련 레벨(2026-10-15): 계정 줄 아래 修 Lv.N과 다음 레벨까지 막대 */
+.title-training { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 6px; font-size: var(--fs-min); color: #e8dcc0; text-shadow: 0 1px 3px #000; }
+.title-training > b { color: #ffd98a; font-weight: 700; }
+.training-bar { position: relative; width: 96px; height: 6px; border-radius: 3px; background: rgba(0, 0, 0, 0.55); box-shadow: 0 0 0 1px rgba(255, 217, 138, 0.35); overflow: hidden; }
+.training-bar > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #b8741a, #ffd98a); }
+.abyss-training { color: #ffd98a; }
 .link-btn { min-height: 32px; padding: 4px 8px; background: none; border: 0; color: #f5d98c; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-shadow: inherit; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .deck-view { display: flex; flex-direction: column; gap: 16px; }
