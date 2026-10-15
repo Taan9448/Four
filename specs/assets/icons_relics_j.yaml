@@ -1,0 +1,24 @@
+id: icons_relics_j
+type: icon-sheet
+summary: 유물 아이콘 90~105(2026-10-15 유물 5등급 확장) — 칸 n = 유물 icon n+89
+# 칸 번호 = data/relics.json의 icon에서 89을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "thorn glove — a thick leather glove gripping a bundle of black thorns"  # 가시 장갑
+  2: "ash cloak — a folded grey ash colored cloak with a faint green mist"  # 잿빛 망토
+  3: "ice mirror shard — a jagged shard of mirror covered in frost"  # 얼음 거울 조각
+  4: "knights crest — a red and silver knight crest shield emblem"  # 기사의 문장
+  5: "five thousand stone — a grey stone block with a deep hammer dent and cracks"  # 오천 번 두드린 돌
+  6: "waterwheel toy — a small wooden waterwheel with blue water drops"  # 작은 물레방아
+  7: "wildfire seed — a single seed glowing with orange flame"  # 들불 씨앗
+  8: "grain compass — a round compass whose needle is a glowing blue wood grain line"  # 결 나침반
+  9: "mirror of law — an ornate dark mirror reflecting a cracked red seal"  # 법칙의 거울
+  10: "bone dice — two white bone dice with red pips"  # 뼈 주사위
+  11: "stopped hourglass — an hourglass with sand frozen in the middle"  # 멈춘 모래시계
+  12: "rift lens — a round glass lens showing a red crack behind it"  # 틈 렌즈
+  13: "dragon scale — a large shimmering green dragon scale"  # 용의 비늘
+  14: "twin blade charm — two small crossed swords tied with a red tassel"  # 쌍검 장식
+  15: "sage beads — a loop of prayer beads glowing with blue light"  # 현자의 염주
+  16: "last seed pod — a dry seed pod split open with one glowing seed inside"  # 마지막 씨앗 꼬투리
+placeholder: { color: '#8a90a3', accent: '#f3e58a' }

@@ -5,9 +5,9 @@ import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
-import { abyssShopPool, abyssShopRift, isAbyss, removePrice, runOath } from './abyss';
+import { abyssShopPool, abyssShopRift, isAbyss, relicAllowed, removePrice, runOath } from './abyss';
 
-type Tier = 'common' | 'uncommon' | 'rare';
+type Tier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 // ───────────────────────── 전리품 ─────────────────────────
 
@@ -29,9 +29,23 @@ function pickByTier<T extends { rarity: string }>(rng: Rng, pool: T[], weights: 
   return rng.pick(pool.filter((x) => x.rarity === tier));
 }
 
-/** 아직 없는 유물 후보(상점·엘리트용: 보스 유물 제외) */
+/** 아직 없는 유물 후보(상점·엘리트용: 전설과 상점에 내놓지 않는 유물은 빼고) */
 function relicPool(data: GameData, run: RunState, exclude: string[] = []) {
-  return [...data.relics.values()].filter((r) => r.rarity !== 'boss' && r.rarity !== 'path' && r.shop && !run.relics.includes(r.id) && !exclude.includes(r.id));
+  return [...data.relics.values()].filter((r) => relicAllowed(run, r) && r.rarity !== 'legendary' && r.shop && !run.relics.includes(r.id) && !exclude.includes(r.id));
+}
+
+/** 보스 전리품 후보: 등급 가중치(relicWeights.boss)로 겹치지 않게 n개(영웅·전설, 모자라면 희귀) */
+function bossRelicChoices(data: GameData, run: RunState, rng: Rng, n: number): string[] {
+  const left = [...data.relics.values()].filter((r) => relicAllowed(run, r) && !run.relics.includes(r.id));
+  const out: string[] = [];
+  const weights = data.balance.economy.relicWeights.boss;
+  while (out.length < n) {
+    const pool = left.filter((r) => !out.includes(r.id) && (weights[r.rarity as Tier] ?? 0) > 0);
+    const pick = pool.length ? pickByTier(rng, pool, weights) : rng.shuffle(left.filter((r) => r.rarity === 'rare' && !out.includes(r.id)))[0];
+    if (!pick) break;
+    out.push(pick.id);
+  }
+  return out;
 }
 
 /** 이긴 전투의 전리품을 굴린다(적용하지 않는다) */
@@ -49,9 +63,7 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const noRelic = isAbyss(run) && (node.moduleId === data.balance.abyss.nemesisModule || (kind === 'elite' && node.floor === runOath(data, run).eliteFloor));
   if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run), eco.relicWeights.elite)?.id ?? null;
   if (kind === 'boss' && !noRelic) {
-    const boss = rng.shuffle([...data.relics.values()].filter((r) => r.rarity === 'boss' && !run.relics.includes(r.id))).map((r) => r.id);
-    const rare = rng.shuffle(relicPool(data, run).filter((r) => r.rarity === 'rare')).map((r) => r.id);
-    relicChoices = [...boss, ...rare].slice(0, eco.bossRelicChoices);
+    relicChoices = bossRelicChoices(data, run, rng, eco.bossRelicChoices);
   }
   return { gold, potion, relic, relicChoices };
 }

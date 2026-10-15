@@ -1,0 +1,24 @@
+id: icons_relics_k
+type: icon-sheet
+summary: 유물 아이콘 106~121(2026-10-15 유물 5등급 확장) — 칸 n = 유물 icon n+105
+# 칸 번호 = data/relics.json의 icon에서 105을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 유물 아이콘(icons_relics*)과 같은 화풍·크기
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "war banner — a torn red war banner on a short pole"  # 전장의 깃발
+  2: "golden ledger — a closed ledger book with golden coins on top"  # 황금 장부
+  3: "thunder drum — a round war drum with lightning crackling across the drum head"  # 천둥 북
+  4: "depth crown — a black iron crown with red crack lines"  # 심연의 관
+  5: "law breaker seal — a square stone seal stamp with a slash cutting through it"  # 법을 끊는 인장
+  6: "rift fang — a long curved fang dripping a red glow"  # 틈의 송곳니
+  7: "hungry echo bell — a dark iron bell with sound rings and a red crack"  # 굶주린 메아리 종
+  8: "stitched heart — a red heart stitched together with thick black thread"  # 꿰맨 심장
+  9: "abyss lantern — a hanging dark lantern casting a cold blue light"  # 심연 등롱
+  10: "echo thread spool — a spool of pale silver thread with faint echo rings"  # 잔향의 실패
+  11: "heaven sheath — an ornate empty sword sheath glowing with blue sword light"  # 천외검의 칼집
+  12: "bottomless gourd — a calabash gourd pouring an endless glowing stream"  # 끝없는 호리병
+  13: "mountain heart — a glowing stone heart shaped like a small mountain"  # 산의 심장
+  14: "fate dice — a golden die with a glowing eye on its face"  # 운명의 주사위
+  15: "starfall mirror — a round mirror with falling stars streaking across it"  # 별이 지는 거울
+  16: "abyss eye — a single large eye opening inside a black crack"  # 심연의 눈
+placeholder: { color: '#8a90a3', accent: '#f3e58a' }

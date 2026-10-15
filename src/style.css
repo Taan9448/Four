@@ -1264,6 +1264,8 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .relic-chip { --rc: #c9a24a; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-family: var(--f-brush); font-size: var(--fs-body); color: #f6ead0; background: radial-gradient(circle at 35% 30%, #4a3a26, #1d150c); border: 2px solid var(--rc); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 0, 0, 0.6); cursor: help; flex: 0 0 auto; }
 .relic-chip.rarity-uncommon { --rc: #6aa8d8; }
 .relic-chip.rarity-rare { --rc: #e2b45c; box-shadow: 0 0 8px rgba(226, 180, 92, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.relic-chip.rarity-epic { --rc: #a35cff; box-shadow: 0 0 8px rgba(163, 92, 255, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
+.relic-chip.rarity-legendary { --rc: #ff8a5c; background: radial-gradient(circle at 35% 30%, #5a2a14, #1d0c06); box-shadow: 0 0 10px rgba(255, 138, 92, 0.65), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
 .relic-chip.rarity-boss { --rc: #d0463a; background: radial-gradient(circle at 35% 30%, #5a1a14, #1d0806); box-shadow: 0 0 8px rgba(208, 70, 58, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.6); }
 .relic-chip.big { width: 48px; height: 48px; font-size: var(--fs-title); border-width: 3px; }
 .relic-chip.fired { animation: relic-fire 0.7s ease-out; }
