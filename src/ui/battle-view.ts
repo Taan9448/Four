@@ -27,6 +27,15 @@ import { isDebug } from './debug';
 import { runTour, tourSeen } from './tour';
 import { surgeCut } from './surge-cut';
 
+/**
+ * 전투 화면이 닫혔다(2026-10-15 렉 줄이기): 나가기·끝내기 뒤에 아직 기다리던 연출(await)이 깨어나면 이것을 던져
+ * 남은 연출·효과음·다시 그리기·결과 창을 모두 건너뛴다. act()와 시작 연출이 받아서 조용히 끝낸다
+ */
+class BattleClosed extends Error {}
+const ignoreClosed = (e: unknown): void => {
+  if (!(e instanceof BattleClosed)) throw e;
+};
+
 export interface BattleContext {
   title: string;
   subtitle: string;
@@ -113,6 +122,12 @@ export class BattleView {
   private flown = new Set<string>();
   /** 적 턴 연출 동안은 손패를 다시 그리지 않는다(다음 턴 손패는 연출이 끝난 뒤 뽑아 온다) */
   private handFrozen = false;
+  /** 전투 화면이 닫혔는가(finish). 닫힌 뒤에는 연출·타이머·대기 동작이 새 일을 만들지 않는다 */
+  private disposed = false;
+  private resizeObs!: ResizeObserver;
+  /** 끌고 있는 카드의 창 듣개를 거두는 함수(끄는 도중 나가도 남지 않게) */
+  private dragCleanup: (() => void) | null = null;
+  private bonusTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private data: GameData,
@@ -127,11 +142,12 @@ export class BattleView {
     // ?debug: 콘솔·화면 점검에서 전투를 들여다볼 수 있게(window.__battle)
     if (isDebug()) (window as unknown as { __battle?: unknown }).__battle = this;
     // 화면에 붙을 때·창 크기가 바뀔 때 아군·적 간격을 다시 맞춘다
-    new ResizeObserver(() => requestAnimationFrame(() => this.fitUnits())).observe(this.unitsEl);
-    if (ctx.bonusText) setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
+    this.resizeObs = new ResizeObserver(() => requestAnimationFrame(() => !this.disposed && this.fitUnits()));
+    this.resizeObs.observe(this.unitsEl);
+    if (ctx.bonusText) this.bonusTimer = setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
     this.startTours();
     // 시작 시 남은 이벤트(지원 규칙 등)는 기록만
-    void this.animate(this.state.events.splice(0));
+    void this.animate(this.state.events.splice(0)).catch(ignoreClosed);
   }
 
   /**
@@ -396,6 +412,7 @@ export class BattleView {
   // ───────────────────────── 갱신 ─────────────────────────
 
   private refresh(): void {
+    if (this.disposed) return;
     const s = this.state;
     const bal = this.data.balance;
     const incoming = s.result ? new Map() : incomingDamage(s);
@@ -930,9 +947,13 @@ export class BattleView {
       over = u?.el ?? null;
       over?.classList.add('drop-target');
     };
-    const up = (ev: PointerEvent) => {
+    const stopListening = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      this.dragCleanup = null;
+    };
+    const up = (ev: PointerEvent) => {
+      stopListening();
       if (!ghost) return;
       ghost.remove();
       el.classList.remove('drag-source');
@@ -948,8 +969,13 @@ export class BattleView {
         void this.act(() => playCard(this.state, i), () => this.flyPlayed(i));
       }
     };
+    this.dragCleanup?.();
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    this.dragCleanup = () => {
+      stopListening();
+      ghost?.remove();
+    };
   }
 
   /** 키보드 대상: 다음·앞 대상으로 */
@@ -1071,6 +1097,15 @@ export class BattleView {
    * freezeHand: 적 턴처럼 연출이 끝난 뒤에야 손패를 다시 그린다(새 손패는 그때 뽑아 온다)
    */
   private async act(fn: () => unknown, before?: () => Promise<void>, freezeHand = false): Promise<void> {
+    try {
+      await this.actInner(fn, before, freezeHand);
+    } catch (e) {
+      ignoreClosed(e);
+    }
+  }
+
+  private async actInner(fn: () => unknown, before: (() => Promise<void>) | undefined, freezeHand: boolean): Promise<void> {
+    this.alive();
     this.busy = true;
     this.hovered = null;
     this.endBtn.disabled = true;
@@ -1081,6 +1116,7 @@ export class BattleView {
     }
     this.renderPreview();
     if (before) await before();
+    this.alive();
     this.handFrozen = freezeHand;
     // 여기서 다시 그리지 않는다: 낸 카드가 손패에 잠깐 되살아나거나, 피해가 연출보다 먼저 보이지 않게(연출이 이벤트마다 다시 그린다)
     // 행동 직전 체력을 적어 둔다(연출이 이벤트마다 옮긴다)
@@ -1088,6 +1124,7 @@ export class BattleView {
     const r = fn() as { ok?: boolean; reason?: string } | undefined;
     if (r && r.ok === false && r.reason) toast(this.toasts, r.reason, 'danger');
     await this.animate(this.state.events.splice(0));
+    this.alive();
     this.shown.clear();
     this.busy = false;
     this.handFrozen = false;
@@ -1099,6 +1136,7 @@ export class BattleView {
 
   private async animate(events: BattleEvent[]): Promise<void> {
     for (const [idx, ev] of events.entries()) {
+      this.alive();
       switch (ev.type) {
         case 'turn':
           if (ev.turn > 1) {
@@ -1115,6 +1153,7 @@ export class BattleView {
           sfx('card');
           const def = resolveCard(this.data, ev.cardId).def;
           if (def.castLine && settings.cutIn) await this.cutIn(ev.cardId, def.castLine);
+          this.alive();
           // 피해 없는 카드(기술·파워): 쓴 사람 위에 시전 이펙트(data/fx.json castFx)
           const cast = def.type !== 'attack' && ev.sourceUid ? this.realFx(cardFx(this.data, def).castFx) : null;
           if (cast) void this.playFx(cast, ev.sourceUid!);
@@ -1148,7 +1187,7 @@ export class BattleView {
             if (ev.amount > 0 && ev.element) sfx(ev.element, { pan, volume: 0.7 });
             const fx = this.hitFxFor(ev);
             if (fx) void this.playFx(fx, ev.targetUid);
-            if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then(() => this.idle(u));
+            if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'hit')).then((done) => done && this.idle(u));
             flash(u.el, ev.grain ? 'blue' : 'white');
             this.refresh();
             if (ev.amount > 0) {
@@ -1165,6 +1204,7 @@ export class BattleView {
               if (big || heavy) screenFlash(this.field, u.c.side === 'party' ? 'red' : ev.crit ? 'gold' : 'white');
               // 타격 멈춤: 보통 70ms, 큰 피해 110ms, 치명타·처치 150ms(빠른 속도면 줄인다)
               await hitStop((big ? 150 : heavy ? 110 : 70) * Math.max(0.5, settings.speed));
+              this.alive();
             }
           }
           if (ev.absorbed) this.refresh();
@@ -1223,9 +1263,11 @@ export class BattleView {
           const n = ev.count ?? 1;
           // 폭주 그림(설정 「폭주 그림」, 누르거나 아무 키로 건너뜀): 네 가지를 그림 위에 보여 주므로 짧은 띠를 대신한다
           if (settings.surgeArt) await surgeCut(this.data, n);
+          this.alive();
           if (!tourSeen('surge-guide')) {
             this.refresh();
             await openSurgeGuide(this.data);
+            this.alive();
             runTour(
               [
                 { target: this.handEls.get(this.state.hand.find((c) => c.cardId === b.echoCard)?.uid ?? '') ?? '.hand', title: '틈의 잔향', text: '손에 든 채 턴을 끝내면 균열 +1. 내공 1을 써서 털어 내면(소멸) 사라진다.' },
@@ -1418,8 +1460,13 @@ export class BattleView {
     el.addEventListener('click', () => el.remove());
   }
 
+  /** 연출 사이 쉬기. 그사이 전투 화면이 닫혔으면 BattleClosed를 던져 남은 연출을 건너뛴다 */
   private wait(ms: number): Promise<void> {
-    return sleep(ms * settings.speed);
+    return sleep(ms * settings.speed).then(() => this.alive());
+  }
+
+  private alive(): void {
+    if (this.disposed) throw new BattleClosed();
   }
 
   /** D 키·冊 표식: 이번 전투의 카드 창(D는 다시 누르면 닫는다) */
@@ -1472,7 +1519,7 @@ export class BattleView {
   }
 
   private idle(u: Unit): void {
-    if (!u.c.downed) void u.player.play(this.spriteFor(u.c, 'idle'), { loop: true });
+    if (!this.disposed && !u.c.downed) void u.player.play(this.spriteFor(u.c, 'idle'), { loop: true });
   }
 
   /** 공격 애니메이션을 재생하고, hit 이벤트 프레임에서 다음 연출(피해 숫자)로 넘어간다 */
@@ -1484,13 +1531,14 @@ export class BattleView {
     let hitResolve!: () => void;
     const hit = new Promise<void>((r) => (hitResolve = r));
     const done = u.player.play(this.spriteFor(u.c, anim), { onEvent: (name) => name === 'hit' && hitResolve() });
-    void done.then(() => {
+    void done.then((finished) => {
       hitResolve();
-      this.idle(u);
+      if (finished) this.idle(u);
     });
     const fx = card ? this.realFx(cardFx(this.data, card).fx) : null;
     if (fx) for (const t of targetUids) void this.playFx(fx, t);
     await Promise.race([hit, this.wait(900)]);
+    this.alive();
   }
 
   /**
@@ -1539,7 +1587,7 @@ export class BattleView {
 
   private async playFx(fxId: string, targetUid: string): Promise<void> {
     const t = this.units.get(targetUid);
-    if (!t) return;
+    if (!t || this.disposed) return;
     const canvas = h('canvas', { class: 'fx-canvas' }) as HTMLCanvasElement;
     const lr = this.fxLayer.getBoundingClientRect();
     const tr = t.el.getBoundingClientRect();
@@ -1613,8 +1661,19 @@ export class BattleView {
 
   /** report=false: 결과를 넘기지 않고 화면만 정리(메뉴에서 나갈 때) */
   private finish(report = true): void {
+    // 두 번 눌러도 결과는 한 번만 넘긴다
+    if (this.disposed) return;
+    this.disposed = true;
+    // 이 화면이 건 듣개·관찰자·타이머를 거두고, 돌던 스프라이트를 멈춘다(기다리던 연출은 깨어나면 BattleClosed로 끝난다)
     document.removeEventListener('keydown', this.onKey);
+    this.resizeObs.disconnect();
+    this.dragCleanup?.();
+    if (this.bonusTimer !== null) clearTimeout(this.bonusTimer);
+    if (this.potionArmTimer !== null) clearTimeout(this.potionArmTimer);
+    this.pilesOverlay?.close();
     for (const u of this.units.values()) u.player.stop();
+    const w = window as unknown as { __battle?: unknown };
+    if (w.__battle === this) delete w.__battle;
     if (report) this.onFinish(this.state);
   }
 }
