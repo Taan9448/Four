@@ -6,7 +6,7 @@ import { ID_RULE, PASSWORD_MIN } from './cloud-id';
 import { CLOUD } from './cloud-config';
 import type { Remote, SyncStatus } from './cloud-sync';
 import { h } from './dom';
-import { openOverlay } from './overlay';
+import { openOverlay, popPanel } from './overlay';
 import { SLOT_COUNT } from './storage';
 
 const when = (t: number | string) => {
@@ -105,6 +105,50 @@ export function chooseGuest(on = true): void {
 }
 
 /**
+ * 게스트로 시작할 때 한 번 묻는 창: 기록이 계정에 저장되지 않는다. true = 게스트로 계속, false = 로그인으로 돌아간다(Esc·바깥 누르기도)
+ */
+export function guestNotice(): Promise<boolean> {
+  return new Promise((resolve) => {
+    let guest = false;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        close();
+      }
+    };
+    const close = () => {
+      document.removeEventListener('keydown', onKey, true);
+      el.remove();
+      resolve(guest);
+    };
+    const login = h('button', { class: 'btn btn-primary', type: 'button', onclick: () => close() }, '로그인하러 가기');
+    const lead = h(
+      'div',
+      { class: 'guest-notice' },
+      h('p', {}, '게스트 기록은 ', h('b', {}, '계정에 저장되지 않는다.'), ' 이 브라우저에만 남아서'),
+      h('ul', {}, h('li', {}, '다른 기기·브라우저에서는 이어 할 수 없고'), h('li', {}, '브라우저 기록을 지우면 함께 사라진다.')),
+      h('p', {}, '로그인하면 어디서든 이어 한다. 나중에 로그인해도 지금까지의 게스트 기록은 계정으로 옮길 수 있다.'),
+    );
+    const el = h(
+      'div',
+      { class: 'overlay pop-overlay', onclick: (e: Event) => e.target === el && close() },
+      popPanel({
+        seal: '客',
+        sealKind: 'muted',
+        eyebrow: '게스트',
+        title: '저장 안 됨',
+        tone: 'plain',
+        lead,
+        actions: [h('button', { class: 'btn', type: 'button', onclick: () => ((guest = true), close()) }, '게스트로 계속'), login],
+      }),
+    );
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(el);
+    requestAnimationFrame(() => login.focus());
+  });
+}
+
+/**
  * 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인 · 회원가입 두 탭 + (시작 화면이면) 게스트로 시작.
  * onDone: 로그인·가입이 끝났다 · onGuest: 게스트로 시작(없으면 단추를 두지 않는다 — 설정의 계정 칸)
  */
@@ -126,7 +170,7 @@ export function loginPanel(opts: { onDone: () => void; onGuest?: () => void; com
     pw2.hidden = m === 'login';
     pw.autocomplete = m === 'login' ? 'current-password' : 'new-password';
     submit.textContent = m === 'login' ? '로그인' : '가입하고 시작';
-    hint.textContent = m === 'login' ? '' : `아이디: ${ID_RULE} · 비밀번호 ${PASSWORD_MIN}자 이상 · 비밀번호를 잊으면 찾을 수 없으니 잘 적어 둔다`;
+    hint.textContent = m === 'login' ? '' : `아이디: ${ID_RULE} · 비밀번호 ${PASSWORD_MIN}자 이상`;
     msg.textContent = '';
   };
   const form = h(
@@ -170,12 +214,20 @@ export function loginPanel(opts: { onDone: () => void; onGuest?: () => void; com
           CLOUD.providers.map((p) => h('button', { class: `btn btn-small cloud-${p.id}`, type: 'button', onclick: () => signIn(p.id).catch((e: unknown) => (msg.textContent = String(e instanceof Error ? e.message : e))) }, p.label)),
         )
       : null,
+    // 게스트는 단추가 아닌 글자 한 줄로(2026-10-15 사용자 요청 — 로그인을 권한다). 누르면 저장 안내 창을 거친다
     opts.onGuest
       ? h(
-          'div',
-          { class: 'login-guest' },
-          h('button', { class: 'btn login-guest-btn', type: 'button', onclick: () => (chooseGuest(true), opts.onGuest!()) }, '게스트로 시작'),
-          h('small', {}, '기록은 이 브라우저에만 저장된다 — 나중에 로그인하면 계정으로 옮긴다'),
+          'button',
+          {
+            class: 'login-guest-link',
+            type: 'button',
+            onclick: async () => {
+              if (!(await guestNotice())) return id.focus();
+              chooseGuest(true);
+              opts.onGuest!();
+            },
+          },
+          '게스트로 시작 →',
         )
       : null,
   );
