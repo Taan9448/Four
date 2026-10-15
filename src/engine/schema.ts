@@ -706,8 +706,27 @@ export const Balance = z
       })
       .strict(),
     party: z.object({ max: z.number().int().positive(), reviveHp: z.number().int().positive() }).strict(),
-    /** 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬) */
-    upgrade: z.object({ maxLevel: z.number().int().positive(), statLevels: z.number().int().nonnegative() }).strict(),
+    /**
+     * 카드 강화: 최대 단계와 수치만 오르는 단계 수(그 위는 특수 스킬).
+     * forge(대강화 +6~+10, GAME_DESIGN 16절 ⑦): rarities 카드만 상점에서 한 번에 price골드, 성공률 chance[+6..+10].
+     * 실패해도 단계는 그대로, 실패마다 그 단계 성공률 × (1 + pity × 실패 수). numberMul: +6의 수치 배율, awakenMul: +10(각성)에서 한 번 더
+     */
+    upgrade: z
+      .object({
+        maxLevel: z.number().int().positive(),
+        statLevels: z.number().int().nonnegative(),
+        forge: z
+          .object({
+            price: z.number().int().positive(),
+            rarities: z.array(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary'])),
+            chance: z.array(z.number().min(0).max(1)).length(5),
+            pity: z.number().min(0),
+            numberMul: z.number().positive(),
+            awakenMul: z.number().positive(),
+          })
+          .strict(),
+      })
+      .strict(),
     /** 편성(GAME_DESIGN 9-1): 동료마다·공용 칸 수(정확히 채워야 출발), 저장 칸 수, 최대 강화 카드를 또 얻었을 때의 골드 */
     loadout: z
       .object({

@@ -54,7 +54,11 @@
     "debugXpPerStage": 55
   },
   "party": { "max": 3, "reviveHp": 10 },
-  "upgrade": { "maxLevel": 5, "statLevels": 3 },
+  "upgrade": {
+    "maxLevel": 5,
+    "statLevels": 3,
+    "forge": { "price": 50, "rarities": ["epic", "legendary"], "chance": [0.5, 0.25, 0.1, 0.05, 0.01], "pity": 0.05, "numberMul": 1.2, "awakenMul": 1.2 }
+  },
   "loadout": { "perCharacter": 8, "common": 8, "presets": 3, "maxedGold": 25, "points": { "common": 1, "uncommon": 2, "rare": 3, "epic": 5, "legendary": 7, "special": 0 }, "cap": { "perCharacter": 24, "common": 17 }, "focusMin": 5 },
   "rewards": {
     "cardChoices": 3,

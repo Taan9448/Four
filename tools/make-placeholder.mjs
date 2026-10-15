@@ -172,6 +172,15 @@ function cardFrame(W, H, spec) {
   const key = CHROMA[spec.chroma]?.hex ?? '#FF00FF';
   const ph = spec.placeholder ?? {};
   const body = ph.color ?? '#4a3426', rim = ph.accent ?? '#b8741a', panel = ph.panel ?? '#e0cfae', banner = ph.banner ?? '#a02634';
+  // 겹치는 테두리: 띠와 모서리 장식만, 안은 키 색(투명)
+  if (spec.overlay) {
+    const b = (spec.overlay.band ?? 8) * s;
+    const c = (spec.overlay.corner ?? (spec.overlay.band ?? 8) * 2) * s;
+    const out = [`<rect width="${W}" height="${H}" fill="${key}"/>`, `<rect x="${b / 2}" y="${b / 2}" width="${W - b}" height="${H - b}" fill="none" stroke="${body}" stroke-width="${b}"/>`];
+    out.push(`<rect x="${b / 2}" y="${b / 2}" width="${W - b}" height="${H - b}" fill="none" stroke="${rim}" stroke-width="${s * 2}"/>`);
+    for (const [x, y] of [[0, 0], [W - c, 0], [0, H - c], [W - c, H - c]]) out.push(`<rect x="${x + s * 2}" y="${y + s * 2}" width="${c - s * 4}" height="${c - s * 4}" fill="${rim}" stroke="${body}" stroke-width="${s * 2}"/>`);
+    return out.join('');
+  }
   const r = (b, fill, extra = '') => `<rect x="${b[0] * s}" y="${b[1] * s}" width="${b[2] * s}" height="${b[3] * s}" fill="${fill}"${extra}/>`;
   const parts = [`<rect width="${W}" height="${H}" fill="${body}"/>`, `<rect x="${3 * s}" y="${3 * s}" width="${W - 6 * s}" height="${H - 6 * s}" fill="none" stroke="${rim}" stroke-width="${2 * s}"/>`];
   // 모서리 3px은 바깥(키 색)

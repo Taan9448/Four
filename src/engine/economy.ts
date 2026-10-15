@@ -3,6 +3,7 @@ import type { GameData } from './data';
 import type { CardDef } from './schema';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
+import { forgeMax, type CardInstance } from './state';
 import { swapCard, swappableCards } from './collection';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
 import { abyssShopPool, abyssShopRift, isAbyss, relicAllowed, removePrice, runOath } from './abyss';
@@ -271,4 +272,60 @@ export function buyUpgrade(data: GameData, run: RunState, uid: string): BuyResul
   // 강화 문구는 런 동작(upgrade_card, 고르는 강화)과 같게
   const msgs = applyRunOps(data, run, [{ op: 'upgrade_card', choose: true }], { pick: uid });
   return { ok: true, message: msgs.join(' · ') };
+}
+
+/** 대강화(+6~+10, GAME_DESIGN 16절 ⑦) 후보: 덱의 영웅·전설 카드 중 +5 이상, 상한 아래 */
+export function forgeCandidates(data: GameData, run: RunState): CardInstance[] {
+  const seen = new Set<string>();
+  return run.deck.filter((c) => {
+    const def = data.cards.get(c.cardId);
+    if (!def || c.temp || c.level < data.balance.upgrade.maxLevel || c.level >= forgeMax(data, def)) return false;
+    // 캠페인은 보유 카드 단위(같은 카드는 한 장)
+    if (!isAbyss(run)) {
+      if (seen.has(c.cardId)) return false;
+      seen.add(c.cardId);
+    }
+    return true;
+  });
+}
+
+const forgeKey = (run: RunState, c: CardInstance) => (isAbyss(run) ? c.uid : c.cardId);
+
+/** 이 카드의 다음 대강화 성공률(천장 반영)과 실패 횟수 */
+export function forgeChance(data: GameData, run: RunState, c: CardInstance): { chance: number; base: number; fails: number } {
+  const f = data.balance.upgrade.forge;
+  const base = f.chance[c.level - data.balance.upgrade.maxLevel] ?? 0;
+  const fails = run.forgeFails?.[forgeKey(run, c)] ?? 0;
+  return { chance: Math.min(1, base * (1 + f.pity * fails)), base, fails };
+}
+
+export type ForgeResult = (BuyResult & { ok: true; success: boolean; level: number }) | (BuyResult & { ok: false });
+
+/**
+ * 대강화 한 번(상점에서, 몇 번이든): price골드를 내고 성공하면 +1, 실패하면 단계 그대로 천장만 오른다.
+ * 결과는 시드·카드·단계·실패 수로 정해진다(다시 불러와도 같다)
+ */
+export function buyForge(data: GameData, run: RunState, uid: string): ForgeResult {
+  shopOf(run);
+  const c = forgeCandidates(data, run).find((x) => x.uid === uid);
+  if (!c) return { ok: false, reason: '대강화할 수 없는 카드' };
+  const fail = pay(run, data.balance.upgrade.forge.price);
+  if (fail) return fail as ForgeResult;
+  const key = forgeKey(run, c);
+  const { chance, fails } = forgeChance(data, run, c);
+  const roll = createRng(run.seed).fork(`forge:${key}:${c.level}:${fails}`).next();
+  const name = data.cards.get(c.cardId)!.name;
+  run.forgeFails ??= {};
+  if (roll >= chance) {
+    run.forgeFails[key] = fails + 1;
+    return { ok: true, success: false, level: c.level, message: `대강화 실패: ${name} +${c.level} 그대로(다음 ${Math.round(forgeChance(data, run, c).chance * 1000) / 10}%)` };
+  }
+  delete run.forgeFails[key];
+  const level = c.level + 1;
+  if (isAbyss(run)) c.level = level;
+  else {
+    run.collection[c.cardId] = level;
+    for (const x of run.deck) if (x.cardId === c.cardId) x.level = level;
+  }
+  return { ok: true, success: true, level, message: `대강화 성공: ${name} +${level}` };
 }

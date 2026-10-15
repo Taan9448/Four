@@ -23,7 +23,7 @@ export const HOLD_NAME: Record<Hold, string> = { clear: '클리어 그대로', p
 /** 보유 카드 전부 +2(강화가 있는 카드만, 최대 강화까지) */
 export function plusTwo(data: GameData, hub: RunState): RunState {
   const h = structuredClone(hub);
-  for (const id of Object.keys(h.collection)) if (data.cards.get(id)?.upgrade) h.collection[id] = Math.min(data.balance.upgrade.maxLevel, h.collection[id] + 2);
+  for (const id of Object.keys(h.collection)) if (data.cards.get(id)?.upgrade) h.collection[id] = Math.max(h.collection[id], Math.min(data.balance.upgrade.maxLevel, h.collection[id] + 2));
   return h;
 }
 

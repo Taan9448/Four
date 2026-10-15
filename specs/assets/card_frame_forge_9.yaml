@@ -1,0 +1,17 @@
+id: card_frame_forge_9
+type: card-frame
+summary: >-
+  the overlay border of a +9 TWIN-STRIKE card: dark steel wrapped in violet lightning, the energy of a move that strikes twice
+# 대강화 +9 카드 틀(2026-10-15, GAME_DESIGN 16절 ⑦). 무공·마법·융합 틀(card_frame_*) 위에 겹치는 테두리 띠만 그린다 — 안은 투명.
+# 게임은 src/ui/card-view.ts의 .cpx-forge로 128×192 그대로 겹친다. 그림이 오기 전에는 CSS 빛(.forge-9)만
+overlay:
+  band: 7
+  corner: 14
+  allowPurple: true
+frame_notes:
+  1: >-
+    dark blued steel (#1d2433, #3d4459, #5d6478) wrapped by a thin violet energy ribbon (#6b4fa3, #a35cff, #d4b8ff) that runs around the whole band; at each corner two small crossed blades
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3d4459', accent: '#a35cff' }
