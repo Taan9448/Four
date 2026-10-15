@@ -1078,7 +1078,28 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .cloud-side p { margin: 4px 0; }
 .cloud-side small { color: var(--muted, #b9b2a2); }
 .cloud-empty { color: var(--muted, #b9b2a2); }
-.title-account.signed-in::after { content: ''; position: absolute; right: 4px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: #ffd98a; box-shadow: 0 0 6px #ffd98a; }
+/* 시작 화면 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼: 로그인 · 회원가입 · 게스트로 시작) */
+.title-login { width: min(340px, calc(100vw - 48px)); margin-top: 18px; }
+.login-panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; border: 1px solid rgba(201, 162, 79, 0.55); border-radius: 10px; background: rgba(8, 9, 14, 0.82); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55); text-align: left; }
+.login-panel.compact { padding: 10px 12px 12px; background: rgba(0, 0, 0, 0.25); box-shadow: none; border-color: var(--line); }
+.login-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid rgba(201, 162, 79, 0.35); }
+.login-tab { min-height: 40px; background: none; border: 0; border-bottom: 2px solid transparent; color: #b9b2a2; font: 700 var(--fs-body)/1 var(--f-ui); cursor: pointer; }
+.login-tab[aria-selected='true'] { color: #f5d98c; border-bottom-color: #c9a24f; }
+.login-form { display: flex; flex-direction: column; gap: 8px; }
+.login-input { min-height: 42px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.45); color: #f4ecd8; font: 400 var(--fs-body)/1.2 var(--f-ui); }
+.login-input:focus { outline: 2px solid #c9a24f; outline-offset: 1px; }
+.login-input[hidden] { display: none; }
+.login-hint:empty, .login-msg:empty { display: none; }
+.login-hint { color: #b9b2a2; font-size: var(--fs-min); line-height: 1.4; }
+.login-msg { margin: 0; color: #ffb38a; font-size: var(--fs-min); }
+.login-submit { min-height: 44px; }
+.login-guest { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; }
+.login-guest-btn { min-height: 44px; }
+.login-guest small { color: #b9b2a2; font-size: var(--fs-min); }
+/* 메뉴 위 계정 한 줄 */
+.title-account { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 14px; font-size: var(--fs-min); color: #e8dcc0; text-shadow: 0 1px 3px #000; }
+.title-account.signed-in .title-who { color: #ffd98a; }
+.link-btn { min-height: 32px; padding: 4px 8px; background: none; border: 0; color: #f5d98c; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-shadow: inherit; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .deck-view { display: flex; flex-direction: column; gap: 16px; }
 .deck-group h3 { margin: 0 0 8px; font-size: var(--fs-body); }

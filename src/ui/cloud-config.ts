@@ -3,6 +3,8 @@
 export const CLOUD = {
   url: 'https://jbrxhycnipzlfbpxytuj.supabase.co',
   key: 'sb_publishable_8hU7FjvsxC14FitGSYSRaw_Wonc-U-V',
+  /** 아이디 로그인: 아이디를 안에서만 쓰는 이메일(아이디@idDomain)로 바꾼다. 메일은 보내지 않는다(Supabase Confirm email 끔) */
+  idDomain: 'player.cheonoe.app',
   /**
    * 로그인 단추(Supabase 대시보드에서 켠 공급자만 둔다 — docs/CLOUD_SAVE.md 3절). 2026-10-15: 이메일 로그인 링크만 먼저.
    * 켤 때: { id: 'google', label: '구글로 로그인' }, { id: 'kakao', label: '카카오로 로그인' }

@@ -4,6 +4,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { browserKV, type BackupFile } from './backup';
 import { CLOUD } from './cloud-config';
+import { checkId, checkPassword, displayName, idToEmail, loginError, normalizeId } from './cloud-id';
 import { CloudSync, readMeta, type CloudStore, type Remote, type SyncStatus, type Written } from './cloud-sync';
 import { onStoreWrite } from './storage';
 
@@ -15,7 +16,8 @@ const PUSH_DELAY = 4000;
 
 export interface CloudUser {
   id: string;
-  email: string;
+  /** 화면에 보일 이름(아이디 계정이면 아이디) */
+  name: string;
   provider: string;
 }
 
@@ -40,7 +42,8 @@ function client(): Promise<SupabaseClient> {
   return clientP;
 }
 
-function hasStoredSession(): boolean {
+/** 로그인해 둔 적이 있는가(시작 화면이 로그인 판을 건너뛴다 — 확인은 bootCloud가 이어서 한다) */
+export function hasStoredSession(): boolean {
   try {
     return localStorage.getItem(AUTH_KEY) !== null;
   } catch {
@@ -118,6 +121,20 @@ function hookWrites(): void {
   addEventListener('online', () => void sync?.push());
 }
 
+let listening = false;
+/** 로그인이 풀리면(다른 탭에서 로그아웃·토큰 만료) 게스트로 */
+function listenAuth(c: SupabaseClient): void {
+  if (listening) return;
+  listening = true;
+  c.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      user = null;
+      sync = null;
+      notify();
+    }
+  });
+}
+
 async function attach(c: SupabaseClient): Promise<void> {
   const { data } = await c.auth.getSession();
   const u = data.session?.user;
@@ -126,7 +143,7 @@ async function attach(c: SupabaseClient): Promise<void> {
     sync = null;
     return notify();
   }
-  user = { id: u.id, email: u.email ?? '', provider: String(u.app_metadata?.provider ?? '') };
+  user = { id: u.id, name: displayName(u.email, u.user_metadata), provider: String(u.app_metadata?.provider ?? '') };
   sync = new CloudSync(browserKV(), supaStore(c, u.id), u.id, { ask: (l, r) => ask(l, r), reload: () => location.reload(), status: setStatus }, deviceName());
   hookWrites();
   notify();
@@ -151,15 +168,9 @@ export async function bootCloud(params: URLSearchParams, askWhich: typeof ask, n
       const { error } = await c.auth.exchangeCodeForSession(code);
       if (error) note(`로그인하지 못했다 — ${error.message}`);
     }
-    c.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
-        user = null;
-        sync = null;
-        notify();
-      }
-    });
+    listenAuth(c);
     await attach(c);
-    if (code && user) note(`${user.email || '계정'}으로 로그인했다`);
+    if (code && user) note(`${user.name}으로 로그인했다`);
   } catch {
     // 서버에 닿지 못했다(오프라인 등): 게스트처럼 계속
     setStatus({ state: 'offline' });
@@ -173,11 +184,31 @@ export async function signIn(provider: Provider): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-/** 이메일로 로그인 링크를 보낸다(링크를 누르면 이 주소로 돌아와 로그인된다 — 같은 브라우저에서 연다) */
-export async function signInEmail(email: string): Promise<void> {
-  const c = await client();
-  const { error } = await c.auth.signInWithOtp({ email, options: { emailRedirectTo: returnTo() } });
-  if (error) throw new Error(error.message);
+export type IdResult = { ok: true } | { ok: false; message: string };
+
+/**
+ * 아이디·비밀번호 로그인(signup이면 가입하고 바로 로그인). 성공하면 계정과 맞춘다(게스트 기록이 있으면 올리거나 묻는다).
+ * 입력이 규칙에 맞지 않거나 서버가 거절하면 까닭을 돌려준다(던지지 않는다)
+ */
+export async function signInWithId(id: string, password: string, mode: 'login' | 'signup', again?: string): Promise<IdResult> {
+  const bad = checkId(id) ?? checkPassword(password, mode === 'signup' ? again : undefined);
+  if (bad) return { ok: false, message: bad };
+  try {
+    const c = await client();
+    listenAuth(c);
+    const email = idToEmail(id);
+    const { data, error } =
+      mode === 'signup'
+        ? await c.auth.signUp({ email, password, options: { data: { username: normalizeId(id) } } })
+        : await c.auth.signInWithPassword({ email, password });
+    if (error) return { ok: false, message: loginError(error.message, mode) };
+    // 가입했는데 세션이 없다 = Supabase의 메일 확인(Confirm email)이 켜져 있다
+    if (!data.session) return { ok: false, message: loginError('email not confirmed', mode) };
+    await attach(c);
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: loginError(e instanceof Error ? e.message : String(e), mode) };
+  }
 }
 
 /** 로그아웃: 바뀐 것을 먼저 올리고, 이 브라우저의 기록은 그대로 둔다(게스트로 계속) */
