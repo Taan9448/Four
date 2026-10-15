@@ -45,8 +45,8 @@ import { openDeck } from './deck-view';
 import { relicChip } from './items';
 import { h } from './dom';
 import { initDebug, isDebug } from './debug';
-import { bootCloud, cloudEnabled, cloudState, onCloudChange } from './cloud';
-import { askWhich } from './cloud-view';
+import { bootCloud, cloudEnabled, cloudState, hasStoredSession, onCloudChange, signOut } from './cloud';
+import { askWhich, chooseGuest, guestChosen, loginPanel } from './cloud-view';
 import { mapView, openPartyGuide, pilgrimLabel, placeName, startRiftMaxText } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
@@ -150,7 +150,15 @@ export class App {
     if (isDebug()) Object.assign(window, { __app: this, __bgm: playBgm });
     // 계정·클라우드 저장: 로그인에서 돌아왔거나(?code=) 로그인해 둔 적이 있으면 계정과 맞춘다(아래 화면 고르기보다 먼저 주소를 읽는다)
     void bootCloud(params, askWhich, (text) => this.flash(text));
-    onCloudChange(() => document.querySelector('.title-account')?.classList.toggle('signed-in', Boolean(cloudState().user)));
+    // 로그인·로그아웃하면 시작 화면을 다시 그린다(로그인 판 ↔ 메뉴, 계정 줄). 동기화 상태만 바뀐 것은 그리지 않는다
+    const who = () => `${cloudState().user?.id ?? ''}|${hasStoredSession()}|${cloudState().status.state === 'offline'}`;
+    let signedAs = who();
+    onCloudChange(() => {
+      const now = who();
+      if (now === signedAs) return;
+      signedAs = now;
+      if (this.root.querySelector('.title-screen')) this.title();
+    });
     const seed = params.get('seed');
     if (params.has('screen')) this.screen(params.get('screen') || 'reward', params.get('module') ?? undefined, params.get('stage') ?? 's2');
     else if (params.has('sandbox'))
@@ -390,6 +398,28 @@ export class App {
   /** 다음 화면에 띄울 알림 */
   private notices: string[] = [];
 
+  /** 시작 화면 메뉴 위 계정 한 줄: 「● 아이디 · 로그아웃」 또는 「게스트 · 로그인」 */
+  private accountLine(): HTMLElement | null {
+    if (!cloudEnabled()) return null;
+    const user = cloudState().user;
+    if (user)
+      return h(
+        'div',
+        { class: 'title-account signed-in' },
+        h('span', { class: 'title-who' }, `● ${user.name}`),
+        h('button', { class: 'link-btn', type: 'button', onclick: () => void signOut().then(() => this.title()) }, '로그아웃'),
+      );
+    // 로그인해 둔 세션을 확인하는 중(서버에 닿지 않으면 이 기기에 저장하며 계속)
+    if (hasStoredSession())
+      return h('div', { class: 'title-account' }, h('span', { class: 'title-who' }, cloudState().status.state === 'offline' ? '오프라인 — 이 기기에 저장하고 연결되면 올린다' : '로그인 확인 중…'));
+    return h(
+      'div',
+      { class: 'title-account' },
+      h('span', { class: 'title-who' }, '게스트'),
+      h('button', { class: 'link-btn', type: 'button', onclick: () => (chooseGuest(false), this.title()) }, '로그인 · 회원가입'),
+    );
+  }
+
   /** 지금 화면에 바로 띄우는 알림(로그인 결과 등) */
   private flash(text: string): void {
     const host = (this.root.firstElementChild as HTMLElement | null) ?? this.root;
@@ -427,6 +457,8 @@ export class App {
     const anySaved = listSlots(data).some((x) => x.saved);
     const abyssSaved = loadAbyss(data);
     const url = frameUrl('title_world', 1, { realOnly: true });
+    // 로그인해 둔 적이 있으면(확인은 bootCloud가 이어서) 판 없이 메뉴로
+    const gate = cloudEnabled() && !cloudState().user && !hasStoredSession() && !guestChosen();
     playBgm('title');
     this.show(
       h(
@@ -439,7 +471,12 @@ export class App {
           { class: 'title-center' },
           h('h1', {}, '천외귀환'),
           h('div', { class: 'title-sub' }, '天外歸還 · 세계의 틈'),
-          h(
+          // 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인하지 않았고 이번 접속에서 게스트도 고르지 않았으면 메뉴 대신
+          gate ? h('div', { class: 'title-login' }, loginPanel({ onDone: () => this.title(), onGuest: () => this.title() })) : null,
+          gate ? null : this.accountLine(),
+          gate
+            ? null
+            : h(
             'div',
             { class: 'title-menu' },
             last
@@ -473,15 +510,6 @@ export class App {
             : null,
           h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
-          // 계정(2026-10-15): 로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다 — 설정 › 저장의 계정 칸을 연다
-          cloudEnabled()
-            ? h(
-                'button',
-                { class: `medal title-medal title-account${cloudState().user ? ' signed-in' : ''}`, 'aria-label': '계정', ...tipAttrs('계정', '로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다'), onclick: () => this.openSettings('save') },
-                h('b', {}, '名'),
-                h('span', {}, '계정'),
-              )
-            : null,
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
         h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),

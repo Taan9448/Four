@@ -1,7 +1,8 @@
 // 계정·클라우드 저장의 화면(2026-10-15): 둘 다 기록이 있고 다를 때 고르는 창, 설정 › 저장 맨 위 「계정」 칸
 import { gameData } from '../engine/data';
 import { previewBackup, type BackupFile } from './backup';
-import { cloudEnabled, cloudState, onCloudChange, signIn, signInEmail, signOut, syncNow } from './cloud';
+import { cloudEnabled, cloudState, onCloudChange, signIn, signInWithId, signOut, syncNow } from './cloud';
+import { ID_RULE, PASSWORD_MIN } from './cloud-id';
 import { CLOUD } from './cloud-config';
 import type { Remote, SyncStatus } from './cloud-sync';
 import { h } from './dom';
@@ -83,14 +84,107 @@ function statusText(s: SyncStatus, last: string | null): string {
   }
 }
 
-const PROVIDER_NAME: Record<string, string> = { google: '구글', kakao: '카카오', email: '이메일' };
+const PROVIDER_NAME: Record<string, string> = { google: '구글', kakao: '카카오' };
+
+/** 이번 탭에서 게스트를 골랐는가(시작 화면이 로그인 판을 다시 띄우지 않는다 — 다음 접속에는 다시 묻는다) */
+const GUEST_KEY = 'cheonoe-guest';
+export function guestChosen(): boolean {
+  try {
+    return sessionStorage.getItem(GUEST_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+export function chooseGuest(on = true): void {
+  try {
+    if (on) sessionStorage.setItem(GUEST_KEY, '1');
+    else sessionStorage.removeItem(GUEST_KEY);
+  } catch {
+    /* 저장할 수 없는 환경: 이번 화면에서만 */
+  }
+}
+
+/**
+ * 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인 · 회원가입 두 탭 + (시작 화면이면) 게스트로 시작.
+ * onDone: 로그인·가입이 끝났다 · onGuest: 게스트로 시작(없으면 단추를 두지 않는다 — 설정의 계정 칸)
+ */
+export function loginPanel(opts: { onDone: () => void; onGuest?: () => void; compact?: boolean }): HTMLElement {
+  let mode: 'login' | 'signup' = 'login';
+  const id = h('input', { type: 'text', class: 'login-input', name: 'username', placeholder: '아이디', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', maxlength: '20', 'aria-label': '아이디' }) as HTMLInputElement;
+  const pw = h('input', { type: 'password', class: 'login-input', name: 'password', placeholder: '비밀번호', autocomplete: 'current-password', 'aria-label': '비밀번호' }) as HTMLInputElement;
+  const pw2 = h('input', { type: 'password', class: 'login-input', name: 'password2', placeholder: '비밀번호 확인', autocomplete: 'new-password', 'aria-label': '비밀번호 확인' }) as HTMLInputElement;
+  const msg = h('p', { class: 'login-msg', role: 'alert' });
+  const submit = h('button', { class: 'btn btn-primary login-submit', type: 'submit' }, '로그인') as HTMLButtonElement;
+  const hint = h('small', { class: 'login-hint' });
+  const tabBtn = (m: 'login' | 'signup', label: string) =>
+    h('button', { class: 'login-tab', type: 'button', role: 'tab', onclick: () => setMode(m) }, label) as HTMLButtonElement;
+  const tabs = { login: tabBtn('login', '로그인'), signup: tabBtn('signup', '회원가입') };
+  const setMode = (m: 'login' | 'signup') => {
+    mode = m;
+    tabs.login.setAttribute('aria-selected', String(m === 'login'));
+    tabs.signup.setAttribute('aria-selected', String(m === 'signup'));
+    pw2.hidden = m === 'login';
+    pw.autocomplete = m === 'login' ? 'current-password' : 'new-password';
+    submit.textContent = m === 'login' ? '로그인' : '가입하고 시작';
+    hint.textContent = m === 'login' ? '' : `아이디: ${ID_RULE} · 비밀번호 ${PASSWORD_MIN}자 이상 · 비밀번호를 잊으면 찾을 수 없으니 잘 적어 둔다`;
+    msg.textContent = '';
+  };
+  const form = h(
+    'form',
+    {
+      class: 'login-form',
+      onsubmit: async (e: Event) => {
+        e.preventDefault();
+        submit.disabled = true;
+        msg.textContent = mode === 'login' ? '로그인하는 중…' : '가입하는 중…';
+        const r = await signInWithId(id.value, pw.value, mode, pw2.value);
+        submit.disabled = false;
+        if (!r.ok) {
+          msg.textContent = r.message;
+          return;
+        }
+        msg.textContent = '';
+        pw.value = pw2.value = '';
+        chooseGuest(false);
+        opts.onDone();
+      },
+    },
+    id,
+    pw,
+    pw2,
+    hint,
+    msg,
+    submit,
+  );
+  setMode('login');
+  return h(
+    'div',
+    { class: `login-panel${opts.compact ? ' compact' : ''}` },
+    h('div', { class: 'login-tabs', role: 'tablist' }, tabs.login, tabs.signup),
+    form,
+    // 구글·카카오(켠 공급자만, cloud-config.ts)
+    CLOUD.providers.length
+      ? h(
+          'div',
+          { class: 'cloud-providers' },
+          CLOUD.providers.map((p) => h('button', { class: `btn btn-small cloud-${p.id}`, type: 'button', onclick: () => signIn(p.id).catch((e: unknown) => (msg.textContent = String(e instanceof Error ? e.message : e))) }, p.label)),
+        )
+      : null,
+    opts.onGuest
+      ? h(
+          'div',
+          { class: 'login-guest' },
+          h('button', { class: 'btn login-guest-btn', type: 'button', onclick: () => (chooseGuest(true), opts.onGuest!()) }, '게스트로 시작'),
+          h('small', {}, '기록은 이 브라우저에만 저장된다 — 나중에 로그인하면 계정으로 옮긴다'),
+        )
+      : null,
+  );
+}
 
 /** 설정 › 저장 맨 위 「계정」 칸(로그인 상태가 바뀌면 다시 그린다) */
 export function accountRows(): HTMLElement[] {
   if (!cloudEnabled()) return [];
   const box = h('div', { class: 'cloud-account', 'aria-live': 'polite' });
-  const msg = h('p', { class: 'cloud-msg' });
-  const fail = (e: unknown) => (msg.textContent = `로그인하지 못했다 — ${e instanceof Error ? e.message : String(e)}`);
   const draw = () => {
     if (!box.isConnected && box.childElementCount) return off();
     const { user, status, lastSync } = cloudState();
@@ -103,7 +197,7 @@ export function accountRows(): HTMLElement[] {
             'span',
             { class: 'set-label' },
             h('span', { class: 'set-name' }, '계정'),
-            h('small', {}, `${user.email || '로그인됨'}${PROVIDER_NAME[user.provider] ? ` · ${PROVIDER_NAME[user.provider]}` : ''}`),
+            h('small', {}, `${user.name}${PROVIDER_NAME[user.provider] ? ` · ${PROVIDER_NAME[user.provider]}` : ''}`),
           ),
           h(
             'span',
@@ -116,7 +210,6 @@ export function accountRows(): HTMLElement[] {
       );
       return;
     }
-    const email = h('input', { type: 'email', class: 'cloud-email', placeholder: 'you@example.com', autocomplete: 'email', 'aria-label': '이메일' }) as HTMLInputElement;
     box.replaceChildren(
       h(
         'div',
@@ -125,38 +218,11 @@ export function accountRows(): HTMLElement[] {
           'span',
           { class: 'set-label' },
           h('span', { class: 'set-name' }, '계정 로그인'),
-          h('small', {}, '로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다. 하지 않으면 이 브라우저에만 저장된다'),
+          h('small', {}, '로그인하면 저장이 계정에 올라가 다른 기기에서 이어 한다. 하지 않으면 이 브라우저에만 저장된다(게스트)'),
         ),
       ),
-      // 구글·카카오(켠 공급자만, cloud-config.ts)
-      ...(CLOUD.providers.length
-        ? [
-            h(
-              'div',
-              { class: 'cloud-providers' },
-              CLOUD.providers.map((p) => h('button', { class: `btn btn-small cloud-${p.id}`, type: 'button', onclick: () => signIn(p.id).catch(fail) }, p.label)),
-            ),
-          ]
-        : []),
-      h(
-        'form',
-        {
-          class: 'cloud-email-row',
-          onsubmit: (e: Event) => {
-            e.preventDefault();
-            const v = email.value.trim();
-            if (!v) return;
-            msg.textContent = '보내는 중…';
-            signInEmail(v)
-              .then(() => (msg.textContent = `${v}로 로그인 링크를 보냈다 — 이 브라우저에서 메일의 링크를 누른다`))
-              .catch(fail);
-          },
-        },
-        email,
-        h('button', { class: 'btn btn-small', type: 'submit' }, '로그인 링크 받기'),
-      ),
+      loginPanel({ onDone: () => undefined, compact: true }),
       h('p', { class: 'cloud-note' }, '지금 이 브라우저의 기록(게스트)은 지워지지 않는다 — 계정이 비어 있으면 그대로 올라가고, 계정에도 기록이 있으면 어느 쪽을 쓸지 묻는다.'),
-      msg,
     );
   };
   const off = onCloudChange(draw);
