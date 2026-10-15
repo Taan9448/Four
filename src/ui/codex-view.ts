@@ -371,7 +371,7 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
   // 등급 순(일반 → 전설 → 길), 같은 등급은 데이터 순(2026-10-15 유물 5등급)
   const RELIC_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'path'];
   const relics = [...data.relics.values()].sort((a, b) => RELIC_ORDER.indexOf(a.rarity) - RELIC_ORDER.indexOf(b.rarity));
-  const potions = [...data.potions.values()];
+  const potions = [...data.potions.values()].sort((a, b) => RELIC_ORDER.indexOf(a.rarity) - RELIC_ORDER.indexOf(b.rarity));
   return splitTab('items', '분류', [
     {
       id: 'relics',
@@ -392,7 +392,7 @@ function itemsTab(data: GameData, codex: Codex): HTMLElement {
       total: potions.length,
       render: () =>
       h('div', { class: 'codex-items' }, potions.map((p) =>
-          codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description, () => openItem(potionChip(data, p.id, { extra: 'huge' }), p.name, `${RARITY_LABEL[p.rarity]} 물약`, p.description)) : unknown('물약'),
+          codex.potions.includes(p.id) ? row(potionChip(data, p.id), p.name, p.description, () => openItem(potionChip(data, p.id, { extra: 'huge' }), p.name, `${RARITY_LABEL[p.rarity]} 물약${p.abyss ? ' · 심연 전용' : ''}`, p.description)) : unknown('물약'),
         )),
     },
   ]);

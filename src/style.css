@@ -1305,6 +1305,8 @@ button.potion-chip { cursor: pointer; }
 button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px color-mix(in srgb, var(--pc) 70%, transparent); }
 .potion-chip.rarity-uncommon { --pc: #6aa8d8; }
 .potion-chip.rarity-rare { --pc: #e2b45c; }
+.potion-chip.rarity-epic { --pc: #a35cff; box-shadow: 0 0 8px rgba(163, 92, 255, 0.55); }
+.potion-chip.rarity-legendary { --pc: #ff8a5c; box-shadow: 0 0 10px rgba(255, 138, 92, 0.7); }
 .potion-chip.empty { border-style: dashed; border-color: rgba(200, 205, 215, 0.3); background: transparent; }
 .potion-chip.empty::before { background: rgba(138, 106, 58, 0.35); }
 .potion-chip.selected { box-shadow: 0 0 0 3px var(--mana), 0 0 12px var(--mana); }
