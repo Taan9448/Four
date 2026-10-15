@@ -1,0 +1,28 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: pine resin — a small cloth pouch dripping golden pine resin
+Cell 2: bamboo flute — a short green bamboo flute with three holes
+Cell 3: hunters snare — a rope snare loop pegged to the ground
+Cell 4: salt pouch — a small tied pouch spilling coarse white salt
+Cell 5: ink stone — a dark rectangular ink stone with a pool of black ink
+Cell 6: copper mirror — a round dull copper hand mirror with a faint glint
+Cell 7: abyss pebble — a smooth dark pebble with a thin red crack line
+Cell 8: seam thread — a spool of red thread with a needle stuck through
+Cell 9: depth marker — a small stone marker post with a carved notch
+Cell 10: rift moss — a clump of pale green moss growing on a black crack
+Cell 11: warrior sash — a red cloth martial arts sash tied in a knot
+Cell 12: scholar brush — a calligraphy brush with a dark tip and wooden handle
+Cell 13: storm bell — a small bronze bell with a tiny lightning spark
+Cell 14: dumpling basket — a round bamboo steamer basket with three dumplings and steam
+Cell 15: lantern wick — a short glowing lantern wick in a small clay dish
+Cell 16: steady stake — a thick wooden stake driven deep into the ground
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
