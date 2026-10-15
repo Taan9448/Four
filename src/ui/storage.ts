@@ -23,6 +23,12 @@ export function readStore(key: string): string | null {
   }
 }
 
+/** 저장이 바뀌면 부른다(계정·클라우드 저장이 모아서 올린다, cloud.ts) */
+let onWrite: ((key: string) => void) | null = null;
+export function onStoreWrite(fn: (key: string) => void): void {
+  onWrite = fn;
+}
+
 export function writeStore(key: string, value: string | null): void {
   try {
     if (value === null) localStorage.removeItem(key);
@@ -30,6 +36,7 @@ export function writeStore(key: string, value: string | null): void {
   } catch {
     /* 저장할 수 없는 환경: 무시 */
   }
+  if (key !== SETTINGS_KEY) onWrite?.(key);
 }
 
 function migrateLegacy(): void {

@@ -3,6 +3,7 @@ import { h } from './dom';
 import { setIdleEnabled } from '../render/idle';
 import { readSettings, writeSettings } from './storage';
 import { resetTour, resetTours, TOUR_LIST, tourSeen } from './tour';
+import { accountRows } from './cloud-view';
 import { applyBackup, backupFileName, browserKV, exportBackup, hasUndo, parseBackup, previewBackup, undoImport } from './backup';
 import { gameData } from '../engine/data';
 import { SLOT_COUNT } from './storage';
@@ -334,7 +335,7 @@ function tabRows(tab: SettingsTab, opts: { onGlossary?: () => void }): (HTMLElem
           : null,
       ];
     case 'save':
-      return saveRows();
+      return [...accountRows(), ...saveRows()];
   }
 }
 

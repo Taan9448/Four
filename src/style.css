@@ -1061,6 +1061,24 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .backup-slots { margin: 4px 0; padding-left: 18px; }
 .backup-error { color: #ff8a7a; }
 .backup-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+/* 계정·클라우드 저장(2026-10-15): 설정 › 저장 맨 위 칸, 기록 고르기 창, 시작 화면 名 표식(로그인하면 금빛 점) */
+.cloud-account { display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.cloud-providers { display: flex; gap: 8px; flex-wrap: wrap; }
+.cloud-email-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.cloud-email { flex: 1 1 180px; min-width: 0; min-height: 36px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.35); color: inherit; font: inherit; }
+.cloud-note, .cloud-status { margin: 0; font-size: var(--fs-min); color: var(--muted, #b9b2a2); }
+.cloud-msg:empty { display: none; }
+.cloud-msg { margin: 0; font-size: var(--fs-min); color: #ffd98a; }
+.cloud-kakao { background: #fee500; color: #191600; border-color: #d8c200; }
+.cloud-ask { display: flex; flex-direction: column; gap: 12px; }
+.cloud-lead { margin: 0; }
+.cloud-sides { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.cloud-side { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: rgba(0, 0, 0, 0.25); }
+.cloud-side h3 { margin: 0 0 4px; font-size: var(--fs-body); }
+.cloud-side p { margin: 4px 0; }
+.cloud-side small { color: var(--muted, #b9b2a2); }
+.cloud-empty { color: var(--muted, #b9b2a2); }
+.title-account.signed-in::after { content: ''; position: absolute; right: 4px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: #ffd98a; box-shadow: 0 0 6px #ffd98a; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .deck-view { display: flex; flex-direction: column; gap: 16px; }
 .deck-group h3 { margin: 0 0 8px; font-size: var(--fs-body); }
