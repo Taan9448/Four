@@ -6,7 +6,7 @@
 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts`의 `BATTLE_OPS` + `src/engine/effects.ts`),
 이 문서와 `tests/engine.test.ts`(원작 기믹은 `tests/mechanics.test.ts`)를 함께 갱신한다. 스키마 검사는 `npm run data:check`.
 
-## 1. 전투 기본 동작(23개)
+## 1. 전투 기본 동작(24개)
 
 | op | 필드 | 기본 대상 | 설명 |
 |---|---|---|---|
@@ -36,6 +36,7 @@
 | `reveal_intent` | — | — | 이번 차례에는 굽이의 법칙 '안개'가 가린 적의 의도가 보인다(안개 속의 눈, 2파) |
 | `purge` | card, amount? | — | `card` 카드를 손패 → 버린 더미 → 뽑을 더미 순으로 amount(기본 1)장까지 소멸시킨다(잔향 먹는 금) |
 | `delay_enrage` | amount | — | 살아 있는 적의 격노와 법칙 '서두르는 자'의 격노가 amount턴 늦게 온다. 이미 격노했으면 지금부터 amount턴 쉰다(격노 늦추기) |
+| `execute` | ratio | 적 하나 | 처형(심연 개편 3, 2026-10-15): 체력이 최대 체력 × ratio 이하인 적을 쓰러뜨린다. 엘리트·보스는 문턱이 `balance.hpRatio.eliteBossMul`배(0.5 → 절반). 꿰맬 자리(`seam`)인 적에게는 듣지 않는다. 쓰러뜨리는 것은 체력 잃기라 방어를 무시하고 변신(transform)은 그대로 일어난다 |
 
 **공통 수식자**
 - `target`: `self`(효과를 일으킨 쪽) · `ally`(카드가 지정한 아군) · `enemy`(지정한 적/적 행동의 대상) · `all_enemies` · `all_allies` · `random_enemy` · `trigger_enemy`(지원 규칙을 일으킨 적). 적 행동에서는 '적/아군'이 적 입장으로 뒤집힌다.
@@ -43,7 +44,8 @@
 - `oncePerBattle`: 이 효과는 한 전투에 한 번만(카드마다, 조건이 맞아 실제로 일어난 때부터 센다 — 은빛 바느질의 상흔 -1).
 - `condition`: `riftGte`, `riftLte`, `targetHasStatus`, `targetStatusGte: [status, n]`, `world`, `partyHas`, `turnMod: [n, r]`, `enemyId`, `hpRatioLte`, `flag`, `scarMin`, `selfBlockGte`(출처 — 지속 효과면 가진 쪽 — 의 방어가 N 이상). 대상이 있는 동작은 대상마다 검사한다.
 - `scale`: `{ per, status?, amount, max? }` → 기본값 + ⌊amount × per⌋(max가 있으면 더하는 값의 상한). `apply_status`·`reveal_grain`·`taunt`의 스택에도 걸린다.
-  - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수 · `consumed` 이 카드가 `consume_rift`로 소비한 균열
+  - per: `rift` 균열 · `hand` 손패 수 · `mana` 마나 · `targetStatus` 대상의 status 스택 · `selfStatus` 자신의 status 스택 · `cardsPlayed` 이번 턴에 이 카드 **전에** 낸 카드 수 · `block` 자신의 방어 · `missingHp` 자신이 잃은 체력 · `enemies` 살아 있는 적 수 · `consumed` 이 카드가 `consume_rift`로 소비한 균열 · `targetMaxHp` 대상의 최대 체력 · `enemyMaxHp` 살아 있는 적 중 가장 큰 최대 체력
+  - 체력 비율(`targetMaxHp`·`enemyMaxHp`, 심연 개편 3): 그 적이 엘리트·보스면 `balance.hpRatio.eliteBossMul`배(절반)로 센다. 아군(회복·방어의 대상)은 그대로. 예: 틈새 찌르기 `{"op":"damage","amount":30,"scale":{"per":"targetMaxHp","amount":0.05}}`(피해 30 + 대상 최대 체력의 5%), 산의 잣대 `{"op":"block","amount":0,"scale":{"per":"enemyMaxHp","amount":0.05}}`. 카드 문구: "피해 30 (대상 최대 체력의 5%, 엘리트·보스 절반)"
   - 예: 결을 따라 `{"op":"damage","amount":4,"scale":{"per":"targetStatus","status":"grain","amount":3}}`, 산처럼 `{"op":"damage","amount":0,"scale":{"per":"block","amount":0.5}}`, 불씨 잇기(화상 두 배) `{"op":"apply_status","status":"burn","stacks":0,"scale":{"per":"targetStatus","status":"burn","amount":1}}`
   - 카드 문구는 꼬리말을 자동으로 붙인다: "피해 4 (대상의 결 노출 1당 +3)", "피해 (자신의 방어 2당 +1)".
 
@@ -73,7 +75,7 @@
   "pool": "story",                      // starter | reward(전투 보상 후보) | story(이벤트로만) | status
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
-  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다)
+  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다) | unique(고유: 덱에 한 장만 — 심연 보상·상점·거래가 덱에 든 고유 카드를 다시 내지 않는다)
   "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 동료 카드는 그 동료의 갈래 하나 또는 비움(잇는 카드), 공용은 아무 동료의 것
   "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'·'틈의 속삭임'·'피의 빚'
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
@@ -225,7 +227,7 @@
 
 ## 7. 심연(GAME_DESIGN 16절)
 
-- **틈의 카드**(`data/cards/abyss.json`, `pool: "abyss"`): 심연 보상(슬롯마다 `abyss.riftCardChance`)·심연 상점 한 칸·틈의 거래로만 나온다. 캠페인 보상·상점·도감 수치에는 들어가지 않는다. 희귀 이상, 대가(균열 +·체력 잃기·소멸·체력을 잃는 발동 상태) 하나는 반드시(`npm run data:check`). 카드 틀은 보랏빛 테두리에 검은 금(`card-abyss`).
+- **틈의 카드**(`data/cards/abyss.json`, `pool: "abyss"`): 심연 보상(슬롯마다 `abyss.riftCardChance`)·심연 상점 한 칸·틈의 거래로만 나온다. 캠페인 보상·상점·도감 수치에는 들어가지 않는다. 업적으로 여는 카드는 희귀 이상(심연 개편 3의 25장은 일반~전설), 대가(균열 +·체력 잃기·소멸·체력을 잃는 발동 상태) 하나는 반드시(`npm run data:check`). 카드 틀은 보랏빛 테두리에 검은 금(`card-abyss`).
 - 1차 10장: 하운 3(틈을 가르는 도끼·금 밟기·흐르지 않는 숨) · 엘리아 2(검은 불·빌린 강물) · 카일 2(왼편이 아닌 검·마지막 돌격) · 보른 2(산을 삼키다·두린의 그림자) · 공용 1(꿰맨 자리). 새 발동 상태 `p_still_breath`(차례 시작 결 노출 2, 차례 끝 체력 2 잃기)·`p_durin_shadow`(맞으면 반격 5, 차례 시작 체력 1 잃기).
 - **길**(시작 유물, `data/relics.json`의 `rarity: "path"`, `shop: false`): 장작꾼(전투 시작 결 노출 1) · 강물(전투 시작 마나 +3) · 산(최대 체력 +15) · 빚(골드 +150, 상흔 +3) · 바늘(규칙 `needle`: 상점 카드 지우기 공짜, 보상 카드 `abyss.needleRewardChoices`장) · 그림자(규칙 `reveal_map`: 지도의 ? 노드 종류가 보이고 엘리트 피해 ×`abyss.shadowEliteDmg`). 무작위 유물(`gain_relic`)·상점·전리품에는 나오지 않는다.
 - **한 방 상한**: 심연 전투에서 적이 아군에게 주는 피해 한 번은 하운 최대 체력 × `abyss.oneHitCap`(내림)을 넘지 않는다(`BattleSetup.enemyHitCap`, 받을 피해 예고에도).
@@ -240,4 +242,7 @@
 - **서약**(`data/abyss_oaths.json`, 1~15단계): `{level, name, glyph, description, mods}`. 고른 단계까지의 `mods`를 차례로 덮어쓴다(`oathMods`). 키 — `enemyHpMul` · `startGold` · `restHealMul` · `rewardChoices` · `eliteFloor` · `startScar` · `lawsMin` · `potionSlots` · `injuriesPersist` · `nemesisEvery` · `eliteAffixMin` · `riftInReward` · `noPowers` · `maxMates` · `haunMaxHp`. 엔진은 이 키만 읽는다(새 서약은 데이터로, 새 키는 스키마 `OathMods`와 `abyss.ts`·테스트를 함께).
 - **업적**(`data/abyss_achievements.json`): `{id, name, description, check: {kind, n, mate?, mates?, oath?, module?, op?, depth?}, unlock: {card | path}}`. `kind`는 스키마 `AchievementDef`의 목록(넘은 굽이·숙적/짐승/접사 적 처치·거래·보스/엘리트·상흔 보스·저체력 보스·부상 통과·심법 없이·한 전투 결 노출·동료 수·함께한 동료·도감 카드·점수·서약·선택지(모듈:동작)·세계 수·법칙 수·덱 크기·덱의 틈의 카드·골드·상흔 0). 셈은 런의 `abyss.track`(`trackBattle`·`trackLoopClear`·`trackChoice`·`trackTick`), 판정은 `achievementMet`. 전투 집계 `tally.grain`(터뜨린 결 노출)·`tally.affixKills`(접사 붙은 적 처치)를 쓴다.
 - **순례 도전**(`data/pilgrimage_challenges.json`, GAME_DESIGN 2절, 2026-10-11): `{id, stage, name, description, check: {kind, n?, mate?, keyword?, cardType?}, unlock: {card | path | title}}`. 스테이지(S1~S9)마다 3개, 자유 여정에서 그 스테이지 보스를 넘길 때 한 번 판정(`settleChallenges`). `kind` — 동료: `withoutMate`(mate가 한 번도 싸우지 않음) · `matesMax`(싸운 동료 n명 이하) · `onlyWith`(하운과 mate 둘만) / 덱(보스를 넘길 때): `noKeyword` · `noType`(cardType) · `keywordMax` / 과정: `noSurge` · `noRest` · `noShop` · `noDowned`(전투가 끝날 때 쓰러진 동료 없음) / 보스전: `bossTurnsMax` · `bossGrain`(결 노출 n번) · `bossKeywordPlays`(keyword 카드 n장 냄). 셈은 길의 `stats`(`fought`·`downed`·`rests`·`shops`·`boss` — 길마다 새로). `unlock.card`·`path`는 심연 업적과 별도로 그 틈의 카드·길을 연다(심연 기록 `opened`), `title`은 칭호(프로필). 카드·골드 보상은 두지 않는다.
-
+- **심연 카드 25장**(심연 개편 3, 2026-10-15, GAME_DESIGN 16절 '심연 개편' ⑤): 업적 없이 처음부터 열린다(틈의 카드 75장 = 1차 10 + 3차 40 + 25). 하운·엘리아·카일·보른·공용 5장씩, 일반 5 · 고급 6 · 희귀 6 · 영웅 5 · 전설 3.
+  - 체력 비율 10장(모두 고유): % 피해 6(틈새 찌르기 5%+30 · 결 따라 쪼개기 7% · 피로 재는 거리 9% · 얼음 심장 찌르기 8% 냉기 · 산사태 11% · 틈의 아가리 적 전체 14% 소멸) · 처형 1(마지막 결: 피해 60 후 20% 이하 처형) · % 방어·회복 3(산의 잣대: 가장 큰 적의 5% 방어 · 달빛 장막: 아군 전체 3% · 틈 사이 숨: 아군 최대 체력 15% 회복 소멸). 엘리트·보스에게는 절반.
+  - 심연 기믹 대응 15장: 부동(흔들리지 않는 것을 쪼개다: 부동인 적에게 피해 두 번 · 흔들림 없는 산: 보른 자신에게 부동) · 안개(안개 가르기·눈치·법칙의 결·틈의 등불: 의도 보이기) · 쇠가죽·성난 하늘(쇠가죽 벗기기·법을 거스르다: 걷어 내기) · 조급한 틈·서두르는 자(재촉을 앞지르다·법을 거스르다: 격노 늦추기) · 가시밭(가시 태우기: 가시 제거) · 독무(맑은 바람: 독 제거) · 좁은 길(별의 길: 3장 뽑기) · 시든 땅(틈의 등불: 아군 회복) · 그 밖(붉은 선·버티는 발·철벽).
+  - 카드 그림: `card_art_abyss_5`~`7`(Codex 요청).

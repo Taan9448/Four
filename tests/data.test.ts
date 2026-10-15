@@ -4,6 +4,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
 import { fastFaceChanges } from '../src/engine/scene';
+import { unlockSource } from '../src/engine/abyss';
 import { playableStages } from '../src/engine/run';
 import { BATTLE_OPS, RUN_OPS, type Effect } from '../src/engine/schema';
 
@@ -63,8 +64,8 @@ describe('데이터 검사', () => {
   });
 
   it('카드 대상: 적 전체 카드의 자기 쪽 효과(방어·회복·체력 잃기·상태 제거)는 target을 적는다(글이 "적 전체에게 방어"로 오해되지 않게)', () => {
-    const enemyOps = new Set(['damage', 'apply_status', 'reveal_grain', 'dispel']);
-    const noTarget = new Set(['draw', 'discard', 'rift', 'gain_neigong', 'gain_mana', 'neigong_max', 'add_card', 'taunt']);
+    const enemyOps = new Set(['damage', 'apply_status', 'reveal_grain', 'dispel', 'execute']);
+    const noTarget = new Set(['draw', 'discard', 'rift', 'gain_neigong', 'gain_mana', 'neigong_max', 'add_card', 'taunt', 'reveal_intent', 'delay_enrage']);
     const bad: string[] = [];
     for (const c of data.cards.values()) {
       if (c.target !== 'all_enemies') continue;
@@ -328,13 +329,14 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
-  it('틈의 카드(심연, GAME_DESIGN 16절): 대가(균열 +·체력 잃기·소멸) 하나는 반드시, 희귀 이상, 심연 모듈·보스가 있다', () => {
+  // 2026-10-15 심연 개편 3: 심연 카드 25장은 일반~전설(희귀 이상 규칙은 업적으로 여는 틈의 카드 — unlockSource에 있는 카드만)
+  it('틈의 카드(심연, GAME_DESIGN 16절): 대가(균열 +·체력 잃기·소멸) 하나는 반드시, 업적으로 여는 카드는 희귀 이상, 심연 모듈·보스가 있다', () => {
     const bad: string[] = [];
     for (const c of data.cards.values()) {
       if (c.pool !== 'abyss') continue;
       const cost = c.keywords.includes('exhaust') || c.effects.some((e) => (e.op === 'rift' && (e.amount ?? 0) > 0) || e.op === 'lose_hp' || (e.op === 'apply_status' && data.statuses.get(e.status ?? '')?.triggers.some((t) => t.effects.some((x) => x.op === 'lose_hp'))));
       if (!cost) bad.push(`${c.id}: 대가가 없다`);
-      if (!['rare', 'epic', 'legendary'].includes(c.rarity)) bad.push(`${c.id}: 희귀 이상이어야 한다`);
+      if (unlockSource(data).has(c.id) && !['rare', 'epic', 'legendary'].includes(c.rarity)) bad.push(`${c.id}: 업적으로 여는 틈의 카드는 희귀 이상이어야 한다`);
     }
     const ab = data.balance.abyss;
     if (data.modules.get(ab.nemesisModule)?.type !== 'boss') bad.push(`숙적 모듈 ${ab.nemesisModule}이(가) 보스가 아니다`);

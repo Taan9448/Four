@@ -490,7 +490,7 @@ function scenesTab(data: GameData, codex: Codex, onPlay: (id: string) => void): 
   return splitTab('scenes', '스테이지', groups, [], h('p', { class: 'hint codex-foot' }, '본 장면을 다시 볼 수 있다. 장면을 누르면 처음부터 다시 본다.'));
 }
 
-/** 심연 탭(3차): 기록 · 굽이별 멈춘 횟수 · 일일 · 업적 · 틈의 카드 50칸 · 법칙·접사(만난 것만) */
+/** 심연 탭(3차): 기록 · 굽이별 멈춘 횟수 · 일일 · 업적 · 틈의 카드 75칸 · 법칙·접사(만난 것만) */
 function abyssTab(data: GameData, codex: Codex, profile: Profile, meta: AbyssMeta): HTMLElement {
   const src = unlockSource(data);
   const open = unlockedRift(data, meta.achievements, meta.opened);

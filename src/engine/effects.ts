@@ -63,6 +63,13 @@ export function checkCondition(
   return true;
 }
 
+/** 체력 비율 효과의 배율: 엘리트·보스 적이면 balance.hpRatio.eliteBossMul, 그 밖(일반 적·아군)은 1 */
+export function hpRatioMul(state: Pick<BattleState, 'data'>, target: Combatant): number {
+  if (target.side !== 'enemy') return 1;
+  const tier = state.data.enemies.get(target.defId)?.tier;
+  return tier === 'elite' || tier === 'boss' ? state.data.balance.hpRatio.eliteBossMul : 1;
+}
+
 /** 효과 수치: 기본값(없으면 fallback) + 비례(scale) → 상태 발동이면 스택 수를 곱한다 */
 export function amountOf(state: BattleState, effect: Effect, target: Combatant | undefined, ctx: EffectContext, fallback = 0): number {
   let amount = effect.amount ?? effect.stacks ?? fallback;
@@ -101,6 +108,14 @@ export function amountOf(state: BattleState, effect: Effect, target: Combatant |
       case 'consumed':
         per = state.consumed ?? 0;
         break;
+      case 'targetMaxHp':
+        per = target ? target.maxHp * hpRatioMul(state, target) : 0;
+        break;
+      case 'enemyMaxHp': {
+        const big = alive(state.enemies).reduce<Combatant | undefined>((m, e) => (!m || e.maxHp > m.maxHp ? e : m), undefined);
+        per = big ? big.maxHp * hpRatioMul(state, big) : 0;
+        break;
+      }
     }
     let add = Math.floor(sc.amount * per);
     if (sc.max !== undefined) add = Math.min(add, sc.max);
@@ -170,6 +185,7 @@ export function defaultTargetFor(op: Effect['op'], cardTarget: string | undefine
     case 'apply_status':
     case 'reveal_grain':
     case 'dispel':
+    case 'execute':
       return cardTarget === 'all_enemies' ? 'all_enemies' : 'enemy';
     default:
       return cardTarget === 'all_allies' ? 'all_allies' : 'self';
@@ -889,6 +905,15 @@ function applyEffect(state: BattleState, effect: Effect, ctx: EffectContext): vo
       case 'lose_hp':
         loseHp(state, target, amount);
         break;
+      case 'execute': {
+        // 처형: 체력이 최대 체력 × ratio 이하인 적을 쓰러뜨린다(엘리트·보스는 문턱이 eliteBossMul배). 꿰맬 자리는 실로만
+        if (target.side !== 'enemy' || target.downed || hasSpecial(state, target, 'seam')) break;
+        const line = target.maxHp * (effect.ratio ?? 0) * hpRatioMul(state, target);
+        if (target.hp > line) break;
+        state.log.push(`${target.name}: 처형.`);
+        loseHp(state, target, target.hp);
+        break;
+      }
       case 'keep_block':
         // 이번 차례에 얻은 방어가 다음 차례 시작에 사라지지 않는다(한 번)
         addStatus(state, target, 'block_kept', 1);

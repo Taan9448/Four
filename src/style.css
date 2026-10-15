@@ -840,6 +840,7 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .kw-innate { background: #4b3a6b; }
 .kw-thread { background: #a02634; }
 .kw-unplayable { background: #2b2b3a; }
+.kw-unique { background: #b8741a; color: #0b0b10; text-shadow: none; }
 .cpx-text-m { font-size: 9.5px; }
 .cpx-text-s { font-size: 9px; line-height: 1.2; }
 .cpx-text-xs { font-size: 8.5px; line-height: 1.18; letter-spacing: -0.02em; }

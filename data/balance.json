@@ -109,6 +109,7 @@
   },
   "enemyTiers": { "normal": { "hp": 1.4, "dmg": 0.88 }, "elite": { "hp": 1.2, "dmg": 1.43 }, "boss": { "hp": 1.0, "dmg": 1.0 } },
   "stage": { "healOnEnter": 1 },
+  "hpRatio": { "eliteBossMul": 0.5 },
   "training": { "levelMax": 99, "xpBase": 100, "xpStep": 20, "xp": { "battle": 10, "elite": 25, "boss": 80 }, "abyssGold": { "every": 10, "amount": 50, "maxBonus": 50 } },
   "abyss": {
     "hpBase": 1.0,

@@ -1,0 +1,20 @@
+id: card_art_abyss_7
+type: card-art-sheet
+summary: 심연 카드 그림 7(2026-10-15 심연 개편 3 — 체력 비율·고유 카드와 심연 기믹 대응 카드) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 칸 순서를 바꾸면 cards도 함께 바꾼다. card_art_abyss_1~4와 같은 화풍(검은 공허·붉게 깜박이는 틈)
+frames: 5
+cards:
+  - abyss_born_stand_firm  # 버티는 발
+  - abyss_born_unshaken  # 흔들림 없는 산
+  - abyss_born_iron_wall  # 철벽
+  - abyss_common_lantern  # 틈의 등불
+  - abyss_common_oathbreak  # 법을 거스르다
+frame_notes:
+  1: "two heavy boots planted firmly on cracked ground with thorns around them"  # 버티는 발
+  2: "a stone mountain figure with broken chains falling off it"  # 흔들림 없는 산
+  3: "a broad iron tower shield with small figures sheltering behind it"  # 철벽
+  4: "a small warm lantern glowing on dry cracked dead ground"  # 틈의 등불
+  5: "a glowing law seal of the rift shattering into pieces"  # 법을 거스르다
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }

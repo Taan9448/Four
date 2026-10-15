@@ -1,0 +1,30 @@
+id: card_art_abyss_5
+type: card-art-sheet
+summary: 심연 카드 그림 5(2026-10-15 심연 개편 3 — 체력 비율·고유 카드와 심연 기믹 대응 카드) — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 칸 순서를 바꾸면 cards도 함께 바꾼다. card_art_abyss_1~4와 같은 화풍(검은 공허·붉게 깜박이는 틈)
+frames: 10
+cards:
+  - abyss_common_seam_pierce  # 틈새 찌르기
+  - abyss_haun_grain_split  # 결 따라 쪼개기
+  - abyss_kyle_red_measure  # 피로 재는 거리
+  - abyss_elia_frost_heart  # 얼음 심장 찌르기
+  - abyss_born_landslide  # 산사태
+  - abyss_common_maw  # 틈의 아가리
+  - abyss_haun_last_grain  # 마지막 결
+  - abyss_born_mountain_measure  # 산의 잣대
+  - abyss_elia_moon_veil  # 달빛 장막
+  - abyss_common_deep_breath  # 틈 사이 숨
+frame_notes:
+  1: "a thin needle-like blade piercing a narrow seam in a huge dark hide"  # 틈새 찌르기
+  2: "a woodcutter's axe splitting a giant log cleanly along a glowing blue grain line"  # 결 따라 쪼개기
+  3: "a red blood drop trail measuring the distance between a sword tip and a towering shadow"  # 피로 재는 거리
+  4: "an ice spear piercing a large glowing heart that is freezing from the inside"  # 얼음 심장 찌르기
+  5: "a huge mountainside collapsing in boulders onto a large dark beast"  # 산사태
+  6: "an enormous black crack shaped like a fanged maw biting down on several shadows"  # 틈의 아가리
+  7: "a single last glowing blue grain line on a splintered stump, an axe raised above it"  # 마지막 결
+  8: "a tall stone shield growing as large as the giant silhouette in front of it"  # 산의 잣대
+  9: "a pale moonlight curtain hanging like a shield in front of small figures"  # 달빛 장막
+  10: "a thin stream of clean blue air flowing through a black crack into an open hand"  # 틈 사이 숨
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; dark rift palette: a black void background with a jagged black crack edged by blinking red, muted subject colors and small cold highlights; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#2b2b3a', accent: '#ff3b3b' }
