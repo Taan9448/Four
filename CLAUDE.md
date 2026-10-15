@@ -24,6 +24,7 @@ npm run balance:human       # 도감에서 내보낸 사람 플레이 기록을 
 npm run balance:trace       # 봇의 전투 하나를 턴마다 기록 (TRACE=s8:s8_boss_blood_hall)
 npm run build               # dist/
 npm run ux:check            # 화면 점검(Playwright, CI 밖): 모든 ?screen= 화면 × PC·휴대폰 × 글자 보통·크게 → 작은 글자·버튼·가로 스크롤·겹침·콘솔 오류 표 (UX_SCREENS, UX_SHOTS, UX_OUT)
+npm run perf:check          # 수명·부하 점검(Playwright, CI 밖): 전투 중 나가기·승리·재진입 뒤 남은 그리기·rAF·듣개, 시작 화면·전투 대기 부하, 배경음악 메모리 (PERF_ONLY=life,title,battle,bgm, PERF_OUT)
 npm run assets:placeholder -- <id> | --all
 npm run assets:prompt -- <id>
 npm run assets:slice -- <id> [--fallback 2|3] [--placeholder]

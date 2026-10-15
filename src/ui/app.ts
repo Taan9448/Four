@@ -44,7 +44,7 @@ import { shopView } from './shop-view';
 import { openDeck } from './deck-view';
 import { relicChip } from './items';
 import { h } from './dom';
-import { initDebug } from './debug';
+import { initDebug, isDebug } from './debug';
 import { mapView, openPartyGuide, pilgrimLabel, placeName, startRiftMaxText } from './map-view';
 import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
@@ -144,6 +144,8 @@ export class App {
     initAudio();
     const params = new URLSearchParams(location.search);
     initDebug(params);
+    // ?debug: 브라우저 점검(전투 재진입·곡 전환 반복, tools/perf-check.mjs)에서 앱을 직접 부른다
+    if (isDebug()) Object.assign(window, { __app: this, __bgm: playBgm });
     const seed = params.get('seed');
     if (params.has('screen')) this.screen(params.get('screen') || 'reward', params.get('module') ?? undefined, params.get('stage') ?? 's2');
     else if (params.has('sandbox'))

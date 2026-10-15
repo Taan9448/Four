@@ -26,7 +26,8 @@
     "assets:status": "node tools/asset-status.mjs",
     "assets:manifest": "node tools/build-manifest.mjs",
     "check:ownership": "node tools/check-ownership.mjs",
-    "ux:check": "node tools/build-manifest.mjs && node tools/ux-check.mjs"
+    "ux:check": "node tools/build-manifest.mjs && node tools/ux-check.mjs",
+    "perf:check": "node tools/build-manifest.mjs && node tools/perf-check.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",

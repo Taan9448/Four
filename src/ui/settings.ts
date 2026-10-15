@@ -312,7 +312,7 @@ function tabRows(tab: SettingsTab, opts: { onGlossary?: () => void }): (HTMLElem
     case 'view':
       return [
         seg('fontScale', '글자 크기', '크게 = 112%', FONT_SCALES),
-        toggle('motion', '배경 움직임', '시작 화면의 빛·안개, 영웅·전설 카드의 빛, 내공·마나 구슬의 물결'),
+        toggle('motion', '배경 움직임', '시작 화면의 빛·안개·입자, 영웅·전설 카드의 빛, 내공·마나 구슬의 물결·기포, 결과 창·폭주 그림의 움직임'),
         toggle('pauseUnfocused', '창을 떠나면 쉬기', '다른 창을 보는 동안 움직임을 멈춰 컴퓨터를 가볍게'),
         head('읽기 보조'),
         toggle('glyphLabels', '표식에 한글 함께', '抽 뽑을 · 棄 버림 · 滅 소멸 · 冊 덱 · 記 기록 · 設 설정'),

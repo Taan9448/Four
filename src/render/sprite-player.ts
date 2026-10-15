@@ -22,22 +22,28 @@ export class SpritePlayer {
   readonly canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private raf = 0;
+  private timer: ReturnType<typeof setTimeout> | null = null;
   private token = 0;
+  /** 지금 재생의 Promise를 끝내는 함수(true: 끝까지 재생, false: 멈춤·다른 재생에 밀림·화면에서 빠짐) */
+  private settle: ((done: boolean) => void) | null = null;
 
   constructor(canvas: HTMLCanvasElement, private opts: PlayerOptions = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
   }
 
-  /** 애니메이션을 재생한다. 1회 재생이면 끝날 때 resolve된다(반복이면 바로 resolve). */
-  async play(assetId: string | null, options: PlayOptions = {}): Promise<void> {
-    const token = ++this.token;
-    cancelAnimationFrame(this.raf);
+  /**
+   * 애니메이션을 재생한다. 1회 재생은 끝나면 true로, 반복 재생은 멈출 때까지 기다린다.
+   * 멈추거나(stop) 다른 재생에 밀리거나 화면에서 빠지면 false로 끝난다 — 영원히 기다리는 Promise를 남기지 않는다(2026-10-15)
+   */
+  async play(assetId: string | null, options: PlayOptions = {}): Promise<boolean> {
+    this.cancel();
+    const token = this.token;
     const asset = await loadSprite(assetId);
-    if (token !== this.token) return;
+    if (token !== this.token) return false;
     if (!asset) {
       // 실제 그림이 있는 id인데 받기에 실패했으면(일시 오류) 옛 임시 실루엣으로 바꾸지 않고 지금 그림을 그대로 둔다(2026-10-14)
-      if (assetId && spriteSource(assetId) === 'sprites' && this.canvas.width > 80) return;
+      if (assetId && spriteSource(assetId) === 'sprites' && this.canvas.width > 80) return false;
       return this.playFallback(token, options);
     }
     const { meta } = asset;
@@ -52,27 +58,27 @@ export class SpritePlayer {
     const total = meta.fallbackLevel === 2 ? (meta.virtualFrames ?? meta.frames) : meta.frames;
     const frameMs = 1000 / meta.fps;
 
-    return new Promise<void>((resolve) => {
+    return new Promise<boolean>((resolve) => {
+      this.settle = resolve;
       // 연출 시계(fxNow): 타격 멈춤 동안 프레임이 멈춘다
       const start = fxNow();
       let lastFrame = 0;
       let attached = false;
       const tick = () => {
-        if (token !== this.token) return resolve();
-        // 화면에서 빠진 캔버스의 반복 재생은 끝낸다(다른 화면으로 넘어가도 돌던 대기 동작이 쌓이지 않게)
+        this.raf = 0;
+        if (token !== this.token) return;
+        // 화면에서 빠진 캔버스는 끝낸다(다른 화면으로 넘어가도 돌던 동작이 쌓이지 않게).
+        // 화면에 붙기 전에 부른 재생(만들자마자 play)은 붙을 때까지 기다린다
         if (this.canvas.isConnected) attached = true;
-        else if (attached) return resolve();
+        else if (attached) return this.finish(false);
         // 창을 떠나 쉬는 중이면 반복 동작은 그리지 않고 드물게만 깨어난다(render/idle.ts)
-        if (loop && isIdle()) {
-          setTimeout(() => token === this.token && (this.raf = requestAnimationFrame(tick)), 250);
-          return;
-        }
+        if (loop && isIdle()) return this.later(token, tick, 250);
         const elapsed = fxNow() - start;
         let n = Math.floor(elapsed / frameMs) + 1; // 1부터
         if (loop) n = ((n - 1) % total) + 1;
         if (n > total) {
           this.drawFrame(asset, total, total);
-          return resolve();
+          return this.finish(true);
         }
         if (n !== lastFrame) {
           // 건너뛴 프레임의 이벤트도 빠짐없이 발생시킨다
@@ -80,18 +86,46 @@ export class SpritePlayer {
           for (let f = from; f <= n; f++) {
             for (const [name, at] of Object.entries(meta.events)) if (at === f) options.onEvent?.(name);
           }
+          if (token !== this.token) return; // 이벤트 처리 중에 멈췄다
           lastFrame = n;
           this.drawFrame(asset, n, total);
         }
-        this.raf = requestAnimationFrame(tick);
+        // 다음 프레임까지 화면 주사율마다 깨어나지 않는다: 대기 동작(6fps)은 초당 6번만(2026-10-15 렉 줄이기)
+        const wait = start + Math.floor(elapsed / frameMs + 1) * frameMs - fxNow();
+        if (wait > 24) this.later(token, tick, wait - 12);
+        else this.raf = requestAnimationFrame(tick);
       };
       this.raf = requestAnimationFrame(tick);
     });
   }
 
+  /** 지금 재생을 멈춘다. 기다리던 Promise는 false로 끝난다 */
   stop(): void {
+    this.cancel();
+  }
+
+  /** 재생 중이면 끊고(토큰을 넘겨 늦게 오는 콜백을 무시) 기다리던 쪽에 false를 알린다 */
+  private cancel(): void {
     this.token++;
     cancelAnimationFrame(this.raf);
+    this.raf = 0;
+    if (this.timer !== null) clearTimeout(this.timer);
+    this.timer = null;
+    this.finish(false);
+  }
+
+  private finish(done: boolean): void {
+    const settle = this.settle;
+    this.settle = null;
+    settle?.(done);
+  }
+
+  /** ms 뒤 다음 화면 갱신 때 fn(그사이 멈추면 아무것도 하지 않는다) */
+  private later(token: number, fn: () => void, ms: number): void {
+    this.timer = setTimeout(() => {
+      this.timer = null;
+      if (token === this.token) this.raf = requestAnimationFrame(fn);
+    }, ms);
   }
 
   private drawFrame(asset: SpriteAsset, n: number, total: number): void {
@@ -116,7 +150,7 @@ export class SpritePlayer {
   }
 
   /** 에셋이 아예 없을 때: 80×80 프레임에 픽셀 실루엣(40 격자를 2배로, 32 격자 도형을 가운데·발 기준선 36에)을 그리고, 이벤트는 프레임 4에 해당하는 시점에 발생 */
-  private playFallback(token: number, options: PlayOptions): Promise<void> {
+  private playFallback(token: number, options: PlayOptions): Promise<boolean> {
     const w = 40, h = 40;
     this.canvas.width = w * 2;
     this.canvas.height = h * 2;
@@ -158,22 +192,30 @@ export class SpritePlayer {
     };
     if (options.loop) {
       const start = fxNow();
-      const tick = () => {
-        if (token !== this.token) return;
-        draw(Math.floor((fxNow() - start) / 500) % 2 === 0 ? 0 : -1);
+      return new Promise<boolean>((resolve) => {
+        this.settle = resolve;
+        let attached = false;
+        const tick = () => {
+          this.raf = 0;
+          if (token !== this.token) return;
+          if (this.canvas.isConnected) attached = true;
+          else if (attached) return this.finish(false);
+          draw(Math.floor((fxNow() - start) / 500) % 2 === 0 ? 0 : -1);
+          // 0.5초마다 한 번 움직이므로 그때만 깨어난다
+          this.later(token, tick, 250);
+        };
         this.raf = requestAnimationFrame(tick);
-      };
-      this.raf = requestAnimationFrame(tick);
-      return Promise.resolve();
+      });
     }
     draw(0);
-    return new Promise((resolve) => {
-      setTimeout(() => {
+    return new Promise<boolean>((resolve) => {
+      this.settle = resolve;
+      this.timer = setTimeout(() => {
         if (token !== this.token) return;
         options.onEvent?.('hit');
         options.onEvent?.('impact');
+        this.timer = setTimeout(() => token === this.token && this.finish(true), 200);
       }, 250);
-      setTimeout(resolve, 450);
     });
   }
 }

@@ -69,6 +69,8 @@ export function initAudio(): void {
   const unlock = () => {
     start();
     if (ctx?.state === 'suspended') void ctx.resume();
+    // 브라우저가 입력 밖의 재생을 막았으면(일부 휴대폰 브라우저) 다음 입력 때 지금 곡을 다시 튼다
+    if (playing?.media?.el.paused && !document.hidden) resumeMedia(playing);
   };
   window.addEventListener('pointerdown', unlock, { capture: true });
   window.addEventListener('keydown', unlock, { capture: true });
@@ -77,11 +79,17 @@ export function initAudio(): void {
     const t = e.target as HTMLElement | null;
     if (t?.closest('button, .btn, [role=tab]')) sfx('click');
   });
-  // 탭을 숨기면 쉰다
+  // 탭을 숨기면 쉰다(곡 파일은 받기·풀기도 멈춘다)
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return;
-    if (document.hidden) void ctx.suspend();
-    else void ctx.resume();
+    if (document.hidden) {
+      void ctx.suspend();
+      playing?.media?.el.pause();
+      for (const m of fading) m.el.pause();
+    } else {
+      void ctx.resume();
+      resumeMedia(playing);
+    }
   });
 }
 
@@ -124,6 +132,7 @@ function start(): void {
   }
 }
 
+/** 효과음 파일(짧다)을 풀어 둔다. 배경음악은 풀지 않고 <audio>로 흘려 듣는다(openMedia) */
 function loadFile(url: string): Promise<AudioBuffer | null> {
   let p = buffers.get(url);
   if (!p) {
@@ -326,10 +335,47 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
 interface Playing {
   mood: Mood;
   gain: GainNode;
+  /** 합성 곡의 마디 예약 타이머 */
   timer: number | null;
-  source: AudioBufferSourceNode | null;
+  /** 파일 곡: <audio>로 흘려 듣고(곡 전체를 풀어 두지 않는다) WebAudio의 곡 버스로 잇는다 */
+  media: { el: HTMLAudioElement; node: MediaElementAudioSourceNode } | null;
 }
 let playing: Playing | null = null;
+/** 바뀌어 사라지는 중인 앞 곡들(1.5초 뒤 놓아 준다) */
+const fading = new Set<NonNullable<Playing['media']>>();
+
+/**
+ * 곡 파일은 <audio>로 흘려 듣는다(2026-10-15 렉 줄이기, Codex 리뷰): decodeAudioData로 곡 전체를 풀면 8곡이 약 296MiB였고
+ * 틀었던 곡마다 메모리에 남았다. 지금은 틀고 있는 곡(과 바뀌는 1.2초 동안의 앞 곡)만 붙들고, 끝난 곡은 소스를 비워 놓아 준다.
+ * 볼륨·잔향·엇갈려 바뀌기는 그대로 곡 버스(bgmBus)를 지난다
+ */
+function openMedia(url: string, out: AudioNode): Playing['media'] {
+  const el = new Audio();
+  el.preload = 'auto';
+  el.loop = true;
+  el.src = url;
+  const node = ctx!.createMediaElementSource(el);
+  node.connect(out);
+  return { el, node };
+}
+
+function releaseMedia(media: Playing['media']): void {
+  if (!media) return;
+  fading.delete(media);
+  media.el.pause();
+  media.node.disconnect();
+  // 소스를 비워 내려받은 곡·디코더를 놓아 준다
+  media.el.removeAttribute('src');
+  media.el.load();
+}
+
+/** 지금 곡을 튼다(탭을 숨겼다 돌아올 때·첫 재생). 그사이 다른 곡으로 바뀌었으면 아무것도 하지 않는다 */
+function resumeMedia(p: Playing | null): void {
+  if (!p?.media || playing !== p) return;
+  p.media.el.play().catch(() => {
+    /* 곡을 바꾸느라 멈췄거나 아직 소리를 못 켰다 — 다음 입력·복귀 때 다시 */
+  });
+}
 
 function voice(v: Voice, ev: NoteEvent, at: number, beat: number, out: AudioNode): void {
   const hz = midiToHz(ev.midi);
@@ -415,8 +461,9 @@ export function playBgm(mood: Mood | null): void {
     old.gain.gain.setValueAtTime(old.gain.gain.value, t);
     old.gain.gain.linearRampToValueAtTime(0.0001, t + 1.2);
     if (old.timer !== null) clearInterval(old.timer);
+    if (old.media) fading.add(old.media);
     setTimeout(() => {
-      old.source?.stop();
+      releaseMedia(old.media);
       old.gain.disconnect();
     }, 1500);
     playing = null;
@@ -427,19 +474,12 @@ export function playBgm(mood: Mood | null): void {
   gain.gain.setValueAtTime(0.0001, t);
   gain.gain.linearRampToValueAtTime(url ? 1 : TRACKS[mood].gain, t + 1.2);
   gain.connect(bgmBus);
-  const now: Playing = { mood, gain, timer: null, source: null };
+  const now: Playing = { mood, gain, timer: null, media: null };
   playing = now;
 
   if (url) {
-    void loadFile(url).then((buf) => {
-      if (!buf || !ctx || playing !== now) return;
-      const s = ctx.createBufferSource();
-      s.buffer = buf;
-      s.loop = true;
-      s.connect(gain);
-      s.start();
-      now.source = s;
-    });
+    now.media = openMedia(url, gain);
+    if (!document.hidden) resumeMedia(now);
     return;
   }
 
