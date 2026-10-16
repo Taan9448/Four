@@ -71,3 +71,21 @@ describe('저장 5 — 데미지·체력 10배(2026-10-12)', () => {
     expect(SAVE_VERSION).toBe(5);
   });
 });
+
+describe('대강화 저장 정리(2026-10-15)', () => {
+  it('데이터에 없는 각인은 지우고, 덱에 없는 카드의 각인 고르기는 버린다', () => {
+    const run = createRun(data, 'SAVEF');
+    const c = run.deck[0];
+    c.marks = ['refine', 'no_such_mark'];
+    run.engravings = { [c.cardId]: ['no_such_mark', 'light'], no_such_card: ['refine'] };
+    run.forgePending = { uid: c.uid, cardId: c.cardId, level: 7, choices: ['no_such_mark', 'edge'] };
+    const a = deserializeRun(data, serializeRun(run))!.run;
+    expect(a.deck[0].marks).toEqual(['refine']);
+    expect(a.engravings).toEqual({ [c.cardId]: ['light'] });
+    expect(a.forgePending?.choices).toEqual(['edge']);
+    run.forgePending = { uid: 'gone', cardId: c.cardId, level: 7, choices: ['edge'] };
+    expect(deserializeRun(data, serializeRun(run))!.run.forgePending).toBeNull();
+    run.forgePending = { uid: c.uid, cardId: c.cardId, level: 7, choices: ['no_such_mark'] };
+    expect(deserializeRun(data, serializeRun(run))!.run.forgePending).toBeNull();
+  });
+});
