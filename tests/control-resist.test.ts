@@ -1,6 +1,6 @@
 // 행동 제약 내성(2026-10-16 사용자 요청): 기절·빙결·마비를 맞으면 다음 차례 끝까지 같은 종류가 50% 확률로 듣지 않는다
 import { describe, expect, it } from 'vitest';
-import { endTurn } from '../src/engine/battle';
+import { endTurn, playCard } from '../src/engine/battle';
 import { addStatus } from '../src/engine/effects';
 import { battle, data } from './helpers';
 
@@ -58,9 +58,9 @@ describe('행동 제약 내성', () => {
     expect(e.statuses.chill ?? 0).toBe(0);
   });
 
-  it('행동을 막는 상태는 모두 내성을 가진다', () => {
+  it('행동을 막는 상태는 모두 내성을 가진다(적이 처음부터 가진 특성 — 졸음 — 은 빼고)', () => {
     for (const st of data.statuses.values()) {
-      if (st.modifiers.skipTurn) {
+      if (st.modifiers.skipTurn && st.kind !== 'trait') {
         expect(st.resist, st.id).toBeDefined();
         expect(data.statuses.has(st.resist!), st.id).toBe(true);
       }
@@ -88,5 +88,15 @@ describe('한정 카드(광역 행동 제약, 2026-10-16)', () => {
     for (let i = before; i < data.balance.limitedCopies + 1; i++) abyssAddCard(data, run, 'born_cliff');
     expect(run.deck.filter((c) => c.cardId === 'born_cliff').length).toBe(data.balance.limitedCopies);
     expect(abyssAddCard(data, run, 'born_cliff')).toContain('한정');
+  });
+
+  it('졸음(교세소 보초): 처음 두 차례는 행동하지 않고, 졸 때 맞으면 깨면서 기절 1', () => {
+    const s = battle({ enemies: ['sleeping_sentry'] });
+    const sentry = s.enemies[0];
+    expect(sentry.statuses.drowsy).toBe(2);
+    const strike = s.hand.findIndex((c) => c.cardId === 'haun_chop');
+    expect(playCard(s, strike, sentry.uid).ok).toBe(true);
+    expect(sentry.statuses.drowsy ?? 0).toBe(0);
+    expect(sentry.statuses.stun).toBe(1);
   });
 });

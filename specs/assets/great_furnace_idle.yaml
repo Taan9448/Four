@@ -1,0 +1,15 @@
+id: great_furnace_idle
+type: character-anim
+size: large
+character: great_furnace
+chroma: magenta
+summary: 큰 화로 대기 4프레임
+depends_on: [great_furnace_ref]
+reference: assets/source/great_furnace_ref.png
+facing: left
+frame_notes:
+  1: "the white flame roars in the furnace mouth"
+  2: "the chains glow brighter orange"
+  3: "embers spit out of the mouth"
+  4: "settles back to a steady roar"
+placeholder: { shape: object, color: '#c2501e', accent: '#ffe08a' }

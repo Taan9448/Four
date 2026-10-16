@@ -1,0 +1,14 @@
+id: shadow_bridge_hit
+type: character-anim
+size: large
+character: shadow_bridge
+chroma: magenta
+summary: 그림자 다리 피격 3프레임
+depends_on: [shadow_bridge_ref]
+reference: assets/source/shadow_bridge_ref.png
+facing: left
+frame_notes:
+  1: "struck, the shadow surface ripples and splits"
+  2: "shadow wisps scatter"
+  3: "the bridge knits back together"
+placeholder: { shape: object, color: '#24202c', accent: '#4b3a6b' }

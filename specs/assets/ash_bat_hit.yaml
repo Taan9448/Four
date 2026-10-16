@@ -1,0 +1,14 @@
+id: ash_bat_hit
+type: character-anim
+size: large
+character: ash_bat
+chroma: magenta
+summary: 재 날개 박쥐 피격 3프레임
+depends_on: [ash_bat_ref]
+reference: assets/source/ash_bat_ref.png
+facing: left
+frame_notes:
+  1: "struck, the bat tumbles back, ash scattering"
+  2: "flutters unsteadily"
+  3: "regains its hover"
+placeholder: { shape: beast, color: '#4a3a36', accent: '#ff8a5c' }

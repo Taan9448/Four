@@ -1,0 +1,11 @@
+id: inner_senior_ref
+type: character-ref
+size: large
+character: inner_senior
+chroma: magenta
+summary: 내원 사형 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a smug young martial sect disciple in neat grey-blue inner-court robes with a white sash, hair tied in a topknot, one fist on his hip, chin raised in contempt"
+  2: "full body, side view facing left, same proportions, weight on the back foot, ready to kick"
+placeholder: { shape: humanoid, color: '#6b7a8f', accent: '#c2c6d1' }

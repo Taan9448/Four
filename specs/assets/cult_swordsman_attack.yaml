@@ -1,0 +1,18 @@
+id: cult_swordsman_attack
+type: character-anim
+size: large
+character: cult_swordsman
+chroma: magenta
+summary: 천마신교 도객 연환도 6프레임
+depends_on: [cult_swordsman_ref]
+reference: assets/source/cult_swordsman_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the saber across the body"
+  2: "first cut sweeps to the left"
+  3: "second cut reverses"
+  4: "the third cut slashes at full reach to the left"
+  5: "the blade trails a red afterimage"
+  6: "returns to the low stance"
+placeholder: { shape: humanoid, color: '#3a2a2a', accent: '#a02634' }

@@ -85,5 +85,6 @@
     "moves": [{"id": "strike_barrier", "name": "결계 내려치기", "intent": "attack", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}]}, {"id": "not_this_world", "name": "이 세계의 냄새가 아니다", "intent": "attack", "targeting": "haun", "effects": [{"op": "damage", "amount": 180}]}, {"id": "green_light", "name": "초록빛에 막힌 대검", "intent": "attack", "effects": [{"op": "damage", "amount": 100}, {"op": "remove_status", "status": "dead_forest", "target": "self", "condition": {"targetHasStatus": "dead_forest"}}]}, {"id": "smoke_horse", "name": "연기의 말", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 140}]}],
     "deathEffects": [{"op": "damage", "amount": 99999, "target": "all_allies"}],
     "flavor": "말도 기사도 모두 검은 연기로 빚어졌다. 사람 두 배의 키, 연기의 대검, 투구 안쪽의 붉은 불빛. 수십 개의 목소리가 겹친 음성. 연기가 아무리 흩어지고 뭉쳐도, 가슴의 매듭만은 그 자리에 있었다."
-  }
+  },
+  {"id": "dry_vine", "name": "마른 결계 덩굴", "hitFx": "fx_hit_slash", "maxHp": 220, "sprite": "dry_vine", "silhouette": "object", "color": "#5c5a3a", "pattern": "cycle", "lore": "실바렌의 죽은 숲에서 결계가 말라붙어 덩굴이 되었다. 한때 은빛 마나를 나무에서 나무로 옮기던 길이었는데, 이제는 지나가는 이의 마나를 빨아 제 몸만 굵힌다. 엘리아는 그것을 보고 오래 말이 없었다. 저것도 원래는 숲이었다고.", "flavor": "죽은 숲의 결계가 말라붙은 덩굴. 지나가는 이의 마나를 빨아들인다.", "moves": [{"id": "drain_mana", "name": "마나 빨기", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -1}, {"op": "block", "amount": 40, "target": "self"}]}, {"id": "entangle", "name": "휘감기", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 50}, {"op": "apply_status", "status": "weak", "stacks": 1}]}]}
 ]

@@ -1,0 +1,11 @@
+id: frozen_shard_ref
+type: character-ref
+size: large
+character: frozen_shard
+chroma: magenta
+summary: 얼어붙은 조각 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a large jagged shard of hexagonal pale blue ice floating in the dark void of the rift, a faint inner light like a frozen star, frost mist trailing from its edges"
+  2: "full view, side view, same proportions, the sharp tip pointing to the left"
+placeholder: { shape: object, color: '#a8d0e8', accent: '#dff4ff' }

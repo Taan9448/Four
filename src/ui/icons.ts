@@ -24,8 +24,8 @@ export const AFFIX_SHEETS: [string, number][] = [['icons_abyss_affixes', 1], ['i
 export const lawIconEl = (l: { icon?: number; glyph: string }): HTMLElement => sheetIconEl(LAW_SHEETS, l.icon, l.glyph, 'law-icon');
 export const affixIconEl = (a: { icon?: number; glyph: string }): HTMLElement => sheetIconEl(AFFIX_SHEETS, a.icon, a.glyph, 'law-icon');
 
-/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~53 icons_status_e(2026-10-11) · 54~56 icons_status_f(2026-10-12 번개) · 57 icons_status_g(2026-10-15 부동) · 58~ icons_status_h(2026-10-16 행동 제약 내성) */
-const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48], ['icons_status_f', 54], ['icons_status_g', 57], ['icons_status_h', 58]];
+/** 상태 아이콘 시트: 1~12 icons_status · 13~28 icons_status_b · 29~43 icons_status_c · 44~47 icons_status_d · 48~53 icons_status_e(2026-10-11) · 54~56 icons_status_f(2026-10-12 번개) · 57 icons_status_g(2026-10-15 부동) · 58~60 icons_status_h(2026-10-16 행동 제약 내성) · 61~ icons_status_i(2026-10-16 졸음) */
+const STATUS_SHEETS: [string, number][] = [['icons_status', 1], ['icons_status_b', 13], ['icons_status_c', 29], ['icons_status_d', 44], ['icons_status_e', 48], ['icons_status_f', 54], ['icons_status_g', 57], ['icons_status_h', 58], ['icons_status_i', 61]];
 
 /** 상태 아이콘 그림 주소(실제 그림이 왔을 때만). 도감 용어 표처럼 이름표 없이 아이콘만 쓰는 자리용 */
 export function statusIconUrl(data: GameData, id: string): string | null {

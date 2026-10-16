@@ -153,5 +153,6 @@
     "type": "boss",
     "name": "귀곡애(鬼哭崖)",
     "content": {"scene": "s0_scene_cliff", "outroScene": "s0_scene_stone_gate", "text": "\"오 년이었던가. 네가 문파의 밥을 먹은 것이. 그 밥값을 오늘 치르거라.\" — 이길 수 없다. 5턴을 버텨라. 검기, 나무 끝을 밟는 추격, 길을 막는 소나무 베기, 검을 고쳐 쥐는 숨, 그리고 소리 없는 마지막 초식.", "enemies": ["kwak_dojin_cliff"], "surviveTurns": 5}
-  }
+  },
+  {"id": "s0_battle_inner_seniors", "stage": "s0", "type": "battle", "name": "내원 사형들", "weight": 2, "conditions": {"floorRange": [3, 3]}, "content": {"text": "장작더미 옆을 지나던 내원 사형이 발을 멈춘다. \"외원 놈이 도끼질 흉내를 내네.\" 발길질이 날아온다.", "enemies": ["inner_senior"]}}
 ]

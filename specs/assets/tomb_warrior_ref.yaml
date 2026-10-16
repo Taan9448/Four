@@ -1,0 +1,11 @@
+id: tomb_warrior_ref
+type: character-ref
+size: large
+character: tomb_warrior
+chroma: magenta
+summary: 오천의 무덤 망령 전사 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, the pale translucent ghost of a stout dwarf warrior in old plate armor, a braided beard, a broad axe in the right hand and a round dwarf shield, faint blue-green ghost light leaking from the joints"
+  2: "full body, side view facing left, same proportions, shield forward and axe raised"
+placeholder: { shape: humanoid, color: '#7a8a7a', accent: '#8fd3ff' }

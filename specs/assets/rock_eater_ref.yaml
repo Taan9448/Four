@@ -1,0 +1,11 @@
+id: rock_eater_ref
+type: character-ref
+size: large
+character: rock_eater
+chroma: magenta
+summary: 바위 먹는 벌레 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a large segmented burrowing worm-beetle with a rock-plated back, a round grinding mouth ringed with stone teeth, small eyes, flecks of metal ore on its shell"
+  2: "full body, side view facing left, same proportions, the front segment raised"
+placeholder: { shape: beast, color: '#8a6a4a', accent: '#c2c6d1' }

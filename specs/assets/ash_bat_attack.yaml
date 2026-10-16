@@ -1,0 +1,18 @@
+id: ash_bat_attack
+type: character-anim
+size: large
+character: ash_bat
+chroma: magenta
+summary: 재 날개 박쥐 재 물기 6프레임
+depends_on: [ash_bat_ref]
+reference: assets/source/ash_bat_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "rears back, wings high"
+  2: "dives toward the left"
+  3: "fangs open"
+  4: "the bite lands at full reach to the left, a spray of glowing ash"
+  5: "flaps back up"
+  6: "returns to hovering"
+placeholder: { shape: beast, color: '#4a3a36', accent: '#ff8a5c' }

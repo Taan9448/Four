@@ -1,0 +1,14 @@
+id: dry_vine_hit
+type: character-anim
+size: large
+character: dry_vine
+chroma: magenta
+summary: 마른 결계 덩굴 피격 3프레임
+depends_on: [dry_vine_ref]
+reference: assets/source/dry_vine_ref.png
+facing: left
+frame_notes:
+  1: "struck, dry bark splinters fly, the tendrils recoil"
+  2: "the silver veins flicker and dim"
+  3: "the vines tighten back into the knot"
+placeholder: { shape: object, color: '#5c5a3a', accent: '#bfe3a0' }

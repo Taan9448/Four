@@ -1,0 +1,15 @@
+id: frozen_shard_idle
+type: character-anim
+size: large
+character: frozen_shard
+chroma: magenta
+summary: 얼어붙은 조각 대기 4프레임
+depends_on: [frozen_shard_ref]
+reference: assets/source/frozen_shard_ref.png
+facing: left
+frame_notes:
+  1: "the ice shard floats and slowly turns"
+  2: "the inner light pulses"
+  3: "frost mist drifts off the edges"
+  4: "settles"
+placeholder: { shape: object, color: '#a8d0e8', accent: '#dff4ff' }

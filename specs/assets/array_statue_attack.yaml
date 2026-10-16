@@ -1,0 +1,18 @@
+id: array_statue_attack
+type: character-anim
+size: large
+character: array_statue
+chroma: magenta
+summary: 구천 계단 진법 석인 돌주먹 6프레임
+depends_on: [array_statue_ref]
+reference: assets/source/array_statue_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "the stone fist draws back with a grind"
+  2: "the statue steps forward to the left"
+  3: "the symbols flare gold"
+  4: "the stone fist punches at full reach to the left"
+  5: "dust bursts from the impact"
+  6: "returns to the stance"
+placeholder: { shape: humanoid, color: '#7a7068', accent: '#ffe08a' }

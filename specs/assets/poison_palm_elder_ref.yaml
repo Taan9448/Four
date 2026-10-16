@@ -1,0 +1,11 @@
+id: poison_palm_elder_ref
+type: character-ref
+size: large
+character: poison_palm_elder
+chroma: magenta
+summary: 독장 장로 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, an old demonic cult elder in layered black and dark green robes, long white beard, the right palm stained dark blue-green and faintly steaming with poison mist"
+  2: "full body, side view facing left, same proportions, the poisoned palm held forward"
+placeholder: { shape: humanoid, color: '#3a5a3a', accent: '#6aa84f' }

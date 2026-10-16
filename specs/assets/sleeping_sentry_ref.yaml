@@ -1,0 +1,11 @@
+id: sleeping_sentry_ref
+type: character-ref
+size: large
+character: sleeping_sentry
+chroma: magenta
+summary: 교세소 보초 혈교도 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a blood cult sentry in dark red guard clothes and a bamboo hat, a curved broadsword at the hip and a small bone whistle on a cord, eyes half closed, nodding off"
+  2: "full body, side view facing left, same proportions, hand on the sword hilt"
+placeholder: { shape: humanoid, color: '#7a2a2a', accent: '#ff3b3b' }

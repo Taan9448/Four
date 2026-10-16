@@ -1,0 +1,14 @@
+id: frozen_shard_hit
+type: character-anim
+size: large
+character: frozen_shard
+chroma: magenta
+summary: 얼어붙은 조각 피격 3프레임
+depends_on: [frozen_shard_ref]
+reference: assets/source/frozen_shard_ref.png
+facing: left
+frame_notes:
+  1: "struck, hexagonal ice chips burst off"
+  2: "the inner light flickers"
+  3: "the shard steadies, frost reforming"
+placeholder: { shape: object, color: '#a8d0e8', accent: '#dff4ff' }

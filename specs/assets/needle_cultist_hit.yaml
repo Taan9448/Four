@@ -1,0 +1,14 @@
+id: needle_cultist_hit
+type: character-anim
+size: large
+character: needle_cultist
+chroma: magenta
+summary: 혈교 독침수 피격 3프레임
+depends_on: [needle_cultist_ref]
+reference: assets/source/needle_cultist_ref.png
+facing: left
+frame_notes:
+  1: "struck, he recoils, the half-mask slipping"
+  2: "stumbles back, dropping a needle"
+  3: "crouches again"
+placeholder: { shape: humanoid, color: '#5a2a3a', accent: '#6aa84f' }
