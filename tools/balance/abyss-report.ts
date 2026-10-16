@@ -104,6 +104,11 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
   const cm = runs.reduce((a, r) => a + (r.cracks?.made ?? 0), 0);
   const ce = runs.reduce((a, r) => a + (r.cracks?.entered ?? 0), 0);
   lines.push(`- 裂 틈새: 런당 ${(cm / Math.max(1, runs.length)).toFixed(2)}곳 열림 · 들어간 비율 ${cm ? fmtPct(ce / cm) : '-'}`);
+  const forged = runs.filter((r) => (r.forged?.cards ?? 0) > 0);
+  const deep = runs.filter((r) => r.depth >= 10);
+  lines.push(
+    `- 鍛 대강화(+6 이상 카드가 덱에 있는 런): 전체 ${fmtPct(runs.length ? forged.length / runs.length : 0)} · 10굽이 이상 ${fmtPct(deep.length ? deep.filter((r) => (r.forged?.cards ?? 0) > 0).length / deep.length : 0)} · 최고 단계 +${Math.max(0, ...runs.map((r) => r.forged?.top ?? 0))}`,
+  );
   lines.push(`- 폭주: 전투당 **${(fights.length ? surges / fights.length : 0).toFixed(2)}회**(목표 0.3 이하) · 폭주가 난 전투 ${fmtPct(fights.length ? fights.filter((b) => (b.surges ?? 0) > 0).length / fights.length : 0)}`);
   lines.push('');
   lines.push('## 봇 성향별');

@@ -21,7 +21,7 @@ describe('전리품', () => {
     expect(a.relic).toBeNull();
   });
 
-  it('엘리트는 가지지 않은 유물 하나(전설 빼고), 보스는 영웅·전설 후보 셋(겹치지 않게). 캠페인에는 심연 전용이 나오지 않는다', () => {
+  it('엘리트는 가지지 않은 유물 하나(전설 빼고), 보스는 후보 셋(겹치지 않게, 순례는 영웅·전설). 캠페인에는 심연 전용이 나오지 않는다', () => {
     const run = createRun(data, 'LOOT');
     const elite = rollLoot(data, run, node('elite'));
     expect(elite.relic).not.toBeNull();
@@ -29,12 +29,32 @@ describe('전리품', () => {
     const boss = rollLoot(data, run, node('boss'));
     expect(boss.relicChoices).toHaveLength(data.balance.economy.bossRelicChoices);
     expect(new Set(boss.relicChoices).size).toBe(boss.relicChoices.length);
-    for (const id of boss.relicChoices) expect(['epic', 'legendary']).toContain(data.relics.get(id)!.rarity);
+    // 첫 캠페인은 campaignWeights의 등급만
+    const campaignBoss = Object.keys(data.balance.economy.campaignWeights!.relic.boss);
+    for (const id of boss.relicChoices) expect(campaignBoss).toContain(data.relics.get(id)!.rarity);
+    // 순례(다시 걷기)는 기본 가중치: 영웅·전설
+    const pilgrim = { ...createRun(data, 'LOOT'), replayOf: createRun(data, 'LOOTP') };
+    for (const id of rollLoot(data, pilgrim, node('boss')).relicChoices) expect(['epic', 'legendary']).toContain(data.relics.get(id)!.rarity);
     for (let i = 0; i < 60; i++) {
       const r = createRun(data, `LOOT${i}`);
       for (const id of [rollLoot(data, r, node('elite')).relic, ...rollLoot(data, r, node('boss')).relicChoices]) if (id) expect(data.relics.get(id)!.abyss, id).toBe(false);
     }
     expect(boss.potion).not.toBeNull(); // 보스는 물약이 반드시 떨어진다
+  });
+
+  it('첫 캠페인은 강한 유물·물약이 극히 드물고(campaignWeights), 순례·심연은 기본 가중치(2026-10-16 사용자 결정)', async () => {
+    const { lootWeights } = await import('../src/engine/economy');
+    const eco = data.balance.economy;
+    const camp = createRun(data, 'LW');
+    const share = (w: Partial<Record<string, number>>, tiers: string[]) => {
+      const all = Object.values(w).reduce<number>((a, b) => a + (b ?? 0), 0);
+      return tiers.reduce((a, t) => a + (w[t] ?? 0), 0) / all;
+    };
+    expect(lootWeights(data, camp).relic).toBe(eco.campaignWeights!.relic);
+    expect(lootWeights(data, { ...camp, replayOf: camp }).relic).toBe(eco.relicWeights);
+    for (const k of ['elite', 'shop'] as const) expect(share(eco.campaignWeights!.relic[k], ['epic', 'legendary'])).toBeLessThanOrEqual(0.01);
+    for (const k of ['battle', 'elite', 'shop'] as const) expect(share(eco.campaignWeights!.potion[k], ['epic', 'legendary'])).toBeLessThanOrEqual(0.01);
+    expect(share(eco.campaignWeights!.relic.boss, ['legendary'])).toBeLessThan(share(eco.relicWeights.boss, ['legendary']));
   });
 
   it('받기: 골드가 더해지고 물약은 빈 칸에, 칸이 가득하면 남긴다', () => {

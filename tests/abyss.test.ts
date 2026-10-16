@@ -424,11 +424,13 @@ describe('보스 하한(2026-10-12 A2)', () => {
 
 // 심연 개편(2026-10-15, GAME_DESIGN 16절 '심연 개편'): 배율 완만화 · 법칙 20개 등급 가중 · 접사 14개 · 부동
 describe('심연 개편 — 법칙·접사·배율', () => {
-  it('배율: 굽이가 깊어져도 줄지 않는다(6~10굽이는 숨 고르기, 11~15굽이가 가장 가파르다)', () => {
+  it('배율: 굽이가 깊어져도 줄지 않는다(6~10굽이는 완만, 11~15굽이가 가장 가파르고, 15굽이부터 그대로 — 2026-10-16 6단계)', () => {
     const at = (n: number) => abyssScale(data, n);
     for (let d = 2; d <= 30; d++) expect(at(d).hp).toBeGreaterThanOrEqual(at(d - 1).hp);
-    expect(at(10).hp).toBeCloseTo(at(6).hp);
+    expect(at(10).hp - at(6).hp).toBeLessThan(at(5).hp - at(1).hp);
+    expect(at(15).hp - at(11).hp).toBeGreaterThan(at(10).hp - at(6).hp);
     expect(at(15).hp - at(11).hp).toBeGreaterThan(at(20).hp - at(16).hp);
+    expect(at(25)).toEqual(at(15));
   });
 
   it('법칙 20개: 등급(순한·보통·가혹)이 고루 있고, 깊을수록 가혹이 많이 걸린다', async () => {

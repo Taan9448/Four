@@ -88,6 +88,19 @@
       "boss": { "epic": 72, "legendary": 28 }
     },
     "bossRelicChoices": 3,
+    "campaignWeights": {
+      "potion": {
+        "battle": { "common": 66, "uncommon": 30, "rare": 3.8, "epic": 0.2 },
+        "elite": { "common": 45, "uncommon": 42, "rare": 12.5, "epic": 0.5 },
+        "boss": { "uncommon": 60, "rare": 37, "epic": 2.7, "legendary": 0.3 },
+        "shop": { "common": 50, "uncommon": 40, "rare": 9.7, "epic": 0.3 }
+      },
+      "relic": {
+        "elite": { "common": 65, "uncommon": 30, "rare": 4.8, "epic": 0.2 },
+        "shop": { "common": 60, "uncommon": 34, "rare": 5.8, "epic": 0.2 },
+        "boss": { "uncommon": 75, "rare": 23.5, "epic": 1.3, "legendary": 0.2 }
+      }
+    },
     "shop": {
       "cards": 5,
       "relics": 2,
@@ -128,7 +141,7 @@
     "dmgBase": 0.93,
     "hpStep": 0.46,
     "dmgStep": 0.31,
-    "deep": [{ "from": 6, "hpStep": 0, "dmgStep": 0 }, { "from": 11, "hpStep": 0.9, "dmgStep": 0.32 }, { "from": 16, "hpStep": 0.3, "dmgStep": 0.1 }],
+    "deep": [{ "from": 6, "hpStep": 0.3, "dmgStep": 0.1 }, { "from": 11, "hpStep": 2.3, "dmgStep": 0.72 }, { "from": 15, "hpStep": 0, "dmgStep": 0 }],
     "importMax": 2,
     "floors": 9,
     "typeWeights": { "battle": 52, "event": 18, "elite": 13, "rest": 8, "shop": 5 },
