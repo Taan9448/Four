@@ -1,0 +1,12 @@
+id: bg_smithy
+type: background
+summary: 대장간 배경 — 대강화(카드 +6~+10) 화면(2026-10-16)
+# 상점의 '대장간' 창 뒤에 어둡게 깔린다(src/ui/forge-view.ts .smithy, 위에 어두운 막이 덮인다). 가운데는 비교적 단순하게 — 카드·확률 고리·단계표가 그 위에 놓인다
+frame_notes:
+  1: >-
+    The inside of an old martial-arts smithy at night, seen from the front: a large black iron anvil on a tree-stump block in the lower
+    center, a roaring stone forge furnace in the back wall glowing orange-red with sparks rising, hammers, tongs and unfinished
+    sword blades hanging on a dark wooden rack on the left, a water quench barrel and a stack of charcoal on the right. Wooden beams
+    and a tiled roof edge above, faint smoke near the ceiling. Warm orange firelight against deep brown and charcoal shadows;
+    the middle area around the anvil stays fairly plain and dark so game panels can sit on top.
+placeholder: { color: '#2a1d16' }

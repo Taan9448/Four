@@ -281,6 +281,11 @@ export function buyUpgrade(data: GameData, run: RunState, uid: string): BuyResul
 }
 
 /** 대강화(+6~+10, GAME_DESIGN 16절 ⑦) 후보: 덱의 영웅·전설 카드 중 +5 이상, 상한 아래 */
+/** 이 상점에서 이미 망치를 댄 카드(상점마다 한 장) */
+export function forgeLocked(run: RunState): string | null {
+  return run.shop?.forgeUid ?? null;
+}
+
 export function forgeCandidates(data: GameData, run: RunState): CardInstance[] {
   const seen = new Set<string>();
   return run.deck.filter((c) => {
@@ -308,15 +313,17 @@ export function forgeChance(data: GameData, run: RunState, c: CardInstance): { c
 export type ForgeResult = (BuyResult & { ok: true; success: boolean; level: number; choices: string[] }) | (BuyResult & { ok: false });
 
 /**
- * 대강화 한 번(상점에서, 몇 번이든): price골드를 내고 성공하면 +1, 실패하면 단계 그대로 천장만 오른다.
+ * 대강화 한 번(상점의 대장간, 상점마다 카드 한 장 — 그 카드는 몇 번이든): price골드를 내고 성공하면 +1, 실패하면 단계 그대로 천장만 오른다.
  * +6~+9에 오르면 각인 후보(choices)가 run.forgePending에 남는다 — chooseEngraving으로 고를 때까지 다음 대강화는 못 한다.
  * 결과는 시드·카드·단계·실패 수로 정해진다(다시 불러와도 같다)
  */
 export function buyForge(data: GameData, run: RunState, uid: string): ForgeResult {
-  shopOf(run);
+  const shop = shopOf(run);
   if (run.forgePending) return { ok: false, reason: '먼저 각인을 고른다' };
+  if (shop.forgeUid && shop.forgeUid !== uid) return { ok: false, reason: '이 대장간에서는 카드 한 장만 강화한다' };
   const c = forgeCandidates(data, run).find((x) => x.uid === uid);
   if (!c) return { ok: false, reason: '대강화할 수 없는 카드' };
+  shop.forgeUid = uid;
   const fail = pay(run, data.balance.upgrade.forge.price);
   if (fail) return fail as ForgeResult;
   const key = forgeKey(run, c);

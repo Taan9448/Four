@@ -193,6 +193,8 @@ export interface ShopState {
   /** 상흔 shopAt 이상일 때 연 상점: 값이 오르고, 꿰매기를 판다(GAME_DESIGN 7절) */
   scarred?: boolean;
   stitchUsed?: boolean;
+  /** 대강화(대장간): 이 상점에서 망치를 댄 카드 uid — 상점마다 카드 한 장만(2026-10-15 사용자 요청) */
+  forgeUid?: string;
 }
 
 export interface LevelUp {

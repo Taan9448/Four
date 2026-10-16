@@ -6,7 +6,7 @@ export interface Overlay {
   close: () => void;
 }
 
-export function openOverlay(title: string, body: HTMLElement, opts: { onClose?: () => void; wide?: boolean } = {}): Overlay {
+export function openOverlay(title: string, body: HTMLElement, opts: { onClose?: () => void; wide?: boolean; className?: string } = {}): Overlay {
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.stopPropagation();
@@ -20,7 +20,7 @@ export function openOverlay(title: string, body: HTMLElement, opts: { onClose?: 
   };
   const panel = h(
     'div',
-    { class: `overlay-panel${opts.wide ? ' wide' : ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+    { class: `overlay-panel${opts.wide ? ' wide' : ''}${opts.className ? ` ${opts.className}` : ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     h('header', { class: 'overlay-head' }, h('h2', {}, title), h('button', { class: 'btn overlay-close', 'aria-label': '닫기', onclick: () => close() }, '✕')),
     h('div', { class: 'overlay-body' }, body),
   );

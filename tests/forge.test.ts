@@ -1,7 +1,7 @@
 // 대강화 +6~+10(심연 개편 5단계, GAME_DESIGN 16절 ⑦) — 각인·각성(2026-10-15 개편)
 import { describe, expect, it } from 'vitest';
 import { createAbyssRun, pathOffer, pathPicks } from '../src/engine/abyss';
-import { buyForge, forgeCandidates, forgeChance, openShop } from '../src/engine/economy';
+import { buyForge, forgeCandidates, forgeChance, forgeLocked, openShop } from '../src/engine/economy';
 import { createRunAt } from '../src/engine/run';
 import { forgeMax, resolveCard } from '../src/engine/state';
 import { chooseEngraving, engravingAllowed, settleEngraving } from '../src/engine/forge';
@@ -202,6 +202,26 @@ describe('대강화 시도', () => {
     settleEngraving(data, run);
     expect(run.collection[epic.id]).toBe(max + 1);
     expect(run.deck.filter((c) => c.cardId === epic.id).every((c) => c.level === max + 1)).toBe(true);
+  });
+});
+
+describe('대장간: 상점마다 카드 한 장', () => {
+  it('한 카드를 두드리면 그 상점에서는 다른 카드를 못 하고, 다음 상점에서는 다시 고른다', () => {
+    const run = createAbyssRun(data, 'ONECARD', { mates: ['elia', 'kyle', 'born'], paths: pathOffer(data, 'ONECARD').slice(0, pathPicks(data, 3).picks), pool: {} });
+    const epics = cards.filter((c) => forgeMax(data, c) > max).slice(0, 2);
+    run.deck.push({ uid: 'a1', cardId: epics[0].id, level: max }, { uid: 'b1', cardId: epics[1].id, level: max });
+    run.shop = openShop(data, run, 'n1-0');
+    run.gold = f.price * 20;
+    expect(forgeLocked(run)).toBeNull();
+    buyForge(data, run, 'a1');
+    settleEngraving(data, run);
+    expect(forgeLocked(run)).toBe('a1');
+    expect(buyForge(data, run, 'b1').ok).toBe(false);
+    expect(buyForge(data, run, 'a1').ok).toBe(true);
+    settleEngraving(data, run);
+    run.shop = openShop(data, run, 'n2-0');
+    expect(forgeLocked(run)).toBeNull();
+    expect(buyForge(data, run, 'b1').ok).toBe(true);
   });
 });
 

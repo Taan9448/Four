@@ -1,12 +1,13 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyForge, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeChance, openShop, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
 import { ownedView } from '../engine/collection';
-import { chooseEngraving, settleEngraving } from '../engine/forge';
+import { settleEngraving } from '../engine/forge';
+import { openSmithy } from './forge-view';
 import type { CardInstance } from '../engine/state';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
@@ -37,98 +38,6 @@ function pickCard(data: GameData, title: string, cards: CardInstance[], onPick: 
     }),
   );
   const ov = openOverlay(title, grid, { wide: true });
-}
-
-const pct = (p: number) => `${Math.round(p * 1000) / 10}%`;
-
-/**
- * 대강화 창(GAME_DESIGN 16절 ⑦): 후보 카드마다 지금 모습 → 다음 모습, 성공률(천장 반영)과 실패 횟수, 시도 단추.
- * 창은 닫지 않고 몇 번이든 시도한다. onResult: 상점 화면 갱신·알림
- */
-function openForge(data: GameData, run: RunState, onResult: (r: ForgeResult | null) => void): void {
-  const price = data.balance.upgrade.forge.price;
-  const body = h('div', { class: 'forge-list' });
-  let last: ForgeResult | null = null;
-  const draw = () => {
-    const list = forgeCandidates(data, run);
-    const pending = run.forgePending;
-    const status = last ? [h('p', { class: `forge-last ${last.ok && last.success ? 'is-ok' : 'is-fail'}`, role: 'status' }, last.ok ? last.message : last.reason)] : [];
-    // 성공 뒤: 각인 셋 중 하나를 고른다(카드는 새긴 뒤 모습). 고를 때까지 다른 시도는 막는다
-    if (pending) {
-      const inst = run.deck.find((c) => c.uid === pending.uid) ?? { uid: pending.uid, cardId: pending.cardId, level: pending.level };
-      body.replaceChildren(
-        ...status,
-        h('p', { class: 'forge-note' }, `${data.cards.get(pending.cardId)?.name} +${pending.level} — 새길 각인을 하나 고른다(한 번 새기면 바꿀 수 없다).`),
-        h(
-          'div',
-          { class: 'engrave-choices' },
-          ...pending.choices.map((id) => {
-            const mod = data.forge.engravings.find((m) => m.id === id)!;
-            return h(
-              'div',
-              { class: 'engrave-choice' },
-              cardView(data, { ...inst, marks: [...(inst.marks ?? []), id] }),
-              h('b', { class: 'engrave-name' }, h('span', { class: 'engrave-glyph', 'aria-hidden': 'true' }, mod.glyph), mod.name),
-              h('small', {}, mod.text),
-              h(
-                'button',
-                {
-                  class: 'btn btn-small btn-primary',
-                  onclick: () => {
-                    const r = chooseEngraving(data, run, id);
-                    last = r.ok ? { ok: true, success: true, level: pending.level, choices: [], message: r.message } : r;
-                    onResult(last);
-                    draw();
-                  },
-                },
-                '새기기',
-              ),
-            );
-          }),
-        ),
-      );
-      return;
-    }
-    body.replaceChildren(
-      ...status,
-      h('p', { class: 'forge-note' }, `가진 골드 ${run.gold} · 한 번에 ${price}골드. 실패해도 단계는 그대로, 실패할 때마다 그 단계 성공률이 기본값의 ${Math.round(data.balance.upgrade.forge.pity * 100)}%씩 오른다(성공하면 처음으로). +6~+9는 성공할 때마다 각인을 셋 중 하나 새기고, +10은 동료마다 다른 각성.`),
-      ...(list.length
-        ? list.map((c) => {
-            const { chance, base, fails } = forgeChance(data, run, c);
-            return h(
-              'div',
-              { class: 'forge-row' },
-              cardView(data, c),
-              h('span', { class: 'forge-arrow', 'aria-hidden': 'true' }, '→'),
-              cardView(data, { ...c, level: c.level + 1 }),
-              h(
-                'div',
-                { class: 'forge-odds' },
-                h('b', {}, `+${c.level} → +${c.level + 1}`),
-                h('span', {}, `성공률 ${pct(chance)}`),
-                h('small', {}, fails ? `기본 ${pct(base)} · 실패 ${fails}번` : `기본 ${pct(base)}`),
-                h(
-                  'button',
-                  {
-                    class: 'btn btn-small btn-primary',
-                    disabled: run.gold < price,
-                    onclick: () => {
-                      const r = buyForge(data, run, c.uid);
-                      last = r;
-                      onResult(r);
-                      draw();
-                    },
-                  },
-                  `시도 · ${price}골드`,
-                ),
-              ),
-            );
-          })
-        : [h('p', { class: 'forge-empty' }, '덱에 +5가 된 영웅·전설 카드가 없다.')]),
-    );
-  };
-  draw();
-  openOverlay('대강화 — 영웅·전설 카드 +6~+10', body, { wide: true, onClose: () => onResult(null) });
 }
 
 export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeId: string, onDone: () => void): HTMLElement {
@@ -306,18 +215,18 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           h(
             'div',
             { class: 'shop-line' },
-            h('span', { class: 'service-glyph' }, '煉'),
+            h('span', { class: 'service-glyph' }, '鎚'),
             h(
               'div',
               { class: 'shop-desc' },
-              h('b', {}, '대강화'),
-              h('small', {}, `영웅·전설 +5 카드를 +6~+10으로. 성공하면 각인(셋 중 하나), +10은 동료의 각성. 실패해도 그대로, 실패할수록 잘 된다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
+              h('b', {}, forgeLocked(run) ? `대장간 — ${data.cards.get(run.deck.find((c) => c.uid === forgeLocked(run))?.cardId ?? '')?.name ?? ''}` : '대장간(대강화)'),
+              h('small', {}, `영웅·전설 +5 카드 한 장을 +6~+10으로(상점마다 한 장). 성공하면 각인, +10은 동료의 각성.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
             ),
             price(data.balance.upgrade.forge.price, false),
             h(
               'button',
-              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0, onclick: () => openForge(data, run, forged) },
-              run.forgePending ? '각인 고르기' : '고르기',
+              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0, onclick: () => openSmithy(data, run, forged) },
+              run.forgePending ? '각인 고르기' : '들어가기',
             ),
           ),
     );
