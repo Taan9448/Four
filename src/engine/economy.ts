@@ -212,6 +212,25 @@ export function buyPotion(data: GameData, run: RunState, index: number): BuyResu
   return { ok: true, message: `물약 구입: ${data.potions.get(item.potionId)!.name}` };
 }
 
+/** 물약을 팔면 받는 골드: 그 등급 상점 값 × potionSellRatio(내림). 할인·상흔 값과 상관없이 같다 */
+export function potionSellPrice(data: GameData, potionId: string): number {
+  const def = data.potions.get(potionId);
+  if (!def) return 0;
+  const sh = data.balance.economy.shop;
+  return Math.floor(sh.potionPrice[def.rarity] * sh.potionSellRatio);
+}
+
+/** 물약 팔기(상점에서만): 그 칸을 비우고 골드를 받는다. 유물은 팔 수 없다(대가가 있는 유물을 떼어 내지 못하게) */
+export function sellPotion(data: GameData, run: RunState, slot: number): BuyResult {
+  shopOf(run);
+  const id = run.potions[slot];
+  if (!id) return { ok: false, reason: '빈 칸' };
+  const gold = potionSellPrice(data, id);
+  run.potions[slot] = null;
+  run.gold += gold;
+  return { ok: true, message: `물약 판매: ${data.potions.get(id)!.name} +${gold}골드` };
+}
+
 /** 바꿀 수 있는 보유 카드(필수 카드·상태 카드 제외) */
 export const swappable = (data: GameData, run: RunState) => swappableCards(data, run);
 

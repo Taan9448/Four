@@ -1,7 +1,7 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, potionSellPrice, sellPotion, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
@@ -240,7 +240,33 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           'aside',
           { class: 'shop-side' },
           services,
-          h('div', { class: 'shop-own panel' }, h('h3', { class: 'shop-h' }, '내 물약 칸'), h('div', { class: 'shop-potions-own' }, run.potions.map((p) => potionChip(data, p)))),
+          // 내 물약 칸: 물약마다 팔기(상점 값의 절반, 2026-10-16). 유물은 팔지 않는다
+          h(
+            'div',
+            { class: 'shop-own panel' },
+            h('h3', { class: 'shop-h' }, '내 물약 칸'),
+            h(
+              'div',
+              { class: 'shop-potions-own' },
+              run.potions.map((p, slot) =>
+                h(
+                  'div',
+                  { class: 'shop-own-slot' },
+                  potionChip(data, p),
+                  p
+                    ? h(
+                        'button',
+                        { class: 'btn btn-small shop-sell', 'aria-label': `${data.potions.get(p)?.name} 팔기 ${potionSellPrice(data, p)}골드`, onclick: () => result(sellPotion(data, run, slot)) },
+                        '팔기 ',
+                        h('i', { class: 'coin' }),
+                        String(potionSellPrice(data, p)),
+                      )
+                    : null,
+                ),
+              ),
+            ),
+            h('small', { class: 'shop-sell-note' }, `물약은 상점 값의 ${Math.round(data.balance.economy.shop.potionSellRatio * 100)}%에 판다. 유물은 팔 수 없다.`),
+          ),
           h('button', { class: 'btn btn-primary shop-leave', onclick: () => (settleEngraving(data, run), onDone()) }, '떠나기'),
         ),
       ),

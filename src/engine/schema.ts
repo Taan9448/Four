@@ -798,6 +798,8 @@ export const Balance = z
             cardPrice: z.partialRecord(Rarity, z.number().int().positive()),
             relicPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int(), epic: z.number().int(), legendary: z.number().int() }).strict(),
             potionPrice: z.object({ common: z.number().int(), uncommon: z.number().int(), rare: z.number().int(), epic: z.number().int(), legendary: z.number().int() }).strict(),
+            /** 물약 팔기(상점에서만, 2026-10-16 사용자 결정): 그 등급 상점 값(potionPrice) × 이 비율, 내림. 유물은 팔지 않는다 */
+            potionSellRatio: z.number().min(0).max(1).default(0.5),
             /** 카드 바꾸기(보유 카드 한 장 → 같은 주인의 다른 카드) 가격. 한 번 쓸 때마다 swapStep씩 비싸진다 */
             swapPrice: z.number().int().positive(),
             swapStep: z.number().int().min(0),
