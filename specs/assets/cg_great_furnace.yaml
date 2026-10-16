@@ -1,0 +1,11 @@
+id: cg_great_furnace
+type: story-cg
+character: born
+summary: 장면 일러스트 — 큰 화로 — 사슬 박힌 바위째 화로를 치는 보른(S2, 2권 2~4장)
+# 2026-10-16 #1305: 새 적 큰 화로(S2 이그니스전). s2_scene_ignis에서 보른이 화로 안에 들어갔을 때(s2_born_inside)만 보인다
+frame_notes:
+  1: >-
+    The innermost forge of the volcanic canyon: a colossal furnace of stacked black stone bound with iron bands, as tall as a tower, its open mouth roaring with WHITE flame that shoots up into an ash-red sky. Dozens of heavy iron chains run into the furnace body from every side, glowing red where they enter, and each chain ends at the ankle of an enslaved smith hunched at an anvil around it. In the foreground Born, the very stocky dwarf, with a broken shackle and a length of chain still on his own ankle and his red beard braided in three braids, has ripped a boulder out of the ground with a chain still embedded in it and swings it two-handed into the flank of the furnace; white sparks and cracks of light burst from the impact and the white flame lurches sideways. He does NOT hold his axe or any weapon besides the chained boulder. High above, on a throne carved into the cliff face behind the furnace, the silhouette of Ignis — a human-shaped figure of white fire three times a man's height with black lava running through it like veins and a crown of flames — looks down. A few other dwarf slaves lift their hammers, turning toward the furnace.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#6b2a14' }

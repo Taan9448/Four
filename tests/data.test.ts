@@ -3,7 +3,7 @@ import { fxRuleIds } from '../src/engine/fx-rules';
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/engine/data';
-import { fastFaceChanges } from '../src/engine/scene';
+import { fastFaceChanges, sceneForRun } from '../src/engine/scene';
 import { unlockSource } from '../src/engine/abyss';
 import { playableStages } from '../src/engine/run';
 import { BATTLE_OPS, RUN_OPS, type Effect } from '../src/engine/schema';
@@ -324,6 +324,17 @@ describe('데이터 검사', () => {
         const spec = specTypes.get(l.cg);
         if (spec !== 'story-cg') bad.push(`${sc.id}: cg ${l.cg}(${spec ?? '명세 없음'})`);
       }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('장면 줄 조건(if): partyHas는 캐릭터, 조건 없는 줄이 하나 이상 남는다(어떤 편성에서도 빈 장면이 되지 않게)', () => {
+    const bad: string[] = [];
+    for (const sc of data.scenes.values()) {
+      for (const l of sc.lines) if (l.if?.partyHas && !data.characters.has(l.if.partyHas)) bad.push(`${sc.id}: 없는 동료 ${l.if.partyHas}`);
+      if (sc.lines.every((l) => l.if)) bad.push(`${sc.id}: 모든 줄에 조건이 있다`);
+      const empty = sceneForRun(sc, { flags: [], selected: [] });
+      if (!empty.lines.length) bad.push(`${sc.id}: 조건을 모두 빼면 빈 장면`);
     }
     expect(bad).toEqual([]);
   });

@@ -82,6 +82,21 @@ describe('장면 편의(B3)', () => {
     expect(autoAdvanceDelay('가'.repeat(30))).toBe(30 * 40 + 600);
   });
 
+  it('장면 줄 조건(if): 플래그·출전 동료가 맞을 때만 그 줄이 남는다(#1305)', async () => {
+    const { sceneForRun } = await import('../src/engine/scene');
+    const scene = {
+      id: 't',
+      lines: [{ text: 'a' }, { text: 'b', if: { flag: 'f' } }, { text: 'c', if: { partyHas: 'elia' } }, { text: 'd', if: { flag: 'f', partyHas: 'born' } }],
+    };
+    const texts = (flags: string[], selected: string[]) => sceneForRun(scene, { flags, selected }).lines.map((l) => l.text).join('');
+    expect(texts([], [])).toBe('a');
+    expect(texts(['f'], ['elia'])).toBe('abc');
+    expect(texts(['f'], ['born'])).toBe('abd');
+    expect(texts([], ['born', 'elia'])).toBe('ac');
+    // 조건이 모두 맞으면 같은 장면을 그대로 돌려준다
+    expect(sceneForRun(scene, { flags: ['f'], selected: ['elia', 'born'] })).toBe(scene);
+  });
+
   it('건너뛴(이미 본) 장면을 다시 기록해도 도감은 그대로다', async () => {
     const { emptyCodex, noteScene } = await import('../src/engine/codex');
     const id = [...data.scenes.keys()][0];

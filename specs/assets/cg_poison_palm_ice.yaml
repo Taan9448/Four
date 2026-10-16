@@ -1,0 +1,11 @@
+id: cg_poison_palm_ice
+type: story-cg
+character: elia
+summary: 장면 일러스트 — 독장과 얼음 벽 — 독장 장로 앞을 막아선 엘리아(S8, 축약본 8장)
+# 2026-10-16 #1305: 새 엘리트 독장 장로(S8). s8_scene_poison_palm에서 엘리아가 출전했을 때만 보인다
+frame_notes:
+  1: >-
+    Night on the Nine Heavens Stairs of Cheonma Peak: steep torch-lit stone steps winding up a dark mountain. On the steps above stands an old cult elder in black robes layered with a moss-green outer robe, a long white beard, his right hand stained blue-black up to the wrist; he thrusts that palm forward and a burst of dark green poison mist pours from it, the stone steps hissing and melting into bubbles where the mist touches. Between him and the party a tall wall of clear blue ice has just erupted from the steps; his poisoned palm strikes the ice and black-green rot spreads across the surface like ink in water, but the wall holds. Just behind the wall Elia stands with one hand raised and frost streaming from her fingers, her silver hair and grey hooded cloak blown back by the cold, her staff in the other hand. Dim figures of companions and torchbearers are behind her. Warm orange torchlight on the elder's side, cold blue ice light on Elia's side.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#1f4a3f' }
