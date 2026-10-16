@@ -543,4 +543,49 @@ subjects:
     a three-headed hound from the rift, larger than a horse; burning orange-red scales instead of fur, three
     dog heads with glowing yellow eyes on necks that join into one thick neck, small flames flickering
     between the scales, a long spiked tail
+  inner_senior: >-
+    an inner-court senior disciple of the Cheongun sect, a smug young martial artist in neat grey-blue
+    inner-court robes with a white sash, hair tied in a topknot, a sneering expression, bare fists
+  dry_vine: >-
+    a knot of dried grey-brown barrier vines from the dead silver forest, thick twisted stems rising from
+    dead soil with faint silver veins of old barrier magic along the bark, a few withered leaves, curling
+    tendrils; an inanimate plant mass, no face
+  great_furnace: >-
+    the Great Furnace of the Velkan canyon, a huge stone and iron furnace with a roaring white-hot flame in
+    its mouth, many heavy iron slave chains running into it from all sides, glowing orange cracks in the
+    stone; an inanimate object, no face
+  ash_bat: >-
+    a cave bat of the volcanic canyon about the size of a dog, soot-black fur, wide leathery wings crusted
+    with hot glowing ash, small red eyes, bared fangs
+  tomb_warrior: >-
+    the ghost of a dwarf warrior from the Tomb of Five Thousand, stout and pale translucent with blue-green
+    ghost light leaking from the joints of old dwarven plate armor, a long braided beard, a broad axe and a
+    round dwarf shield
+  rock_eater: >-
+    a large burrowing rock-eater grub of Khazdum, a segmented body with rock-plated back armor, a round
+    grinding mouth ringed with stone teeth, small dark eyes, flecks of metal ore on its shell
+  sleeping_sentry: >-
+    a blood cult sentry of the Gyosaeso checkpoint, a man in dark red guard clothes and a bamboo hat, a
+    curved broadsword at the hip and a small bone whistle on a cord, drowsy half-closed eyes
+  needle_cultist: >-
+    a blood cult needle thrower, a lean assassin in dark crimson robes with long sleeves, a half-mask over
+    the lower face, thin green-tipped poison needles between the fingers, a needle case on the belt
+  poison_palm_elder: >-
+    a Poison Palm Elder of the Heavenly Demon Cult, an old man in layered black and dark green robes with a
+    long white beard, the right palm stained dark blue-green and faintly steaming with poison mist
+  array_statue: >-
+    a stone guardian of the Nine Heaven Stairs array, a weathered man-sized stone statue shaped like a robed
+    martial artist, carved array symbols glowing faint gold on its chest, moss in the cracks; a stone
+    construct, a blank carved face
+  cult_swordsman: >-
+    a saber swordsman of the Heavenly Demon Cult, a lean man in black robes with a red sash, a heavy curved
+    saber held low, a scar across the face, cold eyes
+  shadow_bridge: >-
+    the Shadow Bridge of the world rift, a long narrow bridge of dark solidified shadow spanning between
+    floating rock fragments, one end rearing up like a beast, ghostly figures with black wedge daggers
+    half-formed inside it; an inanimate structure, no face
+  frozen_shard: >-
+    a frozen shard of Arden ice drifting in the dark void of the rift, a large jagged hexagonal shard of
+    pale blue ice with a faint inner light like a frozen star, frost mist trailing from its edges; an
+    inanimate object, no face
 ```
