@@ -19,7 +19,7 @@ import { sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
-import { affinityChip, elementMark, gaugeChip, INTENT_LABEL, lawIconEl, intentIcon, statusChip } from './icons';
+import { affinityChip, controlMark, elementMark, gaugeChip, INTENT_LABEL, lawIconEl, intentIcon, statusChip } from './icons';
 import { confirmDialog, openOverlay, popPanel, surgeGuide } from './overlay';
 import { openShortcuts, settings, settingsForm } from './settings';
 import { installTooltips, pruneTooltip, tipAttrs } from './tooltip';
@@ -69,6 +69,8 @@ interface Unit {
   intent: HTMLElement;
   /** 고른(또는 마우스를 올린) 카드를 쓰면 이 유닛에 들어갈 피해 */
   preview: HTMLElement;
+  /** 머리 위 행동 제약(기절·빙결·마비·졸음) 표시 자리 — 그림 위에 겹친다 */
+  ctrl: HTMLElement;
 }
 
 export class BattleView {
@@ -388,6 +390,7 @@ export class BattleView {
     const preview = h('div', { class: 'dmg-preview' });
     // 적: 의도 / 아군: 받을 피해 예고. 둘 다 머리 위
     const intent = h('div', { class: c.side === 'enemy' ? 'intent chip' : 'incoming' });
+    const ctrl = h('div', { class: 'ctrl-slot' });
     const el = h(
       'div',
       {
@@ -398,12 +401,12 @@ export class BattleView {
       // 줄 피해 미리보기는 의도 이름표 바로 위에 같은 모양으로(평소에는 비어 있어 자리를 차지하지 않는다)
       preview,
       intent,
-      h('div', { class: 'sprite-wrap' }, canvas),
+      h('div', { class: 'sprite-wrap' }, canvas, ctrl),
       h('div', { class: 'unit-name' }, c.name, c.side === 'party' && c.level ? h('small', { class: 'unit-lv' }, ` Lv${c.level}`) : ''),
       h('div', { class: 'unit-bars' }, block, h('div', { class: 'hp-bar', role: 'progressbar', 'aria-label': `${c.name} 체력`, 'aria-valuemin': '0' }, hp, hpText)),
       statuses,
     );
-    const unit: Unit = { c, el, player, hp, hpText, block, statuses, intent, preview };
+    const unit: Unit = { c, el, player, hp, hpText, block, statuses, intent, preview, ctrl };
     this.units.set(c.uid, unit);
     void player.play(this.spriteFor(c, 'idle'), { loop: true });
     return unit;
@@ -454,6 +457,14 @@ export class BattleView {
         }
       }
       this.fitStatuses(u.statuses);
+      // 행동 제약은 이름표가 접혀도 머리 위에 늘 크게(#1317). 같은 상태·스택이면 다시 그리지 않아 깜빡임 애니메이션이 이어진다
+      const ctrl = (shown?.downed ?? c.downed) ? null : controlMark(this.data, c.statuses);
+      const key = ctrl?.getAttribute('aria-label') ?? '';
+      const stacks = ctrl ? [...ctrl.querySelectorAll('b')].map((b) => b.textContent).join(',') : '';
+      if (u.ctrl.dataset.key !== `${key}|${stacks}`) {
+        u.ctrl.dataset.key = `${key}|${stacks}`;
+        u.ctrl.replaceChildren(...(ctrl ? [ctrl] : []));
+      }
       clear(u.intent);
       if (c.side === 'enemy') this.renderIntent(u, c as EnemyState);
       else this.renderIncoming(u, c.downed ? undefined : incoming.get(c.uid));
