@@ -58,5 +58,6 @@
   {"id": "steadfast", "icon": 57, "name": "부동", "kind": "trait", "description": "흔들리지 않는다. 기절·빙결·마비가 걸리지 않고 냉기·감전도 쌓이지 않는다(심연의 접사·법칙).", "glyph": "不", "decay": 0},
   {"id": "resist_stun", "icon": 58, "name": "기절 내성", "kind": "trait", "description": "방금 기절했다. 다음 차례가 끝날 때까지 기절이 50% 확률로 듣지 않는다(빙결·마비는 그대로 든다).", "glyph": "醒", "decay": 1},
   {"id": "resist_bind", "icon": 59, "name": "빙결 내성", "kind": "trait", "description": "방금 얼어붙었다. 다음 차례가 끝날 때까지 빙결이 50% 확률로 듣지 않는다(기절·마비는 그대로 든다).", "glyph": "融", "decay": 1},
-  {"id": "resist_paralyze", "icon": 60, "name": "마비 내성", "kind": "trait", "description": "방금 마비됐다. 다음 차례가 끝날 때까지 마비가 50% 확률로 듣지 않는다(기절·빙결은 그대로 든다).", "glyph": "舒", "decay": 1}
+  {"id": "resist_paralyze", "icon": 60, "name": "마비 내성", "kind": "trait", "description": "방금 마비됐다. 다음 차례가 끝날 때까지 마비가 50% 확률로 듣지 않는다(기절·빙결은 그대로 든다).", "glyph": "舒", "decay": 1},
+  {"id": "drowsy", "icon": 61, "name": "졸음", "kind": "trait", "description": "졸고 있다. 행동하지 못하고 차례가 끝날 때마다 1씩 줄어 다 줄면 깬다. 졸 때 공격받으면 깜짝 놀라 깨면서 기절 1.", "glyph": "眠", "decay": 1, "modifiers": {"skipTurn": true}, "triggers": [{"on": "attacked", "perStack": false, "effects": [{"op": "remove_status", "status": "drowsy", "target": "self"}, {"op": "apply_status", "status": "stun", "stacks": 1, "target": "self"}]}]}
 ]

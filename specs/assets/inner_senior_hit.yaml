@@ -1,0 +1,14 @@
+id: inner_senior_hit
+type: character-anim
+size: large
+character: inner_senior
+chroma: magenta
+summary: 내원 사형 피격 3프레임
+depends_on: [inner_senior_ref]
+reference: assets/source/inner_senior_ref.png
+facing: left
+frame_notes:
+  1: "struck, his head snaps back, the topknot loosening"
+  2: "stumbles, surprise on his face"
+  3: "straightens his robe angrily"
+placeholder: { shape: humanoid, color: '#6b7a8f', accent: '#c2c6d1' }

@@ -1,0 +1,18 @@
+id: tomb_warrior_attack
+type: character-anim
+size: large
+character: tomb_warrior
+chroma: magenta
+summary: 오천의 무덤 망령 전사 무덤 도끼 6프레임
+depends_on: [tomb_warrior_ref]
+reference: assets/source/tomb_warrior_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the axe high overhead"
+  2: "steps forward to the left behind the shield"
+  3: "the axe begins to fall"
+  4: "the axe chops down at full reach to the left"
+  5: "the ghost light flares on impact"
+  6: "returns to the guard stance"
+placeholder: { shape: humanoid, color: '#7a8a7a', accent: '#8fd3ff' }

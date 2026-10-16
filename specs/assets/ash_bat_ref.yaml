@@ -1,0 +1,11 @@
+id: ash_bat_ref
+type: character-ref
+size: large
+character: ash_bat
+chroma: magenta
+summary: 재 날개 박쥐 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a cave bat with soot-black fur and wide leathery wings crusted with hot glowing ash, small red eyes, fangs bared"
+  2: "full body, side view facing left, same proportions, wings spread mid-flap"
+placeholder: { shape: beast, color: '#4a3a36', accent: '#ff8a5c' }

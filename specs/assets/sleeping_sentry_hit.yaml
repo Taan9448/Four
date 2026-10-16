@@ -1,0 +1,14 @@
+id: sleeping_sentry_hit
+type: character-anim
+size: large
+character: sleeping_sentry
+chroma: magenta
+summary: 교세소 보초 혈교도 피격 3프레임
+depends_on: [sleeping_sentry_ref]
+reference: assets/source/sleeping_sentry_ref.png
+facing: left
+frame_notes:
+  1: "struck, he jolts awake in shock, hat askew"
+  2: "staggers back, blinking"
+  3: "grabs the sword hilt"
+placeholder: { shape: humanoid, color: '#7a2a2a', accent: '#ff3b3b' }

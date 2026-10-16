@@ -1,0 +1,11 @@
+id: needle_cultist_ref
+type: character-ref
+size: large
+character: needle_cultist
+chroma: magenta
+summary: 혈교 독침수 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, a lean blood cult assassin in dark crimson robes with long sleeves, half-mask over the lower face, fingers holding thin green-tipped needles, a needle case on the belt"
+  2: "full body, side view facing left, same proportions, arm drawn back to throw"
+placeholder: { shape: humanoid, color: '#5a2a3a', accent: '#6aa84f' }

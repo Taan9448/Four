@@ -1,0 +1,15 @@
+id: cult_swordsman_idle
+type: character-anim
+size: large
+character: cult_swordsman
+chroma: magenta
+summary: 천마신교 도객 대기 4프레임
+depends_on: [cult_swordsman_ref]
+reference: assets/source/cult_swordsman_ref.png
+facing: left
+frame_notes:
+  1: "low ready stance facing left, saber down"
+  2: "the saber tip turns slightly"
+  3: "his eyes narrow"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#3a2a2a', accent: '#a02634' }

@@ -1,0 +1,15 @@
+id: tomb_warrior_idle
+type: character-anim
+size: large
+character: tomb_warrior
+chroma: magenta
+summary: 오천의 무덤 망령 전사 대기 4프레임
+depends_on: [tomb_warrior_ref]
+reference: assets/source/tomb_warrior_ref.png
+facing: left
+frame_notes:
+  1: "ghostly guard stance facing left, shield forward"
+  2: "the ghost light flickers along the armor"
+  3: "the beard and cloak drift as if underwater"
+  4: "settles into the guard"
+placeholder: { shape: humanoid, color: '#7a8a7a', accent: '#8fd3ff' }

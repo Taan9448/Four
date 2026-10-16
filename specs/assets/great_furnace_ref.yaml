@@ -1,0 +1,11 @@
+id: great_furnace_ref
+type: character-ref
+size: large
+character: great_furnace
+chroma: magenta
+summary: 큰 화로 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a huge stone and iron furnace in a volcanic canyon, a roaring white-hot flame in its mouth, many heavy iron chains running into it from all sides, glowing orange cracks in the stone"
+  2: "full view, side view, same proportions, chains trailing to the left"
+placeholder: { shape: object, color: '#c2501e', accent: '#ffe08a' }

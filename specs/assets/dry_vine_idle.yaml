@@ -1,0 +1,15 @@
+id: dry_vine_idle
+type: character-anim
+size: large
+character: dry_vine
+chroma: magenta
+summary: 마른 결계 덩굴 대기 4프레임
+depends_on: [dry_vine_ref]
+reference: assets/source/dry_vine_ref.png
+facing: left
+frame_notes:
+  1: "the vine knot sways slowly, tendrils curling"
+  2: "the faint silver veins pulse once"
+  3: "a tendril reaches out to the left and draws back"
+  4: "settles"
+placeholder: { shape: object, color: '#5c5a3a', accent: '#bfe3a0' }

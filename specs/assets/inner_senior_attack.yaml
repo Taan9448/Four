@@ -1,0 +1,18 @@
+id: inner_senior_attack
+type: character-anim
+size: large
+character: inner_senior
+chroma: magenta
+summary: 내원 사형 발길질 6프레임
+depends_on: [inner_senior_ref]
+reference: assets/source/inner_senior_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "leans back, lifting the right knee"
+  2: "hops forward to the left"
+  3: "the leg swings out"
+  4: "the front kick lands at full reach to the left"
+  5: "draws the leg back"
+  6: "returns to the smug stance"
+placeholder: { shape: humanoid, color: '#6b7a8f', accent: '#c2c6d1' }

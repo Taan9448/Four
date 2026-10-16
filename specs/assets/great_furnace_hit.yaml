@@ -1,0 +1,14 @@
+id: great_furnace_hit
+type: character-anim
+size: large
+character: great_furnace
+chroma: magenta
+summary: 큰 화로 피격 3프레임
+depends_on: [great_furnace_ref]
+reference: assets/source/great_furnace_ref.png
+facing: left
+frame_notes:
+  1: "struck, a crack opens in the stone and sparks burst out"
+  2: "the flame gutters and the chains rattle"
+  3: "the furnace steadies, glowing"
+placeholder: { shape: object, color: '#c2501e', accent: '#ffe08a' }

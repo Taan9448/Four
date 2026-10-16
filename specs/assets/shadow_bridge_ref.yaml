@@ -1,0 +1,11 @@
+id: shadow_bridge_ref
+type: character-ref
+size: large
+character: shadow_bridge
+chroma: magenta
+summary: 그림자 다리 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-10-16 몬스터 13종 추가
+facing: left
+frame_notes:
+  1: "full view, three-quarter front view, a long narrow bridge made of dark solidified shadow spanning between floating rock fragments, rising up at one end like a rearing beast, ghostly figures with black daggers half-formed inside it"
+  2: "full view, side view, same proportions, the rearing end to the left"
+placeholder: { shape: object, color: '#24202c', accent: '#4b3a6b' }

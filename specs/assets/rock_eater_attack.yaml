@@ -1,0 +1,18 @@
+id: rock_eater_attack
+type: character-anim
+size: large
+character: rock_eater
+chroma: magenta
+summary: 바위 먹는 벌레 갉아먹기 6프레임
+depends_on: [rock_eater_ref]
+reference: assets/source/rock_eater_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "rears up, the grinding mouth opening wide"
+  2: "lunges forward to the left"
+  3: "the stone teeth spin"
+  4: "bites at full reach to the left, gravel and sparks flying"
+  5: "pulls back"
+  6: "returns to the coil"
+placeholder: { shape: beast, color: '#8a6a4a', accent: '#c2c6d1' }

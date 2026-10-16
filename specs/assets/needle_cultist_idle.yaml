@@ -1,0 +1,15 @@
+id: needle_cultist_idle
+type: character-anim
+size: large
+character: needle_cultist
+chroma: magenta
+summary: 혈교 독침수 대기 4프레임
+depends_on: [needle_cultist_ref]
+reference: assets/source/needle_cultist_ref.png
+facing: left
+frame_notes:
+  1: "crouched facing left, needles between the fingers"
+  2: "peers from behind the sleeve"
+  3: "shifts the needles between fingers"
+  4: "settles low"
+placeholder: { shape: humanoid, color: '#5a2a3a', accent: '#6aa84f' }

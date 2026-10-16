@@ -1,0 +1,15 @@
+id: ash_bat_idle
+type: character-anim
+size: large
+character: ash_bat
+chroma: magenta
+summary: 재 날개 박쥐 대기 4프레임
+depends_on: [ash_bat_ref]
+reference: assets/source/ash_bat_ref.png
+facing: left
+frame_notes:
+  1: "hovering facing left, wings up"
+  2: "wings sweep down, a puff of ash falls"
+  3: "wings rise again"
+  4: "hovering, ash drifting"
+placeholder: { shape: beast, color: '#4a3a36', accent: '#ff8a5c' }

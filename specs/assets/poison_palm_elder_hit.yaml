@@ -1,0 +1,14 @@
+id: poison_palm_elder_hit
+type: character-anim
+size: large
+character: poison_palm_elder
+chroma: magenta
+summary: 독장 장로 피격 3프레임
+depends_on: [poison_palm_elder_ref]
+reference: assets/source/poison_palm_elder_ref.png
+facing: left
+frame_notes:
+  1: "struck, the elder sways, robes flaring"
+  2: "the green mist scatters"
+  3: "straightens, unmoved"
+placeholder: { shape: humanoid, color: '#3a5a3a', accent: '#6aa84f' }

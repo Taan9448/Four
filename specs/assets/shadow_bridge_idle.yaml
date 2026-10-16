@@ -1,0 +1,15 @@
+id: shadow_bridge_idle
+type: character-anim
+size: large
+character: shadow_bridge
+chroma: magenta
+summary: 그림자 다리 대기 4프레임
+depends_on: [shadow_bridge_ref]
+reference: assets/source/shadow_bridge_ref.png
+facing: left
+frame_notes:
+  1: "the shadow bridge undulates slowly"
+  2: "ghostly figures press against its surface"
+  3: "the rearing end sways"
+  4: "settles"
+placeholder: { shape: object, color: '#24202c', accent: '#4b3a6b' }

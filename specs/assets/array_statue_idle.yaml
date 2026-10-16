@@ -1,0 +1,15 @@
+id: array_statue_idle
+type: character-anim
+size: large
+character: array_statue
+chroma: magenta
+summary: 구천 계단 진법 석인 대기 4프레임
+depends_on: [array_statue_ref]
+reference: assets/source/array_statue_ref.png
+facing: left
+frame_notes:
+  1: "stands facing left, motionless"
+  2: "the gold array symbols glow brighter"
+  3: "dust falls from the joints"
+  4: "settles"
+placeholder: { shape: humanoid, color: '#7a7068', accent: '#ffe08a' }

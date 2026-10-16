@@ -1,0 +1,10 @@
+id: icons_status_i
+type: icon-sheet
+summary: 상태 아이콘 61(졸음) — 칸 n = 상태 icon n+60
+# 칸 번호 = data/statuses.json의 icon에서 60을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-16 몬스터 13종 추가: 교세소 보초 혈교도의 졸음(안개초 연기에 졸고 있다. 졸 때 맞으면 놀라 기절)
+frames: 1
+baseline: 0.5
+frame_notes:
+  1: "drowsy — a small sleepy closed eye with a drooping lid and a pale grey wisp of smoke curling above it, with two tiny 'z' shaped swirls made of smoke (no letters, just swirl shapes)"
+placeholder: { color: '#3d4459', accent: '#c2c6d1' }

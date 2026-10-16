@@ -213,5 +213,7 @@
     "weight": 1,
     "conditions": {"floorRange": [3, 6]},
     "content": {"text": "함께 떨어져 온 천마봉 혈전의 붉은 돌. 넷이 둘러앉아 서로의 숨소리를 듣는다. 세 번 짧게, 한 번 길게. 네 개의 작은 고리가 돈다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
-  }
+  },
+  {"id": "s9_battle_frozen_shards", "stage": "s9", "type": "battle", "name": "얼어붙은 조각들", "weight": 2, "conditions": {"floorRange": [3, 9]}, "content": {"text": "틈 속을 떠도는 얼음 조각들. 아르덴의 얼음이다. 다가갈수록 온기가 빠져나간다.", "enemies": ["frozen_shard", "shadow_wraith", "frozen_shard"], "enemyScale": {"hp": 0.85}}},
+  {"id": "s9_elite_shadow_bridge", "stage": "s9", "type": "elite", "name": "일어서는 다리", "weight": 1, "conditions": {"floorRange": [3, 6]}, "content": {"text": "떠다니는 조각 사이의 그림자 다리. 반쯤 건넜을 때 다리 자체가 일어섰다. 그림자가 쐐기 단검을 든 망령으로 풀려나온다.", "enemies": ["shadow_bridge"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 검을 고쳐 쥔다. \"칼이 오는 길은 하나야.\" (그림자 다리 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}}
 ]

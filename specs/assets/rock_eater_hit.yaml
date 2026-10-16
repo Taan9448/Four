@@ -1,0 +1,14 @@
+id: rock_eater_hit
+type: character-anim
+size: large
+character: rock_eater
+chroma: magenta
+summary: 바위 먹는 벌레 피격 3프레임
+depends_on: [rock_eater_ref]
+reference: assets/source/rock_eater_ref.png
+facing: left
+frame_notes:
+  1: "struck, rock plates crack and chips fly"
+  2: "curls up defensively"
+  3: "uncoils slowly"
+placeholder: { shape: beast, color: '#8a6a4a', accent: '#c2c6d1' }

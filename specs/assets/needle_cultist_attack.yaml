@@ -1,0 +1,18 @@
+id: needle_cultist_attack
+type: character-anim
+size: large
+character: needle_cultist
+chroma: magenta
+summary: 혈교 독침수 독침 6프레임
+depends_on: [needle_cultist_ref]
+reference: assets/source/needle_cultist_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws the arm back"
+  2: "the sleeve flicks"
+  3: "the wrist snaps forward"
+  4: "a spray of green-tipped needles flies at full reach to the left"
+  5: "the arm follows through"
+  6: "returns to the crouch"
+placeholder: { shape: humanoid, color: '#5a2a3a', accent: '#6aa84f' }
