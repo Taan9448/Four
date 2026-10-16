@@ -232,6 +232,7 @@ export const KEYWORD_HELP: Record<string, string> = {
   thread: '실 — 꿰맬 자리에 들어가는 유일한 피해.',
   unplayable: '사용 불가 — 낼 수 없다.',
   unique: '고유 — 덱에 한 장만 둘 수 있다. 이미 가진 카드는 보상·상점에 다시 나오지 않는다.',
+  limited: '한정 — 심연 덱에 두 장까지만 둘 수 있다. 두 장이 되면 보상·상점에 더 나오지 않는다.',
 };
 
 /** 카드 용어 주석: 키워드·심법·이 카드가 다루는 상태와 속성의 풀이 */
@@ -268,7 +269,7 @@ export function cardGlossary(data: GameData, inst: CardInstance | string): strin
   return out;
 }
 
-const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실', unique: '고유' };
+const KEYWORD_LABEL: Record<string, string> = { fusion: '융합', exhaust: '소멸', retain: '유지', innate: '선천', unplayable: '사용 불가', thread: '실', unique: '고유', limited: '한정' };
 
 /** 특수 스킬(+4·+5) 한 줄: 추가 효과·키워드 변화·비용 변화 */
 export function skillText(data: GameData, skill: UpgradeSkill, cardTarget?: string): string {
@@ -301,7 +302,7 @@ export interface CardTextParts {
   forge: { level: number; name: string; text: string }[];
 }
 
-const KEYWORD_ORDER = ['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
+const KEYWORD_ORDER = ['unique', 'limited', 'fusion', 'thread', 'exhaust', 'retain', 'innate', 'unplayable'] as const;
 
 export function cardTextParts(data: GameData, inst: CardInstance | string): CardTextParts {
   const card = resolveCard(data, inst);
@@ -316,7 +317,7 @@ export function cardText(data: GameData, inst: CardInstance | string): string {
   const card = resolveCard(data, inst);
   if (card.level === 0 && card.def.text) return card.def.text;
   const parts = card.baseEffects.map((e) => describeEffect(data, e, card.def.target));
-  const kw = (['unique', 'fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
+  const kw = (['unique', 'limited', 'fusion', 'thread', 'exhaust', 'retain', 'innate'] as const).filter((k) => card.keywords.includes(k)).map((k) => KEYWORD_LABEL[k]);
   const head = [...(kw.length ? [`[${kw.join('·')}]`] : []), parts.join('. ')].join(' ');
   return [head, ...card.skills.map((s) => skillText(data, s, card.def.target)), ...forgeLines(data, card).map((f) => `★${f.name}: ${f.text}`)].join('\n');
 }

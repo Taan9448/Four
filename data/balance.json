@@ -2,6 +2,8 @@
   "neigongPerTurn": 3,
   "handSize": 5,
   "maxHand": 10,
+  "controlResist": { "chance": 0.5, "stacks": 2 },
+  "limitedCopies": 2,
   "maxEnemies": 5,
   "relicRules": { "keepBlockRatio": 0.5, "critHeavyMultiplier": 2.0, "shopDiscount": 0.8 },
   "mana": {

@@ -556,8 +556,10 @@ export function cureInjuries(data: GameData, run: RunState): string[] {
 export function abyssAddCard(data: GameData, run: RunState, cardId: string): string {
   const def = data.cards.get(cardId);
   if (!def) throw new Error(`알 수 없는 카드: ${cardId}`);
-  // 고유(심연 개편 3): 덱에 한 장만
-  if (def.keywords.includes('unique') && run.deck.some((c) => c.cardId === cardId)) return `${def.name}은(는) 고유 카드라 덱에 한 장만 둘 수 있다`;
+  // 고유(심연 개편 3): 덱에 한 장만 · 한정(광역 기절, 2026-10-16): limitedCopies장까지
+  if (run.deck.filter((c) => c.cardId === cardId).length >= copyLimit(data, def)) {
+    return def.keywords.includes('unique') ? `${def.name}은(는) 고유 카드라 덱에 한 장만 둘 수 있다` : `${def.name}은(는) 한정 카드라 덱에 ${copyLimit(data, def)}장까지만 둘 수 있다`;
+  }
   run.deck.push(instance(run, cardId, run.abyss?.pool[cardId] ?? 0));
   return `카드 획득: ${def.name}${run.abyss?.pool[cardId] ? ` +${run.abyss.pool[cardId]}` : ''}`;
 }
@@ -572,10 +574,19 @@ export function relicAllowed(run: RunState, r: { rarity: string; abyss: boolean 
   return r.rarity !== 'path' && (!r.abyss || isAbyss(run));
 }
 
-/** 이미 덱에 든 심법(파워)·고유 카드는 후보에서 뺀다(한 종류 1장) */
+/** 심연 덱에 둘 수 있는 장수: 고유 1 · 한정 balance.limitedCopies · 나머지 제한 없음 */
+export function copyLimit(data: GameData, def: { keywords: readonly string[] }): number {
+  if (def.keywords.includes('unique')) return 1;
+  if (def.keywords.includes('limited')) return data.balance.limitedCopies;
+  return Infinity;
+}
+
+/** 후보에서 뺄 카드: 이미 덱에 든 심법(파워, 한 종류 1장)과 장수 제한(고유·한정)에 닿은 카드 */
 const powerInDeck = (data: GameData, run: RunState, id: string) => {
   const d = data.cards.get(id);
-  return !!d && (d.type === 'power' || d.keywords.includes('unique')) && run.deck.some((c) => c.cardId === id);
+  if (!d) return false;
+  const n = run.deck.filter((c) => c.cardId === id).length;
+  return (d.type === 'power' && n > 0) || n >= copyLimit(data, d);
 };
 
 /** 심연 보상 후보: 풀(합류 동료·공용) 중 등급 가중치로, 슬롯마다 riftCardChance로 열린 틈의 카드 */

@@ -119,7 +119,7 @@
     "pool": "reward",
     "cost": {"neigong": 3, "mana": 0},
     "target": "all_enemies",
-    "keywords": ["exhaust"],
+    "keywords": ["exhaust", "limited"],
     "castLine": {"speaker": "born", "face": "neutral", "text": "산은 정면으로 안 무너진다."},
     "effects": [{"op": "damage", "amount": 80}, {"op": "apply_status", "status": "stun", "stacks": 1}],
     "upgrade": {"growth": [30, 0], "plus4": {"name": "며칠 전에 쳐 둔 결", "cost": {"neigong": 2, "mana": 0}}, "plus5": {"name": "골짜기를 가두다", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}},

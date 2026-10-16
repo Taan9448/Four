@@ -75,7 +75,7 @@
   "pool": "story",                      // starter | reward(전투 보상 후보) | story(이벤트로만) | status
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
-  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다) | unique(고유: 덱에 한 장만 — 심연 보상·상점·거래가 덱에 든 고유 카드를 다시 내지 않는다)
+  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다) | unique(고유: 덱에 한 장만 — 심연 보상·상점·거래가 덱에 든 고유 카드를 다시 내지 않는다) | limited(한정: 심연 덱에 `balance.limitedCopies`장까지 — 적 전체 기절 카드에 붙인다)
   "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 동료 카드는 그 동료의 갈래 하나 또는 비움(잇는 카드), 공용은 아무 동료의 것
   "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'·'틈의 속삭임'·'피의 빚'
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
@@ -169,6 +169,7 @@
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
 `blockedBy`(선택, 2026-10-12): 대상이 이 상태들 중 하나를 갖고 있으면 그 상태는 쌓이지 않는다(교차 잠금 금지 — 빙결 중 감전, 마비 중 냉기).
+`resist`(선택, 2026-10-16): 행동 제약(기절 `stun` → `resist_stun`, 빙결 `bind` → `resist_bind`, 마비 `paralyze` → `resist_paralyze`)이 걸리면 대상에게 그 내성 상태를 `balance.controlResist.stacks`(2)로 채운다. 내성이 남아 있는 동안 같은 상태는 `controlResist.chance`(0.5) 확률로 듣지 않는다(전투 RNG). 다른 종류는 영향 없다. 내성은 자기 차례 끝에 1씩 줄어 다음 차례 끝에 사라진다.
 `special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, seal)은 엔진이 메커니즘으로 처리한다. 냉기의 임계는 special이 아니라 `balance.elements`의 `threshold`다.
 
 ## 4-1. 상태 발동(파워)

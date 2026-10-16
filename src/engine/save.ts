@@ -122,6 +122,19 @@ function migrate(data: GameData, run: RunState): void {
   for (const id of Object.keys(run.collection)) if (!data.cards.has(id)) delete run.collection[id];
   // 편성 점수 상한(저장 4): 넘는 주인이 있으면 지킬 수 있는 카드는 남기고 추천으로 다시 채운다. 갈래 보너스도 다시 센다
   if (loadoutProblems(data, run, run.loadout).some((p) => p.includes('상한'))) run.loadout = recommendLoadout(data, run, run.loadout);
+  // 대강화(2026-10-15): 데이터에서 빠진 각인은 지우고, 덱에 없는 카드나 없는 각인을 기다리는 각인 고르기는 버린다
+  const engravingIds = new Set(data.forge.engravings.map((m) => m.id));
+  const knownMarks = (marks: string[]) => marks.filter((id) => engravingIds.has(id));
+  for (const c of run.deck ?? []) if (c.marks) c.marks = knownMarks(c.marks);
+  for (const [id, marks] of Object.entries(run.engravings ?? {})) {
+    if (data.cards.has(id)) run.engravings![id] = knownMarks(marks);
+    else delete run.engravings![id];
+  }
+  const p = run.forgePending;
+  if (p) {
+    p.choices = knownMarks(p.choices);
+    if (!p.choices.length || !(run.deck ?? []).some((c) => c.uid === p.uid)) run.forgePending = null;
+  }
   if (!run.loadoutFocus) {
     run.loadoutFocus = {};
     for (const owner of loadoutOwners(data, run)) {

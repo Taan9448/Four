@@ -5,7 +5,8 @@
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { buyCard, buyForge, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, forgeCandidates, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { chooseEngraving } from '../engine/forge';
 import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
 import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
 
@@ -379,6 +380,30 @@ function decideSkip(data: GameData, run: RunState): void {
   skipReward(data, run, 'gold');
 }
 
+/** 봇이 각인을 고르는 순서(봇 정책 — 앞일수록 먼저). 후보에 없는 것은 건너뛴다 */
+const ENGRAVING_ORDER = ['resonance', 'refine', 'edge', 'twin', 'light', 'wall', 'flow', 'breath', 'deepen', 'stitch', 'calm', 'guard', 'break', 'keep', 'first', 'drain', 'fire', 'ice', 'bolt'];
+/** 대장간에 쓰고도 남길 골드(물약·카드 지우기 몫) */
+export const FORGE_RESERVE = 60;
+
+/** 대장간(상점마다 카드 한 장): 전설 → 영웅, 같은 등급이면 단계가 높은 카드를 골라 골드가 남는 만큼 두드리고, 각인은 ENGRAVING_ORDER로 */
+function forgeTurn(data: GameData, run: RunState): void {
+  const price = data.balance.upgrade.forge.price;
+  if (run.gold < price + FORGE_RESERVE) return;
+  const pick = forgeCandidates(data, run).sort(
+    (a, b) => cardValue(data.cards.get(b.cardId)!) - cardValue(data.cards.get(a.cardId)!) || b.level - a.level,
+  )[0];
+  if (!pick) return;
+  while (run.gold >= price + FORGE_RESERVE) {
+    const r = buyForge(data, run, pick.uid);
+    if (!r.ok) return;
+    if (run.forgePending) {
+      const choices = run.forgePending.choices;
+      chooseEngraving(data, run, ENGRAVING_ORDER.find((id) => choices.includes(id)) ?? choices[0]);
+    }
+    if (!forgeCandidates(data, run).some((c) => c.uid === pick.uid)) return;
+  }
+}
+
 /** 상점: 유물(비싼 등급부터) → 값진 카드 → 물약 → 남으면 편성에 없는 가장 약한 카드 바꾸기 */
 function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOptions): void {
   const shop = openShop(data, run, nodeId);
@@ -403,6 +428,7 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     // 덱이 큰 심연에서는 영웅 이상만(보상과 같은 기준)
     if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, bigDeck ? RARITY_VALUE.epic : RARITY_VALUE.rare)) buyCard(data, run, i);
   });
+  forgeTurn(data, run);
   shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
   if (isAbyss(run)) {
     // 심연: 남은 골드로 가장 값싼 카드 지우기(상점마다 한 번)
@@ -666,6 +692,8 @@ export interface AbyssReport {
   score: number;
   battles: BattleRecord[];
   cracks?: { made: number; entered: number };
+  /** 대강화(+6 이상)된 카드 수와 가장 높은 단계 */
+  forged?: { cards: number; top: number };
 }
 
 /** 심연 런 하나를 maxDepth 굽이까지(또는 쓰러질 때까지) 둔다 */
@@ -753,6 +781,13 @@ export function playAbyss(
     deckSize: run.deck.length,
     score: abyssScore(data, run),
     cracks: run.stats.cracks,
+    forged: forgedSummary(data, run),
     battles,
   };
+}
+
+/** 덱에서 +5를 넘긴 카드 수와 가장 높은 단계(봇 대장간 측정) */
+function forgedSummary(data: GameData, run: RunState): { cards: number; top: number } {
+  const over = run.deck.filter((c) => c.level > data.balance.upgrade.maxLevel);
+  return { cards: over.length, top: Math.max(0, ...over.map((c) => c.level)) };
 }

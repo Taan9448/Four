@@ -2,8 +2,8 @@
   { "id": "weak", "name": "약화", "kind": "debuff", "description": "주는 피해가 25% 줄어든다.", "glyph": "弱", "icon": 1, "decay": 1, "modifiers": { "damageDealtMul": 0.75 } },
   { "id": "vulnerable", "name": "취약", "kind": "debuff", "description": "받는 피해가 50% 늘어난다.", "glyph": "破", "icon": 2, "decay": 1, "modifiers": { "damageTakenMul": 1.5 } },
   { "id": "strength", "name": "힘", "kind": "buff", "description": "공격 피해가 스택 × 10만큼 늘어난다.", "glyph": "力", "icon": 3, "decay": 0, "modifiers": { "damageDealtAddPerStack": 10 } },
-  { "id": "bind", "name": "빙결", "kind": "debuff", "description": "발이 얼어붙어 이번 차례에 행동하지 못한다.", "glyph": "氷", "icon": 4, "decay": 1, "modifiers": { "skipTurn": true }, "blockedBy": ["steadfast"] },
-  { "id": "stun", "name": "기절", "kind": "debuff", "description": "이번 차례에 행동하지 못한다.", "glyph": "暈", "icon": 5, "decay": 1, "modifiers": { "skipTurn": true }, "blockedBy": ["steadfast"] },
+  { "id": "bind", "name": "빙결", "kind": "debuff", "description": "발이 얼어붙어 이번 차례에 행동하지 못한다.", "glyph": "氷", "icon": 4, "decay": 1, "modifiers": { "skipTurn": true }, "resist": "resist_bind", "blockedBy": ["steadfast"] },
+  { "id": "stun", "name": "기절", "kind": "debuff", "description": "이번 차례에 행동하지 못한다.", "glyph": "暈", "icon": 5, "decay": 1, "modifiers": { "skipTurn": true }, "resist": "resist_stun", "blockedBy": ["steadfast"] },
   { "id": "poison", "name": "독", "kind": "debuff", "description": "차례 시작마다 스택 × 10만큼 체력을 잃는다.", "glyph": "毒", "icon": 6, "decay": 1, "modifiers": { "turnStartDamagePerStack": 10 } },
   { "id": "grain", "name": "결 노출", "kind": "debuff", "description": "공격을 받으면 1스택을 소모해 피해 +50%, 방어를 무시한다.", "glyph": "理", "icon": 7, "decay": 0, "special": "grain" },
   { "id": "taunt", "name": "도발", "kind": "buff", "description": "적의 공격이 이 동료에게 향한다.", "glyph": "挑", "icon": 8, "decay": 1, "decayAt": "roundEnd", "special": "taunt" },
@@ -53,7 +53,10 @@
   {"id": "p_dumpling_shop", "icon": 52, "name": "기사의 만두집", "kind": "buff", "description": "차례가 끝날 때마다 아군 전체 체력 20 회복(스택마다).", "glyph": "饅", "decay": 0, "triggers": [{"on": "turnEnd", "effects": [{"op": "heal", "amount": 20, "target": "all_allies"}]}]},
   {"id": "p_rock_heart", "icon": 53, "name": "바위 심장", "kind": "buff", "description": "공격을 맞고도 방어가 남아 있으면(다 막으면) 힘 +1(스택마다).", "glyph": "岩", "decay": 0, "triggers": [{"on": "attacked", "condition": {"selfBlockGte": 1}, "effects": [{"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}]},
   {"id": "shock", "icon": 54, "name": "감전", "kind": "debuff", "description": "감전이 쌓인다. 차례마다 1 가라앉는다. 3스택(보스는 5)이 되면 마비되어 한 차례 행동하지 못한다. 얼어붙은 적에게는 쌓이지 않는다.", "glyph": "電", "decay": 1, "blockedBy": ["bind", "steadfast"]},
-  {"id": "paralyze", "icon": 55, "name": "마비", "kind": "debuff", "description": "몸이 굳어 이번 차례에 행동하지 못한다.", "glyph": "痲", "decay": 1, "modifiers": {"skipTurn": true}, "blockedBy": ["steadfast"]},
+  {"id": "paralyze", "icon": 55, "name": "마비", "kind": "debuff", "description": "몸이 굳어 이번 차례에 행동하지 못한다.", "glyph": "痲", "decay": 1, "modifiers": {"skipTurn": true}, "resist": "resist_paralyze", "blockedBy": ["steadfast"]},
   {"id": "p_storm_cloud", "icon": 56, "name": "먹구름", "kind": "buff", "description": "차례가 시작될 때마다 무작위 적 하나에 감전 1(스택마다).", "glyph": "雲", "decay": 0, "triggers": [{"on": "turnStart", "effects": [{"op": "apply_status", "status": "shock", "stacks": 1, "target": "random_enemy"}]}]},
-  {"id": "steadfast", "icon": 57, "name": "부동", "kind": "trait", "description": "흔들리지 않는다. 기절·빙결·마비가 걸리지 않고 냉기·감전도 쌓이지 않는다(심연의 접사·법칙).", "glyph": "不", "decay": 0}
+  {"id": "steadfast", "icon": 57, "name": "부동", "kind": "trait", "description": "흔들리지 않는다. 기절·빙결·마비가 걸리지 않고 냉기·감전도 쌓이지 않는다(심연의 접사·법칙).", "glyph": "不", "decay": 0},
+  {"id": "resist_stun", "icon": 58, "name": "기절 내성", "kind": "trait", "description": "방금 기절했다. 다음 차례가 끝날 때까지 기절이 50% 확률로 듣지 않는다(빙결·마비는 그대로 든다).", "glyph": "醒", "decay": 1},
+  {"id": "resist_bind", "icon": 59, "name": "빙결 내성", "kind": "trait", "description": "방금 얼어붙었다. 다음 차례가 끝날 때까지 빙결이 50% 확률로 듣지 않는다(기절·마비는 그대로 든다).", "glyph": "融", "decay": 1},
+  {"id": "resist_paralyze", "icon": 60, "name": "마비 내성", "kind": "trait", "description": "방금 마비됐다. 다음 차례가 끝날 때까지 마비가 50% 확률로 듣지 않는다(기절·빙결은 그대로 든다).", "glyph": "舒", "decay": 1}
 ]

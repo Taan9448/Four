@@ -96,6 +96,26 @@ describe('상점', () => {
     expect(run.collection[target.cardId]).toBe(level + 1);
   });
 
+  it('물약은 상점에서 상점 값의 절반에 판다(유물은 팔지 않는다)', async () => {
+    const { potionSellPrice, sellPotion } = await import('../src/engine/economy');
+    const run = createRunAt(data, 'SELL', 's2');
+    run.potions = ['great_return_pill', 'wound_salve', null];
+    expect(() => sellPotion(data, run, 0)).toThrow(); // 상점 밖에서는 못 판다
+    openShop(data, run, 'n7-0');
+    const sh = data.balance.economy.shop;
+    const price = potionSellPrice(data, 'great_return_pill');
+    expect(price).toBe(Math.floor(sh.potionPrice.rare * sh.potionSellRatio));
+    const gold = run.gold;
+    expect(sellPotion(data, run, 0).ok).toBe(true);
+    expect(run.gold).toBe(gold + price);
+    expect(run.potions).toEqual([null, 'wound_salve', null]);
+    expect(sellPotion(data, run, 0).ok).toBe(false); // 빈 칸
+    // 사서 바로 팔아도 남지 않는다
+    for (const r of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const) {
+      expect(Math.floor(sh.potionPrice[r] * sh.potionSellRatio)).toBeLessThan(sh.potionPrice[r] * (1 - sh.jitter));
+    }
+  });
+
   it('물약은 빈 칸이 있어야 산다', () => {
     const run = createRunAt(data, 'SHOP', 's2');
     openShop(data, run, 'n7-0');
