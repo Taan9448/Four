@@ -96,9 +96,9 @@
         "shop": { "common": 50, "uncommon": 40, "rare": 9.7, "epic": 0.3 }
       },
       "relic": {
-        "elite": { "common": 60, "uncommon": 32, "rare": 7.7, "epic": 0.3 },
-        "shop": { "common": 55, "uncommon": 35, "rare": 9.7, "epic": 0.3 },
-        "boss": { "uncommon": 60, "rare": 37, "epic": 2.7, "legendary": 0.3 }
+        "elite": { "common": 65, "uncommon": 30, "rare": 4.8, "epic": 0.2 },
+        "shop": { "common": 60, "uncommon": 34, "rare": 5.8, "epic": 0.2 },
+        "boss": { "uncommon": 75, "rare": 23.5, "epic": 1.3, "legendary": 0.2 }
       }
     },
     "shop": {
