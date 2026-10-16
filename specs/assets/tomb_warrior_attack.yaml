@@ -8,6 +8,7 @@ depends_on: [tomb_warrior_ref]
 reference: assets/source/tomb_warrior_ref.png
 facing: left
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 도끼 내려찍기: 도끼를 머리 위로 치켜든 칸1과 낮게 내려찍은 칸4·5의 높이 차가 동작 자체(2026-10-16 검토, 27%)
 frame_notes:
   1: "raises the axe high overhead"
   2: "steps forward to the left behind the shield"
