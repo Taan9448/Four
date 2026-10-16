@@ -47,7 +47,7 @@ describe('전리품', () => {
     const eco = data.balance.economy;
     const camp = createRun(data, 'LW');
     const share = (w: Partial<Record<string, number>>, tiers: string[]) => {
-      const all = Object.values(w).reduce((a, b) => a + (b ?? 0), 0);
+      const all = Object.values(w).reduce<number>((a, b) => a + (b ?? 0), 0);
       return tiers.reduce((a, t) => a + (w[t] ?? 0), 0) / all;
     };
     expect(lootWeights(data, camp).relic).toBe(eco.campaignWeights!.relic);
