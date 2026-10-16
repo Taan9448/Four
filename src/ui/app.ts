@@ -52,7 +52,7 @@ import { confirmDialog, openOverlay } from './overlay';
 import { installTooltips, tipAttrs } from './tooltip';
 import { sceneView } from './scene-view';
 import { applySettings, BUILD_SHORT, settings, settingsForm, type SettingsTab } from './settings';
-import { sceneSkip } from '../engine/scene';
+import { sceneForRun, sceneSkip } from '../engine/scene';
 import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
 import { artOrGlyph, lawIconEl } from './icons';
@@ -821,7 +821,7 @@ export class App {
     if (skip.auto) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     playBgm(mood ?? moodFor(scene.world ?? stage?.world));
-    this.show(sceneView(data, scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
+    this.show(sceneView(data, this.run ? sceneForRun(scene, this.run) : scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
   }
 
   private battle(enc: Encounter): void {

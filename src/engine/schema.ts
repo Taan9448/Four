@@ -223,6 +223,11 @@ export const SceneLine = z
      * title 대사창 대신 화면 가운데 큰 붓글씨 제목 카드(장면 전환·기술 이름)
      */
     effect: z.enum(['flash', 'shake', 'fade', 'glow', 'rift', 'title']).optional(),
+    /**
+     * 이 줄을 보일 조건(2026-10-16 #1305): flag 이 플래그가 있을 때, partyHas 이 동료가 출전했을 때. 둘 다 적으면 둘 다.
+     * 런 밖(도감 다시 보기)에서는 모든 줄을 보인다. src/engine/scene.ts sceneForRun
+     */
+    if: z.object({ flag: z.string().optional(), partyHas: z.string().optional() }).strict().optional(),
   })
   .strict();
 export type SceneLine = z.infer<typeof SceneLine>;

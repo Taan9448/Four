@@ -49,3 +49,12 @@ export function sceneSkip(opts: { seen: boolean; setting: boolean; mode: 'campai
   const repeat = opts.mode !== 'campaign' || opts.clears > 0;
   return { auto: opts.setting && repeat };
 }
+
+/**
+ * 줄 조건(SceneLine.if)에 맞는 줄만 남긴 장면(2026-10-16 #1305 — 보른이 화로 안에 들어갔을 때만 화로를 치는 줄 등).
+ * 조건 없는 줄은 늘 남는다. 조건 줄이 빠지면 그 줄의 장면 일러스트(cg)도 함께 빠진다
+ */
+export function sceneForRun(scene: SceneDef, run: { flags: readonly string[]; selected: readonly string[] }): SceneDef {
+  const keep = scene.lines.filter((l) => !l.if || ((!l.if.flag || run.flags.includes(l.if.flag)) && (!l.if.partyHas || run.selected.includes(l.if.partyHas))));
+  return keep.length === scene.lines.length ? scene : { ...scene, lines: keep };
+}
