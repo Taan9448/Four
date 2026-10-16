@@ -177,7 +177,7 @@ export const Cost = z.object({ neigong: z.number().int().min(0), mana: z.number(
 export type Cost = z.infer<typeof Cost>;
 
 /** thread: 실 카드. '꿰맬 자리'(seam) 상태의 적은 이 키워드 카드의 피해만 받는다. unique: 고유 — 덱에 한 장만(심연 개편 3) */
-export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable', 'thread', 'unique']);
+export const Keyword = z.enum(['exhaust', 'retain', 'innate', 'fusion', 'unplayable', 'thread', 'unique', 'limited']);
 export type Keyword = z.infer<typeof Keyword>;
 
 export const Rarity = z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'special']);
@@ -623,6 +623,8 @@ export const Balance = z
     maxHand: z.number().int().positive(),
     /** 규칙 유물의 수치: keepBlockRatio 차례가 바뀌어도 남는 방어 비율 · critHeavyMultiplier 치명타 배율 · shopDiscount 상점 가격 배율 */
     relicRules: z.object({ keepBlockRatio: z.number(), critHeavyMultiplier: z.number(), shopDiscount: z.number() }).strict(),
+    /** 한정 카드(키워드 limited, 2026-10-16 사용자 결정 — 광역 기절): 심연 덱에 이 장수까지만 */
+    limitedCopies: z.number().int().positive(),
     /** 행동 제약 내성: 같은 행동 제약(기절·빙결·마비)을 다시 맞을 때 듣지 않을 확률과 내성 스택(차례가 끝날 때 1씩 — 2면 다음 차례 끝까지) */
     controlResist: z.object({ chance: z.number().min(0).max(1), stacks: z.number().int().positive() }).strict(),
     /** 한 전투에 함께 설 수 있는 적 수(소환 상한) */

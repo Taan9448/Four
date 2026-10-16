@@ -67,3 +67,26 @@ describe('행동 제약 내성', () => {
     }
   });
 });
+
+describe('한정 카드(광역 행동 제약, 2026-10-16)', () => {
+  it('적 전체에 기절·빙결·마비를 거는 카드는 모두 한정 또는 고유다', () => {
+    const bad: string[] = [];
+    for (const c of data.cards.values()) {
+      const effects = [...c.effects, ...(c.upgrade ? [...c.upgrade.plus4.effects, ...c.upgrade.plus5.effects] : [])];
+      const aoe = effects.some((e) => e.op === 'apply_status' && !!e.status && !!data.statuses.get(e.status)?.modifiers.skipTurn && (e.target ?? c.target) === 'all_enemies');
+      if (aoe && !c.keywords.includes('limited') && !c.keywords.includes('unique')) bad.push(c.id);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('심연 덱에 limitedCopies장까지만, 그 뒤로는 보상 후보에도 나오지 않는다', async () => {
+    const { abyssAddCard, copyLimit, createAbyssRun, pathOffer, pathPicks } = await import('../src/engine/abyss');
+    const run = createAbyssRun(data, 'LIMIT', { mates: ['elia', 'kyle', 'born'], paths: pathOffer(data, 'LIMIT').slice(0, pathPicks(data, 3).picks), pool: {} });
+    const def = data.cards.get('born_cliff')!;
+    expect(copyLimit(data, def)).toBe(data.balance.limitedCopies);
+    const before = run.deck.filter((c) => c.cardId === 'born_cliff').length;
+    for (let i = before; i < data.balance.limitedCopies + 1; i++) abyssAddCard(data, run, 'born_cliff');
+    expect(run.deck.filter((c) => c.cardId === 'born_cliff').length).toBe(data.balance.limitedCopies);
+    expect(abyssAddCard(data, run, 'born_cliff')).toContain('한정');
+  });
+});

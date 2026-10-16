@@ -75,7 +75,7 @@
   "pool": "story",                      // starter | reward(전투 보상 후보) | story(이벤트로만) | status
   "cost": { "neigong": 1, "mana": 2 },  // 둘 다 > 0이면 융합(하운 전용, 반드시 rift 증가)
   "target": "enemy",                    // enemy | all_enemies | self | ally | all_allies | none
-  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다) | unique(고유: 덱에 한 장만 — 심연 보상·상점·거래가 덱에 든 고유 카드를 다시 내지 않는다)
+  "keywords": ["fusion"],               // exhaust(소멸) | retain(유지) | innate(선천) | fusion | unplayable | thread(실: 꿰맬 자리에 들어간다) | unique(고유: 덱에 한 장만 — 심연 보상·상점·거래가 덱에 든 고유 카드를 다시 내지 않는다) | limited(한정: 심연 덱에 `balance.limitedCopies`장까지 — 적 전체 기절 카드에 붙인다)
   "tags": ["haun_rift"],                // 선택: 아키타입(characters[].archetypes의 id, GAME_DESIGN 9-2). 동료 카드는 그 동료의 갈래 하나 또는 비움(잇는 카드), 공용은 아무 동료의 것
   "onTurnEndInHand": [ ... ],           // 선택: 손에 든 채 턴이 끝나면 일어나는 일(하운을 출처로). 상태 카드 '독기'·'틈의 속삭임'·'피의 빚'
   "effects": [ { "op": "damage", "amount": 18 }, { "op": "rift", "amount": 3 } ],
