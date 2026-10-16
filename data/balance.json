@@ -128,7 +128,7 @@
     "dmgBase": 0.93,
     "hpStep": 0.46,
     "dmgStep": 0.31,
-    "deep": [{ "from": 6, "hpStep": 0.3, "dmgStep": 0.1 }, { "from": 11, "hpStep": 2.6, "dmgStep": 0.8 }, { "from": 16, "hpStep": 0.6, "dmgStep": 0.15 }],
+    "deep": [{ "from": 6, "hpStep": 0.3, "dmgStep": 0.1 }, { "from": 11, "hpStep": 2.6, "dmgStep": 0.8 }, { "from": 16, "hpStep": 0, "dmgStep": 0 }],
     "importMax": 2,
     "floors": 9,
     "typeWeights": { "battle": 52, "event": 18, "elite": 13, "rest": 8, "shop": 5 },
