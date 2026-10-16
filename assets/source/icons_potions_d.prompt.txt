@@ -1,0 +1,28 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: pine salve — a small round wooden tin of golden pine resin ointment with a cloth wrap
+Cell 2: iron pellet — two heavy dark iron balls on a small leather sling pouch
+Cell 3: herb broth — a small clay bowl of steaming green herbal soup
+Cell 4: fog lantern — a small paper lantern glowing pale blue inside a wisp of grey fog
+Cell 5: venom jar — a squat dark green ceramic jar with a toxic green drip running down from the lid
+Cell 6: purifying water — a clear glass vial of sparkling water with a white lotus petal floating
+Cell 7: mirror dust — a tiny silk pouch spilling glittering silver mirror flakes
+Cell 8: thunder pill — a round golden pill crackling with small yellow lightning arcs
+Cell 9: glacier bomb — a round bomb made of blue ice with a frosted fuse
+Cell 10: hellfire oil — a black glass bottle filled with roaring red-orange fire
+Cell 11: iron wall scroll — a rolled grey scroll with a steel shield emblem on the seal
+Cell 12: recall incense — a stick of incense in a small bronze holder with a curling purple smoke spiral
+Cell 13: execution needle — a long thin black needle with a red tassel, gleaming at the tip
+Cell 14: calming bell — a small round brass bell with a soft green ribbon and quiet sound rings
+Cell 15: dragon blood pill — a large crimson pill with a tiny golden dragon scale pattern
+Cell 16: heaven tea — an elegant white porcelain teacup with golden steam rising like clouds
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
