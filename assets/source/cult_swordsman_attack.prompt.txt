@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell. No floor, no cast shadow, no vignette.
+Subject: a saber swordsman of the Heavenly Demon Cult, a lean man in black robes with a red sash, a heavy curved saber held low, a scar across the face, cold eyes. Match the attached reference sheet exactly: same sprite design, same colors, same proportions, same pixel size.
+The SAME character in every cell, at the SAME scale. Side view, facing left.
+Size: keep the character exactly as tall as in the attached reference sheet (same height in sprite pixels, same pixel size) in every cell; never shrink or enlarge the character for a pose. The lowest pixel of the feet stays on the same row in every cell, horizontally centered. Draw raised weapons, hair and robes so they stay inside the cell margin instead of shrinking the character. Projectiles, sword trails, sparks and dust also end inside the cell margin: a fireball or slash is drawn whole before the cell edge, never cut off and never spilling into the next cell.
+Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues on the character.
+Frames:
+Cell 1: draws the saber across the body
+Cell 2: first cut sweeps to the left
+Cell 3: second cut reverses
+Cell 4: the third cut slashes at full reach to the left
+Cell 5: the blade trails a red afterimage
+Cell 6: returns to the low stance
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Cell 4's body and robe crossed into Cell 5, and Cell 5's blade crossed into Cell 6. In EVERY cell keep the ENTIRE silhouette, saber and red trail inside local x=50..462 and y=50..462. Use COMPACT STANDING slashes, NOT running lunges. Torso and both feet stay at cell center, short coat tails hang DOWN, tied hair stays close to the head. Extend only the arm and blade to the LEFT. Cell 4's left saber tip stops at x=50 and reaches farther left than Cell 2 at x=100. Cell 3 reverses the cut but the face still looks LEFT; Cell 5 retracts with a compact red afterimage confined left of the torso, never a long rightward blade. Cell 6 matches Cell 1's low LEFT-facing ready stance. Preserve the reference scar, face, black robes, red sash and curved saber.
