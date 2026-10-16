@@ -5,7 +5,7 @@
 // 지도·선택지·보상: 단순한 규칙과 점수(체력이 낮으면 휴식, 선택지는 런 상태를 복제해 적용한 뒤 점수 비교).
 // 봇은 사람보다 약하다. 승률은 절대값이 아니라 스테이지·전투 사이의 상대적인 어려움(난이도 곡선)을 보는 데 쓴다.
 import { battleOutcome, canPlay, cloneBattle, createBattle, describeIntent, endTurn, needsTarget, playCard, potionTarget, usePotion } from '../engine/battle';
-import { buyCard, buyForge, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, forgeCandidates, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
+import { buyCard, buyForge, buyPotion, buyUpgrade, buyRelic, buyRemove, buyStitch, buySwap, claimLoot, forgeCandidates, isReduceCard, openShop, rollLoot, swappable, swapPrice } from '../engine/economy';
 import { chooseEngraving } from '../engine/forge';
 import { abyssScore, createAbyssRun, isAbyss, pathOffer, pathPicks, removePrice } from '../engine/abyss';
 import { recommendLoadout, setLoadout, starterCards } from '../engine/collection';
@@ -278,12 +278,16 @@ export function scoreRun(data: GameData, run: RunState): number {
   return v;
 }
 
-/** 고르는 강화: 등급이 높고 덜 강화된 카드 */
+/**
+ * 고르는 강화: 등급이 높은 카드. 대강화할 수 있는 등급(영웅·전설)은 이미 강화된 카드를 먼저 올려 +5(대장간)로 모으고,
+ * 그 밖은 덜 강화된 카드부터 고르게(6단계, 2026-10-16)
+ */
 function pickUpgrade(data: GameData, run: RunState, filter: Parameters<typeof upgradeCandidates>[2], opts: BotOptions): string | undefined {
   const list = upgradeCandidates(data, run, filter);
+  const forgeable = new Set<string>(data.balance.upgrade.forge.rarities);
   const score = (c: CardInstance) => {
     const def = data.cards.get(c.cardId)!;
-    return cardValue(def) * 10 + lean(def, opts) - c.level * 3;
+    return cardValue(def) * 10 + lean(def, opts) + (forgeable.has(def.rarity) ? c.level * 3 : -c.level * 3);
   };
   return list.sort((a, b) => score(b) - score(a))[0]?.uid;
 }
@@ -428,6 +432,9 @@ function shopTurn(data: GameData, run: RunState, nodeId: string, opts: BotOption
     // 덱이 큰 심연에서는 영웅 이상만(보상과 같은 기준)
     if (cardValue(data.cards.get(c.cardId)!) >= Math.max(opts.minRewardValue, bigDeck ? RARITY_VALUE.epic : RARITY_VALUE.rare)) buyCard(data, run, i);
   });
+  // 카드 강화(상점마다 한 번): 고르는 강화와 같은 기준
+  const up = pickUpgrade(data, run, undefined, opts);
+  if (up && !shop.upgradeUsed && run.gold >= data.balance.economy.shop.upgradePrice + FORGE_RESERVE) buyUpgrade(data, run, up);
   forgeTurn(data, run);
   shop.potions.forEach((p, i) => !p.sold && run.gold >= p.price + 40 && buyPotion(data, run, i));
   if (isAbyss(run)) {
@@ -613,7 +620,7 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
         if (pick) gainRelic(data, run, pick);
       }
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
-      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
+      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, pickUpgrade(data, run, { owner: run.pendingUpgrades[0] }, opts) ?? null);
       run.levelLog = [];
       for (const [id, n] of Object.entries(outcome.tally?.cards ?? {})) bump(log.used, id, n);
       if (run.status === 'map') {
@@ -756,7 +763,7 @@ export function playAbyss(
       claimLoot(data, run, loot);
       const pick = loot.relicChoices.find((id) => relicDownside(data, id) < 2);
       if (pick) gainRelic(data, run, pick);
-      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, null);
+      while (run.pendingUpgrades.length) applyLevelUpgrade(data, run, pickUpgrade(data, run, { owner: run.pendingUpgrades[0] }, opts) ?? null);
       run.levelLog = [];
       const card = decideReward(data, run, rewardOptions(data, run, enc.node.id), opts);
       if (card) addCard(data, run, card);
