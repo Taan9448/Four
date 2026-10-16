@@ -1,0 +1,12 @@
+id: icons_status_h
+type: icon-sheet
+summary: 상태 아이콘 58~60(행동 제약 내성) — 칸 n = 상태 icon n+57
+# 칸 번호 = data/statuses.json의 icon에서 57을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-16 행동 제약 내성: 기절·빙결·마비를 막 맞은 대상(다음 차례 끝까지 같은 종류 50% 버팀). 원래 상태 아이콘(기절 5·빙결 4·마비 55)을 닮되 '깨어남·녹음·풀림'이 보이게
+frames: 3
+baseline: 0.5
+frame_notes:
+  1: "stun resistance — a small dizzy star symbol cracking apart, with a pale blue shield arc around it"
+  2: "freeze resistance — a small ice crystal half melted into water drops, with a warm orange shield arc around it"
+  3: "paralysis resistance — a small yellow lightning bolt snapping in two, with a pale green shield arc around it"
+placeholder: { color: '#3d4459', accent: '#8fd3ff' }

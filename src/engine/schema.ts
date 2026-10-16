@@ -391,6 +391,11 @@ export const StatusDef = z
     decay: z.number().int().min(0),
     /** ownTurnEnd: 그 편의 턴 종료 때 감소 / roundEnd: 적 턴 종료(라운드 종료) 때 감소 */
     decayAt: z.enum(['ownTurnEnd', 'roundEnd']).default('ownTurnEnd'),
+    /**
+     * 행동 제약 내성(2026-10-16 사용자 요청): 이 상태가 걸리면 대상에게 resist 상태가 붙고(balance.controlResist.stacks),
+     * 그 내성이 남아 있는 동안 이 상태는 controlResist.chance 확률로 듣지 않는다. 다른 종류의 행동 제약은 그대로 든다
+     */
+    resist: z.string().optional(),
     modifiers: z
       .object({
         damageDealtMul: z.number(),
@@ -618,6 +623,8 @@ export const Balance = z
     maxHand: z.number().int().positive(),
     /** 규칙 유물의 수치: keepBlockRatio 차례가 바뀌어도 남는 방어 비율 · critHeavyMultiplier 치명타 배율 · shopDiscount 상점 가격 배율 */
     relicRules: z.object({ keepBlockRatio: z.number(), critHeavyMultiplier: z.number(), shopDiscount: z.number() }).strict(),
+    /** 행동 제약 내성: 같은 행동 제약(기절·빙결·마비)을 다시 맞을 때 듣지 않을 확률과 내성 스택(차례가 끝날 때 1씩 — 2면 다음 차례 끝까지) */
+    controlResist: z.object({ chance: z.number().min(0).max(1), stacks: z.number().int().positive() }).strict(),
     /** 한 전투에 함께 설 수 있는 적 수(소환 상한) */
     maxEnemies: z.number().int().positive().default(5),
     mana: z.object({ max: z.number().int().positive(), worlds: z.record(World, WorldMana) }).strict(),

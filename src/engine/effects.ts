@@ -258,6 +258,18 @@ export function addStatus(state: BattleState, target: Combatant, status: string,
       return;
     }
   }
+  // 행동 제약 내성(2026-10-16): 같은 행동 제약을 막 맞은 대상은 내성이 남은 동안 controlResist.chance로 버틴다.
+  // 걸리면 내성을 새로 채운다(다음 차례가 끝날 때까지). 다른 종류(기절 뒤 빙결)는 그대로 든다
+  const resist = stacks > 0 ? state.data.statuses.get(status)!.resist : undefined;
+  if (resist) {
+    if ((target.statuses[resist] ?? 0) > 0 && state.rng.next() < state.data.balance.controlResist.chance) {
+      state.events.push({ type: 'status', targetUid: target.uid, status, stacks: 0 });
+      state.log.push(`${target.name}: ${statusName(state, resist)}으로 ${statusName(state, status)}을(를) 버텼다.`);
+      return;
+    }
+    target.statuses[resist] = state.data.balance.controlResist.stacks;
+    state.events.push({ type: 'status', targetUid: target.uid, status: resist, stacks: state.data.balance.controlResist.stacks });
+  }
   const next = (target.statuses[status] ?? 0) + stacks;
   if (next <= 0) delete target.statuses[status];
   else target.statuses[status] = next;
