@@ -35,7 +35,7 @@ npm run assets:status
 ## 규칙
 1. **카드·적·모듈·지원 규칙은 JSON 데이터로만 추가한다.** 카드별 개별 코드는 금지. 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts` BATTLE_OPS/RUN_OPS + `effects.ts`/`run.ts`), `docs/CARD_EFFECTS.md`와 테스트를 함께 갱신한다.
 2. **엔진 안의 무작위는 시드 RNG(`src/engine/rng.ts`)만 쓴다.** `Math.random` 금지. 수치는 `data/balance.json`에 두고 코드에 박지 않는다.
-3. **그래픽이 필요하면 요청만 한다.** 명세(`specs/assets/<id>.yaml`) → `assets:placeholder` → `assets:prompt` → 에셋 요청 이슈(라벨 `asset-request`, `codex`, 선행 에셋 대기면 `blocked`). 이미지를 직접 만들거나 `assets/source/`·`assets/sprites/`를 고치지 않는다(CI가 막는다). `assets/manifest.json`은 커밋하지 않는다.
+3. **그래픽이 필요하면 요청만 한다.** 명세(`specs/assets/<id>.yaml`) → `assets:placeholder` → `assets:prompt` → 에셋 요청 이슈(라벨 `asset-request`, `codex`, 선행 에셋 대기면 `blocked`). **Codex 작업이 생기면 사람에게 Codex에 붙여 넣을 프롬프트(처리할 이슈 번호·순서·주의점, 복사할 수 있는 text 블록)를 항상 같이 준다**(2026-10-16 사용자 요청). 이미지를 직접 만들거나 `assets/source/`·`assets/sprites/`를 고치지 않는다(CI가 막는다). `assets/manifest.json`은 커밋하지 않는다.
 4. **애니메이션은 반드시 meta.json을 읽는 SpritePlayer로 재생한다.** 피격 판정 같은 타이밍은 `events`의 프레임 번호(1부터)에 맞춘다.
 5. **Codex PR 검토 기준:** CI 통과(검증·소유권), `_contact.png`·`_preview.gif`로 본 프레임 간 일관성, ART_STYLE.md 준수, 다른 폴더 미수정. 문제는 "몇 번째 프레임이 무엇이 틀렸는지" 구체적으로 댓글 + `needs-fix`. 통과면 "아트 승인" 댓글.
 6. **머지(2026-10-05 사용자 위임):** 아트 PR은 "아트 승인" + CI 통과, 코드 PR은 CI 통과면 Claude가 스쿼시 머지한다. 초안이면 해제하고 `needs-fix`를 뗀 뒤 머지한다. 머지할 때마다 무엇을 머지했는지 사람에게 짧게 알린다. 설계 결정이 걸린 PR(화풍·규격·규칙 변경)은 사람이 확인한 뒤 머지한다.
