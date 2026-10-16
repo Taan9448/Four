@@ -65,6 +65,27 @@ export function statusChip(data: GameData, id: string, stacks: number): HTMLElem
   return el;
 }
 
+/**
+ * 머리 위 행동 제약 표시(2026-10-16 #1317): 이번 차례에 행동하지 못하게 하는 상태(skipTurn — 기절·빙결·마비·졸음)를
+ * 큰 아이콘으로. 체력바 아래 이름표는 그대로 두고, 이름표가 접혀도 이것은 늘 보인다. 걸린 것이 없으면 null
+ */
+export function controlMark(data: GameData, statuses: Record<string, number>): HTMLElement | null {
+  const on = Object.entries(statuses).filter(([id, n]) => n > 0 && data.statuses.get(id)?.modifiers.skipTurn);
+  if (!on.length) return null;
+  const el = h(
+    'div',
+    { class: 'ctrl-mark' },
+    on.map(([id, n]) => {
+      const def = data.statuses.get(id)!;
+      const mark = h('span', { class: `ctrl-one ctrl-${id}` }, sheetIconEl(STATUS_SHEETS, def.icon, def.glyph, 'ctrl-icon'), n > 1 ? h('b', {}, n) : '');
+      Object.entries(tipAttrs(`${def.name}${n > 1 ? ` ${n}` : ''} — 행동 불가`, def.description, 'debuff')).forEach(([k, v]) => v && mark.setAttribute(k, v));
+      return mark;
+    }),
+  );
+  el.setAttribute('aria-label', `행동 불가: ${on.map(([id]) => data.statuses.get(id)!.name).join(', ')}`);
+  return el;
+}
+
 /** 속성 표시: 화염 炎(붉은 주황) · 냉기 冷(하늘색) · 번개 雷(노란빛) */
 const ELEMENT_GLYPH: Record<string, string> = { fire: '炎', ice: '冷', lightning: '雷' };
 const ELEMENT_NAME: Record<string, string> = { fire: '화염', ice: '냉기', lightning: '번개' };

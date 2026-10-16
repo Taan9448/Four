@@ -468,6 +468,21 @@ h1, h2, h3 { font-family: var(--f-head); }
 /* 발밑 그림자(2026-10-09): 발(프레임 아래 10% 기준선) 밑에 옅은 타원. 쓰러지면 사라진다 */
 .sprite-wrap::before { content: ''; position: absolute; left: 50%; bottom: 6%; z-index: 0; width: 48%; height: 8%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.32) 45%, transparent 72%); pointer-events: none; }
 .unit.down .sprite-wrap::before { opacity: 0; }
+/* 머리 위 행동 제약(2026-10-16 #1317): 기절·빙결·마비·졸음은 이름표가 접혀도 그림 위쪽에 크게. 머리 근처(프레임 위 14%)에 떠서 천천히 흔들린다 */
+.ctrl-slot { position: absolute; left: 0; right: 0; top: 14%; z-index: 3; display: flex; justify-content: center; pointer-events: none; }
+.ctrl-mark { display: flex; gap: 4px; pointer-events: auto; cursor: help; animation: ctrl-bob 1.6s ease-in-out infinite; }
+.ctrl-one { position: relative; display: inline-flex; filter: drop-shadow(0 0 6px rgba(255, 210, 120, 0.85)) drop-shadow(0 2px 2px #000); }
+.ctrl-one .ctrl-icon { width: 40px; height: 40px; font-size: 1.35rem; border-radius: 50%; border-width: 2px; background: rgba(28, 20, 34, 0.92); }
+.ctrl-one .ctrl-icon.has-art { background: none; border: 0; }
+.ctrl-one .ctrl-icon img { width: 100%; height: 100%; image-rendering: pixelated; }
+.ctrl-one b { position: absolute; right: -6px; bottom: -4px; min-width: 16px; padding: 0 3px; border-radius: 8px; background: #000; color: #ffd9a0; font-size: var(--fs-min); line-height: 16px; text-align: center; }
+.ctrl-bind .ctrl-icon:not(.has-art) { border-color: #8fd3ff; color: #cdeeff; }
+.ctrl-stun .ctrl-icon:not(.has-art) { border-color: #f5d98c; color: #fff1c4; }
+.ctrl-paralyze .ctrl-icon:not(.has-art) { border-color: #ffe066; color: #fff6b0; }
+.ctrl-drowsy .ctrl-icon:not(.has-art) { border-color: #b9bfd0; color: #e4e7f0; }
+@keyframes ctrl-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.no-motion .ctrl-mark { animation: none; }
+@media (prefers-reduced-motion: reduce) { .ctrl-mark { animation: none; } }
 .unit-name { font-size: var(--fs-cap); margin-top: calc(var(--unit-h) * var(--scale) * -0.1); white-space: nowrap; text-shadow: 0 1px 2px #000, 0 0 4px #000; position: relative; }
 .unit-bars { position: relative; display: flex; align-items: center; gap: 4px; width: 92%; margin-top: 3px; }
 .hp-bar { position: relative; flex: 1; height: 15px; background: rgba(0, 0, 0, 0.65); border-radius: 99px; overflow: hidden; border: 1px solid #000; }
@@ -1194,6 +1209,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
   .hp-bar { height: 14px; }
   .hp-text { font-size: var(--fs-min); line-height: 13px; }
   .block-badge { min-width: 22px; height: 22px; font-size: var(--fs-min); }
+  .ctrl-one .ctrl-icon { width: 30px; height: 30px; font-size: 1rem; }
   .intent, .incoming { font-size: var(--fs-min); padding: 1px 4px 1px 2px; gap: 2px; max-width: 120%; white-space: normal; word-break: keep-all; line-height: 1.15; }
   /* 의도 이름표는 두 줄: 이름 / 수치·대상 */
   .intent .intent-name { display: block; flex-basis: 100%; text-align: center; }
