@@ -88,6 +88,19 @@
       "boss": { "epic": 72, "legendary": 28 }
     },
     "bossRelicChoices": 3,
+    "campaignWeights": {
+      "potion": {
+        "battle": { "common": 62, "uncommon": 32, "rare": 5.7, "epic": 0.3 },
+        "elite": { "common": 40, "uncommon": 40, "rare": 19, "epic": 1 },
+        "boss": { "uncommon": 40, "rare": 55, "epic": 4.5, "legendary": 0.5 },
+        "shop": { "common": 45, "uncommon": 40, "rare": 14.5, "epic": 0.5 }
+      },
+      "relic": {
+        "elite": { "common": 52, "uncommon": 35, "rare": 12.5, "epic": 0.5 },
+        "shop": { "common": 48, "uncommon": 38, "rare": 13.5, "epic": 0.5 },
+        "boss": { "rare": 90, "epic": 9, "legendary": 1 }
+      }
+    },
     "shop": {
       "cards": 5,
       "relics": 2,

@@ -28,6 +28,13 @@ export interface Loot {
   relicChoices: string[];
 }
 
+/** 이 런의 등급 가중치: 첫 캠페인 런은 campaignWeights(강한 유물·물약이 극히 드묾), 순례·심연은 기본 가중치 */
+export function lootWeights(data: GameData, run: RunState) {
+  const eco = data.balance.economy;
+  const campaign = !isAbyss(run) && !run.replayOf ? eco.campaignWeights : undefined;
+  return { relic: campaign?.relic ?? eco.relicWeights, potion: campaign?.potion ?? eco.potionWeights };
+}
+
 /** 가중치로 등급을 뽑고 그 등급에서 하나. 등급이 비면 다른 등급으로 */
 function pickByTier<T extends { rarity: string }>(rng: Rng, pool: T[], weights: Partial<Record<string, number>>): T | null {
   const tiers = Object.entries(weights).filter(([r, w]) => (w ?? 0) > 0 && pool.some((x) => x.rarity === r)) as [string, number][];
@@ -45,7 +52,7 @@ function relicPool(data: GameData, run: RunState, exclude: string[] = []) {
 function bossRelicChoices(data: GameData, run: RunState, rng: Rng, n: number): string[] {
   const left = [...data.relics.values()].filter((r) => relicAllowed(run, r) && !run.relics.includes(r.id));
   const out: string[] = [];
-  const weights = data.balance.economy.relicWeights.boss;
+  const weights = lootWeights(data, run).relic.boss;
   while (out.length < n) {
     const pool = left.filter((r) => !out.includes(r.id) && (weights[r.rarity as Tier] ?? 0) > 0);
     const pick = pool.length ? pickByTier(rng, pool, weights) : rng.shuffle(left.filter((r) => r.rarity === 'rare' && !out.includes(r.id)))[0];
@@ -63,12 +70,12 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const [lo, hi] = eco.gold[kind];
   // 굽이의 법칙 '무거운 발': 골드 두 배
   const gold = Math.round(rng.int(lo, hi) * lawRunMul(data, run, 'goldMul'));
-  const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, potionPool(data, run), eco.potionWeights[kind])?.id ?? null) : null;
+  const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, potionPool(data, run), lootWeights(data, run).potion[kind])?.id ?? null) : null;
   let relic: string | null = null;
   let relicChoices: string[] = [];
   // 심연의 숙적·서약 '막아선 자'의 엘리트는 유물을 떨구지 않는다(2026-10-10: 숙적이 잦은 서약이 유물 때문에 봇에게 이득이던 것)
   const noRelic = isAbyss(run) && (node.moduleId === data.balance.abyss.nemesisModule || (kind === 'elite' && node.floor === runOath(data, run).eliteFloor));
-  if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run), eco.relicWeights.elite)?.id ?? null;
+  if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run), lootWeights(data, run).relic.elite)?.id ?? null;
   if (kind === 'boss' && !noRelic) {
     relicChoices = bossRelicChoices(data, run, rng, eco.bossRelicChoices);
   }
@@ -149,14 +156,14 @@ export function openShop(data: GameData, run: RunState, nodeId: string): ShopSta
   }
   const relics: ShopState['relics'] = [];
   for (let i = 0; i < sh.relics; i++) {
-    const def = pickByTier(rng, relicPool(data, run, relics.map((r) => r.relicId)), eco.relicWeights.shop);
+    const def = pickByTier(rng, relicPool(data, run, relics.map((r) => r.relicId)), lootWeights(data, run).relic.shop);
     if (!def) break;
     relics.push({ relicId: def.id, price: priced(rng, sh.relicPrice[def.rarity as Tier], sh.jitter), sold: false });
   }
   const potions: ShopState['potions'] = [];
   const shopPotions = potionPool(data, run);
   for (let i = 0; i < sh.potions; i++) {
-    const def = pickByTier(rng, shopPotions.filter((p) => !potions.some((x) => x.potionId === p.id)), eco.potionWeights.shop);
+    const def = pickByTier(rng, shopPotions.filter((p) => !potions.some((x) => x.potionId === p.id)), lootWeights(data, run).potion.shop);
     if (!def) break;
     potions.push({ potionId: def.id, price: priced(rng, sh.potionPrice[def.rarity], sh.jitter), sold: false });
   }

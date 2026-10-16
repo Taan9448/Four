@@ -792,6 +792,30 @@ export const Balance = z
           })
           .strict(),
         bossRelicChoices: z.number().int().positive(),
+        /**
+         * 첫 캠페인 런(순례·심연이 아닌 런)의 등급 가중치(2026-10-16 사용자 결정): 강한 유물·물약은 극히 드물게.
+         * 순례(스테이지 다시 걷기)와 심연은 potionWeights·relicWeights 그대로
+         */
+        campaignWeights: z
+          .object({
+            potion: z
+              .object({
+                battle: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+                elite: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+                boss: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+                shop: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+              })
+              .strict(),
+            relic: z
+              .object({
+                elite: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+                shop: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+                boss: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']), z.number().min(0)),
+              })
+              .strict(),
+          })
+          .strict()
+          .optional(),
         shop: z
           .object({
             cards: z.number().int().min(0),
