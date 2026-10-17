@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 384x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every used cell is a 96x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Each used cell is ONE small, complete card illustration for a collectible card game. The picture FILLS THE WHOLE CELL edge to edge (no border, no frame, no gap between cells, no rounded corners); the game shows it through the card frame's art window, which hides a few pixels on every side.
+Keep it SIMPLE: ONE clear subject that matches the card, centered and large, readable at 96x64 pixels. A plain background of 2-3 calm flat tones (a simple horizon or two flat bands), no clutter, no small props, no crowds, no busy patterns. Keep the subject inside the middle 81x54 pixels.
+Style: crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; calm night palette: deep indigo, moonlit silver, pale lavender smoke, muted herb green and a few warm hearth-orange accents; no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the pictures.
+Cards:
+Cell 1: a handful of grey-green herb leaves smouldering in a small clay hearth, a heavy pale lavender smoke curling low and sideways
+Cell 2: a slender hand raised gently with soft silver music notes and tiny blue mana sparks drifting down like snow over a sleeping fox
+Cell 3: a quiet night valley with a few village roofs completely blanketed by thick pale lavender fog under a crescent moon
+Cell 4: two fingers pressing a glowing pale blue point on the side of a man's neck, his eyelids closing
+Cell 5: a plain woodcutting axe resting on a dozing guard's shoulder seam, a faint white crack line glowing along the joint
+Cells 6 to 16 are completely empty magenta.
+Rules: no text, no letters, no numbers, no runes that read as letters, no card frame, no border, no watermark.
+Fix: Edit ONLY Cell 5 (second row, first column), keep Cells 1–4 and all magenta empty cells unchanged. In Cell 5 the glowing WHITE CRACK must run along the DOZING GUARD'S SHOULDER CLOTHING/ARMOR SEAM, NOT along the axe head or handle joint. Show a plain woodcutting axe blade gently resting exactly on the guard's shoulder seam, with a thin white line tracing that shoulder joint beneath the edge. The axe head and handle remain ordinary unlit steel and wood. The guard's eyes are closed, head nodding. One large readable shoulder-and-axe subject, full-bleed dark indigo night background, moonlit silver accents, no border, no text. Strict 4x4px blocks on one grid, everything within Cell 5, Cells 6–16 pure magenta.
