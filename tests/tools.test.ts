@@ -582,6 +582,8 @@ describe('폴더 소유권 검사', () => {
     // 다시 그리기 브랜치
     expect(checkOwnership('art/464-veilak_idle-fix', ['assets/source/veilak_idle.png'])).toEqual([]);
     expect(checkOwnership('art/464-veilak_idle-fix-2', ['assets/source/veilak_idle.png'])).toEqual([]);
+    expect(checkOwnership('art/1367-cg_seokdu_whip-v2', ['assets/source/cg_seokdu_whip.png'])).toEqual([]);
+    expect(checkOwnership('art/1367-cg_seokdu_whip-v', ['assets/source/cg_seokdu_whip.png'])).not.toEqual([]);
     expect(checkOwnership('art/464-veilak_idle-redo', ['assets/source/veilak_idle.png']).length).toBe(1);
   });
 });

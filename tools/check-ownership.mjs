@@ -21,8 +21,8 @@ export function checkOwnership(branch, files) {
     if (isArt && !artPath) errors.push(`${f}: art/* 브랜치는 assets/source/, assets/sprites/만 바꿀 수 있다`);
     if (!isArt && artPath) errors.push(`${f}: assets/source/, assets/sprites/는 Codex(art/* 브랜치) 전용이다`);
   }
-  // 다시 그리기(이미 머지된 에셋을 새 PR로)는 art/<이슈번호>-<id>-fix(-2, -3 …)도 받는다
-  if (isArt && !/^art\/\d+-[a-z0-9_]+(-fix(-\d+)?)?$/.test(branch)) errors.push(`브랜치 이름 "${branch}"이(가) art/<이슈번호>-<id>[-fix] 형식이 아니다`);
+  // 다시 그리기(이미 머지된 에셋을 새 PR로)는 art/<이슈번호>-<id>-fix(-2, -3 …)·-v2(-v3 …)도 받는다
+  if (isArt && !/^art\/\d+-[a-z0-9_]+(-fix(-\d+)?|-v\d+)?$/.test(branch)) errors.push(`브랜치 이름 "${branch}"이(가) art/<이슈번호>-<id>[-fix|-fix-N|-vN] 형식이 아니다`);
   return errors;
 }
 
