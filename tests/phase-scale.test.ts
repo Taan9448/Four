@@ -34,7 +34,7 @@ describe('모듈 균열 감쇠(content.riftDecay)', () => {
 describe('단계 기술(MoveDef.phase)', () => {
   it('순서(cycle) 패턴: 조건이 처음 맞으면 의도가 곧바로 바뀌고 다음 적 차례에 쓴다', () => {
     const s = battle({ enemies: ['test_phase'] });
-    expect(foe(s).intent?.moveId).toBe('poke');
+    expect(foe(s).intent?.moveId).not.toBe('tears');
     hurt(s, 150);
     expect(foe(s).intent?.moveId).toBe('tears');
     expect(s.events.some((e) => e.type === 'phase')).toBe(true);

@@ -471,7 +471,13 @@ export const EnemyDef = z
     /** 속성 약점(받는 피해 × elements.weakMultiplier) · 내성(× resistMultiplier, 그 속성 상태가 붙지 않는다) */
     weak: z.array(Element).default([]),
     resist: z.array(Element).default([]),
+    /**
+     * 행동 고르기(2026-10-17 적 AI 개편, GAME_DESIGN 9절): cycle은 행동을 한 바퀴씩 모두 쓰되 바퀴 안의 순서는 상황 점수로 고르고
+     * (보스·ordered는 정한 순서 그대로), random은 weight × 상황 점수(balance.enemyAi)로 고른다
+     */
     pattern: z.enum(['cycle', 'random']),
+    /** 보스가 아닌데도 정한 순서를 지켜야 하는 적(원작 연출의 순서가 있는 적) */
+    ordered: z.boolean().optional(),
     moves: z.array(MoveDef).min(1),
     /**
      * 변신(보스 2단계). downed: 쓰러질 자리에서 대신 변신 / lastStanding: 다른 적이 모두 쓰러져 혼자 남으면 변신 /
@@ -632,6 +638,28 @@ export const Balance = z
     limitedCopies: z.number().int().positive(),
     /** 행동 제약 내성: 같은 행동 제약(기절·빙결·마비)을 다시 맞을 때 듣지 않을 확률과 내성 스택(차례가 끝날 때 1씩 — 2면 다음 차례 끝까지) */
     controlResist: z.object({ chance: z.number().min(0).max(1), stacks: z.number().int().positive() }).strict(),
+    /**
+     * 적 AI(2026-10-17 사용자 요청 — 적이 같은 기술만 쓴다): 행동 고르기 배율. repeatPenalty 바로 전에 쓴 행동 ·
+     * lethal 한 방에 쓰러뜨릴 대상이 있는 공격 · lowHp 이하 체력이면 방어·회복 ×guardWhenLow · healAtFull 체력이 가득한데 회복 ·
+     * buffOwned 이미 가진 강화 · dispel 아군에 강화가 있을 때 걷어 내기(없으면 ×dispelIdle) ·
+     * 방어 기억: 지난 blockMemory 차례 아군 1명당 평균 방어가 공격 피해 × blockedRatio 이상이면 공격 ×blockedAttack, 그 밖의 행동 ×blockedSetup
+     */
+    enemyAi: z
+      .object({
+        repeatPenalty: z.number().min(0),
+        lethal: z.number().min(0),
+        lowHp: z.number().min(0).max(1),
+        guardWhenLow: z.number().min(0),
+        healAtFull: z.number().min(0),
+        buffOwned: z.number().min(0),
+        dispel: z.number().min(0),
+        dispelIdle: z.number().min(0),
+        blockMemory: z.number().int().positive(),
+        blockedRatio: z.number().min(0),
+        blockedAttack: z.number().min(0),
+        blockedSetup: z.number().min(0),
+      })
+      .strict(),
     /** 한 전투에 함께 설 수 있는 적 수(소환 상한) */
     maxEnemies: z.number().int().positive().default(5),
     mana: z.object({ max: z.number().int().positive(), worlds: z.record(World, WorldMana) }).strict(),

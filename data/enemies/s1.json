@@ -10,7 +10,7 @@
     "hitFx": "fx_claw",
     "traits": [{"status": "incorporeal", "stacks": 1}],
     "pattern": "random",
-    "moves": [{"id": "bite", "name": "물어뜯기", "intent": "attack", "weight": 3, "effects": [{"op": "damage", "amount": 70}]}, {"id": "leap", "name": "공중으로 뛰어오른다", "intent": "attack", "targeting": "lowest_hp", "weight": 1, "effects": [{"op": "damage", "amount": 100}]}, {"id": "howl", "name": "뼈를 울리는 으르렁거림", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 40, "target": "self"}]}],
+    "moves": [{"id": "bite", "name": "물어뜯기", "intent": "attack", "weight": 2, "effects": [{"op": "damage", "amount": 70}]}, {"id": "leap", "name": "공중으로 뛰어오른다", "intent": "attack", "targeting": "lowest_hp", "weight": 1, "effects": [{"op": "damage", "amount": 100}]}, {"id": "howl", "name": "뼈를 울리는 으르렁거림", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 40, "target": "self"}]}],
     "flavor": "늑대를 닮았으나 몸집이 송아지만 했고, 털 대신 연기 같은 검은 기운이 몸을 감쌌다. 눈이 있어야 할 자리에 붉은 점 두 개. \"몸이 연기라서 검이 그냥 통과한다고. 마법이 아니면 못 잡아.\""
   },
   {

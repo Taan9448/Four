@@ -26,7 +26,7 @@
     "color": "#4e443d",
     "traits": [{"status": "mountain_regen", "stacks": 1}],
     "pattern": "random",
-    "moves": [{"id": "grasp", "name": "움켜쥐기", "intent": "attack", "targeting": "lowest_hp", "weight": 2, "effects": [{"op": "damage", "amount": 80}]}, {"id": "wall_push", "name": "밀려오는 벽", "intent": "attack", "weight": 1, "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}]}, {"id": "drink_mana", "name": "마나를 빨아들이는 손", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "grasp", "name": "움켜쥐기", "intent": "attack", "targeting": "lowest_hp", "weight": 1.5, "effects": [{"op": "damage", "amount": 80}]}, {"id": "wall_push", "name": "밀려오는 벽", "intent": "attack", "weight": 1, "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}]}, {"id": "drink_mana", "name": "마나를 빨아들이는 손", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "flavor": "벽이 아니었다. 바위로 된 손이었다. 베어 낸 자리를 벽에서 흘러온 돌이 메운다."
   },
   {

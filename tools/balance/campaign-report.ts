@@ -2,6 +2,7 @@
 import type { GameData } from '../../src/engine/data';
 import { playableStages } from '../../src/engine/run';
 import { BOT_STYLE_NAME, type RunReport } from '../../src/sim/bot';
+import { spreadSection, spreadWarning } from './enemy-ai';
 import type { CampaignBatch } from './shared';
 import { fmtPct, outside, TARGETS, targetTable, warningSection } from './warnings';
 
@@ -87,6 +88,7 @@ export function campaignReport(data: GameData, batches: CampaignBatch[], meta: {
   }
   lines.push('');
   lines.push(...cardSection(data, runs));
+  lines.push(...spreadSection(data, runs.flatMap((r) => r.battles)));
   return lines.join('\n');
 }
 
@@ -203,6 +205,7 @@ function campaignWarnings(data: GameData, runs: RunReport[], stageIds: string[])
       if (max !== undefined) ws.push(outside(name, rate, null, max));
     }
   }
+  ws.push(spreadWarning(data, runs.flatMap((r) => r.battles)));
   if (easy.length) ws.push(`엘리트 ${easy.length}곳이 목표 하한 ${Math.round(t.eliteDefeat[0] * 100)}% 아래: ${easy.join(' · ')}`);
   return warningSection(ws);
 }

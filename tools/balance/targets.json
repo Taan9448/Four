@@ -2,22 +2,82 @@
   "$comment": "밸런스 목표(docs/GAME_DESIGN.md 2절 순례·12절·16절). 보고서(tools/balance/*-report.ts)가 이 값과 비교해 맨 위에 경고 줄을 낸다. 값은 비율(0.07 = 7%).",
   "campaign": {
     "battleDefeatMax": 0.02,
-    "eliteDefeat": [0.03, 0.07],
-    "bossDefeatMax": { "s0": 0.02, "s1": 0.02, "s2": 0.08, "s3": 0.06, "s4": 0.07, "s5": 0.08, "s6": 0.1, "s7": 0.12, "s8": 0.14, "s9": 0.22 },
-    "complete": [0.3, 0.4],
+    "eliteDefeat": [
+      0.03,
+      0.07
+    ],
+    "bossDefeatMax": {
+      "s0": 0.02,
+      "s1": 0.02,
+      "s2": 0.08,
+      "s3": 0.06,
+      "s4": 0.07,
+      "s5": 0.08,
+      "s6": 0.1,
+      "s7": 0.12,
+      "s8": 0.14,
+      "s9": 0.22
+    },
+    "complete": [
+      0.3,
+      0.4
+    ],
     "lossShareMax": 0.35
   },
   "abyss": {
     "nemesisShareMax": 0.3,
-    "reach": [[5, 0.27, 0.33], [10, 0.12, 0.18], [15, 0.035, 0.065], [20, 0.005, 0.02]],
+    "reach": [
+      [
+        5,
+        0.27,
+        0.33
+      ],
+      [
+        10,
+        0.12,
+        0.18
+      ],
+      [
+        15,
+        0.035,
+        0.065
+      ],
+      [
+        20,
+        0.005,
+        0.02
+      ]
+    ],
     "wideMedianMax": 7,
-    "deck": [25, 35]
+    "deck": [
+      25,
+      35
+    ]
   },
   "pilgrimage": {
-    "normalTurns": [4, 6],
-    "partyLoss": [0.1, 0.2],
-    "bossDefeat": [0.05, 0.12],
-    "win": [0.8, 0.9],
+    "normalTurns": [
+      4,
+      6
+    ],
+    "partyLoss": [
+      0.1,
+      0.2
+    ],
+    "bossDefeat": [
+      0.05,
+      0.12
+    ],
+    "win": [
+      0.8,
+      0.9
+    ],
     "holdGapMax": 0.05
+  },
+  "enemyAi": {
+    "$comment": "적 AI 쏠림(2026-10-17): 일반·엘리트 적이 되풀이해 쓰는 행동(한 번만·단계 기술 제외) 중 가장 많이 쓴 것의 비율 상한 = max(topShareMin, topShareFactor ÷ 행동 수), 1턴 행동 중 가장 많은 것의 비율 상한 openTopMax. 사용 minUses회 이상인 적만. 보스는 원작 대본이라 보지 않는다",
+    "topShareMin": 0.45,
+    "topShareFactor": 1.4,
+    "openTopMax": 0.8,
+    "minUses": 30
   }
 }

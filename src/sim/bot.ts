@@ -504,6 +504,9 @@ export interface BattleRecord {
   surges?: number;
   /** 변신(모르데카이 → 찢긴 경계 등)이 일어난 턴(없으면 undefined) */
   transformTurn?: number;
+  /** 적 AI 쏠림 측정: '적 id:행동 id' → 쓴 횟수 · 1턴에 쓴 횟수 */
+  moveUse?: Record<string, number>;
+  moveOpen?: Record<string, number>;
 }
 
 /** 전투 사건에서 첫 변신이 일어난 턴 */
@@ -610,6 +613,8 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
         surges: state.tally?.surges ?? 0,
+        moveUse: state.tally?.moveUse,
+        moveOpen: state.tally?.moveOpen,
       });
       applyBattleOutcome(data, run, enc, outcome);
       if (outcome.result === 'victory') {
@@ -751,6 +756,8 @@ export function playAbyss(
         haunAfter: Math.max(0, state.party.find((p) => p.defId === 'haun')!.hp),
         rift: state.rift,
         surges: state.tally?.surges ?? 0,
+        moveUse: state.tally?.moveUse,
+        moveOpen: state.tally?.moveOpen,
         transformTurn: transformTurn(state),
       });
       applyBattleOutcome(data, run, enc, outcome);
