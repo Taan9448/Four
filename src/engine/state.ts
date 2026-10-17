@@ -185,6 +185,9 @@ export interface BattleTally {
   /** 심연 업적: 터뜨린 결 노출 수, 쓰러뜨린 접사 붙은 적 수 */
   grain?: number;
   affixKills?: number;
+  /** 밸런스 측정(적 AI 쏠림): '적 id:행동 id' → 쓴 횟수, 1턴에 쓴 횟수 */
+  moveUse?: Record<string, number>;
+  moveOpen?: Record<string, number>;
   /** 적 id → 이 전투에서 쓴 행동 id(도감에 적는다) */
   moves?: Record<string, string[]>;
 }

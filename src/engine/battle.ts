@@ -586,7 +586,7 @@ export function cloneBattle(s: BattleState): BattleState {
     supportUsed: [...s.supportUsed],
     onceUsed: s.onceUsed ? [...s.onceUsed] : undefined,
     relicCounters: s.relicCounters ? { ...s.relicCounters } : undefined,
-    tally: s.tally ? { ...s.tally, cards: { ...s.tally.cards }, moves: s.tally.moves ? Object.fromEntries(Object.entries(s.tally.moves).map(([k, v]) => [k, [...v]])) : undefined } : undefined,
+    tally: s.tally ? { ...s.tally, cards: { ...s.tally.cards }, moveUse: s.tally.moveUse && { ...s.tally.moveUse }, moveOpen: s.tally.moveOpen && { ...s.tally.moveOpen }, moves: s.tally.moves ? Object.fromEntries(Object.entries(s.tally.moves).map(([k, v]) => [k, [...v]])) : undefined } : undefined,
     potions: [...s.potions],
     flags: [...s.flags],
   };
@@ -764,6 +764,13 @@ function enemyTurn(state: BattleState): void {
     if (state.tally) {
       const seen = ((state.tally.moves ??= {})[enemy.defId] ??= []);
       if (!seen.includes(move.id)) seen.push(move.id);
+      const key = `${enemy.defId}:${move.id}`;
+      const use = (state.tally.moveUse ??= {});
+      use[key] = (use[key] ?? 0) + 1;
+      if (state.turn === 1) {
+        const open = (state.tally.moveOpen ??= {});
+        open[key] = (open[key] ?? 0) + 1;
+      }
     }
     // 접사: 빠른(첫 턴에 한 번 더), 공격한 뒤 효과(독기·탐식)
     const affixes = (enemy.affixes ?? []).map((a) => state.data.affixes.get(a)!).filter(Boolean);

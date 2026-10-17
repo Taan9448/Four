@@ -3,6 +3,7 @@ import type { GameData } from '../../src/engine/data';
 import { abyssPool, unlockedRift } from '../../src/engine/abyss';
 import { BOT_STYLE_NAME, playAbyss, type AbyssReport, type BotOptions } from '../../src/sim/bot';
 import type { AbyssBatch } from './shared';
+import { spreadSection, spreadWarning } from './enemy-ai';
 import { fmtPct, outside, TARGETS, targetTable, warningSection } from './warnings';
 
 /**
@@ -75,6 +76,7 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
     ...t.reach.map(([d, lo, hi]) => outside(`${d}굽이 도달`, runs.filter((r) => r.depth >= d).length / runs.length, lo, hi)),
     outside('넓은 풀 도달 중앙값', median(runs.filter((r) => r.pool === 'wide').map((r) => r.depth)), null, t.wideMedianMax, (x) => `${x}굽이`),
     outside('평균 덱', runs.reduce((a, r) => a + r.deckSize, 0) / runs.length, t.deck[0], t.deck[1], (x) => `${x.toFixed(0)}장`),
+    spreadWarning(data, runs.flatMap((r) => r.battles)),
   ];
   oathRuns.forEach(({ oath, rs }, i) => {
     if (!i) return;
@@ -161,5 +163,6 @@ export function abyssReport(data: GameData, batches: AbyssBatch[], seeds: number
     const [id, d] = k.split('@');
     lines.push(`| ${data.modules.get(id)?.name ?? id} \`${id}\` | ${d} | ${v} |`);
   }
+  lines.push('', ...spreadSection(data, runs.flatMap((r) => r.battles)));
   return lines.join('\n');
 }
