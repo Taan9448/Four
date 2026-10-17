@@ -47,6 +47,8 @@ export interface EnemyState extends Combatant {
   transformHpScale?: number;
   moveCursor: number;
   lastMoves: string[];
+  /** 순서형(cycle) 적이 이번 바퀴에 이미 쓴 행동(바퀴를 다 돌면 비운다) */
+  roundUsed?: string[];
   intent: Intent | null;
 }
 
@@ -149,6 +151,8 @@ export interface BattleState {
   lawEnrage?: { afterTurn: number; text: string; effects: Effect[] }[];
   /** 치명타 전용 수열(전투 RNG에서 떼어 냄). 다른 무작위와 섞이지 않게 */
   critRng?: Rng;
+  /** 적 AI의 방어 기억: 적 차례가 시작될 때 아군 1명당 평균 방어(최근 balance.enemyAi.blockMemory 차례) */
+  aiBlockSeen?: number[];
   /** 결과 화면용 전투 집계(처치·준 피해·치명타·균열 폭주·쓴 카드·하운을 마지막으로 때린 것) */
   tally?: BattleTally;
   /** cardPlayed 유물의 every 셈(유물 id → 맞는 카드 수) */

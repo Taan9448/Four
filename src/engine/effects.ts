@@ -580,6 +580,7 @@ function transformEnemy(state: BattleState, enemy: EnemyState): void {
   enemy.statuses = Object.fromEntries(into.traits.map((tr) => [tr.status, tr.stacks]));
   enemy.moveCursor = 0;
   enemy.lastMoves = [];
+  enemy.roundUsed = undefined;
   enemy.intent = null;
   state.events.push({ type: 'transform', uid: enemy.uid, from, into: into.id, text: t.text });
   state.log.push(`${from} → ${into.name}: ${t.text}`);

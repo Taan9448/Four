@@ -9,7 +9,7 @@
     "silhouette": "humanoid",
     "color": "#8a1f2a",
     "pattern": "random",
-    "moves": [{"id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 3, "effects": [{"op": "damage", "amount": 90}]}, {"id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}, {"op": "add_card", "card": "status_blood_debt", "to": "discard"}, {"op": "rift", "amount": 2}]}, {"id": "suck_essence", "name": "흡정", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "heal", "amount": 60, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "moves": [{"id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 90}]}, {"id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}, {"op": "add_card", "card": "status_blood_debt", "to": "discard"}, {"op": "rift", "amount": 2}]}, {"id": "suck_essence", "name": "흡정", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "heal", "amount": 60, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
     "flavor": "천마신교의 말단. 검붉은 무복, 가슴에 핏방울 모양의 혈적문. 마기가 무겁고 끈적하게 몸에 감겨 있다. 혈적문이 새겨질 때마다 하늘이 붉게 갈라진다."
   },
   {

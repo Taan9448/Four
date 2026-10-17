@@ -269,7 +269,8 @@ function isUnseen(state: BattleState, c: Combatant): boolean {
   return Object.entries(c.statuses).some(([id, n]) => n > 0 && state.data.statuses.get(id)?.special === 'unseen');
 }
 
-function pickTarget(state: BattleState, targeting: string): Combatant | null {
+/** dmg: 이 공격이 대상 하나에 줄 피해. 무작위 대상이면 한 방에 쓰러뜨릴 수 있는 대상을 balance.enemyAi.lethal배 더 노린다 */
+function pickTarget(state: BattleState, targeting: string, dmg = 0): Combatant | null {
   const pool = targetable(state);
   if (pool.length === 0) return null;
   switch (targeting) {
@@ -280,7 +281,9 @@ function pickTarget(state: BattleState, targeting: string): Combatant | null {
     case 'haun':
       return pool.find((p) => p.defId === 'haun') ?? pool[0];
     default:
-      return state.rng.pick(pool);
+      return dmg > 0 && pool.some((p) => p.hp + p.block <= dmg)
+        ? (state.rng.weighted(pool, (p) => (p.hp + p.block <= dmg ? state.data.balance.enemyAi.lethal : 1)) ?? pool[0])
+        : state.rng.pick(pool);
   }
 }
 
@@ -293,7 +296,7 @@ function setIntent(state: BattleState, enemy: EnemyState, move: MoveDef): void {
   const targetsParty = move.effects.some(
     (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
   );
-  const target = targetsParty ? pickTarget(state, move.targeting) : null;
+  const target = targetsParty ? pickTarget(state, move.targeting, moveDamage(state, enemy, move)) : null;
   enemy.intent = { moveId: move.id, name: move.name, kind: move.intent, targetUid: target?.uid ?? null };
 }
 
@@ -324,6 +327,54 @@ export function checkPhaseMoves(state: BattleState): void {
   }
 }
 
+/** 행동이 대상 하나에 주는 피해(이 적의 공격 배율·스테이지 배율까지, 상태 보정 전) */
+function moveDamage(state: BattleState, enemy: EnemyState, move: MoveDef): number {
+  const raw = move.effects
+    .filter((e) => e.op === 'damage' && (e.target ?? 'enemy') !== 'self')
+    .reduce((a, e) => a + (e.amount ?? 0) * (e.times ?? 1), 0);
+  return raw * (enemy.dmgMul ?? 1) * (state.enemyDmgScale ?? 1);
+}
+
+/**
+ * 적 AI 상황 점수(2026-10-17 사용자 요청 — 적이 같은 기술만 쓴다, GAME_DESIGN 9절): 1을 기준으로 지금 판에 맞는 행동은 크게, 쓸모없는 행동은 작게.
+ * 시드 RNG의 가중치로만 쓰여 같은 시드면 같은 결과다. 수치는 balance.enemyAi
+ */
+export function aiScore(state: BattleState, enemy: EnemyState, move: MoveDef): number {
+  const ai = state.data.balance.enemyAi;
+  let w = 1;
+  const dmg = moveDamage(state, enemy, move);
+  const pool = targetable(state);
+  // 방어 기억: 지난 차례들에 아군이 쌓아 둔 방어(1명당 평균)가 이 공격을 다 막을 만큼이었다
+  const seen = state.aiBlockSeen ?? [];
+  const guard = seen.length ? seen.reduce((a, b) => a + b, 0) / seen.length : 0;
+  if (dmg > 0) {
+    if (pool.some((p) => p.hp + p.block <= dmg)) w *= ai.lethal;
+    if (guard > 0 && guard >= dmg * ai.blockedRatio) w *= ai.blockedAttack;
+  } else if (guard > 0 && pool.length) {
+    // 공격이 다 막힐 판이면 강화·약화·방어 같은 준비 행동을 더
+    const best = Math.max(0, ...enemyAttackDamages(state, enemy));
+    if (best > 0 && guard >= best * ai.blockedRatio) w *= ai.blockedSetup;
+  }
+  // 자기 쪽(자신·적 전체)에 거는 효과
+  const selfFx = move.effects.filter((e) => ['self', 'all_allies'].includes(e.target ?? (e.op === 'damage' || e.op === 'apply_status' || e.op === 'dispel' ? 'enemy' : 'self')));
+  const guards = selfFx.some((e) => e.op === 'block' || e.op === 'heal');
+  if (guards && enemy.hp <= enemy.maxHp * ai.lowHp) w *= ai.guardWhenLow;
+  if (selfFx.length && selfFx.every((e) => e.op === 'heal') && enemy.hp >= enemy.maxHp * 0.9) w *= ai.healAtFull;
+  const buffs = selfFx.filter((e) => e.op === 'apply_status' && ['buff', 'trait'].includes(state.data.statuses.get(e.status ?? '')?.kind ?? ''));
+  if (buffs.length && buffs.every((e) => (enemy.statuses[e.status!] ?? 0) > 0)) w *= ai.buffOwned;
+  if (move.effects.some((e) => e.op === 'dispel')) {
+    const buffed = pool.some((p) => p.block > 0 || Object.entries(p.statuses).some(([id, n]) => n > 0 && state.data.statuses.get(id)?.kind === 'buff'));
+    w *= buffed ? ai.dispel : ai.dispelIdle;
+  }
+  return w;
+}
+
+/** 이 적이 지금 쓸 수 있는 공격들의 피해(방어 기억이 준비 행동을 고를 때 견준다) */
+function enemyAttackDamages(state: BattleState, enemy: EnemyState): number[] {
+  const def = state.data.enemies.get(enemy.defId)!;
+  return def.moves.filter((m) => !m.phase).map((m) => moveDamage(state, enemy, m)).filter((d) => d > 0);
+}
+
 function rollIntents(state: BattleState): void {
   for (const enemy of alive(state.enemies)) {
     const def = state.data.enemies.get(enemy.defId)!;
@@ -343,7 +394,8 @@ function rollIntents(state: BattleState): void {
     const usable = (m: MoveDef) =>
       !m.phase && !(m.oncePerBattle && enemy.usedOnce?.includes(m.id)) && checkCondition(state, m.condition, { source: enemy }, enemy);
     let move = def.moves.find((m) => !m.condition && !m.oncePerBattle && !m.phase) ?? def.moves[0];
-    if (def.pattern === 'cycle') {
+    if (def.pattern === 'cycle' && (def.tier === 'boss' || def.ordered)) {
+      // 보스·원작 순서가 있는 적: 정한 순서 그대로
       for (let k = 0; k < def.moves.length; k++) {
         const m = def.moves[enemy.moveCursor % def.moves.length];
         enemy.moveCursor += 1;
@@ -352,11 +404,26 @@ function rollIntents(state: BattleState): void {
           break;
         }
       }
+    } else if (def.pattern === 'cycle') {
+      // 한 바퀴에 쓸 수 있는 행동을 모두 한 번씩 — 바퀴 안의 순서는 상황 점수로(2026-10-17 적 AI). 바퀴를 넘어갈 때 같은 행동을 잇지 않는다
+      // 등장 행동: 첫 행동이 한 번만(소환·호각 등)이면 정한 대로 먼저 쓴다
+      const opener = def.moves[0].oncePerBattle && usable(def.moves[0]) ? def.moves[0] : undefined;
+      // 뒤쪽에 둔 한 번만 행동(소환·되살아나기 등)은 정한 차례가 오기 전에는 꺼내지 않는다(전투의 호흡을 지킨다)
+      const paced = (m: MoveDef) => !m.oncePerBattle || state.turn > def.moves.indexOf(m);
+      const pool = opener ? [opener] : def.moves.filter((m) => usable(m) && paced(m));
+      let left = pool.filter((m) => !enemy.roundUsed?.includes(m.id));
+      if (!left.length) {
+        enemy.roundUsed = [];
+        left = pool.length > 1 ? pool.filter((m) => m.id !== enemy.lastMoves[0]) : pool;
+      }
+      move = state.rng.weighted(left, (m) => aiScore(state, enemy, m)) ?? move;
+      (enemy.roundUsed ??= []).push(move.id);
     } else {
-      // 같은 행동을 세 번 연속 하지 않는다
+      // 같은 행동을 세 번 연속 하지 않는다. 바로 전 행동은 덜, 상황에 맞는 행동은 더
       const banned = enemy.lastMoves.length >= 2 && enemy.lastMoves[0] === enemy.lastMoves[1] ? enemy.lastMoves[0] : null;
       const options = def.moves.filter((m) => m.id !== banned && usable(m));
-      move = state.rng.weighted(options, (m) => m.weight) ?? move;
+      const ai = state.data.balance.enemyAi;
+      move = state.rng.weighted(options, (m) => m.weight * (m.id === enemy.lastMoves[0] ? ai.repeatPenalty : 1) * aiScore(state, enemy, m)) ?? move;
     }
     if (move.oncePerBattle) (enemy.usedOnce ??= []).push(move.id);
     enemy.lastMoves = [move.id, ...enemy.lastMoves].slice(0, 2);
@@ -576,7 +643,7 @@ export function cloneBattle(s: BattleState): BattleState {
     rng: s.rng.clone(),
     critRng: s.critRng?.clone(),
     party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, intent: e.intent ? { ...e.intent } : null })),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], roundUsed: e.roundUsed ? [...e.roundUsed] : undefined, usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),
     hand: cards(s.hand),
     discard: cards(s.discard),
@@ -586,6 +653,7 @@ export function cloneBattle(s: BattleState): BattleState {
     supportUsed: [...s.supportUsed],
     onceUsed: s.onceUsed ? [...s.onceUsed] : undefined,
     relicCounters: s.relicCounters ? { ...s.relicCounters } : undefined,
+    aiBlockSeen: s.aiBlockSeen ? [...s.aiBlockSeen] : undefined,
     tally: s.tally ? { ...s.tally, cards: { ...s.tally.cards }, moveUse: s.tally.moveUse && { ...s.tally.moveUse }, moveOpen: s.tally.moveOpen && { ...s.tally.moveOpen }, moves: s.tally.moves ? Object.fromEntries(Object.entries(s.tally.moves).map(([k, v]) => [k, [...v]])) : undefined } : undefined,
     potions: [...s.potions],
     flags: [...s.flags],
@@ -728,6 +796,9 @@ export function endTurn(state: BattleState): void {
 }
 
 function enemyTurn(state: BattleState): void {
+  // 적 AI의 방어 기억: 적 차례가 시작될 때 아군이 쌓아 둔 방어(1명당 평균)
+  const guards = alive(state.party);
+  if (guards.length) state.aiBlockSeen = [...(state.aiBlockSeen ?? []), guards.reduce((a, p) => a + p.block, 0) / guards.length].slice(-state.data.balance.enemyAi.blockMemory);
   for (const e of state.enemies) e.block = 0;
   applyTurnStartStatuses(state, state.enemies);
   fireSideTriggers(state, state.enemies, 'turnStart');
