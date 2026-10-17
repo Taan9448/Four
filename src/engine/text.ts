@@ -111,8 +111,8 @@ function describeBase(data: GameData, e: Effect, cardTarget?: string): string {
       return `${pre}무작위 카드 ${n}장 버리기`;
     case 'apply_status': {
       const st = data.statuses.get(e.status ?? '');
-      // 파워(지속 효과): 상태의 설명을 그대로 보여 준다
-      if (st?.triggers.length && (e.target ?? 'self') === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description.replace(/\.$/, '')}`;
+      // 파워(지속 효과): 자신에게 거는 상태는 설명을 그대로 보여 준다(대상을 적지 않은 효과는 엔진처럼 카드 대상을 따른다 — 졸음 2 부여)
+      if (st?.triggers.length && (e.target ?? (cardTarget ? defaultTargetFor(e.op, cardTarget) : 'self')) === 'self') return `${pre}지속 「${st.name}」${(e.stacks ?? 1) > 1 ? ` ×${e.stacks}` : ''}: ${st.description.replace(/\.$/, '')}`;
       // 여럿에게 거는 상태는 대상을 적는다(적 하나·자신은 생략)
       const to = tgt && tgt !== '적 1명' && tgt !== '자신' ? `${tgt}에게 ` : '';
       if (e.scale && e.stacks === undefined && e.amount === undefined) return `${pre}${to}${st?.name ?? e.status} 부여`;

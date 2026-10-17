@@ -169,7 +169,7 @@
 
 일반 상태의 효과는 `modifiers`(damageDealtMul, damageDealtAddPerStack, damageTakenMul, skipTurn, turnStartDamagePerStack — 음수면 회복)로 데이터만으로 정의한다.
 `blockedBy`(선택, 2026-10-12): 대상이 이 상태들 중 하나를 갖고 있으면 그 상태는 쌓이지 않는다(교차 잠금 금지 — 빙결 중 감전, 마비 중 냉기).
-`resist`(선택, 2026-10-16): 행동 제약(기절 `stun` → `resist_stun`, 빙결 `bind` → `resist_bind`, 마비 `paralyze` → `resist_paralyze`)이 걸리면 대상에게 그 내성 상태를 `balance.controlResist.stacks`(2)로 채운다. 내성이 남아 있는 동안 같은 상태는 `controlResist.chance`(0.5) 확률로 듣지 않는다(전투 RNG). 다른 종류는 영향 없다. 내성은 자기 차례 끝에 1씩 줄어 다음 차례 끝에 사라진다.
+`resist`(선택, 2026-10-16): 행동 제약(기절 `stun` → `resist_stun`, 빙결 `bind` → `resist_bind`, 마비 `paralyze` → `resist_paralyze`, 졸음 `drowsy` → `resist_sleep`(2026-10-17, 카드로 걸 때만 — 적이 처음 가진 특성은 내성을 남기지 않는다))이 걸리면 대상에게 그 내성 상태를 `balance.controlResist.stacks`(2)로 채운다. 내성이 남아 있는 동안 같은 상태는 `controlResist.chance`(0.5) 확률로 듣지 않는다(전투 RNG). 다른 종류는 영향 없다. 내성은 자기 차례 끝에 1씩 줄어 다음 차례 끝에 사라진다.
 `special`(grain, taunt, incorporeal, flow_eater, knot, knot_exposed, blood_cover, hungry, unseen, seam, seal)은 엔진이 메커니즘으로 처리한다. 냉기의 임계는 special이 아니라 `balance.elements`의 `threshold`다.
 
 ## 4-1. 상태 발동(파워)

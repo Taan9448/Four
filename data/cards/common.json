@@ -434,5 +434,6 @@
     "effects": [{"op": "damage", "amount": 40, "element": "lightning"}],
     "upgrade": {"growth": [20], "plus4": {"name": "번지는 뇌", "effects": [{"op": "apply_status", "status": "shock", "stacks": 1}]}, "plus5": {"name": "손때 묻은 부적", "cost": {"neigong": 0, "mana": 0}}},
     "flavor": "무림의 뇌(雷) 자 부적. 엘리아가 보더니 '이것도 결이네요' 했다."
-  }
+  },
+  {"id": "common_sleep_point", "name": "수혈 짚기", "owner": "common", "type": "attack", "rarity": "uncommon", "pool": "reward", "cost": {"neigong": 1, "mana": 0}, "target": "enemy", "keywords": ["exhaust"], "effects": [{"op": "damage", "amount": 30}, {"op": "apply_status", "status": "drowsy", "stacks": 2}], "upgrade": {"growth": [20, 0], "plus4": {"name": "혼혈", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1}]}, "plus5": {"name": "가벼운 손끝", "effects": [{"op": "draw", "amount": 1}]}}, "flavor": "목덜미의 수혈(睡穴)을 짚으면 사람이 그대로 잠든다. 찌르는 것은 한 번, 잠은 길다."}
 ]

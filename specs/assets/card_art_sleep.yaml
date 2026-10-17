@@ -1,0 +1,20 @@
+id: card_art_sleep
+type: card-art-sheet
+summary: 수면 카드 그림(졸음 갈래) — 칸 1~3 엘리아, 4 공용, 5 하운 — 칸 n = cards의 n번째 카드(96×64 픽셀, 틀의 그림 창 아래에 깐다). 제목에 어울리는 주제 하나를 단순하게
+# 2026-10-17 #1316: 상태 졸음(drowsy)을 거는 카드 5장. 원작 근거는 엘리아의 안개초 연기(3권 2장, 교세소 보초를 재움). 칸 순서를 바꾸면 cards도 함께 바꾼다
+frames: 5
+cards:
+  - elia_mist_herb  # 안개초
+  - elia_sleep_song  # 잠의 노래
+  - elia_sleeping_valley  # 잠든 골짜기
+  - common_sleep_point  # 수혈 짚기
+  - haun_drowsy_seam  # 잠결 베기
+frame_notes:
+  1: "a handful of grey-green herb leaves smouldering in a small clay hearth, a heavy pale lavender smoke curling low and sideways"  # 안개초
+  2: "a slender hand raised gently with soft silver music notes and tiny blue mana sparks drifting down like snow over a sleeping fox"  # 잠의 노래
+  3: "a quiet night valley with a few village roofs completely blanketed by thick pale lavender fog under a crescent moon"  # 잠든 골짜기
+  4: "two fingers pressing a glowing pale blue point on the side of a man's neck, his eyelids closing"  # 수혈 짚기
+  5: "a plain woodcutting axe resting on a dozing guard's shoulder seam, a faint white crack line glowing along the joint"  # 잠결 베기
+style: >-
+  crisp pixel art in the style of late 16-bit era game item and skill illustrations; flat 2-3 tone shading, light from the upper left, a 1-pixel dark outline around the main subject only; calm night palette: deep indigo, moonlit silver, pale lavender smoke, muted herb green and a few warm hearth-orange accents; no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#3b3a5c', accent: '#c9b8ff' }
