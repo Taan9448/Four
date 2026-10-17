@@ -1,0 +1,10 @@
+id: icons_status_j
+type: icon-sheet
+summary: 상태 아이콘 62(수면 내성) — 칸 n = 상태 icon n+61
+# 칸 번호 = data/statuses.json의 icon에서 61을 뺀 값. 순서를 바꾸면 데이터도 함께 바꾼다. 다른 상태 아이콘(icons_status*)과 같은 화풍·크기
+# 2026-10-17 #1316 수면 카드: 졸음(icon 61, 감긴 눈과 연기)을 막 맞은 대상(다음 차례 끝까지 졸음 50% 버팀). 행동 제약 내성(icons_status_h)처럼 '깨어남'이 보이게
+frames: 1
+baseline: 0.5
+frame_notes:
+  1: "sleep resistance — a small eye wide open with the grey smoke wisp above it breaking apart, with a pale gold shield arc around it (no letters)"
+placeholder: { color: '#3d4459', accent: '#f5d98c' }

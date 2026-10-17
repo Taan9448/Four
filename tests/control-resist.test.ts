@@ -2,7 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import { endTurn, playCard } from '../src/engine/battle';
 import { addStatus } from '../src/engine/effects';
-import { battle, data } from './helpers';
+import { cardText } from '../src/engine/text';
+import { battle, data, give } from './helpers';
 
 const fixRng = (s: ReturnType<typeof battle>, v: number) => {
   s.rng = { ...s.rng, next: () => v };
@@ -98,5 +99,51 @@ describe('한정 카드(광역 행동 제약, 2026-10-16)', () => {
     expect(playCard(s, strike, sentry.uid).ok).toBe(true);
     expect(sentry.statuses.drowsy ?? 0).toBe(0);
     expect(sentry.statuses.stun).toBe(1);
+  });
+
+  it('수면 카드(#1316): 졸음을 걸면 수면 내성이 붙고, 내성이 남은 동안 같은 졸음은 확률로 버틴다', () => {
+    const s = battle({ party: [{ id: 'haun', hp: 600, maxHp: 600 }, { id: 'elia', hp: 500, maxHp: 500 }] });
+    const e = s.enemies[0];
+    s.neigong = 9;
+    expect(playCard(s, give(s, 'elia_mist_herb'), e.uid).ok).toBe(true);
+    expect(e.statuses.drowsy).toBe(2);
+    expect(e.statuses.resist_sleep).toBe(data.balance.controlResist.stacks);
+    fixRng(s, 0.1);
+    addStatus(s, e, 'drowsy', 1);
+    expect(e.statuses.drowsy).toBe(2);
+    // 졸 때 맞아서 깨면 기절은 그대로 든다(수면 내성은 기절을 막지 않는다)
+    expect(playCard(s, give(s, 'haun_chop'), e.uid).ok).toBe(true);
+    expect(e.statuses.drowsy ?? 0).toBe(0);
+    expect(e.statuses.stun).toBe(1);
+  });
+
+  it('잠결 베기: 졸고 있는 적에게 피해 +80, 깨어 있으면 기본 피해만', () => {
+    const awake = battle();
+    awake.neigong = 9;
+    const a = awake.enemies[0];
+    const hp0 = a.hp;
+    playCard(awake, give(awake, 'haun_drowsy_seam'), a.uid);
+    const sleeping = battle();
+    sleeping.neigong = 9;
+    const b = sleeping.enemies[0];
+    addStatus(sleeping, b, 'drowsy', 2);
+    const hp1 = b.hp;
+    playCard(sleeping, give(sleeping, 'haun_drowsy_seam'), b.uid);
+    expect(hp1 - b.hp - (hp0 - a.hp)).toBe(80);
+    expect(b.statuses.stun).toBe(1);
+  });
+
+  it('적에게 거는 졸음은 지속 효과가 아니라 "졸음 n 부여"로 적는다', () => {
+    expect(cardText(data, 'elia_mist_herb')).toBe('졸음 2 부여. 방어 30');
+    expect(cardText(data, 'common_sleep_point')).toContain('피해 30. 졸음 2 부여');
+    expect(cardText(data, 'elia_sleeping_valley')).toContain('적 전체에게 졸음 1 부여');
+  });
+
+  it('부동인 적은 졸음도 걸리지 않는다', () => {
+    const s = battle();
+    const e = s.enemies[0];
+    e.statuses.steadfast = 1;
+    addStatus(s, e, 'drowsy', 2);
+    expect(e.statuses.drowsy ?? 0).toBe(0);
   });
 });
