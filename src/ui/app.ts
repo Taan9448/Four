@@ -412,7 +412,7 @@ export class App {
     this.notices.push(`수련 Lv.${to}${gold > trainingGold(data, from) ? ` — 심연 시작 금화 +${gold}` : ''}`);
   }
 
-  /** 시작 화면 계정 줄 아래: 修 수련 Lv.N과 다음 레벨까지 막대 */
+  /** 명패 안 수련 줄: 修 수련 Lv.N과 다음 레벨까지 막대 */
   private trainingLine(): HTMLElement {
     const t = trainingLevel(data, readTraining().xp);
     const gold = trainingGold(data, t.level);
@@ -428,25 +428,44 @@ export class App {
     );
   }
 
-  /** 시작 화면 메뉴 위 계정 한 줄: 「● 아이디 · 로그아웃」 또는 「게스트 · 로그인」 */
-  private accountLine(): HTMLElement | null {
-    if (!cloudEnabled()) return null;
-    const user = cloudState().user;
-    if (user)
-      return h(
-        'div',
-        { class: 'title-account signed-in' },
-        h('span', { class: 'title-who' }, `● ${user.name}`),
-        h('button', { class: 'link-btn', type: 'button', onclick: () => void signOut().then(() => this.title()) }, '로그아웃'),
-      );
-    // 로그인해 둔 세션을 확인하는 중(서버에 닿지 않으면 이 기기에 저장하며 계속)
-    if (hasStoredSession())
-      return h('div', { class: 'title-account' }, h('span', { class: 'title-who' }, cloudState().status.state === 'offline' ? '오프라인 — 이 기기에 저장하고 연결되면 올린다' : '로그인 확인 중…'));
+  /**
+   * 시작 화면 왼쪽 아래 명패(2026-10-17 사용자 결정 B안): 인장 + 계정(아이디·저장 상태·로그아웃) + 수련 Lv.
+   * 오른쪽 아래 衣·錄·設 표식과 짝을 이루고, 가운데에는 제목과 메뉴만 둔다. 계정 저장을 끈 빌드는 수련 줄만
+   */
+  private playerPlate(): HTMLElement {
+    const t = trainingLevel(data, readTraining().xp);
+    const gold = readProfile().clears >= 1 ? trainingGold(data, t.level) : 0;
+    const extra = gold ? h('small', { class: 'plate-gold' }, `심연 시작 금화 +${gold}`) : null;
+    if (!cloudEnabled())
+      return h('div', { class: 'title-plate local' }, h('span', { class: 'plate-seal', 'aria-hidden': 'true' }, '修'), h('div', { class: 'plate-body' }, this.trainingLine(), extra));
+    const { user, status } = cloudState();
+    const SYNC: Record<string, string> = { syncing: '☁ 맞추는 중', offline: '오프라인', held: '동기화 멈춤', error: '올리지 못함' };
+    let seal: string;
+    let kind: string;
+    let name: string;
+    let sync: string;
+    let action: HTMLElement | null;
+    if (user) {
+      [seal, kind, name, sync] = ['名', 'signed-in', user.name, SYNC[status.state] ?? '☁ 저장됨'];
+      action = h('button', { class: 'link-btn', type: 'button', onclick: () => void signOut().then(() => this.title()) }, '로그아웃');
+    } else if (hasStoredSession()) {
+      // 로그인해 둔 세션을 확인하는 중(서버에 닿지 않으면 이 기기에 저장하며 계속)
+      [seal, kind, name, sync, action] = ['名', 'pending', status.state === 'offline' ? '오프라인' : '로그인 확인 중…', status.state === 'offline' ? '이 기기에 저장, 연결되면 올린다' : '', null];
+    } else {
+      [seal, kind, name, sync] = ['客', 'guest', '게스트', '이 기기에만 저장'];
+      action = h('button', { class: 'link-btn', type: 'button', onclick: () => (chooseGuest(false), this.title()) }, '로그인 · 회원가입');
+    }
     return h(
       'div',
-      { class: 'title-account' },
-      h('span', { class: 'title-who' }, '게스트'),
-      h('button', { class: 'link-btn', type: 'button', onclick: () => (chooseGuest(false), this.title()) }, '로그인 · 회원가입'),
+      { class: `title-plate ${kind}` },
+      h('span', { class: 'plate-seal', 'aria-hidden': 'true' }, seal),
+      h(
+        'div',
+        { class: 'plate-body' },
+        h('div', { class: 'plate-name' }, h('b', {}, name), sync ? h('small', { class: `plate-sync sync-${user ? status.state : kind}` }, sync) : null),
+        this.trainingLine(),
+        action || extra ? h('div', { class: 'plate-actions' }, action, extra) : null,
+      ),
     );
   }
 
@@ -503,8 +522,6 @@ export class App {
           h('div', { class: 'title-sub' }, '天外歸還 · 세계의 틈'),
           // 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인하지 않았고 이번 접속에서 게스트도 고르지 않았으면 메뉴 대신
           gate ? h('div', { class: 'title-login' }, loginPanel({ onDone: () => this.title(), onGuest: () => this.title() })) : null,
-          gate ? null : this.accountLine(),
-          gate ? null : this.trainingLine(),
           gate
             ? null
             : h(
@@ -531,6 +548,8 @@ export class App {
               : null,
           ),
         ),
+        // 계정·수련은 왼쪽 아래 명패로(2026-10-17 B안). 로그인 판이 떠 있으면 숨긴다
+        gate ? null : this.playerPlate(),
         // 도감·설정은 오른쪽 아래 둥근 표식으로(2026-10-11 사용자 요청: 가운데 메뉴는 이어하기·새로 시작·불러오기·심연만)
         h(
           'div',
