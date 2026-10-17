@@ -296,7 +296,9 @@ function setIntent(state: BattleState, enemy: EnemyState, move: MoveDef): void {
   const targetsParty = move.effects.some(
     (e) => (e.target ?? (e.op === 'damage' || e.op === 'apply_status' ? 'enemy' : 'self')) === 'enemy',
   );
-  const target = targetsParty ? pickTarget(state, move.targeting, moveDamage(state, enemy, move)) : null;
+  // 막타 노리기는 보스가 아닌 적만(보스는 원작 대본 그대로)
+  const boss = state.data.enemies.get(enemy.defId)?.tier === 'boss';
+  const target = targetsParty ? pickTarget(state, move.targeting, boss ? 0 : moveDamage(state, enemy, move)) : null;
   enemy.intent = { moveId: move.id, name: move.name, kind: move.intent, targetUid: target?.uid ?? null };
 }
 
