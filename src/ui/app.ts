@@ -1115,6 +1115,16 @@ export class App {
     );
   }
 
+  /** 순례 길 끝(순례 누적, 2026-10-21): 이긴 길은 얻은 것이 남고, 진 길은 남지 않는다는 한 줄(순례가 아니면 null) */
+  private pilgrimKeepEl(run: RunState, win: boolean): HTMLElement | null {
+    if (!run.replayOf) return null;
+    return h(
+      'p',
+      { class: `pilgrim-keep${win ? '' : ' lost'}` },
+      win ? '이 길에서 얻은 카드·강화·유물·물약·골드는 클리어 지도에 그대로 남는다.' : '이 길에서 얻은 것은 남지 않는다 — 클리어 지도는 길을 나서기 전 그대로다.',
+    );
+  }
+
   /** 스테이지·굽이 끝 화면의 '얻은 것' 표: 카드 · 유물 · 레벨업(없으면 null) */
   private stageGainsEl(run: RunState): HTMLElement | null {
     const g = stageGainsSummary(data, run);
@@ -1172,6 +1182,7 @@ export class App {
             this.clearMessages.length ? h('ul', { class: 'gains clear-gains' }, ...this.clearMessages.map((m) => h('li', {}, m))) : null,
             // 이번 스테이지에 얻은 것(카드·유물·레벨업, 2026-10-11 UI/UX 3-2)
             this.stageGainsEl(run),
+            this.pilgrimKeepEl(run, true),
             news,
             run.scar > 0
               ? h(
@@ -1617,6 +1628,7 @@ export class App {
                   ? '지금 만들어진 이야기는 여기까지다. 다음 이야기는 이후 작업.'
                   : '하운이 쓰러졌다.',
             ),
+            this.pilgrimKeepEl(run, win),
             news,
             h(
               'p',

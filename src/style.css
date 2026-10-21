@@ -1896,6 +1896,8 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 .stage-gains { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 10px auto 6px; max-width: 520px; text-align: left; font-size: var(--fs-body); }
 .stage-gains dt { color: #e2b45c; font-family: var(--f-head); font-weight: 800; }
 .stage-gains dd { margin: 0; color: var(--ink); }
+.pilgrim-keep { margin: 6px auto; max-width: 520px; font-size: var(--fs-small); color: #bfe3a0; }
+.pilgrim-keep.lost { color: #ffb38a; }
 .next-laws { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 8px 0; color: var(--ink-dim); font-size: var(--fs-sub); }
 /* 심연 시작: 동료 반신 그림 · 서약 줄 전체를 눌러 고른다(2026-10-11 UI/UX 3-4) */
 .abyss-mate { position: relative; overflow: hidden; }
