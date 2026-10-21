@@ -1,4 +1,4 @@
-// 순례(자유 여정 개편, 2026-10-11 사용자 결정 A안): 길에서 얻은 것은 그 길 안에서만
+// 순례(자유 여정 개편, 2026-10-11 사용자 결정 A안 · 2026-10-21 누적): 보스를 넘기면 길에서 얻은 것이 남는다
 import { beforeEach, describe, expect, it } from 'vitest';
 import { acquireCard, setLoadout, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
@@ -17,49 +17,104 @@ const cleared = (seed = 'PIL') => {
 const unowned = (hub: ReturnType<typeof cleared>) =>
   [...data.cards.values()].find((c) => c.pool === 'reward' && hub.collection[c.id] === undefined && hub.roster.some((r) => r.id === c.owner))!;
 
-describe('순례 — 길에서 얻은 것은 길 안에서만(1-1)', () => {
-  it('(a) 보상 카드·강화는 길의 덱에만, 클리어한 런의 보유 목록은 그대로', () => {
+describe('순례 누적 — 보스를 넘기면 길에서 얻은 것이 남는다(2026-10-21)', () => {
+  const freshRelic = (hub: ReturnType<typeof cleared>) => [...data.relics.values()].find((r) => !r.abyss && r.rarity !== 'path' && !hub.relics.includes(r.id))!.id;
+  const potion = () => [...data.potions.values()].find((p) => !p.abyss)!.id;
+
+  it('(a) 카드·강화·유물·물약·골드·편성이 클리어한 런에 더해진다', () => {
     const hub = cleared();
-    const before = structuredClone(hub.collection);
-    const run = startReplay(data, hub, 's2');
     const card = unowned(hub);
-    const pathCollection = structuredClone(run.collection);
-    acquireCard(data, run, card.id);
-    expect(run.deck.some((c) => c.cardId === card.id)).toBe(true);
-    // 덱에만 넣고 보유 목록(강화 단계 포함)은 건드리지 않는다. 가진 카드는 가진 단계로 한 장 더
-    expect(run.collection).toEqual(pathCollection);
-    const have = Object.keys(hub.collection).find((id) => hub.collection[id] > 0) ?? Object.keys(hub.collection)[0];
-    const n = run.deck.filter((c) => c.cardId === have).length;
-    acquireCard(data, run, have);
-    expect(run.deck.filter((c) => c.cardId === have).length).toBe(n + 1);
-    expect(run.deck.filter((c) => c.cardId === have).every((c) => c.level === hub.collection[have])).toBe(true);
-    expect(run.collection[have]).toBe(hub.collection[have]);
     const owned = Object.keys(hub.collection).find((id) => data.cards.get(id)?.upgrade && hub.collection[id] < data.balance.upgrade.maxLevel)!;
+    const lv = hub.collection[owned];
+    const relic = freshRelic(hub);
+    hub.potions = hub.potions.map(() => null);
+    const gold = hub.gold;
+    const run = startReplay(data, hub, 's2');
+    // 길에서 얻는 카드는 캠페인처럼 보유 카드에 들어간다(가진 카드면 +1 강화)
+    expect(acquireCard(data, run, card.id)).toBe(`카드 획득: ${card.name}`);
+    expect(run.collection[card.id]).toBe(0);
     upgradeOwned(data, run, owned);
+    run.relics.push(relic);
+    run.potions[0] = potion();
+    run.gold += 120;
     run.status = 'stage_clear';
-    const back = finishReplay(run);
-    expect(back.collection).toEqual(before);
+    const back = finishReplay(data, run);
+    expect(back.collection[card.id]).toBe(0);
+    expect(back.collection[owned]).toBe(lv + 1);
+    expect(back.relics).toContain(relic);
+    expect(back.potions[0]).toBe(potion());
+    expect(back.gold).toBe(gold + 120);
+    expect(back.loadout).toEqual(run.loadout);
+    expect(back.replays.s2).toBe(1);
   });
 
-  it('(f) 이기든 지든·멈추든 클리어한 런의 보유 카드·편성은 바뀌지 않는다(이긴 횟수만 남는다)', () => {
+  it('(f) 지거나 멈추면 클리어한 런은 그대로다(멈춘 길은 이어서 걸을 수 있다)', () => {
     const hub = cleared('PIL2');
     const collection = structuredClone(hub.collection);
-    const loadout = structuredClone(hub.loadout);
-    for (const end of ['stage_clear', 'defeat', 'suspend'] as const) {
+    const relics = [...hub.relics];
+    for (const end of ['defeat', 'suspend'] as const) {
       const run = startReplay(data, hub, 's1');
       acquireCard(data, run, unowned(hub).id);
-      run.loadout = {};
+      run.relics.push(freshRelic(hub));
+      run.gold += 500;
       let back;
       if (end === 'suspend') back = suspendReplay(run);
       else {
         run.status = end;
-        back = finishReplay(run);
+        back = finishReplay(data, run);
       }
       expect(back.collection).toEqual(collection);
-      expect(back.loadout).toEqual(loadout);
+      expect(back.relics).toEqual(relics);
       Object.assign(hub, back);
     }
-    expect(hub.replays.s1).toBe(1);
+    expect(hub.replays.s1 ?? 0).toBe(0);
+  });
+
+  it('(g) 멈춰 둔 두 길을 차례로 마쳐도 서로 덮어쓰지 않는다 — 달라진 만큼만 더한다', () => {
+    let hub = cleared('PIL9');
+    const owned = Object.keys(hub.collection).find((id) => data.cards.get(id)?.upgrade && hub.collection[id] <= data.balance.upgrade.maxLevel - 2)!;
+    const lv = hub.collection[owned];
+    const gold = hub.gold;
+    // 길 A: +1 강화 · 골드 +50 하고 멈춘다
+    const a = startReplay(data, hub, 's1');
+    upgradeOwned(data, a, owned);
+    a.gold += 50;
+    hub = suspendReplay(a);
+    // 길 B: +1 강화 · 유물 하나 · 골드 −30 하고 보스를 넘긴다
+    const b = startReplay(data, hub, 's2');
+    upgradeOwned(data, b, owned);
+    const relic = freshRelic(hub);
+    b.relics.push(relic);
+    b.gold -= 30;
+    b.status = 'stage_clear';
+    hub = finishReplay(data, b);
+    expect(hub.collection[owned]).toBe(lv + 1);
+    expect(hub.gold).toBe(gold - 30);
+    // 길 A를 이어서: 길 B의 것이 함께 보이고(+2), 길 A에서 늘어난 골드도 그대로
+    const a2 = startReplay(data, hub, 's1');
+    expect(a2.collection[owned]).toBe(lv + 2);
+    expect(a2.relics).toContain(relic);
+    expect(a2.gold).toBe(gold + 50 - 30);
+    expect(a2.deck.filter((c) => c.cardId === owned).every((c) => c.level === lv + 2)).toBe(true);
+    a2.status = 'stage_clear';
+    hub = finishReplay(data, a2);
+    expect(hub.collection[owned]).toBe(lv + 2);
+    expect(hub.gold).toBe(gold + 20);
+    expect(hub.relics.filter((r) => r === relic).length).toBe(1);
+  });
+
+  it('(h) 길에서 넘긴 카드는 지우고, 쓴 물약은 빠진다', () => {
+    let hub = cleared('PIL10');
+    const gone = Object.keys(hub.collection).find((id) => !data.cards.get(id)?.essential)!;
+    hub.potions = [potion(), ...hub.potions.slice(1).map(() => null)];
+    const run = startReplay(data, hub, 's3');
+    delete run.collection[gone];
+    run.potions[0] = null;
+    run.status = 'stage_clear';
+    hub = finishReplay(data, run);
+    expect(hub.collection[gone]).toBeUndefined();
+    expect(Object.values(hub.loadout).flat()).not.toContain(gone);
+    expect(hub.potions[0]).toBeNull();
   });
 });
 
@@ -71,12 +126,12 @@ describe('순례 — 길의 전투 집계(1-4)', () => {
     expect(run.stats.kills).toBe(0);
     run.stats.kills = 5;
     run.status = 'stage_clear';
-    expect(finishReplay(run).stats.kills).toBe(77);
+    expect(finishReplay(data, run).stats.kills).toBe(77);
   });
 });
 
 describe('순례 — 도감 기록(1-3)', () => {
-  it('(c) 다시 하는 런의 덱·보유·상점 카드는 도감에 적지 않고, 클리어한 런의 보유 카드·유물은 적는다', () => {
+  it('(c) 걷는 중인 길의 덱·보유·상점 카드는 도감에 적지 않고(보스를 넘겨 클리어한 런에 들 때 적는다), 클리어한 런의 보유 카드·유물은 적는다', () => {
     const hub = cleared('PIL3');
     const run = startReplay(data, hub, 's3');
     const card = unowned(hub);
@@ -106,7 +161,7 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 등급별 relicPct의 합(2026-10-21) + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
     expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
@@ -116,12 +171,17 @@ describe('순례 — 일행 보정(2)', () => {
     // 출발 편성(열쇠 카드 제외)의 평균 강화
     const cards = Object.values(run.loadout).flat().filter((id) => !data.cards.get(id)?.essential);
     for (const id of cards) run.collection[id] = 2;
-    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100;
+    // 등급마다 하나씩 더 쥐여 준다
+    for (const rarity of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const) run.relics.push([...data.relics.values()].find((r) => r.rarity === rarity && !r.abyss && !run.relics.includes(r.id))!.id);
+    const relicPct = run.relics.reduce((a, id) => a + (p.relicPct[data.relics.get(id)!.rarity] ?? 0), 0);
+    expect(p.relicPct.legendary).toBeGreaterThan(p.relicPct.common!);
+    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + relicPct + 2 * p.upgradePct) * 100) / 100;
     const k = pilgrimScale(data, run);
-    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, upgrade: 2 });
+    const tier = (t: string) => run.relics.filter((id) => data.relics.get(id)!.rarity === t).length;
+    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, relicPct: Math.round(relicPct * 100) / 100, epic: tier('epic'), legendary: tier('legendary'), upgrade: 2 });
     // 기준 레벨 이하면 유물·강화 몫만
     haun.level = 1;
-    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100);
+    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + relicPct + 2 * p.upgradePct) * 100) / 100);
     // 상한
     haun.level = 99;
     run.relics = Array.from({ length: 500 }, () => 'red_thread');
@@ -140,7 +200,7 @@ describe('순례 — 일행 보정(2)', () => {
     expect(pilgrimScale(data, run)).toEqual(fixed);
     expect(deserializeRun(data, serializeRun(run))!.run.pilgrimScale).toEqual(fixed);
     // 클리어한 런으로 돌아가면 남지 않는다
-    expect(finishReplay(run).pilgrimScale).toBeUndefined();
+    expect(finishReplay(data, run).pilgrimScale).toBeUndefined();
   });
 
   it('전투 배율에 곱해진다(어려움 배율과 함께)', () => {
@@ -174,7 +234,7 @@ describe('순례 — 첫 순례 보상(1-2)', () => {
     expect(pilgrimRewardDue(run.replayOf!, 's2')).toBe(true);
     const pick = offers.find((o) => o.kind === 'card')!;
     claimPilgrimReward(data, run.replayOf!, 's2', pick);
-    const back = finishReplay(run);
+    const back = finishReplay(data, run);
     expect(back.collection[pick.cardId]).toBe(0);
     expect(pilgrimRewardDue(back, 's2')).toBe(false);
     // 다음 길에서도 남고, 다시 받지 않는다
@@ -214,7 +274,7 @@ describe('순례 — 도전(3)', () => {
     expect(fresh).toContain('s8_two_not_three');
     expect(fresh).not.toContain('s8_blood_hall');
     expect(settleChallenges(data, run)).toEqual([]);
-    expect(finishReplay(run).challenges?.s8).toEqual(fresh);
+    expect(finishReplay(data, run).challenges?.s8).toEqual(fresh);
   });
 
   it('조건별 판정: 동료·덱·과정·보스전', () => {

@@ -71,7 +71,7 @@ export function parseCodex(data: GameData, text: string | null): Codex {
 
 /** 런이 지금 가진 것(덱·유물·물약·동료)과 상점에 놓인 것을 적는다. 다시 하는 런은 원래 런도 */
 export function noteRun(codex: Codex, run: RunState): Codex {
-  // 자유 여정(순례 A안): 길 안의 카드(덱·보상·상점)는 적지 않는다 — 클리어한 런(replayOf)의 보유 카드만 아래에서 적는다
+  // 순례 길: 길 안의 카드(덱·보상·상점)는 적지 않는다 — 보스를 넘겨 클리어한 런(replayOf)에 들어온 보유 카드만 아래에서 적는다
   const cards = recordsCards(run);
   if (cards) for (const c of run.deck) codex.cards[c.cardId] = Math.max(codex.cards[c.cardId] ?? 0, c.level);
   if (cards) for (const [id, lv] of Object.entries(run.collection ?? {})) codex.cards[id] = Math.max(codex.cards[id] ?? 0, lv);
@@ -91,8 +91,8 @@ export function noteRun(codex: Codex, run: RunState): Codex {
 }
 
 /**
- * 이 런에서 본·얻은 카드를 도감에 적는가. 자유 여정(다시 하는 런)은 적지 않는다(2026-10-11 순례 A안):
- * 길에서 얻은 카드는 그 길 안에서만이고, 심연 풀(보유 ∪ 도감)은 캠페인·심연·첫 순례 보상으로만 넓어진다
+ * 이 런에서 본·얻은 카드를 도감에 적는가. 순례 길(다시 하는 런)은 적지 않는다: 길에서 얻은 카드는 보스를 넘겨 클리어한 런의
+ * 보유 카드가 될 때 적힌다(2026-10-21 순례 누적 — 진 길에서 본·얻은 카드는 심연 풀을 넓히지 않는다)
  */
 export const recordsCards = (run: Pick<RunState, 'replayOf'>): boolean => !run.replayOf;
 

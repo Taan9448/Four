@@ -34,6 +34,7 @@ import {
   setParty,
   restoreParty,
   startReplay,
+  finishReplay,
   upgradeCandidates,
   type RunOptions,
   type RunState,
@@ -678,9 +679,16 @@ export function clearCampaign(data: GameData, seed: string, opts: BotOptions = D
 
 /** 클리어 일행(hub)으로 stageId를 다시 걷는다(순례): 보스를 넘기면 complete. nth: 같은 hub로 몇 번째 걷는지(지도 시드가 달라진다) */
 export function playPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): RunReport {
+  return walkPilgrimage(data, hub, stageId, opts, nth).report;
+}
+
+/** 순례 길 하나를 걷고 클리어 지도로 돌아온다(순례 누적 — 이기면 길에서 얻은 것이 남은 hub, hub는 건드리지 않는다) */
+export function walkPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): { report: RunReport; hub: RunState } {
   const h = structuredClone(hub);
   h.replays[stageId] = nth;
-  return driveRun(data, startReplay(data, h, stageId), `${hub.seed}:${stageId}:${nth}`, opts);
+  const run = startReplay(data, h, stageId);
+  const report = driveRun(data, run, `${hub.seed}:${stageId}:${nth}`, opts);
+  return { report, hub: finishReplay(data, run) };
 }
 
 // ───────────────────────── 심연(GAME_DESIGN 16절) ─────────────────────────

@@ -1098,7 +1098,7 @@ export class App {
     const hub = run.replayOf!;
     const won = run.status === 'stage_clear' || run.status === 'complete';
     const back = () => {
-      this.run = finishReplay(run);
+      this.run = finishReplay(data, run);
       this.map();
     };
     if (!won || !pilgrimRewardDue(hub, run.stageId)) return back();

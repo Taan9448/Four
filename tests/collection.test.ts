@@ -94,7 +94,7 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     expect(loadoutProblems(data, run, back)).toEqual([]);
   });
 
-  it('다시 하기(순례)에서 얻은 카드는 그 길 안에서만 쓰고 클리어한 런에는 남지 않는다(2026-10-11 A안)', () => {
+  it('다시 하기(순례)에서 얻은 카드는 그 길을 지면 클리어한 런에 남지 않는다(2026-10-21 순례 누적 — 이기면 남는다)', () => {
     const hub = createRunAt(data, 'COL6', 's9');
     hub.status = 'complete';
     const replay = startReplay(data, hub, 's1');
@@ -102,7 +102,7 @@ describe('보유 카드와 편성(GAME_DESIGN 9-1)', () => {
     acquireCard(data, replay, card.id);
     expect(replay.deck.some((c) => c.cardId === card.id)).toBe(true);
     replay.status = 'defeat';
-    expect(finishReplay(replay).collection[card.id]).toBeUndefined();
+    expect(finishReplay(data, replay).collection[card.id]).toBeUndefined();
   });
 
   it('옛 저장(덱만)은 덱을 보유 목록으로 바꾸고 이번 스테이지는 그 덱으로 이어 간다', () => {

@@ -1,5 +1,5 @@
 // 순례(자유 여정 개편, GAME_DESIGN 2절, 2026-10-11 사용자 결정 A안): 첫 순례 보상과 순례 도전.
-// 길에서 얻은 것은 그 길 안에서만(collection.ts·run.ts). 여기서는 그 예외인 첫 순례 보상(보유에 영구)과
+// 길에서 얻은 것은 보스를 넘기면 클리어한 런에 남는다(run.ts finishReplay, 2026-10-21). 여기서는 한 번 더 받는 첫 순례 보상과
 // 보스를 넘길 때 한 번 판정하는 도전(틈의 카드·길·칭호를 연다)을 다룬다.
 import type { GameData } from './data';
 import { COMMON, ownerKey, upgradeOwned } from './collection';
