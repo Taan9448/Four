@@ -794,11 +794,22 @@ export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' 
   return out;
 }
 
-/** 유물을 얻는다(이미 있으면 무시). 얻는 순간(pickup) 효과를 적용한다 */
+/** 순례 길(2026-10-21): 가진 유물도 다시 나오고, 다시 나온 유물은 골드로 받는다 */
+export const relicDupAllowed = (run: Pick<RunState, 'replayOf'>): boolean => !!run.replayOf;
+
+/** 가진 유물이 다시 나왔을 때 받는 골드(등급별, balance.pilgrimage.dupGold) */
+export const dupRelicGold = (data: GameData, id: string): number => data.balance.pilgrimage.dupGold[data.relics.get(id)?.rarity ?? ''] ?? 0;
+
+/** 유물을 얻는다(이미 있으면 무시 — 순례 길에서는 골드로). 얻는 순간(pickup) 효과를 적용한다 */
 export function gainRelic(data: GameData, run: RunState, id: string): string[] {
   const relic = data.relics.get(id);
   if (!relic) throw new Error(`알 수 없는 유물: ${id}`);
-  if (run.relics.includes(id)) return [];
+  if (run.relics.includes(id)) {
+    if (!relicDupAllowed(run)) return [];
+    const gold = dupRelicGold(data, id);
+    run.gold += gold;
+    return [`이미 가진 유물 「${relic.name}」 — 골드 +${gold}`];
+  }
   run.relics.push(id);
   const out = [`유물 획득: ${relic.name}`];
   if (relic.trigger === 'pickup') out.push(...applyRunOps(data, run, relic.effects));
@@ -1323,7 +1334,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           const pool = [...data.relics.values()].filter(
             (r) =>
               relicAllowed(run, r) &&
-              !run.relics.includes(r.id) &&
+              (relicDupAllowed(run) || !run.relics.includes(r.id)) &&
               (e.rarity ? (e.rarity as string[]).includes(r.rarity) : r.rarity !== 'epic' && r.rarity !== 'legendary'),
           );
           id = pool.length ? rng.pick(pool).id : undefined;

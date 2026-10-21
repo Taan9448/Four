@@ -1423,6 +1423,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .relic-choice:hover { border-color: #e2b45c; box-shadow: 0 0 14px rgba(226, 180, 92, 0.35); transform: translateY(-3px); }
 .relic-choice span { font-size: var(--fs-sub); line-height: 1.45; }
 .relic-choice small { font-size: var(--fs-min); font-style: italic; color: var(--ink-dim); }
+.relic-choice .relic-dup { font-size: var(--fs-min); font-style: normal; color: #f2c66b; }
 .relic-chip .item-icon, .potion-chip .item-icon { display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: inherit; background: none; font: inherit; color: inherit; }
 .item-icon.has-art img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
 

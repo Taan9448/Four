@@ -9,7 +9,7 @@ import { h } from './dom';
 import { tipAttrs } from './tooltip';
 import { scarBadge } from './map-view';
 import { chipKind } from './overlay';
-import { gainRelic } from '../engine/run';
+import { dupRelicGold, gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
 import { gainItemView, potionChip, relicChip } from './items';
 import type { PilgrimOffer } from '../engine/pilgrimage';
@@ -416,6 +416,8 @@ export function bossLootView(data: GameData, run: RunState, shown: LootShown, on
             },
             relicChip(data, id, 'big'),
             h('b', {}, def.name),
+            // 순례 길: 가진 유물도 나온다 — 고르면 골드로
+            run.relics.includes(id) ? h('em', { class: 'relic-dup' }, `가진 유물 — 고르면 골드 +${dupRelicGold(data, id)}`) : null,
             h('span', {}, def.description),
             def.flavor ? h('small', {}, def.flavor) : null,
           );

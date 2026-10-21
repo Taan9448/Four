@@ -622,7 +622,9 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
         // 전리품: 칸이 가득한 물약은 두고 가고, 보스 유물은 대가가 무겁지 않은 첫 후보(모두 무거우면 건너뛴다)
         const loot = rollLoot(data, run, enc.node);
         claimLoot(data, run, loot);
-        const pick = loot.relicChoices.find((id) => relicDownside(data, id) < 2);
+        // 순례 길은 가진 유물도 후보에 오른다 — 새 유물부터(없으면 가진 유물을 골라 골드로)
+        const light = loot.relicChoices.filter((id) => relicDownside(data, id) < 2);
+        const pick = light.find((id) => !run.relics.includes(id)) ?? light[0];
         if (pick) gainRelic(data, run, pick);
       }
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)

@@ -2,7 +2,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { acquireCard, setLoadout, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
-import { battleSetupFor, createRunAt, enterNode, finishReplay, measurePilgrimScale, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
+import { battleSetupFor, createRunAt, enterNode, finishReplay, gainRelic, measurePilgrimScale, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
+import { rollLoot } from '../src/engine/economy';
 import { deserializeRun, serializeRun } from '../src/engine/save';
 import { challengeMet, challengeState, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../src/engine/pilgrimage';
 import { unlockedPaths, unlockedRift } from '../src/engine/abyss';
@@ -103,6 +104,31 @@ describe('순례 누적 — 보스를 넘기면 길에서 얻은 것이 남는�
     expect(hub.relics.filter((r) => r === relic).length).toBe(1);
   });
 
+  it('(i) 순례 길에서는 가진 유물도 다시 나오고, 다시 나오면 등급별 골드로 받는다(캠페인은 그대로 무시)', () => {
+    const hub = cleared('PIL11');
+    const have = hub.relics[0] ?? freshRelic(hub);
+    if (!hub.relics.includes(have)) hub.relics.push(have);
+    const run = startReplay(data, hub, 's2');
+    const gold = run.gold;
+    const want = data.balance.pilgrimage.dupGold[data.relics.get(have)!.rarity]!;
+    expect(want).toBeGreaterThan(0);
+    expect(gainRelic(data, run, have)).toEqual([`이미 가진 유물 「${data.relics.get(have)!.name}」 — 골드 +${want}`]);
+    expect(run.gold).toBe(gold + want);
+    expect(run.relics.filter((r) => r === have).length).toBe(1);
+    // 캠페인 런은 전처럼 아무 일도 없다
+    const campaign = createRunAt(data, 'PIL11C', 's3');
+    campaign.relics.push(have);
+    const g = campaign.gold;
+    expect(gainRelic(data, campaign, have)).toEqual([]);
+    expect(campaign.gold).toBe(g);
+    // 엘리트·보스 전리품 후보에 가진 유물이 오를 수 있다
+    run.relics = [...data.relics.values()].filter((r) => !r.abyss && r.rarity !== 'path').map((r) => r.id);
+    const elite = run.map.floors.flat().find((n) => n.type === 'elite') ?? { ...run.map.floors[0][0], type: 'elite' as const };
+    const boss = run.map.floors.flat().find((n) => n.type === 'boss')!;
+    expect(rollLoot(data, run, elite).relic).not.toBeNull();
+    expect(rollLoot(data, run, boss).relicChoices.length).toBeGreaterThan(0);
+  });
+
   it('(h) 길에서 넘긴 카드는 지우고, 쓴 물약은 빠진다', () => {
     let hub = cleared('PIL10');
     const gone = Object.keys(hub.collection).find((id) => !data.cards.get(id)?.essential)!;
@@ -161,7 +187,7 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 등급별 relicPct의 합(2026-10-21) + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12 · 유물은 등급별 점수의 곱 2026-10-21): (1 + 레벨 초과 × 레벨당 + 평균 강화 × upgradePct) × (1 + relicGrowth)^(유물 점수 − 무료), 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
     expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
@@ -171,17 +197,31 @@ describe('순례 — 일행 보정(2)', () => {
     // 출발 편성(열쇠 카드 제외)의 평균 강화
     const cards = Object.values(run.loadout).flat().filter((id) => !data.cards.get(id)?.essential);
     for (const id of cards) run.collection[id] = 2;
-    // 등급마다 하나씩 더 쥐여 준다
-    for (const rarity of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const) run.relics.push([...data.relics.values()].find((r) => r.rarity === rarity && !r.abyss && !run.relics.includes(r.id))!.id);
-    const relicPct = run.relics.reduce((a, id) => a + (p.relicPct[data.relics.get(id)!.rarity] ?? 0), 0);
-    expect(p.relicPct.legendary).toBeGreaterThan(p.relicPct.common!);
-    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + relicPct + 2 * p.upgradePct) * 100) / 100;
+    // 무료 점수를 넘기도록 등급마다 여럿 더 쥐여 준다
+    for (const rarity of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const)
+      for (const r of [...data.relics.values()].filter((x) => x.rarity === rarity && !x.abyss && !run.relics.includes(x.id)).slice(0, 8)) run.relics.push(r.id);
+    const pts = run.relics.reduce((a, id) => a + (p.relicPts[data.relics.get(id)!.rarity] ?? 0), 0);
+    expect(pts).toBeGreaterThan(p.relicFree);
+    expect(p.relicPts.legendary).toBeGreaterThan(p.relicPts.common!);
+    const mul = Math.pow(1 + p.relicGrowth, pts - p.relicFree);
+    const round = (x: number) => Math.round(x * 100) / 100;
     const k = pilgrimScale(data, run);
     const tier = (t: string) => run.relics.filter((id) => data.relics.get(id)!.rarity === t).length;
-    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, relicPct: Math.round(relicPct * 100) / 100, epic: tier('epic'), legendary: tier('legendary'), upgrade: 2 });
-    // 기준 레벨 이하면 유물·강화 몫만
+    expect(k).toEqual({
+      hp: round(Math.min(p.maxHp, (1 + over * p.hpPerLevel + 2 * p.upgradePct) * mul)),
+      dmg: round(Math.min(p.maxDmg, (1 + over * p.dmgPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicDmgShare))),
+      level: over,
+      relics: run.relics.length,
+      relicPts: Math.round(pts * 10) / 10,
+      relicMul: round(mul),
+      epic: tier('epic'),
+      legendary: tier('legendary'),
+      upgrade: 2,
+    });
+    // 무료 점수 안이면 유물은 적을 세게 하지 않는다
     haun.level = 1;
-    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + relicPct + 2 * p.upgradePct) * 100) / 100);
+    run.relics = run.relics.slice(0, 3);
+    expect(pilgrimScale(data, run).hp).toBe(round(1 + 2 * p.upgradePct));
     // 상한
     haun.level = 99;
     run.relics = Array.from({ length: 500 }, () => 'red_thread');

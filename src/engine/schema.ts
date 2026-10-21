@@ -877,16 +877,25 @@ export const Balance = z
       .object({ hard: z.object({ byStage: z.record(z.string(), z.object({ hp: z.number().positive(), dmg: z.number().positive() }).strict()) }).strict() })
       .strict(),
     /**
-     * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안): 자유 여정에서 적 체력·피해 배율 =
-     * 1 + max(0, 하운 레벨 − baseLevel[스테이지]) × hpPerLevel(dmgPerLevel) + Σ 유물 등급별 relicPct + 평균 강화 × upgradePct, 상한 maxHp·maxDmg
+     * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안 · 2026-10-21 순례 누적): 자유 여정에서 적 체력 배율 =
+     * (1 + max(0, 하운 레벨 − baseLevel[스테이지]) × hpPerLevel + 평균 강화 × upgradePct) × (1 + relicGrowth)^max(0, 유물 점수 − relicFree),
+     * 피해는 dmgPerLevel과 지수 × relicDmgShare. 상한 maxHp·maxDmg
      */
     pilgrimage: z
       .object({
         baseLevel: z.record(z.string(), z.number().positive()),
         hpPerLevel: z.number().min(0),
         dmgPerLevel: z.number().min(0),
-        /** 유물 한 개당(등급별, 2026-10-21 사용자 결정 — 순례 누적으로 쌓이는 영웅·전설이 더 무겁게). 없는 등급(길 유물)은 0 */
-        relicPct: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'path']), z.number().min(0)),
+        /** 유물 한 개의 점수(등급별, 2026-10-21 사용자 결정 — 순례 누적으로 쌓이는 영웅·전설이 더 무겁게). 없는 등급(길 유물)은 0 */
+        relicPts: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'path']), z.number().min(0)),
+        /** 무료 점수: 클리어 직후 일행이 가진 유물만큼은 적이 세지지 않는다 */
+        relicFree: z.number().min(0).default(0),
+        /** 무료 점수 위 1점마다 적 체력 ×(1 + relicGrowth) — 유물은 여럿이 겹치면 곱으로 세지므로 보정도 곱으로 */
+        relicGrowth: z.number().min(0).default(0),
+        /** 유물 지수가 적 피해에 붙는 비율(체력에는 그대로) */
+        relicDmgShare: z.number().min(0).default(1),
+        /** 순례 길에서 가진 유물이 다시 나오면 받는 골드(등급별, 2026-10-21 사용자 결정) */
+        dupGold: z.record(z.string(), z.number().int().min(0)).default({}),
         /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 1당(2026-10-12 보정식 세 항) */
         upgradePct: z.number().min(0).default(0),
         maxHp: z.number().min(1),
