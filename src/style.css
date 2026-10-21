@@ -1990,6 +1990,42 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .choice-result .pop-eyebrow { text-align: left; }
 .choice-result .pop-chips { justify-content: flex-start; margin: 10px 0 14px; }
 .pop-chips.gains { border-left: 0; background: none; padding: 0; color: inherit; line-height: 1.4; }
+/* 이벤트 결과의 얻고 잃은 것(2026-10-21 #1374): 체력은 동료별 숫자, 유물·물약·카드는 실물 */
+.gain-box { display: flex; flex-direction: column; gap: 8px; align-self: stretch; margin: 6px 0; padding: 10px 14px; border-radius: 10px; text-align: left; }
+.gain-box.lost { background: rgba(160, 38, 52, 0.12); border: 1px solid rgba(255, 120, 100, 0.35); }
+.gain-box.healed { background: rgba(127, 199, 154, 0.08); border: 1px solid rgba(127, 199, 154, 0.4); }
+.gain-box.got { background: rgba(226, 180, 92, 0.08); border: 1px solid rgba(226, 180, 92, 0.55); gap: 12px; }
+.gain-label { margin: 0; font-size: var(--fs-min); letter-spacing: 0.25em; color: #f2c66b; }
+.gain-box.lost .gain-label { color: #ffb38a; }
+.gain-box.healed .gain-label { color: #bfe3a0; }
+.gain-hp { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-sub); }
+.gain-box.lost .gain-member b { color: #ff8a7a; }
+.gain-box.healed .gain-member b { color: #7fc79a; }
+.gain-member small { color: var(--ink-dim); }
+.gain-item { display: flex; gap: 14px; align-items: flex-start; }
+.gain-icon.relic-chip, .gain-icon.potion-chip { width: 64px; height: 64px; border-radius: 12px; font-size: calc(var(--fs-title) * 1.1); flex: none; cursor: default; }
+.gain-icon .item-icon, .gain-icon img { width: 100%; height: 100%; }
+.gain-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gain-info p { margin: 0; font-size: var(--fs-sub); line-height: 1.6; }
+.gain-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.gain-title b { font-family: var(--f-head); font-size: var(--fs-body); color: #f4ecd8; }
+.gain-rarity { padding: 1px 8px; border-radius: 10px; font-size: var(--fs-min); font-weight: 700; background: rgba(255, 255, 255, 0.08); color: #e8dcc0; }
+.gain-item.rarity-uncommon .gain-rarity { background: rgba(106, 168, 216, 0.2); color: #9fd0ff; }
+.gain-item.rarity-rare .gain-rarity { background: rgba(226, 180, 92, 0.2); color: #f2c66b; }
+.gain-item.rarity-epic .gain-rarity, .gain-item.rarity-legendary .gain-rarity { background: rgba(163, 92, 255, 0.2); color: #d4b8ff; }
+.gain-title small { color: var(--ink-dim); font-size: var(--fs-min); }
+.gain-flavor { color: var(--ink-dim); font-style: italic; }
+.gain-card { align-items: center; }
+.gain-card .card { flex: none; cursor: default; }
+.gain-card .card:hover { transform: none; }
+.gain-card .gain-info { align-items: flex-start; }
+.gain-card .gain-info small { color: var(--ink-dim); font-size: var(--fs-sub); }
+.gain-card .gain-rarity { align-self: flex-start; }
+@media (max-width: 600px) {
+  .gain-card { flex-direction: column; align-items: center; text-align: center; }
+  .gain-card .gain-info, .gain-card .gain-rarity { align-items: center; align-self: center; }
+  .gain-icon.relic-chip, .gain-icon.potion-chip { width: 52px; height: 52px; }
+}
 @keyframes pop-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes pop-stamp { 0% { opacity: 0; transform: rotate(-5deg) scale(1.9); } 60% { opacity: 1; transform: rotate(-5deg) scale(0.92); } 100% { transform: rotate(-5deg) scale(1); } }
 @keyframes pop-ink { from { opacity: 0; width: 20%; } to { opacity: 1; width: 120%; } }

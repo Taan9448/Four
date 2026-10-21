@@ -956,7 +956,8 @@ export function choicesFor(data: GameData, run: RunState, module: ModuleDef): Ch
 }
 
 /** pick: 선택지에 고르는 강화(upgrade_card choose)가 있으면 사람이 고른 카드 uid. 휴식 노드면 rest 유물이 뒤따른다 */
-export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number, pick?: string): string[] {
+/** gains: 얻고 잃은 것을 모을 목록(화면용, RunGain) */
+export function applyChoice(data: GameData, run: RunState, module: ModuleDef, index: number, pick?: string, gains?: RunGain[]): string[] {
   const choice = choicesFor(data, run, module)[index];
   if (!choice) throw new Error('없는 선택지');
   if (choice.disabled) throw new Error(`고를 수 없는 선택지: ${choice.disabled}`);
@@ -964,12 +965,12 @@ export function applyChoice(data: GameData, run: RunState, module: ModuleDef, in
   const sc = data.balance.rift.scar;
   const healMul = module.type === 'rest' ? lawRunMul(data, run, 'restHealMul') * (run.scar >= sc.restAt ? sc.restHealMul : 1) : 1;
   const effects = healMul === 1 ? choice.effects : choice.effects.map((e) => (e.op === 'heal_party' ? { ...e, ratio: e.ratio !== undefined ? e.ratio * healMul : undefined, amount: e.amount !== undefined ? Math.floor(e.amount * healMul) : undefined } : e));
-  const out = applyRunOps(data, run, effects, { pick });
+  const out = applyRunOps(data, run, effects, { pick, gains });
   // 확률 결과: 노드마다 정해진 수열로 하나를 고른다(같은 시드면 같은 결과)
   if (choice.outcomes?.length) {
     const o = createRng(run.seed).fork(`outcome:${run.stageId}:${run.position}:${module.id}`).weighted(choice.outcomes, (x) => x.weight)!;
     out.unshift(o.result);
-    out.push(...applyRunOps(data, run, o.effects, { pick }));
+    out.push(...applyRunOps(data, run, o.effects, { pick, gains }));
   }
   if (choice.restDiscard) {
     const ab = run.abyss!;
@@ -1041,8 +1042,23 @@ function matchesFilter(data: GameData, card: CardInstance, filter: Effect['filte
 }
 
 /** 런 단위 동작 해석. 결과 메시지 목록을 돌려준다. opts.pick: 고르는 강화에서 사람이 고른 카드 uid */
-export function applyRunOps(data: GameData, run: RunState, effects: Effect[], opts: { pick?: string } = {}): string[] {
+/**
+ * 화면용(2026-10-21 #1374): 효과 묶음이 얻고 잃은 것. 문자열 메시지(msg)와 짝을 이뤄, 결과 화면이 칩 대신 유물·카드·물약을 실물로,
+ * 체력은 동료별 숫자로 보인다
+ */
+export type RunGain =
+  | { kind: 'relic' | 'card' | 'potion'; id: string; msg: string }
+  | { kind: 'hp'; msg: string; members: { id: string; before: number; after: number; max: number }[] };
+
+/** opts.gains: 얻고 잃은 것을 이 목록에 모은다(화면용, 결과는 같다) */
+export function applyRunOps(data: GameData, run: RunState, effects: Effect[], opts: { pick?: string; gains?: RunGain[] } = {}): string[] {
   const out: string[] = [];
+  const note = (g: RunGain) => opts.gains?.push(g);
+  /** 카드를 얻는 메시지면 화면에 카드로(한정·고유로 못 얻었으면 글만) */
+  const cardMsg = (id: string, msg: string) => {
+    if (msg.startsWith('카드 획득')) note({ kind: 'card', id, msg });
+    return msg;
+  };
   for (const e of effects) {
     run.counter += 1;
     const rng = createRng(run.seed).fork(`ops:${run.stageId}:${run.position}:${run.counter}`);
@@ -1059,7 +1075,10 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           const pool = Object.keys(run.abyss!.pool)
             .map((id) => data.cards.get(id)!)
             .filter((d) => owners.has(ownerKey(data, d)) && (!e.rarity || (e.rarity as string[]).includes(d.rarity)) && !(d.type === 'power' && runOath(data, run).noPowers));
-          for (let i = 0; i < (e.count ?? 1) && pool.length; i++) out.push(abyssAddCard(data, run, rng.pick(pool).id));
+          for (let i = 0; i < (e.count ?? 1) && pool.length; i++) {
+            const id = rng.pick(pool).id;
+            out.push(cardMsg(id, abyssAddCard(data, run, id)));
+          }
           break;
         }
         // 합류한 동료·공용의 보상 카드 중 등급이 맞는 것(없는 카드 우선)
@@ -1073,7 +1092,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           if (!pool.length) break;
           const d = rng.pick(pool);
           fresh.splice(fresh.indexOf(d), 1);
-          out.push(acquireCard(data, run, d.id));
+          out.push(cardMsg(d.id, acquireCard(data, run, d.id)));
         }
         break;
       }
@@ -1128,7 +1147,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       case 'gain_card': {
         const def = data.cards.get(e.card ?? '');
         if (!def) throw new Error(`gain_card: 알 수 없는 카드 ${e.card}`);
-        for (let i = 0; i < (e.count ?? 1); i++) out.push(addCard(data, run, def.id));
+        for (let i = 0; i < (e.count ?? 1); i++) out.push(cardMsg(def.id, addCard(data, run, def.id)));
         break;
       }
       case 'remove_card': {
@@ -1155,14 +1174,22 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         }
         break;
       }
-      case 'heal_party':
+      case 'heal_party': {
+        const members: { id: string; before: number; after: number; max: number }[] = [];
         for (const r of run.roster.filter((x) => run.selected.includes(x.id))) {
           const amount = e.ratio !== undefined ? Math.floor(r.maxHp * e.ratio) : (e.amount ?? 0);
+          const before = r.hp;
           // 음수면 체력 손실(이벤트로는 쓰러지지 않는다: 최소 1)
           r.hp = Math.max(Math.min(r.hp, 1), Math.min(r.maxHp, r.hp + amount));
+          members.push({ id: r.id, before, after: r.hp, max: r.maxHp });
         }
-        out.push('출전 동료 회복');
+        // 손실이면 '회복'이라 하지 않는다(2026-10-21 #1374 — 피 묻은 약장수의 체력 -160이 '출전 동료 회복'으로 보였다)
+        const lose = (e.ratio ?? e.amount ?? 0) < 0;
+        const msg = lose ? `출전 동료 체력 ${e.amount !== undefined ? e.amount : `-${Math.round(-(e.ratio ?? 0) * 100)}%`}` : '출전 동료 회복';
+        out.push(msg);
+        note({ kind: 'hp', msg, members });
         break;
+      }
       case 'gain_run_mana':
         run.mana = Math.max(0, Math.min(data.balance.mana.max, run.mana + (e.amount ?? 0)));
         out.push(`마나 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
@@ -1172,7 +1199,15 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push((e.amount ?? 0) <= -99 ? '상흔을 모두 지웠다' : `상흔 ${e.amount}`);
         break;
       case 'gain_abyss_card':
-        if (isAbyss(run)) out.push(gainAbyssCard(data, run, (pool) => rng.pick(pool)));
+        if (isAbyss(run)) {
+          let picked = '';
+          const msg = gainAbyssCard(data, run, (pool) => {
+            const d = rng.pick(pool);
+            picked = d.id;
+            return d;
+          });
+          out.push(picked ? cardMsg(picked, msg) : msg);
+        }
         break;
       case 'reveal_unseen_card':
         if (isAbyss(run)) out.push(revealUnseenCard(data, run, (pool) => rng.pick(pool)));
@@ -1261,7 +1296,12 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           );
           id = pool.length ? rng.pick(pool).id : undefined;
         }
-        if (id) out.push(...gainRelic(data, run, id));
+        if (id) {
+          const had = run.relics.includes(id);
+          const msgs = gainRelic(data, run, id);
+          if (!had && msgs.length) note({ kind: 'relic', id, msg: msgs[0] });
+          out.push(...msgs);
+        }
         else {
           run.gold += 50;
           out.push('더 얻을 유물이 없다 — 골드 +50');
@@ -1271,7 +1311,10 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       case 'gain_potion': {
         const def = data.potions.get(e.potion ?? '');
         if (!def) throw new Error(`gain_potion: 알 수 없는 물약 ${e.potion}`);
-        out.push(gainPotion(data, run, def.id) ? `물약 획득: ${def.name}` : `물약 칸이 가득해 ${def.name}을(를) 두고 왔다`);
+        if (gainPotion(data, run, def.id)) {
+          out.push(`물약 획득: ${def.name}`);
+          note({ kind: 'potion', id: def.id, msg: `물약 획득: ${def.name}` });
+        } else out.push(`물약 칸이 가득해 ${def.name}을(를) 두고 왔다`);
         break;
       }
       default:

@@ -2,7 +2,7 @@
 import { sfx } from '../render/audio';
 import type { GameData } from '../engine/data';
 import type { ModuleDef } from '../engine/schema';
-import { applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, skipReward, upgradeCandidates, type RunState } from '../engine/run';
+import { type RunGain, applyChoice, applyLevelUpgrade, choiceCardPick, choiceNeedsPick, choiceRemovePick, choicesFor, levelUpgradeCandidates, removeCandidates, skipReward, upgradeCandidates, type RunState } from '../engine/run';
 import { capFor, COMMON, loadoutOwners, loadoutPoints, ownedView, swappableCards } from '../engine/collection';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
@@ -11,7 +11,7 @@ import { scarBadge } from './map-view';
 import { chipKind } from './overlay';
 import { gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
-import { potionChip, relicChip } from './items';
+import { gainItemView, potionChip, relicChip } from './items';
 import type { PilgrimOffer } from '../engine/pilgrimage';
 import { describeChoice } from '../engine/text';
 
@@ -44,10 +44,87 @@ function partyStrip(data: GameData, run: RunState): HTMLElement {
   );
 }
 
+const CARD_RARITY: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설' };
+/** "카일 로웬의 희귀 카드" · "공용 고급 카드" */
+function cardOwnerLine(data: GameData, id: string): string {
+  const def = data.cards.get(id);
+  if (!def) return '';
+  const owner = data.characters.get(def.owner)?.name;
+  const rarity = CARD_RARITY[def.rarity] ? `${CARD_RARITY[def.rarity]} ` : '';
+  return owner ? `${owner}의 ${rarity}카드` : `공용 ${rarity}카드`;
+}
+
+/**
+ * 이벤트 결과에서 얻고 잃은 것(2026-10-21 #1374 — 칩에 이름만 있어 무엇을 얻었는지 알 수 없었다):
+ * 체력은 동료별 숫자(잃은 것 / 되찾은 것), 유물·물약은 아이콘·등급·효과, 카드는 카드 모양 그대로
+ */
+function gainsView(data: GameData, run: RunState, gains: RunGain[]): HTMLElement[] {
+  const boxes: HTMLElement[] = [];
+  for (const g of gains) {
+    if (g.kind !== 'hp') continue;
+    const changed = g.members.filter((m) => m.after !== m.before);
+    if (!changed.length) continue;
+    const lose = changed.some((m) => m.after < m.before);
+    boxes.push(
+      h(
+        'div',
+        { class: `gain-box ${lose ? 'lost' : 'healed'}` },
+        h('p', { class: 'gain-label' }, lose ? '잃은 것' : '되찾은 것'),
+        h(
+          'div',
+          { class: 'gain-hp' },
+          changed.map((m) =>
+            h(
+              'span',
+              { class: 'gain-member' },
+              data.characters.get(m.id)?.name ?? m.id,
+              ' ',
+              h('b', {}, `${m.after >= m.before ? '+' : '−'}${Math.abs(m.after - m.before)}`),
+              ' ',
+              h('small', {}, `(${m.before} → ${m.after} / ${m.max})`),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  const items = gains.filter((g) => g.kind !== 'hp');
+  if (items.length)
+    boxes.push(
+      h(
+        'div',
+        { class: 'gain-box got' },
+        h('p', { class: 'gain-label' }, '얻은 것'),
+        items.map((g) =>
+          g.kind === 'card'
+            ? h(
+                'div',
+                { class: 'gain-item gain-card' },
+                cardView(data, g.id),
+                h(
+                  'div',
+                  { class: 'gain-info' },
+                  h('b', {}, data.cards.get(g.id)?.name ?? g.id),
+                  h('span', { class: 'gain-rarity' }, cardOwnerLine(data, g.id)),
+                  h('small', {}, run.abyss ? '덱에 들어갔다.' : '보유 카드에 들어갔다 — 다음 편성부터 고를 수 있다.'),
+                ),
+              )
+            : gainItemView(data, g.kind as 'relic' | 'potion', g.id),
+        ),
+      ),
+    );
+  return boxes;
+}
+
 /** opts.onEditLoadout: 여관에서 편성 바꾸기(GAME_DESIGN 9-1) */
 export function choiceView(data: GameData, run: RunState, module: ModuleDef, onDone: () => void, opts: { onEditLoadout?: () => void } = {}): HTMLElement {
   const box = h('div', { class: 'choice-box panel' });
-  const render = (result?: string[], resultText?: string) => {
+  /** 고른 선택지를 적용하고 결과를 그린다(얻고 잃은 것은 gains로 따로 받아 실물로 보인다) */
+  const choose = (index: number, pick: string | undefined, text?: string) => {
+    const gains: RunGain[] = [];
+    render(applyChoice(data, run, module, index, pick, gains), text, gains);
+  };
+  const render = (result?: string[], resultText?: string, gains: RunGain[] = []) => {
     box.replaceChildren(
       panelHead(TYPE_SEAL[module.type] ?? '事', TYPE_LABEL[module.type] ?? module.type, module.name),
       h('p', { class: 'choice-text' }, module.content.text ?? ''),
@@ -61,7 +138,9 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             h('p', { class: 'pop-eyebrow' }, '결 과'),
             resultText ? h('p', { class: 'result-text' }, resultText) : null,
             // 얻고 잃은 것을 색 칩으로(2026-10-11 결과 팝업 목업)
-            result.length ? h('div', { class: 'pop-chips gains' }, result.map((r) => h('span', { class: `pop-chip ${chipKind(r)}` }, r))) : null,
+            // 유물·카드·물약·체력은 실물로(2026-10-21 #1374), 나머지(골드·상흔·강화 등)는 칩으로
+            ...gainsView(data, run, gains),
+            ((rest) => (rest.length ? h('div', { class: 'pop-chips gains' }, rest.map((r) => h('span', { class: `pop-chip ${chipKind(r)}` }, r))) : null))(result.filter((r) => !gains.some((g) => g.msg === r))),
             module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : null,
             h('button', { class: 'btn btn-primary', onclick: onDone }, '지도로'),
           )
@@ -81,7 +160,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
                     if (remove) return pickRemove(remove.filter, i, c.result);
                     const cardPick = choiceCardPick(c);
                     if (cardPick) return pickOwned(cardPick.op === 'sell_card' ? '넘길 카드' : '바꿀 카드', i, c.result);
-                    render(applyChoice(data, run, module, i), c.result);
+                    choose(i, undefined, c.result);
                   },
                 },
                 h('span', { class: 'choice-mark' }, '▸'),
@@ -117,7 +196,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             { class: 'reward-cards upgrade-cards' },
             ids.map((id) => {
               const el = cardView(data, ownedView(run, id, `own_${id}`));
-              el.addEventListener('click', () => render(applyChoice(data, run, module, index, id), resultText));
+              el.addEventListener('click', () => choose(index, id, resultText));
               return el;
             }),
           )
@@ -138,7 +217,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             { class: 'reward-cards upgrade-cards' },
             list.map((c) => {
               const el = cardView(data, c);
-              el.addEventListener('click', () => render(applyChoice(data, run, module, index, c.uid), resultText));
+              el.addEventListener('click', () => choose(index, c.uid, resultText));
               return el;
             }),
           )
@@ -165,7 +244,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
             { class: 'reward-cards upgrade-cards' },
             list.map((c) => {
               const el = cardView(data, { ...c, level: c.level + 1 });
-              el.addEventListener('click', () => render(applyChoice(data, run, module, index, c.uid), resultText));
+              el.addEventListener('click', () => choose(index, c.uid, resultText));
               return el;
             }),
           )
