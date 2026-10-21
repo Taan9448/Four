@@ -187,7 +187,7 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 세 항(2026-10-12 · 유물은 등급별 점수의 곱 2026-10-21): (1 + 레벨 초과 × 레벨당 + 평균 강화 × upgradePct) × (1 + relicGrowth)^(유물 점수 − 무료), 상한, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12 · 유물은 등급별 점수의 곱, 보스는 지수를 덜 2026-10-21): (1 + 레벨 초과 × 레벨당 + 평균 강화 × upgradePct) × (1 + relicGrowth)^(유물 점수 − 무료), 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
     expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
@@ -210,6 +210,8 @@ describe('순례 — 일행 보정(2)', () => {
     expect(k).toEqual({
       hp: round(Math.min(p.maxHp, (1 + over * p.hpPerLevel + 2 * p.upgradePct) * mul)),
       dmg: round(Math.min(p.maxDmg, (1 + over * p.dmgPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicDmgShare))),
+      bossHp: round(Math.min(p.maxHp, (1 + over * p.hpPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicBossShare))),
+      bossDmg: round(Math.min(p.maxDmg, (1 + over * p.dmgPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicDmgShare * p.relicBossShare))),
       level: over,
       relics: run.relics.length,
       relicPts: Math.round(pts * 10) / 10,

@@ -894,6 +894,8 @@ export const Balance = z
         relicGrowth: z.number().min(0).default(0),
         /** 유물 지수가 적 피해에 붙는 비율(체력에는 그대로) */
         relicDmgShare: z.number().min(0).default(1),
+        /** 보스는 유물 지수를 이 비율만 받는다(보스는 기믹이 있어 체력·피해 배율이 같아도 일반 전투보다 크게 어려워진다) */
+        relicBossShare: z.number().min(0).default(1),
         /** 순례 길에서 가진 유물이 다시 나오면 받는 골드(등급별, 2026-10-21 사용자 결정) */
         dupGold: z.record(z.string(), z.number().int().min(0)).default({}),
         /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 1당(2026-10-12 보정식 세 항) */

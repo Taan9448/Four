@@ -14,6 +14,9 @@ export interface PilgrimScale {
   relicMul?: number;
   epic?: number;
   legendary?: number;
+  /** 보스전 배율(유물 지수를 relicBossShare만큼만). 없으면 hp·dmg 그대로 */
+  bossHp?: number;
+  bossDmg?: number;
   /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 */
   upgrade: number;
 }
@@ -33,9 +36,14 @@ export function measurePilgrimScale(data: GameData, run: Pick<RunState, 'roster'
   const over = Math.max(0, relicPts - p.relicFree);
   const relicMul = Math.pow(1 + p.relicGrowth, over);
   const round = (x: number) => Math.round(x * 100) / 100;
+  const baseHp = 1 + level * p.hpPerLevel + upgrade * p.upgradePct;
+  const baseDmg = 1 + level * p.dmgPerLevel + upgrade * p.upgradePct;
+  const mul = (e: number) => Math.pow(1 + p.relicGrowth, over * e);
   return {
-    hp: round(Math.min(p.maxHp, (1 + level * p.hpPerLevel + upgrade * p.upgradePct) * relicMul)),
-    dmg: round(Math.min(p.maxDmg, (1 + level * p.dmgPerLevel + upgrade * p.upgradePct) * Math.pow(1 + p.relicGrowth, over * p.relicDmgShare))),
+    hp: round(Math.min(p.maxHp, baseHp * relicMul)),
+    dmg: round(Math.min(p.maxDmg, baseDmg * mul(p.relicDmgShare))),
+    bossHp: round(Math.min(p.maxHp, baseHp * mul(p.relicBossShare))),
+    bossDmg: round(Math.min(p.maxDmg, baseDmg * mul(p.relicDmgShare * p.relicBossShare))),
     level,
     relics: run.relics.length,
     relicPts: Math.round(relicPts * 10) / 10,
