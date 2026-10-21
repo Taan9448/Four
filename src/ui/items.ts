@@ -43,6 +43,34 @@ export function potionChip(data: GameData, id: string | null, opts: { onClick?: 
   );
 }
 
+/** 유물이 일어나는 때(얻은 것 상자에 함께 적는다) */
+const RELIC_TRIGGER: Record<string, string> = {
+  battleStart: '전투 시작', turnStart: '차례 시작', turnEnd: '차례 끝', enemyDowned: '적이 쓰러질 때', allyDowned: '동료가 쓰러질 때',
+  cardPlayed: '카드를 낼 때', riftChanged: '균열이 바뀔 때', pickup: '얻을 때', victory: '승리', cleanVictory: '다치지 않고 이길 때',
+  rest: '휴식', shopEnter: '상점', passive: '늘',
+};
+
+/** 얻은 유물·물약 하나를 크게(이벤트 결과, 2026-10-21 #1374): 아이콘 · 이름 · 등급 · 때 · 효과 · 한 줄 이야기 */
+export function gainItemView(data: GameData, kind: 'relic' | 'potion', id: string): HTMLElement {
+  const relic = kind === 'relic' ? data.relics.get(id) : undefined;
+  const potion = kind === 'potion' ? data.potions.get(id) : undefined;
+  const def = relic ?? potion;
+  if (!def) return h('span', {});
+  const rarity = relic ? `${RELIC_RARITY[relic.rarity]} 유물` : `${POTION_RARITY[potion!.rarity]} 물약${potion!.abyss ? ' · 심연 전용' : ''}`;
+  return h(
+    'div',
+    { class: `gain-item gain-${kind} rarity-${def.rarity}` },
+    relic ? h('span', { class: `gain-icon relic-chip rarity-${relic.rarity}` }, relicIcon(relic.icon, relic.glyph)) : h('span', { class: `gain-icon potion-chip rarity-${potion!.rarity}` }, sheetIcon(POTION_SHEETS, potion!.icon, potion!.glyph)),
+    h(
+      'div',
+      { class: 'gain-info' },
+      h('div', { class: 'gain-title' }, h('b', {}, def.name), h('span', { class: 'gain-rarity' }, rarity), relic && RELIC_TRIGGER[relic.trigger] ? h('small', {}, RELIC_TRIGGER[relic.trigger]) : null),
+      h('p', {}, def.description),
+      relic?.flavor ? h('p', { class: 'gain-flavor' }, relic.flavor) : null,
+    ),
+  );
+}
+
 /** 골드 표시 */
 export function goldChip(gold: number): HTMLElement {
   return h('span', { class: 'gold-chip', ...tipAttrs(`골드 ${gold}`, '전투에서 얻고 상점에서 쓴다.') }, h('i', {}), String(gold));

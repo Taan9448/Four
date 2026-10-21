@@ -111,3 +111,29 @@ describe('번개 갈래 스토리(2026-10-12)', () => {
     expect(idx(run)).toBe(-1);
   });
 });
+
+describe('이벤트 결과의 얻고 잃은 것(#1374)', () => {
+  it('피 묻은 약장수: 체력 손실은 "회복"이 아니고, 유물·카드·동료별 체력이 gains로 모인다', async () => {
+    const { applyChoice: choose } = await import('../src/engine/run');
+    const relicRun = createRunAt(data, 'GAIN1', 's3');
+    const gains: import('../src/engine/run').RunGain[] = [];
+    const before = relicRun.roster.filter((r) => relicRun.selected.includes(r.id)).map((r) => r.hp);
+    const out = choose(data, relicRun, mod('any_event_blood_price'), 1, undefined, gains);
+    expect(out).toContain('출전 동료 체력 -160');
+    expect(out).not.toContain('출전 동료 회복');
+    const hp = gains.find((g) => g.kind === 'hp');
+    expect(hp && hp.kind === 'hp' && hp.members.map((m) => m.before)).toEqual(before);
+    expect(hp && hp.kind === 'hp' && hp.members.every((m) => m.after === Math.max(1, m.before - 160))).toBe(true);
+    const relic = gains.find((g) => g.kind === 'relic');
+    expect(relic && relicRun.relics.includes((relic as { id: string }).id)).toBe(true);
+    expect(out).toContain(relic!.msg);
+
+    const cardRun = createRunAt(data, 'GAIN2', 's3');
+    const cardGains: import('../src/engine/run').RunGain[] = [];
+    choose(data, cardRun, mod('any_event_blood_price'), 0, undefined, cardGains);
+    const card = cardGains.find((g) => g.kind === 'card') as { id: string } | undefined;
+    expect(card && ['rare', 'epic'].includes(data.cards.get(card.id)!.rarity)).toBe(true);
+    // gains를 넘기지 않아도 결과는 같다(화면용)
+    expect(applyChoice(data, createRunAt(data, 'GAIN1', 's3'), mod('any_event_blood_price'), 1)).toEqual(out);
+  });
+});
