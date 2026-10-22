@@ -229,7 +229,10 @@ export function renderPrompt(spec, style) {
           : `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
             `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. `) +
         `Only the facial expression and a small change of hands or shoulders differ between cells.\n` +
-        `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n` +
+        // bleed: 거인 클로즈업 — 어깨가 칸 좌우로 잘려 나가되, 칸 사이에 키 색 띠를 남겨 옆 칸과 섞이지 않게 한다(게임은 좌우 6%를 흐린다)
+        (spec.bleed
+          ? `Each cell is its own close-up panel, like three comic panels side by side: the figure is too big to fit, so the shoulders and arms run off the LEFT and RIGHT sides of the panel and are cut off by a straight vertical line 16 px inside the cell border. Leave that 16 px strip of plain ${key.name} at both sides of every cell, top to bottom, so nothing touches or crosses into the neighbouring cell.\n`
+          : `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n`) +
         `${frameLines}\n` +
         `Style: ${style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
         `Never use ${key.name}, pink or purple on the character.\n` +

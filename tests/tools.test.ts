@@ -281,9 +281,12 @@ describe('자르기 → 검증', () => {
     expect(base).toContain('half-body from the top of the head down to the waist');
     const giant = renderPrompt(loadSpec('gormon_stand'), style);
     expect(giant).not.toContain('half-body from the top of the head down to the waist');
-    expect(giant).toContain('FILLS the cell');
+    expect(giant).toContain('CLOSE-UP of the head, shoulders and chest');
     expect(giant).toContain('at exactly the same size and the same position in every cell');
-    expect(giant).toContain('Keep every figure INSIDE its own cell');
+    // bleed: 거인 클로즈업은 어깨가 칸 좌우로 잘려 나가고, 칸 사이에 키 색 띠만 남긴다
+    expect(giant).toContain('cut off by a straight vertical line 16 px inside the cell border');
+    expect(giant).not.toContain('Keep every figure INSIDE its own cell');
+    expect(base).toContain('Keep every figure INSIDE its own cell');
   });
 
   it('manifest는 실제 스프라이트를 임시 시트보다 우선한다', async () => {
