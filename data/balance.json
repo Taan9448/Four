@@ -130,6 +130,11 @@
     "hpPerLevel": 0.18,
     "dmgPerLevel": 0.12,
     "relicPct": { "common": 0.005, "uncommon": 0.007, "rare": 0.01, "epic": 0.015, "legendary": 0.02 },
+    "tiers": [
+      { "name": "거친 길", "hp": 1.5, "dmg": 1.25, "gold": 1.25, "title": "거친 길의 순례자" },
+      { "name": "험한 길", "hp": 2.5, "dmg": 1.6, "gold": 1.5, "title": "험한 길의 순례자" },
+      { "name": "끝의 길", "hp": 4, "dmg": 2.2, "gold": 2, "title": "끝의 길을 걸은 자" }
+    ],
     "upgradePct": 0.10,
     "maxHp": 3.2,
     "maxDmg": 2.6

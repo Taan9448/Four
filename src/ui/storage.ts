@@ -144,6 +144,14 @@ export function recordChallenges(data: GameData, fresh: readonly ChallengeDef[])
   writeAbyssMeta(meta);
 }
 
+/** 칭호를 프로필에 더한다(순례 난이도 단계 칭호 등, 2026-10-22). 이미 있는 것은 그대로 */
+export function recordTitles(titles: readonly string[]): void {
+  if (!titles.length) return;
+  const p = readProfile();
+  for (const t of titles) if (!p.titles.includes(t)) p.titles.push(t);
+  writeStore(PROFILE_KEY, JSON.stringify(p));
+}
+
 /** 심연 기록: 시작(started) 또는 끝(넘은 굽이·점수). 최고 기록이면 갈아 쓴다 */
 export function recordAbyss(result: { started?: boolean; cleared?: number; score?: number }): Profile {
   const p = readProfile();

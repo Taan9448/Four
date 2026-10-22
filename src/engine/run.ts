@@ -104,6 +104,10 @@ export interface RunState {
   challenges?: Record<string, string[]>;
   /** 순례 일행 보정: 출발 편성을 정할 때 고정한 값(GAME_DESIGN 2절, 2026-10-12 보정식 세 항). 없으면 그때그때 센다 */
   pilgrimScale?: PilgrimScale;
+  /** 순례 난이도 단계(2026-10-22, 0·없음 = 기본): 길을 나설 때 고른다 */
+  pilgrimTier?: number;
+  /** 클리어한 런: 스테이지마다 넘긴 가장 높은 순례 난이도 단계(기본으로 넘기면 0) */
+  tierCleared?: Record<string, number>;
   /** 순례 누적(2026-10-21): 이 길을 출발할 때(멈춘 길은 이어서 걸 때)의 모습. 보스를 넘기면 여기서 달라진 만큼을 클리어한 런에 더한다 */
   pilgrimBase?: PilgrimBase;
   /** 이번 스테이지(심연은 굽이)를 시작할 때의 모습 — 끝 화면의 '얻은 것'·'상흔 +N'(2026-10-11 UI/UX 3-2) */
@@ -321,7 +325,7 @@ function buildMap(data: GameData, run: RunState): StageMap {
  * 스테이지 다시 하기(2026-10-08): 캠페인을 마친 런(hub)의 마지막 파티·덱·유물·물약·골드·레벨 그대로 stageId를 처음부터.
  * 다시 하는 런은 hub를 replayOf로 품고, 끝나면 hub로 돌아간다. 순례 누적(2026-10-21): 보스를 넘기면 그 길에서 달라진 것을 hub에 더한다
  */
-export function startReplay(data: GameData, hub: RunState, stageId: string, opts: { fresh?: boolean } = {}): RunState {
+export function startReplay(data: GameData, hub: RunState, stageId: string, opts: { fresh?: boolean; tier?: number } = {}): RunState {
   if (hub.status !== 'complete') throw new Error('캠페인을 마친 런에서만 다시 할 수 있다');
   const stage = playableStages(data).find((s) => s.id === stageId);
   if (!stage) throw new Error(`다시 할 수 없는 스테이지: ${stageId}`);
@@ -347,6 +351,10 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   run.levelLog = [];
   run.pendingUpgrades = [];
   run.pilgrimBase = pilgrimBase(hub);
+  // 순례 난이도 단계: 열린 단계까지만(GAME_DESIGN 2절)
+  delete run.pilgrimTier;
+  const tier = Math.min(opts.tier ?? 0, pilgrimTierOpen(data, hub, stageId));
+  if (tier > 0) run.pilgrimTier = tier;
   // 이 길의 기록(순례 도전 판정용 전투 집계). 클리어한 런의 기록은 그대로 둔다
   run.stats = emptyStats();
   for (const r of run.roster) r.hp = r.maxHp;
@@ -393,6 +401,7 @@ export function finishReplay(data: GameData, run: RunState): RunState {
   carryBack(hub, run);
   if (run.status === 'stage_clear' || run.status === 'complete') {
     hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
+    (hub.tierCleared ??= {})[run.stageId] = Math.max(hub.tierCleared[run.stageId] ?? 0, run.pilgrimTier ?? 0);
     applyPilgrimGains(data, hub, run.pilgrimBase ?? pilgrimBase(hub), run);
     hub.loadout = Object.fromEntries(Object.entries(run.loadout).map(([k, ids]) => [k, ids.filter((id) => hub.collection[id] !== undefined)]));
     hub.selected = [...run.selected];
@@ -414,6 +423,15 @@ export function suspendReplay(run: RunState): RunState {
   delete paused.suspended;
   hub.suspended = { ...(hub.suspended ?? {}), [run.stageId]: paused };
   return hub;
+}
+
+/**
+ * 그 스테이지에서 고를 수 있는 가장 높은 순례 난이도 단계(2026-10-22): 한 단계 아래로 넘겨야 다음이 열린다 — 기본으로 한 번 넘기면 Ⅰ,
+ * Ⅰ로 넘기면 Ⅱ… 아직 기본으로도 넘기지 않았으면 0
+ */
+export function pilgrimTierOpen(data: GameData, hub: Pick<RunState, 'replays' | 'tierCleared'>, stageId: string): number {
+  const won = hub.tierCleared?.[stageId] ?? (hub.replays[stageId] ? 0 : -1);
+  return Math.max(0, Math.min(data.balance.pilgrimage.tiers.length, won + 1));
 }
 
 /** 멈춘 진행을 버린다(그 스테이지는 다음에 처음부터) */
@@ -1374,7 +1392,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
  * 1 + max(0, 하운 레벨 − 기준 레벨) × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한 maxHp·maxDmg(어려움 배율에 곱한다).
  * 출발 편성을 정하면(setLoadout) run.pilgrimScale에 고정한다 — 길에서 레벨·유물·강화가 늘어도 그 길의 적은 그대로
  */
-export function pilgrimScale(data: GameData, run: Pick<RunState, 'replayOf' | 'roster' | 'relics' | 'stageId' | 'loadout' | 'collection'> & { pilgrimScale?: PilgrimScale }): PilgrimScale {
+export function pilgrimScale(data: GameData, run: Pick<RunState, 'replayOf' | 'roster' | 'relics' | 'stageId' | 'loadout' | 'collection' | 'pilgrimTier'> & { pilgrimScale?: PilgrimScale }): PilgrimScale {
   if (!run.replayOf) return { hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 };
   if (run.pilgrimScale) return run.pilgrimScale;
   return measurePilgrimScale(data, run);

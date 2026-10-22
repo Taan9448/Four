@@ -77,6 +77,8 @@ const deckCount = (data: GameData, run: RunState, test: (d: CardDef) => boolean)
 
 /** 길(다시 하는 런)이 그 도전을 채웠는가. 보스전 조건은 이긴 보스전이 있어야 판정된다 */
 export function challengeMet(data: GameData, run: RunState, c: ChallengeDef): boolean {
+  // 순례 난이도 단계가 모자라면 이루지 못한다(2026-10-22)
+  if ((run.pilgrimTier ?? 0) < c.minTier) return false;
   const k = c.check;
   const st = run.stats;
   const n = k.n ?? 0;
@@ -116,9 +118,10 @@ export function challengeMet(data: GameData, run: RunState, c: ChallengeDef): bo
  * 걷는 동안의 상태(지도 오른쪽 칸): done 이미 이룸 · broken 이번 길에서는 깨졌다 · ok 지금까지 지키는 중 · open 보스전에서 판정.
  * 동료·덱 조건은 지금 출전·덱으로 미리 본다(출발 때 '가능/불가')
  */
-export function challengeState(data: GameData, run: RunState, c: ChallengeDef): 'done' | 'broken' | 'ok' | 'open' {
+export function challengeState(data: GameData, run: RunState, c: ChallengeDef): 'done' | 'broken' | 'ok' | 'open' | 'tier' {
   const hub = run.replayOf ?? run;
   if (challengeDone(hub, c)) return 'done';
+  if ((run.pilgrimTier ?? 0) < c.minTier) return 'tier';
   const k = c.check;
   const mates = [...new Set([...matesFought(run), ...run.selected.filter((id) => id !== 'haun')])];
   switch (k.kind) {
@@ -160,4 +163,28 @@ export function challengeUnlockName(data: GameData, c: ChallengeDef): string {
   if (c.unlock.path) return `심연의 ${data.relics.get(c.unlock.path)?.name ?? c.unlock.path}`;
   if (c.unlock.title) return `칭호 「${c.unlock.title}」`;
   return '';
+}
+
+// ───────── 순례 난이도 단계(2026-10-22) ─────────
+
+/** 단계 이름: "순례 Ⅱ · 험한 길"(0 = 기본) */
+export function tierLabel(data: GameData, tier: number | undefined): string {
+  const t = tier ? data.balance.pilgrimage.tiers[tier - 1] : undefined;
+  return t ? `순례 ${ROMAN[tier! - 1] ?? tier} · ${t.name}` : '기본';
+}
+const ROMAN = ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'];
+export const tierNumeral = (tier: number): string => ROMAN[tier - 1] ?? String(tier);
+
+/**
+ * 이 길에서 보스를 넘기면 새로 얻는 단계 칭호: 순례할 스테이지(S0 빼고) 전부를 그 단계 이상으로 넘긴 단계의 title.
+ * 이미 얻었던(이 길 전에도 다 넘긴) 단계는 빼고 돌려준다
+ */
+export function tierTitlesWon(data: GameData, run: RunState): string[] {
+  const hub = run.replayOf;
+  const tier = run.pilgrimTier ?? 0;
+  if (!hub || !tier || (run.status !== 'stage_clear' && run.status !== 'complete')) return [];
+  const stages = data.stages.filter((s) => s.playable && s.id !== 's0').map((s) => s.id);
+  const before = (k: number, map: Record<string, number>) => stages.every((id) => (map[id] ?? -1) >= k);
+  const now = { ...(hub.tierCleared ?? {}), [run.stageId]: Math.max(hub.tierCleared?.[run.stageId] ?? 0, tier) };
+  return data.balance.pilgrimage.tiers.flatMap((t, i) => (before(i + 1, now) && !before(i + 1, hub.tierCleared ?? {}) ? [t.title] : []));
 }

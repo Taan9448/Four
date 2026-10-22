@@ -2,10 +2,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { acquireCard, setLoadout, upgradeOwned } from '../src/engine/collection';
 import { emptyCodex, noteRun, recordsCards } from '../src/engine/codex';
-import { battleSetupFor, createRunAt, enterNode, finishReplay, gainRelic, measurePilgrimScale, pilgrimScale, startReplay, suspendReplay } from '../src/engine/run';
+import { battleSetupFor, createRunAt, enterNode, finishReplay, gainRelic, measurePilgrimScale, pilgrimScale, pilgrimTierOpen, startReplay, suspendReplay } from '../src/engine/run';
 import { rollLoot } from '../src/engine/economy';
 import { deserializeRun, serializeRun } from '../src/engine/save';
-import { challengeMet, challengeState, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../src/engine/pilgrimage';
+import { challengeMet, challengeState, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges, tierTitlesWon } from '../src/engine/pilgrimage';
 import { unlockedPaths, unlockedRift } from '../src/engine/abyss';
 import { mainTitle, readAbyssMeta, readProfile, recordChallenges, setMainTitle, slotTitle } from '../src/ui/storage';
 import { data } from './helpers';
@@ -396,5 +396,69 @@ describe('순례 — 자유 편성(2026-10-11 사용자 요청: 하운 고정 �
     expect(state.result).toBeFalsy();
     loseHp(state, state.party[1], 9999);
     expect(state.result).toBe('defeat');
+  });
+});
+
+describe('순례 난이도 단계(2026-10-22)', () => {
+  const tiers = data.balance.pilgrimage.tiers;
+  it('한 단계 아래로 넘겨야 다음 단계가 열리고, 고른 단계는 열린 데까지만', () => {
+    let hub = cleared('PILT1');
+    expect(pilgrimTierOpen(data, hub, 's2')).toBe(0);
+    expect(startReplay(data, hub, 's2', { tier: 3 }).pilgrimTier).toBeUndefined();
+    for (let k = 0; k <= tiers.length; k++) {
+      const run = startReplay(data, hub, 's2', { tier: k });
+      expect(run.pilgrimTier ?? 0).toBe(k);
+      run.status = 'stage_clear';
+      hub = finishReplay(data, run);
+      expect(pilgrimTierOpen(data, hub, 's2')).toBe(Math.min(tiers.length, k + 1));
+    }
+    expect(hub.tierCleared?.s2).toBe(tiers.length);
+    // 다른 스테이지는 따로
+    expect(pilgrimTierOpen(data, hub, 's3')).toBe(0);
+  });
+
+  it('일행 보정(상한까지 센 값)에 단계의 체력·피해를 곱하고, 전투 골드를 곱한다', () => {
+    const hub = cleared('PILT2');
+    hub.replays.s4 = 1;
+    hub.tierCleared = { s4: 1 };
+    const base = startReplay(data, hub, 's4');
+    const run = startReplay(data, hub, 's4', { tier: 2 });
+    const k0 = measurePilgrimScale(data, base);
+    const k = measurePilgrimScale(data, run);
+    expect(k.tier).toBe(2);
+    expect(k.hp).toBeCloseTo(k0.hp * tiers[1].hp, 1);
+    expect(k.dmg).toBeCloseTo(k0.dmg * tiers[1].dmg, 1);
+    const node = run.map.floors[0][0];
+    const g0 = rollLoot(data, base, node).gold;
+    const g = rollLoot(data, run, node).gold;
+    // 같은 시드·노드면 같은 굴림 — 단계 골드만큼(반올림 차이 1 안)
+    expect(Math.abs(g - g0 * tiers[1].gold)).toBeLessThanOrEqual(tiers[1].gold);
+  });
+
+  it('단계 도전은 그 단계 이상으로 걸은 길에서만 이루고, 모든 스테이지를 그 단계로 넘기면 칭호', () => {
+    const hub = cleared('PILT3');
+    const c = [...data.challenges.values()].find((x) => x.stage === 's1' && x.minTier === 2 && x.check.kind === 'noDowned')!;
+    hub.replays.s1 = 1;
+    hub.tierCleared = { s1: 1 };
+    const low = startReplay(data, hub, 's1', { tier: 1 });
+    low.status = 'stage_clear';
+    expect(challengeMet(data, low, c)).toBe(false);
+    expect(challengeState(data, low, c)).toBe('tier');
+    const high = startReplay(data, hub, 's1', { tier: 2 });
+    high.status = 'stage_clear';
+    expect(challengeMet(data, high, c)).toBe(true);
+    // 칭호: 나머지 스테이지를 이미 Ⅱ로 넘겼다면, s1을 Ⅱ로 넘길 때 Ⅱ 칭호(Ⅰ은 s1을 Ⅰ로 넘겼을 때 이미 얻었다)
+    const stages = data.stages.filter((s) => s.playable && s.id !== 's0').map((s) => s.id);
+    for (const id of stages) if (id !== 's1') {
+      hub.replays[id] = 1;
+      hub.tierCleared![id] = 2;
+    }
+    const run = startReplay(data, hub, 's1', { tier: 2 });
+    run.status = 'stage_clear';
+    expect(tierTitlesWon(data, run)).toEqual([tiers[1].title]);
+    hub.tierCleared!.s1 = 2;
+    const again = startReplay(data, hub, 's1', { tier: 2 });
+    again.status = 'stage_clear';
+    expect(tierTitlesWon(data, again)).toEqual([]);
   });
 });

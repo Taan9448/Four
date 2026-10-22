@@ -371,12 +371,20 @@ describe('데이터 검사', () => {
     expect(bad).toEqual([]);
   });
 
-  it('(e) 순례 도전(GAME_DESIGN 2절): S1~S9 스테이지마다 3개(27개), 조건마다 필요한 값, 여는 것은 하나(틈의 카드·길·칭호), 중복 없음', () => {
+  it('(e) 순례 도전(GAME_DESIGN 2절): S1~S9 스테이지마다 기본 3개 + 단계 도전 2개(Ⅱ·Ⅲ, 칭호), 조건마다 필요한 값, 여는 것은 하나(틈의 카드·길·칭호), 중복 없음', () => {
     const bad: string[] = [];
     const list = [...data.challenges.values()];
     const stages = playableStages(data).filter((s) => s.id !== 's0');
-    for (const st of stages) if (list.filter((c) => c.stage === st.id).length !== 3) bad.push(`${st.id}: 도전이 3개가 아니다`);
-    if (list.length !== 27) bad.push(`도전 ${list.length}개(27개여야)`);
+    const tiers = data.balance.pilgrimage.tiers.length;
+    for (const st of stages) {
+      const mine = list.filter((c) => c.stage === st.id);
+      if (mine.filter((c) => !c.minTier).length !== 3) bad.push(`${st.id}: 기본 도전이 3개가 아니다`);
+      if (mine.filter((c) => c.minTier === 2).length !== 1 || mine.filter((c) => c.minTier === 3).length !== 1) bad.push(`${st.id}: 단계 도전(Ⅱ·Ⅲ)이 하나씩이 아니다`);
+    }
+    for (const c of list) {
+      if (c.minTier > tiers) bad.push(`${c.id}: 없는 단계 ${c.minTier}`);
+      if (c.minTier && !c.unlock.title) bad.push(`${c.id}: 단계 도전의 보상은 칭호`);
+    }
     const seen = new Set<string>();
     for (const c of list) {
       if (!stages.some((s) => s.id === c.stage)) bad.push(`${c.id}: 순례할 수 없는 스테이지 ${c.stage}`);

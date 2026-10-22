@@ -295,6 +295,15 @@ h1, h2, h3 { font-family: var(--f-head); }
 .challenge-list li small { font-size: var(--fs-min); color: #9fd0ff; }
 .challenge-list li.done { border-color: rgba(226, 180, 92, 0.6); }
 .challenge-list li.done b { color: #e6c36a; }
+.challenge-list .ch-tier { font-style: normal; font-size: var(--fs-min); color: #ffb38a; }
+.place-tier { color: #ffb38a; }
+.tier-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tier-head { font-size: var(--fs-sub); color: #cfcabe; margin-right: 4px; }
+.tier-chip { min-width: 52px; min-height: 36px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); color: var(--ink); font: inherit; font-family: var(--f-head); cursor: pointer; }
+.tier-chip.cleared { border-color: rgba(226, 180, 92, 0.55); }
+.tier-chip.on { background: rgba(255, 138, 92, 0.18); border-color: #ff8a5c; color: #ffd9c7; }
+.tier-chip:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (max-width: 640px) { .tier-chip { min-height: 44px; } }
 .place-dialog .confirm-actions .btn small { display: block; font-size: var(--fs-min); font-weight: 400; opacity: 0.8; }
 .stop .pilgrim-dot { position: absolute; top: -3px; right: -3px; width: 7px; height: 7px; border-radius: 50%; background: #f2c46b; box-shadow: 0 0 5px rgba(242, 196, 107, 0.9); pointer-events: none; }
 .stop .challenge-tag { padding: 0 5px; border-radius: 8px; background: rgba(16, 13, 10, 0.78); color: #cfcabe; font-size: var(--fs-min); }

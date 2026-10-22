@@ -889,6 +889,14 @@ export const Balance = z
         dmgPerLevel: z.number().min(0),
         /** 유물 한 개당(등급별, 2026-10-21 사용자 결정 — 영웅·전설이 더 무겁게). 없는 등급(길 유물)은 0 */
         relicPct: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'path']), z.number().min(0)),
+        /**
+         * 순례 난이도 단계(2026-10-22 사용자 결정 — 쌓을수록 쉬워진 뒤의 엔드 콘텐츠): 길을 나설 때 고른다(0 = 기본, 1부터 이 목록).
+         * 일행 보정(상한까지 센 값)에 체력·피해를 곱하고, 전투 골드를 곱한다. 그 스테이지를 한 단계 아래로 넘겨야 열린다.
+         * title: 순례할 스테이지 전부를 이 단계 이상으로 넘기면 얻는 칭호
+         */
+        tiers: z
+          .array(z.object({ name: z.string(), hp: z.number().min(1), dmg: z.number().min(1), gold: z.number().min(1), title: z.string() }).strict())
+          .default([]),
         /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 1당(2026-10-12 보정식 세 항) */
         upgradePct: z.number().min(0).default(0),
         maxHp: z.number().min(1),
@@ -1249,6 +1257,8 @@ export const ChallengeDef = z
         cardType: z.enum(['attack', 'skill', 'power']).optional(),
       })
       .strict(),
+    /** 이 순례 난이도 단계 이상으로 걸은 길에서만 이룬다(2026-10-22, 0 = 기본) */
+    minTier: z.number().int().min(0).default(0),
     unlock: z.object({ card: z.string().optional(), path: z.string().optional(), title: z.string().optional() }).strict(),
   })
   .strict();
