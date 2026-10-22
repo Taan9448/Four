@@ -1,16 +1,17 @@
 id: gormon_stand
 type: character-standing
 character: gormon
-summary: 고르몬 반신 그림(기본·결의·놀람) — 거인 체격으로 다시 그림(2026-10-22, 전투 그림보다 왜소해 보여서)
+summary: 고르몬 반신 그림(기본·결의·놀람) — 거인 클로즈업으로 다시 그림(2026-10-22, 칸에 몸 전체를 구겨 넣지 않고, 머리·어깨만 크게 잘라 보여 준다)
+bleed: true
 framing: >-
-  Gormon is a GIANT of rock fused with the mountain, each finger as large as a man's torso, not a man-sized figure, so draw a massive, overwhelming hunched colossus that FILLS the cell.
-  Crop tighter than a normal half-body: from just above the head down to the huge fists, cut off cleanly by the bottom edge with no empty background below.
-  The low camera looks up at him so he looms over the viewer. He is hunched forward like a gorilla: the head sits LOW and small, sunk between enormous boulder shoulders that rise above it,
-  the shoulders and arms span almost the whole cell width, right up to the 40 px side margin, and the giant fists sit in front at the bottom of the cell.
-  Roots, moss and cracks of stone spread from his back and shoulders, and jagged mountain rock grows out of his back as part of his body (no scenery behind him), like his battle sprite.
-  Never human proportions, never a bodybuilder-sized man, and never shrink the figure to leave empty background around it.
+  Gormon is a GIANT of rock fused with the mountain, each finger as large as a man's torso. Frame him as a CLOSE-UP of the head, shoulders and chest only: he
+  is hunched forward, so two enormous boulder shoulders with roots and moss rise high on both sides near the top of the cell and run off both panel sides; the
+  rock head is LARGE, about 40% of the cell width, sunk between the shoulders with the lava-red eyes at about one third of the cell height; jagged mountain
+  rock grows from his back above the shoulders as part of his body (no scenery); the chest fills the lower cell and is cut off by the bottom edge. The low
+  camera looks up at him so he looms over the viewer. Do NOT show the whole silhouette and do NOT squeeze the body to fit the narrow cell: it is a close-up of
+  something far too big for the frame, and the parts that do not fit are simply cut off by the panel sides and the bottom edge.
 frame_notes:
-  1: "neutral expression — a hunched rock giant fused with the cave wall, the small head sunk between boulder shoulders, lava-red eyes half-lidded, huge fists resting in front"
-  2: "resolute expression — the stone mouth grinding open, lava-red eyes blazing, one giant fist lifted toward the viewer"
-  3: "surprised expression — a crack running between the giant and the mountain, lava light leaking from it"
+  1: "neutral expression — a large rock face sunk between two mountain-like shoulders that run off both sides, lava-red eyes half-lidded"
+  2: "resolute expression — the stone mouth grinding open, lava-red eyes blazing, the top of one giant fist rising into the frame from below"
+  3: "surprised expression — a crack running between the giant and the mountain on one shoulder, lava light leaking from it"
 placeholder: { color: '#4a3426', accent: '#ff3b3b' }
