@@ -685,10 +685,11 @@ export function playPilgrimage(data: GameData, hub: RunState, stageId: string, o
 }
 
 /** 순례 길 하나를 걷고 클리어 지도로 돌아온다(순례 누적 — 이기면 길에서 얻은 것이 남은 hub, hub는 건드리지 않는다) */
-export function walkPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): { report: RunReport; hub: RunState } {
+export function walkPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0, tier = 0): { report: RunReport; hub: RunState } {
   const h = structuredClone(hub);
   h.replays[stageId] = nth;
-  const run = startReplay(data, h, stageId);
+  // 순례 난이도 단계(열린 데까지만 — hub.tierCleared)
+  const run = startReplay(data, h, stageId, { tier });
   const report = driveRun(data, run, `${hub.seed}:${stageId}:${nth}`, opts);
   return { report, hub: finishReplay(data, run) };
 }

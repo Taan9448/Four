@@ -149,6 +149,8 @@ export function placeDialog(
             chips.push(b);
             return b;
           }),
+          // 휴대폰에서는 툴팁이 안 보이므로 다음 단계가 열리는 조건을 글로
+          open < tiers.length ? h('small', { class: 'tier-hint' }, `${open === 0 ? '기본' : tierNumeral(open)}으로 넘기면 ${tierNumeral(open + 1)} 열림`) : null,
         );
   const ov = openOverlay(
     placeName(st, hub),

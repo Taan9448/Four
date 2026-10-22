@@ -298,6 +298,7 @@ h1, h2, h3 { font-family: var(--f-head); }
 .challenge-list .ch-tier { font-style: normal; font-size: var(--fs-min); color: #ffb38a; }
 .place-tier { color: #ffb38a; }
 .tier-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tier-hint { font-size: var(--fs-min); color: var(--ink-dim); margin-left: 4px; }
 .tier-head { font-size: var(--fs-sub); color: #cfcabe; margin-right: 4px; }
 .tier-chip { min-width: 52px; min-height: 36px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); color: var(--ink); font: inherit; font-family: var(--f-head); cursor: pointer; }
 .tier-chip.cleared { border-color: rgba(226, 180, 92, 0.55); }
