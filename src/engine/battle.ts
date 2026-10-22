@@ -1,6 +1,6 @@
 // 전투 진행: 생성 → 플레이어 턴(카드 사용) → 턴 종료 → 적 턴 → 다음 턴.
 import type { GameData } from './data';
-import type { Effect, Element, MoveDef, World, WorldMana } from './schema';
+import type { Effect, Element, ModuleBossGate, MoveDef, World, WorldMana } from './schema';
 import type { Rng } from './rng';
 import {
   addEcho,
@@ -86,6 +86,8 @@ export interface BattleSetup {
   laws?: string[];
   /** 적마다 덧붙이는 것(심연 접사·숙적 성장). enemies와 같은 순서 */
   enemyMods?: (EnemyMod | undefined)[];
+  /** 보스 2막(모듈 content.bossGate): 첫 보스에 건다 */
+  bossGate?: ModuleBossGate;
 }
 
 /** 세계별 전투 시작 균열 상한(없으면 0) */
@@ -119,6 +121,17 @@ export function createBattle(data: GameData, setup: BattleSetup): BattleState {
     const mod = setup.enemyMods?.[i];
     enemies.push(spawnEnemy(spawnCtx, id, i, lawTraits.length ? { ...mod, traits: [...(mod?.traits ?? []), ...lawTraits] } : mod));
   });
+
+  // 보스 2막: 첫 보스에 관문을 걸고, holdTraits면 정의의 특성을 1막 동안 재운다
+  const gated = setup.bossGate ? enemies.find((e) => data.enemies.get(e.defId)?.tier === 'boss') : undefined;
+  if (gated && setup.bossGate) {
+    const { ratio, text, refill, surge, partyEffects, holdTraits } = setup.bossGate;
+    gated.gate = { ratio, text, refill, surge, partyEffects };
+    if (holdTraits) {
+      gated.heldTraits = Object.fromEntries((data.enemies.get(gated.defId)?.traits ?? []).map((t) => [t.status, gated.statuses[t.status] ?? t.stacks]));
+      for (const id of Object.keys(gated.heldTraits)) delete gated.statuses[id];
+    }
+  }
 
   let worldMana = setup.manaRule ?? bal.mana.worlds[setup.world];
   // 법칙: 마나가 차지 않는다 등(마나 회복 덮어쓰기)
@@ -645,7 +658,7 @@ export function cloneBattle(s: BattleState): BattleState {
     rng: s.rng.clone(),
     critRng: s.critRng?.clone(),
     party: s.party.map(unit),
-    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], roundUsed: e.roundUsed ? [...e.roundUsed] : undefined, usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, intent: e.intent ? { ...e.intent } : null })),
+    enemies: s.enemies.map((e) => ({ ...unit(e), lastMoves: [...e.lastMoves], roundUsed: e.roundUsed ? [...e.roundUsed] : undefined, usedOnce: e.usedOnce ? [...e.usedOnce] : undefined, phaseFired: e.phaseFired ? [...e.phaseFired] : undefined, phasePending: e.phasePending, heldTraits: e.heldTraits ? { ...e.heldTraits } : undefined, intent: e.intent ? { ...e.intent } : null })),
     draw: cards(s.draw),
     hand: cards(s.hand),
     discard: cards(s.discard),

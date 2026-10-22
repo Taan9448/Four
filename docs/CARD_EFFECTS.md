@@ -225,6 +225,12 @@
 - `partyEffects`: 변신 순간 하운을 출처로 일어나는 전투 동작(원작 연출: 엘리아의 마나 `gain_mana`, `add_card … to: hand`).
 - 예: 사무결 → 붉은 거인 사무결(S8 혈전), 모르데카이 → 찢긴 경계(S9 마지막 한 땀). 전투 이벤트 `transform`으로 화면에서 같은 자리에 새 모습으로 다시 그린다.
 
+**보스 2막(체력 관문)** — 모듈 `content.bossGate: { ratio, text, holdTraits?, refill?, surge?, partyEffects? }`(2026-10-22, S9 모르데카이)
+- 첫 보스의 체력이 최대 체력 × ratio 아래로 내려가는 순간(피해·체력 잃기 모두) 거기서 멈추고 한 번 연다. `holdTraits`: 적 정의의 특성(흐름 포식·매듭 등)이 1막 동안 잠들었다 이때 깨어난다. `refill`: 체력이 다시 가득. `surge`: 균열 스택과 상관없이 폭주. `partyEffects`: 하운을 출처로(고리 멈추기 카드 등). 전투 이벤트 `gate`(알림·흔들림, 그 적의 첫 안내).
+- 모듈에 거는 것이라 같은 적을 쓰는 다른 모듈(심연의 숙적)에는 걸리지 않는다.
+
+**폭주 메우기** — 적 `sealsSurge: true`(찢긴 경계): 쓰러지면 그 전투의 폭주 하나(폭주 수와 그 몫의 상흔 `rift.surgeScar`)가 메워진다. 전투 이벤트 `sealSurge`.
+
 ## 6. 전투 마나 규칙
 
 세계 기본값 `balance.mana.worlds[world]`(`battleStart: full | carry | 숫자`, `perTurn`)을 스테이지 `mana`, 모듈 `content.mana` 순으로 덮어쓴다(`GAME_DESIGN.md` 6절). 모듈 `content.startEffects`는 전투 시작에 언제나 일어나는 전투 동작이다(이그니스전의 '흐름에 올라타기', 모르데카이전의 '고리 멈추기'를 손패에).

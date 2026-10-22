@@ -591,6 +591,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       manaRule: mana ?? own?.mana ?? stage.mana,
       riftDecay: enc.module.content.riftDecay,
       riftDecayNote: enc.module.content.riftDecayNote,
+      bossGate: enc.module.content.bossGate,
       // 서약 '두꺼운 살'
       enemyHpScale: scale.hp * norm.hp * (runOath(data, run).enemyHpMul ?? 1) * modScale.hp,
       enemyDmgScale: scale.dmg * norm.dmg * shadow * boss * modScale.dmg,
@@ -622,6 +623,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
     manaRule: mana ?? stage.mana,
     riftDecay: enc.module.content.riftDecay,
     riftDecayNote: enc.module.content.riftDecayNote,
+    bossGate: enc.module.content.bossGate,
     enemyHpScale: stage.enemyHpScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).hp : 1) * pilgrim.hp * modScale.hp,
     enemyDmgScale:
       stage.enemyDmgScale * (run.difficulty === 'hard' ? hardMul(data, stage.id).dmg : 1) * (enc.node.type === 'boss' ? stage.bossDmgMul : 1) * pilgrim.dmg * modScale.dmg,
