@@ -34,6 +34,12 @@ describe('이펙트 규칙(data/fx.json)', () => {
     for (const id of Object.keys(data.fx.statusFx ?? {})) expect(data.statuses.has(id), id).toBe(true);
   });
 
+  it('졸음이 걸리면 초승달·잠 안개 — 수면 카드 모두 같은 연출(2026-10-22)', () => {
+    expect(statusFx(data, 'drowsy')).toBe('fx_sleep_mist');
+    const sleepers = [...data.cards.values()].filter((c) => JSON.stringify(c.effects).includes('"drowsy"'));
+    expect(sleepers.length).toBeGreaterThanOrEqual(5);
+  });
+
   it('공격 카드는 모두 공격 이펙트나 피격 이펙트 중 하나는 따로 받는다(흰 타격 별 하나로 끝나지 않는다)', () => {
     const plain = [...data.cards.values()].filter((c) => c.type === 'attack' && c.owner !== 'common' && c.owner !== 'status').filter((c) => {
       const f = cardFx(data, c);
