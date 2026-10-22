@@ -1,0 +1,30 @@
+id: card_frame_forge_9_fusion
+type: card-frame
+summary: >-
+  REFORGED +9 card frame: the whole frame remade in dark violet star-steel with lightning — fusion layout
+# 대강화 +9 융합 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다). card_frame_fusion와 자리(layout)가 같고
+# 재질·장식만 +9(보랏빛 번개)로 바뀐다. 그림이 오면 게임이 card_frame_fusion 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_9)
+reference: assets/source/card_frame_fusion.png
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14], [113, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+slots: { name: [8, 81, 112, 13], text: [13, 109, 102, 56], plaque: [33, 172, 62, 11] }
+window_shape: an upright oval with a flat bottom
+banner: "a deep violet ribbon (#4b3a6b, #6b4fa3) edged with pale lightning-silver (#d4b8ff, #f1efe6) and with dark steel ends"
+text_panel: "warm off-white hanji paper (#f1efe6, #e0cfae), the same on both halves"
+symmetric: false
+# 보라 번개 틀 — 키 색(마젠타)과 먼 보라(팔레트의 #4b3a6b·#6b4fa3·#a35cff·#d4b8ff)만 쓴다
+allow_purple: true
+frame_notes:
+  1: >-
+    keep exactly the same shapes and positions as the fusion card frame (reference: assets/sprites/card_frame_fusion/frame_01.png): the same
+    art window, cost socket(s), name banner, rarity socket, text box and type plaque; only the materials and ornaments change.
+    the WHOLE border is reforged in dark violet star-steel: deep violet-black metal plates (#2b2b3a, #4b3a6b, #6b4fa3) with bright violet lightning veins (#a35cff, #d4b8ff) crackling across them, a violet glow line around the art window, a small faceted violet crystal (#a35cff, #d4b8ff) at each corner; the outer edge is near-black (#0b0b10); the vertical seam down the middle of the card remains, so the card still reads as two halves (the left half with touches of dark lacquered wood #4a3426, the right half with touches of deep blue leather #1f3f73) joined by a bright metal seam
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#4b3a6b', accent: '#a35cff', panel: '#f1efe6', banner: '#6b4fa3' }

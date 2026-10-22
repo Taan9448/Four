@@ -1,0 +1,29 @@
+id: card_frame_forge_10_murim
+type: card-frame
+summary: >-
+  REFORGED +10 AWAKENED card frame: the whole frame remade as a radiant golden relic — murim layout
+# 대강화 +10 무공 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다). card_frame_murim와 자리(layout)가 같고
+# 재질·장식만 +10(금빛 각성)로 바뀐다. 그림이 오면 게임이 card_frame_murim 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_10)
+reference: assets/source/card_frame_murim.png
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+slots: { name: [10, 81, 108, 15], text: [13, 110, 102, 57], plaque: [34, 174, 60, 12] }
+window_shape: >-
+  a round moon gate: the top is a half circle and the sides run straight down to a flat bottom, like the round opening of an
+  East Asian garden wall
+banner: "a crimson ribbon (#a02634, #5a1020) edged with bright gold (#f2a93b, #ffe08a) and with gold-capped ends"
+text_panel: "warm off-white hanji paper (#f1efe6, #e0cfae)"
+frame_notes:
+  1: >-
+    keep exactly the same shapes and positions as the murim card frame (reference: assets/sprites/card_frame_murim/frame_01.png): the same
+    art window, cost socket(s), name banner, rarity socket, text box and type plaque; only the materials and ornaments change.
+    the WHOLE border is reforged as an awakened golden relic: polished gold plates (#b8741a, #f2a93b, #ffe08a) with red lacquer inlays (#a02634, #5a1020), small flame-shaped gold flourishes (#ff8a5c, #ffe08a) licking up both sides, a radiant gold sunburst crest at the middle of the top border, a bright gold glow line around the art window, gold sunburst ornaments with a white-gold core (#f1efe6) at the corners; the outer edge is dark (#2a1d16); a few touches of the martial arts frame remain: thin strips of dark lacquered wood (#2a1d16, #4a3426) between the metal plates and small cloud-scroll (xiangyun) shapes in the corner ornaments
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#b8741a', accent: '#ffe08a', panel: '#f1efe6', banner: '#a02634' }

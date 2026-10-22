@@ -18,12 +18,12 @@ function forgeClass(card: ResolvedCard): string {
   return card.forge >= 3 ? ` card-forged forge-${card.level}` : card.forge ? ' card-forged' : '';
 }
 
-/** 대강화 각인·각성 표식: 카드 오른쪽 위에 새긴 순서대로 한 글자씩(각성은 금빛) */
-function marksView(card: ResolvedCard): HTMLElement | null {
+/** 대강화 각인·각성 표식: 카드 오른쪽 위에 새긴 순서대로 한 글자씩(각성은 금빛). belowCost: 오른쪽 위에 마나 비용 보석이 있으면 그 아래로(2026-10-22) */
+function marksView(card: ResolvedCard, belowCost = false): HTMLElement | null {
   if (!card.engravings.length && !card.awakening) return null;
   return h(
     'div',
-    { class: 'card-marks-wrap', 'aria-label': `각인 ${card.engravings.map((m) => m.name).join('·')}${card.awakening ? ` · 각성 ${card.awakening.name}` : ''}` },
+    { class: `card-marks-wrap${belowCost ? ' marks-below-cost' : ''}`, 'aria-label': `각인 ${card.engravings.map((m) => m.name).join('·')}${card.awakening ? ` · 각성 ${card.awakening.name}` : ''}` },
     card.engravings.length ? h('div', { class: 'card-marks' }, ...card.engravings.map((m) => h('span', { class: 'card-mark', title: `${m.name}: ${m.text}` }, m.glyph))) : null,
     card.awakening ? h('span', { class: 'card-mark card-mark-awaken', title: `${card.awakening.name}: ${card.awakening.text}` }, card.awakening.glyph) : null,
   );
@@ -31,6 +31,8 @@ function marksView(card: ResolvedCard): HTMLElement | null {
 
 /** 픽셀 카드 틀(Codex 그림 card_frame_*, 2026-10-11). 상태·저주는 무공 틀을 어둡게 */
 const FRAME_ID: Record<CardWorld, string> = { murim: 'card_frame_murim', elheim: 'card_frame_magic', fusion: 'card_frame_fusion', status: 'card_frame_murim' };
+/** 대강화 +8·+9·+10 틀 전체(card_frame_forge_<단계>_<세계>, 2026-10-22 — 테두리만 바뀌어 카드가 그대로였다). 그림이 오면 기본 틀 대신 */
+const FORGE_WORLD: Record<CardWorld, string> = { murim: 'murim', elheim: 'magic', fusion: 'fusion', status: 'murim' };
 /** card_gems 칸 번호: 1 내공 비용 · 2 마나 비용 · 3~7 등급 */
 const GEM_CELL: Record<string, number> = { neigong: 1, mana: 2, common: 3, uncommon: 4, rare: 5, epic: 6, legendary: 7 };
 /** 명세(specs/assets/card_frame_*.yaml)의 layout.art — 그림이 meta.window를 남기지 않았을 때 */
@@ -116,7 +118,11 @@ function pixelCardView(
   const owner = data.characters.get(def.owner);
   const realOnly = !isPxCardsPreview();
   const gem = (key: string) => frameUrl('card_gems', GEM_CELL[key], { realOnly });
-  const [wx, wy, ww, wh] = spriteMeta(FRAME_ID[world])?.window ?? ART_WINDOW;
+  // +8·+9·+10: 그 단계의 틀 전체가 왔으면 기본 틀 대신(자리는 같다 — 그림 창·글 자리는 그 틀의 meta로). 안 왔으면 기본 틀 위에 겹치는 테두리
+  const fullId = card.forge >= 3 ? `card_frame_forge_${card.level}_${FORGE_WORLD[world]}` : null;
+  const fullFrame = fullId ? frameUrl(fullId, 1, { realOnly }) : null;
+  const frameId = fullFrame ? fullId! : FRAME_ID[world];
+  const [wx, wy, ww, wh] = spriteMeta(frameId)?.window ?? spriteMeta(FRAME_ID[world])?.window ?? ART_WINDOW;
   // 비용: 내공·마나 중 있는 것을 왼쪽부터(융합은 왼쪽 내공 · 오른쪽 마나). 0이면 틀의 기본 자원으로 0
   const costs = (
     [
@@ -137,7 +143,7 @@ function pixelCardView(
   // 글씨 크기: 본문과 특수 스킬을 합친 길이로(특수 스킬 줄은 한 줄 몫을 더 친다)
   const len = parts.body.length + parts.skills.reduce((a, sk) => a + sk.name.length + sk.text.length + 10, 0);
   const textSize = len > 72 ? ' cpx-text-xs' : len > 54 ? ' cpx-text-s' : len > 36 ? ' cpx-text-m' : '';
-  const slots = spriteMeta(FRAME_ID[world])?.slots;
+  const slots = spriteMeta(frameId)?.slots ?? spriteMeta(FRAME_ID[world])?.slots;
   const at = (b: number[] | undefined, pad = 0) => (b ? `left:${b[0] + pad}px;top:${b[1] + pad}px;width:${b[2] - pad * 2}px;height:${b[3] - pad * 2}px` : '');
   const name = def.name + (card.level ? ` +${card.level}` : '');
   const nameSize = name.length > 9 ? ' cpx-name-s' : name.length > 7 ? ' cpx-name-m' : '';
@@ -145,7 +151,7 @@ function pixelCardView(
   const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '武';
   const artUrl = cardArtUrl(def.id);
   const shine = def.rarity === 'epic' || def.rarity === 'legendary';
-  const forgeFrame = card.forge >= 3 ? frameUrl(`card_frame_forge_${card.level}`, 1, { realOnly }) : null;
+  const forgeFrame = card.forge >= 3 && !fullFrame ? frameUrl(`card_frame_forge_${card.level}`, 1, { realOnly }) : null;
   return h(
     'div',
     {
@@ -164,10 +170,10 @@ function pixelCardView(
     // 영웅·전설의 움직임(2026-10-11): 테두리 빛(어디서나) · 그림 창 광택 · 전설은 금빛 티끌(손패·보상·크게 보기에서만, CSS)
     shine ? h('span', { class: 'cpx-glow', 'aria-hidden': 'true' }) : null,
     shine ? h('span', { class: 'cpx-sheen', style: `left:${wx}px;top:${wy}px;width:${ww}px;height:${wh}px`, 'aria-hidden': 'true' }) : null,
-    h('img', { class: 'cpx-frame', src: frame, alt: '', draggable: 'false' }),
-    // 대강화 +8·+9·+10 틀(Codex 그림 card_frame_forge_*, 틀 위에 겹치는 테두리). 그림이 오기 전에는 CSS 빛(forge-N)만
+    h('img', { class: 'cpx-frame', src: fullFrame ?? frame, alt: '', draggable: 'false' }),
+    // 대강화 +8·+9·+10 겹치는 테두리(card_frame_forge_*): 틀 전체(card_frame_forge_*_<세계>)가 아직 없을 때만. 그것도 없으면 CSS 빛(forge-N)만
     forgeFrame ? h('img', { class: 'cpx-forge', src: forgeFrame, alt: '', draggable: 'false' }) : null,
-    marksView(card),
+    marksView(card, costs.length > 1),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
     // 색각 보정: 등급 보석 위에 모양(설정에서 켤 때만 보인다)

@@ -1,0 +1,28 @@
+id: card_frame_forge_10_magic
+type: card-frame
+summary: >-
+  REFORGED +10 AWAKENED card frame: the whole frame remade as a radiant golden relic — magic layout
+# 대강화 +10 마법 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다). card_frame_magic와 자리(layout)가 같고
+# 재질·장식만 +10(금빛 각성)로 바뀐다. 그림이 오면 게임이 card_frame_magic 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_10)
+reference: assets/source/card_frame_magic.png
+layout:
+  art: [16, 12, 96, 70]
+  cost: [[14, 14]]
+  name: [4, 78, 120, 18]
+  rarity: [64, 101]
+  text: [12, 108, 104, 66]
+  plaque: [32, 178, 64, 12]
+slots: { name: [12, 80, 104, 19], text: [14, 109, 100, 55], plaque: [36, 174, 56, 11] }
+window_shape: >-
+  a pointed gothic arch: the top rises to a soft point and the sides run straight down to a flat bottom, like a cathedral window
+banner: "a crimson ribbon (#a02634, #5a1020) edged with bright gold (#f2a93b, #ffe08a) and with gold-capped ends"
+text_panel: "pale silver-blue vellum (#dff4ff, #c2c6d1)"
+frame_notes:
+  1: >-
+    keep exactly the same shapes and positions as the magic card frame (reference: assets/sprites/card_frame_magic/frame_01.png): the same
+    art window, cost socket(s), name banner, rarity socket, text box and type plaque; only the materials and ornaments change.
+    the WHOLE border is reforged as an awakened golden relic: polished gold plates (#b8741a, #f2a93b, #ffe08a) with red lacquer inlays (#a02634, #5a1020), small flame-shaped gold flourishes (#ff8a5c, #ffe08a) licking up both sides, a radiant gold sunburst crest at the middle of the top border, a bright gold glow line around the art window, gold sunburst ornaments with a white-gold core (#f1efe6) at the corners; the outer edge is dark (#2a1d16); a few touches of the magic frame remain: thin strips of deep blue leather (#1f3f73) between the metal plates and the ring of abstract magic-circle marks (dots and arcs, no letters) around the art window rim
+style: >-
+  crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
+  steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
+placeholder: { color: '#b8741a', accent: '#ffe08a', panel: '#f1efe6', banner: '#a02634' }
