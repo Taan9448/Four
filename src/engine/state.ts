@@ -45,6 +45,9 @@ export interface EnemyState extends Combatant {
   feedMul?: number;
   /** 변신한 모습의 체력 배율(심연 숙적: 굽이 배율 대신. 없으면 전투의 enemyHpScale) */
   transformHpScale?: number;
+  /** 보스 2막(모듈 content.bossGate): 아직 열리지 않은 관문 · 1막 동안 잠든 특성 */
+  gate?: { ratio: number; text: string; refill: boolean; surge: boolean; partyEffects: Effect[] };
+  heldTraits?: Record<string, number>;
   moveCursor: number;
   lastMoves: string[];
   /** 순서형(cycle) 적이 이번 바퀴에 이미 쓴 행동(바퀴를 다 돌면 비운다) */
@@ -91,6 +94,10 @@ export type BattleEvent =
   | { type: 'downed'; uid: string }
   | { type: 'death'; uid: string }
   | { type: 'transform'; uid: string; from: string; into: string; text: string }
+  /** 보스 2막이 열렸다(모듈 content.bossGate) */
+  | { type: 'gate'; uid: string; name: string; text: string }
+  /** 이 적이 쓰러져 폭주 하나가 메워졌다(EnemyDef.sealsSurge) */
+  | { type: 'sealSurge'; uid: string }
   | { type: 'skip'; uid: string }
   | { type: 'enemy_action'; uid: string; moveName: string }
   /** 단계 기술이 다음 의도로 끼어들었다(MoveDef.phase) */

@@ -20,6 +20,7 @@ import { validateMap } from '../src/engine/route';
 import { buyRemove, openShop } from '../src/engine/economy';
 import { deserializeRun, serializeRun } from '../src/engine/save';
 import { playAbyss } from '../src/sim/bot';
+import { give } from './helpers';
 
 const data = gameData();
 const pool = abyssPool(data, { haun_byeogun: 3, elia_fireball: 2 }, ['kyle_strike', 'born_axe', 'common_punch', ...[...data.cards.values()].filter((c) => c.pool === 'reward').slice(0, 30).map((c) => c.id)]);
@@ -335,6 +336,13 @@ describe('심연 2차', () => {
     const enc = { module: data.modules.get(nem)!, node: { id: 'boss', floor: 9, index: 0, type: 'boss' as const, moduleId: nem, next: [] } };
     const s = createBattle(data, battleSetupFor(data, run, enc as never));
     const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    // 2막(2026-10-22): 체력 50%에서 멈추고 다시 가득 — 그때 고리 멈추기가 손에
+    expect(m.statuses.flow_eater).toBeUndefined();
+    m.hp = Math.ceil(m.maxHp * 0.5) + 1;
+    s.neigong = 10;
+    playCard(s, give(s, 'haun_chop'), m.uid);
+    expect(m.hp).toBe(m.maxHp);
+    expect(m.statuses.flow_eater).toBe(2);
     playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_stop_ring'), m.uid);
     m.hp = 1;
     m.statuses = {};

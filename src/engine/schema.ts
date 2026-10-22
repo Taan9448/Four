@@ -485,6 +485,8 @@ export const EnemyDef = z
      * into의 적 정의로 바뀌고 체력은 가득, 상태는 into의 traits로 다시 시작한다. 변신한 차례에는 행동하지 않는다.
      * partyEffects: 변신 순간 하운을 출처로 아군 쪽에 일어나는 일(원작 연출: 동료의 도움 등)
      */
+    /** 이 적이 쓰러지면 이 전투의 폭주 하나가 메워진다(폭주 수·폭주 상흔 −1번 몫, 2026-10-22 — 찢긴 경계를 꿰매면 하늘의 금이 하나 닫힌다) */
+    sealsSurge: z.boolean().optional(),
     transform: z
       .object({
         triggers: z.array(z.enum(['downed', 'lastStanding', 'partnerDowned'])).min(1),
@@ -1361,6 +1363,22 @@ export const ModuleDef = z
         riftDecay: z.number().int().min(0).optional(),
         /** 균열 게이지 주석에 붙는 감쇠 까닭(짧게, 예: 화로) */
         riftDecayNote: z.string().optional(),
+        /**
+         * 보스 2막(2026-10-22 사용자 결정 — 모르데카이): 첫 보스의 체력이 ratio 아래로 내려가는 순간 거기서 멈추고 2막이 열린다.
+         * holdTraits면 정의의 특성(흐름 포식·매듭 등)은 1막 동안 잠자다 이때 깨어나고, refill이면 체력이 다시 가득 차고,
+         * surge면 균열 스택과 상관없이 폭주한다. partyEffects는 하운을 출처로(고리 멈추기 카드 등)
+         */
+        bossGate: z
+          .object({
+            ratio: z.number().gt(0).lt(1),
+            text: z.string(),
+            holdTraits: z.boolean().default(false),
+            refill: z.boolean().default(false),
+            surge: z.boolean().default(false),
+            partyEffects: z.array(Effect).default([]),
+          })
+          .strict()
+          .optional(),
         /** 이 전투 모든 적의 배율(등급·어려움·순례 배율 뒤에 곱한다, 기본 1). 엘리트·일반 전투 난이도 맞추기(2026-10-13) */
         enemyScale: z.object({ hp: z.number().positive(), dmg: z.number().positive() }).partial().strict().optional(),
         /** 노드에 들어가면 먼저 재생할 비주얼 노벨 장면(data/scenes) */
@@ -1374,3 +1392,6 @@ export const ModuleDef = z
   })
   .strict();
 export type ModuleDef = z.infer<typeof ModuleDef>;
+
+/** 보스 2막(모듈 content.bossGate) */
+export type ModuleBossGate = NonNullable<ModuleDef['content']['bossGate']>;

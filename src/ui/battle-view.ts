@@ -162,21 +162,8 @@ export class BattleView {
       const d = this.data.enemies.get(e.defId);
       return !!d && (d.weak.length > 0 || d.resist.length > 0);
     });
-    // 틈의 심장(모르데카이): 흐름 포식·매듭·고리 멈추기·격노를 처음 만날 때 짚는다
-    const heart = this.state.enemies.find((e) => (e.statuses.flow_eater ?? 0) > 0 || (e.statuses.knot ?? 0) > 0);
-    const heartTour = (then: () => void) => {
-      if (!heart || tourSeen('battle-rift-heart')) return then();
-      const enrage = this.data.enemies.get(heart.defId)?.enrage;
-      runTour(
-        [
-          { target: '.unit-enemy .status-chip', title: '흐름 포식', text: '내공이나 마나를 쓴 카드의 피해는 먹혀서 붉은 "먹힘 +N"으로 뜨고, 그만큼 체력이 늘어난다. 비용 0인 카드로 때리거나 결을 쌓아라.' },
-          { target: '.unit-enemy .chip-knot', title: '매듭 게이지', text: `결 노출을 ${bal.grain.knotThreshold}까지 쌓으면 매듭이 드러난다. 드러난 매듭에 '날 얹기'(비용 0)를 얹으면 크게 들어간다.` },
-          { target: '.hand', title: '고리 멈추기', text: '내공을 모두 비우고 흐르지 않는 자가 된다. 그 차례에는 모르데카이가 하운을 보지 못하고, 결이 드러난다. 매듭을 열 준비에 쓴다.' },
-          ...(enrage ? [{ target: '.unit-enemy .chip-enrage', title: '격노', text: `${enrage.afterTurn}턴부터 차례마다 더 세진다. 오래 끌수록 불리하다.` }] : []),
-        ],
-        { id: 'battle-rift-heart', once: true, onDone: then },
-      );
-    };
+    // 틈의 심장(모르데카이): 흐름 포식·매듭·고리 멈추기·격노를 처음 만날 때 짚는다(2막이 있는 보스는 2막이 열릴 때 — 'gate' 사건)
+    const heartTour = (then: () => void) => this.riftHeartTour(then);
     const affinity = () => {
       if (!hasAffinity) return;
       runTour(
@@ -1363,6 +1350,23 @@ export class BattleView {
           await this.wait(600);
           break;
         }
+        case 'gate': {
+          // 보스 2막(모듈 content.bossGate): 체력이 다시 차고 잠든 특성이 깨어난다 — 바로 뒤에 폭주 사건이 이어진다
+          this.alert(`${ev.name} — ${ev.text}`, 'danger');
+          sfx('transform');
+          shake(this.field, 0.9);
+          flash(this.field, 'red');
+          this.refresh();
+          await this.wait(900);
+          // 흐름 포식·매듭·고리 멈추기 안내는 2막이 열릴 때(처음 한 번)
+          this.riftHeartTour();
+          break;
+        }
+        case 'sealSurge': {
+          this.alert('꿰맨 자리에서 하늘의 금 하나가 닫혔다 — 폭주 −1', 'support');
+          await this.wait(500);
+          break;
+        }
         case 'summon': {
           // 소환: 적 편 끝에 새 자리를 만든다
           const c = this.state.enemies.find((e) => e.uid === ev.uid);
@@ -1534,6 +1538,23 @@ export class BattleView {
   }
 
   /** 공격 애니메이션을 재생하고, hit 이벤트 프레임에서 다음 연출(피해 숫자)로 넘어간다 */
+  /** 틈의 심장 안내(흐름 포식·매듭·고리 멈추기·격노). 흐름 포식·매듭이 붙은 적이 있을 때 처음 한 번 */
+  private riftHeartTour(then: () => void = () => {}): void {
+    const bal = this.data.balance;
+    const heart = this.state.enemies.find((e) => !e.downed && ((e.statuses.flow_eater ?? 0) > 0 || (e.statuses.knot ?? 0) > 0));
+    if (!heart || tourSeen('battle-rift-heart')) return then();
+    const enrage = this.data.enemies.get(heart.defId)?.enrage;
+    runTour(
+      [
+        { target: '.unit-enemy .status-chip', title: '흐름 포식', text: '내공이나 마나를 쓴 카드의 피해는 먹혀서 붉은 "먹힘 +N"으로 뜨고, 그만큼 체력이 늘어난다. 비용 0인 카드로 때리거나 결을 쌓아라.' },
+        { target: '.unit-enemy .chip-knot', title: '매듭 게이지', text: `결 노출을 ${bal.grain.knotThreshold}까지 쌓으면 매듭이 드러난다. 드러난 매듭에 '날 얹기'(비용 0)를 얹으면 크게 들어간다.` },
+        { target: '.hand', title: '고리 멈추기', text: '내공을 모두 비우고 흐르지 않는 자가 된다. 그 차례에는 모르데카이가 하운을 보지 못하고, 결이 드러난다. 매듭을 열 준비에 쓴다.' },
+        ...(enrage ? [{ target: '.unit-enemy .chip-enrage', title: '격노', text: `${enrage.afterTurn}턴부터 차례마다 더 세진다. 오래 끌수록 불리하다.` }] : []),
+      ],
+      { id: 'battle-rift-heart', once: true, onDone: then },
+    );
+  }
+
   private async playAttack(sourceUid: string, targetUids: string[]): Promise<void> {
     const u = this.units.get(sourceUid);
     if (!u) return;

@@ -454,6 +454,7 @@ export function dealDamage(
   );
   if (conducted) state.log.push(`${target.name}: 젖은 몸에 번개가 튀었다(×${bal.elements[element!].conduct!.multiplier}).`);
   if (hpLoss > 0 || blocked > 0) applyElement(state, target, element);
+  passGate(state, target);
   if (target.hp <= 0) {
     knockOut(state, target);
     // 벤 짐승의 기운이 금으로 빨려 올라간다
@@ -517,8 +518,34 @@ export function loseHp(state: BattleState, target: Combatant, amount: number): v
   if (state.tally && target.defId === 'haun' && target.side === 'party') state.tally.haunHitBy = '독·화상·자해 같은 체력 손실';
   target.hp = Math.max(0, target.hp - amount);
   state.events.push({ type: 'damage', sourceUid: null, targetUid: target.uid, amount, blocked: 0, grain: false, absorbed: false });
+  passGate(state, target);
   if (target.hp <= 0) knockOut(state, target);
   else fireStatusTriggers(state, target, 'hpLost');
+}
+
+/**
+ * 보스 2막(모듈 content.bossGate, 2026-10-22): 체력이 관문(ratio) 아래로 내려가면 거기서 멈추고 2막을 연다 — 잠든 특성이 깨어나고,
+ * refill이면 체력이 다시 가득, partyEffects(고리 멈추기 등), surge면 균열 스택과 상관없이 폭주. 한 전투에 한 번
+ */
+function passGate(state: BattleState, target: Combatant): void {
+  if (target.side !== 'enemy' || target.downed) return;
+  const e = target as EnemyState;
+  const g = e.gate;
+  if (!g) return;
+  const line = Math.ceil(e.maxHp * g.ratio);
+  if (e.hp > line) return;
+  delete e.gate;
+  e.hp = g.refill ? e.maxHp : line;
+  for (const [id, stacks] of Object.entries(e.heldTraits ?? {})) {
+    e.statuses[id] = stacks;
+    state.events.push({ type: 'status', targetUid: e.uid, status: id, stacks });
+  }
+  delete e.heldTraits;
+  state.events.push({ type: 'gate', uid: e.uid, name: e.name, text: g.text });
+  state.log.push(`${e.name}: ${g.text}`);
+  const haun = leader(state, true);
+  if (g.partyEffects.length && haun) runEffects(state, g.partyEffects, { source: haun });
+  if (g.surge && !state.result) surge(state);
 }
 
 function knockOut(state: BattleState, target: Combatant): void {
@@ -543,6 +570,13 @@ function knockOut(state: BattleState, target: Combatant): void {
     }
     fireRelics(state, 'enemyDowned');
     const def = state.data.enemies.get(target.defId);
+    // 찢긴 경계를 꿰매면 하늘의 금이 하나 닫힌다: 이 전투의 폭주 하나(수·상흔)가 메워진다
+    if (def?.sealsSurge && state.tally && state.tally.surges > 0) {
+      state.tally.surges -= 1;
+      state.tally.surgeScar = Math.max(0, (state.tally.surgeScar ?? 0) - state.data.balance.rift.surgeScar);
+      state.events.push({ type: 'sealSurge', uid: target.uid });
+      state.log.push('꿰맨 자리에서 하늘의 금 하나가 닫혔다. (폭주 −1)');
+    }
     if (def?.deathEffects.length) runEffects(state, def.deathEffects, { source: target });
     // 접사(메아리치는 등)의 쓰러질 때 효과
     for (const a of (target as EnemyState).affixes ?? []) {

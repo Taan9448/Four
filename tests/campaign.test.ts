@@ -167,13 +167,52 @@ describe('원작 보스 기믹', () => {
     expect(s.result).toBeNull();
   });
 
-  it('S9 모르데카이 → 마지막 한 땀: 고리 멈추기가 손에(쓰면 날 얹기), 쓰러지면 찢긴 경계로 바뀌고 실이 손에 들어온다', () => {
+  it('S9 모르데카이 2막(2026-10-22): 1막은 흐름 포식·매듭 없이 일반 공격, 체력 50%에서 멈추고 2막 — 체력이 다시 가득·폭주·고리 멈추기', () => {
+    const run = createRunAt(data, 'END2', 's9');
+    applyRunOps(data, run, [{ op: 'leave_party', member: 'born' }, { op: 'leave_party', member: 'kyle' }]);
+    const s = createBattle(data, battleSetupFor(data, run, bossEnc('s9')));
+    s.tally = { battles: 0, turns: 0, kills: 0, damage: 0, crits: 0, surges: 0, cards: {} } as typeof s.tally;
+    const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    // 1막: 특성이 잠들어 있고, 고리 멈추기는 아직 없다
+    expect(m.statuses.flow_eater).toBeUndefined();
+    expect(m.statuses.knot).toBeUndefined();
+    expect([...s.hand, ...s.draw].some((c) => c.cardId === 'haun_stop_ring')).toBe(false);
+    const max = m.maxHp;
+    const rift = s.rift;
+    // 한 방에 끝까지 베어도 50%에서 멈추고 2막이 열린다
+    m.hp = Math.ceil(max * 0.5) + 5;
+    s.neigong = 10;
+    playCard(s, give(s, 'haun_chop'), m.uid);
+    expect(m.downed).toBe(false);
+    expect(m.hp).toBe(max);
+    expect(m.statuses.flow_eater).toBe(1);
+    expect(m.statuses.knot).toBe(1);
+    expect(s.events.some((e) => e.type === 'gate')).toBe(true);
+    // 균열 스택과 상관없이 폭주(폭주하면 균열은 리셋 값으로)
+    expect(s.tally!.surges).toBe(1);
+    expect(s.rift).toBe(data.balance.rift.surgeResetTo);
+    expect(rift).toBeLessThan(data.balance.rift.max);
+    expect(s.hand.some((c) => c.cardId === 'haun_stop_ring')).toBe(true);
+    // 관문은 한 번뿐(2막의 내공 공격은 흐름 포식에 먹힌다 — 다시 가득 차지는 않는다)
+    m.hp = Math.ceil(max * 0.4);
+    playCard(s, give(s, 'haun_chop'), m.uid);
+    expect(s.events.filter((e) => e.type === 'gate').length).toBe(1);
+    expect(m.hp).toBeLessThan(max);
+  });
+
+  it('S9 모르데카이 → 마지막 한 땀: 고리 멈추기를 쓰면 날 얹기, 쓰러지면 찢긴 경계로 바뀌고 실이 손에, 꿰매면 폭주 하나가 메워진다', () => {
     const run = createRunAt(data, 'END', 's9');
     applyRunOps(data, run, [{ op: 'set_flag', flag: 'arden_ice' }, { op: 'leave_party', member: 'born' }, { op: 'leave_party', member: 'kyle' }]);
     expect(run.selected).toEqual(['haun', 'elia']);
     const s = createBattle(data, battleSetupFor(data, run, bossEnc('s9')));
+    s.tally = { battles: 0, turns: 0, kills: 0, damage: 0, crits: 0, surges: 0, cards: {} } as typeof s.tally;
     expect(s.mana).toBe(0);
     const m = s.enemies.find((e) => e.defId === 'mordecai')!;
+    // 2막으로(관문을 넘긴다)
+    m.hp = Math.ceil(m.maxHp * 0.5) + 1;
+    s.neigong = 10;
+    playCard(s, give(s, 'haun_chop'), m.uid);
+    expect(s.tally!.surges).toBe(1);
     // 고리 멈추기: 숨까지 멈춰 흐르지 않는 자가 되고, 결을 드러내고, 날을 얹을 자리가 손에 들어온다
     playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_stop_ring'), m.uid);
     expect(s.party[0].statuses.still).toBe(1);
@@ -185,7 +224,7 @@ describe('원작 보스 기믹', () => {
     const border = s.enemies.find((e) => e.defId === 'torn_border')!;
     expect(border).toBeDefined();
     expect(border.statuses.seam).toBe(1);
-    for (const id of ['haun_thread', 'haun_unhae', 'elia_ice_thread', 'elia_silver_seed']) expect(s.hand.some((c) => c.cardId === id), id).toBe(true);
+    for (const id of ['haun_thread', 'haun_unhae', 'elia_ice_thread']) expect(s.hand.some((c) => c.cardId === id), id).toBe(true);
     // 실이 아닌 공격은 꿰맬 자리에 들어가지 않는다
     const hp = border.hp;
     s.neigong = 5;
@@ -194,6 +233,14 @@ describe('원작 보스 기믹', () => {
     playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_thread'), border.uid);
     expect(border.hp).toBeLessThan(hp);
     expect(s.neigongMax).toBe(2);
+    // 찢긴 경계를 꿰매면(쓰러뜨리면) 2막의 폭주 하나가 메워진다 — '폭주 없이' 도전·상흔 보상이 그대로 성립
+    const scar = s.tally!.surgeScar ?? 0;
+    border.hp = 1;
+    border.block = 0;
+    playCard(s, s.hand.findIndex((c) => c.cardId === 'haun_thread'), border.uid);
+    expect(s.result).toBe('victory');
+    expect(s.tally!.surges).toBe(0);
+    expect(s.tally!.surgeScar ?? 0).toBe(Math.max(0, scar - data.balance.rift.surgeScar));
   });
 
   it('S9를 이기면 캠페인이 끝난다(에필로그)', () => {
