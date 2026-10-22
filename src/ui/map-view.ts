@@ -3,7 +3,7 @@ import type { GameData } from '../engine/data';
 import { findNode, type MapNode } from '../engine/route';
 import { availableNodes, pilgrimScale, playableStages, setParty, stageWorld, xpToNext, type RunState } from '../engine/run';
 import { scarStartRift } from '../engine/battle';
-import { challengeDone, challengeState, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
+import { challengeDone, challengeState, pilgrimRewardDue, stageChallenges, tierLabel } from '../engine/pilgrimage';
 import { frameUrl } from '../render/assets';
 import { h } from './dom';
 import { artOrGlyph, lawIconEl } from './icons';
@@ -657,7 +657,7 @@ export function pilgrimLabel(data: GameData, run: RunState): string {
   const x = (n: number) => `×${Number(n.toFixed(2))}`;
   const n1 = (n: number) => Number(n.toFixed(1));
   const tiers = [k.epic ? `영웅 ${k.epic}` : '', k.legendary ? `전설 ${k.legendary}` : ''].filter(Boolean).join(' · ');
-  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics}${tiers ? `(${tiers})` : ''} · 강화 +${n1(k.upgrade)})`;
+  return `${k.tier ? tierLabel(data, k.tier) : '순례'} — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics}${tiers ? `(${tiers})` : ''} · 강화 +${n1(k.upgrade)})`;
 }
 
 const CH_STATE: Record<string, [string, string]> = {
@@ -665,6 +665,7 @@ const CH_STATE: Record<string, [string, string]> = {
   ok: ['○', '지키는 중'],
   broken: ['✕', '이번 길에서는 깨짐'],
   open: ['◇', '보스전에서 판정'],
+  tier: ['⇡', '더 높은 순례 단계로 걸어야 이룬다'],
 };
 
 /** 다시 걷는 스테이지의 도전 3개와 이번 길의 상태(지도 오른쪽 칸). 동료·덱 조건은 지금 출전·덱으로 미리 본다 */
@@ -677,7 +678,8 @@ function pilgrimChallenges(data: GameData, run: RunState): HTMLElement | null {
     list.map((c) => {
       const state = challengeState(data, run, c);
       const [mark, label] = CH_STATE[state];
-      return h('li', { class: `ch-${state}`, ...tipAttrs(`도전 — ${c.name}`, `${c.description}\n${label}`) }, h('b', {}, mark), h('span', {}, c.name));
+      const need = c.minTier ? ` (${tierLabel(data, c.minTier)} 이상)` : '';
+      return h('li', { class: `ch-${state}`, ...tipAttrs(`도전 — ${c.name}`, `${c.description}${need}\n${label}`) }, h('b', {}, mark), h('span', {}, c.name));
     }),
   );
 }

@@ -1,13 +1,13 @@
 // 클리어 지도 = 자유 여정(2026-10-08, 2026-10-11 개편): 캠페인을 마친 런의 큰 세계 지도. 장소를 누르면 마지막 파티로 그 스테이지를 하고,
 // 하다가 '전체 지도로' 나가면 그 자리에 멈춰 두었다가 다시 누르면 이어진다(보스를 넘기면 그 길에서 얻은 것이 남는다).
 import type { GameData } from '../engine/data';
-import { playableStages, type RunState } from '../engine/run';
+import { pilgrimTierOpen, playableStages, type RunState } from '../engine/run';
 import { h } from './dom';
 import { journeyBand, placeName } from './map-view';
 import { installTooltips } from './tooltip';
 import { modeTipAttrs } from './difficulty-text';
 import { openOverlay } from './overlay';
-import { challengeDone, challengeUnlockName, pilgrimRewardDue, stageChallenges } from '../engine/pilgrimage';
+import { challengeDone, challengeUnlockName, pilgrimRewardDue, stageChallenges, tierLabel, tierNumeral } from '../engine/pilgrimage';
 
 export interface HubHandlers {
   /** 장소를 눌렀다: 멈춰 둔 진행이 있으면 이어서, 없으면 처음부터 */
@@ -90,26 +90,68 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
 }
 
 /**
- * 장소를 눌렀을 때의 작은 창(순례, GAME_DESIGN 2절): 이긴 횟수 · 첫 순례 보상 · 도전 3개(이룬 것 표시) · [출발](기본 초점) [편성부터].
+ * 장소를 눌렀을 때의 작은 창(순례, GAME_DESIGN 2절): 이긴 횟수 · 첫 순례 보상 · 도전(이룬 것 표시) · 순례 난이도 단계(기본·Ⅰ·Ⅱ·Ⅲ, 열린 것만) · [출발](기본 초점) [편성부터].
  * 멈춰 둔 길이 있으면 [이어서] [버리고 처음부터]
  */
 export function placeDialog(
   data: GameData,
   hub: RunState,
   stageId: string,
-  handlers: { onGo: () => void; onLoadout: () => void; onResume: () => void; onDiscard: () => void },
+  handlers: { onGo: (tier: number) => void; onLoadout: (tier: number) => void; onResume: () => void; onDiscard: () => void },
 ): void {
   const st = data.stages.find((s) => s.id === stageId)!;
   const paused = hub.suspended?.[stageId];
   const list = stageChallenges(data, stageId);
   const done = list.filter((c) => challengeDone(hub, c)).length;
+  const tiers = data.balance.pilgrimage.tiers;
+  const open = pilgrimTierOpen(data, hub, stageId);
+  // 순례 난이도 단계(2026-10-22): 열린 가장 높은 단계를 미리 고르지 않고 기본부터 — 고른 단계는 출발 버튼에 붙는다
+  let tier = 0;
   const act = (fn: () => void) => () => {
     ov.close();
     fn();
   };
+  const goSmall = h('small', {}, '지금 편성 그대로');
   const main = paused
-    ? h('button', { class: 'btn btn-primary', onclick: act(handlers.onResume) }, '이어서', h('small', {}, `${paused.visited.length}칸 지남`))
-    : h('button', { class: 'btn btn-primary', onclick: act(handlers.onGo) }, '출발', h('small', {}, '지금 편성 그대로'));
+    ? h('button', { class: 'btn btn-primary', onclick: act(handlers.onResume) }, '이어서', h('small', {}, `${paused.visited.length}칸 지남${paused.pilgrimTier ? ` · ${tierLabel(data, paused.pilgrimTier)}` : ''}`))
+    : h('button', { class: 'btn btn-primary', onclick: act(() => handlers.onGo(tier)) }, '출발', goSmall);
+  const chips: HTMLButtonElement[] = [];
+  const pick = (k: number) => {
+    tier = k;
+    chips.forEach((c, i) => {
+      c.classList.toggle('on', i === k);
+      c.setAttribute('aria-pressed', String(i === k));
+    });
+    goSmall.textContent = k ? `${tierLabel(data, k)} · 적 체력 ×${tiers[k - 1].hp} · 골드 ×${tiers[k - 1].gold}` : '지금 편성 그대로';
+  };
+  const tierRow =
+    paused || !tiers.length
+      ? null
+      : h(
+          'div',
+          { class: 'tier-row', role: 'group', 'aria-label': '순례 난이도 단계' },
+          h('span', { class: 'tier-head' }, '단계'),
+          [0, ...tiers.map((_, i) => i + 1)].map((k) => {
+            const locked = k > open;
+            const t = k ? tiers[k - 1] : undefined;
+            const b = h(
+              'button',
+              {
+                type: 'button',
+                class: `tier-chip${k === 0 ? ' on' : ''}${(hub.tierCleared?.[stageId] ?? -1) >= k && hub.replays[stageId] ? ' cleared' : ''}`,
+                disabled: locked,
+                'aria-pressed': String(k === 0),
+                title: locked ? `${k === 1 ? '기본' : tierLabel(data, k - 1)}으로 이 스테이지를 넘기면 열린다` : t ? `${tierLabel(data, k)} — 적 체력 ×${t.hp} · 피해 ×${t.dmg} · 전투 골드 ×${t.gold}` : '기본 순례',
+                onclick: () => pick(k),
+              },
+              k ? tierNumeral(k) : '기본',
+            ) as HTMLButtonElement;
+            chips.push(b);
+            return b;
+          }),
+          // 휴대폰에서는 툴팁이 안 보이므로 다음 단계가 열리는 조건을 글로
+          open < tiers.length ? h('small', { class: 'tier-hint' }, `${open === 0 ? '기본' : tierNumeral(open)}으로 넘기면 ${tierNumeral(open + 1)} 열림`) : null,
+        );
   const ov = openOverlay(
     placeName(st, hub),
     h(
@@ -121,7 +163,9 @@ export function placeDialog(
         h('span', {}, `이긴 횟수 ×${hub.replays[stageId] ?? 0}`),
         h('span', { class: pilgrimRewardDue(hub, stageId) ? 'place-reward due' : 'place-reward got' }, pilgrimRewardDue(hub, stageId) ? '첫 순례 보상 남음' : '첫 순례 보상 받음'),
         h('span', {}, `도전 ${done}/${list.length}`),
+        hub.tierCleared?.[stageId] ? h('span', { class: 'place-tier' }, `${tierLabel(data, hub.tierCleared[stageId])}까지 넘김`) : null,
       ),
+      tierRow,
       h(
         'ul',
         { class: 'challenge-list' },
@@ -129,7 +173,7 @@ export function placeDialog(
           h(
             'li',
             { class: challengeDone(hub, c) ? 'done' : '' },
-            h('b', {}, `${challengeDone(hub, c) ? '✓' : '·'} ${c.name}`),
+            h('b', {}, `${challengeDone(hub, c) ? '✓' : '·'} ${c.name}`, c.minTier ? h('em', { class: 'ch-tier' }, ` ${tierNumeral(c.minTier)} 이상`) : null),
             h('span', {}, c.description),
             h('small', {}, challengeUnlockName(data, c)),
           ),
@@ -138,7 +182,7 @@ export function placeDialog(
       h(
         'div',
         { class: 'confirm-actions' },
-        paused ? h('button', { class: 'btn', onclick: act(handlers.onDiscard) }, '버리고 처음부터') : h('button', { class: 'btn', onclick: act(handlers.onLoadout) }, '편성부터'),
+        paused ? h('button', { class: 'btn', onclick: act(handlers.onDiscard) }, '버리고 처음부터') : h('button', { class: 'btn', onclick: act(() => handlers.onLoadout(tier)) }, '편성부터'),
         main,
       ),
     ),

@@ -57,7 +57,7 @@ import { titleStage } from './title-fx';
 import { runTour, tourSeen } from './tour';
 import { artOrGlyph, lawIconEl } from './icons';
 import { loadPortrait } from '../render/portrait';
-import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges } from '../engine/pilgrimage';
+import { challengeUnlockName, claimPilgrimReward, pilgrimRewardDue, pilgrimRewardOptions, settleChallenges, tierLabel, tierTitlesWon } from '../engine/pilgrimage';
 import {
   campaignCollection,
   clearAbyss,
@@ -75,6 +75,7 @@ import {
   readAbyssMeta,
   recordAbyss,
   recordChallenges,
+  recordTitles,
   slotTitle,
   recordClear,
   saveAbyss,
@@ -1009,8 +1010,8 @@ export class App {
         // 장소를 누르면 작은 창(이긴 횟수·첫 순례 보상·도전 3개) → 출발(지금 편성 그대로) · 편성부터 · 이어서
         onStage: (stageId) =>
           placeDialog(data, run, stageId, {
-            onGo: () => {
-              this.run = startReplay(data, run, stageId);
+            onGo: (tier) => {
+              this.run = startReplay(data, run, stageId, { tier });
               try {
                 setLoadout(data, this.run, this.run.loadout);
               } catch {
@@ -1018,8 +1019,8 @@ export class App {
               }
               this.map();
             },
-            onLoadout: () => {
-              this.run = startReplay(data, run, stageId);
+            onLoadout: (tier) => {
+              this.run = startReplay(data, run, stageId, { tier });
               this.map();
             },
             onResume: () => {
@@ -1084,12 +1085,21 @@ export class App {
     // 순례로 스테이지를 넘기면 옷장이 열릴 수 있다(순례의 끝 — S9)
     const won = run.status === 'stage_clear' || run.status === 'complete';
     const skins = won ? this.skinNews({ kind: 'pilgrimStage', stage: run.stageId }) : [];
-    if (!fresh.length && !skins.length) return null;
+    // 순례 난이도 단계(2026-10-22): 다음 단계가 열렸나 · 모든 스테이지를 이 단계로 넘겨 칭호를 얻었나(finishReplay 전이라 hub는 길 전 그대로)
+    const hub = run.replayOf;
+    const tier = run.pilgrimTier ?? 0;
+    const tierTitles = won ? tierTitlesWon(data, run) : [];
+    if (this.persist) recordTitles(tierTitles);
+    const prevWon = hub.tierCleared?.[run.stageId] ?? (hub.replays[run.stageId] ? 0 : -1);
+    const opened = won && tier > prevWon && tier < data.balance.pilgrimage.tiers.length ? [`${tierLabel(data, tier + 1)}이(가) 열렸다`] : [];
+    const tierNews = [...opened, ...tierTitles.map((t) => `칭호 「${t}」를 얻었다`)];
+    if (!fresh.length && !skins.length && !tierNews.length) return null;
     return h(
       'ul',
       { class: 'gains pilgrim-news' },
       fresh.map((c) => h('li', {}, `도전 「${c.name}」 — ${challengeUnlockName(data, c)}${c.unlock.title ? '을 얻었다' : '이(가) 열렸다'}`)),
       skins.map((t) => h('li', {}, t)),
+      tierNews.map((t) => h('li', {}, t)),
     );
   }
 

@@ -15,10 +15,15 @@ export interface PilgrimScale {
   legendary?: number;
   /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 */
   upgrade: number;
+  /** 순례 난이도 단계(0 = 기본, 2026-10-22). 상한까지 센 배율에 그 단계의 체력·피해를 곱했다 */
+  tier?: number;
 }
 
+/** 순례 난이도 단계의 정의(0 = 기본이면 없음) */
+export const pilgrimTierDef = (data: GameData, tier: number | undefined) => (tier ? data.balance.pilgrimage.tiers[tier - 1] : undefined);
+
 /** 지금 일행으로 보정을 센다(고정하지 않는다) */
-export function measurePilgrimScale(data: GameData, run: Pick<RunState, 'roster' | 'relics' | 'stageId' | 'loadout' | 'collection'>): PilgrimScale {
+export function measurePilgrimScale(data: GameData, run: Pick<RunState, 'roster' | 'relics' | 'stageId' | 'loadout' | 'collection' | 'pilgrimTier'>): PilgrimScale {
   const p = data.balance.pilgrimage;
   const haun = run.roster.find((r) => r.id === 'haun')?.level ?? 1;
   const level = Math.max(0, haun - (p.baseLevel[run.stageId] ?? 1));
@@ -30,14 +35,17 @@ export function measurePilgrimScale(data: GameData, run: Pick<RunState, 'roster'
   const relicPct = rarities.reduce((a, r) => a + (r ? (p.relicPct[r] ?? 0) : 0), 0);
   const extra = relicPct + upgrade * p.upgradePct;
   const round = (x: number) => Math.round(x * 100) / 100;
+  // 순례 난이도 단계: 상한까지 센 값에 곱한다
+  const t = pilgrimTierDef(data, run.pilgrimTier);
   return {
-    hp: round(Math.min(p.maxHp, 1 + level * p.hpPerLevel + extra)),
-    dmg: round(Math.min(p.maxDmg, 1 + level * p.dmgPerLevel + extra)),
+    hp: round(Math.min(p.maxHp, 1 + level * p.hpPerLevel + extra) * (t?.hp ?? 1)),
+    dmg: round(Math.min(p.maxDmg, 1 + level * p.dmgPerLevel + extra) * (t?.dmg ?? 1)),
     level,
     relics: run.relics.length,
     relicPct: round(relicPct),
     epic: rarities.filter((r) => r === 'epic').length,
     legendary: rarities.filter((r) => r === 'legendary').length,
     upgrade: round(upgrade),
+    ...(run.pilgrimTier ? { tier: run.pilgrimTier } : {}),
   };
 }

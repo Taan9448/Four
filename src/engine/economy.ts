@@ -6,6 +6,7 @@ import { createRng, type Rng } from './rng';
 import { forgeMax, type CardInstance } from './state';
 import { engravingOffer } from './forge';
 import { swapCard, swappableCards } from './collection';
+import { pilgrimTierDef } from './pilgrim-scale';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
 import { abyssShopPool, abyssShopRift, isAbyss, potionAllowed, relicAllowed, removePrice, runOath } from './abyss';
 
@@ -70,7 +71,8 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   const rng = createRng(run.seed).fork(`loot:${run.stageId}:${node.id}`);
   const [lo, hi] = eco.gold[kind];
   // 굽이의 법칙 '무거운 발': 골드 두 배
-  const gold = Math.round(rng.int(lo, hi) * lawRunMul(data, run, 'goldMul'));
+  // 순례 난이도 단계: 전투 골드를 곱한다(2026-10-22)
+  const gold = Math.round(rng.int(lo, hi) * lawRunMul(data, run, 'goldMul') * (pilgrimTierDef(data, run.pilgrimTier)?.gold ?? 1));
   const potion = rng.next() < eco.potionDrop[kind] ? (pickByTier(rng, potionPool(data, run), lootWeights(data, run).potion[kind])?.id ?? null) : null;
   let relic: string | null = null;
   let relicChoices: string[] = [];
