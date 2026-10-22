@@ -187,7 +187,7 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 등급별 relicPct의 합(2026-10-21) + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
     expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
@@ -197,12 +197,17 @@ describe('순례 — 일행 보정(2)', () => {
     // 출발 편성(열쇠 카드 제외)의 평균 강화
     const cards = Object.values(run.loadout).flat().filter((id) => !data.cards.get(id)?.essential);
     for (const id of cards) run.collection[id] = 2;
-    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100;
+    // 등급마다 하나씩 더 쥐여 준다
+    for (const rarity of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const) run.relics.push([...data.relics.values()].find((r) => r.rarity === rarity && !r.abyss && !run.relics.includes(r.id))!.id);
+    const relicPct = run.relics.reduce((a, id) => a + (p.relicPct[data.relics.get(id)!.rarity] ?? 0), 0);
+    expect(p.relicPct.legendary).toBeGreaterThan(p.relicPct.common!);
+    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + relicPct + 2 * p.upgradePct) * 100) / 100;
     const k = pilgrimScale(data, run);
-    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, upgrade: 2 });
+    const tier = (t: string) => run.relics.filter((id) => data.relics.get(id)!.rarity === t).length;
+    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, relicPct: Math.round(relicPct * 100) / 100, epic: tier('epic'), legendary: tier('legendary'), upgrade: 2 });
     // 기준 레벨 이하면 유물·강화 몫만
     haun.level = 1;
-    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100);
+    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + relicPct + 2 * p.upgradePct) * 100) / 100);
     // 상한
     haun.level = 99;
     run.relics = Array.from({ length: 500 }, () => 'red_thread');

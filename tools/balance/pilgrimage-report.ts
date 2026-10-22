@@ -146,7 +146,7 @@ export function pilgrimageReport(data: GameData, batches: PilgrimBatch[], seeds:
   lines.push(
     `보유 상태: ${HOLDS.map((h) => `**${HOLD_NAME[h]}**(출발 편성 평균 강화 +${mean(of(h).map((r) => r.scale.upgrade)).toFixed(1)} · 유물 ${mean(of(h).map((r) => r.relics.length)).toFixed(1)}개, 영웅 ${tierOf(h, 'epic').toFixed(1)} · 전설 ${tierOf(h, 'legendary').toFixed(1)})`).join(' · ')}. 쌓음은 클리어 일행이 S1~S9를 그만큼 걸어 이긴 길의 것을 실제로 쌓은 것(진 길은 남지 않는다), 다 모은 상태는 유물 전부 + 보유 카드 전부 최대 강화.`,
   );
-  lines.push(`일행 보정(\`balance.pilgrimage\`, 출발 편성을 정할 때 고정): 1 + max(0, 하운 레벨 − 기준 레벨) × (체력 ${p.hpPerLevel} · 피해 ${p.dmgPerLevel}) + 유물 수 × ${p.relicPct} + 출발 편성 평균 강화 × ${p.upgradePct}(열쇠 카드 제외), 상한 체력 ×${p.maxHp} · 피해 ×${p.maxDmg}. 순례 길에서 가진 유물이 다시 나오면 골드로. 순례는 쌓을수록 쉬워지는 것이 의도(2026-10-22) — 쌓음·다 모은 상태는 얼마나 쉬워지는지 보는 참고값.`);
+  lines.push(`일행 보정(\`balance.pilgrimage\`, 출발 편성을 정할 때 고정): 1 + max(0, 하운 레벨 − 기준 레벨) × (체력 ${p.hpPerLevel} · 피해 ${p.dmgPerLevel}) + 유물 등급별 합(${Object.entries(p.relicPct).map(([k, v]) => `${k} ${v}`).join(' · ')}) + 출발 편성 평균 강화 × ${p.upgradePct}(열쇠 카드 제외), 상한 체력 ×${p.maxHp} · 피해 ×${p.maxDmg}. 순례 길에서 가진 유물이 다시 나오면 골드로. 순례는 쌓을수록 쉬워지는 것이 의도(2026-10-22) — 쌓음·다 모은 상태는 얼마나 쉬워지는지 보는 참고값.`);
   lines.push(`목표(GAME_DESIGN 2절 · 12절): 넘김 ${fmtPct(t.win[0])}~${fmtPct(t.win[1])} · 보스 패배 모든 스테이지 ${fmtPct(t.bossDefeat[0])}~${fmtPct(t.bossDefeat[1])} · 두 보유 상태의 넘김 차이 ${fmtPct(t.holdGapMax)} 안 · 일반 전투 ${t.normalTurns[0]}~${t.normalTurns[1]}턴 · 파티 손실 ${fmtPct(t.partyLoss[0])}~${fmtPct(t.partyLoss[1])}.`);
   lines.push('');
   lines.push(
