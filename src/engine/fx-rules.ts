@@ -44,6 +44,11 @@ export function statusFx(data: GameData, status: string): string | undefined {
   return data.fx.statusFx?.[status];
 }
 
+/** 이펙트가 나올 때 얹는 효과음(data/fx.json sounds) — 없으면 피격·상태의 공통 소리만 */
+export function fxSound(data: GameData, fxId: string): string | undefined {
+  return data.fx.sounds?.[fxId];
+}
+
 /** 규칙과 이벤트가 쓰는 이펙트 id 전부(데이터 검사용) */
 export function fxRuleIds(data: GameData): string[] {
   const ids = new Set<string>(Object.values(data.fx.events).filter((x): x is string => !!x));

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cardFx, elementHitFx, statusFx } from '../src/engine/fx-rules';
+import { cardFx, elementHitFx, fxRuleIds, fxSound, statusFx } from '../src/engine/fx-rules';
 import { data } from './helpers';
 
 const fx = (id: string) => cardFx(data, data.cards.get(id)!);
@@ -38,6 +38,20 @@ describe('이펙트 규칙(data/fx.json)', () => {
     expect(statusFx(data, 'drowsy')).toBe('fx_sleep_mist');
     const sleepers = [...data.cards.values()].filter((c) => JSON.stringify(c.effects).includes('"drowsy"'));
     expect(sleepers.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('이펙트별 효과음: 규칙이 쓰는 이펙트의 소리이고, 이름은 합성 소리 목록에 있다(2026-10-22)', async () => {
+    const { SFX_NAMES } = await import('../src/render/audio');
+    const used = new Set(fxRuleIds(data));
+    const sounds = Object.entries(data.fx.sounds ?? {});
+    expect(sounds.length).toBeGreaterThanOrEqual(13);
+    for (const [fx, name] of sounds) {
+      expect(used.has(fx), fx).toBe(true);
+      expect((SFX_NAMES as readonly string[]).includes(name), `${fx} → ${name}`).toBe(true);
+    }
+    expect(fxSound(data, 'fx_sleep_mist')).toBe('sleep');
+    // 화염·냉기·번개는 피해 소리가 이미 속성별이라 겹치지 않는다
+    expect(fxSound(data, 'fx_fire_burst')).toBeUndefined();
   });
 
   it('공격 카드는 모두 공격 이펙트나 피격 이펙트 중 하나는 따로 받는다(흰 타격 별 하나로 끝나지 않는다)', () => {
