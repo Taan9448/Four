@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: a few tiny pale blue star sparks drift down from above the center of the cell
+Cell 2: a thin pale blue crescent moon fades in above the center, small white stars slowly circling it
+Cell 3: the crescent moon at full brightness with a soft ring of drifting stars, wisps of pale blue sleep mist curling down around the center
+Cell 4: the mist wraps lower around the center like a loose scarf, the moon dimming, the stars slowing
+Cell 5: the moon fades away, a few drifting stars and thin mist wisps settle at the center
+Cell 6: two or three tiny stars blinking out
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: The sixth cell was judged empty because the final sparks were too tiny. Cell6 MUST contain EXACTLY THREE clearly visible small four-point pixel stars, each approximately44-48 source pixels wide including its blue edge bands (11-12 blocks across on the required4px grid), clustered near the cell center. Keep them dimmer than earlier frames but do not reduce them to one-block dots: give each a small pale-blue core and solid blue stepped rays, no letters. This is still a fading ending, visibly much less total light than cell3. In ALL6cells use TRUE uniform4x4px source blocks: each512px cell is a128x128 sprite enlarged exactly4x, not a70x70 sprite enlarged7x. Solid flat colors inside every block, only a small palette of #f1efe6,#dff4ff,#8fd3ff,#4fb4ff,#3a6ea5,#1f3f73 on PURE #000000, no purple/pink. No blurry halos or anti-aliasing; the pale sleep mist is made of thin stepped blue pixel ribbons, not blurred smoke. Keep cell3 the brightest peak with the crescent, star ring and descending mist. Cell4 lower dimming mist, cell5 a few thin settling wisps and stars, cell6 only three fading stars. Keep every effect safely40px or more inside all cell boundaries, no crossing, no text. EXACT1536x1024,3columns x2rows,512x512 cells.
