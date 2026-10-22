@@ -275,6 +275,17 @@ describe('자르기 → 검증', () => {
     expect(data[mid + 3]).toBe(255); // 몸통은 불투명
   });
 
+  it('반신 그림 명세의 framing은 기본 구도(사람 크기 반신) 대신 쓴다 — 거인 보스', () => {
+    const style = loadPromptData();
+    const base = renderPrompt(loadSpec('haun_stand'), style);
+    expect(base).toContain('half-body from the top of the head down to the waist');
+    const giant = renderPrompt(loadSpec('gormon_stand'), style);
+    expect(giant).not.toContain('half-body from the top of the head down to the waist');
+    expect(giant).toContain('FILLS the cell');
+    expect(giant).toContain('at exactly the same size and the same position in every cell');
+    expect(giant).toContain('Keep every figure INSIDE its own cell');
+  });
+
   it('manifest는 실제 스프라이트를 임시 시트보다 우선한다', async () => {
     await prepare('fixture_attack');
     const p = paths(root);
