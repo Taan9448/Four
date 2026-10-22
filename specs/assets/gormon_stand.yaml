@@ -1,9 +1,16 @@
 id: gormon_stand
 type: character-standing
 character: gormon
-summary: 고르몬 반신 그림(기본·결의·놀람)
+summary: 고르몬 반신 그림(기본·결의·놀람) — 거인 체격으로 다시 그림(2026-10-22, 전투 그림보다 왜소해 보여서)
+framing: >-
+  Gormon is a GIANT of rock fused with the mountain, each finger as large as a man's torso, not a man-sized figure, so draw a massive, overwhelming hunched colossus that FILLS the cell.
+  Crop tighter than a normal half-body: from just above the head down to the huge fists, cut off cleanly by the bottom edge with no empty background below.
+  The low camera looks up at him so he looms over the viewer. He is hunched forward like a gorilla: the head sits LOW and small, sunk between enormous boulder shoulders that rise above it,
+  the shoulders and arms span almost the whole cell width, right up to the 40 px side margin, and the giant fists sit in front at the bottom of the cell.
+  Roots, moss and cracks of stone spread from his back and shoulders, and jagged mountain rock grows out of his back as part of his body (no scenery behind him), like his battle sprite.
+  Never human proportions, never a bodybuilder-sized man, and never shrink the figure to leave empty background around it.
 frame_notes:
-  1: "neutral expression — a rock face fused with the cave wall, lava-red eyes half-lidded"
-  2: "resolute expression — the stone mouth grinding open, lava-red eyes blazing"
-  3: "surprised expression — a crack running between the giant and the mountain"
+  1: "neutral expression — a hunched rock giant fused with the cave wall, the small head sunk between boulder shoulders, lava-red eyes half-lidded, huge fists resting in front"
+  2: "resolute expression — the stone mouth grinding open, lava-red eyes blazing, one giant fist lifted toward the viewer"
+  3: "surprised expression — a crack running between the giant and the mountain, lava light leaking from it"
 placeholder: { color: '#4a3426', accent: '#ff3b3b' }

@@ -1,9 +1,15 @@
 id: ignis_stand
 type: character-standing
 character: ignis
-summary: 화염군주 이그니스 반신 그림(기본·결의·놀람)
+summary: 화염군주 이그니스 반신 그림(기본·결의·놀람) — 거인 체격으로 다시 그림(2026-10-22, 전투 그림보다 왜소해 보여서)
+framing: >-
+  Ignis is a GIANT three times a man's height, not a man-sized figure, so draw a massive, overwhelming colossus that FILLS the cell.
+  Crop tighter than a normal half-body: from just above the crown of flames down to the middle of the chest, cut off cleanly by the bottom edge with no empty background below.
+  The low camera looks up at him so he looms over the viewer. Broad heavy shoulders and thick arms span almost the whole cell width, right up to the 40 px side margin;
+  a deep barrel chest; the head is small compared with the huge shoulders. Heavy, thick, wide proportions like his battle sprite: never slim, lanky, skinny or human-sized,
+  and never shrink the figure to leave empty background around it.
 frame_notes:
-  1: "neutral expression — a faceless body of white flame, two white-hot eye holes, black lava veins"
-  2: "resolute expression — the flames roaring higher, one burning hand raised"
+  1: "neutral expression — a hulking colossus of white flame, two white-hot eye holes, thick black lava veins across a massive chest, flames roaring off the broad shoulders and the crown"
+  2: "resolute expression — the flames roaring higher, one huge burning fist raised in front of the chest"
   3: "surprised expression — the white flame split from crown to chest, the lava veins going dark"
 placeholder: { color: '#f1efe6', accent: '#0b0b10' }

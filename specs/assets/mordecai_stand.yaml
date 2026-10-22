@@ -1,9 +1,16 @@
 id: mordecai_stand
 type: character-standing
 character: mordecai
-summary: 지옥왕 모르데카이 반신 그림(기본·결의·놀람) — 원작 외형으로 다시 그림
+summary: 지옥왕 모르데카이 반신 그림(기본·결의·놀람) — 거인 체격으로 다시 그림(2026-10-22, 전투 그림보다 왜소해 보여서)
+framing: >-
+  Mordecai is a towering GIANT stitched together from the bodies of many worlds, not a man-sized figure, so draw a massive, overwhelming hunched shape that FILLS the cell.
+  Crop tighter than a normal half-body: from just above the horns down to the middle of the stomach, cut off cleanly by the bottom edge with no empty background below
+  (the body must touch the bottom edge of the cell).
+  The low camera looks up at him so he looms over the viewer. He leans forward, the head small and low between broad stitched shoulders; the great spine of black iron wedges rises
+  high behind and above the shoulders; the silver mana arm and the dark qi ring arm are thick and long and, with the shoulders, span almost the whole cell width, right up to the 40 px side margin.
+  Heavy, wide proportions like his battle sprite: never slim or narrow, and never shrink the figure to leave empty background around it.
 frame_notes:
-  1: "neutral expression — a towering stitched-together shape, the wedge spine rising behind, a calm hungry tilt of the head"
-  2: "resolute expression — the stitched arms spread wide, the blue-black heart in the chest pulsing brighter"
+  1: "neutral expression — a towering stitched-together shape filling the cell, the huge wedge spine rising behind, a calm hungry tilt of the low head"
+  2: "resolute expression — the thick stitched arms spread wide to the cell sides, the blue-black heart in the chest pulsing brighter"
   3: "surprised expression — the stitches beneath the heart loosening, threads of light unraveling from the chest"
 placeholder: { color: '#1a1020', accent: '#9a3a7a' }

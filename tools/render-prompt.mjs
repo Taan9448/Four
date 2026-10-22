@@ -223,8 +223,11 @@ export function renderPrompt(spec, style) {
         `Grid: ${cols} columns x ${rows} row. Each cell is exactly ${cw}x${ch} px. Cell numbers start at 1 from the left.\n` +
         `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. No scenery, no floor, no shadow, no glow, no gradient behind the character.\n` +
         `Subject: ${subject}. Match the attached character design sheet or reference image if one is attached.\n` +
-        `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
-        `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. ` +
+        // framing이 있으면 기본 구도(사람 크기 반신) 대신 쓴다 — 거인 보스가 칸에 맞추느라 작아지지 않게
+        (spec.framing
+          ? `Framing: the SAME character in all ${spec.frames} cells, at exactly the same size and the same position in every cell. ${spec.framing} `
+          : `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
+            `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. `) +
         `Only the facial expression and a small change of hands or shoulders differ between cells.\n` +
         `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n` +
         `${frameLines}\n` +
