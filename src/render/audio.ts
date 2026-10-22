@@ -3,35 +3,51 @@
 // 브라우저는 사용자가 한 번 누르기 전에는 소리를 막으므로, 첫 클릭·키 입력 때 켠다. 그 전의 요청(곡)은 기억했다가 켜질 때 튼다.
 import { composeBar, midiToHz, TRACKS, type Mood, type NoteEvent, type Voice } from './music';
 
-export type Sfx =
-  | 'click'
-  | 'card'
-  | 'tear'
-  | 'hit'
-  | 'hit_heavy'
-  | 'crit'
-  | 'fire'
-  | 'ice'
-  | 'lightning'
-  | 'block'
-  | 'heal'
-  | 'status'
-  | 'rift'
-  | 'surge'
-  | 'relic'
-  | 'potion'
-  | 'coin'
-  | 'down'
-  | 'transform'
-  | 'levelup'
-  | 'victory'
-  | 'defeat'
-  | 'turn'
-  | 'cutin'
-  | 'power'
-  | 'summon'
-  | 'enrage'
-  | 'discard';
+/** 효과음 이름. 이펙트별 소리(2026-10-22)는 data/fx.json sounds가 이펙트 id → 이름으로 고른다 */
+export const SFX_NAMES = [
+  'click',
+  'card',
+  'tear',
+  'hit',
+  'hit_heavy',
+  'crit',
+  'fire',
+  'ice',
+  'lightning',
+  'block',
+  'heal',
+  'status',
+  'rift',
+  'surge',
+  'relic',
+  'potion',
+  'coin',
+  'down',
+  'transform',
+  'levelup',
+  'victory',
+  'defeat',
+  'turn',
+  'cutin',
+  'power',
+  'summon',
+  'enrage',
+  'discard',
+  'slash',
+  'rend',
+  'void',
+  'snap',
+  'flurry',
+  'quake',
+  'sweep',
+  'bubble',
+  'curse',
+  'bless',
+  'sleep',
+  'roar',
+  'swirl',
+] as const;
+export type Sfx = (typeof SFX_NAMES)[number];
 
 const files = import.meta.glob('../../assets/audio/**/*.{ogg,mp3,wav}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 const fileFor = (kind: 'bgm' | 'sfx', name: string): string | undefined =>
@@ -322,6 +338,80 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
       break;
     case 'discard':
       burst(t, 0.1, 0.25, out, { type: 'bandpass', hz: 1800, to: 900, q: 0.7 });
+      break;
+    // ── 이펙트별 소리(2026-10-22): data/fx.json sounds가 이펙트 → 소리를 고른다. 피격 소리 위에 얹으므로 작게 ──
+    case 'slash':
+      // 붉은 초승달: 날카롭게 가르는 바람
+      burst(t, 0.16, 0.6, out, { type: 'bandpass', hz: 1200, to: 4200, q: 0.7 });
+      tone('triangle', 1800, t + 0.02, 0.1, 0.06, out, { to: 900 });
+      break;
+    case 'rend':
+      // 균열 도끼질: 묵직한 바람 뒤 찢어지는 소리
+      burst(t, 0.25, 0.7, out, { type: 'lowpass', hz: 600, to: 2500 });
+      for (let i = 0; i < 4; i++) burst(t + 0.08 + i * 0.03, 0.05, 0.35 - i * 0.06, out, { type: 'bandpass', hz: 900 + i * 400, to: 2600, q: 1.4 });
+      tone('sawtooth', 90, t, 0.3, 0.15, out, { to: 55 });
+      break;
+    case 'void':
+      // 허공 찢기: 낮게 차오르는 울림 + 비틀린 고음
+      tone('sawtooth', 60, t, 0.5, 0.15, out, { to: 120, attack: 0.05 });
+      burst(t, 0.4, 0.4, out, { type: 'bandpass', hz: 300, to: 3000, q: 2 });
+      tone('sine', 1400, t + 0.05, 0.4, 0.05, out, { to: 700, detune: 40 });
+      break;
+    case 'snap':
+      // 결 실 끊기: 팽팽한 현이 튕겨 끊어진다
+      tone('square', 880, t, 0.06, 0.12, out);
+      tone('sine', 1760, t, 0.25, 0.1, out, { to: 1200 });
+      burst(t, 0.03, 0.3, out, { type: 'highpass', hz: 4000 });
+      break;
+    case 'flurry':
+      // 연속 찌르기: 짧은 쉭쉭 네 번
+      for (let i = 0; i < 4; i++) {
+        burst(t + i * 0.06, 0.05, 0.35, out, { type: 'bandpass', hz: 3000 + i * 300, to: 6000, q: 1.2 });
+        tone('triangle', 2600 + i * 150, t + i * 0.06, 0.03, 0.04, out);
+      }
+      break;
+    case 'quake':
+      // 땅울림: 낮은 쿵 + 흙 구르는 진동
+      tone('sine', 70, t, 0.6, 0.9, out, { to: 35 });
+      burst(t, 0.5, 0.6, out, { type: 'lowpass', hz: 300, to: 80 });
+      tone('square', 45, t, 0.3, 0.1, out);
+      break;
+    case 'sweep':
+      // 가로 쓸기: 길게 지나가는 바람
+      burst(t, 0.35, 0.5, out, { type: 'bandpass', hz: 400, to: 2400, q: 0.5 });
+      burst(t + 0.12, 0.25, 0.3, out, { type: 'bandpass', hz: 2400, to: 600, q: 0.5 });
+      break;
+    case 'bubble':
+      // 독구름: 보글보글
+      for (let i = 0; i < 5; i++) tone('sine', 300 + i * 70, t + i * 0.07, 0.06, 0.12, out, { to: 600 + i * 90 });
+      burst(t, 0.3, 0.1, out, { type: 'lowpass', hz: 700 });
+      break;
+    case 'curse':
+      // 해로운 상태: 어둡게 가라앉는 두 음
+      tone('triangle', 440, t, 0.45, 0.12, out, { to: 220 });
+      tone('sine', 466, t, 0.45, 0.08, out, { to: 233 });
+      burst(t, 0.3, 0.15, out, { type: 'lowpass', hz: 900, to: 200 });
+      break;
+    case 'bless':
+      // 이로운 상태: 짧게 올라가는 음 + 반짝임
+      [67, 71, 74].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.05, 0.25, 0.1, out));
+      tone('sine', 2000, t + 0.12, 0.3, 0.04, out, { to: 2600 });
+      break;
+    case 'sleep':
+      // 졸음: 내려가는 자장가 종소리 + 부드러운 반짝임
+      [79, 76, 72].forEach((m, i) => tone('sine', midiToHz(m), t + i * 0.12, 0.5, 0.08, out, { attack: 0.03 }));
+      burst(t, 0.4, 0.05, out, { type: 'highpass', hz: 6000 });
+      break;
+    case 'roar':
+      // 도발 고함: 낮게 울리는 외침
+      tone('sawtooth', 110, t, 0.5, 0.25, out, { to: 80, attack: 0.04 });
+      tone('square', 55, t, 0.45, 0.12, out);
+      burst(t, 0.4, 0.3, out, { type: 'bandpass', hz: 300, to: 600, q: 0.8 });
+      break;
+    case 'swirl':
+      // 내공·마나 소용돌이: 휘감아 오르는 바람
+      burst(t, 0.4, 0.3, out, { type: 'bandpass', hz: 600, to: 2400, q: 1.5 });
+      tone('sine', 520, t, 0.35, 0.06, out, { to: 780 });
       break;
     case 'defeat':
       [64, 63, 60, 57].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.28, i === 3 ? 1.6 : 0.5, 0.18, out));

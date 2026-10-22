@@ -11,11 +11,11 @@ import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
 import { frameUrl, loadSprite, spriteSource } from '../render/assets';
-import { cardFx, elementHitFx, statusFx } from '../engine/fx-rules';
+import { cardFx, elementHitFx, fxSound, statusFx } from '../engine/fx-rules';
 import { skinSpriteId } from '../engine/wardrobe';
 import { skinReady } from './wardrobe-view';
 import { SpritePlayer } from '../render/sprite-player';
-import { sfx } from '../render/audio';
+import { sfx, type Sfx } from '../render/audio';
 import { cardView } from './card-view';
 import { openDeck } from './deck-view';
 import { clear, h } from './dom';
@@ -1237,9 +1237,11 @@ export class BattleView {
             // 감전·마비처럼 상태마다 정한 이펙트가 있으면 그것(data/fx.json statusFx).
             // 행동 제약 내성(수면 내성 등)은 본 상태(졸음)보다 한 발 먼저 붙는다 — 여기서 금빛 화살표가 나가면 0.4초 겹침 막기에
             // 걸려 본 상태 이펙트(잠 안개)가 지워진다(2026-10-22). 내성은 이펙트 없이 글자만 띄운다
-            if (!this.resistMarkers().has(ev.status))
-              this.playEventFx(statusFx(this.data, ev.status) ?? (ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff'), ev.targetUid);
-            sfx('status', { volume: 0.6 });
+            const played = this.resistMarkers().has(ev.status)
+              ? null
+              : this.playEventFx(statusFx(this.data, ev.status) ?? (ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff'), ev.targetUid);
+            // 이펙트에 제 소리(독 보글보글·잠 종소리 등)가 있으면 그 소리, 없으면 공통 상태 소리
+            if (!played || !fxSound(this.data, played)) sfx('status', { volume: 0.6 });
           }
           if (ev.status === 'knot_exposed' && ev.stacks > 0) this.alert('매듭이 드러났다 — 날 얹기!', 'support');
           break;
@@ -1617,18 +1619,23 @@ export class BattleView {
 
   /** 카드와 상관없이 회복·이로운 상태·해로운 상태·독에 겹치는 이펙트. 같은 자리에 0.4초 안에 두 번은 겹치지 않는다 */
   private eventFxAt = new Map<string, number>();
-  private playEventFx(kind: 'heal' | 'buff' | 'debuff' | 'poison' | (string & {}), targetUid: string): void {
+  /** 낸 이펙트 id(겹침 막기·임시 그림이면 null) */
+  private playEventFx(kind: 'heal' | 'buff' | 'debuff' | 'poison' | (string & {}), targetUid: string): string | null {
     const id = this.realFx(kind in this.data.fx.events ? this.data.fx.events[kind as 'heal'] : kind);
-    if (!id) return;
+    if (!id) return null;
     const now = performance.now();
-    if ((this.eventFxAt.get(targetUid) ?? -1e9) > now - 400) return;
+    if ((this.eventFxAt.get(targetUid) ?? -1e9) > now - 400) return null;
     this.eventFxAt.set(targetUid, now);
     void this.playFx(id, targetUid);
+    return id;
   }
 
   private async playFx(fxId: string, targetUid: string): Promise<void> {
     const t = this.units.get(targetUid);
     if (!t || this.disposed) return;
+    // 이펙트별 효과음(data/fx.json sounds, 2026-10-22): 피격·상태 소리 위에 작게 얹는다. 같은 소리가 한 순간에 겹치면 sfx가 하나로 줄인다
+    const sound = fxSound(this.data, fxId) as Sfx | undefined;
+    if (sound) sfx(sound, { pan: t.c.side === 'enemy' ? 0.35 : -0.35, volume: 0.55 });
     const canvas = h('canvas', { class: 'fx-canvas' }) as HTMLCanvasElement;
     const lr = this.fxLayer.getBoundingClientRect();
     const tr = t.el.getBoundingClientRect();

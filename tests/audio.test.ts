@@ -39,6 +39,7 @@ class FakeAudio {
 const param = () => ({ value: 1, setTargetAtTime() {}, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {}, cancelScheduledValues() {} });
 const node = () => ({ connect: (n: unknown) => n, disconnect: vi.fn() });
 let decodes = 0;
+let made: string[] = [];
 class FakeAudioContext {
   currentTime = 0;
   sampleRate = 8000;
@@ -49,6 +50,11 @@ class FakeAudioContext {
   createConvolver = () => ({ ...node(), buffer: null });
   createBuffer = (_c: number, len: number) => ({ getChannelData: () => new Float32Array(len) });
   createMediaElementSource = () => node();
+  // 합성 효과음용(이펙트별 소리 시험): 만든 소리 마디를 센다
+  createOscillator = () => (made.push('osc'), { ...node(), type: 'sine', frequency: param(), detune: param(), start() {}, stop() {} });
+  createBufferSource = () => (made.push('noise'), { ...node(), buffer: null, start() {}, stop() {} });
+  createBiquadFilter = () => ({ ...node(), type: 'lowpass', frequency: param(), Q: param() });
+  createStereoPanner = () => ({ ...node(), pan: param() });
   decodeAudioData = () => {
     decodes++;
     return Promise.resolve({});
@@ -159,5 +165,18 @@ describe('배경음악 흘려 듣기', () => {
     fire(winHandlers, 'keydown');
     await vi.advanceTimersByTimeAsync(10);
     expect(FakeAudio.all.filter((a) => !a.paused).map(name)).toEqual(['ending']);
+  });
+});
+
+describe('이펙트별 효과음(2026-10-22)', () => {
+  it('data/fx.json sounds가 쓰는 소리는 모두 합성할 수 있다(파일 없이 소리 마디를 만든다)', async () => {
+    const m = await audio();
+    const fx = (await import('../data/fx.json')).default as { sounds: Record<string, string> };
+    for (const name of new Set(Object.values(fx.sounds))) {
+      if (name === 'power') continue; // 파일(assets/audio/sfx/power.ogg)이 있는 소리
+      made = [];
+      m.sfx(name as Parameters<typeof m.sfx>[0]);
+      expect(made.length, name).toBeGreaterThan(0);
+    }
   });
 });

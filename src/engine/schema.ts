@@ -308,6 +308,8 @@ export const FxRules = z
     elementHit: z.object({ fire: z.string(), ice: z.string(), lightning: z.string() }).partial().strict().optional(),
     /** 상태 → 걸릴 때 이펙트(events.debuff·buff 대신) */
     statusFx: z.record(z.string(), z.string()).optional(),
+    /** 이펙트 → 효과음 이름(src/render/audio.ts SFX_NAMES). 그 이펙트가 나올 때 피격·상태 소리 위에 얹는다(2026-10-22) */
+    sounds: z.record(z.string(), z.string()).optional(),
     rules: z.array(
       z
         .object({
