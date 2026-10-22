@@ -1234,8 +1234,11 @@ export class BattleView {
             floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
             // 상태 이펙트: 독 → 독구름, 해로운 상태 → 보랏빛 문양, 이로운 상태 → 금빛 화살표(data/fx.json events)
             const kind = this.data.statuses.get(ev.status)?.kind;
-            // 감전·마비처럼 상태마다 정한 이펙트가 있으면 그것(data/fx.json statusFx)
-            this.playEventFx(statusFx(this.data, ev.status) ?? (ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff'), ev.targetUid);
+            // 감전·마비처럼 상태마다 정한 이펙트가 있으면 그것(data/fx.json statusFx).
+            // 행동 제약 내성(수면 내성 등)은 본 상태(졸음)보다 한 발 먼저 붙는다 — 여기서 금빛 화살표가 나가면 0.4초 겹침 막기에
+            // 걸려 본 상태 이펙트(잠 안개)가 지워진다(2026-10-22). 내성은 이펙트 없이 글자만 띄운다
+            if (!this.resistMarkers().has(ev.status))
+              this.playEventFx(statusFx(this.data, ev.status) ?? (ev.status === 'poison' ? 'poison' : kind === 'debuff' ? 'debuff' : 'buff'), ev.targetUid);
             sfx('status', { volume: 0.6 });
           }
           if (ev.status === 'knot_exposed' && ev.stacks > 0) this.alert('매듭이 드러났다 — 날 얹기!', 'support');
@@ -1604,6 +1607,12 @@ export class BattleView {
    */
   private realFx(id: string | undefined): string | null {
     return id && spriteSource(id) === 'sprites' ? id : null;
+  }
+
+  /** 다른 상태의 행동 제약 내성으로 쓰이는 상태(statuses[].resist) */
+  private resistMarkerSet: Set<string> | null = null;
+  private resistMarkers(): Set<string> {
+    return (this.resistMarkerSet ??= new Set([...this.data.statuses.values()].map((s) => s.resist).filter((r): r is string => !!r)));
   }
 
   /** 카드와 상관없이 회복·이로운 상태·해로운 상태·독에 겹치는 이펙트. 같은 자리에 0.4초 안에 두 번은 겹치지 않는다 */
