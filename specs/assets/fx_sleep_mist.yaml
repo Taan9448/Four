@@ -1,0 +1,14 @@
+id: fx_sleep_mist
+type: fx
+summary: "졸음 — 초승달과 별, 잠 안개가 내려앉는다 6프레임(2026-10-22, 수면 카드)"
+frames: 6
+fps: 12
+events: { impact: 3 }
+frame_notes:
+  1: "a few tiny pale blue star sparks drift down from above the center of the cell"
+  2: "a thin pale blue crescent moon fades in above the center, small white stars slowly circling it"
+  3: "the crescent moon at full brightness with a soft ring of drifting stars, wisps of pale blue sleep mist curling down around the center"
+  4: "the mist wraps lower around the center like a loose scarf, the moon dimming, the stars slowing"
+  5: "the moon fades away, a few drifting stars and thin mist wisps settle at the center"
+  6: "two or three tiny stars blinking out"
+placeholder: { accent: '#8fd3ff' }
