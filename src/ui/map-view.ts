@@ -610,7 +610,7 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
               )
             : null,
           run.replayOf ? pilgrimChallenges(data, run) : null,
-          run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼, 출발 편성의 평균 강화 단계만큼, 그리고 클리어 직후보다 더 모은 유물만큼(유물 점수 일반 1 · 고급 1.2 · 희귀 1.5 · 영웅 2 · 전설 2.5, 무료 점수를 넘긴 1점마다 적 체력 ×1.03 — 유물은 여럿이 겹치면 곱으로 세지므로)(상한 있음). 출발할 때 정해져 이 길 동안 그대로다.') }, pilgrimLabel(data, run)) : null,
+          run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼, 가진 유물 수, 출발 편성의 평균 강화 단계만큼(상한 있음). 출발할 때 정해져 이 길 동안 그대로다.') }, pilgrimLabel(data, run)) : null,
           h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
           run.abyss?.laws?.length
             ? h(
@@ -651,14 +651,12 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   );
 }
 
-/** 순례 일행 보정 한 줄(지도 오른쪽 칸·전투 시작 띠): "순례 — 적 체력 ×4.4 · 피해 ×2.1 (레벨 +0 · 유물 52(영웅 6 · 전설 2) ×3.9 · 강화 +1.5)" */
+/** 순례 일행 보정 한 줄(지도 오른쪽 칸·전투 시작 띠): "순례 — 적 체력 ×2.2 · 피해 ×1.8 (레벨 +8 · 유물 24 · 강화 +1.5)" */
 export function pilgrimLabel(data: GameData, run: RunState): string {
   const k = pilgrimScale(data, run);
   const x = (n: number) => `×${Number(n.toFixed(2))}`;
   const n1 = (n: number) => Number(n.toFixed(1));
-  const tiers = [k.epic ? `영웅 ${k.epic}` : '', k.legendary ? `전설 ${k.legendary}` : ''].filter(Boolean).join(' · ');
-  const mul = k.relicMul && k.relicMul > 1 ? ` ${x(k.relicMul)}` : '';
-  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics}${tiers ? `(${tiers})` : ''}${mul} · 강화 +${n1(k.upgrade)})`;
+  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics} · 강화 +${n1(k.upgrade)})`;
 }
 
 const CH_STATE: Record<string, [string, string]> = {

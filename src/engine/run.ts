@@ -584,9 +584,7 @@ export function battleSetupFor(data: GameData, run: RunState, enc: Encounter): B
       enemyMods: abyssEnemyMods(data, run, enc.module.id, enc.node, enc.node.enemies ?? enc.module.content.enemies ?? []),
     };
   }
-  const k = pilgrimScale(data, run);
-  // 순례 보스전은 유물 지수를 덜 받는다(relicBossShare)
-  const pilgrim = enc.node.type === 'boss' ? { hp: k.bossHp ?? k.hp, dmg: k.bossDmg ?? k.dmg } : k;
+  const pilgrim = pilgrimScale(data, run);
   return {
     world: stageWorld(data, run),
     party: run.selected.map((id) => {

@@ -146,17 +146,12 @@ export function pilgrimageReport(data: GameData, batches: PilgrimBatch[], seeds:
   lines.push(
     `보유 상태: ${HOLDS.map((h) => `**${HOLD_NAME[h]}**(출발 편성 평균 강화 +${mean(of(h).map((r) => r.scale.upgrade)).toFixed(1)} · 유물 ${mean(of(h).map((r) => r.relics.length)).toFixed(1)}개, 영웅 ${tierOf(h, 'epic').toFixed(1)} · 전설 ${tierOf(h, 'legendary').toFixed(1)})`).join(' · ')}. 쌓음은 클리어 일행이 S1~S9를 그만큼 걸어 이긴 길의 것을 실제로 쌓은 것(진 길은 남지 않는다), 다 모은 상태는 유물 전부 + 보유 카드 전부 최대 강화.`,
   );
-  const tiers = Object.entries(p.relicPts)
-    .map(([k, v]) => `${k} ${v}`)
-    .join(' · ');
-  lines.push(
-    `일행 보정(\`balance.pilgrimage\`, 출발 편성을 정할 때 고정): (1 + max(0, 하운 레벨 − 기준 레벨) × (체력 ${p.hpPerLevel} · 피해 ${p.dmgPerLevel}) + 출발 편성 평균 강화 × ${p.upgradePct}(열쇠 카드 제외)) × ${1 + p.relicGrowth}^max(0, 유물 점수(${tiers}) − 무료 ${p.relicFree})(피해는 지수 × ${p.relicDmgShare}), 상한 체력 ×${p.maxHp} · 피해 ×${p.maxDmg}. 순례 길에서 가진 유물이 다시 나오면 골드로.`,
-  );
+  lines.push(`일행 보정(\`balance.pilgrimage\`, 출발 편성을 정할 때 고정): 1 + max(0, 하운 레벨 − 기준 레벨) × (체력 ${p.hpPerLevel} · 피해 ${p.dmgPerLevel}) + 유물 수 × ${p.relicPct} + 출발 편성 평균 강화 × ${p.upgradePct}(열쇠 카드 제외), 상한 체력 ×${p.maxHp} · 피해 ×${p.maxDmg}. 순례 길에서 가진 유물이 다시 나오면 골드로. 순례는 쌓을수록 쉬워지는 것이 의도(2026-10-22) — 쌓음·다 모은 상태는 얼마나 쉬워지는지 보는 참고값.`);
   lines.push(`목표(GAME_DESIGN 2절 · 12절): 넘김 ${fmtPct(t.win[0])}~${fmtPct(t.win[1])} · 보스 패배 모든 스테이지 ${fmtPct(t.bossDefeat[0])}~${fmtPct(t.bossDefeat[1])} · 두 보유 상태의 넘김 차이 ${fmtPct(t.holdGapMax)} 안 · 일반 전투 ${t.normalTurns[0]}~${t.normalTurns[1]}턴 · 파티 손실 ${fmtPct(t.partyLoss[0])}~${fmtPct(t.partyLoss[1])}.`);
   lines.push('');
   lines.push(
     ...warningSection(
-      HOLDS.filter((h) => h !== 'full').flatMap((h) =>
+      (['clear', 'plus2'] as const).flatMap((h) =>
         byHold[h].flatMap((r) => [
           outside(`${HOLD_NAME[h]} ${r.stageId} 넘김`, r.win, t.win[0], t.win[1]),
           outside(`${HOLD_NAME[h]} ${r.stageId} 보스 패배`, r.bossDefeat, t.bossDefeat[0], t.bossDefeat[1]),
@@ -168,12 +163,12 @@ export function pilgrimageReport(data: GameData, batches: PilgrimBatch[], seeds:
   );
   const inRange = (x: number, [lo, hi]: number[]) => x >= lo && x <= hi;
   const gap = Math.abs(winOf('clear') - winOf('plus2'));
-  const bossAll = (['clear', 'plus2', 'stack1', 'stack3'] as const).flatMap((h) => byHold[h].map((r) => r.bossDefeat));
+  const bossAll = (['clear', 'plus2'] as const).flatMap((h) => byHold[h].map((r) => r.bossDefeat));
   lines.push(
     ...targetTable([
-      ...HOLDS.map((h) => ({ label: `넘김 — ${HOLD_NAME[h]}`, target: `${fmtPct(t.win[0])}~${fmtPct(t.win[1])}`, now: fmtPct(winOf(h)), ok: inRange(winOf(h), t.win) })),
+      ...(['clear', 'plus2'] as const).map((h) => ({ label: `넘김 — ${HOLD_NAME[h]}`, target: `${fmtPct(t.win[0])}~${fmtPct(t.win[1])}`, now: fmtPct(winOf(h)), ok: inRange(winOf(h), t.win) })),
       { label: '두 보유 상태의 넘김 차이', target: `${fmtPct(t.holdGapMax)} 이하`, now: `${(gap * 100).toFixed(1)}%p`, ok: gap <= t.holdGapMax },
-      { label: '보스 패배(모든 스테이지 · 다 모은 상태 빼고)', target: `${fmtPct(t.bossDefeat[0])}~${fmtPct(t.bossDefeat[1])}`, now: `${fmtPct(Math.min(...bossAll))}~${fmtPct(Math.max(...bossAll))}`, ok: bossAll.every((x) => inRange(x, t.bossDefeat)) },
+      { label: '보스 패배(모든 스테이지 · 클리어 그대로·+2)', target: `${fmtPct(t.bossDefeat[0])}~${fmtPct(t.bossDefeat[1])}`, now: `${fmtPct(Math.min(...bossAll))}~${fmtPct(Math.max(...bossAll))}`, ok: bossAll.every((x) => inRange(x, t.bossDefeat)) },
       { label: '일반 전투 턴(스테이지 평균)', target: `${t.normalTurns[0]}~${t.normalTurns[1]}`, now: mean(rows(data, runs).map((r) => r.turns)).toFixed(1), ok: inRange(mean(rows(data, runs).map((r) => r.turns)), t.normalTurns) },
       { label: '파티 손실(스테이지 평균)', target: `${fmtPct(t.partyLoss[0])}~${fmtPct(t.partyLoss[1])}`, now: fmtPct(mean(rows(data, runs).map((r) => r.loss))), ok: inRange(mean(rows(data, runs).map((r) => r.loss)), t.partyLoss) },
     ]),

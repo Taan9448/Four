@@ -1,4 +1,4 @@
-// 순례 일행 보정의 세 항(GAME_DESIGN 2절, 2026-10-12 · 유물 몫은 등급별 2026-10-21): run.ts(전투 배율)와 collection.ts(출발 편성 때 고정)가 함께 쓴다
+// 순례 일행 보정의 세 항(GAME_DESIGN 2절, 2026-10-12): run.ts(전투 배율)와 collection.ts(출발 편성 때 고정)가 함께 쓴다
 import type { GameData } from './data';
 import type { RunState } from './run';
 
@@ -9,14 +9,6 @@ export interface PilgrimScale {
   /** 하운 레벨 − 스테이지 기준 레벨(0 이상) */
   level: number;
   relics: number;
-  /** 유물 점수(등급별 relicPts의 합) · 유물이 곱한 적 체력 배율 · 그중 영웅·전설 수(지도·전투 띠에 보인다). 옛 저장에 고정된 값에는 없다 */
-  relicPts?: number;
-  relicMul?: number;
-  epic?: number;
-  legendary?: number;
-  /** 보스전 배율(유물 지수를 relicBossShare만큼만). 없으면 hp·dmg 그대로 */
-  bossHp?: number;
-  bossDmg?: number;
   /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 */
   upgrade: number;
 }
@@ -30,26 +22,13 @@ export function measurePilgrimScale(data: GameData, run: Pick<RunState, 'roster'
     .flat()
     .filter((id) => !data.cards.get(id)?.essential);
   const upgrade = cards.length ? cards.reduce((a, id) => a + (run.collection?.[id] ?? 0), 0) / cards.length : 0;
-  const rarities = run.relics.map((id) => data.relics.get(id)?.rarity);
-  const relicPts = rarities.reduce((a, r) => a + (r ? (p.relicPts[r] ?? 0) : 0), 0);
-  // 클리어 직후 일행이 가진 만큼(relicFree)은 무료, 그 위로 모은 유물 1점마다 곱으로(2026-10-21 순례 누적)
-  const over = Math.max(0, relicPts - p.relicFree);
-  const relicMul = Math.pow(1 + p.relicGrowth, over);
+  const extra = run.relics.length * p.relicPct + upgrade * p.upgradePct;
   const round = (x: number) => Math.round(x * 100) / 100;
-  const baseHp = 1 + level * p.hpPerLevel + upgrade * p.upgradePct;
-  const baseDmg = 1 + level * p.dmgPerLevel + upgrade * p.upgradePct;
-  const mul = (e: number) => Math.pow(1 + p.relicGrowth, over * e);
   return {
-    hp: round(Math.min(p.maxHp, baseHp * relicMul)),
-    dmg: round(Math.min(p.maxDmg, baseDmg * mul(p.relicDmgShare))),
-    bossHp: round(Math.min(p.maxHp, baseHp * mul(p.relicBossShare))),
-    bossDmg: round(Math.min(p.maxDmg, baseDmg * mul(p.relicDmgShare * p.relicBossShare))),
+    hp: round(Math.min(p.maxHp, 1 + level * p.hpPerLevel + extra)),
+    dmg: round(Math.min(p.maxDmg, 1 + level * p.dmgPerLevel + extra)),
     level,
     relics: run.relics.length,
-    relicPts: Math.round(relicPts * 10) / 10,
-    relicMul: round(relicMul),
-    epic: rarities.filter((r) => r === 'epic').length,
-    legendary: rarities.filter((r) => r === 'legendary').length,
     upgrade: round(upgrade),
   };
 }

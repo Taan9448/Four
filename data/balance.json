@@ -128,15 +128,11 @@
     "baseLevel": { "s0": 1, "s1": 2.5, "s2": 3, "s3": 4, "s4": 5.5, "s5": 6.5, "s6": 7.5, "s7": 8.5, "s8": 9.5, "s9": 10 },
     "hpPerLevel": 0.18,
     "dmgPerLevel": 0.12,
-    "relicPts": { "common": 1, "uncommon": 1.2, "rare": 1.5, "epic": 2, "legendary": 2.5 },
-    "relicFree": 28,
-    "relicGrowth": 0.03,
-    "relicDmgShare": 0.4,
-    "relicBossShare": 0.8,
+    "relicPct": 0.01,
     "dupGold": { "common": 45, "uncommon": 60, "rare": 80, "epic": 110, "legendary": 150 },
     "upgradePct": 0.10,
-    "maxHp": 40,
-    "maxDmg": 8
+    "maxHp": 3.2,
+    "maxDmg": 2.6
   },
   "enemyTiers": { "normal": { "hp": 1.4, "dmg": 0.88 }, "elite": { "hp": 1.2, "dmg": 1.43 }, "boss": { "hp": 1.0, "dmg": 1.0 } },
   "stage": { "healOnEnter": 1 },

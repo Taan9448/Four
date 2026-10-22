@@ -187,7 +187,7 @@ describe('순례 — 저장 이행(5)', () => {
 
 describe('순례 — 일행 보정(2)', () => {
   const p = data.balance.pilgrimage;
-  it('(d) 세 항(2026-10-12 · 유물은 등급별 점수의 곱, 보스는 지수를 덜 2026-10-21): (1 + 레벨 초과 × 레벨당 + 평균 강화 × upgradePct) × (1 + relicGrowth)^(유물 점수 − 무료), 상한, 캠페인은 1', () => {
+  it('(d) 세 항(2026-10-12): 1 + 레벨 초과 × 레벨당 + 유물 수 × relicPct + 출발 편성 평균 강화 × upgradePct, 상한, 캠페인은 1', () => {
     const hub = cleared('PIL6');
     expect(pilgrimScale(data, hub)).toEqual({ hp: 1, dmg: 1, level: 0, relics: 0, upgrade: 0 });
     const run = startReplay(data, hub, 's3');
@@ -197,33 +197,12 @@ describe('순례 — 일행 보정(2)', () => {
     // 출발 편성(열쇠 카드 제외)의 평균 강화
     const cards = Object.values(run.loadout).flat().filter((id) => !data.cards.get(id)?.essential);
     for (const id of cards) run.collection[id] = 2;
-    // 무료 점수를 넘기도록 등급마다 여럿 더 쥐여 준다
-    for (const rarity of ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const)
-      for (const r of [...data.relics.values()].filter((x) => x.rarity === rarity && !x.abyss && !run.relics.includes(x.id)).slice(0, 8)) run.relics.push(r.id);
-    const pts = run.relics.reduce((a, id) => a + (p.relicPts[data.relics.get(id)!.rarity] ?? 0), 0);
-    expect(pts).toBeGreaterThan(p.relicFree);
-    expect(p.relicPts.legendary).toBeGreaterThan(p.relicPts.common!);
-    const mul = Math.pow(1 + p.relicGrowth, pts - p.relicFree);
-    const round = (x: number) => Math.round(x * 100) / 100;
+    const want = (per: number, cap: number) => Math.round(Math.min(cap, 1 + over * per + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100;
     const k = pilgrimScale(data, run);
-    const tier = (t: string) => run.relics.filter((id) => data.relics.get(id)!.rarity === t).length;
-    expect(k).toEqual({
-      hp: round(Math.min(p.maxHp, (1 + over * p.hpPerLevel + 2 * p.upgradePct) * mul)),
-      dmg: round(Math.min(p.maxDmg, (1 + over * p.dmgPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicDmgShare))),
-      bossHp: round(Math.min(p.maxHp, (1 + over * p.hpPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicBossShare))),
-      bossDmg: round(Math.min(p.maxDmg, (1 + over * p.dmgPerLevel + 2 * p.upgradePct) * Math.pow(1 + p.relicGrowth, (pts - p.relicFree) * p.relicDmgShare * p.relicBossShare))),
-      level: over,
-      relics: run.relics.length,
-      relicPts: Math.round(pts * 10) / 10,
-      relicMul: round(mul),
-      epic: tier('epic'),
-      legendary: tier('legendary'),
-      upgrade: 2,
-    });
-    // 무료 점수 안이면 유물은 적을 세게 하지 않는다
+    expect(k).toEqual({ hp: want(p.hpPerLevel, p.maxHp), dmg: want(p.dmgPerLevel, p.maxDmg), level: over, relics: run.relics.length, upgrade: 2 });
+    // 기준 레벨 이하면 유물·강화 몫만
     haun.level = 1;
-    run.relics = run.relics.slice(0, 3);
-    expect(pilgrimScale(data, run).hp).toBe(round(1 + 2 * p.upgradePct));
+    expect(pilgrimScale(data, run).hp).toBe(Math.round((1 + run.relics.length * p.relicPct + 2 * p.upgradePct) * 100) / 100);
     // 상한
     haun.level = 99;
     run.relics = Array.from({ length: 500 }, () => 'red_thread');
