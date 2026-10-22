@@ -104,23 +104,23 @@ describe('순례 누적 — 보스를 넘기면 길에서 얻은 것이 남는�
     expect(hub.relics.filter((r) => r === relic).length).toBe(1);
   });
 
-  it('(i) 순례 길에서는 가진 유물도 다시 나오고, 다시 나오면 등급별 골드로 받는다(캠페인은 그대로 무시)', () => {
+  it('(i) 가진 유물도 다시 나오고, 다시 나오면 등급별 골드로 받는다(순례·캠페인 모두)', () => {
     const hub = cleared('PIL11');
     const have = hub.relics[0] ?? freshRelic(hub);
     if (!hub.relics.includes(have)) hub.relics.push(have);
     const run = startReplay(data, hub, 's2');
     const gold = run.gold;
-    const want = data.balance.pilgrimage.dupGold[data.relics.get(have)!.rarity]!;
+    const want = data.balance.economy.relicDupGold[data.relics.get(have)!.rarity]!;
     expect(want).toBeGreaterThan(0);
     expect(gainRelic(data, run, have)).toEqual([`이미 가진 유물 「${data.relics.get(have)!.name}」 — 골드 +${want}`]);
     expect(run.gold).toBe(gold + want);
     expect(run.relics.filter((r) => r === have).length).toBe(1);
-    // 캠페인 런은 전처럼 아무 일도 없다
+    // 캠페인 런도 같다(2026-10-22 모든 모드)
     const campaign = createRunAt(data, 'PIL11C', 's3');
     campaign.relics.push(have);
     const g = campaign.gold;
-    expect(gainRelic(data, campaign, have)).toEqual([]);
-    expect(campaign.gold).toBe(g);
+    expect(gainRelic(data, campaign, have)).toHaveLength(1);
+    expect(campaign.gold).toBe(g + want);
     // 엘리트·보스 전리품 후보에 가진 유물이 오를 수 있다
     run.relics = [...data.relics.values()].filter((r) => !r.abyss && r.rarity !== 'path').map((r) => r.id);
     const elite = run.map.floors.flat().find((n) => n.type === 'elite') ?? { ...run.map.floors[0][0], type: 'elite' as const };

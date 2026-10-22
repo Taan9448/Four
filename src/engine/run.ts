@@ -794,18 +794,18 @@ export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' 
   return out;
 }
 
-/** 순례 길(2026-10-21): 가진 유물도 다시 나오고, 다시 나온 유물은 골드로 받는다 */
-export const relicDupAllowed = (run: Pick<RunState, 'replayOf'>): boolean => !!run.replayOf;
+/** 가진 유물이 다시 나왔을 때 받는 골드(등급별, balance.economy.relicDupGold — 2026-10-22 모든 모드) */
+export const dupRelicGold = (data: GameData, id: string): number => data.balance.economy.relicDupGold[data.relics.get(id)?.rarity ?? ''] ?? 0;
 
-/** 가진 유물이 다시 나왔을 때 받는 골드(등급별, balance.pilgrimage.dupGold) */
-export const dupRelicGold = (data: GameData, id: string): number => data.balance.pilgrimage.dupGold[data.relics.get(id)?.rarity ?? ''] ?? 0;
-
-/** 유물을 얻는다(이미 있으면 무시 — 순례 길에서는 골드로). 얻는 순간(pickup) 효과를 적용한다 */
+/**
+ * 유물을 얻는다. 얻는 순간(pickup) 효과를 적용한다. 가진 유물이 다시 나오면(2026-10-22 사용자 결정 — 캠페인·순례·심연 모두)
+ * 등급별 골드로 받는다(심연의 길은 그대로 무시)
+ */
 export function gainRelic(data: GameData, run: RunState, id: string): string[] {
   const relic = data.relics.get(id);
   if (!relic) throw new Error(`알 수 없는 유물: ${id}`);
   if (run.relics.includes(id)) {
-    if (!relicDupAllowed(run)) return [];
+    if (relic.rarity === 'path') return [];
     const gold = dupRelicGold(data, id);
     run.gold += gold;
     return [`이미 가진 유물 「${relic.name}」 — 골드 +${gold}`];
@@ -1328,13 +1328,12 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push(`동료 모두 최대 체력 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
         break;
       case 'gain_relic': {
-        // relic이 없으면 가지지 않은 유물 중 무작위(영웅·전설 제외 — rarity가 있으면 그 등급만. 심연 전용은 심연에서만)
+        // relic이 없으면 유물 중 무작위(가진 유물이면 골드로 — 영웅·전설 제외, rarity가 있으면 그 등급만. 심연 전용은 심연에서만)
         let id = e.relic;
         if (!id) {
           const pool = [...data.relics.values()].filter(
             (r) =>
               relicAllowed(run, r) &&
-              (relicDupAllowed(run) || !run.relics.includes(r.id)) &&
               (e.rarity ? (e.rarity as string[]).includes(r.rarity) : r.rarity !== 'epic' && r.rarity !== 'legendary'),
           );
           id = pool.length ? rng.pick(pool).id : undefined;

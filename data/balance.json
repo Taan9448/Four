@@ -73,6 +73,7 @@
   },
   "economy": {
     "startGold": 30,
+    "relicDupGold": { "common": 35, "uncommon": 45, "rare": 60, "epic": 85, "legendary": 115 },
     "debugGoldPerStage": 80,
     "gold": { "battle": [10, 16], "elite": [25, 35], "boss": [55, 75] },
     "potionSlots": 3,
@@ -129,7 +130,6 @@
     "hpPerLevel": 0.18,
     "dmgPerLevel": 0.12,
     "relicPct": { "common": 0.005, "uncommon": 0.007, "rare": 0.01, "epic": 0.015, "legendary": 0.02 },
-    "dupGold": { "common": 45, "uncommon": 60, "rare": 80, "epic": 110, "legendary": 150 },
     "upgradePct": 0.10,
     "maxHp": 3.2,
     "maxDmg": 2.6
