@@ -894,6 +894,9 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .card-marks-wrap { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .card-marks { position: absolute; top: 6px; right: 5px; display: flex; flex-direction: column; gap: 2px; }
 .card-mark-awaken { position: absolute; top: 2px; left: 50%; transform: translateX(-50%); }
+/* 융합 카드는 오른쪽 위가 마나 비용 보석 자리 — 각인 구슬을 그 아래로, 조금 작게(넷이 이름 띠에 닿지 않게) */
+.card-px .marks-below-cost .card-marks { top: 28px; gap: 1px; }
+.card-px .marks-below-cost .card-mark:not(.card-mark-awaken) { width: 13px; height: 13px; font-size: 9px; }
 .card-mark { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: #1f3f73; color: #dff4ff; font-size: 0.72rem; line-height: 1; box-shadow: 0 0 0 1px #4fb4ff; }
 .card-mark-awaken { background: #b8741a; color: #fff6d8; box-shadow: 0 0 0 1px #ffe08a, 0 0 6px rgba(242, 169, 59, 0.8); }
 .engrave-choices { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }

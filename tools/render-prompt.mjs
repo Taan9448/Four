@@ -192,7 +192,7 @@ export function renderPrompt(spec, style) {
         `- Everything else is the frame body: ${notes(1)}\n` +
         `Style: ${spec.style ?? style.sprite_style}; front view, perfectly flat, symmetric left to right${spec.symmetric === false ? ' except where described' : ''}, light from the upper left, no perspective, no drop shadow.\n` +
         paletteLine(spec, style) +
-        `Never use ${key.name}, pink or purple in the frame.\n` +
+        `Never use ${key.name}, pink or purple in the frame${spec.allow_purple ? ' except the violet tones listed in the palette' : ''}.\n` +
         'Rules: no text, no letters, no numbers, no runes that read as letters, no signature, no watermark, no picture inside the art window.'
       );
     }

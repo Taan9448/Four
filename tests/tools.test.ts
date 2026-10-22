@@ -552,6 +552,22 @@ describe('저장소의 실제 명세와 임시 시트', () => {
   });
 });
 
+describe('대강화 틀 전체(2026-10-22)', () => {
+  it('+8·+9·+10 × 무공·마법·융합 9장은 기본 틀과 자리(layout)가 같고, 보라 틀만 보라를 쓴다', () => {
+    const base = { murim: 'card_frame_murim', magic: 'card_frame_magic', fusion: 'card_frame_fusion' };
+    for (const t of [8, 9, 10])
+      for (const [w, id] of Object.entries(base)) {
+        const spec = loadSpec(`card_frame_forge_${t}_${w}`);
+        expect(spec.layout, `${t} ${w}`).toEqual(loadSpec(id).layout);
+        const prompt = renderPrompt(spec, loadPromptData());
+        expect(prompt).toContain(`assets/sprites/${id}/frame_01.png`);
+        expect(prompt.includes('except the violet tones')).toBe(t === 9);
+        // 색 코드가 YAML 주석으로 잘리지 않는다
+        expect(prompt).toMatch(/NAME BANNER: .*ribbon \(#[0-9a-f]{6}, #[0-9a-f]{6}\)/);
+      }
+  });
+});
+
 describe('팔레트 맞춤', () => {
   const palette = (loadStyleData() as { palette: string[] }).palette.map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
   const hex = (c: number[]) => `#${c.map((x) => x.toString(16).padStart(2, '0')).join('')}`;
