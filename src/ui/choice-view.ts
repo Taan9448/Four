@@ -9,7 +9,7 @@ import { h } from './dom';
 import { tipAttrs } from './tooltip';
 import { scarBadge } from './map-view';
 import { chipKind } from './overlay';
-import { gainRelic } from '../engine/run';
+import { dupRelicGold, gainRelic } from '../engine/run';
 import { swapPotion, type Loot } from '../engine/economy';
 import { gainItemView, potionChip, relicChip } from './items';
 import type { PilgrimOffer } from '../engine/pilgrimage';
@@ -358,12 +358,17 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
 /** 보상 화면 머리: 고른 카드가 어디로 가는지 한 줄 + (캠페인) 지금 편성 점수 막대 — 편성 화면과 같은 막대 */
 function rewardDestination(data: GameData, run: RunState): HTMLElement {
   if (run.abyss) return h('p', { class: 'reward-dest' }, '고른 카드는 덱에 바로 들어간다.');
-  if (run.replayOf) return h('p', { class: 'reward-dest' }, '고른 카드는 이 순례 길의 덱에만 들어간다.');
   const owners = loadoutOwners(data, run);
   return h(
     'div',
     { class: 'reward-dest' },
-    h('p', {}, '고른 카드는 보유 카드에 들어간다. 다음 편성(여관·출발 전)에서 덱에 넣을 수 있다.'),
+    h(
+      'p',
+      {},
+      run.replayOf
+        ? '고른 카드는 보유 카드에 들어간다. 이 길의 보스를 넘기면 클리어 뒤에도 남는다(지거나 길을 버리면 사라진다).'
+        : '고른 카드는 보유 카드에 들어간다. 다음 편성(여관·출발 전)에서 덱에 넣을 수 있다.',
+    ),
     h(
       'div',
       { class: 'reward-points' },
@@ -411,6 +416,8 @@ export function bossLootView(data: GameData, run: RunState, shown: LootShown, on
             },
             relicChip(data, id, 'big'),
             h('b', {}, def.name),
+            // 순례 길: 가진 유물도 나온다 — 고르면 골드로
+            run.relics.includes(id) ? h('em', { class: 'relic-dup' }, `가진 유물 — 고르면 골드 +${dupRelicGold(data, id)}`) : null,
             h('span', {}, def.description),
             def.flavor ? h('small', {}, def.flavor) : null,
           );

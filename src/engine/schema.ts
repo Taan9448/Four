@@ -802,6 +802,8 @@ export const Balance = z
     economy: z
       .object({
         startGold: z.number().int().min(0),
+        /** 가진 유물이 전리품·사건으로 다시 나오면 받는 골드(등급별, 2026-10-22 사용자 결정 — 캠페인·순례·심연 모두) */
+        relicDupGold: z.record(z.string(), z.number().int().min(0)).default({}),
         /** 중간 스테이지에서 시작할 때(createRunAt) 앞 스테이지당 주는 골드 */
         debugGoldPerStage: z.number().int().min(0),
         gold: z.object({ battle: Range, elite: Range, boss: Range }).strict(),
@@ -878,14 +880,15 @@ export const Balance = z
       .strict(),
     /**
      * 순례 일행 보정(GAME_DESIGN 2절, 2026-10-11 A안): 자유 여정에서 적 체력·피해 배율 =
-     * 1 + max(0, 하운 레벨 − baseLevel[스테이지]) × hpPerLevel(dmgPerLevel) + 유물 수 × relicPct, 상한 maxHp·maxDmg
+     * 1 + max(0, 하운 레벨 − baseLevel[스테이지]) × hpPerLevel(dmgPerLevel) + Σ 유물 등급별 relicPct + 평균 강화 × upgradePct, 상한 maxHp·maxDmg
      */
     pilgrimage: z
       .object({
         baseLevel: z.record(z.string(), z.number().positive()),
         hpPerLevel: z.number().min(0),
         dmgPerLevel: z.number().min(0),
-        relicPct: z.number().min(0),
+        /** 유물 한 개당(등급별, 2026-10-21 사용자 결정 — 영웅·전설이 더 무겁게). 없는 등급(길 유물)은 0 */
+        relicPct: z.partialRecord(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary', 'path']), z.number().min(0)),
         /** 출발 편성(열쇠 카드 제외)의 평균 강화 단계 1당(2026-10-12 보정식 세 항) */
         upgradePct: z.number().min(0).default(0),
         maxHp: z.number().min(1),

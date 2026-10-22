@@ -71,7 +71,7 @@ describe('난이도', () => {
 });
 
 describe('스테이지 다시 하기', () => {
-  it('마친 런의 파티로 그 스테이지를 처음부터, 끝나면 이긴 횟수만 남는다', () => {
+  it('마친 런의 파티로 그 스테이지를 처음부터, 이기면 이긴 횟수와 달라진 골드가 남는다(2026-10-21 순례 누적)', () => {
     const hub = createRunAt(data, 'HUB', 's9');
     hub.status = 'complete';
     hub.gold = 123;
@@ -80,11 +80,11 @@ describe('스테이지 다시 하기', () => {
     expect(replay.status).toBe('map');
     expect(replay.deck.length).toBe(hub.deck.length);
     expect(replay.roster.every((r) => r.hp === r.maxHp)).toBe(true);
-    replay.gold = 0;
+    replay.gold = 23;
     replay.status = 'stage_clear';
-    const back = finishReplay(replay);
+    const back = finishReplay(data, replay);
     expect(back.status).toBe('complete');
-    expect(back.gold).toBe(123);
+    expect(back.gold).toBe(23);
     expect(back.replays.s2).toBe(1);
     expect(() => startReplay(data, createRun(data, 'X'), 's1')).toThrow();
   });

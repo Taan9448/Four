@@ -43,14 +43,15 @@ function pickByTier<T extends { rarity: string }>(rng: Rng, pool: T[], weights: 
   return rng.pick(pool.filter((x) => x.rarity === tier));
 }
 
-/** 아직 없는 유물 후보(상점·엘리트용: 전설과 상점에 내놓지 않는 유물은 빼고) */
-function relicPool(data: GameData, run: RunState, exclude: string[] = []) {
-  return [...data.relics.values()].filter((r) => relicAllowed(run, r) && r.rarity !== 'legendary' && r.shop && !run.relics.includes(r.id) && !exclude.includes(r.id));
+/** 유물 후보(상점·엘리트용: 전설과 상점에 내놓지 않는 유물은 빼고). dup: 가진 유물도(전리품 — 다시 나오면 골드, 상점은 없는 것만) */
+function relicPool(data: GameData, run: RunState, exclude: string[] = [], dup = false) {
+  return [...data.relics.values()].filter((r) => relicAllowed(run, r) && r.rarity !== 'legendary' && r.shop && (dup || !run.relics.includes(r.id)) && !exclude.includes(r.id));
 }
 
 /** 보스 전리품 후보: 등급 가중치(relicWeights.boss)로 겹치지 않게 n개(영웅·전설, 모자라면 희귀) */
 function bossRelicChoices(data: GameData, run: RunState, rng: Rng, n: number): string[] {
-  const left = [...data.relics.values()].filter((r) => relicAllowed(run, r) && !run.relics.includes(r.id));
+  // 가진 유물도 후보에 오른다(고르면 골드, 2026-10-22)
+  const left = [...data.relics.values()].filter((r) => relicAllowed(run, r));
   const out: string[] = [];
   const weights = lootWeights(data, run).relic.boss;
   while (out.length < n) {
@@ -75,7 +76,7 @@ export function rollLoot(data: GameData, run: RunState, node: MapNode): Loot {
   let relicChoices: string[] = [];
   // 심연의 숙적·서약 '막아선 자'의 엘리트는 유물을 떨구지 않는다(2026-10-10: 숙적이 잦은 서약이 유물 때문에 봇에게 이득이던 것)
   const noRelic = isAbyss(run) && (node.moduleId === data.balance.abyss.nemesisModule || (kind === 'elite' && node.floor === runOath(data, run).eliteFloor));
-  if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run), lootWeights(data, run).relic.elite)?.id ?? null;
+  if (kind === 'elite' && !noRelic) relic = pickByTier(rng, relicPool(data, run, [], true), lootWeights(data, run).relic.elite)?.id ?? null;
   if (kind === 'boss' && !noRelic) {
     relicChoices = bossRelicChoices(data, run, rng, eco.bossRelicChoices);
   }

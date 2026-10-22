@@ -6,6 +6,7 @@ import { findNode, generateStageMap, mutateMapForSurge, type MapNode, type Stage
 import type { BattleOutcome, BattleSetup } from './battle';
 import type { CardInstance } from './state';
 import { measurePilgrimScale, type PilgrimScale } from './pilgrim-scale';
+import { applyPilgrimGains, pilgrimBase, type PilgrimBase } from './pilgrim-gains';
 export type { PilgrimScale } from './pilgrim-scale';
 export { measurePilgrimScale } from './pilgrim-scale';
 import { acquireCard, beginStageLoadout, COMMON, setLoadout, grantStarters, joinMidStage, ownerKey, recommendLoadout, swapCard, swappableCards, upgradeOwned, type Loadout } from './collection';
@@ -103,6 +104,8 @@ export interface RunState {
   challenges?: Record<string, string[]>;
   /** 순례 일행 보정: 출발 편성을 정할 때 고정한 값(GAME_DESIGN 2절, 2026-10-12 보정식 세 항). 없으면 그때그때 센다 */
   pilgrimScale?: PilgrimScale;
+  /** 순례 누적(2026-10-21): 이 길을 출발할 때(멈춘 길은 이어서 걸 때)의 모습. 보스를 넘기면 여기서 달라진 만큼을 클리어한 런에 더한다 */
+  pilgrimBase?: PilgrimBase;
   /** 이번 스테이지(심연은 굽이)를 시작할 때의 모습 — 끝 화면의 '얻은 것'·'상흔 +N'(2026-10-11 UI/UX 3-2) */
   stageStart?: StageStart;
   /** 결과 화면 통계 */
@@ -316,7 +319,7 @@ function buildMap(data: GameData, run: RunState): StageMap {
 
 /**
  * 스테이지 다시 하기(2026-10-08): 캠페인을 마친 런(hub)의 마지막 파티·덱·유물·물약·골드·레벨 그대로 stageId를 처음부터.
- * 다시 하는 런은 hub를 replayOf로 품고, 끝나면(이기든 지든) hub로 돌아간다. 다시 한 결과는 hub에 남기지 않는다(이긴 횟수만)
+ * 다시 하는 런은 hub를 replayOf로 품고, 끝나면 hub로 돌아간다. 순례 누적(2026-10-21): 보스를 넘기면 그 길에서 달라진 것을 hub에 더한다
  */
 export function startReplay(data: GameData, hub: RunState, stageId: string, opts: { fresh?: boolean } = {}): RunState {
   if (hub.status !== 'complete') throw new Error('캠페인을 마친 런에서만 다시 할 수 있다');
@@ -326,10 +329,10 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   const { [stageId]: paused, ...others } = hub.suspended ?? {};
   const back: RunState = structuredClone({ ...hub, replayOf: null, suspended: others });
   if (paused && !opts.fresh) {
-    // 멈춘 진행을 이어서: 그 길에서 얻은 카드는 그 길에 그대로, 그사이 클리어한 런에 들어온 카드(첫 순례 보상)도 함께 쓴다
+    // 멈춘 진행을 이어서: 그사이 클리어한 런에 들어온 것(다른 길·첫 순례 보상)에 이 길에서 달라진 만큼을 얹어 다시 맞춘다
     const run: RunState = structuredClone(paused);
     run.replayOf = back;
-    run.collection = mergeCollections(run.collection, hub.collection);
+    rebaseWalk(data, run, hub);
     run.presets = structuredClone(hub.presets);
     return run;
   }
@@ -343,6 +346,7 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   run.shop = null;
   run.levelLog = [];
   run.pendingUpgrades = [];
+  run.pilgrimBase = pilgrimBase(hub);
   // 이 길의 기록(순례 도전 판정용 전투 집계). 클리어한 런의 기록은 그대로 둔다
   run.stats = emptyStats();
   for (const r of run.roster) r.hp = r.maxHp;
@@ -355,23 +359,51 @@ export function startReplay(data: GameData, hub: RunState, stageId: string, opts
   return run;
 }
 
+/** 멈춘 길을 이어서 걸 때: 지금 hub에 이 길에서 달라진 만큼을 얹은 모습으로 맞추고, 그 hub를 새 기준으로 삼는다(지금 체력은 그대로) */
+function rebaseWalk(data: GameData, run: RunState, hub: RunState): void {
+  // 옛 저장(기준이 없는 멈춘 길)은 지금부터 센다
+  const base = run.pilgrimBase ?? pilgrimBase(run);
+  const next: RunState = structuredClone({ ...hub, replayOf: null, suspended: undefined, loadout: run.loadout });
+  applyPilgrimGains(data, next, base, run);
+  run.collection = next.collection;
+  run.engravings = next.engravings;
+  run.relics = next.relics;
+  run.potions = next.potions;
+  run.gold = next.gold;
+  run.loadout = next.loadout;
+  for (const r of run.roster) {
+    const n = next.roster.find((x) => x.id === r.id);
+    if (!n) continue;
+    r.maxHp = n.maxHp;
+    r.level = n.level;
+    r.xp = n.xp;
+    r.hp = Math.min(r.hp, r.maxHp);
+  }
+  for (const c of run.deck) if (run.collection[c.cardId] !== undefined) c.level = run.collection[c.cardId];
+  run.pilgrimBase = pilgrimBase(hub);
+}
+
 /**
- * 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올린다.
- * 순례(2026-10-11 A안): 길에서 얻은 카드·강화·카드 바꾸기·골드·유물·물약·레벨은 그 길 안에서만 — hub의 보유 카드·편성은 그대로.
- * 남기는 것은 이긴 횟수와 편성 저장 칸뿐(저장 칸은 불러올 때 가지지 않은 카드를 걸러 낸다)
+ * 다시 하기를 끝내고 hub로 돌아간다. 이겼으면 그 스테이지의 이긴 횟수를 올리고, 순례 누적(2026-10-21 사용자 결정):
+ * 그 길에서 달라진 카드·강화·각인·유물·물약·골드·동료를 hub에 더한다(편성·출전도 그 길의 것으로). 지면 편성 저장 칸만 남긴다
  */
-export function finishReplay(run: RunState): RunState {
+export function finishReplay(data: GameData, run: RunState): RunState {
   const hub = run.replayOf;
   if (!hub) throw new Error('다시 하는 중이 아니다');
-  if (run.status === 'stage_clear' || run.status === 'complete') hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
   carryBack(hub, run);
+  if (run.status === 'stage_clear' || run.status === 'complete') {
+    hub.replays[run.stageId] = (hub.replays[run.stageId] ?? 0) + 1;
+    applyPilgrimGains(data, hub, run.pilgrimBase ?? pilgrimBase(hub), run);
+    hub.loadout = Object.fromEntries(Object.entries(run.loadout).map(([k, ids]) => [k, ids.filter((id) => hub.collection[id] !== undefined)]));
+    hub.selected = [...run.selected];
+  }
   if (hub.suspended) delete hub.suspended[run.stageId];
   return hub;
 }
 
 /**
  * 자유 여정(2026-10-11): 다시 하던 스테이지를 지도에서 멈추고 클리어 지도로 나간다. 진행(그 길의 덱·골드·유물·얻은 카드)은
- * hub.suspended에 남아 그 장소를 다시 누르면 이어진다(startReplay). 클리어한 런에는 편성 저장 칸만 남긴다
+ * hub.suspended에 남아 그 장소를 다시 누르면 이어진다(startReplay). 클리어한 런에는 편성 저장 칸만 남긴다(길에서 얻은 것은 보스를 넘길 때)
  */
 export function suspendReplay(run: RunState): RunState {
   const hub = run.replayOf;
@@ -389,7 +421,7 @@ export function discardSuspended(hub: RunState, stageId: string): void {
   if (hub.suspended) delete hub.suspended[stageId];
 }
 
-/** 다시 하기에서 클리어한 런에 남기는 것: 편성 저장 칸만(순례 A안 — 보유 카드·편성은 그대로) */
+/** 다시 하기에서 클리어한 런에 늘 남기는 것: 편성 저장 칸(이기면 finishReplay가 길에서 달라진 것도 더한다) */
 function carryBack(hub: RunState, run: RunState): void {
   hub.presets = structuredClone(run.presets);
 }
@@ -762,11 +794,22 @@ export function fireRunRelics(data: GameData, run: RunState, trigger: 'victory' 
   return out;
 }
 
-/** 유물을 얻는다(이미 있으면 무시). 얻는 순간(pickup) 효과를 적용한다 */
+/** 가진 유물이 다시 나왔을 때 받는 골드(등급별, balance.economy.relicDupGold — 2026-10-22 모든 모드) */
+export const dupRelicGold = (data: GameData, id: string): number => data.balance.economy.relicDupGold[data.relics.get(id)?.rarity ?? ''] ?? 0;
+
+/**
+ * 유물을 얻는다. 얻는 순간(pickup) 효과를 적용한다. 가진 유물이 다시 나오면(2026-10-22 사용자 결정 — 캠페인·순례·심연 모두)
+ * 등급별 골드로 받는다(심연의 길은 그대로 무시)
+ */
 export function gainRelic(data: GameData, run: RunState, id: string): string[] {
   const relic = data.relics.get(id);
   if (!relic) throw new Error(`알 수 없는 유물: ${id}`);
-  if (run.relics.includes(id)) return [];
+  if (run.relics.includes(id)) {
+    if (relic.rarity === 'path') return [];
+    const gold = dupRelicGold(data, id);
+    run.gold += gold;
+    return [`이미 가진 유물 「${relic.name}」 — 골드 +${gold}`];
+  }
   run.relics.push(id);
   const out = [`유물 획득: ${relic.name}`];
   if (relic.trigger === 'pickup') out.push(...applyRunOps(data, run, relic.effects));
@@ -1285,13 +1328,12 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
         out.push(`동료 모두 최대 체력 ${e.amount! >= 0 ? '+' : ''}${e.amount}`);
         break;
       case 'gain_relic': {
-        // relic이 없으면 가지지 않은 유물 중 무작위(영웅·전설 제외 — rarity가 있으면 그 등급만. 심연 전용은 심연에서만)
+        // relic이 없으면 유물 중 무작위(가진 유물이면 골드로 — 영웅·전설 제외, rarity가 있으면 그 등급만. 심연 전용은 심연에서만)
         let id = e.relic;
         if (!id) {
           const pool = [...data.relics.values()].filter(
             (r) =>
               relicAllowed(run, r) &&
-              !run.relics.includes(r.id) &&
               (e.rarity ? (e.rarity as string[]).includes(r.rarity) : r.rarity !== 'epic' && r.rarity !== 'legendary'),
           );
           id = pool.length ? rng.pick(pool).id : undefined;

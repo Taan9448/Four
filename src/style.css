@@ -1423,6 +1423,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .relic-choice:hover { border-color: #e2b45c; box-shadow: 0 0 14px rgba(226, 180, 92, 0.35); transform: translateY(-3px); }
 .relic-choice span { font-size: var(--fs-sub); line-height: 1.45; }
 .relic-choice small { font-size: var(--fs-min); font-style: italic; color: var(--ink-dim); }
+.relic-choice .relic-dup { font-size: var(--fs-min); font-style: normal; color: #f2c66b; }
 .relic-chip .item-icon, .potion-chip .item-icon { display: grid; place-items: center; width: 100%; height: 100%; border: 0; border-radius: inherit; background: none; font: inherit; color: inherit; }
 .item-icon.has-art img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
 
@@ -1807,7 +1808,6 @@ img.vn-portrait, img.cutin-portrait {
 /* 보상·상점 카드의 보유 맥락 표(새 카드 / 보유 +1 → +2 / 최대 → 골드) */
 .offer-badge { position: absolute; left: 50%; top: -10px; transform: translateX(-50%); z-index: 3; white-space: nowrap; padding: 1px 7px; border-radius: 9px; font-size: var(--fs-cap); font-weight: 700; line-height: 15px; letter-spacing: -0.02em; border: 1px solid rgba(0, 0, 0, 0.6); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); pointer-events: auto; }
 .offer-new { background: #2f7d4a; color: #eaffef; }
-.offer-path { background: #3d4459; color: #e6e9f2; }
 .offer-up { background: #e2b45c; color: #2a1a06; }
 .offer-max { background: #5b5248; color: #f3e6c4; }
 .shop-cards .card { margin-top: 8px; }
@@ -1897,6 +1897,8 @@ button.potion-chip::after, .potion-chip.swap-slot::after { content: ''; position
 .stage-gains { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 10px auto 6px; max-width: 520px; text-align: left; font-size: var(--fs-body); }
 .stage-gains dt { color: #e2b45c; font-family: var(--f-head); font-weight: 800; }
 .stage-gains dd { margin: 0; color: var(--ink); }
+.pilgrim-keep { margin: 6px auto; max-width: 520px; font-size: var(--fs-small); color: #bfe3a0; }
+.pilgrim-keep.lost { color: #ffb38a; }
 .next-laws { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 8px 0; color: var(--ink-dim); font-size: var(--fs-sub); }
 /* 심연 시작: 동료 반신 그림 · 서약 줄 전체를 눌러 고른다(2026-10-11 UI/UX 3-4) */
 .abyss-mate { position: relative; overflow: hidden; }

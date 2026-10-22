@@ -34,6 +34,7 @@ import {
   setParty,
   restoreParty,
   startReplay,
+  finishReplay,
   upgradeCandidates,
   type RunOptions,
   type RunState,
@@ -621,7 +622,9 @@ function driveRun(data: GameData, run: RunState, seed: string, opts: BotOptions)
         // 전리품: 칸이 가득한 물약은 두고 가고, 보스 유물은 대가가 무겁지 않은 첫 후보(모두 무거우면 건너뛴다)
         const loot = rollLoot(data, run, enc.node);
         claimLoot(data, run, loot);
-        const pick = loot.relicChoices.find((id) => relicDownside(data, id) < 2);
+        // 순례 길은 가진 유물도 후보에 오른다 — 새 유물부터(없으면 가진 유물을 골라 골드로)
+        const light = loot.relicChoices.filter((id) => relicDownside(data, id) < 2);
+        const pick = light.find((id) => !run.relics.includes(id)) ?? light[0];
         if (pick) gainRelic(data, run, pick);
       }
       // 레벨업 강화는 무작위로 바로(봇은 카드 가치를 모른다)
@@ -678,9 +681,16 @@ export function clearCampaign(data: GameData, seed: string, opts: BotOptions = D
 
 /** 클리어 일행(hub)으로 stageId를 다시 걷는다(순례): 보스를 넘기면 complete. nth: 같은 hub로 몇 번째 걷는지(지도 시드가 달라진다) */
 export function playPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): RunReport {
+  return walkPilgrimage(data, hub, stageId, opts, nth).report;
+}
+
+/** 순례 길 하나를 걷고 클리어 지도로 돌아온다(순례 누적 — 이기면 길에서 얻은 것이 남은 hub, hub는 건드리지 않는다) */
+export function walkPilgrimage(data: GameData, hub: RunState, stageId: string, opts: BotOptions = DEFAULT_BOT, nth = 0): { report: RunReport; hub: RunState } {
   const h = structuredClone(hub);
   h.replays[stageId] = nth;
-  return driveRun(data, startReplay(data, h, stageId), `${hub.seed}:${stageId}:${nth}`, opts);
+  const run = startReplay(data, h, stageId);
+  const report = driveRun(data, run, `${hub.seed}:${stageId}:${nth}`, opts);
+  return { report, hub: finishReplay(data, run) };
 }
 
 // ───────────────────────── 심연(GAME_DESIGN 16절) ─────────────────────────

@@ -604,13 +604,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
             ? h(
                 'div',
                 { class: 'mode-badges' },
-                run.replayOf ? h('span', { class: 'mode-badge replay', ...tipAttrs('순례', '클리어한 일행으로 이 스테이지를 다시 걷는다. 길에서 얻는 것은 이 길 안에서만 쓰고, 이긴 횟수만 남는다.') }, '순례') : null,
+                run.replayOf ? h('span', { class: 'mode-badge replay', ...tipAttrs('순례', '클리어한 일행으로 이 스테이지를 다시 걷는다. 보스를 넘기면 이 길에서 얻은 카드·강화·유물·물약·골드가 남는다. 지거나 길을 버리면 사라진다.') }, '순례') : null,
                 run.difficulty === 'hard' ? h('span', { class: 'mode-badge hard' }, '어려움') : null,
                 run.hardcore ? h('span', { class: 'mode-badge hardcore', ...tipAttrs('하드코어', `쓰러진 동료는 돌아오지 않는다.${run.fallen.length ? `\n잃은 동료: ${run.fallen.map((id) => data.characters.get(id)?.name ?? id).join(', ')}` : ''}`) }, '하드코어') : null,
               )
             : null,
           run.replayOf ? pilgrimChallenges(data, run) : null,
-          run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼, 가진 유물 수, 출발 편성의 평균 강화 단계만큼(상한 있음). 출발할 때 정해져 이 길 동안 그대로다.') }, pilgrimLabel(data, run)) : null,
+          run.replayOf ? h('p', { class: 'pilgrim-scale', ...tipAttrs('일행 보정', '클리어한 일행이 강한 만큼 적도 강해진다: 하운 레벨이 이 스테이지 기준보다 높은 만큼, 가진 유물(등급이 높을수록 더 — 일반 0.5% · 고급 0.7% · 희귀 1% · 영웅 1.5% · 전설 2%), 출발 편성의 평균 강화 단계만큼(상한 있음 — 많이 모을수록 순례는 쉬워진다). 출발할 때 정해져 이 길 동안 그대로다.') }, pilgrimLabel(data, run)) : null,
           h('p', { class: 'stage-summary' }, run.abyss ? abyssTeaser(data, run) : (stage.teaser ?? '')),
           run.abyss?.laws?.length
             ? h(
@@ -651,12 +651,13 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
   );
 }
 
-/** 순례 일행 보정 한 줄(지도 오른쪽 칸·전투 시작 띠): "순례 — 적 체력 ×2.2 · 피해 ×1.8 (레벨 +8 · 유물 24 · 강화 +1.5)" */
+/** 순례 일행 보정 한 줄(지도 오른쪽 칸·전투 시작 띠): "순례 — 적 체력 ×2.2 · 피해 ×1.8 (레벨 +8 · 유물 24(영웅 4 · 전설 2) · 강화 +1.5)" */
 export function pilgrimLabel(data: GameData, run: RunState): string {
   const k = pilgrimScale(data, run);
   const x = (n: number) => `×${Number(n.toFixed(2))}`;
   const n1 = (n: number) => Number(n.toFixed(1));
-  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics} · 강화 +${n1(k.upgrade)})`;
+  const tiers = [k.epic ? `영웅 ${k.epic}` : '', k.legendary ? `전설 ${k.legendary}` : ''].filter(Boolean).join(' · ');
+  return `순례 — 적 체력 ${x(k.hp)} · 피해 ${x(k.dmg)} (레벨 +${n1(k.level)} · 유물 ${k.relics}${tiers ? `(${tiers})` : ''} · 강화 +${n1(k.upgrade)})`;
 }
 
 const CH_STATE: Record<string, [string, string]> = {
