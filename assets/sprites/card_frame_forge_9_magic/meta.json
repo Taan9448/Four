@@ -1,0 +1,60 @@
+{
+  "id": "card_frame_forge_9_magic",
+  "type": "card-frame",
+  "frameW": 128,
+  "frameH": 192,
+  "track": "pixel",
+  "pixelScale": 8,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    192
+  ],
+  "fit": "pad",
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "94d3508afccdd376",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1024,
+    1536
+  ],
+  "gridPurity": 0.79,
+  "window": [
+    17,
+    13,
+    94,
+    67
+  ],
+  "slots": {
+    "name": [
+      12,
+      82,
+      104,
+      17
+    ],
+    "text": [
+      14,
+      109,
+      100,
+      55
+    ],
+    "plaque": [
+      36,
+      174,
+      56,
+      11
+    ]
+  }
+}
