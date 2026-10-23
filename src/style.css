@@ -925,7 +925,26 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .card-px .cpx-spark { animation: cpx-rise 3.6s linear infinite; }
 @keyframes cpx-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 80% { opacity: 0.8; } 100% { transform: translateY(-120px); opacity: 0; } }
 .card-px.card-disabled .cpx-sheen, .card-px.card-disabled .cpx-spark { display: none; }
-.no-motion .cpx-glow, .no-motion .cpx-sheen, .no-motion .cpx-spark { display: none !important; }
+.no-motion .cpx-glow, .no-motion .cpx-sheen, .no-motion .cpx-spark, .no-motion .cpx-forge-fx, .no-motion .cpx-ember { display: none !important; }
+/* 대강화 +8·+9·+10 움직임(2026-10-23 사용자 요청 — 고강인 만큼 화려하게). 손패·보상·크게 보기에서만, 연출 끄기·줄인 움직임이면 없다 */
+.cpx-forge-fx { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; display: none; border-radius: 3px; }
+.cpx-forge-fx::before, .cpx-forge-fx::after { content: ''; position: absolute; pointer-events: none; }
+:is(.hand, .reward-cards, .zoom-card) .card-px .cpx-forge-fx, :is(.hand, .reward-cards, .zoom-card) .card-px .cpx-ember { display: block; }
+/* +8 담금질한 강철: 차가운 빛이 틀 전체를 비스듬히 훑는다 */
+.forge-8 .cpx-forge-fx::before { top: -30%; bottom: -30%; width: 40%; left: -60%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(143, 211, 255, 0.35), rgba(223, 244, 255, 0.7), rgba(143, 211, 255, 0.35), transparent); mix-blend-mode: screen; animation: forge-sweep 3.6s ease-in-out infinite; }
+/* +9 보랏빛 번개: 틀 안쪽이 불규칙하게 번쩍이고, 빛줄기가 훑는다 */
+.forge-9 .cpx-forge-fx::before { inset: 0; box-shadow: inset 0 0 0 2px rgba(212, 184, 255, 0.9), inset 0 0 14px rgba(163, 92, 255, 0.85); opacity: 0; animation: forge-flicker 2.3s steps(1) infinite; }
+.forge-9 .cpx-forge-fx::after { top: -30%; bottom: -30%; width: 30%; left: -60%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(163, 92, 255, 0.35), rgba(240, 225, 255, 0.75), rgba(163, 92, 255, 0.35), transparent); mix-blend-mode: screen; animation: forge-sweep 2.8s ease-in-out infinite; }
+/* +10 금빛 각성: 금빛이 넓게 훑고 안쪽 테두리가 숨 쉬듯 타오른다 + 금빛 불티 */
+.forge-10 .cpx-forge-fx::before { top: -30%; bottom: -30%; width: 55%; left: -70%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255, 224, 138, 0.4), rgba(255, 250, 225, 0.85), rgba(255, 224, 138, 0.4), transparent); mix-blend-mode: screen; animation: forge-sweep 3s ease-in-out infinite; }
+.forge-10 .cpx-forge-fx::after { inset: 0; box-shadow: inset 0 0 0 2px rgba(255, 224, 138, 0.8), inset 0 0 16px rgba(255, 138, 92, 0.7); animation: forge-burn 2.2s ease-in-out infinite; }
+.cpx-ember { position: absolute; z-index: 5; bottom: 6px; width: 3px; height: 3px; background: #ffe08a; box-shadow: 0 0 4px #ff8a5c; pointer-events: none; opacity: 0; display: none; animation: forge-ember 2.4s ease-out infinite; }
+@keyframes forge-sweep { 0%, 40% { left: -70%; } 80%, 100% { left: 140%; } }
+@keyframes forge-flicker { 0%, 100% { opacity: 0; } 8% { opacity: 1; } 11% { opacity: 0.2; } 14% { opacity: 0.9; } 18% { opacity: 0; } 61% { opacity: 0.8; } 64% { opacity: 0; } }
+@keyframes forge-burn { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes forge-ember { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(-150px) translateX(6px); } }
+@media (prefers-reduced-motion: reduce) { .cpx-forge-fx, .cpx-ember { display: none !important; } }
+.card-px.card-disabled .cpx-forge-fx, .card-px.card-disabled .cpx-ember { display: none; }
 .no-motion .card-px img.cpx-rarity { animation: none; }
 @media (prefers-reduced-motion: reduce) { .cpx-glow, .cpx-sheen, .cpx-spark { display: none !important; } .card-px img.cpx-rarity { animation: none; } }
 

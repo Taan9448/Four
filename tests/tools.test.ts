@@ -560,7 +560,9 @@ describe('대강화 틀 전체(2026-10-22)', () => {
         const spec = loadSpec(`card_frame_forge_${t}_${w}`);
         expect(spec.layout, `${t} ${w}`).toEqual(loadSpec(id).layout);
         const prompt = renderPrompt(spec, loadPromptData());
-        expect(prompt).toContain(`assets/sprites/${id}/frame_01.png`);
+        expect(spec.reference).toBe(`assets/source/${id}.png`);
+        // 고강인 만큼 화려하게(2026-10-23 — 첫 작업이 기본 틀 색만 바꾼 것이었다)
+        expect(prompt).toContain('DRAMATICALLY MORE LAVISH');
         expect(prompt.includes('except the violet tones')).toBe(t === 9);
         // 색 코드가 YAML 주석으로 잘리지 않는다
         expect(prompt).toMatch(/NAME BANNER: .*ribbon \(#[0-9a-f]{6}, #[0-9a-f]{6}\)/);

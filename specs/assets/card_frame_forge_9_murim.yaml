@@ -2,8 +2,8 @@ id: card_frame_forge_9_murim
 type: card-frame
 summary: >-
   REFORGED +9 card frame: the whole frame remade in dark violet star-steel with lightning — murim layout
-# 대강화 +9 무공 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다). card_frame_murim와 자리(layout)가 같고
-# 재질·장식만 +9(보랏빛 번개)로 바뀐다. 그림이 오면 게임이 card_frame_murim 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_9)
+# 대강화 +9 무공 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다. 2026-10-23: 첫 작업이 기본 틀 색만 바꾼 것이라 '고강인 만큼 화려하게' 다시). card_frame_murim와 자리(layout)가 같고
+# 장식은 훨씬 화려하게, 재질은 +9(보랏빛 번개)로 바뀐다. 그림이 오면 게임이 card_frame_murim 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_9)
 reference: assets/source/card_frame_murim.png
 layout:
   art: [16, 12, 96, 70]
@@ -22,9 +22,9 @@ text_panel: "warm off-white hanji paper (#f1efe6, #e0cfae)"
 allow_purple: true
 frame_notes:
   1: >-
-    keep exactly the same shapes and positions as the murim card frame (reference: assets/sprites/card_frame_murim/frame_01.png): the same
-    art window, cost socket(s), name banner, rarity socket, text box and type plaque; only the materials and ornaments change.
-    the WHOLE border is reforged in dark violet star-steel: deep violet-black metal plates (#2b2b3a, #4b3a6b, #6b4fa3) with bright violet lightning veins (#a35cff, #d4b8ff) crackling across them, a violet glow line around the art window, a small faceted violet crystal (#a35cff, #d4b8ff) at each corner; the outer edge is near-black (#0b0b10); a few touches of the martial arts frame remain: thin strips of dark lacquered wood (#2a1d16, #4a3426) between the metal plates and small cloud-scroll (xiangyun) shapes in the corner ornaments
+    THIS IS A TOP-TIER FORGED CARD and must look DRAMATICALLY MORE LAVISH than the base frame — never a simple recolor of it. Keep only the positions and sizes of the art window, cost socket(s), name banner, rarity socket, text box and type plaque from the reference (the game prints text there); everything else is redesigned: a thicker, layered border carved in raised relief with several depth steps, dense ornaments on every side and corner, extra gems, and ornaments that grow over the edges of the art window rim and the ends of the name banner (but never into the art window opening or the text box). Much more detail and contrast than the base frame.
+    +9 VIOLET LIGHTNING: dark violet star-steel (#2b2b3a, #4b3a6b, #6b4fa3) carved in relief with forked lightning bolts that glow bright violet and white (#a35cff, #d4b8ff, #f1efe6); a jagged crown of lightning spikes rising from the middle of the top border; large clusters of faceted violet crystals at the four corners; crackling arcs leaping between the crystals along the sides; tiny white star specks scattered over the dark metal; the art window rim crackling with a thin violet lightning line; the name banner ending in jagged lightning-bolt tips; two crossed lightning bolts above the type plaque.
+    Martial-arts touch (keep it subtle): the art window keeps its round moon-gate shape, small cloud-scroll (xiangyun) curls hidden inside the corner ornaments.
 style: >-
   crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
   steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
