@@ -173,6 +173,9 @@ function pixelCardView(
     h('img', { class: 'cpx-frame', src: fullFrame ?? frame, alt: '', draggable: 'false' }),
     // 대강화 +8·+9·+10 겹치는 테두리(card_frame_forge_*): 틀 전체(card_frame_forge_*_<세계>)가 아직 없을 때만. 그것도 없으면 CSS 빛(forge-N)만
     forgeFrame ? h('img', { class: 'cpx-forge', src: forgeFrame, alt: '', draggable: 'false' }) : null,
+    // 대강화 +8·+9·+10 움직임(2026-10-23 — 고강인 만큼 화려하게): 틀 전체를 훑는 빛(+8 강철·+9 보랏빛 번개 깜박임·+10 금빛), +10은 금빛 불티가 오른다
+    card.forge >= 3 ? h('span', { class: 'cpx-forge-fx', 'aria-hidden': 'true' }) : null,
+    ...(card.forge >= 5 ? [0, 1, 2, 3, 4, 5].map((i) => h('i', { class: 'cpx-ember', style: `left:${10 + i * 21}px;animation-delay:${(i * 0.53) % 2.4}s`, 'aria-hidden': 'true' })) : []),
     marksView(card, costs.length > 1),
     ...costs.map(costEl),
     h('div', { class: `cpx-name${nameSize}`, style: at(slots?.name) }, def.name, card.level ? h('span', { class: `card-level${card.level > 3 ? ' card-level-skill' : ''}${card.forge ? ' card-level-forge' : ''}` }, ` +${card.level}`) : null),
