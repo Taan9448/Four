@@ -23,14 +23,14 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 1,
-  "sourceHash": "a78615281b7d204e",
+  "sourceHash": "423d9482b4cc1b00",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1024,
     1536
   ],
-  "gridPurity": 0.702,
+  "gridPurity": 0.677,
   "window": [
     17,
     16,
@@ -39,21 +39,21 @@
   ],
   "slots": {
     "name": [
-      11,
+      10,
       82,
-      106,
+      108,
       10
     ],
     "text": [
       13,
       109,
       102,
-      61
+      56
     ],
     "plaque": [
-      33,
+      32,
       173,
-      62,
+      64,
       12
     ]
   }
