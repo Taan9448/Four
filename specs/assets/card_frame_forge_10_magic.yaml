@@ -2,8 +2,8 @@ id: card_frame_forge_10_magic
 type: card-frame
 summary: >-
   REFORGED +10 AWAKENED card frame: the whole frame remade as a radiant golden relic — magic layout
-# 대강화 +10 마법 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다). card_frame_magic와 자리(layout)가 같고
-# 재질·장식만 +10(금빛 각성)로 바뀐다. 그림이 오면 게임이 card_frame_magic 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_10)
+# 대강화 +10 마법 카드 틀 전체(2026-10-22 사용자 요청 — 테두리만 바뀌어 카드 디자인이 그대로였다. 2026-10-23: 첫 작업이 기본 틀 색만 바꾼 것이라 '고강인 만큼 화려하게' 다시). card_frame_magic와 자리(layout)가 같고
+# 장식은 훨씬 화려하게, 재질은 +10(금빛 각성)로 바뀐다. 그림이 오면 게임이 card_frame_magic 대신 이 틀을 쓴다(src/ui/card-view.ts). 오기 전에는 겹치는 테두리(card_frame_forge_10)
 reference: assets/source/card_frame_magic.png
 layout:
   art: [16, 12, 96, 70]
@@ -19,9 +19,9 @@ banner: "a crimson ribbon (#a02634, #5a1020) edged with bright gold (#f2a93b, #f
 text_panel: "pale silver-blue vellum (#dff4ff, #c2c6d1)"
 frame_notes:
   1: >-
-    keep exactly the same shapes and positions as the magic card frame (reference: assets/sprites/card_frame_magic/frame_01.png): the same
-    art window, cost socket(s), name banner, rarity socket, text box and type plaque; only the materials and ornaments change.
-    the WHOLE border is reforged as an awakened golden relic: polished gold plates (#b8741a, #f2a93b, #ffe08a) with red lacquer inlays (#a02634, #5a1020), small flame-shaped gold flourishes (#ff8a5c, #ffe08a) licking up both sides, a radiant gold sunburst crest at the middle of the top border, a bright gold glow line around the art window, gold sunburst ornaments with a white-gold core (#f1efe6) at the corners; the outer edge is dark (#2a1d16); a few touches of the magic frame remain: thin strips of deep blue leather (#1f3f73) between the metal plates and the ring of abstract magic-circle marks (dots and arcs, no letters) around the art window rim
+    THIS IS A TOP-TIER FORGED CARD and must look DRAMATICALLY MORE LAVISH than the base frame — never a simple recolor of it. Keep only the positions and sizes of the art window, cost socket(s), name banner, rarity socket, text box and type plaque from the reference (the game prints text there); everything else is redesigned: a thicker, layered border carved in raised relief with several depth steps, dense ornaments on every side and corner, extra gems, and ornaments that grow over the edges of the art window rim and the ends of the name banner (but never into the art window opening or the text box). Much more detail and contrast than the base frame.
+    +10 AWAKENED GOLDEN RELIC, the most lavish of all: polished gold (#b8741a, #f2a93b, #ffe08a) with crimson lacquer panels (#a02634, #5a1020) and white-gold highlights (#f1efe6); a sculpted golden dragon coiling up both sides of the card — its head with open jaws at the top beside the top crest, its tail curling at the bottom; a radiant sunburst halo with long gold rays behind a crest at the middle of the top border; flame-shaped gold flourishes (#ff8a5c, #ffe08a) licking up both sides; red rubies (#ff3b3b, #a02634) and white-gold gems studding the border; large sunburst ornaments at the four corners; the art window ringed by a double gold rim with small flame tongues; the crimson name banner ending in golden wing-shaped finials.
+    Magic touch (keep it subtle): the art window keeps its shape, a ring of abstract magic-circle marks (dots and arcs, no letters) inside the window rim.
 style: >-
   crisp detailed pixel art in the style of a late 16-bit era game interface; 1-pixel dark outline on the outer edge, 2-3 flat tone
   steps per material, bevelled metal reads clearly, no anti-aliasing, no gradients, no dithering noise, no blur
