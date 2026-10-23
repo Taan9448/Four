@@ -6,7 +6,7 @@ import { hasSkipTurn } from '../engine/effects';
 import { cardText, ELEMENT_LABEL } from '../engine/text';
 import type { GameData } from '../engine/data';
 import { intentHidden, resolveCard, spritesFor, type BattleEvent, type CardInstance, type BattleState, type Combatant, type EnemyState } from '../engine/state';
-import { cssZoom, flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, tearCard, toast } from '../render/fx';
+import { cssZoom, flash, floatOver, flyClone, flyIn, hitStop, impact, screenFlash, shake, sleep, slamRing, tearCard, toast } from '../render/fx';
 import { speakerInfo } from '../engine/text';
 import { loadPortrait, standingFor } from '../render/portrait';
 import { RiftOverlay } from '../render/rift-overlay';
@@ -690,9 +690,25 @@ export class BattleView {
     // Codex 그림(fx_card_tear)이 있으면: 솔기가 터지는 프레임(events.impact)이 카드가 벌어지는 순간에 오게 앞당기고, 조각은 그림이 그린다
     const tearFx = spriteSource('fx_card_tear') === 'sprites' ? await loadSprite('fx_card_tear') : null;
     const lead = tearFx ? (((tearFx.meta.events.impact ?? 1) - 1) * 1000) / tearFx.meta.fps : undefined;
+    // 카드를 낼 때(data/fx.json cardPlay, 2026-10-23): 등급 소리를 얹고, 대강화 +8·+9·+10은 크게 치솟았다가 쾅 내리꽂힌다
+    // (묵직한 소리 · 화면 흔들림 · 단계 색 번쩍 · 충격파 · 짧은 타격 멈춤 — 일반 카드를 내는 느낌이 아니게)
+    const card = resolveCard(this.data, inst);
+    const play = this.data.fx.cardPlay;
+    const raritySound = play?.rarity[card.def.rarity] as Sfx | undefined;
+    if (raritySound) sfx(raritySound, { volume: 0.6 });
+    const slam = card.forge >= 3 ? play?.forge[String(card.level)] : undefined;
     sfx('tear', { volume: 0.7 });
     const tear = tearCard(el, {
-      ms: 850 * Math.max(0.6, settings.speed),
+      ms: 850 * Math.max(0.6, settings.speed) * (slam ? 1.25 : 1),
+      slam: slam ? card.level - 7 : 0,
+      onSlam: (x, y, height) => {
+        if (!slam || this.disposed) return;
+        sfx(slam.sound as Sfx, { volume: 0.9 });
+        shake(this.field, slam.shake);
+        screenFlash(this.field, slam.flash);
+        slamRing(x, y, height * 1.5, slam.ring);
+        void hitStop(slam.stop);
+      },
       toward: to,
       stage: this.tearStage(el),
       leadMs: lead,

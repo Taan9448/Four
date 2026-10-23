@@ -1,5 +1,5 @@
 {
-  "$comment": "이펙트 규칙(GAME_DESIGN 13절, 2026-10-12): 카드에 fx·hitFx가 없으면 위에서부터 처음 맞는 규칙이 칸(fx·hitFx·castFx)마다 정한다. 그림이 아직 임시면 지금처럼(fx 없음·fx_hit_strike) 보인다. sounds: 이펙트별 효과음(2026-10-22) — 이름은 src/render/audio.ts SFX_NAMES, 화염·냉기·번개·회복은 피해·회복 소리가 이미 속성별이라 넣지 않는다.",
+  "$comment": "이펙트 규칙(GAME_DESIGN 13절, 2026-10-12): 카드에 fx·hitFx가 없으면 위에서부터 처음 맞는 규칙이 칸(fx·hitFx·castFx)마다 정한다. 그림이 아직 임시면 지금처럼(fx 없음·fx_hit_strike) 보인다. sounds: 이펙트별 효과음(2026-10-22) — 이름은 src/render/audio.ts SFX_NAMES, 화염·냉기·번개·회복은 피해·회복 소리가 이미 속성별이라 넣지 않는다. cardPlay: 카드를 낼 때(2026-10-23) — rarity는 일반 카드 소리 위에 얹는 등급 소리, forge는 대강화 +8·+9·+10이 쾅 내리꽂힐 때의 소리·흔들림(0~1)·번쩍 색·타격 멈춤(ms)·충격파 색.",
   "events": {
     "heal": "fx_heal_light",
     "buff": "fx_buff_rise",
@@ -8,6 +8,14 @@
   },
   "elementHit": { "lightning": "fx_hit_shock" },
   "statusFx": { "shock": "fx_hit_shock", "paralyze": "fx_hit_shock", "drowsy": "fx_sleep_mist" },
+  "cardPlay": {
+    "rarity": { "uncommon": "card_uncommon", "rare": "card_rare", "epic": "card_epic", "legendary": "card_legendary" },
+    "forge": {
+      "8": { "sound": "slam_8", "shake": 0.5, "flash": "blue", "stop": 60, "ring": "steel" },
+      "9": { "sound": "slam_9", "shake": 0.7, "flash": "violet", "stop": 80, "ring": "violet" },
+      "10": { "sound": "slam_10", "shake": 0.95, "flash": "gold", "stop": 120, "ring": "gold" }
+    }
+  },
   "sounds": {
     "fx_blood_crescent": "slash",
     "fx_rift_cleave": "rend",

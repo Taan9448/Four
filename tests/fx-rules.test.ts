@@ -54,6 +54,17 @@ describe('이펙트 규칙(data/fx.json)', () => {
     expect(fxSound(data, 'fx_fire_burst')).toBeUndefined();
   });
 
+  it('카드를 낼 때: 등급 소리(고급~전설) + 대강화 +8·+9·+10 쾅 — 소리 이름은 합성 목록에 있고 단계가 오를수록 세다(2026-10-23)', async () => {
+    const { SFX_NAMES } = await import('../src/render/audio');
+    const play = data.fx.cardPlay!;
+    expect(Object.keys(play.rarity).sort()).toEqual(['epic', 'legendary', 'rare', 'uncommon']);
+    const forge = ['8', '9', '10'].map((k) => play.forge[k]);
+    for (const name of [...Object.values(play.rarity), ...forge.map((f) => f.sound)]) expect((SFX_NAMES as readonly string[]).includes(name), name).toBe(true);
+    expect(forge[0].shake).toBeLessThan(forge[1].shake);
+    expect(forge[1].shake).toBeLessThan(forge[2].shake);
+    expect(forge[0].stop).toBeLessThan(forge[2].stop);
+  });
+
   it('공격 카드는 모두 공격 이펙트나 피격 이펙트 중 하나는 따로 받는다(흰 타격 별 하나로 끝나지 않는다)', () => {
     const plain = [...data.cards.values()].filter((c) => c.type === 'attack' && c.owner !== 'common' && c.owner !== 'status').filter((c) => {
       const f = cardFx(data, c);

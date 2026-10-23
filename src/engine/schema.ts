@@ -310,6 +310,19 @@ export const FxRules = z
     statusFx: z.record(z.string(), z.string()).optional(),
     /** 이펙트 → 효과음 이름(src/render/audio.ts SFX_NAMES). 그 이펙트가 나올 때 피격·상태 소리 위에 얹는다(2026-10-22) */
     sounds: z.record(z.string(), z.string()).optional(),
+    /** 카드를 낼 때(2026-10-23): 등급별로 얹는 소리, 대강화 +8·+9·+10의 쾅(소리·흔들림 0~1·번쩍 색·타격 멈춤 ms·충격파 색) */
+    cardPlay: z
+      .object({
+        rarity: z.record(z.string(), z.string()).default({}),
+        forge: z
+          .record(
+            z.string(),
+            z.object({ sound: z.string(), shake: z.number().min(0).max(1), flash: z.enum(['white', 'gold', 'red', 'blue', 'violet']), stop: z.number().int().min(0).max(300), ring: z.enum(['steel', 'violet', 'gold']) }).strict(),
+          )
+          .default({}),
+      })
+      .strict()
+      .optional(),
     rules: z.array(
       z
         .object({

@@ -2080,13 +2080,27 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .impact-blue { --impact: rgba(140, 210, 255, 0.95); }
 @keyframes impact-ring { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2); } 60% { opacity: 0.9; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25); } }
 @keyframes impact-slash { 0% { opacity: 0; width: 10%; } 30% { opacity: 1; } 100% { opacity: 0; width: 125%; } }
-.b-scene.fx-screen-white, .b-scene.fx-screen-gold, .b-scene.fx-screen-red { position: relative; }
-.fx-screen-white::after, .fx-screen-gold::after, .fx-screen-red::after { content: ''; position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: screen-flash 0.2s ease-out forwards; }
+.b-scene.fx-screen-white, .b-scene.fx-screen-gold, .b-scene.fx-screen-red, .b-scene.fx-screen-blue, .b-scene.fx-screen-violet { position: relative; }
+.fx-screen-white::after, .fx-screen-gold::after, .fx-screen-red::after, .fx-screen-blue::after, .fx-screen-violet::after { content: ''; position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: screen-flash 0.2s ease-out forwards; }
 .fx-screen-white::after { background: rgba(255, 252, 240, 0.22); }
 .fx-screen-gold::after { background: rgba(255, 210, 110, 0.26); }
 .fx-screen-red::after { background: radial-gradient(ellipse at center, transparent 40%, rgba(220, 30, 30, 0.4)); }
+/* 대강화 카드 쾅(2026-10-23): +8 차가운 푸른빛 · +9 보랏빛 번쩍 */
+.fx-screen-blue::after { background: rgba(143, 211, 255, 0.28); }
+.fx-screen-violet::after { background: radial-gradient(ellipse at center, rgba(212, 184, 255, 0.35), rgba(107, 79, 163, 0.3)); }
+/* 쾅 내리친 자리의 충격파: 단계 색 고리 두 겹 + 빛살(화면 좌표, 찢는 카드처럼 body 위) */
+.card-slam { position: fixed; z-index: 899; pointer-events: none; border-radius: 50%; transform: translate(-50%, -50%) scale(0.2); }
+.slam-ring { border: 5px solid var(--slam); box-shadow: 0 0 24px var(--slam), inset 0 0 18px var(--slam); animation: slam-ring 0.52s cubic-bezier(.2,.7,.3,1) both; }
+.slam-ring-2 { border-width: 3px; animation-duration: 0.62s; }
+.slam-rays { background: repeating-conic-gradient(from 0deg, var(--slam) 0deg 4deg, transparent 4deg 22deg); -webkit-mask-image: radial-gradient(circle, transparent 18%, #000 30%, transparent 70%); mask-image: radial-gradient(circle, transparent 18%, #000 30%, transparent 70%); animation: slam-rays 0.48s ease-out both; }
+.slam-steel { --slam: #8fd3ff; }
+.slam-violet { --slam: #c39bff; }
+.slam-gold { --slam: #ffd36b; }
+@keyframes slam-ring { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.25); } 70% { opacity: 0.85; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+@keyframes slam-rays { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(0deg); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6) rotate(25deg); } }
 @keyframes screen-flash { from { opacity: 1; } to { opacity: 0; } }
-.no-motion .impact-slash, .no-motion .fx-screen-white::after, .no-motion .fx-screen-gold::after { display: none; }
+.no-motion .impact-slash, .no-motion .fx-screen-white::after, .no-motion .fx-screen-gold::after, .no-motion .fx-screen-blue::after, .no-motion .fx-screen-violet::after { display: none; }
+.no-motion .slam-rays, .no-motion .slam-ring-2 { display: none; }
 
 /* 지도 옆 칸: 상흔이 남긴 다음 전투 시작 균열(GAME_DESIGN 7절) */
 .start-rift { margin: 4px 0 0; font-size: var(--fs-cap); color: #ff8a8a; font-weight: 700; text-align: center; cursor: help; }

@@ -171,8 +171,10 @@ describe('배경음악 흘려 듣기', () => {
 describe('이펙트별 효과음(2026-10-22)', () => {
   it('data/fx.json sounds가 쓰는 소리는 모두 합성할 수 있다(파일 없이 소리 마디를 만든다)', async () => {
     const m = await audio();
-    const fx = (await import('../data/fx.json')).default as { sounds: Record<string, string> };
-    for (const name of new Set(Object.values(fx.sounds))) {
+    const fx = (await import('../data/fx.json')).default as { sounds: Record<string, string>; cardPlay: { rarity: Record<string, string>; forge: Record<string, { sound: string }> } };
+    // 카드를 낼 때의 등급 소리·대강화 쾅(2026-10-23)도 합성한다
+    const cardPlay = [...Object.values(fx.cardPlay.rarity), ...Object.values(fx.cardPlay.forge).map((f) => f.sound)];
+    for (const name of new Set([...Object.values(fx.sounds), ...cardPlay])) {
       if (name === 'power') continue; // 파일(assets/audio/sfx/power.ogg)이 있는 소리
       made = [];
       m.sfx(name as Parameters<typeof m.sfx>[0]);
