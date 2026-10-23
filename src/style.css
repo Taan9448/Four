@@ -838,6 +838,8 @@ h1, h2, h3 { font-family: var(--f-head); }
 .t-murim .cpx-name-s, .t-status .cpx-name-s { font-size: 9.5px; }
 .t-elheim .cpx-name, .t-fusion .cpx-name { color: #f2f6ff; text-shadow: 0 1px 0 #0b0b10; }
 .t-fusion .cpx-name { color: #ffe9b8; }
+/* 대강화 틀 전체(+8·+9·+10)는 이름 띠가 어두운 강철·보라·진홍이다 — 무공 카드도 밝은 글씨로(2026-10-23, 무공 기본 틀은 밝은 한지 띠라 어두운 글씨였다) */
+.card-px.cpx-forge-full .cpx-name { color: #fff6e0; text-shadow: 0 1px 0 #0b0b10, 0 0 3px rgba(11, 11, 16, 0.8); }
 .cpx-name .card-level { color: inherit; opacity: 0.85; }
 img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 32px; height: 32px; image-rendering: pixelated; pointer-events: none; }
 .card-px .gem.cpx-rarity { z-index: 2; left: 59px; top: 96px; right: auto; }
