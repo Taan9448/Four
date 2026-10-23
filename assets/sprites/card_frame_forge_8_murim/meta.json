@@ -23,38 +23,38 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 1,
-  "sourceHash": "223e0eee2b722f86",
+  "sourceHash": "22b0e63dddab6e43",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1024,
     1536
   ],
-  "gridPurity": 0.702,
+  "gridPurity": 0.652,
   "window": [
-    16,
-    12,
-    96,
-    67
+    18,
+    14,
+    92,
+    65
   ],
   "slots": {
     "name": [
-      10,
+      16,
       82,
-      108,
-      13
+      96,
+      9
     ],
     "text": [
-      13,
-      110,
-      102,
-      57
+      15,
+      108,
+      98,
+      55
     ],
     "plaque": [
-      35,
-      176,
-      58,
-      9
+      36,
+      171,
+      56,
+      10
     ]
   }
 }
