@@ -46,6 +46,13 @@ export const SFX_NAMES = [
   'sleep',
   'roar',
   'swirl',
+  'card_uncommon',
+  'card_rare',
+  'card_epic',
+  'card_legendary',
+  'slam_8',
+  'slam_9',
+  'slam_10',
 ] as const;
 export type Sfx = (typeof SFX_NAMES)[number];
 
@@ -412,6 +419,50 @@ export function sfx(name: Sfx, opts: { pan?: number; volume?: number } = {}): vo
       // 내공·마나 소용돌이: 휘감아 오르는 바람
       burst(t, 0.4, 0.3, out, { type: 'bandpass', hz: 600, to: 2400, q: 1.5 });
       tone('sine', 520, t, 0.35, 0.06, out, { to: 780 });
+      break;
+    // ── 카드를 낼 때(2026-10-23): 등급 소리는 카드 소리 위에 얹고, 대강화 +8·+9·+10은 쾅 내리꽂는 소리 ──
+    case 'card_uncommon':
+      // 고급: 맑은 종 한 번
+      tone('sine', 1047, t, 0.25, 0.07, out);
+      break;
+    case 'card_rare':
+      // 희귀: 밝은 두 음
+      tone('triangle', 988, t, 0.25, 0.08, out);
+      tone('triangle', 1319, t + 0.06, 0.3, 0.07, out);
+      break;
+    case 'card_epic':
+      // 영웅: 보랏빛 화음 + 낮은 울림
+      [74, 78, 81].forEach((m, i) => tone('sine', midiToHz(m), t + i * 0.03, 0.45, 0.07, out, { attack: 0.02 }));
+      tone('sine', 110, t, 0.3, 0.35, out, { to: 70 });
+      break;
+    case 'card_legendary':
+      // 전설: 금빛 펼친 화음 + 깊은 울림 + 반짝임
+      [72, 76, 79, 84].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.05, 0.6, 0.08, out, { attack: 0.01 }));
+      tone('sine', 82, t, 0.5, 0.5, out, { to: 41 });
+      burst(t + 0.1, 0.4, 0.12, out, { type: 'highpass', hz: 6000 });
+      break;
+    case 'slam_8':
+      // +8 강철: 묵직한 쿵 + 모루 쇳소리
+      tone('sine', 90, t, 0.4, 1, out, { to: 38 });
+      burst(t, 0.25, 0.8, out, { type: 'lowpass', hz: 1400, to: 200 });
+      tone('triangle', 1760, t + 0.01, 0.55, 0.16, out, { to: 1560 });
+      tone('sine', 2640, t + 0.01, 0.45, 0.08, out);
+      break;
+    case 'slam_9':
+      // +9 번개: 쿵 + 터지는 번개 세 번
+      tone('sine', 80, t, 0.5, 1, out, { to: 34 });
+      burst(t, 0.3, 0.8, out, { type: 'lowpass', hz: 1200, to: 160 });
+      for (let i = 0; i < 3; i++) burst(t + 0.02 + i * 0.07, 0.07, 0.55 - i * 0.12, out, { type: 'highpass', hz: 3200 + i * 900 });
+      tone('square', 2900, t + 0.02, 0.04, 0.1, out);
+      tone('sawtooth', 120, t + 0.05, 0.4, 0.12, out, { to: 60 });
+      break;
+    case 'slam_10':
+      // +10 금빛 각성: 땅이 울리는 큰 쾅 + 길게 남는 징 + 금빛 반짝임
+      tone('sine', 62, t, 0.9, 1, out, { to: 26 });
+      burst(t, 0.6, 0.9, out, { type: 'lowpass', hz: 1000, to: 90 });
+      tone('square', 48, t, 0.35, 0.18, out);
+      [220, 331, 441].forEach((hz, i) => tone('sine', hz, t + 0.03, 1.4 - i * 0.25, 0.12 - i * 0.025, out, { attack: 0.01, detune: i * 4 }));
+      [84, 88, 91, 96].forEach((m, i) => tone('triangle', midiToHz(m), t + 0.15 + i * 0.06, 0.5, 0.05, out));
       break;
     case 'defeat':
       [64, 63, 60, 57].forEach((m, i) => tone('triangle', midiToHz(m), t + i * 0.28, i === 3 ? 1.6 : 0.5, 0.18, out));

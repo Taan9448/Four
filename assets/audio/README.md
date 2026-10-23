@@ -61,6 +61,8 @@
 | `sleep` | 이펙트 소리: 졸음(잠 안개) |
 | `roar` | 이펙트 소리: 도발 고함 |
 | `swirl` | 이펙트 소리: 내공·마나 소용돌이(대상 없는 기술) |
+| `card_uncommon` · `card_rare` · `card_epic` · `card_legendary` | 카드를 낼 때 등급 소리(카드 소리 위에 얹음) |
+| `slam_8` · `slam_9` · `slam_10` | 대강화 +8·+9·+10 카드가 쾅 내리꽂힐 때 |
 | `levelup` | 레벨 업 |
 | `victory` | 전투 승리 |
 | `defeat` | 전투 패배 |

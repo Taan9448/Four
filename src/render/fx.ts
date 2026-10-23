@@ -143,6 +143,10 @@ export interface TearOptions {
   leadMs?: number;
   /** 종잇조각·먹 방울(CSS)을 튀길까(그림 이펙트가 조각을 그리면 끈다 — 조각이 두 겹으로 보이지 않게). 기본 true */
   bits?: boolean;
+  /** 쾅 내리치기(대강화 +8·+9·+10, 2026-10-23): 1~3. 크게 치솟았다가 버티는 자리로 내리꽂힌다 */
+  slam?: number;
+  /** 내리꽂히는 순간(화면 좌표의 카드 가운데·카드 높이) — 흔들림·충격파·소리를 거는 자리 */
+  onSlam?: (x: number, y: number, height: number) => void;
 }
 
 /**
@@ -208,7 +212,8 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
     const anim = g.animate(
       [
         { transform: tf(0, 0, rot, scale, 0), filter: 'brightness(1)', opacity: 1 },
-        { transform: tf(dx, dy, 0, S, 0), filter: `brightness(1.08) ${glow}`, opacity: 1, offset: at.arrive },
+        // 쾅(대강화): 단계만큼 크게 치솟았다가(arrive) 버티는 자리로 내리꽂힌다(hold)
+        { transform: tf(dx, dy - (opts.slam ? 18 * opts.slam : 0), 0, S * (1 + (opts.slam ?? 0) * 0.09), 0), filter: `brightness(${opts.slam ? 1.3 : 1.08}) ${glow}`, opacity: 1, offset: at.arrive },
         // 팽팽하게 버티는 순간(살짝 떨림)
         { transform: tf(dx + side * 0.8, dy, side * -1.2, S * 1.02, 0), filter: `brightness(1.15) ${glow}`, opacity: 1, offset: at.hold },
         // 위쪽부터 벌어진다
@@ -232,6 +237,7 @@ export function tearCard(el: HTMLElement, opts: TearOptions = {}): Promise<void>
   const bits: Promise<void>[] = [];
   // 그림 이펙트는 터지는 프레임이 벌어지는 순간(at.open)에 오도록 앞당겨 부른다(2026-10-14: 솔기가 조각이 다 흩어진 뒤에야 터졌다)
   setTimeout(() => opts.onTear?.(sx, sy, hgt * S * z), Math.max(0, ms * at.open - (opts.leadMs ?? ms * 0.04)));
+  if (opts.slam) setTimeout(() => opts.onSlam?.(sx, sy, hgt * S * z), ms * at.hold * 0.92);
   if (!reduce && opts.bits !== false) {
     for (let i = 0; i < 9; i++) {
       const side = i % 2 ? 1 : -1;
@@ -320,8 +326,25 @@ export function impact(layer: HTMLElement, target: HTMLElement, strength: 'light
   if (!reducedMotion()) add('impact-slash', 260, { transform: `translate(-50%, -50%) rotate(${dir > 0 ? -28 : 28}deg)` });
 }
 
+/**
+ * 쾅 내리친 자리의 충격파(대강화 카드, 2026-10-23): 단계 색 고리 두 겹 + 빛살. 화면 좌표(body에 붙인다). 운영체제 '움직임 줄이기'면 고리 하나만
+ */
+export function slamRing(x: number, y: number, size: number, tone: 'steel' | 'violet' | 'gold'): void {
+  const add = (cls: string, ms: number, delay = 0) => {
+    const el = document.createElement('i');
+    el.className = `card-slam ${cls} slam-${tone}`;
+    Object.assign(el.style, { left: `${x}px`, top: `${y}px`, width: `${size}px`, height: `${size}px`, animationDelay: `${delay}ms` });
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), ms + delay);
+  };
+  add('slam-ring', 520);
+  if (reducedMotion()) return;
+  add('slam-ring slam-ring-2', 620, 90);
+  add('slam-rays', 480);
+}
+
 /** 화면 전체가 한 번 번쩍(큰 피해·치명타·처치) */
-export function screenFlash(field: HTMLElement, tone: 'white' | 'gold' | 'red' = 'white'): void {
+export function screenFlash(field: HTMLElement, tone: 'white' | 'gold' | 'red' | 'blue' | 'violet' = 'white'): void {
   restartAnimation(field, `fx-screen-${tone}`, 200);
 }
 
