@@ -155,7 +155,7 @@ function pixelCardView(
   return h(
     'div',
     {
-      class: `card card-px t-${world} card-${def.type} rarity-${def.rarity}${forgeClass(card)}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
+      class: `card card-px t-${world} card-${def.type} rarity-${def.rarity}${forgeClass(card)}${fullFrame ? ' cpx-forge-full' : ''}${def.pool === 'abyss' ? ' card-abyss' : ''}${opts.disabled ? ' card-disabled' : ''}${opts.selected ? ' card-selected' : ''}`,
       style: owner ? `--owner:${owner.color}` : '',
       title: opts.disabled ?? '',
     },
