@@ -1,0 +1,60 @@
+{
+  "id": "card_frame_forge_8_murim",
+  "type": "card-frame",
+  "frameW": 128,
+  "frameH": 192,
+  "track": "pixel",
+  "pixelScale": 8,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    192
+  ],
+  "fit": "pad",
+  "frames": 1,
+  "fps": 1,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 1,
+  "sourceHash": "22b0e63dddab6e43",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1024,
+    1536
+  ],
+  "gridPurity": 0.652,
+  "window": [
+    18,
+    14,
+    92,
+    65
+  ],
+  "slots": {
+    "name": [
+      16,
+      82,
+      96,
+      9
+    ],
+    "text": [
+      15,
+      108,
+      98,
+      55
+    ],
+    "plaque": [
+      36,
+      171,
+      56,
+      10
+    ]
+  }
+}
