@@ -82,7 +82,7 @@
     "type": "battle",
     "name": "죽어 가는 숲",
     "weight": 2,
-    "conditions": {"floorRange": [8, 8]},
+    "conditions": {"floorRange": [5, 6]},
     "content": {"text": "은빛 잎사귀들이 회색으로 바래 있었다. 땅에서 검은 연기가 피어오르고, 빛 알갱이가 흐렸다. 그 연기 속에서 빈 갑옷 하나와 그림자늑대가 걸어 나왔다. — 마나가 죽어 가는 땅: 마나 3으로 시작해 차례마다 1씩 찬다.", "enemies": ["empty_armor", "shadow_wolf"], "mana": {"battleStart": 3, "perTurn": 1}}
   },
   {
@@ -91,7 +91,7 @@
     "type": "battle",
     "name": "선봉의 빈 갑옷",
     "weight": 2,
-    "conditions": {"floorRange": [8, 8]},
+    "conditions": {"floorRange": [5, 6]},
     "content": {"text": "실바렌으로 가는 길목, 투구 안쪽에 붉은 불빛 두 점만 떠 있는 빈 갑옷들이 일정한 박자로 창을 내질렀다.", "enemies": ["empty_armor", "empty_armor"]}
   },
   {
@@ -109,7 +109,7 @@
     "type": "elite",
     "name": "결계 밖의 창병들",
     "weight": 1,
-    "conditions": {"floorRange": [8, 8]},
+    "conditions": {"floorRange": [5, 6]},
     "content": {"text": "쓰러뜨린 자리를 다른 갑옷이 메웠다. 창이 사방에서 날아왔다. 하운은 투구와 몸통 사이의 이음매를 보았다.", "enemies": ["empty_armor", "empty_armor", "empty_armor"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"보인다! 아니, 안 보여! 그래도 네가 어디 베는지는 보여!\" 카일의 검이 하운의 검을 따라간다. (적 전체 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
@@ -190,7 +190,7 @@
     "type": "event",
     "name": "숲이 여는 길",
     "once": true,
-    "conditions": {"floorRange": [8, 8]},
+    "conditions": {"floorRange": [4, 6]},
     "content": {"text": "은빛 숲은 밤에 더 밝았다. 엘리아가 앞장섰다. 그녀가 지나가면 덤불이 저절로 비켜섰고, 쓰러진 나무 위로 가지들이 다리처럼 이어졌다. \"엘프의 피야.\" 카일이 숨을 헐떡이며 속삭였다. \"반만 섞였어도 숲이 알아보는 거지.\"", "choices": [{"label": "엘리아가 연 길을 달린다", "effects": [{"op": "heal_party", "ratio": 0.2}], "result": "첫눈이 은빛 잎사귀 위에 내려앉아 숲 전체가 은과 흰빛으로 빛났다. 아름답다고 생각할 여유는 없었다. 출전 동료 전원 체력 20% 회복"}, {"label": "숨을 맞춰 달린다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "세 번 짧게, 한 번 길게. 고른 카드 1장을 강화했다(+1)."}]}
   },
   {
@@ -199,7 +199,7 @@
     "type": "event",
     "name": "검은 깃 화살",
     "once": true,
-    "conditions": {"floorRange": [8, 8]},
+    "conditions": {"floorRange": [5, 6]},
     "content": {"text": "파발로 온 엘프의 어깨에는 아직 검은 깃 화살이 박혀 있었다. 엘리아가 화살을 뽑고 상처를 치유해 주었다. 탈리온이라는 그 엘프는 그 뒤로 엘리아를 보지 않았다. 고맙다는 말도 하지 않았다.", "choices": [{"label": "탈리온의 걸음을 본다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "그러나 그는 엘리아의 반걸음 뒤에서 달렸다. 앞서지 않고. 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "화살촉을 살핀다", "effects": [{"op": "heal_party", "amount": 80}], "result": "검은 깃, 검은 쇠. 마왕군의 화살이었다. 보른이 말없이 도끼날을 손가락으로 쓸었다. 출전 동료 전원 체력 80 회복"}]}
   },
   {
