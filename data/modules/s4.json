@@ -168,7 +168,7 @@
     "type": "event",
     "name": "찌그러진 갑옷 더미",
     "weight": 2,
-    "conditions": {"floorRange": [6, 8]},
+    "conditions": {"floorRange": [3, 4]},
     "content": {"text": "바위가 정확히, 마치 계산된 것처럼 무너져 있었다. 그 아래 찌그러진 빈 갑옷들. 산의 매듭을 쳐서 산을 무너뜨린 자의 솜씨였다.", "choices": [{"label": "갑옷 사이에서 드워프의 끌을 찾는다", "result": "무너진 바위가 어깨를 긁었다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 40 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -40}]}, {"label": "묵념하고 지나간다", "result": "출전 동료 전원 체력 50 회복.", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
@@ -177,7 +177,7 @@
     "type": "event",
     "name": "좁혀 드는 갱도",
     "weight": 2,
-    "conditions": {"floorRange": [5, 8]},
+    "conditions": {"floorRange": [3, 4]},
     "content": {"text": "천장이 낮아졌다. 벽이 좁혀 들었다. 산이 조금씩, 주먹을 쥐듯이 오므라들고 있었다.", "choices": [{"label": "보른이 바위의 결로 길을 연다", "condition": {"partyHas": "born"}, "result": "돌이 결을 따라 비켜났다. 출전 동료 전원 체력 60 회복, 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "heal_party", "amount": 60}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "벽 사이를 밀고 나간다", "result": "바위에 쓸린 상처가 남았다. 무작위 카드 2장을 강화했다(+1). 출전 동료 전원 체력 50 감소.", "effects": [{"op": "upgrade_card", "count": 2}, {"op": "heal_party", "amount": -50}]}]}
   },
   {

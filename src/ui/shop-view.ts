@@ -1,7 +1,7 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, potionSellPrice, sellPotion, swappable, swapPrice, type BuyResult, type ForgeResult } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, potionSellPrice, sellPotion, swappable, swapPrice, type BuyResult, type ForgeResult, rerollCandidates } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
@@ -220,12 +220,12 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
               'div',
               { class: 'shop-desc' },
               h('b', {}, forgeLocked(run) ? `대장간 — ${data.cards.get(run.deck.find((c) => c.uid === forgeLocked(run))?.cardId ?? '')?.name ?? ''}` : '대장간(대강화)'),
-              h('small', {}, `영웅·전설 +5 카드 한 장을 +6~+10으로(상점마다 한 장). 성공하면 각인, +10은 동료의 각성.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
+              h('small', {}, `영웅·전설 +5 카드 한 장을 +6~+10으로(상점마다 한 장). 성공하면 각인, +10은 동료의 각성. 새긴 각인은 ${data.balance.upgrade.forge.rerollPrice}골드로 다시 새길 수 있다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
             ),
             price(data.balance.upgrade.forge.price, false),
             h(
               'button',
-              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0, onclick: () => openSmithy(data, run, forged) },
+              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0 && rerollCandidates(data, run).length === 0, onclick: () => openSmithy(data, run, forged) },
               run.forgePending ? '각인 고르기' : '들어가기',
             ),
           ),

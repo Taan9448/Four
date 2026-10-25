@@ -57,6 +57,8 @@ export interface RunState {
   forgeFails?: Record<string, number>;
   /** 캠페인 보유 카드의 대강화 각인: 카드 id → 각인 id(고른 순서). 심연은 카드 인스턴스의 marks */
   engravings?: Record<string, string[]>;
+  /** 각인 다시 새기기 횟수: 카드 id(심연은 카드 uid) → 지금까지 굴린 수(다시 불러와도 같은 결과가 나오게 시드에 섞는다) */
+  engraveRolls?: Record<string, number>;
   /** 대강화에 성공해 고를 각인(상점을 떠나면 첫 후보로 새긴다) */
   forgePending?: { uid: string; cardId: string; level: number; choices: string[] } | null;
   /** 편성: 주인(동료 id·'common') → 카드 id */

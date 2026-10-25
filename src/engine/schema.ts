@@ -787,6 +787,8 @@ export const Balance = z
             levelMul: z.number().min(0),
             /** 각인을 고를 때 보여 주는 후보 수 */
             offer: z.number().int().positive(),
+            /** 각인 다시 새기기(큐브) 한 번의 값: 새긴 각인 한 칸을 받을 수 있는 다른 각인으로 무작위로 바꾼다 */
+            rerollPrice: z.number().int().positive(),
           })
           .strict(),
       })

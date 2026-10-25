@@ -150,7 +150,11 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
     return n;
   };
   const allModules = [...data.modules.values()];
+  // 고르게 섞기(2026-10-25 사용자 요청 — 엘리트·전투가 한쪽으로 몰려 만든 몬스터를 영영 못 만났다):
+  // 엘리트는 한 지도에 같은 모듈을 두 번 놓지 않고, 전투는 같은 층의 이웃 노드끼리 다른 모듈로(남은 것이 없으면 겹쳐도 된다)
+  const placed = new Set<string>();
   for (let f = 1; f <= stage.floors; f++) {
+    const onFloor = new Set<string>();
     for (const node of floors[f - 1]) {
       const pinned = pinnedByFloor.get(f);
       const runBefore = Math.max(0, ...parentsOf(node).map((p) => calmRun.get(p.id) ?? 0));
@@ -186,11 +190,16 @@ export function generateStageMap(data: GameData, stageId: string, rng: Rng, ctx:
       let assigned = false;
       while (!assigned && candidates.length) {
         const [type] = rng.weighted(candidates, ([, w]) => w)!;
-        const mods = allModules.filter((m) => m.type === type && (override ? override.eligible(m, f, used) : moduleEligible(data, stage, m, f, ctx, used)));
+        const eligible = allModules.filter((m) => m.type === type && (override ? override.eligible(m, f, used) : moduleEligible(data, stage, m, f, ctx, used)));
+        const seen = type === 'elite' ? placed : type === 'battle' ? onFloor : undefined;
+        const fresh = seen ? eligible.filter((m) => !seen.has(m.id)) : eligible;
+        const mods = fresh.length ? fresh : eligible;
         const mod = rng.weighted(mods, (m) => m.weight * (m.tags.includes('scar') ? 1 + ctx.scar * (override?.scarWeight ?? route.scarWeightPerPoint) : 1));
         if (mod) {
           node.type = type;
           node.moduleId = mod.id;
+          placed.add(mod.id);
+          onFloor.add(mod.id);
           // 어디서나 나오는 사건(stage "*")은 한 지도에 한 번씩만(스테이지마다 다시 나올 수 있다)
           if (mod.once || mod.stage === '*') used.add(mod.id);
           assigned = true;

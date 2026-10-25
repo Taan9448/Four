@@ -4,7 +4,7 @@ import type { CardDef, PotionDef } from './schema';
 import type { MapNode } from './route';
 import { createRng, type Rng } from './rng';
 import { forgeMax, type CardInstance } from './state';
-import { engravingOffer } from './forge';
+import { engravingOffer, rerollPool } from './forge';
 import { swapCard, swappableCards } from './collection';
 import { pilgrimTierDef } from './pilgrim-scale';
 import { addCard, applyRunOps, fireRunRelics, gainPotion, gainRelic, lawRunMul, upgradeCandidates, type RunState, type ShopState } from './run';
@@ -337,6 +337,53 @@ export function forgeChance(data: GameData, run: RunState, c: CardInstance): { c
   const base = f.chance[c.level - data.balance.upgrade.maxLevel] ?? 0;
   const fails = run.forgeFails?.[forgeKey(run, c)] ?? 0;
   return { chance: Math.min(1, base * (1 + f.pity * fails)), base, fails };
+}
+
+/** 각인 다시 새기기 후보: 각인이 하나라도 있는 덱의 카드(캠페인은 같은 카드 한 장) */
+export function rerollCandidates(data: GameData, run: RunState): CardInstance[] {
+  const seen = new Set<string>();
+  return run.deck.filter((c) => {
+    if (c.temp || !(c.marks ?? []).length || !data.cards.has(c.cardId)) return false;
+    if (!isAbyss(run)) {
+      if (seen.has(c.cardId)) return false;
+      seen.add(c.cardId);
+    }
+    return true;
+  });
+}
+
+export type RerollResult = { ok: true; from: string; to: string; slot: number; message: string } | { ok: false; reason: string };
+
+/**
+ * 각인 다시 새기기(2026-10-25 사용자 요청 — 메이플스토리 큐브처럼): rerollPrice골드를 내고 +6~+9 중 한 칸(slot, +6이 0)의 각인을
+ * 그 칸에 받을 수 있는 다른 각인 하나로 무작위로 바꾼다. 상점마다 몇 번이든. +10 각성은 동료마다 하나라 바꾸지 않는다.
+ * 결과는 시드·카드·칸·굴린 수로 정해진다(다시 불러와도 같다)
+ */
+export function rerollEngraving(data: GameData, run: RunState, uid: string, slot: number): RerollResult {
+  if (run.forgePending) return { ok: false, reason: '먼저 각인을 고른다' };
+  const c = rerollCandidates(data, run).find((x) => x.uid === uid);
+  if (!c) return { ok: false, reason: '다시 새길 각인이 없는 카드' };
+  const from = (c.marks ?? [])[slot];
+  if (!from) return { ok: false, reason: '그 칸에는 각인이 없다' };
+  const pool = rerollPool(data, c, slot);
+  if (!pool.length) return { ok: false, reason: '바꿀 수 있는 다른 각인이 없다' };
+  const fail = pay(run, data.balance.upgrade.forge.rerollPrice);
+  if (fail) return fail as RerollResult;
+  const key = forgeKey(run, c);
+  run.engraveRolls ??= {};
+  const n = run.engraveRolls[key] ?? 0;
+  run.engraveRolls[key] = n + 1;
+  const to = createRng(run.seed).fork(`reroll:${key}:${slot}:${n}`).pick(pool);
+  const marks = [...(c.marks ?? [])];
+  marks[slot] = to;
+  if (isAbyss(run)) c.marks = marks;
+  else {
+    run.engravings ??= {};
+    run.engravings[c.cardId] = marks;
+    for (const x of run.deck) if (x.cardId === c.cardId) x.marks = [...marks];
+  }
+  const name = (id: string) => data.forge.engravings.find((m) => m.id === id)?.name ?? id;
+  return { ok: true, from, to, slot, message: `+${data.balance.upgrade.maxLevel + 1 + slot} 각인 ◆${name(from)} → ◆${name(to)}` };
 }
 
 export type ForgeResult = (BuyResult & { ok: true; success: boolean; level: number; choices: string[] }) | (BuyResult & { ok: false });

@@ -29,6 +29,18 @@ export function engravingOffer(data: GameData, run: RunState, inst: CardInstance
   return createRng(run.seed).fork(`engrave:${key}:${inst.level}`).shuffle(pool).slice(0, data.balance.upgrade.forge.offer);
 }
 
+/**
+ * 각인 다시 새기기(큐브)의 후보: slot번째 칸(+6이 0)의 각인을 뺀 모습으로 받을 수 있는 각인 중 지금 것이 아닌 것.
+ * 다른 칸에 새긴 각인은 다시 받지 않는다(engravingAllowed)
+ */
+export function rerollPool(data: GameData, inst: CardInstance, slot: number): string[] {
+  const marks = inst.marks ?? [];
+  const current = marks[slot];
+  if (!current) return [];
+  const without = { ...inst, marks: marks.filter((_, i) => i !== slot) };
+  return data.forge.engravings.filter((m) => m.id !== current && engravingAllowed(data, without, m)).map((m) => m.id);
+}
+
 /** 고를 각인이 남았는가 */
 export function engravingPending(run: RunState): NonNullable<RunState['forgePending']> | null {
   return run.forgePending ?? null;
