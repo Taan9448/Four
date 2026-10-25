@@ -32,6 +32,14 @@ import { surgeCut } from './surge-cut';
  * 남은 연출·효과음·다시 그리기·결과 창을 모두 건너뛴다. act()와 시작 연출이 받아서 조용히 끝낸다
  */
 class BattleClosed extends Error {}
+/**
+ * 그림을 기다리되 오래 걸리면 그림 없이 간다(2026-10-25 사용자 요청 — "가끔 스킬을 쓰면 안 나가고 먹통").
+ * 느리거나 끊긴 네트워크에서 그림 한 장이 오지 않으면 그 await가 끝나지 않아 전투가 멈췄다
+ */
+const within = <T>(p: Promise<T>, ms: number, fallback: T): Promise<T> => Promise.race([p, new Promise<T>((r) => setTimeout(() => r(fallback), ms))]);
+/** 카드를 낸 뒤 연출이 이보다 오래 걸리면 연출을 건너뛰고 카드를 낸다 */
+const BEFORE_MAX_MS = 4000;
+
 /** 손패 카드가 떠오르는 움직임(style.css .card transition 0.15s)이 끝날 때까지 + 여유 */
 const HAND_LIFT_MS = 200;
 
@@ -159,6 +167,8 @@ export class BattleView {
     this.resizeObs.observe(this.unitsEl);
     if (ctx.bonusText) this.bonusTimer = setTimeout(() => this.alert(ctx.bonusText!, 'support'), 300);
     this.startTours();
+    // 카드 찢기 그림은 미리 받아 둔다(처음 낸 카드에서 기다리지 않게)
+    void loadSprite(spriteSource('fx_card_tear') === 'sprites' ? 'fx_card_tear' : null);
     // 시작 시 남은 이벤트(지원 규칙 등)는 기록만
     void this.animate(this.state.events.splice(0)).catch(ignoreClosed);
   }
@@ -731,7 +741,7 @@ export class BattleView {
     const to = this.flyTarget(handIndex, targetUid);
     this.flown.add(inst.uid);
     // Codex 그림(fx_card_tear)이 있으면: 솔기가 터지는 프레임(events.impact)이 카드가 벌어지는 순간에 오게 앞당기고, 조각은 그림이 그린다
-    const tearFx = spriteSource('fx_card_tear') === 'sprites' ? await loadSprite('fx_card_tear') : null;
+    const tearFx = spriteSource('fx_card_tear') === 'sprites' ? await within(loadSprite('fx_card_tear'), 300, null) : null;
     const lead = tearFx ? (((tearFx.meta.events.impact ?? 1) - 1) * 1000) / tearFx.meta.fps : undefined;
     // 카드를 낼 때(data/fx.json cardPlay, 2026-10-23): 등급 소리를 얹고, 대강화 +8·+9·+10은 크게 치솟았다가 쾅 내리꽂힌다
     // (묵직한 소리 · 화면 흔들림 · 단계 색 번쩍 · 충격파 · 짧은 타격 멈춤 — 일반 카드를 내는 느낌이 아니게)
@@ -1206,8 +1216,22 @@ export class BattleView {
     try {
       await this.actInner(fn, before, freezeHand);
     } catch (e) {
-      ignoreClosed(e);
+      if (e instanceof BattleClosed) return;
+      // 연출 중 오류가 나도 손패가 잠긴 채 남지 않게(2026-10-25 "먹통") — 상태는 엔진이 이미 바꿨으니 화면만 다시 맞춘다
+      console.error('[battle] 연출 오류', e);
+      this.recover();
     }
+  }
+
+  /** 연출이 끝나지 못했을 때: 잠금을 풀고, 내지 못한 카드는 손패에 다시 보이게 하고, 화면을 다시 그린다 */
+  private recover(): void {
+    if (this.disposed) return;
+    this.busy = false;
+    this.handFrozen = false;
+    this.shown.clear();
+    for (const c of this.state.hand) this.flown.delete(c.uid);
+    this.refresh();
+    if (this.state.result) this.showResult();
   }
 
   private async actInner(fn: () => unknown, before: (() => Promise<void>) | undefined, freezeHand: boolean): Promise<void> {
@@ -1221,7 +1245,7 @@ export class BattleView {
       u.el.classList.remove('targetable', 'target-focus');
     }
     this.renderPreview();
-    if (before) await before();
+    if (before) await within(before(), BEFORE_MAX_MS * Math.max(1, settings.speed), undefined);
     this.alive();
     this.handFrozen = freezeHand;
     // 여기서 다시 그리지 않는다: 낸 카드가 손패에 잠깐 되살아나거나, 피해가 연출보다 먼저 보이지 않게(연출이 이벤트마다 다시 그린다)
@@ -1761,7 +1785,7 @@ export class BattleView {
     const def = resolveCard(this.data, cardId).def;
     sfx('cutin');
     const who = speakerInfo(this.data, line.speaker);
-    const img = await loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags));
+    const img = await within(loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags)), 600, null);
     const portrait = img
       ? h('img', { class: 'cutin-portrait', src: img.src, alt: who.name })
       : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who.color}` }, who.name);
