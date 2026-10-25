@@ -1,13 +1,13 @@
 // 상점 화면(2026-10-08): 카드·유물·물약을 사고, 카드 지우기·강화를 한 번씩 쓴다. 진열은 노드마다 시드로 정해져 런에 남는다.
 import type { GameData } from '../engine/data';
 import { sfx } from '../render/audio';
-import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, potionSellPrice, sellPotion, swappable, swapPrice, type BuyResult, type ForgeResult, rerollCandidates } from '../engine/economy';
+import { buyCard, buyPotion, buyRelic, buyRemove, buyStitch, buySwap, buyUpgrade, forgeCandidates, forgeLocked, openShop, potionSellPrice, sellPotion, swappable, swapPrice, type BuyResult, type ForgeResult, type RerollResult, rerollCandidates } from '../engine/economy';
 import { removePrice } from '../engine/abyss';
 import type { ModuleDef } from '../engine/schema';
 import { upgradeCandidates, type RunState } from '../engine/run';
 import { ownedView } from '../engine/collection';
 import { settleEngraving } from '../engine/forge';
-import { openSmithy } from './forge-view';
+import { openEngraveReroll, openSmithy } from './forge-view';
 import type { CardInstance } from '../engine/state';
 import { cardView, offerCardView } from './card-view';
 import { h } from './dom';
@@ -55,6 +55,12 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
     if (!r.ok) return result(r);
     toast(toasts, r.message, r.success ? 'support' : 'danger');
     sfx(r.success ? 'levelup' : 'discard');
+    render();
+  };
+  const rerolled = (r: RerollResult | null) => {
+    if (!r) return render();
+    if (!r.ok) return result(r);
+    toast(toasts, r.message, 'support');
     render();
   };
   const price = (n: number, sold: boolean) => h('span', { class: `price${!sold && run.gold < n ? ' short' : ''}` }, sold ? '팔림' : h('span', {}, h('i', { class: 'coin' }), String(n)));
@@ -220,13 +226,36 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
               'div',
               { class: 'shop-desc' },
               h('b', {}, forgeLocked(run) ? `대장간 — ${data.cards.get(run.deck.find((c) => c.uid === forgeLocked(run))?.cardId ?? '')?.name ?? ''}` : '대장간(대강화)'),
-              h('small', {}, `영웅·전설 +5 카드 한 장을 +6~+10으로(상점마다 한 장). 성공하면 각인, +10은 동료의 각성. 새긴 각인은 ${data.balance.upgrade.forge.rerollPrice}골드로 다시 새길 수 있다.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
+              h('small', {}, `영웅·전설 +5 카드 한 장을 +6~+10으로(상점마다 한 장). 성공하면 각인, +10은 동료의 각성.${run.abyss ? ' 이번 심연에서만.' : ' 보유 카드에 남는다.'}`),
             ),
             price(data.balance.upgrade.forge.price, false),
             h(
               'button',
-              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0 && rerollCandidates(data, run).length === 0, onclick: () => openSmithy(data, run, forged) },
+              { class: `btn btn-small${run.forgePending ? ' btn-primary' : ''}`, disabled: !run.forgePending && forgeCandidates(data, run).length === 0, onclick: () => openSmithy(data, run, forged) },
               run.forgePending ? '각인 고르기' : '들어가기',
+            ),
+          ),
+          // 각인 다시 새기기(큐브, 2026-10-25 사용자 요청 — 대장간과 따로 그 아래 줄): 새긴 각인 한 칸을 다른 각인으로 무작위로
+          h(
+            'div',
+            { class: 'shop-line' },
+            h('span', { class: 'service-glyph' }, '刻'),
+            h(
+              'div',
+              { class: 'shop-desc' },
+              h('b', {}, '각인 다시 새기기'),
+              h('small', {}, `새긴 각인(+6~+9) 한 칸을 그 칸에 받을 수 있는 다른 각인으로 무작위로 바꾼다. 몇 번이든, 한 번에 ${data.balance.upgrade.forge.rerollPrice}골드. +10 각성은 그대로.`),
+            ),
+            price(data.balance.upgrade.forge.rerollPrice, false),
+            h(
+              'button',
+              {
+                class: 'btn btn-small',
+                disabled: !!run.forgePending || rerollCandidates(data, run).length === 0,
+                title: run.forgePending ? '먼저 대장간에서 각인을 고른다' : rerollCandidates(data, run).length ? '' : '각인을 새긴 카드(+6 이상)가 덱에 없다',
+                onclick: () => openEngraveReroll(data, run, rerolled),
+              },
+              '들어가기',
             ),
           ),
     );
