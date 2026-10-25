@@ -643,13 +643,14 @@ h1, h2, h3 { font-family: var(--f-head); }
 
 .hand { --overlap: -12px; display: flex; justify-content: center; align-items: flex-end; min-width: 0; padding-bottom: 4px; }
 .hand .card { margin: 0 calc(var(--overlap) / 2); transform: translateY(var(--lift, 0)) rotate(var(--rot, 0)); transform-origin: 50% 130%; }
-.hand .card:hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-40px) rotate(0) scale(1.2); z-index: 60 !important; }
+.hand .card.card-hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-40px) rotate(0) scale(1.2); z-index: 60 !important; }
 .hand .card.card-selected { transform: translateY(-52px) rotate(0) scale(1.26); }
 /* 떠오른 카드의 원래 자리(2026-10-25): 카드가 떠오르며 기울기를 펴면 원래 자리 아래쪽·바깥 모서리가 비어 마우스가 카드 밖이 되고,
    내려오면 다시 올라가길 되풀이했다. 올린 동안에는 떠오른 변환을 되돌린 투명 받침(.hand-hit)이 쉬던 자리를 그대로 덮는다
-   (올림 translateY(-40px) scale(1.2)의 역 → 쉬는 자리 translateY(--lift) rotate(--rot), 기준점 같음) */
+   (올림 translateY(-40px) scale(1.2)의 역 → 쉬는 자리 translateY(--lift) rotate(--rot), 기준점 같음).
+   떠오르는 0.15초 동안은 받침도 함께 움직여 모서리가 잠깐 비므로, 올림은 CSS :hover가 아니라 battle-view가 움직임이 끝난 뒤 정하는 .card-hover로 건다 */
 .hand .card > .hand-hit { position: absolute; inset: 0; display: none; transform-origin: 50% 130%; transform: scale(calc(1 / 1.2)) translateY(40px) translateY(var(--lift, 0)) rotate(var(--rot, 0)); }
-.hand .card:hover:not(.card-disabled, .card-selected) > .hand-hit { display: block; }
+.hand .card.card-hover:not(.card-disabled, .card-selected) > .hand-hit { display: block; }
 .b-scene.aiming .hand .card > .hand-hit { display: none; }
 /* 대상 고르기 중: 고른 카드는 가운데에 크게 떠오르고, 나머지는 양옆으로 비켜나 어두워진다 */
 .b-scene.aiming .hand .card.card-selected { transform: translate(var(--dx, 0px), -70px) rotate(0) scale(1.4); transform-origin: 50% 100%; z-index: 80 !important; box-shadow: 0 0 0 3px #f5d98c, 0 0 30px rgba(245, 217, 140, 0.65), 0 18px 30px rgba(0, 0, 0, 0.6); animation: card-glow 1.8s ease-in-out infinite; }
@@ -776,10 +777,10 @@ h1, h2, h3 { font-family: var(--f-head); }
 .card-text { flex: 1; font-size: var(--fs-min); line-height: 1.42; white-space: pre-line; }
 .card-flavor { font-size: var(--fs-min); font-style: italic; line-height: 1.35; max-height: 2.8em; overflow: hidden; opacity: 0.65; padding-right: 20px; }
 .card-flavor.flavor-hover { display: none; }
-.hand .card:is(:hover, .card-selected) .card-flavor.flavor-hover { display: block; }
+.hand .card:is(.card-hover, .card-selected) .card-flavor.flavor-hover { display: block; }
 /* 픽셀 카드의 플레이버(손패에서 올리거나 고르면 카드 위에 한 줄 띠로). 글자는 카드 격자 px(× --cpx-zoom × 손패 확대) */
 .cpx-flavor { display: none; position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); width: 150px; padding: 3px 6px; border-radius: 4px; background: rgba(10, 11, 16, 0.88); border: 1px solid rgba(226, 180, 92, 0.45); color: #e8dfc8; font-size: 9.5px; font-style: italic; line-height: 1.35; text-align: center; pointer-events: none; }
-.hand .card-px:is(:hover, .card-selected) .cpx-flavor { display: block; }
+.hand .card-px:is(.card-hover, .card-selected) .cpx-flavor { display: block; }
 .b-scene.aiming .hand .card-px .cpx-flavor { display: none; }
 .card-level { color: #2d5d93; }
 .card-level-skill { color: #b8741a; }
@@ -948,7 +949,7 @@ img.cpx-rarity { position: absolute; z-index: 2; left: 48px; top: 85px; width: 3
 .forge-10 .cpx-forge-fx::before { top: -30%; bottom: -30%; width: 55%; left: -70%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255, 224, 138, 0.4), rgba(255, 250, 225, 0.85), rgba(255, 224, 138, 0.4), transparent); mix-blend-mode: screen; animation: forge-sweep 3s ease-in-out infinite; }
 .forge-10 .cpx-forge-fx::after { inset: 0; box-shadow: inset 0 0 0 2px rgba(255, 224, 138, 0.8), inset 0 0 16px rgba(255, 138, 92, 0.7); animation: forge-burn 2.2s ease-in-out infinite; }
 /* 전투 손패(2026-10-25): 쉬는 카드는 테두리만 숨 쉬고, 훑는 빛줄기는 마우스를 올리거나 고른 카드에만 — 손패가 번쩍번쩍하지 않게 */
-.hand .card-px:not(:hover, .card-selected) .cpx-forge-fx::before { display: none; }
+.hand .card-px:not(.card-hover, .card-selected) .cpx-forge-fx::before { display: none; }
 .cpx-ember { position: absolute; z-index: 5; bottom: 6px; width: 3px; height: 3px; background: #ffe08a; box-shadow: 0 0 4px #ff8a5c; pointer-events: none; opacity: 0; display: none; animation: forge-ember 2.4s ease-out infinite; }
 @keyframes forge-sweep { 0%, 40% { left: -70%; } 80%, 100% { left: 140%; } }
 @keyframes forge-burn { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
@@ -1288,7 +1289,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
   .status-chip .icon { width: 15px; height: 15px; font-size: var(--fs-min); }
   .dmg-preview b { font-size: var(--fs-body); }
   .dmg-preview small { font-size: var(--fs-min); }
-  .hand .card:hover:not(.card-disabled) { transform: translateY(var(--lift, 0)) rotate(var(--rot, 0)); }
+  .hand .card.card-hover:not(.card-disabled) { transform: translateY(var(--lift, 0)) rotate(var(--rot, 0)); }
   .hand .card.card-selected { transform: translateY(-30px) rotate(0) scale(1.18); }
   .shade { display: none; }
   .dock { position: static; height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; grid-template-areas: 'mid mid' 'left end'; gap: 8px; padding: 0; }
@@ -1311,7 +1312,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
   /* 손패는 가로로 밀어 본다(부채꼴 없이, 선택 시 위로 올라오는 만큼 위 여백) */
   .hand { grid-area: hand; justify-content: flex-start; align-items: flex-start; overflow-x: auto; padding: 16px 16px 6px; scroll-padding-inline: 16px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
   .hand .card { margin: 0 3px; transform: none; scroll-snap-align: start; }
-  .hand .card:hover:not(.card-disabled) { transform: none; }
+  .hand .card.card-hover:not(.card-disabled) { transform: none; }
   .hand .card > .hand-hit { display: none !important; }
   .hand .card.card-selected { transform: translateY(-12px); }
   .card { width: 108px; min-height: 152px; padding: 6px 6px 4px; }
@@ -2222,7 +2223,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .hand .card { zoom: 0.62; }
   /* 쉬는 손패는 작은 그림(0.62), 고른 카드는 원래 크기(--cpx-zoom)로 아래에서 솟아 글을 읽게 한다 */
   /* 2026-10-25: zoom을 바꾸면 손패 자리가 다시 짜여 옆 카드가 밀리고 마우스 밑 카드가 바뀌며 떨렸다 — 자리는 그대로 두고 transform으로만 키운다 */
-  .hand .card:hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-6px) scale(calc(var(--cpx-zoom) / 0.62)); transform-origin: 50% 100%; }
+  .hand .card.card-hover:not(.card-disabled), .hand .card.card-selected { transform: translateY(-6px) scale(calc(var(--cpx-zoom) / 0.62)); transform-origin: 50% 100%; }
   .b-scene.aiming .hand .card.card-selected { transform: translateY(-6px) scale(calc(var(--cpx-zoom) / 0.62)); transform-origin: 50% 100%; }
   /* 받침: 올림(기준점 아래 끝)의 역 → 쉬는 자리(기준점 130%를 아래 끝 기준으로 옮겨 기울인다) */
   .hand .card > .hand-hit { transform-origin: 50% 100%; transform: scale(calc(0.62 / var(--cpx-zoom))) translateY(6px) translateY(var(--lift, 0)) translateY(30%) rotate(var(--rot, 0)) translateY(-30%); }

@@ -32,6 +32,9 @@ import { surgeCut } from './surge-cut';
  * 남은 연출·효과음·다시 그리기·결과 창을 모두 건너뛴다. act()와 시작 연출이 받아서 조용히 끝낸다
  */
 class BattleClosed extends Error {}
+/** 손패 카드가 떠오르는 움직임(style.css .card transition 0.15s)이 끝날 때까지 + 여유 */
+const HAND_LIFT_MS = 200;
+
 const ignoreClosed = (e: unknown): void => {
   if (!(e instanceof BattleClosed)) throw e;
 };
@@ -116,6 +119,11 @@ export class BattleView {
   private potionEl!: HTMLElement;
   /** 마우스를 올린 손패 카드(피해 미리보기) */
   private hovered: number | null = null;
+  /** 손패에서 떠오른 카드(.card-hover)·떠오르기 시작한 때·마지막 마우스 자리 — CSS :hover 대신 판정한다(resolveHandHover) */
+  private hoverCard: HTMLElement | null = null;
+  private hoverAt = 0;
+  private hoverTimer: number | null = null;
+  private pointer = { x: -1, y: -1 };
   private busy = false;
   private lastCard: string | null = null;
   /** 손패 카드 요소(uid별). 손패를 떠난 카드를 더미로 날려 보내고, 새로 들어온 카드를 뽑을 더미에서 끌어오는 데 쓴다 */
@@ -295,6 +303,7 @@ export class BattleView {
     );
 
     document.addEventListener('keydown', this.onKey);
+    window.addEventListener('pointermove', this.onPointerMove, { passive: true });
     installTooltips();
     return h('section', { class: 'screen battle', 'data-seed': this.ctx.seed }, this.field, this.toasts);
   }
@@ -617,8 +626,8 @@ export class BattleView {
       });
       el.addEventListener('focus', () => this.setHover(i));
       el.addEventListener('blur', () => this.setHover(null));
-      el.addEventListener('mouseenter', () => this.setHover(i));
-      el.addEventListener('mouseleave', () => this.setHover(null));
+      el.addEventListener('mouseenter', this.resolveHandHover);
+      el.addEventListener('mouseleave', this.resolveHandHover);
       // 떠오른 카드 밑 빈자리도 이 카드로 친다(style.css .hand-hit) — 카드 아래쪽에 마우스를 두면 오르내리길 되풀이하지 않게
       el.append(h('span', { class: 'hand-hit', 'aria-hidden': 'true' }));
       this.handEl.appendChild(el);
@@ -626,6 +635,10 @@ export class BattleView {
     });
 
     if (this.selected !== null && this.handEl.isConnected) this.layoutAim();
+    // 다시 그린 손패에서도 마우스 밑 카드는 떠오른 채로(새 요소라 바로 정한다)
+    this.hoverCard = null;
+    this.hoverAt = 0;
+    if (this.handEl.isConnected) this.resolveHandHover();
 
     const ms = 260 * Math.max(0.6, settings.speed);
     for (const x of leaving) void flyClone(x.el, this.pileRect(x.to), { ms, scale: 0.25 }, x.rect);
@@ -821,6 +834,40 @@ export class BattleView {
     if (v.lethal) lines.push('이대로면 쓰러진다');
     Object.entries(tipAttrs(`받을 피해 ${v.hpLoss}`, lines.join('\n'), 'attack')).forEach(([k, v2]) => v2 !== undefined && u.intent.setAttribute(k, v2));
   }
+
+  /**
+   * 손패의 떠오른 카드 정하기(2026-10-25 사용자 요청 — 가장자리에 마우스를 두면 카드가 오르내리길 되풀이했다).
+   * 카드가 떠오르는 0.15초 동안은 카드와 받침(.hand-hit)이 함께 움직여 바깥 모서리가 잠깐 비고, CSS :hover는 그 틈에 풀렸다.
+   * 그래서 떠오르기 시작한 뒤 움직임이 끝날 때까지는 판정을 미루고, 끝난 뒤 마우스 자리 맨 위 카드(받침 포함)로 정한다
+   */
+  private resolveHandHover = (e?: MouseEvent): void => {
+    // mouseenter·mouseleave는 pointermove보다 먼저 오므로 자리는 그 이벤트에서 읽는다
+    if (e instanceof MouseEvent) this.pointer = { x: e.clientX, y: e.clientY };
+    if (this.hoverTimer !== null) clearTimeout(this.hoverTimer);
+    this.hoverTimer = null;
+    if (this.disposed) return;
+    const wait = this.hoverCard ? this.hoverAt + HAND_LIFT_MS - performance.now() : 0;
+    if (wait > 0) {
+      this.hoverTimer = window.setTimeout(() => this.resolveHandHover(), wait);
+      return;
+    }
+    const top = this.pointer.x < 0 ? null : document.elementFromPoint(this.pointer.x, this.pointer.y)?.closest<HTMLElement>('.card');
+    const next = top && top.parentElement === this.handEl ? top : null;
+    if (next === this.hoverCard) return;
+    this.hoverCard?.classList.remove('card-hover');
+    this.hoverCard = next;
+    this.hoverAt = performance.now();
+    next?.classList.add('card-hover');
+    const i = next ? [...this.handEls.values()].indexOf(next) : -1;
+    this.setHover(i >= 0 ? i : null);
+  };
+
+  private onPointerMove = (e: PointerEvent): void => {
+    this.pointer.x = e.clientX;
+    this.pointer.y = e.clientY;
+    // 손패를 다시 그린 뒤에는 브라우저가 옛 카드에만 mouseleave를 보내므로, 떠오른 카드 밖으로 나가면 여기서도 다시 정한다
+    if (this.hoverCard && !(e.target instanceof Node && this.hoverCard.contains(e.target))) this.resolveHandHover(e);
+  };
 
   private setHover(i: number | null): void {
     if (this.hovered === i) return;
@@ -1732,6 +1779,8 @@ export class BattleView {
     this.disposed = true;
     // 이 화면이 건 듣개·관찰자·타이머를 거두고, 돌던 스프라이트를 멈춘다(기다리던 연출은 깨어나면 BattleClosed로 끝난다)
     document.removeEventListener('keydown', this.onKey);
+    window.removeEventListener('pointermove', this.onPointerMove);
+    if (this.hoverTimer !== null) clearTimeout(this.hoverTimer);
     this.resizeObs.disconnect();
     this.dragCleanup?.();
     if (this.bonusTimer !== null) clearTimeout(this.bonusTimer);
