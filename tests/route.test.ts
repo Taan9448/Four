@@ -169,7 +169,7 @@ describe('모듈·적이 지도에 나올 수 있다', () => {
     expect(orphans).toEqual([]);
   });
 
-  it('시드 300개면 캠페인 스테이지의 전투·엘리트 모듈이 모두 한 번 이상 지도에 나온다', () => {
+  it('시드 300개면 캠페인 스테이지의 모듈(이야기 제외)이 모두 한 번 이상 지도에 나온다 — 전투 없는 노드 연속 한도까지 따져서', () => {
     const flags = [...new Set([...data.modules.values()].map((m) => m.conditions.flag).filter((f): f is string => !!f))];
     const roster = [...data.characters.keys()];
     const seen = new Set<string>();
@@ -179,8 +179,11 @@ describe('모듈·적이 지도에 나올 수 있다', () => {
         for (const n of map.floors.flat()) if (n.moduleId) seen.add(n.moduleId);
       }
     }
+    // 세계의 틈(S9)은 자유 층(3·6·9층)이 모두 이야기 노드 둘 뒤라 전투 없는 노드 연속 한도에 걸려 사건·휴식이 캠페인에 못 나온다
+    // (그 사건들은 심연의 틈 세계 굽이에서 나온다 — 심연 지도에는 이야기 노드가 없다)
+    const abyssOnly = (m: { stage: string; type: string }) => m.stage === 's9' && (m.type === 'event' || m.type === 'rest');
     const never = [...data.modules.values()]
-      .filter((m) => data.stages.some((s) => s.id === m.stage) && (m.type === 'battle' || m.type === 'elite' || m.type === 'boss'))
+      .filter((m) => data.stages.some((s) => s.id === m.stage) && m.type !== 'story' && !abyssOnly(m))
       .filter((m) => !seen.has(m.id))
       .map((m) => m.id);
     expect(never).toEqual([]);

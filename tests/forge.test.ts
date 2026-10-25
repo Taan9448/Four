@@ -1,10 +1,10 @@
 // 대강화 +6~+10(심연 개편 5단계, GAME_DESIGN 16절 ⑦) — 각인·각성(2026-10-15 개편)
 import { describe, expect, it } from 'vitest';
 import { createAbyssRun, pathOffer, pathPicks } from '../src/engine/abyss';
-import { buyForge, forgeCandidates, forgeChance, forgeLocked, openShop } from '../src/engine/economy';
+import { buyForge, forgeCandidates, forgeChance, forgeLocked, openShop, rerollCandidates, rerollEngraving } from '../src/engine/economy';
 import { createRunAt } from '../src/engine/run';
 import { forgeMax, resolveCard } from '../src/engine/state';
-import { chooseEngraving, engravingAllowed, settleEngraving } from '../src/engine/forge';
+import { chooseEngraving, engravingAllowed, rerollPool, settleEngraving } from '../src/engine/forge';
 import { ownedView } from '../src/engine/collection';
 import { cardText } from '../src/engine/text';
 import { promptFor } from '../tools/render-prompt.mjs';
@@ -233,5 +233,76 @@ describe('대강화 틀 명세', () => {
       expect(text).toContain('BORDER BAND');
       expect(text).not.toContain('ART WINDOW');
     }
+  });
+});
+
+// 각인 다시 새기기(2026-10-25 사용자 요청 — 메이플스토리 큐브처럼 +6~+9 각인을 한 칸씩 무작위로 바꾼다)
+describe('각인 다시 새기기', () => {
+  const marks4 = ['refine', 'flow', 'calm', 'first'].filter((id) => engravingAllowed(data, { uid: 'x', cardId: epic.id, level: max + 1 }, data.forge.engravings.find((m) => m.id === id)!));
+  const campaign = (seed: string, marks: string[]) => {
+    const run = createRunAt(data, seed, 's3');
+    run.collection[epic.id] = max + marks.length;
+    run.engravings = { [epic.id]: [...marks] };
+    run.deck.push({ uid: 'c1', cardId: epic.id, level: max + marks.length, marks: [...marks] }, { uid: 'c2', cardId: epic.id, level: max + marks.length, marks: [...marks] });
+    run.shop = openShop(data, run, 'n1-0');
+    run.gold = f.rerollPrice * 3;
+    return run;
+  };
+
+  it('각인이 있는 카드만 후보(캠페인은 같은 카드 한 장), 값은 rerollPrice', () => {
+    expect(f.rerollPrice).toBe(100);
+    const run = campaign('ROLL1', marks4);
+    run.deck.push({ uid: 'p', cardId: epic.id === rare.id ? 'x' : rare.id, level: max });
+    expect(rerollCandidates(data, run).map((c) => c.uid)).toEqual(['c1']);
+  });
+
+  it('한 칸만 다른 각인으로 바뀌고, 다른 칸·같은 카드의 덱 인스턴스·보유 각인이 함께 따라간다. 골드를 낸다', () => {
+    const run = campaign('ROLL2', marks4);
+    const r = rerollEngraving(data, run, 'c1', 1);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.from).toBe(marks4[1]);
+    expect(r.to).not.toBe(marks4[1]);
+    expect(marks4).not.toContain(r.to);
+    const next = [...marks4];
+    next[1] = r.to;
+    expect(run.engravings![epic.id]).toEqual(next);
+    expect(run.deck.filter((c) => c.cardId === epic.id).map((c) => c.marks)).toEqual([next, next]);
+    expect(run.gold).toBe(f.rerollPrice * 2);
+    expect(r.message).toContain(`+${max + 2}`);
+  });
+
+  it('후보는 그 칸을 뺀 모습으로 받을 수 있는 각인(다른 칸 것·지금 것은 빼고)', () => {
+    const inst = { uid: 'x', cardId: epic.id, level: max + marks4.length, marks: marks4 };
+    for (let slot = 0; slot < marks4.length; slot++) {
+      const pool = rerollPool(data, inst, slot);
+      expect(pool.length).toBeGreaterThan(0);
+      for (const id of pool) expect(marks4).not.toContain(id);
+    }
+  });
+
+  it('여러 번 굴리면 다른 결과도 나오고, 같은 시드·횟수면 같은 결과다. 골드가 모자라면·고를 각인이 남았으면 못 한다', () => {
+    const a = campaign('ROLL3', marks4);
+    const b = campaign('ROLL3', marks4);
+    const seq = (run: ReturnType<typeof campaign>) => [0, 1, 2].map(() => (rerollEngraving(data, run, 'c1', 0) as { to: string }).to);
+    const sa = seq(a);
+    expect(seq(b)).toEqual(sa);
+    expect(a.gold).toBe(0);
+    expect(rerollEngraving(data, a, 'c1', 0).ok).toBe(false);
+    const c = campaign('ROLL4', marks4);
+    c.forgePending = { uid: 'c1', cardId: epic.id, level: max + 1, choices: ['refine'] };
+    expect(rerollEngraving(data, c, 'c1', 0)).toEqual({ ok: false, reason: '먼저 각인을 고른다' });
+    expect(rerollEngraving(data, campaign('ROLL5', marks4), 'c1', marks4.length).ok).toBe(false);
+  });
+
+  it('심연: 그 카드 한 장의 각인만 바뀐다', () => {
+    const run = createAbyssRun(data, 'ROLLA', { mates: ['elia', 'kyle', 'born'], paths: pathOffer(data, 'ROLLA').slice(0, pathPicks(data, 3).picks), pool: {} });
+    run.deck.push({ uid: 'a1', cardId: epic.id, level: max + 2, marks: marks4.slice(0, 2) }, { uid: 'a2', cardId: epic.id, level: max + 2, marks: marks4.slice(0, 2) });
+    run.shop = openShop(data, run, 'n1-0');
+    run.gold = f.rerollPrice;
+    const r = rerollEngraving(data, run, 'a1', 0);
+    expect(r.ok).toBe(true);
+    expect(run.deck.find((c) => c.uid === 'a1')!.marks![0]).not.toBe(marks4[0]);
+    expect(run.deck.find((c) => c.uid === 'a2')!.marks).toEqual(marks4.slice(0, 2));
   });
 });

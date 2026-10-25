@@ -2341,6 +2341,21 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .smithy-step.is-done .smithy-step-lv { color: #6aa84f; }
 .smithy-step.is-now { color: #ffe08a; background: rgba(242, 169, 59, 0.16); box-shadow: inset 0 0 0 1px #f2a93b; }
 .smithy-step.is-now .smithy-step-lv { color: #ffe08a; }
+.smithy-tabs { position: relative; z-index: 1; display: flex; justify-content: center; gap: 6px; margin-bottom: 4px; }
+.smithy-tab { min-height: var(--tap, 40px); padding: 6px 14px; border-radius: 6px; border: 1px solid #6e5440; background: rgba(13, 10, 9, 0.7); color: #e0cfae; font-weight: 700; cursor: pointer; }
+.smithy-tab.is-on { background: rgba(242, 169, 59, 0.22); border-color: #f2a93b; color: #ffe08a; }
+.smithy-tab:disabled { opacity: 0.5; cursor: not-allowed; }
+/* 각인 다시 새기기(큐브): 왼쪽 카드 · 오른쪽 각인 칸마다 단추 */
+.smithy-roll { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(260px, 1.6fr); gap: 16px; align-items: start; position: relative; z-index: 1; }
+.smithy-roll-list ol { gap: 8px; }
+.smithy-roll-row { display: grid; grid-template-columns: 40px 1fr auto; gap: 8px; align-items: center; padding: 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.04); color: #e0cfae; }
+.smithy-roll-mark { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.smithy-roll-mark small { color: #c2c6d1; font-size: var(--fs-cap); }
+.smithy-roll-row.is-new { background: rgba(242, 169, 59, 0.2); box-shadow: inset 0 0 0 1px #f2a93b; animation: roll-new 0.9s ease-out; }
+.smithy-roll-row.is-fixed { opacity: 0.75; }
+.smithy-roll-list .smithy-result { margin-top: 10px; max-width: none; }
+@keyframes roll-new { 0% { background: rgba(255, 224, 138, 0.6); } 100% { background: rgba(242, 169, 59, 0.2); } }
+@media (max-width: 640px) { .smithy-roll { grid-template-columns: 1fr; } }
 .smithy-foot { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: center; padding-top: 10px; border-top: 1px solid rgba(184, 116, 26, 0.4); color: #e0cfae; }
 .smithy-foot small { flex-basis: 100%; text-align: center; color: #8f7a63; }
 .smithy-pick, .smithy-engrave { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; align-items: center; }
