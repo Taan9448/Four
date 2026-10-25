@@ -124,6 +124,9 @@ export class BattleView {
   private hoverAt = 0;
   private hoverTimer: number | null = null;
   private pointer = { x: -1, y: -1 };
+  /** 뽑은 카드가 다 날아와 앉는 때 · 손패 요소마다 그린 결과(다시 그릴 때 그대로면 요소를 그대로 둔다) */
+  private handSettleAt = 0;
+  private handSig = new WeakMap<HTMLElement, string>();
   private busy = false;
   private lastCard: string | null = null;
   /** 손패 카드 요소(uid별). 손패를 떠난 카드를 더미로 날려 보내고, 새로 들어온 카드를 뽑을 더미에서 끌어오는 데 쓴다 */
@@ -596,16 +599,33 @@ export class BattleView {
     const first = this.handEls.size === 0;
     const prev = this.handEls;
     this.handEls = new Map();
-    clear(this.handEl);
+    // 떠 있던 카드(새로 그려도 같은 카드면 처음부터 떠 있게 — 다시 그릴 때마다 떠오르는 움직임이 처음부터 다시 돌지 않게)
+    const hoverUid = this.hoverCard ? [...prev].find(([, e]) => e === this.hoverCard)?.[0] : undefined;
     const n = s.hand.length;
     const mid = (n - 1) / 2;
     const step = n > 1 ? Math.min(5, 36 / (n - 1)) : 0;
     this.handEl.style.setProperty('--overlap', `${n > 8 ? -46 : n > 6 ? -32 : n > 4 ? -18 : -8}px`);
     this.handHint.textContent = n ? `◀ ${n}장 ▶` : '';
-    s.hand.forEach((inst, i) => {
+    const els = s.hand.map((inst, i) => {
       const check = canPlay(s, i);
-      const el = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i, flavor: 'hover' });
+      const fresh = cardView(this.data, inst, { disabled: check.ok ? undefined : check.reason, selected: this.selected === i, flavor: 'hover' });
+      // 그대로인 카드는 요소를 그대로 둔다(2026-10-25 사용자 요청 — 유물이 연달아 돌 때 0.12초마다 손패를 새로 만들어
+      // 마우스 밑 카드가 매번 다시 떠오르고, 대강화·등급 빛도 매번 처음부터 다시 돌았다). 자리(i)·장수가 같고 그린 결과가 같을 때만
+      const sig = `${i}/${n}|${fresh.outerHTML}`;
+      const old = prev.get(inst.uid);
       const off = i - mid;
+      // 낸 카드(찢기며 감춘 요소)가 손패에 남았으면 새로 만든다 — 감춘 채로 남지 않게
+      if (old && this.handSig.get(old) === sig && !this.flown.has(inst.uid)) {
+        old.style.zIndex = String(10 + i);
+        this.handEls.set(inst.uid, old);
+        return old;
+      }
+      const el = fresh;
+      this.handSig.set(el, sig);
+      if (inst.uid === hoverUid) {
+        el.classList.add('card-hover');
+        this.hoverCard = el;
+      }
       el.style.setProperty('--rot', `${off * step}deg`);
       el.style.setProperty('--lift', `${Math.round(off * off * step * 0.7)}px`);
       el.style.zIndex = String(10 + i);
@@ -630,19 +650,27 @@ export class BattleView {
       el.addEventListener('mouseleave', this.resolveHandHover);
       // 떠오른 카드 밑 빈자리도 이 카드로 친다(style.css .hand-hit) — 카드 아래쪽에 마우스를 두면 오르내리길 되풀이하지 않게
       el.append(h('span', { class: 'hand-hit', 'aria-hidden': 'true' }));
-      this.handEl.appendChild(el);
       this.handEls.set(inst.uid, el);
+      return el;
     });
+    // 제자리에 있는 요소는 옮기지 않는다(떼었다 붙이면 CSS 움직임이 처음부터 다시 돈다): 빠진 것부터 걷고, 필요한 자리에만 끼운다
+    const keep = new Set(els);
+    for (const c of [...this.handEl.children]) if (!keep.has(c as HTMLElement)) c.remove();
+    let at = this.handEl.firstElementChild;
+    for (const el of els) {
+      if (el === at) at = at.nextElementSibling;
+      else this.handEl.insertBefore(el, at);
+    }
+    if (this.hoverCard && !keep.has(this.hoverCard)) this.hoverCard = null;
 
     if (this.selected !== null && this.handEl.isConnected) this.layoutAim();
-    // 다시 그린 손패에서도 마우스 밑 카드는 떠오른 채로(새 요소라 바로 정한다)
-    this.hoverCard = null;
-    this.hoverAt = 0;
-    if (this.handEl.isConnected) this.resolveHandHover();
 
     const ms = 260 * Math.max(0.6, settings.speed);
     for (const x of leaving) void flyClone(x.el, this.pileRect(x.to), { ms, scale: 0.25 }, x.rect);
     const arriving = s.hand.filter((c) => !prev.has(c.uid)).map((c) => this.handEls.get(c.uid)!);
+    // 뽑은 카드가 날아오는 동안은 떠오를 카드를 정하지 않는다(지나가는 카드가 마우스 밑에서 잠깐씩 떠오르지 않게)
+    if (arriving.length) this.handSettleAt = performance.now() + (arriving.length - 1) * 70 * settings.speed + ms + 40;
+    if (this.handEl.isConnected) this.resolveHandHover();
     if (!arriving.length) return;
     // 처음 그릴 때는 아직 화면에 붙기 전이라 한 박자 뒤에
     const run = () => {
@@ -846,13 +874,13 @@ export class BattleView {
     if (this.hoverTimer !== null) clearTimeout(this.hoverTimer);
     this.hoverTimer = null;
     if (this.disposed) return;
-    const wait = this.hoverCard ? this.hoverAt + HAND_LIFT_MS - performance.now() : 0;
+    const now = performance.now();
+    const wait = Math.max(this.hoverCard ? this.hoverAt + HAND_LIFT_MS - now : 0, this.handSettleAt - now);
     if (wait > 0) {
       this.hoverTimer = window.setTimeout(() => this.resolveHandHover(), wait);
       return;
     }
-    const top = this.pointer.x < 0 ? null : document.elementFromPoint(this.pointer.x, this.pointer.y)?.closest<HTMLElement>('.card');
-    const next = top && top.parentElement === this.handEl ? top : null;
+    const next = this.handCardAt(this.pointer.x, this.pointer.y);
     if (next === this.hoverCard) return;
     this.hoverCard?.classList.remove('card-hover');
     this.hoverCard = next;
@@ -861,6 +889,21 @@ export class BattleView {
     const i = next ? [...this.handEls.values()].indexOf(next) : -1;
     this.setHover(i >= 0 ? i : null);
   };
+
+  /**
+   * 그 자리 맨 위의 손패 카드(받침 포함). 잠깐 덮는 알림 띠·숫자·연출 층은 건너뛰고(유물·물약 알림이 손패 위에 뜰 때 내려앉지 않게),
+   * 단추·창 같은 다른 화면 요소가 위에 있으면 카드로 치지 않는다
+   */
+  private handCardAt(x: number, y: number): HTMLElement | null {
+    if (x < 0) return null;
+    for (const el of document.elementsFromPoint(x, y)) {
+      const card = el.closest<HTMLElement>('.card');
+      if (card && card.parentElement === this.handEl) return card;
+      if (el.closest('.toast, .float-text, .fx-layer, .card-ghost, .card-slam, .tooltip')) continue;
+      return null;
+    }
+    return null;
+  }
 
   private onPointerMove = (e: PointerEvent): void => {
     this.pointer.x = e.clientX;
