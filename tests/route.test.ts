@@ -111,3 +111,78 @@ describe('폭주가 지도를 가른다(GAME_DESIGN 7절, 2026-10-11)', () => {
     expect(run.scar).toBe(4);
   });
 });
+
+/**
+ * 만든 적·모듈이 실제 지도에 나오는가(2026-10-25 사용자 요청 — "몬스터를 만든 게 실제로는 맵에 안 나오는 게 있다").
+ * 나올 수 있는 층(floorRange)이 고정 이야기 층이나 정해진 상점·휴식 층과만 겹치면 그 모듈은 영영 뽑히지 않는다
+ */
+describe('모듈·적이 지도에 나올 수 있다', () => {
+  const route = data.balance.route;
+  const pinnedIds = new Set(data.stages.flatMap((s) => s.pinned.map((p) => p.module)));
+  const floorsFor = (moduleId: string): number[] => {
+    const m = data.modules.get(moduleId)!;
+    const stage = data.stages.find((s) => s.id === m.stage);
+    if (!stage) return [];
+    const pinned = new Set(stage.pinned.map((p) => p.floor));
+    const r = m.conditions.floorRange;
+    const out: number[] = [];
+    for (let f = 1; f <= stage.floors; f++) {
+      const forced = stage.forcedTypes[String(f)];
+      if (pinned.has(f)) continue;
+      if (forced ? forced !== m.type : (stage.typeWeights[m.type as keyof typeof stage.typeWeights] ?? 0) <= 0) continue;
+      if (r && (f < r[0] || f > r[1])) continue;
+      if (m.type === 'elite' && !forced && f < route.eliteMinFloor) continue;
+      out.push(f);
+    }
+    return out;
+  };
+
+  it('캠페인 스테이지의 뽑는 모듈마다 나올 수 있는 층이 하나 이상 있다', () => {
+    const dead = [...data.modules.values()]
+      .filter((m) => data.stages.some((s) => s.id === m.stage) && m.type !== 'boss' && m.type !== 'story' && !pinnedIds.has(m.id) && m.weight > 0)
+      .filter((m) => floorsFor(m.id).length === 0)
+      .map((m) => `${m.id} floorRange=${JSON.stringify(m.conditions.floorRange)}`);
+    expect(dead).toEqual([]);
+  });
+
+  it('조건 깃발·동료는 어딘가에서 세워지거나 합류한다', () => {
+    // 깃발을 세우는 곳: 모듈 내용(선택지·전투 결과)의 set_flag
+    const setters = JSON.stringify([...data.modules.values()].map((m) => m.content));
+    const missing = [...data.modules.values()].flatMap((m) => {
+      const c = m.conditions;
+      const out: string[] = [];
+      if (c.flag && !setters.includes(`"flag":"${c.flag}"`)) out.push(`${m.id} flag ${c.flag}`);
+      if (c.partyHas && !data.characters.has(c.partyHas)) out.push(`${m.id} partyHas ${c.partyHas}`);
+      return out;
+    });
+    expect(missing).toEqual([]);
+  });
+
+  it('게임의 적은 모두 어느 전투에 나온다(모듈·보스·심연 또는 변신·소환으로)', () => {
+    const inModules = new Set([...data.modules.values()].flatMap((m) => [...(m.content.enemies ?? [])]));
+    const viaEnemy = new Set<string>();
+    for (const e of data.enemies.values()) {
+      if (e.transform) viaEnemy.add(e.transform.into);
+      for (const mv of e.moves) for (const ef of mv.effects) if (ef.enemy) viaEnemy.add(ef.enemy);
+    }
+    const orphans = [...data.enemies.keys()].filter((id) => !id.startsWith('test_') && !inModules.has(id) && !viaEnemy.has(id));
+    expect(orphans).toEqual([]);
+  });
+
+  it('시드 300개면 캠페인 스테이지의 전투·엘리트 모듈이 모두 한 번 이상 지도에 나온다', () => {
+    const flags = [...new Set([...data.modules.values()].map((m) => m.conditions.flag).filter((f): f is string => !!f))];
+    const roster = [...data.characters.keys()];
+    const seen = new Set<string>();
+    for (const st of data.stages) {
+      for (let i = 0; i < 300; i++) {
+        const map = generateStageMap(data, st.id, createRng(`seen-${i}`).fork(`map:${st.id}`), ctx({ scar: i % 8, flags, roster }));
+        for (const n of map.floors.flat()) if (n.moduleId) seen.add(n.moduleId);
+      }
+    }
+    const never = [...data.modules.values()]
+      .filter((m) => data.stages.some((s) => s.id === m.stage) && (m.type === 'battle' || m.type === 'elite' || m.type === 'boss'))
+      .filter((m) => !seen.has(m.id))
+      .map((m) => m.id);
+    expect(never).toEqual([]);
+  });
+});

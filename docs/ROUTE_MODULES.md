@@ -33,7 +33,7 @@
   "tags": [],                          // "scar"면 상흔에 비례해 가중치 증가
   "once": false,                       // 런당 1회
   "conditions": {                      // 생성 시점 조건(모두 선택)
-    "floorRange": [3, 9],
+    "floorRange": [3, 9],             // 고정 층(pinned)·정해진 상점/휴식 층(forcedTypes)과만 겹치면 영영 안 나온다 — tests/route.test.ts가 막는다
     "scarMin": 0,
     "flag": "met_companions",          // 이전 고정 스토리 노드가 줄 플래그도 인정
     "partyHas": "kyle"                 // 합류(예정) 동료
