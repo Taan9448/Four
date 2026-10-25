@@ -619,6 +619,8 @@ export class BattleView {
       el.addEventListener('blur', () => this.setHover(null));
       el.addEventListener('mouseenter', () => this.setHover(i));
       el.addEventListener('mouseleave', () => this.setHover(null));
+      // 떠오른 카드 밑 빈자리도 이 카드로 친다(style.css .hand-hit) — 카드 아래쪽에 마우스를 두면 오르내리길 되풀이하지 않게
+      el.append(h('span', { class: 'hand-hit', 'aria-hidden': 'true' }));
       this.handEl.appendChild(el);
       this.handEls.set(inst.uid, el);
     });
