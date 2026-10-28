@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { createAbyssRun, pathOffer, pathPicks } from '../src/engine/abyss';
 import { buyForge, forgeCandidates, forgeChance, forgeLocked, openShop, rerollCandidates, rerollEngraving } from '../src/engine/economy';
-import { createRunAt } from '../src/engine/run';
+import { advanceStage, createRunAt } from '../src/engine/run';
 import { forgeMax, resolveCard } from '../src/engine/state';
 import { chooseEngraving, engravingAllowed, rerollPool, settleEngraving } from '../src/engine/forge';
 import { ownedView } from '../src/engine/collection';
@@ -189,6 +189,22 @@ describe('대강화 시도', () => {
     const poor = make();
     poor.gold = f.price - 1;
     expect(buyForge(data, poor, 'forge-b').ok).toBe(false);
+  });
+
+  it('캠페인: 천장(실패 수)은 스테이지를 넘어가도 남는다 — 저장했다 불러와도', async () => {
+    const { serializeRun, deserializeRun } = await import('../src/engine/save');
+    const run = createRunAt(data, 'FORGEKEEP', 's3');
+    run.collection[epic.id] = max;
+    run.deck.push({ uid: 'k1', cardId: epic.id, level: max });
+    run.forgeFails = { [epic.id]: 3 };
+    const before = forgeChance(data, run, { uid: 'k', cardId: epic.id, level: max }).chance;
+    expect(before).toBeGreaterThan(forgeChance(data, { ...run, forgeFails: {} }, { uid: 'k', cardId: epic.id, level: max }).chance);
+    run.status = 'stage_clear';
+    advanceStage(data, run);
+    expect(run.stageId).toBe('s4');
+    expect(run.forgeFails?.[epic.id]).toBe(3);
+    expect(forgeChance(data, run, { uid: 'k', cardId: epic.id, level: max }).chance).toBe(before);
+    expect(deserializeRun(data, serializeRun(run))!.run.forgeFails?.[epic.id]).toBe(3);
   });
 
   it('캠페인: 보유 카드에 남고 덱의 같은 카드도 함께 오른다', () => {

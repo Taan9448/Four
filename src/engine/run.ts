@@ -377,6 +377,7 @@ function rebaseWalk(data: GameData, run: RunState, hub: RunState): void {
   applyPilgrimGains(data, next, base, run);
   run.collection = next.collection;
   run.engravings = next.engravings;
+  run.forgeFails = next.forgeFails;
   run.relics = next.relics;
   run.potions = next.potions;
   run.gold = next.gold;
