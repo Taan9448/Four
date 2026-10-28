@@ -20,8 +20,8 @@ const SCREENS = [
 const VIEWPORTS = [
   { tag: 'PC', width: 1440, height: 900, btn: 36 },
   { tag: '휴대폰', width: 390, height: 844, btn: 44, mobile: true },
-  // 휴대폰 가로(2026-10-12 B7): 전투·지도·보상만
-  { tag: '가로', width: 844, height: 390, btn: 44, mobile: true, only: ['battle', 'map', 'reward'] },
+  // 휴대폰 가로(2026-10-12 B7 전투·지도·보상 → 2026-10-28 모든 화면)
+  { tag: '가로', width: 844, height: 390, btn: 44, mobile: true },
 ];
 const FONTS = [
   { tag: '보통', scale: 1 },

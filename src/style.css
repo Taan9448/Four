@@ -2370,3 +2370,77 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .shop-own-slot { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
 .shop-sell { padding-inline: 8px; }
 .shop-sell-note { display: block; margin-top: 6px; color: var(--muted, #8f7a63); }
+
+/*
+ * 휴대폰 가로 화면 전체(2026-10-28 사용자 요청 — 세로로만 짜인 화면을 가로로 돌리면 가로에 맞춰 바뀌게).
+ * 위 전투 가로 묶음(2026-10-12 B7)과 같은 조건. 파일 끝에 두어 뒤에 있는 화면별 규칙보다 앞선다.
+ * - 바깥 여백을 줄이고 노치(안전 영역)를 피한다 · 높이는 주소창을 뺀 실제 높이(dvh)
+ * - 시작 화면: 왼쪽 제목 · 오른쪽 메뉴(로그인 판), 표식은 오른쪽 위로
+ * - 지도: 왼쪽 여정 띠 + 두루마리, 오른쪽 일행 칸(따로 스크롤) — 한 화면에 지도가 다 보인다
+ * - 판(보상·선택지·상점·레벨 업 등)·끝 화면·창: 제목·여백을 줄여 카드와 선택지가 첫 화면에 들어오게
+ */
+@media (orientation: landscape) and (max-height: 500px) {
+  #app { padding: 4px max(8px, env(safe-area-inset-right)) 4px max(8px, env(safe-area-inset-left)); }
+  body { min-height: 100dvh; }
+  .b-scene { height: calc(100dvh - 8px); }
+  .backdrop, .wardrobe-screen, .loadout-screen { min-height: calc(100dvh - 8px); }
+  .backdrop { padding: 10px 12px; }
+  .codex-screen { height: calc(100dvh - 8px); }
+
+  /* 시작 화면 */
+  .title-screen { min-height: calc(100dvh - 8px); }
+  .title-center { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 4vw; align-items: center; width: 100%; padding: 64px 24px 16px; }
+  .title-center h1 { grid-column: 1; grid-row: 1; align-self: end; font-size: clamp(calc(var(--fs-title) * 1.6), 7vw, calc(var(--fs-title) * 2.4)); }
+  .title-sub { grid-column: 1; grid-row: 2; align-self: start; margin-bottom: 0; }
+  .title-login, .title-menu { grid-column: 2; grid-row: 1 / 3; justify-self: center; }
+  .title-menu { width: min(40vw, 290px); gap: 8px; }
+  .title-menu .btn { height: 48px; }
+  .title-login .login-panel { padding: 10px 12px 12px; gap: 6px; }
+  .title-login .login-form { gap: 6px; }
+  .title-login .login-input { min-height: 38px; padding: 6px 10px; }
+  .title-login .login-submit { min-height: 40px; }
+  .title-corner { top: 10px; bottom: auto; right: 12px; gap: 10px; }
+  .medal.title-medal { width: 44px; height: 44px; font-size: calc(var(--fs-body) * 1.3); }
+  .title-plate { left: 12px; bottom: 10px; max-width: calc(50% - 24px); padding: 6px 10px 6px 6px; gap: 8px; }
+  .plate-seal { width: 38px; height: 38px; font-size: calc(var(--fs-body) * 1.3); }
+  .plate-sync, .plate-gold { display: none; }
+  .title-foot { display: none; }
+
+  /* 지도: 왼쪽 여정 띠 + 두루마리, 오른쪽 일행 칸 */
+  .map-screen:not(.hub-screen) { display: grid; grid-template-columns: minmax(0, 1fr) 248px; grid-template-rows: auto minmax(0, 1fr); height: calc(100dvh - 8px); min-height: 0; background: radial-gradient(ellipse at 50% 0%, #1a2130, #0b0e13 70%); }
+  .map-screen:not(.hub-screen) .journey-area { grid-column: 1; grid-row: 1; padding: 8px 8px 0; }
+  .map-screen:not(.hub-screen) .local { display: contents; }
+  .map-screen:not(.hub-screen) .scroll-wrap { grid-column: 1; grid-row: 2; padding: 10px 14px 8px; overflow-x: auto; overflow-y: hidden; }
+  .map-screen:not(.hub-screen) .scroll { min-width: 0; height: 100%; }
+  .map-screen:not(.hub-screen) .side-panel { grid-column: 2; grid-row: 1 / 3; overflow-y: auto; padding: 8px 8px 8px 0; }
+  .journey-area .banner { font-size: var(--fs-min); padding: 3px 10px; bottom: 4px; }
+
+  /* 판: 제목·여백 줄이기 */
+  .panel-head { gap: 10px; margin-bottom: 6px; }
+  .panel-head h2 { font-size: calc(var(--fs-body) * 1.4); }
+  .seal { width: 36px; height: 36px; font-size: calc(var(--fs-title) * 0.8); }
+  .choice-box { padding: 14px 18px 14px; }
+  .choice-text { line-height: 1.6; }
+  .choices { margin-top: 10px; gap: 6px; }
+  .choice { padding: 8px 14px; }
+  .party-strip { margin: 6px 0 2px; padding: 6px 10px; }
+  .reward-cards { gap: 12px; margin: 8px 0 12px; }
+  .reward-cards .card { margin: 8px 6px; }
+
+  /* 끝 화면(스테이지 끝·승리·패배·심연) */
+  .end-box { gap: 6px; padding: 12px 14px; }
+  .end-box h1, .end-screen.finale h1 { font-size: clamp(calc(var(--fs-title) * 1.4), 5.5vw, calc(var(--fs-title) * 2)); }
+  .end-sub { margin-bottom: 2px; }
+  .end-box .outro { line-height: 1.6; }
+  .end-box .btn-large { margin-top: 6px; }
+
+  /* 창: 화면 높이 안에서 안쪽만 스크롤 */
+  .overlay { padding: 6px max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left)); }
+  .overlay-panel { max-height: calc(100dvh - 12px); }
+  .overlay-head { padding: 6px 12px; }
+  .overlay-body { padding: 10px 12px; }
+
+  /* 도감·편성 머리 */
+  .codex-head { padding: 8px 12px; }
+  .codex-title h2 { font-size: calc(var(--fs-title) * 0.9); }
+}
