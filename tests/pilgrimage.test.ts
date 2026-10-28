@@ -104,6 +104,45 @@ describe('순례 누적 — 보스를 넘기면 길에서 얻은 것이 남는�
     expect(hub.relics.filter((r) => r === relic).length).toBe(1);
   });
 
+  it('(j) 대강화 천장(실패 수)도 길을 마치면 남고 다음 길로 이어진다 — 두 길이면 늘어난 만큼씩, 단계가 오르면 새 단계 것으로(2026-10-28)', () => {
+    let hub = cleared('PIL12');
+    const card = [...data.cards.values()].find((c) => (c.rarity === 'epic' || c.rarity === 'legendary') && c.upgrade && hub.roster.some((r) => r.id === c.owner))!;
+    const max = data.balance.upgrade.maxLevel;
+    hub.collection[card.id] = max;
+    hub.forgeFails = { [card.id]: 2 };
+    // 길 A: 3번 더 실패하고 멈춘다 · 길 B: 4번 더 실패하고 보스를 넘긴다
+    const a = startReplay(data, hub, 's1');
+    expect(a.forgeFails?.[card.id]).toBe(2);
+    a.forgeFails![card.id] = 5;
+    hub = suspendReplay(a);
+    expect(hub.forgeFails?.[card.id]).toBe(2);
+    const b = startReplay(data, hub, 's2');
+    b.forgeFails![card.id] = 6;
+    b.status = 'stage_clear';
+    hub = finishReplay(data, b);
+    expect(hub.forgeFails?.[card.id]).toBe(6);
+    // 길 A를 이어서 마치면 길 A의 3번이 더해진다
+    const a2 = startReplay(data, hub, 's1');
+    expect(a2.forgeFails?.[card.id]).toBe(9);
+    a2.status = 'stage_clear';
+    hub = finishReplay(data, a2);
+    expect(hub.forgeFails?.[card.id]).toBe(9);
+    // 다음 길에서 성공해 +6이 되고 새 단계에서 1번 실패: 새 단계의 1번만 남는다
+    const c = startReplay(data, hub, 's3');
+    c.collection[card.id] = max + 1;
+    c.forgeFails![card.id] = 1;
+    c.status = 'stage_clear';
+    hub = finishReplay(data, c);
+    expect(hub.collection[card.id]).toBe(max + 1);
+    expect(hub.forgeFails?.[card.id]).toBe(1);
+    // 지면 그 길의 실패는 남지 않는다(그 길의 골드·강화처럼)
+    const d = startReplay(data, hub, 's4');
+    d.forgeFails![card.id] = 7;
+    d.status = 'defeat';
+    hub = finishReplay(data, d);
+    expect(hub.forgeFails?.[card.id]).toBe(1);
+  });
+
   it('(i) 가진 유물도 다시 나오고, 다시 나오면 등급별 골드로 받는다(순례·캠페인 모두)', () => {
     const hub = cleared('PIL11');
     const have = hub.relics[0] ?? freshRelic(hub);

@@ -1,4 +1,4 @@
-// 순례 누적(GAME_DESIGN 2절, 2026-10-21 사용자 결정): 길에서 보스를 넘기면 그 길에서 달라진 것(카드·강화·각인·유물·물약·골드·동료)을
+// 순례 누적(GAME_DESIGN 2절, 2026-10-21 사용자 결정): 길에서 보스를 넘기면 그 길에서 달라진 것(카드·강화·각인·대강화 천장·유물·물약·골드·동료)을
 // 클리어한 런(hub)에 더한다. 길마다 출발할 때의 모습(base)을 적어 두고 '달라진 만큼'만 옮기므로, 여러 길을 멈춰 두었다가
 // 차례로 마쳐도 서로 덮어쓰지 않는다. 지거나 버린 길은 옮기지 않는다
 import type { GameData } from './data';
@@ -13,11 +13,13 @@ export interface PilgrimBase {
   potionSlots: number;
   collection: Record<string, number>;
   engravings: Record<string, string[]>;
+  /** 대강화 천장(실패 수, 카드 id → 지금 단계에서 실패한 횟수). 옛 저장에는 없다 */
+  forgeFails?: Record<string, number>;
   roster: Record<string, { maxHp: number; level: number; xp: number }>;
 }
 
 /** 지금 모습을 기준으로 적는다 */
-export function pilgrimBase(run: Pick<RunState, 'gold' | 'relics' | 'potions' | 'collection' | 'engravings' | 'roster'>): PilgrimBase {
+export function pilgrimBase(run: Pick<RunState, 'gold' | 'relics' | 'potions' | 'collection' | 'engravings' | 'forgeFails' | 'roster'>): PilgrimBase {
   return {
     gold: run.gold,
     relics: [...run.relics],
@@ -25,6 +27,7 @@ export function pilgrimBase(run: Pick<RunState, 'gold' | 'relics' | 'potions' | 
     potionSlots: run.potions.length,
     collection: { ...run.collection },
     engravings: structuredClone(run.engravings ?? {}),
+    forgeFails: { ...(run.forgeFails ?? {}) },
     roster: Object.fromEntries(run.roster.map((r) => [r.id, { maxHp: r.maxHp, level: r.level, xp: r.xp }])),
   };
 }
@@ -68,6 +71,20 @@ export function applyPilgrimGains(data: GameData, target: RunState, base: Pilgri
     target.engravings ??= {};
     if (now?.length) target.engravings[id] = [...now];
     else delete target.engravings[id];
+  }
+  // 대강화 천장(2026-10-28 사용자 요청 — "실패해서 오른 확률이 길을 마치면 사라진다"): 실패 수도 길에서 달라진 만큼 더한다.
+  // 길에서 단계가 오른 카드는 새 단계의 실패 수(길의 것)로, 그대로인 카드는 늘어난 실패 수만큼
+  const baseFails = base.forgeFails ?? {};
+  for (const id of new Set([...Object.keys(walk.forgeFails ?? {}), ...Object.keys(baseFails)])) {
+    if (target.collection[id] === undefined) continue;
+    const now = walk.forgeFails?.[id] ?? 0;
+    const was = baseFails[id] ?? 0;
+    const leveled = walk.collection[id] !== base.collection[id];
+    if (!leveled && now === was) continue;
+    const fails = leveled ? now : Math.max(0, (target.forgeFails?.[id] ?? 0) + now - was);
+    target.forgeFails ??= {};
+    if (fails > 0) target.forgeFails[id] = fails;
+    else delete target.forgeFails[id];
   }
   // 유물
   for (const id of walk.relics) if (!base.relics.includes(id) && !target.relics.includes(id)) target.relics.push(id);
