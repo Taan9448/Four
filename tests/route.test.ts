@@ -189,3 +189,28 @@ describe('모듈·적이 지도에 나올 수 있다', () => {
     expect(never).toEqual([]);
   });
 });
+
+describe('고정 노드로 잠깐 떠난 동료(개작 B안)', () => {
+  it('떠나 있는 층에는 그 동료가 있어야 하는 사건을 놓지 않는다', () => {
+    const roster = ['haun', 'elia', 'kyle', 'born'];
+    // 시험용: 보른이 있어야 하는 S2 사건을 3~5층(보른이 사슬 안에 있는 층)에 하나 끼워 둔다
+    const base = data.modules.get('s2_event_old_dwarf')!;
+    const probe = { ...base, id: 's2_probe_needs_born', weight: 50, conditions: { floorRange: [3, 5] as [number, number], partyHas: 'born' } };
+    data.modules.set(probe.id, probe);
+    try {
+      // S2 보른: 2층에 떠나 6층에 돌아온다 / S9 보른: 7층에 남는다
+      const cases: [string, string, number, number][] = [['s2', 'born', 3, 6], ['s9', 'born', 8, 10]];
+      for (const [stage, member, from, to] of cases) {
+        for (let i = 0; i < 120; i++) {
+          const map = generateStageMap(data, stage, createRng(`away-${stage}-${i}`).fork(`map:${stage}`), ctx({ roster }));
+          for (const node of map.floors.flat()) {
+            if (node.floor < from || node.floor > to || !node.moduleId) continue;
+            expect(data.modules.get(node.moduleId)?.conditions.partyHas, `${stage} ${node.floor}층 ${node.moduleId}`).not.toBe(member);
+          }
+        }
+      }
+    } finally {
+      data.modules.delete(probe.id);
+    }
+  });
+});

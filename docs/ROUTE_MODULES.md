@@ -38,7 +38,7 @@
     "floorRange": [3, 9],             // 고정 층(pinned)·정해진 상점/휴식 층(forcedTypes)과만 겹치면 영영 안 나온다 — tests/route.test.ts가 막는다
     "scarMin": 0,
     "flag": "met_companions",          // 이전 고정 스토리 노드가 줄 플래그도 인정
-    "partyHas": "kyle"                 // 합류(예정) 동료
+    "partyHas": "kyle"                 // 합류(예정) 동료 — 고정 노드의 leave_party로 떠나 있는 층(S2 보른 3~5층, S8 엘리아 8~9층, S9 보른·카일)에는 놓지 않는다
   },
   "content": {
     "text": "...",
