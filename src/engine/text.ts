@@ -204,7 +204,7 @@ export function describeRunEffect(data: GameData, e: Effect): string {
     case 'join_party':
       return `${data.characters.get(e.member ?? '')?.name ?? e.member} 합류`;
     case 'leave_party':
-      return `${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈`;
+      return `${data.characters.get(e.member ?? '')?.name ?? e.member} 이탈${e.skipInPilgrimage ? '(순례에서는 함께 간다)' : ''}`;
     case 'gain_abyss_card':
       return '틈의 카드 1장';
     case 'reveal_unseen_card':

@@ -70,3 +70,22 @@ describe('원작 B안: 잠깐 빠지는 동료가 데이터에 맞게 들어 있
     expect(r('s7_boss_blood_hand')).toBe(30);
   });
 });
+
+describe('순례에서는 S8 엘리아가 빠지지 않는다(2026-10-31 사용자 결정)', () => {
+  const stairOps = () => data.modules.get('s8_story_broken_stair')!.content.choices![0].effects;
+  it('캠페인에서는 일곱째 굽이에서 빠진다', () => {
+    const run = createRunAt(data, 'ELIA-C', 's8');
+    expect(run.roster.some((r) => r.id === 'elia')).toBe(true);
+    applyRunOps(data, run, stairOps());
+    expect(run.roster.some((r) => r.id === 'elia')).toBe(false);
+  });
+  it('순례(replayOf가 있는 런)에서는 그대로 남고, 혈전 뒤 합류도 건너뛴다', () => {
+    const run = createRunAt(data, 'ELIA-P', 's8');
+    run.replayOf = structuredClone(run);
+    const before = run.roster.length;
+    applyRunOps(data, run, stairOps());
+    expect(run.roster.some((r) => r.id === 'elia')).toBe(true);
+    applyRunOps(data, run, data.modules.get('s8_boss_blood_hall')!.content.clearEffects ?? []);
+    expect(run.roster.length).toBe(before);
+  });
+});
