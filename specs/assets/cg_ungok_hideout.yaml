@@ -1,0 +1,10 @@
+id: cg_ungok_hideout
+type: story-cg
+summary: 장면 일러스트 — 운곡루의 타 버린 간판 — 숨은 집의 왕 노인(S6, 개작 6권 6~7장)
+# 2026-10-31 개작 원고 B안: 폐사찰(cg_old_temple) 대신 숨은 집 마당
+frame_notes:
+  1: >-
+    A rainy afternoon in the small walled yard of a hidden farmhouse in the hills: a half-burnt wooden inn signboard leans against the inner wall, only its last character still legible, rain dripping from it; beside it a little child hangs wet socks on a line. Through the open door of the main room, warm lamplight: an old man sits in a wooden wheelchair, thin, white-haired, a long white beard, a faded grey robe, a blanket over his lap that lies flat where his legs should be, holding out one hand. In the doorway a young man in a grey servant outfit has just dropped a bowl of water, frozen mid-step; behind him a big bald man with an old burn scar on one side of his head takes off his straw rain hat. Soft grey rain, warm interior light, intimate and tearful.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#3a3b38' }

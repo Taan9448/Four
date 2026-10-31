@@ -46,21 +46,29 @@ const nodeId = (floor: number, index: number) => `f${floor}n${index}`;
  */
 export const isCalm = (type: NodeType) => type !== 'battle' && type !== 'elite' && type !== 'boss';
 
-/** 고정 스토리 노드가 그 층 이전에 줄 플래그·합류 동료(조건 판정용) */
+/** 고정 스토리 노드가 그 층 이전에 줄 플래그·합류 동료·떠난 동료(조건 판정용). 같은 동료가 떠났다 돌아오면 마지막 것만 남긴다(S2 보른) */
 function expectedFromPinned(data: GameData, stage: StageDef, beforeFloor: number) {
   const flags = new Set<string>();
   const joins = new Set<string>();
-  for (const pin of stage.pinned) {
+  const leaves = new Set<string>();
+  for (const pin of [...stage.pinned].sort((a, b) => a.floor - b.floor)) {
     if (pin.floor >= beforeFloor) continue;
     const mod = data.modules.get(pin.module);
     for (const choice of mod?.content.choices ?? []) {
       for (const e of choice.effects) {
         if (e.op === 'set_flag' && e.flag) flags.add(e.flag);
-        if (e.op === 'join_party' && e.member) joins.add(e.member);
+        if (e.op === 'join_party' && e.member) {
+          joins.add(e.member);
+          leaves.delete(e.member);
+        }
+        if (e.op === 'leave_party' && e.member) {
+          leaves.add(e.member);
+          joins.delete(e.member);
+        }
       }
     }
   }
-  return { flags, joins };
+  return { flags, joins, leaves };
 }
 
 function moduleEligible(
@@ -79,7 +87,7 @@ function moduleEligible(
   if (c.flag !== undefined || c.partyHas !== undefined) {
     const exp = expectedFromPinned(data, stage, floor);
     if (c.flag !== undefined && !ctx.flags.includes(c.flag) && !exp.flags.has(c.flag)) return false;
-    if (c.partyHas !== undefined && !ctx.roster.includes(c.partyHas) && !exp.joins.has(c.partyHas)) return false;
+    if (c.partyHas !== undefined && ((!ctx.roster.includes(c.partyHas) && !exp.joins.has(c.partyHas)) || exp.leaves.has(c.partyHas))) return false;
   }
   return true;
 }

@@ -175,11 +175,11 @@
     "id": "s2_event_old_dwarf",
     "stage": "s2",
     "type": "event",
-    "name": "늙은 드워프",
+    "name": "그롬의 쪽지",
     "weight": 2,
     "once": true,
-    "conditions": {"floorRange": [4, 5], "partyHas": "born"},
-    "content": {"text": "화로의 불길이 가장 뜨거운 자리. 수염이 하얗게 세고 한쪽 눈이 먼 늙은 드워프가 망치를 쥔 채 떨고 있다. 망치 소리 사이로 드워프의 말이 들린다. 하운은 알아듣지 못했다. 그러나 그 이름만은 알아들었다. 두린.", "choices": [{"label": "보른이 고개를 든다", "condition": {"partyHas": "born"}, "result": "늙은 드워프의 멀지 않은 한쪽 눈에서 눈물이 흘렀다. 눈물은 화로의 열기에 금세 말라 버렸다. 그가 쥐고 있던 대장장이의 망치를 보른의 손에 쥐여 주었다. (보른의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "망치 소리에 숨을 맞춘다", "result": "세 번 짧게, 한 번 길게. 쾅, 쾅, 쾅. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}]}
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "세탁물 사이에 접힌 쪽지가 안쪽에서 나왔다. 늙은 드워프 그롬의 글씨였다. 수염이 하얗게 센 두린의 스승. \"보른은 우리 쪽에 있다. 망치를 내보이고 들어왔다. 바보 같은 놈.\" 쪽지 끝에 이름이 하나 더 있었다. 두린.", "choices": [{"label": "답장에 보른의 몫을 적는다", "result": "\"여섯째 날, 여섯 문.\" 안에서 보른이 문을 셀 것이다. 그롬이 그 쪽지를 보른에게 건넬 것이다. (고른 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "쪽지를 다시 접어 숨을 고른다", "result": "세 번 짧게, 한 번 길게. 안에서도 누군가 같은 박자로 망치를 치고 있었다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}]}
   },
   {
     "id": "s2_rest_red_camp",

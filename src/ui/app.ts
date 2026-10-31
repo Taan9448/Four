@@ -1635,11 +1635,13 @@ export class App {
               'p',
               { class: 'outro' },
               finale
-                ? '세계의 틈이 닫혔다. 천마봉 위에는 바느질 자국처럼 가지런한 흉터, 청운봉선(靑雲縫線)이 남았다.'
+                ? '세계의 틈이 닫혔다. 바느질 자국 같은 그 자리를 사람들은 청운봉선(靑雲縫線)이라 불렀고, 천마봉 일곱째 다리 아래에는 은빛 싹 하나가 남았다.'
                 : win
                   ? '지금 만들어진 이야기는 여기까지다. 다음 이야기는 이후 작업.'
                   : '하운이 쓰러졌다.',
             ),
+            // 구출(op rescue): 이야기 끝에 이번 런에서 함께 데리고 나온 사람을 모아 보인다
+            finale && (run.rescued ?? 0) > 0 ? h('p', { class: 'end-rescued' }, `함께 데리고 나온 사람 ${run.rescued}명`) : null,
             this.pilgrimKeepEl(run, win),
             news,
             h(

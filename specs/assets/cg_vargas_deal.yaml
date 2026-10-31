@@ -1,0 +1,10 @@
+id: cg_vargas_deal
+type: story-cg
+character: haun_sword
+summary: 장면 일러스트 — 바르가스의 거래 — 열쇠 너머의 귀곡애(S5 왕좌의 방, 개작 5권)
+frame_notes:
+  1: >-
+    The throne room of the demon castle Nocturna with its broken windows, snow blowing upward outside. The demon king Vargas — three times a man's height, seven twisted horns like a crown, torn bat wings, a starry black light in his chest — holds out a black crystal key toward a stone window frame; inside the frame, as if through a window, appears a different world: a misty Eastern mountain cliff with pine trees, a moss-covered stone gate and a single moon — the Ghost Valley Cliff of home. Jin Haun in his grey servant outfit, narrow plain sword in hand, stands half-turned toward that vision, his face torn with longing — but his body is turning away, toward a dark stairway behind him where small figures of escaping people are visible below. Cold blue light from the window, red-black light from Vargas.
+framing: >-
+  A cinematic story illustration for a visual-novel scene. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text.
+placeholder: { color: '#2a1e2e' }
