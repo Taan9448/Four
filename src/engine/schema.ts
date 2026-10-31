@@ -54,6 +54,8 @@ export const RUN_OPS = [
   'gain_gold',
   'gain_max_hp',
   'gain_relic',
+  // 구출(2026-10-31 개작 B안): 사건에서 데리고 나온 사람 수를 런에 센다(amount). 스테이지 끝 화면에 보인다
+  'rescue',
   'gain_potion',
   'gain_random_card',
   'swap_card',

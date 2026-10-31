@@ -191,6 +191,8 @@ export function describeRunEffect(data: GameData, e: Effect): string {
       return n <= -99 ? '상흔 모두 지움' : `상흔 ${sign(n)}`;
     case 'gain_run_mana':
       return `마나 ${sign(n)}`;
+    case 'rescue':
+      return `구한 사람 ${n}명`;
     case 'gain_max_hp':
       return `최대 체력 ${sign(n)}`;
     case 'gain_relic':

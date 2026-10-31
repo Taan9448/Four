@@ -73,6 +73,8 @@ export interface RunState {
   stageGains: string[];
   mana: number;
   scar: number;
+  /** 구출 사건으로 데리고 나온 사람 수(op rescue, 개작 원고 B안). 스테이지 끝 화면·결과 화면에 보인다 */
+  rescued?: number;
   flags: string[];
   usedModules: string[];
   supportActive: boolean;
@@ -167,23 +169,24 @@ export interface BattleLog {
 export interface StageStart {
   relics: string[];
   scar: number;
+  rescued?: number;
   levels: Record<string, number>;
 }
 
 /** 스테이지·굽이를 시작할 때 적어 둔다(끝 화면이 이번에 얻은 유물·레벨·상흔을 비교한다) */
 export function markStageStart(run: RunState): void {
-  run.stageStart = { relics: [...run.relics], scar: run.scar, levels: Object.fromEntries(run.roster.map((r) => [r.id, r.level])) };
+  run.stageStart = { relics: [...run.relics], scar: run.scar, rescued: run.rescued ?? 0, levels: Object.fromEntries(run.roster.map((r) => [r.id, r.level])) };
 }
 
 /** 이번 스테이지에 얻은 것: 카드(stageGains)·유물·레벨업·상흔 변화 */
-export function stageGainsSummary(data: GameData, run: RunState): { cards: string[]; relics: string[]; levels: { name: string; from: number; to: number }[]; scarDelta: number } {
+export function stageGainsSummary(data: GameData, run: RunState): { cards: string[]; relics: string[]; levels: { name: string; from: number; to: number }[]; scarDelta: number; rescued: number } {
   const st = run.stageStart;
   const cards = run.stageGains.map((id) => data.cards.get(id)?.name ?? id);
   const relics = run.relics.filter((id) => !st?.relics.includes(id)).map((id) => data.relics.get(id)?.name ?? id);
   const levels = st
     ? run.roster.filter((r) => st.levels[r.id] !== undefined && r.level > st.levels[r.id]).map((r) => ({ name: data.characters.get(r.id)?.name ?? r.id, from: st.levels[r.id], to: r.level }))
     : [];
-  return { cards, relics, levels, scarDelta: st ? run.scar - st.scar : 0 };
+  return { cards, relics, levels, scarDelta: st ? run.scar - st.scar : 0, rescued: (run.rescued ?? 0) - (st?.rescued ?? 0) };
 }
 
 export function emptyStats(): RunStats {
@@ -1289,6 +1292,12 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
       case 'set_flag':
         if (e.flag && !run.flags.includes(e.flag)) run.flags.push(e.flag);
         break;
+      case 'rescue': {
+        const n = Math.max(0, e.amount ?? 0);
+        run.rescued = (run.rescued ?? 0) + n;
+        out.push(`구한 사람 ${n}명`);
+        break;
+      }
       case 'join_party': {
         const def = data.characters.get(e.member ?? '');
         if (!def) throw new Error(`join_party: 알 수 없는 캐릭터 ${e.member}`);
