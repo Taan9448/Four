@@ -396,6 +396,27 @@ subjects:
   lina: >-
     Princess Lina of Arden; golden hair braided and pinned up, sky-blue eyes, a sky-blue gown, later silver
     armor; a calm, strong smile
+  mara: >-
+    Mara, a leader of the Belkan refugees in her forties; sun-darkened skin, hair tied back with a rag, red ash
+    on a patched brown dress, a list of names and a small cloth sack at her belt, sharp counting eyes
+  garret: >-
+    Sir Garret, an old knight of Arden in his sixties who leads a refugee village; one ear missing, a short white
+    beard, a dented steel cuirass over a fur-lined coat, two empty fingers on one leather glove
+  herda: >-
+    Herda, a dwarf woman mine engineer of Kazdum; stocky, braided brown hair with grey streaks, a leather work
+    apron full of measuring tools, a coil of rope over one shoulder, steady practical eyes
+  yeojin: >-
+    Yeojin, a village woman of Ungok in her thirties who passes messages through laundry; hair in a plain bun
+    with a wooden pin, a faded blue jeogori-like jacket, sleeves rolled up, a folded cloth with stitched names
+  yeonbun: >-
+    Yeonbun, an old village woman of Ungok in her seventies; deeply wrinkled kind face, white hair in a small bun,
+    a worn grey-brown cotton jacket, a hoe in her hand, dirt on her fingers
+  doyeon: >-
+    Doyeon, a young Daoist priest of Wudang in his twenties; a plain grey Daoist robe soaked at the hem, hair in a
+    topknot with a wooden pin, a messenger's satchel, a serious guarded face
+  maeseol: >-
+    Maeseol, an eighteen-year-old swordswoman of the Hwasan sect; a long scar across one cheek, black hair tied
+    high, a dark red-and-white plum-blossom swordsman outfit, a slim straight sword at her hip
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet

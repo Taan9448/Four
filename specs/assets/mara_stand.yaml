@@ -1,0 +1,9 @@
+id: mara_stand
+type: character-standing
+character: mara
+summary: 마라 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "calm counting look — weighing a sack in one hand"
+  2: "resolute — pointing at a list of names"
+  3: "surprised — eyes wide, hand at her mouth"
+placeholder: { color: '#8a5a3a', accent: '#e8d8b0' }
