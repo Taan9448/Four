@@ -30,3 +30,22 @@ describe('구출', () => {
     expect(back.rescued).toBe(9);
   });
 });
+
+describe('잠깐 떠났다 돌아오는 동료', () => {
+  it('leave_party 뒤 join_party는 떠날 때의 레벨·경험치·편성으로 돌아온다', () => {
+    const run = createRunAt(data, 'REJOIN', 's2');
+    const born = run.roster.find((r) => r.id === 'born')!;
+    born.level = 5;
+    born.xp = 7;
+    born.maxHp += 40;
+    const loadout = [...(run.loadout.born ?? [])];
+    applyRunOps(data, run, [{ op: 'leave_party', member: 'born' }]);
+    expect(run.roster.some((r) => r.id === 'born')).toBe(false);
+    applyRunOps(data, run, [{ op: 'join_party', member: 'born' }]);
+    const back = run.roster.find((r) => r.id === 'born')!;
+    expect(back.level).toBe(5);
+    expect(back.xp).toBe(7);
+    expect(run.departed?.some((r) => r.id === 'born') ?? false).toBe(false);
+    expect(run.loadout.born).toEqual(loadout);
+  });
+});

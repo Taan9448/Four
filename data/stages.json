@@ -52,7 +52,7 @@
     "mapArt": "map_s2",
     "journey": {"label": "화산 협곡", "x": 70, "y": 74, "region": "elheim"},
     "teaser": "은빛 숲을 떠난 지 보름. 화산재로 붉게 물든 서쪽 평원 너머, 사슬의 도시 벨칸이 있다. 숲을 노린 쐐기에 찍힌 표식이 거기서 왔다.",
-    "pinned": [{"floor": 1, "module": "s2_story_red_plain"}],
+    "pinned": [{"floor": 1, "module": "s2_story_red_plain"}, {"floor": 2, "module": "s2_story_into_chains"}, {"floor": 6, "module": "s2_story_six_doors"}],
     "forcedTypes": {"7": "shop", "8": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 14, "rest": 8},
     "boss": "s2_boss_ignis",

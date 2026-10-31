@@ -5,14 +5,40 @@
     "type": "story",
     "name": "붉은 평원",
     "once": true,
-    "content": {"scene": "s2_scene_red_plain", "text": "서쪽으로 가는 길은 온통 붉었다. 녹슨 쇠의 붉음, 마른 피의 붉음. 피난민 행렬이 동쪽으로 멀어진다. 붉은 먼지가 일었다가 가라앉았다.", "choices": [{"label": "\"구할게.\"", "result": "토마가 고개를 끄덕이고 수레를 향해 달려갔다. 하운은 그 약속을 지고 서쪽으로 걷는다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "heal_party", "amount": 60}]}, {"label": "카일과 새벽 대련을 한 번 더 한다", "condition": {"partyHas": "kyle"}, "result": "\"오늘은 결이 보일 거야!\" 서른 합째, 카일의 목검이 다시 하운이 힘을 넘기는 이음매를 노리고 들어왔다. (카일의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아와 숨을 맞춘다", "condition": {"partyHas": "elia"}, "result": "세 번 짧게, 한 번 길게. 엘리아가 그 박자에 맞춰, 조용히, 같이 숨을 쉬었다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+    "content": {"scene": "s2_scene_red_plain", "text": "피난민 행렬이 골짜기를 빠져나간다. 토마는 손을 흔들지 않았다. 하운은 손 대신 아이가 만든 작은 집게를 쥐고 있었다.", "choices": [{"label": "집게를 쥔다", "result": "\"돌려줄게.\" 그 말이 약속이 되었다. 출전 동료 전원 체력 60 회복", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "heal_party", "amount": 60}]}, {"label": "카일과 새벽 대련을 한 번 더 한다", "condition": {"partyHas": "kyle"}, "result": "\"오늘은 결이 보일 거야!\" 서른 합째, 카일의 목검이 다시 하운이 힘을 넘기는 이음매를 노리고 들어왔다. (카일의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아와 숨을 맞춘다", "condition": {"partyHas": "elia"}, "result": "세 번 짧게, 한 번 길게. 엘리아가 그 박자에 맞춰, 조용히, 같이 숨을 쉬었다. (하운의 카드 1장 강화 +1)", "effects": [{"op": "set_flag", "flag": "promise_toma"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}]}
+  },
+  {
+    "id": "s2_story_into_chains",
+    "stage": "s2",
+    "type": "story",
+    "name": "사슬 안으로",
+    "once": true,
+    "content": {"scene": "s2_scene_into_chains", "text": "보른이 쇠막대 앞에서 망치를 내보였다. 빈 갑옷 둘이 그를 협곡 안쪽으로 데려갔다. — 보른이 일행을 떠난다(여섯 개의 문까지).", "choices": [{"label": "엘리아와 신호를 정한다 — 종소리 하나는 시작, 둘은 기다림, 셋은 철수", "effects": [{"op": "leave_party", "member": "born"}, {"op": "set_flag", "flag": "s2_born_inside"}, {"op": "gain_card", "card": "elia_firestorm"}], "result": "밝은 신호는 적에게도 보였다. 보른 이탈 · 엘리아의 불기둥을 얻었다(안쪽 신호가 끊기면 바깥에서 크게)."}, {"label": "첫날이라고 적는다", "effects": [{"op": "leave_party", "member": "born"}, {"op": "set_flag", "flag": "s2_born_inside"}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "숫자 아래의 빈칸이 너무 넓었다. 보른 이탈 · 하운의 카드 2장을 강화했다(+1)."}]}
+  },
+  {
+    "id": "s2_event_twelve",
+    "stage": "s2",
+    "type": "event",
+    "name": "열두 사람의 밤",
+    "weight": 4,
+    "once": true,
+    "conditions": {"floorRange": [3, 5]},
+    "content": {"text": "하운은 열두 사람의 이름을 외우고 들어갔다. 베르트, 니아, 오렌. 혼자 걸을 수 있는 사람은 여덟, 부축이 필요한 사람은 셋, 업어야 하는 사람은 하나. 카일이 숫자를 다시 읽었다. \"열둘. 더 보여도 오늘은 열둘.\" 수레에 열세 번째 자리는 없었다.", "choices": [{"label": "열둘만 데리고 나온다", "effects": [{"op": "rescue", "amount": 12}, {"op": "set_flag", "flag": "s2_twelve"}, {"op": "upgrade_card", "count": 1, "choose": true}], "result": "이튿날 아침, 에다가 벽에 기대어 앉았다. \"감독관이 스물넷을 더 묶었어요. 열둘이 나갔다고 집마다 두 사람씩.\" 하운은 열두 이름 아래에 빈칸을 만들었다. 이번에는 사람들에게 먼저 물을 것. 구한 사람 12명 · 고른 카드 1장을 강화했다(+1)."}, {"label": "오늘은 들어가지 않는다 — 안쪽 사정부터 묻는다", "effects": [{"op": "heal_party", "ratio": 0.2}], "result": "\"내가 밖에 있는 동안 동생은 안에 있어요.\" 니아의 말을 끝까지 들었다. 구출은 미뤘다. 출전 동료 전원 최대 체력의 20% 회복"}]}
+  },
+  {
+    "id": "s2_story_six_doors",
+    "stage": "s2",
+    "type": "story",
+    "name": "여섯 개의 문",
+    "once": true,
+    "content": {"scene": "s2_scene_six_doors", "text": "여섯 구역의 문이 모두 돌아갔다. 중앙 화로의 판이 열리고, 보른이 발찌를 벗었다.", "choices": [{"label": "보른의 팔뚝을 쥔다", "effects": [{"op": "join_party", "member": "born"}, {"op": "heal_party", "ratio": 0.2}], "result": "보른 합류 · 출전 동료 전원 최대 체력의 20% 회복"}, {"label": "\"이름은 기억한다\" — 집게를 돌려받는다", "effects": [{"op": "join_party", "member": "born"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}], "result": "집게는 한스의 손에 있었다. 보른은 빈 소매를 걷어 올렸다. 보른 합류 · 보른의 카드 1장을 강화했다(+1)."}]}
   },
   {
     "id": "s2_boss_ignis",
     "stage": "s2",
     "type": "boss",
     "name": "큰 화로 — 화염군주 이그니스",
-    "content": {"scene": "s2_scene_ignis", "outroScene": "s2_scene_five_breaths", "text": "협곡의 가장 안쪽, 흰 불길의 큰 화로. 모든 사슬이 그 화로로 모여든다. 협곡의 마나는 모두 이그니스가 쥐고 있다. 하운의 고리가 돌아도 끌려오는 마나가 없다. 큰 화로 안의 공기는 금을 아물게 두지 않는다.", "enemies": ["ignis", "great_furnace"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_ride_flow", "to": "hand"}], "surgeTutorial": true, "riftDecay": 0, "riftDecayNote": "화로", "bonus": {"condition": {"partyHas": "born", "flag": "s2_born_inside"}, "text": "쾅! 보른이 사슬 박힌 바위로 큰 화로를 다시 친다. 화로의 결이 벌어지고, 드워프들이 하나둘 망치를 든다. (이그니스 약화 2, 취약 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "gain_card", "card": "haun_byeogun"}, {"op": "gain_card", "card": "kyle_red_sword"}, {"op": "set_flag", "flag": "byeogun"}, {"op": "set_flag", "flag": "red_sword"}]}
+    "content": {"scene": "s2_scene_ignis", "outroScene": "s2_scene_five_breaths", "text": "중앙 화로. 여섯 구역의 사슬을 잃은 이그니스가 남은 힘을 제 몸에 모은다. 협곡의 마나는 그가 먼저 끌어간다 — 당기면 빼앗긴다. 큰 화로 안의 공기는 금을 아물게 두지 않는다.", "enemies": ["ignis", "great_furnace"], "mana": {"battleStart": 0, "perTurn": 0}, "startEffects": [{"op": "add_card", "card": "haun_ride_flow", "to": "hand"}], "surgeTutorial": true, "riftDecay": 0, "riftDecayNote": "화로", "bonus": {"condition": {"partyHas": "born"}, "text": "\"저 판!\" 한스가 외친다. 보른의 망치와 그롬의 끌이 중앙 화로와 옥좌를 잇는 금속판을 노린다. (이그니스 약화 2, 취약 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 312}, {"op": "gain_card", "card": "haun_byeogun"}, {"op": "gain_card", "card": "kyle_red_sword"}, {"op": "set_flag", "flag": "byeogun"}, {"op": "set_flag", "flag": "red_sword"}]}
   },
   {
     "id": "s2_battle_collared_wolves",
@@ -74,7 +100,7 @@
     "type": "battle",
     "name": "화로 사이",
     "weight": 2,
-    "conditions": {"floorRange": [6, 7]},
+    "conditions": {"floorRange": [3, 5]},
     "content": {"text": "쾅, 쾅, 쾅. 망치 소리 사이로 불의 정령 둘이 빈 갑옷 곁을 맴돈다. 노예들은 고개를 들지 않는다.", "enemies": ["fire_spirit", "ash_armor", "fire_spirit"]}
   },
   {
@@ -112,7 +138,7 @@
     "name": "처진 수레",
     "weight": 2,
     "once": true,
-    "conditions": {"floorRange": [2, 3]},
+    "conditions": {"floorRange": [3, 4]},
     "content": {"text": "행렬에서 처진 수레 한 대. 갈비뼈가 드러난 소가 붉은 풀밭에 주저앉았다. 수레 위에는 붉은 재에 덮인 아이 둘과 노인 하나. 화로에서 쫓겨난 사람들이다. 쓸모가 없다고.", "choices": [{"label": "평원 토끼를 구워 함께 먹는다", "result": "아이들의 얼굴에서 눈만 하얗게 빛났다. 노인이 처음으로 웃었다. (출전 동료 전원 체력 60 회복)", "effects": [{"op": "heal_party", "amount": 60}]}, {"label": "짐을 덜어 수레에 실어 하일론으로 보낸다", "result": "하일론으로 가면 길드의 보호를 받을 수 있을 것이다. 짐이 가벼워졌다. (몸이 가벼워졌다 — 카드 1장이 강화됐다)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
@@ -123,16 +149,6 @@
     "weight": 2,
     "conditions": {"floorRange": [2, 5]},
     "content": {"text": "바람이 협곡에서 이쪽으로 분다. 풀잎을 손으로 쓸면 손바닥에 붉은 가루가 묻어난다. 밤이 되면 지평선의 연기 아래가 희미하게 붉게 빛났다. 땅속에서 불이 숨을 쉬는 것처럼.", "choices": [{"label": "바람을 등지고 걷는다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}, {"label": "붉은 가루가 흘러가는 길을 읽는다", "result": "바람에도 결이 있었다. 협곡이 숨을 쉬는 쪽이 보였다. (카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1}]}]}
-  },
-  {
-    "id": "s2_event_ore_cart",
-    "stage": "s2",
-    "type": "event",
-    "name": "광석 수레",
-    "weight": 3,
-    "once": true,
-    "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "협곡을 내려다보는 절벽 위 바위틈. 화로 앞 노예들의 발목 사슬은 모두 큰 화로와 이어져 있다. 사슬을 하나 끊으면 묶인 사람에게 불이 흘러 들어간다. \"안으로 들어가야 한다.\" 보른이 말했다.", "choices": [{"label": "\"내가 들어간다.\" 보른이 먼저 걸어 내려간다", "condition": {"partyHas": "born"}, "result": "보른은 도끼를 바닥에 던지고 양손을 들었다. 빈 갑옷이 그의 발목에 사슬을 채웠다. 그는 한 번도 뒤를 돌아보지 않았다. \"우리 사람들이 저기 있다.\" (이그니스와 싸울 때 보른이 큰 화로를 친다)", "effects": [{"op": "set_flag", "flag": "s2_born_inside"}]}, {"label": "광석 수레 바닥, 흑철 원석 사이에 몸을 묻는다", "result": "무겁고, 날카롭고, 뜨거웠다. 옷이 그을렸다. 광석 틈으로 화로들이 지나갔다. 덜컹, 덜컹. (출전 동료 전원 체력 50 손실, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -50}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 신호를 정한다 — \"푸른빛이 보이면.\"", "condition": {"partyHas": "elia"}, "result": "하운이 검을 반쯤 뽑아 보였다. 엘리아는 절벽 위에 남아, 신호가 오면 협곡 반대편 끝에서 큰불을 일으키기로 했다. 불기둥을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_firestorm"}]}]}
   },
   {
     "id": "s2_event_furnaces",
@@ -153,7 +169,7 @@
     "once": true,
     "tags": ["scar"],
     "conditions": {"floorRange": [4, 5]},
-    "content": {"scene": "s2_scene_hans_anvil", "text": "가장 큰 모루 앞의 사내가 망치를 내리칠 때마다 쇠를 들여다본다. 아주 짧게, 그러나 정확히. 그가 두드리는 것은 사람 팔뚝만 한 검은 쐐기였다. 몸통에 물결처럼 흐르는 문자가 새겨지고 있다.", "choices": [{"label": "쐐기의 표면을 손가락으로 쓸어 본다", "result": "엉켜 있었다. 쇠의 결 위로, 결을 잃은 마나가 반대 방향으로 감겨 소용돌이쳤다. 그가 검을 내리친 자리의 허공에 검은 금이 그어질 때 손끝에 남던 감각과 똑같았다. 손가락이 떨렸다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "\"토마도 그렇게 말했습니다.\"", "condition": {"flag": "promise_toma"}, "result": "한스의 입가가 아주 조금 올라갔다. 이 년 만에 처음 웃는 것처럼 어색한 웃음이었다. 그가 망치 소리에 섞어 검 다루는 법 하나를 일러 주었다. (고른 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "망치 소리에 묻혀 물러난다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}]}
+    "content": {"scene": "s2_scene_hans_anvil", "text": "안쪽 소식이 빨랫감에 섞여 나왔다. 중앙 화로의 대장장이 한스는 사람 팔뚝만 한 검은 쐐기를 두드린다. 쐐기를 만드는 사람은 조금 더 먹었고, 병기와 생활 도구를 만드는 사람은 덜 먹었다.", "choices": [{"label": "쐐기 그림을 들여다본다", "result": "엉켜 있었다. 쇠의 결 위로, 결을 잃은 마나가 반대 방향으로 감겨 소용돌이쳤다. 그가 검을 내리친 자리의 허공에 검은 금이 그어질 때 손끝에 남던 감각과 똑같았다. 손가락이 떨렸다. (하운의 카드 2장 강화 +1, 상흔 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}]}, {"label": "\"토마를 벨칸으로 데려오지 않겠습니다.\" 답장을 쓴다", "condition": {"flag": "promise_toma"}, "result": "\"직접 만나실 수 있게 길을 만들겠습니다.\" 하운은 그 종이를 마라와 카일, 엘리아에게 먼저 보여 주었다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "빨랫감에 답장을 섞어 보낸다", "result": "출전 동료 전원 체력 50 회복", "effects": [{"op": "heal_party", "amount": 50}]}]}
   },
   {
     "id": "s2_event_old_dwarf",
