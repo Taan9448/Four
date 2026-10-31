@@ -5,23 +5,33 @@
     "type": "story",
     "name": "얼어붙은 들판",
     "once": true,
-    "content": {"scene": "s3_scene_frozen_field", "text": "얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다. 굴뚝 연기까지 얼어 있었다. 기사들의 은신처, 모닥불 너머로 카일이 고개를 들었다.", "choices": [{"label": "\"가렛 경. 얼음 궁전으로 가는 길을 알려 주세요.\"", "result": "\"맹세했거든요. 왕녀님의 기사가 되겠다고. 그리고 친구들이 하나도 빠짐없이 살아서 돌아오게 하겠다고.\" 카일의 눈에 무언가가 단단해져 있었다. 장작의 가장 단단한 옹이처럼. (출전 동료 전원 최대 체력의 20% 회복)", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "카일 곁에 말없이 앉는다", "condition": {"partyHas": "kyle"}, "result": "하운은 아무 말도 하지 않았다. 보른이 카일의 다른 쪽 옆에 앉았다. 엘리아가 카일의 등 뒤에 섰다. 모닥불이 탁탁 튀었다. (카일의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 손끝 불꽃을 지켜본다", "condition": {"partyHas": "elia"}, "result": "손가락 한 마디만 한 불꽃이 커졌다가, 곧 다시 작아졌다. 엘리아는 얼어붙은 마나를 조금씩 끌어오는 법을 다시 익혔다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+    "content": {"scene": "s3_scene_frozen_field", "text": "얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다. 피난촌의 모닥불 너머로 가렛이 지도를 폈다. \"북문 바깥까지만 간다. 내가 물러나라고 하면 전부 돌아와야 한다.\"", "choices": [{"label": "\"가렛 경. 얼음 궁전으로 가는 길을 알려 주세요.\"", "result": "\"맹세했거든요. 왕녀님의 기사가 되겠다고. 그리고 친구들이 하나도 빠짐없이 살아서 돌아오게 하겠다고.\" 카일의 눈에 무언가가 단단해져 있었다. 장작의 가장 단단한 옹이처럼. (출전 동료 전원 최대 체력의 20% 회복)", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "카일 곁에 말없이 앉는다", "condition": {"partyHas": "kyle"}, "result": "하운은 아무 말도 하지 않았다. 보른이 카일의 다른 쪽 옆에 앉았다. 엘리아가 카일의 등 뒤에 섰다. 모닥불이 탁탁 튀었다. (카일의 카드 2장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 손끝 불꽃을 지켜본다", "condition": {"partyHas": "elia"}, "result": "손가락 한 마디만 한 불꽃이 커졌다가, 곧 다시 작아졌다. 엘리아는 얼어붙은 마나를 조금씩 끌어오는 법을 다시 익혔다. (엘리아의 카드 1장 강화 +1)", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+  },
+  {
+    "id": "s3_event_first_thaw",
+    "stage": "s3",
+    "type": "event",
+    "name": "첫 번째 해빙",
+    "weight": 4,
+    "once": true,
+    "conditions": {"floorRange": [2, 5]},
+    "content": {"scene": "s3_scene_first_thaw", "text": "얼음 속 식탁에 앉은 아이. 숟가락을 쥔 채 멈춘 에른 옆에는 이미 다친 어머니가 기대 앉아 있다. 한쪽만 풀면, 남은 쪽이 찢어진다.", "choices": [{"label": "돌방을 쌓아 에른부터 깨운다", "effects": [{"op": "rescue", "amount": 1}, {"op": "set_flag", "flag": "s3_ern_awake"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}], "result": "열이틀 걸려 판돌을 넣었다. 메라는 울다가 웃었다. 구한 사람 1명 · 엘리아의 카드 1장을 강화했다(+1)."}, {"label": "오늘은 관찰만 한다 — 모래시계 하나까지", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}], "result": "보이는 선을 모두 따라가려 하지 않았다. 하운의 카드 1장을 강화했다(+1)."}]}
   },
   {
     "id": "s3_elite_rowen_knights",
     "stage": "s3",
     "type": "elite",
-    "name": "남쪽 성문",
+    "name": "북문",
     "once": true,
     "conditions": {"floorRange": [6, 6]},
-    "content": {"scene": "s3_scene_south_gate", "text": "얼음으로 된 성문 앞에 일곱 개의 형체가 서 있다. 방패에는 푸른 바탕에 흰 눈송이, 그 아래 은빛 검 하나. 로웬 가문의 문장이다.", "enemies": ["rowen_ice_brother", "rowen_ice_knight", "rowen_ice_brother"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"로웬의 일은 로웬이 끝내야죠.\" 카일이 붉은 검을 뽑는다. 힘이 어디서 시작해서, 어디로 가는지. 물줄기를 따라. (얼음 기사 전원 결 노출 3, 붉은 검을 손에 든다)", "effects": [{"op": "reveal_grain", "stacks": 3, "target": "all_enemies"}, {"op": "add_card", "card": "kyle_red_sword", "to": "hand"}]}}
+    "content": {"scene": "s3_scene_south_gate", "text": "북문 계단 위에 노기사, 회랑에 두 기사. 방패에는 푸른 바탕에 흰 눈송이, 그 아래 은빛 검 하나. 로웬 가문의 문장이다.", "enemies": ["rowen_ice_brother", "rowen_ice_knight", "rowen_ice_brother"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"여기로 빼겠다!\" 카일이 형들을 좁은 회랑으로 끌어들인다. 아버지가 가르쳐 준 자세에서 반 보 벗어난 자리. (얼음 기사 전원 결 노출 3, 붉은 검을 손에 든다)", "effects": [{"op": "reveal_grain", "stacks": 3, "target": "all_enemies"}, {"op": "add_card", "card": "kyle_red_sword", "to": "hand"}]}}
   },
   {
     "id": "s3_boss_celias",
     "stage": "s3",
     "type": "boss",
     "name": "얼음 궁전의 탑 — 빙결의 여왕 셀리아스",
-    "content": {"scene": "s3_scene_tower", "outroScene": "s3_scene_thaw", "text": "천장이 없는 탑 꼭대기. 얼음 옥좌 뒤, 얼음 속의 왕녀가 손을 뻗고 있다. 셀리아스의 얼음 몸을 이루는 모든 육각형이 이어지는 단 하나의 점은, 그 얼음 안에 있다.", "enemies": ["celias", "princess_ice"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 검을 내려놓고 맨손을 뻗는다. \"왕녀님. 카일이에요. 노 젓다가 맨날 빠지던.\" (손 내밀기를 손에 든다)", "effects": [{"op": "add_card", "card": "kyle_hand_out", "to": "hand"}]}, "clearEffects": [{"op": "set_flag", "flag": "kyle_knight"}]}
+    "content": {"scene": "s3_scene_tower", "outroScene": "s3_scene_thaw", "text": "천장이 없는 탑 꼭대기. 셀리아스는 왕과 왕비, 리나를 \"가장 아름다운 순간\"에 붙잡아 두었다. 셀리아스의 몸으로 가는 선은 리나의 손 바로 밖에 붙어 있다 — 같은 것으로 보이게.", "enemies": ["celias", "princess_ice"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 검을 내려놓고 맨손을 뻗는다. \"왕녀님. 카일이에요. 노 젓다가 맨날 빠지던.\" (손 내밀기를 손에 든다)", "effects": [{"op": "add_card", "card": "kyle_hand_out", "to": "hand"}]}, "clearEffects": [{"op": "rescue", "amount": 3}, {"op": "set_flag", "flag": "kyle_knight"}]}
   },
   {
     "id": "s3_battle_ice_wolves",
