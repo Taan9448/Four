@@ -152,6 +152,8 @@ export const Effect = z
     to: z.enum(['hand', 'draw', 'discard']).optional(),
     count: z.number().int().positive().optional(),
     member: z.string().optional(),
+    /** 런 동작: 순례(클리어 뒤 다시 걷는 길, replayOf)에서는 건너뛴다 — S8 엘리아가 일곱째 굽이에 남는 것처럼 이야기 때문에만 빠지는 경우(2026-10-31 사용자 결정) */
+    skipInPilgrimage: z.boolean().optional(),
     flag: z.string().optional(),
     /** gain_random_card: 이 등급 중에서(합류한 동료·공용의 보상 카드, 없는 카드 우선) */
     rarity: z.array(z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary'])).optional(),
