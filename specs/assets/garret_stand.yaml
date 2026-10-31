@@ -1,0 +1,9 @@
+id: garret_stand
+type: character-standing
+character: garret
+summary: 가렛 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "tired stern look — hand on a dented shield rim"
+  2: "resolute — spear shaft planted, jaw set"
+  3: "surprised — brows up, looking at someone he recognizes"
+placeholder: { color: '#7a7f88', accent: '#e8d8b0' }

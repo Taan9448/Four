@@ -1,0 +1,9 @@
+id: yeojin_stand
+type: character-standing
+character: yeojin
+summary: 여진 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "calm neutral look — folded cloth in her hands"
+  2: "resolute — gripping someone's arm firmly"
+  3: "surprised — looking up from the cloth"
+placeholder: { color: '#4a6a8a', accent: '#e8d8b0' }

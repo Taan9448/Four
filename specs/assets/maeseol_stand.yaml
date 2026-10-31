@@ -1,0 +1,9 @@
+id: maeseol_stand
+type: character-standing
+character: maeseol
+summary: 매설 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "cool neutral look — hand resting on the sword hilt"
+  2: "resolute — sword half drawn, eyes narrowed"
+  3: "surprised — brows up, scar pulling at her cheek"
+placeholder: { color: '#8a2a2a', accent: '#e8d8b0' }

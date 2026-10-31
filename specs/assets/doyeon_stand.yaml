@@ -1,0 +1,9 @@
+id: doyeon_stand
+type: character-standing
+character: doyeon
+summary: 도연 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "guarded neutral look — arms folded in his sleeves"
+  2: "resolute — holding a knotted sash tightly"
+  3: "surprised — brows up, mouth slightly open"
+placeholder: { color: '#7a7a70', accent: '#e8d8b0' }

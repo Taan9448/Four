@@ -1,0 +1,9 @@
+id: herda_stand
+type: character-standing
+character: herda
+summary: 헤르다 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "focused neutral look — checking a measuring cord"
+  2: "resolute — hand raised to signal a stop"
+  3: "surprised — leaning back as the ground moves"
+placeholder: { color: '#6a5038', accent: '#e8d8b0' }

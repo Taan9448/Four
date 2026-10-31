@@ -1,0 +1,9 @@
+id: yeonbun_stand
+type: character-standing
+character: yeonbun
+summary: 연분 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+frame_notes:
+  1: "gentle neutral look — a faint smile"
+  2: "resolute — hand raised, palm out, to stop someone"
+  3: "surprised — leaning forward with narrowed eyes"
+placeholder: { color: '#7a6a58', accent: '#e8d8b0' }
