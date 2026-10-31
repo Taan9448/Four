@@ -194,7 +194,7 @@
     "background": "bg_rift",
     "mapArt": "map_s9",
     "journey": {"label": "세계의 틈", "x": 50, "y": 42, "region": "rift"},
-    "teaser": "하늘의 금 안쪽으로 발을 들인다. 흐름이 느껴지지 않는 곳이다. 바깥에서는 석두가 줄을 붙들고 있다.",
+    "teaser": "하늘의 금 안쪽으로 발을 들인다. 공기가 모자라고, 표식이 움직인다. 바깥에서는 석두가 줄을 붙들고 있다.",
     "pinned": [{"floor": 1, "module": "s9_story_second_line"}, {"floor": 2, "module": "s9_story_no_flow"}, {"floor": 4, "module": "s9_story_frozen_fragment"}, {"floor": 5, "module": "s9_story_sword_saint_rock"}, {"floor": 7, "module": "s9_story_born_stays"}, {"floor": 8, "module": "s9_story_kyle_stays"}],
     "forcedTypes": {"6": "elite", "10": "rest"},
     "typeWeights": {"battle": 55, "event": 15, "elite": 14, "rest": 8},
