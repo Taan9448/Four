@@ -133,7 +133,7 @@
     "background": "bg_blood_road",
     "mapArt": "map_s6",
     "journey": {"label": "운곡촌", "x": 18, "y": 72, "region": "murim"},
-    "teaser": "여섯 해 만에 돌아온 무림. 장작을 지고 운곡촌 장터에 들어섰지만, 아무도 하운을 알아보지 못한다. 산문의 현판이 바뀌어 있었다.",
+    "teaser": "여섯 해 만에 돌아온 무림. 장작을 지고 운곡촌 장터에 들어섰지만, 아무도 하운을 알아보지 못한다. 객잔의 붉은 처마가 있던 자리에 회색 벽이 서 있었다.",
     "pinned": [{"floor": 1, "module": "s6_story_return"}, {"floor": 2, "module": "s6_battle_ambush"}, {"floor": 3, "module": "s6_story_old_temple"}],
     "forcedTypes": {"9": "shop", "10": "rest"},
     "typeWeights": {"battle": 52, "event": 18, "elite": 13, "rest": 7, "inn": 6},

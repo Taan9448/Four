@@ -3,9 +3,9 @@
     "id": "s8_story_returning_sword",
     "stage": "s8",
     "type": "story",
-    "name": "돌려보내는 검",
+    "name": "놓는 연습",
     "once": true,
-    "content": {"scene": "s8_scene_returning_sword", "text": "스무 날 동안, 하운은 연무장 뒤편의 작은 마당에서 살았다. 열아홉째 날 밤, 모래가 가라앉았다. 노인이 의자 위에서 소리 없이 웃었다. \"…되었다.\"", "choices": [{"label": "하나의 초식을 백 번, 천 번", "effects": [{"op": "gain_card", "card": "haun_unhae"}, {"op": "set_flag", "flag": "unhae"}, {"op": "upgrade_card", "count": 1, "choose": true}], "result": "운해귀종을 얻었다. 어깨에 힘이 들어갔다. 숨이 반 박자 빠르다. 구름은 무겁지 않다. (고른 카드 1장 강화 +1)"}, {"label": "마당 가장자리의 셋과 숨을 맞춘다", "effects": [{"op": "gain_card", "card": "haun_unhae"}, {"op": "set_flag", "flag": "unhae"}, {"op": "upgrade_card", "count": 2, "filter": {"costNeigongGte": 1}}], "result": "운해귀종을 얻었다. 카일은 잠들어서도, 보른은 세 번 짧게, 엘리아는 콩알만 한 고리로. (내공을 쓰는 카드 2장 강화 +1)"}]}
+    "content": {"scene": "s8_scene_returning_sword", "text": "손바닥 위의 나무토막. 밀면 버티지 말고, 밀어 오는 쪽으로 흘려서 놓아라. 첫날 다섯 번 떨어뜨렸다. 열아홉째 날 저녁, 노인이 의자 위에서 소리 없이 웃었다. \"…이제 보고 있구나.\"", "choices": [{"label": "나무토막을 천 번 놓는다", "effects": [{"op": "gain_card", "card": "haun_unhae"}, {"op": "set_flag", "flag": "unhae"}, {"op": "upgrade_card", "count": 1, "choose": true}], "result": "운해귀종을 얻었다. 버티던 손이 먼저 풀렸다. 흩어진 힘을 삼키지 않고 갈 자리로. (고른 카드 1장 강화 +1)"}, {"label": "카일의 목검을 흘려 본다", "effects": [{"op": "gain_card", "card": "haun_unhae"}, {"op": "set_flag", "flag": "unhae"}, {"op": "upgrade_card", "count": 2, "filter": {"costNeigongGte": 1}}], "result": "운해귀종을 얻었다. 놓은 다음에 서 있는 것까지가 하나. 같은 자리, 다른 발. (내공을 쓰는 카드 2장 강화 +1)"}]}
   },
   {
     "id": "s8_story_nine_stairs",
@@ -13,22 +13,22 @@
     "type": "story",
     "name": "구천 계단",
     "once": true,
-    "content": {"scene": "s8_scene_nine_stairs", "text": "청운맹 삼천이 모두 나선다. 방패벽 오백, 금강진과 태극검진, 매화검수, 목검을 든 청운의 제자 백오십. 다만 어디에 힘을 더 실을지는 정해야 한다.", "choices": [{"label": "무당의 태극검진 — 왼편을 흘린다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}, {"op": "set_flag", "flag": "formation_taiji"}], "result": "태극이 흐름을 돌린다. 왼편의 칼끝이 비껴 나간다. (고른 카드 1장 강화 +1)"}, {"label": "소림의 금강진 — 보른과 혜각이 맨 앞에서", "condition": {"partyHas": "born"}, "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}, {"op": "set_flag", "flag": "formation_vajra"}], "result": "곤봉과 망치가 같은 박자로. 쾅, 쾅, 쾅. (보른의 카드 2장 강화 +1)"}, {"label": "방패벽 오백 — 카일의 \"전진!\"", "condition": {"partyHas": "kyle"}, "effects": [{"op": "gain_card", "card": "kyle_forward"}, {"op": "set_flag", "flag": "formation_shield"}], "result": "방패가 맞물리고 창이 내밀어졌다. 쿵. 쿵. (전진!을 얻었다)"}, {"label": "화산의 매화검수 — 틈을 꽃잎처럼", "effects": [{"op": "upgrade_card", "count": 1}, {"op": "set_flag", "flag": "formation_plum"}], "result": "빠르게, 가볍게. 매화검수들이 대열의 틈을 파고든다. (카드 1장 강화)"}]}
+    "content": {"scene": "s8_scene_nine_stairs", "text": "맹주 없는 연합이 천마봉으로 오른다. 무당의 청현, 소림의 혜각, 화산의 매설, 방패를 든 운곡촌 사람들. 어디에 힘을 더 실을지는 함께 정한다.", "choices": [{"label": "무당의 태극검진 — 왼편을 흘린다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}, {"op": "set_flag", "flag": "formation_taiji"}], "result": "태극이 흐름을 돌린다. 왼편의 칼끝이 비껴 나간다. (고른 카드 1장 강화 +1)"}, {"label": "소림의 금강진 — 보른과 혜각이 맨 앞에서", "condition": {"partyHas": "born"}, "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}, {"op": "set_flag", "flag": "formation_vajra"}], "result": "곤봉과 망치가 같은 박자로. 쾅, 쾅, 쾅. (보른의 카드 2장 강화 +1)"}, {"label": "방패벽 오백 — 카일의 \"전진!\"", "condition": {"partyHas": "kyle"}, "effects": [{"op": "gain_card", "card": "kyle_forward"}, {"op": "set_flag", "flag": "formation_shield"}], "result": "방패가 맞물리고 창이 내밀어졌다. 쿵. 쿵. (전진!을 얻었다)"}, {"label": "화산의 매설 — 옆의 좁은 계단", "effects": [{"op": "upgrade_card", "count": 1}, {"op": "set_flag", "flag": "formation_plum"}], "result": "화산의 검로를 익힌 손이 빠르게 움직인다. 좁은 계단을 맡았다. (카드 1장 강화)"}]}
   },
   {
     "id": "s8_story_broken_stair",
     "stage": "s8",
     "type": "story",
-    "name": "끊긴 계단",
+    "name": "일곱째 굽이",
     "once": true,
-    "content": {"scene": "s8_scene_broken_stair", "text": "초록빛 다리를 건넜다. 마나 없이, 오직 청운호흡으로. 장로 셋을 꺾은 초식 가운데, 손에 가장 오래 남은 것은—", "choices": [{"label": "제일식, 청운출수 — 구름이 산굴에서 나온다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_chulsu"}], "result": "첫 번째 장로의 검이 감겨 비틀리며 손에서 빠져나갔다. 엘리아의 마지막 마나가 다리가 되었다. (청운출수를 얻었다. 런 마나 0, 상흔 +1)"}, {"label": "제칠식, 비운천리 — 구름은 무겁지 않다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_biun"}], "result": "몸이 절벽 위를 미끄러져 두 번째 장로의 등 뒤로. 검집이 목덜미의 이음매를 쳤다. (비운천리를 얻었다. 런 마나 0, 상흔 +1)"}, {"label": "제십오식, 낙운무흔 — 떨어지는 구름은 흔적이 없다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_nakun"}], "result": "세 번째 장로의 핏빛 장력이 검을 타고 허공으로 빠져나갔다. 균형이 무너진 순간, 검집이 명치를 쳤다. (낙운무흔을 얻었다. 런 마나 0, 상흔 +1)"}]}
+    "content": {"scene": "s8_scene_broken_stair", "text": "일곱째 굽이에서 계단이 끊겼다. 줄을 세 번 던졌다. 엘리아가 가장 약한 연결부를 붙들고 이 자리에 남는다 — 위험하면 통과를 멈추는 사람으로. \"돌아오면 먼저 네 이름 부를게.\" 줄을 건너며 손에 가장 오래 남은 초식은—", "choices": [{"label": "제일식, 청운출수 — 구름이 산굴에서 나온다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_chulsu"}, {"op": "leave_party", "member": "elia"}], "result": "첫 번째 장로의 검이 감겨 비틀리며 손에서 빠져나갔다. 엘리아의 남은 마나가 줄의 매듭이 되었다. (청운출수를 얻었다. 런 마나 0, 상흔 +1. 엘리아는 일곱째 굽이에 남는다 — 보스를 넘기면 돌아온다)"}, {"label": "제칠식, 비운천리 — 구름은 무겁지 않다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_biun"}, {"op": "leave_party", "member": "elia"}], "result": "몸이 줄 위를 미끄러져 두 번째 장로의 등 뒤로. 검집이 목덜미의 이음매를 쳤다. (비운천리를 얻었다. 런 마나 0, 상흔 +1. 엘리아는 일곱째 굽이에 남는다 — 보스를 넘기면 돌아온다)"}, {"label": "제십오식, 낙운무흔 — 떨어지는 구름은 흔적이 없다", "effects": [{"op": "gain_run_mana", "amount": -10}, {"op": "scar", "amount": 1}, {"op": "set_flag", "flag": "elia_bridge"}, {"op": "gain_card", "card": "haun_nakun"}, {"op": "leave_party", "member": "elia"}], "result": "세 번째 장로의 핏빛 장력이 검을 타고 허공으로 빠져나갔다. 균형이 무너진 순간, 검집이 명치를 쳤다. (낙운무흔을 얻었다. 런 마나 0, 상흔 +1. 엘리아는 일곱째 굽이에 남는다 — 보스를 넘기면 돌아온다)"}]}
   },
   {
     "id": "s8_boss_blood_hall",
     "stage": "s8",
     "type": "boss",
     "name": "혈전",
-    "content": {"scene": "s8_scene_blood_hall", "outroScene": "s8_scene_sky_splits", "text": "두 개의 옥좌. 천하맹주와 천마신교 교주가 함께 일어선다. 피가 결을 덮어, 교주의 장력에는 결이 보이지 않는다.", "enemies": ["kwak_dojin", "sa_mugyeol"], "clearEffects": [{"op": "set_flag", "flag": "sky_split"}]}
+    "content": {"scene": "s8_scene_blood_hall", "outroScene": "s8_scene_sky_splits", "text": "두 개의 의자. 청운문 장문인 곽도진과 운곡촌에서 길을 묻던 붉은 눈의 손님 — 천마신교 교주 사무결. 바닥의 붉은 홈이 청동 그릇으로 모인다. 피가 결을 덮어, 교주의 장력에는 결이 보이지 않는다.", "enemies": ["kwak_dojin", "sa_mugyeol"], "clearEffects": [{"op": "set_flag", "flag": "sky_split"}, {"op": "join_party", "member": "elia"}]}
   },
   {
     "id": "s8_battle_first_wave",
@@ -37,7 +37,7 @@
     "name": "첫 굽이의 물결",
     "weight": 3,
     "conditions": {"floorRange": [3, 5]},
-    "content": {"text": "계단마다 횃불이 타오른다. 혈교도의 첫 물결이 굽이를 타고 쏟아져 내려온다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"전진!\" 쿵. 방패벽이 첫 물결을 받아 낸다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}}
+    "content": {"text": "계단마다 횃불이 타오른다. 교도의 첫 물결이 굽이를 타고 쏟아져 내려온다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"턱 아래로!\" 카일이 사람들을 물리고 방패를 세운다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}}
   },
   {
     "id": "s8_battle_vajra",
@@ -46,7 +46,7 @@
     "name": "금강진의 오른편",
     "weight": 3,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "호법 하나가 혈교도를 거느리고 오른편 바위를 타고 내려온다. 그 앞을 소림의 금강진이 막아선다.", "enemies": ["cult_guardian", "blood_cultist"], "bonus": {"condition": {"flag": "formation_vajra"}, "text": "금강진의 맨 앞, 곤봉과 망치가 같은 박자로 떨어진다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "호법 하나가 교도를 거느리고 오른편 바위를 타고 내려온다. 그 앞을 소림의 무승들이 막아선다.", "enemies": ["cult_guardian", "blood_cultist"], "bonus": {"condition": {"flag": "formation_vajra"}, "text": "금강진의 맨 앞, 곤봉과 망치가 같은 박자로 떨어진다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_battle_taiji",
@@ -55,7 +55,7 @@
     "name": "태극검진의 왼편",
     "weight": 3,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "왼편 절벽에서 혈교도가 뛰어내리고, 위에서는 활시위 소리가 난다. 무당의 도사들이 원을 그리며 칼끝을 흘린다.", "enemies": ["blood_cultist", "stair_archer"], "bonus": {"condition": {"flag": "formation_taiji"}, "text": "태극검진이 측면을 흘린다. (하운 방어 100)", "effects": [{"op": "block", "amount": 100, "target": "self"}]}}
+    "content": {"text": "왼편 절벽에서 교도가 뛰어내리고, 위에서는 활시위 소리가 난다. 무당의 도사들이 원을 그리며 칼끝을 흘린다.", "enemies": ["blood_cultist", "stair_archer"], "bonus": {"condition": {"flag": "formation_taiji"}, "text": "태극검진이 측면을 흘린다. (하운 방어 100)", "effects": [{"op": "block", "amount": 100, "target": "self"}]}}
   },
   {
     "id": "s8_battle_arrow_rain",
@@ -73,7 +73,7 @@
     "name": "호법의 굽이",
     "weight": 2,
     "conditions": {"floorRange": [5, 8]},
-    "content": {"text": "손바닥이 피처럼 붉은 호법 둘이 굽이 한가운데를 막고 섰다. 호법 서른여섯 가운데 둘.", "enemies": ["cult_guardian", "cult_guardian"], "bonus": {"condition": {"flag": "formation_plum"}, "text": "매화검수들이 호법의 틈을 꽃잎처럼 파고든다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "손바닥이 붉은 호법 둘이 굽이 한가운데를 막고 섰다.", "enemies": ["cult_guardian", "cult_guardian"], "bonus": {"condition": {"flag": "formation_plum"}, "text": "매설이 옆의 좁은 계단에서 호법의 틈을 파고든다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_battle_eighth_turn",
@@ -82,7 +82,7 @@
     "name": "여덟째 굽이",
     "weight": 3,
     "conditions": {"floorRange": [8, 8]},
-    "content": {"text": "끊긴 계단 너머, 여덟째 굽이. 활을 든 혈교도들과 그들을 지키는 호법이 아직 버티고 있다.", "enemies": ["stair_archer", "cult_guardian", "stair_archer"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 활을 든 혈교도들을 덮친다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "줄을 건넌 여덟째 굽이. 맞은편 고정점을 지키기 전에는 위로 달리지 않는다. 활을 든 교도와 그들을 지키는 호법.", "enemies": ["stair_archer", "cult_guardian", "stair_archer"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 고정점의 줄을 묶고 활을 든 교도들을 덮친다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_elite_elder_descends",
@@ -92,7 +92,7 @@
     "weight": 1,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "장로 하나가 혈교도를 거느리고 굽이를 내려온다. 핏빛 장력이 바위를 가른다.", "enemies": ["stair_elder", "blood_cultist"], "enemyScale": {"hp": 1.2}, "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 마법 없이 흐름을 읽었다. \"여섯째 굽이 왼쪽! 장로가 내려와요!\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "장로 하나가 교도를 거느리고 굽이를 내려온다. 핏빛 장력이 바위를 가른다.", "enemies": ["stair_elder", "blood_cultist"], "enemyScale": {"hp": 1.2}, "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 바위에 흙가루를 뿌려 흐름을 읽었다. \"여섯째 굽이 왼쪽! 장로가 내려와요!\" (적 전원 결 노출 1)", "effects": [{"op": "reveal_grain", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s8_elite_elder_archers",
@@ -118,11 +118,11 @@
     "id": "s8_event_seokdu_axe",
     "stage": "s8",
     "type": "event",
-    "name": "보른의 도끼를 든 석두",
+    "name": "아래는 내가 셀게",
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"text": "석두가 보른의 도끼를 들고 하운의 옆에 섰다. 하운이 혈교도의 어깨를 가리키면, 석두의 도끼가 그 어깨를 쳤다. \"형! 나 지금 결 봤어!\"", "choices": [{"label": "\"아직 아니다!\"", "effects": [{"op": "gain_card", "card": "haun_read_grain"}], "result": "\"그래도 형이 어디 가리키는지는 보여!\" 하운은 더 또렷이 가리키기로 했다. (결 읽기를 얻었다)"}, {"label": "\"그럼 충분하다!\"", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "석두의 도끼가 하운이 가리킨 자리를 정확히 쳤다. (고른 카드 1장 강화 +1)"}]}
+    "content": {"text": "석두가 후방에서 표를 두 장 만들었다. 계단을 오르는 사람, 내려오는 사람. 같은 사람에게 이름을 여러 번 묻는 일이 미안했지만 추측으로 채우지는 않았다.", "choices": [{"label": "\"이름 하나라도 비면 나한테 알려.\"", "effects": [{"op": "gain_card", "card": "haun_read_grain"}], "result": "\"형은 위에서 이름 잃어버리지 마.\" 하운은 오를 때마다 수를 셌다. (결 읽기를 얻었다)"}, {"label": "석두에게 철수 신호를 맡긴다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "종이 세 번 울리면 뒤에 남은 사람이 없다는 뜻. (고른 카드 1장 강화 +1)"}]}
   },
   {
     "id": "s8_event_unsent_letter",
@@ -132,17 +132,17 @@
     "weight": 2,
     "once": true,
     "conditions": {"partyHas": "kyle"},
-    "content": {"text": "카일은 넉 달 만에 청운호흡의 박자를 잠들어서도 쉴 수 있게 되었다. 그는 그것이 신기하다며 리나 왕녀에게 보낼 편지에 길게 썼다. 부칠 수 없는 편지였다.", "choices": [{"label": "편지 끝에 한 줄을 보태 준다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}], "result": "\"이거 왕녀님이 읽으시면 웃으실 거야.\" (카일의 카드 1장 강화 +1)"}, {"label": "방패벽 훈련을 함께 본다", "effects": [{"op": "gain_card", "card": "kyle_shield_wall"}], "result": "방패·창·받침·메움, 네 줄. \"벽이 무너지지 않는 한, 아무도 죽지 않아.\" (방패벽을 얻었다)"}]}
+    "content": {"text": "카일은 리나에게 보낼 편지에 무림의 말을 하나씩 적었다. 밥, 물, 멈춰. 엘하임은 지금 무림보다 두 배 빨리 흐른다. 부칠 수 없는 편지였다.", "choices": [{"label": "편지 끝에 한 줄을 보태 준다", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}], "result": "\"이거 왕녀님이 읽으시면 웃으실 거야.\" (카일의 카드 1장 강화 +1)"}, {"label": "운곡촌 사람들의 방패 훈련을 함께 본다", "effects": [{"op": "gain_card", "card": "kyle_shield_wall"}], "result": "목소리가 들리지 않을 때도 알 수 있는 손짓. (방패벽을 얻었다)"}]}
   },
   {
     "id": "s8_event_brothers_name",
     "stage": "s8",
     "type": "event",
-    "name": "형의 이름 옆에 한 줄",
+    "name": "바퀴 그림",
     "weight": 2,
     "once": true,
     "conditions": {"partyHas": "born"},
-    "content": {"text": "보른은 드워프의 망치질 박자를 버리고 청운호흡으로 바꾸었다. 네 번 짧게에서 세 번 짧게로. 그는 그것이 형에게 미안하다고 했다. 그러다 돌에 새긴 형의 이름 옆에, 한 줄을 더 새기면 된다고 혼자 결론을 내렸다.", "choices": [{"label": "한 줄을 같이 새긴다", "effects": [{"op": "gain_card", "card": "born_together"}], "result": "보른이 짧게 고개를 끄덕였다. \"같이 가.\" (같이 가를 얻었다)"}, {"label": "세 번 짧게, 박자를 맞춰 준다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}], "result": "망치 소리가 숨과 같은 박자로 떨어졌다. (보른의 카드 2장 강화 +1)"}]}
+    "content": {"text": "낙안봉에서 아이를 실어 나르던 수레꾼 도갑이 돌아오지 못했다. 보른은 그의 가족에게 보낼 바퀴 그림을 깎다가 손에 힘이 너무 들어간 것을 알았다. 작은 일이라는 이유로 그 작은 것마저 거칠게 만들고 있었다.", "choices": [{"label": "한 줄을 같이 새긴다", "effects": [{"op": "gain_card", "card": "born_together"}], "result": "보른이 짧게 고개를 끄덕였다. \"같이 가.\" (같이 가를 얻었다)"}, {"label": "세 번 짧게, 박자를 맞춰 준다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}], "result": "망치 소리가 숨과 같은 박자로 떨어졌다. (보른의 카드 2장 강화 +1)"}]}
   },
   {
     "id": "s8_event_bean_warmth",
@@ -152,37 +152,37 @@
     "weight": 2,
     "once": true,
     "conditions": {"partyHas": "elia", "floorRange": [3, 6]},
-    "content": {"text": "엘리아는 계단 중턱의 바위 위에서 마법을 쓰지 않았다. 아랫배 깊은 곳, 넉 달 동안 기른 콩알만 한 고리가 돌았다. 그녀가 눈을 감고 계단 위아래 사람들의 흐름을 읽었다.", "choices": [{"label": "숨을 세어 달라고 한다", "effects": [{"op": "gain_card", "card": "elia_count"}], "result": "\"하나, 둘, 셋… 길게.\" 그녀의 숨이 하운의 숨과 겹쳤다. (숨 세기를 얻었다)"}, {"label": "약초 주머니를 맡긴다", "effects": [{"op": "gain_card", "card": "elia_clinic"}], "result": "마나 없이도 상처는 싸맬 수 있다. 은빛 의원의 손. (은빛 의원을 얻었다)"}]}
+    "content": {"text": "엘리아는 계단 중턱에서 마법을 쓰지 않았다. 아랫배 깊은 곳, 왕일검에게 배운 작은 고리가 돌았다. 남은 마나를 대신 만들지는 못했다. 그래도 몸을 버티는 데는 도움이 되었다.", "choices": [{"label": "숨을 세어 달라고 한다", "effects": [{"op": "gain_card", "card": "elia_count"}], "result": "\"하나, 둘, 셋… 길게.\" 그녀의 숨이 하운의 숨과 겹쳤다. (숨 세기를 얻었다)"}, {"label": "약초 주머니를 맡긴다", "effects": [{"op": "gain_card", "card": "elia_clinic"}], "result": "마나 없이도 상처는 싸맬 수 있다. 은빛 의원의 손. (은빛 의원을 얻었다)"}]}
   },
   {
     "id": "s8_event_wooden_swords",
     "stage": "s8",
     "type": "event",
-    "name": "목검의 제자들",
+    "name": "같은 자리의 다른 발",
     "weight": 2,
     "once": true,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "청운문의 제자 백오십이 목검을 들고 다섯째 굽이로 올랐다. 그들의 제칠식은 가벼웠다. 구름은 무겁지 않다. 하운이 스무 날 동안 그들 앞에서 펼친 그대로.", "choices": [{"label": "제칠식을 한 번 더 펼쳐 보인다", "effects": [{"op": "gain_card", "card": "haun_biun"}], "result": "몸이 미끄러지듯 등 뒤로. 목검들이 같은 길을 따라왔다. (비운천리를 얻었다)"}, {"label": "어깨에 힘을 빼라고 일러 준다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "사부가 하던 말을 그대로 했다. 어깨에 힘이 들어갔다. 숨이 반 박자 빠르다. (하운의 카드 2장 강화 +1)"}]}
+    "content": {"text": "카일이 목검을 들고 하운이 흘린 쪽으로만 밀어 주기로 했다. 처음으로 매끄럽게 됐다. 그 순간 카일이 남은 손으로 어깨를 밀었고, 하운은 그대로 넘어졌다.", "choices": [{"label": "제칠식을 한 번 더 펼쳐 보인다", "effects": [{"op": "gain_card", "card": "haun_biun"}], "result": "몸이 미끄러지듯 등 뒤로. 목검들이 같은 길을 따라왔다. (비운천리를 얻었다)"}, {"label": "놓은 다음 서 있는 데까지", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}], "result": "흘린 뒤의 발을 고쳤다. 어깨에 힘이 들어갔다. 숨이 반 박자 빠르다. (하운의 카드 2장 강화 +1)"}]}
   },
   {
     "id": "s8_event_wounded",
     "stage": "s8",
     "type": "event",
-    "name": "화살 맞은 매화검수",
+    "name": "화살 맞은 무승",
     "weight": 2,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "막지 못한 화살이 대열에 박혔다. 화산의 매화검수 하나가 계단에 쓰러져 있다. 방패벽이 그 앞을 덮는다.", "choices": [{"label": "상처를 싸매 준다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "매화검수가 이를 악물고 일어섰다. 답례로 매화검의 검로 하나를 보여 주었다. (고른 카드 1장 강화 +1)"}, {"label": "방패 뒤로 옮기고 길을 서두른다", "effects": [{"op": "heal_party", "amount": 60}], "result": "그믐이 지나기 전에 혈전에 닿아야 한다. (출전 동료 전원 체력 60 회복)"}]}
+    "content": {"text": "막지 못한 화살이 대열에 박혔다. 소림의 무승 하나가 계단에 쓰러져 있다. 방패가 그 앞을 덮는다.", "choices": [{"label": "상처를 싸매 준다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "무승이 이를 악물고 일어섰다. 혜각이 말없이 그의 어깨를 받쳤다. (고른 카드 1장 강화 +1)"}, {"label": "방패 뒤로 옮기고 길을 서두른다", "effects": [{"op": "heal_party", "amount": 60}], "result": "그믐이 지나기 전에 혈전에 닿아야 한다. (출전 동료 전원 체력 60 회복)"}]}
   },
   {
     "id": "s8_event_naan_crack",
     "stage": "s8",
     "type": "event",
-    "name": "낙안봉 위의 금",
+    "name": "아물지 않는 하늘",
     "weight": 2,
     "tags": ["scar"],
     "once": true,
     "conditions": {"floorRange": [4, 8], "flag": "sky_crack"},
-    "content": {"text": "그믐의 하늘, 낙안봉 쪽 별과 별 사이에 금이 하나 걸려 있다. 아물지 않는. 청운맹 사람들은 그것을 승리의 표식이라 불렀다. 하운만이 그것을 다르게 보았다.", "choices": [{"label": "그래도 운하검을 벼린다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "끝을 내야 한다. 최대한 빨리. (하운의 카드 2장 강화 +1, 상흔 +1)"}, {"label": "\"부스러기는 제가 쓸어 담겠습니다.\"", "effects": [{"op": "gain_card", "card": "haun_breath"}], "result": "바깥에서 아무것도 끌어오지 않는다. 세 번 짧게, 한 번 길게. (청운호흡을 얻었다)"}]}
+    "content": {"text": "그믐의 하늘, 낙안봉 쪽 별과 별 사이에 금이 하나 걸려 있다. 엘리아가 쉰을 넘게 세어도 닫히지 않았던 금. 하운은 그 옆에 자기 이름을 적어 두었다.", "choices": [{"label": "그래도 칼을 벼린다", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}, {"op": "scar", "amount": 1}], "result": "끝을 내야 한다. 최대한 빨리. (하운의 카드 2장 강화 +1, 상흔 +1)"}, {"label": "\"부스러기는 제가 쓸어 담겠습니다.\"", "effects": [{"op": "gain_card", "card": "haun_breath"}], "result": "바깥에서 아무것도 끌어오지 않는다. 세 번 짧게, 한 번 길게. (청운호흡을 얻었다)"}]}
   },
   {
     "id": "s8_rest_landing",
@@ -190,16 +190,16 @@
     "type": "rest",
     "name": "계단참",
     "weight": 1,
-    "content": {"text": "계단참의 바위 그늘. 위에서 혈전의 핏빛 불빛이 내려다본다. 세 번 짧게, 한 번 길게.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
+    "content": {"text": "계단참의 바위 그늘. 위에서 혈전의 붉은 불빛이 내려다본다. 세 번 짧게, 한 번 길게.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
   },
   {
     "id": "s8_rest_shield_shade",
     "stage": "s8",
     "type": "rest",
-    "name": "방패벽 뒤",
+    "name": "방패 뒤",
     "weight": 1,
     "conditions": {"floorRange": [3, 8]},
-    "content": {"text": "방패 오백이 맞물린 그늘. 쿵. 쿵. 창끝 너머로 화살이 꽂히는 소리가 이어진다. 벽이 무너지지 않는 한, 아무도 죽지 않는다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
+    "content": {"text": "운곡촌 사람들의 방패가 맞물린 그늘. 창끝 너머로 화살이 꽂히는 소리가 이어진다. 정해 둔 바위 뒤로, 물러날 줄도 안다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
   },
   {"id": "s8_shop", "stage": "s8", "type": "shop", "name": "구천 계단 아래 객잔", "weight": 1, "content": {"text": "천마봉으로 오르는 마지막 객잔. 손님은 없고, 주인은 이미 짐을 반쯤 꾸려 두었다. \"올라갈 거면 지금 다 사 가시오.\""}},
   {"id": "s8_battle_array_stairs", "stage": "s8", "type": "battle", "name": "구천 계단의 진법", "weight": 3, "conditions": {"floorRange": [3, 8]}, "content": {"text": "계단 양쪽의 돌사람이 고개를 든다. 진법이 움직인다. 하나를 치면 짝이 그 자리를 메운다.", "enemies": ["array_statue", "array_statue"]}},
