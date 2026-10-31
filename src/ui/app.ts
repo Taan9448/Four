@@ -1142,6 +1142,8 @@ export class App {
       ['카드', g.cards.join(' · ')],
       ['유물', g.relics.join(' · ')],
       ['레벨', g.levels.map((l) => `${l.name} ${l.from} → ${l.to}`).join(' · ')],
+      // 구출 사건으로 데리고 나온 사람(개작 원고 B안 — 권마다 "몇 명이 돌아왔나"로 끝난다)
+      ['구한 사람', g.rescued > 0 ? `${g.rescued}명${(run.rescued ?? 0) > g.rescued ? ` (지금까지 ${run.rescued}명)` : ''}` : ''],
     ];
     const shown = rows.filter(([, v]) => v);
     if (!shown.length) return null;

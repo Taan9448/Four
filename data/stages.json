@@ -32,7 +32,7 @@
     "mapArt": "map_s1",
     "journey": {"label": "은빛 숲", "x": 60, "y": 66, "region": "elheim", "unknownLabel": "낯선 숲", "knownFlag": "met_companions"},
     "teaser": "눈을 뜨니 낯선 숲이다. 은빛 잎사귀, 처음 보는 나무, 그리고 하늘에 뜬 두 개의 달. 여기는 어디인가.",
-    "pinned": [{"floor": 1, "module": "s1_story_two_moons"}, {"floor": 2, "module": "s1_story_silver_bell"}, {"floor": 3, "module": "s1_story_strangers_sword"}, {"floor": 7, "module": "s1_story_first_snow"}],
+    "pinned": [{"floor": 1, "module": "s1_story_two_moons"}, {"floor": 2, "module": "s1_story_silver_bell"}, {"floor": 3, "module": "s1_story_strangers_sword"}, {"floor": 7, "module": "s1_story_first_snow"}, {"floor": 9, "module": "s1_rest_barrier_edge"}],
     "forcedTypes": {"8": "shop", "9": "rest"},
     "typeWeights": {"battle": 55, "event": 18, "elite": 12, "rest": 8, "inn": 7},
     "boss": "s1_boss_veilak",
