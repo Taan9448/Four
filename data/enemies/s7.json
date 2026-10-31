@@ -1,22 +1,22 @@
 [
   {
     "id": "blood_cultist",
-    "name": "혈교도",
+    "name": "신교 교도",
     "hitFx": "fx_blood_crescent",
-    "lore": "천마신교의 말단 교도. 검붉은 무복의 가슴에 핏방울 모양의 혈적문을 새겼고, 무겁고 끈적한 마기가 몸에 감겨 있다. 진무관을 봉쇄한 호법들에게 쌀과 무기를 실어 나르고, 소림의 탑림과 낙안봉의 골짜기에서 대열을 이룬다. 하나하나는 강하지 않다. 그러나 언제나 숫자가 많다.",
+    "lore": "천마신교의 말단 교도. 가슴에 핏방울 모양의 표식을 새겼고, 무겁고 끈적한 기운이 몸에 감겨 있다. 진무전을 가둔 호법들에게 곡식을 실어 나르고, 소림의 사리탑 사이와 낙안봉의 골짜기에서 대열을 이룬다. 하나하나는 강하지 않다. 그러나 언제나 숫자가 많다.",
     "maxHp": 320,
     "sprite": "blood_cultist",
     "silhouette": "humanoid",
     "color": "#8a1f2a",
     "pattern": "random",
-    "moves": [{"id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 90}]}, {"id": "blood_mark", "name": "혈적문", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}, {"op": "add_card", "card": "status_blood_debt", "to": "discard"}, {"op": "rift", "amount": 2}]}, {"id": "suck_essence", "name": "흡정", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "heal", "amount": 60, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
-    "flavor": "천마신교의 말단. 검붉은 무복, 가슴에 핏방울 모양의 혈적문. 마기가 무겁고 끈적하게 몸에 감겨 있다. 혈적문이 새겨질 때마다 하늘이 붉게 갈라진다."
+    "moves": [{"id": "blood_blade", "name": "혈도 베기", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 90}]}, {"id": "blood_mark", "name": "핏방울 표식", "intent": "buff", "weight": 1, "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 50, "target": "self"}, {"op": "add_card", "card": "status_blood_debt", "to": "discard"}, {"op": "rift", "amount": 2}]}, {"id": "suck_essence", "name": "흡정", "intent": "debuff", "effects": [{"op": "gain_mana", "amount": -2}, {"op": "heal", "amount": 60, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "flavor": "천마신교의 말단. 가슴에 핏방울 모양의 표식. 기운이 무겁고 끈적하게 몸에 감겨 있다. 표식이 새겨질 때마다 하늘이 붉게 갈라진다."
   },
   {
     "id": "cult_guardian",
-    "name": "마교 호법",
+    "name": "신교 호법",
     "hitFx": "fx_hit_blunt",
-    "lore": "천마신교의 호법. 손바닥이 피처럼 붉어 혈마장을 쓴다. 셋이 서면 혈마삼재진이 되어, 세 바위에서 흘러나온 마기가 진무관 지붕 위 스무 장 허공에서 엉킨다. 그 진이 삼 년 동안 무당을 가뒀다. 셋이 서 있는 한 매듭은 내공이 닿지 않는 높이에 있다. 진은 보급로로 오는 쌀과 피를 먹고 살고, 하나가 쓰러지면 매듭이 풀린다.",
+    "lore": "천마신교의 호법. 손바닥이 피처럼 붉다. 셋이 세 돌자리 — 북쪽 샘, 동쪽 종루, 서쪽 창고 — 에 서면 그 힘이 진무전 옆 회랑 지붕 위에서 하나의 매듭으로 엉킨다. 그 진이 무당을 가뒀다. 셋이 서 있는 한 매듭은 내공만으로 닿지 않는다. 샘을 막고 고리를 떼면 힘이 약해지고, 하나가 쓰러지면 진이 풀린다.",
     "maxHp": 360,
     "sprite": "cult_guardian",
     "silhouette": "humanoid",
@@ -24,13 +24,13 @@
     "pattern": "cycle",
     "deathEffects": [{"op": "remove_status", "status": "incorporeal", "target": "all_allies"}],
     "moves": [{"id": "blood_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "effects": [{"op": "damage", "amount": 90}]}, {"id": "guard_formation", "name": "호법진", "intent": "defend", "effects": [{"op": "block", "amount": 70, "target": "all_allies"}, {"op": "apply_status", "status": "thorns", "stacks": 1, "target": "self"}]}, {"id": "palm_wind", "name": "장풍", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 60}, {"op": "apply_status", "status": "vulnerable", "stacks": 1}, {"op": "rift", "amount": 1}]}],
-    "flavor": "손바닥이 피처럼 붉다. 셋이 서면 진이 되고, 진은 삼 년 동안 무당을 가뒀다. 하나가 쓰러지면 진의 매듭이 풀린다. 장풍이 하늘의 결을 긁고 지나간다."
+    "flavor": "손바닥이 피처럼 붉다. 셋이 세 돌자리에 서면 진이 되고, 진은 무당을 가뒀다. 하나가 쓰러지면 매듭이 풀린다. 장풍이 하늘의 결을 긁고 지나간다."
   },
   {
     "id": "poison_hand",
-    "name": "독수마군",
+    "name": "양문혁",
     "hitFx": "fx_claw",
-    "lore": "잿더미가 된 소림사를 감시하던 분타의 장로. 무당이 열렸다는 소식에 분타가 스스로 물러날 때도 그는 물러나지 않고, 무승들이 삼 년 동안 다시 쌓은 탑림에 혈교도 이백과 진을 쳤다. 손톱 끝에 바른 검푸른 독은 손목의 경맥으로 이어져 흐른다. 독을 끌어올릴수록 그 독은 제 경맥에도 고인다. 이음매를 치면 독이 거꾸로 흐른다.",
+    "lore": "소림 피란민이 나갈 남쪽 길에서 기다리던 자. 빈 수레 세 대를 앞에 두고 일어나지도 않는다. \"무당 문을 연 칼이라더니, 오늘은 칼이 짧구나.\" 독은 바람을 타고 온다 — 그는 바람이 자기 등 뒤에서 부는 자리를 고른다. 손끝의 독은 손목의 경맥으로 이어져, 끌어올릴수록 제 경맥에도 고인다.",
     "maxHp": 1000,
     "sprite": "poison_hand",
     "silhouette": "humanoid",
@@ -38,27 +38,27 @@
     "scale": 1.2,
     "tier": "elite",
     "pattern": "cycle",
-    "moves": [{"id": "venom_nail", "name": "검푸른 독 손톱", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 80}, {"op": "apply_status", "status": "poison", "stacks": 2}]}, {"id": "draw_venom", "name": "독기 끌어올리기", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 100, "target": "self"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "self"}]}, {"id": "myriad_venom", "name": "만독수", "intent": "attack", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}, {"op": "apply_status", "status": "poison", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "status_miasma", "to": "discard"}]}],
-    "flavor": "소림의 잿더미를 감시하던 분타의 장로. 검푸른 독을 바른 손톱. 독은 손톱 끝에서 손목의 경맥으로 이어져 흐른다 — 끌어올릴수록 제 경맥에도 고인다."
+    "moves": [{"id": "venom_nail", "name": "바람 타는 독", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 80}, {"op": "apply_status", "status": "poison", "stacks": 2}]}, {"id": "draw_venom", "name": "독기 끌어올리기", "intent": "buff", "effects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "block", "amount": 100, "target": "self"}, {"op": "apply_status", "status": "poison", "stacks": 2, "target": "self"}]}, {"id": "myriad_venom", "name": "독 손", "intent": "attack", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}, {"op": "apply_status", "status": "poison", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "status_miasma", "to": "discard"}]}],
+    "flavor": "독을 쓰는 자. 바람이 등 뒤에서 부는 자리를 고른다. 독은 손끝에서 손목의 경맥으로 이어져 흐른다 — 끌어올릴수록 제 경맥에도 고인다."
   },
   {
     "id": "branch_elite",
     "name": "분타 정예",
     "hitFx": "fx_blood_crescent",
-    "lore": "화산 낙안봉 꼭대기에 성채처럼 들어선 섬서 분타의 정예. 분타주 혈수마군의 곁을 지키며 성채의 계단과 지하 통로를 메운다. 혈교도보다 마기가 짙어 혈마장을 쓰고, 분타주를 노리는 칼 앞에 몸을 던진다. 그들이 지키는 지하에는 팔목에 붕대를 감은 아이 서른이 갇혀 있다.",
+    "lore": "낙안봉 위에 들어선 분타의 정예. 염탁의 곁을 지키며 저수조의 물문과 계단을 메운다. 교도보다 기운이 짙어 장력을 쓰고, 분타주를 노리는 칼 앞에 몸을 던진다. 그들이 지키는 물문 옆 잠긴 방에 아이 서른이 갇혀 있다.",
     "maxHp": 420,
     "sprite": "branch_elite",
     "silhouette": "humanoid",
     "color": "#6a1a20",
     "pattern": "random",
     "moves": [{"id": "elite_blade", "name": "혈도", "intent": "attack", "targeting": "random", "weight": 2, "effects": [{"op": "damage", "amount": 100}]}, {"id": "elite_palm", "name": "혈마장", "intent": "attack", "targeting": "random", "weight": 1, "effects": [{"op": "damage", "amount": 70}, {"op": "apply_status", "status": "weak", "stacks": 1}]}, {"id": "elite_guard", "name": "호위", "intent": "defend", "weight": 1, "effects": [{"op": "block", "amount": 80, "target": "all_allies"}]}],
-    "flavor": "낙안봉 꼭대기의 섬서 분타를 지키는 정예. 성채의 계단을 메운다."
+    "flavor": "낙안봉 위의 분타를 지키는 정예. 물문과 계단을 메운다."
   },
   {
     "id": "hyeolsu",
-    "name": "혈수마군",
+    "name": "염탁",
     "hitFx": "fx_blood_crescent",
-    "lore": "천마신교 섬서 분타주이자 교주의 오른팔. 큰 키에 넓은 어깨, 두 손이 팔꿈치까지 핏빛이다. 낙안봉 분타의 지하에 아이들을 가두고, 그 팔목에서 받은 피를 마신다. 천마혈공의 피가 결을 덮어 결이 드러나지 않는다. 그 덮개를 벗기려면 몸에 남은 엘하임의 마나를 물동이째 쏟아야 한다. 그가 쓰러지면 분타가 무기를 내려놓는다.",
+    "lore": "낙안봉 분타를 맡은 자. 두 손이 팔꿈치까지 붉고, 그 붉은 장력은 검을 타고 들어와 칼날에 달라붙는다. 결이 없는 것은 아니다. 너무 빠르게 바뀌어 읽은 순간에는 이미 다른 자리가 된다 — 피가 결을 덮는다. 바닥의 붉은 홈에서 올라오는 힘을 끌어 쓰고, 마지막 출구를 무너뜨려 나가는 사람들을 다시 가두려 한다.",
     "maxHp": 1660,
     "sprite": "branch_lord",
     "silhouette": "boss",
@@ -68,8 +68,8 @@
     "pattern": "cycle",
     "traits": [{"status": "blood_cover", "stacks": 1}],
     "deathEffects": [{"op": "damage", "amount": 99999, "target": "all_allies"}],
-    "moves": [{"id": "blood_palm_force", "name": "핏빛 장력", "intent": "attack", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}]}, {"id": "heavenly_blood_art", "name": "천마혈공", "intent": "buff", "effects": [{"op": "block", "amount": 150, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "rift", "amount": 3}]}, {"id": "noisy_first", "name": "\"시끄러운 것부터\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 140}]}, {"id": "childrens_blood", "name": "아이들의 피", "intent": "special", "effects": [{"op": "heal", "amount": 180, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
-    "flavor": "섬서 분타주이자 교주의 오른팔. 큰 키, 넓은 어깨, 팔꿈치까지 핏빛인 두 손. 천마혈공의 피가 결을 덮어 결 읽기가 통하지 않는다. 아이들에게서 받은 피를 마신다. 그가 쓰러지면 분타가 무기를 내려놓는다. 천마혈공이 돌면 하늘이 크게 찢어진다."
+    "moves": [{"id": "blood_palm_force", "name": "핏빛 장력", "intent": "attack", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}]}, {"id": "heavenly_blood_art", "name": "피로 가린 결", "intent": "buff", "effects": [{"op": "block", "amount": 150, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 2, "target": "self"}, {"op": "rift", "amount": 3}]}, {"id": "noisy_first", "name": "\"시끄러운 것부터\"", "intent": "attack", "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 140}]}, {"id": "childrens_blood", "name": "붉은 홈의 힘", "intent": "special", "effects": [{"op": "heal", "amount": 180, "target": "self"}, {"op": "apply_status", "status": "strength", "stacks": 1, "target": "self"}]}],
+    "flavor": "팔꿈치까지 붉은 두 손. 붉은 장력이 칼날에 달라붙는다. 피가 결을 덮어 결 읽기가 통하지 않는다. 바닥의 붉은 홈에서 힘을 끌어 쓴다. 그 힘이 갈라지면 하늘이 크게 찢어진다."
   },
-  {"id": "needle_cultist", "name": "혈교 독침수", "hitFx": "fx_hit_pierce", "maxHp": 280, "sprite": "needle_cultist", "silhouette": "humanoid", "color": "#5a2a3a", "pattern": "random", "lore": "낙안봉 아래 혈교 분타의 독침수. 소매 속 침통에 독수마군이 달인 독을 묻힌 침을 넣고 다닌다. 앞에 서지 않고 늘 기둥 뒤에서 가장 약해 보이는 자를 노린다.", "flavor": "소매 속 침통에 독침을 넣고 다니는 혈교도. 가장 약한 자를 멀리서 노린다.", "moves": [{"id": "poison_needles", "name": "독침", "intent": "attack", "weight": 2, "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 30, "times": 2}, {"op": "apply_status", "status": "poison", "stacks": 2}]}, {"id": "needle_case", "name": "침통 털기", "intent": "attack", "weight": 1, "targeting": "random", "effects": [{"op": "damage", "amount": 60}]}]}
+  {"id": "needle_cultist", "name": "신교 독침수", "hitFx": "fx_hit_pierce", "maxHp": 280, "sprite": "needle_cultist", "silhouette": "humanoid", "color": "#5a2a3a", "pattern": "random", "lore": "낙안봉 아래 분타의 독침수. 소매 속 침통에 독을 묻힌 침을 넣고 다닌다. 앞에 서지 않고 늘 기둥 뒤에서 가장 약해 보이는 자를 노린다.", "flavor": "소매 속 침통에 독침을 넣고 다니는 교도. 가장 약한 자를 멀리서 노린다.", "moves": [{"id": "poison_needles", "name": "독침", "intent": "attack", "weight": 2, "targeting": "lowest_hp", "effects": [{"op": "damage", "amount": 30, "times": 2}, {"op": "apply_status", "status": "poison", "stacks": 2}]}, {"id": "needle_case", "name": "침통 털기", "intent": "attack", "weight": 1, "targeting": "random", "effects": [{"op": "damage", "amount": 60}]}]}
 ]

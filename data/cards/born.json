@@ -137,7 +137,7 @@
     "tags": ["born_iron"],
     "effects": [{"op": "block", "amount": 40, "target": "all_allies"}],
     "upgrade": {"growth": [20], "plus4": {"name": "물길", "effects": [{"op": "heal", "amount": 20, "target": "all_allies"}]}, "plus5": {"name": "회반죽 없이", "addKeywords": ["retain"]}},
-    "flavor": "회반죽 한 줌 쓰지 않은 돌벽이 흑풍장을 받아 냈다. \"돌은 원래 서로 기대고 싶어 한다.\""
+    "flavor": "회반죽 한 줌 쓰지 않은 돌벽이 배진의 장력을 받아 냈다. \"돌은 원래 서로 기대고 싶어 한다.\""
   },
   {
     "id": "born_axe",

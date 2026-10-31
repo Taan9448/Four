@@ -3,71 +3,71 @@
     "id": "s6_story_return",
     "stage": "s6",
     "type": "story",
-    "name": "아무도 모르는 귀환",
+    "name": "하나뿐인 달",
     "once": true,
-    "content": {"scene": "s6_scene_return", "text": "운곡촌 교세소의 현판이 '천하'와 '일통' 사이에서 갈라져 있다. 회벽에는 그을린 구름 문양이 희미하게 푸른빛을 낸다. 장터 사람들이 수군거린다. 청운귀.", "choices": [{"label": "\"이음매부터 칩니다.\"", "result": "검을 뽑지 않았다. 검집 끝으로 이음매를 눌렀을 뿐이다. '검집'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_scabbard"}]}, {"label": "청염초로 푸른 구름을 그린다", "condition": {"partyHas": "elia"}, "result": "마법이 아니라 그냥 풀이었다. 엘리아의 '청염초'를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_ghost_fire"}]}, {"label": "장부대로 돌려준다", "result": "쌀 한 말, 소금 한 줌, 은자 몇 닢. 계곡의 밤이 따뜻했다. 출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
+    "content": {"scene": "s6_scene_return", "text": "운곡촌의 객잔 자리에 회색 벽이 섰다. 장터에는 장작을 사는 자리가 없다. 다섯 집이 한 줄로 묶여 곡식을 낸다. 엘하임에서 여섯 해, 여기서는 세 번의 봄이 지났다.", "choices": [{"label": "\"패 드릴까요.\"", "result": "무딘 도끼로 노파의 장작을 팼다. 검집 끝으로 결을 짚었을 뿐이다. '검집'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_scabbard"}]}, {"label": "엘리아에게 이곳 풀을 알려 준다", "condition": {"partyHas": "elia"}, "result": "청염초. 마법이 아니라 그냥 풀이었다. 엘리아의 '청염초'를 얻었다.", "effects": [{"op": "gain_card", "card": "elia_ghost_fire"}]}, {"label": "소금 장수의 외상 장부를 읽는다", "result": "'주방 장작'. 세 번의 새해에 낸 표. 날짜를 종이에 옮기는 손가락이 떨렸다. 출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}]}
   },
   {
     "id": "s6_battle_ambush",
     "stage": "s6",
     "type": "battle",
-    "name": "혈위대 함정",
+    "name": "두 번 낸 값",
     "once": true,
     "conditions": {"floorRange": [2, 2]},
-    "content": {"scene": "s6_scene_ambush", "outroScene": "s6_scene_ambush_after", "text": "양쪽이 막힌 계곡 길. 안개초 연기가 흘러내리고, 청염초의 귀신불이 일렁인다. 혈위대는 귀신에게 맞는다고 생각한다. (적 전원 약화 1)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "startEffects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 밤새 결을 쳐 둔 절벽이 무너져 길을 막는다. (적 전원 기절 1)", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"scene": "s6_scene_ambush", "outroScene": "s6_scene_ambush_after", "text": "돌려준 곡식은 산 위 장부에 이미 받은 것으로 적혔다. 같은 값을 두 번 낸 밤, 열두 사람이 숯막으로 걸어 나온다. 뒤에서 횃불이 따라온다. (적 전원 약화 1)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "startEffects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 낮에 봐 둔 비탈의 결을 친다. 돌이 길 위에만 떨어진다. (적 전원 기절 1)", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 12}]}
   },
   {
     "id": "s6_story_old_temple",
     "stage": "s6",
     "type": "story",
-    "name": "폐사찰의 노인",
+    "name": "운곡루의 노인",
     "once": true,
-    "content": {"scene": "s6_scene_old_temple", "text": "폐사찰 지하 장경각. 수레 의자 위의 노인이 생강 넣은 보리차를 두 손으로 감싸 쥐고 있다. 청운문의 전대 대사형, 왕일검(王一劍).", "choices": [{"label": "세 번 절한다", "result": "왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 청운호흡을 배웠다 — 안개초·방패벽·난쟁이 벽을 얻었다. 하운은 그 숨의 이름을 처음 들었다. '청운호흡'을 얻었다.", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "gain_card", "card": "haun_breath"}]}, {"label": "교세 흐름 지도를 들여다본다", "result": "왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 청운호흡을 배웠다 — 안개초·방패벽·난쟁이 벽을 얻었다. 붉은 먹의 선을 따라 결을 읽었다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "생강 넣은 보리차를 받는다", "result": "왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 청운호흡을 배웠다 — 안개초·방패벽·난쟁이 벽을 얻었다. 하운은 그 냄새를 알았다. 출전 동료 전원 최대 체력의 50% 회복", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "heal_party", "ratio": 0.5}]}]}
+    "content": {"scene": "s6_scene_old_temple", "text": "반쯤 불탄 운곡루의 간판이 숨은 집 마당에 기대어 있다. 수레 의자 위의 노인, 무릎 아래 담요가 평평하다. 주방의 왕 노인 — 청운문의 전대 대사형, 왕일검(王一劍).", "choices": [{"label": "세 번 절한다", "result": "\"이제는 알고 배우고 싶습니다.\" 왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 닫힌 고리의 숨을 배운다 — 안개초·방패벽·난쟁이 벽을 얻었다. 하운은 그 숨의 이름을 처음 들었다. '청운호흡'을 얻었다.", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "gain_card", "card": "haun_breath"}]}, {"label": "번진 둘째 줄을 들여다본다", "result": "왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 닫힌 고리의 숨을 배운다 — 안개초·방패벽·난쟁이 벽을 얻었다. 읽지 못한 줄은 읽지 못한 채 남겼다. 고른 카드 1장을 강화했다(+1).", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "upgrade_card", "count": 1, "choose": true}]}, {"label": "무말랭이 그릇을 받는다", "result": "왕일검이 일행을 돕는다(전투 밖 지원: 청운호흡 박자). 셋이 닫힌 고리의 숨을 배운다 — 안개초·방패벽·난쟁이 벽을 얻었다. \"석두 것까지 먹지 마라.\" 출전 동료 전원 최대 체력의 50% 회복", "effects": [{"op": "join_party", "member": "wang"}, {"op": "gain_card", "card": "elia_fog_herb"}, {"op": "gain_card", "card": "kyle_shield_wall"}, {"op": "gain_card", "card": "born_dwarf_wall"}, {"op": "heal_party", "ratio": 0.5}]}]}
   },
   {
     "id": "s6_battle_patrol",
     "stage": "s6",
     "type": "battle",
-    "name": "교세 순찰",
+    "name": "곡식 걷는 길",
     "weight": 2,
     "conditions": {"floorRange": [4, 7]},
-    "content": {"text": "교세를 걷으러 온 혈위대 둘. 마을 어귀에서 난쟁이 벽을 보고도 돌아가지 않았다.", "enemies": ["blood_guard", "blood_guard"]}
+    "content": {"text": "곡식을 걷으러 온 산 위의 경비 둘. 다섯 집 가운데 한 집 앞에서 멈춰 섰다.", "enemies": ["blood_guard", "blood_guard"]}
   },
   {
     "id": "s6_battle_tax_cart",
     "stage": "s6",
     "type": "battle",
-    "name": "교세 수레 길",
+    "name": "산으로 가는 수레",
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"text": "운곡촌에서 청운산으로 교세를 실어 나르는 수레 길. 호송하는 혈위대와 흑풍대.", "enemies": ["blood_guard", "black_wind"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"큰 성을 치려면 먼저 보급로를 끊으라고.\" 카일이 수레 앞을 막아선다. (아군 전원 방어 50)", "effects": [{"op": "block", "amount": 50, "target": "all_allies"}]}}
+    "content": {"text": "운곡촌에서 청운산으로 곡식을 실어 나르는 수레 길. 호송하는 경비와 배진의 척후.", "enemies": ["blood_guard", "black_wind"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "\"큰 성을 치려면 먼저 보급로를 끊으라고.\" 카일이 수레 앞을 막아선다. (아군 전원 방어 50)", "effects": [{"op": "block", "amount": 50, "target": "all_allies"}]}}
   },
   {
     "id": "s6_battle_village_raid",
     "stage": "s6",
     "type": "battle",
-    "name": "마을을 벌주러",
+    "name": "빚을 받으러",
     "weight": 2,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "청운귀를 숨겼다며 마을을 벌주러 온 혈위대. 그러나 아무도 서로를 고하지 않았다.", "enemies": ["blood_guard", "blood_guard", "blood_guard"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 바위틈의 화로에 안개초를 태운다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "못 낸 곡식 대신 사람을 데려가겠다는 경비들. 그러나 아무도 서로를 가리키지 않았다.", "enemies": ["blood_guard", "blood_guard", "blood_guard"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 바위틈의 화로에 안개초를 태운다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_battle_black_wind",
     "stage": "s6",
     "type": "battle",
-    "name": "흑풍대 척후",
+    "name": "산을 재는 자들",
     "weight": 2,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"text": "섬서 분타에서 보낸 흑풍대 척후 둘. 검은 두건 아래 곡도가 번뜩인다.", "enemies": ["black_wind", "black_wind"]}
+    "content": {"text": "배진이 보낸 척후 둘. 싸우러 온 것이 아니라 골짜기의 물길과 바람을 재러 왔다.", "enemies": ["black_wind", "black_wind"]}
   },
   {
     "id": "s6_battle_wall_climb",
     "stage": "s6",
     "type": "battle",
-    "name": "벽을 넘는 자들",
+    "name": "물길을 오르는 자들",
     "weight": 2,
     "conditions": {"floorRange": [6, 9]},
-    "content": {"text": "경공으로 난쟁이 벽을 타고 오르려는 흑풍대.", "enemies": ["black_wind", "black_wind", "black_wind"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 끌어온 물길이 벽면으로 쏟아진다. 젖은 돌벽은 미끄럽다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "젖은 돌 대신 널판을 놓고 물길을 따라 올라오는 배진의 군사.", "enemies": ["black_wind", "black_wind", "black_wind"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 끌어온 물길이 벽면으로 쏟아진다. 젖은 돌벽은 미끄럽다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_battle_mountain_gate",
@@ -76,35 +76,35 @@
     "name": "청운산 아래",
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 혈위대와 흑풍대가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 40)", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies"}]}}
+    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 산 위의 경비와 배진의 척후가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 40)", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_elite_black_wind_captain",
     "stage": "s6",
     "type": "elite",
-    "name": "첫 토벌",
+    "name": "숯막 골짜기의 밤",
     "once": true,
     "conditions": {"floorRange": [5, 9]},
-    "content": {"scene": "s6_scene_first_raid", "outroScene": "s6_scene_first_raid_after", "text": "새벽 안개 속, 난쟁이 벽 앞. 칼자국 세 줄의 흑풍대주가 곡도를 뽑는다. 하운은 검을 뽑지 않는다.", "enemies": ["black_wind", "black_wind_captain"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패벽 백이 한 걸음씩 나아간다. \"전진!\" 쿵. (적 전원 피해 50, 아군 전원 방어 40)", "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}, {"op": "block", "amount": 40, "target": "all_allies"}]}}
+    "content": {"scene": "s6_scene_first_raid", "outroScene": "s6_scene_first_raid_after", "text": "숯막 골짜기, 안개가 해 뜨기 전에 걷혔다. 배진은 입구로 오지 않고 물길로 돌아 들어온다. 귀신을 믿지 않는 지휘관이다.", "enemies": ["black_wind", "black_wind_captain"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "농부와 나무꾼의 방패가 미리 정한 손짓에 맞춰 함께 물러났다가 함께 선다. \"뒤로 두 칸!\" (적 전원 피해 50, 아군 전원 방어 40)", "effects": [{"op": "damage", "amount": 50, "target": "all_enemies"}, {"op": "block", "amount": 40, "target": "all_allies"}]}}
   },
   {
     "id": "s6_elite_guard_two_hundred",
     "stage": "s6",
     "type": "elite",
-    "name": "혈위대 이백",
+    "name": "재징발대",
     "weight": 1,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "마맛자국 부대주가 다시 왔다. 이번에는 쉰이 아니라 이백. 대열이 계곡 입구를 가득 메운다. (적 전원 힘 2)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"text": "마맛자국 사형이 다시 왔다. 이번에는 곡식이 아니라 사람을 세러. 대열이 마을 어귀를 메운다. (적 전원 힘 2)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_event_valley_fortress",
     "stage": "s6",
     "type": "event",
-    "name": "계곡의 요새",
+    "name": "비어 있지 않은 골짜기",
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "폐사찰의 사람 서른이 운곡촌 뒤 계곡으로 옮겨 왔다. 수레 의자 위에서 왕일검이 계곡을 둘러본다. \"여기가 너의 산이 될 거다.\" 하운이 장작을 하러 수천 번 드나들던 곳이다.", "choices": [{"label": "보른의 난쟁이 벽", "condition": {"partyHas": "born"}, "result": "회반죽도, 쇠못도 없이 돌들이 맞물렸다. \"돌은 원래 서로 기대고 싶어 한다.\" 사람들은 그 벽을 '난쟁이 벽'이라 불렀다. 보른의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "카일의 방패벽", "condition": {"partyHas": "kyle"}, "result": "네 줄, 열 명씩. 방패·창·받침·메움. \"벽이 무너지지 않는 한, 아무도 죽지 않아.\" '전진!'을 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_forward"}]}, {"label": "엘리아의 은빛 의원", "condition": {"partyHas": "elia"}, "result": "한 달이 지나자 열병으로 죽는 아이가 없어졌다. 귀가 뾰족한 것은 아무도 문제 삼지 않았다. '은빛 의원'을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_clinic"}]}]}
+    "content": {"text": "숯막에는 사람이 더 늘었다. 솥이 두 개 걸렸고 담장 아래 빨래가 널렸다. 보른이 나무판을 내민다. 누울 자리와 비가 새는 자리. 비가 새지 않는 쪽이 더 작다. \"지금은 버틴다. 다음 비에는 모르겠다.\"", "choices": [{"label": "보른과 돌담을 쌓는다", "condition": {"partyHas": "born"}, "result": "회반죽도, 쇠못도 없이 돌들이 맞물렸다. \"돌은 원래 서로 기대고 싶어 한다.\" 사람들은 그 벽을 '난쟁이 벽'이라 불렀다. 보른의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "born"}}]}, {"label": "카일의 방패 훈련", "condition": {"partyHas": "kyle"}, "result": "앞줄은 움직였고 뒷줄은 멈췄다. 다음 날에는 손짓부터 정했다. 목소리가 들리지 않아도 알 수 있도록. '전진!'을 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_forward"}]}, {"label": "서연의 약방을 돕는다", "condition": {"partyHas": "elia"}, "result": "엘리아는 춘복이 스스로 손을 내릴 때까지 기다렸다가 상처를 씻었다. 귀가 뾰족한 것은 아무도 문제 삼지 않았다. '은빛 의원'을 얻었다.", "effects": [{"op": "gain_card", "card": "elia_clinic"}]}]}
   },
   {
     "id": "s6_event_dawn_firewood",
@@ -120,10 +120,10 @@
     "id": "s6_event_third_article",
     "stage": "s6",
     "type": "event",
-    "name": "셋째 조항",
+    "name": "한 줄로 묶인 다섯 집",
     "weight": 2,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "일곱 마을이 교세를 내지 않기 시작했다. 마을 사람들은 셋째 조항을 잊었다. 아무도 서로를 고하지 않았다. 대신 서로에게 알렸다. 혈교도가 어느 길로 오는지, 몇 명인지.", "choices": [{"label": "마을 사람들이 알려 준 길로 간다", "result": "혈교도가 오지 않는 길이었다. 출전 동료 전원 체력 80 회복", "effects": [{"op": "heal_party", "amount": 80}]}, {"label": "쌀을 지고 온 사람들을 맞는다", "result": "스무 마을의 사람들이 밤마다 계곡으로 찾아왔다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "다섯 집이 한 줄로 묶인 납부. 한 집이 못 내면 한 사람이 산으로 간다. 여진이 명단을 수놓은 천을 펼친다. 세탁물이 오가는 길로 산 위와 소식을 주고받는다.", "choices": [{"label": "여진이 알려 준 길로 간다", "result": "검문소를 피하는 길이었다. 출전 동료 전원 체력 80 회복", "effects": [{"op": "heal_party", "amount": 80}]}, {"label": "떠날 사람과 남을 사람을 함께 적는다", "result": "어느 쪽에도 겁쟁이나 용감한 사람이라는 말을 붙이지 않았다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_event_nahan_staff",
@@ -133,7 +133,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 7], "partyHas": "kyle"},
-    "content": {"text": "\"혈교도 하나가 저 마흔을 다 벨 거요.\" 무승이 고개를 저었다. 카일이 웃었다. \"마흔이 하나처럼 움직이면?\" 열흘째, 무승이 시험 삼아 나한곤으로 방패벽을 내리쳤다. 벽은 흔들렸지만 무너지지 않았다. 창 다섯 자루가 무승의 가슴 앞에서 멈췄다.", "choices": [{"label": "방패벽 훈련을 돕는다", "result": "무승이 곤봉을 내리고 합장했다. 카일의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "줄을 하나 더 세운다", "result": "마흔이 쉰이 되고, 쉰이 백이 되었다. '방패벽'을 하나 더 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_shield_wall"}]}]}
+    "content": {"text": "소림에서 살아 나온 무승이 고개를 저었다. \"칼 든 자 하나가 저 마흔을 벨 거요.\" 춘복의 조카 도윤이 방패를 들고 자기가 숙부보다 잘한다고 자랑하다가 물러나는 신호를 놓쳤다.", "choices": [{"label": "방패벽 훈련을 돕는다", "result": "무승이 곤봉을 내리고 합장했다. 카일의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "kyle"}}]}, {"label": "줄을 하나 더 세운다", "result": "마흔이 쉰이 되고, 쉰이 백이 되었다. '방패벽'을 하나 더 얻었다.", "effects": [{"op": "gain_card", "card": "kyle_shield_wall"}]}]}
   },
   {
     "id": "s6_event_elia_breath",
@@ -143,27 +143,27 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 6], "partyHas": "elia"},
-    "content": {"text": "청운호흡 첫날. 카일은 박자를 놓쳐 기침을 했고, 보른은 네 번 짧게 쉬던 망치질의 숨을 세 번으로 고쳤다. 엘리아의 박자는 한 번도 흐트러지지 않았다. \"이상하구나. 처음 배우는 숨이 아니로구나.\" \"삼 년 동안 들었거든요.\" 대답한 뒤에야, 그녀의 귀 끝이 붉어졌다.", "choices": [{"label": "숨의 박자를 바꾸지 않는다", "result": "\"남의 숨을 삼 년이나 따라 쉬었으면, 그건 배운 게 아니라 닮은 게다.\" 마당 건너편에서 같은 박자가 돌아왔다. 엘리아의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}]}, {"label": "발끝으로 마당의 모래를 고른다", "result": "갈퀴도 없이. 노인이 소리 없이 웃었다. \"…너는 그러지 마라, 하운아.\" 출전 동료 전원 최대 체력의 25% 회복", "effects": [{"op": "heal_party", "ratio": 0.25}]}]}
+    "content": {"text": "왕일검이 엘리아에게 배를 세게 누르지 말라고 한다. 힘이 모이는 느낌을 만들려고 근육만 굳힌 것이다. \"없던 것을 만들려고 했어요.\" \"처음에는 다 그렇지. 없는 느낌을 있다고 하면 더 오래 걸린다.\"", "choices": [{"label": "숨의 박자를 바꾸지 않는다", "result": "\"한 달 뒤에 뭘 할 수 있을까요.\" \"지금보다 네 몸을 조금 잘 알겠지.\" 엘리아는 그 답을 적었다. 기대보다 작지만 거짓말은 아니라고. 엘리아의 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2, "filter": {"owner": "elia"}}]}, {"label": "발끝으로 마당의 모래를 고른다", "result": "갈퀴도 없이. 노인이 소리 없이 웃었다. \"…너는 그러지 마라, 하운아.\" 출전 동료 전원 최대 체력의 25% 회복", "effects": [{"op": "heal_party", "ratio": 0.25}]}]}
   },
   {
     "id": "s6_event_spearheads",
     "stage": "s6",
     "type": "event",
-    "name": "칼 쉰 자루, 창날 백 개",
+    "name": "마당 문턱",
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8], "partyHas": "born"},
-    "content": {"text": "혈위대가 계곡물에 버리고 간 칼 쉰 자루. 운곡촌의 대장장이 노인이 그것을 녹여 창날을 만든다. 보른이 풀무 곁에 앉았다.", "choices": [{"label": "보른과 함께 망치를 든다", "result": "칼 쉰 자루가 창날 백 개가 되었다. 보른의 '도끼 손질'을 얻었다.", "effects": [{"op": "gain_card", "card": "born_whetstone"}]}, {"label": "창날을 방패벽에 나눠 준다", "result": "농부들의 창끝이 가지런해졌다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "왕일검의 수레 의자가 마당 문턱에서 멈춘다. 넘을 때마다 마 씨 허리가 먼저 늙는다. 하운은 문턱을 부수는 대신 보른과 경사판을 그린다.", "choices": [{"label": "보른과 함께 경사판을 만든다", "result": "\"잘 만들었다는 소리를 듣고 싶으면 내 무릎부터 지켜라.\" 두 번째 판은 기울기가 낮았다. 보른의 '도끼 손질'을 얻었다.", "effects": [{"op": "gain_card", "card": "born_whetstone"}]}, {"label": "왕일검에게 발을 고친다", "result": "\"왼발. 그렇게 멀리 말고.\" 다 나은 자리와 아직 아픈 자리를 구분했다. 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_event_valley_lights",
     "stage": "s6",
     "type": "event",
-    "name": "계곡의 불빛",
+    "name": "담장 안의 달력",
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [6, 9]},
-    "content": {"text": "두 달째 밤, 계곡의 사람은 오백을 넘었다. 집집마다 켜진 등잔, 장작더미 앞의 모닥불, 방패벽 훈련장의 횃불, 의원의 약초 끓이는 불. 왕일검이 수레 의자 위에서 말했다. \"너는 엘하임에서 사람을 배워 왔다. 천하일통은 칼로 쌓은 것이다. 칼로는 칼만 이긴다.\"", "choices": [{"label": "불빛을 오래 내려다본다", "result": "성을 쌓는 법, 사람을 벽으로 만드는 법, 풀로 사람을 살리는 법. 출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "\"칼 아닌 것으로.\"", "result": "칼 아닌 것으로 칼에 금을 낸다. 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2}]}]}
+    "content": {"text": "석두가 보낸 나무쪽 달력. 세 번의 겨울과 네 번째 봄. 같은 날에 두 번 적은 곳도, 한 달 가까이 빈 곳도 있다. 맨 뒤에는 새 명부. 칠월 보름 점검 뒤 사람들을 나눠 보낸다고 했다.", "choices": [{"label": "달력을 처음부터 읽는다", "result": "등운시 다음 날, 내원에 들어갔다. 새 옷이 짧았다. 출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "\"이름을 다 데려온다.\"", "result": "처음에는 동생 하나를 찾으려 했다. 지금은 이름을 셌다. 카드 2장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 2}]}]}
   },
   {
     "id": "s6_event_full_moon_news",
@@ -173,7 +173,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "개방의 거지가 소식을 가져왔다. 이번 보름, 청운산 연무장에서 석두를 친다고. 서른여섯 번째 보름이라 특별히 백 대라고. 청운귀가 보러 온다니까.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -40, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -40}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "담장 너머의 구령을 떠올린다", "result": "오 년 동안 후원 장작더미 앞에서 들은 구령. '청운십팔식'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_cloud_form"}]}]}
+    "content": {"text": "개방의 연락꾼이 신발 한 짝 없이 들어왔다. 보름날 점검이 있다고. 보른은 작업 창고 쪽 쉰여덟을, 석두는 안쪽 뇌옥과 주방의 서른아홉을 모으기로 한다.", "choices": [{"label": "밤길을 서두른다", "result": "발이 무거워도 숨은 흐트러지지 않았다. (출전 동료 전원 체력 -40, 하운의 카드 2장 강화 +1)", "effects": [{"op": "heal_party", "amount": -40}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "담장 너머의 구령을 떠올린다", "result": "오 년 동안 후원 장작더미 앞에서 들은 구령. '청운십팔식'을 얻었다.", "effects": [{"op": "gain_card", "card": "haun_cloud_form"}]}]}
   },
   {
     "id": "s6_rest_valley_spring",
@@ -188,10 +188,10 @@
     "id": "s6_rest_scripture_yard",
     "stage": "s6",
     "type": "rest",
-    "name": "장경각 뒤 마당",
+    "name": "숨은 집 마당",
     "weight": 1,
     "conditions": {"floorRange": [4, 6]},
-    "content": {"text": "폐사찰 장경각 뒤편의 작은 마당. 새벽마다 세 번 짧게, 한 번 길게 숨 쉬는 소리가 난다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
+    "content": {"text": "운곡루 간판이 기대어 선 숨은 집의 마당. 새벽마다 세 번 짧게, 한 번 길게 숨 쉬는 소리가 난다.", "choices": [{"label": "쉰다", "result": "출전 동료 전원 최대 체력의 30% 회복", "effects": [{"op": "heal_party", "ratio": 0.3}]}, {"label": "수련한다", "result": "고른 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}]}]}
   },
   {
     "id": "s6_rest_woodpile",
@@ -208,15 +208,15 @@
     "name": "마 씨의 가마솥",
     "weight": 1,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "불탄 객잔 터의 주인이던 마 씨가 계곡에 가마솥을 걸었다. 국 냄새가 계곡 입구까지 퍼진다.", "choices": [{"label": "한 그릇 얻어먹는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
+    "content": {"text": "운곡루의 주인이던 마 씨가 숯막에 가마솥을 걸었다. 빗물이 들어가 죽이 묽어도, 국 냄새가 골짜기 입구까지 퍼진다.", "choices": [{"label": "한 그릇 얻어먹는다", "result": "출전 동료 전원 최대 체력의 40% 회복", "effects": [{"op": "heal_party", "ratio": 0.4}]}, {"label": "짐을 정리한다", "result": "몸이 가벼워졌다. 카드 1장이 강화됐다.", "effects": [{"op": "upgrade_card", "count": 1}]}]}
   },
   {
     "id": "s6_boss_full_moon",
     "stage": "s6",
     "type": "boss",
     "name": "보름의 연무장",
-    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장. 보름달 아래 혈위대가 줄지어 섰다. 조명각의 검에 청운의 내공과 마교의 마기가 엉켜 있다. 그가 무릎을 꿇으면 혈위대도 무기를 내린다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "주춧돌이 갈라진 산문으로 방패벽이 걸어 들어온다. \"전진!\" 쿵. (혈위대 전원 약화 1, 아군 전원 방어 50)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "all_allies"}]}, "clearEffects": [{"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
+    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장, 보름날 점검. 명부의 아흔일곱이 사슬에 묶여 있다. 조명각의 검에 청운의 내공과 다른 기운이 엉켜 있다. 이번에는 그를 베지 않고 데려 내려온다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "창고 뒤벽이 열렸다는 망치 소리. 카일이 아래 길에서 내려오는 들것을 받는다. (적 전원 약화 1, 아군 전원 방어 50)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "all_allies"}]}, "clearEffects": [{"op": "rescue", "amount": 97}, {"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
   },
-  {"id": "s6_shop", "stage": "s6", "type": "shop", "name": "운곡 전장(錢莊)", "weight": 1, "content": {"text": "교세소 뒷골목의 낡은 전장. 주인은 하운의 얼굴을 알아보는 듯했지만 아무 말 없이 주판알만 튕겼다."}},
-  {"id": "s6_battle_sentry_post", "stage": "s6", "type": "battle", "name": "교세소 검문소", "weight": 2, "conditions": {"floorRange": [4, 9]}, "content": {"scene": "s6_scene_sentry_post", "text": "교세소 검문소. 보초 둘이 창에 기대 꾸벅꾸벅 졸고 있다. 아궁이에서 안개초 연기가 피어오른다. 깨기 전에 지나가거나, 깨기 전에 쓰러뜨리거나.", "enemies": ["sleeping_sentry", "sleeping_sentry"]}}
+  {"id": "s6_shop", "stage": "s6", "type": "shop", "name": "운곡 전장(錢莊)", "weight": 1, "content": {"text": "장터 뒷골목의 낡은 전장. 주인은 하운의 얼굴을 알아보는 듯했지만 아무 말 없이 주판알만 튕겼다."}},
+  {"id": "s6_battle_sentry_post", "stage": "s6", "type": "battle", "name": "아래 길 검문소", "weight": 2, "conditions": {"floorRange": [4, 9]}, "content": {"scene": "s6_scene_sentry_post", "text": "마을 아래 길의 새 검문소. 보초 둘이 창에 기대 꾸벅꾸벅 졸고 있다. 아궁이에서 안개초 연기가 피어오른다. 깨기 전에 지나가거나, 깨기 전에 쓰러뜨리거나.", "enemies": ["sleeping_sentry", "sleeping_sentry"]}}
 ]
