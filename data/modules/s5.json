@@ -11,24 +11,34 @@
     "id": "s5_story_border_crack",
     "stage": "s5",
     "type": "story",
-    "name": "경계의 금",
+    "name": "종이에 남은 약속",
     "once": true,
-    "content": {"scene": "s5_scene_border_crack", "text": "카즈둠의 겨울. 왕궁의 작은 방에서 하운이 금의 모든 것을 털어놓고, 엘리아가 서고의 석판을 읽는다.", "choices": [{"label": "\"이제부터는 넷이서 세자.\"", "result": "넷이 함께 숨을 세기로 했다. 숨 세기를 얻었다.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "gain_card", "card": "elia_count"}]}, {"label": "\"제가 낸 금은 제가 쓸어 담겠습니다.\"", "result": "\"혼자 쓸어 담지 마요.\" 엘리아의 손이 하운의 손등 위에 얹혔다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "겨울 내내 엘리아에게 차를 가져다준다", "condition": {"partyHas": "elia"}, "result": "\"말 안 해도 돼요. 숨 쉬는 거 들리니까.\" 엘리아의 카드 1장을 강화했다(+1). 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}, {"op": "heal_party", "ratio": 0.2}]}]}
+    "content": {"scene": "s5_scene_border_crack", "text": "아르덴·벨칸·실바렌·카즈둠의 대표가 같은 방에 앉았다. 서명은 오후 내내 이어졌다. 약속이 완성된 날과 떠날 수 있는 날은 서로 달랐다.", "choices": [{"label": "\"이제부터는 넷이서 세자.\"", "result": "넷이 함께 숨을 세기로 했다. 숨 세기를 얻었다.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "gain_card", "card": "elia_count"}]}, {"label": "\"제가 낸 금은 제가 쓸어 담겠습니다.\"", "result": "\"혼자 쓸어 담지 마요.\" 엘리아의 손이 하운의 손등 위에 얹혔다. 하운의 카드 2장을 강화했다(+1).", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 2, "filter": {"owner": "haun"}}]}, {"label": "겨울 내내 엘리아에게 차를 가져다준다", "condition": {"partyHas": "elia"}, "result": "\"말 안 해도 돼요. 숨 쉬는 거 들리니까.\" 엘리아의 카드 1장을 강화했다(+1). 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "set_flag", "flag": "rift_known"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}, {"op": "heal_party", "ratio": 0.2}]}]}
   },
   {
     "id": "s5_story_sewer",
     "stage": "s5",
     "type": "story",
-    "name": "북쪽 하수로",
+    "name": "성 아래의 사람들",
     "once": true,
-    "content": {"scene": "s5_scene_sewer", "text": "연합군 삼천이 정면에서 하루를 버티는 사이, 넷은 그롬이 알려 준 북쪽 하수로로 숨어든다.", "choices": [{"label": "보른을 따라 하수로로 들어간다", "result": "보른이 무너진 곳마다 바위의 결을 읽어 길을 열었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "리나의 나팔 소리를 등 뒤에 두고 간다", "condition": {"partyHas": "kyle"}, "result": "길게, 짧게, 길게. 카일이 붉은 검을 고쳐 쥐었다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 지팡이 빛으로 어둠을 밝힌다", "condition": {"partyHas": "elia"}, "result": "엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+    "content": {"scene": "s5_scene_sewer", "text": "두 번째 원정. 얼음 바다를 건너, 이센이 아는 집의 뒷문으로 성 아래 사람들을 먼저 빼낸다. 그다음이 일곱 회랑이다.", "choices": [{"label": "보른을 따라 하수로로 들어간다", "result": "보른이 무너진 곳마다 바위의 결을 읽어 길을 열었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "heal_party", "ratio": 0.2}]}, {"label": "리나의 나팔 소리를 등 뒤에 두고 간다", "condition": {"partyHas": "kyle"}, "result": "길게, 짧게, 길게. 카일이 붉은 검을 고쳐 쥐었다. 카일의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}]}, {"label": "엘리아의 지팡이 빛으로 어둠을 밝힌다", "condition": {"partyHas": "elia"}, "result": "엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+  },
+  {
+    "id": "s5_event_ash_ferry",
+    "stage": "s5",
+    "type": "event",
+    "name": "잿물 나루",
+    "weight": 4,
+    "once": true,
+    "conditions": {"floorRange": [4, 6]},
+    "content": {"scene": "s5_scene_ash_ferry", "text": "첫 원정은 잿물 나루에서 멈췄다. 얼음 범람, 나뉜 대열, 불붙은 창고. 죽은 사람은 다섯이었다.", "choices": [{"label": "나루에 작은 원을 그린다 — 다음 길은 여기서", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "kyle"}}, {"op": "set_flag", "flag": "s5_ferry_failed"}], "result": "실패를 지워 새 지도를 만들지 않았다. 카일의 카드 1장을 강화했다(+1)."}, {"label": "이센의 이야기를 끝까지 듣는다", "effects": [{"op": "heal_party", "ratio": 0.2}, {"op": "set_flag", "flag": "s5_ferry_failed"}], "result": "\"당신들이 돌아간 뒤에, 우리한테 남은 놈들은 더 많이 가져갔어.\" 북쪽 원정은 돌아온 사람들에게만 끝난 일이 아니었다. 출전 동료 전원 최대 체력의 20% 회복"}]}
   },
   {
     "id": "s5_boss_vargas",
     "stage": "s5",
     "type": "boss",
     "name": "왕좌의 방 — 마왕 바르가스",
-    "content": {"scene": "s5_scene_throne", "outroScene": "s5_scene_void_key", "text": "깨진 창가의 마왕, 쐐기 수백 개가 박힌 잠든 문. 방의 엉킨 마나가 모두 마왕에게로 빨려 든다.", "enemies": ["wedge", "vargas", "wedge"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 망치가 쐐기가 박힌 돌의 결을 친다. 쐐기가 반쯤 튀어나왔다. (쐐기 전원 피해 140)", "effects": [{"op": "damage", "amount": 140, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}, "clearEffects": [{"op": "gain_card", "card": "haun_cheonoe"}, {"op": "set_flag", "flag": "void_key"}, {"op": "set_flag", "flag": "cheonoe"}, {"op": "gain_run_mana", "amount": 10}]}
+    "content": {"scene": "s5_scene_throne", "outroScene": "s5_scene_void_key", "text": "왕좌의 방. 수백 개의 쐐기가 흐름을 비틀고, 엉킨 마나가 모두 바르가스에게로 빨려 든다. 그는 공허의 열쇠로 귀곡애로 가는 길을 열어 보이며 거래를 청한다. 빼앗으려 들면 끝이 없다 — 창가의 틀을 열어 돌려보내야 한다.", "enemies": ["wedge", "vargas", "wedge"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "born"}, "text": "보른의 망치가 쐐기가 박힌 돌의 결을 친다. 쐐기가 반쯤 튀어나왔다. (쐐기 전원 피해 140)", "effects": [{"op": "damage", "amount": 140, "target": "all_enemies", "condition": {"enemyId": "wedge"}}]}, "clearEffects": [{"op": "gain_card", "card": "haun_cheonoe"}, {"op": "set_flag", "flag": "void_key"}, {"op": "set_flag", "flag": "cheonoe"}, {"op": "gain_run_mana", "amount": 10}]}
   },
   {
     "id": "s5_battle_sewer_wolves",

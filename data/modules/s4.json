@@ -3,24 +3,34 @@
     "id": "s4_story_grandfather_mountain",
     "stage": "s4",
     "type": "story",
-    "name": "할아버지 산",
+    "name": "문 밖의 카즈둠",
     "once": true,
-    "content": {"scene": "s4_scene_grandfather_mountain", "text": "숨 쉬지 않는 산. 북쪽 사면의 무너진 바위 더미 앞에서, 보른이 두린의 돌을 꺼낸다.", "choices": [{"label": "보른이 두린의 돌을 바위에 댄다", "result": "바위가 결을 따라 소리 없이 갈라졌다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "산의 바위에 손을 대 본다", "result": "바위의 결 위로, 훨씬 크고 느린 결이 덮여 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 함께 마나의 흐름을 짚는다", "condition": {"partyHas": "elia"}, "result": "\"이 산이… 그의 몸이에요.\" 엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+    "content": {"scene": "s4_scene_grandfather_mountain", "text": "검게 변한 산 밖의 정착지. 헤르다가 비탈 옆 높은 땅에서 길을 내고, 보른이 두린의 돌을 꺼낸다.", "choices": [{"label": "보른이 두린의 돌을 바위에 댄다", "result": "바위가 결을 따라 소리 없이 갈라졌다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}, {"label": "산의 바위에 손을 대 본다", "result": "바위의 결 위로, 훨씬 크고 느린 결이 덮여 있었다. 하운의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "haun"}}]}, {"label": "엘리아와 함께 마나의 흐름을 짚는다", "condition": {"partyHas": "elia"}, "result": "\"이 산이… 그의 몸이에요.\" 엘리아의 카드 1장을 강화했다(+1).", "effects": [{"op": "upgrade_card", "count": 1, "filter": {"owner": "elia"}}]}]}
+  },
+  {
+    "id": "s4_event_nine_trapped",
+    "stage": "s4",
+    "type": "event",
+    "name": "돌 너머의 아홉 명",
+    "weight": 4,
+    "once": true,
+    "conditions": {"floorRange": [2, 4]},
+    "content": {"scene": "s4_scene_nine_trapped", "text": "물은 처음 한 시진 동안 빠르게 올라왔다. 헤르다는 하운이 부르는 숫자를 듣고 안쪽의 지도를 바꾸었다. 물이 먼저 차는 낮은 작업장을 지우고, 사람들이 올라갈 수 있는 선반 모양의 바위를 표시했다.", "choices": [{"label": "막대에 선을 긋고, 숫자를 틀리지 않게 부른다", "effects": [{"op": "rescue", "amount": 9}, {"op": "set_flag", "flag": "s4_nine_rescued"}, {"op": "upgrade_card", "count": 1, "choose": true}], "result": "안쪽의 아홉이 모두 나왔다. 사흘 뒤, 바린이 두 장의 기록을 놓았다. \"어디부터 달랐는지 말해 주십시오.\" 하운은 자기가 본 틈과 들은 소리를 설명했다. 구한 사람 9명 · 고른 카드 1장을 강화했다(+1)."}, {"label": "다음 날, 학교 길의 배수로를 판다 — 네르가 그은 자리부터", "effects": [{"op": "rescue", "amount": 9}, {"op": "heal_party", "ratio": 0.2}], "result": "길고 위험한 갱도가 아니었다. 몇 걸음짜리 배수로였다. 그날은 한 번 잘한 뒤에 곧바로 더 큰 일을 하려고 하지 않았다. 구한 사람 9명 · 출전 동료 전원 최대 체력의 20% 회복"}]}
   },
   {
     "id": "s4_story_five_thousand",
     "stage": "s4",
     "type": "story",
-    "name": "오천의 무덤",
+    "name": "두린을 모셔 오다",
     "once": true,
-    "content": {"scene": "s4_scene_five_thousand", "text": "빈 갑옷 오천의 무덤 위에, 망치를 무릎에 올린 드워프가 앉아 있다. 보른이 형의 망치를 쥐었다.", "choices": [{"label": "동굴 입구에 서서 보른을 기다린다", "result": "보른이 형의 망치를 허리에 찼다. 두린의 망치를 얻었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "heal_party", "ratio": 0.2}]}, {"label": "\"망치에 뭐라고 쓰여 있었어?\"", "result": "'보른, 다음 갱도는 네가 파라.' 두린의 망치를 얻었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}]}
+    "content": {"scene": "s4_scene_five_thousand", "text": "빈 갑옷들이 받친 바위더미 위에, 망치를 무릎에 올린 드워프가 앉아 있다. 받침을 세우는 데 열흘. 보른이 형의 망치를 쥐었다.", "choices": [{"label": "동굴 입구에 서서 보른을 기다린다", "result": "보른이 형의 망치를 허리에 찼다. 두린의 망치를 얻었다. 출전 동료 전원 최대 체력의 20% 회복.", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "heal_party", "ratio": 0.2}]}, {"label": "\"망치에 뭐라고 쓰여 있었어?\"", "result": "'보른, 다음 갱도는 네가 파라.' 두린의 망치를 얻었다. 보른의 카드 1장을 강화했다(+1).", "effects": [{"op": "gain_card", "card": "born_durin_hammer"}, {"op": "set_flag", "flag": "durin_hammer"}, {"op": "upgrade_card", "count": 1, "filter": {"owner": "born"}}]}]}
   },
   {
     "id": "s4_boss_gormon",
     "stage": "s4",
     "type": "boss",
     "name": "산의 심장 — 고르몬",
-    "content": {"scene": "s4_scene_gormon", "outroScene": "s4_scene_durin_name", "text": "벽이 손이 되고, 손이 거인이 된다. 베면 산이 메우고, 동굴은 주먹을 쥐듯 오므라든다.", "enemies": ["gormon"], "bonus": {"condition": {"partyHas": "born"}, "text": "산과 고르몬이 만나는 이음매 — 보른의 망치(산 쪽)와 하운의 검(고르몬 쪽)이 동시에. (두린의 망치를 손에 든다, 고르몬 결 노출 2)", "effects": [{"op": "add_card", "card": "born_durin_hammer", "to": "hand"}, {"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"scene": "s4_scene_gormon", "outroScene": "s4_scene_durin_name", "text": "왕궁을 버리고, 네 구역으로 나눠 산의 몸에서 고르몬을 떼어 낸다. 베면 산이 메우고, 동굴은 주먹을 쥐듯 오므라든다. 헤르다의 받침이 산을 받친다.", "enemies": ["gormon"], "bonus": {"condition": {"partyHas": "born"}, "text": "산과 고르몬이 만나는 이음매 — 보른의 망치(산 쪽)와 하운의 검(고르몬 쪽)이 동시에. (두린의 망치를 손에 든다, 고르몬 결 노출 2)", "effects": [{"op": "add_card", "card": "born_durin_hammer", "to": "hand"}, {"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s4_battle_golem_pair",
