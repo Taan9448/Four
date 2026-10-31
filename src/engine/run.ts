@@ -1322,10 +1322,17 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
           run.supportActive = true;
           if (!run.flags.includes(`support:${def.id}`)) run.flags.push(`support:${def.id}`);
         } else {
-          // 동료는 하운 레벨 -1로 합류한다(늦게 온 동료가 너무 뒤처지지 않게)
-          const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
-          const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
-          run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
+          const kept = run.departed?.find((r) => r.id === def.id);
+          if (kept) {
+            // 잠깐 떠났던 동료(S2 보른이 사슬 안으로, S8 엘리아가 일곱째 굽이에)는 떠날 때의 레벨·경험치로 돌아온다
+            run.departed = run.departed!.filter((r) => r.id !== def.id);
+            run.roster.push({ ...kept, hp: Math.max(1, kept.hp) });
+          } else {
+            // 동료는 하운 레벨 -1로 합류한다(늦게 온 동료가 너무 뒤처지지 않게)
+            const level = Math.max(1, (run.roster.find((r) => r.id === 'haun')?.level ?? 1) - 1);
+            const maxHp = def.maxHp + def.hpPerLevel * (level - 1);
+            run.roster.push({ id: def.id, hp: maxHp, maxHp, level, xp: 0 });
+          }
           // 시작 카드 10장을 받고 추천 편성으로 바로 덱에(GAME_DESIGN 9-1)
           joinMidStage(data, run, def.id);
           if (run.selected.length < data.balance.party.max) run.selected.push(def.id);
