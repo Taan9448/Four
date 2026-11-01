@@ -422,9 +422,11 @@ subjects:
     nothing like Jin Haun: SHORT dark-brown hair cut bluntly at the jaw with a straight fringe, a red cloth
     headband with long trailing ends; a sharp angular face with fierce upturned eyes, red lips, sun-tanned skin, a
     few freckles; one LONG pale diagonal scar from above her left eyebrow across the cheek down to the jaw, clearly
-    visible. An airy, lightweight fantasy martial outfit: an opaque, lined ivory silk halter top with softly
+    visible. An airy, lightweight fantasy martial outfit: an opaque, lined ivory silk cropped top with softly
     draped panels, dark-red plum-blossom embroidery along the edges and loose fluttering fabric tails at the
-    outer sides; bare shoulders, back, arms, midriff and navel. Narrow dark-red hip straps support a high-cut
+    outer sides, supported by two thin dark-red shoulder straps and a simple back tie. Her neck is entirely
+    bare: no collar, neck wrap, neck bow or choker. Bare shoulders, back, arms, midriff and navel. Narrow dark-red
+    hip straps support a high-cut
     T-back bikini bottom with an opaque front panel fully covering the groin and small ivory embroidered
     fabric ties fluttering at the sides; no long skirt panels or leggings. Tall dark-red wrapped boots to above
     the knee; black fingerless gloves, plain leather bracers; a slim straight jian with a small plum-blossom
