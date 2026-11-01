@@ -1171,7 +1171,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .login-panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; border: 1px solid rgba(201, 162, 79, 0.55); border-radius: 10px; background: rgba(8, 9, 14, 0.82); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55); text-align: left; }
 .login-panel.compact { padding: 10px 12px 12px; background: rgba(0, 0, 0, 0.25); box-shadow: none; border-color: var(--line); }
 .login-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid rgba(201, 162, 79, 0.35); }
-.login-tab { min-height: 40px; background: none; border: 0; border-bottom: 2px solid transparent; color: #b9b2a2; font: 700 var(--fs-body)/1 var(--f-ui); cursor: pointer; }
+.login-tab { min-height: var(--tap); background: none; border: 0; border-bottom: 2px solid transparent; color: #b9b2a2; font: 700 var(--fs-body)/1 var(--f-ui); cursor: pointer; }
 .login-tab[aria-selected='true'] { color: #f5d98c; border-bottom-color: #c9a24f; }
 .login-form { display: flex; flex-direction: column; gap: 8px; }
 .login-input { min-height: 42px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.45); color: #f4ecd8; font: 400 var(--fs-body)/1.2 var(--f-ui); }
@@ -1182,7 +1182,7 @@ input:focus-visible + .set-switch { outline: 2px solid var(--gold); outline-offs
 .login-msg { margin: 0; color: #ffb38a; font-size: var(--fs-min); }
 .login-submit { min-height: 44px; }
 /* 게스트는 단추가 아닌 글자 한 줄(로그인을 권한다) */
-.login-guest-link { align-self: center; min-height: 36px; padding: 6px 10px; background: none; border: 0; color: #b9b2a2; font: 400 var(--fs-min)/1 var(--f-ui); letter-spacing: 0.04em; cursor: pointer; }
+.login-guest-link { align-self: center; min-height: var(--tap); padding: 6px 10px; background: none; border: 0; color: #b9b2a2; font: 400 var(--fs-min)/1 var(--f-ui); letter-spacing: 0.04em; cursor: pointer; }
 .login-guest-link:hover, .login-guest-link:focus-visible { color: #f5d98c; text-decoration: underline; text-underline-offset: 3px; }
 .guest-notice { text-align: left; }
 .guest-notice p { margin: 0 0 6px; }
