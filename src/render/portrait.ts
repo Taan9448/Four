@@ -3,6 +3,7 @@
 import type { GameData } from '../engine/data';
 import type { Face } from '../engine/schema';
 import { spritesFor } from '../engine/state';
+import { skinStandId } from '../engine/wardrobe';
 import { loadSprite, spriteSource } from './assets';
 
 const FACE_FRAME: Record<Face, number> = { neutral: 0, resolve: 1, surprise: 2 };
@@ -12,10 +13,13 @@ export function standingId(characterId: string): string {
 }
 
 /**
- * 복장에 맞는 반신 그림 id: 런 플래그로 바뀐 복장(outfits의 sprites.stand, 예: 하운 '못생긴 검')의 실제 그림이 있으면 그것,
- * 없으면 기본 <캐릭터>_stand. 캐릭터가 아닌 화자(장면 인물)는 기본
+ * 복장에 맞는 반신 그림 id: 옷장에서 입은 옷의 반신 그림(skins, 세트에 portrait가 있을 때)이 실제 그림으로 왔으면 그것,
+ * 다음은 런 플래그로 바뀐 복장(outfits의 sprites.stand, 예: 하운 '못생긴 검')의 실제 그림, 없으면 기본 <캐릭터>_stand.
+ * 캐릭터가 아닌 화자(장면 인물)는 기본
  */
-export function standingFor(data: GameData, characterId: string, flags: readonly string[] = []): string {
+export function standingFor(data: GameData, characterId: string, flags: readonly string[] = [], skins?: Readonly<Record<string, string>>): string {
+  const worn = skinStandId(data, characterId, skins);
+  if (worn && spriteSource(worn) === 'sprites') return worn;
   const def = data.characters.get(characterId);
   const outfit = def ? spritesFor(def, flags).stand : undefined;
   return outfit && spriteSource(outfit) === 'sprites' ? outfit : standingId(characterId);

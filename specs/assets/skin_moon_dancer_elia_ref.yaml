@@ -1,0 +1,11 @@
+id: skin_moon_dancer_elia_ref
+type: character-ref
+character: skin_moon_dancer_elia
+summary: "엘리아 옷장 「달빛 무희」 기준 시트(3/4 정면 + 오른쪽 측면) — 2026-11-01 사용자 요청"
+depends_on: [elia_ref]
+reference: assets/source/elia_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose in the new outfit, holding the long staff; the same face, hair colour, body proportions and height as the attached reference sheet, only the clothes, hairstyle details and staff decoration change"
+  2: "full body, side view facing right, the same outfit and proportions, standing ready with the long staff lowered"
+placeholder: { shape: humanoid, color: '#2a3a7a', accent: '#c8d8ff' }

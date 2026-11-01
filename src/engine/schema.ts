@@ -374,6 +374,8 @@ export const SkinData = z
           sprites: z.record(z.string(), z.string()).optional(),
           /** 캠페인(이야기)에서도 입는다(기본은 순례·심연에서만) */
           anyMode: z.boolean().optional(),
+          /** 장면·컷인의 반신 그림(표정 셋)도 이 옷으로: skin_<세트>_<동료>_stand(2026-11-01 사용자 요청) */
+          portrait: z.boolean().optional(),
         })
         .strict(),
     ),

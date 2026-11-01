@@ -1,0 +1,16 @@
+id: skin_summer_lake_elia_attack
+type: character-anim
+character: skin_summer_lake_elia
+summary: "엘리아 옷장 「여름 호숫가」 공격 6프레임"
+depends_on: [skin_summer_lake_elia_ref]
+reference: assets/source/skin_summer_lake_elia_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: "draws the staff back with a playful grin, water droplets streaming into the stone"
+  2: "a ball of swirling lake water forms at the tip of the staff"
+  3: "the water ball grows, glittering, her body leaning back"
+  4: "thrusts the staff forward, the water ball fired to the right"
+  5: "staff extended, a spray of droplets and a few white petals trailing"
+  6: "lowers the staff and brushes her hair back, returning to idle"
+placeholder: { shape: humanoid, color: '#f2f2ea', accent: '#7ccf8a' }

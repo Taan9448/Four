@@ -1,0 +1,11 @@
+id: skin_moon_dancer_elia_stand
+type: character-standing
+character: skin_moon_dancer_elia
+summary: "엘리아 옷장 「달빛 무희」 반신 그림(기본·결의·놀람) — elia_stand와 같은 얼굴·같은 화풍·같은 구도, 옷만 이 세트로. 옷을 입으면 장면·컷인의 반신 그림이 이것으로 바뀐다"
+depends_on: [skin_moon_dancer_elia_ref]
+reference: assets/source/elia_stand.png
+frame_notes:
+  1: "neutral expression — a soft, slightly shy smile, eyes lowered a little; loose silver hair with thin braids and a crescent hairpin; the midnight-blue halter top with its silver crescent clasp, bare shoulders; the slender staff resting against one shoulder, the pale-blue ribbon over her elbow"
+  2: "resolute expression — brows drawn, firm lips, chin up; the blue stone in its silver crescent glowing beside her face, the ribbon lifting in a faint breeze"
+  3: "surprised expression — eyes wide, a hand raised to her mouth, a faint blush, the ribbon slipping off one elbow"
+placeholder: { color: '#2a3a7a', accent: '#c8d8ff' }

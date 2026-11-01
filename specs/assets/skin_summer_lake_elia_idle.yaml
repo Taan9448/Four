@@ -1,0 +1,13 @@
+id: skin_summer_lake_elia_idle
+type: character-anim
+character: skin_summer_lake_elia
+summary: "엘리아 옷장 「여름 호숫가」 대기 4프레임"
+depends_on: [skin_summer_lake_elia_ref]
+reference: assets/source/skin_summer_lake_elia_ref.png
+facing: right
+frame_notes:
+  1: "standing relaxed in sandals, staff upright in the right hand with its white flower wreath, the open linen cover-up hanging off her shoulders, a few sparkling water droplets around the blue stone"
+  2: "the ponytail and the cover-up hem sway in a summer breeze, droplets rise"
+  3: "the blue stone brightens, droplets gather into it with a little splash of light"
+  4: "the stone dims, she gives a small cheerful bounce back to the idle stance"
+placeholder: { shape: humanoid, color: '#f2f2ea', accent: '#7ccf8a' }

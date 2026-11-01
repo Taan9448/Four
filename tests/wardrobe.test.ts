@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { spritesFor } from '../src/engine/state';
-import { battleSkins, emptyWardrobe, equipSkin, parseWardrobe, skinSpriteId, unlockSkins } from '../src/engine/wardrobe';
+import { battleSkins, emptyWardrobe, equipSkin, parseWardrobe, skinSpriteId, skinStandId, unlockSkins } from '../src/engine/wardrobe';
 import { data } from './helpers';
 
 describe('옷장(2026-10-12)', () => {
@@ -31,8 +31,8 @@ describe('옷장(2026-10-12)', () => {
     expect(battleSkins(data, w, { replayOf: {} })).toEqual({ haun: 'cheongun' });
     expect(battleSkins(data, w, { abyss: {} })).toEqual({ haun: 'cheongun' });
     // 깨진 기록·없는 세트는 버린다(처음부터 열린 은빛 기사검은 늘 있다)
-    expect(parseWardrobe(data, '{"unlocked":["cheongun","nope"],"equipped":{"haun":"cheongun","elia":"cheonma"}}')).toEqual({ unlocked: ['cheongun', 'silver_sword'], equipped: { haun: 'cheongun' } });
-    expect(parseWardrobe(data, 'not json')).toEqual({ unlocked: ['silver_sword'], equipped: {} });
+    expect(parseWardrobe(data, '{"unlocked":["cheongun","nope"],"equipped":{"haun":"cheongun","elia":"cheonma"}}')).toEqual({ unlocked: ['cheongun', 'silver_sword', 'moon_dancer', 'summer_lake'], equipped: { haun: 'cheongun' } });
+    expect(parseWardrobe(data, 'not json')).toEqual({ unlocked: ['silver_sword', 'moon_dancer', 'summer_lake'], equipped: {} });
   });
 
   it('은빛 기사검: 처음부터 열려 있고, 카일만 입으며, 캠페인에서도 입고, 그림은 옛 기본 그림(kyle_*)이다', () => {
@@ -52,13 +52,33 @@ describe('옷장(2026-10-12)', () => {
     expect(kyle.sprites.attack).toBe('kyle_attack');
   });
 
-  it('세트마다 네 동료의 그림 명세(기준·대기·공격·피격)가 있다', async () => {
+  it('세트마다 입는 동료의 그림 명세(기준·대기·공격·피격, 반신 그림 세트는 반신도)가 있다', async () => {
     const { readdirSync } = await import('node:fs');
     const specs = new Set(readdirSync('specs/assets').map((f) => f.replace(/\.yaml$/, '')));
     const missing = data.skins.sets
       .filter((s) => !s.sprites)
-      .flatMap((s) => data.skins.characters.flatMap((c) => ['ref', 'idle', 'attack', 'hit'].map((a) => `skin_${s.id}_${c}_${a}`)))
+      .flatMap((s) =>
+        (s.characters ?? data.skins.characters).flatMap((c) => ['ref', 'idle', 'attack', 'hit', ...(s.portrait ? ['stand'] : [])].map((a) => `skin_${s.id}_${c}_${a}`)),
+      )
       .filter((id) => !specs.has(id));
     expect(missing).toEqual([]);
+  });
+
+  it('반신 그림 세트(엘리아 달빛 무희·여름 호숫가)를 입으면 반신 그림 id가 그 옷으로, 아니면 없다', () => {
+    expect(skinStandId(data, 'elia', { elia: 'moon_dancer' })).toBe('skin_moon_dancer_elia_stand');
+    expect(skinStandId(data, 'elia', { elia: 'summer_lake' })).toBe('skin_summer_lake_elia_stand');
+    expect(skinStandId(data, 'elia', { elia: 'cheongun' })).toBeUndefined(); // 반신 그림이 없는 세트
+    expect(skinStandId(data, 'elia', {})).toBeUndefined();
+    expect(skinStandId(data, 'kyle', { kyle: 'moon_dancer' })).toBeUndefined(); // 엘리아만의 세트
+    expect(skinStandId(data, 'elia', undefined)).toBeUndefined();
+  });
+
+  it('엘리아 새 옷 두 벌은 처음부터 열려 있고 캠페인에서도 입는다', () => {
+    const w = parseWardrobe(data, null);
+    expect(w.unlocked).toEqual(expect.arrayContaining(['moon_dancer', 'summer_lake']));
+    equipSkin(data, w, 'elia', 'summer_lake');
+    expect(battleSkins(data, w, {})).toEqual({ elia: 'summer_lake' });
+    equipSkin(data, w, 'haun', 'summer_lake'); // 엘리아만
+    expect(w.equipped.haun).toBeUndefined();
   });
 });

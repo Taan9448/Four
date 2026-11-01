@@ -1,0 +1,16 @@
+id: skin_moon_dancer_elia_attack
+type: character-anim
+character: skin_moon_dancer_elia
+summary: "엘리아 옷장 「달빛 무희」 공격 6프레임"
+depends_on: [skin_moon_dancer_elia_ref]
+reference: assets/source/skin_moon_dancer_elia_ref.png
+facing: right
+events: { hit: 4 }
+frame_notes:
+  1: "spins once on the ball of her foot, staff drawn back, ribbon and skirt panels flaring, motes streaming into the stone"
+  2: "a crescent of pale moonlight forms at the tip of the staff"
+  3: "the crescent swells, she leans back in a dancer's arch"
+  4: "sweeps the staff forward to the right, a moonlight crescent bolt released"
+  5: "staff extended, silver sparks and ribbon trailing"
+  6: "lowers the staff with a small bow, returning to idle"
+placeholder: { shape: humanoid, color: '#2a3a7a', accent: '#c8d8ff' }

@@ -1,0 +1,13 @@
+id: skin_moon_dancer_elia_idle
+type: character-anim
+character: skin_moon_dancer_elia
+summary: "엘리아 옷장 「달빛 무희」 대기 4프레임"
+depends_on: [skin_moon_dancer_elia_ref]
+reference: assets/source/skin_moon_dancer_elia_ref.png
+facing: right
+frame_notes:
+  1: "standing gracefully on bare feet, weight on one hip, the staff upright in the right hand, the pale-blue ribbon drifting around her elbows, tiny silver motes around the blue stone"
+  2: "a slow dancer's sway, the side-slit skirt panels and ribbon swinging softly, motes rise"
+  3: "the blue stone brightens like a small moon, motes gather into it, anklets glinting"
+  4: "the stone dims, she settles back into the hip-weighted stance, motes scatter softly"
+placeholder: { shape: humanoid, color: '#2a3a7a', accent: '#c8d8ff' }
