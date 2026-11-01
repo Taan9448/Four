@@ -1,7 +1,7 @@
 id: herda_stand
 type: character-standing
 character: herda
-summary: 헤르다 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31)
+summary: "헤르다 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31). 2026-11-01: 인간이 아니라 드워프로(작고 다부진 50대)"
 frame_notes:
   1: "focused neutral look — checking a measuring cord"
   2: "resolute — hand raised to signal a stop"
