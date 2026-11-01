@@ -427,8 +427,8 @@ subjects:
     shoulders, back and arms, dark-red plum-blossom embroidery along the edges; a wide dark-red sash belt slung low
     on the hips; a short dark-red skirt-panel front and back with side slits open up to the hip, showing her bare
     thighs; tall dark-red wrapped boots to above the knee; black fingerless gloves, leather bracers, a thin gold
-    anklet-like chain at the hip; a slim straight jian with a small plum-blossom tassel. Bold fan-service in the
-    style of fantasy game heroines, but never explicit: no nudity, no exposed nipples, no underwear shown
+    anklet-like chain at the hip; a slim straight jian with a small plum-blossom tassel. Bold bikini-armor-level
+    fan-service in the style of fantasy game heroines; her nipples and groin always stay covered by the outfit
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet
