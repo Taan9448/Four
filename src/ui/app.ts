@@ -353,6 +353,8 @@ export class App {
   /** 옷장(2026-10-12): 순례·심연에서 입는 옷. back: 돌아갈 화면(기본 시작 화면) */
   private wardrobe(from?: () => void): void {
     if (!from) playBgm('title');
+    // 수련 레벨로 여는 옷은 이미 넘긴 레벨이어도 연다(조건이 생기기 전에 레벨을 올린 계정)
+    if (this.persist) recordSkinEvent(data, { kind: 'trainingLevel', level: trainingLevel(data, readTraining().xp).level });
     const back = from ?? (() => this.title());
     this.show(this.backdrop(wardrobeView(data, readWardrobe(data), { onBack: () => back(), onSave: (w) => this.persist && writeWardrobe(w) }), 'bg_loadout'));
   }
@@ -411,6 +413,8 @@ export class App {
     if (to <= from) return;
     const gold = trainingGold(data, to);
     this.notices.push(`수련 Lv.${to}${gold > trainingGold(data, from) ? ` — 심연 시작 금화 +${gold}` : ''}`);
+    // 수련 레벨로 여는 옷(2026-11-01: 엘리아 「달빛 무희」 Lv.10 · 「여름 호숫가」 Lv.20)
+    this.notices.push(...this.skinNews({ kind: 'trainingLevel', level: to }));
   }
 
   /** 명패 안 수련 줄: 修 수련 Lv.N과 다음 레벨까지 막대 */

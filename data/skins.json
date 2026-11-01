@@ -7,8 +7,8 @@
     { "id": "simyeon", "name": "심연을 걷는 자", "description": "검보라 장포에 틈 모양 은빛 자수가 희미하게 빛난다. 심연 5굽이를 넘으면.", "unlock": { "kind": "abyssDepth", "depth": 5 } },
     { "id": "sullye", "name": "순례의 끝", "description": "크림빛 순례 망토, 대삿갓과 염주. 순례로 세계의 틈을 넘으면.", "unlock": { "kind": "pilgrimStage", "stage": "s9" } },
     { "id": "silver_sword", "name": "은빛 기사검", "description": "붉은 검을 벼리기 전, 로웬 가문의 은빛 양날 검. 캠페인·순례·심연 어디서나 들 수 있다.", "unlock": { "kind": "always" }, "characters": ["kyle"], "sprites": { "kyle": "kyle" }, "anyMode": true },
-    { "id": "moon_dancer", "name": "달빛 무희", "description": "은빛 숲 달맞이 축제에서 엘프 무희들이 입는 옷. 등이 깊게 트인 남색 비단 상의와 은빛 초승달 장식, 걸을 때마다 옆트임 사이로 다리가 드러난다.", "unlock": { "kind": "always" }, "characters": ["elia"], "anyMode": true, "portrait": true },
-    { "id": "summer_lake", "name": "여름 호숫가", "description": "은빛 숲 호숫가의 한여름. 잎사귀 장식의 흰 비키니에 어깨로 흘러내린 얇은 리넨 덧옷, 지팡이 끝에는 흰 꽃 화관.", "unlock": { "kind": "always" }, "characters": ["elia"], "anyMode": true, "portrait": true }
+    { "id": "moon_dancer", "name": "달빛 무희", "description": "은빛 숲 달맞이 축제에서 엘프 무희들이 입는 옷. 등이 깊게 트인 남색 비단 상의와 은빛 초승달 장식, 걸을 때마다 옆트임 사이로 다리가 드러난다.", "unlock": { "kind": "trainingLevel", "level": 10 }, "characters": ["elia"], "anyMode": true, "portrait": true },
+    { "id": "summer_lake", "name": "여름 호숫가", "description": "은빛 숲 호숫가의 한여름. 잎사귀 장식의 흰 비키니에 어깨로 흘러내린 얇은 리넨 덧옷, 지팡이 끝에는 흰 꽃 화관.", "unlock": { "kind": "trainingLevel", "level": 20 }, "characters": ["elia"], "anyMode": true, "portrait": true }
   ],
   "characters": ["haun", "elia", "kyle", "born"]
 }
