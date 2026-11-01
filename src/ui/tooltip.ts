@@ -4,6 +4,11 @@ import { h } from './dom';
 
 let tip: HTMLElement | null = null;
 let current: HTMLElement | null = null;
+/** 손가락으로 연 주석: 화면이 바뀌며 생기는 마우스 경계 이벤트(pointerover)로 닫지 않는다 */
+let byTouch = false;
+/** 연 동안 대사 띠가 새로 뜨거나 카드가 떠오르면 자리를 다시 잡는다 */
+let watcher: MutationObserver | null = null;
+let settleTimer = 0;
 
 function ensure(): HTMLElement {
   if (!tip) {
@@ -28,7 +33,32 @@ function show(el: HTMLElement): void {
   }
   t.classList.toggle('wide', el.dataset.tipKind === 'card');
   t.classList.add('on');
-  // 대상 위쪽 가운데, 화면 밖으로 나가면 안쪽으로
+  settle(el);
+  if (!watcher) {
+    watcher = new MutationObserver((list) => {
+      if (current && list.some((m) => m.target instanceof Element && m.target.closest('[data-tip-avoid]'))) settle(current);
+    });
+  }
+  watcher.disconnect();
+  for (const a of document.querySelectorAll('[data-tip-avoid]')) watcher.observe(a, { childList: true, subtree: true });
+}
+
+/** 지금 자리를 잡고, 카드가 떠오르는 움직임·대사 띠가 나타나는 움직임이 끝날 때까지(0.6초) 매 프레임 따라간다 */
+function settle(el: HTMLElement): void {
+  place(el);
+  cancelAnimationFrame(settleTimer);
+  const until = performance.now() + 600;
+  const step = () => {
+    if (current !== el) return;
+    place(el);
+    if (performance.now() < until) settleTimer = requestAnimationFrame(step);
+  };
+  settleTimer = requestAnimationFrame(step);
+}
+
+/** 대상 위쪽 가운데, 화면 밖으로 나가면 안쪽으로, 피할 띠가 있으면 그 위로 */
+function place(el: HTMLElement): void {
+  const t = ensure();
   const r = el.getBoundingClientRect();
   const tw = t.offsetWidth;
   const th = t.offsetHeight;
@@ -48,6 +78,9 @@ function show(el: HTMLElement): void {
 
 function hide(): void {
   current = null;
+  byTouch = false;
+  cancelAnimationFrame(settleTimer);
+  watcher?.disconnect();
   tip?.classList.remove('on');
 }
 
@@ -60,15 +93,19 @@ export function installTooltips(): void {
   document.addEventListener('pointerover', (e) => {
     if (e.pointerType === 'touch') return;
     const el = target(e);
-    if (el && el !== current) show(el);
-    else if (!el && current) hide();
+    if (el && el !== current) {
+      byTouch = false;
+      show(el);
+    } else if (!el && current && !byTouch) hide();
   });
   document.addEventListener('pointerdown', (e) => {
     // 휴대폰: 누르면 띄우고, 다른 곳을 누르면 닫는다(카드·유닛을 누르는 동작은 그대로 진행)
     if (e.pointerType !== 'touch') return;
     const el = target(e);
-    if (el && el !== current) show(el);
-    else hide();
+    if (el && el !== current) {
+      show(el);
+      byTouch = true;
+    } else hide();
   });
   document.addEventListener('scroll', hide, true);
   window.addEventListener('blur', hide);
