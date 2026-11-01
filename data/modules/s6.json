@@ -67,7 +67,7 @@
     "name": "물길을 오르는 자들",
     "weight": 2,
     "conditions": {"floorRange": [6, 9]},
-    "content": {"text": "젖은 돌 대신 널판을 놓고 물길을 따라 올라오는 배진의 군사.", "enemies": ["black_wind", "black_wind", "black_wind"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 끌어온 물길이 벽면으로 쏟아진다. 젖은 돌벽은 미끄럽다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "젖은 돌 대신 널판을 놓고 물길을 따라 올라오는 배진의 군사.", "enemies": ["black_wind", "black_wind", "black_wind"], "enemyScale": {"hp": 0.82}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 끌어온 물길이 벽면으로 쏟아진다. 젖은 돌벽은 미끄럽다. (적 전원 취약 1)", "effects": [{"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_battle_mountain_gate",
@@ -76,7 +76,7 @@
     "name": "청운산 아래",
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 산 위의 경비와 배진의 척후가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 40)", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies"}]}}
+    "content": {"text": "청운산이 가깝다. 산문으로 가는 길목을 산 위의 경비와 배진의 척후가 지킨다.", "enemies": ["blood_guard", "black_wind", "blood_guard"], "enemyScale": {"hp": 0.9}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "방패와 방패가 맞물린다. \"전진!\" 쿵. (적 전원 피해 40)", "effects": [{"op": "damage", "amount": 40, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_elite_black_wind_captain",
@@ -94,7 +94,7 @@
     "name": "재징발대",
     "weight": 1,
     "conditions": {"floorRange": [4, 9]},
-    "content": {"text": "마맛자국 사형이 다시 왔다. 이번에는 곡식이 아니라 사람을 세러. 대열이 마을 어귀를 메운다. (적 전원 힘 2)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "enemyScale": {"hp": 1.4, "dmg": 1.15}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
+    "content": {"text": "마맛자국 사형이 다시 왔다. 이번에는 곡식이 아니라 사람을 세러. 대열이 마을 어귀를 메운다. (적 전원 힘 2)", "enemies": ["blood_guard", "pockmark_vice", "blood_guard"], "enemyScale": {"hp": 1.4, "dmg": 1.1}, "startEffects": [{"op": "apply_status", "status": "strength", "stacks": 2, "target": "all_enemies"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "달콤한 냄새의 안개가 대열 위로 흘러내린다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}}
   },
   {
     "id": "s6_event_valley_fortress",
@@ -215,7 +215,7 @@
     "stage": "s6",
     "type": "boss",
     "name": "보름의 연무장",
-    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장, 보름날 점검. 명부의 아흔일곱이 사슬에 묶여 있다. 조명각의 검에 청운의 내공과 다른 기운이 엉켜 있다. 이번에는 그를 베지 않고 데려 내려온다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "창고 뒤벽이 열렸다는 망치 소리. 카일이 아래 길에서 내려오는 들것을 받는다. (적 전원 약화 1, 아군 전원 방어 50)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "all_allies"}]}, "clearEffects": [{"op": "rescue", "amount": 97}, {"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
+    "content": {"scene": "s6_scene_full_moon", "outroScene": "s6_scene_seokdu", "text": "청운산 연무장, 보름날 점검. 명부의 아흔일곱이 사슬에 묶여 있다. 조명각의 검에 청운의 내공과 다른 기운이 엉켜 있다. 이번에는 그를 베지 않고 데려 내려온다.", "enemies": ["blood_guard", "jo_myeonggak", "blood_guard"], "enemyScale": {"hp": 0.9, "dmg": 0.9}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "창고 뒤벽이 열렸다는 망치 소리. 카일이 아래 길에서 내려오는 들것을 받는다. (적 전원 약화 1, 아군 전원 방어 50)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}, {"op": "block", "amount": 50, "target": "all_allies"}]}, "clearEffects": [{"op": "rescue", "amount": 97}, {"op": "set_flag", "flag": "seokdu"}, {"op": "gain_card", "card": "haun_biun"}]}
   },
   {"id": "s6_shop", "stage": "s6", "type": "shop", "name": "운곡 전장(錢莊)", "weight": 1, "content": {"text": "장터 뒷골목의 낡은 전장. 주인은 하운의 얼굴을 알아보는 듯했지만 아무 말 없이 주판알만 튕겼다."}},
   {"id": "s6_battle_sentry_post", "stage": "s6", "type": "battle", "name": "아래 길 검문소", "weight": 2, "conditions": {"floorRange": [4, 9]}, "content": {"scene": "s6_scene_sentry_post", "text": "마을 아래 길의 새 검문소. 보초 둘이 창에 기대 꾸벅꾸벅 졸고 있다. 아궁이에서 안개초 연기가 피어오른다. 깨기 전에 지나가거나, 깨기 전에 쓰러뜨리거나.", "enemies": ["sleeping_sentry", "sleeping_sentry"]}}

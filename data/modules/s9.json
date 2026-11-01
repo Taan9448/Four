@@ -52,7 +52,7 @@
     "stage": "s9",
     "type": "boss",
     "name": "틈의 심장",
-    "content": {"scene": "s9_scene_mordecai", "outroScene": "s9_scene_sealing", "text": "얼굴이 없다. 눈처럼 보이는 자리는 흐름이 안으로 접히는 구멍 — 힘을 쓰는 쪽을 따라온다. 아직은 칼이 닿는다. 그다음은 숨까지 멈춰 흐르지 않는 자가 되고, 결을 읽어 매듭을 드러내고, 도끼를 내리듯 날을 얹어라.", "enemies": ["mordecai"], "mana": {"battleStart": 0, "perTurn": 0}, "bossGate": {"ratio": 0.5, "text": "\"…아아. 맛을 알겠다. 흐름이로구나.\" 꿰맨 팔들이 벌어지고, 가슴의 심장이 흐름을 빨아들이기 시작한다. 하늘이 터졌다 — 숨을 멈춰야 한다.", "holdTraits": true, "refill": true, "surge": true, "partyEffects": [{"op": "add_card", "card": "haun_stop_ring", "to": "hand"}, {"op": "add_card", "card": "haun_stop_ring", "to": "draw", "count": 2}, {"op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2}]}, "clearEffects": [{"op": "set_flag", "flag": "rift_sealed"}]}
+    "content": {"scene": "s9_scene_mordecai", "outroScene": "s9_scene_sealing", "text": "얼굴이 없다. 눈처럼 보이는 자리는 흐름이 안으로 접히는 구멍 — 힘을 쓰는 쪽을 따라온다. 아직은 칼이 닿는다. 그다음은 숨까지 멈춰 흐르지 않는 자가 되고, 결을 읽어 매듭을 드러내고, 도끼를 내리듯 날을 얹어라.", "enemies": ["mordecai"], "enemyScale": {"hp": 0.9, "dmg": 0.82}, "mana": {"battleStart": 0, "perTurn": 0}, "bossGate": {"ratio": 0.5, "text": "\"…아아. 맛을 알겠다. 흐름이로구나.\" 꿰맨 팔들이 벌어지고, 가슴의 심장이 흐름을 빨아들이기 시작한다. 하늘이 터졌다 — 숨을 멈춰야 한다.", "holdTraits": true, "refill": true, "surge": true, "partyEffects": [{"op": "add_card", "card": "haun_stop_ring", "to": "hand"}, {"op": "add_card", "card": "haun_stop_ring", "to": "draw", "count": 2}, {"op": "add_card", "card": "haun_place_blade", "to": "draw", "count": 2}]}, "clearEffects": [{"op": "set_flag", "flag": "rift_sealed"}]}
   },
   {
     "id": "s9_battle_hounds",
@@ -79,7 +79,7 @@
     "name": "그림자 망령",
     "weight": 3,
     "conditions": {"floorRange": [3, 9]},
-    "content": {"text": "그림자 속에서 사람의 형상을 흉내 내다 만 것들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "enemyScale": {"hp": 0.7}, "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 80)", "effects": [{"op": "damage", "amount": 80, "target": "random_enemy"}]}}
+    "content": {"text": "그림자 속에서 사람의 형상을 흉내 내다 만 것들이 일어선다. 손에 쐐기를 깎아 만든 검은 단검. 결이 없다. 장력은 그냥 통과한다.", "enemies": ["shadow_wraith", "shadow_wraith", "shadow_wraith"], "enemyScale": {"hp": 0.62}, "mana": {"battleStart": 0, "perTurn": 0}, "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 눈을 감는다. 칼이 오는 길은 하나야. 막아 낸 단검이 온 길로 돌아간다. (적 하나에게 피해 80)", "effects": [{"op": "damage", "amount": 80, "target": "random_enemy"}]}}
   },
   {
     "id": "s9_battle_glass_tower",
@@ -214,6 +214,6 @@
     "conditions": {"floorRange": [3, 6]},
     "content": {"text": "함께 떨어져 온 천마봉 혈전의 붉은 돌. 넷이 둘러앉아 서로의 숨소리를 듣는다. 모두 동시에 잠들 수는 없어서, 차례를 정했다.", "choices": [{"label": "쉰다", "effects": [{"op": "heal_party", "ratio": 0.3}], "result": "출전 동료 전원 최대 체력의 30% 회복"}, {"label": "수련한다", "effects": [{"op": "upgrade_card", "count": 1, "choose": true}], "result": "고른 카드 1장을 강화했다(+1)."}]}
   },
-  {"id": "s9_battle_frozen_shards", "stage": "s9", "type": "battle", "name": "얼어붙은 조각들", "weight": 2, "conditions": {"floorRange": [3, 9]}, "content": {"text": "틈 속을 떠도는 얼음 조각들. 아르덴의 얼음이다. 다가갈수록 온기가 빠져나간다.", "enemies": ["frozen_shard", "shadow_wraith", "frozen_shard"], "enemyScale": {"hp": 0.85}}},
+  {"id": "s9_battle_frozen_shards", "stage": "s9", "type": "battle", "name": "얼어붙은 조각들", "weight": 2, "conditions": {"floorRange": [3, 9]}, "content": {"text": "틈 속을 떠도는 얼음 조각들. 아르덴의 얼음이다. 다가갈수록 온기가 빠져나간다.", "enemies": ["frozen_shard", "shadow_wraith", "frozen_shard"], "enemyScale": {"hp": 0.75}}},
   {"id": "s9_elite_shadow_bridge", "stage": "s9", "type": "elite", "name": "일어서는 다리", "weight": 1, "conditions": {"floorRange": [3, 6]}, "content": {"text": "떠다니는 조각 사이의 그림자 다리. 반쯤 건넜을 때 다리 자체가 일어섰다. 나루의 그림자처럼 — 베기보다 붙을 자리를 빼앗아야 한다.", "enemies": ["shadow_bridge"], "bonus": {"condition": {"partyHas": "kyle"}, "text": "카일이 검을 고쳐 쥔다. \"칼이 오는 길은 하나야.\" (그림자 다리 결 노출 2)", "effects": [{"op": "reveal_grain", "stacks": 2, "target": "all_enemies"}]}}}
 ]
