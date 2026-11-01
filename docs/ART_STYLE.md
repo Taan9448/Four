@@ -422,13 +422,15 @@ subjects:
     nothing like Jin Haun: SHORT dark-brown hair cut bluntly at the jaw with a straight fringe, a red cloth
     headband with long trailing ends; a sharp angular face with fierce upturned eyes, red lips, sun-tanned skin, a
     few freckles; one LONG pale diagonal scar from above her left eyebrow across the cheek down to the jaw, clearly
-    visible. A very revealing, glamorous martial outfit: a white wrap-front halter top with a deep plunging
-    neckline showing ample cleavage, cut short under the bust to bare the whole toned midriff and navel, bare
-    shoulders, back and arms, dark-red plum-blossom embroidery along the edges; a wide dark-red sash belt slung low
-    on the hips; a short dark-red skirt-panel front and back with side slits open up to the hip, showing her bare
-    thighs; tall dark-red wrapped boots to above the knee; black fingerless gloves, leather bracers, a thin gold
-    anklet-like chain at the hip; a slim straight jian with a small plum-blossom tassel. Bold bikini-armor-level
-    fan-service in the style of fantasy game heroines; her nipples and groin always stay covered by the outfit
+    visible. An airy, lightweight fantasy martial outfit: an opaque, lined ivory silk halter top with softly
+    draped panels, dark-red plum-blossom embroidery along the edges and loose fluttering fabric tails at the
+    outer sides; bare shoulders, back, arms, midriff and navel. Narrow dark-red hip straps support a high-cut
+    T-back bikini bottom with an opaque front panel fully covering the groin and small ivory embroidered
+    fabric ties fluttering at the sides; no long skirt panels or leggings. Tall dark-red wrapped boots to above
+    the knee; black fingerless gloves, plain leather bracers; a slim straight jian with a small plum-blossom
+    tassel. The light fabric is not transparent: the top covers the breasts and nipples, with no visible or
+    outlined nipples, and the bottom fully covers the groin. Use ordinary story-character poses rather than
+    intimate close-ups
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet
