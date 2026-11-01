@@ -6,6 +6,7 @@ depends_on: [skin_moon_dancer_elia_ref]
 reference: assets/source/skin_moon_dancer_elia_ref.png
 facing: right
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 달빛 초승달 쏘기: 지팡이를 머리 위로 치켜든 칸2·3(초승달이 머리 위)과 앞으로 뻗은 칸4~6의 높이 차(2026-11-01 검토, 22%)
 frame_notes:
   1: "spins once on the ball of her foot, staff drawn back, ribbon and skirt panels flaring, motes streaming into the stone"
   2: "a crescent of pale moonlight forms at the tip of the staff"

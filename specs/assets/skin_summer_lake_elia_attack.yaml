@@ -6,6 +6,7 @@ depends_on: [skin_summer_lake_elia_ref]
 reference: assets/source/skin_summer_lake_elia_ref.png
 facing: right
 events: { hit: 4 }
+bbox_tolerance: 0.3   # 물 구슬 쏘기: 지팡이를 치켜든 칸2·3(물 구슬이 머리 위)과 앞으로 뻗은 칸4~6의 높이 차(2026-11-01, 달빛 무희와 같은 동작)
 frame_notes:
   1: "draws the staff back with a playful grin, water droplets streaming into the stone"
   2: "a ball of swirling lake water forms at the tip of the staff"
