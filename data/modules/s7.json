@@ -50,7 +50,7 @@
     "name": "사리탑 사이의 교도",
     "weight": 2,
     "conditions": {"floorRange": [4, 7]},
-    "content": {"text": "소림의 사리탑 사이, 남은 분타 병력이 곡식과 사람을 실어 가려 한다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 탑 그늘에서 안개초를 태운다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "소림의 사리탑 사이, 남은 분타 병력이 곡식과 사람을 실어 가려 한다.", "enemies": ["blood_cultist", "blood_cultist", "blood_cultist"], "enemyScale": {"hp": 0.85}, "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 탑 그늘에서 안개초를 태운다. (적 전원 약화 1)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s7_battle_nakan_valley",
@@ -59,7 +59,7 @@
     "name": "낙안봉 골짜기",
     "weight": 2,
     "conditions": {"floorRange": [7, 9]},
-    "content": {"text": "낙안봉으로 오르는 유일한 골짜기. 검붉은 무복이 골짜기를 메운다.", "enemies": ["blood_cultist", "branch_elite", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 절벽의 한 점에 망치를 내리친다. 절벽이 결을 따라 미끄러져 내려 길을 가둔다. (적 전원 기절 1)", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
+    "content": {"text": "낙안봉으로 오르는 유일한 골짜기. 검붉은 무복이 골짜기를 메운다.", "enemies": ["blood_cultist", "branch_elite", "blood_cultist"], "enemyScale": {"hp": 0.78}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른이 절벽의 한 점에 망치를 내리친다. 절벽이 결을 따라 미끄러져 내려 길을 가둔다. (적 전원 기절 1)", "effects": [{"op": "apply_status", "status": "stun", "stacks": 1, "target": "all_enemies"}]}}
   },
   {
     "id": "s7_battle_outpost",
@@ -78,7 +78,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [3, 6]},
-    "content": {"scene": "s7_scene_wudang_knot", "outroScene": "s7_scene_first_crack", "text": "세 돌자리의 힘이 회랑 지붕 위 매듭으로 엉켰다. 셋이 서 있는 한 내공만으로는 닿지 않는다(호법 전원 무형). 하나가 쓰러지면 진이 무너진다. 남은 마나를 칼끝에 맺힐 만큼만 — 푸른 검광.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "startEffects": [{"op": "apply_status", "status": "incorporeal", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "haun_blue_edge", "to": "hand"}], "bonus": {"condition": {"flag": "wudang_supply"}, "text": "북쪽 샘을 막았다. 물을 받지 못한 돌에서 열이 오르고, 호법은 손을 떼었다 붙이기를 반복한다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 42}]}
+    "content": {"scene": "s7_scene_wudang_knot", "outroScene": "s7_scene_first_crack", "text": "세 돌자리의 힘이 회랑 지붕 위 매듭으로 엉켰다. 셋이 서 있는 한 내공만으로는 닿지 않는다(호법 전원 무형). 하나가 쓰러지면 진이 무너진다. 남은 마나를 칼끝에 맺힐 만큼만 — 푸른 검광.", "enemies": ["cult_guardian", "cult_guardian", "cult_guardian"], "enemyScale": {"hp": 0.85}, "startEffects": [{"op": "apply_status", "status": "incorporeal", "stacks": 1, "target": "all_enemies"}, {"op": "add_card", "card": "haun_blue_edge", "to": "hand"}], "bonus": {"condition": {"flag": "wudang_supply"}, "text": "북쪽 샘을 막았다. 물을 받지 못한 돌에서 열이 오르고, 호법은 손을 떼었다 붙이기를 반복한다. (적 전원 약화 2)", "effects": [{"op": "apply_status", "status": "weak", "stacks": 2, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 42}]}
   },
   {
     "id": "s7_elite_poison_hand",
@@ -88,7 +88,7 @@
     "once": true,
     "weight": 2,
     "conditions": {"floorRange": [4, 8]},
-    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "text": "소림 피란민 백여든여섯이 나갈 남쪽 길. 빈 수레 세 대 앞에 양문혁이 앉아 있다. 바람이 그의 등 뒤에서 분다. 독은 바람을 타고 온다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 수레가 막은 자리를 무너뜨린다. 쾅, 쾅, 쾅. (적 전원 피해 60, 취약 1)", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 185}, {"op": "gain_card", "card": "born_together"}]}
+    "content": {"scene": "s7_scene_tower_forest", "outroScene": "s7_scene_hyegak", "text": "소림 피란민 백여든여섯이 나갈 남쪽 길. 빈 수레 세 대 앞에 양문혁이 앉아 있다. 바람이 그의 등 뒤에서 분다. 독은 바람을 타고 온다.", "enemies": ["blood_cultist", "poison_hand", "blood_cultist"], "enemyScale": {"hp": 0.85}, "bonus": {"condition": {"partyHas": "born"}, "text": "보른과 혜각이 나란히 선다. 망치와 곤봉이 같은 박자로 수레가 막은 자리를 무너뜨린다. 쾅, 쾅, 쾅. (적 전원 피해 60, 취약 1)", "effects": [{"op": "damage", "amount": 60, "target": "all_enemies"}, {"op": "apply_status", "status": "vulnerable", "stacks": 1, "target": "all_enemies"}]}, "clearEffects": [{"op": "rescue", "amount": 185}, {"op": "gain_card", "card": "born_together"}]}
   },
   {
     "id": "s7_elite_branch_guard",
@@ -219,7 +219,7 @@
     "stage": "s7",
     "type": "boss",
     "name": "낙안봉",
-    "content": {"scene": "s7_scene_nakan", "outroScene": "s7_scene_unhealed", "text": "물문 옆 잠긴 방, 등 뒤에 아이 서른. 염탁의 붉은 장력이 결을 덮어 결 노출이 붙지 않는다(피의 덮개). 혼합한 힘은 계획에 넣지 않았다 — 그래도 마지막 출구가 무너지려 할 때, 천외귀운만이 덮개를 벗긴다.", "enemies": ["branch_elite", "hyeolsu", "branch_elite"], "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 반대편 짐문으로 아이들을 내보내며 숨을 센다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}, "clearEffects": [{"op": "rescue", "amount": 30}, {"op": "set_flag", "flag": "sky_crack"}, {"op": "scar", "amount": 1}]}
+    "content": {"scene": "s7_scene_nakan", "outroScene": "s7_scene_unhealed", "text": "물문 옆 잠긴 방, 등 뒤에 아이 서른. 염탁의 붉은 장력이 결을 덮어 결 노출이 붙지 않는다(피의 덮개). 혼합한 힘은 계획에 넣지 않았다 — 그래도 마지막 출구가 무너지려 할 때, 천외귀운만이 덮개를 벗긴다.", "enemies": ["branch_elite", "hyeolsu", "branch_elite"], "enemyScale": {"dmg": 0.95}, "startEffects": [{"op": "add_card", "card": "haun_cheonoe", "to": "hand"}], "bonus": {"condition": {"partyHas": "elia"}, "text": "엘리아가 반대편 짐문으로 아이들을 내보내며 숨을 센다. (아군 전원 방어 60)", "effects": [{"op": "block", "amount": 60, "target": "all_allies"}]}, "clearEffects": [{"op": "rescue", "amount": 30}, {"op": "set_flag", "flag": "sky_crack"}, {"op": "scar", "amount": 1}]}
   },
   {"id": "s7_shop", "stage": "s7", "type": "shop", "name": "강나루 약방", "weight": 1, "content": {"text": "나룻배가 닿는 곳마다 약방 깃발이 섰다. 늙은 약사가 말린 약재를 저울에 달며 하운의 낯빛을 살폈다."}},
   {"id": "s7_battle_needle_ambush", "stage": "s7", "type": "battle", "name": "기둥 뒤의 독침", "weight": 2, "conditions": {"floorRange": [3, 8]}, "content": {"text": "분타의 회랑. 앞을 막는 교도 뒤, 기둥 그늘에서 소매가 펄럭인다. 초록 끝이 반짝인다.", "enemies": ["blood_cultist", "needle_cultist"]}}
