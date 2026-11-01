@@ -7,7 +7,7 @@
     "content": {
       "scene": "abyss_scene_nemesis",
       "text": "닫힌 줄 알았던 틈 너머, 같은 목소리가 더 깊은 곳에서 울린다. 아직은 칼이 닿는다 — 꿰맨 몸을 반까지 베어 낸다. 그다음은 흐름을 실은 공격이 먹힌다. 숨을 멈추고 결을 읽어 매듭을 드러내고, 날을 얹어라.",
-      "enemies": ["mordecai"],
+      "enemies": ["mordecai"], "enemyScale": {"hp": 0.85, "dmg": 0.85},
       "background": "bg_rift",
       "mana": { "battleStart": 0, "perTurn": 0 },
       "bossGate": {

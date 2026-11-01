@@ -146,9 +146,9 @@
   "abyss": {
     "hpBase": 1.0,
     "dmgBase": 0.93,
-    "hpStep": 0.46,
-    "dmgStep": 0.31,
-    "deep": [{ "from": 6, "hpStep": 0.3, "dmgStep": 0.1 }, { "from": 11, "hpStep": 2.3, "dmgStep": 0.72 }, { "from": 15, "hpStep": 0, "dmgStep": 0 }],
+    "hpStep": 0.5,
+    "dmgStep": 0.33,
+    "deep": [{ "from": 6, "hpStep": 0.05, "dmgStep": 0 }, { "from": 11, "hpStep": 1.8, "dmgStep": 0.6 }, { "from": 15, "hpStep": 0, "dmgStep": 0 }],
     "importMax": 2,
     "floors": 9,
     "typeWeights": { "battle": 52, "event": 18, "elite": 13, "rest": 8, "shop": 5 },
@@ -194,7 +194,7 @@
     "eventFloor": 4,
     "rescueModule": "abyss_rescue",
     "echoModule": "abyss_rift_echo",
-    "nemesis": { "enrageStep": 2, "knotFrom": 3, "knotStacks": 4, "faint": { "enrageDelay": 2, "feedMul": 0.5 }, "borderHpScale": [0.8, 1.25, 1.5] },
+    "nemesis": { "enrageStep": 2, "knotFrom": 3, "knotStacks": 4, "faint": { "enrageDelay": 2, "feedMul": 0.5 }, "borderHpScale": [0.6, 1.25, 1.5] },
     "oath": { "scoreMul": 1.1, "depthOffset": 2, "stepDepth": 5 },
     "daily": { "laws": 1, "oath": [1, 5], "mates": [1, 3] }
   },
