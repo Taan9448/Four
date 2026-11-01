@@ -422,17 +422,15 @@ subjects:
     nothing like Jin Haun: SHORT dark-brown hair cut bluntly at the jaw with a straight fringe, a red cloth
     headband with long trailing ends; a sharp angular face with fierce upturned eyes, red lips, sun-tanned skin, a
     few freckles; one LONG pale diagonal scar from above her left eyebrow across the cheek down to the jaw, clearly
-    visible. An airy, lightweight fantasy martial outfit: an opaque, lined ivory silk cropped top with softly
-    draped panels, dark-red plum-blossom embroidery along the edges and loose fluttering fabric tails at the
-    outer sides, supported by two thin dark-red shoulder straps and a simple back tie. Her neck is entirely
-    bare: no collar, neck wrap, neck bow or choker. Bare shoulders, back, arms, midriff and navel. Narrow dark-red
-    hip straps support a high-cut
-    T-back bikini bottom with an opaque front panel fully covering the groin and small ivory embroidered
-    fabric ties fluttering at the sides; no long skirt panels or leggings. Tall dark-red wrapped boots to above
-    the knee; black fingerless gloves, plain leather bracers; a slim straight jian with a small plum-blossom
-    tassel. The light fabric is not transparent: the top covers the breasts and nipples, with no visible or
-    outlined nipples, and the bottom fully covers the groin. Use ordinary story-character poses rather than
-    intimate close-ups
+    visible. A plain ivory two-piece swimsuit: an opaque, fully lined ivory strapless bandeau top with a small
+    fabric bow at the center front and continuous fabric beneath the bow. The broad band covers the entire
+    bust including its lower curve; its back is a plain secure ivory band. Matching mid-rise classic ivory
+    swim briefs have broad side bands, full front and seat coverage, and ordinary low or moderate leg openings.
+    Use solid nontransparent cloth with a subtle plain woven texture; no embroidery, mesh, lace, cutouts,
+    narrow strings, thong, hip ties or skirt panels. Her neck and shoulders are bare: no collar, scarf, neck
+    wrap, halter ties or shoulder straps. Bare arms, midriff and navel. Tall dark-red wrapped boots to above
+    the knee, black fingerless gloves, plain leather bracers, and a slim straight jian with a small
+    plum-blossom tassel. No new jewelry or accessories. Use ordinary composed story-character poses
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet
