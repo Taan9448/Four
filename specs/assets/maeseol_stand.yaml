@@ -1,9 +1,9 @@
 id: maeseol_stand
 type: character-standing
 character: maeseol
-summary: "매설 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31). 2026-11-01 다시 디자인: 하운과 닮지 않게(턱선 단발·긴 대각 흉터) + 사용자 결정으로 과감한 무복(민소매 크롭·옆트임)"
+summary: "매설 반신 그림(기본·결의·놀람) — 개작 원고 조연(2026-10-31). 2026-11-01 다시 디자인: 하운과 닮지 않게(턱선 단발·긴 대각 흉터) + 사용자 결정으로 볼륨감 있고 노출이 많은 무복(스물둘로 올림)"
 frame_notes:
-  1: "cool, confident look — weight on one hip, chin slightly raised, one hand resting on the sword hilt"
+  1: "cool, alluring look — weight on one hip, chin slightly raised, one hand resting on the sword hilt"
   2: "fierce resolute look — jian drawn a hand-width from the scabbard close to her body, eyes narrowed, a small confident smirk"
   3: "surprised — eyes wide, mouth open, the long scar pulling at her cheek"
 placeholder: { color: '#d8cfc0', accent: '#e8d8b0' }

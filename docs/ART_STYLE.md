@@ -417,16 +417,18 @@ subjects:
     Doyeon, a young Daoist priest of Wudang in his twenties; a plain grey Daoist robe soaked at the hem, hair in a
     topknot with a wooden pin, a messenger's satchel, a serious guarded face
   maeseol: >-
-    Maeseol, an eighteen-year-old swordswoman of the Hwasan (Mount Hua) sect, clearly an adult young woman with a
-    mature face and a confident adult figure, who must look nothing like Jin Haun: SHORT dark-brown hair cut
-    bluntly at the jaw with a straight fringe, a red cloth headband with long trailing ends; a sharp angular face
-    with fierce upturned eyes, sun-tanned skin, a few freckles; one LONG pale diagonal scar from above her left
-    eyebrow across the cheek down to the jaw, clearly visible; a lean athletic, curvy build. A BOLD, form-fitting
-    martial outfit: a sleeveless white high-collared top cropped above the waist, showing bare toned shoulders,
-    arms and midriff, dark-red plum-blossom embroidery along the collar and hem; a wide dark-red sash belt; a
-    dark-red skirt-panel with thigh-high side slits over fitted black leggings and tall wrapped boots; black
-    fingerless gloves and leather bracers; a slim straight jian with a small plum-blossom tassel at her hip.
-    Stylish and confident fan-appeal, never explicit: no nudity, no underwear shown
+    Maeseol, a twenty-two-year-old swordswoman of the Hwasan (Mount Hua) sect, unmistakably a grown woman with a
+    mature face and a voluptuous adult figure (full bust, narrow waist, wide hips, long legs), who must look
+    nothing like Jin Haun: SHORT dark-brown hair cut bluntly at the jaw with a straight fringe, a red cloth
+    headband with long trailing ends; a sharp angular face with fierce upturned eyes, red lips, sun-tanned skin, a
+    few freckles; one LONG pale diagonal scar from above her left eyebrow across the cheek down to the jaw, clearly
+    visible. A very revealing, glamorous martial outfit: a white wrap-front halter top with a deep plunging
+    neckline showing ample cleavage, cut short under the bust to bare the whole toned midriff and navel, bare
+    shoulders, back and arms, dark-red plum-blossom embroidery along the edges; a wide dark-red sash belt slung low
+    on the hips; a short dark-red skirt-panel front and back with side slits open up to the hip, showing her bare
+    thighs; tall dark-red wrapped boots to above the knee; black fingerless gloves, leather bracers, a thin gold
+    anklet-like chain at the hip; a slim straight jian with a small plum-blossom tassel. Bold fan-service in the
+    style of fantasy game heroines, but never explicit: no nudity, no exposed nipples, no underwear shown
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet
