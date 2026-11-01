@@ -1,0 +1,12 @@
+id: maeseol_hit
+type: character-anim
+character: maeseol
+summary: "매설 피격 3프레임 — 진하운 옷장 「화산의 매설」"
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frame_notes:
+  1: "struck, head snapping back, short hair and headband ends whipping, teeth gritted"
+  2: "skidding back one step on the boots, jian raised across the body, skirt panels swinging"
+  3: "regaining footing with a fierce glare, jian levelled forward again"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#b0202a' }

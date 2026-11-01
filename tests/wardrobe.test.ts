@@ -73,6 +73,20 @@ describe('옷장(2026-10-12)', () => {
     expect(skinStandId(data, 'elia', undefined)).toBeUndefined();
   });
 
+  it('진하운 「화산의 매설」: 수련 Lv.20에 열리고, 전투 그림은 maeseol_*, 반신 그림은 maeseol_stand', async () => {
+    const w = parseWardrobe(data, null);
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 20 })).toContain('maeseol');
+    equipSkin(data, w, 'elia', 'maeseol'); // 진하운만
+    expect(w.equipped.elia).toBeUndefined();
+    equipSkin(data, w, 'haun', 'maeseol');
+    expect(battleSkins(data, w, {})).toEqual({ haun: 'maeseol' }); // 캠페인에서도
+    expect(skinSpriteId(data, 'maeseol', 'haun', 'attack')).toBe('maeseol_attack');
+    expect(skinStandId(data, 'haun', { haun: 'maeseol' })).toBe('maeseol_stand');
+    const { readdirSync } = await import('node:fs');
+    const specs = new Set(readdirSync('specs/assets').map((f) => f.replace(/\.yaml$/, '')));
+    expect(['maeseol_ref', 'maeseol_idle', 'maeseol_attack', 'maeseol_hit', 'maeseol_stand'].filter((id) => !specs.has(id))).toEqual([]);
+  });
+
   it('엘리아 새 옷 두 벌은 수련 Lv.10 · Lv.20에 열리고 캠페인에서도 입는다', () => {
     const w = parseWardrobe(data, null);
     expect(w.unlocked).not.toContain('moon_dancer');
@@ -81,7 +95,7 @@ describe('옷장(2026-10-12)', () => {
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 9 })).toEqual([]);
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 10 })).toEqual(['moon_dancer']);
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 19 })).toEqual([]);
-    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 25 })).toEqual(['summer_lake']); // 넘긴 레벨이어도 연다
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 25 })).toEqual(['summer_lake', 'maeseol']); // 넘긴 레벨이어도 연다(진하운 「화산의 매설」도 Lv.20)
     expect(unlockText(data, { kind: 'trainingLevel', level: 20 })).toBe('수련 Lv.20에 이른다');
     equipSkin(data, w, 'elia', 'summer_lake');
     expect(battleSkins(data, w, {})).toEqual({ elia: 'summer_lake' });

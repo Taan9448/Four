@@ -1,0 +1,17 @@
+id: maeseol_attack
+type: character-anim
+character: maeseol
+summary: "매설 매화검 찌르기 6프레임 — 진하운 옷장 「화산의 매설」"
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+events: { hit: 4 }
+bbox_tolerance: 0.3   # 매화검: 검을 어깨 위로 끌어올린 칸2·3과 낮고 길게 찌른 칸4·5의 높이 차
+frame_notes:
+  1: "low crouch facing right, jian drawn back at the hip, eyes fixed on the target, headband ends trailing"
+  2: "springs forward off the back foot, jian rising to shoulder height, skirt panels flaring"
+  3: "jian cocked beside the shoulder, a few small red plum-petal sparks gathering at the tip"
+  4: "a long lunging thrust to the right, arm and blade fully extended, a short trail of red plum petals bursting from the tip"
+  5: "follow-through in the deep lunge, petals scattering, tassel and headband whipping forward"
+  6: "pulls back into the ready stance, point lowered"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#b0202a' }

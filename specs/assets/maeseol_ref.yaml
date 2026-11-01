@@ -1,0 +1,11 @@
+id: maeseol_ref
+type: character-ref
+character: maeseol
+summary: "매설 전투 기준 시트(3/4 정면 + 오른쪽 측면) — 진하운 옷장 「화산의 매설」(2026-11-01 사용자 요청)"
+depends_on: [maeseol_stand]
+reference: assets/source/maeseol_stand.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose, the slim straight jian held low in the right hand with its small plum-blossom tassel; the same face, short jaw-length hair, red headband, long diagonal scar and the same outfit as the attached half-body portrait, now shown head to toe including the tall dark-red wrapped boots"
+  2: "full body, side view facing right, same outfit and proportions, standing ready with the jian point lowered toward the ground, headband ends trailing behind"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#b0202a' }
