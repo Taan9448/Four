@@ -1129,6 +1129,7 @@ export function applyRunOps(data: GameData, run: RunState, effects: Effect[], op
     return msg;
   };
   for (const e of effects) {
+    if (e.skipInPilgrimage && run.replayOf) continue;
     run.counter += 1;
     const rng = createRng(run.seed).fork(`ops:${run.stageId}:${run.position}:${run.counter}`);
     switch (e.op) {
