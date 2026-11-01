@@ -403,8 +403,10 @@ subjects:
     Sir Garret, an old knight of Arden in his sixties who leads a refugee village; one ear missing, a short white
     beard, a dented steel cuirass over a fur-lined coat, two empty fingers on one leather glove
   herda: >-
-    Herda, a dwarf woman mine engineer of Kazdum; stocky, braided brown hair with grey streaks, a leather work
-    apron full of measuring tools, a coil of rope over one shoulder, steady practical eyes
+    Herda, a female DWARF mine engineer of Kazdum in her fifties, clearly a dwarf and not a human: short (about
+    four feet) and very broad and stocky, thick strong arms and big work-worn hands, a wide square face with a
+    broad nose, ruddy weathered cheeks and fine wrinkles; thick brown hair with grey streaks in two heavy braids,
+    a leather work apron full of measuring tools, a coil of rope over one shoulder, steady practical eyes
   yeojin: >-
     Yeojin, a village woman of Ungok in her thirties who passes messages through laundry; hair in a plain bun
     with a wooden pin, a faded blue jeogori-like jacket, sleeves rolled up, a folded cloth with stitched names
@@ -415,8 +417,16 @@ subjects:
     Doyeon, a young Daoist priest of Wudang in his twenties; a plain grey Daoist robe soaked at the hem, hair in a
     topknot with a wooden pin, a messenger's satchel, a serious guarded face
   maeseol: >-
-    Maeseol, an eighteen-year-old swordswoman of the Hwasan sect; a long scar across one cheek, black hair tied
-    high, a dark red-and-white plum-blossom swordsman outfit, a slim straight sword at her hip
+    Maeseol, an eighteen-year-old swordswoman of the Hwasan (Mount Hua) sect, clearly an adult young woman with a
+    mature face and a confident adult figure, who must look nothing like Jin Haun: SHORT dark-brown hair cut
+    bluntly at the jaw with a straight fringe, a red cloth headband with long trailing ends; a sharp angular face
+    with fierce upturned eyes, sun-tanned skin, a few freckles; one LONG pale diagonal scar from above her left
+    eyebrow across the cheek down to the jaw, clearly visible; a lean athletic, curvy build. A BOLD, form-fitting
+    martial outfit: a sleeveless white high-collared top cropped above the waist, showing bare toned shoulders,
+    arms and midriff, dark-red plum-blossom embroidery along the collar and hem; a wide dark-red sash belt; a
+    dark-red skirt-panel with thigh-high side slits over fitted black leggings and tall wrapped boots; black
+    fingerless gloves and leather bracers; a slim straight jian with a small plum-blossom tassel at her hip.
+    Stylish and confident fan-appeal, never explicit: no nudity, no underwear shown
   veilak: >-
     Veilak, the Shadow Legion commander; a knight and horse made of black smoke, twice a man's height, a
     greatsword of smoke, two red lights burning inside the empty helmet
