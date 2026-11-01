@@ -1,0 +1,13 @@
+id: maeseol_idle
+type: character-anim
+character: maeseol
+summary: "매설 대기 4프레임 — 진하운 옷장 「화산의 매설」"
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frame_notes:
+  1: "relaxed ready stance facing right, jian held low in the right hand with the point down, left hand resting on the hip, weight on the back leg"
+  2: "same stance, chest slightly raised, the red headband ends and skirt-panel hems lifting a little in the wind"
+  3: "same stance, a quick flick of the wrist so the jian tip draws a tiny circle, the plum-blossom tassel swinging"
+  4: "same stance, settling back, headband ends and skirt panels falling still"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#b0202a' }

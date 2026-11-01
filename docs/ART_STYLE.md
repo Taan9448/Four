@@ -132,6 +132,7 @@
 | skin_sullye_born | 보른 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_born` | magenta | large |
 | skin_moon_dancer_elia | 엘리아 옷장 「달빛 무희」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 남색 비단 홀터 상의·드러난 등과 허리·옆트임 긴 치마폭·은빛 초승달 장신구, 맨발 — 5절 `subjects.skin_moon_dancer_elia` | magenta | large |
 | skin_summer_lake_elia | 엘리아 옷장 「여름 호숫가」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 잎사귀 장식 흰 비키니·어깨로 흘러내린 연초록 리넨 덧옷·귀 뒤 흰 꽃·샌들, 화관 감은 지팡이 — 5절 `subjects.skin_summer_lake_elia` | magenta | large |
+| maeseol | 매설 — 진하운 옷장 「화산의 매설」(수련 Lv.20, 캠페인에서도, 반신 그림은 `maeseol_stand` 그대로 — 2026-11-01 사용자 요청) | 반신 그림(`maeseol_stand`)과 같은 인물·같은 옷을 전신으로: 턱선 단발·붉은 머리띠·왼뺨 대각 흉터, 흰 홀터·매화 자수·낮은 허리띠·옆트임 붉은 치마폭, 붉은 장화, 매화 술 직검 — 5절 `subjects.maeseol` | magenta | large |
 | wang | 왕일검(S6~) | 낫처럼 굽은 등, 흐릿한 눈 속의 날카로운 빛, 숱 적은 흰 머리. **다리가 없어 바퀴 달린 나무 의자에 앉고 무릎에 담요**(초상화만) | none | portrait |
 | wang_cook | 왕 노인(S0) | 같은 인물이 두 다리가 있을 때: 낫처럼 굽은 등, 오른 다리를 절며 지팡이, 낡은 회갈색 주방 옷과 앞치마(초상화만) | none | portrait |
 | kwak_dojin | 곽도진 | 마른 몸, 단정히 빗어 넘긴 흰머리, 이마 주름, 서른 살처럼 맑고 차가운 눈, 흰 학창의, 소나무 결 무늬 송문고검 | magenta | large |
