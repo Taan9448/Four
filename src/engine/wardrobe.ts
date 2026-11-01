@@ -61,7 +61,8 @@ export function skinStandId(data: GameData, charId: string, skins: Readonly<Reco
 export type SkinEvent =
   | { kind: 'campaignClear'; difficulty: 'normal' | 'hard'; hardcore: boolean }
   | { kind: 'abyssDepth'; depth: number }
-  | { kind: 'pilgrimStage'; stage: string };
+  | { kind: 'pilgrimStage'; stage: string }
+  | { kind: 'trainingLevel'; level: number };
 
 function opens(u: SkinUnlock, ev: SkinEvent): boolean {
   switch (u.kind) {
@@ -74,6 +75,8 @@ function opens(u: SkinUnlock, ev: SkinEvent): boolean {
       return ev.kind === 'abyssDepth' && ev.depth >= u.depth;
     case 'pilgrimStage':
       return ev.kind === 'pilgrimStage' && ev.stage === u.stage;
+    case 'trainingLevel':
+      return ev.kind === 'trainingLevel' && ev.level >= u.level;
     case 'always':
       return false;
   }
@@ -97,6 +100,8 @@ export function unlockText(data: GameData, u: SkinUnlock): string {
       return `심연 ${u.depth}굽이를 넘는다`;
     case 'pilgrimStage':
       return `순례로 ${data.stages.find((s) => s.id === u.stage)?.name ?? u.stage}을(를) 넘는다`;
+    case 'trainingLevel':
+      return `수련 Lv.${u.level}에 이른다`;
     case 'always':
       return '처음부터 열려 있다';
   }

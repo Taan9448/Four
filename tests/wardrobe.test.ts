@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { spritesFor } from '../src/engine/state';
-import { battleSkins, emptyWardrobe, equipSkin, parseWardrobe, skinSpriteId, skinStandId, unlockSkins } from '../src/engine/wardrobe';
+import { battleSkins, emptyWardrobe, equipSkin, parseWardrobe, skinSpriteId, skinStandId, unlockSkins, unlockText } from '../src/engine/wardrobe';
 import { data } from './helpers';
 
 describe('옷장(2026-10-12)', () => {
@@ -31,8 +31,8 @@ describe('옷장(2026-10-12)', () => {
     expect(battleSkins(data, w, { replayOf: {} })).toEqual({ haun: 'cheongun' });
     expect(battleSkins(data, w, { abyss: {} })).toEqual({ haun: 'cheongun' });
     // 깨진 기록·없는 세트는 버린다(처음부터 열린 은빛 기사검은 늘 있다)
-    expect(parseWardrobe(data, '{"unlocked":["cheongun","nope"],"equipped":{"haun":"cheongun","elia":"cheonma"}}')).toEqual({ unlocked: ['cheongun', 'silver_sword', 'moon_dancer', 'summer_lake'], equipped: { haun: 'cheongun' } });
-    expect(parseWardrobe(data, 'not json')).toEqual({ unlocked: ['silver_sword', 'moon_dancer', 'summer_lake'], equipped: {} });
+    expect(parseWardrobe(data, '{"unlocked":["cheongun","nope"],"equipped":{"haun":"cheongun","elia":"cheonma"}}')).toEqual({ unlocked: ['cheongun', 'silver_sword'], equipped: { haun: 'cheongun' } });
+    expect(parseWardrobe(data, 'not json')).toEqual({ unlocked: ['silver_sword'], equipped: {} });
   });
 
   it('은빛 기사검: 처음부터 열려 있고, 카일만 입으며, 캠페인에서도 입고, 그림은 옛 기본 그림(kyle_*)이다', () => {
@@ -73,9 +73,16 @@ describe('옷장(2026-10-12)', () => {
     expect(skinStandId(data, 'elia', undefined)).toBeUndefined();
   });
 
-  it('엘리아 새 옷 두 벌은 처음부터 열려 있고 캠페인에서도 입는다', () => {
+  it('엘리아 새 옷 두 벌은 수련 Lv.10 · Lv.20에 열리고 캠페인에서도 입는다', () => {
     const w = parseWardrobe(data, null);
-    expect(w.unlocked).toEqual(expect.arrayContaining(['moon_dancer', 'summer_lake']));
+    expect(w.unlocked).not.toContain('moon_dancer');
+    equipSkin(data, w, 'elia', 'moon_dancer'); // 아직 잠김
+    expect(w.equipped.elia).toBeUndefined();
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 9 })).toEqual([]);
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 10 })).toEqual(['moon_dancer']);
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 19 })).toEqual([]);
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 25 })).toEqual(['summer_lake']); // 넘긴 레벨이어도 연다
+    expect(unlockText(data, { kind: 'trainingLevel', level: 20 })).toBe('수련 Lv.20에 이른다');
     equipSkin(data, w, 'elia', 'summer_lake');
     expect(battleSkins(data, w, {})).toEqual({ elia: 'summer_lake' });
     equipSkin(data, w, 'haun', 'summer_lake'); // 엘리아만
