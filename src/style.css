@@ -2246,6 +2246,12 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .wd-body { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 10px; flex: 1; }
 .wd-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
 .wd-canvas { width: 240px; height: 240px; image-rendering: pixelated; }
+/* 반신 그림(2026-11-01): 대기 그림 왼쪽에 입은 옷의 반신 그림 */
+.wd-figures { display: flex; align-items: flex-end; justify-content: center; gap: 8px; }
+.wd-portrait { flex: none; width: 130px; height: 200px; overflow: hidden; }
+.wd-figures .wd-canvas { width: 160px; height: 160px; }
+.wd-item .btn { flex: none; white-space: nowrap; }
+.wd-portrait img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
 .wd-preview h3 { margin: 4px 0 0; }
 .wd-note { margin: 0; color: var(--ink-dim); font-size: var(--fs-cap); }
 .wd-list { display: flex; flex-direction: column; gap: 8px; }

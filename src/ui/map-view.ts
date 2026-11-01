@@ -15,6 +15,8 @@ import { starterCards } from '../engine/collection';
 import { deckGroupsView } from './deck-view';
 import { openOverlay } from './overlay';
 import { loadPortrait, standingFor } from '../render/portrait';
+import { battleSkins } from '../engine/wardrobe';
+import { readWardrobe } from './storage';
 import { abyssScale, loopLabel, nemesisEvery, WORLD_NAME } from '../engine/abyss';
 
 /** 노드 표식: 두루마리 위의 한자 */
@@ -155,7 +157,7 @@ export function openMemberInfo(data: GameData, run: RunState, id: string): void 
   if (!def || !r) return;
   const next = xpToNext(data, r.level);
   const pic = h('div', { class: 'member-pic', style: `--owner:${def.color}` }, h('span', {}, def.name.slice(0, 1)));
-  void loadPortrait(id, 'neutral', standingFor(data, id, run.flags)).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: def.name })));
+  void loadPortrait(id, 'neutral', standingFor(data, id, run.flags, battleSkins(data, readWardrobe(data), run))).then((img) => img && pic.replaceChildren(h('img', { src: img.src, alt: def.name })));
   const cards = run.deck.filter((c) => data.cards.get(c.cardId)?.owner === id);
   const stat = (label: string, value: string) => h('div', {}, h('dt', {}, label), h('dd', {}, value));
   openOverlay(

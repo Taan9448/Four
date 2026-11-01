@@ -29,7 +29,7 @@ export function sceneView(
   data: GameData,
   scene: SceneDef,
   onDone: () => void,
-  opts: { background?: string; flags?: readonly string[] } = {},
+  opts: { background?: string; flags?: readonly string[]; skins?: Readonly<Record<string, string>> } = {},
 ): HTMLElement {
   const bgUrl = frameUrl(scene.background ?? opts.background, 1, { realOnly: true });
   const slots: Record<Side, Slot> = {
@@ -89,7 +89,7 @@ export function sceneView(
     slot.speaker = speaker;
     slot.face = face;
     const info = speakerInfo(data, speaker);
-    const img = await loadPortrait(speaker, face, standingFor(data, speaker, opts.flags));
+    const img = await loadPortrait(speaker, face, standingFor(data, speaker, opts.flags, opts.skins));
     if (slot.speaker !== speaker || slot.face !== face) return; // 그 사이 다른 줄로 넘어감
     const el = img
       ? h('img', { class: 'vn-portrait', src: img.src, alt: info.name })

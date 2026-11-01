@@ -1785,7 +1785,7 @@ export class BattleView {
     const def = resolveCard(this.data, cardId).def;
     sfx('cutin');
     const who = speakerInfo(this.data, line.speaker);
-    const img = await within(loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags)), 600, null);
+    const img = await within(loadPortrait(line.speaker, line.face, standingFor(this.data, line.speaker, this.state.flags, this.ctx.skins)), 600, null);
     const portrait = img
       ? h('img', { class: 'cutin-portrait', src: img.src, alt: who.name })
       : h('div', { class: 'cutin-portrait cutin-fallback', style: `--owner:${who.color}` }, who.name);

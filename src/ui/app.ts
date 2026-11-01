@@ -841,7 +841,9 @@ export class App {
     if (skip.auto) return then();
     const stage = this.run ? data.stages.find((s) => s.id === this.run!.stageId) : undefined;
     playBgm(mood ?? moodFor(scene.world ?? stage?.world));
-    this.show(sceneView(data, this.run ? sceneForRun(scene, this.run) : scene, then, { background: background ?? stage?.background, flags: this.run?.flags }));
+    // 입은 옷의 반신 그림(2026-11-01): 전투와 같은 규칙(순례·심연은 입은 옷 전부, 캠페인은 anyMode 세트)
+    const skins = this.run ? battleSkins(data, readWardrobe(data), this.run) : undefined;
+    this.show(sceneView(data, this.run ? sceneForRun(scene, this.run) : scene, then, { background: background ?? stage?.background, flags: this.run?.flags, skins }));
   }
 
   private battle(enc: Encounter): void {

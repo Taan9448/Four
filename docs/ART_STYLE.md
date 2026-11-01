@@ -130,6 +130,8 @@
 | skin_sullye_elia | 엘리아 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_elia` | magenta | large |
 | skin_sullye_kyle | 카일 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_kyle` | magenta | large |
 | skin_sullye_born | 보른 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_born` | magenta | large |
+| skin_moon_dancer_elia | 엘리아 옷장 「달빛 무희」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 남색 비단 홀터 상의·드러난 등과 허리·옆트임 긴 치마폭·은빛 초승달 장신구, 맨발 — 5절 `subjects.skin_moon_dancer_elia` | magenta | large |
+| skin_summer_lake_elia | 엘리아 옷장 「여름 호숫가」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 잎사귀 장식 흰 비키니·어깨로 흘러내린 연초록 리넨 덧옷·귀 뒤 흰 꽃·샌들, 화관 감은 지팡이 — 5절 `subjects.skin_summer_lake_elia` | magenta | large |
 | wang | 왕일검(S6~) | 낫처럼 굽은 등, 흐릿한 눈 속의 날카로운 빛, 숱 적은 흰 머리. **다리가 없어 바퀴 달린 나무 의자에 앉고 무릎에 담요**(초상화만) | none | portrait |
 | wang_cook | 왕 노인(S0) | 같은 인물이 두 다리가 있을 때: 낫처럼 굽은 등, 오른 다리를 절며 지팡이, 낡은 회갈색 주방 옷과 앞치마(초상화만) | none | portrait |
 | kwak_dojin | 곽도진 | 마른 몸, 단정히 빗어 넘긴 흰머리, 이마 주름, 서른 살처럼 맑고 차가운 눈, 흰 학창의, 소나무 결 무늬 송문고검 | magenta | large |
@@ -331,6 +333,28 @@ subjects:
     door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing a
     sturdy sand-coloured travelling coat over chainmail, an ochre hood, wooden beads woven into his beard braids;
     holding a heavy two-handed war hammer with a leather-wrapped haft
+  skin_moon_dancer_elia: >-
+    Elia, a nineteen-year-old half-elf mage, unmistakably an adult young woman with a slender, softly curvy
+    figure; long silver hair worn loose this time with a few thin braids and a silver crescent hairpin, ears
+    slightly pointed at the tips, grey eyes with a faint green tint; wearing a revealing elven moon-dancer
+    outfit for the Silver Forest moon festival: an opaque deep midnight-blue silk halter top with a deep V
+    neckline held by a silver crescent clasp, bare shoulders, bare back and bare arms; a bare slim midriff and
+    navel; a low-slung silver chain belt with small crescent pendants over a long midnight-blue silk skirt made
+    of a front panel and a back panel with side slits open up to the hip, so her bare legs show as she moves;
+    thin silver armlets, wrist bangles and anklets, barefoot; a long airy pale-blue silk ribbon draped over both
+    elbows; holding a slender pale wooden staff whose blue stone sits in a silver crescent. Glamorous, alluring
+    fantasy-game heroine style with an adult figure; all fabric is opaque, her nipples and groin always stay
+    covered; ordinary graceful poses
+  skin_summer_lake_elia: >-
+    Elia, a nineteen-year-old half-elf mage, unmistakably an adult young woman with a slender, softly curvy
+    figure; silver hair tied up in a loose high ponytail with a white flower tucked behind one slightly pointed
+    ear, grey eyes with a faint green tint, a cheerful summer smile; wearing a summer lakeside swimsuit outfit:
+    an opaque white two-piece bikini trimmed with small green leaf shapes — a halter bikini top that fully
+    covers the bust and classic bikini bottoms with an opaque front and small side ties — under a thin, open,
+    pale-green linen cover-up shirt that slips off both shoulders with the sleeves rolled up; bare midriff,
+    bare legs, simple woven sandals; holding her long wooden staff with the blue stone, a small wreath of white
+    flowers wound around the top of the staff. Bright, playful fantasy-game summer-event heroine style with an
+    adult figure; all fabric is opaque, her nipples and groin always stay covered; ordinary cheerful poses
   wang: >-
     Wang Ilgeom, the old former first disciple of the Cheongun sect who hid for forty years as a kitchen elder;
     back bent like a sickle, thin white hair tied back, deep wrinkles, hazy eyes hiding a sharp glint, a worn

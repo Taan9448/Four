@@ -1,0 +1,12 @@
+id: skin_summer_lake_elia_hit
+type: character-anim
+character: skin_summer_lake_elia
+summary: "엘리아 옷장 「여름 호숫가」 피격 3프레임"
+depends_on: [skin_summer_lake_elia_ref]
+reference: assets/source/skin_summer_lake_elia_ref.png
+facing: right
+frame_notes:
+  1: "struck, head turned away, the ponytail and the linen cover-up whipping"
+  2: "stumbling back, the staff raised across the body, a white petal falling from the wreath"
+  3: "steadying, a thin watery shimmer of a broken barrier fading"
+placeholder: { shape: humanoid, color: '#f2f2ea', accent: '#7ccf8a' }

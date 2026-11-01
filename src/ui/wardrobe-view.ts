@@ -5,6 +5,7 @@ import { spritesFor } from '../engine/state';
 import { equipSkin, SKIN_ANIMS, skinFits, skinSpriteId, unlockText, type Wardrobe } from '../engine/wardrobe';
 import { spriteSource } from '../render/assets';
 import { SpritePlayer } from '../render/sprite-player';
+import { loadPortrait, standingFor } from '../render/portrait';
 import { h } from './dom';
 
 /** 세트의 세 그림(대기·공격·피격)이 모두 실제 그림인가 — 아니면 원래 옷을 입는다 */
@@ -52,11 +53,19 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
     player?.stop();
     player = new SpritePlayer(canvas);
     void player.play(worn && ready ? skinSpriteId(data, worn, tab, 'idle') : baseIdle(data, tab), { loop: true });
+    // 반신 그림(2026-11-01): 반신 그림이 있는 세트(portrait)를 입으면 장면·컷인의 표정 셋도 이 옷 — 미리 보기에 함께 보인다
+    const set = worn ? data.skins.sets.find((s) => s.id === worn) : undefined;
+    const pic = h('div', { class: 'wd-portrait' });
+    const shown = tab;
+    void loadPortrait(tab, 'neutral', standingFor(data, tab, [], worn ? { [tab]: worn } : undefined)).then(
+      (img) => img && shown === tab && pic.replaceChildren(h('img', { src: img.src, alt: '' })),
+    );
     preview.replaceChildren(
       ...[
-        canvas,
+        h('div', { class: 'wd-figures' }, pic, canvas),
         h('h3', {}, `${data.characters.get(tab)!.name} — ${setName(worn)}`),
         worn && !ready ? h('p', { class: 'wd-note' }, '그림 준비 중 — 그림이 오면 바로 이 옷을 입는다. 그때까지는 원래 옷.') : null,
+        set?.portrait ? h('p', { class: 'wd-note' }, '장면·컷인의 반신 그림(표정 셋)도 이 옷으로 바뀐다.') : null,
         h(
           'p',
           { class: 'wd-note' },

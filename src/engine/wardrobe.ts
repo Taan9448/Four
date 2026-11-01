@@ -47,6 +47,16 @@ export const skinSpriteId = (data: GameData, setId: string, charId: string, anim
   return prefix ? `${prefix}_${anim}` : `skin_${setId}_${charId}_${anim}`;
 };
 
+/**
+ * 입은 옷의 반신 그림 id(2026-11-01 사용자 요청: 옷을 입으면 장면·컷인의 반신 그림 표정 셋도 바뀐다).
+ * 그 동료가 반신 그림이 있는 세트(portrait)를 입었으면 skin_<세트>_<동료>_stand, 아니면 undefined. 그림이 왔는지는 화면이 본다
+ */
+export function skinStandId(data: GameData, charId: string, skins: Readonly<Record<string, string>> | undefined): string | undefined {
+  const setId = skins?.[charId];
+  const set = setId ? data.skins.sets.find((s) => s.id === setId) : undefined;
+  return set?.portrait && skinFits(data, set.id, charId) ? skinSpriteId(data, set.id, charId, 'stand') : undefined;
+}
+
 /** 옷장이 여는 일 */
 export type SkinEvent =
   | { kind: 'campaignClear'; difficulty: 'normal' | 'hard'; hardcore: boolean }
