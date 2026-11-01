@@ -44,6 +44,8 @@
 @media (max-width: 600px) {
   :root { --fs-body: 1rem; --fs-sub: 0.9rem; --fs-cap: 0.84rem; --tap: var(--tap-mobile); --cpx-zoom: 1.2; }
 }
+/* 휴대폰 가로(높이 500px 이하): 폭은 넓어도 손가락으로 누르므로 터치 목표 44px */
+@media (max-height: 500px) { :root { --tap: var(--tap-mobile); } }
 /* 포커스 링: 키보드로 옮겨 다닐 때 모든 누르는 곳에 금빛 테 */
 :is(button, a, input, select, textarea, summary, [role='button'], [tabindex], .card, .node, label):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
@@ -1523,7 +1525,7 @@ button.potion-chip:hover { transform: translateY(-2px); box-shadow: 0 0 10px col
 .btn-world { border-color: rgba(143, 211, 255, 0.55); }
 .hub-member { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-sub); }
 .hub-member small { color: var(--ink-dim); }
-.stop.pick { background: none; border: 0; font: inherit; cursor: pointer; }
+.stop.pick { background: none; border: 0; font: inherit; cursor: pointer; min-height: var(--tap); }
 .stop.pick:hover { color: #fff; }
 .stop.pick:hover i { box-shadow: 0 0 0 5px rgba(226, 180, 92, 0.45); }
 .stop .replays { color: #e2b45c; font-size: var(--fs-min); }
@@ -2399,7 +2401,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
   .title-login .login-panel { padding: 10px 12px 12px; gap: 6px; }
   .title-login .login-form { gap: 6px; }
   .title-login .login-input { min-height: 38px; padding: 6px 10px; }
-  .title-login .login-submit { min-height: 40px; }
+  .title-login .login-submit { min-height: var(--tap); }
   .title-corner { top: 10px; bottom: auto; right: 12px; gap: 10px; }
   .medal.title-medal { width: 44px; height: 44px; font-size: calc(var(--fs-body) * 1.3); }
   .title-plate { left: 12px; bottom: 10px; max-width: calc(50% - 24px); padding: 6px 10px 6px 6px; gap: 8px; }
