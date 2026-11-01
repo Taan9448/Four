@@ -112,7 +112,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
     h(
       'header',
       { class: 'panel wd-head' },
-      h('div', {}, h('h2', {}, '옷장'), h('p', { class: 'hint' }, `연 옷 ${opened} / ${data.skins.sets.length}벌 — 캠페인·어려움·하드코어를 마치거나 심연·순례를 넘으면 한 벌씩 열린다.`)),
+      h('div', {}, h('h2', {}, '옷장'), h('p', { class: 'hint' }, `연 옷 ${opened} / ${data.skins.sets.length}벌 — 캠페인·어려움·하드코어를 마치거나 심연·순례를 넘거나 수련 레벨이 오르면 열린다.`)),
       h('button', { class: 'btn', onclick: () => (player?.stop(), handlers.onBack()) }, '돌아가기'),
     ),
     roster,

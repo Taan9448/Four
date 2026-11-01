@@ -356,6 +356,8 @@ export const SkinUnlock = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('pilgrimStage'), stage: z.string() }).strict(),
   /** 처음부터 열려 있다(카일 '은빛 기사검' 등 기본 그림의 다른 모습) */
   z.object({ kind: z.literal('always') }).strict(),
+  /** 수련 레벨(계정에 하나, training.ts)이 level에 이르면(2026-11-01 사용자 요청: 엘리아 두 벌 Lv.10·Lv.20) */
+  z.object({ kind: z.literal('trainingLevel'), level: z.number().int().positive() }).strict(),
 ]);
 export type SkinUnlock = z.infer<typeof SkinUnlock>;
 export const SkinData = z
