@@ -1,0 +1,11 @@
+id: skin_bulmyeol_born_stand
+type: character-standing
+character: skin_bulmyeol_born
+summary: "보른 옷장 「불멸」 반신 그림(기본·결의·놀람) — born_stand와 같은 얼굴·같은 화풍·같은 구도, 옷과 무기만 이 세트로, 무기는 도끼가 아니라 이 세트의 망치. 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-03 사용자 요청)"
+depends_on: [skin_bulmyeol_born_ref]
+reference: assets/source/born_stand.png
+frame_notes:
+  1: "neutral expression — stern unreadable face, arms crossed over the red beard braided into three; in this set's armor; noticeably shorter so more empty space is left above the head"
+  2: "resolute expression — eyes narrowed under heavy brows, the golden war hammer with glowing runes resting on the shoulder (a HAMMER, NOT an axe), no shield"
+  3: "surprised expression — bushy brows raised, eyes wide, red beard braids bouncing"
+placeholder: { color: '#6e5440', accent: '#ffd25a' }
