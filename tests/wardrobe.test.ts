@@ -64,10 +64,12 @@ describe('옷장(2026-10-12)', () => {
     expect(missing).toEqual([]);
   });
 
-  it('반신 그림 세트(엘리아 달빛 무희·여름 호숫가)를 입으면 반신 그림 id가 그 옷으로, 아니면 없다', () => {
+  it('반신 그림 세트(엘리아 달빛 무희·여름 호숫가, 기존 다섯 벌)를 입으면 반신 그림 id가 그 옷으로, 아니면 없다', () => {
     expect(skinStandId(data, 'elia', { elia: 'moon_dancer' })).toBe('skin_moon_dancer_elia_stand');
     expect(skinStandId(data, 'elia', { elia: 'summer_lake' })).toBe('skin_summer_lake_elia_stand');
-    expect(skinStandId(data, 'elia', { elia: 'cheongun' })).toBeUndefined(); // 반신 그림이 없는 세트
+    expect(skinStandId(data, 'elia', { elia: 'cheongun' })).toBe('skin_cheongun_elia_stand'); // 기존 벌도 반신 그림(2026-11-03)
+    expect(skinStandId(data, 'born', { born: 'simyeon' })).toBe('skin_simyeon_born_stand');
+    expect(skinStandId(data, 'kyle', { kyle: 'silver_sword' })).toBeUndefined(); // 은빛 기사검은 kyle_stand 그대로
     expect(skinStandId(data, 'elia', {})).toBeUndefined();
     expect(skinStandId(data, 'kyle', { kyle: 'moon_dancer' })).toBeUndefined(); // 엘리아만의 세트
     expect(skinStandId(data, 'elia', undefined)).toBeUndefined();

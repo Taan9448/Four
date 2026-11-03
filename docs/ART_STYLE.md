@@ -110,26 +110,26 @@
 | kyle_red | 카일 로웬(붉은 검, 2026-10-12 기본 전투 그림) | 같은 인물·같은 갑옷. **칼날이 짙은 진홍이고 날 끝이 식어 가는 숯불처럼 은은히 빛나는 긴 양날 검**(이그니스의 심장으로 벼림), 검은 쇠 코등이. 은빛 검(`kyle`)은 옷장 '은빛 기사검'으로 남는다 | magenta | large |
 | born | 보른(S1~S3, 도끼) | 작고 다부진 드워프(사람 키의 약 70%), 문짝 같은 어깨, 굵은 팔뚝, **얼굴 절반을 덮은 붉은 수염을 세 갈래로 땋음**, 자기 키만 한 양손 도끼. **방패 없음** | magenta | large |
 | born_hammer | 보른(S4~, 두린의 망치) | 같은 인물(붉은 수염은 그을려 끝이 조금 짧다). 드워프 문자가 새겨진 손잡이의 큰 전투 망치 | magenta | large |
-| skin_cheongun_haun | 진하운 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_haun` | magenta | large |
-| skin_cheongun_elia | 엘리아 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_elia` | magenta | large |
-| skin_cheongun_kyle | 카일 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_kyle` | magenta | large |
-| skin_cheongun_born | 보른 옷장 「청운의 귀환」(노말 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_born` | magenta | large |
-| skin_cheonma_haun | 진하운 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_haun` | green | large |
-| skin_cheonma_elia | 엘리아 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_elia` | green | large |
-| skin_cheonma_kyle | 카일 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_kyle` | green | large |
-| skin_cheonma_born | 보른 옷장 「천마를 넘어」(어려움 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_born` | green | large |
-| skin_bulmyeol_haun | 진하운 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_haun` | magenta | large |
-| skin_bulmyeol_elia | 엘리아 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_elia` | magenta | large |
-| skin_bulmyeol_kyle | 카일 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_kyle` | magenta | large |
-| skin_bulmyeol_born | 보른 옷장 「불멸」(하드코어 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_born` | magenta | large |
-| skin_simyeon_haun | 진하운 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_haun` | green | large |
-| skin_simyeon_elia | 엘리아 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_elia` | green | large |
-| skin_simyeon_kyle | 카일 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_kyle` | green | large |
-| skin_simyeon_born | 보른 옷장 「심연을 걷는 자」(심연 5굽이 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_born` | green | large |
-| skin_sullye_haun | 진하운 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_haun` | magenta | large |
-| skin_sullye_elia | 엘리아 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_elia` | magenta | large |
-| skin_sullye_kyle | 카일 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_kyle` | magenta | large |
-| skin_sullye_born | 보른 옷장 「순례의 끝」(순례 S9 클리어) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_born` | magenta | large |
+| skin_cheongun_haun | 진하운 옷장 「청운의 귀환」(노말 클리어, 반신 그림 `skin_cheongun_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_haun` | magenta | large |
+| skin_cheongun_elia | 엘리아 옷장 「청운의 귀환」(노말 클리어, 반신 그림 `skin_cheongun_elia_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_elia` | magenta | large |
+| skin_cheongun_kyle | 카일 옷장 「청운의 귀환」(노말 클리어, 반신 그림 `skin_cheongun_kyle_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_kyle` | magenta | large |
+| skin_cheongun_born | 보른 옷장 「청운의 귀환」(노말 클리어, 반신 그림 `skin_cheongun_born_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_born` | magenta | large |
+| skin_cheonma_haun | 진하운 옷장 「천마를 넘어」(어려움 클리어, 반신 그림 `skin_cheonma_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_haun` | green | large |
+| skin_cheonma_elia | 엘리아 옷장 「천마를 넘어」(어려움 클리어, 반신 그림 `skin_cheonma_elia_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_elia` | green | large |
+| skin_cheonma_kyle | 카일 옷장 「천마를 넘어」(어려움 클리어, 반신 그림 `skin_cheonma_kyle_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_kyle` | green | large |
+| skin_cheonma_born | 보른 옷장 「천마를 넘어」(어려움 클리어, 반신 그림 `skin_cheonma_born_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheonma_born` | green | large |
+| skin_bulmyeol_haun | 진하운 옷장 「불멸」(하드코어 클리어, 반신 그림 `skin_bulmyeol_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_haun` | magenta | large |
+| skin_bulmyeol_elia | 엘리아 옷장 「불멸」(하드코어 클리어, 반신 그림 `skin_bulmyeol_elia_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_elia` | magenta | large |
+| skin_bulmyeol_kyle | 카일 옷장 「불멸」(하드코어 클리어, 반신 그림 `skin_bulmyeol_kyle_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_kyle` | magenta | large |
+| skin_bulmyeol_born | 보른 옷장 「불멸」(하드코어 클리어, 반신 그림 `skin_bulmyeol_born_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_bulmyeol_born` | magenta | large |
+| skin_simyeon_haun | 진하운 옷장 「심연을 걷는 자」(심연 5굽이 클리어, 반신 그림 `skin_simyeon_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_haun` | green | large |
+| skin_simyeon_elia | 엘리아 옷장 「심연을 걷는 자」(심연 5굽이 클리어, 반신 그림 `skin_simyeon_elia_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_elia` | green | large |
+| skin_simyeon_kyle | 카일 옷장 「심연을 걷는 자」(심연 5굽이 클리어, 반신 그림 `skin_simyeon_kyle_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_kyle` | green | large |
+| skin_simyeon_born | 보른 옷장 「심연을 걷는 자」(심연 5굽이 클리어, 반신 그림 `skin_simyeon_born_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_simyeon_born` | green | large |
+| skin_sullye_haun | 진하운 옷장 「순례의 끝」(순례 S9 클리어, 반신 그림 `skin_sullye_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_haun` | magenta | large |
+| skin_sullye_elia | 엘리아 옷장 「순례의 끝」(순례 S9 클리어, 반신 그림 `skin_sullye_elia_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_elia` | magenta | large |
+| skin_sullye_kyle | 카일 옷장 「순례의 끝」(순례 S9 클리어, 반신 그림 `skin_sullye_kyle_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`kyle_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_kyle` | magenta | large |
+| skin_sullye_born | 보른 옷장 「순례의 끝」(순례 S9 클리어, 반신 그림 `skin_sullye_born_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_sullye_born` | magenta | large |
 | skin_moon_dancer_elia | 엘리아 옷장 「달빛 무희」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 남색 비단 홀터 상의·드러난 등과 허리·옆트임 긴 치마폭·은빛 초승달 장신구, 맨발 — 5절 `subjects.skin_moon_dancer_elia` | magenta | large |
 | skin_summer_lake_elia | 엘리아 옷장 「여름 호숫가」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 잎사귀 장식 흰 비키니·어깨로 흘러내린 연초록 리넨 덧옷·귀 뒤 흰 꽃·샌들, 화관 감은 지팡이 — 5절 `subjects.skin_summer_lake_elia` | magenta | large |
 | maeseol | 매설 — 진하운 옷장 「화산의 매설」(수련 Lv.20, 캠페인에서도, 반신 그림은 `maeseol_stand` 그대로 — 2026-11-01 사용자 요청) | 반신 그림(`maeseol_stand`)과 같은 인물·같은 옷을 전신으로: 턱선 단발·붉은 머리띠·왼뺨 대각 흉터, 흰 홀터·매화 자수·낮은 허리띠·옆트임 붉은 치마폭, 붉은 장화, 매화 술 직검 — 5절 `subjects.maeseol` | magenta | large |

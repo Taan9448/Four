@@ -1,0 +1,12 @@
+id: skin_simyeon_kyle_stand
+type: character-standing
+character: skin_simyeon_kyle
+summary: "카일 옷장 「심연을 걷는 자」 반신 그림(기본·결의·놀람) — kyle_stand와 같은 얼굴·같은 화풍·같은 구도, 옷과 무기만 이 세트로. 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-03 사용자 요청)"
+depends_on: [skin_simyeon_kyle_ref]
+reference: assets/source/kyle_stand.png
+chroma: green
+frame_notes:
+  1: "neutral expression — easy confident grin; in this set's armor and cape; one hand resting on the pommel of the black long sword with a violet glowing fuller at the hip"
+  2: "resolute expression — a fierce grin, the hilt of the black long sword with a violet glowing fuller gripped in both hands in front of the chest"
+  3: "surprised expression — eyebrows shot up, mouth open, leaning back with one hand raised"
+placeholder: { color: '#c2c6d1', accent: '#9b5cff' }

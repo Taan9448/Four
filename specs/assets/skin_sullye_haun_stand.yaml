@@ -1,0 +1,11 @@
+id: skin_sullye_haun_stand
+type: character-standing
+character: skin_sullye_haun
+summary: "진하운 옷장 「순례의 끝」 반신 그림(기본·결의·놀람) — haun_sword_stand와 같은 얼굴·같은 화풍·같은 구도, 옷과 무기만 이 세트로. 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-03 사용자 요청)"
+depends_on: [skin_sullye_haun_ref]
+reference: assets/source/haun_sword_stand.png
+frame_notes:
+  1: "neutral expression — calm, quiet, slightly distant look; lips closed; the long bangs partly over the eyes; in this set's outfit; the narrow straight sword with its hilt wrapped in white cloth sheathed at his left hip, one hand resting lightly on the grip"
+  2: "resolute expression — eyes sharpened and focused forward, jaw set, the narrow straight sword with its hilt wrapped in white cloth drawn and held upright before the chest"
+  3: "surprised expression — eyes wide, lips slightly parted, head drawn back a little, bangs swaying; the narrow straight sword with its hilt wrapped in white cloth still sheathed at the hip"
+placeholder: { color: '#8a90a3', accent: '#e2c27a' }
