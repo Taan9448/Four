@@ -5,6 +5,12 @@ summary: "카일 옷장 「심연을 걷는 자」 반신 그림(기본·결의�
 depends_on: [skin_simyeon_kyle_ref]
 reference: assets/source/kyle_stand.png
 chroma: green
+bleed: true
+framing: >-
+  a close-up half-body framed EXACTLY like the attached ORIGINAL portrait sheet: the head the same size and at the same height as in
+  the original, and the shoulders just as broad as in the original, so the shoulders and upper arms run off the LEFT and RIGHT sides
+  of the cell and are cut off there; the body is cut off cleanly by the bottom edge. Normal adult proportions as in the original —
+  NOT big-headed, NOT chibi: never keep the head large while drawing the shoulders, chest or arms narrower or smaller than the original.
 frame_notes:
   1: "neutral expression — easy confident grin; in this set's armor and cape; one hand resting on the pommel of the black long sword with a violet glowing fuller at the hip"
   2: "resolute expression — a fierce grin, the hilt of the black long sword with a violet glowing fuller gripped in both hands in front of the chest"
