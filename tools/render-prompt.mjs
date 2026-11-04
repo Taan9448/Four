@@ -228,7 +228,9 @@ export function renderPrompt(spec, style) {
           ? `Framing: the SAME character in all ${spec.frames} cells, at exactly the same size and the same position in every cell. ${spec.framing} `
           : `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
             `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. `) +
-        `Only the facial expression and a small change of hands or shoulders differ between cells.\n` +
+        `Only the facial expression and a small change of hands or shoulders differ between cells. ` +
+        // 2026-11-04: 원래 반신 그림을 참조로 옷만 바꾸면 머리는 그대로 두고 몸만 줄여 대두가 됐다 — 비율을 지키고, 줄여야 하면 머리까지 같이 줄인다
+        `Keep natural adult head-to-body proportions (match the attached original portrait if there is one): if the figure has to be smaller to fit, scale the head together with the body; never keep a large head on narrowed shoulders.\n` +
         // bleed: 거인 클로즈업 — 어깨가 칸 좌우로 잘려 나가되, 칸 사이에 키 색 띠를 남겨 옆 칸과 섞이지 않게 한다(게임은 좌우 6%를 흐린다)
         (spec.bleed
           ? `Each cell is its own close-up panel, like three comic panels side by side: the figure is too big to fit, so the shoulders and arms run off the LEFT and RIGHT sides of the panel and are cut off by a straight vertical line 16 px inside the cell border. Leave that 16 px strip of plain ${key.name} at both sides of every cell, top to bottom, so nothing touches or crosses into the neighbouring cell.\n`
