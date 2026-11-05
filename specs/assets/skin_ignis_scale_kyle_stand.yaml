@@ -1,0 +1,19 @@
+id: skin_ignis_scale_kyle_stand
+type: character-standing
+character: skin_ignis_scale_kyle
+summary: "카일 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — kyle_stand와 같은 화풍·같은 구도, 투구를 쓴 채(면갑은 용의 턱처럼 위로 열려 얼굴이 보인다). 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-05 사용자 요청)"
+depends_on: [skin_ignis_scale_kyle_ref]
+reference: assets/source/kyle_stand.png
+chroma: green
+bleed: true
+framing: >-
+  a close-up half-body framed EXACTLY like the attached ORIGINAL portrait sheet: the head (with the helm) at the same size and height as
+  the head in the original, and the shoulders just as broad as in the original, so the pauldrons and upper arms run off the LEFT and RIGHT
+  sides of the cell and are cut off there; the body is cut off cleanly by the bottom edge. Normal adult proportions as in the original —
+  NOT big-headed, NOT chibi. He WEARS the dragon-head helm in every cell; its fanged jaw visor is raised up like an open dragon mouth
+  so his whole face shows inside it.
+frame_notes:
+  1: "neutral expression — easy confident grin under the raised dragon-jaw visor of his helm; the obsidian scale armor with ember-glowing seams and the crimson cape; one gauntlet resting on the pommel of the flamberge at the hip"
+  2: "resolute expression — a fierce grin, the hilt of the red-hot glowing flamberge gripped in both hands in front of the chest, ember light on his face"
+  3: "surprised expression — eyebrows shot up, mouth open, leaning back with one gauntlet raised, the helm plume flickering"
+placeholder: { color: '#2b2627', accent: '#ff8a2a' }

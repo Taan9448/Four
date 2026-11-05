@@ -1,0 +1,13 @@
+id: skin_ignis_scale_kyle_hit
+type: character-anim
+character: skin_ignis_scale_kyle
+summary: "카일 옷장 「이그니스의 비늘」 피격 3프레임"
+depends_on: [skin_ignis_scale_kyle_ref]
+reference: assets/source/skin_ignis_scale_kyle_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "struck, helm snapped back, ember sparks scattering from the armor seams"
+  2: "stumbling back, sword arm lowered"
+  3: "steadying, the flamberge raised again"
+placeholder: { shape: humanoid, color: '#2b2627', accent: '#ff8a2a' }

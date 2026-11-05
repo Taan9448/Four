@@ -1,5 +1,6 @@
 // 옷장(GAME_DESIGN 13-2절, 2026-10-12 사용자 요청): 스토리를 마친 뒤 순례·심연에서 네 동료가 입는 옷을 고른다(카일 '은빛 기사검'은 처음부터·캠페인에서도).
 // 위: 머리 판, 동료 줄(이름·입은 옷), 아래: 미리 보기(대기 그림) + 세트 목록(원래 옷 + 연 세트 · 잠긴 세트는 여는 조건).
+// 구경(2026-11-05 사용자 요청): 세트 이름을 누르면 잠긴 옷도 미리 보기에 띄운다 — 입지는 못해도 모습은 본다.
 import type { GameData } from '../engine/data';
 import { spritesFor } from '../engine/state';
 import { equipSkin, SKIN_ANIMS, skinFits, skinSpriteId, unlockText, type Wardrobe } from '../engine/wardrobe';
@@ -29,6 +30,8 @@ export interface WardrobeHandlers {
 export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: WardrobeHandlers): HTMLElement {
   const chars = data.skins.characters.filter((id) => data.characters.has(id));
   let tab = chars[0];
+  /** 미리 보기에 띄운 세트(undefined면 입은 옷, null이면 원래 옷) */
+  let peek: string | null | undefined;
   let player: SpritePlayer | null = null;
   const roster = h('div', { class: 'wd-roster', role: 'tablist', 'aria-label': '동료' });
   const preview = h('div', { class: 'panel wd-preview' });
@@ -40,14 +43,15 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
       ...chars.map((id) =>
         h(
           'button',
-          { class: `wd-mate${id === tab ? ' on' : ''}`, role: 'tab', 'aria-selected': String(id === tab), onclick: () => ((tab = id), draw()) },
+          { class: `wd-mate${id === tab ? ' on' : ''}`, role: 'tab', 'aria-selected': String(id === tab), onclick: () => ((tab = id), (peek = undefined), draw()) },
           h('b', {}, data.characters.get(id)!.name),
           h('small', {}, setName(wardrobe.equipped[id])),
         ),
       ),
     );
-    // 미리 보기: 입은 세트의 대기 그림(그림이 아직이면 원래 옷)
-    const worn = wardrobe.equipped[tab];
+    // 미리 보기: 구경하는 세트(없으면 입은 세트)의 대기 그림(그림이 아직이면 원래 옷)
+    const worn = peek === undefined ? wardrobe.equipped[tab] : (peek ?? undefined);
+    const locked = !!worn && !wardrobe.unlocked.includes(worn);
     const ready = worn ? skinReady(data, worn, tab) : true;
     const canvas = h('canvas', { class: 'wd-canvas', width: 160, height: 160 }) as HTMLCanvasElement;
     player?.stop();
@@ -64,7 +68,8 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
       ...[
         h('div', { class: 'wd-figures' }, pic, canvas),
         h('h3', {}, `${data.characters.get(tab)!.name} — ${setName(worn)}`),
-        worn && !ready ? h('p', { class: 'wd-note' }, '그림 준비 중 — 그림이 오면 바로 이 옷을 입는다. 그때까지는 원래 옷.') : null,
+        locked && set ? h('p', { class: 'wd-note wd-lock' }, `🔒 잠긴 옷 — ${unlockText(data, set.unlock)}. 모습만 볼 수 있다.`) : null,
+        worn && !ready ? h('p', { class: 'wd-note' }, locked ? '그림 준비 중 — 지금은 원래 옷으로 보인다.' : '그림 준비 중 — 그림이 오면 바로 이 옷을 입는다. 그때까지는 원래 옷.') : null,
         set?.portrait ? h('p', { class: 'wd-note' }, '장면·컷인의 반신 그림(표정 셋)도 이 옷으로 바뀐다.') : null,
         h(
           'p',
@@ -73,18 +78,26 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
         ),
       ].filter((x): x is NonNullable<typeof x> => !!x),
     );
+    const shownId = (peek === undefined ? wardrobe.equipped[tab] : peek) ?? null;
     const row = (id: string | null) => {
       const set = id ? data.skins.sets.find((s) => s.id === id)! : null;
       const open = !id || wardrobe.unlocked.includes(id);
       const on = (wardrobe.equipped[tab] ?? null) === id;
       return h(
         'div',
-        { class: `wd-item${on ? ' on' : ''}${open ? '' : ' locked'}` },
+        { class: `wd-item${on ? ' on' : ''}${open ? '' : ' locked'}${shownId === id ? ' peek' : ''}` },
         h(
-          'div',
-          { class: 'wd-item-text' },
+          'button',
+          {
+            class: 'wd-item-text',
+            type: 'button',
+            'aria-pressed': String(shownId === id),
+            'aria-label': `${set ? set.name : '원래 옷'} 미리 보기`,
+            onclick: () => ((peek = id), draw()),
+          },
           h('b', {}, set ? set.name : '원래 옷'),
-          h('small', {}, set ? (open ? set.description : `🔒 ${unlockText(data, set.unlock)}`) : '이야기의 옷 그대로'),
+          h('small', {}, set ? set.description : '이야기의 옷 그대로'),
+          set && !open ? h('small', { class: 'wd-lock' }, `🔒 ${unlockText(data, set.unlock)}`) : null,
           set && open && !skinReady(data, set.id, tab) ? h('em', { class: 'wd-pending' }, '그림 준비 중') : null,
         ),
         h(
@@ -95,6 +108,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
             onclick: () => {
               equipSkin(data, wardrobe, tab, id);
               handlers.onSave(wardrobe);
+              peek = undefined;
               draw();
             },
           },
@@ -102,7 +116,7 @@ export function wardrobeView(data: GameData, wardrobe: Wardrobe, handlers: Wardr
         ),
       );
     };
-    list.replaceChildren(h('h3', {}, '옷'), row(null), ...data.skins.sets.filter((s) => skinFits(data, s.id, tab)).map((s) => row(s.id)));
+    list.replaceChildren(h('h3', {}, '옷'), h('p', { class: 'wd-note' }, '옷 이름을 누르면 잠긴 옷도 미리 볼 수 있다.'), row(null), ...data.skins.sets.filter((s) => skinFits(data, s.id, tab)).map((s) => row(s.id)));
   };
   draw();
   const opened = wardrobe.unlocked.length;
