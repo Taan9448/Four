@@ -2259,7 +2259,11 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; border: 1px sol
 .wd-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(0, 0, 0, 0.25); }
 .wd-item.on { border-color: #e2b45c; box-shadow: inset 0 0 0 1px rgba(226, 180, 92, 0.5); }
 .wd-item.locked { opacity: 0.6; }
-.wd-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wd-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; min-height: var(--tap); padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.wd-item-text:focus-visible { outline: 2px solid #e2b45c; outline-offset: 4px; border-radius: 6px; }
+.wd-item.peek { border-color: rgba(226, 180, 92, 0.7); background: rgba(74, 54, 26, 0.35); }
+.wd-item.locked.peek { opacity: 0.85; }
+.wd-lock { color: #e6c36a; }
 .wd-item-text small { color: var(--ink-dim); font-size: var(--fs-cap); }
 .wd-pending { font-style: normal; font-size: var(--fs-cap); color: #e6c36a; }
 @media (max-width: 720px) {

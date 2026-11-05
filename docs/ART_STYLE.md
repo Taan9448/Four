@@ -133,6 +133,8 @@
 | skin_moon_dancer_elia | 엘리아 옷장 「달빛 무희」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 남색 비단 홀터 상의·드러난 등과 허리·옆트임 긴 치마폭·은빛 초승달 장신구, 맨발 — 5절 `subjects.skin_moon_dancer_elia` | magenta | large |
 | skin_summer_lake_elia | 엘리아 옷장 「여름 호숫가」(처음부터, 캠페인에서도, 반신 그림 포함 — 2026-11-01 사용자 요청) | 같은 인물·같은 키와 비율(`elia_ref` 기준), 옷만 바꾼다. 잎사귀 장식 흰 비키니·어깨로 흘러내린 연초록 리넨 덧옷·귀 뒤 흰 꽃·샌들, 화관 감은 지팡이 — 5절 `subjects.skin_summer_lake_elia` | magenta | large |
 | maeseol | 매설 — 진하운 옷장 「화산의 매설」(수련 Lv.20, 캠페인에서도, 반신 그림은 `maeseol_stand` 그대로 — 2026-11-01 사용자 요청) | 반신 그림(`maeseol_stand`)과 같은 인물·같은 옷을 전신으로: 턱선 단발·붉은 머리띠·왼뺨 대각 흉터, 흰 홀터·매화 자수·낮은 허리띠·옆트임 붉은 치마폭, 붉은 장화, 매화 술 직검 — 5절 `subjects.maeseol` | magenta | large |
+| skin_ignis_scale_kyle | 카일 옷장 「이그니스의 비늘」(수련 Lv.20, 캠페인에서도, 반신 그림 포함 — 2026-11-05 사용자 요청) | 같은 인물·같은 키와 비율(`kyle_ref` 기준). 투구까지 갖춘 흑요 비늘 풀 판금, 숯불처럼 빛나는 이음매, 용머리 투구와 불꽃 깃, 끝이 그을린 진홍 망토, 붉게 달아오른 물결 칼날 플랑베르주 — 5절 `subjects.skin_ignis_scale_kyle` | green | large |
+| skin_ignis_scale_born | 보른 옷장 「이그니스의 비늘」(수련 Lv.20, 캠페인에서도, 반신 그림 포함 — 2026-11-05 사용자 요청) | 같은 인물·같은 키와 비율(`born_hammer_ref` 기준). 쇳물 균열이 빛나는 흑철 풀 판금, 불씨를 뿜는 굴뚝 뿔 투구(가리개는 코·뺨까지, 수염은 아래로), 녹은 핵이 빛나는 망치 — 5절 `subjects.skin_ignis_scale_born` | green | large |
 | wang | 왕일검(S6~) | 낫처럼 굽은 등, 흐릿한 눈 속의 날카로운 빛, 숱 적은 흰 머리. **다리가 없어 바퀴 달린 나무 의자에 앉고 무릎에 담요**(초상화만) | none | portrait |
 | wang_cook | 왕 노인(S0) | 같은 인물이 두 다리가 있을 때: 낫처럼 굽은 등, 오른 다리를 절며 지팡이, 낡은 회갈색 주방 옷과 앞치마(초상화만) | none | portrait |
 | kwak_dojin | 곽도진 | 마른 몸, 단정히 빗어 넘긴 흰머리, 이마 주름, 서른 살처럼 맑고 차가운 눈, 흰 학창의, 소나무 결 무늬 송문고검 | magenta | large |
@@ -334,6 +336,24 @@ subjects:
     door, thick forearms; a red beard covering half his face, braided into three braids; no shield; wearing a
     sturdy sand-coloured travelling coat over chainmail, an ochre hood, wooden beads woven into his beard braids;
     holding a heavy two-handed war hammer with a leather-wrapped haft
+  skin_ignis_scale_kyle: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin, his body and height exactly as in his reference
+    sheet; wearing ornate FULL plate armor forged from the black obsidian scales of the fire dragon Ignis:
+    overlapping dark scale plates whose seams and fine cracks glow like live embers (orange), sharp layered
+    pauldrons, a gold-edged gorget and belt, a crimson tabard with a small gold flame emblem, a long crimson cape
+    whose hem is charred into flame-shaped tatters; a dragon-head great helm: the visor shaped like the dragon's
+    fanged jaw, two swept-back black horns, a row of short spikes along the crest and a crimson flame-like plume
+    rising from the top, two ember-orange glints at the eye slits; holding a long two-handed flamberge with a
+    WAVY blade that glows red-hot orange from within along a bright yellow core line, a black crossguard shaped
+    like dragon claws and a gold pommel
+  skin_ignis_scale_born: >-
+    Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
+    door, thick forearms; a red beard braided into three braids; no shield; wearing ornate forge-lord dwarven FULL
+    plate of black iron whose seams and cracks glow with molten orange light, huge spiked pauldrons, a crimson
+    chest plate and a heavy gold buckle; a black iron helm with two short chimney-like horns puffing glowing
+    embers and a face guard over the nose and cheeks with ember-orange eye openings, his three red beard braids
+    hanging out below the guard bound with black iron rings; holding a heavy two-handed war hammer whose black
+    iron head is cracked open, showing a glowing molten core
   skin_moon_dancer_elia: >-
     Elia, a nineteen-year-old half-elf mage, unmistakably an adult young woman with a slender, softly curvy
     figure; long silver hair worn loose this time with a few thin braids and a silver crescent hairpin, ears
