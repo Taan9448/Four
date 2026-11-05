@@ -89,6 +89,21 @@ describe('옷장(2026-10-12)', () => {
     expect(['maeseol_ref', 'maeseol_idle', 'maeseol_attack', 'maeseol_hit', 'maeseol_stand'].filter((id) => !specs.has(id))).toEqual([]);
   });
 
+  it('카일·보른 「이그니스의 비늘」: 수련 Lv.20, 캠페인에서도, 반신 그림까지', async () => {
+    const w = parseWardrobe(data, null);
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 20 })).toContain('ignis_scale');
+    equipSkin(data, w, 'elia', 'ignis_scale'); // 카일·보른만
+    expect(w.equipped.elia).toBeUndefined();
+    equipSkin(data, w, 'kyle', 'ignis_scale');
+    equipSkin(data, w, 'born', 'ignis_scale');
+    expect(battleSkins(data, w, {})).toEqual({ kyle: 'ignis_scale', born: 'ignis_scale' }); // 캠페인에서도
+    expect(skinStandId(data, 'kyle', w.equipped)).toBe('skin_ignis_scale_kyle_stand');
+    const { readdirSync } = await import('node:fs');
+    const specs = new Set(readdirSync('specs/assets').map((f) => f.replace(/\.yaml$/, '')));
+    const ids = ['kyle', 'born'].flatMap((c) => ['ref', 'idle', 'attack', 'hit', 'stand'].map((a) => `skin_ignis_scale_${c}_${a}`));
+    expect(ids.filter((id) => !specs.has(id))).toEqual([]);
+  });
+
   it('엘리아 새 옷 두 벌은 수련 Lv.10 · Lv.20에 열리고 캠페인에서도 입는다', () => {
     const w = parseWardrobe(data, null);
     expect(w.unlocked).not.toContain('moon_dancer');
@@ -97,7 +112,7 @@ describe('옷장(2026-10-12)', () => {
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 9 })).toEqual([]);
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 10 })).toEqual(['moon_dancer']);
     expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 19 })).toEqual([]);
-    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 25 })).toEqual(['summer_lake', 'maeseol']); // 넘긴 레벨이어도 연다(진하운 「화산의 매설」도 Lv.20)
+    expect(unlockSkins(data, w, { kind: 'trainingLevel', level: 25 })).toEqual(['summer_lake', 'ignis_scale', 'maeseol']); // 넘긴 레벨이어도 연다(진하운 「화산의 매설」·카일·보른 「이그니스의 비늘」도 Lv.20)
     expect(unlockText(data, { kind: 'trainingLevel', level: 20 })).toBe('수련 Lv.20에 이른다');
     equipSkin(data, w, 'elia', 'summer_lake');
     expect(battleSkins(data, w, {})).toEqual({ elia: 'summer_lake' });

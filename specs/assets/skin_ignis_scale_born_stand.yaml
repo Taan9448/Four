@@ -1,0 +1,12 @@
+id: skin_ignis_scale_born_stand
+type: character-standing
+character: skin_ignis_scale_born
+summary: "보른 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — born_stand와 같은 화풍·같은 구도, 투구를 쓴 채(얼굴 가리개는 코·뺨까지, 눈과 눈썹은 보인다). 무기는 도끼가 아니라 이 세트의 망치(2026-11-05 사용자 요청)"
+depends_on: [skin_ignis_scale_born_ref]
+reference: assets/source/born_stand.png
+chroma: green
+frame_notes:
+  1: "neutral expression — stern eyes under heavy brows, seen through the opening of the black iron horned helm he WEARS (the face guard covers only the nose and cheeks); arms crossed over the three red beard braids hanging out below the guard; noticeably shorter so more empty space is left above the head"
+  2: "resolute expression — eyes narrowed, the war hammer with the glowing molten core resting on the shoulder (a HAMMER, NOT an axe), no shield, embers puffing from the helm horns"
+  3: "surprised expression — brows raised high and eyes wide inside the helm opening, red beard braids bouncing"
+placeholder: { color: '#2b2627', accent: '#ff8a2a' }

@@ -1,0 +1,12 @@
+id: skin_ignis_scale_kyle_ref
+type: character-ref
+character: skin_ignis_scale_kyle
+summary: "카일 옷장 「이그니스의 비늘」 기준 시트(3/4 정면 + 오른쪽 측면) — 투구까지 갖춘 풀아머, 무기도 바뀐다(2026-11-05 사용자 요청)"
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "full body, three-quarter front view, calm upright standing pose in the new full armor with the closed dragon-head helm ON, holding the long wavy-bladed flamberge glowing red-hot; the same body proportions and height as the attached reference sheet, only the armor, helm and weapon change"
+  2: "full body, side view facing right, the same armor, helm and proportions, standing ready with the long wavy-bladed flamberge glowing red-hot lowered"
+placeholder: { shape: humanoid, color: '#2b2627', accent: '#ff8a2a' }
