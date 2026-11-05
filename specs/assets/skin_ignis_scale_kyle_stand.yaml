@@ -1,7 +1,7 @@
 id: skin_ignis_scale_kyle_stand
 type: character-standing
 character: skin_ignis_scale_kyle
-summary: "카일 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — kyle_stand와 같은 화풍·같은 구도, 투구를 쓴 채(면갑은 용의 턱처럼 위로 열려 얼굴이 보인다). 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-05 사용자 요청)"
+summary: "카일 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — kyle_stand와 같은 화풍·같은 구도, 투구를 쓴 채(면갑은 용의 턱처럼 위로 열려 얼굴이 보인다). 옷을 입으면 장면·컷인·동료 창의 반신 그림이 이것으로 바뀐다(2026-11-05 사용자 요청) — 특별한 옷이라 칸마다 자세·효과까지 확실히 다른 순간(2026-11-06 사용자 요청: 기본은 윙크하며 검을 어깨에 걸침, 결의는 달아오른 검을 얼굴 옆에 세운 투지, 놀람은 저절로 닫히는 면갑을 붙잡음)"
 depends_on: [skin_ignis_scale_kyle_ref]
 reference: assets/source/kyle_stand.png
 chroma: green
@@ -12,8 +12,9 @@ framing: >-
   sides of the cell and are cut off there; the body is cut off cleanly by the bottom edge. Normal adult proportions as in the original —
   NOT big-headed, NOT chibi. He WEARS the dragon-head helm in every cell; its fanged jaw visor is raised up like an open dragon mouth
   so his whole face shows inside it.
+pose_variety: true
 frame_notes:
-  1: "neutral expression — easy confident grin under the raised dragon-jaw visor of his helm; the obsidian scale armor with ember-glowing seams and the crimson cape; one gauntlet resting on the pommel of the flamberge at the hip"
-  2: "resolute expression — a fierce grin, the hilt of the red-hot glowing flamberge gripped in both hands in front of the chest, ember light on his face"
-  3: "surprised expression — eyebrows shot up, mouth open, leaning back with one gauntlet raised, the helm plume flickering"
+  1: "neutral (cocky, relaxed) — the flat of the glowing flamberge resting lazily on one pauldron like a showman, his other gauntlet on his hip; chin tilted up, a lopsided smirk and a playful WINK; a single ember drifting past his face, the helm plume flickering softly"
+  2: "resolute (battle fury) — a wild, toothy battle grin, brows slammed down, eyes blazing; the red-hot flamberge raised upright right beside his face in both gauntlets, its orange glow lighting half his face from below, sparks and heat shimmer rising, the armor seams flaring brighter, the crimson cape whipping up behind the shoulders"
+  3: "surprised (caught off guard) — the fanged dragon-jaw visor starts to snap shut on its own and he catches it with one gauntlet, shoving it back up; eyes wide, mouth open in a startled shout, a puff of grey smoke bursting from the helm's nostrils, the flamberge lowered and forgotten in his other hand; his face still fully visible"
 placeholder: { color: '#2b2627', accent: '#ff8a2a' }

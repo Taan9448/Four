@@ -1,12 +1,13 @@
 id: skin_ignis_scale_born_stand
 type: character-standing
 character: skin_ignis_scale_born
-summary: "보른 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — born_stand와 같은 화풍·같은 구도, 투구를 쓴 채(얼굴 가리개는 코·뺨까지, 눈과 눈썹은 보인다). 무기는 도끼가 아니라 이 세트의 망치(2026-11-05 사용자 요청)"
+summary: "보른 옷장 「이그니스의 비늘」 반신 그림(기본·결의·놀람) — born_stand와 같은 화풍·같은 구도, 투구를 쓴 채(얼굴 가리개는 코·뺨까지, 눈과 눈썹은 보인다). 무기는 도끼가 아니라 이 세트의 망치(2026-11-05 사용자 요청) — 특별한 옷이라 칸마다 자세·효과까지 확실히 다른 순간(2026-11-06 사용자 요청: 기본은 수염을 쓰다듬는 뿌듯함, 결의는 뿔에서 불씨를 뿜는 함성, 놀람은 투구 뿔로 그을음을 터뜨림)"
 depends_on: [skin_ignis_scale_born_ref]
 reference: assets/source/born_stand.png
 chroma: green
+pose_variety: true
 frame_notes:
-  1: "neutral expression — stern eyes under heavy brows, seen through the opening of the black iron horned helm he WEARS (the face guard covers only the nose and cheeks); arms crossed over the three red beard braids hanging out below the guard; noticeably shorter so more empty space is left above the head"
-  2: "resolute expression — eyes narrowed, the war hammer with the glowing molten core resting on the shoulder (a HAMMER, NOT an axe), no shield, embers puffing from the helm horns"
-  3: "surprised expression — brows raised high and eyes wide inside the helm opening, red beard braids bouncing"
+  1: "neutral (gruff pride) — one gauntlet slowly stroking his three braided red beard braids, eyes half-closed and crinkled with smug satisfaction under the helm; the war hammer (a HAMMER, NOT an axe) stands head-down beside him, his other gauntlet resting on the end of its haft; a thin lazy wisp of smoke curling from the helm's chimney horns; noticeably shorter so more empty space is left above the head"
+  2: "resolute (furnace war cry) — leaning forward, roaring a battle cry, brows furious, eyes glowing ember-orange inside the helm opening; the molten-core hammer heaved up beside his shoulder in both fists (kept inside the cell), its core blazing white-orange; fountains of embers blasting from both helm horns like a forge chimney; no shield"
+  3: "surprised (soot sneeze) — a big sudden puff of black soot and sparks bursts from both helm horns, his eyes squeezed then popped wide, brows shot up, beard braids flying upward; one gauntlet flapping at the smoke in front of his face, the hammer leaning against his shoulder"
 placeholder: { color: '#2b2627', accent: '#ff8a2a' }

@@ -228,7 +228,10 @@ export function renderPrompt(spec, style) {
           ? `Framing: the SAME character in all ${spec.frames} cells, at exactly the same size and the same position in every cell. ${spec.framing} `
           : `Framing: the SAME character in all ${spec.frames} cells, half-body from the top of the head down to the waist, body turned slightly toward the viewer, ` +
             `at exactly the same size and the same position in every cell. The top of the head is a little below the top of the cell; the body is cut off cleanly by the bottom edge of the cell. `) +
-        `Only the facial expression and a small change of hands or shoulders differ between cells. ` +
+        // pose_variety(2026-11-06): 특별한 옷의 반신 그림 — 머리 크기·위치는 같게, 표정·손·무기 자세·효과는 칸마다 확실히 다르게
+        (spec.pose_variety
+          ? `The head stays at the same size and height in every cell, but each cell is a clearly DIFFERENT moment: the expression, the hands, the weapon pose and the glowing effects change as described for that cell, so the three cells never look like the same picture with only the mouth changed. `
+          : `Only the facial expression and a small change of hands or shoulders differ between cells. `) +
         // 2026-11-04: 원래 반신 그림을 참조로 옷만 바꾸면 머리는 그대로 두고 몸만 줄여 대두가 됐다 — 비율을 지키고, 줄여야 하면 머리까지 같이 줄인다
         `Keep natural adult head-to-body proportions (match the attached original portrait if there is one): if the figure has to be smaller to fit, scale the head together with the body; never keep a large head on narrowed shoulders.\n` +
         // bleed: 거인 클로즈업 — 어깨가 칸 좌우로 잘려 나가되, 칸 사이에 키 색 띠를 남겨 옆 칸과 섞이지 않게 한다(게임은 좌우 6%를 흐린다)
