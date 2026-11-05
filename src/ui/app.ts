@@ -316,8 +316,11 @@ export class App {
       case 'codex':
         return this.codex((id as CodexTab | undefined) ?? 'cards');
       case 'wardrobe': {
-        // 옷장: 모든 세트를 연 채로(저장하지 않는다)
-        const w = { unlocked: data.skins.sets.map((s) => s.id), equipped: { haun: data.skins.sets[0].id } as Record<string, string> };
+        // 옷장: 모든 세트를 연 채로(저장하지 않는다). &locked: 처음 계정처럼 잠긴 채로(잠긴 옷 구경 점검)
+        const locked = new URLSearchParams(location.search).has('locked');
+        const w = locked
+          ? { unlocked: data.skins.sets.filter((s) => s.unlock.kind === 'always').map((s) => s.id), equipped: {} as Record<string, string> }
+          : { unlocked: data.skins.sets.map((s) => s.id), equipped: { haun: data.skins.sets[0].id } as Record<string, string> };
         return this.show(this.backdrop(wardrobeView(data, w, { onBack: () => this.title(), onSave: () => {} }), 'bg_loadout'));
       }
       case 'pilgrim': {

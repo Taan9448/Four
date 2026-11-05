@@ -1,0 +1,18 @@
+id: skin_ignis_scale_kyle_attack
+type: character-anim
+character: skin_ignis_scale_kyle
+summary: "카일 옷장 「이그니스의 비늘」 공격 6프레임"
+depends_on: [skin_ignis_scale_kyle_ref]
+reference: assets/source/skin_ignis_scale_kyle_ref.png
+facing: right
+chroma: green
+events: { hit: 4 }
+bbox_tolerance: 0.3
+frame_notes:
+  1: "the flamberge held at the right shoulder, knees bent, weight back"
+  2: "big step forward, the flamberge raised beside the helm"
+  3: "body leaning in, the flamberge at its peak beside the helm (not far above it)"
+  4: "heavy straight downward cut to the right, a thin orange ember streak trailing the wavy blade"
+  5: "follow-through, the flamberge low in front, a few sparks falling, cape swinging forward"
+  6: "recovering to the ready stance"
+placeholder: { shape: humanoid, color: '#2b2627', accent: '#ff8a2a' }

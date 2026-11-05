@@ -1,0 +1,14 @@
+id: skin_ignis_scale_kyle_idle
+type: character-anim
+character: skin_ignis_scale_kyle
+summary: "카일 옷장 「이그니스의 비늘」 대기 4프레임"
+depends_on: [skin_ignis_scale_kyle_ref]
+reference: assets/source/skin_ignis_scale_kyle_ref.png
+facing: right
+chroma: green
+frame_notes:
+  1: "ready knight stance, the flamberge held forward in both hands, weight on the back foot, ember glow along the armor seams"
+  2: "shoulders rise slightly, the cape's charred hem sways, the helm plume flickers"
+  3: "rolls the shoulders, the flamberge tip lifts a little, its glow pulses brighter"
+  4: "settles back, plume and cape settling"
+placeholder: { shape: humanoid, color: '#2b2627', accent: '#ff8a2a' }

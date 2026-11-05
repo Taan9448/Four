@@ -1,0 +1,19 @@
+id: skin_ignis_scale_born_attack
+type: character-anim
+character: skin_ignis_scale_born
+summary: "보른 옷장 「이그니스의 비늘」 공격 6프레임"
+depends_on: [skin_ignis_scale_born_ref]
+reference: assets/source/skin_ignis_scale_born_ref.png
+facing: right
+size_note: "IMPORTANT size: draw Born SMALLER than in the attached reference sheet, at the same on-screen size as his normal battle animations (born_hammer_idle/attack/hit): about 70 px tall from the top of the head to the soles in the 160 px frame, about 87% of the reference sheet figure; keep the same proportions, only scale the whole figure down"
+chroma: green
+events: { hit: 4 }
+bbox_tolerance: 0.3
+frame_notes:
+  1: "hammer drawn back behind the shoulder with both hands, its molten core glowing"
+  2: "steps forward, hammer swinging up"
+  3: "hammer at its peak beside the helm (not far above it), body coiled"
+  4: "a heavy blow down to the right, a burst of orange sparks and grey dust"
+  5: "follow-through, hammer head on the ground, beard braids swinging forward"
+  6: "recovering, hammer resting again"
+placeholder: { shape: humanoid, color: '#2b2627', accent: '#ff8a2a' }
