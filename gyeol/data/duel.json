@@ -923,7 +923,7 @@
       "id": "nakun",
       "name": "낙운무흔",
       "hanja": "落雲無痕",
-      "chain": 3,
+      "chain": 5,
       "pure": false,
       "damage": 0.06,
       "posture": 0.45,
@@ -935,7 +935,7 @@
       "name": "벽운단하",
       "hanja": "劈雲斷河",
       "chain": 5,
-      "pure": false,
+      "pure": true,
       "damage": 0.22,
       "posture": 0.35,
       "returnMul": 0,
@@ -945,11 +945,11 @@
       "id": "unhae",
       "name": "운해귀종",
       "hanja": "雲海歸宗",
-      "chain": 5,
-      "pure": true,
+      "chain": 10,
+      "pure": false,
       "damage": 0.1,
       "posture": 1.0,
-      "returnMul": 1.5,
+      "returnMul": 0.75,
       "line": "운해귀종은 베는 초식이 아니다. 돌려보내는 초식이다."
     }
   ]
