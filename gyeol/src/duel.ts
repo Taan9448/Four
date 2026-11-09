@@ -360,11 +360,19 @@ export const streakTier = (d: Duel): number => d.data.rules.streakTiers.filter((
 
 export const isFocusing = (d: Duel): boolean => d.t < d.focusUntil;
 
-/** 받기(패링)·베기·피하기·기술·집중 입력. 지금 시각(d.t)에 누른 것으로 친다. 받아들였으면 true */
-export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus'): boolean {
+/** 입력이 화면에 늦게 닿았을 때 거슬러 올라갈 수 있는 최대 ms(그 사이 판정이 끝난 공격은 되돌리지 않는다) */
+export const MAX_INPUT_LAG = 80;
+
+/**
+ * 받기(패링)·베기·피하기·기술·집중 입력. 받아들였으면 true.
+ * at: 실제로 누른 대결 시각(2026-11-09 입력 시각 보정). 화면 프레임이 입력보다 늦게 돌면 d.t보다 이르다.
+ * 받기·피하기만 그 시각으로 판정한다(아직 판정하지 않은 타격에 한해). 베기·기술은 지금 시작한다.
+ */
+export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus', at = d.t): boolean {
   if (d.result) return false;
   const p = d.player;
   const r = d.data.rules;
+  const t0 = Math.min(d.t, Math.max(at, d.t - MAX_INPUT_LAG));
   if (input === 'focus') {
     // 집중: 게이지가 가득 찼을 때만, 무엇을 하는 중이든 쓸 수 있다(박자 도전에는 없다)
     if (d.mode === 'rhythm' || d.focus < r.focusMax || isFocusing(d)) return false;
@@ -376,18 +384,18 @@ export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'f
   if (d.clash) return input === 'attack' || input === 'parry' ? clashPress(d) : false;
   if (p.action !== 'idle') return false;
   if (input === 'parry') {
-    if (d.t - p.lastPress < r.parryLockout) return false;
-    p.lastPress = d.t;
-    p.parryAt = d.t;
+    if (t0 - p.lastPress < r.parryLockout) return false;
+    p.lastPress = t0;
+    p.parryAt = t0;
     return true;
   }
   if (input === 'dodge') {
-    if (d.t - p.lastDodge < r.dodgeLockout) return false;
-    p.lastDodge = d.t;
+    if (t0 - p.lastDodge < r.dodgeLockout) return false;
+    p.lastDodge = t0;
     p.action = 'dodge';
-    p.actionStart = d.t;
-    p.actionEnd = d.t + r.dodgeDuration;
-    p.iframeUntil = d.t + r.dodgeIframe;
+    p.actionStart = t0;
+    p.actionEnd = t0 + r.dodgeDuration;
+    p.iframeUntil = t0 + r.dodgeIframe;
     p.parryAt = null;
     return true;
   }

@@ -163,3 +163,41 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
   .art-frames .foe-bar b { width: 200px; height: 64px; line-height: 64px; }
   .art-frames .me-bar b { width: 150px; height: 45px; line-height: 45px; font-size: 14px; }
 }
+
+/* 7-4절 1단계(2026-11-09): 설정 창 · 로딩 · 전체 화면 · 휴대폰 가로 배치 */
+.settings-open { margin-top: 18px; }
+.settings-panel { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(4, 3, 6, 0.72); padding: 16px; }
+.settings-box { width: min(460px, 100%); max-height: 92vh; overflow: auto; padding: 20px 22px; border-radius: 14px; border: 1px solid rgba(226, 180, 92, 0.35); background: linear-gradient(180deg, #1f1a14, #120f0c); }
+.settings-box h2 { margin: 0 0 12px; font-family: 'Song Myung', serif; font-weight: 400; font-size: 28px; }
+.settings-box .row { display: grid; grid-template-columns: 7.5em 1fr 4em; align-items: center; gap: 10px; min-height: var(--tap); }
+.settings-box .row.end { display: flex; justify-content: flex-end; margin-top: 8px; }
+.settings-box input[type='range'] { width: 100%; accent-color: var(--gold); }
+.settings-box input[type='checkbox'] { width: 22px; height: 22px; accent-color: var(--gold); justify-self: start; }
+.settings-box select { min-height: 40px; border-radius: 8px; background: #1d1a22; color: var(--ink); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0 8px; font: inherit; }
+.settings-box output { text-align: right; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.settings-box .note { margin: 0 0 6px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; }
+.loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0b0a0e; }
+.loading span { font-family: 'Song Myung', serif; font-size: 22px; color: var(--ink-dim); animation: inkPulse 1.2s ease-in-out infinite; }
+@keyframes inkPulse { 50% { opacity: 0.35; letter-spacing: 0.08em; } }
+.fs { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(10, 8, 14, 0.55); color: var(--ink-dim); font-size: 20px; cursor: pointer; }
+.fs[hidden] { display: none; }
+.rotate-hint { display: none; }
+@media (max-width: 640px) and (orientation: portrait) {
+  .rotate-hint { display: block; margin: 10px 14px 0; color: var(--ink-dim); font-size: 13px; text-align: center; }
+}
+/* 휴대폰 가로: 화면을 꽉 채우고 버튼을 양손 엄지 자리에 겹친다(왼손 받기·피하기, 오른손 베기·기술·집중) */
+@media (orientation: landscape) and (max-height: 520px) {
+  .duel { position: relative; width: 100vw; height: 100vh; height: 100dvh; padding: 0; overflow: hidden; }
+  .duel .stage { width: min(100vw, 177.78vh); margin: 0 auto; }
+  .duel .pads { position: absolute; inset: 0; display: block; padding: 0; pointer-events: none; }
+  .duel .pad, .duel .back { position: absolute; pointer-events: auto; width: 31vh; min-width: 118px; min-height: 0; height: 15vh; font-size: 17px; opacity: 0.92; }
+  .duel .pad small { display: none; }
+  .duel .pad.parry { left: 2vw; bottom: 5vh; height: 19vh; font-size: 20px; }
+  .duel .pad.dodge { left: 2vw; bottom: 27vh; }
+  .duel .pad.attack { right: 2vw; bottom: 5vh; height: 19vh; font-size: 20px; }
+  .duel .pad.tech { right: 2vw; bottom: 27vh; }
+  .duel .pad.focus { right: 2vw; bottom: 45vh; }
+  .duel .back { left: 50%; bottom: 3vh; transform: translateX(-50%); height: 11vh; width: auto; min-width: 0; padding: 0 14px; white-space: nowrap; font-size: 13px; }
+  .duel .me-bar { bottom: auto; top: 12px; }
+  .rotate-hint { display: none; }
+}

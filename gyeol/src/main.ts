@@ -1,13 +1,15 @@
 // 「결」 목업(2026-11-09): 상대 고르기 → 대결 또는 박자 도전 → 결과.
 // 입력: 받기 K·Space, 베기 J·화면 클릭, 피하기 L·Shift, 기술 I, 집중 U, Esc 상대 고르기. 휴대폰은 버튼.
 // 4차(2026-11-09): 칼 맞부딪힘 겨루기(J·K 연타), 위기(배수의 진), 집중(심안), 적별 결정타, 날씨 입자, 적 도발·하운 대사.
-import { initAudio, sfx } from '../../src/render/audio';
+import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import raw from '../data/duel.json';
 import { advance, createDuel, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
+import { loadSave, writeSave, type Quality } from './save';
+import { openSettings } from './settings';
 import { createWeather, gust } from './scene';
-import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
+import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
 
 const data = raw as unknown as DuelData;
@@ -16,7 +18,6 @@ let stopLoop: (() => void) | null = null;
 
 const ELEMENT_NAME: Record<Element, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
 const WORD: Record<Judgement, JudgeWord> = { excellent: 'EXCELLENT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
-const BEST_KEY = 'gyeol.rhythmBest';
 const GROUND_TEXT_Y = CONTACT.y - 150;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, ...kids: (Node | string)[]): HTMLElementTagNameMap[K] {
@@ -27,21 +28,13 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string,
 }
 
 function readBest(): Record<string, { accuracy: number; rank: string }> {
-  try {
-    return JSON.parse(localStorage.getItem(BEST_KEY) ?? '{}') as Record<string, { accuracy: number; rank: string }>;
-  } catch {
-    return {};
-  }
+  return loadSave().rhythmBest;
 }
 function writeBest(id: string, accuracy: number, rank: string): boolean {
-  const best = readBest();
-  if ((best[id]?.accuracy ?? -1) >= accuracy) return false;
-  best[id] = { accuracy, rank };
-  try {
-    localStorage.setItem(BEST_KEY, JSON.stringify(best));
-  } catch {
-    // 저장이 막힌 브라우저면 이번 판만
-  }
+  const save = loadSave();
+  if ((save.rhythmBest[id]?.accuracy ?? -1) >= accuracy) return false;
+  save.rhythmBest[id] = { accuracy, rank };
+  writeSave(save);
   return true;
 }
 
@@ -66,6 +59,23 @@ function applyUiArt(): void {
 function padIcon(kind: (typeof PAD_ART)[number]): HTMLImageElement | '' {
   const u = frameUrl('icons_gyeol_pads', PAD_ART.indexOf(kind) + 1, { realOnly: true });
   return u ? el('img', { class: 'pad-icon', src: u, alt: '' }) : '';
+}
+
+/**
+ * 화면 품질(7-4절): 설정이 auto면 high에서 시작해, 대결 중 프레임이 계속 느리면(1.5초 평균 20ms 넘음) 한 단계씩 내린다.
+ * 내린 단계는 이번 판(페이지) 동안 기억한다.
+ */
+let autoQuality: Exclude<Quality, 'auto'> = 'high';
+const currentQuality = (): Exclude<Quality, 'auto'> => {
+  const q = loadSave().settings.quality;
+  return q === 'auto' ? autoQuality : q;
+};
+
+/** 설정을 소리·흔들림에 반영한다 */
+function applySettings(): void {
+  const st = loadSave().settings;
+  setVolumes({ master: st.master, bgm: st.bgm, sfx: st.sfx });
+  setShakeScale(st.shake);
 }
 
 function elementsOf(f: FoeDef): Element[] {
@@ -112,9 +122,16 @@ function title(): void {
         el('p', {}, el('kbd', {}, 'U'), ' 집중(심안) — 받기로 모은 게이지가 차면 잠시 시간이 느려지고 결이 처음부터 보인다. 속임수는 虛로 드러난다.'),
         el('p', {}, '체력이 20% 아래면 배수의 진 — EXCELLENT 판정이 넓어진다.'),
       ),
+      settingsButton(),
       el('p', { class: 'proto' }, '목업 · 하운의 받기·피하기 동작과 결 이펙트·기운·아이콘은 Codex 그림이 오면 자동으로 바뀐다'),
     ),
   );
+}
+
+function settingsButton(): HTMLButtonElement {
+  const b = el('button', { class: 'btn settings-open', type: 'button' }, '설정');
+  b.addEventListener('click', () => openSettings(applySettings));
+  return b;
 }
 
 async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
@@ -152,16 +169,43 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), '상대 고르기');
   back.addEventListener('click', title);
   const overlay = el('div', { class: 'result', hidden: '' });
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back)));
+  const loading = el('div', { class: 'loading' }, el('span', {}, '결을 고르는 중…'));
+  const fsBtn = el('button', { class: 'fs', type: 'button', 'aria-label': '전체 화면', title: '전체 화면' }, '⛶');
+  fsBtn.addEventListener('click', () => {
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void document.documentElement.requestFullscreen?.().catch(() => undefined);
+  });
+  if (!document.fullscreenEnabled) fsBtn.hidden = true;
+  const hint = el('p', { class: 'rotate-hint' }, '휴대폰을 가로로 돌리면 화면이 커지고 버튼이 양손 엄지 자리로 갑니다');
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay, loading, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back), hint));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
   const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id);
+  loading.remove();
+  // 대결 중 화면이 꺼지지 않게(지원하는 브라우저만)
+  let wake: { release(): Promise<void> } | null = null;
+  void (navigator as Navigator & { wakeLock?: { request(t: 'screen'): Promise<{ release(): Promise<void> }> } }).wakeLock
+    ?.request('screen')
+    .then((w) => (wake = w))
+    .catch(() => undefined);
+  // 품질: high면 고해상도 화면에서 캔버스를 그만큼 키운다(최대 2배)
+  let quality = currentQuality();
+  const fitCanvas = () => {
+    setRenderQuality(quality);
+    const k = quality === 'high' ? Math.min(2, Math.max(1, Math.round(((window.devicePixelRatio || 1) * canvas.clientWidth) / W * 2) / 2)) : 1;
+    if (canvas.width !== W * k) {
+      canvas.width = W * k;
+      canvas.height = H * k;
+    }
+  };
+  fitCanvas();
   const fx: Fx = emptyFx();
   fx.weather = createWeather(foeDef.weather);
   let hitstopUntil = 0;
-  let last = performance.now();
+  /** 대결 시계를 마지막으로 민 실제 시각(입력 시각 보정의 기준) */
+  let lastReal = performance.now();
   let raf = 0;
   let alive = true;
   let lastTier = 0;
@@ -201,30 +245,50 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   let lastBeat = 0;
   let lastClashFx = 0;
 
-  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus') => {
-    if (!alive) return;
-    if (press(d, input) && input === 'parry') fx.guardPose = performance.now();
+  /** 지금 대결 시계가 실제 시간의 몇 배로 흐르는가(끝 장면·집중이면 느리게) */
+  const rateAt = (real: number) => (real < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : 1);
+  /** 대결 시계를 실제 시각 real까지 민다(멈칫 동안은 멈춰 있다) */
+  const advanceTo = (real: number) => {
+    if (real <= lastReal) return;
+    const from = Math.max(lastReal, Math.min(real, hitstopUntil));
+    const dt = Math.min(50, real - from);
+    if (dt > 0) advance(d, d.t + dt * rateAt(real));
+    lastReal = real;
   };
-  attackBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('attack')));
-  dodgeBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('dodge')));
-  parryBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('parry')));
-  techBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('tech')));
-  focusBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('focus')));
-  canvas.addEventListener('pointerdown', () => doPress('attack'));
+  /**
+   * 입력 시각 보정(7-4절): 누른 순간(event.timeStamp − 판정 보정)까지 대결 시계를 먼저 민 다음 누른다.
+   * 화면이 그보다 이미 앞서 있으면(입력이 늦게 닿음) 그만큼 거슬러 올라간 시각으로 받기·피하기를 판정한다.
+   */
+  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus', stamp: number) => {
+    if (!alive) return;
+    const real = stamp - loadSave().settings.inputOffset;
+    advanceTo(real);
+    const at = real < lastReal ? d.t - (lastReal - real) * rateAt(real) : d.t;
+    if (press(d, input, at) && input === 'parry') fx.guardPose = performance.now();
+  };
+  const onPad = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus') => (e: PointerEvent) => (e.preventDefault(), doPress(input, e.timeStamp));
+  attackBtn.addEventListener('pointerdown', onPad('attack'));
+  dodgeBtn.addEventListener('pointerdown', onPad('dodge'));
+  parryBtn.addEventListener('pointerdown', onPad('parry'));
+  techBtn.addEventListener('pointerdown', onPad('tech'));
+  focusBtn.addEventListener('pointerdown', onPad('focus'));
+  canvas.addEventListener('pointerdown', (e) => doPress('attack', e.timeStamp));
   const onKey = (e: KeyboardEvent) => {
     if (e.repeat) return;
     const k = e.key.toLowerCase();
-    if (k === 'k' || k === ' ') (e.preventDefault(), doPress('parry'));
-    else if (k === 'j') doPress('attack');
-    else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge'));
-    else if (k === 'i') doPress('tech');
-    else if (k === 'u') doPress('focus');
+    if (k === 'k' || k === ' ') (e.preventDefault(), doPress('parry', e.timeStamp));
+    else if (k === 'j') doPress('attack', e.timeStamp);
+    else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge', e.timeStamp));
+    else if (k === 'i') doPress('tech', e.timeStamp);
+    else if (k === 'u') doPress('focus', e.timeStamp);
     else if (k === 'escape') title();
   };
   window.addEventListener('keydown', onKey);
 
-  const spark = (x: number, y: number, n: number, color: string, speed = 260, size = 4) => {
+  const spark = (x: number, y: number, count: number, color: string, speed = 260, size = 4) => {
     const now = performance.now();
+    // 품질이 낮으면 불꽃 수를 줄인다
+    const n = Math.max(1, Math.round(count * (quality === 'high' ? 1 : quality === 'normal' ? 0.6 : 0.35)));
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2 + (i % 3) * 0.3;
       const v = speed * (0.5 + ((i * 37) % 10) / 10);
@@ -232,7 +296,8 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     }
   };
   const text = (x: number, y: number, s: string, color: string, size = 34, icon?: number) => fx.texts.push({ x, y, text: s, color, born: performance.now(), size, icon });
-  const flash = (color: string, life: number, strength = 0.55) => (fx.flash = { color, born: performance.now(), life, strength });
+  // 번쩍임 줄이기(광과민 설정)면 세기를 크게 낮춘다
+  const flash = (color: string, life: number, strength = 0.55) => (fx.flash = { color, born: performance.now(), life, strength: loadSave().settings.reduceFlash ? strength * 0.25 : strength });
   const elColor = (e?: Element) => ELEMENT_COLOR[e ?? 'none'];
   const bloomColor = (e?: Element) => (e === 'fire' ? 'rgba(255,170,80,ALPHA)' : e === 'ice' ? 'rgba(170,235,255,ALPHA)' : e === 'lightning' ? 'rgba(210,160,255,ALPHA)' : 'rgba(255,214,120,ALPHA)');
 
@@ -530,44 +595,77 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
 
   const steps = foeDef.chart?.steps ?? [];
   const chartEnd = steps.length ? steps[steps.length - 1].at : 1;
+  // 막대·버튼은 값이 바뀔 때만 DOM에 쓴다(매 프레임 쓰면 스타일 계산이 프레임마다 돈다 — 7-4절)
+  const shown = new Map<string, string>();
+  const put = (key: string, value: string, apply: (v: string) => void) => {
+    if (shown.get(key) === value) return;
+    shown.set(key, value);
+    apply(value);
+  };
+  const pct = (x: number) => `${(Math.max(0, Math.min(1, x)) * 100).toFixed(1)}%`;
   const bars = () => {
     if (rhythm) {
-      progress.style.width = `${Math.min(1, d.t / chartEnd) * 100}%`;
+      put('progress', pct(d.t / chartEnd), (v) => (progress.style.width = v));
       const sc = rhythmScore(d);
-      scoreEl.textContent = sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · EXCELLENT ${d.stats.excellent} · GREAT ${d.stats.perfect - d.stats.excellent} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라';
+      put('score', sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · EXCELLENT ${d.stats.excellent} · GREAT ${d.stats.perfect - d.stats.excellent} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라', (v) => (scoreEl.textContent = v));
     } else {
-      foeHp.style.width = `${(d.foe.hp / foeDef.hp) * 100}%`;
-      foePosture.style.width = `${Math.min(1, d.foe.posture / foeDef.posture) * 100}%`;
-      myHp.style.width = `${(d.player.hp / data.player.hp) * 100}%`;
-      myPosture.style.width = `${Math.min(1, d.player.posture / data.player.posture) * 100}%`;
+      put('foeHp', pct(d.foe.hp / foeDef.hp), (v) => (foeHp.style.width = v));
+      put('foePosture', pct(d.foe.posture / foeDef.posture), (v) => (foePosture.style.width = v));
+      put('myHp', pct(d.player.hp / data.player.hp), (v) => (myHp.style.width = v));
+      put('myPosture', pct(d.player.posture / data.player.posture), (v) => (myPosture.style.width = v));
       const fk = d.focus / data.rules.focusMax;
-      myFocus.style.width = `${(isFocusing(d) ? (d.focusUntil - d.t) / data.rules.focusDuration : fk) * 100}%`;
-      focusBtn.style.setProperty('--focus', String(fk));
-      focusBtn.disabled = fk < 1 || isFocusing(d) || !!d.result;
-      focusBtn.classList.toggle('ready', fk >= 1 && !isFocusing(d));
-      focusBtn.classList.toggle('on', isFocusing(d));
+      const focusing = isFocusing(d);
+      put('myFocus', pct(focusing ? (d.focusUntil - d.t) / data.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
+      put('focusK', fk.toFixed(2), (v) => focusBtn.style.setProperty('--focus', v));
+      put('focusState', `${fk >= 1}|${focusing}|${!!d.result}`, () => {
+        focusBtn.disabled = fk < 1 || focusing || !!d.result;
+        focusBtn.classList.toggle('ready', fk >= 1 && !focusing);
+        focusBtn.classList.toggle('on', focusing);
+      });
     }
-    const tier = streakTier(d);
-    streakEl.textContent = '';
     fx.chain = { n: d.chain, pure: d.chainPure };
     const ready = techOf(d, d.techReady);
-    techBtn.disabled = rhythm || !ready || !!d.result;
-    techName.textContent = ready ? ready.name : '기술';
-    techBtn.classList.toggle('ready', !!ready);
-    techBtn.dataset.tech = ready?.id ?? '';
-    streakEl.className = `streak tier-${tier}`;
-    hud.classList.toggle('open', isOpen(d));
+    put('tech', `${ready?.id ?? ''}|${!!d.result}`, () => {
+      techBtn.disabled = rhythm || !ready || !!d.result;
+      techName.textContent = ready ? ready.name : '기술';
+      techBtn.classList.toggle('ready', !!ready);
+      techBtn.dataset.tech = ready?.id ?? '';
+    });
+    put('tier', String(streakTier(d)), (v) => (streakEl.className = `streak tier-${v}`));
+    put('open', String(isOpen(d)), (v) => hud.classList.toggle('open', v === 'true'));
+  };
+
+  // 품질 자동 조절: 최근 프레임 간격을 재서, 처음 1초(그림 풀기)를 빼고 1.5초 평균이 20ms를 넘으면 한 단계 내린다
+  const started = performance.now();
+  let prevFrame = started;
+  let slowSince = 0;
+  let avgFrame = 16.7;
+  const tuneQuality = (now: number) => {
+    const gap = now - prevFrame;
+    prevFrame = now;
+    if (loadSave().settings.quality !== 'auto' || now - started < 1000 || gap > 250) return;
+    avgFrame = avgFrame * 0.94 + gap * 0.06;
+    if (avgFrame <= 20 || quality === 'low') {
+      slowSince = 0;
+      return;
+    }
+    slowSince ||= now;
+    if (now - slowSince > 1500) {
+      quality = quality === 'high' ? 'normal' : 'low';
+      autoQuality = quality;
+      slowSince = 0;
+      avgFrame = 16.7;
+      fitCanvas();
+    }
   };
 
   const frame = (now: number) => {
     if (!alive) return;
-    const dt = Math.min(50, now - last);
-    last = now;
+    tuneQuality(now);
     // 느린 화면: 끝 장면이면 0.25배, 집중(심안) 중이면 focusRate배
-    const rate = now < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : 1;
-    fx.timeScale = rate;
+    fx.timeScale = rateAt(now);
     fx.uiScale = W / Math.max(1, canvas.clientWidth);
-    if (now >= hitstopUntil) advance(d, d.t + dt * rate);
+    advanceTo(now);
     handleEvents();
     // 위기: 심장이 뛴다(가장자리 붉은 맥박과 같은 박자)
     if (d.crisis && !d.result && now - lastBeat > 860) {
@@ -593,11 +691,13 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     alive = false;
     cancelAnimationFrame(raf);
     window.removeEventListener('keydown', onKey);
+    void wake?.release().catch(() => undefined);
     stopLoop = null;
   };
 }
 
 initAudio();
+applySettings();
 applyUiArt();
 const params = new URLSearchParams(location.search);
 const direct = data.foes.find((f) => f.id === params.get('foe'));

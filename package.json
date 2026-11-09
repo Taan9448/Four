@@ -27,7 +27,8 @@
     "assets:manifest": "node tools/build-manifest.mjs",
     "check:ownership": "node tools/check-ownership.mjs",
     "ux:check": "node tools/build-manifest.mjs && node tools/ux-check.mjs",
-    "perf:check": "node tools/build-manifest.mjs && node tools/perf-check.mjs"
+    "perf:check": "node tools/build-manifest.mjs && node tools/perf-check.mjs",
+    "gyeol:perf": "node tools/build-manifest.mjs && node tools/gyeol-perf.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
