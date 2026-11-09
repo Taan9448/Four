@@ -1,0 +1,34 @@
+{
+  "id": "fx_gyeol_aura_3",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 11.765,
+  "gridDetected": true,
+  "nativeSize": [
+    43,
+    44
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {},
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "7ecaea7c10309a5c",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.666
+}
