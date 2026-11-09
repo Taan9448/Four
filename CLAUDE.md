@@ -4,6 +4,7 @@
 그래픽 에셋은 OpenAI Codex(`AGENTS.md`)가 만든다. 사람은 이슈를 Codex에 넘기고 결과를 확인한다. PR 머지는 Claude Code가 한다(규칙 6).
 
 ## 기준 문서
+- **두 번째 게임 「결」(2026-11-09):** `gyeol/` 폴더. 「천외귀환」의 `assets/`·`data/enemies/`·`src/render/`를 가져다 쓰는 결 읽기 패링 액션. 설계 기준은 `gyeol/docs/GAME_DESIGN.md`. 「천외귀환」 코드는 고치지 않고 가져다 쓰기만 한다.
 - 게임 설계의 단일 기준은 `docs/GAME_DESIGN.md`다. 설계를 바꾸면 이 문서부터 고친다.
 - 경로·모듈: `docs/ROUTE_MODULES.md` / 카드·효과: `docs/CARD_EFFECTS.md` / 에셋: `docs/ASSET_PIPELINE.md` / 화풍: `docs/ART_STYLE.md` / 계정 저장(Supabase 설정·SQL): `docs/CLOUD_SAVE.md`
 - 이 저장소를 세팅한 프롬프트 원문: `docs/prompts/`(보관용, 수정하지 않는다)
@@ -15,7 +16,8 @@ npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s
                             # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex|loadout|pilgrim|surgeguide|surgecut|wardrobe[&module=<id>][&pilgrim] (화면 하나만 띄우기, &pilgrim: 순례 길로, wardrobe&locked: 잠긴 옷장)
                             # ?screen=abyssclear|abyssend|abyssshop|abyssrest[&module=<id>] (심연 화면)
                             # &pxcards: Codex 카드 틀(card_frame_*)이 오기 전에 임시 틀로 픽셀 카드 미리 보기
-npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구)
+                            # http://localhost:5173/gyeol/ — 「결」 손맛 시제품(?foe=shadow_wolf|chain_overseer|ignis 바로 대결)
+npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구 + gyeol/tests)
 npm run typecheck           # tsc
 npm run data:check          # data/ 스키마·상호 참조 검사
 npm run balance             # 자동 플레이 봇(수비형·공격형 동시) 밸런스 → docs/BALANCE_REPORT.md (BALANCE_SEEDS, BALANCE_START=s8)
@@ -36,7 +38,7 @@ npm run assets:status
 1. **카드·적·모듈·지원 규칙은 JSON 데이터로만 추가한다.** 카드별 개별 코드는 금지. 새 효과가 필요하면 기본 동작을 하나 추가하고(`src/engine/schema.ts` BATTLE_OPS/RUN_OPS + `effects.ts`/`run.ts`), `docs/CARD_EFFECTS.md`와 테스트를 함께 갱신한다.
 2. **엔진 안의 무작위는 시드 RNG(`src/engine/rng.ts`)만 쓴다.** `Math.random` 금지. 수치는 `data/balance.json`에 두고 코드에 박지 않는다.
 3. **그래픽이 필요하면 요청만 한다.** 명세(`specs/assets/<id>.yaml`) → `assets:placeholder` → `assets:prompt` → 에셋 요청 이슈(라벨 `asset-request`, `codex`, 선행 에셋 대기면 `blocked`). **Codex 작업이 생기면 사람에게 Codex에 붙여 넣을 프롬프트(처리할 이슈 번호·순서·주의점, 복사할 수 있는 text 블록)를 항상 같이 준다**(2026-10-16 사용자 요청). 이미지를 직접 만들거나 `assets/source/`·`assets/sprites/`를 고치지 않는다(CI가 막는다). `assets/manifest.json`은 커밋하지 않는다.
-4. **애니메이션은 반드시 meta.json을 읽는 SpritePlayer로 재생한다.** 피격 판정 같은 타이밍은 `events`의 프레임 번호(1부터)에 맞춘다.
+4. **애니메이션은 반드시 meta.json을 읽는 SpritePlayer로 재생한다.** 피격 판정 같은 타이밍은 `events`의 프레임 번호(1부터)에 맞춘다. 「결」만 예외: 판정과 그림이 맞아야 해서 대결 시계로 프레임을 고르되, 프레임 수와 `events`는 meta.json을 따른다(`gyeol/docs/GAME_DESIGN.md` 4절).
 5. **Codex PR 검토 기준:** CI 통과(검증·소유권), `_contact.png`·`_preview.gif`로 본 프레임 간 일관성, ART_STYLE.md 준수, 다른 폴더 미수정. 문제는 "몇 번째 프레임이 무엇이 틀렸는지" 구체적으로 댓글 + `needs-fix`. 통과면 "아트 승인" 댓글.
 6. **머지(2026-10-05 사용자 위임):** 아트 PR은 "아트 승인" + CI 통과, 코드 PR은 CI 통과면 Claude가 스쿼시 머지한다. 초안이면 해제하고 `needs-fix`를 뗀 뒤 머지한다. 머지할 때마다 무엇을 머지했는지 사람에게 짧게 알린다. 설계 결정이 걸린 PR(화풍·규격·규칙 변경)은 사람이 확인한 뒤 머지한다.
    **머지 후 확인:** 게임에서 실제 에셋으로 자동 교체됐는지 확인하고 이슈에 `integrated`, 이 에셋을 기다리던 이슈의 `blocked`를 푼다.
@@ -50,4 +52,5 @@ npm run assets:status
 - `src/render/` — assets(manifest 조회), sprite-player, fx(흔들림·숫자·번쩍임), rift-overlay, preview, portrait(반신 그림), audio(합성 효과음·배경음악), music(곡 악보)
 - `src/ui/` — app(화면 흐름), map-view(여정 띠·두루마리 지도), battle-view, choice-view, card-view(세계별 카드 틀), scene-view, deck-view, hub-view(클리어 지도), shop-view, codex-view(도감), loadout-view(편성), overlay(창), tooltip(주석), icons(상태·의도 아이콘), settings, storage(localStorage), backup(저장 파일), cloud·cloud-sync·cloud-view·cloud-config(계정·클라우드 저장, Supabase)
 - `data/` — balance, statuses, characters, stages, support, speakers, cards/, enemies/(스테이지별), modules/, scenes/, abyss_laws·abyss_affixes·abyss_oaths·abyss_achievements(심연)
+- `gyeol/` — 「결」: data(duel.json: 판정 수치·상대 패턴), src(duel: 판정 순수 로직, render: 캔버스, main: 화면), tests, docs
 - `tools/` — 에셋 파이프라인 스크립트(Node + sharp), `__fixtures__/`(검증기 테스트용 명세), `balance/`(봇 실행·기록, vitest로 돈다)
