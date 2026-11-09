@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_finisher_shadow_assassin",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 4,
+  "gridDetected": false,
+  "nativeSize": [
+    128,
+    128
+  ],
+  "fit": "pad",
+  "frames": 6,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "f8427af78c8ad8fd",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.793
+}
