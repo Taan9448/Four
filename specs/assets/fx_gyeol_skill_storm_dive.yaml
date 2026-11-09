@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_storm_dive
+type: fx
+summary: "「결」 받을 수 없는 기술 그림자 암살자 「낙뢰 강하」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-09)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a dark violet thundercloud gathering at the top of the cell, small violet sparks"
+  2: "impact: a thick jagged violet lightning bolt striking straight down into the center with a white core"
+  3: "the lightning splitting into branches across the ground, a bright violet shock ring"
+  4: "crackling violet arcs jumping between points on the ground"
+  5: "small fading violet sparks and a scorched spot"
+  6: "faint violet afterglow"
+placeholder: { accent: '#a35cff' }

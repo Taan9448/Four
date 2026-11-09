@@ -40,6 +40,11 @@ export interface Rules {
   /** 연속 박자 단계(이 수에 이르면 단계 +1)와 단계마다 패링 체간 배율 가산 */
   streakTiers: number[];
   streakPostureBonus: number;
+  /** 베기 연타 막기(2026-11-09): 틈·비틀거림이 아닐 때의 베기는 적이 막는다 — 피해 배율, 체간 */
+  foeGuardMul: number;
+  foeGuardPosture: number;
+  /** 막힌 베기가 이만큼 이어지면 적이 곧바로 가장 빠른 공격으로 되받아친다 */
+  punishAfter: number;
 }
 
 export interface MoveDef {
@@ -55,6 +60,8 @@ export interface MoveDef {
   unblockable?: boolean;
   /** 속임수: 가짜 타격 순간에서 이만큼 더 끌었다가 친다 */
   feint?: number;
+  /** 받을 수 없는 기술의 전용 이펙트(Codex fx_gyeol_skill_*) — 타격 순간 하운 쪽에 터진다 */
+  fx?: string;
 }
 
 export interface PatternDef {
@@ -116,7 +123,9 @@ export type DuelEvent =
   | { type: 'feint'; t: number; move: string }
   | { type: 'streak'; t: number; streak: number; tier: number }
   | { type: 'judge'; t: number; grade: Grade; judgement: Judgement }
-  | { type: 'strike'; t: number; damage: number; counter: boolean }
+  | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean }
+  | { type: 'punish'; t: number; move: string }
+  | { type: 'skill'; t: number; move: string; name: string }
   | { type: 'stagger'; t: number }
   | { type: 'recover'; t: number }
   | { type: 'deathblow'; t: number; damage: number }
@@ -138,6 +147,8 @@ export interface Duel {
   openingUntil: number;
   /** 연속 박자: 패링·간파가 이어진 수(맞거나 막으면 0) */
   streak: number;
+  /** 적이 이어서 막은 베기 수(틈에 베거나 패링하면 0) */
+  blockedRun: number;
   player: {
     hp: number;
     posture: number;
@@ -208,6 +219,7 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
     result: null,
     openingUntil: -1,
     streak: 0,
+    blockedRun: 0,
     player: {
       hp: data.player.hp,
       posture: 0,
@@ -361,13 +373,33 @@ function landStrike(d: Duel): void {
     return;
   }
   const counter = isOpen(d);
-  const dmg = counter ? a.damage * r.counterMul : a.damage;
+  // 틈 밖의 베기는 적이 막는다: 피해는 조금, 체간도 조금. 연타하면 되받아친다
+  const blocked = !counter;
+  const dmg = counter ? a.damage * r.counterMul : Math.max(1, Math.round(a.damage * r.foeGuardMul));
   f.hp = Math.max(0, f.hp - dmg);
-  f.posture += counter ? r.counterPosture : a.posture;
-  if (counter) d.stats.counters++;
-  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter });
+  f.posture += counter ? r.counterPosture : r.foeGuardPosture;
+  if (counter) {
+    d.stats.counters++;
+    d.blockedRun = 0;
+  } else d.blockedRun++;
+  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter, blocked });
   if (checkFoeDown(d)) return;
   checkStagger(d);
+  if (blocked && d.blockedRun >= r.punishAfter) punish(d);
+}
+
+/** 되받아치기: 서 있거나 거두는 중이면 곧바로 가장 빠른(받을 수 있는) 공격을 시작한다 */
+function punish(d: Duel): void {
+  const f = d.foe;
+  if (f.state !== 'idle' && f.state !== 'recover') return;
+  const moves = Object.entries(d.foeDef.moves).filter(([, m]) => !m.unblockable && !m.feint);
+  if (!moves.length) return;
+  const [id] = moves.reduce((a, b) => (b[1].windup < a[1].windup ? b : a));
+  d.blockedRun = 0;
+  f.pattern = null;
+  f.pending = null;
+  d.events.push({ type: 'punish', t: d.t, move: id });
+  startMove(d, id);
 }
 
 function stepWindup(d: Duel): void {
@@ -454,6 +486,8 @@ function startMove(d: Duel, moveId: string, hitAt?: number): void {
   f.fakeAt = feint > 0 ? f.hitAt - feint : null;
   f.fakeShown = false;
   f.stateEnd = f.hitAt;
+  // 받을 수 없는 기술은 이름을 외치며 나간다
+  if (m.unblockable) d.events.push({ type: 'skill', t: d.t, move: moveId, name: m.name });
 }
 
 function judge(d: Duel, grade: Grade, t: number, judgement: Judgement): void {
@@ -467,7 +501,8 @@ function bumpStreak(d: Duel, t: number): void {
   d.streak++;
   d.stats.maxStreak = Math.max(d.stats.maxStreak, d.streak);
   const tier = streakTier(d);
-  if (tier > before || d.streak >= 2) d.events.push({ type: 'streak', t, streak: d.streak, tier });
+  // 이어 받을 때마다 숫자(1, 2, 3…)를 띄운다. tier가 오른 순간은 화면이 tier > before로 안다
+  d.events.push({ type: 'streak', t, streak: d.streak, tier: Math.max(tier, before) });
 }
 
 function resolveHit(d: Duel): void {
@@ -503,6 +538,7 @@ function resolveHit(d: Duel): void {
     f.posture += m.posture * (r.parryPostureMul + tier * r.streakPostureBonus);
     d.openingUntil = H + r.counterWindow;
     d.stats.parries++;
+    d.blockedRun = 0;
     const judgement: Judgement = since <= r.excellent ? 'excellent' : 'great';
     d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement });
     judge(d, 'perfect', H, judgement);

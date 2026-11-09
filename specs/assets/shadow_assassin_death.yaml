@@ -1,0 +1,20 @@
+id: shadow_assassin_death
+type: character-anim
+character: shadow_assassin
+summary: "「결」 그림자 암살자 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [shadow_assassin_ref]
+reference: assets/source/shadow_assassin_ref.png
+facing: left
+chroma: green
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the assassin recoils, violet lightning sparking wildly off the blades"
+  2: "the blades slip from its hands, the hood falling back"
+  3: "collapsing to its knees, the violet lightning fading to small sparks"
+  4: "falling forward, the body starting to dissolve into shadow"
+  5: "a dark shadow stain on the ground with the two blades lying in it"
+  6: "only the two dull blades and a faint shadow left"
+placeholder: { shape: humanoid, color: '#15121c', accent: '#8a90a3' }

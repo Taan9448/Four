@@ -121,13 +121,28 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
-  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg);
+  const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
+  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx);
   const fx: Fx = emptyFx();
   let hitstopUntil = 0;
   let last = performance.now();
   let raf = 0;
   let alive = true;
   let lastTier = 0;
+  /** 끝 장면 느린 화면: 이 시각까지 대결 시계를 slowRate배로 민다 */
+  let slowUntil = 0;
+  const slowRate = 0.25;
+  /** 받을 수 없는 기술이 터질 때 전용 이펙트(Codex fx_gyeol_skill_*)가 없으면 원소 타격 이펙트를 크게 */
+  const skillBurst = (moveId: string, now: number, x: number) => {
+    const m = d.foeDef.moves[moveId];
+    if (!m?.unblockable) return;
+    if (m.fx && sp.fx[m.fx]) fx.bursts.push({ x, y: CONTACT.y, sprite: m.fx, born: now, scale: 1.7 });
+    else {
+      const sprite = m.element === 'fire' ? 'fx_hit_fire' : m.element === 'ice' ? 'fx_hit_ice' : m.element === 'lightning' ? 'fx_hit_shock' : 'fx_hit_blunt';
+      fx.bursts.push({ x, y: CONTACT.y, sprite, born: now, scale: 1.9 });
+      spark(x, CONTACT.y, 24, ELEMENT_COLOR[m.element ?? 'danger'].spark, 360, 5);
+    }
+  };
 
   const doPress = (input: 'parry' | 'attack' | 'dodge') => {
     if (!alive) return;
@@ -178,6 +193,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           break;
         }
         case 'mikiri':
+          skillBurst(ev.move, now, PLAYER_X + 70);
           sfx('swirl');
           sfx('snap', { volume: 0.7 });
           spark(PLAYER_X + 40, CONTACT.y + 20, 16, '#ff9a8a', 260);
@@ -186,6 +202,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           hitstopUntil = now + 90;
           break;
         case 'evade':
+          skillBurst(ev.move, now, PLAYER_X + 70);
           sfx('swirl', { volume: 0.6 });
           judge(fx, 'GOOD', '피함', now);
           break;
@@ -193,7 +210,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           sfx('block', { volume: 0.7 });
           spark(CONTACT.x - 30, CONTACT.y, 10, elColor(ev.element).spark, 180);
           judge(fx, 'GOOD', '막음', now);
-          if (!rhythm) text(PLAYER_X, CONTACT.y - 30, `-${ev.damage}`, '#cfd6e6', 22);
+          if (!rhythm) text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#cfd6e6', 22);
           addShake(fx, now, 3 + d.foeDef.moves[ev.move].damage * 0.25, 160);
           break;
         case 'burn':
@@ -216,11 +233,19 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           addShake(fx, now, power, ev.heavy ? 380 : 220);
           flash('#ff3b3b', ev.heavy ? 260 : 180, ev.heavy ? 0.6 : 0.45);
           if (ev.heavy) hitstopUntil = now + 90;
+          skillBurst(ev.move, now, PLAYER_X + 10);
           judge(fx, 'MISS', '놓침', now);
-          if (!rhythm) text(PLAYER_X, CONTACT.y - 30, `-${ev.damage}`, '#ff8a7a', ev.heavy ? 34 : 28);
+          if (!rhythm) text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', ev.heavy ? 34 : 28);
           break;
         }
         case 'strike':
+          if (ev.blocked) {
+            // 틈 밖의 베기: 적이 칼을 막는다(쇳소리, 작은 불꽃, 피해 1)
+            sfx('block', { volume: 0.5 });
+            spark(FOE_X - 40, CONTACT.y, 6, '#d8dde8', 160, 3);
+            text(FOE_X - 10, CONTACT.y - 60, `막힘 ${ev.damage}`, '#b8bcc8', 20);
+            break;
+          }
           sfx(ev.counter ? 'crit' : 'slash');
           fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: ev.counter ? 1.1 : 0.8 });
           judge(fx, ev.counter ? 'COUNTER' : 'HIT', ev.counter ? '반격' : '', now, 'foe');
@@ -231,8 +256,20 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
             hitstopUntil = now + 60;
           }
           break;
+        case 'punish':
+          sfx('enrage', { volume: 0.7 });
+          text(FOE_X, CONTACT.y - 150, '되받아친다!', '#ff8a7a', 26);
+          addShake(fx, now, 5, 160);
+          break;
+        case 'skill': {
+          // 받을 수 없는 기술: 이름을 외치며 나간다
+          sfx('roar', { volume: 0.8 });
+          fx.banner = { name: ev.name, born: now, element: d.foeDef.moves[ev.move]?.element };
+          break;
+        }
         case 'streak': {
           const tier = streakTier(d);
+          fx.combo = { n: ev.streak, tier, born: now, up: tier > lastTier };
           if (tier > lastTier) {
             const names = ['', '결이 보인다', '결을 탄다', '결과 하나가 된다'];
             text(PLAYER_X, CONTACT.y - 160, names[Math.min(3, tier)], tier >= 3 ? '#fff0c0' : tier === 2 ? '#ffd27a' : '#9fd8ff', 26);
@@ -261,11 +298,14 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           hitstopUntil = now + 200;
           break;
         case 'win':
-          sfx('victory');
-          finish();
-          break;
         case 'lose':
-          sfx('defeat');
+          // 끝 장면: 느린 화면으로 쓰러지는 쪽에 다가가고, 위아래로 검은 띠
+          sfx(ev.type === 'win' ? 'victory' : 'defeat');
+          slowUntil = now + 1600;
+          fx.finale = { born: now, x: ev.type === 'win' ? FOE_X - 60 : PLAYER_X + 20 };
+          fx.combo = null;
+          fx.banner = null;
+          flash(ev.type === 'win' ? '#ffffff' : '#3a0000', 400, 0.5);
           finish();
           break;
         case 'judge':
@@ -313,7 +353,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
       }
       overlay.hidden = false;
       again.focus();
-    }, 900);
+    }, 2600);
   };
 
   const steps = foeDef.chart?.steps ?? [];
@@ -330,7 +370,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
       myPosture.style.width = `${Math.min(1, d.player.posture / data.player.posture) * 100}%`;
     }
     const tier = streakTier(d);
-    streakEl.textContent = d.streak >= 2 ? `연속 박자 ${d.streak}` : '';
+    streakEl.textContent = '';
     streakEl.className = `streak tier-${tier}`;
     hud.classList.toggle('open', isOpen(d));
   };
@@ -339,7 +379,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     if (!alive) return;
     const dt = Math.min(50, now - last);
     last = now;
-    if (now >= hitstopUntil) advance(d, d.t + dt);
+    if (now >= hitstopUntil) advance(d, d.t + (now < slowUntil ? dt * slowRate : dt));
     handleEvents();
     pruneFx(fx, now);
     draw(ctx, d, sp, fx, now);

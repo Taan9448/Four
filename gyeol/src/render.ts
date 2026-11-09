@@ -18,8 +18,8 @@ export const ICON = { S: 1, A: 2, B: 3, C: 4, perfect: 5, good: 6, miss: 7, evad
 
 type Anim = SpriteAsset | null;
 export interface Sprites {
-  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim };
-  foe: { idle: Anim; attack: Anim; hit: Anim };
+  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim; death: Anim };
+  foe: { idle: Anim; attack: Anim; hit: Anim; death: Anim };
   bg: Anim;
   fx: Record<string, Anim>;
 }
@@ -30,7 +30,7 @@ const real = async (id: string): Promise<Anim> => {
   return a && a.source === 'sprites' ? a : null;
 };
 
-export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string): Promise<Sprites> {
+export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = []): Promise<Sprites> {
   const ids = {
     pi: loadSprite(`${playerPrefix}_idle`),
     pa: loadSprite(`${playerPrefix}_attack`),
@@ -43,16 +43,18 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
     bg: loadSprite(bg),
   };
   const fxIds = ['fx_hit_slash', 'fx_hit_blunt', 'fx_hit_fire', 'fx_hit_ice', 'fx_hit_shock', 'fx_hit_grain'];
-  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol'];
-  const [pi, pa, ph, pp, pd, fi, fa, fh, b, ...fx] = await Promise.all([
+  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', ...skillFx];
+  const [pi, pa, ph, pp, pd, fi, fa, fh, b, pDeath, fDeath, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
+    real(`${playerPrefix}_death`),
+    real(`${foePrefix}_death`),
     ...fxIds.map((id) => loadSprite(id)),
     ...gyeolFx.map((id) => real(id)),
   ]);
   const all = [...fxIds, ...gyeolFx];
   return {
-    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd },
-    foe: { idle: fi, attack: fa, hit: fh },
+    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd, death: pDeath },
+    foe: { idle: fi, attack: fa, hit: fh, death: fDeath },
     bg: b,
     fx: Object.fromEntries(all.map((id, i) => [id, fx[i]])),
   };
@@ -76,13 +78,19 @@ export interface Fx {
   slashes: { born: number }[];
   /** 판정 글자(EXCELLENT·GREAT·GOOD·MISS·HIT·COUNTER·BREAK) — 자리마다 하나 */
   judges: { word: JudgeWord; sub: string; x: number; y: number; born: number; slot: 'center' | 'foe' }[];
+  /** 연속 받기 숫자(1, 2, 3…) */
+  combo: { n: number; tier: number; born: number; up: boolean } | null;
+  /** 받을 수 없는 기술 이름 띠 */
+  banner: { name: string; born: number; element?: Element } | null;
+  /** 끝 장면: 느린 화면 동안 위아래 검은 띠와 쓰러지는 쪽으로 다가가기 */
+  finale: { born: number; x: number } | null;
   flash: { color: string; born: number; life: number; strength: number } | null;
   shake: { power: number; born: number; life: number } | null;
   /** 받기 자세를 잠깐 보인다(실제 시간) */
   guardPose: number;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], flash: null, shake: null, guardPose: -Infinity });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, finale: null, flash: null, shake: null, guardPose: -Infinity });
 
 export type JudgeWord = 'EXCELLENT' | 'GREAT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
 
@@ -130,7 +138,7 @@ function strikeFrame(asset: SpriteAsset, phase: 'windup' | 'recover', elapsed: n
   return hit + Math.floor(k * (asset.meta.frames - hit + 1));
 }
 
-function drawSprite(ctx: CanvasRenderingContext2D, asset: Anim, frame: number, x: number, opts: { alpha?: number; tint?: string; scale?: number; y?: number } = {}): void {
+function drawSprite(ctx: CanvasRenderingContext2D, asset: Anim, frame: number, x: number, opts: { alpha?: number; tint?: string; scale?: number; y?: number; rot?: number } = {}): void {
   if (!asset) return;
   const img = frameOf(asset, frame);
   if (!img) return;
@@ -141,6 +149,7 @@ function drawSprite(ctx: CanvasRenderingContext2D, asset: Anim, frame: number, x
   ctx.save();
   ctx.globalAlpha = opts.alpha ?? 1;
   ctx.translate(x, opts.y ?? GROUND);
+  if (opts.rot) ctx.rotate(opts.rot);
   ctx.drawImage(opts.tint ? tinted(img, asset.meta.frameW, asset.meta.frameH, opts.tint) : img, -w * ax, -h * ay, w, h);
   ctx.restore();
 }
@@ -182,6 +191,15 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
       ctx.translate((Math.sin(now * 0.11) * p) | 0, (Math.cos(now * 0.17) * p * 0.7) | 0);
     }
   }
+  if (fx.finale) {
+    // 끝 장면: 쓰러지는 쪽으로 천천히 다가간다
+    const k = Math.min(1, (now - fx.finale.born) / 900);
+    const z = 1 + 0.18 * (1 - (1 - k) ** 3);
+    const fy = GROUND - 120;
+    ctx.translate(fx.finale.x, fy);
+    ctx.scale(z, z);
+    ctx.translate(-fx.finale.x, -fy);
+  }
   drawBackground(ctx, sp);
   drawAura(ctx, d, sp, now);
   drawPlayer(ctx, d, sp, fx, now);
@@ -189,6 +207,15 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawCue(ctx, d, now);
   drawEffects(ctx, sp, fx, now);
   ctx.restore();
+  drawCombo(ctx, fx, now);
+  drawBanner(ctx, fx, now);
+  if (fx.finale) {
+    const k = Math.min(1, (now - fx.finale.born) / 500);
+    const bar = 54 * (1 - (1 - k) ** 2);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, bar);
+    ctx.fillRect(0, H - bar, W, bar);
+  }
   if (fx.flash) {
     const k = 1 - (now - fx.flash.born) / fx.flash.life;
     if (k > 0) {
@@ -257,9 +284,27 @@ function drawAura(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, now: numb
   ctx.restore();
 }
 
+/** 쓰러짐: Codex death 그림이 있으면 그것을, 없으면 피격 마지막 칸을 기울여 눕히며 흐리게 */
+function drawFall(ctx: CanvasRenderingContext2D, death: Anim, hit: Anim, x: number, elapsed: number, dir: 1 | -1): void {
+  if (death) {
+    const n = 1 + Math.floor(elapsed / (1000 / death.meta.fps));
+    drawSprite(ctx, death, Math.min(death.meta.frames, n), x);
+    return;
+  }
+  if (!hit) return;
+  // 느린 화면(대결 시계 0.25배) 안에서 1.5초쯤 걸려 눕도록 대결 시계 360ms에 걸쳐 쓰러진다
+  const k = Math.min(1, elapsed / 360);
+  const ease = k * k;
+  drawSprite(ctx, hit, hit.meta.frames, x + dir * 12 * ease, { rot: dir * (Math.PI / 2.2) * ease, alpha: 1 - Math.max(0, (elapsed - 700) / 600), y: GROUND + 10 * ease });
+}
+
 function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx, now: number): void {
   const p = d.player;
   const t = d.t;
+  if (d.result === 'lose') {
+    drawFall(ctx, sp.player.death, sp.player.hit, PLAYER_X, t - p.actionStart, -1);
+    return;
+  }
   if (p.action === 'attack' && sp.player.attack) {
     const a = d.data.player.attack;
     const el = t - p.actionStart;
@@ -288,10 +333,6 @@ function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx,
   } else if (sp.player.idle) {
     drawSprite(ctx, sp.player.idle, loopFrame(sp.player.idle, t), PLAYER_X);
   }
-  if (d.result === 'lose') {
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-    ctx.fillRect(PLAYER_X - 80, GROUND - 200, 160, 200);
-  }
 }
 
 function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
@@ -312,11 +353,14 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
   } else if (f.state === 'stagger' && sp.foe.hit) {
     const wob = Math.sin(t * 0.03) * 4;
     drawSprite(ctx, sp.foe.hit, 2, FOE_X + wob, { tint: 'rgba(255,240,200,0.22)' });
-  } else if (f.state === 'dead' && sp.foe.hit) {
-    const k = Math.max(0, 1 - (t - f.stateStart) / 900);
-    drawSprite(ctx, sp.foe.hit, sp.foe.hit.meta.frames, FOE_X, { alpha: k });
+  } else if (f.state === 'dead') {
+    drawFall(ctx, sp.foe.death, sp.foe.hit, FOE_X, t - f.stateStart, 1);
   } else if (sp.foe.idle) {
     drawSprite(ctx, sp.foe.idle, loopFrame(sp.foe.idle, t), FOE_X, { tint });
+  }
+  if (f.state === 'windup' && move?.unblockable && sp.fx.fx_gyeol_danger_charge) {
+    const a = sp.fx.fx_gyeol_danger_charge;
+    drawSprite(ctx, a, loopFrame(a, t), FOE_X, { alpha: 0.9 });
   }
   if (open) {
     const k = (d.openingUntil - t) / d.data.rules.counterWindow;
@@ -337,6 +381,7 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
 
 /** 결: 원소마다 색과 결의 모양이 다르다. 붉은 결은 받을 수 없다(피하기). 속임수는 고리가 가짜 순간에 닿았다가 다시 좁혀 든다 */
 function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
+  if (d.result) return;
   const c = cue(d);
   if (!c.visible) return;
   const r = d.data.rules;
@@ -659,6 +704,90 @@ function drawJudge(ctx: CanvasRenderingContext2D, j: Fx['judges'][number], now: 
     ctx.fillStyle = st.top;
     ctx.fillText(j.sub, 0, st.size * 0.62);
   }
+  ctx.restore();
+}
+
+/** 연속 받기 숫자: 받을 때마다 크게 튀어나오고, 단계가 오르면 더 크게 빛난다 */
+function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  const c = fx.combo;
+  if (!c) return;
+  const el = now - c.born;
+  if (el > 2200) return;
+  const pop = 1 + (c.up ? 0.9 : 0.55) * Math.max(0, 1 - el / 140) ** 2;
+  const alpha = el < 1600 ? 1 : 1 - (el - 1600) / 600;
+  const color = c.tier >= 3 ? ['#ffffff', '#ffe08a'] : c.tier === 2 ? ['#fff1c4', '#e8a53a'] : c.tier === 1 ? ['#eaf7ff', '#6fb8ff'] : ['#f2efe8', '#a8a093'];
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(PLAYER_X - 150, GROUND - 260);
+  ctx.scale(pop, pop);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = '900 64px "Cinzel", serif';
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = color[1];
+  ctx.shadowBlur = c.tier >= 1 ? 20 : 8;
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = '#120c06';
+  ctx.strokeText(String(c.n), 0, 0);
+  ctx.shadowBlur = 0;
+  const g = ctx.createLinearGradient(0, -52, 0, 4);
+  g.addColorStop(0, color[0]);
+  g.addColorStop(1, color[1]);
+  ctx.fillStyle = g;
+  ctx.fillText(String(c.n), 0, 0);
+  ctx.font = '800 18px "Song Myung", serif';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  ctx.strokeText('연속 박자', 0, 24);
+  ctx.fillStyle = color[0];
+  ctx.fillText('연속 박자', 0, 24);
+  ctx.restore();
+}
+
+/** 받을 수 없는 기술 이름: 붉은 먹 띠 위에 적이 외친 기술명이 미끄러져 들어온다 */
+function drawBanner(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  const b = fx.banner;
+  if (!b) return;
+  const el = now - b.born;
+  const life = 1400;
+  if (el > life) return;
+  const inK = Math.min(1, el / 160);
+  const alpha = el < life - 300 ? 1 : (life - el) / 300;
+  const col = ELEMENT_COLOR[b.element ?? 'danger'];
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const cx = FOE_X - 40 + (1 - inK) * 120;
+  const cy = GROUND - 300;
+  // 먹 붓질 띠(가장자리가 들쭉날쭉한 기울어진 띠)
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.04);
+  ctx.beginPath();
+  const w = 300;
+  const h = 46;
+  ctx.moveTo(-w / 2, -h / 2 + 6);
+  for (let i = 0; i <= 12; i++) ctx.lineTo(-w / 2 + (w * i) / 12, -h / 2 + ((i * 37) % 9) - 2);
+  for (let i = 12; i >= 0; i--) ctx.lineTo(-w / 2 + (w * i) / 12 + ((i * 13) % 7), h / 2 - ((i * 29) % 8));
+  ctx.closePath();
+  const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+  g.addColorStop(0, 'rgba(90,10,10,0)');
+  g.addColorStop(0.12, 'rgba(120,14,14,0.92)');
+  g.addColorStop(0.88, 'rgba(120,14,14,0.92)');
+  g.addColorStop(1, 'rgba(90,10,10,0)');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = `rgba(${col.line},0.7)`;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '800 30px "Song Myung", "Nanum Myeongjo", serif';
+  ctx.shadowColor = col.glow;
+  ctx.shadowBlur = 14;
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+  ctx.strokeText(`「${b.name}」`, 0, 2);
+  ctx.fillStyle = '#fff1e8';
+  ctx.fillText(`「${b.name}」`, 0, 2);
   ctx.restore();
 }
 

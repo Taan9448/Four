@@ -1,0 +1,19 @@
+id: haun_sword_death
+type: character-anim
+character: haun_sword
+summary: "「결」 진하운 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck hard, head thrown back, the plain sword slipping in his grip"
+  2: "staggering backward, knees buckling, one hand reaching out"
+  3: "dropping to one knee, the sword point digging into the ground to hold himself up"
+  4: "the sword hand loosens, his body tipping sideways"
+  5: "falling onto his side, long black hair spreading on the ground, the sword lying beside him"
+  6: "lying still on the ground, eyes closed, the sword beside his open hand"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#ff3b3b' }

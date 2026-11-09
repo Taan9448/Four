@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_molten_canyon
+type: fx
+summary: "「결」 받을 수 없는 기술 화염군주 이그니스 「녹아내리는 협곡」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-09)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "the ground in the cell glowing orange, cracks of lava opening"
+  2: "impact: a pillar of molten lava and white flame erupting upward from the center"
+  3: "the eruption at full height, lava globs flying outward, the ground split open"
+  4: "the pillar collapsing into a pool of molten lava with tall flames"
+  5: "the lava pool cooling to dark red, smoke rising"
+  6: "a dark cooling crack in the ground with thin smoke"
+placeholder: { accent: '#ff8a5c' }

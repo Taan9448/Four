@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_shadow_pounce
+type: fx
+summary: "「결」 받을 수 없는 기술 그림자늑대 「그림자 덮치기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-09)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a huge black smoke wolf head with glowing red eyes lunging forward from the right, jaws wide open"
+  2: "impact: the smoke jaws snap shut in the center with a burst of black smoke and red sparks"
+  3: "black smoke claw marks slashed across the cell in three diagonal lines, red glow at their edges"
+  4: "the smoke claw marks spreading and fraying"
+  5: "drifting black smoke strands with a few red embers"
+  6: "faint black smoke wisps fading"
+placeholder: { accent: '#ff3b3b' }

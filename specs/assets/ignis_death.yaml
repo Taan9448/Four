@@ -1,0 +1,20 @@
+id: ignis_death
+type: character-anim
+character: ignis
+summary: "「결」 화염군주 이그니스 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [ignis_ref]
+reference: assets/source/ignis_ref.png
+facing: left
+chroma: magenta
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the giant of white flame roars, flames flaring wildly upward"
+  2: "the flames gutter and shrink, black lava veins cracking open across the body"
+  3: "the giant sinks to its knees, flames turning from white to orange and red"
+  4: "the body collapsing into a heap of glowing embers and cooling black rock"
+  5: "a smoking mound of dark rock with a few red embers"
+  6: "a cold dark mound of rock with thin smoke rising"
+placeholder: { shape: humanoid, color: '#f1efe6', accent: '#0b0b10' }
