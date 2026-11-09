@@ -1,0 +1,91 @@
+{
+  "$comment": "「결」 손맛 시제품 수치(2026-11-09). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id를 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤) 시간에 맞춰 늘이거나 줄여 그린다.",
+  "rules": {
+    "perfect": 150,
+    "guard": 420,
+    "parryLockout": 220,
+    "cueLead": 520,
+    "counterWindow": 700,
+    "counterMul": 3,
+    "counterPosture": 18,
+    "guardChip": 0.25,
+    "guardPosture": 22,
+    "parryPostureMul": 1.6,
+    "deathblow": 0.45,
+    "stagger": 1600,
+    "playerStagger": 900,
+    "hurtLock": 380
+  },
+  "player": {
+    "name": "진하운",
+    "sprite": "haun_sword",
+    "hp": 100,
+    "posture": 100,
+    "postureRegen": 14,
+    "attack": { "duration": 340, "hitAt": 170, "damage": 6, "posture": 4 }
+  },
+  "foes": [
+    {
+      "id": "shadow_wolf",
+      "title": "그림자늑대",
+      "sprite": "wolf",
+      "bg": "bg_elheim_forest",
+      "note": "빠르고 가볍다. 짧은 두 번 물기가 섞인다.",
+      "hp": 70,
+      "posture": 60,
+      "postureRegen": 10,
+      "idle": [700, 1300],
+      "moves": {
+        "bite": { "name": "물기", "windup": 420, "recover": 260, "damage": 10, "posture": 14 },
+        "lunge": { "name": "덮치기", "windup": 640, "recover": 380, "damage": 16, "posture": 20 }
+      },
+      "patterns": [
+        { "weight": 3, "steps": [{ "move": "bite" }] },
+        { "weight": 2, "steps": [{ "move": "bite" }, { "move": "bite", "after": 120 }] },
+        { "weight": 2, "steps": [{ "move": "lunge" }] }
+      ]
+    },
+    {
+      "id": "chain_overseer",
+      "title": "사슬 감독관",
+      "sprite": "chain_overseer",
+      "bg": "bg_volcano_canyon",
+      "note": "사슬을 늘어뜨렸다가 박자를 끌어 내리친다. 세 번째 사슬이 늦게 온다.",
+      "hp": 120,
+      "posture": 90,
+      "postureRegen": 8,
+      "idle": [900, 1500],
+      "moves": {
+        "lash": { "name": "사슬 채찍", "windup": 520, "recover": 320, "damage": 14, "posture": 16 },
+        "drag": { "name": "끌어 내리치기", "windup": 900, "recover": 420, "damage": 22, "posture": 26 }
+      },
+      "patterns": [
+        { "weight": 3, "steps": [{ "move": "lash" }, { "move": "lash", "after": 200 }] },
+        { "weight": 2, "steps": [{ "move": "lash" }, { "move": "lash", "after": 160 }, { "move": "drag", "after": 240 }] },
+        { "weight": 2, "steps": [{ "move": "drag" }] }
+      ]
+    },
+    {
+      "id": "ignis",
+      "title": "화염군주 이그니스",
+      "sprite": "ignis",
+      "bg": "bg_volcano_canyon",
+      "note": "느리지만 무겁다. 불길의 손 세 번은 박자가 점점 빨라진다.",
+      "hp": 200,
+      "posture": 140,
+      "postureRegen": 6,
+      "idle": [1100, 1800],
+      "moves": {
+        "hand": { "name": "불길의 손", "windup": 760, "recover": 420, "damage": 20, "posture": 24 },
+        "hand_fast": { "name": "불길의 손", "windup": 480, "recover": 300, "damage": 16, "posture": 20 },
+        "whip": { "name": "불길의 채찍", "windup": 600, "recover": 360, "damage": 18, "posture": 20 },
+        "canyon": { "name": "녹아내리는 협곡", "windup": 1200, "recover": 600, "damage": 34, "posture": 40 }
+      },
+      "patterns": [
+        { "weight": 3, "steps": [{ "move": "hand" }, { "move": "hand_fast", "after": 180 }, { "move": "hand_fast", "after": 60 }] },
+        { "weight": 3, "steps": [{ "move": "whip" }, { "move": "whip", "after": 260 }] },
+        { "weight": 2, "steps": [{ "move": "canyon" }] }
+      ]
+    }
+  ]
+}

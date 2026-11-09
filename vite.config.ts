@@ -19,11 +19,13 @@ export default defineConfig({
     },
   ],
   build: {
+    // 「결」(2026-11-09): 같은 저장소의 두 번째 게임 — gyeol/index.html을 따로 빌드한다(배포 …/gyeol/)
+    rollupOptions: { input: { main: 'index.html', gyeol: 'gyeol/index.html' } },
     // 스프라이트 프레임은 base64로 JS에 넣지 않는다(작은 PNG 1,200여 장이 JS를 1.7MB 키웠다). 쓸 때 파일로 받는다
     assetsInlineLimit: (file) => (/[\\/]assets[\\/](sprites|placeholders)[\\/]/.test(file) ? false : undefined),
   },
   test: {
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'gyeol/tests/**/*.test.ts'],
     testTimeout: 30000,
   },
 });
