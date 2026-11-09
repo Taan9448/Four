@@ -393,3 +393,115 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     expect(press(r, 'tech')).toBe(false);
   });
 });
+
+describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
+  const r = data.rules;
+  const aim = HIT - data.player.attack.hitAt; // 베기가 적의 타격 순간에 닿도록
+
+  it('겨루기: 노려 벤 칼이 적의 타격과 동시에 닿으면 칼끼리 맞부딪힌다 — 연타로 밀면 이기고 틈이 열린다', () => {
+    const d = createDuel(data, 'dummy');
+    advance(d, aim);
+    press(d, 'attack');
+    advance(d, HIT + 2);
+    expect(d.events.some((e) => e.type === 'clash')).toBe(true);
+    expect(d.foe.state).toBe('clash');
+    expect(d.player.hp).toBe(100);
+    // 대결 중 다른 입력은 받지 않고, J·K는 민다
+    expect(press(d, 'dodge')).toBe(false);
+    for (let t = d.t; d.clash && t < d.t + 2000; t += 60) {
+      advance(d, t);
+      press(d, t % 120 ? 'attack' : 'parry');
+    }
+    const won = d.events.find((e) => e.type === 'clashWin');
+    expect(won).toMatchObject({ damage: Math.round(data.player.attack.damage * r.clashWinDamage) });
+    expect(d.foe.hp).toBe(100 - Math.round(data.player.attack.damage * r.clashWinDamage));
+    expect(d.foe.state).toBe('recover');
+    expect(isOpen(d)).toBe(true);
+    expect(d.player.action).toBe('idle');
+  });
+
+  it('겨루기에서 밀리면 베인다(적 공격 피해 × clashLoseMul)', () => {
+    const d = createDuel(data, 'dummy');
+    advance(d, aim);
+    press(d, 'attack');
+    advance(d, HIT + 2000);
+    expect(d.events.find((e) => e.type === 'clashLose')).toMatchObject({ damage: Math.round(20 * r.clashLoseMul) });
+    expect(d.player.hp).toBe(100 - Math.round(20 * r.clashLoseMul));
+    expect(d.chain).toBe(0);
+  });
+
+  it('연타한 베기나 받을 수 없는 공격에는 겨루기가 없다', () => {
+    const spam = createDuel(data, 'dummy');
+    advance(spam, aim - data.player.attack.duration);
+    press(spam, 'attack');
+    advance(spam, aim);
+    expect(press(spam, 'attack')).toBe(true); // 앞 베기가 끝나자마자 다시
+    advance(spam, HIT + 5);
+    expect(spam.events.some((e) => e.type === 'clash')).toBe(false);
+    expect(spam.events.some((e) => e.type === 'hit')).toBe(true);
+    const red = createDuel(single(swing({ unblockable: true })), 'dummy');
+    advance(red, aim);
+    press(red, 'attack');
+    advance(red, HIT + 5);
+    expect(red.events.some((e) => e.type === 'clash')).toBe(false);
+  });
+
+  it('위기(배수의 진): 체력이 crisisHp 아래로 떨어지면 한 번 알리고, EXCELLENT 폭이 넓어진다', () => {
+    const run = (damage: number) => {
+      const d = createDuel(single(swing({ damage })), 'dummy');
+      advance(d, HIT + 5); // 맞는다
+      const H2 = HIT + 200 + 500 + 400;
+      advance(d, H2 - 80); // EXCELLENT(60)보다 늦게, 넓힌 폭(60 × crisisExcellentMul) 안
+      press(d, 'parry');
+      advance(d, H2 + 5);
+      return d;
+    };
+    const low = run(85);
+    expect(low.crisis).toBe(true);
+    expect(low.events.filter((e) => e.type === 'crisis')).toHaveLength(1);
+    expect(low.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'excellent' });
+    const fine = run(10);
+    expect(fine.crisis).toBe(false);
+    expect(fine.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'great' });
+  });
+
+  it('집중(심안): 받기로 게이지를 모아 가득 차면 쓴다 — 그동안 결이 공격 시작부터 보인다, 박자 도전에는 없다', () => {
+    const d = createDuel({ ...data, foes: [{ ...data.foes[0], posture: 1000 }] }, 'dummy');
+    expect(d.focus).toBe(r.focusStart);
+    expect(press(d, 'focus')).toBe(false);
+    let hit = HIT;
+    for (let i = 0; i < 3; i++) {
+      advance(d, hit - 40);
+      press(d, 'parry');
+      advance(d, hit + 5);
+      hit += 200 + 500 + 400;
+    }
+    expect(d.focus).toBe(Math.min(r.focusMax, r.focusStart + 3 * r.focusGain.excellent));
+    expect(press(d, 'focus')).toBe(true);
+    expect(d.focus).toBe(0);
+    expect(d.events.some((e) => e.type === 'focus')).toBe(true);
+
+    const slow = single(swing({ windup: 1200 }));
+    const seen = createDuel(slow, 'dummy');
+    seen.focus = r.focusMax;
+    press(seen, 'focus');
+    advance(seen, 600); // 공격 시작(500) 직후, 타격(1700)까지 1100 — 평소에는 아직 안 보인다
+    expect(cue(seen)).toMatchObject({ visible: true, focus: true });
+    const plain = createDuel(slow, 'dummy');
+    advance(plain, 600);
+    expect(cue(plain).visible).toBe(false);
+
+    const rh = createDuel(real, 'ignis', 'x', 'rhythm');
+    rh.focus = r.focusMax;
+    expect(press(rh, 'focus')).toBe(false);
+  });
+
+  it('모든 상대에 결정타·날씨·대사가 있다', () => {
+    for (const f of real.foes) {
+      expect(f.finisher?.name, f.id).toBeTruthy();
+      expect(f.weather, f.id).toBeTruthy();
+      expect(f.lines?.start?.length, f.id).toBeGreaterThan(0);
+    }
+    expect(real.player.lines?.start?.length).toBeGreaterThan(0);
+  });
+});

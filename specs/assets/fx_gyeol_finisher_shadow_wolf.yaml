@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_shadow_wolf
+type: fx
+summary: "「결」 결정타 단영(斷影) — 이 적 전용 마무리 — 흰 보랏빛 두 줄기가 X로 엇갈려 그림자 늑대를 끊고, 검은 연기가 사방으로 흩어진다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a single thin white-violet line of light across the cell from upper left to lower right"
+  2: "impact: the line explodes into a wide crescent slash and a second crescent crosses it from upper right to lower left, forming a brilliant X with a white core, black smoke bursting from the center"
+  3: "the X at full brightness, black smoke tendrils and two small red ember points blasting outward in a ring"
+  4: "the X thinning into violet afterglow, smoke tendrils spreading wide and curling"
+  5: "faint violet X afterimage, smoke wisps drifting and thinning"
+  6: "a faint violet X line and a few dark wisps"
+placeholder: { accent: '#c8beff' }

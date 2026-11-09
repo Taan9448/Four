@@ -5,6 +5,7 @@
 // 적 체간이 가득 차면 비틀거리고(stagger), 그때 베면 결정타. 무작위는 시드 RNG만 쓴다.
 // 2026-11-09 목업 2차: 원소(화염: 패링해도 화상, 냉기: 결이 느리다 갑자기, 번개: 박자가 튐), 받을 수 없는 공격(붉은 결 → 피하기),
 // 속임수 공격(가짜 타격 순간 뒤 한 박자 늦게), 연속 박자(streak 단계), 박자 도전 모드(고정 악보·판정·등급).
+// 2026-11-09 목업 4차: 칼 맞부딪힘 겨루기(clash), 위기(배수의 진), 집중(심안), 적별 결정타·날씨·대사(화면은 데이터만 읽는다).
 import { createRng, type Rng } from '../../src/engine/rng';
 
 export type Element = 'fire' | 'ice' | 'lightning';
@@ -45,6 +46,46 @@ export interface Rules {
   foeGuardPosture: number;
   /** 막힌 베기가 이만큼 이어지면 적이 곧바로 가장 빠른 공격으로 되받아친다 */
   punishAfter: number;
+  /**
+   * 칼 맞부딪힘 겨루기(2026-11-09): 하운의 베기가 닿는 순간과 적의 타격 순간이 clashWindow ms 안이면 겨루기.
+   * 베기를 연타하지 않고 한 번 노려 벤 것만 친다(앞 베기가 끝나고 clashCalm ms 뒤에 시작한 베기).
+   * 겨루기 동안 J·K를 누를 때마다 clashPush만큼 밀고(clashPressGap ms보다 빠른 연타는 한 번), 적은 초마다 clashPower만큼 민다.
+   * 끝까지 밀거나 clashDuration이 끝날 때 절반 넘게 밀었으면 이긴다.
+   */
+  clashWindow: number;
+  clashCalm: number;
+  clashDuration: number;
+  clashPush: number;
+  clashPressGap: number;
+  /** 이기면: 적 체간(최대 대비) · 베기 피해 배율 · 그 뒤 반격 틈 */
+  clashWinPosture: number;
+  clashWinDamage: number;
+  /** 지면: 적 공격 피해 배율 · 내 체간 */
+  clashLoseMul: number;
+  clashLosePosture: number;
+  /** 위기(배수의 진): 체력이 이 비율 이하면 EXCELLENT 판정 폭이 crisisExcellentMul배 */
+  crisisHp: number;
+  crisisExcellentMul: number;
+  /** 집중(심안): 받기로 게이지를 모아 가득 차면 쓴다 — focusDuration ms(대결 시계) 동안 화면이 focusRate배로 느려지고 결이 처음부터 보인다 */
+  focusMax: number;
+  focusStart: number;
+  focusGain: { excellent: number; great: number; good: number };
+  focusDuration: number;
+  focusRate: number;
+}
+
+/** 날씨·환경 입자(화면만) */
+export type Weather = 'leaves' | 'embers' | 'snow' | 'rain' | 'ash';
+/** 대사(말풍선): 순간마다 여러 줄 중 하나 */
+export type LineKey = 'start' | 'reply' | 'clash' | 'stagger' | 'crisis' | 'win' | 'lose';
+export type Lines = Partial<Record<LineKey, string[]>>;
+
+/** 적별 결정타 연출(화면만): 이름·모양·하운 대사. Codex fx_gyeol_finisher_<적 id>가 오면 그 그림 */
+export interface FinisherDef {
+  name: string;
+  hanja: string;
+  style: 'cross' | 'chain' | 'shatter' | 'shadow' | 'quench';
+  line: string;
 }
 
 export interface MoveDef {
@@ -93,6 +134,11 @@ export interface FoeDef {
   moves: Record<string, MoveDef>;
   patterns: PatternDef[];
   chart?: ChartDef;
+  /** 겨루기에서 초마다 미는 힘(없으면 0.45) */
+  clashPower?: number;
+  finisher?: FinisherDef;
+  weather?: Weather;
+  lines?: Lines;
 }
 
 export interface PlayerDef {
@@ -103,6 +149,7 @@ export interface PlayerDef {
   posture: number;
   postureRegen: number;
   attack: { duration: number; hitAt: number; damage: number; posture: number };
+  lines?: Lines;
 }
 
 /**
@@ -158,11 +205,17 @@ export type DuelEvent =
   | { type: 'stagger'; t: number }
   | { type: 'recover'; t: number }
   | { type: 'deathblow'; t: number; damage: number }
+  | { type: 'clash'; t: number; move: string }
+  | { type: 'clashPush'; t: number; balance: number }
+  | { type: 'clashWin'; t: number; damage: number }
+  | { type: 'clashLose'; t: number; damage: number }
+  | { type: 'crisis'; t: number }
+  | { type: 'focus'; t: number }
   | { type: 'win'; t: number }
   | { type: 'lose'; t: number };
 
-export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'tech' | 'hurt' | 'broken';
-export type FoeState = 'idle' | 'windup' | 'recover' | 'stagger' | 'dead';
+export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'tech' | 'hurt' | 'broken' | 'clash';
+export type FoeState = 'idle' | 'windup' | 'recover' | 'stagger' | 'dead' | 'clash';
 export type Mode = 'duel' | 'rhythm';
 
 export interface Duel {
@@ -188,6 +241,13 @@ export interface Duel {
   /** 쓰는 중인 기술(피해가 들어갔는가) */
   techUsing: string | null;
   techLanded: boolean;
+  /** 겨루기: 0(적이 다 밀었다)~1(하운이 다 밀었다), 0.5에서 시작 */
+  clash: { start: number; end: number; balance: number; move: string; lastPress: number; presses: number } | null;
+  /** 위기(배수의 진)에 들어섰는가 */
+  crisis: boolean;
+  /** 집중 게이지와 집중이 끝나는 시각(대결 시계) */
+  focus: number;
+  focusUntil: number;
   player: {
     hp: number;
     posture: number;
@@ -202,6 +262,8 @@ export interface Duel {
     /** 피하기 무적이 끝나는 시각 */
     iframeUntil: number;
     lastDodge: number;
+    /** 마지막 베기가 끝난(끊긴) 시각 — 연타가 아닌 노린 베기만 겨루기가 된다 */
+    lastAttackEnd: number;
   };
   foe: {
     hp: number;
@@ -267,6 +329,10 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
     techForce: 0,
     techUsing: null,
     techLanded: false,
+    clash: null,
+    crisis: false,
+    focus: mode === 'rhythm' ? 0 : data.rules.focusStart,
+    focusUntil: -1,
     player: {
       hp: data.player.hp,
       posture: 0,
@@ -279,6 +345,7 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
       lastGuard: -Infinity,
       iframeUntil: -Infinity,
       lastDodge: -Infinity,
+      lastAttackEnd: -Infinity,
     },
     foe: { hp: foeDef.hp, posture: 0, state: 'idle', stateStart: 0, stateEnd: 0, move: null, hitAt: 0, fakeAt: null, fakeShown: false, pattern: null, step: 0, pending: null, chartIdx: 0 },
     events: [],
@@ -291,11 +358,22 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
 
 export const streakTier = (d: Duel): number => d.data.rules.streakTiers.filter((n) => d.streak >= n).length;
 
-/** 받기(패링)·베기·피하기 입력. 지금 시각(d.t)에 누른 것으로 친다. 받아들였으면 true */
-export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech'): boolean {
+export const isFocusing = (d: Duel): boolean => d.t < d.focusUntil;
+
+/** 받기(패링)·베기·피하기·기술·집중 입력. 지금 시각(d.t)에 누른 것으로 친다. 받아들였으면 true */
+export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus'): boolean {
   if (d.result) return false;
   const p = d.player;
   const r = d.data.rules;
+  if (input === 'focus') {
+    // 집중: 게이지가 가득 찼을 때만, 무엇을 하는 중이든 쓸 수 있다(박자 도전에는 없다)
+    if (d.mode === 'rhythm' || d.focus < r.focusMax || isFocusing(d)) return false;
+    d.focus = 0;
+    d.focusUntil = d.t + r.focusDuration;
+    d.events.push({ type: 'focus', t: d.t });
+    return true;
+  }
+  if (d.clash) return input === 'attack' || input === 'parry' ? clashPress(d) : false;
   if (p.action !== 'idle') return false;
   if (input === 'parry') {
     if (d.t - p.lastPress < r.parryLockout) return false;
@@ -346,7 +424,8 @@ export function advance(d: Duel, to: number): void {
     d.t += dt;
     regen(d, dt);
     stepPlayer(d);
-    if (d.mode === 'rhythm') stepChart(d);
+    if (d.clash) stepClash(d, dt);
+    else if (d.mode === 'rhythm') stepChart(d);
     else stepFoe(d);
   }
   if (d.result) d.t = Math.max(d.t, to);
@@ -363,18 +442,22 @@ export interface Cue {
   /** 속임수의 가짜 순간을 지나기 전이면 true(고리는 가짜 순간에 닿는다) */
   faking: boolean;
   heavy: boolean;
+  /** 집중 중: 결이 공격을 시작할 때부터 보이고, 속임수가 드러난다 */
+  focus: boolean;
 }
 
 /** 화면용: 지금 결(타격 예고)이 보이는가와 고리 비율 */
 export function cue(d: Duel): Cue {
   const f = d.foe;
-  const none: Cue = { visible: false, left: 0, ratio: 0, unblockable: false, faking: false, heavy: false };
+  const focus = isFocusing(d);
+  const none: Cue = { visible: false, left: 0, ratio: 0, unblockable: false, faking: false, heavy: false, focus };
   if (f.state !== 'windup' || !f.move) return none;
   const m = d.foeDef.moves[f.move];
-  const lead = d.data.rules.cueLead;
   const faking = f.fakeAt !== null && d.t < f.fakeAt;
   // 속임수: 가짜 순간까지는 그쪽으로 좁혀 들고, 지나면 진짜 순간으로 짧게 다시 좁혀 든다
   const target = faking ? f.fakeAt! : f.hitAt;
+  // 집중 중이면 공격을 시작할 때부터 결이 보인다
+  const lead = focus ? Math.max(d.data.rules.cueLead, target - f.stateStart) : d.data.rules.cueLead;
   const span = faking || f.fakeAt === null ? lead : Math.min(lead, f.hitAt - f.fakeAt);
   const left = target - d.t;
   let ratio = Math.max(0, Math.min(1, left / span));
@@ -388,6 +471,7 @@ export function cue(d: Duel): Cue {
     unblockable: !!m.unblockable,
     faking,
     heavy: m.damage >= HEAVY_DAMAGE,
+    focus,
   };
 }
 
@@ -427,7 +511,10 @@ function stepPlayer(d: Duel): void {
     p.attackLanded = true;
     landStrike(d);
   }
-  if (p.action !== 'idle' && d.t >= p.actionEnd) p.action = 'idle';
+  if (p.action !== 'idle' && d.t >= p.actionEnd) {
+    if (p.action === 'attack') p.lastAttackEnd = d.t;
+    p.action = 'idle';
+  }
 }
 
 function landStrike(d: Duel): void {
@@ -435,6 +522,11 @@ function landStrike(d: Duel): void {
   const r = d.data.rules;
   const a = d.data.player.attack;
   if (f.state === 'dead') return;
+  // 노려 벤 칼이 적의 타격과 거의 동시에 닿으면 칼끼리 맞부딪힌다
+  if (f.state === 'windup' && canClash(d) && Math.abs(f.hitAt - d.t) <= r.clashWindow) {
+    startClash(d);
+    return;
+  }
   if (f.state === 'stagger') {
     const dmg = Math.round(d.foeDef.hp * r.deathblow);
     f.hp = Math.max(0, f.hp - dmg);
@@ -566,6 +658,117 @@ function judge(d: Duel, grade: Grade, t: number, judgement: Judgement): void {
   d.stats[grade]++;
   if (judgement === 'excellent') d.stats.excellent++;
   if (d.mode === 'rhythm') d.events.push({ type: 'judge', t, grade, judgement });
+  else gainFocus(d, judgement);
+}
+
+function gainFocus(d: Duel, judgement: Judgement): void {
+  if (judgement === 'miss' || isFocusing(d)) return;
+  const r = d.data.rules;
+  d.focus = Math.min(r.focusMax, d.focus + r.focusGain[judgement]);
+}
+
+/** 겨루기가 될 수 있는 베기인가: 대결에서, 베는 중이고, 앞 베기에서 clashCalm 넘게 쉬었다가 노려 벤 칼 */
+function canClash(d: Duel): boolean {
+  const p = d.player;
+  const f = d.foe;
+  if (d.mode === 'rhythm' || p.action !== 'attack' || !f.move) return false;
+  if (d.foeDef.moves[f.move].unblockable) return false;
+  return p.actionStart - p.lastAttackEnd >= d.data.rules.clashCalm;
+}
+
+function startClash(d: Duel): void {
+  const f = d.foe;
+  const p = d.player;
+  const t = d.t;
+  d.clash = { start: t, end: t + d.data.rules.clashDuration, balance: 0.5, move: f.move!, lastPress: -Infinity, presses: 0 };
+  f.state = 'clash';
+  f.stateStart = t;
+  f.fakeAt = null;
+  f.pattern = null;
+  f.pending = null;
+  p.action = 'clash';
+  p.actionStart = t;
+  p.actionEnd = Infinity;
+  p.attackLanded = true;
+  p.parryAt = null;
+  d.events.push({ type: 'clash', t, move: f.move! });
+}
+
+function clashPress(d: Duel): boolean {
+  const c = d.clash!;
+  const r = d.data.rules;
+  if (d.t - c.lastPress < r.clashPressGap) return false;
+  c.lastPress = d.t;
+  c.presses++;
+  c.balance = Math.min(1, c.balance + r.clashPush);
+  d.events.push({ type: 'clashPush', t: d.t, balance: c.balance });
+  if (c.balance >= 1) endClash(d, true);
+  return true;
+}
+
+function stepClash(d: Duel, dt: number): void {
+  const c = d.clash!;
+  c.balance = Math.max(0, c.balance - ((d.foeDef.clashPower ?? 0.45) * dt) / 1000);
+  if (c.balance <= 0) endClash(d, false);
+  else if (d.t >= c.end) endClash(d, c.balance > 0.5);
+}
+
+function endClash(d: Duel, won: boolean): void {
+  const c = d.clash!;
+  const f = d.foe;
+  const p = d.player;
+  const r = d.data.rules;
+  const t = d.t;
+  const m = d.foeDef.moves[c.move];
+  d.clash = null;
+  f.move = c.move;
+  f.state = 'recover';
+  f.stateStart = t;
+  if (won) {
+    // 밀어냈다: 적이 크게 비틀대며 물러나고, 되돌아오는 틈이 열린다
+    const dmg = Math.round(d.data.player.attack.damage * r.clashWinDamage);
+    f.hp = Math.max(0, f.hp - dmg);
+    f.posture += d.foeDef.posture * r.clashWinPosture;
+    f.stateEnd = t + r.counterWindow;
+    d.openingUntil = t + r.counterWindow;
+    p.action = 'idle';
+    p.actionEnd = t;
+    p.lastAttackEnd = t;
+    gainFocus(d, 'great');
+    d.events.push({ type: 'clashWin', t, damage: dmg });
+    if (checkFoeDown(d)) return;
+    checkStagger(d);
+    return;
+  }
+  // 밀렸다: 칼이 튕겨 나가며 베인다
+  const dmg = Math.round(m.damage * r.clashLoseMul);
+  p.hp = Math.max(0, p.hp - dmg);
+  p.posture = Math.min(d.data.player.posture - 1, p.posture + r.clashLosePosture);
+  p.action = 'hurt';
+  p.actionStart = t;
+  p.actionEnd = t + r.hurtLock;
+  p.lastAttackEnd = t;
+  f.stateEnd = t + m.recover;
+  d.streak = 0;
+  d.stats.hits++;
+  breakChain(d);
+  d.events.push({ type: 'clashLose', t, damage: dmg });
+  if (p.hp <= 0) {
+    d.result = 'lose';
+    d.events.push({ type: 'lose', t });
+    return;
+  }
+  updateCrisis(d);
+}
+
+/** 위기(배수의 진): 체력이 crisisHp 이하로 떨어진 순간 한 번 */
+function updateCrisis(d: Duel): void {
+  const p = d.player;
+  if (d.crisis || d.mode === 'rhythm' || p.hp <= 0) return;
+  if (p.hp <= d.data.player.hp * d.data.rules.crisisHp) {
+    d.crisis = true;
+    d.events.push({ type: 'crisis', t: d.t });
+  }
 }
 
 /** 결 연환을 잇는다(받기·막기·피하기 성공). 조건이 맞는 가장 높은 기술을 준비한다 */
@@ -633,9 +836,16 @@ function resolveHit(d: Duel): void {
   const m = d.foeDef.moves[moveId];
   const H = f.hitAt;
   const heavy = m.damage >= HEAVY_DAMAGE;
+  // 노려 벤 칼이 아직 닿기 전인데 곧(clashWindow 안) 닿는다면 칼끼리 맞부딪힌다
+  if (canClash(d) && !p.attackLanded && p.actionStart + d.data.player.attack.hitAt - H <= r.clashWindow) {
+    startClash(d);
+    return;
+  }
   const since = p.parryAt === null ? Infinity : H - p.parryAt;
   p.parryAt = null;
   const rhythm = d.mode === 'rhythm';
+  // 위기(배수의 진)면 EXCELLENT 폭이 넓어진다
+  const ex = d.crisis ? r.crisisExcellentMul : 1;
   const dodging = H <= p.iframeUntil && p.action === 'dodge';
   if (H <= p.iframeUntil && p.action === 'tech') {
     // 기술을 쓰는 동안은 공격이 닿지 않는다
@@ -648,7 +858,7 @@ function resolveHit(d: Duel): void {
       d.openingUntil = H + r.counterWindow;
       // 간파 정밀도: 무적 시간 한가운데 즈음(누르고 40~200ms 뒤 타격)이면 EXCELLENT
       const after = H - (p.iframeUntil - r.dodgeIframe);
-      const judgement: Judgement = after >= 40 && after <= 200 ? 'excellent' : 'great';
+      const judgement: Judgement = after >= 40 / ex && after <= 200 * ex ? 'excellent' : 'great';
       d.events.push({ type: 'mikiri', t: H, move: moveId, judgement });
       judge(d, 'perfect', H, judgement);
       bumpStreak(d, H);
@@ -664,7 +874,7 @@ function resolveHit(d: Duel): void {
     d.openingUntil = H + r.counterWindow;
     d.stats.parries++;
     d.blockedRun = 0;
-    const judgement: Judgement = since <= r.excellent ? 'excellent' : 'great';
+    const judgement: Judgement = since <= r.excellent * ex ? 'excellent' : 'great';
     d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement });
     judge(d, 'perfect', H, judgement);
     bumpStreak(d, H);
@@ -679,6 +889,7 @@ function resolveHit(d: Duel): void {
     d.stats.guards++;
     d.streak = 0;
     d.events.push({ type: 'guard', t: H, move: moveId, damage: dmg, element: m.element });
+    updateCrisis(d);
     judge(d, 'good', H, 'good');
     link(d, 'good', m.damage, H);
     if (p.posture >= d.data.player.posture) {
@@ -695,7 +906,9 @@ function resolveHit(d: Duel): void {
     d.events.push({ type: 'hit', t: H, move: moveId, damage: m.damage, element: m.element, heavy, unblockable: !!m.unblockable });
     judge(d, 'miss', H, 'miss');
     breakChain(d);
+    updateCrisis(d);
     // 베는 중에 맞으면 베기가 끊긴다
+    if (p.action === 'attack') p.lastAttackEnd = H;
     if (p.action !== 'broken') {
       p.action = 'hurt';
       p.actionStart = H;
@@ -718,6 +931,7 @@ function burn(d: Duel, dmg: number, t: number): void {
   if (dmg <= 0) return;
   d.player.hp = Math.max(0, d.player.hp - dmg);
   d.events.push({ type: 'burn', t, damage: dmg });
+  updateCrisis(d);
 }
 
 function nextStep(d: Duel): void {

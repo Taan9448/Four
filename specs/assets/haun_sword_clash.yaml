@@ -1,0 +1,18 @@
+id: haun_sword_clash
+type: character-anim
+character: haun_sword
+summary: "「결」 진하운 겨루기 4프레임 반복 — 칼을 두 손으로 맞대고 앞으로 밀며 버틴다(2026-11-09)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 4
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.35
+frame_notes:
+  1: "low wide stance leaning hard to the right, both hands on the sword grip, the blade held out horizontally at chest height to the right as if pressed against an unseen blade, teeth gritted, long hair streaming back"
+  2: "the same pose pushed a little further forward, back foot sliding, arms trembling, the blade edge glinting"
+  3: "the same pose pushed back slightly, knees bending deeper, straining"
+  4: "close to frame 1 so the loop is seamless"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#ffe6a0' }
