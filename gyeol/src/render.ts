@@ -74,13 +74,37 @@ export interface Fx {
   /** 결 패링 연출(Codex 12프레임이 없으면 코드로 그린 금빛 연꽃) */
   blooms: { x: number; y: number; born: number; color: string; big: boolean }[];
   slashes: { born: number }[];
+  /** 판정 글자(EXCELLENT·GREAT·GOOD·MISS·HIT·COUNTER·BREAK) — 자리마다 하나 */
+  judges: { word: JudgeWord; sub: string; x: number; y: number; born: number; slot: 'center' | 'foe' }[];
   flash: { color: string; born: number; life: number; strength: number } | null;
   shake: { power: number; born: number; life: number } | null;
   /** 받기 자세를 잠깐 보인다(실제 시간) */
   guardPose: number;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], flash: null, shake: null, guardPose: -Infinity });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], flash: null, shake: null, guardPose: -Infinity });
+
+export type JudgeWord = 'EXCELLENT' | 'GREAT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
+
+/** 판정 글자 모양: 크기·색(위→아래)·윤곽·빛·기울기·지속 */
+const JUDGE_STYLE: Record<JudgeWord, { size: number; top: string; bottom: string; edge: string; glow: string; tilt: number; life: number; shine?: boolean; stars?: boolean; crack?: boolean }> = {
+  EXCELLENT: { size: 52, top: '#ffffff', bottom: '#ffc94a', edge: '#3a2205', glow: '#ffd27a', tilt: -0.04, life: 1000, shine: true, stars: true },
+  GREAT: { size: 50, top: '#fff1c4', bottom: '#e8a53a', edge: '#33200a', glow: '#ffb24a', tilt: -0.03, life: 900, shine: true },
+  GOOD: { size: 42, top: '#eef6ff', bottom: '#7fa6d6', edge: '#121a2b', glow: '#8fc0ff', tilt: 0, life: 800 },
+  MISS: { size: 42, top: '#c9a7a0', bottom: '#7a2a24', edge: '#1a0806', glow: '#ff3b30', tilt: 0.05, life: 850, crack: true },
+  HIT: { size: 30, top: '#ffffff', bottom: '#ffb36a', edge: '#2a1206', glow: '#ff9a4a', tilt: -0.12, life: 500 },
+  COUNTER: { size: 46, top: '#fff3d6', bottom: '#ff6a2a', edge: '#2a0c04', glow: '#ff7a2a', tilt: -0.1, life: 850, shine: true },
+  BREAK: { size: 48, top: '#ffffff', bottom: '#ffe08a', edge: '#2a1a04', glow: '#fff0c0', tilt: 0, life: 1100, shine: true, stars: true },
+};
+
+/** 판정 글자를 띄운다(같은 자리의 앞 글자는 바로 지운다 — 겹쳐 읽기 어렵지 않게) */
+export function judge(fx: Fx, word: JudgeWord, sub: string, now: number, slot: 'center' | 'foe' = 'center'): void {
+  fx.judges = fx.judges.filter((j) => j.slot !== slot);
+  // 하운 쪽(받기 판정)은 접점 아래쪽, 적 쪽(HIT·COUNTER·BREAK)은 적 머리 위 — 동시에 떠도 겹치지 않게
+  const x = slot === 'foe' ? FOE_X + 40 : PLAYER_X + 70;
+  const y = slot === 'foe' ? CONTACT.y - 175 : CONTACT.y - 70;
+  fx.judges.push({ word, sub, x, y, born: now, slot });
+}
 
 /** 흔들림은 더 센 쪽을 남긴다(약한 흔들림이 강한 흔들림을 덮지 않게) */
 export function addShake(fx: Fx, now: number, power: number, life: number): void {
@@ -514,6 +538,7 @@ function drawEffects(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: nu
   }
   for (const b of fx.blooms) drawBloom(ctx, sp, b, now);
   for (const s of fx.slashes) drawSlash(ctx, sp, s.born, now);
+  for (const j of fx.judges) drawJudge(ctx, j, now);
   for (const s of fx.sparks) {
     const k = (now - s.born) / s.life;
     if (k >= 1) continue;
@@ -542,6 +567,101 @@ function drawEffects(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: nu
   ctx.globalAlpha = 1;
 }
 
+/** 판정 글자: 크게 튀어나왔다가 자리 잡고, 위로 떠오르며 사라진다. EXCELLENT는 빛이 훑고 별이 반짝인다 */
+function drawJudge(ctx: CanvasRenderingContext2D, j: Fx['judges'][number], now: number): void {
+  const st = JUDGE_STYLE[j.word];
+  const el = now - j.born;
+  const k = el / st.life;
+  if (k >= 1) return;
+  const pop = 1 + 0.75 * Math.max(0, 1 - el / 110) ** 2 - (el > 110 && el < 200 ? 0.05 * Math.sin(((el - 110) / 90) * Math.PI) : 0);
+  const alpha = k < 0.65 ? 1 : 1 - (k - 0.65) / 0.35;
+  const drift = j.word === 'MISS' ? 14 * k : -22 * k;
+  const shakeX = j.word === 'MISS' && el < 220 ? Math.sin(el * 0.25) * 5 * (1 - el / 220) : 0;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(j.x + shakeX, j.y + drift);
+  ctx.rotate(st.tilt);
+  ctx.scale(pop, pop);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `900 ${st.size}px "Cinzel", "Song Myung", serif`;
+  const w = ctx.measureText(j.word).width;
+  // 바깥 빛 + 굵은 어두운 윤곽
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = st.glow;
+  ctx.shadowBlur = 22;
+  ctx.lineWidth = Math.max(6, st.size * 0.2);
+  ctx.strokeStyle = st.edge;
+  ctx.strokeText(j.word, 0, 0);
+  ctx.shadowBlur = 0;
+  // 채움: 위→아래 그라데이션, 빛나는 단계는 밝은 띠가 왼쪽에서 오른쪽으로 훑는다
+  const v = ctx.createLinearGradient(0, -st.size * 0.5, 0, st.size * 0.45);
+  v.addColorStop(0, st.top);
+  v.addColorStop(1, st.bottom);
+  ctx.fillStyle = v;
+  ctx.fillText(j.word, 0, 0);
+  if (st.shine) {
+    const p = Math.min(1.2, el / 420) - 0.1;
+    const h = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+    const stop = (x: number) => Math.max(0, Math.min(1, x));
+    h.addColorStop(0, 'rgba(255,255,255,0)');
+    h.addColorStop(stop(p - 0.12), 'rgba(255,255,255,0)');
+    h.addColorStop(stop(p), 'rgba(255,255,255,0.85)');
+    h.addColorStop(stop(p + 0.12), 'rgba(255,255,255,0)');
+    h.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalCompositeOperation = 'source-atop';
+    ctx.fillStyle = h;
+    ctx.fillText(j.word, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  // 위쪽 가는 밝은 선(새김 느낌)
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+  ctx.strokeText(j.word, 0, -1);
+  if (st.crack) {
+    // MISS: 글자를 비스듬히 가르는 금
+    ctx.strokeStyle = 'rgba(20,6,4,0.9)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-w * 0.55, -st.size * 0.1);
+    ctx.lineTo(-w * 0.1, st.size * 0.05);
+    ctx.lineTo(w * 0.15, -st.size * 0.08);
+    ctx.lineTo(w * 0.55, st.size * 0.12);
+    ctx.stroke();
+  }
+  if (st.stars) {
+    // 네 갈래 별 셋이 번갈아 반짝인다
+    ctx.fillStyle = '#fffbe6';
+    const pts: [number, number][] = [[-w * 0.55, -st.size * 0.45], [w * 0.52, -st.size * 0.3], [w * 0.3, st.size * 0.5]];
+    pts.forEach(([sx, sy], i) => {
+      const tw = Math.max(0, Math.sin(el / 90 + i * 2.1));
+      const r = 9 * tw;
+      if (r < 1) return;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - r);
+      ctx.lineTo(sx + r * 0.25, sy - r * 0.25);
+      ctx.lineTo(sx + r, sy);
+      ctx.lineTo(sx + r * 0.25, sy + r * 0.25);
+      ctx.lineTo(sx, sy + r);
+      ctx.lineTo(sx - r * 0.25, sy + r * 0.25);
+      ctx.lineTo(sx - r, sy);
+      ctx.lineTo(sx - r * 0.25, sy - r * 0.25);
+      ctx.closePath();
+      ctx.fill();
+    });
+  }
+  // 한국어 작은 글(결·간파·막음·놓침…)
+  if (j.sub) {
+    ctx.font = `800 ${Math.round(st.size * 0.38)}px "Song Myung", "Nanum Myeongjo", serif`;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+    ctx.strokeText(j.sub, 0, st.size * 0.62);
+    ctx.fillStyle = st.top;
+    ctx.fillText(j.sub, 0, st.size * 0.62);
+  }
+  ctx.restore();
+}
+
 /** 오래된 효과를 지운다 */
 export function pruneFx(fx: Fx, now: number): void {
   fx.sparks = fx.sparks.filter((s) => now - s.born < s.life);
@@ -549,6 +669,7 @@ export function pruneFx(fx: Fx, now: number): void {
   fx.bursts = fx.bursts.filter((b) => now - b.born < 600);
   fx.blooms = fx.blooms.filter((b) => now - b.born < 700);
   fx.slashes = fx.slashes.filter((s) => now - s.born < 600);
+  fx.judges = fx.judges.filter((j) => now - j.born < JUDGE_STYLE[j.word].life);
   if (fx.flash && now - fx.flash.born > fx.flash.life) fx.flash = null;
   if (fx.shake && now - fx.shake.born > fx.shake.life) fx.shake = null;
 }

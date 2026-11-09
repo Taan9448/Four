@@ -2,6 +2,8 @@ id: fx_gyeol_parry_a
 type: fx
 summary: "「결」 패링 이펙트 앞 6프레임(뒤 fx_gyeol_parry_b와 이어 12프레임) — 칼끝에서 금빛 나뭇결이 연꽃처럼 피어나는 화려한 받아침(2026-11-09). 카드 찢김과 다른 모양"
 frames: 6
+# 1칸은 점광 하나라 원래 거의 비어 있다
+min_fill: 0.0005
 fps: 24
 events: { impact: 2 }
 frame_notes:

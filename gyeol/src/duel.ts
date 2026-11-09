@@ -11,6 +11,8 @@ export type Element = 'fire' | 'ice' | 'lightning';
 
 export interface Rules {
   perfect: number;
+  /** 패링 중에서도 타격에 이만큼 가까이 받으면 EXCELLENT(아니면 GREAT) */
+  excellent: number;
   guard: number;
   parryLockout: number;
   cueLead: number;
@@ -100,18 +102,20 @@ export interface DuelData {
 }
 
 export type Grade = 'perfect' | 'good' | 'miss';
+/** 판정 글자(2026-11-09): 패링·간파는 정밀도에 따라 EXCELLENT·GREAT, 막기·피함은 GOOD, 맞으면 MISS */
+export type Judgement = 'excellent' | 'great' | 'good' | 'miss';
 
 export type DuelEvent =
-  | { type: 'parry'; t: number; move: string; element?: Element; heavy: boolean }
+  | { type: 'parry'; t: number; move: string; element?: Element; heavy: boolean; judgement: Judgement }
   | { type: 'guard'; t: number; move: string; damage: number; element?: Element }
   | { type: 'guardBreak'; t: number }
   | { type: 'hit'; t: number; move: string; damage: number; element?: Element; heavy: boolean; unblockable: boolean }
-  | { type: 'mikiri'; t: number; move: string }
+  | { type: 'mikiri'; t: number; move: string; judgement: Judgement }
   | { type: 'evade'; t: number; move: string }
   | { type: 'burn'; t: number; damage: number }
   | { type: 'feint'; t: number; move: string }
   | { type: 'streak'; t: number; streak: number; tier: number }
-  | { type: 'judge'; t: number; grade: Grade }
+  | { type: 'judge'; t: number; grade: Grade; judgement: Judgement }
   | { type: 'strike'; t: number; damage: number; counter: boolean }
   | { type: 'stagger'; t: number }
   | { type: 'recover'; t: number }
@@ -179,6 +183,8 @@ export interface Duel {
     dodges: number;
     maxStreak: number;
     perfect: number;
+    /** perfect 가운데 EXCELLENT */
+    excellent: number;
     good: number;
     miss: number;
   };
@@ -217,7 +223,7 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
     },
     foe: { hp: foeDef.hp, posture: 0, state: 'idle', stateStart: 0, stateEnd: 0, move: null, hitAt: 0, fakeAt: null, fakeShown: false, pattern: null, step: 0, pending: null, chartIdx: 0 },
     events: [],
-    stats: { parries: 0, guards: 0, hits: 0, counters: 0, deathblows: 0, dodges: 0, maxStreak: 0, perfect: 0, good: 0, miss: 0 },
+    stats: { parries: 0, guards: 0, hits: 0, counters: 0, deathblows: 0, dodges: 0, maxStreak: 0, perfect: 0, excellent: 0, good: 0, miss: 0 },
   };
   // 첫 공격은 숨을 고를 시간을 조금 더 준다
   d.foe.stateEnd = foeDef.idle[1];
@@ -317,7 +323,8 @@ export const isOpen = (d: Duel): boolean => d.t <= d.openingUntil && d.foe.state
 export function rhythmScore(d: Duel): { accuracy: number; rank: 'S' | 'A' | 'B' | 'C'; total: number } {
   const s = d.stats;
   const total = s.perfect + s.good + s.miss;
-  const accuracy = total ? (s.perfect + s.good * 0.5) / total : 0;
+  // EXCELLENT 1 · GREAT 0.9 · GOOD 0.5 · MISS 0
+  const accuracy = total ? (s.excellent + (s.perfect - s.excellent) * 0.9 + s.good * 0.5) / total : 0;
   const rank = accuracy >= 0.92 && s.miss === 0 ? 'S' : accuracy >= 0.8 ? 'A' : accuracy >= 0.6 ? 'B' : 'C';
   return { accuracy, rank, total };
 }
@@ -449,9 +456,10 @@ function startMove(d: Duel, moveId: string, hitAt?: number): void {
   f.stateEnd = f.hitAt;
 }
 
-function judge(d: Duel, grade: Grade, t: number): void {
+function judge(d: Duel, grade: Grade, t: number, judgement: Judgement): void {
   d.stats[grade]++;
-  if (d.mode === 'rhythm') d.events.push({ type: 'judge', t, grade });
+  if (judgement === 'excellent') d.stats.excellent++;
+  if (d.mode === 'rhythm') d.events.push({ type: 'judge', t, grade, judgement });
 }
 
 function bumpStreak(d: Duel, t: number): void {
@@ -480,20 +488,24 @@ function resolveHit(d: Duel): void {
       // 간파: 받을 수 없는 공격을 피하면 틈이 열린다
       f.posture += r.mikiriPosture;
       d.openingUntil = H + r.counterWindow;
-      d.events.push({ type: 'mikiri', t: H, move: moveId });
-      judge(d, 'perfect', H);
+      // 간파 정밀도: 무적 시간 한가운데 즈음(누르고 40~200ms 뒤 타격)이면 EXCELLENT
+      const after = H - (p.iframeUntil - r.dodgeIframe);
+      const judgement: Judgement = after >= 40 && after <= 200 ? 'excellent' : 'great';
+      d.events.push({ type: 'mikiri', t: H, move: moveId, judgement });
+      judge(d, 'perfect', H, judgement);
       bumpStreak(d, H);
     } else {
       d.events.push({ type: 'evade', t: H, move: moveId });
-      judge(d, 'good', H);
+      judge(d, 'good', H, 'good');
     }
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.perfect) {
     const tier = streakTier(d);
     f.posture += m.posture * (r.parryPostureMul + tier * r.streakPostureBonus);
     d.openingUntil = H + r.counterWindow;
     d.stats.parries++;
-    d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy });
-    judge(d, 'perfect', H);
+    const judgement: Judgement = since <= r.excellent ? 'excellent' : 'great';
+    d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement });
+    judge(d, 'perfect', H, judgement);
     bumpStreak(d, H);
     if (m.element === 'fire' && !rhythm) burn(d, r.fireParryChip, H);
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.guard) {
@@ -505,7 +517,7 @@ function resolveHit(d: Duel): void {
     d.stats.guards++;
     d.streak = 0;
     d.events.push({ type: 'guard', t: H, move: moveId, damage: dmg, element: m.element });
-    judge(d, 'good', H);
+    judge(d, 'good', H, 'good');
     if (p.posture >= d.data.player.posture) {
       p.posture = 0;
       p.action = 'broken';
@@ -518,7 +530,7 @@ function resolveHit(d: Duel): void {
     d.stats.hits++;
     d.streak = 0;
     d.events.push({ type: 'hit', t: H, move: moveId, damage: m.damage, element: m.element, heavy, unblockable: !!m.unblockable });
-    judge(d, 'miss', H);
+    judge(d, 'miss', H, 'miss');
     // 베는 중에 맞으면 베기가 끊긴다
     if (p.action !== 'broken') {
       p.action = 'hurt';
