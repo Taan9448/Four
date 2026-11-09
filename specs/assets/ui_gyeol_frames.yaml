@@ -1,0 +1,36 @@
+id: ui_gyeol_frames
+type: ui-parts
+frames: 5
+summary: >-
+  ornamental frames for the screens of "Gyeol", a wuxia parry-action game, in carved lacquer, aged gold-bronze and black sumi ink; every
+  frame is left BLANK in the middle because the game writes names, numbers and buttons on top of it
+# 2026-11-09 사용자 요청: 「결」 UI를 Codex 그림으로. 칸1 적 이름 판(전투 위쪽 가운데) · 칸2 하운 이름 판(왼쪽 아래) ·
+# 칸3 결과 제목 띠 · 칸4 상대 고르기 카드 바탕(세로 판) · 칸5 시작 화면 "결" 뒤의 먹 붓 원(엔소).
+frame_notes:
+  1: >-
+    FOE NAMEPLATE: a wide horizontal ornate plaque about 480 px wide and 110 px tall, centered: black lacquer with a dull crimson inner
+    border line, aged gold-bronze cloud-scroll end caps at the left and right, a small downward point at the bottom center like a hanging
+    tag. The middle 70% is plain black lacquer.
+  2: >-
+    HERO NAMEPLATE: a smaller horizontal plaque about 360 px wide and 90 px tall, centered: weathered pale wood with a thin dark ink border
+    and small worn steel corner fittings, humble and plain (the hero is a servant). Plain middle.
+  3: >-
+    RESULT BANNER: a long horizontal hanging banner about 490 px wide and 150 px tall, centered: dark red brocade cloth stretched between
+    a thin gold-bronze rod at the top and bottom, the left and right ends cut in a swallowtail, a faint gold wood-grain pattern woven
+    along the edges. Plain middle.
+  4: >-
+    FOE SELECTION CARD: a tall vertical tablet about 380 px wide and 480 px tall, filling most of the cell height, centered: dark
+    lacquered wood board with a gold-bronze border, cloud-scroll ornaments in the four corners and a small round boss at the top center.
+    The inside (about 85% of the board) is plain dark wood with a very faint grain.
+  5: >-
+    TITLE ENSO: a single bold circle painted in one stroke of black sumi ink with a dry-brush tail and a few ink splatters, about 470 px in
+    diameter, the stroke about 40 px thick, slightly open at the upper right where the brush lifted, with a small square red seal stamp
+    (blank face, no characters) at the lower right outside the circle. The inside of the circle is flat key color.
+framing: >-
+  Straight front view, no perspective tilt, no cast shadow on the background, no glow outside the shapes. Each frame is centered in its
+  cell; everything outside it (and inside the enso circle) is flat key color. Cell 6 stays empty.
+style: >-
+  refined painterly game UI ornament for an East Asian ink-and-lacquer martial world: black and red lacquer, aged gold-bronze,
+  weathered wood, real sumi ink brush texture; soft realistic shading lit from the upper left, crisp edges; not pixel art, no text,
+  no letters, no characters in the seal
+placeholder: { color: '#2a1a12' }
