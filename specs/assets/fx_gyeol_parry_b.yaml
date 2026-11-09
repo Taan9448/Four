@@ -1,0 +1,14 @@
+id: fx_gyeol_parry_b
+type: fx
+summary: "「결」 패링 이펙트 뒤 6프레임(fx_gyeol_parry_a 다음) — 금빛 결의 연꽃이 흩어지며 잔광으로 사라진다(2026-11-09)"
+frames: 6
+fps: 24
+events: {}
+frame_notes:
+  1: "the golden lotus of curved grain lines breaking into separate floating strands, each strand still glowing amber, the center a faint white glow"
+  2: "the strands drifting further apart and curling like wood shavings of light, small gold motes between them"
+  3: "only the outer tips of the strands remain bright, the rest fading to dim amber, motes sinking slightly"
+  4: "a faint wide circle of amber dots where the ring was, a few thin strands still visible"
+  5: "scattered dim gold motes and one faint vertical hairline of light in the center, like the grain of wood"
+  6: "almost gone: a few tiny dim gold motes"
+placeholder: { accent: '#ffd27a' }

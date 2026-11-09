@@ -1,0 +1,15 @@
+id: fx_gyeol_aura_3
+type: fx
+summary: "「결」 연속 박자 기운 3단계(10연속) — 흰 금빛 불꽃 같은 기운과 등 뒤 나뭇결 후광이 활활 탄다(반복 재생, 하운 뒤에 깐다, 2026-11-09)"
+frames: 6
+fps: 10
+loop: true
+events: {}
+frame_notes:
+  1: "a blazing white-gold aura of flame-like light filling the lower two thirds of the cell around an empty vertical space in the center (where a standing figure will be), and behind it a large round halo made of concentric golden wood-grain rings"
+  2: "the aura flames flicker upward, the halo rings rotating slowly, white sparks rising"
+  3: "the aura at its brightest, flames licking higher, the halo glowing"
+  4: "the flames shift to the left, sparks streaming up"
+  5: "the flames shift to the right, the halo rings rotated further"
+  6: "the flames close to frame 1, looping smoothly"
+placeholder: { accent: '#fff0c0' }

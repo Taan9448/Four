@@ -1,0 +1,15 @@
+id: fx_gyeol_aura_2
+type: fx
+summary: "「결」 연속 박자 기운 2단계(6연속) — 금빛 결의 띠가 몸 둘레를 휘감아 오른다(반복 재생, 하운 뒤에 깐다, 2026-11-09)"
+frames: 6
+fps: 10
+loop: true
+events: {}
+frame_notes:
+  1: "two golden ribbons of curved wood-grain light spiraling up around an empty vertical space in the center of the cell (where a standing figure will be), from the ground up to about two thirds of the cell height"
+  2: "the ribbons rotate a little, golden motes drifting off them"
+  3: "the ribbons brighter, a thin golden ring of light on the ground around the base"
+  4: "the ribbons rotated further, motes rising"
+  5: "the ribbons dimming slightly, the ground ring pulsing"
+  6: "the ribbons close to frame 1 positions, looping smoothly"
+placeholder: { accent: '#ffd27a' }

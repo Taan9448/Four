@@ -16,12 +16,22 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .title { width: min(960px, 100%); padding: 40px 16px 32px; text-align: center; }
 .title h1 { margin: 0; font-family: 'Song Myung', serif; font-size: clamp(72px, 14vw, 128px); font-weight: 400; color: #f4ead6; letter-spacing: 0.05em; text-shadow: 0 0 24px rgba(226, 180, 92, 0.35); }
 .title .sub { margin: 6px 0 28px; color: var(--ink-dim); font-size: 17px; }
-.foes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.foe-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 12px 16px; min-height: var(--tap); border: 1px solid rgba(226, 180, 92, 0.3); border-radius: 12px; background: linear-gradient(180deg, #221c15, #120f0c); cursor: pointer; }
-.foe-card:hover, .foe-card:focus-visible { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(226, 180, 92, 0.35); }
-.foe-card img { width: 128px; height: 128px; image-rendering: pixelated; }
+.foes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.foe-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 12px 16px; border: 1px solid rgba(226, 180, 92, 0.3); border-radius: 12px; background: linear-gradient(180deg, #221c15, #120f0c); }
+.foe-card:focus-within { border-color: var(--gold); }
+.foe-card img { width: 112px; height: 112px; image-rendering: pixelated; }
+.foe-text { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .foe-card b { font-family: 'Nanum Myeongjo', serif; font-size: 19px; }
 .foe-card small { color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+.foe-card .best { color: #ffd27a; }
+.foe-actions { display: flex; gap: 8px; margin-top: auto; }
+.foe-actions .btn { min-width: 108px; }
+.tags { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 13px; border: 1px solid currentColor; }
+.el-fire { color: #ffae6a; }
+.el-ice { color: #a8e6ff; }
+.el-lightning { color: #d4b0ff; }
+.danger { color: #ff6a5a; }
 .help { margin: 28px auto 0; max-width: 640px; text-align: left; color: var(--ink-dim); font-size: 15px; line-height: 1.7; }
 .help p { margin: 4px 0; }
 .proto { margin-top: 24px; color: #7f7668; font-size: 13px; }
@@ -41,8 +51,16 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .foe-bar .bar.posture i { left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #e2b45c, #fff0c0, #e2b45c); }
 .me-bar .bar.posture i { background: linear-gradient(90deg, #8a8fb0, #c9cde6); }
 .hud.open .foe-bar b { color: #ffd27a; }
+.bar.progress i { background: linear-gradient(90deg, #6b5a38, #e2b45c); }
+.streak { position: absolute; left: 14px; top: 14px; font-family: 'Song Myung', serif; font-size: 22px; text-shadow: 0 2px 4px #000; }
+.streak.tier-1 { color: #9fd8ff; }
+.streak.tier-2 { color: #ffd27a; }
+.streak.tier-3 { color: #fff0c0; text-shadow: 0 0 12px rgba(255, 220, 140, 0.9), 0 2px 4px #000; }
+.score { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); font-size: 15px; color: var(--ink); text-shadow: 0 1px 3px #000; white-space: nowrap; }
 
-.pads { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; padding: 0 12px; }
+.pads { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 0 12px; }
+.pad:disabled { opacity: 0.35; cursor: default; }
+.pad.dodge { background: linear-gradient(180deg, #3a1f24, #1f1013); border-color: rgba(255, 106, 90, 0.4); }
 .pad { min-height: 64px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.16); font-family: 'Nanum Myeongjo', serif; font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; user-select: none; touch-action: manipulation; }
 .pad small { font-family: 'IBM Plex Sans KR', sans-serif; font-size: 13px; font-weight: 400; opacity: 0.7; }
 .pad.attack { background: linear-gradient(180deg, #3a1d1a, #1f100e); }
@@ -56,15 +74,22 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .result p { margin: 0; color: var(--ink-dim); font-size: 16px; }
 .result .time { font-size: 14px; }
 .result .row { display: flex; gap: 10px; margin-top: 10px; }
+.result .kicker { color: #c9b98f; font-size: 14px; }
+.rank { font-family: 'Song Myung', serif; font-size: 96px; line-height: 1; }
+.rank-S { color: #ffe08a; text-shadow: 0 0 24px rgba(255, 210, 120, 0.8); }
+.rank-A { color: #e6e9f2; }
+.rank-B { color: #d9a46a; }
+.rank-C { color: #9a948a; }
+.rank-icon { width: 112px; height: 112px; image-rendering: pixelated; }
 .btn { min-height: var(--tap); padding: 0 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: #1d1a22; cursor: pointer; font-size: 16px; }
 .btn.primary { background: linear-gradient(180deg, #5a4420, #33260f); border-color: var(--gold); }
 
 @media (max-width: 640px) {
   .foes { grid-template-columns: 1fr; }
-  .foe-card { flex-direction: row; text-align: left; }
   .foe-card img { width: 80px; height: 80px; }
+  .score { font-size: 13px; }
   .duel { padding-top: 0; }
-  .pads { grid-template-columns: 1fr 1fr; }
+  .pads { grid-template-columns: 1fr 1fr 1fr; }
   .back { grid-column: 1 / -1; grid-row: 2; }
   .pad { min-height: 84px; }
 }

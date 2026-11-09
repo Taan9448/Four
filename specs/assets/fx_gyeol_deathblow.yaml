@@ -1,0 +1,14 @@
+id: fx_gyeol_deathblow
+type: fx
+summary: "「결」 결정타 6프레임 — 무너진 적의 결을 따라 한 줄로 갈라지는 거대한 금빛 일섬(2026-11-09)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+frame_notes:
+  1: "a long thin diagonal line of white light across the whole cell from lower left to upper right, like a single hair of light"
+  2: "impact: the line explodes into a wide crescent slash of white-gold light with a hot white core, golden grain lines branching off both sides like the cracks in split wood"
+  3: "the crescent at full brightness, the branching grain cracks spreading across the cell, large gold and white sparks bursting outward"
+  4: "the crescent thinning, the grain cracks glowing amber, sparks streaking outward and down"
+  5: "a fading amber afterimage of the crescent and cracks, embers drifting"
+  6: "a faint golden line where the cut was, a few dim embers"
+placeholder: { accent: '#ffe08a' }

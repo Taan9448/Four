@@ -1,0 +1,17 @@
+id: icons_gyeol
+type: icon-sheet
+summary: "「결」 박자 도전 등급·판정·위험 아이콘 9종(2026-11-09). 글자 없이 모양과 색으로 구분한다"
+# 칸 번호는 gyeol/src/render.ts의 ICON 표와 같다
+frames: 9
+baseline: 0.5
+frame_notes:
+  1: "rank S — a radiant golden lotus seal: a round gold medallion with a blooming lotus of golden wood-grain petals and a white-gold glow"
+  2: "rank A — a silver round medallion with a half-open lotus of silver grain lines"
+  3: "rank B — a bronze round medallion with a single curved bronze grain line across it"
+  4: "rank C — a plain grey stone disc with a small crack"
+  5: "perfect judgement — a bright golden spark burst with curved grain lines radiating, like a small parry flash"
+  6: "good judgement — a small steel-blue shield with a light scratch across it"
+  7: "miss judgement — a broken red-brown line snapped in two"
+  8: "evasion — a pale blue swirl with a faint ghostly afterimage of a dash"
+  9: "danger (unblockable blow) — a bold crimson diamond with a jagged red line of light through it"
+placeholder: { color: '#3a3020', accent: '#ffd27a' }
