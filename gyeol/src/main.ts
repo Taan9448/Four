@@ -3,8 +3,8 @@
 import { initAudio, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import raw from '../data/duel.json';
-import { advance, createDuel, isOpen, press, rhythmScore, streakTier, type DuelData, type Element, type FoeDef, type Mode } from './duel';
-import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, loadSprites, PLAYER_X, pruneFx, W, type Fx, type Sprites } from './render';
+import { advance, createDuel, isOpen, press, rhythmScore, streakTier, type DuelData, type Element, type FoeDef, type Judgement, type Mode } from './duel';
+import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
 
 const data = raw as unknown as DuelData;
@@ -12,6 +12,7 @@ const app = document.getElementById('app')!;
 let stopLoop: (() => void) | null = null;
 
 const ELEMENT_NAME: Record<Element, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
+const WORD: Record<Judgement, JudgeWord> = { excellent: 'EXCELLENT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
 const BEST_KEY = 'gyeol.rhythmBest';
 const GROUND_TEXT_Y = CONTACT.y - 150;
 
@@ -168,7 +169,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           sfx(ev.element === 'lightning' ? 'lightning' : ev.element === 'ice' ? 'ice' : ev.element === 'fire' ? 'fire' : 'snap', { volume: 0.8 });
           fx.blooms.push({ x: CONTACT.x - 20, y: CONTACT.y, born: now, color: bloomColor(ev.element), big: ev.heavy });
           spark(CONTACT.x - 20, CONTACT.y, ev.heavy ? 30 : 20, elColor(ev.element).spark, ev.heavy ? 380 : 300);
-          text(CONTACT.x, CONTACT.y - 80, '결!', '#ffd27a', ev.heavy ? 52 : 44, ICON.perfect);
+          judge(fx, WORD[ev.judgement], '결', now);
           // 무거운 공격을 받아칠수록 세게 흔들리고 오래 멈칫한다
           const dmg = d.foeDef.moves[ev.move].damage;
           addShake(fx, now, 3 + dmg * 0.4, ev.heavy ? 260 : 170);
@@ -180,18 +181,19 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           sfx('swirl');
           sfx('snap', { volume: 0.7 });
           spark(PLAYER_X + 40, CONTACT.y + 20, 16, '#ff9a8a', 260);
-          text(PLAYER_X, CONTACT.y - 110, '간파!', '#ffb0a0', 40, ICON.evade);
+          judge(fx, WORD[ev.judgement], '간파', now);
           addShake(fx, now, 8, 220);
           hitstopUntil = now + 90;
           break;
         case 'evade':
           sfx('swirl', { volume: 0.6 });
-          text(PLAYER_X, CONTACT.y - 100, '피함', '#cfe6ff', 26, ICON.evade);
+          judge(fx, 'GOOD', '피함', now);
           break;
         case 'guard':
           sfx('block', { volume: 0.7 });
           spark(CONTACT.x - 30, CONTACT.y, 10, elColor(ev.element).spark, 180);
-          text(PLAYER_X, CONTACT.y - 80, rhythm ? '막음' : `막음 -${ev.damage}`, '#cfd6e6', 26, ICON.good);
+          judge(fx, 'GOOD', '막음', now);
+          if (!rhythm) text(PLAYER_X, CONTACT.y - 30, `-${ev.damage}`, '#cfd6e6', 22);
           addShake(fx, now, 3 + d.foeDef.moves[ev.move].damage * 0.25, 160);
           break;
         case 'burn':
@@ -214,13 +216,15 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           addShake(fx, now, power, ev.heavy ? 380 : 220);
           flash('#ff3b3b', ev.heavy ? 260 : 180, ev.heavy ? 0.6 : 0.45);
           if (ev.heavy) hitstopUntil = now + 90;
-          text(PLAYER_X, CONTACT.y - 90, rhythm ? '놓침' : `-${ev.damage}`, '#ff8a7a', ev.heavy ? 36 : 30, rhythm ? ICON.miss : undefined);
+          judge(fx, 'MISS', '놓침', now);
+          if (!rhythm) text(PLAYER_X, CONTACT.y - 30, `-${ev.damage}`, '#ff8a7a', ev.heavy ? 34 : 28);
           break;
         }
         case 'strike':
           sfx(ev.counter ? 'crit' : 'slash');
           fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: ev.counter ? 1.1 : 0.8 });
-          text(FOE_X, CONTACT.y - 90, ev.counter ? `반격 ${ev.damage}` : `${ev.damage}`, ev.counter ? '#ffb15c' : '#ffffff', ev.counter ? 34 : 24);
+          judge(fx, ev.counter ? 'COUNTER' : 'HIT', ev.counter ? '반격' : '', now, 'foe');
+          text(FOE_X + 50, CONTACT.y - 40, `${ev.damage}`, ev.counter ? '#ffb15c' : '#ffffff', ev.counter ? 30 : 22);
           if (ev.counter) {
             spark(FOE_X - 20, CONTACT.y, 14, '#ffb15c', 260);
             addShake(fx, now, 6, 160);
@@ -240,7 +244,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
         }
         case 'stagger':
           sfx('snap');
-          text(FOE_X, CONTACT.y - 140, '체간이 무너졌다 — 베어라!', '#ffe9b0', 26);
+          judge(fx, 'BREAK', '체간이 무너졌다 — 베어라!', now, 'foe');
           flash('#fff3c4', 200);
           addShake(fx, now, 8, 220);
           break;
@@ -287,7 +291,15 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
         overlay.replaceChildren(
           el('p', { class: 'kicker' }, `${foeDef.chart!.title} — 박자 도전`),
           rankIcon ? el('img', { class: 'rank-icon', src: rankIcon, alt: `등급 ${sc.rank}` }) : el('div', { class: `rank rank-${sc.rank}` }, sc.rank),
-          el('p', {}, `정확도 ${Math.round(sc.accuracy * 100)}% · 결 ${s.perfect} · 막음 ${s.good} · 놓침 ${s.miss}`),
+          el('p', {}, `정확도 ${Math.round(sc.accuracy * 100)}%`),
+          el(
+            'div',
+            { class: 'judge-row' },
+            el('span', { class: 'j-excellent' }, `EXCELLENT ${s.excellent}`),
+            el('span', { class: 'j-great' }, `GREAT ${s.perfect - s.excellent}`),
+            el('span', { class: 'j-good' }, `GOOD ${s.good}`),
+            el('span', { class: 'j-miss' }, `MISS ${s.miss}`),
+          ),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak}${newBest ? ' · 최고 기록!' : ''}`),
           el('div', { class: 'row' }, again, pick),
         );
@@ -310,7 +322,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     if (rhythm) {
       progress.style.width = `${Math.min(1, d.t / chartEnd) * 100}%`;
       const sc = rhythmScore(d);
-      scoreEl.textContent = sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · 결 ${d.stats.perfect} · 막음 ${d.stats.good} · 놓침 ${d.stats.miss}` : '결을 받아라';
+      scoreEl.textContent = sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · EXCELLENT ${d.stats.excellent} · GREAT ${d.stats.perfect - d.stats.excellent} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라';
     } else {
       foeHp.style.width = `${(d.foe.hp / foeDef.hp) * 100}%`;
       foePosture.style.width = `${Math.min(1, d.foe.posture / foeDef.posture) * 100}%`;

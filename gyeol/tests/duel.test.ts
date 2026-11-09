@@ -270,6 +270,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
       advance(d, steps[steps.length - 1].at + 1500);
       expect(d.result, foe.id).toBe('win');
       expect(d.stats.perfect, foe.id).toBe(steps.length);
+      expect(d.stats.excellent, foe.id).toBe(steps.length);
       expect(rhythmScore(d).rank).toBe('S');
       expect(d.foe.hp).toBe(foe.hp);
     }
@@ -291,5 +292,22 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
       expect(f.chart?.steps.length ?? 0, f.id).toBeGreaterThanOrEqual(12);
       for (const st of f.chart!.steps) expect(f.moves[st.move], `${f.id}.${st.move}`).toBeTruthy();
     }
+  });
+
+  it('판정 글자: 타격 60ms 안에 받으면 EXCELLENT, 그 밖의 패링은 GREAT, 막기 GOOD, 맞으면 MISS', () => {
+    const at = (lead: number | null) => {
+      const d = createDuel(single(swing({})), 'dummy');
+      if (lead !== null) {
+        advance(d, HIT - lead);
+        press(d, 'parry');
+      }
+      advance(d, HIT + 10);
+      const ev = d.events.find((e) => e.type === 'parry');
+      return ev && ev.type === 'parry' ? ev.judgement : d.events.some((e) => e.type === 'guard') ? 'good' : 'miss';
+    };
+    expect(at(40)).toBe('excellent');
+    expect(at(120)).toBe('great');
+    expect(at(300)).toBe('good');
+    expect(at(null)).toBe('miss');
   });
 });

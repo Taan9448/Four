@@ -80,6 +80,11 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .rank-A { color: #e6e9f2; }
 .rank-B { color: #d9a46a; }
 .rank-C { color: #9a948a; }
+.judge-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px; letter-spacing: 0.04em; }
+.j-excellent { color: #ffe08a; text-shadow: 0 0 8px rgba(255, 210, 120, 0.7); }
+.j-great { color: #f0b04a; }
+.j-good { color: #9fc0ec; }
+.j-miss { color: #d0645a; }
 .rank-icon { width: 112px; height: 112px; image-rendering: pixelated; }
 .btn { min-height: var(--tap); padding: 0 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.18); background: #1d1a22; cursor: pointer; font-size: 16px; }
 .btn.primary { background: linear-gradient(180deg, #5a4420, #33260f); border-color: var(--gold); }

@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: two golden ribbons of curved wood-grain light spiraling up around an empty vertical space in the center of the cell (where a standing figure will be), from the ground up to about two thirds of the cell height
+Cell 2: the ribbons rotate a little, golden motes drifting off them
+Cell 3: the ribbons brighter, a thin golden ring of light on the ground around the base
+Cell 4: the ribbons rotated further, motes rising
+Cell 5: the ribbons dimming slightly, the ground ring pulsing
+Cell 6: the ribbons close to frame 1 positions, looping smoothly
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Keep the character's vertical space EMPTY. In each 512x512 cell, x=192..320 and y=40..430 must be completely BLACK, with no ribbon, spark or glow crossing it. Show the two golden spiral ribbons only as curved LEFT and RIGHT portions around this empty standing silhouette, as though their middle sections are hidden behind him. A thin ground ring may pass below the empty corridor at y=440..470 in cells 3 to 5. Cells 1 and 6 must closely MATCH in ribbon position, height and brightness, with the ground ring faded out in both, so frame 6 returns smoothly to frame 1. Keep this stage clearly stronger and taller than a few blue foot-lines, yet less intense than the final blazing halo stage.
