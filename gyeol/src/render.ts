@@ -4,21 +4,17 @@
 // 오기 전에는 코드로 그린 대체 연출을 쓴다(임시 상자 그림은 쓰지 않는다).
 import { loadSprite, type SpriteAsset } from '../../src/render/assets';
 import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element } from './duel';
+import { clashShift, drawBubbles, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
-export const W = 960;
-export const H = 540;
-const GROUND = 452;
-const SCALE = 2.6;
-export const PLAYER_X = 330;
-export const FOE_X = 640;
-export const CONTACT = { x: (PLAYER_X + FOE_X) / 2, y: GROUND - 120 };
+import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W } from './layout';
+export { CONTACT, FOE_X, H, PLAYER_X, W } from './layout';
 
 /** icons_gyeol 칸 번호(명세 frame_notes와 같다) */
 export const ICON = { S: 1, A: 2, B: 3, C: 4, perfect: 5, good: 6, miss: 7, evade: 8, danger: 9 } as const;
 
 type Anim = SpriteAsset | null;
 export interface Sprites {
-  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim; death: Anim; tech: Anim };
+  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim; death: Anim; tech: Anim; clash: Anim };
   foe: { idle: Anim; attack: Anim; hit: Anim; death: Anim };
   bg: Anim;
   fx: Record<string, Anim>;
@@ -30,7 +26,7 @@ const real = async (id: string): Promise<Anim> => {
   return a && a.source === 'sprites' ? a : null;
 };
 
-export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = []): Promise<Sprites> {
+export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = ''): Promise<Sprites> {
   const ids = {
     pi: loadSprite(`${playerPrefix}_idle`),
     pa: loadSprite(`${playerPrefix}_attack`),
@@ -44,18 +40,20 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
   };
   const fxIds = ['fx_hit_slash', 'fx_hit_blunt', 'fx_hit_fire', 'fx_hit_ice', 'fx_hit_shock', 'fx_hit_grain'];
   const techFx = TECH_IDS.flatMap((t) => [`fx_gyeol_tech_${t}_a`, `fx_gyeol_tech_${t}_b`]);
-  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', ...techFx, ...skillFx];
-  const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, ...fx] = await Promise.all([
+  const finisher = foeId ? [`fx_gyeol_finisher_${foeId}`] : [];
+  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', ...techFx, ...skillFx, ...finisher];
+  const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
     real(`${playerPrefix}_tech`),
     real(`${playerPrefix}_death`),
     real(`${foePrefix}_death`),
+    real(`${playerPrefix}_clash`),
     ...fxIds.map((id) => loadSprite(id)),
     ...gyeolFx.map((id) => real(id)),
   ]);
   const all = [...fxIds, ...gyeolFx];
   return {
-    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd, death: pDeath, tech: pTech },
+    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd, death: pDeath, tech: pTech, clash: pClash },
     foe: { idle: fi, attack: fa, hit: fh, death: fDeath },
     bg: b,
     fx: Object.fromEntries(all.map((id, i) => [id, fx[i]])),
@@ -102,9 +100,18 @@ export interface Fx {
   shake: { power: number; born: number; life: number } | null;
   /** 받기 자세를 잠깐 보인다(실제 시간) */
   guardPose: number;
+  /** 4차: 날씨 입자, 말풍선, 적별 결정타, 위기 심장 박동(마지막 박동 시각), 입자가 움직이는 빠르기(느린 화면이면 느리게) */
+  weather: WeatherState | null;
+  weatherLast: number;
+  timeScale: number;
+  bubbles: Bubble[];
+  finisher: Finisher | null;
+  crisisBeat: number;
+  /** 캔버스가 화면에 줄여 보이는 비율(W / 보이는 너비) */
+  uiScale: number;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, pure: true }, finale: null, flash: null, shake: null, guardPose: -Infinity });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, pure: true }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
 
 export type JudgeWord = 'EXCELLENT' | 'GREAT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
 
@@ -217,8 +224,23 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
     ctx.translate(fx.finale.x, fy);
     ctx.scale(z, z);
     ctx.translate(-fx.finale.x, -fy);
+  } else if (d.clash) {
+    // 겨루기: 맞붙은 칼로 바짝 다가간다
+    const k = Math.min(1, (d.t - d.clash.start) / 220);
+    const z = 1 + 0.14 * (1 - (1 - k) ** 2);
+    const cx = CONTACT.x + clashShift(d);
+    ctx.translate(cx, CONTACT.y);
+    ctx.scale(z, z);
+    ctx.translate(-cx, -CONTACT.y);
   }
+  // 날씨 입자는 실제 시간(느린 화면이면 느리게)으로 움직인다
+  if (fx.weather) {
+    const dt = fx.weatherLast < 0 ? 0 : Math.min(0.05, (now - fx.weatherLast) / 1000) * fx.timeScale;
+    stepWeather(fx.weather, dt);
+  }
+  fx.weatherLast = now;
   drawBackground(ctx, sp);
+  drawWeather(ctx, fx.weather, false, now);
   foeScale = d.foeDef.scale ?? 1;
   readyFx = sp.fx.fx_gyeol_tech_ready ?? null;
   actorScale = d.data.player.scale ?? 1;
@@ -228,12 +250,20 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   actorScale = foeScale;
   drawFoe(ctx, d, sp);
   actorScale = 1;
+  drawClashSparks(ctx, d, sp.fx.fx_gyeol_clash ?? null, now);
   drawCue(ctx, d, now);
+  drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
+  drawWeather(ctx, fx.weather, true, now);
   ctx.restore();
+  drawFocus(ctx, d, now);
+  if (d.crisis && !d.result) drawCrisis(ctx, fx.crisisBeat, now);
   drawCombo(ctx, fx, now);
   drawChain(ctx, fx);
   drawBanner(ctx, fx, now);
+  drawClashBar(ctx, d, now);
+  drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale);
+  drawFinisherName(ctx, fx.finisher, now);
   if (fx.finale) {
     const k = Math.min(1, (now - fx.finale.born) / 500);
     const bar = 54 * (1 - (1 - k) ** 2);
@@ -330,6 +360,13 @@ function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx,
     drawFall(ctx, sp.player.death, sp.player.hit, PLAYER_X, t - p.actionStart, -1);
     return;
   }
+  if (p.action === 'clash') {
+    // 겨루기: 칼을 맞댄 채 버틴다(Codex haun_sword_clash가 오면 그것, 없으면 베기 그림의 타격 칸)
+    const x = PLAYER_X + 46 + clashShift(d) + Math.sin(now * 0.09) * 2;
+    if (sp.player.clash) drawSprite(ctx, sp.player.clash, loopFrame(sp.player.clash, now), x);
+    else if (sp.player.attack) drawSprite(ctx, sp.player.attack, sp.player.attack.meta.events.hit ?? Math.ceil(sp.player.attack.meta.frames / 2), x);
+    return;
+  }
   if (p.action === 'tech') {
     // 기술: Codex 기술 동작이 있으면 그것, 없으면 베기 그림을 늘여 잔상 셋과 함께
     const k = Math.min(0.999, (t - p.actionStart) / TECH_DURATION);
@@ -378,7 +415,11 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
   const open = isOpen(d);
   const move = f.move ? d.foeDef.moves[f.move] : null;
   const tint = open ? 'rgba(255,214,120,0.18)' : move?.unblockable && f.state === 'windup' ? 'rgba(255,40,30,0.22)' : undefined;
-  if (f.state === 'windup' && sp.foe.attack && move) {
+  if (f.state === 'clash' && sp.foe.attack) {
+    // 겨루기: 타격 칸에서 칼을 맞대고 떤다
+    const hit = sp.foe.attack.meta.events.hit ?? Math.ceil(sp.foe.attack.meta.frames / 2);
+    drawSprite(ctx, sp.foe.attack, hit, FOE_X - 40 + (foeScale - 1) * 60 + clashShift(d) + Math.cos(t * 0.09) * 2);
+  } else if (f.state === 'windup' && sp.foe.attack && move) {
     // 속임수: 가짜 순간까지 들어 올렸다가, 끌어 두는 동안 타격 직전 칸에 멈춰 떤다
     const fakeSpan = (f.fakeAt ?? f.hitAt) - f.stateStart;
     const holding = f.fakeAt !== null && t >= f.fakeAt;
@@ -501,6 +542,17 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
     ctx.strokeText('危', FOE_X, GROUND - 230 * foeScale);
     ctx.fillStyle = `rgba(255,70,60,${pulse})`;
     ctx.fillText('危', FOE_X, GROUND - 230 * foeScale);
+  }
+  // 집중(심안): 속임수의 가짜 결이 드러난다(虛)
+  if (c.focus && c.faking) {
+    ctx.shadowBlur = 0;
+    ctx.font = '800 30px "Song Myung", serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.strokeText('虛', cx, cy - 46);
+    ctx.fillStyle = 'rgba(190,220,255,0.95)';
+    ctx.fillText('虛', cx, cy - 46);
   }
   // 속임수: 가짜 순간이 지나면 진짜 결이 다시 좁혀 든다는 표시
   if (!c.faking && d.foe.fakeAt !== null) {
@@ -1020,6 +1072,8 @@ export function pruneFx(fx: Fx, now: number): void {
   fx.slashes = fx.slashes.filter((s) => now - s.born < 600);
   fx.judges = fx.judges.filter((j) => now - j.born < JUDGE_STYLE[j.word].life);
   if (fx.tech && now - fx.tech.born > 2600) fx.tech = null;
+  fx.bubbles = fx.bubbles.filter((b) => now - b.born < b.life);
+  if (fx.finisher && now - fx.finisher.born > 1600) fx.finisher = null;
   if (fx.flash && now - fx.flash.born > fx.flash.life) fx.flash = null;
   if (fx.shake && now - fx.shake.born > fx.shake.life) fx.shake = null;
 }

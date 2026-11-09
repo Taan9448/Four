@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_chain_overseer
+type: fx
+summary: "「결」 결정타 쇄련단(碎鏈斷) — 이 적 전용 마무리 — 흰 일섬이 달군 사슬을 끊고, 주황 사슬 고리가 불꽃을 끌며 사방으로 튄다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a single thin white line of light across the cell, a short length of glowing orange chain across its middle"
+  2: "impact: the slash explodes into a wide white-orange crescent, the chain snaps at the center with a burst of white heat"
+  3: "dozens of glowing orange chain links and fragments flying outward in all directions trailing sparks, a hot orange shockwave ring"
+  4: "links tumbling farther out and starting to fall, cooling from orange to dull red, sparks raining"
+  5: "a few dull red links falling at the edges, embers and grey smoke"
+  6: "faint embers and a wisp of smoke"
+placeholder: { accent: '#ffb060' }

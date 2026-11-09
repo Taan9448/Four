@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_shadow_assassin
+type: fx
+summary: "「결」 결정타 영멸(影滅) — 이 적 전용 마무리 — 보랏빛 잔상 세 줄기가 잇달아 엇갈려 베고, 그림자 몸이 물에 번진 먹처럼 흩어진다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin violet line of light across the cell, a dark purple shadow shape behind it"
+  2: "impact: three crisscrossing violet crescent slashes flash at once with white cores, purple lightning sparks"
+  3: "the slashes at full brightness, the dark shadow tearing apart into splashes of black-violet ink flying outward"
+  4: "ink splashes spreading wide and thinning, violet slash afterglow fading"
+  5: "a few ink droplets and faint violet streaks"
+  6: "faint violet streaks"
+placeholder: { accent: '#d7a8ff' }

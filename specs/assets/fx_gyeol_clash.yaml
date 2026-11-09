@@ -1,0 +1,15 @@
+id: fx_gyeol_clash
+type: fx
+summary: "「결」 칼 맞부딪힘 겨루기 — 맞댄 두 칼날 사이에서 쉬지 않고 튀는 불꽃(반복 6프레임, 2026-11-09). 화려하게"
+frames: 6
+fps: 16
+loop: true
+events: {}
+frame_notes:
+  1: "a blinding white-gold star of light at the exact center of the cell where two blades grind together, short sharp spark streaks shooting out in all directions, a thin horizontal glint line through the center"
+  2: "the star flares bigger, long curved orange-gold spark trails spraying up and down to both sides like a grinder wheel, small hot white fragments"
+  3: "the star pulses smaller, a ring of tiny sparks expanding, a few long streaks falling downward with gravity"
+  4: "the star flares again with a cross-shaped glint, a new spray of sparks to the upper left and lower right"
+  5: "bright core, sparks scattering wide, faint orange smoke wisps at the edges"
+  6: "close to frame 1 so the loop is seamless, the star at medium size with fresh short streaks"
+placeholder: { accent: '#ffe6a0' }

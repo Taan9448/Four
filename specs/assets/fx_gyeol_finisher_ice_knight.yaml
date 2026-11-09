@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_ice_knight
+type: fx
+summary: "「결」 결정타 빙결파(氷結破) — 이 적 전용 마무리 — 옅은 푸른 일섬이 얼음 갑옷을 결대로 가르고, 얼음 조각과 서리가 크게 터진다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a single thin icy white line of light diagonally across the cell over a faint shape of cracked ice"
+  2: "impact: the line explodes into a wide pale-blue crescent slash, white cracks racing through the ice like wood grain"
+  3: "the ice bursts into many sharp crystal shards flying outward, a white frost ring expanding, glittering"
+  4: "shards farther out and spinning, frost mist spreading, sparkles"
+  5: "a few small shards and drifting frost sparkles"
+  6: "faint glittering frost dust"
+placeholder: { accent: '#bfeaff' }

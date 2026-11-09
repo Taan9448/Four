@@ -1,9 +1,12 @@
 // 「결」 목업(2026-11-09): 상대 고르기 → 대결 또는 박자 도전 → 결과.
-// 입력: 받기 K·Space, 베기 J·화면 클릭, 피하기 L·Shift, Esc 상대 고르기. 휴대폰은 세 버튼.
+// 입력: 받기 K·Space, 베기 J·화면 클릭, 피하기 L·Shift, 기술 I, 집중 U, Esc 상대 고르기. 휴대폰은 버튼.
+// 4차(2026-11-09): 칼 맞부딪힘 겨루기(J·K 연타), 위기(배수의 진), 집중(심안), 적별 결정타, 날씨 입자, 적 도발·하운 대사.
 import { initAudio, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import raw from '../data/duel.json';
-import { advance, createDuel, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type Element, type FoeDef, type Judgement, type Mode } from './duel';
+import { advance, createDuel, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { heartbeat } from './heart';
+import { createWeather, gust } from './scene';
 import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
 
@@ -81,6 +84,9 @@ function title(): void {
         el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
         el('p', {}, '원소: ', el('span', { class: 'tag el-fire' }, '화염'), ' 받아도 화상 · ', el('span', { class: 'tag el-ice' }, '냉기'), ' 느리다 마지막에 빨라진다 · ', el('span', { class: 'tag el-lightning' }, '번개'), ' 박자가 튄다.'),
         el('p', {}, '패링·간파가 이어지면 연속 박자 — 3·6·10번째에 기운이 세지고 체간을 더 깎는다.'),
+        el('p', {}, '겨루기: 연타하지 말고 적이 치는 순간에 맞춰 한 번 베면 칼끼리 맞부딪힌다 — ', el('kbd', {}, 'J'), '·', el('kbd', {}, 'K'), ' 연타로 밀어내면 큰 틈.'),
+        el('p', {}, el('kbd', {}, 'U'), ' 집중(심안) — 받기로 모은 게이지가 차면 잠시 시간이 느려지고 결이 처음부터 보인다. 속임수는 虛로 드러난다.'),
+        el('p', {}, '체력이 20% 아래면 배수의 진 — EXCELLENT 판정이 넓어진다.'),
       ),
       el('p', { class: 'proto' }, '목업 · 하운의 받기·피하기 동작과 결 이펙트·기운·아이콘은 Codex 그림이 오면 자동으로 바뀐다'),
     ),
@@ -94,7 +100,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const rhythm = mode === 'rhythm';
   const canvas = el('canvas', { width: String(W), height: String(H), class: 'field', 'aria-label': `${foeDef.title}와의 ${rhythm ? '박자 도전' : '대결'}` });
   const ctx = canvas.getContext('2d')!;
-  const foeHp = el('i'), foePosture = el('i'), myHp = el('i'), myPosture = el('i'), progress = el('i');
+  const foeHp = el('i'), foePosture = el('i'), myHp = el('i'), myPosture = el('i'), myFocus = el('i'), progress = el('i');
   const streakEl = el('div', { class: 'streak' });
   const scoreEl = el('div', { class: 'score' });
   const hud = el(
@@ -107,7 +113,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
       rhythm ? el('div', { class: 'bar progress' }, progress) : el('div', { class: 'bar hp' }, foeHp),
       rhythm ? '' : el('div', { class: 'bar posture' }, foePosture),
     ),
-    rhythm ? scoreEl : el('div', { class: 'me-bar' }, el('b', {}, data.player.name), el('div', { class: 'bar hp' }, myHp), el('div', { class: 'bar posture' }, myPosture)),
+    rhythm ? scoreEl : el('div', { class: 'me-bar' }, el('b', {}, data.player.name), el('div', { class: 'bar hp' }, myHp), el('div', { class: 'bar posture' }, myPosture), el('div', { class: 'bar focus' }, myFocus)),
     streakEl,
   );
   const attackBtn = el('button', { class: 'pad attack', type: 'button' }, '베기', el('small', {}, 'J'));
@@ -115,18 +121,20 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const parryBtn = el('button', { class: 'pad parry', type: 'button' }, '받기', el('small', {}, 'K'));
   const techName = el('span', { class: 'tech-name' }, '기술');
   const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, techName, el('small', {}, 'I'));
+  const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, '집중', el('small', {}, 'U'));
   const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
   const back = el('button', { class: 'back', type: 'button' }, '상대 고르기');
   back.addEventListener('click', title);
   const overlay = el('div', { class: 'result', hidden: '' });
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, back)));
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back)));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
-  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx);
+  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id);
   const fx: Fx = emptyFx();
+  fx.weather = createWeather(foeDef.weather);
   let hitstopUntil = 0;
   let last = performance.now();
   let raf = 0;
@@ -147,7 +155,28 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     }
   };
 
-  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech') => {
+  // 대사: 순간마다 여러 줄을 돌려 가며(첫 줄은 판마다 다르게)
+  let lineSeed = 0;
+  for (const ch of seed) lineSeed = (lineSeed * 31 + ch.charCodeAt(0)) >>> 0;
+  const lineTurn: Partial<Record<string, number>> = {};
+  const say = (who: 'player' | 'foe', key: LineKey, delay = 0, text?: string) => {
+    if (rhythm) return;
+    const pool = who === 'player' ? data.player.lines?.[key] : foeDef.lines?.[key];
+    const id = `${who}:${key}`;
+    const n = lineTurn[id] ?? lineSeed;
+    lineTurn[id] = n + 1;
+    const line = text ?? (pool?.length ? pool[n % pool.length] : null);
+    if (!line) return;
+    const born = performance.now() + delay;
+    fx.bubbles = fx.bubbles.filter((b) => b.who !== who || b.born > born);
+    fx.bubbles.push({ who, text: line, born, life: 1300 + line.length * 45 });
+  };
+  let foeStaggered = false;
+  let lastDeathblow = -1;
+  let lastBeat = 0;
+  let lastClashFx = 0;
+
+  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus') => {
     if (!alive) return;
     if (press(d, input) && input === 'parry') fx.guardPose = performance.now();
   };
@@ -155,6 +184,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   dodgeBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('dodge')));
   parryBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('parry')));
   techBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('tech')));
+  focusBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('focus')));
   canvas.addEventListener('pointerdown', () => doPress('attack'));
   const onKey = (e: KeyboardEvent) => {
     if (e.repeat) return;
@@ -163,6 +193,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     else if (k === 'j') doPress('attack');
     else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge'));
     else if (k === 'i') doPress('tech');
+    else if (k === 'u') doPress('focus');
     else if (k === 'escape') title();
   };
   window.addEventListener('keydown', onKey);
@@ -194,7 +225,10 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           const dmg = d.foeDef.moves[ev.move].damage;
           addShake(fx, now, 3 + dmg * 0.4, ev.heavy ? 260 : 170);
           hitstopUntil = now + (ev.heavy ? 120 : 70);
-          if (ev.heavy) flash('#fff3c4', 160, 0.35);
+          if (ev.heavy) {
+            flash('#fff3c4', 160, 0.35);
+            gust(fx.weather, CONTACT.x, CONTACT.y, 380);
+          }
           break;
         }
         case 'mikiri':
@@ -238,6 +272,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           addShake(fx, now, power, ev.heavy ? 380 : 220);
           flash('#ff3b3b', ev.heavy ? 260 : 180, ev.heavy ? 0.6 : 0.45);
           if (ev.heavy) hitstopUntil = now + 90;
+          if (ev.heavy || ev.unblockable) gust(fx.weather, PLAYER_X, CONTACT.y, 300 + ev.damage * 10);
           skillBurst(ev.move, now, PLAYER_X + 10);
           judge(fx, 'MISS', '놓침', now);
           if (!rhythm) text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', ev.heavy ? 34 : 28);
@@ -307,8 +342,61 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           if (t.id === 'unhae') fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: 'rgba(255,214,120,ALPHA)', big: true });
           spark(FOE_X, CONTACT.y, 44, c?.core ?? '#ffffff', 480, 5);
           text(FOE_X - 30, CONTACT.y + 50, `${t.name} ${ev.damage}`, c?.core ?? '#ffffff', 34);
+          gust(fx.weather, FOE_X, CONTACT.y, 800);
           break;
         }
+        case 'clash':
+          // 칼끼리 맞부딪혔다: 번쩍 멈추고, 겨루기 막대가 뜬다
+          sfx('crit');
+          sfx('block');
+          flash('#ffffff', 220, 0.55);
+          addShake(fx, now, 10, 260);
+          hitstopUntil = now + 140;
+          spark(CONTACT.x, CONTACT.y - 10, 30, '#ffe6a0', 380, 4);
+          gust(fx.weather, CONTACT.x, CONTACT.y, 500);
+          say('foe', 'clash');
+          say('player', 'clash', 600);
+          break;
+        case 'clashPush':
+          sfx('block', { volume: 0.35 });
+          addShake(fx, now, 3, 90);
+          spark(CONTACT.x + (ev.balance - 0.5) * 80, CONTACT.y - 10, 6, '#fff0c0', 260, 3);
+          break;
+        case 'clashWin':
+          sfx('slam_8');
+          flash('#bfe4ff', 260, 0.5);
+          addShake(fx, now, 14, 320);
+          hitstopUntil = now + 140;
+          spark(FOE_X - 30, CONTACT.y, 34, '#bfe4ff', 420, 4);
+          gust(fx.weather, CONTACT.x + 40, CONTACT.y, 700);
+          judge(fx, 'COUNTER', '밀어냈다 — 베어라!', now, 'foe');
+          text(FOE_X + 50, CONTACT.y - 40, `${ev.damage}`, '#bfe4ff', 28);
+          break;
+        case 'clashLose':
+          sfx('hit_heavy');
+          flash('#ff3b3b', 260, 0.55);
+          addShake(fx, now, 14, 320);
+          judge(fx, 'MISS', '밀렸다', now);
+          text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', 30);
+          break;
+        case 'crisis':
+          // 배수의 진: 붉은 가장자리와 심장 소리, EXCELLENT 폭이 넓어진다
+          sfx('power', { volume: 0.9 });
+          flash('#ff2a2a', 320, 0.35);
+          fx.crisisBeat = now;
+          lastBeat = now;
+          heartbeat(0.6);
+          text(PLAYER_X + 40, CONTACT.y - 200, '배수의 진 — 결이 넓어진다', '#ffb0a0', 24);
+          say('foe', 'crisis');
+          say('player', 'crisis', 1500);
+          break;
+        case 'focus':
+          // 심안: 시간이 느려지고 결이 처음부터 보인다
+          sfx('swirl');
+          sfx('power', { volume: 0.5 });
+          flash('#bfe4ff', 300, 0.3);
+          text(PLAYER_X + 40, CONTACT.y - 200, '심안 — 결이 처음부터 보인다', '#cfe6ff', 24);
+          break;
         case 'link':
           break;
         case 'streak': {
@@ -328,13 +416,20 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           judge(fx, 'BREAK', '체간이 무너졌다 — 베어라!', now, 'foe');
           flash('#fff3c4', 200);
           addShake(fx, now, 8, 220);
+          if (!foeStaggered) say('foe', 'stagger');
+          say('player', 'stagger', foeStaggered ? 0 : 500);
+          foeStaggered = true;
           break;
         case 'recover':
           text(FOE_X, CONTACT.y - 140, '자세를 되찾았다', '#c9c3d6', 22);
           break;
         case 'deathblow':
           sfx('slam_9');
-          fx.slashes.push({ born: now });
+          lastDeathblow = ev.t;
+          // 적마다 다른 결정타(Codex fx_gyeol_finisher_<id>가 오면 그 그림만, 없으면 공통 일섬 + 적별 코드 연출)
+          if (foeDef.finisher) fx.finisher = { def: foeDef.finisher, sprite: `fx_gyeol_finisher_${foeDef.id}`, born: now };
+          if (!sp.fx[`fx_gyeol_finisher_${foeDef.id}`]) fx.slashes.push({ born: now });
+          gust(fx.weather, FOE_X, CONTACT.y, 700);
           spark(FOE_X - 10, CONTACT.y, 40, '#ffe6a0', 440, 5);
           text(FOE_X, CONTACT.y - 120, `결정타 ${ev.damage}`, '#ffe08a', 44);
           flash('#ffffff', 300, 0.7);
@@ -350,6 +445,14 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           fx.combo = null;
           fx.banner = null;
           flash(ev.type === 'win' ? '#ffffff' : '#3a0000', 400, 0.5);
+          if (ev.type === 'win') {
+            say('foe', 'lose', 150);
+            // 결정타로 끝냈으면 그 결정타의 대사
+            say('player', 'win', 1100, lastDeathblow === ev.t ? foeDef.finisher?.line : undefined);
+          } else {
+            say('player', 'lose', 150);
+            say('foe', 'win', 1100);
+          }
           finish();
           break;
         case 'judge':
@@ -412,6 +515,12 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
       foePosture.style.width = `${Math.min(1, d.foe.posture / foeDef.posture) * 100}%`;
       myHp.style.width = `${(d.player.hp / data.player.hp) * 100}%`;
       myPosture.style.width = `${Math.min(1, d.player.posture / data.player.posture) * 100}%`;
+      const fk = d.focus / data.rules.focusMax;
+      myFocus.style.width = `${(isFocusing(d) ? (d.focusUntil - d.t) / data.rules.focusDuration : fk) * 100}%`;
+      focusBtn.style.setProperty('--focus', String(fk));
+      focusBtn.disabled = fk < 1 || isFocusing(d) || !!d.result;
+      focusBtn.classList.toggle('ready', fk >= 1 && !isFocusing(d));
+      focusBtn.classList.toggle('on', isFocusing(d));
     }
     const tier = streakTier(d);
     streakEl.textContent = '';
@@ -429,14 +538,32 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     if (!alive) return;
     const dt = Math.min(50, now - last);
     last = now;
-    if (now >= hitstopUntil) advance(d, d.t + (now < slowUntil ? dt * slowRate : dt));
+    // 느린 화면: 끝 장면이면 0.25배, 집중(심안) 중이면 focusRate배
+    const rate = now < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : 1;
+    fx.timeScale = rate;
+    fx.uiScale = W / Math.max(1, canvas.clientWidth);
+    if (now >= hitstopUntil) advance(d, d.t + dt * rate);
     handleEvents();
+    // 위기: 심장이 뛴다(가장자리 붉은 맥박과 같은 박자)
+    if (d.crisis && !d.result && now - lastBeat > 860) {
+      lastBeat = now;
+      fx.crisisBeat = now;
+      heartbeat(0.45);
+    }
+    // 겨루기: 맞댄 칼에서 쉬지 않고 불꽃이 튄다
+    if (d.clash && now - lastClashFx > 70) {
+      lastClashFx = now;
+      spark(CONTACT.x + (d.clash.balance - 0.5) * 80, CONTACT.y - 10, 4, '#ffd27a', 220, 3);
+    }
     pruneFx(fx, now);
     draw(ctx, d, sp, fx, now);
     bars();
     raf = requestAnimationFrame(frame);
   };
   raf = requestAnimationFrame(frame);
+  // 첫마디: 적이 먼저, 하운이 받는다
+  say('foe', 'start', 350);
+  say('player', 'start', 2100);
   stopLoop = () => {
     alive = false;
     cancelAnimationFrame(raf);
