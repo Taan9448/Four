@@ -343,7 +343,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     expect(p.events.find((e) => e.type === 'streak')).toMatchObject({ streak: 1 });
   });
 
-  it('진하운의 기술: 3연환 낙운무흔, 5연환 벽운단하, 5연환 모두 EXCELLENT면 운해귀종(받아낸 힘을 돌려보낸다)', () => {
+  it('진하운의 기술: GOOD 이상 5연환 낙운무흔, EXCELLENT 5연환 벽운단하, 10연환 운해귀종(받아낸 힘을 돌려보낸다)', () => {
     const run = (leads: number[]) => {
       const dd = single(swing({ damage: 10, posture: 1 }));
       const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], hp: 1000, posture: 1000 }] }, 'dummy');
@@ -356,17 +356,20 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
       }
       return d;
     };
-    expect(run([40, 40]).techReady).toBeNull();
-    expect(run([40, 300, 40]).techReady).toBe('nakun');
-    expect(run([40, 300, 40, 40, 40]).techReady).toBe('byeogun');
-    const pure = run([40, 40, 40, 40, 40]);
+    const ex = (n: number) => Array<number>(n).fill(40);
+    expect(run(ex(4)).techReady).toBeNull();
+    expect(run([40, 300, 40, 40]).techReady).toBeNull();
+    expect(run([40, 300, 40, 40, 40]).techReady).toBe('nakun');
+    expect(run(ex(5)).techReady).toBe('byeogun');
+    expect(run([300, ...ex(8)]).techReady).toBe('nakun');
+    const pure = run([300, ...ex(9)]);
     expect(pure.techReady).toBe('unhae');
-    // 쓰면: 무적, 피해 = 최대 체력 × damage + 받아낸 힘(10×5) × returnMul, 체간은 가득(비틀거림)
+    // 쓰면: 무적, 피해 = 최대 체력 × damage + 받아낸 힘(10×10) × returnMul, 체간은 가득(비틀거림)
     const unhae = real.techs.find((t) => t.id === 'unhae')!;
     expect(press(pure, 'tech')).toBe(true);
     advance(pure, pure.t + TECH_DURATION);
     const hit = pure.events.find((e) => e.type === 'techHit');
-    expect(hit).toMatchObject({ tech: 'unhae', damage: Math.round(1000 * unhae.damage + 50 * unhae.returnMul) });
+    expect(hit).toMatchObject({ tech: 'unhae', damage: Math.round(1000 * unhae.damage + 100 * unhae.returnMul) });
     expect(pure.foe.state).toBe('stagger');
     expect(pure.techReady).toBeNull();
     expect(pure.chain).toBe(0);
@@ -376,16 +379,16 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     const dd = single(swing({ posture: 1 }));
     const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], posture: 1000 }] }, 'dummy');
     let hit = HIT;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       advance(d, hit - 40);
       press(d, 'parry');
       advance(d, hit + 5);
       hit += 1100;
     }
-    expect(d.techReady).toBe('nakun');
+    expect(d.techReady).toBe('byeogun');
     advance(d, hit + 5); // 맞음
     expect(d.chain).toBe(0);
-    expect(d.techReady).toBe('nakun');
+    expect(d.techReady).toBe('byeogun');
     const r = createDuel(real, 'ignis', 'x', 'rhythm');
     expect(press(r, 'tech')).toBe(false);
   });

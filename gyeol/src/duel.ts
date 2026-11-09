@@ -107,7 +107,8 @@ export interface PlayerDef {
 
 /**
  * 진하운의 기술(2026-11-09): 받기·피하기를 끊기지 않고 이어 가면(결 연환) 열린다.
- * chain 이상 이어졌고, pure면 그 사이가 모두 EXCELLENT여야 한다. 준비된 기술은 맞아도 남고, 스킬 입력으로 쓴다.
+ * chain 이상 이어졌고(GOOD 이상이면 잇는다), pure면 그 사이가 모두 EXCELLENT여야 한다.
+ * 지금: 낙운무흔 5연환 · 벽운단하 EXCELLENT 5연환 · 운해귀종 10연환(2026-11-09 사용자 조정). 준비된 기술은 맞아도 남고, 스킬 입력으로 쓴다.
  */
 export interface TechDef {
   id: string;

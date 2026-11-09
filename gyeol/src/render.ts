@@ -930,33 +930,37 @@ function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
 }
 
 /** 결 연환 구슬 다섯: 이어 받은 만큼 찬다(모두 EXCELLENT면 금빛, 섞이면 은빛). 3에 낙운무흔, 5에 벽운단하·운해귀종 */
+const CHAIN_PIPS = 10;
+
 function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
   const c = fx.chain;
   if (c.n <= 0 || fx.finale) return;
-  const x0 = PLAYER_X - 150 - 48;
+  const x0 = PLAYER_X - 150 - 19 * 4.5;
   const y = GROUND - 210;
   ctx.save();
-  for (let i = 0; i < 5; i++) {
+  // 구슬 열 개: 5(낙운무흔·벽운단하)와 10(운해귀종)에 금테
+  const gap = 19;
+  for (let i = 0; i < CHAIN_PIPS; i++) {
     const on = i < c.n;
-    const x = x0 + i * 24;
+    const x = x0 + i * gap;
     ctx.beginPath();
-    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.arc(x, y, 7, 0, Math.PI * 2);
     ctx.fillStyle = on ? (c.pure ? '#ffd27a' : '#c9d4e6') : 'rgba(0,0,0,0.45)';
     ctx.shadowColor = on ? (c.pure ? '#ffd27a' : '#9fc0ec') : 'transparent';
     ctx.shadowBlur = on ? 10 : 0;
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = i === 2 || i === 4 ? '#fff0c0' : 'rgba(255,255,255,0.4)';
+    ctx.strokeStyle = i === 4 || i === 9 ? '#fff0c0' : 'rgba(255,255,255,0.4)';
     ctx.stroke();
   }
   ctx.font = '800 15px "Song Myung", serif';
   ctx.textAlign = 'center';
   ctx.lineWidth = 3;
   ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-  ctx.strokeText(`결 연환 ${c.n}`, x0 + 48, y + 26);
+  ctx.strokeText(`결 연환 ${c.n}`, x0 + gap * 4.5, y + 26);
   ctx.fillStyle = c.pure ? '#ffe9b0' : '#d8e2f2';
-  ctx.fillText(`결 연환 ${c.n}`, x0 + 48, y + 26);
+  ctx.fillText(`결 연환 ${c.n}`, x0 + gap * 4.5, y + 26);
   ctx.restore();
 }
 

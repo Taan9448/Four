@@ -42,7 +42,7 @@ jobs:
             echo "code=true" >> "$GITHUB_OUTPUT"; echo "assets=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           echo "$FILES"
-          if echo "$FILES" | grep -qE '^(src|data|tools|tests|specs)/|^(package\.json|package-lock\.json|tsconfig\.json|vite\.config\.ts|index\.html)$'; then echo "code=true" >> "$GITHUB_OUTPUT"; else echo "code=false" >> "$GITHUB_OUTPUT"; fi
+          if echo "$FILES" | grep -qE '^(src|data|tools|tests|specs|gyeol)/|^(package\.json|package-lock\.json|tsconfig\.json|vite\.config\.ts|index\.html)$'; then echo "code=true" >> "$GITHUB_OUTPUT"; else echo "code=false" >> "$GITHUB_OUTPUT"; fi
           if echo "$FILES" | grep -qE '^(assets|specs|tools)/|^docs/ART_STYLE\.md$'; then echo "assets=true" >> "$GITHUB_OUTPUT"; else echo "assets=false" >> "$GITHUB_OUTPUT"; fi
 
   code:
