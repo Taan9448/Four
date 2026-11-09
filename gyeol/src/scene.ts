@@ -142,21 +142,38 @@ export function gust(w: WeatherState | null, x: number, y: number, power: number
 
 const LEAF = ['#5f6e32', '#8a6a2a', '#4a5a2a', '#a07a34'];
 
-export function drawWeather(ctx: CanvasRenderingContext2D, w: WeatherState | null, front: boolean, now: number): void {
-  if (!w) return;
+/** 반딧불 빛(한 번 그려 둔다) */
+let fireflyGlow: HTMLCanvasElement | null = null;
+function fireflySprite(): HTMLCanvasElement {
+  if (fireflyGlow) return fireflyGlow;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 32;
+  const c = cv.getContext('2d')!;
+  const g = c.createRadialGradient(16, 16, 0, 16, 16, 16);
+  g.addColorStop(0, 'rgba(230,255,150,1)');
+  g.addColorStop(1, 'rgba(160,220,90,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 32, 32);
+  fireflyGlow = cv;
+  return cv;
+}
+
+/** density: 화면 품질에 따라 그릴 입자 비율(1 전부 · 0.5 절반 · 0 없음) */
+export function drawWeather(ctx: CanvasRenderingContext2D, w: WeatherState | null, front: boolean, now: number, density = 1): void {
+  if (!w || density <= 0) return;
+  const every = density >= 1 ? 1 : Math.round(1 / density);
   ctx.save();
-  for (const m of w.motes) {
+  for (let i = 0; i < w.motes.length; i += every) {
+    const m = w.motes[i];
     if (m.front !== front) continue;
     switch (w.kind) {
       case 'leaves':
         if (m.alt) {
           const a = 0.35 + 0.45 * Math.max(0, Math.sin(now / 420 + m.phase * 3));
           ctx.globalCompositeOperation = 'lighter';
-          const g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.size * 4);
-          g.addColorStop(0, `rgba(230,255,150,${a})`);
-          g.addColorStop(1, 'rgba(160,220,90,0)');
-          ctx.fillStyle = g;
-          ctx.fillRect(m.x - m.size * 4, m.y - m.size * 4, m.size * 8, m.size * 8);
+          ctx.globalAlpha = a;
+          ctx.drawImage(fireflySprite(), m.x - m.size * 4, m.y - m.size * 4, m.size * 8, m.size * 8);
+          ctx.globalAlpha = 1;
           ctx.globalCompositeOperation = 'source-over';
         } else {
           ctx.save();
@@ -236,6 +253,46 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number): string[
 }
 
 /** 말풍선: 하운은 한지 빛, 적은 붉은 먹빛. 머리 위에 튀어나왔다가 사라진다 */
+const BUBBLE_PAD = 12;
+const bubbleCache = new Map<string, { cv: HTMLCanvasElement; bw: number; bh: number }>();
+/** 말풍선 판(그림자·테두리·글자)을 대사마다 한 번 그려 둔다 */
+function bubbleArt(text: string, player: boolean, u: number): { cv: HTMLCanvasElement; bw: number; bh: number } {
+  const key = `${player ? 'p' : 'f'}:${u.toFixed(2)}:${text}`;
+  const hit = bubbleCache.get(key);
+  if (hit) return hit;
+  if (bubbleCache.size > 80) bubbleCache.clear();
+  const cv = document.createElement('canvas');
+  const c = cv.getContext('2d')!;
+  const font = `700 ${Math.round(17 * u)}px "Nanum Myeongjo", "Song Myung", serif`;
+  c.font = font;
+  const lines = wrap(c, text, 220 * u);
+  const tw = Math.max(...lines.map((l) => c.measureText(l).width));
+  const lh = 22 * u;
+  const bw = tw + 26;
+  const bh = lines.length * lh + 16;
+  cv.width = Math.ceil(bw + BUBBLE_PAD * 2);
+  cv.height = Math.ceil(bh + BUBBLE_PAD * 2);
+  c.translate(BUBBLE_PAD, BUBBLE_PAD);
+  c.beginPath();
+  c.roundRect(0, 0, bw, bh, 10);
+  c.fillStyle = player ? 'rgba(243,234,214,0.96)' : 'rgba(34,14,14,0.94)';
+  c.shadowColor = 'rgba(0,0,0,0.5)';
+  c.shadowBlur = 8;
+  c.fill();
+  c.shadowBlur = 0;
+  c.lineWidth = 2;
+  c.strokeStyle = player ? '#3a2c1c' : '#b0453a';
+  c.stroke();
+  c.font = font;
+  c.fillStyle = player ? '#2a2016' : '#ffe9e0';
+  c.textAlign = 'center';
+  c.textBaseline = 'top';
+  lines.forEach((l, i) => c.fillText(l, bw / 2, 9 + i * lh));
+  const art = { cv, bw, bh };
+  bubbleCache.set(key, art);
+  return art;
+}
+
 /** zoom: 화면에 줄여 보이는 비율(휴대폰이면 글자를 키운다) */
 export function drawBubbles(ctx: CanvasRenderingContext2D, bubbles: Bubble[], now: number, foeScale: number, zoom = 1): void {
   const u = Math.max(1, Math.min(1.8, zoom * 0.62));
@@ -244,42 +301,26 @@ export function drawBubbles(ctx: CanvasRenderingContext2D, bubbles: Bubble[], no
     if (el < 0 || el > b.life) continue;
     const pop = el < 140 ? 0.85 + 0.15 * (el / 140) : 1;
     const alpha = el > b.life - 260 ? (b.life - el) / 260 : Math.min(1, el / 80);
-    ctx.save();
-    ctx.font = `700 ${Math.round(17 * u)}px "Nanum Myeongjo", "Song Myung", serif`;
-    const lines = wrap(ctx, b.text, 220 * u);
-    const tw = Math.max(...lines.map((l) => ctx.measureText(l).width));
-    const lh = 22 * u;
-    const bw = tw + 26;
-    const bh = lines.length * lh + 16;
     const player = b.who === 'player';
     const ax = player ? PLAYER_X - 6 : FOE_X + 14;
     const ay = player ? GROUND - 262 : Math.max(100, GROUND - 272 * foeScale);
-    const x = Math.max(10, Math.min(W - 10 - bw, ax - bw / 2));
-    const y = ay - 14 - bh;
+    const art = bubbleArt(b.text, player, u);
+    // 꼬리 끝이 머리 위(ax, ay)에 오게, 판은 화면 안으로 민다
+    const x = Math.max(10, Math.min(W - 10 - art.bw, ax - art.bw / 2));
+    ctx.save();
     ctx.globalAlpha = alpha;
     ctx.translate(ax, ay);
     ctx.scale(pop, pop);
     ctx.translate(-ax, -ay);
+    ctx.drawImage(art.cv, x - BUBBLE_PAD, ay - 14 - art.bh - BUBBLE_PAD);
+    // 꼬리(판이 밀려도 머리를 가리키게 따로 그린다)
     ctx.beginPath();
-    ctx.roundRect(x, y, bw, bh, 10);
-    // 꼬리
-    ctx.moveTo(ax - 8, y + bh - 1);
+    ctx.moveTo(ax - 8, ay - 15);
     ctx.lineTo(ax, ay);
-    ctx.lineTo(ax + 8, y + bh - 1);
+    ctx.lineTo(ax + 8, ay - 15);
+    ctx.closePath();
     ctx.fillStyle = player ? 'rgba(243,234,214,0.96)' : 'rgba(34,14,14,0.94)';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 8;
     ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = player ? '#3a2c1c' : '#b0453a';
-    ctx.beginPath();
-    ctx.roundRect(x, y, bw, bh, 10);
-    ctx.stroke();
-    ctx.fillStyle = player ? '#2a2016' : '#ffe9e0';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    lines.forEach((l, i) => ctx.fillText(l, x + bw / 2, y + 9 + i * lh));
     ctx.restore();
   }
 }
@@ -625,13 +666,33 @@ export function drawClashBar(ctx: CanvasRenderingContext2D, d: Duel, now: number
 /* ───────────── 위기·집중 화면 ───────────── */
 
 /** 위기(배수의 진): 화면 가장자리가 붉게 맥박친다(심장 소리와 같은 박자) */
+/** 가장자리 어둠·붉음(원형 그라데이션)은 한 번 그려 두고 투명도만 바꾼다 */
+const vignettes = new Map<string, HTMLCanvasElement>();
+function vignette(color: string, inner: number): HTMLCanvasElement {
+  const key = `${color}:${inner}`;
+  let cv = vignettes.get(key);
+  if (cv) return cv;
+  cv = document.createElement('canvas');
+  cv.width = W / 2;
+  cv.height = H / 2;
+  const c = cv.getContext('2d')!;
+  c.scale(0.5, 0.5);
+  const g = c.createRadialGradient(W / 2, H / 2, H * inner, W / 2, H / 2, W * 0.62);
+  g.addColorStop(0, `rgba(${color},0)`);
+  g.addColorStop(1, `rgba(${color},1)`);
+  c.fillStyle = g;
+  c.fillRect(0, 0, W, H);
+  vignettes.set(key, cv);
+  return cv;
+}
+
 export function drawCrisis(ctx: CanvasRenderingContext2D, beat: number, now: number): void {
   const pulse = Math.exp(-(now - beat) / 200);
-  const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.62);
-  g.addColorStop(0, 'rgba(120,0,0,0)');
-  g.addColorStop(1, `rgba(150,8,8,${0.32 + 0.3 * pulse})`);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.globalAlpha = 0.32 + 0.3 * pulse;
+  ctx.drawImage(vignette('150,8,8', 0.35), 0, 0, W, H);
+  ctx.restore();
 }
 
 /** 집중(심안): 화면이 푸르스름하게 가라앉고, 하운에게서 먹빛 고리가 번진다. 끝날 즈음 옅어진다 */
@@ -642,11 +703,10 @@ export function drawFocus(ctx: CanvasRenderingContext2D, d: Duel, now: number): 
   ctx.save();
   ctx.fillStyle = `rgba(14,28,52,${0.28 * k})`;
   ctx.fillRect(0, 0, W, H);
-  const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.6);
-  g.addColorStop(0, 'rgba(0,0,0,0)');
-  g.addColorStop(1, `rgba(0,6,20,${0.55 * k})`);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
+  ctx.imageSmoothingEnabled = true;
+  ctx.globalAlpha = 0.55 * k;
+  ctx.drawImage(vignette('0,6,20', 0.3), 0, 0, W, H);
+  ctx.globalAlpha = 1;
   for (let i = 0; i < 3; i++) {
     const p = ((now / 1400 + i / 3) % 1);
     ctx.strokeStyle = `rgba(170,210,255,${0.3 * (1 - p) * k})`;

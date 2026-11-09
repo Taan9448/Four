@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { advance, createDuel, cue, isOpen, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
+import { advance, createDuel, cue, isOpen, MAX_INPUT_LAG, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
+import { defaultSettings, KEY, loadSave, normalize, resetSaveCache, writeSave } from '../src/save';
 import realRaw from '../data/duel.json';
 
 const real = realRaw as unknown as DuelData;
@@ -503,5 +504,43 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
       expect(f.lines?.start?.length, f.id).toBeGreaterThan(0);
     }
     expect(real.player.lines?.start?.length).toBeGreaterThan(0);
+  });
+});
+
+describe('「결」 1단계 — 입력 시각 보정·저장', () => {
+  it('늦게 닿은 받기는 실제로 누른 시각(at)으로 판정한다 — 단, MAX_INPUT_LAG까지만', () => {
+    // 화면은 타격 순간을 지나지 않았지만 이미 타격 30ms 전에 있다: 140ms 전에 눌렀으면 GREAT(150 안), 지금 눌렀다고 치면 EXCELLENT
+    const late = createDuel(data, 'dummy');
+    advance(late, HIT - 30);
+    expect(press(late, 'parry', HIT - 140)).toBe(true);
+    advance(late, HIT + 5);
+    expect(late.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'great' });
+    // 너무 먼 과거는 MAX_INPUT_LAG로 자른다
+    const far = createDuel(data, 'dummy');
+    advance(far, HIT - 30);
+    press(far, 'parry', 0);
+    expect(far.player.parryAt).toBe(HIT - 30 - MAX_INPUT_LAG);
+    // 미래 시각은 지금으로
+    const fut = createDuel(data, 'dummy');
+    advance(fut, 100);
+    press(fut, 'parry', 500);
+    expect(fut.player.parryAt).toBe(100);
+  });
+
+  it('저장: 빈 저장은 기본값, 깨진 값은 걸러 내고, 옛 박자 도전 기록을 옮긴다', () => {
+    const mem = new Map<string, string>();
+    const st = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
+    resetSaveCache();
+    mem.set('gyeol.rhythmBest', JSON.stringify({ ignis: { accuracy: 0.9, rank: 'A' } }));
+    const s = loadSave(st);
+    expect(s.settings).toEqual(defaultSettings());
+    expect(s.rhythmBest.ignis.rank).toBe('A');
+    s.settings.inputOffset = 30;
+    writeSave(s, st);
+    expect(JSON.parse(mem.get(KEY)!).settings.inputOffset).toBe(30);
+    const bad = normalize({ settings: { master: 7, inputOffset: 999, quality: 'ultra', reduceFlash: 'yes' }, story: 3 });
+    expect(bad.settings).toMatchObject({ master: 1, inputOffset: 120, quality: 'auto', reduceFlash: false });
+    expect(bad.story).toEqual({ cleared: [], stars: {} });
+    resetSaveCache();
   });
 });

@@ -135,8 +135,16 @@ export function judge(fx: Fx, word: JudgeWord, sub: string, now: number, slot: '
   fx.judges.push({ word, sub, x, y, born: now, slot });
 }
 
+/** 화면 흔들림 배율(설정, 0이면 흔들지 않는다) */
+let shakeScale = 1;
+export function setShakeScale(k: number): void {
+  shakeScale = k;
+}
+
 /** 흔들림은 더 센 쪽을 남긴다(약한 흔들림이 강한 흔들림을 덮지 않게) */
-export function addShake(fx: Fx, now: number, power: number, life: number): void {
+export function addShake(fx: Fx, now: number, power0: number, life: number): void {
+  const power = power0 * shakeScale;
+  if (power <= 0) return;
   const cur = fx.shake;
   const curLeft = cur ? cur.power * Math.max(0, 1 - (now - cur.born) / cur.life) : 0;
   if (power >= curLeft) fx.shake = { power, born: now, life };
@@ -159,6 +167,31 @@ function strikeFrame(asset: SpriteAsset, phase: 'windup' | 'recover', elapsed: n
   return hit + Math.floor(k * (asset.meta.frames - hit + 1));
 }
 
+/**
+ * 화면 품질(2026-11-09 7-4절): high = 모든 빛 번짐·날씨 · normal = 날씨 절반, 결 줄기는 가짜 빛(두 겹 선) · low = 날씨 끔.
+ * main이 설정·프레임 시간으로 정해 넘긴다.
+ */
+export type RenderQuality = 'high' | 'normal' | 'low';
+let quality: RenderQuality = 'high';
+export function setRenderQuality(q: RenderQuality): void {
+  quality = q;
+}
+export const renderQuality = (): RenderQuality => quality;
+
+/** 한 번 그려 두고 다시 쓰는 작은 캔버스(빛 번짐 글자·띠 등). 너무 많아지면 비운다 */
+const glowCache = new Map<string, HTMLCanvasElement>();
+function cached(key: string, w: number, h: number, paint: (c: CanvasRenderingContext2D) => void): HTMLCanvasElement {
+  let cv = glowCache.get(key);
+  if (cv) return cv;
+  if (glowCache.size > 300) glowCache.clear();
+  cv = document.createElement('canvas');
+  cv.width = Math.ceil(w);
+  cv.height = Math.ceil(h);
+  paint(cv.getContext('2d')!);
+  glowCache.set(key, cv);
+  return cv;
+}
+
 /** 지금 그리는 캐릭터의 크기 배율(2026-11-09, duel.json scale) — drawPlayer·drawFoe가 정한다 */
 let actorScale = 1;
 let foeScale = 1;
@@ -179,22 +212,29 @@ function drawSprite(ctx: CanvasRenderingContext2D, asset: Anim, frame: number, x
   ctx.restore();
 }
 
-/** 색 입히기는 따로 된 작은 캔버스에서 한다(본 캔버스에서 하면 뒤 배경까지 물든다) */
-let tintCanvas: HTMLCanvasElement | null = null;
+/**
+ * 색 입히기는 따로 된 작은 캔버스에서 한다(본 캔버스에서 하면 뒤 배경까지 물든다).
+ * 프레임·색마다 한 번만 만들어 둔다(2026-11-09 최적화: 예전에는 그릴 때마다 복사했다).
+ */
+const tintCache = new WeakMap<object, Map<string, HTMLCanvasElement>>();
 function tinted(img: CanvasImageSource, w: number, h: number, color: string): CanvasImageSource {
-  tintCanvas ??= document.createElement('canvas');
-  if (tintCanvas.width !== w || tintCanvas.height !== h) {
-    tintCanvas.width = w;
-    tintCanvas.height = h;
+  let byColor = tintCache.get(img);
+  if (!byColor) {
+    byColor = new Map();
+    tintCache.set(img, byColor);
   }
-  const c = tintCanvas.getContext('2d')!;
-  c.globalCompositeOperation = 'source-over';
-  c.clearRect(0, 0, w, h);
+  let cv = byColor.get(color);
+  if (cv) return cv;
+  cv = document.createElement('canvas');
+  cv.width = w;
+  cv.height = h;
+  const c = cv.getContext('2d')!;
   c.drawImage(img, 0, 0, w, h);
   c.globalCompositeOperation = 'source-atop';
   c.fillStyle = color;
   c.fillRect(0, 0, w, h);
-  return tintCanvas;
+  byColor.set(color, cv);
+  return cv;
 }
 
 export function drawIcon(ctx: CanvasRenderingContext2D, sp: Sprites, n: number, x: number, y: number, size: number): boolean {
@@ -207,6 +247,9 @@ export function drawIcon(ctx: CanvasRenderingContext2D, sp: Sprites, n: number, 
 }
 
 export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx, now: number): void {
+  // 캔버스가 W×H보다 크면(고해상도 화면, 품질 high) 그만큼 키워 그린다 — 좌표는 언제나 W×H 기준
+  const k = ctx.canvas.width / W;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   if (fx.shake) {
@@ -234,13 +277,14 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
     ctx.translate(-cx, -CONTACT.y);
   }
   // 날씨 입자는 실제 시간(느린 화면이면 느리게)으로 움직인다
-  if (fx.weather) {
+  const density = quality === 'high' ? 1 : quality === 'normal' ? 0.5 : 0;
+  if (fx.weather && density > 0) {
     const dt = fx.weatherLast < 0 ? 0 : Math.min(0.05, (now - fx.weatherLast) / 1000) * fx.timeScale;
     stepWeather(fx.weather, dt);
   }
   fx.weatherLast = now;
   drawBackground(ctx, sp);
-  drawWeather(ctx, fx.weather, false, now);
+  drawWeather(ctx, fx.weather, false, now, density);
   foeScale = d.foeDef.scale ?? 1;
   readyFx = sp.fx.fx_gyeol_tech_ready ?? null;
   actorScale = d.data.player.scale ?? 1;
@@ -254,7 +298,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawCue(ctx, d, now);
   drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
-  drawWeather(ctx, fx.weather, true, now);
+  drawWeather(ctx, fx.weather, true, now, density);
   ctx.restore();
   drawFocus(ctx, d, now);
   if (d.crisis && !d.result) drawCrisis(ctx, fx.crisisBeat, now);
@@ -282,23 +326,35 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   }
 }
 
+/** 배경(그림 + 어둡게 + 발밑 그림자)은 한 번 그려 둔 캔버스를 쓴다(흔들림 여백 40px 포함) */
+let bgCache: { key: object | null; cv: HTMLCanvasElement } | null = null;
 function drawBackground(ctx: CanvasRenderingContext2D, sp: Sprites): void {
-  ctx.fillStyle = '#0d0b10';
-  ctx.fillRect(-40, -40, W + 80, H + 80);
-  const bg = sp.bg ? frameOf(sp.bg, 1) : null;
-  if (bg && sp.bg) {
-    const s = W / sp.bg.meta.frameW;
-    const h = sp.bg.meta.frameH * s;
-    ctx.drawImage(bg, 0, H - h + 40, W, h);
-    ctx.fillStyle = 'rgba(8,6,12,0.45)';
-    ctx.fillRect(0, 0, W, H);
+  if (!bgCache || bgCache.key !== sp.bg) {
+    const cv = document.createElement('canvas');
+    cv.width = W + 80;
+    cv.height = H + 80;
+    const c = cv.getContext('2d')!;
+    c.imageSmoothingEnabled = false;
+    c.translate(40, 40);
+    c.fillStyle = '#0d0b10';
+    c.fillRect(-40, -40, W + 80, H + 80);
+    const bg = sp.bg ? frameOf(sp.bg, 1) : null;
+    if (bg && sp.bg) {
+      const s = W / sp.bg.meta.frameW;
+      const h = sp.bg.meta.frameH * s;
+      c.drawImage(bg, 0, H - h + 40, W, h);
+      c.fillStyle = 'rgba(8,6,12,0.45)';
+      c.fillRect(0, 0, W, H);
+    }
+    c.fillStyle = 'rgba(0,0,0,0.35)';
+    for (const x of [PLAYER_X, FOE_X]) {
+      c.beginPath();
+      c.ellipse(x, GROUND + 4, 70, 12, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    bgCache = { key: sp.bg, cv };
   }
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  for (const x of [PLAYER_X, FOE_X]) {
-    ctx.beginPath();
-    ctx.ellipse(x, GROUND + 4, 70, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  ctx.drawImage(bgCache.cv, -40, -40);
 }
 
 /** 연속 박자 기운: 단계 1 푸른 결 · 2 금빛 띠 · 3 흰 금빛 불꽃과 나뭇결 후광 */
@@ -475,23 +531,35 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   const lineColor = inPerfect ? `rgba(255,214,120,${alpha})` : `rgba(${col.line},${alpha})`;
+  const glow = quality === 'high';
+  const width = inPerfect || c.unblockable ? 4 : 2.5;
+  const path = () => {
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    if (c.element === 'lightning') {
+      // 번개: 지그재그로 튄다
+      const n = 7;
+      for (let i = 1; i <= n; i++) {
+        const k = i / n;
+        const jag = i === n ? 0 : (((i * 53 + Math.floor(now / 70)) % 7) - 3) * 7;
+        ctx.lineTo(sx + (cx - sx) * k, sy + (cy - sy) * k + jag);
+      }
+    } else {
+      ctx.quadraticCurveTo((sx + cx) / 2, cy - 40 * c.ratio, cx, cy);
+    }
+  };
+  if (!glow) {
+    // 가짜 빛: 굵고 옅은 선을 먼저(빛 번짐보다 훨씬 싸다)
+    ctx.strokeStyle = inPerfect ? `rgba(255,214,120,${alpha * 0.3})` : `rgba(${col.line},${alpha * 0.3})`;
+    ctx.lineWidth = width * 3.2;
+    path();
+    ctx.stroke();
+  }
   ctx.strokeStyle = lineColor;
   ctx.shadowColor = inPerfect ? '#ffd27a' : col.glow;
-  ctx.shadowBlur = 16;
-  ctx.lineWidth = inPerfect || c.unblockable ? 4 : 2.5;
-  ctx.beginPath();
-  ctx.moveTo(sx, sy);
-  if (c.element === 'lightning') {
-    // 번개: 지그재그로 튄다
-    const n = 7;
-    for (let i = 1; i <= n; i++) {
-      const k = i / n;
-      const jag = i === n ? 0 : (((i * 53 + Math.floor(now / 70)) % 7) - 3) * 7;
-      ctx.lineTo(sx + (cx - sx) * k, sy + (cy - sy) * k + jag);
-    }
-  } else {
-    ctx.quadraticCurveTo((sx + cx) / 2, cy - 40 * c.ratio, cx, cy);
-  }
+  ctx.shadowBlur = glow ? 16 : 0;
+  ctx.lineWidth = width;
+  path();
   ctx.stroke();
   // 원소 알갱이가 결을 따라 흐른다
   ctx.shadowBlur = 0;
@@ -518,7 +586,7 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   ctx.lineWidth = inPerfect ? 4 : 2.5;
   ctx.strokeStyle = lineColor;
   ctx.shadowColor = ctx.strokeStyle as string;
-  ctx.shadowBlur = inPerfect ? 14 : 6;
+  ctx.shadowBlur = glow ? (inPerfect ? 14 : 6) : 0;
   ctx.beginPath();
   if (c.element === 'lightning') {
     // 번개 고리는 각진 고리
@@ -719,16 +787,23 @@ function drawJudge(ctx: CanvasRenderingContext2D, j: Fx['judges'][number], now: 
   ctx.scale(pop, pop);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = `900 ${st.size}px "Cinzel", "Song Myung", serif`;
+  const font = `900 ${st.size}px "Cinzel", "Song Myung", serif`;
+  ctx.font = font;
   const w = ctx.measureText(j.word).width;
-  // 바깥 빛 + 굵은 어두운 윤곽
-  ctx.lineJoin = 'round';
-  ctx.shadowColor = st.glow;
-  ctx.shadowBlur = 22;
-  ctx.lineWidth = Math.max(6, st.size * 0.2);
-  ctx.strokeStyle = st.edge;
-  ctx.strokeText(j.word, 0, 0);
-  ctx.shadowBlur = 0;
+  // 바깥 빛 + 굵은 어두운 윤곽: 빛 번짐이 비싸서 글자마다 한 번 그려 둔다
+  const pad = 40;
+  const halo = cached(`judge:${j.word}`, w + pad * 2, st.size * 1.6 + pad * 2, (c) => {
+    c.font = font;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.lineJoin = 'round';
+    c.shadowColor = st.glow;
+    c.shadowBlur = 22;
+    c.lineWidth = Math.max(6, st.size * 0.2);
+    c.strokeStyle = st.edge;
+    c.strokeText(j.word, w / 2 + pad, st.size * 0.8 + pad);
+  });
+  ctx.drawImage(halo, -w / 2 - pad, -st.size * 0.8 - pad);
   // 채움: 위→아래 그라데이션, 빛나는 단계는 밝은 띠가 왼쪽에서 오른쪽으로 훑는다
   const v = ctx.createLinearGradient(0, -st.size * 0.5, 0, st.size * 0.45);
   v.addColorStop(0, st.top);
@@ -960,13 +1035,18 @@ function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   ctx.font = '900 64px "Cinzel", serif';
-  ctx.lineJoin = 'round';
-  ctx.shadowColor = color[1];
-  ctx.shadowBlur = c.tier >= 1 ? 20 : 8;
-  ctx.lineWidth = 10;
-  ctx.strokeStyle = '#120c06';
-  ctx.strokeText(String(c.n), 0, 0);
-  ctx.shadowBlur = 0;
+  const nw = ctx.measureText(String(c.n)).width;
+  const halo = cached(`combo:${c.n}:${c.tier}`, nw + 80, 120, (g) => {
+    g.font = '900 64px "Cinzel", serif';
+    g.textAlign = 'center';
+    g.lineJoin = 'round';
+    g.shadowColor = color[1];
+    g.shadowBlur = c.tier >= 1 ? 20 : 8;
+    g.lineWidth = 10;
+    g.strokeStyle = '#120c06';
+    g.strokeText(String(c.n), nw / 2 + 40, 80);
+  });
+  ctx.drawImage(halo, -nw / 2 - 40, -80);
   const g = ctx.createLinearGradient(0, -52, 0, 4);
   g.addColorStop(0, color[0]);
   g.addColorStop(1, color[1]);
@@ -997,11 +1077,17 @@ function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
     const x = x0 + i * gap;
     ctx.beginPath();
     ctx.arc(x, y, 7, 0, Math.PI * 2);
+    if (on) {
+      // 빛 번짐 대신 옅은 큰 원(가짜 빛)
+      ctx.fillStyle = c.pure ? 'rgba(255,210,122,0.28)' : 'rgba(159,192,236,0.28)';
+      ctx.beginPath();
+      ctx.arc(x, y, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+    }
     ctx.fillStyle = on ? (c.pure ? '#ffd27a' : '#c9d4e6') : 'rgba(0,0,0,0.45)';
-    ctx.shadowColor = on ? (c.pure ? '#ffd27a' : '#9fc0ec') : 'transparent';
-    ctx.shadowBlur = on ? 10 : 0;
     ctx.fill();
-    ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = i === 4 || i === 9 ? '#fff0c0' : 'rgba(255,255,255,0.4)';
     ctx.stroke();
@@ -1030,8 +1116,18 @@ function drawBanner(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.globalAlpha = alpha;
   const cx = FOE_X - 40 + (1 - inK) * 120;
   const cy = GROUND - 300;
-  // 먹 붓질 띠(가장자리가 들쭉날쭉한 기울어진 띠)
+  // 띠 전체(빛 번짐 글자 포함)를 기술 이름마다 한 번 그려 둔다
+  const art = cached(`banner:${b.name}:${b.element ?? ''}`, 380, 110, (g) => {
+    g.translate(190, 55);
+    paintBanner(g, b.name, col);
+  });
   ctx.translate(cx, cy);
+  ctx.drawImage(art, -190, -55);
+  ctx.restore();
+}
+
+function paintBanner(ctx: CanvasRenderingContext2D, name: string, col: { line: string; glow: string }): void {
+  // 먹 붓질 띠(가장자리가 들쭉날쭉한 기울어진 띠)
   ctx.rotate(-0.04);
   ctx.beginPath();
   const w = 300;
@@ -1057,10 +1153,9 @@ function drawBanner(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.shadowBlur = 14;
   ctx.lineWidth = 5;
   ctx.strokeStyle = 'rgba(0,0,0,0.9)';
-  ctx.strokeText(`「${b.name}」`, 0, 2);
+  ctx.strokeText(`「${name}」`, 0, 2);
   ctx.fillStyle = '#fff1e8';
-  ctx.fillText(`「${b.name}」`, 0, 2);
-  ctx.restore();
+  ctx.fillText(`「${name}」`, 0, 2);
 }
 
 /** 오래된 효과를 지운다 */
