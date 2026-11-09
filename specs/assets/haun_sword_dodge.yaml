@@ -1,0 +1,18 @@
+id: haun_sword_dodge
+type: character-anim
+character: haun_sword
+summary: "「결」 진하운 피하기 5프레임 — 붉은 결(받을 수 없는 공격)을 낮게 비켜선다(2026-11-09)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 5
+fps: 14
+events: {}
+bbox_tolerance: 0.35
+frame_notes:
+  1: "ready stance, sword low, knees bending to spring"
+  2: "a quick low step back and to the side, body crouched and turned slightly away, the sword kept close to the body, the long hair and sleeves trailing forward with the motion"
+  3: "lowest point of the evasion, crouched almost to one knee, a faint translucent afterimage of the standing pose left behind where he was"
+  4: "rising from the crouch, already turning back to face right, eyes fixed forward"
+  5: "back in the ready stance, sword low in front"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#ff6a5a' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_aura_1
+type: fx
+summary: "「결」 연속 박자 기운 1단계(3연속) — 발밑에서 푸른 나뭇결 빛줄기 몇 가닥이 천천히 피어오른다(반복 재생, 하운 뒤에 깐다, 2026-11-09)"
+frames: 6
+fps: 10
+loop: true
+events: {}
+frame_notes:
+  1: "three or four thin pale-blue lines of light rising slowly from the ground in the lower third of the cell, gently curved like wood grain, with plenty of empty space above"
+  2: "the lines rise a little higher and sway to the left"
+  3: "the lines at their highest point, softly glowing, one small blue mote floating up"
+  4: "the lines sway to the right, the mote higher"
+  5: "the lines sinking slightly, a new faint line starting at the base"
+  6: "the lines back near the starting height, looping smoothly back to frame 1"
+placeholder: { accent: '#8fd3ff' }

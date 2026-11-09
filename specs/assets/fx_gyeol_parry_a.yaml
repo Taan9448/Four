@@ -1,0 +1,14 @@
+id: fx_gyeol_parry_a
+type: fx
+summary: "「결」 패링 이펙트 앞 6프레임(뒤 fx_gyeol_parry_b와 이어 12프레임) — 칼끝에서 금빛 나뭇결이 연꽃처럼 피어나는 화려한 받아침(2026-11-09). 카드 찢김과 다른 모양"
+frames: 6
+fps: 24
+events: { impact: 2 }
+frame_notes:
+  1: "a single pin-point of white light in the exact center, with four very thin golden hairlines starting to extend from it like the grain of polished wood"
+  2: "impact: a bright white-gold starburst in the center, the hairlines shooting outward into a ring of eight curved golden grain lines like the veins of a lotus petal, a thin circular shockwave ring just starting"
+  3: "the golden grain lines bloom wider into a lotus-like ring of curved light petals around the center, the shockwave ring expanding, tiny gold and white sparks flung outward"
+  4: "the light petals at full size forming a wide golden lotus of grain lines, the center still bright, a second thinner blue-white ring inside the first, sparks flying further"
+  5: "the petals begin to rotate slightly clockwise, edges turning from gold to pale amber, the center cooling to a soft white, sparks fading into streaks"
+  6: "the lotus of grain lines still large but thinning, many small golden splinters drifting outward, the shockwave ring faint and wide"
+placeholder: { accent: '#ffd27a' }

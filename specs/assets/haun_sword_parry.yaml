@@ -1,0 +1,19 @@
+id: haun_sword_parry
+type: character-anim
+character: haun_sword
+summary: "「결」 진하운 받기(패링) 6프레임 — 결을 읽고 칼날을 비스듬히 대어 받아친다(2026-11-09)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 6
+fps: 14
+events: { deflect: 3 }
+bbox_tolerance: 0.25
+frame_notes:
+  1: "ready stance, eyes narrowed on the incoming blow, the plain sword held low in front"
+  2: "the sword snaps up diagonally in front of the chest, edge angled to the right, both hands on the grip, front foot planted"
+  3: "the moment of the deflection: the blade meets the blow at an angle, a small burst of blue-white light and two sparks at the point of contact on the right of the blade, body braced, hair flicking back"
+  4: "the deflected force slides off, the sword turned flat and pushed outward to the right, weight still forward"
+  5: "a calm half step back, the sword returning to the middle, a faint blue afterglow along the edge"
+  6: "settled ready stance again, sword low in front"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#ffd27a' }

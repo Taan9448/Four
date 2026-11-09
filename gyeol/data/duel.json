@@ -1,5 +1,5 @@
 {
-  "$comment": "「결」 손맛 시제품 수치(2026-11-09). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id를 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤) 시간에 맞춰 늘이거나 줄여 그린다.",
+  "$comment": "「결」 수치(2026-11-09 목업 2차). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id·그림을 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤)에 맞춰 늘이거나 줄여 그린다. element: fire(패링해도 화상)·ice(결이 느리다 갑자기)·lightning(박자가 튐), unblockable: 붉은 결(피해야 함), feint: 가짜 타격 순간 뒤 이만큼 끌었다 친다. chart: 박자 도전 악보(at = 타격 순간).",
   "rules": {
     "perfect": 150,
     "guard": 420,
@@ -14,7 +14,20 @@
     "deathblow": 0.45,
     "stagger": 1600,
     "playerStagger": 900,
-    "hurtLock": 380
+    "hurtLock": 380,
+    "dodgeIframe": 320,
+    "dodgeDuration": 420,
+    "dodgeLockout": 650,
+    "mikiriPosture": 30,
+    "fireParryChip": 2,
+    "fireGuardExtra": 3,
+    "lightningJitter": 90,
+    "streakTiers": [
+      3,
+      6,
+      10
+    ],
+    "streakPostureBonus": 0.25
   },
   "player": {
     "name": "진하운",
@@ -22,7 +35,12 @@
     "hp": 100,
     "posture": 100,
     "postureRegen": 14,
-    "attack": { "duration": 340, "hitAt": 170, "damage": 6, "posture": 4 }
+    "attack": {
+      "duration": 340,
+      "hitAt": 170,
+      "damage": 6,
+      "posture": 4
+    }
   },
   "foes": [
     {
@@ -30,62 +48,859 @@
       "title": "그림자늑대",
       "sprite": "wolf",
       "bg": "bg_elheim_forest",
-      "note": "빠르고 가볍다. 짧은 두 번 물기가 섞인다.",
+      "note": "빠르고 가볍다. 물다 말고 한 박자 늦게 무는 헛물기, 붉은 결의 그림자 덮치기는 피해야 한다.",
       "hp": 70,
       "posture": 60,
       "postureRegen": 10,
-      "idle": [700, 1300],
+      "idle": [
+        700,
+        1300
+      ],
       "moves": {
-        "bite": { "name": "물기", "windup": 420, "recover": 260, "damage": 10, "posture": 14 },
-        "lunge": { "name": "덮치기", "windup": 640, "recover": 380, "damage": 16, "posture": 20 }
+        "bite": {
+          "name": "물기",
+          "windup": 420,
+          "recover": 260,
+          "damage": 10,
+          "posture": 14
+        },
+        "lunge": {
+          "name": "덮치기",
+          "windup": 640,
+          "recover": 380,
+          "damage": 16,
+          "posture": 20
+        },
+        "bite_feint": {
+          "name": "헛물기",
+          "windup": 380,
+          "recover": 260,
+          "damage": 12,
+          "posture": 16,
+          "feint": 260
+        },
+        "shadow_pounce": {
+          "name": "그림자 덮치기",
+          "windup": 720,
+          "recover": 480,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true
+        }
       },
       "patterns": [
-        { "weight": 3, "steps": [{ "move": "bite" }] },
-        { "weight": 2, "steps": [{ "move": "bite" }, { "move": "bite", "after": 120 }] },
-        { "weight": 2, "steps": [{ "move": "lunge" }] }
-      ]
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "bite"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "bite"
+            },
+            {
+              "move": "bite",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lunge"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "bite_feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "bite"
+            },
+            {
+              "move": "shadow_pounce",
+              "after": 300
+            }
+          ]
+        }
+      ],
+      "chart": {
+        "title": "숲의 사냥",
+        "steps": [
+          {
+            "move": "bite",
+            "at": 2020
+          },
+          {
+            "move": "bite",
+            "at": 2720
+          },
+          {
+            "move": "bite",
+            "at": 3420
+          },
+          {
+            "move": "lunge",
+            "at": 4520
+          },
+          {
+            "move": "bite",
+            "at": 5420
+          },
+          {
+            "move": "bite",
+            "at": 5920
+          },
+          {
+            "move": "bite_feint",
+            "at": 7020
+          },
+          {
+            "move": "bite",
+            "at": 7920
+          },
+          {
+            "move": "shadow_pounce",
+            "at": 9220
+          },
+          {
+            "move": "bite",
+            "at": 10420
+          },
+          {
+            "move": "bite",
+            "at": 10920
+          },
+          {
+            "move": "bite",
+            "at": 11420
+          },
+          {
+            "move": "lunge",
+            "at": 12420
+          },
+          {
+            "move": "bite_feint",
+            "at": 13520
+          },
+          {
+            "move": "shadow_pounce",
+            "at": 14820
+          },
+          {
+            "move": "bite",
+            "at": 16020
+          },
+          {
+            "move": "bite",
+            "at": 16520
+          },
+          {
+            "move": "lunge",
+            "at": 17420
+          }
+        ]
+      }
     },
     {
       "id": "chain_overseer",
       "title": "사슬 감독관",
       "sprite": "chain_overseer",
       "bg": "bg_volcano_canyon",
-      "note": "사슬을 늘어뜨렸다가 박자를 끌어 내리친다. 세 번째 사슬이 늦게 온다.",
+      "note": "달군 사슬(화염)은 받아도 손이 덴다. 끄는 척 멈췄다 내리치고, 붉은 결의 발목 사슬은 피해야 한다.",
       "hp": 120,
       "posture": 90,
       "postureRegen": 8,
-      "idle": [900, 1500],
+      "idle": [
+        900,
+        1500
+      ],
       "moves": {
-        "lash": { "name": "사슬 채찍", "windup": 520, "recover": 320, "damage": 14, "posture": 16 },
-        "drag": { "name": "끌어 내리치기", "windup": 900, "recover": 420, "damage": 22, "posture": 26 }
+        "lash": {
+          "name": "달군 사슬",
+          "windup": 520,
+          "recover": 320,
+          "damage": 14,
+          "posture": 16,
+          "element": "fire"
+        },
+        "drag": {
+          "name": "끌어 내리치기",
+          "windup": 900,
+          "recover": 420,
+          "damage": 22,
+          "posture": 26
+        },
+        "drag_feint": {
+          "name": "끄는 척",
+          "windup": 640,
+          "recover": 420,
+          "damage": 22,
+          "posture": 26,
+          "feint": 380
+        },
+        "chain_sweep": {
+          "name": "발목 사슬",
+          "windup": 820,
+          "recover": 520,
+          "damage": 20,
+          "posture": 0,
+          "unblockable": true,
+          "element": "fire"
+        }
       },
       "patterns": [
-        { "weight": 3, "steps": [{ "move": "lash" }, { "move": "lash", "after": 200 }] },
-        { "weight": 2, "steps": [{ "move": "lash" }, { "move": "lash", "after": 160 }, { "move": "drag", "after": 240 }] },
-        { "weight": 2, "steps": [{ "move": "drag" }] }
-      ]
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "lash"
+            },
+            {
+              "move": "lash",
+              "after": 200
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lash"
+            },
+            {
+              "move": "lash",
+              "after": 160
+            },
+            {
+              "move": "drag",
+              "after": 240
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "drag_feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "drag"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lash"
+            },
+            {
+              "move": "chain_sweep",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "chart": {
+        "title": "화로의 박자",
+        "steps": [
+          {
+            "move": "lash",
+            "at": 2120
+          },
+          {
+            "move": "lash",
+            "at": 3120
+          },
+          {
+            "move": "drag",
+            "at": 4620
+          },
+          {
+            "move": "lash",
+            "at": 5920
+          },
+          {
+            "move": "lash",
+            "at": 6820
+          },
+          {
+            "move": "lash",
+            "at": 7720
+          },
+          {
+            "move": "drag_feint",
+            "at": 9220
+          },
+          {
+            "move": "lash",
+            "at": 10520
+          },
+          {
+            "move": "chain_sweep",
+            "at": 11920
+          },
+          {
+            "move": "lash",
+            "at": 13220
+          },
+          {
+            "move": "lash",
+            "at": 14020
+          },
+          {
+            "move": "drag",
+            "at": 15420
+          },
+          {
+            "move": "drag_feint",
+            "at": 16920
+          },
+          {
+            "move": "chain_sweep",
+            "at": 18420
+          },
+          {
+            "move": "lash",
+            "at": 19720
+          },
+          {
+            "move": "lash",
+            "at": 20520
+          },
+          {
+            "move": "lash",
+            "at": 21320
+          }
+        ]
+      }
+    },
+    {
+      "id": "ice_knight",
+      "title": "얼음 기사",
+      "sprite": "ice_knight",
+      "bg": "bg_arden",
+      "note": "결이 느리게 오다 마지막에 갑자기 빨라진다(냉기). 칼끝을 멈췄다 찌르고, 붉은 결의 빙창 쇄도는 피해야 한다.",
+      "hp": 140,
+      "posture": 100,
+      "postureRegen": 7,
+      "idle": [
+        1000,
+        1600
+      ],
+      "moves": {
+        "thrust": {
+          "name": "얼음 찌르기",
+          "windup": 700,
+          "recover": 320,
+          "damage": 14,
+          "posture": 16,
+          "element": "ice"
+        },
+        "frost_cleave": {
+          "name": "서리 베기",
+          "windup": 980,
+          "recover": 460,
+          "damage": 22,
+          "posture": 26,
+          "element": "ice"
+        },
+        "frozen_feint": {
+          "name": "멈춘 칼끝",
+          "windup": 560,
+          "recover": 360,
+          "damage": 16,
+          "posture": 18,
+          "element": "ice",
+          "feint": 420
+        },
+        "glacier_lance": {
+          "name": "빙창 쇄도",
+          "windup": 1000,
+          "recover": 560,
+          "damage": 24,
+          "posture": 0,
+          "element": "ice",
+          "unblockable": true
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "thrust"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "thrust",
+              "after": 220
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "frost_cleave"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "frozen_feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "glacier_lance",
+              "after": 300
+            }
+          ]
+        }
+      ],
+      "chart": {
+        "title": "서리의 행진",
+        "steps": [
+          {
+            "move": "thrust",
+            "at": 2300
+          },
+          {
+            "move": "thrust",
+            "at": 3400
+          },
+          {
+            "move": "frost_cleave",
+            "at": 4900
+          },
+          {
+            "move": "thrust",
+            "at": 6200
+          },
+          {
+            "move": "thrust",
+            "at": 7200
+          },
+          {
+            "move": "frozen_feint",
+            "at": 8700
+          },
+          {
+            "move": "thrust",
+            "at": 9900
+          },
+          {
+            "move": "glacier_lance",
+            "at": 11500
+          },
+          {
+            "move": "thrust",
+            "at": 12800
+          },
+          {
+            "move": "frost_cleave",
+            "at": 14300
+          },
+          {
+            "move": "frozen_feint",
+            "at": 15800
+          },
+          {
+            "move": "thrust",
+            "at": 17000
+          },
+          {
+            "move": "thrust",
+            "at": 18000
+          },
+          {
+            "move": "glacier_lance",
+            "at": 19600
+          }
+        ]
+      }
+    },
+    {
+      "id": "shadow_assassin",
+      "title": "그림자 암살자",
+      "sprite": "shadow_assassin",
+      "bg": "bg_nocturna",
+      "note": "노크투르나의 보랏빛 번개를 두른 칼. 박자가 뚝뚝 튄다(번개). 그림자 속임에 속지 말고, 붉은 결의 낙뢰 강하는 피해야 한다.",
+      "hp": 110,
+      "posture": 80,
+      "postureRegen": 10,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "spark_slash": {
+          "name": "번개 베기",
+          "windup": 380,
+          "recover": 240,
+          "damage": 12,
+          "posture": 14,
+          "element": "lightning"
+        },
+        "chain_bolt": {
+          "name": "연쇄 번개",
+          "windup": 460,
+          "recover": 260,
+          "damage": 14,
+          "posture": 16,
+          "element": "lightning"
+        },
+        "blink_feint": {
+          "name": "그림자 속임",
+          "windup": 340,
+          "recover": 260,
+          "damage": 14,
+          "posture": 16,
+          "element": "lightning",
+          "feint": 300
+        },
+        "storm_dive": {
+          "name": "낙뢰 강하",
+          "windup": 760,
+          "recover": 520,
+          "damage": 24,
+          "posture": 0,
+          "element": "lightning",
+          "unblockable": true
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "spark_slash"
+            },
+            {
+              "move": "spark_slash",
+              "after": 80
+            },
+            {
+              "move": "spark_slash",
+              "after": 80
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "chain_bolt"
+            },
+            {
+              "move": "chain_bolt",
+              "after": 200
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "blink_feint"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "spark_slash"
+            },
+            {
+              "move": "storm_dive",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "chart": {
+        "title": "보랏빛 낙뢰",
+        "steps": [
+          {
+            "move": "spark_slash",
+            "at": 1980
+          },
+          {
+            "move": "spark_slash",
+            "at": 2630
+          },
+          {
+            "move": "spark_slash",
+            "at": 3280
+          },
+          {
+            "move": "chain_bolt",
+            "at": 4180
+          },
+          {
+            "move": "chain_bolt",
+            "at": 4930
+          },
+          {
+            "move": "blink_feint",
+            "at": 6030
+          },
+          {
+            "move": "spark_slash",
+            "at": 6930
+          },
+          {
+            "move": "spark_slash",
+            "at": 7430
+          },
+          {
+            "move": "storm_dive",
+            "at": 8630
+          },
+          {
+            "move": "spark_slash",
+            "at": 9730
+          },
+          {
+            "move": "blink_feint",
+            "at": 10730
+          },
+          {
+            "move": "chain_bolt",
+            "at": 11630
+          },
+          {
+            "move": "spark_slash",
+            "at": 12280
+          },
+          {
+            "move": "spark_slash",
+            "at": 12780
+          },
+          {
+            "move": "spark_slash",
+            "at": 13280
+          },
+          {
+            "move": "storm_dive",
+            "at": 14480
+          }
+        ]
+      }
     },
     {
       "id": "ignis",
       "title": "화염군주 이그니스",
       "sprite": "ignis",
       "bg": "bg_volcano_canyon",
-      "note": "느리지만 무겁다. 불길의 손 세 번은 박자가 점점 빨라진다.",
+      "note": "느리지만 무겁다(화염). 불길의 손 세 번은 점점 빨라지고, 움켜쥐는 척 멈췄다 친다. 붉은 결의 녹아내리는 협곡은 피해야 한다.",
       "hp": 200,
       "posture": 140,
       "postureRegen": 6,
-      "idle": [1100, 1800],
+      "idle": [
+        1100,
+        1800
+      ],
       "moves": {
-        "hand": { "name": "불길의 손", "windup": 760, "recover": 420, "damage": 20, "posture": 24 },
-        "hand_fast": { "name": "불길의 손", "windup": 480, "recover": 300, "damage": 16, "posture": 20 },
-        "whip": { "name": "불길의 채찍", "windup": 600, "recover": 360, "damage": 18, "posture": 20 },
-        "canyon": { "name": "녹아내리는 협곡", "windup": 1200, "recover": 600, "damage": 34, "posture": 40 }
+        "hand": {
+          "name": "불길의 손",
+          "windup": 760,
+          "recover": 420,
+          "damage": 20,
+          "posture": 24,
+          "element": "fire"
+        },
+        "hand_fast": {
+          "name": "불길의 손",
+          "windup": 480,
+          "recover": 300,
+          "damage": 16,
+          "posture": 20,
+          "element": "fire"
+        },
+        "whip": {
+          "name": "불길의 채찍",
+          "windup": 600,
+          "recover": 360,
+          "damage": 18,
+          "posture": 20,
+          "element": "fire"
+        },
+        "hand_feint": {
+          "name": "움켜쥐는 척",
+          "windup": 620,
+          "recover": 420,
+          "damage": 20,
+          "posture": 24,
+          "element": "fire",
+          "feint": 420
+        },
+        "canyon": {
+          "name": "녹아내리는 협곡",
+          "windup": 1200,
+          "recover": 600,
+          "damage": 34,
+          "posture": 0,
+          "element": "fire",
+          "unblockable": true
+        }
       },
       "patterns": [
-        { "weight": 3, "steps": [{ "move": "hand" }, { "move": "hand_fast", "after": 180 }, { "move": "hand_fast", "after": 60 }] },
-        { "weight": 3, "steps": [{ "move": "whip" }, { "move": "whip", "after": 260 }] },
-        { "weight": 2, "steps": [{ "move": "canyon" }] }
-      ]
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "hand"
+            },
+            {
+              "move": "hand_fast",
+              "after": 180
+            },
+            {
+              "move": "hand_fast",
+              "after": 60
+            }
+          ]
+        },
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "whip"
+            },
+            {
+              "move": "whip",
+              "after": 260
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "hand_feint"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "canyon"
+            }
+          ]
+        }
+      ],
+      "chart": {
+        "title": "큰 화로",
+        "steps": [
+          {
+            "move": "hand",
+            "at": 2360
+          },
+          {
+            "move": "hand_fast",
+            "at": 3460
+          },
+          {
+            "move": "hand_fast",
+            "at": 4260
+          },
+          {
+            "move": "whip",
+            "at": 5660
+          },
+          {
+            "move": "whip",
+            "at": 6760
+          },
+          {
+            "move": "hand_feint",
+            "at": 8460
+          },
+          {
+            "move": "canyon",
+            "at": 10660
+          },
+          {
+            "move": "hand",
+            "at": 12660
+          },
+          {
+            "move": "hand_fast",
+            "at": 13660
+          },
+          {
+            "move": "hand_fast",
+            "at": 14360
+          },
+          {
+            "move": "whip",
+            "at": 15660
+          },
+          {
+            "move": "hand_feint",
+            "at": 17360
+          },
+          {
+            "move": "whip",
+            "at": 18660
+          },
+          {
+            "move": "canyon",
+            "at": 20860
+          },
+          {
+            "move": "hand_fast",
+            "at": 22760
+          },
+          {
+            "move": "hand_fast",
+            "at": 23460
+          },
+          {
+            "move": "hand_fast",
+            "at": 24160
+          }
+        ]
+      }
     }
   ]
 }
