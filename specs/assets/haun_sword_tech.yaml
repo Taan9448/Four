@@ -1,0 +1,19 @@
+id: haun_sword_tech
+type: character-anim
+character: haun_sword
+summary: "「결」 진하운 기술 시전 6프레임 — 숨을 고르고 결을 따라 크게 베어 낸다(낙운무흔·벽운단하·운해귀종 공통, 4프레임에 터짐, 2026-11-09)"
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 6
+fps: 8
+events: { hit: 4 }
+bbox_tolerance: 0.35
+frame_notes:
+  1: "stands still with eyes closed, sword held low at his side, a faint blue-white glow rising around his feet and hair lifting slightly"
+  2: "eyes snap open, sword drawn back behind him in both hands, body coiled low, the glow brighter"
+  3: "steps forward, the sword rising in a wide arc beside the head (not far above it), a trail of white-blue light following the blade"
+  4: "a huge clean sweeping cut forward to the right, the whole blade glowing white-blue, a long bright arc of light trailing from it"
+  5: "follow-through, body low and turned, the sword held out to the right, the light arc fading into motes"
+  6: "straightening calmly, sword lowered, a few motes drifting around him"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#ffd27a' }

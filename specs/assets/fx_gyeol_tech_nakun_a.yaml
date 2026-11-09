@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_nakun_a
+type: fx
+summary: "「결」 진하운 기술 낙운무흔(落雲無痕) 앞 6프레임(뒤 _b와 이어 12프레임) — 청운십팔식 제십오식 — 떨어지는 구름은 자국을 남기지 않는다. 구름 띠가 하늘에서 소용돌이쳐 내려앉아 적의 균형을 무너뜨린다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 20
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "thin pale-blue and white cloud ribbons appearing high in the upper part of the cell, curling into a slow spiral"
+  2: "impact: the cloud ribbons rush down in a tight spiral onto the center, a soft white flash where they meet, small white petals of cloud flying out"
+  3: "a wide swirl of white-blue cloud streams wrapping around the center like a whirlpool lying on its side, light streaks"
+  4: "the swirl at its widest, a pale ring of wind pressure flattening outward along the ground"
+  5: "the cloud streams unwinding outward, many small cloud wisps and white motes"
+  6: "the wisps spreading thin, a faint pale ring on the ground"
+placeholder: { accent: '#a8d8ff' }

@@ -3,8 +3,8 @@
 import { initAudio, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import raw from '../data/duel.json';
-import { advance, createDuel, isOpen, press, rhythmScore, streakTier, type DuelData, type Element, type FoeDef, type Judgement, type Mode } from './duel';
-import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, W, type Fx, type JudgeWord, type Sprites } from './render';
+import { advance, createDuel, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type Element, type FoeDef, type Judgement, type Mode } from './duel';
+import { addShake, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
 
 const data = raw as unknown as DuelData;
@@ -113,11 +113,14 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const attackBtn = el('button', { class: 'pad attack', type: 'button' }, '베기', el('small', {}, 'J'));
   const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, '피하기', el('small', {}, 'L'));
   const parryBtn = el('button', { class: 'pad parry', type: 'button' }, '받기', el('small', {}, 'K'));
+  const techName = el('span', { class: 'tech-name' }, '기술');
+  const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, techName, el('small', {}, 'I'));
+  const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
   const back = el('button', { class: 'back', type: 'button' }, '상대 고르기');
   back.addEventListener('click', title);
   const overlay = el('div', { class: 'result', hidden: '' });
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, back)));
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, back)));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
@@ -144,13 +147,14 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     }
   };
 
-  const doPress = (input: 'parry' | 'attack' | 'dodge') => {
+  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech') => {
     if (!alive) return;
     if (press(d, input) && input === 'parry') fx.guardPose = performance.now();
   };
   attackBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('attack')));
   dodgeBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('dodge')));
   parryBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('parry')));
+  techBtn.addEventListener('pointerdown', (e) => (e.preventDefault(), doPress('tech')));
   canvas.addEventListener('pointerdown', () => doPress('attack'));
   const onKey = (e: KeyboardEvent) => {
     if (e.repeat) return;
@@ -158,6 +162,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     if (k === 'k' || k === ' ') (e.preventDefault(), doPress('parry'));
     else if (k === 'j') doPress('attack');
     else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge'));
+    else if (k === 'i') doPress('tech');
     else if (k === 'escape') title();
   };
   window.addEventListener('keydown', onKey);
@@ -267,6 +272,45 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           fx.banner = { name: ev.name, born: now, element: d.foeDef.moves[ev.move]?.element };
           break;
         }
+        case 'techReady': {
+          const t = techOf(d, ev.tech)!;
+          sfx('power', { volume: 0.8 });
+          text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — I`, TECH_COLOR[t.id]?.core ?? '#fff6d6', 24);
+          flash(TECH_COLOR[t.id]?.glow ?? '#ffd27a', 220, 0.25);
+          break;
+        }
+        case 'tech': {
+          // 기술: 컷인(반신 그림 + 이름 + 대사) 동안 잠깐 멈췄다가 연출이 터진다
+          const t = techOf(d, ev.tech)!;
+          sfx('cutin');
+          hitstopUntil = now + 700;
+          fx.tech = { id: t.id, born: now };
+          // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 하운 반신 그림(결의)
+          const cg = frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
+          const stand = cg ? null : frameUrl('haun_sword_stand', 2);
+          cutin.className = `cutin tech-${t.id}${cg ? ' has-cg' : ''}`;
+          cutin.replaceChildren(
+            cg ? el('img', { class: 'cg', src: cg, alt: '' }) : stand ? el('img', { src: stand, alt: '' }) : '',
+            el('div', { class: 'cutin-text' }, el('div', { class: 'hanja' }, t.hanja), el('div', { class: 'tname' }, t.name), el('div', { class: 'tline' }, t.line)),
+          );
+          cutin.hidden = false;
+          setTimeout(() => (cutin.hidden = true), 1150);
+          break;
+        }
+        case 'techHit': {
+          const t = techOf(d, ev.tech)!;
+          sfx(t.id === 'unhae' ? 'slam_10' : t.id === 'byeogun' ? 'slam_9' : 'slam_8');
+          const c = TECH_COLOR[t.id];
+          flash(c?.core ?? '#ffffff', 360, 0.7);
+          addShake(fx, now, t.id === 'nakun' ? 10 : 20, 480);
+          hitstopUntil = now + 160;
+          if (t.id === 'unhae') fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: 'rgba(255,214,120,ALPHA)', big: true });
+          spark(FOE_X, CONTACT.y, 44, c?.core ?? '#ffffff', 480, 5);
+          text(FOE_X - 30, CONTACT.y + 50, `${t.name} ${ev.damage}`, c?.core ?? '#ffffff', 34);
+          break;
+        }
+        case 'link':
+          break;
         case 'streak': {
           const tier = streakTier(d);
           fx.combo = { n: ev.streak, tier, born: now, up: tier > lastTier };
@@ -371,6 +415,12 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     }
     const tier = streakTier(d);
     streakEl.textContent = '';
+    fx.chain = { n: d.chain, pure: d.chainPure };
+    const ready = techOf(d, d.techReady);
+    techBtn.disabled = rhythm || !ready || !!d.result;
+    techName.textContent = ready ? ready.name : '기술';
+    techBtn.classList.toggle('ready', !!ready);
+    techBtn.dataset.tech = ready?.id ?? '';
     streakEl.className = `streak tier-${tier}`;
     hud.classList.toggle('open', isOpen(d));
   };

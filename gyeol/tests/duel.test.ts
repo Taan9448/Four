@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advance, createDuel, cue, isOpen, press, rhythmScore, streakTier, type DuelData, type MoveDef } from '../src/duel';
+import { advance, createDuel, cue, isOpen, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
 import realRaw from '../data/duel.json';
 
 const real = realRaw as unknown as DuelData;
@@ -8,6 +8,7 @@ const real = realRaw as unknown as DuelData;
 const data: DuelData = {
   rules: { ...real.rules, perfect: 150, guard: 420, parryLockout: 220, cueLead: 500, counterWindow: 700, counterMul: 3, stagger: 1600 },
   player: { ...real.player, hp: 100, posture: 100 },
+  techs: real.techs,
   foes: [
     {
       id: 'dummy',
@@ -340,5 +341,52 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     press(p, 'parry');
     advance(p, HIT + 5);
     expect(p.events.find((e) => e.type === 'streak')).toMatchObject({ streak: 1 });
+  });
+
+  it('진하운의 기술: 3연환 낙운무흔, 5연환 벽운단하, 5연환 모두 EXCELLENT면 운해귀종(받아낸 힘을 돌려보낸다)', () => {
+    const run = (leads: number[]) => {
+      const dd = single(swing({ damage: 10, posture: 1 }));
+      const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], hp: 1000, posture: 1000 }] }, 'dummy');
+      let hit = HIT;
+      for (const lead of leads) {
+        advance(d, hit - lead);
+        press(d, 'parry');
+        advance(d, hit + 5);
+        hit += 200 + 500 + 400;
+      }
+      return d;
+    };
+    expect(run([40, 40]).techReady).toBeNull();
+    expect(run([40, 300, 40]).techReady).toBe('nakun');
+    expect(run([40, 300, 40, 40, 40]).techReady).toBe('byeogun');
+    const pure = run([40, 40, 40, 40, 40]);
+    expect(pure.techReady).toBe('unhae');
+    // 쓰면: 무적, 피해 = 최대 체력 × damage + 받아낸 힘(10×5) × returnMul, 체간은 가득(비틀거림)
+    const unhae = real.techs.find((t) => t.id === 'unhae')!;
+    expect(press(pure, 'tech')).toBe(true);
+    advance(pure, pure.t + TECH_DURATION);
+    const hit = pure.events.find((e) => e.type === 'techHit');
+    expect(hit).toMatchObject({ tech: 'unhae', damage: Math.round(1000 * unhae.damage + 50 * unhae.returnMul) });
+    expect(pure.foe.state).toBe('stagger');
+    expect(pure.techReady).toBeNull();
+    expect(pure.chain).toBe(0);
+  });
+
+  it('맞으면 결 연환은 끊기지만 준비된 기술은 남는다, 박자 도전에서는 기술이 없다', () => {
+    const dd = single(swing({ posture: 1 }));
+    const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], posture: 1000 }] }, 'dummy');
+    let hit = HIT;
+    for (let i = 0; i < 3; i++) {
+      advance(d, hit - 40);
+      press(d, 'parry');
+      advance(d, hit + 5);
+      hit += 1100;
+    }
+    expect(d.techReady).toBe('nakun');
+    advance(d, hit + 5); // 맞음
+    expect(d.chain).toBe(0);
+    expect(d.techReady).toBe('nakun');
+    const r = createDuel(real, 'ignis', 'x', 'rhythm');
+    expect(press(r, 'tech')).toBe(false);
   });
 });

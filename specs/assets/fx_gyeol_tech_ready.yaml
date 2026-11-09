@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_ready
+type: fx
+summary: "「결」 기술 준비 — 하운 발밑에서 구름 결 고리가 맴돌며 피어오른다(반복 6프레임, 게임이 기술 색을 입힌다, 2026-11-09)"
+frames: 6
+fps: 10
+loop: true
+events: {}
+frame_notes:
+  1: "a flat ellipse ring of white cloud wisps around the feet at the bottom of the cell, around an empty vertical space in the center (where a standing figure will be), small white motes rising"
+  2: "the ring rotates, wisps curling upward a little, motes higher"
+  3: "the ring brighter, two thin ribbons of light rising up both sides of the empty center"
+  4: "the ribbons at their highest, motes floating"
+  5: "the ribbons sinking, the ring rotating further"
+  6: "close to frame 1, looping smoothly"
+placeholder: { accent: '#ffffff' }

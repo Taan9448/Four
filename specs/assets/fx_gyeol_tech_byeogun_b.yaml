@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_byeogun_b
+type: fx
+summary: "「결」 진하운 기술 벽운단하(劈雲斷河) 뒤 6프레임(fx_gyeol_tech_byeogun_a 다음) — 잔광으로 흩어진다(2026-11-09)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "the vertical seam of light slowly closing from both ends toward the middle, blue sparks"
+  2: "the seam short and bright in the middle, crack lines fading"
+  3: "a small bright blue star where the seam closed, falling droplets"
+  4: "the star shrinking, droplets on the ground in a ring"
+  5: "a faint ring of blue sparkles on the ground"
+  6: "almost nothing: a few dim blue sparkles"
+placeholder: { accent: '#4fb4ff' }
