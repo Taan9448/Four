@@ -1,0 +1,37 @@
+id: ui_gyeol_pads
+type: ui-parts
+frames: 6
+summary: >-
+  the six action buttons of "Gyeol", a wuxia parry-action game, as carved lacquered wooden plaques (hanging name boards of a martial hall);
+  every face is left BLANK because the game writes the Korean label and an icon on top of it
+# 2026-11-09 사용자 요청: 「결」 버튼·UI를 Codex 그림으로. 칸 번호 = gyeol/src/main.ts PAD_ART(베기·피하기·받기·기술·집중·상대 고르기).
+# 게임은 버튼 너비에 맞춰(가로 약 110%) 판을 깔고 가운데에 글자·아이콘을 얹는다. 눌림·꺼짐·준비 빛은 CSS가 한다.
+frame_notes:
+  1: >-
+    STRIKE: a wide horizontal plaque about 470 px wide and 180 px tall, centered in the cell, with softly rounded corners: deep
+    oxblood-red lacquered wood (#5a1612 to #2a0a08 at the edges), a thin worn steel-silver border inlay, small steel corner fittings,
+    and one faint diagonal sword-cut groove across the far right end. The middle 70% of the face is plain smooth lacquer.
+  2: >-
+    DODGE: the same plaque shape, size and position as cell 1, in smoky dark crimson-black lacquer (#3a1418 to #160709), its border
+    carved as a thin curling wisp of ink smoke that trails off at the left and right ends. Plain middle.
+  3: >-
+    PARRY (the most important button): the same plaque shape, size and position, in warm aged gold-bronze over dark wood, with fine
+    flowing wood-grain lines (the "grain" the hero reads) carved in low relief along the top and bottom borders, and a small lotus boss at
+    each end. Slightly brighter than the others. Plain middle.
+  4: >-
+    TECHNIQUE: the same plaque shape, size and position, in deep azure-jade lacquer (#123049 to #08141f) with a pale jade-green
+    border carved with East Asian cloud scrolls (xiangyun) at both ends. Plain middle.
+  5: >-
+    FOCUS: the same plaque shape, size and position, in dark indigo ink-stone (#151c33 to #0a0d18) with a polished surface and two
+    or three thin concentric ripple rings engraved around each end, like a drop on still ink. Plain middle.
+  6: >-
+    BACK: the same plaque shape and position but plainer and narrower (about 400 px wide, same height): dark walnut wood with
+    a thin dull bronze border and no ornament. Plain middle.
+framing: >-
+  All six plaques share the same center, the same height and the same lighting so the buttons line up in one row; straight front view,
+  no perspective tilt, no cast shadow on the background, no glow outside the plaque. Everything outside the plaque is flat key color.
+style: >-
+  refined painterly game UI ornament for an East Asian ink-and-lacquer martial world: lacquered wood, aged gold-bronze, worn steel,
+  jade and ink-stone; soft realistic shading lit from the upper left, crisp edges, readable at 180 px wide on screen;
+  not pixel art, no text, no letters, no symbols on the faces
+placeholder: { color: '#3a2a1a' }

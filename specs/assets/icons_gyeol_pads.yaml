@@ -1,0 +1,14 @@
+id: icons_gyeol_pads
+type: icon-sheet
+summary: "「결」 버튼 아이콘 6종(2026-11-09) — 버튼 판 위 글자 왼쪽에 얹는다. 글자 없이 모양으로 구분한다"
+# 칸 번호 = gyeol/src/main.ts PAD_ART(베기·피하기·받기·기술·집중·상대 고르기)
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: "strike — a single sword blade slashing diagonally from upper right to lower left with a bright white-red cutting arc behind it"
+  2: "dodge — a pale figure-less dash: two curved wind streaks and a faint ghostly afterimage arc sweeping to the left"
+  3: "parry — two sword blades crossing in an X with a small golden spark burst and curved golden wood-grain lines at the crossing point"
+  4: "technique — a swirling white-blue cloud spiral with a sharp golden glint at its center"
+  5: "focus — a calm open eye drawn in pale blue ink with two thin ripple rings around it"
+  6: "back — a small rolled paper scroll with a curved arrow pointing left"
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

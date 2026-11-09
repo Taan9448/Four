@@ -45,12 +45,36 @@ function writeBest(id: string, accuracy: number, rank: string): boolean {
   return true;
 }
 
+/**
+ * 버튼·UI 그림(2026-11-09): Codex 그림(ui_gyeol_pads·icons_gyeol_pads·ui_gyeol_frames·title_gyeol)이 실제로 들어온 것만 쓴다.
+ * 오기 전에는 지금의 CSS 바탕 그대로. 칸 번호: 버튼 판·아이콘은 PAD_ART 순서, 틀은 1 적 이름 · 2 하운 이름 · 3 결과 띠 · 4 상대 카드 · 5 먹 원.
+ */
+const PAD_ART = ['attack', 'dodge', 'parry', 'tech', 'focus', 'back'] as const;
+function applyUiArt(): void {
+  const root = document.documentElement;
+  const real = (id: string, n: number) => frameUrl(id, n, { realOnly: true });
+  const use = (cls: string, vars: [string, string | null][]) => {
+    if (vars.some(([, u]) => !u)) return;
+    for (const [k, u] of vars) root.style.setProperty(k, `url("${u}")`);
+    root.classList.add(cls);
+  };
+  use('art-pads', PAD_ART.map((p, i): [string, string | null] => [`--pad-${p}`, real('ui_gyeol_pads', i + 1)]));
+  use('art-frames', [['--plate-foe', real('ui_gyeol_frames', 1)], ['--plate-me', real('ui_gyeol_frames', 2)], ['--plate-result', real('ui_gyeol_frames', 3)], ['--plate-card', real('ui_gyeol_frames', 4)], ['--enso', real('ui_gyeol_frames', 5)]]);
+  use('art-title', [['--title-bg', real('title_gyeol', 1)]]);
+}
+/** 버튼 아이콘(icons_gyeol_pads가 오면) */
+function padIcon(kind: (typeof PAD_ART)[number]): HTMLImageElement | '' {
+  const u = frameUrl('icons_gyeol_pads', PAD_ART.indexOf(kind) + 1, { realOnly: true });
+  return u ? el('img', { class: 'pad-icon', src: u, alt: '' }) : '';
+}
+
 function elementsOf(f: FoeDef): Element[] {
   return [...new Set(Object.values(f.moves).map((m) => m.element).filter((e): e is Element => !!e))];
 }
 
 function title(): void {
   stopLoop?.();
+  document.documentElement.classList.add('on-title');
   const best = readBest();
   const cards = data.foes.map((f) => {
     const img = frameUrl(`${f.sprite}_idle`, 1);
@@ -95,6 +119,7 @@ function title(): void {
 
 async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   stopLoop?.();
+  document.documentElement.classList.remove('on-title');
   const seed = `${foeDef.id}-${Date.now().toString(36)}`;
   const d = createDuel(data, foeDef.id, seed, mode);
   const rhythm = mode === 'rhythm';
@@ -116,15 +141,15 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     rhythm ? scoreEl : el('div', { class: 'me-bar' }, el('b', {}, data.player.name), el('div', { class: 'bar hp' }, myHp), el('div', { class: 'bar posture' }, myPosture), el('div', { class: 'bar focus' }, myFocus)),
     streakEl,
   );
-  const attackBtn = el('button', { class: 'pad attack', type: 'button' }, '베기', el('small', {}, 'J'));
-  const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, '피하기', el('small', {}, 'L'));
-  const parryBtn = el('button', { class: 'pad parry', type: 'button' }, '받기', el('small', {}, 'K'));
+  const attackBtn = el('button', { class: 'pad attack', type: 'button' }, padIcon('attack'), '베기', el('small', {}, 'J'));
+  const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, padIcon('dodge'), '피하기', el('small', {}, 'L'));
+  const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, 'K'));
   const techName = el('span', { class: 'tech-name' }, '기술');
-  const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, techName, el('small', {}, 'I'));
-  const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, '집중', el('small', {}, 'U'));
+  const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, 'I'));
+  const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
   const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
-  const back = el('button', { class: 'back', type: 'button' }, '상대 고르기');
+  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), '상대 고르기');
   back.addEventListener('click', title);
   const overlay = el('div', { class: 'result', hidden: '' });
   app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back)));
@@ -573,6 +598,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
 }
 
 initAudio();
+applyUiArt();
 const params = new URLSearchParams(location.search);
 const direct = data.foes.find((f) => f.id === params.get('foe'));
 if (direct) void play(direct, params.has('rhythm') ? 'rhythm' : 'duel');
