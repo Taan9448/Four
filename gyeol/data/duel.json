@@ -2,6 +2,7 @@
   "$comment": "「결」 수치(2026-11-09 목업 2차). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id·그림을 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤)에 맞춰 늘이거나 줄여 그린다. element: fire(패링해도 화상)·ice(결이 느리다 갑자기)·lightning(박자가 튐), unblockable: 붉은 결(피해야 함), feint: 가짜 타격 순간 뒤 이만큼 끌었다 친다. chart: 박자 도전 악보(at = 타격 순간).",
   "rules": {
     "perfect": 150,
+    "excellent": 60,
     "guard": 420,
     "parryLockout": 220,
     "cueLead": 520,

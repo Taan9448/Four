@@ -183,6 +183,8 @@ export function normalizeSpec(raw) {
     reference: raw.reference ?? null,
     /** 기준 시트와 다른 크기로 그려야 할 때 한 줄(예: 옷장 보른 동작은 원래 전투 동작 크기) */
     size_note: raw.size_note ?? null,
+    // 희미한 칸 허용(2026-11-09): 잔광·점광처럼 원래 거의 빈 이펙트 칸의 '그림 있음' 기준(칸 면적 비율, 기본 0.005)
+    min_fill: typeof raw.min_fill === 'number' ? raw.min_fill : null,
   };
 }
 

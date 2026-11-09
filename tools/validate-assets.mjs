@@ -63,7 +63,9 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   if (fallback !== 3) {
     for (let n = 1; n <= cells; n++) {
       const filled = cellHasContent(keyed, spec, n, undefined, rectOf);
-      if (n <= expectFrames && !filled) errors.push(`${n}번 칸이 비어 있다(프레임 수 부족)`);
+      // 그려야 하는 칸은 명세의 min_fill(희미한 잔광 칸)로 판정하고, 비어야 하는 칸은 기본 기준 그대로
+      const drawn = filled || (spec.min_fill != null && cellHasContent(keyed, spec, n, spec.min_fill, rectOf));
+      if (n <= expectFrames && !drawn) errors.push(`${n}번 칸이 비어 있다(프레임 수 부족)`);
       if (n > expectFrames && filled) errors.push(`${n}번 칸에 그림이 있다(빈 칸이어야 함)`);
     }
   }

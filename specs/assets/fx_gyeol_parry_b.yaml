@@ -2,6 +2,8 @@ id: fx_gyeol_parry_b
 type: fx
 summary: "「결」 패링 이펙트 뒤 6프레임(fx_gyeol_parry_a 다음) — 금빛 결의 연꽃이 흩어지며 잔광으로 사라진다(2026-11-09)"
 frames: 6
+# 5·6칸은 사라져 가는 잔광이라 원래 거의 비어 있다
+min_fill: 0.0005
 fps: 24
 events: {}
 frame_notes:
