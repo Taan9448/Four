@@ -1,0 +1,20 @@
+id: chain_overseer_death
+type: character-anim
+character: chain_overseer
+summary: "「결」 사슬 감독관 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [chain_overseer_ref]
+reference: assets/source/chain_overseer_ref.png
+facing: left
+chroma: magenta
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the overseer reels back, the heated chains whipping loose"
+  2: "dropping the chains, which fall glowing to the ground around him"
+  3: "falling to his knees, one hand on the ground, armor plates cracked"
+  4: "toppling forward onto his face"
+  5: "lying face down, the chains cooling from orange to dark iron around him"
+  6: "lying still, the chains dark and cold"
+placeholder: { shape: humanoid, color: '#5a4442', accent: '#f2a93b' }

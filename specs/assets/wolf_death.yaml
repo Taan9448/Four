@@ -1,0 +1,19 @@
+id: wolf_death
+type: character-anim
+character: shadow_wolf
+summary: "「결」 그림자늑대 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [wolf_ref]
+reference: assets/source/wolf_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "the shadow wolf rears back, howling, smoke flaring from its body"
+  2: "its legs give way, the smoke of its body starting to unravel at the edges"
+  3: "collapsing onto its side, the body breaking into strands of black smoke"
+  4: "half of the body already dissolved into drifting smoke, the red eyes dimming"
+  5: "only the head and a few smoke strands left, eyes fading out"
+  6: "a last thin wisp of black smoke on the ground, almost gone"
+placeholder: { shape: beast, color: '#1d2433', accent: '#ff3b3b' }

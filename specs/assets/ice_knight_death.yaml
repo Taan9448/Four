@@ -1,0 +1,20 @@
+id: ice_knight_death
+type: character-anim
+character: ice_knight
+summary: "「결」 얼음 기사 쓰러짐 6프레임 — 끝 장면에서 느린 화면으로 재생한다(2026-11-09)"
+depends_on: [ice_knight_ref]
+reference: assets/source/ice_knight_ref.png
+facing: left
+chroma: magenta
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, cracks spreading across the ice armor with a white flash"
+  2: "the knight staggers, the ice sword cracking in its hand"
+  3: "dropping to one knee, the shield breaking into large ice shards"
+  4: "the whole body shattering into chunks of blue ice that start to fall"
+  5: "a pile of broken ice chunks and the empty helmet on the ground"
+  6: "a small heap of melting ice shards and frost mist"
+placeholder: { shape: humanoid, color: '#9cc8de', accent: '#dff4ff' }

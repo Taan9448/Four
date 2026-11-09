@@ -1,0 +1,15 @@
+id: fx_gyeol_danger_charge
+type: fx
+summary: "「결」 받을 수 없는 기술을 모을 때 적 둘레의 붉은 기운(반복 6프레임, 적 그림 위에 겹친다, 2026-11-09)"
+frames: 6
+fps: 12
+loop: true
+events: {}
+frame_notes:
+  1: "a ring of jagged crimson light around an empty vertical space in the center of the cell (where a standing figure will be), with crimson flame-like spikes pointing outward"
+  2: "the spikes flicker longer, small red sparks being sucked inward toward the center"
+  3: "the crimson ring pulses brighter with a thin white edge"
+  4: "the spikes flicker shorter, sparks rotating around"
+  5: "the ring pulses again, a few red streaks rising"
+  6: "close to frame 1, looping smoothly"
+placeholder: { accent: '#ff3b3b' }

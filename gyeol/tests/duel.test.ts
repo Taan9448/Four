@@ -51,7 +51,8 @@ describe('「결」 대결 판정', () => {
     advance(later, 100);
     press(later, 'attack');
     advance(later, 100 + data.player.attack.duration);
-    expect(later.events.find((e) => e.type === 'strike')).toMatchObject({ counter: false, damage: data.player.attack.damage });
+    // 틈 밖의 베기는 적이 막는다(피해 foeGuardMul배, 최소 1)
+    expect(later.events.find((e) => e.type === 'strike')).toMatchObject({ counter: false, blocked: true, damage: Math.max(1, Math.round(data.player.attack.damage * data.rules.foeGuardMul)) });
   });
 
   it('너무 일찍(guard 안) 누르면 막기 — 피해 일부와 내 체간', () => {
@@ -116,7 +117,7 @@ describe('「결」 대결 판정', () => {
     const lose = createDuel(data, 'dummy');
     advance(lose, 20000);
     expect(lose.result).toBe('lose');
-    const win = createDuel({ ...data, foes: [{ ...data.foes[0], hp: 6 }] }, 'dummy');
+    const win = createDuel({ ...data, foes: [{ ...data.foes[0], hp: 1 }] }, 'dummy');
     press(win, 'attack');
     advance(win, data.player.attack.duration);
     expect(win.result).toBe('win');
@@ -309,5 +310,35 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     expect(at(120)).toBe('great');
     expect(at(300)).toBe('good');
     expect(at(null)).toBe('miss');
+  });
+
+  it('베기 연타로는 이길 수 없다 — 막힌 베기가 쌓이면 적이 되받아친다', () => {
+    for (const foe of real.foes) {
+      const d = createDuel(real, foe.id, 'spam');
+      for (let t = 0; t < 60000 && !d.result; t += 16) {
+        advance(d, t);
+        press(d, 'attack');
+      }
+      expect(d.result, foe.id).not.toBe('win');
+    }
+    const slow = single(swing({}));
+    const d = createDuel({ ...slow, foes: [{ ...slow.foes[0], idle: [5000, 5000] }] }, 'dummy');
+    for (let i = 0; i < 3; i++) {
+      press(d, 'attack');
+      advance(d, d.t + data.player.attack.duration + 5);
+    }
+    expect(d.events.some((e) => e.type === 'punish')).toBe(true);
+    expect(d.foe.state).toBe('windup');
+  });
+
+  it('받을 수 없는 기술은 시작할 때 이름을 외치고(skill), 연속 박자는 1부터 숫자가 오른다', () => {
+    const d = createDuel(single(swing({ unblockable: true, name: '그림자 덮치기' })), 'dummy');
+    advance(d, 600);
+    expect(d.events.find((e) => e.type === 'skill')).toMatchObject({ name: '그림자 덮치기' });
+    const p = createDuel(single(swing({})), 'dummy');
+    advance(p, HIT - 60);
+    press(p, 'parry');
+    advance(p, HIT + 5);
+    expect(p.events.find((e) => e.type === 'streak')).toMatchObject({ streak: 1 });
   });
 });

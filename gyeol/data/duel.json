@@ -28,7 +28,10 @@
       6,
       10
     ],
-    "streakPostureBonus": 0.25
+    "streakPostureBonus": 0.25,
+    "foeGuardMul": 0.15,
+    "foeGuardPosture": 2,
+    "punishAfter": 3
   },
   "player": {
     "name": "진하운",
@@ -86,7 +89,8 @@
           "recover": 480,
           "damage": 22,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_shadow_pounce"
         }
       },
       "patterns": [
@@ -261,7 +265,8 @@
           "damage": 20,
           "posture": 0,
           "unblockable": true,
-          "element": "fire"
+          "element": "fire",
+          "fx": "fx_gyeol_skill_chain_sweep"
         }
       },
       "patterns": [
@@ -442,7 +447,8 @@
           "damage": 24,
           "posture": 0,
           "element": "ice",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_glacier_lance"
         }
       },
       "patterns": [
@@ -603,7 +609,8 @@
           "damage": 24,
           "posture": 0,
           "element": "lightning",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_storm_dive"
         }
       },
       "patterns": [
@@ -780,7 +787,8 @@
           "damage": 34,
           "posture": 0,
           "element": "fire",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_molten_canyon"
         }
       },
       "patterns": [

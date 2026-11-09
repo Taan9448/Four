@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_chain_sweep
+type: fx
+summary: "「결」 받을 수 없는 기술 사슬 감독관 「발목 사슬」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-09)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a red-hot glowing iron chain sweeping in low from the right along the ground"
+  2: "impact: the chain whips across the center at ankle height in a wide arc, orange sparks bursting"
+  3: "the glowing chain coiling around the impact point, a ring of fire and sparks on the ground"
+  4: "the chain pulled back to the right, a burning trail line on the ground"
+  5: "embers and smoke along the burnt line"
+  6: "faint embers fading"
+placeholder: { accent: '#f2a93b' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_glacier_lance
+type: fx
+summary: "「결」 받을 수 없는 기술 얼음 기사 「빙창 쇄도」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-09)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a row of sharp ice spears forming in the air on the right, pointing left"
+  2: "impact: the ice spears thrust through the center, a white-blue burst of frost"
+  3: "a cluster of jagged ice spikes erupting from the ground in the center"
+  4: "the ice spikes cracking, frost mist spreading"
+  5: "broken ice shards scattered, frost mist"
+  6: "faint glittering frost fading"
+placeholder: { accent: '#8fd3ff' }
