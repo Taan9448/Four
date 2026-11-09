@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_unhae_a
+type: fx
+summary: "「결」 진하운 기술 운해귀종(雲海歸宗) 앞 6프레임(뒤 _b와 이어 12프레임) — 최상승 — 운해귀종은 베는 초식이 아니다, 돌려보내는 초식이다. 구름바다가 소용돌이치고 받아낸 힘이 금빛 물줄기가 되어 적에게 돌아가 거대한 금빛 연꽃으로 터진다(2026-11-09). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a great slow whirlpool of golden-white cloud sea forming across the whole cell, many curved golden streams rotating around the center"
+  2: "the golden streams gather and twist into a single thick spiraling river of golden light rushing toward the center"
+  3: "impact: the river of light strikes the center and blooms into a gigantic golden lotus of curved wood-grain light petals, white-gold blinding core, two shockwave rings"
+  4: "the giant golden lotus at full size filling most of the cell, petals of light rotating, golden sparks and cloud wisps flying outward"
+  5: "the lotus petals separating into many flowing golden streams that curve back outward like returning tides"
+  6: "the streams wide and thinning, a huge faint golden ring and drifting motes"
+placeholder: { accent: '#ffd27a' }

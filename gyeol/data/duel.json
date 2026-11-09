@@ -44,7 +44,8 @@
       "hitAt": 170,
       "damage": 6,
       "posture": 4
-    }
+    },
+    "scale": 1.0
   },
   "foes": [
     {
@@ -219,7 +220,8 @@
             "at": 17420
           }
         ]
-      }
+      },
+      "scale": 0.85
     },
     {
       "id": "chain_overseer",
@@ -399,7 +401,8 @@
             "at": 21320
           }
         ]
-      }
+      },
+      "scale": 1.12
     },
     {
       "id": "ice_knight",
@@ -561,7 +564,8 @@
             "at": 19600
           }
         ]
-      }
+      },
+      "scale": 1.05
     },
     {
       "id": "shadow_assassin",
@@ -731,7 +735,8 @@
             "at": 14480
           }
         ]
-      }
+      },
+      "scale": 0.95
     },
     {
       "id": "ignis",
@@ -909,7 +914,43 @@
             "at": 24160
           }
         ]
-      }
+      },
+      "scale": 1.45
+    }
+  ],
+  "techs": [
+    {
+      "id": "nakun",
+      "name": "낙운무흔",
+      "hanja": "落雲無痕",
+      "chain": 3,
+      "pure": false,
+      "damage": 0.06,
+      "posture": 0.45,
+      "returnMul": 0,
+      "line": "떨어지는 구름은 자국을 남기지 않는다."
+    },
+    {
+      "id": "byeogun",
+      "name": "벽운단하",
+      "hanja": "劈雲斷河",
+      "chain": 5,
+      "pure": false,
+      "damage": 0.22,
+      "posture": 0.35,
+      "returnMul": 0,
+      "line": "운하검 제일식, 벽운단하."
+    },
+    {
+      "id": "unhae",
+      "name": "운해귀종",
+      "hanja": "雲海歸宗",
+      "chain": 5,
+      "pure": true,
+      "damage": 0.1,
+      "posture": 1.0,
+      "returnMul": 1.5,
+      "line": "운해귀종은 베는 초식이 아니다. 돌려보내는 초식이다."
     }
   ]
 }

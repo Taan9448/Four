@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_unhae_b
+type: fx
+summary: "「결」 진하운 기술 운해귀종(雲海歸宗) 뒤 6프레임(fx_gyeol_tech_unhae_a 다음) — 잔광으로 흩어진다(2026-11-09)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "the golden streams curling outward like waves of a sea of clouds, amber glow"
+  2: "the waves settling into a calm flat sea of golden cloud at the bottom of the cell, motes rising"
+  3: "the cloud sea glowing softly, a few golden petals of light floating up"
+  4: "the floating petals fading, the sea thinning"
+  5: "a faint golden mist and a few motes"
+  6: "almost gone: a few dim golden motes"
+placeholder: { accent: '#ffd27a' }

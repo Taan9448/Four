@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_nakun_b
+type: fx
+summary: "「결」 진하운 기술 낙운무흔(落雲無痕) 뒤 6프레임(fx_gyeol_tech_nakun_a 다음) — 잔광으로 흩어진다(2026-11-09)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "the cloud wisps drifting slowly downward like falling feathers, pale blue light"
+  2: "a few large soft cloud puffs settling, small white motes"
+  3: "the puffs thinning into translucent veils"
+  4: "faint veils and motes sinking"
+  5: "a last faint ring of mist on the ground"
+  6: "almost nothing left: a few faint white motes"
+placeholder: { accent: '#a8d8ff' }

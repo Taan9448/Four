@@ -83,6 +83,8 @@ export interface FoeDef {
   sprite: string;
   /** 배경 그림 id */
   bg: string;
+  /** 화면 크기 배율(2026-11-09): 이그니스처럼 큰 적은 크게, 늑대는 작게 */
+  scale?: number;
   note: string;
   hp: number;
   posture: number;
@@ -96,16 +98,38 @@ export interface FoeDef {
 export interface PlayerDef {
   name: string;
   sprite: string;
+  scale?: number;
   hp: number;
   posture: number;
   postureRegen: number;
   attack: { duration: number; hitAt: number; damage: number; posture: number };
 }
 
+/**
+ * 진하운의 기술(2026-11-09): 받기·피하기를 끊기지 않고 이어 가면(결 연환) 열린다.
+ * chain 이상 이어졌고, pure면 그 사이가 모두 EXCELLENT여야 한다. 준비된 기술은 맞아도 남고, 스킬 입력으로 쓴다.
+ */
+export interface TechDef {
+  id: string;
+  name: string;
+  hanja: string;
+  chain: number;
+  pure: boolean;
+  /** 적 최대 체력 대비 피해 비율 */
+  damage: number;
+  /** 적 최대 체간 대비 체간 비율(1이면 곧바로 비틀거림) */
+  posture: number;
+  /** 연환 동안 받아낸 공격 피해의 합 × 이 배율을 더 돌려보낸다(운해귀종) */
+  returnMul: number;
+  /** 시전 대사(「천외귀환」 카드 castLine) */
+  line: string;
+}
+
 export interface DuelData {
   rules: Rules;
   player: PlayerDef;
   foes: FoeDef[];
+  techs: TechDef[];
 }
 
 export type Grade = 'perfect' | 'good' | 'miss';
@@ -126,13 +150,17 @@ export type DuelEvent =
   | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean }
   | { type: 'punish'; t: number; move: string }
   | { type: 'skill'; t: number; move: string; name: string }
+  | { type: 'link'; t: number; chain: number; pure: boolean }
+  | { type: 'techReady'; t: number; tech: string }
+  | { type: 'tech'; t: number; tech: string; damage: number }
+  | { type: 'techHit'; t: number; tech: string; damage: number }
   | { type: 'stagger'; t: number }
   | { type: 'recover'; t: number }
   | { type: 'deathblow'; t: number; damage: number }
   | { type: 'win'; t: number }
   | { type: 'lose'; t: number };
 
-export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'hurt' | 'broken';
+export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'tech' | 'hurt' | 'broken';
 export type FoeState = 'idle' | 'windup' | 'recover' | 'stagger' | 'dead';
 export type Mode = 'duel' | 'rhythm';
 
@@ -149,6 +177,16 @@ export interface Duel {
   streak: number;
   /** 적이 이어서 막은 베기 수(틈에 베거나 패링하면 0) */
   blockedRun: number;
+  /** 결 연환: 끊기지 않고 받거나 피한 수, 그 사이가 모두 EXCELLENT였는가, 받아낸 공격 피해의 합 */
+  chain: number;
+  chainPure: boolean;
+  chainForce: number;
+  /** 준비된 기술과, 준비됐을 때의 받아낸 힘(운해귀종이 돌려보낸다) */
+  techReady: string | null;
+  techForce: number;
+  /** 쓰는 중인 기술(피해가 들어갔는가) */
+  techUsing: string | null;
+  techLanded: boolean;
   player: {
     hp: number;
     posture: number;
@@ -194,6 +232,7 @@ export interface Duel {
     dodges: number;
     maxStreak: number;
     perfect: number;
+    techs: number;
     /** perfect 가운데 EXCELLENT */
     excellent: number;
     good: number;
@@ -220,6 +259,13 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
     openingUntil: -1,
     streak: 0,
     blockedRun: 0,
+    chain: 0,
+    chainPure: true,
+    chainForce: 0,
+    techReady: null,
+    techForce: 0,
+    techUsing: null,
+    techLanded: false,
     player: {
       hp: data.player.hp,
       posture: 0,
@@ -235,7 +281,7 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
     },
     foe: { hp: foeDef.hp, posture: 0, state: 'idle', stateStart: 0, stateEnd: 0, move: null, hitAt: 0, fakeAt: null, fakeShown: false, pattern: null, step: 0, pending: null, chartIdx: 0 },
     events: [],
-    stats: { parries: 0, guards: 0, hits: 0, counters: 0, deathblows: 0, dodges: 0, maxStreak: 0, perfect: 0, excellent: 0, good: 0, miss: 0 },
+    stats: { parries: 0, guards: 0, hits: 0, counters: 0, deathblows: 0, dodges: 0, maxStreak: 0, perfect: 0, excellent: 0, good: 0, miss: 0, techs: 0 },
   };
   // 첫 공격은 숨을 고를 시간을 조금 더 준다
   d.foe.stateEnd = foeDef.idle[1];
@@ -245,7 +291,7 @@ export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: 
 export const streakTier = (d: Duel): number => d.data.rules.streakTiers.filter((n) => d.streak >= n).length;
 
 /** 받기(패링)·베기·피하기 입력. 지금 시각(d.t)에 누른 것으로 친다. 받아들였으면 true */
-export function press(d: Duel, input: 'parry' | 'attack' | 'dodge'): boolean {
+export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech'): boolean {
   if (d.result) return false;
   const p = d.player;
   const r = d.data.rules;
@@ -264,6 +310,21 @@ export function press(d: Duel, input: 'parry' | 'attack' | 'dodge'): boolean {
     p.actionEnd = d.t + r.dodgeDuration;
     p.iframeUntil = d.t + r.dodgeIframe;
     p.parryAt = null;
+    return true;
+  }
+  if (input === 'tech') {
+    // 기술: 준비돼 있을 때만. 쓰는 동안은 무적(TECH_DURATION), TECH_HIT에 피해가 들어간다
+    if (d.mode === 'rhythm' || !d.techReady) return false;
+    p.action = 'tech';
+    p.actionStart = d.t;
+    p.actionEnd = d.t + TECH_DURATION;
+    p.iframeUntil = p.actionEnd;
+    p.parryAt = null;
+    d.techUsing = d.techReady;
+    d.techLanded = false;
+    d.techReady = null;
+    d.stats.techs++;
+    d.events.push({ type: 'tech', t: d.t, tech: d.techUsing, damage: 0 });
     return true;
   }
   // 박자 도전에서는 베기가 없다(받기·피하기만 판정)
@@ -348,9 +409,19 @@ function regen(d: Duel, dt: number): void {
   if (f.state === 'idle' && !f.pending) f.posture = Math.max(0, f.posture - (d.foeDef.postureRegen * dt) / 1000);
 }
 
+/** 기술 동작 길이와 피해가 들어가는 순간(그림 연출과 맞춘다) */
+export const TECH_DURATION = 900;
+export const TECH_HIT = 420;
+
+export const techOf = (d: Duel, id: string | null): TechDef | undefined => (id ? d.data.techs.find((t) => t.id === id) : undefined);
+
 function stepPlayer(d: Duel): void {
   const p = d.player;
   const a = d.data.player.attack;
+  if (p.action === 'tech' && !d.techLanded && d.t >= p.actionStart + TECH_HIT) {
+    d.techLanded = true;
+    landTech(d);
+  }
   if (p.action === 'attack' && !p.attackLanded && d.t >= p.actionStart + a.hitAt) {
     p.attackLanded = true;
     landStrike(d);
@@ -496,6 +567,54 @@ function judge(d: Duel, grade: Grade, t: number, judgement: Judgement): void {
   if (d.mode === 'rhythm') d.events.push({ type: 'judge', t, grade, judgement });
 }
 
+/** 결 연환을 잇는다(받기·막기·피하기 성공). 조건이 맞는 가장 높은 기술을 준비한다 */
+function link(d: Duel, judgement: Judgement, force: number, t: number): void {
+  if (d.mode === 'rhythm') return;
+  d.chain++;
+  d.chainPure &&= judgement === 'excellent';
+  d.chainForce += force;
+  d.events.push({ type: 'link', t, chain: d.chain, pure: d.chainPure });
+  const best = [...d.data.techs]
+    .filter((x) => d.chain >= x.chain && (!x.pure || d.chainPure))
+    .sort((a, b) => b.chain - a.chain || Number(b.pure) - Number(a.pure))[0];
+  if (!best) return;
+  const cur = techOf(d, d.techReady);
+  const better = !cur || best.chain > cur.chain || (best.chain === cur.chain && best.pure && !cur.pure);
+  if (better) {
+    d.techReady = best.id;
+    d.techForce = d.chainForce;
+    d.events.push({ type: 'techReady', t, tech: best.id });
+  }
+}
+
+function breakChain(d: Duel): void {
+  d.chain = 0;
+  d.chainPure = true;
+  d.chainForce = 0;
+}
+
+function landTech(d: Duel): void {
+  const f = d.foe;
+  const tech = techOf(d, d.techUsing);
+  if (!tech || f.state === 'dead') return;
+  const dmg = Math.round(d.foeDef.hp * tech.damage + d.techForce * tech.returnMul);
+  f.hp = Math.max(0, f.hp - dmg);
+  f.posture += d.foeDef.posture * tech.posture;
+  d.events.push({ type: 'techHit', t: d.t, tech: tech.id, damage: dmg });
+  breakChain(d);
+  d.techForce = 0;
+  if (checkFoeDown(d)) return;
+  // 기술은 공격을 끊는다: 비틀거리지 않으면 잠깐 거두는 자세로
+  if (f.state === 'windup') {
+    f.state = 'recover';
+    f.move = null;
+    f.fakeAt = null;
+    f.stateStart = d.t;
+    f.stateEnd = d.t + 600;
+  }
+  checkStagger(d);
+}
+
 function bumpStreak(d: Duel, t: number): void {
   const before = streakTier(d);
   d.streak++;
@@ -517,7 +636,10 @@ function resolveHit(d: Duel): void {
   p.parryAt = null;
   const rhythm = d.mode === 'rhythm';
   const dodging = H <= p.iframeUntil && p.action === 'dodge';
-  if (dodging) {
+  if (H <= p.iframeUntil && p.action === 'tech') {
+    // 기술을 쓰는 동안은 공격이 닿지 않는다
+    d.events.push({ type: 'evade', t: H, move: moveId });
+  } else if (dodging) {
     d.stats.dodges++;
     if (m.unblockable) {
       // 간파: 받을 수 없는 공격을 피하면 틈이 열린다
@@ -529,9 +651,11 @@ function resolveHit(d: Duel): void {
       d.events.push({ type: 'mikiri', t: H, move: moveId, judgement });
       judge(d, 'perfect', H, judgement);
       bumpStreak(d, H);
+      link(d, judgement, m.damage, H);
     } else {
       d.events.push({ type: 'evade', t: H, move: moveId });
       judge(d, 'good', H, 'good');
+      link(d, 'good', m.damage, H);
     }
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.perfect) {
     const tier = streakTier(d);
@@ -543,6 +667,7 @@ function resolveHit(d: Duel): void {
     d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement });
     judge(d, 'perfect', H, judgement);
     bumpStreak(d, H);
+    link(d, judgement, m.damage, H);
     if (m.element === 'fire' && !rhythm) burn(d, r.fireParryChip, H);
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.guard) {
     let dmg = Math.round(m.damage * r.guardChip);
@@ -554,6 +679,7 @@ function resolveHit(d: Duel): void {
     d.streak = 0;
     d.events.push({ type: 'guard', t: H, move: moveId, damage: dmg, element: m.element });
     judge(d, 'good', H, 'good');
+    link(d, 'good', m.damage, H);
     if (p.posture >= d.data.player.posture) {
       p.posture = 0;
       p.action = 'broken';
@@ -567,6 +693,7 @@ function resolveHit(d: Duel): void {
     d.streak = 0;
     d.events.push({ type: 'hit', t: H, move: moveId, damage: m.damage, element: m.element, heavy, unblockable: !!m.unblockable });
     judge(d, 'miss', H, 'miss');
+    breakChain(d);
     // 베는 중에 맞으면 베기가 끊긴다
     if (p.action !== 'broken') {
       p.action = 'hurt';
