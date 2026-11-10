@@ -1481,7 +1481,8 @@
           "recover": 520,
           "damage": 18,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_pine_cleave"
         },
         "grip": {
           "name": "검을 고쳐 쥔다",
@@ -1582,7 +1583,8 @@
           "recover": 480,
           "damage": 14,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_web_throw"
         },
         "lure": {
           "name": "헛찍기",
@@ -1693,7 +1695,8 @@
           "recover": 560,
           "damage": 22,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_shadow_charge"
         },
         "smoke": {
           "name": "연기 속임",

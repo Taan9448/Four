@@ -1,0 +1,21 @@
+id: ore_spider_death
+type: character-anim
+size: large
+character: ore_spider
+chroma: magenta
+summary: "「결」 광석거미 쓰러짐 6프레임 — 이야기 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-10). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [ore_spider_ref]
+reference: assets/source/ore_spider_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the silver ore shell cracking open along a seam with a burst of white sparks"
+  2: "the legs on the near side buckle one after another, the body tilting"
+  3: "collapses onto its belly, all legs splayed out flat, shell fragments falling"
+  4: "rolls half onto its back, the legs curling inward"
+  5: "lying on its back, legs curled tight, the cracked shell dull grey, small ore shards scattered around"
+  6: "still, legs curled, the last faint glint fading from the ore"
+placeholder: { shape: beast, color: '#c0c4cc', accent: '#4b3a6b' }

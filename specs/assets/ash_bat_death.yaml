@@ -1,0 +1,21 @@
+id: ash_bat_death
+type: character-anim
+size: large
+character: ash_bat
+chroma: magenta
+summary: "「결」 재 박쥐 쓰러짐 6프레임 — 이야기 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-10). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [ash_bat_ref]
+reference: assets/source/ash_bat_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the ash wings crumple, a burst of grey ash and a few orange embers"
+  2: "spiraling down, one wing folded, trailing ash"
+  3: "crashes to the ground, wings spread flat, ash puffing up"
+  4: "the wings crumbling into ash from the tips inward"
+  5: "the body a small pile of grey ash with a few glowing embers"
+  6: "a faint pile of grey ash, the last ember going out"
+placeholder: { shape: beast, color: '#4a3a36', accent: '#ff8a5c' }

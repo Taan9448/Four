@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_ash_bat
+type: fx
+summary: "「결」 결정타 날개 꺾기(折翼) — 재 박쥐 전용 마무리 — 푸른 반달 일섬이 두 날개를 가르고, 불티가 꺼지며 잿가루가 흰 김과 함께 흩날린다(2026-11-10). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin blue-white crescent arc sweeping in from the left across the center"
+  2: "impact: the crescent flashes bright blue-white, cutting through a spray of orange embers"
+  3: "the embers snuffed out into puffs of grey ash and white steam, spreading to both sides like broken wings"
+  4: "grey ash drifting down, the steam rising"
+  5: "a light fall of grey ash"
+  6: "faint ash specks"
+placeholder: { accent: '#9fd2ff' }

@@ -1,0 +1,21 @@
+id: veilak_death
+type: character-anim
+size: large
+character: veilak
+chroma: magenta
+summary: "「결」 그림자 군단장 베일락 쓰러짐 6프레임 — 이야기 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-10). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [veilak_ref]
+reference: assets/source/veilak_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the smoke greatsword shatters into black fragments, the knight thrown back in the saddle"
+  2: "the smoke horse rears up, both horse and rider fraying into black smoke at the edges"
+  3: "the rider slumps forward over the horse's neck, the horse's legs dissolving into smoke"
+  4: "horse and rider collapse together into a heap of churning black smoke, the red lights flickering"
+  5: "the smoke heap spreading low over the ground and drifting away, two faint red lights"
+  6: "a last thin wisp of black smoke and one dying red ember on the ground"
+placeholder: { shape: boss, color: '#2b2b3a', accent: '#ff3b3b' }

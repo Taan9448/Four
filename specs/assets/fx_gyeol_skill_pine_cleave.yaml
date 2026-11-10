@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_pine_cleave
+type: fx
+summary: "「결」 받을 수 없는 기술 곽도진 「소나무 베기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-10)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a pale blue-white crescent of sword qi, as wide as a pine trunk, rushing in low from the right"
+  2: "impact: the crescent strikes the center with a blinding pale blue flash, a shockwave of air"
+  3: "a wide horizontal cut of pale blue light across the cell, green pine needles and bark splinters blown outward"
+  4: "pine needles scattering in the wind, the blue light fading"
+  5: "drifting pine needles and a thin trail of blue qi"
+  6: "a few falling pine needles"
+placeholder: { accent: '#9fd3ff' }
