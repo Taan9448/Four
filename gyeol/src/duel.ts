@@ -136,6 +136,9 @@ export interface FoeDef {
   chart?: ChartDef;
   /** 겨루기에서 초마다 미는 힘(없으면 0.45) */
   clashPower?: number;
+  /** 수련장 상대(결투장·박자 도전·도감 목록에 안 나온다)와 수련 종류(종류마다 공격 패턴을 바꿔 낀다) */
+  practice?: boolean;
+  drills?: { id: string; name: string; note: string; patterns: PatternDef[] }[];
   finisher?: FinisherDef;
   weather?: Weather;
   lines?: Lines;
@@ -173,22 +176,49 @@ export interface TechDef {
   line: string;
 }
 
+/**
+ * 결투장 난이도(2026-11-10, 7-3절): 수련(판정 폭 넓게·적 피해 적게) · 본선(그대로) · 결(판정 폭 좁게·적 체간 빨리 회복).
+ * judgeMul은 perfect·excellent·guard 폭에 곱한다.
+ */
+export interface DifficultyDef {
+  id: string;
+  name: string;
+  note: string;
+  judgeMul: number;
+  foeDamageMul: number;
+  postureRegenMul: number;
+}
+
+/** 대결 등급(2026-11-10): 점수 = base + excellent × EXCELLENT 비율 − hit × 맞은 수 − guard × 막은 수. S·A·B 문턱, 그 아래 C */
+export interface GradeRules {
+  base: number;
+  excellent: number;
+  hit: number;
+  guard: number;
+  S: number;
+  A: number;
+  B: number;
+}
+
 export interface DuelData {
-  rules: Rules;
+  rules: Rules & { grade: GradeRules };
   player: PlayerDef;
   foes: FoeDef[];
   techs: TechDef[];
+  difficulties?: DifficultyDef[];
 }
 
 export type Grade = 'perfect' | 'good' | 'miss';
+export type DuelRank = 'S' | 'A' | 'B' | 'C';
 /** 판정 글자(2026-11-09): 패링·간파는 정밀도에 따라 EXCELLENT·GREAT, 막기·피함은 GOOD, 맞으면 MISS */
 export type Judgement = 'excellent' | 'great' | 'good' | 'miss';
 
 export type DuelEvent =
-  | { type: 'parry'; t: number; move: string; element?: Element; heavy: boolean; judgement: Judgement }
-  | { type: 'guard'; t: number; move: string; damage: number; element?: Element }
+  | { type: 'parry'; t: number; move: string; element?: Element; heavy: boolean; judgement: Judgement; lead: number }
+  | { type: 'guard'; t: number; move: string; damage: number; element?: Element; lead: number }
   | { type: 'guardBreak'; t: number }
-  | { type: 'hit'; t: number; move: string; damage: number; element?: Element; heavy: boolean; unblockable: boolean }
+  | { type: 'hit'; t: number; move: string; damage: number; element?: Element; heavy: boolean; unblockable: boolean; lead: number | null }
+  | { type: 'refill'; t: number }
   | { type: 'mikiri'; t: number; move: string; judgement: Judgement }
   | { type: 'evade'; t: number; move: string }
   | { type: 'burn'; t: number; damage: number }
@@ -216,12 +246,15 @@ export type DuelEvent =
 
 export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'tech' | 'hurt' | 'broken' | 'clash';
 export type FoeState = 'idle' | 'windup' | 'recover' | 'stagger' | 'dead' | 'clash';
-export type Mode = 'duel' | 'rhythm';
+/** practice: 수련장 — 하운은 다치지 않고, 적은 쓰러지면 다시 일어선다(끝나지 않는다) */
+export type Mode = 'duel' | 'rhythm' | 'practice';
 
 export interface Duel {
   data: DuelData;
   foeDef: FoeDef;
   mode: Mode;
+  /** 난이도 id(difficulties) */
+  difficulty: string;
   rng: Rng;
   t: number;
   result: 'win' | 'lose' | null;
@@ -307,15 +340,27 @@ const STEP = 2;
 /** 화면이 세게 흔들리는 무거운 공격의 기준 피해 */
 export const HEAVY_DAMAGE = 20;
 
-export function createDuel(data: DuelData, foeId: string, seed = 'gyeol', mode: Mode = 'duel'): Duel {
-  const foeDef = data.foes.find((f) => f.id === foeId);
-  if (!foeDef) throw new Error(`알 수 없는 상대: ${foeId}`);
+/** 난이도를 입힌 데이터·상대(원본은 고치지 않는다) */
+function withDifficulty(data: DuelData, foe: FoeDef, diff: DifficultyDef | undefined): { data: DuelData; foeDef: FoeDef } {
+  if (!diff || (diff.judgeMul === 1 && diff.foeDamageMul === 1 && diff.postureRegenMul === 1)) return { data, foeDef: foe };
+  const r = data.rules;
+  const rules = { ...r, perfect: Math.round(r.perfect * diff.judgeMul), excellent: Math.round(r.excellent * diff.judgeMul), guard: Math.round(r.guard * diff.judgeMul) };
+  const moves = Object.fromEntries(Object.entries(foe.moves).map(([k, m]) => [k, { ...m, damage: Math.max(1, Math.round(m.damage * diff.foeDamageMul)) }]));
+  const foeDef = { ...foe, moves, postureRegen: foe.postureRegen * diff.postureRegenMul };
+  return { data: { ...data, rules, foes: data.foes.map((f) => (f.id === foe.id ? foeDef : f)) }, foeDef };
+}
+
+export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode: Mode = 'duel', difficulty = 'main'): Duel {
+  const foe0 = data0.foes.find((f) => f.id === foeId);
+  if (!foe0) throw new Error(`알 수 없는 상대: ${foeId}`);
+  const { data, foeDef } = withDifficulty(data0, foe0, (data0.difficulties ?? []).find((x) => x.id === difficulty));
   if (mode === 'rhythm' && !foeDef.chart) throw new Error(`${foeId}에는 박자 도전 악보가 없다`);
   const rng = createRng(seed).fork(foeId);
   const d: Duel = {
     data,
     foeDef,
     mode,
+    difficulty,
     rng,
     t: 0,
     result: null,
@@ -750,7 +795,7 @@ function endClash(d: Duel, won: boolean): void {
   }
   // 밀렸다: 칼이 튕겨 나가며 베인다
   const dmg = Math.round(m.damage * r.clashLoseMul);
-  p.hp = Math.max(0, p.hp - dmg);
+  hurt(d, dmg);
   p.posture = Math.min(d.data.player.posture - 1, p.posture + r.clashLosePosture);
   p.action = 'hurt';
   p.actionStart = t;
@@ -883,7 +928,7 @@ function resolveHit(d: Duel): void {
     d.stats.parries++;
     d.blockedRun = 0;
     const judgement: Judgement = since <= r.excellent * ex ? 'excellent' : 'great';
-    d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement });
+    d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement, lead: since });
     judge(d, 'perfect', H, judgement);
     bumpStreak(d, H);
     link(d, judgement, m.damage, H);
@@ -891,12 +936,12 @@ function resolveHit(d: Duel): void {
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.guard) {
     let dmg = Math.round(m.damage * r.guardChip);
     if (m.element === 'fire') dmg += r.fireGuardExtra;
-    if (!rhythm) p.hp = Math.max(0, p.hp - dmg);
+    hurt(d, dmg);
     p.posture += rhythm ? 0 : r.guardPosture;
     p.lastGuard = H;
     d.stats.guards++;
     d.streak = 0;
-    d.events.push({ type: 'guard', t: H, move: moveId, damage: dmg, element: m.element });
+    d.events.push({ type: 'guard', t: H, move: moveId, damage: dmg, element: m.element, lead: since });
     updateCrisis(d);
     judge(d, 'good', H, 'good');
     link(d, 'good', m.damage, H);
@@ -908,10 +953,10 @@ function resolveHit(d: Duel): void {
       d.events.push({ type: 'guardBreak', t: H });
     }
   } else {
-    if (!rhythm) p.hp = Math.max(0, p.hp - m.damage);
+    hurt(d, m.damage);
     d.stats.hits++;
     d.streak = 0;
-    d.events.push({ type: 'hit', t: H, move: moveId, damage: m.damage, element: m.element, heavy, unblockable: !!m.unblockable });
+    d.events.push({ type: 'hit', t: H, move: moveId, damage: m.damage, element: m.element, heavy, unblockable: !!m.unblockable, lead: Number.isFinite(since) && since >= 0 && since < 2000 ? since : null });
     judge(d, 'miss', H, 'miss');
     breakChain(d);
     updateCrisis(d);
@@ -935,9 +980,14 @@ function resolveHit(d: Duel): void {
   if (!rhythm) checkStagger(d);
 }
 
+/** 하운이 다친다(대결에서만 — 박자 도전·수련장은 다치지 않는다) */
+function hurt(d: Duel, dmg: number): void {
+  if (d.mode === 'duel') d.player.hp = Math.max(0, d.player.hp - dmg);
+}
+
 function burn(d: Duel, dmg: number, t: number): void {
   if (dmg <= 0) return;
-  d.player.hp = Math.max(0, d.player.hp - dmg);
+  hurt(d, dmg);
   d.events.push({ type: 'burn', t, damage: dmg });
   updateCrisis(d);
 }
@@ -995,6 +1045,13 @@ function checkStagger(d: Duel): void {
 function checkFoeDown(d: Duel): boolean {
   const f = d.foe;
   if (f.hp > 0) return false;
+  if (d.mode === 'practice') {
+    // 수련장: 철목인은 다시 일어선다
+    f.hp = d.foeDef.hp;
+    f.posture = 0;
+    d.events.push({ type: 'refill', t: d.t });
+    return false;
+  }
   f.state = 'dead';
   f.stateStart = d.t;
   f.move = null;
@@ -1002,3 +1059,22 @@ function checkFoeDown(d: Duel): boolean {
   d.events.push({ type: 'win', t: d.t });
   return true;
 }
+
+/**
+ * 대결 등급(2026-11-10): 이긴 대결만 매긴다. 맞지 않고 EXCELLENT가 많을수록 높다.
+ * 점수 = base + excellent × (EXCELLENT ÷ 판정 수) − hit × 맞음 − guard × 막음
+ */
+export function duelGrade(d: Duel): { rank: DuelRank; score: number } | null {
+  if (d.result !== 'win') return null;
+  const g = d.data.rules.grade;
+  const s = d.stats;
+  const judged = s.perfect + s.good + s.miss;
+  const ratio = judged ? s.excellent / judged : 0;
+  const score = Math.round(g.base + g.excellent * ratio - g.hit * s.hits - g.guard * s.guards);
+  const rank: DuelRank = score >= g.S ? 'S' : score >= g.A ? 'A' : score >= g.B ? 'B' : 'C';
+  return { rank, score };
+}
+
+const RANK_ORDER: Record<DuelRank, number> = { S: 4, A: 3, B: 2, C: 1 };
+/** 더 높은 등급 */
+export const betterRank = (a: DuelRank | undefined, b: DuelRank): DuelRank => (a && RANK_ORDER[a] >= RANK_ORDER[b] ? a : b);

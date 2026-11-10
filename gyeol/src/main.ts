@@ -1,13 +1,15 @@
-// 「결」 목업(2026-11-09): 상대 고르기 → 대결 또는 박자 도전 → 결과.
+// 「결」(2026-11-10 2단계): 시작 → 로비 → 결투장·박자 도전·수련장·기록 → 대결 → 결과. 대결 밖의 화면은 screens.ts.
 // 입력: 받기 K·Space, 베기 J·화면 클릭, 피하기 L·Shift, 기술 I, 집중 U, Esc 상대 고르기. 휴대폰은 버튼.
 // 4차(2026-11-09): 칼 맞부딪힘 겨루기(J·K 연타), 위기(배수의 진), 집중(심안), 적별 결정타, 날씨 입자, 적 도발·하운 대사.
 import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
+import { applyUiArt, el, padIcon, rankBadge } from './dom';
 import raw from '../data/duel.json';
-import { advance, createDuel, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { advance, betterRank, createDuel, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { loadSave, writeSave, type Quality } from './save';
 import { openSettings } from './settings';
+import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
@@ -16,49 +18,15 @@ const data = raw as unknown as DuelData;
 const app = document.getElementById('app')!;
 let stopLoop: (() => void) | null = null;
 
-const ELEMENT_NAME: Record<Element, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
 const WORD: Record<Judgement, JudgeWord> = { excellent: 'EXCELLENT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
 const GROUND_TEXT_Y = CONTACT.y - 150;
 
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, ...kids: (Node | string)[]): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-  e.append(...kids);
-  return e;
-}
-
-function readBest(): Record<string, { accuracy: number; rank: string }> {
-  return loadSave().rhythmBest;
-}
 function writeBest(id: string, accuracy: number, rank: string): boolean {
   const save = loadSave();
   if ((save.rhythmBest[id]?.accuracy ?? -1) >= accuracy) return false;
   save.rhythmBest[id] = { accuracy, rank };
   writeSave(save);
   return true;
-}
-
-/**
- * 버튼·UI 그림(2026-11-09): Codex 그림(ui_gyeol_pads·icons_gyeol_pads·ui_gyeol_frames·title_gyeol)이 실제로 들어온 것만 쓴다.
- * 오기 전에는 지금의 CSS 바탕 그대로. 칸 번호: 버튼 판·아이콘은 PAD_ART 순서, 틀은 1 적 이름 · 2 하운 이름 · 3 결과 띠 · 4 상대 카드 · 5 먹 원.
- */
-const PAD_ART = ['attack', 'dodge', 'parry', 'tech', 'focus', 'back'] as const;
-function applyUiArt(): void {
-  const root = document.documentElement;
-  const real = (id: string, n: number) => frameUrl(id, n, { realOnly: true });
-  const use = (cls: string, vars: [string, string | null][]) => {
-    if (vars.some(([, u]) => !u)) return;
-    for (const [k, u] of vars) root.style.setProperty(k, `url("${u}")`);
-    root.classList.add(cls);
-  };
-  use('art-pads', PAD_ART.map((p, i): [string, string | null] => [`--pad-${p}`, real('ui_gyeol_pads', i + 1)]));
-  use('art-frames', [['--plate-foe', real('ui_gyeol_frames', 1)], ['--plate-me', real('ui_gyeol_frames', 2)], ['--plate-result', real('ui_gyeol_frames', 3)], ['--plate-card', real('ui_gyeol_frames', 4)], ['--enso', real('ui_gyeol_frames', 5)]]);
-  use('art-title', [['--title-bg', real('title_gyeol', 1)]]);
-}
-/** 버튼 아이콘(icons_gyeol_pads가 오면) */
-function padIcon(kind: (typeof PAD_ART)[number]): HTMLImageElement | '' {
-  const u = frameUrl('icons_gyeol_pads', PAD_ART.indexOf(kind) + 1, { realOnly: true });
-  return u ? el('img', { class: 'pad-icon', src: u, alt: '' }) : '';
 }
 
 /**
@@ -78,67 +46,45 @@ function applySettings(): void {
   setShakeScale(st.shake);
 }
 
-function elementsOf(f: FoeDef): Element[] {
-  return [...new Set(Object.values(f.moves).map((m) => m.element).filter((e): e is Element => !!e))];
-}
+/** 화면 사이 이동 */
+const nav: Nav = {
+  go(s: Screen) {
+    stopLoop?.();
+    setKeys(null);
+    document.querySelector('.settings-panel')?.remove();
+    if (s !== 'title') document.documentElement.classList.remove('on-title');
+    window.scrollTo(0, 0);
+    if (s === 'title') renderTitle(app, nav);
+    else if (s === 'lobby') renderLobby(app, nav);
+    else if (s === 'arena') renderArena(app, nav, data);
+    else if (s === 'rhythm') renderRhythm(app, nav, data);
+    else if (s === 'practice') renderPractice(app, nav, data);
+    else if (s === 'records') renderRecords(app, nav, data);
+    else if (s === 'calibrate') renderCalibrate(app, nav);
+  },
+  play(foe, mode, opts) {
+    setKeys(null);
+    void play(foe, mode, opts);
+  },
+  settings() {
+    openSettings(applySettings);
+  },
+};
 
-function title(): void {
-  stopLoop?.();
-  document.documentElement.classList.add('on-title');
-  const best = readBest();
-  const cards = data.foes.map((f) => {
-    const img = frameUrl(`${f.sprite}_idle`, 1);
-    const fight = el('button', { class: 'btn primary', type: 'button' }, '대결');
-    fight.addEventListener('click', () => void play(f, 'duel'));
-    const rhythm = el('button', { class: 'btn', type: 'button' }, '박자 도전');
-    rhythm.addEventListener('click', () => void play(f, 'rhythm'));
-    const tags = elementsOf(f).map((e) => el('span', { class: `tag el-${e}` }, ELEMENT_NAME[e]));
-    const b = best[f.id];
-    return el(
-      'article',
-      { class: 'foe-card' },
-      img ? el('img', { src: img, alt: '' }) : '',
-      el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, f.note), b ? el('small', { class: 'best' }, `박자 도전 최고 ${b.rank} · ${Math.round(b.accuracy * 100)}%`) : ''),
-      el('div', { class: 'foe-actions' }, fight, rhythm),
-    );
-  });
-  app.replaceChildren(
-    el(
-      'section',
-      { class: 'title' },
-      el('h1', {}, '결'),
-      el('p', { class: 'sub' }, '적의 공격에는 결이 있다. 결을 읽고, 받아치고, 되돌아오는 틈을 벤다.'),
-      el('div', { class: 'foes' }, ...cards),
-      el(
-        'div',
-        { class: 'help' },
-        el('p', {}, el('kbd', {}, 'K'), '·', el('kbd', {}, 'Space'), ' 받기 — 좁혀 드는 고리가 과녁 고리와 겹칠 때(금빛) 누르면 패링. 이르면 막기.'),
-        el('p', {}, el('kbd', {}, 'L'), '·', el('kbd', {}, 'Shift'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(危)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
-        el('p', {}, el('kbd', {}, 'J'), '·화면 클릭 베기 — 패링·간파 뒤 적에게 금이 보이는 동안 베면 반격(3배). 적 체간이 가득 차면 결정타.'),
-        el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
-        el('p', {}, '원소: ', el('span', { class: 'tag el-fire' }, '화염'), ' 받아도 화상 · ', el('span', { class: 'tag el-ice' }, '냉기'), ' 느리다 마지막에 빨라진다 · ', el('span', { class: 'tag el-lightning' }, '번개'), ' 박자가 튄다.'),
-        el('p', {}, '패링·간파가 이어지면 연속 박자 — 3·6·10번째에 기운이 세지고 체간을 더 깎는다.'),
-        el('p', {}, '겨루기: 연타하지 말고 적이 치는 순간에 맞춰 한 번 베면 칼끼리 맞부딪힌다 — ', el('kbd', {}, 'J'), '·', el('kbd', {}, 'K'), ' 연타로 밀어내면 큰 틈.'),
-        el('p', {}, el('kbd', {}, 'U'), ' 집중(심안) — 받기로 모은 게이지가 차면 잠시 시간이 느려지고 결이 처음부터 보인다. 속임수는 虛로 드러난다.'),
-        el('p', {}, '체력이 20% 아래면 배수의 진 — EXCELLENT 판정이 넓어진다.'),
-      ),
-      settingsButton(),
-      el('p', { class: 'proto' }, '목업 · 하운의 받기·피하기 동작과 결 이펙트·기운·아이콘은 Codex 그림이 오면 자동으로 바뀐다'),
-    ),
-  );
-}
+const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '박자 도전으로', practice: '수련장으로', lobby: '로비로' };
 
-function settingsButton(): HTMLButtonElement {
-  const b = el('button', { class: 'btn settings-open', type: 'button' }, '설정');
-  b.addEventListener('click', () => openSettings(applySettings));
-  return b;
-}
-
-async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
+async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby' }): Promise<void> {
   stopLoop?.();
   document.documentElement.classList.remove('on-title');
-  const seed = `${foeDef.id}-${Date.now().toString(36)}`;
-  const d = createDuel(data, foeDef.id, seed, mode);
+  window.scrollTo(0, 0);
+  const seed = `${foeDef0.id}-${Date.now().toString(36)}`;
+  // 수련장: 고른 수련 종류의 패턴으로 바꿔 낀 철목인
+  const drill = foeDef0.drills?.find((x) => x.id === opts.drill);
+  const foeDef: FoeDef = drill ? { ...foeDef0, patterns: drill.patterns } : foeDef0;
+  const playData: DuelData = drill ? { ...data, foes: data.foes.map((f) => (f.id === foeDef.id ? foeDef : f)) } : data;
+  const d = createDuel(playData, foeDef.id, seed, mode, opts.difficulty ?? 'main');
+  const practice = mode === 'practice';
+  const leave = () => nav.go(opts.back);
   const rhythm = mode === 'rhythm';
   const canvas = el('canvas', { width: String(W), height: String(H), class: 'field', 'aria-label': `${foeDef.title}와의 ${rhythm ? '박자 도전' : '대결'}` });
   const ctx = canvas.getContext('2d')!;
@@ -166,8 +112,8 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
   const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
-  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), '상대 고르기');
-  back.addEventListener('click', title);
+  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), practice ? '그만하기' : '나가기');
+  back.addEventListener('click', leave);
   const overlay = el('div', { class: 'result', hidden: '' });
   const loading = el('div', { class: 'loading' }, el('span', {}, '결을 고르는 중…'));
   const fsBtn = el('button', { class: 'fs', type: 'button', 'aria-label': '전체 화면', title: '전체 화면' }, '⛶');
@@ -203,6 +149,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   fitCanvas();
   const fx: Fx = emptyFx();
   fx.weather = createWeather(foeDef.weather);
+  if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
   let hitstopUntil = 0;
   /** 대결 시계를 마지막으로 민 실제 시각(입력 시각 보정의 기준) */
   let lastReal = performance.now();
@@ -241,6 +188,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     fx.bubbles.push({ who, text: line, born, life: 1300 + line.length * 45 });
   };
   let foeStaggered = false;
+  let clashWins = 0;
   let lastDeathblow = -1;
   let lastBeat = 0;
   let lastClashFx = 0;
@@ -281,7 +229,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge', e.timeStamp));
     else if (k === 'i') doPress('tech', e.timeStamp);
     else if (k === 'u') doPress('focus', e.timeStamp);
-    else if (k === 'escape') title();
+    else if (k === 'escape') leave();
   };
   window.addEventListener('keydown', onKey);
 
@@ -301,11 +249,18 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
   const elColor = (e?: Element) => ELEMENT_COLOR[e ?? 'none'];
   const bloomColor = (e?: Element) => (e === 'fire' ? 'rgba(255,170,80,ALPHA)' : e === 'ice' ? 'rgba(170,235,255,ALPHA)' : e === 'lightning' ? 'rgba(210,160,255,ALPHA)' : 'rgba(255,214,120,ALPHA)');
 
+  // 수련장: 누른 시점(타격 몇 ms 전)을 화면 아래 막대에 찍는다
+  const mark = (lead: number | null, kind: 'excellent' | 'great' | 'good' | 'miss') => {
+    if (!practice || !fx.practice) return;
+    fx.practice.marks.push({ lead, kind, born: performance.now() });
+    if (fx.practice.marks.length > 12) fx.practice.marks.shift();
+  };
   const handleEvents = () => {
     const now = performance.now();
     for (const ev of d.events) {
       switch (ev.type) {
         case 'parry': {
+          mark(ev.lead, ev.judgement);
           sfx('block');
           sfx(ev.element === 'lightning' ? 'lightning' : ev.element === 'ice' ? 'ice' : ev.element === 'fire' ? 'fire' : 'snap', { volume: 0.8 });
           fx.blooms.push({ x: CONTACT.x - 20, y: CONTACT.y, born: now, color: bloomColor(ev.element), big: ev.heavy });
@@ -336,6 +291,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           judge(fx, 'GOOD', '피함', now);
           break;
         case 'guard':
+          mark(ev.lead, 'good');
           sfx('block', { volume: 0.7 });
           spark(CONTACT.x - 30, CONTACT.y, 10, elColor(ev.element).spark, 180);
           judge(fx, 'GOOD', '막음', now);
@@ -354,6 +310,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           addShake(fx, now, 12, 280);
           break;
         case 'hit': {
+          if (!ev.unblockable) mark(ev.lead, 'miss');
           sfx(ev.heavy ? 'hit_heavy' : 'hit');
           const sprite = ev.element === 'fire' ? 'fx_hit_fire' : ev.element === 'ice' ? 'fx_hit_ice' : ev.element === 'lightning' ? 'fx_hit_shock' : 'fx_hit_blunt';
           fx.bursts.push({ x: PLAYER_X + 10, y: CONTACT.y + 10, sprite, born: now, scale: ev.heavy ? 1.1 : 0.8 });
@@ -453,6 +410,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           spark(CONTACT.x + (ev.balance - 0.5) * 80, CONTACT.y - 10, 6, '#fff0c0', 260, 3);
           break;
         case 'clashWin':
+          clashWins++;
           sfx('slam_8');
           flash('#bfe4ff', 260, 0.5);
           addShake(fx, now, 14, 320);
@@ -546,6 +504,7 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           finish();
           break;
         case 'judge':
+        case 'refill':
           break;
       }
     }
@@ -553,14 +512,43 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
     if (streakTier(d) < lastTier) lastTier = streakTier(d);
   };
 
+  /** 끝난 대결을 기록에 더한다(대결만 — 수련장은 끝나지 않고, 박자 도전은 최고 기록만) */
+  let bestUp = false;
+  const record = () => {
+    const save = loadSave();
+    if (!save.seen.includes(foeDef.id)) save.seen.push(foeDef.id);
+    if (mode === 'duel') {
+      const st = save.stats;
+      const s = d.stats;
+      st.duels++;
+      if (d.result === 'win') st.wins++;
+      st.parries += s.parries;
+      st.excellent += s.excellent;
+      st.deathblows += s.deathblows;
+      st.techs += s.techs;
+      st.clashWins += clashWins;
+      st.maxStreak = Math.max(st.maxStreak, s.maxStreak);
+      st.playMs += Math.round(d.t);
+      const g = duelGrade(d);
+      if (g) {
+        const key = `${foeDef.id}:${d.difficulty}`;
+        const prev = save.duelBest[key] as DuelRank | undefined;
+        const next = betterRank(prev, g.rank);
+        bestUp = next !== prev;
+        save.duelBest[key] = next;
+      }
+    }
+    writeSave(save);
+  };
   const finish = () => {
+    record();
     setTimeout(() => {
       if (!alive) return;
       const s = d.stats;
       const again = el('button', { class: 'btn primary', type: 'button' }, '다시');
-      again.addEventListener('click', () => void play(foeDef, mode));
-      const pick = el('button', { class: 'btn', type: 'button' }, '상대 고르기');
-      pick.addEventListener('click', title);
+      again.addEventListener('click', () => void play(foeDef0, mode, opts));
+      const pick = el('button', { class: 'btn', type: 'button' }, BACK_LABEL[opts.back] ?? '나가기');
+      pick.addEventListener('click', leave);
       if (rhythm) {
         const sc = rhythmScore(d);
         const newBest = writeBest(foeDef.id, sc.accuracy, sc.rank);
@@ -581,9 +569,12 @@ async function play(foeDef: FoeDef, mode: Mode): Promise<void> {
           el('div', { class: 'row' }, again, pick),
         );
       } else {
+        const g = duelGrade(d);
+        const diffName = data.difficulties?.find((x) => x.id === d.difficulty)?.name ?? '';
         overlay.replaceChildren(
           el('h2', {}, d.result === 'win' ? `${foeDef.title}을(를) 베었다` : '쓰러졌다'),
-          el('p', {}, `패링 ${s.parries} · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
+          g ? el('div', { class: 'grade-line' }, rankBadge(g.rank, 'lg'), el('span', {}, `${diffName} · 점수 ${g.score}${bestUp ? ' · 최고 등급!' : ''}`)) : '',
+          el('p', {}, `패링 ${s.parries}(EXCELLENT ${s.excellent}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak} · ${(d.t / 1000).toFixed(1)}초`),
           el('div', { class: 'row' }, again, pick),
         );
@@ -700,6 +691,10 @@ initAudio();
 applySettings();
 applyUiArt();
 const params = new URLSearchParams(location.search);
+// 점검·개발용: ?foe=<id>[&rhythm|&practice[=drill]][&diff=easy|main|hard] 바로 대결, ?screen=lobby|arena|rhythm|practice|records|calibrate
 const direct = data.foes.find((f) => f.id === params.get('foe'));
-if (direct) void play(direct, params.has('rhythm') ? 'rhythm' : 'duel');
-else title();
+const screen = params.get('screen') as Screen | null;
+if (direct) {
+  const mode: Mode = params.has('rhythm') ? 'rhythm' : params.has('practice') || direct.practice ? 'practice' : 'duel';
+  void play(direct, mode, { difficulty: params.get('diff') ?? 'main', drill: params.get('practice') || undefined, back: mode === 'practice' ? 'practice' : mode === 'rhythm' ? 'rhythm' : 'arena' });
+} else nav.go(screen ?? 'title');

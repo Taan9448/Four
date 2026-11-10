@@ -1,0 +1,16 @@
+id: bg_gyeol_lobby
+type: key-art
+summary: "「결」 로비 — 운곡루 뒤뜰의 밤(2026-11-10). 왼쪽·가운데에 하운과 왕일검의 반신 그림을 얹고, 오른쪽에 메뉴를 얹는다. 인물 없음"
+frame_notes:
+  1: >-
+    The back yard of an old two-story wooden teahouse-inn in a mountain village at night, painted like a calm hand-drawn anime
+    background with soft watercolor texture: dark grey-tiled roof eaves at the top right with a few warm paper lanterns glowing orange,
+    a packed-earth yard, a neat woodpile stacked against the wall at the far left, an old chopping block with an axe resting on it,
+    a black iron-wood training dummy with three short wooden arms standing near the right, a stone well, bamboo and pines behind a low
+    wall, and a large pale moon in a deep blue night sky with thin clouds. Cool moonlight from the upper left, warm lantern light from the right.
+framing: >-
+  The left half and the center of the picture stay calm with no strong detail at standing-figure height, because the game places two
+  large half-body character portraits there (a young swordsman on the left, an old man in a wheelchair in the center). The right third
+  is a little darker and plainer (the game puts a column of menu buttons over it). Keep the training dummy and lanterns on the right edge,
+  small. No people, no animals, no text.
+placeholder: { color: '#1a2030' }

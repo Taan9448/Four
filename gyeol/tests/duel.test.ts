@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { advance, createDuel, cue, isOpen, MAX_INPUT_LAG, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
+import { advance, betterRank, createDuel, cue, duelGrade, isOpen, MAX_INPUT_LAG, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
+import { calibrationOffset } from '../src/calibrate';
 import { defaultSettings, KEY, loadSave, normalize, resetSaveCache, writeSave } from '../src/save';
 import realRaw from '../data/duel.json';
 
 const real = realRaw as unknown as DuelData;
+/** 대결 상대(수련장 철목인 빼고) */
+const duelFoes = real.foes.filter((f) => !f.practice);
 
 // 한 가지 공격만 하는 적: 첫 공격은 idle[1]=500ms 뒤 시작, windup 400 → 타격은 900ms
 const data: DuelData = {
@@ -261,7 +264,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   });
 
   it('박자 도전: 악보대로 오고, 판정을 세어 등급을 매기며 죽지 않는다', () => {
-    for (const foe of real.foes) {
+    for (const foe of duelFoes) {
       const d = createDuel(real, foe.id, 'x', 'rhythm');
       const steps = foe.chart!.steps;
       // 모든 타격을 정확히 받거나(받을 수 없으면) 피한다
@@ -286,9 +289,9 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   });
 
   it('실제 데이터: 다섯 상대 모두 원소·받을 수 없는 공격·속임수·악보를 갖췄다', () => {
-    const els = new Set(real.foes.flatMap((f) => Object.values(f.moves).map((m) => m.element)).filter(Boolean));
+    const els = new Set(duelFoes.flatMap((f) => Object.values(f.moves).map((m) => m.element)).filter(Boolean));
     expect([...els].sort()).toEqual(['fire', 'ice', 'lightning']);
-    for (const f of real.foes) {
+    for (const f of duelFoes) {
       const ms = Object.values(f.moves);
       expect(ms.some((m) => m.unblockable), f.id).toBe(true);
       expect(ms.some((m) => (m.feint ?? 0) > real.rules.perfect), f.id).toBe(true);
@@ -315,7 +318,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   });
 
   it('베기 연타로는 이길 수 없다 — 막힌 베기가 쌓이면 적이 되받아친다', () => {
-    for (const foe of real.foes) {
+    for (const foe of duelFoes) {
       const d = createDuel(real, foe.id, 'spam');
       for (let t = 0; t < 60000 && !d.result; t += 16) {
         advance(d, t);
@@ -498,7 +501,7 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
   });
 
   it('모든 상대에 결정타·날씨·대사가 있다', () => {
-    for (const f of real.foes) {
+    for (const f of duelFoes) {
       expect(f.finisher?.name, f.id).toBeTruthy();
       expect(f.weather, f.id).toBeTruthy();
       expect(f.lines?.start?.length, f.id).toBeGreaterThan(0);
@@ -542,5 +545,74 @@ describe('「결」 1단계 — 입력 시각 보정·저장', () => {
     expect(bad.settings).toMatchObject({ master: 1, inputOffset: 120, quality: 'auto', reduceFlash: false });
     expect(bad.story).toEqual({ cleared: [], stars: {} });
     resetSaveCache();
+  });
+});
+
+describe('「결」 2단계 — 난이도·수련장·대결 등급·박자 맞추기', () => {
+  const withDiffs: DuelData = { ...data, difficulties: real.difficulties };
+
+  it('난이도: 수련은 판정 폭이 넓고 적 피해가 적다, 결은 좁다 — 원본 데이터는 그대로', () => {
+    const easy = createDuel(withDiffs, 'dummy', 'x', 'duel', 'easy');
+    const hard = createDuel(withDiffs, 'dummy', 'x', 'duel', 'hard');
+    const ez = real.difficulties!.find((d) => d.id === 'easy')!;
+    expect(easy.data.rules.perfect).toBe(Math.round(data.rules.perfect * ez.judgeMul));
+    expect(easy.foeDef.moves.swing.damage).toBe(Math.round(20 * ez.foeDamageMul));
+    expect(hard.data.rules.perfect).toBeLessThan(data.rules.perfect);
+    expect(data.foes[0].moves.swing.damage).toBe(20);
+    // 수련에서는 본선이면 막기가 될 이른 받기도 패링이 된다
+    advance(easy, HIT - 180);
+    press(easy, 'parry');
+    advance(easy, HIT + 5);
+    expect(easy.events.some((e) => e.type === 'parry')).toBe(true);
+  });
+
+  it('수련장: 하운은 다치지 않고 철목인은 쓰러지면 다시 선다(끝나지 않는다)', () => {
+    const d = createDuel({ ...data, foes: [{ ...data.foes[0], hp: 10 }] }, 'dummy', 'x', 'practice');
+    advance(d, HIT + 5); // 맞는다
+    expect(d.player.hp).toBe(data.player.hp);
+    expect(d.events.find((e) => e.type === 'hit')).toMatchObject({ lead: null });
+    advance(d, HIT + 400); // 맞고 움찔한 뒤
+    d.foe.hp = 1;
+    d.foe.state = 'stagger';
+    d.foe.stateEnd = d.t + 1000;
+    press(d, 'attack');
+    advance(d, d.t + data.player.attack.duration);
+    expect(d.result).toBeNull();
+    expect(d.foe.hp).toBe(10);
+    expect(d.events.some((e) => e.type === 'refill')).toBe(true);
+  });
+
+  it('받기·막기 사건에 누른 시점(타격 몇 ms 전)이 실린다', () => {
+    const d = createDuel(data, 'dummy');
+    advance(d, HIT - 40);
+    press(d, 'parry');
+    advance(d, HIT + 5);
+    expect(d.events.find((e) => e.type === 'parry')).toMatchObject({ lead: 40 });
+  });
+
+  it('대결 등급: 이긴 대결만, 맞지 않고 EXCELLENT가 많을수록 높다', () => {
+    const base = createDuel(real, 'shadow_wolf');
+    expect(duelGrade(base)).toBeNull();
+    const g = real.rules.grade;
+    const mk = (hits: number, ex: number, judged: number) => {
+      const d = createDuel(real, 'shadow_wolf');
+      d.result = 'win';
+      Object.assign(d.stats, { hits, excellent: ex, perfect: ex, good: judged - ex - hits, miss: hits, guards: 0 });
+      return duelGrade(d)!;
+    };
+    expect(mk(0, 10, 10)).toMatchObject({ rank: 'S', score: g.base + g.excellent });
+    expect(mk(1, 4, 10).rank).toBe('A');
+    expect(mk(4, 0, 10).rank).toBe('C');
+    expect(betterRank('A', 'S')).toBe('S');
+    expect(betterRank('S', 'B')).toBe('S');
+    expect(betterRank(undefined, 'C')).toBe('C');
+  });
+
+  it('박자 맞추기: 가장 가까운 박과의 차를 평균(위아래 하나씩 버림), 너무 벗어난 것과 적은 수는 버린다', () => {
+    const beats = Array.from({ length: 12 }, (_, i) => 1000 + i * 750);
+    const late = beats.map((b, i) => b + 30 + (i % 3) - 1);
+    expect(calibrationOffset(beats, late)).toMatchObject({ mean: 30, used: 12 });
+    expect(calibrationOffset(beats, [...beats.slice(0, 8).map((b) => b - 20), 99999])).toMatchObject({ mean: -20, used: 8 });
+    expect(calibrationOffset(beats, beats.slice(0, 4))).toBeNull();
   });
 });

@@ -1,0 +1,363 @@
+// 「결」 대결 밖의 화면(2026-11-10 2단계, 설계 7-3절): 시작 · 로비(운곡루 뒤뜰) · 결투장 · 박자 도전 · 수련장 · 박자 맞추기 · 기록.
+// PC 위주(2026-11-10 사용자 요청). 휴대폰에서는 한 줄로 쌓여 보인다.
+import { frameUrl } from '../../src/render/assets';
+import { sfx } from '../../src/render/audio';
+import lobbyRaw from '../data/lobby.json';
+import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt } from './dom';
+import type { DuelData, FoeDef, Mode, TechDef } from './duel';
+import { calibrationOffset } from './calibrate';
+import { loadSave, writeSave } from './save';
+
+export type Screen = 'title' | 'lobby' | 'arena' | 'rhythm' | 'practice' | 'records' | 'calibrate';
+
+export interface PlayOpts {
+  difficulty?: string;
+  drill?: string;
+  /** 대결이 끝나거나 나가면 돌아갈 화면 */
+  back: Screen;
+}
+
+export interface Nav {
+  go(s: Screen): void;
+  play(foe: FoeDef, mode: Mode, opts: PlayOpts): void;
+  settings(): void;
+}
+
+interface LobbyData {
+  wang: string[];
+  menu: { id: string; name: string; note: string; locked?: string }[];
+}
+const lobby = lobbyRaw as LobbyData;
+
+/** 키보드: 화면마다 하나만 붙이고, 화면을 떠나면 뗀다 */
+let keyHandler: ((e: KeyboardEvent) => void) | null = null;
+export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
+  if (keyHandler) window.removeEventListener('keydown', keyHandler);
+  keyHandler = fn;
+  if (fn) window.addEventListener('keydown', fn);
+}
+
+const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
+const portrait = (id: string, n = 1) => frameUrl(id, n);
+
+function header(title: string, nav: Nav, sub?: string): HTMLElement {
+  return el(
+    'header',
+    { class: 'screen-head' },
+    button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')),
+    el('div', {}, el('h1', {}, title), sub ? el('p', { class: 'sub' }, sub) : ''),
+  );
+}
+
+/* ───────── 시작 ───────── */
+
+export function renderTitle(app: HTMLElement, nav: Nav): void {
+  document.documentElement.classList.add('on-title');
+  const enter = button('들어가기', 'btn primary big', () => nav.go('lobby'));
+  app.replaceChildren(
+    el(
+      'section',
+      { class: 'title' },
+      el('h1', {}, '결'),
+      el('p', { class: 'sub' }, '적의 공격에는 결이 있다. 결을 읽고, 받아치고, 되돌아오는 틈을 벤다.'),
+      el('div', { class: 'title-actions' }, enter, button('설정', 'btn', () => nav.settings())),
+      el('p', { class: 'proto' }, 'Enter로 들어간다'),
+    ),
+  );
+  setKeys((e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      nav.go('lobby');
+    }
+  });
+  enter.focus();
+}
+
+/* ───────── 로비: 운곡루 뒤뜰 ───────── */
+
+const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rhythm: 'tech', practice: 'focus', records: 'dodge', settings: 'back' };
+
+export function renderLobby(app: HTMLElement, nav: Nav): void {
+  document.documentElement.classList.remove('on-title');
+  const save = loadSave();
+  let line = Math.floor(Date.now() / 1000) % lobby.wang.length;
+  const say = el('p', { class: 'lobby-say' }, lobby.wang[line]);
+  const wang = el('button', { class: 'lobby-wang', type: 'button', 'aria-label': '왕일검에게 말 걸기' }, el('img', { src: portrait('wang_stand') ?? '', alt: '' }), say);
+  wang.addEventListener('click', () => {
+    line = (line + 1) % lobby.wang.length;
+    say.textContent = lobby.wang[line];
+    say.classList.remove('pop');
+    void say.offsetWidth;
+    say.classList.add('pop');
+  });
+  const go = (id: string) => {
+    sfx('click');
+    if (id === 'settings') nav.settings();
+    else if (id !== 'story') nav.go(id as Screen);
+  };
+  const items = lobby.menu.map((m, i) => {
+    const locked = !!m.locked;
+    // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = lobby.json menu 순서)이 오면 이름 왼쪽에
+    const icon = realArt('icons_gyeol_menu', i + 1);
+    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
+    return el('li', { class: locked ? 'locked' : '' }, b, el('small', { id: `note-${m.id}` }, locked ? `🔒 ${m.locked}` : m.note));
+  });
+  const st = save.stats;
+  app.replaceChildren(
+    el(
+      'section',
+      { class: 'lobby' },
+      el('div', { class: 'lobby-scene' }, el('img', { class: 'lobby-haun', src: portrait('haun_sword_stand') ?? '', alt: '진하운' }), wang),
+      el('header', { class: 'lobby-head' }, el('h1', {}, '결'), el('p', {}, '운곡루 뒤뜰 · 밤')),
+      el('ol', { class: 'lobby-menu' }, ...items),
+      el('footer', { class: 'lobby-foot' }, st.duels ? `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}` : '처음 왔구나. 수련장에서 손부터 풀어 보아라.'),
+    ),
+  );
+  setKeys((e) => {
+    const n = Number(e.key);
+    if (n >= 1 && n <= lobby.menu.length && !lobby.menu[n - 1].locked) go(lobby.menu[n - 1].id);
+    else if (e.key === 'Escape') nav.go('title');
+  });
+  (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
+}
+
+/* ───────── 결투장 ───────── */
+
+let arenaDifficulty = 'main';
+
+export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const save = loadSave();
+  const diffs = data.difficulties ?? [];
+  const seg = el('div', { class: 'seg', role: 'radiogroup', 'aria-label': '난이도' });
+  const draw = () => {
+    seg.replaceChildren(
+      ...diffs.map((d) => {
+        const b = button([el('b', {}, d.name), el('small', {}, d.note)], `seg-btn${d.id === arenaDifficulty ? ' on' : ''}`, () => {
+          arenaDifficulty = d.id;
+          draw();
+        }, { role: 'radio', 'aria-checked': String(d.id === arenaDifficulty) });
+        return b;
+      }),
+    );
+    grid.replaceChildren(
+      ...duelFoes(data).map((f) => {
+        const img = frameUrl(`${f.sprite}_idle`, 1);
+        const tags = elementsOf(f).map((e) => el('span', { class: `tag el-${e}` }, ELEMENT_NAME[e]));
+        const best = el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell', title: `${d.name} 최고 등급` }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`]))));
+        return el(
+          'article',
+          { class: 'foe-card' },
+          img ? el('img', { src: img, alt: '' }) : '',
+          el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, f.note)),
+          best,
+          el('div', { class: 'foe-actions' }, button('대결', 'btn primary', () => nav.play(f, 'duel', { difficulty: arenaDifficulty, back: 'arena' }))),
+        );
+      }),
+    );
+  };
+  const grid = el('div', { class: 'foes' });
+  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 EXCELLENT가 많을수록 높은 등급.'), seg, grid, helpBox()));
+  draw();
+  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+}
+
+function helpBox(): HTMLElement {
+  return el(
+    'details',
+    { class: 'help' },
+    el('summary', {}, '조작과 규칙'),
+    el('p', {}, el('kbd', {}, 'K'), '·', el('kbd', {}, 'Space'), ' 받기 — 좁혀 드는 고리가 과녁 고리와 겹칠 때(금빛) 누르면 패링. 이르면 막기.'),
+    el('p', {}, el('kbd', {}, 'L'), '·', el('kbd', {}, 'Shift'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(危)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
+    el('p', {}, el('kbd', {}, 'J'), '·화면 클릭 베기 — 패링·간파 뒤 적에게 금이 보이는 동안 베면 반격(3배). 적 체간이 가득 차면 결정타.'),
+    el('p', {}, el('kbd', {}, 'I'), ' 기술 — 결 연환(끊기지 않고 받은 수)이 차면 열린다. ', el('kbd', {}, 'U'), ' 집중 — 게이지가 차면 시간이 느려지고 결이 처음부터 보인다.'),
+    el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
+    el('p', {}, '원소: ', el('span', { class: 'tag el-fire' }, '화염'), ' 받아도 화상 · ', el('span', { class: 'tag el-ice' }, '냉기'), ' 느리다 마지막에 빨라진다 · ', el('span', { class: 'tag el-lightning' }, '번개'), ' 박자가 튄다.'),
+    el('p', {}, '겨루기: 적이 치는 순간에 맞춰 한 번 베면 칼끼리 맞부딪힌다 — J·K 연타로 밀어낸다. 체력 20% 아래면 배수의 진(EXCELLENT 폭이 넓어진다).'),
+  );
+}
+
+/* ───────── 박자 도전 ───────── */
+
+export function renderRhythm(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const save = loadSave();
+  const cards = duelFoes(data)
+    .filter((f) => f.chart)
+    .map((f) => {
+      const img = frameUrl(`${f.sprite}_idle`, 1);
+      const b = save.rhythmBest[f.id];
+      return el(
+        'article',
+        { class: 'foe-card' },
+        img ? el('img', { src: img, alt: '' }) : '',
+        el('div', { class: 'foe-text' }, el('b', {}, f.chart!.title), el('small', {}, `${f.title} · ${f.chart!.steps.length}박`)),
+        el('div', { class: 'best-row' }, el('span', { class: 'best-cell' }, el('small', {}, '최고'), rankBadge(b?.rank)), el('small', { class: 'best' }, b ? `정확도 ${Math.round(b.accuracy * 100)}%` : '아직 없음')),
+        el('div', { class: 'foe-actions' }, button('도전', 'btn primary', () => nav.play(f, 'rhythm', { back: 'rhythm' }))),
+      );
+    });
+  app.replaceChildren(el('section', { class: 'screen' }, header('박자 도전', nav, '정해진 악보대로 오는 결을 받아 낸다. 베기는 없다 — 받기와 피하기로 정확도를 겨룬다.'), el('div', { class: 'foes' }, ...cards)));
+  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+}
+
+/* ───────── 수련장 ───────── */
+
+export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const dummy = data.foes.find((f) => f.practice);
+  const save = loadSave();
+  const drills = (dummy?.drills ?? []).map((dr, i) =>
+    el(
+      'li',
+      {},
+      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' })),
+      el('small', {}, dr.note),
+    ),
+  );
+  const off = save.settings.inputOffset;
+  app.replaceChildren(
+    el(
+      'section',
+      { class: 'screen practice' },
+      header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다. 화면 아래 막대에 누른 시점이 찍힌다.'),
+      el('div', { class: 'practice-grid' }, el('ol', { class: 'lobby-menu drills' }, ...drills), el('aside', { class: 'calib-card' }, el('h2', {}, '박자 맞추기'), el('p', {}, '박자에 맞춰 열두 번 눌러, 손과 화면·소리의 지연을 잰다. 잰 값을 판정 보정으로 쓸 수 있다.'), el('p', { class: 'now' }, `지금 판정 보정 ${off > 0 ? '+' : ''}${off}ms`), button('재기', 'btn primary', () => nav.go('calibrate')))),
+    ),
+  );
+  setKeys((e) => {
+    const n = Number(e.key);
+    const dr = dummy?.drills?.[n - 1];
+    if (dr && dummy) nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' });
+    else if (e.key === 'Escape') nav.go('lobby');
+  });
+}
+
+/* ───────── 박자 맞추기(입력 지연 재기) ───────── */
+
+const CAL_BEAT = 750;
+const CAL_LEAD = 4;
+const CAL_COUNT = 12;
+
+export function renderCalibrate(app: HTMLElement, nav: Nav): void {
+  const ring = el('div', { class: 'cal-ring' });
+  const count = el('p', { class: 'cal-count' }, 'Space·K·클릭으로 박자에 맞춰 누른다');
+  const result = el('div', { class: 'cal-result' });
+  const start = button('시작', 'btn primary', () => run());
+  const stage = el('div', { class: 'cal-stage' }, ring, count);
+  app.replaceChildren(el('section', { class: 'screen calibrate' }, header('박자 맞추기', nav, `첫 ${CAL_LEAD}박은 듣기만 하고, 다음 ${CAL_COUNT}박에 맞춰 누른다.`), stage, el('div', { class: 'row' }, start, button('수련장으로', 'btn', () => nav.go('practice'))), result));
+  let timers: number[] = [];
+  let beats: number[] = [];
+  let presses: number[] = [];
+  let running = false;
+  const tap = (stamp: number) => {
+    if (!running) return;
+    presses.push(stamp);
+    ring.classList.remove('tap');
+    void ring.offsetWidth;
+    ring.classList.add('tap');
+  };
+  stage.addEventListener('pointerdown', (e) => tap(e.timeStamp));
+  const run = () => {
+    timers.forEach((t) => clearTimeout(t));
+    timers = [];
+    beats = [];
+    presses = [];
+    running = true;
+    result.replaceChildren();
+    start.disabled = true;
+    const t0 = performance.now() + 600;
+    for (let i = 0; i < CAL_LEAD + CAL_COUNT; i++) {
+      const at = t0 + i * CAL_BEAT;
+      if (i >= CAL_LEAD) beats.push(at);
+      timers.push(
+        window.setTimeout(() => {
+          sfx(i < CAL_LEAD ? 'click' : 'snap', { volume: 0.9 });
+          ring.classList.remove('beat');
+          void ring.offsetWidth;
+          ring.classList.add('beat');
+          count.textContent = i < CAL_LEAD ? `듣기 ${i + 1} / ${CAL_LEAD}` : `누르기 ${i - CAL_LEAD + 1} / ${CAL_COUNT}`;
+        }, Math.max(0, at - performance.now())),
+      );
+    }
+    timers.push(window.setTimeout(finish, t0 + (CAL_LEAD + CAL_COUNT) * CAL_BEAT - performance.now()));
+  };
+  const finish = () => {
+    running = false;
+    start.disabled = false;
+    start.textContent = '다시 재기';
+    const r = calibrationOffset(beats, presses.filter((p) => p >= beats[0] - 300));
+    if (!r) {
+      count.textContent = '누른 수가 모자라다. 다시 재 보자.';
+      return;
+    }
+    const v = Math.max(-120, Math.min(120, r.mean));
+    count.textContent = r.mean >= 0 ? `평균 ${r.mean}ms 늦게 눌렀다` : `평균 ${-r.mean}ms 일찍 눌렀다`;
+    const apply = button(`판정 보정 ${v > 0 ? '+' : ''}${v}ms로 쓰기`, 'btn primary', () => {
+      const save = loadSave();
+      save.settings.inputOffset = v;
+      writeSave(save);
+      apply.disabled = true;
+      apply.textContent = '저장했다';
+    });
+    result.replaceChildren(el('p', {}, `쓴 박 ${r.used} · 흔들림 ±${r.spread}ms${r.spread > 60 ? ' — 고르지 않다. 한 번 더 재면 좋다' : ''}`), apply);
+  };
+  setKeys((e) => {
+    if (e.repeat) return;
+    if (e.key === ' ' || e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      tap(e.timeStamp);
+    } else if (e.key === 'Escape') {
+      timers.forEach((t) => clearTimeout(t));
+      nav.go('practice');
+    }
+  });
+}
+
+/* ───────── 기록 ───────── */
+
+function techCondition(t: TechDef): string {
+  return t.pure ? `EXCELLENT만 ${t.chain}연속` : `GOOD 이상 ${t.chain}연속`;
+}
+
+export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const save = loadSave();
+  const diffs = data.difficulties ?? [];
+  const foes = duelFoes(data).map((f) => {
+    const seen = save.seen.includes(f.id);
+    const img = frameUrl(`${f.sprite}_idle`, 1);
+    return el(
+      'article',
+      { class: `codex-card${seen ? '' : ' unseen'}` },
+      img ? el('img', { src: img, alt: '' }) : '',
+      el('b', {}, seen ? f.title : '???'),
+      el('small', {}, seen ? f.note : '아직 겨뤄 보지 않았다.'),
+      seen && f.finisher ? el('small', { class: 'fin' }, `결정타 「${f.finisher.hanja}」 ${f.finisher.name}`) : '',
+      el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell' }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`])))),
+    );
+  });
+  const techs = data.techs.map((t) => {
+    const cg = realArt(`cg_gyeol_tech_${t.id}`);
+    return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', { class: 'hanja' }, t.hanja), el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
+  });
+  const st = save.stats;
+  const min = Math.round(st.playMs / 60000);
+  const rows: [string, string][] = [
+    ['대결', `${st.duels}번 · 이김 ${st.wins}`],
+    ['패링', `${st.parries}번 · EXCELLENT ${st.excellent}`],
+    ['결정타', `${st.deathblows}번`],
+    ['기술', `${st.techs}번`],
+    ['겨루기 승리', `${st.clashWins}번`],
+    ['최대 연속 박자', `${st.maxStreak}`],
+    ['대결 시간', `${min}분`],
+  ];
+  app.replaceChildren(
+    el(
+      'section',
+      { class: 'screen records' },
+      header('기록', nav),
+      el('h2', {}, '상대 도감'),
+      el('div', { class: 'codex-grid' }, ...foes),
+      el('h2', {}, '진하운의 기술'),
+      el('div', { class: 'tech-grid' }, ...techs),
+      el('h2', {}, '쌓인 기록'),
+      el('dl', { class: 'stats' }, ...rows.flatMap(([k, v]) => [el('dt', {}, k), el('dd', {}, v)])),
+    ),
+  );
+  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+}

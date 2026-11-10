@@ -1,0 +1,14 @@
+id: icons_gyeol_menu
+type: icon-sheet
+summary: "「결」 로비 메뉴 아이콘 6종(2026-11-10) — 메뉴 판의 이름 왼쪽에 얹는다. 글자 없이 모양으로 구분한다"
+# 칸 번호 = gyeol/data/lobby.json menu 순서(이야기·결투장·박자 도전·수련장·기록·설정)
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: "story — a half-unrolled old paper handscroll with wooden rollers and a red tie"
+  2: "arena — two straight swords crossed in an X over a small round stone dais"
+  3: "rhythm challenge — a small round hand drum with a red rim and two drumsticks crossed above it"
+  4: "practice yard — a black iron-wood training dummy post with three short wooden arms on a stone base"
+  5: "records — a closed bound book with a dark blue cover and a gold corner, a ribbon bookmark hanging out"
+  6: "settings — a writing brush lying on an ink stone with a small pool of black ink"
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

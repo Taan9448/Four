@@ -24,16 +24,35 @@ export interface SaveData {
   rhythmBest: Record<string, { accuracy: number; rank: string }>;
   /** 이야기 진행(7-2): 깬 장·별 — 3단계에서 채운다 */
   story: { cleared: string[]; stars: Record<string, number> };
-  /** 상대별 최고 대결 등급 — 2단계에서 채운다 */
+  /** 상대·난이도별 최고 대결 등급(`<상대 id>:<난이도 id>` → S·A·B·C) */
   duelBest: Record<string, string>;
+  /** 쌓인 기록(기록 화면) */
+  stats: Stats;
+  /** 한 번이라도 겨뤄 본 상대(도감에서 그림·설명을 보인다) */
+  seen: string[];
 }
+
+export interface Stats {
+  duels: number;
+  wins: number;
+  parries: number;
+  excellent: number;
+  deathblows: number;
+  techs: number;
+  clashWins: number;
+  maxStreak: number;
+  /** 대결 시계 합(ms) */
+  playMs: number;
+}
+
+export const emptyStats = (): Stats => ({ duels: 0, wins: 0, parries: 0, excellent: 0, deathblows: 0, techs: 0, clashWins: 0, maxStreak: 0, playMs: 0 });
 
 export const KEY = 'gyeol.save';
 const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto' });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {} }, duelBest: {} });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {} }, duelBest: {}, stats: emptyStats(), seen: [] });
 
 interface Store {
   getItem(k: string): string | null;
@@ -69,6 +88,12 @@ export function normalize(raw: unknown): SaveData {
   if (r.rhythmBest && typeof r.rhythmBest === 'object') s.rhythmBest = { ...r.rhythmBest };
   if (r.story && Array.isArray(r.story.cleared)) s.story = { cleared: [...r.story.cleared], stars: { ...(r.story.stars ?? {}) } };
   if (r.duelBest && typeof r.duelBest === 'object') s.duelBest = { ...r.duelBest };
+  if (r.stats && typeof r.stats === 'object') {
+    const base = emptyStats();
+    for (const k of Object.keys(base) as (keyof Stats)[]) base[k] = clamp(r.stats[k], 0, Number.MAX_SAFE_INTEGER, 0);
+    s.stats = base;
+  }
+  if (Array.isArray(r.seen)) s.seen = r.seen.filter((x): x is string => typeof x === 'string');
   return s;
 }
 

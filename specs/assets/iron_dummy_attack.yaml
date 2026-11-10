@@ -1,0 +1,19 @@
+id: iron_dummy_attack
+type: character-anim
+size: large
+character: iron_dummy
+chroma: magenta
+summary: "철목인 치기 6프레임 — 「결」 수련장·서장 튜토리얼 상대(2026-11-10). 사람이 아니라 나무 기둥이 돌며 나무 팔로 친다"
+depends_on: [iron_dummy_ref]
+reference: assets/source/iron_dummy_ref.png
+facing: left
+events: { hit: 4 }
+bbox_tolerance: 0.2
+frame_notes:
+  1: "the dummy stands still, its three wooden arms at rest"
+  2: "the whole post twists back to the right on its stone base, the upper arm cocked back, a little dust at the base"
+  3: "it starts to spin back to the left, the upper arm swinging around in a wide arc"
+  4: "impact: the upper wooden arm whips fully out to the left at chest height, a short white motion streak behind it"
+  5: "the post keeps turning a little past, arms wobbling"
+  6: "settles back to the rest pose, a faint dust puff at the base"
+placeholder: { shape: object, color: '#4a4038', accent: '#8a90a3' }
