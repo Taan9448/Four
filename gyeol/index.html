@@ -7,9 +7,18 @@
     <title>결 — 손맛 시제품</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 제목 決(먹 붓글씨): 쓰는 글자만 받는다 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E6%B1%BA&display=block" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Song+Myung&family=Nanum+Myeongjo:wght@400;800&family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap" />
   </head>
   <body>
+    <!-- 먹 번짐: 글자 가장자리를 붓 자국처럼 거칠게(.ink-han) -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="ink-bleed" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
     <main id="app"></main>
     <script type="module" src="./src/main.ts"></script>
   </body>

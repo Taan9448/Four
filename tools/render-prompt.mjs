@@ -239,7 +239,7 @@ export function renderPrompt(spec, style) {
           ? `Each cell is its own close-up panel, like three comic panels side by side: the figure is too big to fit, so the shoulders and arms run off the LEFT and RIGHT sides of the panel and are cut off by a straight vertical line 16 px inside the cell border. Leave that 16 px strip of plain ${key.name} at both sides of every cell, top to bottom, so nothing touches or crosses into the neighbouring cell.\n`
           : `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n`) +
         `${frameLines}\n` +
-        `Style: ${style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
+        `Style: ${spec.style ?? style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
         `Never use ${key.name}, pink or purple on the character.\n` +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
       );

@@ -1,0 +1,24 @@
+id: haun_gyeol_stand
+type: character-standing
+character: haun_sword
+summary: "「결」 로비의 진하운(2026-11-10 다시 그림) — 카드 게임 반신 그림 대신, 운곡루 뒤뜰 밤 배경(bg_gyeol_lobby)과 같은 붓맛·달빛으로 무릎 위까지"
+depends_on: [haun_ref]
+reference: assets/sprites/haun_sword_stand/frame_01.png
+frame_notes:
+  1: "calm — standing relaxed, weight on one leg, body turned a little toward the viewer; the plain sword in its black scabbard held loosely in the left hand down at his side; the right hand empty and relaxed; quiet, slightly distant eyes looking toward the right; lips closed; a faint cool moonlight edge on his hair and left shoulder"
+  2: "ready — the same stance and size, but the right hand now rests on the crude plain grip of the sheathed sword at the left hip, thumb pushing the guard a finger's width out of the scabbard; eyes sharpened and focused forward to the right; jaw set; the bangs stirred by a small wind"
+  3: "listening — the same stance and size, head tilted slightly toward the right as if an old man beside him just said something; eyebrows a little raised, a very small reluctant smile; the sword held loosely in the left hand again"
+framing: >-
+  Three-quarter figure from the top of the head down to just below the knees, standing upright, body turned slightly
+  toward the viewer and toward the RIGHT side of the cell (he looks at an old master who sits to his right). The top of
+  the head is about 50 px below the top of the cell; the figure is cut off cleanly by the bottom edge of the cell just
+  below the knees. Shoulders about 300 px wide. The scabbard and hands stay inside the cell. Head size and position are
+  exactly the same in all three cells.
+style: >-
+  calm hand-drawn anime feature-film character painted to sit naturally inside a soft watercolor night background:
+  gentle, slightly textured brush-like line art in dark warm grey (not black, not thick), soft painterly shading with
+  two or three tones instead of hard cel blocks, muted desaturated night colors (grey-blue cloth, cool skin shadows),
+  cool blue moonlight rim light from the upper left and a very faint warm orange lantern glow on the right edge of the
+  figure; quiet, grounded, realistic adult proportions; no bandages on the forearms (only a little cloth wrapped around
+  the palms); no glow aura, no sparkles
+placeholder: { color: '#8a90a3', accent: '#9fc4ff' }

@@ -39,5 +39,20 @@
       "name": "설정",
       "note": "소리 · 흔들림 · 판정 보정 · 화면 품질"
     }
-  ]
+  ],
+  "account": {
+    "$comment": "계정·수련(2026-11-10 목업): 「천외귀환」과 같은 로그인 판(로그인·회원가입·게스트)과 시작 화면 왼쪽 아래 명패. 지금은 서버에 닿지 않는 목업이다(mock). 수련 Lv.은 이 기기 기록으로 셈한다: 경험치 = 이김×win + PERFECT×perfect + 마친 장×chapter, 다음 레벨까지 base + step×(레벨−1).",
+    "mock": true,
+    "training": {
+      "xp": {
+        "win": 20,
+        "perfect": 1,
+        "chapter": 60
+      },
+      "need": {
+        "base": 120,
+        "step": 60
+      }
+    }
+  }
 }
