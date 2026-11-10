@@ -1,0 +1,22 @@
+id: wang_gyeol_stand
+type: character-standing
+character: wang
+summary: "「결」 로비의 왕일검(2026-11-10 다시 그림) — 바퀴 달린 나무 의자에 앉은 온몸, 운곡루 뒤뜰 밤 배경과 같은 붓맛·등불빛"
+reference: assets/sprites/wang_stand/frame_01.png
+frame_notes:
+  1: "kind — sitting back in the wooden wheelchair, the blanket flat over his lap below the knees, both hands resting on the armrests; a small steaming clay teacup on the right armrest; hazy, gentle half-closed eyes and a kind, sleepy smile; looking toward the LEFT (toward the young swordsman)"
+  2: "teaching — the same chair, size and position; leaning slightly forward, mouth open in mid-sentence, the right hand raised with the index finger lifted as if explaining something simple; the left hand on the armrest; eyes still gentle; looking toward the LEFT"
+  3: "sharp — the same chair, size and position; the hazy eyes suddenly clear and sharp as a blade, eyebrows lowered, a thin dry smile; a plain short wooden practice sword now lying across the blanket on his lap under his right hand; looking toward the LEFT"
+framing: >-
+  The whole figure AND the whole wheelchair, from the top of his head down to the bottoms of the wheels resting on the
+  ground, seen from slightly to the right so the chair faces a little toward the LEFT. The old man is small and bent;
+  the chair with its two large wooden cart wheels fills about 80% of the cell width; the bottoms of the wheels are about
+  60 px above the bottom edge of the cell; the top of his head is in the upper half of the cell (the empty space above him
+  is plain background). Chair, wheels and figure are exactly the same size and position in all three cells.
+style: >-
+  calm hand-drawn anime feature-film character painted to sit naturally inside a soft watercolor night background:
+  gentle, slightly textured brush-like line art in dark warm grey (not black, not thick), soft painterly shading with
+  two or three tones instead of hard cel blocks, muted desaturated night colors (worn grey-brown robe, weathered wood),
+  a warm orange paper-lantern glow from the right on his face, hands and the chair, and a faint cool blue moonlight
+  edge from the upper left on his white hair; quiet, grounded, realistic proportions; no glow aura, no sparkles
+placeholder: { color: '#6e5440', accent: '#e0cfae' }

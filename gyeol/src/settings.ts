@@ -1,4 +1,5 @@
 // 「결」 설정 창(2026-11-09, 7-4절 8): 소리·흔들림·번쩍임·판정 보정·화면 품질. 바꾸는 즉시 저장하고 onChange로 반영한다.
+import { accountRows } from './account';
 import { loadSave, writeSave, type Quality, type Settings } from './save';
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, ...kids: (Node | string)[]): HTMLElementTagNameMap[K] {
@@ -54,6 +55,11 @@ export function openSettings(onChange: () => void): void {
       'div',
       { class: 'settings-box' },
       h('h2', {}, '설정'),
+      // 계정(2026-11-10 목업): 로그인 판 또는 아이디·동기화·로그아웃
+      accountRows(() => {
+        shut();
+        openSettings(onChange);
+      }),
       slider('전체 소리', 'master'),
       slider('배경 음악', 'bgm'),
       slider('효과음', 'sfx'),

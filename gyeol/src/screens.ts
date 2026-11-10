@@ -3,6 +3,7 @@
 import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
+import { accountState, loginPanel, playerPlate } from './account';
 import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
@@ -66,24 +67,34 @@ function header(title: string, nav: Nav, sub?: string): HTMLElement {
 
 export function renderTitle(app: HTMLElement, nav: Nav): void {
   document.documentElement.classList.add('on-title');
+  const redraw = () => renderTitle(app, nav);
+  // 「천외귀환」과 같은 흐름(2026-11-10 목업): 이 탭에서 로그인도 게스트도 고르지 않았으면 메뉴 대신 로그인 판
+  const gate = accountState().kind === 'none';
   const enter = button('들어가기', 'btn primary big', () => nav.go('lobby'));
+  const logo = el('h1', { class: 'logo', 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決'));
   app.replaceChildren(
     el(
       'section',
-      { class: 'title' },
-      el('h1', {}, '결'),
+      { class: `title${gate ? ' gated' : ''}` },
+      logo,
+      el('p', { class: 'logo-read', 'aria-hidden': 'true' }, '결'),
       el('p', { class: 'sub' }, '적의 공격에는 결이 있다. 결을 읽고, 받아치고, 되돌아오는 틈을 벤다.'),
-      el('div', { class: 'title-actions' }, enter, button('설정', 'btn', () => nav.settings())),
-      el('p', { class: 'proto' }, 'Enter로 들어간다'),
+      gate
+        ? loginPanel({ onDone: redraw, onGuest: redraw })
+        : el('div', { class: 'title-actions' }, enter, button('설정', 'btn', () => nav.settings())),
+      gate ? '' : el('p', { class: 'proto' }, 'Enter로 들어간다'),
     ),
+    gate ? '' : playerPlate(redraw),
   );
   setKeys((e) => {
+    if (gate) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       nav.go('lobby');
     }
   });
-  enter.focus();
+  if (gate) (app.querySelector('.login-input') as HTMLInputElement | null)?.focus();
+  else enter.focus();
 }
 
 /* ───────── 로비: 운곡루 뒤뜰 ───────── */
@@ -95,13 +106,37 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const save = loadSave();
   let line = Math.floor(Date.now() / 1000) % lobby.wang.length;
   const say = el('p', { class: 'lobby-say' }, lobby.wang[line]);
-  const wang = el('button', { class: 'lobby-wang', type: 'button', 'aria-label': '왕일검에게 말 걸기' }, el('img', { src: portrait('wang_stand') ?? '', alt: '' }), say);
+  // 로비 그림(2026-11-10): Codex 결 전용 그림(haun_gyeol_stand·wang_gyeol_stand)이 오면 그것으로, 그 전에는 「천외귀환」 반신 그림
+  const stand = (id: string, old: string) => (n: number) => realArt(id, n) ?? (n === 1 ? (portrait(old) ?? '') : null);
+  const haunArt = stand('haun_gyeol_stand', 'haun_sword_stand');
+  const wangArt = stand('wang_gyeol_stand', 'wang_stand');
+  const gyeolArt = !!realArt('haun_gyeol_stand');
+  const haunImg = el('img', { class: 'lobby-haun', src: haunArt(1) ?? '', alt: '진하운' });
+  const wangImg = el('img', { src: wangArt(1) ?? '', alt: '' });
+  /** 칸 n으로 잠깐 바꿨다가 돌아온다(그림이 없는 칸이면 그대로) */
+  let back = 0;
+  const pose = (img: HTMLImageElement, art: (n: number) => string | null, n: number, ms = 0) => {
+    const u = art(n);
+    if (!u) return;
+    img.src = u;
+    if (ms) {
+      clearTimeout(back);
+      back = window.setTimeout(() => {
+        haunImg.src = haunArt(1) ?? haunImg.src;
+        wangImg.src = wangArt(1) ?? wangImg.src;
+      }, ms);
+    }
+  };
+  const wang = el('button', { class: 'lobby-wang', type: 'button', 'aria-label': '왕일검에게 말 걸기' }, wangImg, say);
   wang.addEventListener('click', () => {
     line = (line + 1) % lobby.wang.length;
     say.textContent = lobby.wang[line];
     say.classList.remove('pop');
     void say.offsetWidth;
     say.classList.add('pop');
+    // 왕일검은 가르치고, 하운은 듣는다
+    pose(wangImg, wangArt, 2, 2600);
+    pose(haunImg, haunArt, 3, 2600);
   });
   const go = (id: string) => {
     sfx('click');
@@ -113,6 +148,15 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = lobby.json menu 순서)이 오면 이름 왼쪽에
     const icon = realArt('icons_gyeol_menu', i + 1);
     const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
+    // 싸우러 가는 메뉴에 손이 가면 하운이 칼자루에 손을 얹는다
+    if (m.id === 'story' || m.id === 'arena') {
+      const ready = () => pose(haunImg, haunArt, 2);
+      const calm = () => pose(haunImg, haunArt, 1);
+      b.addEventListener('pointerenter', ready);
+      b.addEventListener('focus', ready);
+      b.addEventListener('pointerleave', calm);
+      b.addEventListener('blur', calm);
+    }
     return el('li', { class: locked ? 'locked' : '' }, b, el('small', { id: `note-${m.id}` }, locked ? `🔒 ${m.locked}` : m.note));
   });
   const st = save.stats;
@@ -120,8 +164,8 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     el(
       'section',
       { class: 'lobby' },
-      el('div', { class: 'lobby-scene' }, el('img', { class: 'lobby-haun', src: portrait('haun_sword_stand') ?? '', alt: '진하운' }), wang),
-      el('header', { class: 'lobby-head' }, el('h1', {}, '결'), el('p', {}, '운곡루 뒤뜰 · 밤')),
+      el('div', { class: `lobby-scene${gyeolArt ? ' gyeol-art' : ''}` }, haunImg, wang),
+      el('header', { class: 'lobby-head' }, el('h1', { 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')), el('p', {}, '운곡루 뒤뜰 · 밤')),
       el('ol', { class: 'lobby-menu' }, ...items),
       el('footer', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
     ),

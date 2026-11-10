@@ -154,13 +154,19 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   let quality = currentQuality();
   const fitCanvas = () => {
     setRenderQuality(quality);
-    const k = quality === 'high' ? Math.min(2, Math.max(1, Math.round(((window.devicePixelRatio || 1) * canvas.clientWidth) / W * 2) / 2)) : 1;
+    // 보통도 큰 화면(PC 전체 높이로 키운 전투 화면)에서는 1.5배까지 — 글자·판정 표시가 뭉개지지 않게
+    const want = ((window.devicePixelRatio || 1) * canvas.clientWidth) / W;
+    const k = quality === 'high' ? Math.min(2, Math.max(1, Math.round(want * 2) / 2)) : quality === 'normal' && want >= 1.4 ? 1.5 : 1;
     if (canvas.width !== W * k) {
       canvas.width = W * k;
       canvas.height = H * k;
     }
+    // 화면 위 글·이름판(HUD)도 캔버스가 960px보다 커진 만큼 키운다(PC 전체 화면)
+    if (canvas.clientWidth) canvas.parentElement?.style.setProperty('--ui', (canvas.clientWidth / W).toFixed(3));
   };
   fitCanvas();
+  const resizeObs = new ResizeObserver(() => fitCanvas());
+  resizeObs.observe(canvas);
   const fx: Fx = emptyFx();
   fx.weather = createWeather(foeDef.weather);
   if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
@@ -823,6 +829,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     alive = false;
     cancelAnimationFrame(raf);
     window.removeEventListener('keydown', onKey);
+    resizeObs.disconnect();
     void wake?.release().catch(() => undefined);
     stopLoop = null;
   };
