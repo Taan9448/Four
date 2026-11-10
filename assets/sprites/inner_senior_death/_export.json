@@ -1,0 +1,71 @@
+{
+  "method": "integer Y translation only, no resize or resampling",
+  "frames": [
+    {
+      "frame": 1,
+      "translate": [
+        0,
+        0
+      ],
+      "bottomBefore": 143,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 3894,
+      "visiblePixelsAfter": 3894
+    },
+    {
+      "frame": 2,
+      "translate": [
+        0,
+        0
+      ],
+      "bottomBefore": 143,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 3259,
+      "visiblePixelsAfter": 3259
+    },
+    {
+      "frame": 3,
+      "translate": [
+        0,
+        0
+      ],
+      "bottomBefore": 143,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 3562,
+      "visiblePixelsAfter": 3562
+    },
+    {
+      "frame": 4,
+      "translate": [
+        0,
+        3
+      ],
+      "bottomBefore": 140,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 3018,
+      "visiblePixelsAfter": 3018
+    },
+    {
+      "frame": 5,
+      "translate": [
+        0,
+        0
+      ],
+      "bottomBefore": 143,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 2699,
+      "visiblePixelsAfter": 2699
+    },
+    {
+      "frame": 6,
+      "translate": [
+        0,
+        1
+      ],
+      "bottomBefore": 142,
+      "bottomAfter": 143,
+      "visiblePixelsBefore": 2702,
+      "visiblePixelsAfter": 2702
+    }
+  ]
+}
