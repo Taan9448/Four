@@ -721,3 +721,78 @@ export function drawFocus(ctx: CanvasRenderingContext2D, d: Duel, now: number): 
   ctx.fillText('심안(心眼)', W / 2, H - 22);
   ctx.restore();
 }
+
+/* ───────────── 수련장 판정 폭 막대(2026-11-10) ───────────── */
+
+export interface PracticeMark {
+  /** 타격 몇 ms 전에 눌렀나(null: 누르지 않았거나 너무 이르다) */
+  lead: number | null;
+  kind: 'excellent' | 'great' | 'good' | 'miss';
+  born: number;
+}
+
+const MARK_COLOR: Record<PracticeMark['kind'], string> = { excellent: '#ffe08a', great: '#ffb24a', good: '#8fc0ff', miss: '#ff6a5a' };
+
+/**
+ * 화면 아래 가운데: 오른쪽 끝이 타격 순간, 왼쪽으로 갈수록 이르다. 막기(파랑)·GREAT(주황)·EXCELLENT(금) 폭과
+ * 최근 누른 자리(점), 평균 시점을 보인다. 폭은 지금 규칙(난이도 포함)을 그대로 쓴다.
+ */
+export function drawPracticeBar(ctx: CanvasRenderingContext2D, rules: { perfect: number; excellent: number; guard: number }, p: { marks: PracticeMark[]; drill: string }, now: number): void {
+  const span = Math.max(rules.guard + 80, 500);
+  // 왼쪽 아래 하운 이름 판·체력 막대를 비켜 조금 오른쪽에
+  const w = 400;
+  const x1 = W / 2 + 40 + w / 2;
+  const x0 = x1 - w;
+  const y = H - 44;
+  const xAt = (lead: number) => x1 - (Math.min(span, Math.max(0, lead)) / span) * w;
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(x0 - 8, y - 22, w + 46, 50);
+  const band = (from: number, to: number, color: string) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(xAt(to), y - 6, xAt(from) - xAt(to), 12);
+  };
+  band(rules.perfect, rules.guard, 'rgba(110,160,230,0.55)');
+  band(rules.excellent, rules.perfect, 'rgba(255,170,70,0.75)');
+  band(0, rules.excellent, 'rgba(255,224,138,0.95)');
+  // 타격 순간
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x1, y - 12, 2, 24);
+  ctx.font = '700 12px "IBM Plex Sans KR", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(230,236,255,0.85)';
+  ctx.fillText('막기', (xAt(rules.guard) + xAt(rules.perfect)) / 2, y + 22);
+  ctx.fillText('GREAT', (xAt(rules.perfect) + xAt(rules.excellent)) / 2, y + 22);
+  ctx.fillText('EXC', (xAt(rules.excellent) + x1) / 2, y + 22);
+  ctx.fillText('타격', x1, y - 14);
+  // 누른 자리: 최근 것일수록 진하다, 막 찍힌 것은 크게
+  const n = p.marks.length;
+  p.marks.forEach((m, i) => {
+    const age = (now - m.born) / 1000;
+    const alpha = 0.25 + 0.75 * ((i + 1) / n);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = MARK_COLOR[m.kind];
+    if (m.lead === null) {
+      // 누르지 않았거나(늦음) 너무 이르다: 막대 오른쪽 밖에 ×
+      ctx.font = '900 16px sans-serif';
+      ctx.fillText('×', x1 + 18, y + 6);
+    } else {
+      const r = age < 0.25 ? 7 - age * 12 : 4;
+      ctx.beginPath();
+      ctx.arc(xAt(m.lead), y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+  ctx.globalAlpha = 1;
+  const leads = p.marks.filter((m) => m.lead !== null).slice(-8).map((m) => m.lead!);
+  ctx.textAlign = 'left';
+  ctx.font = '700 14px "Nanum Myeongjo", serif';
+  ctx.fillStyle = '#f2ead8';
+  ctx.fillText(`수련: ${p.drill}`, x0 - 4, y - 30);
+  if (leads.length) {
+    const avg = Math.round(leads.reduce((a, b) => a + b, 0) / leads.length);
+    ctx.textAlign = 'right';
+    ctx.fillText(`평균 타격 ${avg}ms 전에 눌렀다`, x1 + 36, y - 30);
+  }
+  ctx.restore();
+}

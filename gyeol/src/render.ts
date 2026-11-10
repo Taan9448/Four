@@ -4,7 +4,7 @@
 // 오기 전에는 코드로 그린 대체 연출을 쓴다(임시 상자 그림은 쓰지 않는다).
 import { loadSprite, type SpriteAsset } from '../../src/render/assets';
 import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element } from './duel';
-import { clashShift, drawBubbles, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
+import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
 import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W } from './layout';
 export { CONTACT, FOE_X, H, PLAYER_X, W } from './layout';
@@ -34,7 +34,7 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
     pp: real(`${playerPrefix}_parry`),
     pd: real(`${playerPrefix}_dodge`),
     fi: loadSprite(`${foePrefix}_idle`),
-    fa: loadSprite(`${foePrefix}_attack`),
+    fa: real(`${foePrefix}_attack`),
     fh: loadSprite(`${foePrefix}_hit`),
     bg: loadSprite(bg),
   };
@@ -109,6 +109,8 @@ export interface Fx {
   crisisBeat: number;
   /** 캔버스가 화면에 줄여 보이는 비율(W / 보이는 너비) */
   uiScale: number;
+  /** 수련장: 최근 누른 시점(타격 몇 ms 전, null이면 누르지 않음)과 판정 — 화면 아래 판정 폭 막대 */
+  practice?: { marks: PracticeMark[]; drill: string };
 }
 
 export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, pure: true }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
@@ -307,6 +309,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawBanner(ctx, fx, now);
   drawClashBar(ctx, d, now);
   drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale);
+  if (fx.practice) drawPracticeBar(ctx, d.data.rules, fx.practice, now);
   drawFinisherName(ctx, fx.finisher, now);
   if (fx.finale) {
     const k = Math.min(1, (now - fx.finale.born) / 500);
@@ -475,6 +478,12 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
     // 겨루기: 타격 칸에서 칼을 맞대고 떤다
     const hit = sp.foe.attack.meta.events.hit ?? Math.ceil(sp.foe.attack.meta.frames / 2);
     drawSprite(ctx, sp.foe.attack, hit, FOE_X - 40 + (foeScale - 1) * 60 + clashShift(d) + Math.cos(t * 0.09) * 2);
+  } else if ((f.state === 'windup' || f.state === 'recover') && !sp.foe.attack && sp.foe.idle && move) {
+    // 공격 그림이 없는 상대(철목인, Codex iron_dummy_attack 전): 대기 그림을 뒤로 당겼다가 앞으로 내민다
+    const fakeSpan = (f.fakeAt ?? f.hitAt) - f.stateStart;
+    const k = f.state === 'windup' ? Math.min(1, (t - f.stateStart) / Math.max(1, fakeSpan)) : 1 - Math.min(1, (t - f.stateStart) / Math.max(1, move.recover));
+    const pull = f.state === 'windup' ? (k < 0.75 ? (k / 0.75) * 24 : 24 - ((k - 0.75) / 0.25) * 84) : -60 * k;
+    drawSprite(ctx, sp.foe.idle, 1, FOE_X + pull, { tint, rot: f.state === 'windup' && k > 0.75 ? -0.12 : 0 });
   } else if (f.state === 'windup' && sp.foe.attack && move) {
     // 속임수: 가짜 순간까지 들어 올렸다가, 끌어 두는 동안 타격 직전 칸에 멈춰 떤다
     const fakeSpan = (f.fakeAt ?? f.hitAt) - f.stateStart;
