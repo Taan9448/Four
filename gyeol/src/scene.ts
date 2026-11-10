@@ -727,17 +727,17 @@ export function drawFocus(ctx: CanvasRenderingContext2D, d: Duel, now: number): 
 export interface PracticeMark {
   /** 타격 몇 ms 전에 눌렀나(null: 누르지 않았거나 너무 이르다) */
   lead: number | null;
-  kind: 'excellent' | 'great' | 'good' | 'miss';
+  kind: 'perfect' | 'excellent' | 'good' | 'miss';
   born: number;
 }
 
-const MARK_COLOR: Record<PracticeMark['kind'], string> = { excellent: '#ffe08a', great: '#ffb24a', good: '#8fc0ff', miss: '#ff6a5a' };
+const MARK_COLOR: Record<PracticeMark['kind'], string> = { perfect: '#ffe08a', excellent: '#ffb24a', good: '#8fc0ff', miss: '#ff6a5a' };
 
 /**
- * 화면 아래 가운데: 오른쪽 끝이 타격 순간, 왼쪽으로 갈수록 이르다. 막기(파랑)·GREAT(주황)·EXCELLENT(금) 폭과
+ * 화면 아래 가운데: 오른쪽 끝이 타격 순간, 왼쪽으로 갈수록 이르다. 막기(파랑)·EXCELLENT(주황)·PERFECT(금) 폭과
  * 최근 누른 자리(점), 평균 시점을 보인다. 폭은 지금 규칙(난이도 포함)을 그대로 쓴다.
  */
-export function drawPracticeBar(ctx: CanvasRenderingContext2D, rules: { perfect: number; excellent: number; guard: number }, p: { marks: PracticeMark[]; drill: string }, now: number): void {
+export function drawPracticeBar(ctx: CanvasRenderingContext2D, rules: { parry: number; perfect: number; guard: number }, p: { marks: PracticeMark[]; drill: string }, now: number): void {
   const span = Math.max(rules.guard + 80, 500);
   // 왼쪽 아래 하운 이름 판·체력 막대를 비켜 조금 오른쪽에
   const w = 400;
@@ -752,18 +752,18 @@ export function drawPracticeBar(ctx: CanvasRenderingContext2D, rules: { perfect:
     ctx.fillStyle = color;
     ctx.fillRect(xAt(to), y - 6, xAt(from) - xAt(to), 12);
   };
-  band(rules.perfect, rules.guard, 'rgba(110,160,230,0.55)');
-  band(rules.excellent, rules.perfect, 'rgba(255,170,70,0.75)');
-  band(0, rules.excellent, 'rgba(255,224,138,0.95)');
+  band(rules.parry, rules.guard, 'rgba(110,160,230,0.55)');
+  band(rules.perfect, rules.parry, 'rgba(255,170,70,0.75)');
+  band(0, rules.perfect, 'rgba(255,224,138,0.95)');
   // 타격 순간
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(x1, y - 12, 2, 24);
   ctx.font = '700 12px "IBM Plex Sans KR", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(230,236,255,0.85)';
-  ctx.fillText('막기', (xAt(rules.guard) + xAt(rules.perfect)) / 2, y + 22);
-  ctx.fillText('GREAT', (xAt(rules.perfect) + xAt(rules.excellent)) / 2, y + 22);
-  ctx.fillText('EXC', (xAt(rules.excellent) + x1) / 2, y + 22);
+  ctx.fillText('막기', (xAt(rules.guard) + xAt(rules.parry)) / 2, y + 22);
+  ctx.fillText('EXCELLENT', (xAt(rules.parry) + xAt(rules.perfect)) / 2, y + 22);
+  ctx.fillText('PERF', (xAt(rules.perfect) + x1) / 2, y + 22);
   ctx.fillText('타격', x1, y - 14);
   // 누른 자리: 최근 것일수록 진하다, 막 찍힌 것은 크게
   const n = p.marks.length;

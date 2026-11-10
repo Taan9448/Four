@@ -1,0 +1,721 @@
+{
+  "$comment": "「결」 이야기(2026-11-10 3단계, 설계 7-2절). 운곡루에서 왕일검에게 놓는 연습을 배우며 지나온 싸움을 떠올린다. speakers: 화자 이름·반신 그림(stand, 없으면 이름만). 장면 줄: speaker 없으면 내레이션, cg는 장면 일러스트(none이면 걷음), face는 반신 그림 칸(1 기본·2 결의·3 놀람). chapters: intro → bouts(각 intro·outro) → outro. 대결 규칙: survive(버티기 횟수), techs·focus·clash(그 장에서 쓸 수 있는 것), tips(처음 나오는 순간 안내). challenge: 별 셋째 칸 — noHitsInBout(bout 번호, 0부터)·noRedHits·clashWin. tutorial: 서장 단계(7-2-1절). upcoming: 다음 단계에서 열 장.",
+  "speakers": {
+    "haun": {
+      "name": "진하운",
+      "stand": "haun_sword_stand"
+    },
+    "haun_young": {
+      "name": "진하운",
+      "stand": "haun_stand"
+    },
+    "wang": {
+      "name": "왕일검",
+      "stand": "wang_stand"
+    },
+    "kwak_dojin": {
+      "name": "곽도진",
+      "stand": "kwak_dojin_stand"
+    },
+    "inner": {
+      "name": "내원 사형",
+      "stand": null
+    },
+    "elia": {
+      "name": "엘리아",
+      "stand": "elia_stand"
+    },
+    "kyle": {
+      "name": "카일",
+      "stand": "kyle_stand"
+    },
+    "born": {
+      "name": "보른",
+      "stand": "born_stand"
+    },
+    "veilak": {
+      "name": "베일락",
+      "stand": "veilak_stand"
+    },
+    "ignis": {
+      "name": "이그니스",
+      "stand": "ignis_stand"
+    }
+  },
+  "chapters": [
+    {
+      "id": "prologue",
+      "no": 0,
+      "title": "서장",
+      "subtitle": "운곡루의 밤",
+      "recall": "원작 6권 — 운곡루",
+      "bg": "bg_cheongun",
+      "intro": [
+        {
+          "text": "무림으로 돌아온 지 한 달. 운곡촌 객잔 운곡루의 뒤뜰에서는 밤마다 장작 패는 소리가 났다."
+        },
+        {
+          "speaker": "wang",
+          "text": "그 칼, 들고만 있지 말고 이리 와 봐라."
+        },
+        {
+          "text": "다리를 잃은 노인이 바퀴 달린 의자에 앉아 나무토막을 쥐고 있었다. 주방의 왕 노인 — 아니, 왕일검."
+        },
+        {
+          "speaker": "wang",
+          "text": "베는 법은 이미 알지. 오늘은 받는 법을 보자."
+        },
+        {
+          "speaker": "wang",
+          "text": "저 철목인은 내가 움직인다. 나무토막 끝이 가는 대로 칠 게다."
+        },
+        {
+          "speaker": "haun",
+          "text": "…다치게 하시면 안 됩니다, 할아버지."
+        },
+        {
+          "speaker": "wang",
+          "text": "다치는 건 너다. 그러니 잘 받아라."
+        }
+      ],
+      "tutorial": [
+        {
+          "id": "watch",
+          "title": "결을 본다",
+          "say": "날이 오기 전에 결이 먼저 온다. 지금은 보기만 해라.",
+          "goal": {
+            "type": "resolved",
+            "count": 3
+          },
+          "goalText": "공격을 지켜본다",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "slow": 0.6,
+            "earlyCue": true,
+            "labels": true
+          }
+        },
+        {
+          "id": "guard",
+          "title": "받는다",
+          "say": "고리가 과녁에 겹칠 때 받아라. K.",
+          "goal": {
+            "type": "block",
+            "count": 3
+          },
+          "goalText": "받기(막기도 된다)",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "slow": 0.6,
+            "earlyCue": true
+          },
+          "hint": "parry"
+        },
+        {
+          "id": "parry",
+          "title": "결대로 받는다",
+          "say": "금빛일 때. 이르면 막을 뿐이다. 아래 막대에 네가 누른 자리가 찍힌다.",
+          "goal": {
+            "type": "parry",
+            "count": 3
+          },
+          "goalText": "패링(GREAT 이상)",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "slow": 0.8,
+            "window": true
+          },
+          "hint": "parry"
+        },
+        {
+          "id": "counter",
+          "title": "되돌린다",
+          "say": "받은 힘이 돌아오는 틈 — 적에게 금빛 금이 보일 때 베어라. J.",
+          "goal": {
+            "type": "counter",
+            "count": 2
+          },
+          "goalText": "반격",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "window": true
+          },
+          "hint": "attack"
+        },
+        {
+          "id": "deathblow",
+          "title": "무너뜨린다",
+          "say": "받을수록 체간이 찬다. 비틀거리면 놓치지 말고 베어라.",
+          "goal": {
+            "type": "deathblow",
+            "count": 1
+          },
+          "goalText": "결정타",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                },
+                {
+                  "move": "jab",
+                  "after": 300
+                }
+              ]
+            }
+          ],
+          "assist": {},
+          "hint": "attack"
+        },
+        {
+          "id": "dodge",
+          "title": "피한다",
+          "say": "붉은 결은 받지 마라. 비켜라. L.",
+          "goal": {
+            "type": "mikiri",
+            "count": 2
+          },
+          "goalText": "간파(붉은 결 피하기)",
+          "drill": [
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "sweep"
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "swing"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "slow": 0.8
+          },
+          "hint": "dodge"
+        },
+        {
+          "id": "feint",
+          "title": "속지 않는다",
+          "say": "멈춘 칼은 아직 오지 않은 칼이다. \"…지금!\"을 기다려라.",
+          "goal": {
+            "type": "feintParry",
+            "count": 2
+          },
+          "goalText": "속임수의 진짜 타격 받기",
+          "drill": [
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "pause"
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "window": true
+          },
+          "hint": "parry"
+        },
+        {
+          "id": "bout",
+          "title": "한 판",
+          "say": "이제 혼자 해 봐라. 쓰러지지는 않게 해 주마.",
+          "goal": {
+            "type": "win"
+          },
+          "goalText": "철목인을 쓰러뜨린다",
+          "drill": null,
+          "assist": {},
+          "final": true
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "됐다. 손은 기억하고 있구나."
+        },
+        {
+          "speaker": "wang",
+          "text": "그럼 이제 말해 봐라. 네가 지금까지 받아 낸 것들을."
+        },
+        {
+          "speaker": "haun",
+          "text": "…처음은, 귀곡애였습니다."
+        },
+        {
+          "text": "하운은 눈을 감았다. 절벽 위로 바람이 울던 밤이 떠올랐다."
+        }
+      ]
+    },
+    {
+      "id": "ch1",
+      "no": 1,
+      "title": "1장",
+      "subtitle": "귀곡애",
+      "recall": "원작 1권 1~6장 — S0 청운산",
+      "bg": "bg_cheongun",
+      "rules": {
+        "techs": [
+          "nakun"
+        ],
+        "focus": false,
+        "clash": false
+      },
+      "tips": [
+        "tech"
+      ],
+      "intro": [
+        {
+          "text": "청운문 외문의 잡역, 열일곱 살 진하운. 관운각에서 장문인과 천마신교의 밀담을 엿들은 밤이었다."
+        },
+        {
+          "text": "쥐도, 새끼도. 그 한마디를 들은 뒤로 숲은 횃불로 가득 찼다."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "inner_senior",
+          "intro": [
+            {
+              "text": "횃불 셋. 앞선 사형이 검을 뽑았다."
+            },
+            {
+              "speaker": "inner",
+              "text": "장문인께서 찾으신다. 순순히 따라와라."
+            },
+            {
+              "speaker": "haun_young",
+              "text": "…쥐도, 새끼도. 그 말씀을 들었습니다."
+            },
+            {
+              "speaker": "inner",
+              "text": "그럼 더더욱 놓아줄 수 없지."
+            }
+          ]
+        },
+        {
+          "foe": "kwak_dojin_cliff",
+          "survive": 5,
+          "intro": [
+            {
+              "text": "숲이 끝났다. 귀곡애 동쪽 가장자리, 짐승 길이 있어야 할 자리에는 바위가 무너져 있었다. 깎아지른 절벽만 남아 있었다."
+            },
+            {
+              "text": "등 뒤에서 낙엽 밟는 소리가 들렸다. 곽도진이 숲의 경계에 서 있었다. 학창의에는 나뭇잎 하나 붙어 있지 않았다.",
+              "cg": "cg_cliff_kwak"
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "막다른 곳이구나. 귀곡애. 백 년 전 청운검선께서 이 절벽에서 검을 깨치셨다지."
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "오 년이었던가. 네가 문파의 밥을 먹은 것이. 그 밥값을 오늘 치르거라."
+            },
+            {
+              "speaker": "haun_young",
+              "text": "산문의 현판에 쓰신 글은… 다 거짓이었습니까.",
+              "cg": "none"
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "거짓은 아니었다. 나는 정말로 네 결이 어디까지 자라는지 보고 싶었다."
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "그러나 들풀은 들풀이다. 아무리 잘 자라도, 길을 막으면 베어야 한다."
+            },
+            {
+              "text": "▶ 곽도진은 이길 수 없다. 받기·막기·피하기로 다섯 번 버틴다."
+            }
+          ],
+          "outro": [
+            {
+              "text": "다섯 번째 검을 받아 냈을 때, 곽도진의 검이 구름처럼 펼쳐졌다. 운해귀종.",
+              "cg": "cg_cliff_unhae"
+            },
+            {
+              "text": "발밑의 바위가 무너졌다. 하운은 귀곡애 아래로 떨어졌다.",
+              "cg": "cg_fall"
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "쥐가 하나 남았군.",
+              "cg": "none"
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "곽도진의 운해귀종을 보았다고."
+        },
+        {
+          "speaker": "haun",
+          "text": "받지 못했습니다. 다섯 번 버텼을 뿐입니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "다섯 번이면 됐다. 받아 본 자만 돌려보낼 수 있다."
+        },
+        {
+          "speaker": "wang",
+          "text": "그날 네 손이 처음 흘려보낸 구름 — 청운십팔식 제십오식, 낙운무흔. 그것부터 손에 쥐어라."
+        }
+      ],
+      "challenge": {
+        "type": "noHitsInBout",
+        "bout": 1,
+        "text": "곽도진에게 한 번도 맞지 않고 버틴다"
+      },
+      "unlockText": "기술 낙운무흔 — EXCELLENT 이상 5연속으로 준비된다"
+    },
+    {
+      "id": "ch2",
+      "no": 2,
+      "title": "2장",
+      "subtitle": "은빛 숲",
+      "recall": "원작 1권 7~20장 — S1 은빛 숲",
+      "bg": "bg_elheim_forest",
+      "rules": {
+        "techs": [
+          "nakun"
+        ],
+        "focus": true,
+        "clash": false
+      },
+      "tips": [
+        "focus"
+      ],
+      "intro": [
+        {
+          "text": "눈을 떴을 때, 하늘에는 달이 두 개 떠 있었다. 하나는 은빛이었다. 다른 하나는 옅은 푸른빛이었다.",
+          "cg": "cg_two_moons"
+        },
+        {
+          "text": "뒤를 돌아보니 그곳에도 석문이 있었다. 손바닥 홈에 피 묻은 손을 대 보아도, 석문은 굳게 닫힌 채 침묵했다."
+        },
+        {
+          "text": "그때 숲 저편에서 비명이 들렸다.",
+          "cg": "none"
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "shadow_wolf",
+          "intro": [
+            {
+              "text": "송아지만 한 몸, 털 대신 연기 같은 검은 기운, 눈이 있어야 할 자리에 붉은 점 두 개."
+            },
+            {
+              "text": "하운의 손에는 아무것도 없었다. 그는 땅에 떨어진 나뭇가지를 집어 들었다.",
+              "cg": "cg_branch_knot"
+            },
+            {
+              "text": "세 번 짧게, 한 번 길게. 결이 보였다. 장작을 패듯이.",
+              "cg": "none"
+            }
+          ],
+          "outro": [
+            {
+              "speaker": "kyle",
+              "text": "나뭇가지로 그림자늑대의 목을 땄지? 대체 어떻게 한 거야?"
+            },
+            {
+              "speaker": "haun_young",
+              "text": "…장작을 패듯이."
+            }
+          ]
+        },
+        {
+          "foe": "ore_spider",
+          "intro": [
+            {
+              "text": "하일론의 은 광산. 광부 셋이 갇혔다는 말을 듣고 일행은 갱도로 내려갔다."
+            },
+            {
+              "speaker": "born",
+              "text": "줄을 놓지 마라. 갱도에서는 줄이 길이다."
+            }
+          ],
+          "outro": [
+            {
+              "speaker": "born",
+              "text": "줄을 왜 놓았지?"
+            },
+            {
+              "speaker": "haun",
+              "text": "…한 번 더 벨 수 있을 것 같았습니다."
+            },
+            {
+              "speaker": "born",
+              "text": "벨 수 있었지. 그래서 나갈 수 있었나?"
+            },
+            {
+              "text": "그날 하운은 두린이라는 이름을 처음 들었다."
+            }
+          ]
+        },
+        {
+          "foe": "veilak",
+          "intro": [
+            {
+              "text": "실바렌. 아름드리 은빛 나무 일곱 그루를 감싼 초록빛 결계가 여기저기 금이 간 채 깜빡이고 있었다.",
+              "cg": "cg_silvaren_siege"
+            },
+            {
+              "text": "그 한가운데, 검은 연기로 빚은 말과 기사가 서 있었다. 그림자 군단장 베일락."
+            },
+            {
+              "speaker": "haun",
+              "text": "저것들은 군단장의 명령으로만 움직입니다. 군단장을 쓰러뜨리면, 나머지는 흩어질 겁니다.",
+              "cg": "none"
+            },
+            {
+              "speaker": "elia",
+              "text": "하운. 군단장을 부탁해요. 나는 결계로 가요. 어머니한테."
+            },
+            {
+              "speaker": "kyle",
+              "text": "가자, 장작 소년. 가장 큰 장작을 패러."
+            }
+          ],
+          "outro": [
+            {
+              "text": "군단장이 쓰러지자 빈 갑옷들이 하나씩 무너졌다. 실이 풀린 실타래처럼."
+            },
+            {
+              "text": "그리고 하운은 처음으로 하늘의 금을 보았다. 하나, 둘, 셋 — 숨 셋을 세는 동안 금이 아물었다."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "하늘의 금을 보았다고."
+        },
+        {
+          "speaker": "haun",
+          "text": "결을 먼저 보려 하면, 세상이 조금 느려집니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "그 눈을 쓰는 법을 알아 둬라. 숨을 멈추면 결이 먼저 드러난다 — 심안이다."
+        }
+      ],
+      "challenge": {
+        "type": "noRedHits",
+        "text": "붉은 결에 한 번도 맞지 않는다"
+      },
+      "unlockText": "집중(심안) — 받기로 게이지를 채워 U"
+    },
+    {
+      "id": "ch3",
+      "no": 3,
+      "title": "3장",
+      "subtitle": "화산 협곡",
+      "recall": "원작 2권 사슬의 도시 — S2 화산 협곡",
+      "bg": "bg_volcano_canyon",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "clash"
+      ],
+      "intro": [
+        {
+          "text": "벨칸의 화산 협곡. 사슬에 묶인 사람들이 여섯 구역의 화로에 망치를 내리치고 있었다."
+        },
+        {
+          "text": "보른은 스스로 사슬에 들어갔다. 안에서 연락하겠다고. 대답은 짧았다."
+        },
+        {
+          "speaker": "born",
+          "text": "같이 가."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "ash_bat",
+          "intro": [
+            {
+              "text": "협곡 위로 재 박쥐 떼가 돌았다. 불티가 눈처럼 내렸다."
+            }
+          ]
+        },
+        {
+          "foe": "chain_overseer",
+          "intro": [
+            {
+              "text": "구역을 지키는 감독관이 달군 사슬을 끌었다. 사슬이 바닥을 긁을 때마다 불꽃이 튀었다."
+            },
+            {
+              "speaker": "kyle",
+              "text": "저 사슬, 받으면 손이 데겠는데."
+            }
+          ]
+        },
+        {
+          "foe": "ignis",
+          "intro": [
+            {
+              "text": "가장 안쪽에서 흰 불길이 높아졌다. 사람처럼 서 있었지만 어깨가 화로의 폭만 했다.",
+              "cg": "cg_great_furnace"
+            },
+            {
+              "speaker": "ignis",
+              "text": "…빼앗아 간 것이 꽤 되는구나.",
+              "cg": "none"
+            },
+            {
+              "text": "내공과 함께 쓸 힘을 당기려는 생각을 하자마자 팔 안쪽이 뜨거워졌다. 하운은 즉시 멈췄다."
+            },
+            {
+              "speaker": "elia",
+              "text": "당기지 말아요."
+            },
+            {
+              "speaker": "kyle",
+              "text": "그럼 닿는 자리부터 만들자."
+            }
+          ],
+          "outro": [
+            {
+              "text": "하운은 주변의 마나를 당기지 않았다. 검끝을 흐름 옆에 붙였다. 칼날의 옆면이 흐름과 나란해졌다."
+            },
+            {
+              "text": "이그니스의 가슴에 있던 붉은 돌이 갈라졌다. 쇠를 식히다 금이 가는 것과 비슷한, 짧고 높은 소리였다.",
+              "cg": "cg_ignis_split"
+            },
+            {
+              "speaker": "kyle",
+              "text": "하나.",
+              "cg": "none"
+            },
+            {
+              "text": "둘. 셋. 넷. 다섯. 검은 선이 사라졌다."
+            },
+            {
+              "speaker": "kyle",
+              "text": "봤어. 이번엔 나도 봤어."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "칼끝을 흐름 옆에 나란히. 당기지 않고."
+        },
+        {
+          "speaker": "haun",
+          "text": "운하검 제일식 — 벽운단하. 그때 처음 썼습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "벤 게 아니다. 흐름이 갈라질 자리를 내준 것이지. 다음은 무엇을 받았느냐."
+        }
+      ],
+      "challenge": {
+        "type": "clashWin",
+        "text": "겨루기에서 한 번 이긴다"
+      },
+      "unlockText": "기술 벽운단하 — PERFECT만 5연속으로 준비된다 · 겨루기(결 연환 3 이상, 무거운 공격에 맞춰 베기)"
+    }
+  ],
+  "upcoming": [
+    {
+      "no": 4,
+      "subtitle": "아르덴"
+    },
+    {
+      "no": 5,
+      "subtitle": "카즈둠"
+    },
+    {
+      "no": 6,
+      "subtitle": "노크투르나"
+    },
+    {
+      "no": 7,
+      "subtitle": "운곡촌"
+    },
+    {
+      "no": 8,
+      "subtitle": "낙안봉"
+    },
+    {
+      "no": 9,
+      "subtitle": "천마봉"
+    },
+    {
+      "no": 10,
+      "subtitle": "세계의 틈"
+    }
+  ],
+  "tips": {
+    "tech": {
+      "key": "I",
+      "text": "결 연환이 차서 기술이 준비됐다. I(기술 버튼)를 누르면 쓴다 — 쓰는 동안은 맞지 않는다."
+    },
+    "focus": {
+      "key": "U",
+      "text": "집중 게이지가 찼다. U를 누르면 시간이 느려지고 결이 처음부터 보인다. 속임수는 虛로 드러난다."
+    },
+    "clash": {
+      "key": "J·K",
+      "text": "칼끼리 맞부딪혔다! 결 연환을 이은 채 무거운 공격에 맞춰 베면 겨루기가 된다. J·K를 연타해 밀어내라."
+    }
+  }
+}

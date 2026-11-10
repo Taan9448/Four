@@ -1,8 +1,8 @@
 {
-  "$comment": "「결」 수치(2026-11-09 목업 2차). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id·그림을 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤)에 맞춰 늘이거나 줄여 그린다. element: fire(패링해도 화상)·ice(결이 느리다 갑자기)·lightning(박자가 튐), unblockable: 붉은 결(피해야 함), feint: 가짜 타격 순간 뒤 이만큼 끌었다 친다. chart: 박자 도전 악보(at = 타격 순간). 2026-11-09 4차: clash*(칼 맞부딪힘 겨루기)·crisis*(위기, 배수의 진)·focus*(집중, 심안) 규칙, 적마다 clashPower(겨루기에서 초마다 미는 힘)·finisher(결정타 연출)·weather(환경 입자)·lines(대사), player.lines(하운 대사: start는 적의 첫마디에 대한 대답). 2026-11-10 2단계: rules.grade(대결 등급 점수·문턱), difficulties(결투장 난이도: judgeMul은 perfect·excellent·guard 폭, foeDamageMul, postureRegenMul), 수련장 상대 iron_dummy(practice: 목록에 안 나옴, drills: 수련 종류별 패턴).",
+  "$comment": "「결」 수치(2026-11-09 목업 2차). 시간은 모두 ms. 적 그림·이름은 「천외귀환」 data/enemies의 같은 id·그림을 그대로 쓴다. 공격은 그 적의 <sprite>_attack 그림(meta.json의 events.hit 프레임이 타격 순간)을 windup(타격까지)·recover(타격 뒤)에 맞춰 늘이거나 줄여 그린다. element: fire(패링해도 화상)·ice(결이 느리다 갑자기)·lightning(박자가 튐), unblockable: 붉은 결(피해야 함), feint: 가짜 타격 순간 뒤 이만큼 끌었다 친다. chart: 박자 도전 악보(at = 타격 순간). 2026-11-09 4차: clash*(칼 맞부딪힘 겨루기)·crisis*(위기, 배수의 진)·focus*(집중, 심안) 규칙, 적마다 clashPower(겨루기에서 초마다 미는 힘)·finisher(결정타 연출)·weather(환경 입자)·lines(대사), player.lines(하운 대사: start는 적의 첫마디에 대한 대답). 2026-11-10 2단계: rules.grade(대결 등급 점수·문턱), difficulties(결투장 난이도: judgeMul은 perfect·excellent·guard 폭, foeDamageMul, postureRegenMul), 수련장 상대 iron_dummy(practice: 목록에 안 나옴, drills: 수련 종류별 패턴). 2026-11-10 3단계: 이야기 상대 inner_senior·kwak_dojin_cliff(버티기 — story.json이 survive를 건다)·ore_spider·veilak·ash_bat, ignis phase2(체력 절반에서 포효 → 빨라지고 세짐). 2026-11-10 사용자 조정: 4단계 판정(rules.parry = 받기 성공 폭, rules.perfect = PERFECT 폭 40ms), 기술 min(그 사이 판정 하한: 낙운무흔 EXCELLENT 5 · 벽운단하 PERFECT 5 · 운해귀종 EXCELLENT 10), 겨루기는 결 연환 clashMinChain 이상 + 무거운 공격(피해 20 이상 또는 move.clash)에서 clashWindow 45ms, 밀기 0.075·적 힘 1.15배.",
   "rules": {
-    "perfect": 150,
-    "excellent": 60,
+    "parry": 150,
+    "perfect": 40,
     "guard": 420,
     "parryLockout": 220,
     "cueLead": 520,
@@ -32,35 +32,36 @@
     "foeGuardMul": 0.15,
     "foeGuardPosture": 2,
     "punishAfter": 3,
-    "clashWindow": 80,
+    "clashWindow": 45,
     "clashCalm": 450,
     "clashDuration": 1800,
-    "clashPush": 0.09,
+    "clashPush": 0.075,
     "clashPressGap": 45,
     "clashWinPosture": 0.3,
     "clashWinDamage": 2,
     "clashLoseMul": 0.7,
     "clashLosePosture": 30,
     "crisisHp": 0.2,
-    "crisisExcellentMul": 1.6,
     "focusMax": 100,
     "focusStart": 40,
     "focusGain": {
-      "excellent": 20,
-      "great": 14,
+      "perfect": 20,
+      "excellent": 14,
       "good": 6
     },
     "focusDuration": 2400,
     "focusRate": 0.45,
     "grade": {
       "base": 85,
-      "excellent": 15,
+      "perfect": 15,
       "hit": 10,
       "guard": 2,
       "S": 95,
       "A": 80,
       "B": 60
-    }
+    },
+    "crisisPerfectMul": 1.6,
+    "clashMinChain": 3
   },
   "player": {
     "name": "진하운",
@@ -494,7 +495,7 @@
         ]
       },
       "scale": 0.85,
-      "clashPower": 0.32,
+      "clashPower": 0.368,
       "weather": "leaves",
       "finisher": {
         "name": "단영",
@@ -703,7 +704,7 @@
         ]
       },
       "scale": 1.12,
-      "clashPower": 0.5,
+      "clashPower": 0.575,
       "weather": "ash",
       "finisher": {
         "name": "쇄련단",
@@ -895,7 +896,7 @@
         ]
       },
       "scale": 1.05,
-      "clashPower": 0.42,
+      "clashPower": 0.483,
       "weather": "snow",
       "finisher": {
         "name": "빙결파",
@@ -1095,7 +1096,7 @@
         ]
       },
       "scale": 0.95,
-      "clashPower": 0.38,
+      "clashPower": 0.437,
       "weather": "rain",
       "finisher": {
         "name": "영멸",
@@ -1303,7 +1304,7 @@
         ]
       },
       "scale": 1.45,
-      "clashPower": 0.58,
+      "clashPower": 0.667,
       "weather": "embers",
       "finisher": {
         "name": "멸화일섬",
@@ -1331,6 +1332,537 @@
         "lose": [
           "불이… 꺼진다…"
         ]
+      },
+      "phase2": {
+        "at": 0.5,
+        "name": "흰 불이 커진다",
+        "line": "…빼앗아 간 것이 꽤 되는구나.",
+        "speed": 0.82,
+        "damageMul": 1.15,
+        "roar": 1500
+      }
+    },
+    {
+      "id": "inner_senior",
+      "title": "내원 사형",
+      "sprite": "inner_senior",
+      "bg": "bg_cheongun",
+      "scale": 1.0,
+      "weather": "leaves",
+      "clashPower": 0.345,
+      "note": "청운문 내원의 사형. 잡역을 깔보지만 검은 곧다. 내려베고 곧장 찌른다.",
+      "hp": 70,
+      "posture": 55,
+      "postureRegen": 8,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "slash": {
+          "name": "내려베기",
+          "windup": 620,
+          "recover": 350,
+          "damage": 10,
+          "posture": 10
+        },
+        "thrust": {
+          "name": "찌르기",
+          "windup": 430,
+          "recover": 300,
+          "damage": 8,
+          "posture": 8
+        },
+        "sweep": {
+          "name": "후려치기",
+          "windup": 560,
+          "recover": 380,
+          "damage": 12,
+          "posture": 12
+        }
+      },
+      "patterns": [
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "slash"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "slash"
+            },
+            {
+              "move": "thrust",
+              "after": 250
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "sweep"
+            },
+            {
+              "move": "thrust",
+              "after": 300
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "쪼개기",
+        "hanja": "劈柴",
+        "style": "cross",
+        "line": "장작은… 결대로 쪼개진다."
+      },
+      "lines": {
+        "start": [
+          "잡역 주제에 검을 들었다고?",
+          "장작이나 팰 것이지."
+        ],
+        "clash": [
+          "버티네?"
+        ],
+        "stagger": [
+          "이, 이 녀석이…"
+        ],
+        "crisis": [
+          "봐라, 이게 내원의 검이다."
+        ],
+        "win": [
+          "주제를 알아라."
+        ],
+        "lose": [
+          "말도 안 돼… 잡역한테…"
+        ]
+      }
+    },
+    {
+      "id": "kwak_dojin_cliff",
+      "title": "청운문 장문인 곽도진",
+      "sprite": "kwak_dojin",
+      "bg": "bg_cheongun",
+      "scale": 1.05,
+      "weather": "leaves",
+      "clashPower": 1.035,
+      "note": "귀곡애의 곽도진. 지금의 하운으로는 이길 수 없다 — 다섯 번 받아 내며 버틴다.",
+      "hp": 9999,
+      "posture": 9999,
+      "postureRegen": 50,
+      "idle": [
+        700,
+        1100
+      ],
+      "moves": {
+        "qi": {
+          "name": "검기",
+          "windup": 700,
+          "recover": 420,
+          "damage": 14,
+          "posture": 10
+        },
+        "crane": {
+          "name": "학창의 그림자",
+          "windup": 620,
+          "recover": 400,
+          "damage": 14,
+          "posture": 10,
+          "feint": 320
+        },
+        "pine": {
+          "name": "소나무 베기",
+          "windup": 900,
+          "recover": 520,
+          "damage": 18,
+          "posture": 0,
+          "unblockable": true
+        },
+        "grip": {
+          "name": "검을 고쳐 쥔다",
+          "windup": 520,
+          "recover": 360,
+          "damage": 16,
+          "posture": 10
+        }
+      },
+      "patterns": [
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "qi"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "crane"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "pine"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "grip"
+            },
+            {
+              "move": "qi",
+              "after": 300
+            }
+          ]
+        }
+      ],
+      "lines": {
+        "start": [
+          "막다른 곳이구나. 귀곡애."
+        ],
+        "crisis": [
+          "들풀은 들풀이다."
+        ],
+        "win": [
+          "쥐도, 새끼도."
+        ],
+        "stagger": [
+          "…허."
+        ]
+      },
+      "storyOnly": true
+    },
+    {
+      "id": "ore_spider",
+      "title": "광석거미",
+      "sprite": "ore_spider",
+      "bg": "bg_kazdum",
+      "scale": 1.0,
+      "weather": "ash",
+      "clashPower": 0.46,
+      "note": "은 광산의 광석거미. 다리 찍기가 빠르게 이어지고, 거미줄은 받을 수 없다.",
+      "hp": 110,
+      "posture": 80,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "bite": {
+          "name": "물기",
+          "windup": 520,
+          "recover": 360,
+          "damage": 10,
+          "posture": 10
+        },
+        "legs": {
+          "name": "다리 찍기",
+          "windup": 340,
+          "recover": 220,
+          "damage": 7,
+          "posture": 6
+        },
+        "web": {
+          "name": "거미줄 던지기",
+          "windup": 850,
+          "recover": 480,
+          "damage": 14,
+          "posture": 0,
+          "unblockable": true
+        },
+        "lure": {
+          "name": "헛찍기",
+          "windup": 560,
+          "recover": 360,
+          "damage": 11,
+          "posture": 10,
+          "feint": 300
+        }
+      },
+      "patterns": [
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "legs"
+            },
+            {
+              "move": "legs",
+              "after": 160
+            },
+            {
+              "move": "legs",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "bite"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "web"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "lure"
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "마디 끊기",
+        "hanja": "斷節",
+        "style": "shatter",
+        "line": "…이번엔 줄을 놓지 않는다."
+      },
+      "lines": {
+        "start": [
+          "(바위 틈에서 다리가 여덟 개 기어 나온다)"
+        ],
+        "stagger": [
+          "(다리가 꺾인다)"
+        ],
+        "lose": [
+          "(마디가 하나씩 풀린다)"
+        ],
+        "win": [
+          "(거미줄이 하운을 감는다)"
+        ]
+      }
+    },
+    {
+      "id": "veilak",
+      "title": "그림자 군단장 베일락",
+      "sprite": "veilak",
+      "bg": "bg_silvaren",
+      "scale": 1.3,
+      "weather": "ash",
+      "clashPower": 0.575,
+      "note": "실바렌을 둘러싼 그림자 군단의 군단장. 연기의 대검은 무겁고, 말 돌격은 받을 수 없다.",
+      "hp": 160,
+      "posture": 110,
+      "postureRegen": 10,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "greatsword": {
+          "name": "연기 대검",
+          "windup": 820,
+          "recover": 500,
+          "damage": 20,
+          "posture": 18
+        },
+        "sweep": {
+          "name": "횡베기",
+          "windup": 560,
+          "recover": 380,
+          "damage": 12,
+          "posture": 12
+        },
+        "charge": {
+          "name": "그림자 돌격",
+          "windup": 950,
+          "recover": 560,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true
+        },
+        "smoke": {
+          "name": "연기 속임",
+          "windup": 620,
+          "recover": 400,
+          "damage": 14,
+          "posture": 12,
+          "feint": 350
+        }
+      },
+      "patterns": [
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "greatsword"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "sweep"
+            },
+            {
+              "move": "greatsword",
+              "after": 250
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "charge"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "smoke"
+            },
+            {
+              "move": "sweep",
+              "after": 300
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "매듭 끊기",
+        "hanja": "斷結",
+        "style": "shadow",
+        "line": "모든 실이 만나는 자리 — 거기다."
+      },
+      "lines": {
+        "start": [
+          "작은 결계 하나를 지키겠다고 여기까지 왔나."
+        ],
+        "clash": [
+          "힘으로 나를 밀겠다고?"
+        ],
+        "stagger": [
+          "…매듭을 보았다고?"
+        ],
+        "crisis": [
+          "숲과 함께 사라져라."
+        ],
+        "win": [
+          "실바렌은 오늘 밤 무너진다."
+        ],
+        "lose": [
+          "군단이… 흩어진다…"
+        ]
+      }
+    },
+    {
+      "id": "ash_bat",
+      "title": "재 박쥐",
+      "sprite": "ash_bat",
+      "bg": "bg_volcano_canyon",
+      "scale": 0.8,
+      "weather": "embers",
+      "clashPower": 0.345,
+      "note": "협곡 위를 도는 재 박쥐. 빠르게 내리꽂고, 불티를 뿌린다.",
+      "hp": 60,
+      "posture": 50,
+      "postureRegen": 8,
+      "idle": [
+        600,
+        1100
+      ],
+      "moves": {
+        "dive": {
+          "name": "급강하",
+          "windup": 380,
+          "recover": 300,
+          "damage": 8,
+          "posture": 8
+        },
+        "wings": {
+          "name": "날개 치기",
+          "windup": 300,
+          "recover": 200,
+          "damage": 6,
+          "posture": 5
+        },
+        "ember": {
+          "name": "불티 뿌리기",
+          "windup": 600,
+          "recover": 380,
+          "damage": 8,
+          "posture": 8,
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "dive"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "wings"
+            },
+            {
+              "move": "wings",
+              "after": 150
+            },
+            {
+              "move": "dive",
+              "after": 250
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "ember"
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "날개 꺾기",
+        "hanja": "折翼",
+        "style": "quench",
+        "line": "재는 재로."
+      },
+      "lines": {
+        "start": [
+          "(끼이익 — 재가 섞인 날갯짓)"
+        ],
+        "stagger": [
+          "(날개가 꺾인다)"
+        ],
+        "lose": [
+          "(재가 되어 흩어진다)"
+        ]
       }
     }
   ],
@@ -1340,7 +1872,7 @@
       "name": "낙운무흔",
       "hanja": "落雲無痕",
       "chain": 5,
-      "pure": false,
+      "min": "excellent",
       "damage": 0.06,
       "posture": 0.45,
       "returnMul": 0,
@@ -1351,7 +1883,7 @@
       "name": "벽운단하",
       "hanja": "劈雲斷河",
       "chain": 5,
-      "pure": true,
+      "min": "perfect",
       "damage": 0.22,
       "posture": 0.35,
       "returnMul": 0,
@@ -1362,7 +1894,7 @@
       "name": "운해귀종",
       "hanja": "雲海歸宗",
       "chain": 10,
-      "pure": false,
+      "min": "excellent",
       "damage": 0.1,
       "posture": 1.0,
       "returnMul": 0.75,

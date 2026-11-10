@@ -1,16 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { advance, betterRank, createDuel, cue, duelGrade, isOpen, MAX_INPUT_LAG, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type MoveDef } from '../src/duel';
+import { advance, betterRank, createDuel, cue, duelGrade, isOpen, MAX_INPUT_LAG, press, rhythmScore, streakTier, TECH_DURATION, type DuelData, type DuelOptions, type MoveDef } from '../src/duel';
 import { calibrationOffset } from '../src/calibrate';
 import { defaultSettings, KEY, loadSave, normalize, resetSaveCache, writeSave } from '../src/save';
 import realRaw from '../data/duel.json';
+import storyRaw from '../data/story.json';
+import { existsSync } from 'node:fs';
 
 const real = realRaw as unknown as DuelData;
 /** 대결 상대(수련장 철목인 빼고) */
 const duelFoes = real.foes.filter((f) => !f.practice);
+/** 박자 도전 악보가 있는 결투장 상대(처음 다섯) */
+const chartFoes = duelFoes.filter((f) => f.chart);
+/** 이길 수 있는 상대(버티기 전용 곽도진 빼고) */
+const beatable = duelFoes.filter((f) => f.hp < 9999);
 
 // 한 가지 공격만 하는 적: 첫 공격은 idle[1]=500ms 뒤 시작, windup 400 → 타격은 900ms
 const data: DuelData = {
-  rules: { ...real.rules, perfect: 150, guard: 420, parryLockout: 220, cueLead: 500, counterWindow: 700, counterMul: 3, stagger: 1600 },
+  rules: { ...real.rules, parry: 150, perfect: 40, guard: 420, parryLockout: 220, cueLead: 500, counterWindow: 700, counterMul: 3, stagger: 1600 },
   player: { ...real.player, hp: 100, posture: 100 },
   techs: real.techs,
   foes: [
@@ -32,7 +38,7 @@ const data: DuelData = {
 const HIT = 900;
 
 describe('「결」 대결 판정', () => {
-  it('타격 직전(perfect 안)에 받으면 패링 — 적 체간이 오르고 되돌아오는 틈이 열린다', () => {
+  it('타격 직전(parry 안)에 받으면 패링 — 적 체간이 오르고 되돌아오는 틈이 열린다', () => {
     const d = createDuel(data, 'dummy');
     advance(d, HIT - 100);
     expect(press(d, 'parry')).toBe(true);
@@ -146,7 +152,7 @@ describe('「결」 대결 판정', () => {
     const r = real;
     for (const f of r.foes) {
       for (const p of f.patterns) for (const s of p.steps) expect(f.moves[s.move], `${f.id}.${s.move}`).toBeTruthy();
-      for (const m of Object.values(f.moves)) expect(m.windup).toBeGreaterThan(r.rules.perfect);
+      for (const m of Object.values(f.moves)) expect(m.windup).toBeGreaterThan(r.rules.parry);
     }
   });
 });
@@ -264,19 +270,19 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   });
 
   it('박자 도전: 악보대로 오고, 판정을 세어 등급을 매기며 죽지 않는다', () => {
-    for (const foe of duelFoes) {
+    for (const foe of chartFoes) {
       const d = createDuel(real, foe.id, 'x', 'rhythm');
       const steps = foe.chart!.steps;
       // 모든 타격을 정확히 받거나(받을 수 없으면) 피한다
       for (const st of steps) {
         const m = foe.moves[st.move];
-        advance(d, st.at - (m.unblockable ? 120 : 60));
+        advance(d, st.at - (m.unblockable ? 120 : 30));
         press(d, m.unblockable ? 'dodge' : 'parry');
       }
       advance(d, steps[steps.length - 1].at + 1500);
       expect(d.result, foe.id).toBe('win');
+      expect(d.stats.clean, foe.id).toBe(steps.length);
       expect(d.stats.perfect, foe.id).toBe(steps.length);
-      expect(d.stats.excellent, foe.id).toBe(steps.length);
       expect(rhythmScore(d).rank).toBe('S');
       expect(d.foe.hp).toBe(foe.hp);
     }
@@ -289,18 +295,19 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   });
 
   it('실제 데이터: 다섯 상대 모두 원소·받을 수 없는 공격·속임수·악보를 갖췄다', () => {
-    const els = new Set(duelFoes.flatMap((f) => Object.values(f.moves).map((m) => m.element)).filter(Boolean));
+    const els = new Set(chartFoes.flatMap((f) => Object.values(f.moves).map((m) => m.element)).filter(Boolean));
     expect([...els].sort()).toEqual(['fire', 'ice', 'lightning']);
-    for (const f of duelFoes) {
+    expect(chartFoes.length).toBe(5);
+    for (const f of chartFoes) {
       const ms = Object.values(f.moves);
       expect(ms.some((m) => m.unblockable), f.id).toBe(true);
-      expect(ms.some((m) => (m.feint ?? 0) > real.rules.perfect), f.id).toBe(true);
+      expect(ms.some((m) => (m.feint ?? 0) > real.rules.parry), f.id).toBe(true);
       expect(f.chart?.steps.length ?? 0, f.id).toBeGreaterThanOrEqual(12);
       for (const st of f.chart!.steps) expect(f.moves[st.move], `${f.id}.${st.move}`).toBeTruthy();
     }
   });
 
-  it('판정 글자: 타격 60ms 안에 받으면 EXCELLENT, 그 밖의 패링은 GREAT, 막기 GOOD, 맞으면 MISS', () => {
+  it('판정 4단계: 타격 40ms 안에 받으면 PERFECT, 그 밖의 패링은 EXCELLENT, 막기 GOOD, 맞으면 MISS', () => {
     const at = (lead: number | null) => {
       const d = createDuel(single(swing({})), 'dummy');
       if (lead !== null) {
@@ -311,8 +318,9 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
       const ev = d.events.find((e) => e.type === 'parry');
       return ev && ev.type === 'parry' ? ev.judgement : d.events.some((e) => e.type === 'guard') ? 'good' : 'miss';
     };
-    expect(at(40)).toBe('excellent');
-    expect(at(120)).toBe('great');
+    expect(at(30)).toBe('perfect');
+    expect(at(50)).toBe('excellent');
+    expect(at(120)).toBe('excellent');
     expect(at(300)).toBe('good');
     expect(at(null)).toBe('miss');
   });
@@ -347,7 +355,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     expect(p.events.find((e) => e.type === 'streak')).toMatchObject({ streak: 1 });
   });
 
-  it('진하운의 기술: GOOD 이상 5연환 낙운무흔, EXCELLENT 5연환 벽운단하, 10연환 운해귀종(받아낸 힘을 돌려보낸다)', () => {
+  it('진하운의 기술: EXCELLENT 이상 5연환 낙운무흔, PERFECT 5연환 벽운단하, EXCELLENT 이상 10연환 운해귀종(받아낸 힘을 돌려보낸다)', () => {
     const run = (leads: number[]) => {
       const dd = single(swing({ damage: 10, posture: 1 }));
       const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], hp: 1000, posture: 1000 }] }, 'dummy');
@@ -360,13 +368,14 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
       }
       return d;
     };
-    const ex = (n: number) => Array<number>(n).fill(40);
+    const ex = (n: number) => Array<number>(n).fill(30); // PERFECT
     expect(run(ex(4)).techReady).toBeNull();
-    expect(run([40, 300, 40, 40]).techReady).toBeNull();
-    expect(run([40, 300, 40, 40, 40]).techReady).toBe('nakun');
+    expect(run([30, 100, 30, 30]).techReady).toBeNull();
+    expect(run([30, 100, 30, 30, 30]).techReady).toBe('nakun'); // EXCELLENT 섞임
+    expect(run([30, 300, 30, 30, 30]).techReady).toBeNull(); // GOOD(막기)이 섞이면 아무것도 아니다
     expect(run(ex(5)).techReady).toBe('byeogun');
-    expect(run([300, ...ex(8)]).techReady).toBe('nakun');
-    const pure = run([300, ...ex(9)]);
+    expect(run([100, ...ex(8)]).techReady).toBe('nakun');
+    const pure = run([100, ...ex(9)]);
     expect(pure.techReady).toBe('unhae');
     // 쓰면: 무적, 피해 = 최대 체력 × damage + 받아낸 힘(10×10) × returnMul, 체간은 가득(비틀거림)
     const unhae = real.techs.find((t) => t.id === 'unhae')!;
@@ -384,7 +393,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], posture: 1000 }] }, 'dummy');
     let hit = HIT;
     for (let i = 0; i < 5; i++) {
-      advance(d, hit - 40);
+      advance(d, hit - 30);
       press(d, 'parry');
       advance(d, hit + 5);
       hit += 1100;
@@ -402,8 +411,9 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
   const r = data.rules;
   const aim = HIT - data.player.attack.hitAt; // 베기가 적의 타격 순간에 닿도록
 
-  it('겨루기: 노려 벤 칼이 적의 타격과 동시에 닿으면 칼끼리 맞부딪힌다 — 연타로 밀면 이기고 틈이 열린다', () => {
+  it('겨루기: 결 연환을 이은 채 무거운 공격에 노려 벤 칼이 동시에 닿으면 칼끼리 맞부딪힌다 — 연타로 밀면 이기고 틈이 열린다', () => {
     const d = createDuel(data, 'dummy');
+    d.chain = r.clashMinChain;
     advance(d, aim);
     press(d, 'attack');
     advance(d, HIT + 2);
@@ -426,6 +436,7 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
 
   it('겨루기에서 밀리면 베인다(적 공격 피해 × clashLoseMul)', () => {
     const d = createDuel(data, 'dummy');
+    d.chain = r.clashMinChain;
     advance(d, aim);
     press(d, 'attack');
     advance(d, HIT + 2000);
@@ -434,8 +445,26 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
     expect(d.chain).toBe(0);
   });
 
-  it('연타한 베기나 받을 수 없는 공격에는 겨루기가 없다', () => {
+  it('겨루기는 특수한 순간에만: 결 연환이 모자라거나, 가벼운 공격이거나, 연타한 베기거나, 받을 수 없는 공격이면 없다', () => {
+    const fresh = createDuel(data, 'dummy'); // 결 연환 0
+    advance(fresh, aim);
+    press(fresh, 'attack');
+    advance(fresh, HIT + 5);
+    expect(fresh.events.some((e) => e.type === 'clash')).toBe(false);
+    const light = createDuel(single(swing({ damage: 10 })), 'dummy');
+    light.chain = r.clashMinChain;
+    advance(light, aim);
+    press(light, 'attack');
+    advance(light, HIT + 5);
+    expect(light.events.some((e) => e.type === 'clash')).toBe(false);
+    const marked = createDuel(single(swing({ damage: 10, clash: true })), 'dummy');
+    marked.chain = r.clashMinChain;
+    advance(marked, aim);
+    press(marked, 'attack');
+    advance(marked, HIT + 5);
+    expect(marked.events.some((e) => e.type === 'clash')).toBe(true);
     const spam = createDuel(data, 'dummy');
+    spam.chain = r.clashMinChain;
     advance(spam, aim - data.player.attack.duration);
     press(spam, 'attack');
     advance(spam, aim);
@@ -443,19 +472,20 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
     advance(spam, HIT + 5);
     expect(spam.events.some((e) => e.type === 'clash')).toBe(false);
     expect(spam.events.some((e) => e.type === 'hit')).toBe(true);
-    const red = createDuel(single(swing({ unblockable: true })), 'dummy');
+    const red = createDuel(single(swing({ unblockable: true, damage: 30 })), 'dummy');
+    red.chain = r.clashMinChain;
     advance(red, aim);
     press(red, 'attack');
     advance(red, HIT + 5);
     expect(red.events.some((e) => e.type === 'clash')).toBe(false);
   });
 
-  it('위기(배수의 진): 체력이 crisisHp 아래로 떨어지면 한 번 알리고, EXCELLENT 폭이 넓어진다', () => {
+  it('위기(배수의 진): 체력이 crisisHp 아래로 떨어지면 한 번 알리고, PERFECT 폭이 넓어진다', () => {
     const run = (damage: number) => {
       const d = createDuel(single(swing({ damage })), 'dummy');
       advance(d, HIT + 5); // 맞는다
       const H2 = HIT + 200 + 500 + 400;
-      advance(d, H2 - 80); // EXCELLENT(60)보다 늦게, 넓힌 폭(60 × crisisExcellentMul) 안
+      advance(d, H2 - 55); // PERFECT(40)보다 이르고, 넓힌 폭(40 × crisisPerfectMul) 안
       press(d, 'parry');
       advance(d, H2 + 5);
       return d;
@@ -463,10 +493,10 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
     const low = run(85);
     expect(low.crisis).toBe(true);
     expect(low.events.filter((e) => e.type === 'crisis')).toHaveLength(1);
-    expect(low.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'excellent' });
+    expect(low.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'perfect' });
     const fine = run(10);
     expect(fine.crisis).toBe(false);
-    expect(fine.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'great' });
+    expect(fine.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'excellent' });
   });
 
   it('집중(심안): 받기로 게이지를 모아 가득 차면 쓴다 — 그동안 결이 공격 시작부터 보인다, 박자 도전에는 없다', () => {
@@ -475,12 +505,14 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
     expect(press(d, 'focus')).toBe(false);
     let hit = HIT;
     for (let i = 0; i < 3; i++) {
-      advance(d, hit - 40);
+      advance(d, hit - 20);
       press(d, 'parry');
       advance(d, hit + 5);
       hit += 200 + 500 + 400;
     }
-    expect(d.focus).toBe(Math.min(r.focusMax, r.focusStart + 3 * r.focusGain.excellent));
+    const got = d.events.filter((e) => e.type === 'parry').map((e) => (e.type === 'parry' ? e.judgement : 'miss'));
+    expect(got).toHaveLength(3);
+    expect(d.focus).toBe(Math.min(r.focusMax, r.focusStart + got.reduce((a, j) => a + (j === 'perfect' ? r.focusGain.perfect : r.focusGain.excellent), 0)));
     expect(press(d, 'focus')).toBe(true);
     expect(d.focus).toBe(0);
     expect(d.events.some((e) => e.type === 'focus')).toBe(true);
@@ -502,7 +534,7 @@ describe('「결」 목업 4차 — 겨루기·위기·집중', () => {
 
   it('모든 상대에 결정타·날씨·대사가 있다', () => {
     for (const f of duelFoes) {
-      expect(f.finisher?.name, f.id).toBeTruthy();
+      if (beatable.includes(f)) expect(f.finisher?.name, f.id).toBeTruthy();
       expect(f.weather, f.id).toBeTruthy();
       expect(f.lines?.start?.length, f.id).toBeGreaterThan(0);
     }
@@ -517,7 +549,7 @@ describe('「결」 1단계 — 입력 시각 보정·저장', () => {
     advance(late, HIT - 30);
     expect(press(late, 'parry', HIT - 140)).toBe(true);
     advance(late, HIT + 5);
-    expect(late.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'great' });
+    expect(late.events.find((e) => e.type === 'parry')).toMatchObject({ judgement: 'excellent' });
     // 너무 먼 과거는 MAX_INPUT_LAG로 자른다
     const far = createDuel(data, 'dummy');
     advance(far, HIT - 30);
@@ -590,17 +622,17 @@ describe('「결」 2단계 — 난이도·수련장·대결 등급·박자 맞�
     expect(d.events.find((e) => e.type === 'parry')).toMatchObject({ lead: 40 });
   });
 
-  it('대결 등급: 이긴 대결만, 맞지 않고 EXCELLENT가 많을수록 높다', () => {
+  it('대결 등급: 이긴 대결만, 맞지 않고 PERFECT가 많을수록 높다', () => {
     const base = createDuel(real, 'shadow_wolf');
     expect(duelGrade(base)).toBeNull();
     const g = real.rules.grade;
     const mk = (hits: number, ex: number, judged: number) => {
       const d = createDuel(real, 'shadow_wolf');
       d.result = 'win';
-      Object.assign(d.stats, { hits, excellent: ex, perfect: ex, good: judged - ex - hits, miss: hits, guards: 0 });
+      Object.assign(d.stats, { hits, perfect: ex, clean: ex, good: judged - ex - hits, miss: hits, guards: 0 });
       return duelGrade(d)!;
     };
-    expect(mk(0, 10, 10)).toMatchObject({ rank: 'S', score: g.base + g.excellent });
+    expect(mk(0, 10, 10)).toMatchObject({ rank: 'S', score: g.base + g.perfect });
     expect(mk(1, 4, 10).rank).toBe('A');
     expect(mk(4, 0, 10).rank).toBe('C');
     expect(betterRank('A', 'S')).toBe('S');
@@ -614,5 +646,83 @@ describe('「결」 2단계 — 난이도·수련장·대결 등급·박자 맞�
     expect(calibrationOffset(beats, late)).toMatchObject({ mean: 30, used: 12 });
     expect(calibrationOffset(beats, [...beats.slice(0, 8).map((b) => b - 20), 99999])).toMatchObject({ mean: -20, used: 8 });
     expect(calibrationOffset(beats, beats.slice(0, 4))).toBeNull();
+  });
+});
+
+describe('「결」 3단계 — 이야기 규칙(버티기·2단계·잠금·튜토리얼 도움)', () => {
+  it('버티기: 받기·막기를 정한 수만큼 해내면 상대가 쓰러지지 않고도 이긴다', () => {
+    const d = createDuel(data, 'dummy', 'x', 'duel', 'main', { survive: 2 });
+    let hit = HIT;
+    for (let i = 0; i < 2; i++) {
+      advance(d, hit - 100);
+      press(d, 'parry');
+      advance(d, hit + 5);
+      hit += 200 + 500 + 400;
+    }
+    expect(d.result).toBe('win');
+    expect(d.foe.hp).toBe(100);
+    expect(d.events.find((e) => e.type === 'win')).toMatchObject({ survived: true });
+    expect(d.events.filter((e) => e.type === 'endure')).toHaveLength(2);
+  });
+
+  it('2단계: 체력이 문턱 아래로 처음 떨어지면 포효하고 공격 준비가 빨라지며 세진다', () => {
+    const dd: DuelData = { ...data, foes: [{ ...data.foes[0], phase2: { at: 0.5, name: '불이 커진다', speed: 0.5, damageMul: 2, roar: 800 } }] };
+    const d = createDuel(dd, 'dummy');
+    d.foe.hp = 52;
+    d.foe.state = 'stagger';
+    d.foe.stateEnd = 5000;
+    press(d, 'attack');
+    advance(d, data.player.attack.duration + 5);
+    expect(d.events.find((e) => e.type === 'phase')).toMatchObject({ name: '불이 커진다' });
+    expect(d.phase).toBe(2);
+    expect(d.foeDef.moves.swing.windup).toBe(200);
+    expect(d.foeDef.moves.swing.damage).toBe(40);
+    expect(d.foe.state).toBe('idle');
+    expect(data.foes[0].moves.swing.windup).toBe(400); // 원본은 그대로
+  });
+
+  it('잠금: 쓸 수 있는 기술만 준비되고, 집중이 잠기면 게이지도 안 찬다', () => {
+    const run = (opts: DuelOptions) => {
+      const dd = single(swing({ damage: 10, posture: 1 }));
+      const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], hp: 1000, posture: 1000 }] }, 'dummy', 'x', 'duel', 'main', opts);
+      let hit = HIT;
+      for (let i = 0; i < 5; i++) {
+        advance(d, hit - 30);
+        press(d, 'parry');
+        advance(d, hit + 5);
+        hit += 1100;
+      }
+      return d;
+    };
+    expect(run({}).techReady).toBe('byeogun');
+    expect(run({ techs: ['nakun'] }).techReady).toBe('nakun');
+    const nf = run({ focus: false });
+    expect(nf.focus).toBe(real.rules.focusStart);
+    nf.focus = 100;
+    expect(press(nf, 'focus')).toBe(false);
+  });
+
+  it('튜토리얼 도움: noLose면 체력이 1 밑으로 내려가지 않고, assistCue면 결이 처음부터 보인다', () => {
+    const d = createDuel(single(swing({ damage: 500 })), 'dummy', 'x', 'duel', 'main', { noLose: true });
+    advance(d, HIT + 5);
+    expect(d.player.hp).toBe(1);
+    expect(d.result).toBeNull();
+    const slow = createDuel(single(swing({ windup: 1200 })), 'dummy', 'x', 'duel', 'main', { assistCue: true });
+    advance(slow, 600);
+    expect(cue(slow).visible).toBe(true);
+  });
+
+  it('이야기 데이터: 장마다 상대·화자·장면 그림이 있고, 튜토리얼 목표가 알맞다', () => {
+    const s = storyRaw as unknown as { speakers: Record<string, { stand: string | null }>; chapters: { id: string; intro: { speaker?: string; cg?: string }[]; outro: { speaker?: string; cg?: string }[]; bouts?: { foe: string; intro?: { speaker?: string; cg?: string }[]; outro?: { speaker?: string; cg?: string }[] }[]; tutorial?: { goal: { type: string } }[] }[] };
+    const lines = s.chapters.flatMap((c) => [...c.intro, ...c.outro, ...(c.bouts ?? []).flatMap((b) => [...(b.intro ?? []), ...(b.outro ?? [])])]);
+    for (const l of lines) {
+      if (l.speaker) expect(s.speakers[l.speaker], l.speaker).toBeTruthy();
+      if (l.cg && l.cg !== 'none') expect(existsSync(`assets/sprites/${l.cg}`), l.cg).toBe(true);
+    }
+    for (const sp of Object.values(s.speakers)) if (sp.stand) expect(existsSync(`assets/sprites/${sp.stand}`), sp.stand).toBe(true);
+    for (const c of s.chapters) for (const b of c.bouts ?? []) expect(real.foes.find((f) => f.id === b.foe), b.foe).toBeTruthy();
+    const tut = s.chapters[0].tutorial!;
+    expect(tut).toHaveLength(8);
+    expect(tut[tut.length - 1].goal.type).toBe('win');
   });
 });
