@@ -275,7 +275,7 @@
 
 | 상대 | 쓰러짐 | 결정타 | 받을 수 없는 기술 |
 |---|---|---|---|
-| 내원 사형(1장) | `inner_senior_death` — 칼이 튕겨 나가고 무릎 꿇었다 옆으로 쓰러져 기절(죽지 않음), 칼은 땅에 꽂혀 선다 | `fx_gyeol_finisher_inner_senior` 쪼개기(劈柴): 장작 패듯 곧게 내리친 금빛 일섬, 나뭇결 빛 조각 | 없음 |
+| 내원 사형(1장) | `inner_senior_death` — 맨손 권법가: 가슴을 맞고 뒤로 밀려 무릎 꿇었다 옆으로 쓰러져 기절(죽지 않음) | `fx_gyeol_finisher_inner_senior` 쪼개기(劈柴): 장작 패듯 곧게 내리친 금빛 일섬, 나뭇결 빛 조각 | 없음 |
 | 곽도진(1장, 버티기) | 없음(쓰러지지 않는 상대) | 없음 | `fx_gyeol_skill_pine_cleave` 소나무 베기: 소나무 둥치만 한 푸른 검기 반달, 솔잎·나무껍질 |
 | 광석거미(2장) | `ore_spider_death` — 껍질이 갈라지고 다리가 꺾여 뒤집힌다 | `fx_gyeol_finisher_ore_spider` 마디 끊기(斷節): 다리 마디 여섯 칼금, 은빛 광석 조각 | `fx_gyeol_skill_web_throw` 거미줄 던지기: 은빛 거미줄 덩이가 그물로 터진다 |
 | 베일락(2장) | `veilak_death` — 연기 대검이 깨지고 말과 기사가 연기 더미로 무너져 흩어진다 | `fx_gyeol_finisher_veilak` 매듭 끊기(斷結): 그림자 실이 모인 매듭을 꿰뚫어 실이 풀린다 | `fx_gyeol_skill_shadow_charge` 그림자 돌격: 말 돌격 모양 검은 연기 벽 |
