@@ -143,6 +143,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     if (id === 'settings') nav.settings();
     else nav.go(id as Screen);
   };
+  let armed = false;
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = lobby.json menu 순서)이 오면 이름 왼쪽에
@@ -150,10 +151,11 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
     // 싸우러 가는 메뉴에 손이 가면 하운이 칼자루에 손을 얹는다
     if (m.id === 'story' || m.id === 'arena') {
+      // 로비에 들어올 때 첫 메뉴에 저절로 가는 초점은 빼고, 마우스를 올리거나 키보드로 옮겼을 때만
       const ready = () => pose(haunImg, haunArt, 2);
       const calm = () => pose(haunImg, haunArt, 1);
       b.addEventListener('pointerenter', ready);
-      b.addEventListener('focus', ready);
+      b.addEventListener('focus', () => armed && ready());
       b.addEventListener('pointerleave', calm);
       b.addEventListener('blur', calm);
     }
@@ -176,6 +178,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     else if (e.key === 'Escape') nav.go('title');
   });
   (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
+  armed = true;
 }
 
 /* ───────── 결투장 ───────── */
