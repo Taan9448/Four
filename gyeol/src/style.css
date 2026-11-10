@@ -473,3 +473,20 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
   .art-frames .title.gated h1.logo { width: 220px; height: 220px; font-size: 116px; }
   .title.gated .sub { margin-bottom: 14px; }
 }
+.survive.warn { border-color: rgba(190, 230, 255, 0.9); color: #e6f6ff; box-shadow: 0 0 14px rgba(160, 220, 255, 0.5); }
+/* 장면 고르기(6장 바르가스의 거래) */
+.vn-choices { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.vn-choices[hidden] { display: none; }
+.vn-choice { justify-content: flex-start; text-align: left; min-height: 44px; font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 17px; background: rgba(30, 24, 16, 0.92); border-color: rgba(226, 180, 92, 0.5); display: flex; align-items: center; gap: 10px; }
+.vn-choice:hover, .vn-choice:focus-visible { border-color: #ffe08a; outline: none; box-shadow: 0 0 12px rgba(255, 224, 138, 0.35); }
+.vn-choice .key { font-family: 'IBM Plex Sans KR', sans-serif; font-size: 12px; font-weight: 400; opacity: 0.6; }
+/* 에필로그 뒤 새벽 로비: 푸른 밤 위에 동트는 빛 */
+.lobby.dawn::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(255, 190, 130, 0.5) 0%, rgba(255, 160, 110, 0.22) 40%, rgba(255, 150, 100, 0.06) 75%); mix-blend-mode: screen; z-index: 0; }
+.lobby.dawn > * { position: relative; z-index: 1; }
+/* 에필로그 결과: 끝 글 */
+.credits { margin: 18px auto 6px; text-align: center; font-family: 'Nanum Myeongjo', serif; color: #e9dcc0; line-height: 2; animation: creditsIn 2.4s ease-out both; }
+.credits p { margin: 0; }
+.credits p:first-child { font-family: 'Song Myung', serif; font-size: 30px; color: #f4ead6; }
+@keyframes creditsIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.tip-card kbd { white-space: nowrap; }
+.duel .tip-card { top: 24%; }

@@ -1,0 +1,21 @@
+id: jo_myeonggak_death
+type: character-anim
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: "「결」 조명각 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치. 죽지 않는다 — 칼을 떨어뜨리고 무릎 꿇는다(베지 않는다)"
+depends_on: [jo_myeonggak_ref]
+reference: assets/source/jo_myeonggak_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "his sword knocked from his hand by a scabbard pressing the knot of his wrist, the twisted sword flying"
+  2: "stumbles back holding his wrist, eyes wide"
+  3: "drops to both knees, defeated but alive, glaring"
+  4: "kneeling with head bowed, both hands on the ground"
+  5: "kneeling, shoulders slumped, his fallen sword on the ground beside him"
+  6: "kneeling still, head bowed, subdued (not dead)"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

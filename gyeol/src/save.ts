@@ -23,7 +23,7 @@ export interface SaveData {
   /** 박자 도전 최고 기록(상대 id별) */
   rhythmBest: Record<string, { accuracy: number; rank: string }>;
   /** 이야기 진행(7-2): 깬 장·별 — 3단계에서 채운다 */
-  story: { cleared: string[]; stars: Record<string, number> };
+  story: { cleared: string[]; stars: Record<string, number>; flags: string[] };
   /** 상대·난이도별 최고 대결 등급(`<상대 id>:<난이도 id>` → S·A·B·C) */
   duelBest: Record<string, string>;
   /** 쌓인 기록(기록 화면) */
@@ -55,7 +55,7 @@ const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto' });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {} }, duelBest: {}, stats: emptyStats(), seen: [], tips: [] });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, duelBest: {}, stats: emptyStats(), seen: [], tips: [] });
 
 interface Store {
   getItem(k: string): string | null;
@@ -89,7 +89,7 @@ export function normalize(raw: unknown): SaveData {
     quality: st.quality === 'high' || st.quality === 'normal' || st.quality === 'low' || st.quality === 'auto' ? st.quality : d.quality,
   };
   if (r.rhythmBest && typeof r.rhythmBest === 'object') s.rhythmBest = { ...r.rhythmBest };
-  if (r.story && Array.isArray(r.story.cleared)) s.story = { cleared: [...r.story.cleared], stars: { ...(r.story.stars ?? {}) } };
+  if (r.story && Array.isArray(r.story.cleared)) s.story = { cleared: [...r.story.cleared], stars: { ...(r.story.stars ?? {}) }, flags: Array.isArray(r.story.flags) ? r.story.flags.filter((x): x is string => typeof x === 'string') : [] };
   if (r.duelBest && typeof r.duelBest === 'object') s.duelBest = { ...r.duelBest };
   if (r.stats && typeof r.stats === 'object') {
     const base = emptyStats();

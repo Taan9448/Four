@@ -1,0 +1,21 @@
+id: sa_giant_death
+type: character-anim
+size: large
+character: sa_mugyeol_giant
+chroma: green
+summary: "「결」 붉은 거인 사무결 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [sa_giant_ref]
+reference: assets/source/sa_giant_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the red flow connecting the giant to the sky above snaps, red sparks spraying from every crack"
+  2: "the giant's huge body rocks back, layers of red power peeling off"
+  3: "the red layers falling away, the giant shrinking and buckling"
+  4: "collapsing into a heap of fading red light and black cracked shell"
+  5: "only a dim red glow and cracked shell pieces left"
+  6: "a faint red ember among the shell pieces, going out"
+placeholder: { shape: humanoid, color: '#a01020', accent: '#ff5a3a' }

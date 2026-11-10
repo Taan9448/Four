@@ -40,6 +40,38 @@
     "ignis": {
       "name": "이그니스",
       "stand": "ignis_stand"
+    },
+    "celias": {
+      "name": "셀리아스",
+      "stand": "celias_stand"
+    },
+    "gormon": {
+      "name": "고르몬",
+      "stand": "gormon_stand"
+    },
+    "vargas": {
+      "name": "바르가스",
+      "stand": "vargas_stand"
+    },
+    "jo": {
+      "name": "조명각",
+      "stand": "jo_myeonggak_stand"
+    },
+    "yeomtak": {
+      "name": "염탁",
+      "stand": "hyeolsu_stand"
+    },
+    "sa_mugyeol": {
+      "name": "사무결",
+      "stand": "sa_mugyeol_stand"
+    },
+    "mordecai": {
+      "name": "모르데카이",
+      "stand": "mordecai_stand"
+    },
+    "seokdu": {
+      "name": "석두",
+      "stand": "seokdu_stand"
     }
   },
   "chapters": [
@@ -672,38 +704,943 @@
         "text": "겨루기에서 한 번 이긴다"
       },
       "unlockText": "기술 벽운단하 — PERFECT만 5연속으로 준비된다 · 겨루기(결 연환 3 이상, 무거운 공격에 맞춰 베기)"
-    }
-  ],
-  "upcoming": [
+    },
     {
+      "id": "ch4",
       "no": 4,
-      "subtitle": "아르덴"
+      "title": "4장",
+      "subtitle": "아르덴",
+      "recall": "원작 3권 얼음의 왕국 — S3 아르덴",
+      "bg": "bg_arden",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "fragile"
+      ],
+      "intro": [
+        {
+          "text": "아르덴의 국경을 넘자 봄이 사라졌다. 얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다."
+        },
+        {
+          "speaker": "haun",
+          "text": "탑 꼭대기에서 왕녀를 붙잡은 얼음을 먼저 봤습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "왕녀를 붙잡은 얼음이라. 그걸 베었느냐."
+        },
+        {
+          "speaker": "haun",
+          "text": "아니요. 베면 안 되는 얼음이었습니다."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "ice_wolf",
+          "intro": [
+            {
+              "text": "밀대 사이에서 늑대가 나왔다. 투명한 갈비뼈 안쪽에 어두운 덩어리가 매달려 있었다. 턱이 부서져도 멈추지 않았다."
+            },
+            {
+              "text": "머리를 치지 마라! 가슴이다!"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "ice_knight",
+          "intro": [
+            {
+              "text": "북문 한가운데, 계단 위에서 기사가 검을 들었다. 칼끝이 느리게 오다가 마지막에 갑자기 빨라졌다.",
+              "cg": "cg_ice_palace"
+            },
+            {
+              "speaker": "haun",
+              "text": "발뒤꿈치. 선이 올라오는 자리는 그 아래야.",
+              "cg": "none"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "celias",
+          "duel": {
+            "fragile": 3
+          },
+          "intro": [
+            {
+              "text": "탑의 마지막 계단은 지붕 없는 방으로 이어졌다. 왕은 검을 빼려다 멈췄고, 왕비는 옆의 소녀를 붙잡으려 손을 뻗고 있었다. 리나 왕녀였다.",
+              "cg": "cg_princess_ice"
+            },
+            {
+              "speaker": "celias",
+              "text": "무너지지 않게 붙잡아 두었다. 네가 버리고 간 자리에.",
+              "cg": "none"
+            },
+            {
+              "text": "셀리아스의 몸으로 이어지는 선은 소녀의 손을 뚫고 가지 않았다. 손을 감싼 얼음 바로 밖에 붙어 있었다."
+            },
+            {
+              "speaker": "elia",
+              "text": "붙여 놓은 거야. 같은 것으로 보이게."
+            },
+            {
+              "text": "(푸른 「護」 결은 왕녀의 얼음 — 받아치지 말고 막거나 피한다. 셀리아스의 결만 받아친다)"
+            }
+          ],
+          "outro": [
+            {
+              "text": "카일이 리나의 팔 아래로 왼손을 넣었다. 하운은 얼음 바로 바깥, 셀리아스에게 이어진 선만 그었다."
+            },
+            {
+              "speaker": "kyle",
+              "text": "하운. 기다리고 있어. 네가 할 수 있을 때 해."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "얼음을 쪼개지 않고, 얼음 바로 바깥만."
+        },
+        {
+          "speaker": "haun",
+          "text": "엘리아가 같은 자리에 틈을 남겼습니다. 둘이 따로 그렸는데도요."
+        },
+        {
+          "speaker": "wang",
+          "text": "남의 결을 보는 눈이 하나 더 있었구나. 다음."
+        }
+      ],
+      "challenge": {
+        "type": "noCrack",
+        "text": "왕녀의 얼음에 금을 내지 않는다"
+      },
+      "unlockText": "결투장 — 얼음 늑대 · 셀리아스"
     },
     {
+      "id": "ch5",
       "no": 5,
-      "subtitle": "카즈둠"
+      "title": "5장",
+      "subtitle": "카즈둠",
+      "recall": "원작 4권 산의 이름 — S4 카즈둠",
+      "bg": "bg_kazdum",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "mountain"
+      ],
+      "intro": [
+        {
+          "text": "보른은 산이 보이기 사흘 전부터 수레에서 내렸다. 바퀴 소리가 너무 크다고 했다."
+        },
+        {
+          "speaker": "haun",
+          "text": "산과 몸이 붙은 거인이었습니다. 한 곳을 자르면 다른 벽에서 메웠어요."
+        },
+        {
+          "speaker": "wang",
+          "text": "메우는 것보다 빨리 받아쳤느냐."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "rock_golem",
+          "intro": [
+            {
+              "text": "받침을 세우는 동안 동굴 벽에서 바위가 일어섰다."
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "tomb_warrior",
+          "intro": [
+            {
+              "text": "위의 돌을 움직이면 아래에서 갑옷이 찌그러지는 소리가 났다. 오천의 무덤에서 전사 하나가 일어섰다.",
+              "cg": "cg_durin_rest"
+            },
+            {
+              "speaker": "born",
+              "text": "…쉬게 해 드려야지.",
+              "cg": "none"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "gormon",
+          "intro": [
+            {
+              "text": "검은 벽에서 붉은 빛이 켜졌다. 동굴 전체가 큰 짐승의 등처럼 울렁였다.",
+              "cg": "cg_gormon_wakes"
+            },
+            {
+              "speaker": "gormon",
+              "text": "…두린의 냄새가 난다.",
+              "cg": "none"
+            },
+            {
+              "speaker": "born",
+              "text": "하운, 내 손을 봐. 산 쪽은 내가 친다. 네가 자를 건 그 뒤야."
+            },
+            {
+              "text": "(산이 메운다 — 체간이 아주 빨리 돌아온다. 쉬지 않고 받아쳐 연속 박자로 몰아쳐야 한다)"
+            }
+          ],
+          "outro": [
+            {
+              "text": "마지막 구역이 떨어졌다. 산이 처음으로 산의 무게만큼만 내려앉았다."
+            },
+            {
+              "speaker": "born",
+              "text": "형. …다음 갱도는 내가 팔게."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "메우는 쪽보다 한 박자 먼저, 쉬지 않고."
+        },
+        {
+          "speaker": "haun",
+          "text": "보른이 산 쪽을 쳤습니다. 저는 그 뒤만 잘랐어요."
+        },
+        {
+          "speaker": "wang",
+          "text": "혼자 받아 낸 게 아니로구나. 다음."
+        }
+      ],
+      "challenge": {
+        "type": "maxStreak",
+        "bout": 2,
+        "n": 10,
+        "text": "고르몬과의 대결에서 연속 박자 10"
+      },
+      "unlockText": "결투장 — 바위 골렘 · 무덤 망령 전사 · 고르몬"
     },
     {
+      "id": "ch6",
       "no": 6,
-      "subtitle": "노크투르나"
+      "title": "6장",
+      "subtitle": "노크투르나",
+      "recall": "원작 5권 마왕의 문 — S5 노크투르나",
+      "bg": "bg_nocturna",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [],
+      "intro": [
+        {
+          "text": "두 번째 원정의 출발 명부는 첫 번째보다 짧았다.",
+          "cg": "cg_nocturna"
+        },
+        {
+          "speaker": "haun",
+          "text": "문 앞에서, 돌아갈 길을 보여 주더군요.",
+          "cg": "none"
+        },
+        {
+          "speaker": "wang",
+          "text": "그래서. 받았느냐."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "shadow_fragment",
+          "intro": [
+            {
+              "text": "망루의 모든 그림자가 동시에 소리 없는 비명을 질렀다."
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "shadow_assassin",
+          "intro": [
+            {
+              "text": "일곱째 회랑. 보랏빛 번개를 두른 칼이 어둠 속에서 튀었다."
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "vargas",
+          "intro": [
+            {
+              "text": "마왕 바르가스는 왕좌에 앉아 있지 않았다. 방 한가운데 서서 깨진 창밖의 전장을 내려다보고 있었다.",
+              "cg": "cg_vargas_throne"
+            },
+            {
+              "speaker": "vargas",
+              "text": "이방인이로군. 너는 어디서 왔느냐, 작은 것.",
+              "cg": "none"
+            },
+            {
+              "speaker": "haun",
+              "text": "장작 패던 곳에서."
+            },
+            {
+              "text": "바르가스의 가슴에서 검은 수정이 나왔다. 공허의 열쇠. 빛 가운데에서 낯선 바위와 나무의 그림자가 비쳤다. 하운은 소나무 냄새를 맡은 것 같았다.",
+              "cg": "cg_vargas_deal"
+            },
+            {
+              "speaker": "vargas",
+              "text": "네 흔적에 맞춘 길이다. 지금 건너갈 수 있다. 내가 나머지 문을 여는 동안 방해하지 않는다면. 선택은 길지 않다.",
+              "cg": "none",
+              "choices": [
+                {
+                  "text": "열쇠를 쥔다 — 바르가스의 힘이 줄지만, 끝에 하는 말이 달라진다",
+                  "flag": "took_key"
+                },
+                {
+                  "text": "받지 않는다 — 지금 나를 보고 있는 사람을 버리지 않는다"
+                }
+              ]
+            }
+          ],
+          "ifFlag": {
+            "flag": "took_key",
+            "duel": {
+              "foeDamageMul": 0.6
+            },
+            "intro": [
+              {
+                "text": "하운은 열쇠를 쥐었다. 바르가스의 손이 비었다. 그 몫만큼 그의 팔이 가벼워졌다."
+              },
+              {
+                "speaker": "vargas",
+                "text": "…그래도 싸우겠다는 것이냐."
+              }
+            ]
+          },
+          "outro": [
+            {
+              "text": "검끝이 가슴의 매듭을 찔렀다. 이미 드러난 한 점에 닿을 만큼만.",
+              "cg": "cg_cheonoe_gwiun"
+            },
+            {
+              "speaker": "vargas",
+              "text": "내가 모은 것을…….",
+              "cg": "none"
+            },
+            {
+              "speaker": "haun",
+              "text": "돌려보냈어요."
+            },
+            {
+              "speaker": "vargas",
+              "text": "네가 연 것은…… 네가 닫아야 한다."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "받지 않았구나."
+        },
+        {
+          "speaker": "haun",
+          "text": "지금 저를 보고 있는 사람을 버리지 않겠다고 했습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "…그 말을 한 녀석이 지금 내 앞에서 장작을 패고 있군. 다음."
+        }
+      ],
+      "outroIf": {
+        "flag": "took_key",
+        "lines": [
+          {
+            "speaker": "wang",
+            "text": "쥐었구나."
+          },
+          {
+            "speaker": "haun",
+            "text": "…돌아갈 길이 손바닥에 있었습니다. 그래도 놓지 못했어요."
+          },
+          {
+            "speaker": "wang",
+            "text": "쥔 것을 말하는 것도 받아 낸 것이다. 언젠가 놓는 날이 오겠지. 다음."
+          }
+        ]
+      },
+      "challenge": {
+        "type": "flagNot",
+        "flag": "took_key",
+        "text": "열쇠를 받지 않고 이긴다"
+      },
+      "unlockText": "결투장 — 그림자 조각 · 바르가스"
     },
     {
+      "id": "ch7",
       "no": 7,
-      "subtitle": "운곡촌"
+      "title": "7장",
+      "subtitle": "운곡촌",
+      "recall": "원작 6권 돌아온 잡역 — S6 운곡촌",
+      "bg": "bg_blood_road",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "subdue"
+      ],
+      "intro": [
+        {
+          "text": "산 아래로 가는 길은 하운이 기억한 곳에서 끊겼다. 소나무 사이로 낮은 지붕들이 보였다.",
+          "cg": "cg_tax_office"
+        },
+        {
+          "speaker": "wang",
+          "text": "조명각을 베지 않았다지.",
+          "cg": "none"
+        },
+        {
+          "speaker": "haun",
+          "text": "검집으로 매듭을 눌렀습니다. 데리고 내려왔어요."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "black_wind",
+          "intro": [
+            {
+              "text": "배진은 골짜기 입구로 들어가지 않았다. 위쪽 능선에서 돌담과 목책, 솥의 연기를 보았다.",
+              "cg": "cg_charcoal_valley"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "black_wind_captain",
+          "intro": [
+            {
+              "text": "바깥 창고의 지붕이 기울었다. 그 아래에 사람이 있었다. 하운은 생각하기 전에 손을 뻗었다.",
+              "cg": "none"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "jo_myeonggak",
+          "duel": {
+            "finish": "stagger",
+            "staggerWin": 3
+          },
+          "intro": [
+            {
+              "speaker": "jo",
+              "text": "누가 가르쳤느냐."
+            },
+            {
+              "speaker": "haun",
+              "text": "여러 사람에게 배웠습니다."
+            },
+            {
+              "text": "조명각의 검에는 두 기운이 반대 방향으로 꼬여 있었다. 결이 엉킨 검은 엉킨 곳에서 갈라진다."
+            },
+            {
+              "text": "(베지 않는다 — 결정타는 없다. 비틀거리게 세 번 만들면 데려 내려온다)"
+            }
+          ],
+          "outro": [
+            {
+              "text": "검집이 그 매듭을 눌렀다. 검이 떨어졌다. 하운은 그를 베지 않았다."
+            },
+            {
+              "speaker": "seokdu",
+              "text": "…형, 밥 남겼어."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "엉킨 검은 엉킨 곳에서 갈라진다. 베지 않고."
+        },
+        {
+          "speaker": "haun",
+          "text": "서둘러 잘못 들어가면 남은 길까지 잃을 것 같았습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "서두르지 않는 것도 손이 하는 일이다. 다음."
+        }
+      ],
+      "challenge": {
+        "type": "noRedHits",
+        "text": "붉은 결에 한 번도 맞지 않는다"
+      },
+      "unlockText": "결투장 — 배진의 척후 · 흑풍대주 배진 · 조명각"
     },
     {
+      "id": "ch8",
       "no": 8,
-      "subtitle": "낙안봉"
+      "title": "8장",
+      "subtitle": "낙안봉",
+      "recall": "원작 7권 하늘의 금 — S7 낙안봉",
+      "bg": "bg_nakan",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "veil",
+        "focus"
+      ],
+      "intro": [
+        {
+          "text": "정찰대가 가져온 물은 병 속에서도 얼지 않았다. 낙안봉의 배수로에서 담아 온 물이었다.",
+          "cg": "cg_shield_wall"
+        },
+        {
+          "speaker": "haun",
+          "text": "붉은 물이 결을 가렸습니다. 늦게 보였어요.",
+          "cg": "none"
+        },
+        {
+          "speaker": "wang",
+          "text": "늦게 보이면 먼저 보는 수밖에."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "blood_cultist",
+          "duel": {
+            "veil": 0.45
+          },
+          "intro": [
+            {
+              "text": "혈전의 바닥에는 붉은 홈이 파여 있었다. 물처럼 흐르는 것이 홈을 따라 모였다."
+            },
+            {
+              "text": "(붉은 장력 — 결이 늦게 보인다. 집중(U)을 쓰면 처음부터 보인다)"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "poison_hand",
+          "duel": {
+            "veil": 0.45
+          },
+          "intro": [
+            {
+              "text": "하운은 두 걸음 옆으로 옮겼다. 바람 아래에 사람들을 두지 않으려고. 그래도 왼팔에 독이 올랐다."
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "yeomtak",
+          "duel": {
+            "veil": 0.45
+          },
+          "intro": [
+            {
+              "text": "염탁이 바닥을 내려쳤다. 붉은 물이 홈에서 솟았다."
+            },
+            {
+              "speaker": "elia",
+              "text": "거기 힘이 쌓여 있어요! 가운데를 건드리면 어디로 나갈지 몰라요!"
+            },
+            {
+              "speaker": "haun",
+              "text": "물러나."
+            }
+          ],
+          "outro": [
+            {
+              "text": "하운은 염탁의 팔 아래, 힘이 한곳으로 모인 매듭을 짧게 찔렀다. 갈라진 자리는 닫히지 않았다.",
+              "cg": "cg_nakan_crack"
+            },
+            {
+              "speaker": "haun",
+              "text": "아이를 구한 것도 내 이름으로, 저 금을 낸 것도 내 이름으로 적어 줘.",
+              "cg": "none"
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "모인 힘을 삼키지 않고, 갈 자리로 보낸다. 그걸 이제 할 수 있겠느냐."
+        },
+        {
+          "speaker": "haun",
+          "text": "…해 보겠습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "운해귀종. 돌려보내는 초식이다. 다음은 천마봉이로구나."
+        }
+      ],
+      "challenge": {
+        "type": "maxStreak",
+        "n": 10,
+        "text": "연속 박자 10을 잇는다"
+      },
+      "unlockText": "기술 운해귀종 — EXCELLENT 이상으로 10연속 받아 내면 준비된다"
     },
     {
+      "id": "ch9",
       "no": 9,
-      "subtitle": "천마봉"
+      "title": "9장",
+      "subtitle": "천마봉",
+      "recall": "원작 8권 구천 계단 — S8 천마봉",
+      "bg": "bg_heavenly_peak",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun",
+          "unhae"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "unhae"
+      ],
+      "intro": [
+        {
+          "text": "천마봉의 소식은 한 장의 비밀문서로 오지 않았다. 청동 그릇을 실은 수레가 산 안으로 들어갔다.",
+          "cg": "cg_nine_stairs"
+        },
+        {
+          "speaker": "haun",
+          "text": "장문인을 다시 만났습니다. 귀곡애에서처럼.",
+          "cg": "none"
+        },
+        {
+          "speaker": "wang",
+          "text": "…돌아올 자리는 있었다."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "stair_elder",
+          "intro": [
+            {
+              "text": "여섯째 굽이. 계단 위에서 장로 하나가 천천히 내려왔다. 검은 옷 위에 녹빛 겉옷을 겹쳐 입었다.",
+              "cg": "cg_poison_palm_ice"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "kwak_dojin_peak",
+          "duel": {
+            "finish": "unhae"
+          },
+          "intro": [
+            {
+              "speaker": "kwak_dojin",
+              "text": "또 너냐.",
+              "cg": "none"
+            },
+            {
+              "text": "(송문고검은 운해귀종으로만 부러진다 — 결 연환을 이어 운해귀종을 준비해 써라)"
+            }
+          ],
+          "outro": [
+            {
+              "text": "하운은 버티지 않았다. 나무토막처럼, 밀어 오는 쪽으로 흘렸다. 운해귀종. 송문고검의 끝이 부러졌다."
+            },
+            {
+              "speaker": "kwak_dojin",
+              "text": "너무 멀리 왔다."
+            },
+            {
+              "speaker": "wang",
+              "text": "돌아올 자리는 있었다."
+            }
+          ]
+        },
+        {
+          "foe": "sa_giant",
+          "intro": [
+            {
+              "text": "청동 그릇이 갈라지며 사무결의 몸 둘레에 붉은 힘이 겹겹이 모였다. 기둥에 닿는 거인."
+            },
+            {
+              "speaker": "kyle",
+              "text": "오래 잡지 마."
+            },
+            {
+              "text": "아래로 보내지 마 — 엘리아의 말이었다."
+            }
+          ],
+          "outro": [
+            {
+              "text": "칼끝을 사무결의 몸이 아니라 새로 들어오는 흐름의 가장자리에 댔다. 받은 것을 몸에 가두지 않고, 다시 위의 틈으로."
+            },
+            {
+              "speaker": "sa_mugyeol",
+              "text": "장작 패던 것이…… 네 해도 못 되어."
+            },
+            {
+              "text": "하늘의 문은 닫히지 않았다.",
+              "cg": "cg_sky_splits"
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "그가 망설였던 일과, 끝까지 베려 했던 일. 둘 다 말해 다오."
+        },
+        {
+          "speaker": "haun",
+          "text": "하나만 말하면 거짓말이 되니까요."
+        },
+        {
+          "speaker": "wang",
+          "text": "그래. …이제 마지막이로구나."
+        }
+      ],
+      "challenge": {
+        "type": "noRedHits",
+        "text": "붉은 결에 한 번도 맞지 않는다"
+      },
+      "unlockText": "결투장 — 계단의 장로 · 곽도진(천마봉) · 붉은 거인 사무결"
     },
     {
+      "id": "ch10",
       "no": 10,
-      "subtitle": "세계의 틈"
+      "title": "10장",
+      "subtitle": "세계의 틈",
+      "recall": "원작 9권 세 숨 — S9 세계의 틈",
+      "bg": "bg_rift",
+      "rules": {
+        "techs": [
+          "nakun",
+          "byeogun",
+          "unhae"
+        ],
+        "focus": true,
+        "clash": true
+      },
+      "tips": [
+        "breath"
+      ],
+      "intro": [
+        {
+          "text": "틈 속에는 위도 아래도 없었다. 검은 허공에 부서진 세계의 조각들이 떠 있었다.",
+          "cg": "cg_rift_void"
+        },
+        {
+          "speaker": "haun",
+          "text": "흐르는 것을 찾는다면, 흐르지 않으면 된다. 거기서 처음 그렇게 생각했습니다.",
+          "cg": "none"
+        },
+        {
+          "speaker": "wang",
+          "text": "그게 놓는 연습이다. 마저 말해 봐라."
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "bone_giant",
+          "intro": [
+            {
+              "text": "부서진 세계의 조각들 사이에서 뼈가 맞물렸다."
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "rift_beast",
+          "intro": [
+            {
+              "text": "종을 친 사람은 종소리를 듣지 못했다. 검은 금에서 나온 것이 풀밭을 건넜다.",
+              "cg": "cg_dolnae_evac"
+            }
+          ],
+          "outro": []
+        },
+        {
+          "foe": "mordecai",
+          "intro": [
+            {
+              "text": "모르데카이는 가까이서 보니 얼굴이 없었다. 눈처럼 보였던 자리는 흐름이 안으로 접히는 구멍이었다.",
+              "cg": "cg_mordecai"
+            },
+            {
+              "speaker": "elia",
+              "text": "힘을 쓰는 쪽을 따라와요. 흐르는 걸 보고 있어요.",
+              "cg": "none"
+            },
+            {
+              "speaker": "mordecai",
+              "text": "…아아. 둘이 왔구나. 두 세계의 숨을 다 가진 것이."
+            },
+            {
+              "speaker": "elia",
+              "text": "다음엔 세 번까지만 해요. 그 사이에 내가 저쪽을 부를게요."
+            },
+            {
+              "text": "(세 숨 — 하얀 「息」 결을 이어서 세 번 받아 내면 매듭이 드러난다)"
+            }
+          ],
+          "outro": [
+            {
+              "text": "세 숨에 세 걸음. 장작을 세우던 발처럼 왼발을 붙였다. 검은 두 가닥이 새로 맞물리는 틈에 들어가 있었다. 더 깊이 찌르지 않고, 옆으로 틀었다.",
+              "cg": "cg_sealing"
+            },
+            {
+              "text": "놓고 계시오.",
+              "cg": "none"
+            },
+            {
+              "text": "하운은 실을 놓았다."
+            }
+          ]
+        }
+      ],
+      "outro": [
+        {
+          "speaker": "wang",
+          "text": "놓았구나."
+        },
+        {
+          "speaker": "haun",
+          "text": "네. 놓았습니다."
+        },
+        {
+          "speaker": "wang",
+          "text": "…비었구나. 그래도 네 몸은 남았다. 이제 장작이나 패러 가자."
+        }
+      ],
+      "challenge": {
+        "type": "maxStreak",
+        "n": 12,
+        "text": "연속 박자 12를 잇는다"
+      },
+      "unlockText": "에필로그 — 장작 패는 날"
+    },
+    {
+      "id": "epilogue",
+      "no": 11,
+      "title": "에필로그",
+      "subtitle": "장작 패는 날",
+      "recall": "원작 9권 에필로그 — 운곡촌의 늦겨울",
+      "bg": "bg_blood_road",
+      "rules": {},
+      "intro": [
+        {
+          "text": "늦겨울, 운곡촌. 장작 패는 날.",
+          "cg": "cg_firewood_day"
+        },
+        {
+          "text": "첫 장작은 비뚤어졌다. 하운은 예전처럼 내공으로 누르려다 멈췄다. 나무를 다시 세우고 발을 조금 옮겼다. 급하게 쪼갤 필요는 없었다.",
+          "cg": "none"
+        }
+      ],
+      "bouts": [
+        {
+          "foe": "firewood",
+          "mode": "rhythm",
+          "intro": [
+            {
+              "text": "(장작이 오는 박자에 맞춰 받는다 — 지지 않는다)"
+            }
+          ],
+          "outro": []
+        }
+      ],
+      "outro": [
+        {
+          "text": "엘리아가 차 두 잔을 들고 나왔다. 하운의 어깨가 올라가는 것을 보고 잠깐 쉬자고 했다."
+        },
+        {
+          "speaker": "seokdu",
+          "text": "누나, 내 잔은?"
+        },
+        {
+          "speaker": "elia",
+          "text": "안에 있어."
+        },
+        {
+          "speaker": "wang",
+          "text": "네가 받아 낸 것들은 다 들었다."
+        },
+        {
+          "text": "하운은 마당의 남은 나무를 보았다. 오늘 다 하지 못하면 내일 하면 되었다. 잠깐 쉬고 나서, 그는 다시 도끼를 들었다.",
+          "cg": "cg_firewood_day"
+        }
+      ],
+      "outroIf": {
+        "flag": "took_key",
+        "lines": [
+          {
+            "text": "엘리아가 차 두 잔을 들고 나왔다. 하운의 품에는 아직 검은 수정이 있었다."
+          },
+          {
+            "speaker": "wang",
+            "text": "네가 받아 낸 것들은 다 들었다. 쥔 것도."
+          },
+          {
+            "speaker": "haun",
+            "text": "…언젠가 놓겠습니다."
+          },
+          {
+            "speaker": "wang",
+            "text": "그래. 오늘 다 하지 못하면 내일 하면 된다."
+          },
+          {
+            "text": "잠깐 쉬고 나서, 하운은 다시 도끼를 들었다.",
+            "cg": "cg_firewood_day"
+          }
+        ]
+      },
+      "challenge": {
+        "type": "maxStreak",
+        "n": 12,
+        "text": "장작 열두 개를 끊지 않고 받는다"
+      },
+      "unlockText": "운곡루 로비가 새벽으로 바뀐다",
+      "ending": [
+        "「決」 — 끝",
+        "원작 「천외귀환」",
+        "받아서, 돌려보낸다.",
+        "함께 받아 준 모든 이에게"
+      ]
     }
   ],
+  "upcoming": [],
   "tips": {
     "tech": {
       "key": "I",
@@ -716,6 +1653,30 @@
     "clash": {
       "key": "J·K",
       "text": "칼끼리 맞부딪혔다! 결 연환을 이은 채 무거운 공격에 맞춰 베면 겨루기가 된다. J·K를 연타해 밀어내라."
+    },
+    "fragile": {
+      "key": "K 일찍",
+      "text": "푸른 「護」 결은 왕녀의 얼음이다. 받아치면(패링) 금이 간다 — 일찍 눌러 막거나(다치지 않는다) 피한다. 금이 셋이면 진다."
+    },
+    "mountain": {
+      "key": "J·K",
+      "text": "산이 메운다 — 체간이 아주 빨리 돌아온다. 쉬지 않고 받아치고 반격해 연속 박자로 몰아쳐야 비틀거린다."
+    },
+    "subdue": {
+      "key": "K",
+      "text": "베지 않는다 — 결정타는 없다. 비틀거리게 세 번 만들면 데려 내려온다."
+    },
+    "veil": {
+      "key": "U",
+      "text": "붉은 장력 — 결이 피에 가려 늦게 보인다. 집중(U)을 쓰면 처음부터 보인다."
+    },
+    "unhae": {
+      "key": "I",
+      "text": "송문고검은 운해귀종으로만 부러진다. EXCELLENT 이상으로 열 번 이어 받아 운해귀종을 준비해 써라."
+    },
+    "breath": {
+      "key": "K ×3",
+      "text": "흐름이 멈추는 숨 — 하얀 「息」 결을 이어서 세 번 받아 내면 매듭이 드러난다. 가닥은 베어도 메워진다."
     }
   }
 }

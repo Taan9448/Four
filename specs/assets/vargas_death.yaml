@@ -1,0 +1,21 @@
+id: vargas_death
+type: character-anim
+size: large
+character: vargas
+chroma: magenta
+summary: "「결」 마왕 바르가스 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [vargas_ref]
+reference: assets/source/vargas_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck in the chest, the black crystal knot in his chest cracking with a burst of dark light"
+  2: "staggers back, the torn bat wings folding, horns tilting"
+  3: "his huge body begins to fray into dark mist at the edges, one knee on the ground"
+  4: "half dissolved into dark mist, looking up with a faint smile"
+  5: "only the crowned horns and a swirl of dark mist left, a crack of pale light where he stood"
+  6: "a thin crack of pale light in the air and a last wisp of dark mist"
+placeholder: { shape: humanoid, color: '#2a2a34', accent: '#7dff9a' }

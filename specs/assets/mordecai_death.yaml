@@ -1,0 +1,21 @@
+id: mordecai_death
+type: character-anim
+size: large
+character: mordecai
+chroma: green
+summary: "「결」 지옥왕 모르데카이 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [mordecai_ref]
+reference: assets/source/mordecai_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck at the knot where two strands meet, the face scattering into threads"
+  2: "the stitched strands unravelling from the edges, his voice turning into scraping metal"
+  3: "the body coming apart into loose dark threads, the last arm reaching out"
+  4: "most of the body unravelled into drifting threads, the hollow face fading"
+  5: "a tangle of loose threads sinking, blue light flickering"
+  6: "a few last dark threads and a faint blue glint"
+placeholder: { shape: humanoid, color: '#1a1020', accent: '#4fb4ff' }
