@@ -1,0 +1,21 @@
+id: bone_giant_death
+type: character-anim
+size: large
+character: bone_giant
+chroma: green
+summary: "「결」 뼈 거인 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [bone_giant_ref]
+reference: assets/source/bone_giant_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the bone club shattering, bones knocked loose"
+  2: "the ribcage cracking apart, the giant swaying"
+  3: "the joints coming apart, collapsing downward"
+  4: "a pile of large bones tumbling"
+  5: "scattered bones, a few still rolling"
+  6: "a still heap of bones"
+placeholder: { shape: boss, color: '#d8d0bc', accent: '#a02634' }

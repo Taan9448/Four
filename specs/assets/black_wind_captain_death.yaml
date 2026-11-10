@@ -1,0 +1,21 @@
+id: black_wind_captain_death
+type: character-anim
+size: large
+character: black_wind_captain
+chroma: magenta
+summary: "「결」 흑풍대주 배진 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [black_wind_captain_ref]
+reference: assets/source/black_wind_captain_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, his saber knocked aside, head turned"
+  2: "staggers back, the black scarf torn loose by the wind"
+  3: "drops onto one knee, saber dropped"
+  4: "topples onto his side"
+  5: "lying on his side, the black scarf fluttering"
+  6: "lying still, defeated"
+placeholder: { shape: humanoid, color: '#3a3038', accent: '#8a90a3' }

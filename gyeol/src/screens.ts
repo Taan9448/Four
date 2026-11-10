@@ -37,6 +37,8 @@ export interface Nav {
 
 interface LobbyData {
   wang: string[];
+  /** 에필로그를 마친 뒤(새벽) 왕일검의 말 */
+  wangDawn?: string[];
   menu: { id: string; name: string; note: string; locked?: string }[];
 }
 const lobby = lobbyRaw as LobbyData;
@@ -104,8 +106,11 @@ const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rh
 export function renderLobby(app: HTMLElement, nav: Nav): void {
   document.documentElement.classList.remove('on-title');
   const save = loadSave();
-  let line = Math.floor(Date.now() / 1000) % lobby.wang.length;
-  const say = el('p', { class: 'lobby-say' }, lobby.wang[line]);
+  // 에필로그를 마치면 운곡루 뒤뜰에 새벽이 온다(7-2)
+  const dawn = save.story.cleared.includes('epilogue');
+  const wangLines = dawn && lobby.wangDawn?.length ? lobby.wangDawn : lobby.wang;
+  let line = Math.floor(Date.now() / 1000) % wangLines.length;
+  const say = el('p', { class: 'lobby-say' }, wangLines[line]);
   // 로비 그림(2026-11-10): Codex 결 전용 그림(haun_gyeol_stand·wang_gyeol_stand)이 오면 그것으로, 그 전에는 「천외귀환」 반신 그림
   const stand = (id: string, old: string) => (n: number) => realArt(id, n) ?? (n === 1 ? (portrait(old) ?? '') : null);
   const haunArt = stand('haun_gyeol_stand', 'haun_sword_stand');
@@ -129,8 +134,8 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   };
   const wang = el('button', { class: 'lobby-wang', type: 'button', 'aria-label': '왕일검에게 말 걸기' }, wangImg, say);
   wang.addEventListener('click', () => {
-    line = (line + 1) % lobby.wang.length;
-    say.textContent = lobby.wang[line];
+    line = (line + 1) % wangLines.length;
+    say.textContent = wangLines[line];
     say.classList.remove('pop');
     void say.offsetWidth;
     say.classList.add('pop');
@@ -165,9 +170,9 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   app.replaceChildren(
     el(
       'section',
-      { class: 'lobby' },
+      { class: `lobby${dawn ? ' dawn' : ''}` },
       el('div', { class: `lobby-scene${gyeolArt ? ' gyeol-art' : ''}` }, haunImg, wang),
-      el('header', { class: 'lobby-head' }, el('h1', { 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')), el('p', {}, '운곡루 뒤뜰 · 밤')),
+      el('header', { class: 'lobby-head' }, el('h1', { 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')), el('p', {}, dawn ? '운곡루 뒤뜰 · 새벽' : '운곡루 뒤뜰 · 밤')),
       el('ol', { class: 'lobby-menu' }, ...items),
       el('footer', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
     ),

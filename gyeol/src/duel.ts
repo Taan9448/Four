@@ -108,6 +108,10 @@ export interface MoveDef {
   fx?: string;
   /** 겨루기가 되는 공격인가(없으면 피해 HEAVY_DAMAGE 이상이면 된다) */
   clash?: boolean;
+  /** 쪼개지 않기(4장): 왕녀의 얼음 — 받아치면(패링) 금이 간다. 막거나 피해야 한다(막아도 피해 없음) */
+  fragile?: boolean;
+  /** 세 숨(10장): 흐름이 멈추는 숨 — 이어서 세 번 받아 내면 매듭이 드러나 곧장 비틀거린다 */
+  breath?: boolean;
 }
 
 export interface PatternDef {
@@ -260,8 +264,12 @@ export type DuelEvent =
   | { type: 'clashLose'; t: number; damage: number }
   | { type: 'crisis'; t: number }
   | { type: 'focus'; t: number }
-  | { type: 'win'; t: number; survived?: boolean }
-  | { type: 'lose'; t: number };
+  | { type: 'crack'; t: number; got: number; max: number }
+  | { type: 'breath'; t: number; got: number }
+  | { type: 'knot'; t: number }
+  | { type: 'finishHint'; t: number; tech: string }
+  | { type: 'win'; t: number; survived?: boolean; subdued?: boolean }
+  | { type: 'lose'; t: number; reason?: 'fragile' };
 
 export type PlayerAction = 'idle' | 'attack' | 'dodge' | 'tech' | 'hurt' | 'broken' | 'clash';
 export type FoeState = 'idle' | 'windup' | 'recover' | 'stagger' | 'dead' | 'clash';
@@ -280,6 +288,11 @@ export interface Duel {
   phase: 1 | 2;
   /** 버티기: 해낸 수 */
   endured: number;
+  /** 쪼개지 않기: 금 간 수 · 베지 않는다: 비틀거린 수 · 세 숨: 이어서 받은 숨 · 운해귀종 안내를 띄웠나 */
+  cracks: number;
+  staggers: number;
+  breathRun: number;
+  finishHinted: boolean;
   rng: Rng;
   t: number;
   result: 'win' | 'lose' | null;
@@ -382,6 +395,15 @@ export interface DuelOptions {
   focus?: boolean;
   clash?: boolean;
   assistCue?: boolean;
+  /** 쪼개지 않기: 왕녀의 얼음에 금이 이만큼 가면 진다 */
+  fragile?: number;
+  /** 끝내는 법: stagger = 결정타 없이 비틀거림 staggerWin번이면 끝(베지 않는다), unhae = 운해귀종으로만 쓰러진다 */
+  finish?: 'stagger' | 'unhae';
+  staggerWin?: number;
+  /** 붉은 장력: 집중하지 않으면 결이 이 비율만큼만 보인다(늦게 보인다) */
+  veil?: number;
+  /** 적 피해 배율(바르가스의 열쇠를 받으면 쉬워진다) */
+  foeDamageMul?: number;
 }
 
 /** 난이도를 입힌 데이터·상대(원본은 고치지 않는다) */
@@ -397,7 +419,13 @@ function withDifficulty(data: DuelData, foe: FoeDef, diff: DifficultyDef | undef
 export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode: Mode = 'duel', difficulty = 'main', opts: DuelOptions = {}): Duel {
   const foe0 = data0.foes.find((f) => f.id === foeId);
   if (!foe0) throw new Error(`알 수 없는 상대: ${foeId}`);
-  const { data, foeDef } = withDifficulty(data0, foe0, (data0.difficulties ?? []).find((x) => x.id === difficulty));
+  const dd = withDifficulty(data0, foe0, (data0.difficulties ?? []).find((x) => x.id === difficulty));
+  const data = dd.data;
+  let foeDef = dd.foeDef;
+  if (opts.foeDamageMul && opts.foeDamageMul !== 1) {
+    const k = opts.foeDamageMul;
+    foeDef = { ...foeDef, moves: Object.fromEntries(Object.entries(foeDef.moves).map(([id, m]) => [id, { ...m, damage: Math.max(1, Math.round(m.damage * k)) }])) };
+  }
   if (mode === 'rhythm' && !foeDef.chart) throw new Error(`${foeId}에는 박자 도전 악보가 없다`);
   const rng = createRng(seed).fork(foeId);
   const d: Duel = {
@@ -408,6 +436,10 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
     opts,
     phase: 1,
     endured: 0,
+    cracks: 0,
+    staggers: 0,
+    breathRun: 0,
+    finishHinted: false,
     rng,
     t: 0,
     result: null,
@@ -545,6 +577,9 @@ export interface Cue {
   heavy: boolean;
   /** 집중 중: 결이 공격을 시작할 때부터 보이고, 속임수가 드러난다 */
   focus: boolean;
+  /** 왕녀의 얼음(받아치면 안 된다) · 흐름이 멈추는 숨 */
+  fragile?: boolean;
+  breath?: boolean;
 }
 
 /** 화면용: 지금 결(타격 예고)이 보이는가와 고리 비율 */
@@ -558,7 +593,8 @@ export function cue(d: Duel): Cue {
   // 속임수: 가짜 순간까지는 그쪽으로 좁혀 들고, 지나면 진짜 순간으로 짧게 다시 좁혀 든다
   const target = faking ? f.fakeAt! : f.hitAt;
   // 집중 중이면 공격을 시작할 때부터 결이 보인다
-  const lead = focus ? Math.max(d.data.rules.cueLead, target - f.stateStart) : d.data.rules.cueLead;
+  // 붉은 장력: 집중하지 않으면 결이 늦게(veil 비율만큼만) 보인다
+  const lead = focus ? Math.max(d.data.rules.cueLead, target - f.stateStart) : d.data.rules.cueLead * (d.opts.veil ?? 1);
   const span = faking || f.fakeAt === null ? lead : Math.min(lead, f.hitAt - f.fakeAt);
   const left = target - d.t;
   let ratio = Math.max(0, Math.min(1, left / span));
@@ -573,6 +609,8 @@ export function cue(d: Duel): Cue {
     faking,
     heavy: m.damage >= HEAVY_DAMAGE,
     focus,
+    fragile: !!m.fragile,
+    breath: !!m.breath,
   };
 }
 
@@ -628,9 +666,16 @@ function landStrike(d: Duel): void {
     startClash(d);
     return;
   }
+  // 베지 않는다: 비틀거리는 상대에게 결정타는 없다 — 칼등으로 누르기만 한다(체력 1 밑으로 안 내려감)
+  if (f.state === 'stagger' && d.opts.finish === 'stagger' && d.mode === 'duel') {
+    const dmg = a.damage;
+    damageFoe(d, dmg);
+    d.events.push({ type: 'strike', t: d.t, damage: dmg, counter: true, blocked: false });
+    return;
+  }
   if (f.state === 'stagger') {
     const dmg = Math.round(d.foeDef.hp * r.deathblow);
-    f.hp = Math.max(0, f.hp - dmg);
+    damageFoe(d, dmg);
     f.posture = 0;
     d.stats.deathblows++;
     d.events.push({ type: 'deathblow', t: d.t, damage: dmg });
@@ -642,7 +687,7 @@ function landStrike(d: Duel): void {
   // 틈 밖의 베기는 적이 막는다: 피해는 조금, 체간도 조금. 연타하면 되받아친다
   const blocked = !counter;
   const dmg = counter ? a.damage * r.counterMul : Math.max(1, Math.round(a.damage * r.foeGuardMul));
-  f.hp = Math.max(0, f.hp - dmg);
+  damageFoe(d, dmg);
   f.posture += counter ? r.counterPosture : r.foeGuardPosture;
   if (counter) {
     d.stats.counters++;
@@ -833,7 +878,7 @@ function endClash(d: Duel, won: boolean): void {
   if (won) {
     // 밀어냈다: 적이 크게 비틀대며 물러나고, 되돌아오는 틈이 열린다
     const dmg = Math.round(d.data.player.attack.damage * r.clashWinDamage);
-    f.hp = Math.max(0, f.hp - dmg);
+    damageFoe(d, dmg);
     f.posture += d.foeDef.posture * r.clashWinPosture;
     f.stateEnd = t + r.counterWindow;
     d.openingUntil = t + r.counterWindow;
@@ -911,7 +956,7 @@ function landTech(d: Duel): void {
   const tech = techOf(d, d.techUsing);
   if (!tech || f.state === 'dead') return;
   const dmg = Math.round(d.foeDef.hp * tech.damage + d.techForce * tech.returnMul);
-  f.hp = Math.max(0, f.hp - dmg);
+  damageFoe(d, dmg, tech.id);
   f.posture += d.foeDef.posture * tech.posture;
   d.events.push({ type: 'techHit', t: d.t, tech: tech.id, damage: dmg });
   breakChain(d);
@@ -987,13 +1032,18 @@ function resolveHit(d: Duel): void {
     d.blockedRun = 0;
     const judgement: Judgement = since <= r.perfect * ex ? 'perfect' : 'excellent';
     d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement, lead: since });
+    if (m.fragile && !rhythm) crack(d, H);
+    if (m.breath) breathe(d, H);
+    else if (d.breathRun) d.breathRun = 0;
     judge(d, 'clean', H, judgement);
     bumpStreak(d, H);
     link(d, judgement, m.damage, H);
     endure(d, H);
     if (m.element === 'fire' && !rhythm) burn(d, r.fireParryChip, H);
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.guard) {
-    let dmg = Math.round(m.damage * r.guardChip);
+    // 왕녀의 얼음은 막으면 다치지 않는다(받아치지 않고 감싸 막는 것이 맞다)
+    let dmg = m.fragile ? 0 : Math.round(m.damage * r.guardChip);
+    d.breathRun = 0;
     if (m.element === 'fire') dmg += r.fireGuardExtra;
     hurt(d, dmg);
     p.posture += rhythm ? 0 : r.guardPosture;
@@ -1013,6 +1063,7 @@ function resolveHit(d: Duel): void {
       d.events.push({ type: 'guardBreak', t: H });
     }
   } else {
+    d.breathRun = 0;
     hurt(d, m.damage);
     d.stats.hits++;
     if (m.unblockable) d.stats.redHits++;
@@ -1034,11 +1085,50 @@ function resolveHit(d: Duel): void {
     d.events.push({ type: 'lose', t: H });
     return;
   }
+  if (d.result === 'lose') return;
   f.state = 'recover';
   f.stateStart = H;
   f.stateEnd = H + m.recover;
   f.fakeAt = null;
   if (!rhythm) checkStagger(d);
+}
+
+/**
+ * 적이 다친다. 끝내는 법(opts.finish)이 있으면 체력이 1 밑으로 내려가지 않는다:
+ * stagger(베지 않는다)는 언제나, unhae는 운해귀종이 아닌 피해일 때(처음 막히면 안내 사건을 한 번 낸다).
+ */
+function damageFoe(d: Duel, dmg: number, tech?: string): void {
+  const f = d.foe;
+  const fin = d.mode === 'duel' ? d.opts.finish : undefined;
+  const floor = fin === 'stagger' || (fin === 'unhae' && tech !== 'unhae') ? 1 : 0;
+  f.hp = Math.max(floor, f.hp - dmg);
+  if (fin === 'unhae' && floor && f.hp === 1 && !d.finishHinted) {
+    d.finishHinted = true;
+    d.events.push({ type: 'finishHint', t: d.t, tech: 'unhae' });
+  }
+}
+
+/** 쪼개지 않기: 왕녀의 얼음을 받아쳤다 — 금이 가고, 다 차면 진다 */
+function crack(d: Duel, t: number): void {
+  const max = d.opts.fragile;
+  if (!max) return;
+  d.cracks++;
+  d.events.push({ type: 'crack', t, got: d.cracks, max });
+  if (d.cracks >= max && !d.result) {
+    d.result = 'lose';
+    d.events.push({ type: 'lose', t, reason: 'fragile' });
+  }
+}
+
+/** 세 숨: 흐름이 멈추는 숨을 이어서 받는다 — 셋째에 매듭이 드러나 체간이 가득 찬다 */
+function breathe(d: Duel, t: number): void {
+  d.breathRun++;
+  d.events.push({ type: 'breath', t, got: d.breathRun });
+  if (d.breathRun >= 3) {
+    d.breathRun = 0;
+    d.foe.posture = d.foeDef.posture;
+    d.events.push({ type: 'knot', t });
+  }
 }
 
 /** 하운이 다친다(대결에서만 — 박자 도전·수련장은 다치지 않는다) */
@@ -1125,7 +1215,15 @@ function checkStagger(d: Duel): void {
     f.stateEnd = d.t + d.data.rules.stagger;
     f.pending = null;
     d.openingUntil = -1;
+    d.staggers++;
     d.events.push({ type: 'stagger', t: d.t });
+    // 베지 않는다: 비틀거림이 다 차면 결정타 없이 끝난다(데려 내려온다)
+    if (d.opts.finish === 'stagger' && d.mode === 'duel' && d.staggers >= (d.opts.staggerWin ?? 3)) {
+      f.state = 'dead';
+      f.stateStart = d.t;
+      d.result = 'win';
+      d.events.push({ type: 'win', t: d.t, subdued: true });
+    }
   }
 }
 

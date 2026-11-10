@@ -554,7 +554,8 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   const r = d.data.rules;
   const key = c.unblockable ? 'danger' : (c.element ?? 'none');
   const col = ELEMENT_COLOR[key];
-  const inPerfect = !c.faking && !c.unblockable && c.left <= r.parry;
+  // 왕녀의 얼음(護)은 받아치면 안 되므로 금빛으로 바뀌지 않는다
+  const inPerfect = !c.faking && !c.unblockable && !c.fragile && c.left <= r.parry;
   const alpha = 0.3 + 0.7 * (1 - c.ratio);
   const cx = CONTACT.x - 40;
   const cy = CONTACT.y;
@@ -643,6 +644,22 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
     ctx.strokeText('危', FOE_X, GROUND - 230 * foeScale);
     ctx.fillStyle = `rgba(255,70,60,${pulse})`;
     ctx.fillText('危', FOE_X, GROUND - 230 * foeScale);
+  }
+  // 왕녀의 얼음(護 — 받아치지 말고 막거나 피한다) · 흐름이 멈추는 숨(息 — 이어서 세 번 받는다)
+  if (c.fragile || c.breath) {
+    ctx.shadowBlur = 0;
+    const mark = c.fragile ? '護' : '息';
+    ctx.font = '800 34px "Song Myung", serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.strokeText(mark, FOE_X, GROUND - 230 * foeScale);
+    ctx.fillStyle = c.fragile ? 'rgba(190,230,255,0.95)' : 'rgba(250,248,255,0.95)';
+    ctx.fillText(mark, FOE_X, GROUND - 230 * foeScale);
+    if (c.breath && d.breathRun) {
+      ctx.font = '700 18px "Nanum Myeongjo", serif';
+      ctx.fillText(`${d.breathRun} / 3`, FOE_X, GROUND - 200 * foeScale);
+    }
   }
   // 집중(심안): 속임수의 가짜 결이 드러난다(虛)
   if (c.focus && c.faking) {

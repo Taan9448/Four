@@ -1,0 +1,21 @@
+id: celias_death
+type: character-anim
+size: large
+character: celias
+chroma: magenta
+summary: "「결」 빙결의 여왕 셀리아스 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [celias_ref]
+reference: assets/source/celias_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, a white crack running from the chest across the whole ice body"
+  2: "the ice crown shatters, cracks spreading over the gown, she reaches out one hand"
+  3: "large pieces of the ice body breaking off and falling, she sinks to her knees"
+  4: "the upper body collapsing into a pile of broken ice slabs"
+  5: "a heap of shattered ice glittering, frost mist rising"
+  6: "only melting ice shards and a thin frost mist left on the ground"
+placeholder: { shape: boss, color: '#bfe0f0', accent: '#4fb4ff' }

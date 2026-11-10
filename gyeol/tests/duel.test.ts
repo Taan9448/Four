@@ -10,9 +10,9 @@ const real = realRaw as unknown as DuelData;
 /** 대결 상대(수련장 철목인 빼고) */
 const duelFoes = real.foes.filter((f) => !f.practice);
 /** 박자 도전 악보가 있는 결투장 상대(처음 다섯) */
-const chartFoes = duelFoes.filter((f) => f.chart);
+const chartFoes = duelFoes.filter((f) => f.chart && !f.storyOnly);
 /** 이길 수 있는 상대(버티기 전용 곽도진 빼고) */
-const beatable = duelFoes.filter((f) => f.hp < 9999);
+const beatable = duelFoes.filter((f) => f.hp < 9999 && !(f.storyOnly && f.chart));
 
 // 한 가지 공격만 하는 적: 첫 공격은 idle[1]=500ms 뒤 시작, windup 400 → 타격은 900ms
 const data: DuelData = {
@@ -575,7 +575,7 @@ describe('「결」 1단계 — 입력 시각 보정·저장', () => {
     expect(JSON.parse(mem.get(KEY)!).settings.inputOffset).toBe(30);
     const bad = normalize({ settings: { master: 7, inputOffset: 999, quality: 'ultra', reduceFlash: 'yes' }, story: 3 });
     expect(bad.settings).toMatchObject({ master: 1, inputOffset: 120, quality: 'auto', reduceFlash: false });
-    expect(bad.story).toEqual({ cleared: [], stars: {} });
+    expect(bad.story).toEqual({ cleared: [], stars: {}, flags: [] });
     resetSaveCache();
   });
 });
@@ -724,5 +724,149 @@ describe('「결」 3단계 — 이야기 규칙(버티기·2단계·잠금·튜
     const tut = s.chapters[0].tutorial!;
     expect(tut).toHaveLength(8);
     expect(tut[tut.length - 1].goal.type).toBe('win');
+  });
+});
+
+describe('「결」 4단계 — 4~10장 특수 규칙', () => {
+  /** 다음 공격까지: 서 있게 바꾸고 100ms 뒤 시작 → 타격은 그 400ms 뒤 */
+  const restart = (d: ReturnType<typeof createDuel>) => {
+    d.foe.state = 'idle';
+    d.foe.move = null;
+    d.foe.pattern = null;
+    d.foe.stateEnd = d.t + 100;
+    return d.t + 100 + 400;
+  };
+  const parryAt = (d: ReturnType<typeof createDuel>, hit: number, lead = 30) => {
+    advance(d, hit - lead);
+    press(d, 'parry');
+    advance(d, hit + 5);
+  };
+
+  it('쪼개지 않기: 왕녀의 얼음을 받아치면 금이 가고 셋이면 진다 — 막으면 다치지 않는다', () => {
+    const dd = single(swing({ fragile: true, posture: 0 }));
+    const d = createDuel(dd, 'dummy', 'x', 'duel', 'main', { fragile: 3 });
+    let hit = HIT;
+    for (let i = 0; i < 3; i++) {
+      parryAt(d, hit);
+      hit = restart(d);
+    }
+    expect(d.events.filter((e) => e.type === 'crack')).toHaveLength(3);
+    expect(d.result).toBe('lose');
+    expect(d.events.find((e) => e.type === 'lose')).toMatchObject({ reason: 'fragile' });
+    const g = createDuel(dd, 'dummy', 'x', 'duel', 'main', { fragile: 3 });
+    parryAt(g, HIT, 300); // 일찍 눌러 막기
+    expect(g.events.find((e) => e.type === 'guard')).toMatchObject({ damage: 0 });
+    expect(g.cracks).toBe(0);
+    expect(g.player.hp).toBe(100);
+    advance(createDuel(dd, 'dummy'), 0);
+    const c = createDuel(dd, 'dummy', 'x', 'duel', 'main', { fragile: 3 });
+    advance(c, HIT - 100);
+    expect(cue(c)).toMatchObject({ visible: true, fragile: true });
+  });
+
+  it('베지 않는다: 결정타 없이 비틀거림 세 번이면 이기고, 체력은 1 밑으로 안 내려간다', () => {
+    const d = createDuel(single(swing({})), 'dummy', 'x', 'duel', 'main', { finish: 'stagger', staggerWin: 3 });
+    let hit = HIT;
+    for (let i = 0; i < 3; i++) {
+      d.foe.posture = d.foeDef.posture - 1;
+      parryAt(d, hit);
+      if (d.result) break;
+      expect(d.foe.state).toBe('stagger');
+      press(d, 'attack');
+      advance(d, d.t + data.player.attack.duration);
+      hit = restart(d);
+    }
+    expect(d.result).toBe('win');
+    expect(d.events.find((e) => e.type === 'win')).toMatchObject({ subdued: true });
+    expect(d.events.some((e) => e.type === 'deathblow')).toBe(false);
+    expect(d.foe.hp).toBeGreaterThanOrEqual(1);
+  });
+
+  it('운해귀종으로만: 다른 피해로는 체력 1에서 멈추고(안내 한 번), 운해귀종이면 쓰러진다', () => {
+    const d = createDuel(single(swing({})), 'dummy', 'x', 'duel', 'main', { finish: 'unhae' });
+    d.foe.hp = 3;
+    d.foe.state = 'stagger';
+    d.foe.stateEnd = 5000;
+    press(d, 'attack');
+    advance(d, data.player.attack.duration + 5);
+    expect(d.foe.hp).toBe(1);
+    expect(d.result).toBeNull();
+    expect(d.events.filter((e) => e.type === 'finishHint')).toHaveLength(1);
+    d.foe.state = 'idle';
+    d.foe.stateEnd = d.t + 5000;
+    d.techReady = 'unhae';
+    expect(press(d, 'tech')).toBe(true);
+    advance(d, d.t + TECH_DURATION);
+    expect(d.result).toBe('win');
+  });
+
+  it('붉은 장력: 집중하지 않으면 결이 늦게 보이고, 집중하면 처음부터 보인다', () => {
+    const dd = single(swing({ windup: 1200 }));
+    const plain = createDuel(dd, 'dummy');
+    const veiled = createDuel(dd, 'dummy', 'x', 'duel', 'main', { veil: 0.45 });
+    const hit = 500 + 1200;
+    advance(plain, hit - 400);
+    advance(veiled, hit - 400);
+    expect(cue(plain).visible).toBe(true);
+    expect(cue(veiled).visible).toBe(false);
+    advance(veiled, hit - 200);
+    expect(cue(veiled).visible).toBe(true);
+    const f = createDuel(dd, 'dummy', 'x', 'duel', 'main', { veil: 0.45, assistCue: true });
+    advance(f, 600);
+    expect(cue(f).visible).toBe(true);
+  });
+
+  it('세 숨: 흐름이 멈추는 숨을 이어서 세 번 받으면 매듭이 드러나 비틀거린다(놓치면 처음부터)', () => {
+    const dd = single(swing({ breath: true, posture: 0 }));
+    const d = createDuel({ ...dd, foes: [{ ...dd.foes[0], posture: 999 }] }, 'dummy');
+    let hit = HIT;
+    parryAt(d, hit);
+    hit = restart(d);
+    advance(d, hit + 5); // 하나 놓친다
+    expect(d.breathRun).toBe(0);
+    hit = restart(d);
+    for (let i = 0; i < 3; i++) {
+      parryAt(d, hit);
+      if (i < 2) hit = restart(d);
+    }
+    expect(d.events.some((e) => e.type === 'knot')).toBe(true);
+    expect(d.foe.state).toBe('stagger');
+  });
+
+  it('바르가스의 열쇠: 적 피해 배율이 사본에만 든다', () => {
+    const d = createDuel(single(swing({ damage: 20 })), 'dummy', 'x', 'duel', 'main', { foeDamageMul: 0.6 });
+    expect(d.foeDef.moves.swing.damage).toBe(12);
+    advance(d, HIT + 5);
+    expect(d.player.hp).toBe(88);
+  });
+
+  it('이야기 데이터: 4~10장·에필로그의 상대·규칙·안내·화자·고르기가 맞물린다', () => {
+    const st = storyRaw as unknown as { speakers: Record<string, { stand: string | null }>; chapters: { id: string; tips?: string[]; bouts?: { foe: string; mode?: string; ifFlag?: { flag: string }; intro?: { speaker?: string; choices?: { flag?: string }[] }[] }[]; challenge?: { type: string; flag?: string }; outroIf?: { flag: string } }[]; tips: Record<string, unknown> };
+    expect(st.chapters.map((c) => c.id)).toEqual(['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'ch6', 'ch7', 'ch8', 'ch9', 'ch10', 'epilogue']);
+    const flags = new Set<string>();
+    for (const ch of st.chapters) {
+      for (const t of ch.tips ?? []) expect(st.tips[t], `${ch.id} 안내 ${t}`).toBeTruthy();
+      for (const b of ch.bouts ?? []) {
+        const foe = real.foes.find((f) => f.id === b.foe);
+        expect(foe, `${ch.id} ${b.foe}`).toBeTruthy();
+        if (b.mode === 'rhythm') expect(foe!.chart?.steps.length ?? 0).toBeGreaterThanOrEqual(12);
+        for (const line of b.intro ?? []) {
+          if (line.speaker) expect(st.speakers[line.speaker], `${ch.id} 화자 ${line.speaker}`).toBeTruthy();
+          for (const c of line.choices ?? []) if (c.flag) flags.add(c.flag);
+        }
+      }
+    }
+    // 고르기로 생기는 flag만 규칙·끝 장면·도전 과제에 쓴다
+    for (const ch of st.chapters) {
+      for (const b of ch.bouts ?? []) if (b.ifFlag) expect(flags.has(b.ifFlag.flag)).toBe(true);
+      if (ch.outroIf) expect(flags.has(ch.outroIf.flag)).toBe(true);
+      if (ch.challenge?.flag) expect(flags.has(ch.challenge.flag)).toBe(true);
+    }
+    expect(flags).toEqual(new Set(['took_key']));
+    // 새 상대의 그림(대기·피격)은 「천외귀환」 것이 있다
+    for (const f of real.foes) {
+      expect(existsSync(`assets/sprites/${f.sprite}_idle/meta.json`), `${f.id} 대기`).toBe(true);
+      expect(existsSync(`assets/sprites/${f.sprite}_hit/meta.json`), `${f.id} 피격`).toBe(true);
+    }
   });
 });

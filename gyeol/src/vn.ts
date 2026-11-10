@@ -11,6 +11,8 @@ export interface SceneLine {
   cg?: string;
   /** 반신 그림 칸(1 기본 · 2 결의 · 3 놀람) */
   face?: number;
+  /** 고르기(2026-11-10 6장 바르가스의 거래): 고른 쪽의 flag가 장 안에 남는다. 건너뛰면 아무것도 고르지 않은 것 */
+  choices?: { text: string; flag?: string }[];
 }
 
 export interface Speaker {
@@ -18,10 +20,13 @@ export interface Speaker {
   stand: string | null;
 }
 
-/** 장면을 처음부터 끝까지 보여 주고 끝나면 풀린다 */
-export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Record<string, Speaker>, bg?: string, title?: string): Promise<void> {
-  if (!lines.length) return Promise.resolve();
+/** 장면을 처음부터 끝까지 보여 주고 끝나면 풀린다(고른 flag들을 돌려준다) */
+export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Record<string, Speaker>, bg?: string, title?: string): Promise<string[]> {
+  if (!lines.length) return Promise.resolve([]);
   return new Promise((resolve) => {
+    const picked: string[] = [];
+    let choosing = false;
+    const choiceBox = el('div', { class: 'vn-choices', hidden: '' });
     const bgUrl = bg ? frameUrl(bg, 1) : null;
     const back = el('div', { class: 'vn-bg' });
     if (bgUrl) back.style.backgroundImage = `url("${bgUrl}")`;
@@ -32,10 +37,11 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
     const text = el('p', { class: 'vn-text' });
     const more = el('span', { class: 'vn-more', 'aria-hidden': 'true' }, '▼');
     const skip = button('건너뛰기 (Esc)', 'btn vn-skip', () => finish());
-    const box = el('div', { class: 'vn-box' }, name, text, more);
+    const box = el('div', { class: 'vn-box' }, name, text, more, choiceBox);
     const root = el('div', { class: 'vn', role: 'dialog', 'aria-label': title ?? '장면' }, back, cg, left, right, title ? el('div', { class: 'vn-title' }, title) : '', box, skip);
     host.append(root);
     let i = -1;
+    const offered = new Set<number>();
     let typing = 0;
     let full = '';
     let shown = 0;
@@ -75,15 +81,49 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
         if (shown >= full.length) {
           clearInterval(typing);
           more.hidden = false;
+          if (lines[i].choices?.length) {
+            offered.add(i);
+            offer();
+          }
         }
       }, 22);
     };
+    /** 고르기 줄: 글이 다 나오면 단추를 띄우고, 고를 때까지 다음 줄로 넘어가지 않는다 */
+    const offer = () => {
+      const ch = lines[i]?.choices;
+      if (!ch?.length || choosing) return;
+      choosing = true;
+      more.hidden = true;
+      choiceBox.hidden = false;
+      choiceBox.replaceChildren(
+        ...ch.map((c, k) =>
+          button([el('span', { class: 'key' }, String(k + 1)), c.text], 'btn vn-choice', () => {
+            if (c.flag) picked.push(c.flag);
+            choosing = false;
+            choiceBox.hidden = true;
+            choiceBox.replaceChildren();
+            next();
+          }),
+        ),
+      );
+      (choiceBox.firstElementChild as HTMLButtonElement | null)?.focus();
+    };
     const next = () => {
+      if (choosing) return;
       if (shown < full.length) {
         clearInterval(typing);
         shown = full.length;
         text.textContent = full;
         more.hidden = false;
+        if (lines[i]?.choices?.length) {
+          offered.add(i);
+          offer();
+        }
+        return;
+      }
+      if (lines[i]?.choices?.length && !choosing && choiceBox.hidden && shown >= full.length && !offered.has(i)) {
+        offered.add(i);
+        offer();
         return;
       }
       i++;
@@ -94,6 +134,21 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       }
     };
     const onKey = (e: KeyboardEvent) => {
+      if (choosing) {
+        const k = Number(e.key);
+        const btns = choiceBox.querySelectorAll<HTMLButtonElement>('.vn-choice');
+        if (k >= 1 && k <= btns.length) {
+          e.preventDefault();
+          e.stopPropagation();
+          btns[k - 1].click();
+          return;
+        }
+        // Enter·Space는 초점이 간 단추를 누른다(바깥 단축키로 새지 않게)
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.stopPropagation();
+          return;
+        }
+      }
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         e.stopPropagation();
@@ -111,10 +166,10 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       clearInterval(typing);
       window.removeEventListener('keydown', onKey, true);
       root.remove();
-      resolve();
+      resolve(picked);
     }
     root.addEventListener('click', (e) => {
-      if (e.target !== skip) next();
+      if (e.target !== skip && !choiceBox.contains(e.target as Node)) next();
     });
     window.addEventListener('keydown', onKey, true);
     next();

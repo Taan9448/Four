@@ -1,0 +1,21 @@
+id: kwak_dojin_death
+type: character-anim
+size: large
+character: kwak_dojin
+chroma: magenta
+summary: "「결」 장문인 곽도진 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치. 송문고검이 부러진다"
+depends_on: [kwak_dojin_ref]
+reference: assets/source/kwak_dojin_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "his old pine-pattern sword snapping near the tip, the broken tip spinning away"
+  2: "pushing forward anyway with the broken sword, white hair and sleeves streaming"
+  3: "stops, the broken sword lowered, a wound on his chest, eyes clearing"
+  4: "sinks to one knee, leaning on the broken sword"
+  5: "kneeling, head bowed, the broken sword planted in the ground"
+  6: "kneeling motionless, white hair hanging, the broken sword still in his hand"
+placeholder: { shape: humanoid, color: '#e0cfae', accent: '#9fd3ff' }

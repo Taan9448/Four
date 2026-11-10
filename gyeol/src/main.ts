@@ -5,7 +5,7 @@ import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import { applyUiArt, el, padIcon, rankBadge } from './dom';
 import raw from '../data/duel.json';
-import { advance, betterRank, createDuel, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { loadSave, writeSave, type Quality } from './save';
 import { openSettings } from './settings';
@@ -277,6 +277,15 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     if (fx.practice.marks.length > 12) fx.practice.marks.shift();
   };
   // 처음 나오는 순간 안내(이야기 — 장마다 tips): 한 번만, 잠깐 느려지며 카드가 뜬다
+  /** 화면 위 가운데 칩(버티기·금·비틀거림·숨 세기) */
+  const chip = (textValue: string, warn = false) => {
+    surviveEl.hidden = false;
+    surviveEl.textContent = textValue;
+    surviveEl.classList.toggle('warn', warn);
+    surviveEl.classList.remove('bump');
+    void surviveEl.offsetWidth;
+    surviveEl.classList.add('bump');
+  };
   const tip = (id: string) => {
     if (!opts.tips?.includes(id)) return;
     const save = loadSave();
@@ -563,7 +572,12 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'stagger':
           sfx('snap');
-          judge(fx, 'BREAK', '체간이 무너졌다 — 베어라!', now, 'foe');
+          // 베지 않는다(7장): 결정타 대신 비틀거림을 센다
+          if (d.opts.finish === 'stagger' && d.mode === 'duel') {
+            judge(fx, 'BREAK', '비틀거린다 — 베지 않는다', now, 'foe');
+            chip(`비틀거림 ${d.staggers} / ${d.opts.staggerWin ?? 3}`);
+            tip('subdue');
+          } else judge(fx, 'BREAK', '체간이 무너졌다 — 베어라!', now, 'foe');
           flash('#fff3c4', 200);
           addShake(fx, now, 8, 220);
           if (!foeStaggered) say('foe', 'stagger');
@@ -620,11 +634,30 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           text(FOE_X, CONTACT.y - 170, '2단계', '#ffb07a', 30);
           break;
         case 'endure':
-          surviveEl.hidden = false;
-          surviveEl.textContent = `버티기 ${ev.got} / ${ev.need}`;
-          surviveEl.classList.remove('bump');
-          void surviveEl.offsetWidth;
-          surviveEl.classList.add('bump');
+          chip(`버티기 ${ev.got} / ${ev.need}`);
+          break;
+        case 'crack':
+          // 쪼개지 않기(4장): 왕녀의 얼음을 받아쳤다
+          sfx('ice', { volume: 0.8 });
+          flash('#cfe9ff', 240, 0.5);
+          text(PLAYER_X + 60, CONTACT.y - 150, '왕녀의 얼음에 금이 갔다', '#cfe9ff', 26);
+          chip(`왕녀의 얼음 금 ${ev.got} / ${ev.max}`, true);
+          break;
+        case 'breath':
+          // 세 숨(10장): 흐름이 멈추는 숨을 이어서 받는다
+          text(FOE_X - 40, CONTACT.y - 160, `숨 ${ev.got}`, '#f4f0ff', 30 + ev.got * 4);
+          chip(`세 숨 ${ev.got} / 3`);
+          break;
+        case 'knot':
+          sfx('slam_9');
+          fx.banner = { name: '매듭이 드러난다', born: now };
+          flash('#ffffff', 320, 0.6);
+          addShake(fx, now, 12, 360);
+          break;
+        case 'finishHint':
+          // 운해귀종으로만 끝난다(9장)
+          text(FOE_X, CONTACT.y - 170, '운해귀종으로만 끝난다', '#bfe4ff', 28);
+          tip('unhae');
           break;
         case 'judge':
         case 'refill':
@@ -706,14 +739,14 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             el('span', { class: 'j-miss' }, `MISS ${s.miss}`),
           ),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak}${newBest ? ' · 최고 기록!' : ''}`),
-          el('div', { class: 'row' }, again, pick),
+          el('div', { class: 'row' }, nextBtn ?? '', again, pick),
         );
       } else {
         const g = duelGrade(d);
         const diffName = data.difficulties?.find((x) => x.id === d.difficulty)?.name ?? '';
         overlay.replaceChildren(
           opts.title ? el('p', { class: 'kicker' }, opts.title) : '',
-          el('h2', {}, d.result === 'win' ? (d.opts.survive ? '버텨 냈다' : `${foeDef.title}을(를) 베었다`) : '쓰러졌다'),
+          el('h2', {}, d.result === 'win' ? (d.opts.survive ? '버텨 냈다' : d.opts.finish === 'stagger' ? `${foeDef.title}을(를) 데려 내려왔다` : `${foeDef.title}을(를) 베었다`) : d.cracks >= (d.opts.fragile ?? Infinity) ? '왕녀의 얼음이 깨졌다' : '쓰러졌다'),
           g ? el('div', { class: 'grade-line' }, rankBadge(g.rank, 'lg'), el('span', {}, `${diffName} · 점수 ${g.score}${bestUp ? ' · 최고 등급!' : ''}`)) : '',
           el('p', {}, `패링 ${s.parries}(PERFECT ${s.perfect}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak} · ${(d.t / 1000).toFixed(1)}초`),
@@ -750,6 +783,16 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       put('myFocus', pct(focusing ? (d.focusUntil - d.t) / data.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
       put('focusK', fk.toFixed(2), (v) => focusBtn.style.setProperty('--focus', v));
       if (fk >= 1) tip('focus');
+      // 장의 특수 규칙 안내(처음 한 번): 왕녀의 얼음·세 숨은 그 결이 처음 보일 때, 나머지는 대결이 시작되고 조금 뒤
+      if (opts.tips?.length && !d.result) {
+        const c = cue(d);
+        if (c.visible && c.fragile) tip('fragile');
+        if (c.visible && c.breath) tip('breath');
+        if (d.t > 1500) {
+          if (d.opts.veil) tip('veil');
+          if (foeDef.postureRegen >= 30) tip('mountain');
+        }
+      }
       put('focusState', `${fk >= 1}|${focusing}|${!!d.result}`, () => {
         focusBtn.disabled = fk < 1 || focusing || !!d.result;
         focusBtn.classList.toggle('ready', fk >= 1 && !focusing);

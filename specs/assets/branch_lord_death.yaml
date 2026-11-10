@@ -1,0 +1,21 @@
+id: branch_lord_death
+type: character-anim
+size: large
+character: branch_lord
+chroma: green
+summary: "「결」 분타주 염탁 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [branch_lord_ref]
+reference: assets/source/branch_lord_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck under the arm at the knot of gathered power, red light bursting out of the wound"
+  2: "the red power splitting and spraying out of his body in two directions"
+  3: "staggers back toward collapsing stairs, arm hanging"
+  4: "falls backward, red light draining out of him"
+  5: "lying on his back among broken stones, the red glow fading"
+  6: "lying still, the last red glow gone"
+placeholder: { shape: humanoid, color: '#6a0f1a', accent: '#ff3b3b' }

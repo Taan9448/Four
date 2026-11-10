@@ -1,0 +1,21 @@
+id: gormon_death
+type: character-anim
+size: large
+character: gormon
+chroma: magenta
+summary: "「결」 대지의 거인 고르몬 쓰러짐 6프레임 — 이야기 4단계(2026-11-10) 대결 끝 장면에서 느린 화면으로 재생한다. 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [gormon_ref]
+reference: assets/source/gormon_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, a huge chunk of rock breaking off the shoulder, the red glow in the chest flickering"
+  2: "the giant staggers, its arm separating from the cave wall behind it"
+  3: "drops onto one knee, cracks of red light spreading through the rock body"
+  4: "collapses forward into a heap of boulders, dust billowing"
+  5: "a pile of boulders, the last red glow fading inside"
+  6: "quiet grey boulders, settling dust"
+placeholder: { shape: boss, color: '#5b4a3f', accent: '#ff8a5c' }
