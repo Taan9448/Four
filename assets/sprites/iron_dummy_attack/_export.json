@@ -1,0 +1,195 @@
+{
+  "source": "_source.png",
+  "prompt": "_prompt.txt",
+  "target": {
+    "height": 82,
+    "bottom": 143,
+    "frame": [
+      160,
+      160
+    ]
+  },
+  "regenerations": 2,
+  "frames": [
+    {
+      "frame": 1,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 59,
+        "maxX": 98,
+        "minY": 70,
+        "maxY": 143,
+        "width": 40,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 57,
+        "maxX": 100,
+        "minY": 62,
+        "maxY": 143,
+        "width": 44,
+        "height": 82
+      }
+    },
+    {
+      "frame": 2,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 65,
+        "maxX": 103,
+        "minY": 70,
+        "maxY": 143,
+        "width": 39,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 64,
+        "maxX": 106,
+        "minY": 62,
+        "maxY": 143,
+        "width": 43,
+        "height": 82
+      }
+    },
+    {
+      "frame": 3,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 40,
+        "maxX": 97,
+        "minY": 70,
+        "maxY": 143,
+        "width": 58,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 37,
+        "maxX": 99,
+        "minY": 62,
+        "maxY": 143,
+        "width": 63,
+        "height": 82
+      }
+    },
+    {
+      "frame": 4,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 34,
+        "maxX": 96,
+        "minY": 70,
+        "maxY": 143,
+        "width": 63,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 30,
+        "maxX": 98,
+        "minY": 62,
+        "maxY": 143,
+        "width": 69,
+        "height": 82
+      }
+    },
+    {
+      "frame": 5,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 49,
+        "maxX": 96,
+        "minY": 70,
+        "maxY": 143,
+        "width": 48,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 46,
+        "maxX": 98,
+        "minY": 62,
+        "maxY": 143,
+        "width": 53,
+        "height": 82
+      }
+    },
+    {
+      "frame": 6,
+      "method": "uniform nearest-neighbor scaling and anchored 160x160 crop",
+      "before": {
+        "minX": 59,
+        "maxX": 106,
+        "minY": 70,
+        "maxY": 143,
+        "width": 48,
+        "height": 74
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "crop": {
+        "left": 8,
+        "top": 15,
+        "width": 160,
+        "height": 160
+      },
+      "after": {
+        "minX": 57,
+        "maxX": 109,
+        "minY": 62,
+        "maxY": 143,
+        "width": 53,
+        "height": 82
+      }
+    }
+  ]
+}
