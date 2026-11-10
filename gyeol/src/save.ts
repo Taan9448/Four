@@ -30,13 +30,16 @@ export interface SaveData {
   stats: Stats;
   /** 한 번이라도 겨뤄 본 상대(도감에서 그림·설명을 보인다) */
   seen: string[];
+  /** 이미 본 안내(기술·집중·겨루기 — 처음 나오는 순간 한 번) */
+  tips: string[];
 }
 
 export interface Stats {
   duels: number;
   wins: number;
   parries: number;
-  excellent: number;
+  /** PERFECT 판정 수(옛 저장의 excellent를 옮긴다) */
+  perfect: number;
   deathblows: number;
   techs: number;
   clashWins: number;
@@ -45,14 +48,14 @@ export interface Stats {
   playMs: number;
 }
 
-export const emptyStats = (): Stats => ({ duels: 0, wins: 0, parries: 0, excellent: 0, deathblows: 0, techs: 0, clashWins: 0, maxStreak: 0, playMs: 0 });
+export const emptyStats = (): Stats => ({ duels: 0, wins: 0, parries: 0, perfect: 0, deathblows: 0, techs: 0, clashWins: 0, maxStreak: 0, playMs: 0 });
 
 export const KEY = 'gyeol.save';
 const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto' });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {} }, duelBest: {}, stats: emptyStats(), seen: [] });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {} }, duelBest: {}, stats: emptyStats(), seen: [], tips: [] });
 
 interface Store {
   getItem(k: string): string | null;
@@ -91,9 +94,12 @@ export function normalize(raw: unknown): SaveData {
   if (r.stats && typeof r.stats === 'object') {
     const base = emptyStats();
     for (const k of Object.keys(base) as (keyof Stats)[]) base[k] = clamp(r.stats[k], 0, Number.MAX_SAFE_INTEGER, 0);
+    const old = (r.stats as { excellent?: number }).excellent;
+    if (!base.perfect && typeof old === 'number') base.perfect = clamp(old, 0, Number.MAX_SAFE_INTEGER, 0);
     s.stats = base;
   }
   if (Array.isArray(r.seen)) s.seen = r.seen.filter((x): x is string => typeof x === 'string');
+  if (Array.isArray(r.tips)) s.tips = r.tips.filter((x): x is string => typeof x === 'string');
   return s;
 }
 

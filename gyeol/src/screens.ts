@@ -4,23 +4,34 @@ import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
 import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt } from './dom';
-import type { DuelData, FoeDef, Mode, TechDef } from './duel';
+import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
+import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
 import { loadSave, writeSave } from './save';
 
-export type Screen = 'title' | 'lobby' | 'arena' | 'rhythm' | 'practice' | 'records' | 'calibrate';
+export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'calibrate';
 
 export interface PlayOpts {
   difficulty?: string;
   drill?: string;
   /** 대결이 끝나거나 나가면 돌아갈 화면 */
   back: Screen;
+  /** 이야기: 대결 덧붙임(버티기·쓸 수 있는 기술 등), 결과 머리글, 이기면 누를 다음 버튼, 처음 나오는 순간 안내 */
+  duel?: DuelOptions;
+  title?: string;
+  next?: { label: string; go: (d: Duel) => void };
+  tips?: string[];
+  /** 서장 튜토리얼 단계와 끝났을 때(건너뛰었으면 skipped) */
+  tutorial?: TutorialStep[];
+  onTutorialDone?: (skipped: boolean) => void;
 }
 
 export interface Nav {
   go(s: Screen): void;
   play(foe: FoeDef, mode: Mode, opts: PlayOpts): void;
   settings(): void;
+  /** 대결 고리·키를 멈춘다(화면을 바꾸지 않고) */
+  stop(): void;
 }
 
 interface LobbyData {
@@ -38,6 +49,8 @@ export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
 }
 
 const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
+/** 결투장 상대: 처음부터 있던 다섯(악보가 있는 상대) + 이야기에서 겨뤄 본 상대(이야기 전용 빼고) */
+const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.chart || seen.includes(f.id)));
 const portrait = (id: string, n = 1) => frameUrl(id, n);
 
 function header(title: string, nav: Nav, sub?: string): HTMLElement {
@@ -93,7 +106,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const go = (id: string) => {
     sfx('click');
     if (id === 'settings') nav.settings();
-    else if (id !== 'story') nav.go(id as Screen);
+    else nav.go(id as Screen);
   };
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
@@ -110,7 +123,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
       el('div', { class: 'lobby-scene' }, el('img', { class: 'lobby-haun', src: portrait('haun_sword_stand') ?? '', alt: '진하운' }), wang),
       el('header', { class: 'lobby-head' }, el('h1', {}, '결'), el('p', {}, '운곡루 뒤뜰 · 밤')),
       el('ol', { class: 'lobby-menu' }, ...items),
-      el('footer', { class: 'lobby-foot' }, st.duels ? `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}` : '처음 왔구나. 수련장에서 손부터 풀어 보아라.'),
+      el('footer', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
     ),
   );
   setKeys((e) => {
@@ -140,7 +153,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
       }),
     );
     grid.replaceChildren(
-      ...duelFoes(data).map((f) => {
+      ...arenaFoes(data, save.seen).map((f) => {
         const img = frameUrl(`${f.sprite}_idle`, 1);
         const tags = elementsOf(f).map((e) => el('span', { class: `tag el-${e}` }, ELEMENT_NAME[e]));
         const best = el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell', title: `${d.name} 최고 등급` }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`]))));
@@ -156,7 +169,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
     );
   };
   const grid = el('div', { class: 'foes' });
-  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 EXCELLENT가 많을수록 높은 등급.'), seg, grid, helpBox()));
+  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 PERFECT가 많을수록 높은 등급.'), seg, grid, helpBox()));
   draw();
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
@@ -172,7 +185,8 @@ function helpBox(): HTMLElement {
     el('p', {}, el('kbd', {}, 'I'), ' 기술 — 결 연환(끊기지 않고 받은 수)이 차면 열린다. ', el('kbd', {}, 'U'), ' 집중 — 게이지가 차면 시간이 느려지고 결이 처음부터 보인다.'),
     el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
     el('p', {}, '원소: ', el('span', { class: 'tag el-fire' }, '화염'), ' 받아도 화상 · ', el('span', { class: 'tag el-ice' }, '냉기'), ' 느리다 마지막에 빨라진다 · ', el('span', { class: 'tag el-lightning' }, '번개'), ' 박자가 튄다.'),
-    el('p', {}, '겨루기: 적이 치는 순간에 맞춰 한 번 베면 칼끼리 맞부딪힌다 — J·K 연타로 밀어낸다. 체력 20% 아래면 배수의 진(EXCELLENT 폭이 넓어진다).'),
+    el('p', {}, '판정: PERFECT(타격 바로 앞) · EXCELLENT(받기) · GOOD(막기·피함) · MISS. 기술은 이어 받은 판정 단계로 열린다.'),
+    el('p', {}, '겨루기: 결 연환을 3 이상 이은 채, 적의 무거운 공격이 닿는 순간에 맞춰 한 번 베면 칼끼리 맞부딪힌다 — J·K 연타로 밀어낸다. 체력 20% 아래면 배수의 진(PERFECT 폭이 넓어진다).'),
   );
 }
 
@@ -312,7 +326,7 @@ export function renderCalibrate(app: HTMLElement, nav: Nav): void {
 /* ───────── 기록 ───────── */
 
 function techCondition(t: TechDef): string {
-  return t.pure ? `EXCELLENT만 ${t.chain}연속` : `GOOD 이상 ${t.chain}연속`;
+  return t.min === 'perfect' ? `PERFECT만 ${t.chain}연속` : t.min === 'excellent' ? `EXCELLENT 이상 ${t.chain}연속` : `GOOD 이상 ${t.chain}연속`;
 }
 
 export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void {
@@ -339,7 +353,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
   const min = Math.round(st.playMs / 60000);
   const rows: [string, string][] = [
     ['대결', `${st.duels}번 · 이김 ${st.wins}`],
-    ['패링', `${st.parries}번 · EXCELLENT ${st.excellent}`],
+    ['패링', `${st.parries}번 · PERFECT ${st.perfect}`],
     ['결정타', `${st.deathblows}번`],
     ['기술', `${st.techs}번`],
     ['겨루기 승리', `${st.clashWins}번`],

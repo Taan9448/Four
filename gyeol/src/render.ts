@@ -3,7 +3,7 @@
 // 「결」 전용 그림(받기·피하기 동작, 결 이펙트 12프레임, 결정타, 연속 박자 기운, 아이콘)은 Codex 실제 그림이 왔을 때만 쓰고,
 // 오기 전에는 코드로 그린 대체 연출을 쓴다(임시 상자 그림은 쓰지 않는다).
 import { loadSprite, type SpriteAsset } from '../../src/render/assets';
-import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element } from './duel';
+import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element, type Judgement } from './duel';
 import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
 import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W } from './layout';
@@ -84,14 +84,14 @@ export interface Fx {
   /** 결 패링 연출(Codex 12프레임이 없으면 코드로 그린 금빛 연꽃) */
   blooms: { x: number; y: number; born: number; color: string; big: boolean }[];
   slashes: { born: number }[];
-  /** 판정 글자(EXCELLENT·GREAT·GOOD·MISS·HIT·COUNTER·BREAK) — 자리마다 하나 */
+  /** 판정 글자(PERFECT·EXCELLENT·GOOD·MISS·HIT·COUNTER·BREAK) — 자리마다 하나 */
   judges: { word: JudgeWord; sub: string; x: number; y: number; born: number; slot: 'center' | 'foe' }[];
   /** 연속 받기 숫자(1, 2, 3…) */
   combo: { n: number; tier: number; born: number; up: boolean } | null;
   /** 받을 수 없는 기술 이름 띠 */
   banner: { name: string; born: number; element?: Element } | null;
-  /** 결 연환 표시(끊기지 않고 받은 수, 모두 EXCELLENT인가) */
-  chain: { n: number; pure: boolean };
+  /** 결 연환 표시(끊기지 않고 받은 수, 그 사이 가장 낮은 판정) */
+  chain: { n: number; min: Judgement };
   /** 기술 연출(쓴 순간부터, 실제 시간) */
   tech: { id: string; born: number } | null;
   /** 끝 장면: 느린 화면 동안 위아래 검은 띠와 쓰러지는 쪽으로 다가가기 */
@@ -111,16 +111,18 @@ export interface Fx {
   uiScale: number;
   /** 수련장: 최근 누른 시점(타격 몇 ms 전, null이면 누르지 않음)과 판정 — 화면 아래 판정 폭 막대 */
   practice?: { marks: PracticeMark[]; drill: string };
+  /** 서장 튜토리얼: 결 줄기·과녁 고리에 이름표 */
+  labels?: boolean;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, pure: true }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, min: 'perfect' }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
 
-export type JudgeWord = 'EXCELLENT' | 'GREAT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
+export type JudgeWord = 'PERFECT' | 'EXCELLENT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
 
 /** 판정 글자 모양: 크기·색(위→아래)·윤곽·빛·기울기·지속 */
 const JUDGE_STYLE: Record<JudgeWord, { size: number; top: string; bottom: string; edge: string; glow: string; tilt: number; life: number; shine?: boolean; stars?: boolean; crack?: boolean }> = {
-  EXCELLENT: { size: 52, top: '#ffffff', bottom: '#ffc94a', edge: '#3a2205', glow: '#ffd27a', tilt: -0.04, life: 1000, shine: true, stars: true },
-  GREAT: { size: 50, top: '#fff1c4', bottom: '#e8a53a', edge: '#33200a', glow: '#ffb24a', tilt: -0.03, life: 900, shine: true },
+  PERFECT: { size: 54, top: '#ffffff', bottom: '#ffc94a', edge: '#3a2205', glow: '#ffd27a', tilt: -0.04, life: 1050, shine: true, stars: true },
+  EXCELLENT: { size: 48, top: '#fff1c4', bottom: '#e8a53a', edge: '#33200a', glow: '#ffb24a', tilt: -0.03, life: 900, shine: true },
   GOOD: { size: 42, top: '#eef6ff', bottom: '#7fa6d6', edge: '#121a2b', glow: '#8fc0ff', tilt: 0, life: 800 },
   MISS: { size: 42, top: '#c9a7a0', bottom: '#7a2a24', edge: '#1a0806', glow: '#ff3b30', tilt: 0.05, life: 850, crack: true },
   HIT: { size: 30, top: '#ffffff', bottom: '#ffb36a', edge: '#2a1206', glow: '#ff9a4a', tilt: -0.12, life: 500 },
@@ -298,6 +300,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   actorScale = 1;
   drawClashSparks(ctx, d, sp.fx.fx_gyeol_clash ?? null, now);
   drawCue(ctx, d, now);
+  if (fx.labels) drawCueLabels(ctx, d);
   drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
   drawWeather(ctx, fx.weather, true, now, density);
@@ -522,6 +525,27 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
   }
 }
 
+/** 서장 튜토리얼: 결이 보이는 동안 줄기와 과녁 고리에 이름표를 단다 */
+function drawCueLabels(ctx: CanvasRenderingContext2D, d: Duel): void {
+  const c = cue(d);
+  if (!c.visible || d.result) return;
+  const cx = CONTACT.x - 40;
+  const cy = CONTACT.y;
+  ctx.save();
+  ctx.font = '700 16px "Nanum Myeongjo", serif';
+  ctx.textAlign = 'center';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  const tag = (text: string, x: number, y: number) => {
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = '#fff1d6';
+    ctx.fillText(text, x, y);
+  };
+  tag('결 — 적의 칼이 오는 길', (cx + FOE_X) / 2 + 40, CONTACT.y - 108);
+  tag('과녁 — 좁혀 드는 고리가 여기 겹칠 때 받는다', cx + 20, cy - 52);
+  ctx.restore();
+}
+
 /** 결: 원소마다 색과 결의 모양이 다르다. 붉은 결은 받을 수 없다(피하기). 속임수는 고리가 가짜 순간에 닿았다가 다시 좁혀 든다 */
 function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   if (d.result) return;
@@ -530,7 +554,7 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   const r = d.data.rules;
   const key = c.unblockable ? 'danger' : (c.element ?? 'none');
   const col = ELEMENT_COLOR[key];
-  const inPerfect = !c.faking && !c.unblockable && c.left <= r.perfect;
+  const inPerfect = !c.faking && !c.unblockable && c.left <= r.parry;
   const alpha = 0.3 + 0.7 * (1 - c.ratio);
   const cx = CONTACT.x - 40;
   const cy = CONTACT.y;
@@ -779,7 +803,7 @@ function drawEffects(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: nu
   ctx.globalAlpha = 1;
 }
 
-/** 판정 글자: 크게 튀어나왔다가 자리 잡고, 위로 떠오르며 사라진다. EXCELLENT는 빛이 훑고 별이 반짝인다 */
+/** 판정 글자: 크게 튀어나왔다가 자리 잡고, 위로 떠오르며 사라진다. PERFECT는 빛이 훑고 별이 반짝인다 */
 function drawJudge(ctx: CanvasRenderingContext2D, j: Fx['judges'][number], now: number): void {
   const st = JUDGE_STYLE[j.word];
   const el = now - j.born;
@@ -1070,7 +1094,7 @@ function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.restore();
 }
 
-/** 결 연환 구슬 다섯: 이어 받은 만큼 찬다(모두 EXCELLENT면 금빛, 섞이면 은빛). 3에 낙운무흔, 5에 벽운단하·운해귀종 */
+/** 결 연환 구슬 열: 이어 받은 만큼 찬다(모두 PERFECT면 금빛, EXCELLENT 이상이면 은빛, GOOD이 섞이면 잿빛). 3에 낙운무흔, 5에 벽운단하·운해귀종 */
 const CHAIN_PIPS = 10;
 
 function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
@@ -1088,14 +1112,14 @@ function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
     ctx.arc(x, y, 7, 0, Math.PI * 2);
     if (on) {
       // 빛 번짐 대신 옅은 큰 원(가짜 빛)
-      ctx.fillStyle = c.pure ? 'rgba(255,210,122,0.28)' : 'rgba(159,192,236,0.28)';
+      ctx.fillStyle = c.min === 'perfect' ? 'rgba(255,210,122,0.28)' : c.min === 'excellent' ? 'rgba(159,192,236,0.28)' : 'rgba(150,150,150,0.2)';
       ctx.beginPath();
       ctx.arc(x, y, 11, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
       ctx.arc(x, y, 7, 0, Math.PI * 2);
     }
-    ctx.fillStyle = on ? (c.pure ? '#ffd27a' : '#c9d4e6') : 'rgba(0,0,0,0.45)';
+    ctx.fillStyle = on ? (c.min === 'perfect' ? '#ffd27a' : c.min === 'excellent' ? '#c9d4e6' : '#8f8a82') : 'rgba(0,0,0,0.45)';
     ctx.fill();
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = i === 4 || i === 9 ? '#fff0c0' : 'rgba(255,255,255,0.4)';
@@ -1106,7 +1130,7 @@ function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
   ctx.lineWidth = 3;
   ctx.strokeStyle = 'rgba(0,0,0,0.85)';
   ctx.strokeText(`결 연환 ${c.n}`, x0 + gap * 4.5, y + 26);
-  ctx.fillStyle = c.pure ? '#ffe9b0' : '#d8e2f2';
+  ctx.fillStyle = c.min === 'perfect' ? '#ffe9b0' : c.min === 'excellent' ? '#d8e2f2' : '#bdb6aa';
   ctx.fillText(`결 연환 ${c.n}`, x0 + gap * 4.5, y + 26);
   ctx.restore();
 }
@@ -1117,7 +1141,7 @@ function drawBanner(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   if (!b) return;
   const el = now - b.born;
   const life = 1400;
-  if (el > life) return;
+  if (el < 0 || el > life) return;
   const inK = Math.min(1, el / 160);
   const alpha = el < life - 300 ? 1 : (life - el) / 300;
   const col = ELEMENT_COLOR[b.element ?? 'danger'];

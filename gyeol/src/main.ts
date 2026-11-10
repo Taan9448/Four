@@ -9,6 +9,7 @@ import { advance, betterRank, createDuel, duelGrade, isFocusing, isOpen, press, 
 import { heartbeat } from './heart';
 import { loadSave, writeSave, type Quality } from './save';
 import { openSettings } from './settings';
+import { renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
@@ -18,7 +19,7 @@ const data = raw as unknown as DuelData;
 const app = document.getElementById('app')!;
 let stopLoop: (() => void) | null = null;
 
-const WORD: Record<Judgement, JudgeWord> = { excellent: 'EXCELLENT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
+const WORD: Record<Judgement, JudgeWord> = { perfect: 'PERFECT', excellent: 'EXCELLENT', good: 'GOOD', miss: 'MISS' };
 const GROUND_TEXT_Y = CONTACT.y - 150;
 
 function writeBest(id: string, accuracy: number, rank: string): boolean {
@@ -61,6 +62,11 @@ const nav: Nav = {
     else if (s === 'practice') renderPractice(app, nav, data);
     else if (s === 'records') renderRecords(app, nav, data);
     else if (s === 'calibrate') renderCalibrate(app, nav);
+    else if (s === 'story') renderStory(app, nav, data);
+  },
+  stop() {
+    stopLoop?.();
+    setKeys(null);
   },
   play(foe, mode, opts) {
     setKeys(null);
@@ -71,7 +77,7 @@ const nav: Nav = {
   },
 };
 
-const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '박자 도전으로', practice: '수련장으로', lobby: '로비로' };
+const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '박자 도전으로', practice: '수련장으로', lobby: '로비로', story: '이야기 목록' };
 
 async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby' }): Promise<void> {
   stopLoop?.();
@@ -82,9 +88,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const drill = foeDef0.drills?.find((x) => x.id === opts.drill);
   const foeDef: FoeDef = drill ? { ...foeDef0, patterns: drill.patterns } : foeDef0;
   const playData: DuelData = drill ? { ...data, foes: data.foes.map((f) => (f.id === foeDef.id ? foeDef : f)) } : data;
-  const d = createDuel(playData, foeDef.id, seed, mode, opts.difficulty ?? 'main');
+  const d = createDuel(playData, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}) });
+  const tutorial = opts.tutorial;
   const practice = mode === 'practice';
-  const leave = () => nav.go(opts.back);
+  const leave = () => (tutorial ? (stopLoop?.(), opts.onTutorialDone?.(true)) : nav.go(opts.back));
   const rhythm = mode === 'rhythm';
   const canvas = el('canvas', { width: String(W), height: String(H), class: 'field', 'aria-label': `${foeDef.title}와의 ${rhythm ? '박자 도전' : '대결'}` });
   const ctx = canvas.getContext('2d')!;
@@ -110,11 +117,18 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const techName = el('span', { class: 'tech-name' }, '기술');
   const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, 'I'));
   const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
+  // 이야기에서 아직 배우지 않은 것은 잠가 둔다
+  if (opts.duel?.focus === false) focusBtn.classList.add('locked');
   const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
-  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), practice ? '그만하기' : '나가기');
+  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), tutorial ? '건너뛰기' : practice ? '그만하기' : '나가기');
   back.addEventListener('click', leave);
   const overlay = el('div', { class: 'result', hidden: '' });
+  // 버티기(곽도진): 받아 낸 수, 처음 나오는 순간 안내 카드, 서장 튜토리얼 판
+  const surviveEl = el('div', { class: 'survive', hidden: '' });
+  const tipEl = el('div', { class: 'tip-card', hidden: '' });
+  const tutTitle = el('b', {}), tutSay = el('p', { class: 'tut-say' }), tutGoal = el('p', { class: 'tut-goal' });
+  const tutPanel = el('div', { class: 'tut-panel', hidden: '' }, tutTitle, tutSay, tutGoal);
   const loading = el('div', { class: 'loading' }, el('span', {}, '결을 고르는 중…'));
   const fsBtn = el('button', { class: 'fs', type: 'button', 'aria-label': '전체 화면', title: '전체 화면' }, '⛶');
   fsBtn.addEventListener('click', () => {
@@ -123,7 +137,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   });
   if (!document.fullscreenEnabled) fsBtn.hidden = true;
   const hint = el('p', { class: 'rotate-hint' }, '휴대폰을 가로로 돌리면 화면이 커지고 버튼이 양손 엄지 자리로 갑니다');
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, cutin, overlay, loading, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back), hint));
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, surviveEl, tutPanel, tipEl, cutin, overlay, loading, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back), hint));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
@@ -151,6 +165,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   fx.weather = createWeather(foeDef.weather);
   if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
   let hitstopUntil = 0;
+  /** 서장 튜토리얼 단계의 느린 화면 배율(도움) */
+  let tutSlow = 1;
   /** 대결 시계를 마지막으로 민 실제 시각(입력 시각 보정의 기준) */
   let lastReal = performance.now();
   let raf = 0;
@@ -188,13 +204,12 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     fx.bubbles.push({ who, text: line, born, life: 1300 + line.length * 45 });
   };
   let foeStaggered = false;
-  let clashWins = 0;
   let lastDeathblow = -1;
   let lastBeat = 0;
   let lastClashFx = 0;
 
   /** 지금 대결 시계가 실제 시간의 몇 배로 흐르는가(끝 장면·집중이면 느리게) */
-  const rateAt = (real: number) => (real < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : 1);
+  const rateAt = (real: number) => (real < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : tutSlow);
   /** 대결 시계를 실제 시각 real까지 민다(멈칫 동안은 멈춰 있다) */
   const advanceTo = (real: number) => {
     if (real <= lastReal) return;
@@ -250,14 +265,94 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const bloomColor = (e?: Element) => (e === 'fire' ? 'rgba(255,170,80,ALPHA)' : e === 'ice' ? 'rgba(170,235,255,ALPHA)' : e === 'lightning' ? 'rgba(210,160,255,ALPHA)' : 'rgba(255,214,120,ALPHA)');
 
   // 수련장: 누른 시점(타격 몇 ms 전)을 화면 아래 막대에 찍는다
-  const mark = (lead: number | null, kind: 'excellent' | 'great' | 'good' | 'miss') => {
+  const mark = (lead: number | null, kind: Judgement) => {
     if (!practice || !fx.practice) return;
     fx.practice.marks.push({ lead, kind, born: performance.now() });
     if (fx.practice.marks.length > 12) fx.practice.marks.shift();
   };
+  // 처음 나오는 순간 안내(이야기 — 장마다 tips): 한 번만, 잠깐 느려지며 카드가 뜬다
+  const tip = (id: string) => {
+    if (!opts.tips?.includes(id)) return;
+    const save = loadSave();
+    if (save.tips.includes(id)) return;
+    const t = story.tips[id];
+    if (!t) return;
+    save.tips.push(id);
+    writeSave(save);
+    tipEl.replaceChildren(el('kbd', {}, t.key), el('p', {}, t.text));
+    tipEl.hidden = false;
+    slowUntil = performance.now() + 1400;
+    setTimeout(() => (tipEl.hidden = true), 4200);
+  };
+
+  // 서장 튜토리얼(7-2-1): 단계마다 설명 → 따라 하기 → 통과
+  let tutStep = -1;
+  let tutCount = 0;
+  let tutPassing = false;
+  const hintPads: Record<string, HTMLButtonElement> = { parry: parryBtn, attack: attackBtn, dodge: dodgeBtn };
+  const tutApply = () => {
+    const st = tutorial![tutStep];
+    tutCount = 0;
+    tutPassing = false;
+    if (st.drill) d.foeDef = { ...d.foeDef, patterns: st.drill };
+    else d.foeDef = { ...d.foeDef, patterns: foeDef0.patterns };
+    d.foe.pattern = null;
+    d.opts.assistCue = !!st.assist.earlyCue;
+    tutSlow = st.assist.slow ?? 1;
+    fx.practice = st.assist.window ? { marks: [], drill: st.title } : undefined;
+    fx.labels = !!st.assist.labels;
+    for (const [k, b] of Object.entries(hintPads)) b.classList.toggle('hint', st.hint === k);
+    if (st.final) {
+      // 마지막 한 판: 진짜 대결(쓰러지지는 않는다), 철목인 체력은 줄여서
+      d.mode = 'duel';
+      d.opts.noLose = true;
+      d.foeDef = { ...d.foeDef, hp: 120 };
+      d.foe.hp = 120;
+      d.foe.posture = 0;
+    }
+    tutTitle.textContent = `서장 · ${tutStep + 1}/${tutorial!.length}  ${st.title}`;
+    tutSay.textContent = `왕일검: "${st.say}"`;
+    tutGoalText();
+    tutPanel.hidden = false;
+    tutPanel.classList.remove('pass');
+  };
+  const tutGoalText = () => {
+    const st = tutorial![tutStep];
+    tutGoal.textContent = st.goal.count ? `${st.goalText}  ${Math.min(tutCount, st.goal.count)} / ${st.goal.count}` : st.goalText;
+  };
+  const tutEvent = (ev: (typeof d.events)[number]) => {
+    if (!tutorial || tutStep < 0 || tutPassing) return;
+    const st = tutorial[tutStep];
+    const g = st.goal;
+    const m = 'move' in ev ? d.foeDef.moves[ev.move] : undefined;
+    const hit =
+      (g.type === 'resolved' && (ev.type === 'hit' || ev.type === 'guard' || ev.type === 'parry' || ev.type === 'evade' || ev.type === 'mikiri')) ||
+      (g.type === 'block' && (ev.type === 'guard' || ev.type === 'parry')) ||
+      (g.type === 'parry' && ev.type === 'parry') ||
+      (g.type === 'counter' && ev.type === 'strike' && ev.counter) ||
+      (g.type === 'deathblow' && ev.type === 'deathblow') ||
+      (g.type === 'mikiri' && ev.type === 'mikiri') ||
+      (g.type === 'feintParry' && ev.type === 'parry' && !!m?.feint);
+    if (!hit) return;
+    tutCount++;
+    tutGoalText();
+    if (tutCount < (g.count ?? 1)) return;
+    // 통과: 잠깐 뒤 다음 단계
+    tutPassing = true;
+    tutPanel.classList.add('pass');
+    tutGoal.textContent = '통과!';
+    sfx('power', { volume: 0.7 });
+    setTimeout(() => {
+      if (!alive) return;
+      tutStep++;
+      tutApply();
+    }, 1400);
+  };
+
   const handleEvents = () => {
     const now = performance.now();
     for (const ev of d.events) {
+      tutEvent(ev);
       switch (ev.type) {
         case 'parry': {
           mark(ev.lead, ev.judgement);
@@ -355,6 +450,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         }
         case 'techReady': {
+          tip('tech');
           const t = techOf(d, ev.tech)!;
           sfx('power', { volume: 0.8 });
           text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — I`, TECH_COLOR[t.id]?.core ?? '#fff6d6', 24);
@@ -393,6 +489,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         }
         case 'clash':
+          tip('clash');
           // 칼끼리 맞부딪혔다: 번쩍 멈추고, 겨루기 막대가 뜬다
           sfx('crit');
           sfx('block');
@@ -410,7 +507,6 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           spark(CONTACT.x + (ev.balance - 0.5) * 80, CONTACT.y - 10, 6, '#fff0c0', 260, 3);
           break;
         case 'clashWin':
-          clashWins++;
           sfx('slam_8');
           flash('#bfe4ff', 260, 0.5);
           addShake(fx, now, 14, 320);
@@ -428,7 +524,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', 30);
           break;
         case 'crisis':
-          // 배수의 진: 붉은 가장자리와 심장 소리, EXCELLENT 폭이 넓어진다
+          // 배수의 진: 붉은 가장자리와 심장 소리, PERFECT 폭이 넓어진다
           sfx('power', { volume: 0.9 });
           flash('#ff2a2a', 320, 0.35);
           fx.crisisBeat = now;
@@ -489,11 +585,13 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           // 끝 장면: 느린 화면으로 쓰러지는 쪽에 다가가고, 위아래로 검은 띠
           sfx(ev.type === 'win' ? 'victory' : 'defeat');
           slowUntil = now + 1600;
-          fx.finale = { born: now, x: ev.type === 'win' ? FOE_X - 60 : PLAYER_X + 20 };
+          fx.finale = { born: now, x: ev.type === 'win' && !(ev.type === 'win' && ev.survived) ? FOE_X - 60 : PLAYER_X + 20 };
           fx.combo = null;
           fx.banner = null;
           flash(ev.type === 'win' ? '#ffffff' : '#3a0000', 400, 0.5);
-          if (ev.type === 'win') {
+          if (ev.type === 'win' && ev.survived) {
+            say('foe', 'win', 300);
+          } else if (ev.type === 'win') {
             say('foe', 'lose', 150);
             // 결정타로 끝냈으면 그 결정타의 대사
             say('player', 'win', 1100, lastDeathblow === ev.t ? foeDef.finisher?.line : undefined);
@@ -502,6 +600,25 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             say('foe', 'win', 1100);
           }
           finish();
+          break;
+        case 'phase':
+          // 2단계: 포효하며 빨라지고 세진다
+          sfx('roar');
+          sfx('enrage', { volume: 0.8 });
+          // 결정타로 넘어가면 결정타 이름이 먼저 — 2단계 띠는 조금 뒤에
+          fx.banner = { name: ev.name, born: now + 1100, element: 'fire' };
+          flash('#ffffff', 360, 0.45);
+          addShake(fx, now, 16, 600);
+          gust(fx.weather, FOE_X, CONTACT.y, 900);
+          if (ev.line) say('foe', 'start', 200, ev.line);
+          text(FOE_X, CONTACT.y - 170, '2단계', '#ffb07a', 30);
+          break;
+        case 'endure':
+          surviveEl.hidden = false;
+          surviveEl.textContent = `버티기 ${ev.got} / ${ev.need}`;
+          surviveEl.classList.remove('bump');
+          void surviveEl.offsetWidth;
+          surviveEl.classList.add('bump');
           break;
         case 'judge':
         case 'refill':
@@ -523,10 +640,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       st.duels++;
       if (d.result === 'win') st.wins++;
       st.parries += s.parries;
-      st.excellent += s.excellent;
+      st.perfect += s.perfect;
       st.deathblows += s.deathblows;
       st.techs += s.techs;
-      st.clashWins += clashWins;
+      st.clashWins += s.clashWins;
       st.maxStreak = Math.max(st.maxStreak, s.maxStreak);
       st.playMs += Math.round(d.t);
       const g = duelGrade(d);
@@ -541,11 +658,28 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     writeSave(save);
   };
   const finish = () => {
+    if (tutorial) {
+      // 서장 마지막 한 판을 이겼다 → 바깥(story.ts)이 장면과 결과를 잇는다
+      setTimeout(() => {
+        if (!alive) return;
+        stopLoop?.();
+        opts.onTutorialDone?.(false);
+      }, 2600);
+      return;
+    }
     record();
     setTimeout(() => {
       if (!alive) return;
       const s = d.stats;
-      const again = el('button', { class: 'btn primary', type: 'button' }, '다시');
+      const won = d.result === 'win';
+      // 이야기에서 이기면 '다음'이 앞에, 지면 '다시'가 앞에
+      const nextBtn = won && opts.next ? el('button', { class: 'btn primary', type: 'button' }, opts.next.label) : null;
+      nextBtn?.addEventListener('click', () => {
+        stopLoop?.();
+        setKeys(null);
+        opts.next!.go(d);
+      });
+      const again = el('button', { class: nextBtn ? 'btn' : 'btn primary', type: 'button' }, '다시');
       again.addEventListener('click', () => void play(foeDef0, mode, opts));
       const pick = el('button', { class: 'btn', type: 'button' }, BACK_LABEL[opts.back] ?? '나가기');
       pick.addEventListener('click', leave);
@@ -560,8 +694,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           el(
             'div',
             { class: 'judge-row' },
-            el('span', { class: 'j-excellent' }, `EXCELLENT ${s.excellent}`),
-            el('span', { class: 'j-great' }, `GREAT ${s.perfect - s.excellent}`),
+            el('span', { class: 'j-perfect' }, `PERFECT ${s.perfect}`),
+            el('span', { class: 'j-excellent' }, `EXCELLENT ${s.clean - s.perfect}`),
             el('span', { class: 'j-good' }, `GOOD ${s.good}`),
             el('span', { class: 'j-miss' }, `MISS ${s.miss}`),
           ),
@@ -572,15 +706,16 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         const g = duelGrade(d);
         const diffName = data.difficulties?.find((x) => x.id === d.difficulty)?.name ?? '';
         overlay.replaceChildren(
-          el('h2', {}, d.result === 'win' ? `${foeDef.title}을(를) 베었다` : '쓰러졌다'),
+          opts.title ? el('p', { class: 'kicker' }, opts.title) : '',
+          el('h2', {}, d.result === 'win' ? (d.opts.survive ? '버텨 냈다' : `${foeDef.title}을(를) 베었다`) : '쓰러졌다'),
           g ? el('div', { class: 'grade-line' }, rankBadge(g.rank, 'lg'), el('span', {}, `${diffName} · 점수 ${g.score}${bestUp ? ' · 최고 등급!' : ''}`)) : '',
-          el('p', {}, `패링 ${s.parries}(EXCELLENT ${s.excellent}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
+          el('p', {}, `패링 ${s.parries}(PERFECT ${s.perfect}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak} · ${(d.t / 1000).toFixed(1)}초`),
-          el('div', { class: 'row' }, again, pick),
+          el('div', { class: 'row' }, nextBtn ?? '', again, pick),
         );
       }
       overlay.hidden = false;
-      again.focus();
+      (nextBtn ?? again).focus();
     }, 2600);
   };
 
@@ -598,7 +733,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     if (rhythm) {
       put('progress', pct(d.t / chartEnd), (v) => (progress.style.width = v));
       const sc = rhythmScore(d);
-      put('score', sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · EXCELLENT ${d.stats.excellent} · GREAT ${d.stats.perfect - d.stats.excellent} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라', (v) => (scoreEl.textContent = v));
+      put('score', sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · PERFECT ${d.stats.perfect} · EXCELLENT ${d.stats.clean - d.stats.perfect} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라', (v) => (scoreEl.textContent = v));
     } else {
       put('foeHp', pct(d.foe.hp / foeDef.hp), (v) => (foeHp.style.width = v));
       put('foePosture', pct(d.foe.posture / foeDef.posture), (v) => (foePosture.style.width = v));
@@ -608,13 +743,14 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       const focusing = isFocusing(d);
       put('myFocus', pct(focusing ? (d.focusUntil - d.t) / data.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
       put('focusK', fk.toFixed(2), (v) => focusBtn.style.setProperty('--focus', v));
+      if (fk >= 1) tip('focus');
       put('focusState', `${fk >= 1}|${focusing}|${!!d.result}`, () => {
         focusBtn.disabled = fk < 1 || focusing || !!d.result;
         focusBtn.classList.toggle('ready', fk >= 1 && !focusing);
         focusBtn.classList.toggle('on', focusing);
       });
     }
-    fx.chain = { n: d.chain, pure: d.chainPure };
+    fx.chain = { n: d.chain, min: d.chainMin };
     const ready = techOf(d, d.techReady);
     put('tech', `${ready?.id ?? ''}|${!!d.result}`, () => {
       techBtn.disabled = rhythm || !ready || !!d.result;
@@ -676,8 +812,13 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   };
   raf = requestAnimationFrame(frame);
   // 첫마디: 적이 먼저, 하운이 받는다
-  say('foe', 'start', 350);
-  say('player', 'start', 2100);
+  if (tutorial) {
+    tutStep = 0;
+    tutApply();
+  } else {
+    say('foe', 'start', 350);
+    say('player', 'start', 2100);
+  }
   stopLoop = () => {
     alive = false;
     cancelAnimationFrame(raf);
@@ -691,7 +832,7 @@ initAudio();
 applySettings();
 applyUiArt();
 const params = new URLSearchParams(location.search);
-// 점검·개발용: ?foe=<id>[&rhythm|&practice[=drill]][&diff=easy|main|hard] 바로 대결, ?screen=lobby|arena|rhythm|practice|records|calibrate
+// 점검·개발용: ?foe=<id>[&rhythm|&practice[=drill]][&diff=easy|main|hard] 바로 대결, ?screen=lobby|story|arena|rhythm|practice|records|calibrate
 const direct = data.foes.find((f) => f.id === params.get('foe'));
 const screen = params.get('screen') as Screen | null;
 if (direct) {
