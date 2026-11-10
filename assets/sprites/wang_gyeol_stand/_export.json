@@ -1,0 +1,33 @@
+{
+  "method": "integer translation only; no resize, resampling, recoloring or clipping",
+  "source": "assets/source/wang_gyeol_stand.png",
+  "frames": [
+    {
+      "frame": 1,
+      "translate": [
+        0,
+        33
+      ],
+      "visiblePixelsBefore": 220626,
+      "visiblePixelsAfter": 220626
+    },
+    {
+      "frame": 2,
+      "translate": [
+        0,
+        33
+      ],
+      "visiblePixelsBefore": 226656,
+      "visiblePixelsAfter": 226656
+    },
+    {
+      "frame": 3,
+      "translate": [
+        0,
+        33
+      ],
+      "visiblePixelsBefore": 222800,
+      "visiblePixelsAfter": 222800
+    }
+  ]
+}
