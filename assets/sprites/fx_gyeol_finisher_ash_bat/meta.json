@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_finisher_ash_bat",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 9.505,
+  "gridDetected": true,
+  "nativeSize": [
+    54,
+    54
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "22073bb3a7a43c07",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.634
+}
