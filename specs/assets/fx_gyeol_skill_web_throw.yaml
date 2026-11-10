@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_web_throw
+type: fx
+summary: "「결」 받을 수 없는 기술 광석거미 「거미줄 던지기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-10)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thick sticky silver-white web ball flying in from the right, trailing strands"
+  2: "impact: the web bursts open in the center into a wide radial net, strands snapping tight"
+  3: "the silver net stretched across the cell, glistening, a few strands vibrating"
+  4: "the net sagging, strands starting to tear"
+  5: "torn web strands hanging and drifting"
+  6: "a few faint silver threads"
+placeholder: { accent: '#c2c6d1' }

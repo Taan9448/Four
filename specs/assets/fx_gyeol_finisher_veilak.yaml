@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_veilak
+type: fx
+summary: "「결」 결정타 매듭 끊기(斷結) — 베일락 전용 마무리 — 그림자 실이 모이는 매듭 한 점을 흰 일섬이 꿰뚫자, 검은 연기 실이 사방으로 풀려 흩어지고 붉은 빛이 꺼진다(2026-11-10). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "many thin black smoke threads converge from every side of the cell into one tight dark knot in the center, a red glow inside it"
+  2: "impact: a short white-violet horizontal flash pierces the knot, a blinding white core"
+  3: "the knot bursts, the black smoke threads snapping and whipping outward in every direction, red sparks"
+  4: "the cut threads unraveling and fading into grey smoke, the red glow dimming"
+  5: "loose grey smoke strands drifting apart"
+  6: "faint smoke wisps"
+placeholder: { accent: '#d4b8ff' }

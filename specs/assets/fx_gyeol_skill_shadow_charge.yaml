@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_shadow_charge
+type: fx
+summary: "「결」 받을 수 없는 기술 베일락 「그림자 돌격」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-10)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a dark wall of black smoke in the shape of a charging horse's chest and lance rushing in from the right, red eyes glowing"
+  2: "impact: a huge burst of black smoke and red sparks in the center, a dark shockwave ring"
+  3: "smoke hoof-prints and torn black smoke streaks slashing across the cell to the left"
+  4: "the smoke streaks spreading and fraying, red embers"
+  5: "drifting black smoke with a few red embers"
+  6: "faint black smoke wisps"
+placeholder: { accent: '#ff3b3b' }

@@ -1,0 +1,21 @@
+id: inner_senior_death
+type: character-anim
+size: large
+character: inner_senior
+chroma: magenta
+summary: "「결」 내원 사형 쓰러짐 6프레임 — 이야기 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-10). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [inner_senior_ref]
+reference: assets/source/inner_senior_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck hard across the sword, his straight sword flying up out of his hand, his head snapping back"
+  2: "staggers back two steps clutching his chest, the topknot coming loose, eyes wide in disbelief"
+  3: "drops onto one knee, one hand on the ground, his hair falling over his face"
+  4: "topples onto his side on the ground, robe sleeves spread"
+  5: "lying on his side, his sword stuck upright in the earth beside him"
+  6: "lying still, beaten and unconscious (not dead), the sword still standing beside him"
+placeholder: { shape: humanoid, color: '#6b7a8f', accent: '#c2c6d1' }

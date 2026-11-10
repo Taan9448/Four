@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_ore_spider
+type: fx
+summary: "「결」 결정타 마디 끊기(斷節) — 광석거미 전용 마무리 — 빠른 흰 칼금 여섯 줄이 다리 마디마다 끊고, 은빛 광석 조각이 터져 흩어진다(2026-11-10). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "six short thin white cut lines appear at once in a ring around the center, like the joints of six legs"
+  2: "impact: all six lines flash bright white-silver at the same moment, with a sharp white burst in the center"
+  3: "silver ore fragments and white sparks explode outward from each cut line"
+  4: "the silver fragments tumbling outward, a thin cold blue ring spreading"
+  5: "a few silver shards and fading sparks falling"
+  6: "faint silver glints"
+placeholder: { accent: '#c2c6d1' }

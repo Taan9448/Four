@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_inner_senior
+type: fx
+summary: "「결」 결정타 쪼개기(劈柴) — 내원 사형 전용 마무리 — 장작을 쪼개듯 위에서 곧게 내리친 금빛 일섬, 나뭇결 모양 빛 조각이 양쪽으로 갈라진다(2026-11-10). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin vertical gold line from the top of the cell to the center, like an axe raised over a log"
+  2: "impact: the line becomes a blinding vertical gold-white cleave with a white core, splitting the space in two like a log split along its grain"
+  3: "the two halves pushed apart, long pale wood-grain shaped light streaks and wood chips flying to both sides"
+  4: "the wood-grain light streaks curling outward and fading, a few golden splinters spinning"
+  5: "faint golden splinters and drifting sawdust"
+  6: "a few dim golden motes"
+placeholder: { accent: '#ffe08a' }
