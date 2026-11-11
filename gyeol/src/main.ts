@@ -641,6 +641,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           gust(fx.weather, FOE_X, CONTACT.y, 900);
           if (ev.line) say('foe', 'start', 200, ev.line);
           text(FOE_X, CONTACT.y - 170, `다시 일어선다 — ${ev.n} / ${ev.of}단계`, '#ffb07a', 28);
+          if (sp.fx.fx_gyeol_revive) fx.bursts.push({ x: FOE_X, y: CONTACT.y, sprite: 'fx_gyeol_revive', born: now, scale: 2 });
           tip('phase', true);
           break;
         case 'stanceCounter':
@@ -657,6 +658,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         case 'armorBreak':
           sfx('slam_8');
           text(FOE_X, CONTACT.y - 190, '갑옷이 깨졌다', '#ffe08a', 28);
+          if (sp.fx.fx_gyeol_armor_break) fx.bursts.push({ x: FOE_X, y: CONTACT.y, sprite: 'fx_gyeol_armor_break', born: now, scale: 1.8 });
           break;
         case 'endure':
           chip(`버티기 ${ev.got} / ${ev.need}`);

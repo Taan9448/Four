@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_mordecai
+type: fx
+summary: "「결」 결정타 장작 패기(劈薪) — 모르데카이 전용 마무리 — 세 숨 뒤, 두 가닥이 맞물리는 틈에 내려친 일섬이 장작 쪼개듯 가닥을 옆으로 틀어 가른다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "two thick dark strands with faint blue light twisting together in the center like a knotted log"
+  2: "impact: a straight downward white-gold strike drops into the seam between the two strands, like an axe into a log"
+  3: "the two strands split apart sideways along the seam, pale wood-grain shaped light and blue sparks flying"
+  4: "the split strands unravelling into thin threads"
+  5: "loose threads and blue motes drifting"
+  6: "faint threads"
+placeholder: { accent: '#ffe08a' }

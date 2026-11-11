@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_gormon
+type: fx
+summary: "「결」 결정타 산 떼기(離山) — 고르몬 전용 마무리 — 거대한 바위 덩어리 뒤의 실 같은 금을 따라 금빛 일섬이 지나가며 산과 몸이 떨어진다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a huge dark rock mass filling most of the cell with a thin glowing orange crack line along its back"
+  2: "impact: a long horizontal gold-white cut runs exactly along the crack line, blinding white core"
+  3: "the rock mass splits apart into two big halves separating up and down, dust and orange sparks bursting from the gap"
+  4: "boulders tumbling apart, a cloud of brown dust"
+  5: "settling dust and small pebbles"
+  6: "faint dust specks"
+placeholder: { accent: '#ffb070' }

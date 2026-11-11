@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_stair_elder
+type: fx
+summary: "「결」 결정타 계단 끊기(斷階) — 계단의 장로 전용 마무리 — 층층이 쌓인 녹빛 장력의 계단을 대각선 일섬이 끊어 계단이 무너진다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a diagonal staircase shape made of green-tinted palm force rising from lower left to upper right"
+  2: "impact: a diagonal white-gold slash cuts across the stairs with a bright flash"
+  3: "the stair blocks breaking apart and falling, green sparks"
+  4: "falling fragments"
+  5: "a few fragments and green motes"
+  6: "faint motes"
+placeholder: { accent: '#bfe3a0' }

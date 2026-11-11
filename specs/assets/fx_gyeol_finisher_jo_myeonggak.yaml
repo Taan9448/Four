@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_jo_myeonggak
+type: fx
+summary: "「결」 결정타 검집 누르기(按鞘) — 조명각 전용 마무리 — 두 갈래로 꼬인 붉고 푸른 기운의 매듭을 검집 끝이 눌러 풀고, 기운이 맥없이 흩어진다(베지 않는다)(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "two energy strands, one red and one pale blue, twisted together into a tight knot in the center"
+  2: "impact: a blunt round white pressure ring presses down on the knot (a scabbard tip, no blade), the strands jolt"
+  3: "the twisted strands loosen and unwind apart, red and blue sparks drifting"
+  4: "the two strands hanging limp and fading"
+  5: "a few red and blue motes falling"
+  6: "faint motes"
+placeholder: { accent: '#ffd0a0' }

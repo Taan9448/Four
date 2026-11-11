@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_void_grasp
+type: fx
+summary: "「결」 받을 수 없는 기술 바르가스 「공허의 손」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a huge black void hand with violet edges reaching in from the right"
+  2: "impact: the black hand closes in the center with a dark violet burst and a ring"
+  3: "black void streaks slashing across the cell, violet sparks"
+  4: "the void streaks fraying"
+  5: "drifting black wisps with violet motes"
+  6: "faint wisps"
+placeholder: { accent: '#c9a0ff' }

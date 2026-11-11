@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_knot_thrust
+type: fx
+summary: "「결」 받을 수 없는 기술 조명각 「엉킨 찌르기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "two twisted red and pale blue energy strands spiraling into a thrust from the right"
+  2: "impact: the twisted thrust hits the center with a red and blue burst"
+  3: "red and blue sparks spraying in a spiral"
+  4: "the spiral fading"
+  5: "red and blue motes"
+  6: "faint motes"
+placeholder: { accent: '#ffb0b0' }

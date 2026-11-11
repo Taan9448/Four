@@ -1,0 +1,15 @@
+id: fx_gyeol_stance
+type: fx
+summary: "「결」 반격 자세(構) 기운 6프레임 고리 — 적이 반격 자세로 기다리는 동안 적 둘레에 되풀이해 그린다(2026-11-11). 보랏빛, 은은하게"
+frames: 6
+fps: 8
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "a thin violet ring of coiled energy low around the bottom of the cell, small violet sparks"
+  2: "the violet ring slightly brighter, wisps rising"
+  3: "violet wisps rising higher like a coiled spring, a faint glyph-like glint"
+  4: "the wisps at their highest, ring brightest"
+  5: "the wisps sinking back"
+  6: "back to a thin violet ring, almost the same as the first cell so it loops"
+placeholder: { accent: '#c896ff' }

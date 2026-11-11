@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_rift_leap
+type: fx
+summary: "「결」 받을 수 없는 기술 틈의 짐승 「틈 넘기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a dark violet rift tear opening on the right with a beast silhouette lunging through"
+  2: "impact: the beast silhouette bursts out in the center with jagged violet lightning"
+  3: "jagged violet lightning streaks across the cell"
+  4: "the rift tear closing, sparks"
+  5: "violet motes"
+  6: "faint motes"
+placeholder: { accent: '#c9a0ff' }

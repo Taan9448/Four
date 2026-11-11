@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_last_arm
+type: fx
+summary: "「결」 받을 수 없는 기술 모르데카이 「마지막 팔」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a long dark arm made of black threads with blue light reaching in from the right"
+  2: "impact: the thread arm grabs the center with a burst of blue light and threads"
+  3: "black threads whipping outward, blue sparks"
+  4: "threads unravelling"
+  5: "blue motes and loose threads"
+  6: "faint threads"
+placeholder: { accent: '#9fd0ff' }

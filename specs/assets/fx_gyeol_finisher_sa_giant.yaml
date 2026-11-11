@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_sa_giant
+type: fx
+summary: "「결」 결정타 천외귀운(天外歸雲) — 붉은 거인 사무결 전용 마무리 — 위의 틈에서 내려오는 붉은 흐름의 가장자리를 칼끝이 틀어 위로 되돌려 보낸다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a wide column of red power pouring down from the top of the cell into the center"
+  2: "impact: a curved white-gold blade edge touches the side of the column with a bright flash"
+  3: "the red column bends and turns, rushing back upward to the top of the cell in a great arc, red sparks"
+  4: "the red stream disappearing upward, white steam left below"
+  5: "a few red embers rising, thin steam"
+  6: "faint embers"
+placeholder: { accent: '#ff9a7a' }

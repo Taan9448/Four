@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_floor_slam
+type: fx
+summary: "「결」 받을 수 없는 기술 염탁 「바닥 내려치기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a red palm glow slamming down from above"
+  2: "impact: a red shockwave bursts from the ground in the center, red liquid spurting up from cracks"
+  3: "red cracks and splashes spreading sideways"
+  4: "the red splashes falling"
+  5: "red drops and steam"
+  6: "faint steam"
+placeholder: { accent: '#ff6a5a' }

@@ -1,0 +1,21 @@
+id: ice_wolf_death
+type: character-anim
+size: large
+character: ice_wolf
+chroma: magenta
+summary: "「결」 얼음 늑대 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [ice_wolf_ref]
+reference: assets/source/ice_wolf_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck in the chest, the dark lump inside the transparent ribs cracking"
+  2: "the legs buckle, ice body cracking"
+  3: "collapsing onto its side"
+  4: "the ice body breaking into chunks"
+  5: "a pile of ice chunks, frost mist"
+  6: "melting ice shards"
+placeholder: { shape: beast, color: '#bfe4f2', accent: '#4fb4ff' }

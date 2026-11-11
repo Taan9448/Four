@@ -1,0 +1,15 @@
+id: fx_gyeol_revive
+type: fx
+summary: "「결」 다시 일어섬 이펙트 6프레임 — 정예·보스가 격퇴된 뒤 다음 단계로 일어설 때 적 위치에 한 번(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a dark ember glow gathering at the bottom center of the cell"
+  2: "impact: a pillar of dark red and gold light bursts upward from the bottom, a shockwave ring on the ground"
+  3: "the pillar of light at full height with rising embers"
+  4: "the pillar thinning, embers flying outward"
+  5: "rising embers and smoke"
+  6: "faint embers"
+placeholder: { accent: '#ffb07a' }

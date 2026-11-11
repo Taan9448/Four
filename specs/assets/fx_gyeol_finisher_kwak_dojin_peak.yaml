@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_kwak_dojin_peak
+type: fx
+summary: "「결」 결정타 송문 꺾기(折松) — 곽도진 전용 마무리 — 송문고검의 푸른 검기를 비스듬한 일섬이 꺾어 칼끝이 부러져 날아가고 솔잎이 흩날린다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a long pale blue sword-qi blade shape standing upright in the center, green pine needles around it"
+  2: "impact: a slanted white-gold slash hits the base of the blue blade with a bright flash"
+  3: "the tip of the blue blade snaps off and spins away, shards of blue light and pine needles scattering"
+  4: "the broken blue blade fading, pine needles drifting down"
+  5: "a few falling pine needles and blue motes"
+  6: "faint pine needles"
+placeholder: { accent: '#9fd3ff' }
