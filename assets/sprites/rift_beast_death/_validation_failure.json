@@ -1,0 +1,16 @@
+{
+  "id": "rift_beast_death",
+  "previewMethod": "unchanged writePreviews function from tools/validate-assets.mjs; only rendered PNG/GIF, no validation override",
+  "cell6Rect": {
+    "x": 1024,
+    "y": 512,
+    "w": 512,
+    "h": 512
+  },
+  "sourceCellContent": 106,
+  "sourceCellArea": 262144,
+  "sourceFillRatio": 0.00040435791015625,
+  "defaultMinFill": 0.005,
+  "defaultRequiredPixels": 1311,
+  "exportedFrame6VisiblePixels": 17
+}
