@@ -66,6 +66,60 @@ describe('「결」 대결 판정', () => {
     expect(later.events.find((e) => e.type === 'strike')).toMatchObject({ counter: false, blocked: true, damage: Math.max(1, Math.round(data.player.attack.damage * data.rules.foeGuardMul)) });
   });
 
+  it('연베기: 박자에 맞춰(칼이 끝나기 직전~끝난 뒤) 다시 베면 둘째·셋째 칼로 이어지고, 일찍 누르면 그 칼은 잇지 못한다', () => {
+    const c = data.player.combo!;
+    // 너무 일찍(연타) 누르면 이번 칼은 끊긴다
+    const early = createDuel(data, 'dummy');
+    advance(early, 10);
+    press(early, 'attack');
+    advance(early, 10 + data.player.attack.hitAt + 10);
+    expect(press(early, 'attack')).toBe(false);
+    advance(early, 10 + data.player.attack.duration - 30);
+    expect(press(early, 'attack')).toBe(false);
+    const d = createDuel(data, 'dummy');
+    const a = data.player.attack;
+    const steps = c.steps;
+    advance(d, 10);
+    press(d, 'attack');
+    // 박자에 맞춰: 끝나기 lead ms 안 → 끝나자마자 둘째 칼
+    advance(d, 10 + a.duration - c.lead + 20);
+    expect(press(d, 'attack')).toBe(true);
+    advance(d, 10 + a.duration + (steps[1].hitAt ?? a.hitAt) + 10);
+    const strikes = d.events.filter((e) => e.type === 'strike');
+    expect(strikes.map((e) => (e as { step?: number }).step)).toEqual([0, 1]);
+    // 셋째 칼(마무리): 둘째 칼이 끝난 뒤 window 안에 눌러도 이어진다 — 막혀도 배율만큼
+    advance(d, d.player.actionEnd + 30);
+    expect(press(d, 'attack')).toBe(true);
+    advance(d, d.t + (steps[2].hitAt ?? a.hitAt) + 10);
+    const third = d.events.filter((e) => e.type === 'strike')[2] as { step?: number; damage: number; blocked: boolean };
+    expect(third.step).toBe(2);
+    expect(third.damage).toBe(Math.max(1, Math.round(a.damage * data.rules.foeGuardMul * steps[2].damageMul)));
+  });
+
+  it('연베기: 끝난 칼에서 window가 지나면 첫 칼로 돌아간다', () => {
+    const d = createDuel(data, 'dummy');
+    const a = data.player.attack;
+    advance(d, 10);
+    press(d, 'attack');
+    advance(d, 10 + a.duration + data.player.combo!.window + 50);
+    press(d, 'attack');
+    expect(d.player.comboStep).toBe(0);
+  });
+
+  it('강베기: 늦게 떨어지지만 막혀도 체간을 크게 깎는다', () => {
+    const d = createDuel(data, 'dummy');
+    const h = data.player.heavy!;
+    advance(d, 10);
+    expect(press(d, 'heavy')).toBe(true);
+    advance(d, 10 + h.hitAt - 5);
+    expect(d.events.some((e) => e.type === 'strike')).toBe(false);
+    advance(d, 10 + h.hitAt + 5);
+    const strike = d.events.find((e) => e.type === 'strike') as { kind?: string; blocked: boolean; damage: number };
+    expect(strike).toMatchObject({ kind: 'heavy', blocked: true });
+    expect(strike.damage).toBe(Math.max(1, Math.round(data.player.attack.damage * data.rules.foeGuardMul * h.damageMul)));
+    expect(d.foe.posture).toBeCloseTo(data.rules.foeGuardPosture * h.guardPostureMul, 5);
+  });
+
   it('너무 일찍(guard 안) 누르면 막기 — 피해 일부와 내 체간', () => {
     const d = createDuel(data, 'dummy');
     advance(d, HIT - 300);

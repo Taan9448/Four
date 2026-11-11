@@ -462,10 +462,24 @@ function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx,
     return;
   }
   if (p.action === 'attack' && sp.player.attack) {
-    const a = d.data.player.attack;
+    const hitAt = p.attackHitAt;
+    const duration = p.actionEnd - p.actionStart;
     const el = t - p.actionStart;
-    const f = el < a.hitAt ? strikeFrame(sp.player.attack, 'windup', el, a.hitAt) : strikeFrame(sp.player.attack, 'recover', el - a.hitAt, a.duration - a.hitAt);
-    drawSprite(ctx, sp.player.attack, f, PLAYER_X);
+    const f = el < hitAt ? strikeFrame(sp.player.attack, 'windup', el, hitAt) : strikeFrame(sp.player.attack, 'recover', el - hitAt, duration - hitAt);
+    if (p.attackKind === 'heavy') {
+      // 강베기: 칼을 모으는 동안 금빛이 차오르고, 떨어질 때 잔상 둘과 함께 한 걸음 크게 내딛는다
+      const k = Math.min(1, el / hitAt);
+      if (el < hitAt) drawSprite(ctx, sp.player.attack, f, PLAYER_X - 6 * k, { tint: `rgba(255,214,120,${0.15 + 0.45 * k})` });
+      else {
+        for (let i = 2; i >= 1; i--) drawSprite(ctx, sp.player.attack, Math.max(1, f - i), PLAYER_X + 18 - i * 16, { alpha: 0.22 * (3 - i), tint: 'rgba(255,214,120,0.6)' });
+        drawSprite(ctx, sp.player.attack, f, PLAYER_X + 18, { scale: 1.06 });
+      }
+    } else {
+      // 연베기: 칼마다 한 걸음씩 다가선다(셋째 칼은 잔상)
+      const step = p.comboStep * 12;
+      if (p.comboStep >= 2) drawSprite(ctx, sp.player.attack, Math.max(1, f - 1), PLAYER_X + step - 14, { alpha: 0.3, tint: 'rgba(170,220,255,0.6)' });
+      drawSprite(ctx, sp.player.attack, f, PLAYER_X + step);
+    }
   } else if (p.action === 'dodge') {
     const k = Math.min(1, (t - p.actionStart) / d.data.rules.dodgeDuration);
     if (sp.player.dodge) {

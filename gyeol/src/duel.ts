@@ -207,8 +207,14 @@ export interface PlayerDef {
   posture: number;
   postureRegen: number;
   attack: { duration: number; hitAt: number; damage: number; posture: number };
+  /** 연베기(2026-11-11): 베기가 맞은 뒤 ~ 끝나고 window ms 안에 다시 베면 다음 칼(steps 순서)로 이어진다 */
+  combo?: { lead: number; window: number; steps: { damageMul: number; postureMul: number; duration?: number; hitAt?: number }[] };
+  /** 강베기(H): 늦게 떨어지지만 피해·체간이 크고, 막혀도 체간을 크게 깎는다 */
+  heavy?: { duration: number; hitAt: number; damageMul: number; postureMul: number; guardPostureMul: number };
   lines?: Lines;
 }
+
+export type AttackKind = 'slash' | 'heavy';
 
 /**
  * 진하운의 기술(2026-11-09): 받기·피하기를 끊기지 않고 이어 가면(결 연환) 열린다.
@@ -290,7 +296,7 @@ export type DuelEvent =
   | { type: 'feint'; t: number; move: string }
   | { type: 'streak'; t: number; streak: number; tier: number }
   | { type: 'judge'; t: number; grade: Grade; judgement: Judgement }
-  | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean }
+  | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean; kind?: AttackKind; step?: number }
   | { type: 'punish'; t: number; move: string }
   | { type: 'skill'; t: number; move: string; name: string }
   | { type: 'link'; t: number; chain: number; min: Judgement }
@@ -375,6 +381,13 @@ export interface Duel {
     actionStart: number;
     actionEnd: number;
     attackLanded: boolean;
+    /** 지금 베기의 종류·연베기 몇째 칼(0부터)·타격 시각(시작에서 ms) */
+    attackKind: AttackKind;
+    comboStep: number;
+    attackHitAt: number;
+    /** 연베기: 이번 칼이 끝나면 곧바로 다음 칼 · 너무 일찍 눌러(연타) 이번 칼은 잇지 못한다 */
+    comboQueued: boolean;
+    comboBroken: boolean;
     /** 마지막으로 받기를 누른 시각(공격 하나를 판정하면 지운다) */
     parryAt: number | null;
     lastPress: number;
@@ -520,6 +533,11 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
       actionStart: 0,
       actionEnd: 0,
       attackLanded: false,
+      attackKind: 'slash',
+      comboStep: 0,
+      attackHitAt: 0,
+      comboQueued: false,
+      comboBroken: false,
       parryAt: null,
       lastPress: -Infinity,
       lastGuard: -Infinity,
@@ -548,7 +566,27 @@ export const MAX_INPUT_LAG = 80;
  * at: 실제로 누른 대결 시각(2026-11-09 입력 시각 보정). 화면 프레임이 입력보다 늦게 돌면 d.t보다 이르다.
  * 받기·피하기만 그 시각으로 판정한다(아직 판정하지 않은 타격에 한해). 베기·기술은 지금 시작한다.
  */
-export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus', at = d.t): boolean {
+export type Input = 'parry' | 'attack' | 'heavy' | 'dodge' | 'tech' | 'focus';
+
+/** 베기를 시작한다(연베기 step, 강베기) */
+function startAttack(d: Duel, kind: AttackKind, step: number, t: number): void {
+  const p = d.player;
+  const pl = d.data.player;
+  const st = kind === 'slash' ? pl.combo?.steps[step] : undefined;
+  const duration = kind === 'heavy' ? pl.heavy!.duration : (st?.duration ?? pl.attack.duration);
+  p.action = 'attack';
+  p.attackKind = kind;
+  p.comboStep = step;
+  p.attackHitAt = kind === 'heavy' ? pl.heavy!.hitAt : (st?.hitAt ?? pl.attack.hitAt);
+  p.actionStart = t;
+  p.actionEnd = t + duration;
+  p.attackLanded = false;
+  p.comboQueued = false;
+  p.comboBroken = false;
+  p.parryAt = null;
+}
+
+export function press(d: Duel, input: Input, at = d.t): boolean {
   if (d.result) return false;
   const p = d.player;
   const r = d.data.rules;
@@ -562,7 +600,18 @@ export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'f
     d.events.push({ type: 'focus', t: d.t });
     return true;
   }
-  if (d.clash) return input === 'attack' || input === 'parry' ? clashPress(d) : false;
+  if (d.clash) return input === 'attack' || input === 'heavy' || input === 'parry' ? clashPress(d) : false;
+  // 연베기: 칼이 끝나기 조금 전(lead)부터 다시 베면 끝나자마자 다음 칼 — 그보다 일찍 누르면(연타) 이번 칼은 잇지 못한다
+  const combo = d.data.player.combo;
+  if (input === 'attack' && d.mode !== 'rhythm' && combo && p.action === 'attack' && p.attackKind === 'slash') {
+    if (t0 < p.actionEnd - combo.lead || !p.attackLanded) {
+      p.comboBroken = true;
+      return false;
+    }
+    if (p.comboBroken || p.comboQueued || p.comboStep + 1 >= combo.steps.length) return false;
+    p.comboQueued = true;
+    return true;
+  }
   if (p.action !== 'idle') return false;
   if (input === 'parry') {
     if (t0 - p.lastPress < r.parryLockout) return false;
@@ -597,12 +646,14 @@ export function press(d: Duel, input: 'parry' | 'attack' | 'dodge' | 'tech' | 'f
   }
   // 박자 도전에서는 베기가 없다(받기·피하기만 판정)
   if (d.mode === 'rhythm') return false;
-  const a = d.data.player.attack;
-  p.action = 'attack';
-  p.actionStart = d.t;
-  p.actionEnd = d.t + a.duration;
-  p.attackLanded = false;
-  p.parryAt = null;
+  if (input === 'heavy') {
+    if (!d.data.player.heavy) return false;
+    startAttack(d, 'heavy', 0, d.t);
+    return true;
+  }
+  // 끝난 칼에서 window 안에 다시 베어도 다음 칼로 잇는다(박자에 맞춰 떼었다 누르기)
+  const next = combo && p.attackKind === 'slash' && !p.comboBroken && d.t - p.lastAttackEnd <= combo.window && p.comboStep + 1 < combo.steps.length ? p.comboStep + 1 : 0;
+  startAttack(d, 'slash', next, d.t);
   return true;
 }
 
@@ -707,18 +758,20 @@ export const techOf = (d: Duel, id: string | null): TechDef | undefined => (id ?
 
 function stepPlayer(d: Duel): void {
   const p = d.player;
-  const a = d.data.player.attack;
   if (p.action === 'tech' && !d.techLanded && d.t >= p.actionStart + TECH_HIT) {
     d.techLanded = true;
     landTech(d);
   }
-  if (p.action === 'attack' && !p.attackLanded && d.t >= p.actionStart + a.hitAt) {
+  if (p.action === 'attack' && !p.attackLanded && d.t >= p.actionStart + p.attackHitAt) {
     p.attackLanded = true;
     landStrike(d);
   }
   if (p.action !== 'idle' && d.t >= p.actionEnd) {
     if (p.action === 'attack') p.lastAttackEnd = d.t;
+    const chain = p.action === 'attack' && p.comboQueued;
     p.action = 'idle';
+    // 미리 눌러 둔 연베기: 끊기지 않고 다음 칼
+    if (chain && !d.result) startAttack(d, 'slash', p.comboStep + 1, d.t);
   }
 }
 
@@ -771,14 +824,20 @@ function landStrike(d: Duel): void {
   const counter = isOpen(d);
   // 틈 밖의 베기는 적이 막는다: 피해는 조금, 체간도 조금. 연타하면 되받아친다
   const blocked = !counter;
-  const dmg = counter ? a.damage * r.counterMul : Math.max(1, Math.round(a.damage * r.foeGuardMul));
+  // 베기 종류: 연베기는 칼마다 배율, 강베기는 크게(막혀도 체간을 크게 깎는다)
+  const p = d.player;
+  const heavy = p.attackKind === 'heavy' ? d.data.player.heavy : undefined;
+  const st = p.attackKind === 'slash' ? d.data.player.combo?.steps[p.comboStep] : undefined;
+  const dMul = heavy ? heavy.damageMul : (st?.damageMul ?? 1);
+  const pMul = heavy ? (counter ? heavy.postureMul : heavy.guardPostureMul) : (st?.postureMul ?? 1);
+  const dmg = counter ? Math.round(a.damage * r.counterMul * dMul) : Math.max(1, Math.round(a.damage * r.foeGuardMul * dMul));
   damageFoe(d, dmg);
-  f.posture += counter ? r.counterPosture : r.foeGuardPosture;
+  f.posture += (counter ? r.counterPosture : r.foeGuardPosture) * pMul;
   if (counter) {
     d.stats.counters++;
     d.blockedRun = 0;
   } else d.blockedRun++;
-  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter, blocked });
+  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter, blocked, kind: p.attackKind, step: p.comboStep });
   if (checkFoeDown(d)) return;
   checkStagger(d);
   if (blocked && d.blockedRun >= r.punishAfter) punish(d);
