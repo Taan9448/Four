@@ -638,6 +638,8 @@ export interface Cue {
   breath?: boolean;
   /** 반격 자세(構): 베지 말고 기다린다 */
   stance?: boolean;
+  /** 겨루기가 되는 공격: 결 연환이 이어졌고 무거운 공격 — 타격 순간에 노려 베면 칼끼리 맞부딪힌다 */
+  clash?: boolean;
 }
 
 /** 화면용: 지금 결(타격 예고)이 보이는가와 고리 비율 */
@@ -671,6 +673,7 @@ export function cue(d: Duel): Cue {
     fragile: !!m.fragile,
     breath: !!m.breath,
     stance: !!m.stance,
+    clash: clashChance(d),
   };
 }
 
@@ -901,12 +904,28 @@ function gainFocus(d: Duel, judgement: Judgement): void {
 }
 
 /** 겨루기가 될 수 있는 베기인가: 대결에서, 베는 중이고, 앞 베기에서 clashCalm 넘게 쉬었다가 노려 벤 칼 */
+/**
+ * 겨루기 기회(화면 안내용, 2026-11-11): 지금 다가오는 공격이 겨루기가 될 수 있는가 — 하운이 연타 중이 아닐 때.
+ * canClash의 조건 중 '이번 베기' 쪽만 뺀 것. 속임수는 가짜 순간을 지난 뒤에만.
+ */
+export function clashChance(d: Duel): boolean {
+  const f = d.foe;
+  const p = d.player;
+  if (d.mode !== 'duel' || d.opts.clash === false || f.state !== 'windup' || !f.move) return false;
+  const m = d.foeDef.moves[f.move];
+  if (m.unblockable || m.stance || m.fragile || m.breath || !(m.clash ?? m.damage >= HEAVY_DAMAGE)) return false;
+  if (f.fakeAt !== null && d.t < f.fakeAt) return false;
+  if (d.chain < d.data.rules.clashMinChain) return false;
+  return p.action !== 'attack' && d.t - p.lastAttackEnd >= d.data.rules.clashCalm * 0.5;
+}
+
 function canClash(d: Duel): boolean {
   const p = d.player;
   const f = d.foe;
   if (d.mode === 'rhythm' || d.opts.clash === false || p.action !== 'attack' || !f.move) return false;
   const m = d.foeDef.moves[f.move];
-  if (m.unblockable) return false;
+  // 받을 수 없는 공격·반격 자세·왕녀의 얼음·세 숨은 겨루기가 되지 않는다
+  if (m.unblockable || m.stance || m.fragile || m.breath) return false;
   // 특수한 순간에만: 결 연환이 이어진 채, 적의 무거운 공격에 노려 벤 칼
   if (d.chain < d.data.rules.clashMinChain) return false;
   if (!(m.clash ?? m.damage >= HEAVY_DAMAGE)) return false;

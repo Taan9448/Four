@@ -175,6 +175,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   resizeObs.observe(canvas);
   const fx: Fx = emptyFx();
   fx.weather = createWeather(foeDef.weather);
+  fx.clashOn = mode === 'duel' && opts.duel?.clash !== false;
   if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
   let hitstopUntil = 0;
   /** 서장 튜토리얼 단계의 느린 화면 배율(도움) */
@@ -817,6 +818,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       if (!d.result && !rhythm) {
         const c = cue(d);
         if (c.visible && c.stance) tip('stance', true);
+        if (c.visible && c.clash) tip('clashReady', true);
         const gm = d.foeDef.gimmicks;
         if (d.t > 1500 && gm) {
           if (gm.armor && !d.armorBroken) tip('armor', true);

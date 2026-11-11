@@ -984,3 +984,26 @@ describe('「결」 5단계 — 하운 옷·업적', () => {
     expect(condMet({ kind: 'rhythm', rank: 'A', all: true }, s, ['a', 'b', 'c'])).toBe(false);
   });
 });
+
+describe('「결」 겨루기 기회 안내(2026-11-11)', () => {
+  it('결 연환 3 이상 + 무거운 공격이면 결에 겨루기 기회가 뜨고, 아니면 안 뜬다', async () => {
+    const { clashChance } = await import('../src/duel');
+    const heavy = createDuel(single(swing({ damage: 24 })), 'dummy');
+    advance(heavy, 700);
+    expect(clashChance(heavy)).toBe(false); // 결 연환 0
+    heavy.chain = heavy.data.rules.clashMinChain;
+    expect(cue(heavy).clash).toBe(true);
+    const light = createDuel(single(swing({ damage: 10 })), 'dummy');
+    light.chain = 5;
+    advance(light, 700);
+    expect(cue(light).clash).toBe(false); // 가벼운 공격
+    const red = createDuel(single(swing({ damage: 30, unblockable: true })), 'dummy');
+    red.chain = 5;
+    advance(red, 700);
+    expect(cue(red).clash).toBe(false); // 붉은 결
+    const off = createDuel(single(swing({ damage: 24 })), 'dummy', 'x', 'duel', 'main', { clash: false });
+    off.chain = 5;
+    advance(off, 700);
+    expect(cue(off).clash).toBe(false); // 겨루기가 꺼진 장
+  });
+});
