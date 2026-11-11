@@ -12,7 +12,7 @@ import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
 import { loadSave, writeSave } from './save';
 
-export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'calibrate';
+export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
 
 export interface PlayOpts {
   difficulty?: string;
@@ -42,6 +42,8 @@ interface LobbyData {
   /** 에필로그를 마친 뒤(새벽) 왕일검의 말 */
   wangDawn?: string[];
   menu: { id: string; name: string; note: string; locked?: string }[];
+  /** 오른쪽 아래 둥근 표식(옷장·도감·설정·「천외귀환」 바로가기) */
+  corner: { id: string; hanja: string; name: string; note: string }[];
 }
 const lobby = lobbyRaw as LobbyData;
 
@@ -67,54 +69,43 @@ function header(title: string, nav: Nav, sub?: string): HTMLElement {
   );
 }
 
-/* ───────── 시작 ───────── */
+/* ───────── 시작: 로그인 판 ───────── */
 
+/**
+ * 시작 화면은 로그인 판뿐이다(2026-11-11 사용자 요청: 들어가기·설정만 있던 화면을 없앤다).
+ * 로그인해 둔 적이 있거나 이 탭에서 게스트를 골랐으면 곧장 메인(로비)으로
+ */
 export function renderTitle(app: HTMLElement, nav: Nav): void {
+  if (accountState().kind !== 'none') return nav.go('lobby');
   document.documentElement.classList.add('on-title');
-  const redraw = () => renderTitle(app, nav);
-  // 「천외귀환」과 같은 흐름: 로그인해 둔 적도 없고 이 탭에서 게스트도 고르지 않았으면 메뉴 대신 로그인 판
-  const gate = accountState().kind === 'none';
-  const enter = button('들어가기', 'btn primary big', () => nav.go('lobby'));
   const logo = el('h1', { class: 'logo', 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決'));
   app.replaceChildren(
     el(
       'section',
-      { class: `title${gate ? ' gated' : ''}` },
+      { class: 'title gated' },
       logo,
       el('p', { class: 'logo-read', 'aria-hidden': 'true' }, '결'),
       el('p', { class: 'sub' }, '적의 공격에는 결이 있다. 결을 읽고, 받아치고, 되돌아오는 틈을 벤다.'),
-      gate
-        ? loginPanel({ onDone: redraw, onGuest: redraw })
-        : el('div', { class: 'title-actions' }, enter, button('설정', 'btn', () => nav.settings())),
-      gate ? '' : el('p', { class: 'proto' }, 'Enter로 들어간다'),
+      loginPanel({ onDone: () => nav.go('lobby'), onGuest: () => nav.go('lobby') }),
     ),
-    gate ? '' : playerPlate(redraw),
   );
-  setKeys((e) => {
-    if (gate) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      nav.go('lobby');
-    }
-  });
-  if (gate) (app.querySelector('.login-input') as HTMLInputElement | null)?.focus();
-  else enter.focus();
-  // 로그인해 둔 세션이 풀렸으면(만료·다른 탭에서 로그아웃) 로그인 판으로
-  const section = app.querySelector('section.title');
-  const off = onCloudChange(() => {
-    if (!section?.isConnected) return off();
-    if ((accountState().kind === 'none') !== gate) {
-      off();
-      redraw();
-    }
-  });
+  setKeys(null);
+  (app.querySelector('.login-input') as HTMLInputElement | null)?.focus();
 }
 
-/* ───────── 로비: 운곡루 뒤뜰 ───────── */
+/* ───────── 메인: 운곡루 뒤뜰 ───────── */
 
-const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rhythm: 'tech', practice: 'focus', records: 'dodge', settings: 'back' };
+const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rhythm: 'tech', practice: 'focus' };
 
+/** 「천외귀환」 주소(같은 배포의 한 단계 위 — 개발 서버에서는 /) */
+export const CHEONOE_URL = new URL('../', location.href).href;
+
+/**
+ * 메인(2026-11-11 사용자 요청 — 「천외귀환」 시작 화면과 같은 구성): 가운데 제목과 메뉴, 왼쪽 아래 명패(계정·수련),
+ * 오른쪽 아래 둥근 표식(옷장 · 도감 · 설정 · 「천외귀환」 바로가기). 뒤뜰의 하운(왼쪽)과 왕일검(오른쪽)은 그대로
+ */
 export function renderLobby(app: HTMLElement, nav: Nav): void {
+  if (accountState().kind === 'none') return nav.go('title');
   document.documentElement.classList.remove('on-title');
   const save = loadSave();
   // 에필로그를 마치면 운곡루 뒤뜰에 새벽이 온다(7-2)
@@ -157,17 +148,18 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const go = (id: string) => {
     sfx('click');
     if (id === 'settings') nav.settings();
+    else if (id === 'cheonoe') location.href = CHEONOE_URL;
     else nav.go(id as Screen);
   };
   let armed = false;
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
-    // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = lobby.json menu 순서)이 오면 이름 왼쪽에
+    // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
     const icon = realArt('icons_gyeol_menu', i + 1);
     const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
     // 싸우러 가는 메뉴에 손이 가면 하운이 칼자루에 손을 얹는다
     if (m.id === 'story' || m.id === 'arena') {
-      // 로비에 들어올 때 첫 메뉴에 저절로 가는 초점은 빼고, 마우스를 올리거나 키보드로 옮겼을 때만
+      // 들어올 때 첫 메뉴에 저절로 가는 초점은 빼고, 마우스를 올리거나 키보드로 옮겼을 때만
       const ready = () => pose(haunImg, haunArt, 2);
       const calm = () => pose(haunImg, haunArt, 1);
       b.addEventListener('pointerenter', ready);
@@ -177,24 +169,41 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     }
     return el('li', { class: locked ? 'locked' : '' }, b, el('small', { id: `note-${m.id}` }, locked ? `🔒 ${m.locked}` : m.note));
   });
-  const st = save.stats;
-  app.replaceChildren(
-    el(
-      'section',
-      { class: `lobby${dawn ? ' dawn' : ''}` },
-      el('div', { class: `lobby-scene${gyeolArt ? ' gyeol-art' : ''}` }, haunImg, wang),
-      el('header', { class: 'lobby-head' }, el('h1', { 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')), el('p', {}, dawn ? '운곡루 뒤뜰 · 새벽' : '운곡루 뒤뜰 · 밤')),
-      el('ol', { class: 'lobby-menu' }, ...items),
-      el('footer', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
-    ),
+  const corner = lobby.corner.map((c) =>
+    button([el('b', {}, c.hanja), el('span', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` }),
   );
+  const st = save.stats;
+  const section = el(
+    'section',
+    { class: `lobby main${dawn ? ' dawn' : ''}` },
+    el('div', { class: `lobby-scene${gyeolArt ? ' gyeol-art' : ''}` }, haunImg, wang),
+    el(
+      'div',
+      { class: 'lobby-center' },
+      el('h1', { class: 'lobby-logo', 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')),
+      el('p', { class: 'lobby-place' }, dawn ? '운곡루 뒤뜰 · 새벽' : '운곡루 뒤뜰 · 밤'),
+      el('ol', { class: 'lobby-menu' }, ...items),
+    ),
+    el('p', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
+    // 계정·수련은 왼쪽 아래 명패로(「천외귀환」과 같다). 로그인하기를 누르면 로그인 판으로
+    playerPlate(() => nav.go(accountState().kind === 'none' ? 'title' : 'lobby')),
+    el('nav', { class: 'lobby-corner', 'aria-label': '옷장 · 도감 · 설정 · 천외귀환' }, ...corner),
+  );
+  app.replaceChildren(section);
   setKeys((e) => {
     const n = Number(e.key);
     if (n >= 1 && n <= lobby.menu.length && !lobby.menu[n - 1].locked) go(lobby.menu[n - 1].id);
-    else if (e.key === 'Escape') nav.go('title');
   });
   (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
   armed = true;
+  // 로그인해 둔 세션이 풀렸으면(만료·다른 탭에서 로그아웃) 로그인 판으로
+  const off = onCloudChange(() => {
+    if (!section.isConnected) return off();
+    if (accountState().kind === 'none') {
+      off();
+      nav.go('title');
+    }
+  });
 }
 
 /* ───────── 결투장 ───────── */
@@ -427,8 +436,8 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
     el(
       'section',
       { class: 'screen records' },
-      header('기록', nav),
-      ...progressSections(data, () => renderRecords(app, nav, data)),
+      header('도감', nav),
+      ...achievementSection(data),
       el('h2', {}, '상대 도감'),
       el('div', { class: 'codex-grid' }, ...foes),
       el('h2', {}, '진하운의 기술'),
@@ -452,14 +461,22 @@ export function announceAchievements(data: DuelData): void {
   got.forEach((a, i) => setTimeout(() => toast(`업적 — ${a.name}`, a.text), 600 + i * 900));
 }
 
-/** 기록 화면: 업적·하운 옷 */
-function progressSections(data: DuelData, redraw: () => void): HTMLElement[] {
+/** 도감: 업적 */
+function achievementSection(data: DuelData): HTMLElement[] {
   const save = loadSave();
   const ids = chartIds(data);
   const ach = progress.achievements.map((a) => {
     const met = save.achievements.includes(a.id) || condMet(a.cond, save, ids);
     return el('li', { class: `ach${met ? ' met' : ''}` }, el('b', {}, met ? '✦ ' + a.name : '◇ ' + a.name), el('small', {}, a.text));
   });
+  const got = progress.achievements.filter((a) => save.achievements.includes(a.id) || condMet(a.cond, save, ids)).length;
+  return [el('h2', {}, `업적 ${got} / ${progress.achievements.length}`), el('ul', { class: 'ach-grid' }, ...ach)];
+}
+
+/* ───────── 옷장: 하운 옷 ───────── */
+
+export function renderWardrobe(app: HTMLElement, nav: Nav): void {
+  const save = loadSave();
   const outfits = progress.outfits.map((o) => {
     const open = condMet(o.unlock, save);
     const on = (save.outfit || 'base') === o.id;
@@ -468,15 +485,10 @@ function progressSections(data: DuelData, redraw: () => void): HTMLElement[] {
       const s = loadSave();
       s.outfit = o.id;
       writeSave(s);
-      redraw();
+      renderWardrobe(app, nav);
     }, open && !on ? {} : { disabled: '' });
     return el('article', { class: `outfit-card${open ? '' : ' locked'}${on ? ' on' : ''}` }, img ? el('img', { src: img, alt: '' }) : '', el('b', {}, o.name), el('small', {}, open ? o.text : condText(o.unlock)), pick);
   });
-  const got = progress.achievements.filter((a) => save.achievements.includes(a.id) || condMet(a.cond, save, ids)).length;
-  return [
-    el('h2', {}, `하운 옷 — 이야기 별 ${starTotal(save)}`),
-    el('div', { class: 'outfit-grid' }, ...outfits),
-    el('h2', {}, `업적 ${got} / ${progress.achievements.length}`),
-    el('ul', { class: 'ach-grid' }, ...ach),
-  ];
+  app.replaceChildren(el('section', { class: 'screen wardrobe' }, header('옷장', nav, `하운이 입는 옷 — 이야기 별 ${starTotal(save)}개로 연다`), el('div', { class: 'outfit-grid' }, ...outfits)));
+  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }

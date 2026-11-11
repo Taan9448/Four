@@ -7,6 +7,8 @@ import { CLOUD } from '../../src/ui/cloud-config';
 import { checkId, checkPassword, displayName, idToEmail, loginError, normalizeId } from '../../src/ui/cloud-id';
 import { GyeolSync, readMeta, type CloudData, type GyeolStore, type KV, type Remote, type SyncStatus, type Written } from './cloud-sync';
 import { onSaveWrite } from './save';
+import { forgetAccountTraining, loadAccountTraining, type CheonoeRow } from './training';
+import type { BackupFile } from '../../src/ui/backup';
 
 /** 「천외귀환」 src/ui/cloud.ts와 같은 키 — 로그인을 함께 쓴다 */
 const AUTH_KEY = 'cheonoe-auth';
@@ -108,6 +110,29 @@ function supaStore(c: SupabaseClient, userId: string): GyeolStore {
   };
 }
 
+/** 「천외귀환」 계정 행(saves) — 수련 경험치를 함께 쓰려고 읽고 고친다(rev가 같을 때만, training.ts) */
+function cheonoeRow(c: SupabaseClient, userId: string): CheonoeRow {
+  return {
+    async fetch() {
+      const { data, error } = await c.from('saves').select('data, rev').eq('user_id', userId).maybeSingle();
+      if (error) throw new Error(error.message);
+      return data ? { data: data.data as BackupFile, rev: data.rev as number } : null;
+    },
+    async update(file, expect) {
+      const { data, error } = await c.from('saves').update({ data: file, rev: expect + 1, updated_at: new Date().toISOString(), device: `${deviceName()} · 결` }).eq('user_id', userId).eq('rev', expect).select('rev, updated_at');
+      if (error) throw new Error(error.message);
+      return data?.length ? { rev: data[0].rev as number, updatedAt: data[0].updated_at as string } : null;
+    },
+  };
+}
+
+let row: CheonoeRow | null = null;
+
+/** 수련 경험치를 더할 곳(로그인했으면 계정 행과 계정 id) */
+export function trainingTarget(): { row: CheonoeRow | null; user: string | null } {
+  return { row: user ? row : null, user: user?.id ?? null };
+}
+
 const deviceName = (): string => (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '휴대폰' : 'PC');
 
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -135,6 +160,8 @@ function listenAuth(c: SupabaseClient): void {
     if (event === 'SIGNED_OUT') {
       user = null;
       sync = null;
+      row = null;
+      forgetAccountTraining();
       notify();
     }
   });
@@ -149,6 +176,8 @@ async function attach(c: SupabaseClient): Promise<void> {
     return notify();
   }
   user = { id: u.id, name: displayName(u.email, u.user_metadata) };
+  row = cheonoeRow(c, u.id);
+  void loadAccountTraining(row).catch(() => undefined);
   sync = new GyeolSync(browserKV(), supaStore(c, u.id), u.id, { ask: (l, r) => ask(l, r), reload: () => location.reload(), status: setStatus }, deviceName());
   hookWrites();
   notify();
@@ -198,6 +227,8 @@ export async function signOut(): Promise<void> {
   await c.auth.signOut();
   user = null;
   sync = null;
+  row = null;
+  forgetAccountTraining();
   setStatus({ state: 'idle' });
 }
 

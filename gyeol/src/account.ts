@@ -1,18 +1,13 @@
 // 「결」 계정·수련(2026-11-10 목업 → 2026-11-11 실제 연결): 「천외귀환」 시작 화면과 같은 방식 — 로그인 · 회원가입 두 탭 + 「게스트로 시작」 글자 한 줄,
 // 들어간 뒤에는 시작 화면 왼쪽 아래 명패(인장 + 아이디·저장 상태·로그아웃 + 修 수련 Lv.). 설정 맨 위에도 「계정」 칸.
 // 로그인·올리기는 cloud.ts(같은 Supabase 계정, 「결」 기록은 gyeol_saves 표). 설계는 gyeol/docs/GAME_DESIGN.md 7-6절.
-import lobbyRaw from '../data/lobby.json';
 import storyRaw from '../data/story.json';
 import { ID_RULE, PASSWORD_MIN } from '../../src/ui/cloud-id';
 import { cloudEnabled, cloudState, hasStoredSession, onCloudChange, signInWithId, signOut as cloudSignOut, syncNow } from './cloud';
 import type { CloudData, Remote, SyncStatus } from './cloud-sync';
 import { el } from './dom';
-import { loadSave } from './save';
+import { currentTraining, onTrainingChange, TRAINING_XP } from './training';
 
-interface AccountData {
-  training: { xp: { win: number; perfect: number; chapter: number }; need: { base: number; step: number } };
-}
-const ACCOUNT = (lobbyRaw as unknown as { account: AccountData }).account;
 const CHAPTERS = (storyRaw as unknown as { chapters: unknown[] }).chapters.length;
 
 /** signed-in: 로그인함 · pending: 로그인해 둔 세션을 확인하는 중(또는 오프라인) · guest: 이번 탭에서 게스트를 골랐다 · none: 아직 고르지 않았다 */
@@ -94,7 +89,6 @@ const PLATE_SYNC: Partial<Record<SyncStatus['state'], string>> = { syncing: '☁
 
 function side(title: string, d: CloudData | null, foot: string): HTMLElement {
   if (!d) return el('div', { class: 'cloud-side' }, el('h3', {}, title), el('p', { class: 'cloud-empty' }, '기록 없음 — 처음부터'), el('small', {}, foot));
-  const t = trainingLevel(xpOf(d));
   return el(
     'div',
     { class: 'cloud-side' },
@@ -102,7 +96,6 @@ function side(title: string, d: CloudData | null, foot: string): HTMLElement {
     el(
       'ul',
       {},
-      el('li', {}, `수련 Lv.${t.level}`),
       el('li', {}, `이야기 ${d.story.cleared.length} / ${CHAPTERS}장`),
       el('li', {}, `이긴 대결 ${d.stats.wins} / ${d.stats.duels}`),
       el('li', {}, `업적 ${d.achievements.length}`),
@@ -158,45 +151,28 @@ export function askWhich(local: CloudData, remote: Remote | null): Promise<'loca
   });
 }
 
-/* ───────── 수련 Lv. ───────── */
+/* ───────── 수련 Lv.(「천외귀환」과 같은 계정 수련 — training.ts) ───────── */
 
-export interface Training {
-  level: number;
-  into: number;
-  need: number;
-  xp: number;
-}
+const XP = TRAINING_XP;
 
-/** 수련 경험치: 기록(이김·PERFECT·마친 장)으로 셈한다. 기록이 계정에 올라가므로 경험치도 함께 따라간다 */
-export function xpOf(d: Pick<CloudData, 'stats' | 'story'>): number {
-  const x = ACCOUNT.training.xp;
-  return d.stats.wins * x.win + d.stats.perfect * x.perfect + d.story.cleared.length * x.chapter;
-}
-
-export const trainingXp = (): number => xpOf(loadSave());
-
-export function trainingLevel(xp: number): Training {
-  const { base, step } = ACCOUNT.training.need;
-  let level = 1;
-  let left = Math.max(0, Math.floor(xp));
-  for (let need = base; left >= need; need = base + step * level) {
-    left -= need;
-    level++;
-  }
-  return { level, into: left, need: base + step * (level - 1), xp };
-}
-
-function trainingLine(): HTMLElement {
-  const t = trainingLevel(trainingXp());
-  const x = ACCOUNT.training.xp;
-  const bar = el('span', { class: 'training-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(t.need), 'aria-valuenow': String(t.into), 'aria-label': `다음 레벨까지 ${t.into}/${t.need}` }, el('i', { style: `width:${Math.round((t.into / t.need) * 100)}%` }));
-  return el(
-    'div',
-    { class: 'plate-training', title: `이긴 대결 +${x.win} · PERFECT +${x.perfect} · 마친 장 +${x.chapter}. 다음 레벨까지 ${t.need - t.into}` },
-    el('b', { 'aria-hidden': 'true' }, '修'),
-    el('span', {}, `수련 Lv.${t.level}`),
-    bar,
-  );
+/** 修 수련 Lv.과 막대. 경험치가 오르거나 계정에서 읽어 오면 저절로 바뀐다 */
+export function trainingLine(): HTMLElement {
+  const line = el('div', { class: 'plate-training' });
+  const paint = () => {
+    const t = currentTraining();
+    const max = t.need === 0;
+    line.title = `「천외귀환」과 같은 계정 수련 — 이긴 전투·대결마다 오른다(일반 ${XP.battle} · 정예 ${XP.elite} · 보스 ${XP.boss}).${max ? '' : ` 다음 레벨까지 ${t.need - t.into}`}`;
+    line.replaceChildren(
+      el('b', { 'aria-hidden': 'true' }, '修'),
+      el('span', {}, `수련 Lv.${t.level}`),
+      max
+        ? ''
+        : el('span', { class: 'training-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(t.need), 'aria-valuenow': String(t.into), 'aria-label': `다음 레벨까지 ${t.into}/${t.need}` }, el('i', { style: `width:${Math.round((t.into / t.need) * 100)}%` })),
+    );
+  };
+  paint();
+  const off = onTrainingChange(() => (line.isConnected ? paint() : off()));
+  return line;
 }
 
 /* ───────── 로그인 판 ───────── */
