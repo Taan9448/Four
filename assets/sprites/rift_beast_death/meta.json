@@ -5,7 +5,7 @@
   "frameH": 160,
   "track": "pixel",
   "pixelScale": 4,
-  "gridDetected": false,
+  "gridDetected": true,
   "nativeSize": [
     128,
     128
@@ -23,12 +23,12 @@
   "facing": "left",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "d25145d61466f25b",
+  "sourceHash": "2d706541acacf55c",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.579
+  "gridPurity": 1
 }
