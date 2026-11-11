@@ -1,0 +1,21 @@
+id: rock_golem_death
+type: character-anim
+size: large
+character: rock_golem
+chroma: magenta
+summary: "「결」 바위 골렘 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [rock_golem_ref]
+reference: assets/source/rock_golem_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, a rock chunk breaking off"
+  2: "staggers, cracks spreading"
+  3: "drops to its knees"
+  4: "collapses into a pile of rocks"
+  5: "rocks settling, dust"
+  6: "a still pile of rocks"
+placeholder: { shape: humanoid, color: '#6e6259', accent: '#ff8a5c' }

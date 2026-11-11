@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_frozen_palm
+type: fx
+summary: "「결」 받을 수 없는 기술 계단의 장로 「독장 얼리기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a green-tinted palm print of cold force flying in from the right, frost trailing"
+  2: "impact: the palm print bursts in the center into green-white frost crystals"
+  3: "frost crystals spreading, green sparks"
+  4: "crystals melting"
+  5: "green frost motes"
+  6: "faint motes"
+placeholder: { accent: '#bfe3ff' }

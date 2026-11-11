@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_black_wind_captain
+type: fx
+summary: "「결」 결정타 돌담(石垣) — 흑풍대주 배진 전용 마무리 — 휘몰아치는 검은 바람이 돌담 같은 금빛 막에 부딪혀 흩어진다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a swirling black wind gust rushing in from the right"
+  2: "impact: the gust slams into a vertical wall of golden light shaped like stacked stones, a bright flash"
+  3: "the black wind breaks apart against the stone-light wall into scattered black wisps"
+  4: "black wisps fading, the golden wall dimming"
+  5: "a few dark wisps and gold motes"
+  6: "faint motes"
+placeholder: { accent: '#ffd27a' }

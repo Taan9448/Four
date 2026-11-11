@@ -1,0 +1,21 @@
+id: stair_elder_death
+type: character-anim
+size: large
+character: stair_elder
+chroma: green
+summary: "「결」 계단의 장로 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [stair_elder_ref]
+reference: assets/source/stair_elder_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the green palm force breaking"
+  2: "staggers back on the stairs"
+  3: "sinks down sitting on a step"
+  4: "slumps over"
+  5: "lying on the steps"
+  6: "lying still"
+placeholder: { shape: humanoid, color: '#6a1a22', accent: '#ff3b3b' }

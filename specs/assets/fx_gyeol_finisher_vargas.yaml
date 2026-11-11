@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_vargas
+type: fx
+summary: "「결」 결정타 천외귀운(天外歸雲) — 바르가스 전용 마무리 — 가슴의 검은 매듭을 찌른 푸른 일섬이 모인 검은 흐름을 창밖으로 돌려보내 하늘로 흩어지게 한다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a knot of black swirling streams converging into one dark point in the center, a faint violet glow"
+  2: "impact: a short blue-white thrust pierces the dark knot with a white star flash"
+  3: "the black streams reverse direction and rush outward and upward in long curving trails, like clouds returning to the sky"
+  4: "the trails thinning into pale blue-white wisps rising upward"
+  5: "a few rising silver wisps, one small silver moon-shaped glint"
+  6: "faint rising wisps"
+placeholder: { accent: '#bfe4ff' }

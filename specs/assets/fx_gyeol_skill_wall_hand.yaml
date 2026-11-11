@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_wall_hand
+type: fx
+summary: "「결」 받을 수 없는 기술 고르몬 「벽에서 솟은 손」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a huge rock hand bursting out from the right with rocks and dust"
+  2: "impact: the rock fingers slam shut in the center with a burst of rubble and orange sparks"
+  3: "rubble and dust flying outward"
+  4: "the rock hand crumbling into falling stones"
+  5: "settling dust"
+  6: "faint dust"
+placeholder: { accent: '#ffb070' }

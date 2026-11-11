@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_black_gust
+type: fx
+summary: "「결」 받을 수 없는 기술 흑풍대주 배진 「흑풍참」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a crescent of black wind sweeping in from the right"
+  2: "impact: the black crescent slices through the center with a burst of black wind and grey dust"
+  3: "black wind streaks spreading across the cell to the left"
+  4: "the wind streaks thinning"
+  5: "grey dust wisps"
+  6: "faint wisps"
+placeholder: { accent: '#a0a8c0' }

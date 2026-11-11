@@ -2991,7 +2991,8 @@
           "recover": 520,
           "damage": 24,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_grave_cleave"
         }
       },
       "patterns": [
@@ -3174,7 +3175,8 @@
           "recover": 560,
           "damage": 28,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_wall_hand"
         },
         "crush": {
           "name": "누르는 척",
@@ -3648,7 +3650,8 @@
           "recover": 580,
           "damage": 30,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_void_grasp"
         }
       },
       "patterns": [
@@ -4080,7 +4083,8 @@
           "recover": 540,
           "damage": 26,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_black_gust"
         }
       },
       "patterns": [
@@ -4278,7 +4282,8 @@
           "recover": 540,
           "damage": 24,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_knot_thrust"
         }
       },
       "patterns": [
@@ -4638,7 +4643,8 @@
           "recover": 520,
           "damage": 24,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_poison_mist"
         }
       },
       "patterns": [
@@ -4835,7 +4841,8 @@
           "damage": 28,
           "posture": 0,
           "element": "fire",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_floor_slam"
         }
       },
       "patterns": [
@@ -5094,7 +5101,8 @@
           "damage": 24,
           "posture": 0,
           "element": "ice",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_frozen_palm"
         }
       },
       "patterns": [
@@ -5563,7 +5571,8 @@
           "damage": 30,
           "posture": 0,
           "element": "fire",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_red_tide"
         }
       },
       "patterns": [
@@ -5839,7 +5848,8 @@
           "recover": 580,
           "damage": 28,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_bone_rain"
         }
       },
       "patterns": [
@@ -6012,7 +6022,8 @@
           "damage": 22,
           "posture": 0,
           "element": "lightning",
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_rift_leap"
         }
       },
       "patterns": [
@@ -6123,7 +6134,8 @@
           "recover": 580,
           "damage": 30,
           "posture": 0,
-          "unblockable": true
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_last_arm"
         },
         "breath": {
           "name": "멈춘 흐름",

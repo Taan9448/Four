@@ -44,7 +44,7 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
   const fxIds = ['fx_hit_slash', 'fx_hit_blunt', 'fx_hit_fire', 'fx_hit_ice', 'fx_hit_shock', 'fx_hit_grain'];
   const techFx = TECH_IDS.flatMap((t) => [`fx_gyeol_tech_${t}_a`, `fx_gyeol_tech_${t}_b`]);
   const finisher = foeId ? [`fx_gyeol_finisher_${foeId}`] : [];
-  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', ...techFx, ...skillFx, ...finisher];
+  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_stance', 'fx_gyeol_revive', 'fx_gyeol_armor_break', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', ...techFx, ...skillFx, ...finisher];
   const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
     real(`${playerPrefix}_tech`),
@@ -511,6 +511,11 @@ function drawFoe(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites): void {
   }
   if (f.state === 'windup' && move?.unblockable && sp.fx.fx_gyeol_danger_charge) {
     const a = sp.fx.fx_gyeol_danger_charge;
+    drawSprite(ctx, a, loopFrame(a, t), FOE_X, { alpha: 0.9 });
+  }
+  // 반격 자세(構): 기다리는 동안 적 둘레에 보랏빛 기운(Codex fx_gyeol_stance, 되풀이)
+  if (f.state === 'windup' && move?.stance && sp.fx.fx_gyeol_stance) {
+    const a = sp.fx.fx_gyeol_stance;
     drawSprite(ctx, a, loopFrame(a, t), FOE_X, { alpha: 0.9 });
   }
   if (open) {

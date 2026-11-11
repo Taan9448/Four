@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_tomb_warrior
+type: fx
+summary: "「결」 결정타 쉼(息) — 무덤 망령 전사 전용 마무리 — 녹슨 투구 속 푸른 빛을 부드러운 금빛 일섬이 감싸 꺼뜨리고, 투구가 조용히 내려앉는다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a cold blue ghost light glowing inside a dark helmet silhouette"
+  2: "impact: a soft wide gold arc wraps around the blue light with a gentle flash"
+  3: "the blue light dissolving into calm drifting motes, gold dust settling"
+  4: "blue motes rising slowly, the helmet silhouette fading"
+  5: "a few blue motes"
+  6: "faint motes"
+placeholder: { accent: '#ffe6a0' }

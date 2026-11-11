@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_red_tide
+type: fx
+summary: "「결」 받을 수 없는 기술 붉은 거인 사무결 「붉은 해일」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-11)"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a huge red wave of power rising from the right"
+  2: "impact: the red wave crashes down in the center with a burst of red spray"
+  3: "red spray and streaks flooding across the cell"
+  4: "the red tide receding"
+  5: "red embers and steam"
+  6: "faint embers"
+placeholder: { accent: '#ff7a6a' }

@@ -1,0 +1,21 @@
+id: tomb_warrior_death
+type: character-anim
+size: large
+character: tomb_warrior
+chroma: magenta
+summary: "「결」 무덤 망령 전사 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [tomb_warrior_ref]
+reference: assets/source/tomb_warrior_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the shield lowered, blue light flickering in the helmet"
+  2: "staggers back"
+  3: "sinks to one knee leaning on the axe"
+  4: "kneels still, the blue light dimming"
+  5: "the blue light goes out, kneeling armor"
+  6: "empty armor kneeling in silence"
+placeholder: { shape: humanoid, color: '#7a8a7a', accent: '#8fd3ff' }

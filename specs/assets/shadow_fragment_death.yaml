@@ -1,0 +1,21 @@
+id: shadow_fragment_death
+type: character-anim
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: "「결」 그림자 조각 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [shadow_fragment_ref]
+reference: assets/source/shadow_fragment_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the shadow body torn"
+  2: "the shadow fraying at the edges"
+  3: "shrinking and twisting"
+  4: "half dissolved into black wisps"
+  5: "a few black wisps"
+  6: "a last faint wisp"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_bone_giant
+type: fx
+summary: "「결」 결정타 뼈마디(骨節) — 뼈 거인 전용 마무리 — 관절마다 붉은 금이 그어지고 뼈마디가 한꺼번에 풀려 흩어진다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "several short red glowing marks at joint positions arranged like a giant skeleton"
+  2: "impact: all the joint marks flash white at once with a sharp burst in the center"
+  3: "bone fragments flying apart from each joint, red sparks"
+  4: "bones tumbling outward, dust"
+  5: "scattered bone chips falling"
+  6: "faint dust"
+placeholder: { accent: '#ffb0a0' }

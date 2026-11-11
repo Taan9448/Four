@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_yeomtak
+type: fx
+summary: "「결」 결정타 매듭 찌르기(刺結) — 염탁 전용 마무리 — 팔 아래 한곳에 모인 붉은 힘의 매듭을 가는 칼끝이 짧게 찌르자 붉은 힘이 두 갈래로 갈라져 터져 나간다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "dark red streams converging into one tight glowing red knot in the center"
+  2: "impact: a very thin short white-gold thrust hits the knot with a sharp flash"
+  3: "the red power splits into two huge diverging streams bursting out to the upper left and upper right, red sparks"
+  4: "the two red streams fading into dark red smoke"
+  5: "drifting red embers"
+  6: "faint red specks"
+placeholder: { accent: '#ff7a6a' }

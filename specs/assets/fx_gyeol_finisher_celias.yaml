@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_celias
+type: fx
+summary: "「결」 결정타 빙심일점(氷心一點) — 셀리아스 전용 마무리 — 왕녀를 감싼 얼음 바로 바깥 한 점을 흰 바늘 같은 일섬이 찌르고, 바깥 얼음만 별처럼 깨져 흩어진다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a tiny white star point in the center surrounded by a thin pale blue ring of ice, a smaller untouched glowing core inside it"
+  2: "impact: a needle-thin white thrust strikes exactly the outer edge of the ring, a sharp white star burst"
+  3: "the outer ice ring shatters outward into many pale blue shards while the inner glowing core stays whole"
+  4: "ice shards spinning outward, frost sparkles, the inner core softly glowing"
+  5: "fading frost mist and a few shards"
+  6: "faint frost sparkles"
+placeholder: { accent: '#cfe9ff' }

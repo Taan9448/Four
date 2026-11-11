@@ -1,0 +1,15 @@
+id: fx_gyeol_armor_break
+type: fx
+summary: "「결」 갑옷 깨짐 이펙트 6프레임 — 기믹 갑옷이 깨질 때 적 위치에 한 번(2026-11-11)"
+frames: 6
+fps: 14
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a faint hexagonal shield pattern of pale light covering the center"
+  2: "impact: the shield cracks with a bright white flash at one point"
+  3: "the shield shatters into many glowing hexagonal shards flying outward"
+  4: "shards spinning and fading"
+  5: "a few shards falling"
+  6: "faint glints"
+placeholder: { accent: '#ffe6a0' }

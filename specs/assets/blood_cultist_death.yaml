@@ -1,0 +1,21 @@
+id: blood_cultist_death
+type: character-anim
+size: large
+character: blood_cultist
+chroma: green
+summary: "「결」 신교 교도 쓰러짐 6프레임 — 대결 끝 장면에서 느린 화면으로 재생한다(2026-11-11). 대기·피격 그림과 같은 크기·같은 발 위치"
+depends_on: [blood_cultist_ref]
+reference: assets/source/blood_cultist_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck, the red blade knocked aside"
+  2: "staggers, red glow fading from the hands"
+  3: "drops to the knees"
+  4: "falls forward"
+  5: "lying face down"
+  6: "lying still"
+placeholder: { shape: humanoid, color: '#8a1f2a', accent: '#ff3b3b' }

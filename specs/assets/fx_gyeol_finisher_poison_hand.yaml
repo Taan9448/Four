@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_poison_hand
+type: fx
+summary: "「결」 결정타 독 거두기(收毒) — 독수 양문혁 전용 마무리 — 퍼지는 녹색 독무를 원을 그리는 금빛 일섬이 한곳으로 거두어 꺼뜨린다(2026-11-11). 화려하게, 칸을 크게 쓴다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a spreading cloud of green poison mist"
+  2: "impact: a circular golden sweep sweeps around the cloud with a bright flash"
+  3: "the green mist is pulled inward into a small spiral at the center"
+  4: "the green spiral shrinking and fading"
+  5: "a few green motes"
+  6: "faint motes"
+placeholder: { accent: '#bfe3a0' }
