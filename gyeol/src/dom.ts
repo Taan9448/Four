@@ -56,3 +56,16 @@ export function rankBadge(rank: string | undefined, size: 'sm' | 'lg' = 'sm'): H
   if (u) return el('img', { class: `rank-icon ${size}`, src: u, alt: `등급 ${rank}` });
   return el('span', { class: `rank rank-${rank ?? 'none'} ${size}` }, rank ?? '—');
 }
+
+/** 화면 오른쪽 아래에 잠깐 뜨는 알림(업적 등) */
+export function toast(title: string, text: string): void {
+  let box = document.querySelector<HTMLElement>('.toasts');
+  if (!box) {
+    box = el('div', { class: 'toasts', 'aria-live': 'polite' });
+    document.body.append(box);
+  }
+  const t = el('div', { class: 'toast' }, el('b', {}, title), el('small', {}, text));
+  box.append(t);
+  setTimeout(() => t.classList.add('out'), 3600);
+  setTimeout(() => t.remove(), 4200);
+}

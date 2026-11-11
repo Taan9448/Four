@@ -1,0 +1,29 @@
+{
+  "$comment": "「결」 5단계(2026-11-11): 하운 옷(「천외귀환」 하운 옷 그림 skin_<id>_haun_idle·attack·hit을 입힌다 — 받기·피하기·기술·겨루기·쓰러짐은 기본 옷 그림)과 업적. unlock·cond 종류: cleared(장 id) · stars(별 합) · stat(save.stats 칸 ≥ n) · duelBest(난이도 id의 등급 rank가 하나라도) · rhythm(박자 도전 rank 이상 — all이면 모든 악보) · flagNot(장을 마쳤고 flag가 없다)",
+  "outfits": [
+    { "id": "base", "name": "잡역복", "text": "청운문 잡역의 회색 옷. 기워 입었다.", "unlock": null },
+    { "id": "cheongun", "name": "청운의 귀환", "text": "청운문 제자의 흰 도포와 은빛 구름 자수.", "unlock": { "kind": "cleared", "chapter": "ch5" } },
+    { "id": "cheonma", "name": "천마를 넘어", "text": "검은 무복에 진홍 안감, 금실 용 무늬.", "unlock": { "kind": "cleared", "chapter": "ch9" } },
+    { "id": "simyeon", "name": "심연을 걷는 자", "text": "검보라 장포에 틈 모양 은빛 자수.", "unlock": { "kind": "cleared", "chapter": "ch10" } },
+    { "id": "sullye", "name": "순례의 끝", "text": "크림빛 순례 망토, 대삿갓과 염주.", "unlock": { "kind": "cleared", "chapter": "epilogue" } },
+    { "id": "bulmyeol", "name": "불멸", "text": "흑금 갑주와 흰 금빛 목도리.", "unlock": { "kind": "stars", "n": 30 } }
+  ],
+  "achievements": [
+    { "id": "first_win", "name": "첫 결", "text": "대결에서 처음 이긴다", "cond": { "kind": "stat", "key": "wins", "n": 1 } },
+    { "id": "parry100", "name": "받는 손", "text": "패링 100번", "cond": { "kind": "stat", "key": "parries", "n": 100 } },
+    { "id": "parry500", "name": "돌려보내는 손", "text": "패링 500번", "cond": { "kind": "stat", "key": "parries", "n": 500 } },
+    { "id": "perfect300", "name": "결이 보인다", "text": "PERFECT 300번", "cond": { "kind": "stat", "key": "perfect", "n": 300 } },
+    { "id": "deathblow30", "name": "결이 끝나는 자리", "text": "결정타 30번", "cond": { "kind": "stat", "key": "deathblows", "n": 30 } },
+    { "id": "streak20", "name": "결을 탄다", "text": "연속 박자 20", "cond": { "kind": "stat", "key": "maxStreak", "n": 20 } },
+    { "id": "streak40", "name": "결과 하나가 된다", "text": "연속 박자 40", "cond": { "kind": "stat", "key": "maxStreak", "n": 40 } },
+    { "id": "clash10", "name": "맞댄 칼", "text": "겨루기에서 10번 이긴다", "cond": { "kind": "stat", "key": "clashWins", "n": 10 } },
+    { "id": "tech50", "name": "운하검", "text": "기술을 50번 쓴다", "cond": { "kind": "stat", "key": "techs", "n": 50 } },
+    { "id": "no_key", "name": "지금 나를 보는 사람", "text": "6장에서 바르가스의 열쇠를 받지 않는다", "cond": { "kind": "flagNot", "chapter": "ch6", "flag": "took_key" } },
+    { "id": "story_all", "name": "장작 패는 날", "text": "에필로그까지 마친다", "cond": { "kind": "cleared", "chapter": "epilogue" } },
+    { "id": "stars20", "name": "별 스물", "text": "이야기 별 20개", "cond": { "kind": "stars", "n": 20 } },
+    { "id": "stars33", "name": "모든 별", "text": "이야기 별 33개 — 모든 장 별 셋", "cond": { "kind": "stars", "n": 33 } },
+    { "id": "hard_s", "name": "결의 결", "text": "결투장 난이도 「결」에서 S 등급", "cond": { "kind": "duelBest", "diff": "hard", "rank": "S" } },
+    { "id": "rhythm_s", "name": "박자를 탄다", "text": "박자 도전에서 S 등급", "cond": { "kind": "rhythm", "rank": "S" } },
+    { "id": "rhythm_all", "name": "모든 악보", "text": "모든 박자 도전 악보를 A 등급 이상으로", "cond": { "kind": "rhythm", "rank": "A", "all": true } }
+  ]
+}

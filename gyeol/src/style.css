@@ -490,3 +490,27 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 @keyframes creditsIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .tip-card kbd { white-space: nowrap; }
 .duel .tip-card { top: 24%; }
+/* 단계 점(◆◇)과 기믹 표식 — 적 이름판 아래 */
+.foe-phase { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 16px; }
+.phase-pips { color: #ffb07a; font-size: 13px; letter-spacing: 3px; text-shadow: 0 1px 2px #000; }
+.gimmicks { display: flex; gap: 4px; }
+.gimmicks i { font-style: normal; font-size: 11px; padding: 0 6px; border-radius: 999px; border: 1px solid rgba(255, 200, 150, 0.55); color: #ffd9b0; background: rgba(20, 10, 6, 0.7); }
+/* 5단계: 업적 알림·기록 화면의 하운 옷·업적 */
+.toasts { position: fixed; right: 18px; bottom: 18px; z-index: 80; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { min-width: 240px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255, 224, 138, 0.7); background: rgba(20, 15, 8, 0.94); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; gap: 2px; animation: toastIn 0.3s ease-out; transition: opacity 0.5s; }
+.toast b { font-family: 'Nanum Myeongjo', serif; color: #ffe08a; font-size: 16px; }
+.toast small { color: var(--ink-dim); font-size: 13px; }
+.toast.out { opacity: 0; }
+@keyframes toastIn { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+.outfit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.outfit-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 12px; border: 1px solid rgba(226, 180, 92, 0.3); background: linear-gradient(180deg, #221c15, #120f0c); text-align: center; }
+.outfit-card img { width: 112px; height: 112px; image-rendering: pixelated; }
+.outfit-card.locked img { filter: brightness(0.25) grayscale(1); }
+.outfit-card.on { border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 210, 122, 0.3); }
+.outfit-card b { font-family: 'Nanum Myeongjo', serif; }
+.outfit-card small { color: var(--ink-dim); font-size: 13px; line-height: 1.4; min-height: 2.8em; }
+.ach-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.ach { padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03); display: flex; flex-direction: column; gap: 2px; color: #8f877a; }
+.ach.met { border-color: rgba(255, 224, 138, 0.45); color: var(--ink); }
+.ach.met b { color: #ffe08a; }
+.ach small { font-size: 13px; }

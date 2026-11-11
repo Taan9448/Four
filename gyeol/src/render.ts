@@ -26,11 +26,14 @@ const real = async (id: string): Promise<Anim> => {
   return a && a.source === 'sprites' ? a : null;
 };
 
-export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = ''): Promise<Sprites> {
+/** 하운 옷(5단계): 옷 그림(대기·베기·피격)이 실제로 있으면 그것, 없으면 기본 옷 */
+const worn = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? loadSprite(`${base}_${kind}`)) : loadSprite(`${base}_${kind}`));
+
+export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null): Promise<Sprites> {
   const ids = {
-    pi: loadSprite(`${playerPrefix}_idle`),
-    pa: loadSprite(`${playerPrefix}_attack`),
-    ph: loadSprite(`${playerPrefix}_hit`),
+    pi: worn(outfit, playerPrefix, 'idle'),
+    pa: worn(outfit, playerPrefix, 'attack'),
+    ph: worn(outfit, playerPrefix, 'hit'),
     pp: real(`${playerPrefix}_parry`),
     pd: real(`${playerPrefix}_dodge`),
     fi: loadSprite(`${foePrefix}_idle`),
@@ -555,7 +558,7 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   const key = c.unblockable ? 'danger' : (c.element ?? 'none');
   const col = ELEMENT_COLOR[key];
   // 왕녀의 얼음(護)은 받아치면 안 되므로 금빛으로 바뀌지 않는다
-  const inPerfect = !c.faking && !c.unblockable && !c.fragile && c.left <= r.parry;
+  const inPerfect = !c.faking && !c.unblockable && !c.fragile && !c.stance && c.left <= r.parry;
   const alpha = 0.3 + 0.7 * (1 - c.ratio);
   const cx = CONTACT.x - 40;
   const cy = CONTACT.y;
@@ -646,15 +649,15 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
     ctx.fillText('危', FOE_X, GROUND - 230 * foeScale);
   }
   // 왕녀의 얼음(護 — 받아치지 말고 막거나 피한다) · 흐름이 멈추는 숨(息 — 이어서 세 번 받는다)
-  if (c.fragile || c.breath) {
+  if (c.fragile || c.breath || c.stance) {
     ctx.shadowBlur = 0;
-    const mark = c.fragile ? '護' : '息';
+    const mark = c.fragile ? '護' : c.breath ? '息' : '構';
     ctx.font = '800 34px "Song Myung", serif';
     ctx.textAlign = 'center';
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
     ctx.strokeText(mark, FOE_X, GROUND - 230 * foeScale);
-    ctx.fillStyle = c.fragile ? 'rgba(190,230,255,0.95)' : 'rgba(250,248,255,0.95)';
+    ctx.fillStyle = c.fragile ? 'rgba(190,230,255,0.95)' : c.stance ? 'rgba(200,150,255,0.98)' : 'rgba(250,248,255,0.95)';
     ctx.fillText(mark, FOE_X, GROUND - 230 * foeScale);
     if (c.breath && d.breathRun) {
       ctx.font = '700 18px "Nanum Myeongjo", serif';

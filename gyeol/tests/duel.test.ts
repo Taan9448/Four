@@ -297,7 +297,7 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
   it('실제 데이터: 다섯 상대 모두 원소·받을 수 없는 공격·속임수·악보를 갖췄다', () => {
     const els = new Set(chartFoes.flatMap((f) => Object.values(f.moves).map((m) => m.element)).filter(Boolean));
     expect([...els].sort()).toEqual(['fire', 'ice', 'lightning']);
-    expect(chartFoes.length).toBe(5);
+    expect(chartFoes.length).toBeGreaterThanOrEqual(8);
     for (const f of chartFoes) {
       const ms = Object.values(f.moves);
       expect(ms.some((m) => m.unblockable), f.id).toBe(true);
@@ -665,19 +665,45 @@ describe('「결」 3단계 — 이야기 규칙(버티기·2단계·잠금·튜
     expect(d.events.filter((e) => e.type === 'endure')).toHaveLength(2);
   });
 
-  it('2단계: 체력이 문턱 아래로 처음 떨어지면 포효하고 공격 준비가 빨라지며 세진다', () => {
-    const dd: DuelData = { ...data, foes: [{ ...data.foes[0], phase2: { at: 0.5, name: '불이 커진다', speed: 0.5, damageMul: 2, roar: 800 } }] };
+  it('다단계: 격퇴하면 다시 일어나 다음 단계로 — 체력을 새로 채우고 수·패턴이 바뀌며, 마지막 단계에서야 쓰러진다', () => {
+    const dd: DuelData = {
+      ...data,
+      foes: [
+        {
+          ...data.foes[0],
+          phases: [
+            { name: '다시 선다', hp: 60, speed: 0.5, damageMul: 2, roar: 800, moves: { jab: { name: '찌르기', windup: 300, recover: 200, damage: 10, posture: 10 } }, patterns: [{ weight: 1, steps: [{ move: 'jab' }] }] },
+            { name: '마지막', hp: 40, roar: 600, gimmicks: { armor: 0.5 } },
+          ],
+        },
+      ],
+    };
     const d = createDuel(dd, 'dummy');
-    d.foe.hp = 52;
-    d.foe.state = 'stagger';
-    d.foe.stateEnd = 5000;
-    press(d, 'attack');
-    advance(d, data.player.attack.duration + 5);
-    expect(d.events.find((e) => e.type === 'phase')).toMatchObject({ name: '불이 커진다' });
+    expect(d.phaseCount).toBe(3);
+    const fell = () => {
+      d.foe.hp = 1;
+      d.foe.state = 'stagger';
+      d.foe.stateEnd = d.t + 5000;
+      press(d, 'attack');
+      advance(d, d.t + data.player.attack.duration + 5);
+    };
+    fell();
+    expect(d.result).toBeNull();
+    expect(d.events.find((e) => e.type === 'phase')).toMatchObject({ name: '다시 선다', n: 2, of: 3 });
     expect(d.phase).toBe(2);
+    expect(d.foe.hp).toBe(60);
+    expect(d.foeDef.hp).toBe(60);
     expect(d.foeDef.moves.swing.windup).toBe(200);
     expect(d.foeDef.moves.swing.damage).toBe(40);
+    expect(d.foeDef.moves.jab.windup).toBe(150);
+    expect(d.foeDef.patterns[0].steps[0].move).toBe('jab');
     expect(d.foe.state).toBe('idle');
+    fell();
+    expect(d.phase).toBe(3);
+    expect(d.foeDef.gimmicks?.armor).toBe(0.5);
+    expect(d.foeDef.patterns[0].steps[0].move).toBe('jab'); // 패턴이 없으면 앞 단계 그대로
+    fell();
+    expect(d.result).toBe('win');
     expect(data.foes[0].moves.swing.windup).toBe(400); // 원본은 그대로
   });
 
@@ -868,5 +894,93 @@ describe('「결」 4단계 — 4~10장 특수 규칙', () => {
       expect(existsSync(`assets/sprites/${f.sprite}_idle/meta.json`), `${f.id} 대기`).toBe(true);
       expect(existsSync(`assets/sprites/${f.sprite}_hit/meta.json`), `${f.id} 피격`).toBe(true);
     }
+  });
+});
+
+describe('「결」 5단계 — 기믹', () => {
+  it('반격 자세(構): 베면 되받아 맞고, 참으면 끝에 틈이 열린다', () => {
+    const dd = single(swing({ stance: true, damage: 18, posture: 15 }));
+    const hit = createDuel(dd, 'dummy');
+    advance(hit, 700);
+    expect(cue(hit).stance).toBe(true);
+    press(hit, 'attack');
+    advance(hit, 700 + data.player.attack.duration);
+    expect(hit.events.find((e) => e.type === 'stanceCounter')).toMatchObject({ damage: 18 });
+    expect(hit.player.hp).toBe(82);
+    const wait = createDuel(dd, 'dummy');
+    advance(wait, HIT + 5);
+    expect(wait.events.some((e) => e.type === 'stanceBreak')).toBe(true);
+    expect(wait.player.hp).toBe(100);
+    expect(isOpen(wait)).toBe(true);
+  });
+
+  it('갑옷: 한 번 비틀거리기 전까지 베기 피해가 줄고, 비틀거리면 깨진다', () => {
+    const dd: DuelData = { ...data, foes: [{ ...data.foes[0], hp: 1000, gimmicks: { armor: 0.25 } }] };
+    const d = createDuel(dd, 'dummy');
+    advance(d, 100);
+    press(d, 'attack');
+    advance(d, 100 + data.player.attack.duration);
+    const first = d.events.find((e) => e.type === 'strike') as { damage: number };
+    expect(1000 - d.foe.hp).toBe(Math.max(1, Math.round(first.damage * 0.25)));
+    d.foe.posture = d.foeDef.posture;
+    d.foe.state = 'idle';
+    advance(d, HIT - 30);
+    press(d, 'parry');
+    advance(d, HIT + 5);
+    expect(d.events.some((e) => e.type === 'armorBreak')).toBe(true);
+    expect(d.armorBroken).toBe(true);
+  });
+
+  it('재생: 2.5초 동안 다치지 않으면 체력이 찬다 · 가속: 패턴마다 공격 준비가 빨라진다', () => {
+    const dd: DuelData = { ...data, foes: [{ ...data.foes[0], hp: 100, idle: [5000, 5000], gimmicks: { regen: 10 } }] };
+    const d = createDuel(dd, 'dummy');
+    d.foe.hp = 50;
+    advance(d, 4000);
+    expect(d.foe.hp).toBeGreaterThan(55);
+    const fast: DuelData = { ...data, foes: [{ ...data.foes[0], gimmicks: { accelerate: { step: 0.9, min: 0.8 } } }] };
+    const f = createDuel(fast, 'dummy');
+    advance(f, 600);
+    expect(f.tempo).toBeCloseTo(0.9);
+    expect(f.foe.hitAt - f.foe.stateStart).toBe(360);
+  });
+
+  it('실제 데이터: 정예는 2단계, 보스는 3단계 이상', () => {
+    const elites = ['ore_spider', 'chain_overseer', 'ice_knight', 'tomb_warrior', 'shadow_assassin', 'black_wind_captain', 'poison_hand', 'stair_elder', 'bone_giant'];
+    const bosses = ['veilak', 'ignis', 'celias', 'gormon', 'vargas', 'jo_myeonggak', 'yeomtak', 'kwak_dojin_peak', 'sa_giant', 'mordecai'];
+    for (const id of elites) expect(1 + (real.foes.find((f) => f.id === id)?.phases?.length ?? 0), id).toBe(2);
+    for (const id of bosses) expect(1 + (real.foes.find((f) => f.id === id)?.phases?.length ?? 0), id).toBeGreaterThanOrEqual(3);
+    // 단계에서 쓰는 수는 모두 정의되어 있다
+    for (const f of real.foes) {
+      let moves = { ...f.moves };
+      for (const ph of f.phases ?? []) {
+        moves = { ...moves, ...(ph.moves ?? {}) };
+        for (const p of ph.patterns ?? []) for (const st of p.steps) expect(moves[st.move], `${f.id} ${ph.name} ${st.move}`).toBeTruthy();
+      }
+    }
+  });
+});
+
+describe('「결」 5단계 — 하운 옷·업적', () => {
+  it('옷은 조건을 채워야 입히고, 업적은 한 번만 새로 이룬다', async () => {
+    const { condMet, newAchievements, outfitPrefix, progress } = await import('../src/progress');
+    const s = normalize({});
+    expect(s.outfit).toBe('base');
+    expect(outfitPrefix(s)).toBeNull();
+    s.outfit = 'cheongun';
+    expect(outfitPrefix(s)).toBeNull(); // 5장을 아직 안 마쳤다
+    s.story.cleared.push('ch5');
+    expect(outfitPrefix(s)).toBe('skin_cheongun_haun');
+    for (const o of progress.outfits) if (o.id !== 'base') expect(existsSync(`assets/sprites/skin_${o.id}_haun_idle/meta.json`), o.id).toBe(true);
+    s.stats.wins = 1;
+    expect(newAchievements(s, []).map((a) => a.id)).toEqual(['first_win']);
+    expect(newAchievements(s, [])).toEqual([]);
+    expect(condMet({ kind: 'flagNot', chapter: 'ch6', flag: 'took_key' }, s)).toBe(false);
+    s.story.cleared.push('ch6');
+    expect(condMet({ kind: 'flagNot', chapter: 'ch6', flag: 'took_key' }, s)).toBe(true);
+    s.story.flags.push('took_key');
+    expect(condMet({ kind: 'flagNot', chapter: 'ch6', flag: 'took_key' }, s)).toBe(false);
+    s.rhythmBest = { a: { accuracy: 1, rank: 'S' }, b: { accuracy: 0.85, rank: 'A' } };
+    expect(condMet({ kind: 'rhythm', rank: 'A', all: true }, s, ['a', 'b'])).toBe(true);
+    expect(condMet({ kind: 'rhythm', rank: 'A', all: true }, s, ['a', 'b', 'c'])).toBe(false);
   });
 });

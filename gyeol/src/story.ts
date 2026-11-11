@@ -4,7 +4,7 @@ import storyRaw from '../data/story.json';
 import { button, el, rankBadge } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { loadSave, writeSave } from './save';
-import { setKeys, type Nav } from './screens';
+import { announceAchievements, setKeys, type Nav } from './screens';
 import { playScene, type SceneLine, type Speaker } from './vn';
 
 export interface TutorialStep {
@@ -136,6 +136,7 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
 
 export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch: Chapter): Promise<void> {
   setKeys(null);
+  dataRef = data;
   const label = `${ch.title} · ${ch.subtitle}`;
   /** 이 장에서 고른 것 + 지난 장까지 저장된 것 */
   const flags = new Set<string>(loadSave().story.flags);
@@ -203,7 +204,11 @@ function complete(ch: Chapter, results: BoutResult[], flags: string[] = []): voi
     save.story.stars[ch.id] = Math.max(save.story.stars[ch.id] ?? 0, got);
   }
   writeSave(save);
+  announceAchievements(dataRef ?? { foes: [] } as unknown as DuelData);
 }
+
+/** 업적 판정에 쓰는 대결 데이터(runChapter가 넣는다) */
+let dataRef: DuelData | null = null;
 
 function showResult(app: HTMLElement, nav: Nav, data: DuelData, ch: Chapter, results: BoutResult[], flags: string[] = []): void {
   nav.stop();

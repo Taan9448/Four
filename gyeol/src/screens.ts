@@ -4,7 +4,8 @@ import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
 import { accountState, loginPanel, playerPlate } from './account';
-import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt } from './dom';
+import { condMet, condText, newAchievements, progress, starTotal } from './progress';
+import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
@@ -53,7 +54,7 @@ export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
 
 const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
 /** 결투장 상대: 처음부터 있던 다섯(악보가 있는 상대) + 이야기에서 겨뤄 본 상대(이야기 전용 빼고) */
-const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.chart || seen.includes(f.id)));
+const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.starter || seen.includes(f.id)));
 const portrait = (id: string, n = 1) => frameUrl(id, n);
 
 function header(title: string, nav: Nav, sub?: string): HTMLElement {
@@ -247,7 +248,7 @@ function helpBox(): HTMLElement {
 export function renderRhythm(app: HTMLElement, nav: Nav, data: DuelData): void {
   const save = loadSave();
   const cards = duelFoes(data)
-    .filter((f) => f.chart)
+    .filter((f) => f.chart && !f.storyOnly && (f.starter || save.seen.includes(f.id)))
     .map((f) => {
       const img = frameUrl(`${f.sprite}_idle`, 1);
       const b = save.rhythmBest[f.id];
@@ -417,6 +418,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       'section',
       { class: 'screen records' },
       header('기록', nav),
+      ...progressSections(data, () => renderRecords(app, nav, data)),
       el('h2', {}, '상대 도감'),
       el('div', { class: 'codex-grid' }, ...foes),
       el('h2', {}, '진하운의 기술'),
@@ -426,4 +428,45 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
     ),
   );
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+}
+
+/** 박자 도전 악보가 있는 결투장 상대 */
+export const chartIds = (data: DuelData): string[] => duelFoes(data).filter((f) => f.chart && !f.storyOnly).map((f) => f.id);
+
+/** 새로 이룬 업적을 저장하고 알린다(대결·장을 마칠 때) */
+export function announceAchievements(data: DuelData): void {
+  const save = loadSave();
+  const got = newAchievements(save, chartIds(data));
+  if (!got.length) return;
+  writeSave(save);
+  got.forEach((a, i) => setTimeout(() => toast(`업적 — ${a.name}`, a.text), 600 + i * 900));
+}
+
+/** 기록 화면: 업적·하운 옷 */
+function progressSections(data: DuelData, redraw: () => void): HTMLElement[] {
+  const save = loadSave();
+  const ids = chartIds(data);
+  const ach = progress.achievements.map((a) => {
+    const met = save.achievements.includes(a.id) || condMet(a.cond, save, ids);
+    return el('li', { class: `ach${met ? ' met' : ''}` }, el('b', {}, met ? '✦ ' + a.name : '◇ ' + a.name), el('small', {}, a.text));
+  });
+  const outfits = progress.outfits.map((o) => {
+    const open = condMet(o.unlock, save);
+    const on = (save.outfit || 'base') === o.id;
+    const img = frameUrl(o.id === 'base' ? 'haun_sword_idle' : `skin_${o.id}_haun_idle`, 1);
+    const pick = button(on ? '입는 중' : open ? '입기' : '🔒', `btn small${on ? ' primary' : ''}`, () => {
+      const s = loadSave();
+      s.outfit = o.id;
+      writeSave(s);
+      redraw();
+    }, open && !on ? {} : { disabled: '' });
+    return el('article', { class: `outfit-card${open ? '' : ' locked'}${on ? ' on' : ''}` }, img ? el('img', { src: img, alt: '' }) : '', el('b', {}, o.name), el('small', {}, open ? o.text : condText(o.unlock)), pick);
+  });
+  const got = progress.achievements.filter((a) => save.achievements.includes(a.id) || condMet(a.cond, save, ids)).length;
+  return [
+    el('h2', {}, `하운 옷 — 이야기 별 ${starTotal(save)}`),
+    el('div', { class: 'outfit-grid' }, ...outfits),
+    el('h2', {}, `업적 ${got} / ${progress.achievements.length}`),
+    el('ul', { class: 'ach-grid' }, ...ach),
+  ];
 }

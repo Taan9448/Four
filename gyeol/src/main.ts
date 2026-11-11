@@ -4,6 +4,8 @@
 import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import { applyUiArt, el, padIcon, rankBadge } from './dom';
+import { announceAchievements } from './screens';
+import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
@@ -97,6 +99,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const ctx = canvas.getContext('2d')!;
   const foeHp = el('i'), foePosture = el('i'), myHp = el('i'), myPosture = el('i'), myFocus = el('i'), progress = el('i');
   const streakEl = el('div', { class: 'streak' });
+  const phasePips = el('span', { class: 'phase-pips' });
+  const gimmickEl = el('span', { class: 'gimmicks' });
   const scoreEl = el('div', { class: 'score' });
   const hud = el(
     'div',
@@ -107,6 +111,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       el('b', {}, rhythm ? `${foeDef.title} — ${foeDef.chart!.title}` : foeDef.title),
       rhythm ? el('div', { class: 'bar progress' }, progress) : el('div', { class: 'bar hp' }, foeHp),
       rhythm ? '' : el('div', { class: 'bar posture' }, foePosture),
+      // 단계 점(◆ 지금·지난 단계, ◇ 남은 단계)과 기믹 표식(갑옷·재생·가속·결 가림)
+      rhythm ? '' : el('div', { class: 'foe-phase' }, phasePips, gimmickEl),
     ),
     rhythm ? scoreEl : el('div', { class: 'me-bar' }, el('b', {}, data.player.name), el('div', { class: 'bar hp' }, myHp), el('div', { class: 'bar posture' }, myPosture), el('div', { class: 'bar focus' }, myFocus)),
     streakEl,
@@ -142,7 +148,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
-  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id);
+  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave()));
   loading.remove();
   // 대결 중 화면이 꺼지지 않게(지원하는 브라우저만)
   let wake: { release(): Promise<void> } | null = null;
@@ -286,8 +292,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     void surviveEl.offsetWidth;
     surviveEl.classList.add('bump');
   };
-  const tip = (id: string) => {
-    if (!opts.tips?.includes(id)) return;
+  /** 처음 한 번 안내. global이면 이야기 장이 아니어도(결투장에서도) 띄운다 — 단계·기믹 */
+  const tip = (id: string, global = false) => {
+    if (!global && !opts.tips?.includes(id)) return;
+    if (tutorial) return;
     const save = loadSave();
     if (save.tips.includes(id)) return;
     const t = story.tips[id];
@@ -622,16 +630,32 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           finish();
           break;
         case 'phase':
-          // 2단계: 포효하며 빨라지고 세진다
+          // 다단계: 격퇴했지만 다시 일어선다 — 패턴·기믹이 바뀐다
           sfx('roar');
           sfx('enrage', { volume: 0.8 });
-          // 결정타로 넘어가면 결정타 이름이 먼저 — 2단계 띠는 조금 뒤에
+          // 결정타로 넘어가면 결정타 이름이 먼저 — 단계 띠는 조금 뒤에
           fx.banner = { name: ev.name, born: now + 1100, element: 'fire' };
           flash('#ffffff', 360, 0.45);
           addShake(fx, now, 16, 600);
           gust(fx.weather, FOE_X, CONTACT.y, 900);
           if (ev.line) say('foe', 'start', 200, ev.line);
-          text(FOE_X, CONTACT.y - 170, '2단계', '#ffb07a', 30);
+          text(FOE_X, CONTACT.y - 170, `다시 일어선다 — ${ev.n} / ${ev.of}단계`, '#ffb07a', 28);
+          tip('phase', true);
+          break;
+        case 'stanceCounter':
+          // 반격 자세에 베었다
+          sfx('hit_heavy');
+          flash('#3a0000', 260, 0.5);
+          addShake(fx, now, 12, 300);
+          text(PLAYER_X, CONTACT.y - 140, `構 — 되받아 맞았다 -${ev.damage}`, '#ff9a8a', 26);
+          break;
+        case 'stanceBreak':
+          sfx('snap');
+          text(FOE_X, CONTACT.y - 150, '자세가 풀렸다 — 지금!', '#ffe08a', 26);
+          break;
+        case 'armorBreak':
+          sfx('slam_8');
+          text(FOE_X, CONTACT.y - 190, '갑옷이 깨졌다', '#ffe08a', 28);
           break;
         case 'endure':
           chip(`버티기 ${ev.got} / ${ev.need}`);
@@ -695,6 +719,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       }
     }
     writeSave(save);
+    announceAchievements(data);
   };
   const finish = () => {
     if (tutorial) {
@@ -774,8 +799,13 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       const sc = rhythmScore(d);
       put('score', sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · PERFECT ${d.stats.perfect} · EXCELLENT ${d.stats.clean - d.stats.perfect} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라', (v) => (scoreEl.textContent = v));
     } else {
-      put('foeHp', pct(d.foe.hp / foeDef.hp), (v) => (foeHp.style.width = v));
-      put('foePosture', pct(d.foe.posture / foeDef.posture), (v) => (foePosture.style.width = v));
+      put('foeHp', pct(d.foe.hp / d.foeDef.hp), (v) => (foeHp.style.width = v));
+      put('foePosture', pct(d.foe.posture / d.foeDef.posture), (v) => (foePosture.style.width = v));
+      // 단계 점과 기믹 표식
+      put('phase', `${d.phase}/${d.phaseCount}`, () => (phasePips.textContent = d.phaseCount > 1 ? '◆'.repeat(d.phase) + '◇'.repeat(d.phaseCount - d.phase) : ''));
+      const gm = d.foeDef.gimmicks ?? {};
+      const tags = [gm.armor && !d.armorBroken ? '갑옷' : '', gm.regen ? '재생' : '', gm.accelerate ? `가속 ×${(1 / d.tempo).toFixed(2)}` : '', gm.veil ? '결 가림' : ''].filter(Boolean);
+      put('gimmicks', tags.join('|'), () => gimmickEl.replaceChildren(...tags.map((x) => el('i', {}, x))));
       put('myHp', pct(d.player.hp / data.player.hp), (v) => (myHp.style.width = v));
       put('myPosture', pct(d.player.posture / data.player.posture), (v) => (myPosture.style.width = v));
       const fk = d.focus / data.rules.focusMax;
@@ -784,6 +814,16 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       put('focusK', fk.toFixed(2), (v) => focusBtn.style.setProperty('--focus', v));
       if (fk >= 1) tip('focus');
       // 장의 특수 규칙 안내(처음 한 번): 왕녀의 얼음·세 숨은 그 결이 처음 보일 때, 나머지는 대결이 시작되고 조금 뒤
+      if (!d.result && !rhythm) {
+        const c = cue(d);
+        if (c.visible && c.stance) tip('stance', true);
+        const gm = d.foeDef.gimmicks;
+        if (d.t > 1500 && gm) {
+          if (gm.armor && !d.armorBroken) tip('armor', true);
+          if (gm.regen) tip('regen', true);
+          if (gm.accelerate) tip('accelerate', true);
+        }
+      }
       if (opts.tips?.length && !d.result) {
         const c = cue(d);
         if (c.visible && c.fragile) tip('fragile');
