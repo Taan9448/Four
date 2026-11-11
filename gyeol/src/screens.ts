@@ -93,6 +93,8 @@ export function renderTitle(app: HTMLElement, nav: Nav): void {
 /* ───────── 메인: 운곡루 뒤뜰 ───────── */
 
 const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rhythm: 'tech', practice: 'focus' };
+/** 메뉴 아이콘 칸(Codex icons_gyeol_menu는 처음 메뉴 순서: 이야기·결투장·박자 도전·수련장·기록·설정) */
+const MENU_ICON: Record<string, number> = { story: 1, arena: 2, rhythm: 3, practice: 4 };
 
 /** 「천외귀환」 주소(같은 배포의 한 단계 위 — 개발 서버에서는 /) */
 export const CHEONOE_URL = new URL('../', location.href).href;
@@ -117,7 +119,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
-    const icon = realArt('icons_gyeol_menu', i + 1);
+    const icon = realArt('icons_gyeol_menu', MENU_ICON[m.id] ?? i + 1);
     const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', title: `🔒 ${m.locked}` } : { title: m.note });
     return el('li', { class: locked ? 'locked' : '' }, b);
   });
@@ -215,9 +217,36 @@ function helpBox(): HTMLElement {
 
 /* ───────── 박자 도전 ───────── */
 
+/** 박자 도전은 수련장 안의 한 칸이다(2026-11-11 사용자 요청) — 옛 주소(?screen=rhythm)는 그 칸으로 */
 export function renderRhythm(app: HTMLElement, nav: Nav, data: DuelData): void {
+  practiceTab = 'rhythm';
+  renderPractice(app, nav, data);
+}
+
+/* ───────── 수련장: 수련 · 박자 도전 ───────── */
+
+let practiceTab: 'drill' | 'rhythm' = 'drill';
+
+export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const dummy = data.foes.find((f) => f.practice);
   const save = loadSave();
-  const cards = duelFoes(data)
+  const redraw = () => renderPractice(app, nav, data);
+  const tab = (id: 'drill' | 'rhythm', label: string, han: string) => {
+    const b = button([el('b', { class: 'tab-han', 'aria-hidden': 'true' }, han), el('span', {}, label)], `prac-tab${practiceTab === id ? ' on' : ''}`, () => {
+      practiceTab = id;
+      redraw();
+    }, { role: 'tab', 'aria-selected': String(practiceTab === id) });
+    return b;
+  };
+  const drills = (dummy?.drills ?? []).map((dr, i) =>
+    el(
+      'li',
+      {},
+      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' })),
+      el('small', {}, dr.note),
+    ),
+  );
+  const charts = duelFoes(data)
     .filter((f) => f.chart && !f.storyOnly && (f.starter || save.seen.includes(f.id)))
     .map((f) => {
       const img = frameUrl(`${f.sprite}_idle`, 1);
@@ -228,40 +257,36 @@ export function renderRhythm(app: HTMLElement, nav: Nav, data: DuelData): void {
         img ? el('img', { src: img, alt: '' }) : '',
         el('div', { class: 'foe-text' }, el('b', {}, f.chart!.title), el('small', {}, `${f.title} · ${f.chart!.steps.length}박`)),
         el('div', { class: 'best-row' }, el('span', { class: 'best-cell' }, el('small', {}, '최고'), rankBadge(b?.rank)), el('small', { class: 'best' }, b ? `정확도 ${Math.round(b.accuracy * 100)}%` : '아직 없음')),
-        el('div', { class: 'foe-actions' }, button('도전', 'btn primary', () => nav.play(f, 'rhythm', { back: 'rhythm' }))),
+        el('div', { class: 'foe-actions' }, button('도전', 'btn primary', () => nav.play(f, 'rhythm', { back: 'practice' }))),
       );
     });
-  app.replaceChildren(el('section', { class: 'screen' }, header('박자 도전', nav, '정해진 악보대로 오는 결을 받아 낸다. 베기는 없다 — 받기와 피하기로 정확도를 겨룬다.'), el('div', { class: 'foes' }, ...cards)));
-  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
-}
-
-/* ───────── 수련장 ───────── */
-
-export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void {
-  const dummy = data.foes.find((f) => f.practice);
-  const save = loadSave();
-  const drills = (dummy?.drills ?? []).map((dr, i) =>
-    el(
-      'li',
-      {},
-      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' })),
-      el('small', {}, dr.note),
-    ),
-  );
   const off = save.settings.inputOffset;
+  const body =
+    practiceTab === 'drill'
+      ? el(
+          'div',
+          { class: 'practice-grid' },
+          el('ol', { class: 'lobby-menu drills' }, ...drills),
+          el('aside', { class: 'calib-card' }, el('h2', {}, '박자 맞추기'), el('p', {}, '박자에 맞춰 열두 번 눌러, 손과 화면·소리의 지연을 잰다. 잰 값을 판정 보정으로 쓸 수 있다.'), el('p', { class: 'now' }, `지금 판정 보정 ${off > 0 ? '+' : ''}${off}ms`), button('재기', 'btn primary', () => nav.go('calibrate'))),
+        )
+      : el('div', {}, el('p', { class: 'prac-lead' }, '정해진 악보대로 오는 결을 받아 낸다. 베기는 없다 — 받기와 피하기로 정확도를 겨룬다.'), el('div', { class: 'foes' }, ...charts));
   app.replaceChildren(
     el(
       'section',
       { class: 'screen practice' },
-      header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다. 화면 아래 막대에 누른 시점이 찍힌다.'),
-      el('div', { class: 'practice-grid' }, el('ol', { class: 'lobby-menu drills' }, ...drills), el('aside', { class: 'calib-card' }, el('h2', {}, '박자 맞추기'), el('p', {}, '박자에 맞춰 열두 번 눌러, 손과 화면·소리의 지연을 잰다. 잰 값을 판정 보정으로 쓸 수 있다.'), el('p', { class: 'now' }, `지금 판정 보정 ${off > 0 ? '+' : ''}${off}ms`), button('재기', 'btn primary', () => nav.go('calibrate')))),
+      header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다.'),
+      el('div', { class: 'prac-tabs', role: 'tablist' }, tab('drill', '수련', '修'), tab('rhythm', '박자 도전', '拍')),
+      body,
     ),
   );
   setKeys((e) => {
     const n = Number(e.key);
     const dr = dummy?.drills?.[n - 1];
-    if (dr && dummy) nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' });
-    else if (e.key === 'Escape') nav.go('lobby');
+    if (practiceTab === 'drill' && dr && dummy) nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' });
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      practiceTab = practiceTab === 'drill' ? 'rhythm' : 'drill';
+      redraw();
+    } else if (e.key === 'Escape') nav.go('lobby');
   });
 }
 

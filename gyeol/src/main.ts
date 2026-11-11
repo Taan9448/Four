@@ -3,7 +3,7 @@
 // 4차(2026-11-09): 칼 맞부딪힘 겨루기(J·K 연타), 위기(배수의 진), 집중(심안), 적별 결정타, 날씨 입자, 적 도발·하운 대사.
 import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
-import { applyUiArt, el, padIcon, rankBadge, toast } from './dom';
+import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
 import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
@@ -83,7 +83,7 @@ const nav: Nav = {
   },
 };
 
-const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '박자 도전으로', practice: '수련장으로', lobby: '로비로', story: '이야기 목록' };
+const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '수련장으로', practice: '수련장으로', lobby: '로비로', story: '이야기 지도' };
 
 async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby' }): Promise<void> {
   stopLoop?.();
@@ -101,7 +101,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const rhythm = mode === 'rhythm';
   const canvas = el('canvas', { width: String(W), height: String(H), class: 'field', 'aria-label': `${foeDef.title}와의 ${rhythm ? '박자 도전' : '대결'}` });
   const ctx = canvas.getContext('2d')!;
-  const foeHp = el('i'), foePosture = el('i'), myHp = el('i'), myPosture = el('i'), myFocus = el('i'), progress = el('i');
+  const foeHp = el('i', { class: 'fill' }), foePosture = el('i', { class: 'fill' }), myHp = el('i', { class: 'fill' }), myPosture = el('i', { class: 'fill' }), myFocus = el('i', { class: 'fill' }), progress = el('i');
+  // 잔상 막대(2026-11-11): 깎인 만큼 밝은 띠가 잠깐 남았다가 따라 줄어든다
+  const foeHpLag = el('i', { class: 'lag' }), myHpLag = el('i', { class: 'lag' });
+  const myHpNum = el('span', { class: 'hp-num' }), foeHpNum = el('span', { class: 'hp-num' });
+  const face = realArt('haun_gyeol_stand') ?? frameUrl('haun_sword_stand', 1);
   const streakEl = el('div', { class: 'streak' });
   const phasePips = el('span', { class: 'phase-pips' });
   const gimmickEl = el('span', { class: 'gimmicks' });
@@ -113,12 +117,27 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       'div',
       { class: 'foe-bar' },
       el('b', {}, rhythm ? `${foeDef.title} — ${foeDef.chart!.title}` : foeDef.title),
-      rhythm ? el('div', { class: 'bar progress' }, progress) : el('div', { class: 'bar hp' }, foeHp),
-      rhythm ? '' : el('div', { class: 'bar posture' }, foePosture),
+      rhythm ? el('div', { class: 'bar progress' }, progress) : el('div', { class: 'bar hp' }, foeHpLag, foeHp, el('span', { class: 'gloss' }), foeHpNum),
+      rhythm ? '' : el('div', { class: 'bar posture' }, foePosture, el('span', { class: 'gloss' })),
       // 단계 점(◆ 지금·지난 단계, ◇ 남은 단계)과 기믹 표식(갑옷·재생·가속·결 가림)
       rhythm ? '' : el('div', { class: 'foe-phase' }, phasePips, gimmickEl),
     ),
-    rhythm ? scoreEl : el('div', { class: 'me-bar' }, el('b', {}, data.player.name), el('div', { class: 'bar hp' }, myHp), el('div', { class: 'bar posture' }, myPosture), el('div', { class: 'bar focus' }, myFocus)),
+    // 하운 이름판(2026-11-11): 얼굴 인장 + 이름·체력 숫자 + 굵은 체력 막대 + 이름 붙은 체간·집중 막대
+    rhythm
+      ? scoreEl
+      : el(
+          'div',
+          { class: 'me-bar' },
+          el('div', { class: 'me-face', style: face ? `background-image:url("${face}")` : '' }, face ? '' : el('b', {}, '雲')),
+          el(
+            'div',
+            { class: 'me-body' },
+            el('div', { class: 'me-name' }, el('b', {}, data.player.name), myHpNum),
+            el('div', { class: 'bar hp' }, myHpLag, myHp, el('span', { class: 'gloss' })),
+            el('div', { class: 'bar-row' }, el('em', {}, '체간'), el('div', { class: 'bar posture' }, myPosture, el('span', { class: 'gloss' }))),
+            el('div', { class: 'bar-row' }, el('em', {}, '집중'), el('div', { class: 'bar focus' }, myFocus, el('span', { class: 'gloss' }))),
+          ),
+        ),
     streakEl,
   );
   const attackBtn = el('button', { class: 'pad attack', type: 'button' }, padIcon('attack'), '베기', el('small', {}, 'J'));
@@ -131,8 +150,17 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   if (opts.duel?.focus === false) focusBtn.classList.add('locked');
   const cutin = el('div', { class: 'cutin', hidden: '' });
   if (rhythm) attackBtn.disabled = true;
-  const back = el('button', { class: 'back', type: 'button' }, padIcon('back'), tutorial ? '건너뛰기' : practice ? '그만하기' : '나가기');
-  back.addEventListener('click', leave);
+  // 나가기 버튼 대신 일시 정지(2026-11-11 사용자 요청): Esc 또는 오른쪽 위 ⏸ — 계속 · 다시 · 나가기
+  const leaveLabel = tutorial ? '서장 건너뛰기' : practice ? '그만하기' : (BACK_LABEL[opts.back] ?? '나가기');
+  const pauseBtn = el('button', { class: 'pause-btn', type: 'button', 'aria-label': '일시 정지 (Esc)', title: '일시 정지 (Esc)' }, el('span', { 'aria-hidden': 'true' }, '❚❚'));
+  const resumeBtn = el('button', { class: 'res-btn primary', type: 'button' }, el('b', {}, '계속'), el('small', {}, 'Esc'));
+  const pauseAgain = el('button', { class: 'res-btn', type: 'button' }, el('b', {}, '처음부터'));
+  const pauseLeave = el('button', { class: 'res-btn', type: 'button' }, el('b', {}, leaveLabel));
+  const pauseEl = el(
+    'div',
+    { class: 'pause', hidden: '', role: 'dialog', 'aria-modal': 'true', 'aria-label': '일시 정지' },
+    el('div', { class: 'pause-box' }, el('p', { class: 'pause-mark', 'aria-hidden': 'true' }, '止'), el('h2', {}, '일시 정지'), el('p', { class: 'kicker' }, opts.title ?? foeDef.title), el('div', { class: 'res-row' }, resumeBtn, pauseAgain, pauseLeave)),
+  );
   const overlay = el('div', { class: 'result', hidden: '' });
   // 버티기(곽도진): 받아 낸 수, 처음 나오는 순간 안내 카드, 서장 튜토리얼 판
   const surviveEl = el('div', { class: 'survive', hidden: '' });
@@ -147,7 +175,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   });
   if (!document.fullscreenEnabled) fsBtn.hidden = true;
   const hint = el('p', { class: 'rotate-hint' }, '휴대폰을 가로로 돌리면 화면이 커지고 버튼이 양손 엄지 자리로 갑니다');
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, surviveEl, tutPanel, tipEl, cutin, overlay, loading, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn, back), hint));
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, surviveEl, tutPanel, tipEl, cutin, overlay, pauseEl, loading, pauseBtn, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn), hint));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
@@ -182,6 +210,34 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   fx.clashOn = mode === 'duel' && opts.duel?.clash !== false;
   if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
   let hitstopUntil = 0;
+  /** 일시 정지: 대결 시계·입력을 멈춘다. 풀 때 멈춘 동안만큼 멈칫·느린 화면 시각을 뒤로 민다 */
+  let paused = false;
+  let pausedAt = 0;
+  const setPause = (on: boolean) => {
+    if (on === paused || !alive) return;
+    if (on && (d.result || !overlay.hidden)) return;
+    paused = on;
+    pauseEl.hidden = !on;
+    pauseBtn.classList.toggle('on', on);
+    const now = performance.now();
+    if (on) {
+      pausedAt = now;
+      sfx('click');
+      requestAnimationFrame(() => resumeBtn.focus());
+    } else {
+      const gap = now - pausedAt;
+      hitstopUntil += gap;
+      slowUntil += gap;
+      lastReal = now;
+    }
+  };
+  pauseBtn.addEventListener('click', () => setPause(!paused));
+  resumeBtn.addEventListener('click', () => setPause(false));
+  pauseAgain.addEventListener('click', () => void play(foeDef0, mode, opts));
+  pauseLeave.addEventListener('click', () => {
+    paused = false;
+    leave();
+  });
   /** 서장 튜토리얼 단계의 느린 화면 배율(도움) */
   let tutSlow = 1;
   /** 대결 시계를 마지막으로 민 실제 시각(입력 시각 보정의 기준) */
@@ -240,7 +296,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
    * 화면이 그보다 이미 앞서 있으면(입력이 늦게 닿음) 그만큼 거슬러 올라간 시각으로 받기·피하기를 판정한다.
    */
   const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus', stamp: number) => {
-    if (!alive) return;
+    if (!alive || paused) return;
     const real = stamp - loadSave().settings.inputOffset;
     advanceTo(real);
     const at = real < lastReal ? d.t - (lastReal - real) * rateAt(real) : d.t;
@@ -261,9 +317,21 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge', e.timeStamp));
     else if (k === 'i') doPress('tech', e.timeStamp);
     else if (k === 'u') doPress('focus', e.timeStamp);
-    else if (k === 'escape') leave();
+    else if (k === 'escape' || k === 'p') {
+      e.preventDefault();
+      // 결과가 떠 있으면 Esc = 나가기, 아니면 멈춤·계속
+      if (!overlay.hidden) leave();
+      else setPause(!paused);
+    }
   };
   window.addEventListener('keydown', onKey);
+  // 창을 떠나면(다른 탭·창) 저절로 멈춘다
+  const onHide = () => {
+    if (document.hidden) setPause(true);
+  };
+  const onBlur = () => setPause(true);
+  document.addEventListener('visibilitychange', onHide);
+  window.addEventListener('blur', onBlur);
 
   const spark = (x: number, y: number, count: number, color: string, speed = 260, size = 4) => {
     const now = performance.now();
@@ -751,15 +819,16 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       const s = d.stats;
       const won = d.result === 'win';
       // 이야기에서 이기면 '다음'이 앞에, 지면 '다시'가 앞에
-      const nextBtn = won && opts.next ? el('button', { class: 'btn primary', type: 'button' }, opts.next.label) : null;
+      // 결과 단추(2026-11-11): 모두 같은 크기의 먹 판 — 앞에 오는 단추만 붉은 인장 테
+      const nextBtn = won && opts.next ? el('button', { class: 'res-btn primary', type: 'button' }, el('b', {}, opts.next.label), el('small', {}, 'Enter')) : null;
       nextBtn?.addEventListener('click', () => {
         stopLoop?.();
         setKeys(null);
         opts.next!.go(d);
       });
-      const again = el('button', { class: nextBtn ? 'btn' : 'btn primary', type: 'button' }, '다시');
+      const again = el('button', { class: nextBtn ? 'res-btn' : 'res-btn primary', type: 'button' }, el('b', {}, '다시'), nextBtn ? '' : el('small', {}, 'Enter'));
       again.addEventListener('click', () => void play(foeDef0, mode, opts));
-      const pick = el('button', { class: 'btn', type: 'button' }, BACK_LABEL[opts.back] ?? '나가기');
+      const pick = el('button', { class: 'res-btn', type: 'button' }, el('b', {}, BACK_LABEL[opts.back] ?? '나가기'), el('small', {}, 'Esc'));
       pick.addEventListener('click', leave);
       if (rhythm) {
         const sc = rhythmScore(d);
@@ -778,7 +847,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             el('span', { class: 'j-miss' }, `MISS ${s.miss}`),
           ),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak}${newBest ? ' · 최고 기록!' : ''}`),
-          el('div', { class: 'row' }, nextBtn ?? '', again, pick),
+          el('div', { class: 'res-row' }, nextBtn ?? '', again, pick),
         );
       } else {
         const g = duelGrade(d);
@@ -789,7 +858,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           g ? el('div', { class: 'grade-line' }, rankBadge(g.rank, 'lg'), el('span', {}, `${diffName} · 점수 ${g.score}${bestUp ? ' · 최고 등급!' : ''}`)) : '',
           el('p', {}, `패링 ${s.parries}(PERFECT ${s.perfect}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak} · ${(d.t / 1000).toFixed(1)}초`),
-          el('div', { class: 'row' }, nextBtn ?? '', again, pick),
+          el('div', { class: 'res-row' }, nextBtn ?? '', again, pick),
         );
       }
       overlay.hidden = false;
@@ -807,24 +876,71 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     apply(value);
   };
   const pct = (x: number) => `${(Math.max(0, Math.min(1, x)) * 100).toFixed(1)}%`;
+  /** 애니메이션을 처음부터 다시 건다 */
+  const replay = (node: HTMLElement | null | undefined, cls: string) => {
+    if (!node) return;
+    node.classList.remove(cls);
+    void node.offsetWidth;
+    node.classList.add(cls);
+  };
+  /**
+   * 체력 막대(2026-11-11 사용자 요청 — 스펙타클하게): 깎이면 막대가 흔들리며 번쩍이고 잔상(밝은 띠)이 잠깐 남았다 따라 줄어든다,
+   * 크게 깎이면 더 세게, 차오르면 초록빛, 30% 아래면 붉게 맥박친다. 숫자도 같이
+   */
+  const hpState = new Map<string, { v: number; timer: number }>();
+  const animHp = (key: string, fill: HTMLElement, lag: HTMLElement, ratio: number, num: HTMLElement | null, cur: number, max: number) => {
+    const v = Math.max(0, Math.min(1, ratio));
+    const prev = hpState.get(key);
+    if (prev && Math.abs(prev.v - v) < 0.0005) return;
+    const bar = fill.parentElement!;
+    fill.style.width = pct(v);
+    if (num) num.textContent = `${Math.max(0, Math.ceil(cur))} / ${max}`;
+    if (prev && v < prev.v) {
+      clearTimeout(prev.timer);
+      replay(bar, prev.v - v >= 0.12 ? 'hit-big' : 'hit');
+      if (key === 'me') replay(hud.querySelector<HTMLElement>('.me-bar'), 'shake');
+      const timer = window.setTimeout(() => (lag.style.width = pct(v)), 420);
+      hpState.set(key, { v, timer });
+    } else {
+      if (prev && v > prev.v) replay(bar, 'heal');
+      lag.style.width = pct(v);
+      hpState.set(key, { v, timer: 0 });
+    }
+    bar.classList.toggle('danger', v > 0 && v <= 0.3);
+    if (key === 'me') hud.querySelector('.me-bar')?.classList.toggle('danger', v > 0 && v <= 0.3);
+  };
   const bars = () => {
     if (rhythm) {
       put('progress', pct(d.t / chartEnd), (v) => (progress.style.width = v));
       const sc = rhythmScore(d);
       put('score', sc.total ? `정확도 ${Math.round(sc.accuracy * 100)}% · PERFECT ${d.stats.perfect} · EXCELLENT ${d.stats.clean - d.stats.perfect} · GOOD ${d.stats.good} · MISS ${d.stats.miss}` : '결을 받아라', (v) => (scoreEl.textContent = v));
     } else {
-      put('foeHp', pct(d.foe.hp / d.foeDef.hp), (v) => (foeHp.style.width = v));
-      put('foePosture', pct(d.foe.posture / d.foeDef.posture), (v) => (foePosture.style.width = v));
+      animHp('foe', foeHp, foeHpLag, d.foe.hp / d.foeDef.hp, foeHpNum, d.foe.hp, d.foeDef.hp);
+      put('foePosture', pct(d.foe.posture / d.foeDef.posture), (v) => {
+        foePosture.style.width = v;
+        // 체간이 거의 찼다 = 무너뜨릴 때 — 금빛이 타오른다
+        foePosture.parentElement!.classList.toggle('near', d.foe.posture / d.foeDef.posture >= 0.75);
+      });
       // 단계 점과 기믹 표식
       put('phase', `${d.phase}/${d.phaseCount}`, () => (phasePips.textContent = d.phaseCount > 1 ? '◆'.repeat(d.phase) + '◇'.repeat(d.phaseCount - d.phase) : ''));
       const gm = d.foeDef.gimmicks ?? {};
       const tags = [gm.armor && !d.armorBroken ? '갑옷' : '', gm.regen ? '재생' : '', gm.accelerate ? `가속 ×${(1 / d.tempo).toFixed(2)}` : '', gm.veil ? '결 가림' : ''].filter(Boolean);
       put('gimmicks', tags.join('|'), () => gimmickEl.replaceChildren(...tags.map((x) => el('i', {}, x))));
-      put('myHp', pct(d.player.hp / data.player.hp), (v) => (myHp.style.width = v));
-      put('myPosture', pct(d.player.posture / data.player.posture), (v) => (myPosture.style.width = v));
+      animHp('me', myHp, myHpLag, d.player.hp / data.player.hp, myHpNum, d.player.hp, data.player.hp);
+      put('myPosture', pct(d.player.posture / data.player.posture), (v) => {
+        myPosture.style.width = v;
+        // 내 체간이 거의 찼다 = 무너지기 직전 — 붉게 깜박인다
+        myPosture.parentElement!.classList.toggle('near', d.player.posture / data.player.posture >= 0.75);
+      });
       const fk = d.focus / data.rules.focusMax;
       const focusing = isFocusing(d);
       put('myFocus', pct(focusing ? (d.focusUntil - d.t) / data.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
+      put('focusFull', `${fk >= 1}|${focusing}`, () => {
+        const bar = myFocus.parentElement!;
+        if (fk >= 1 && !focusing && !bar.classList.contains('full')) replay(bar, 'burst');
+        bar.classList.toggle('full', fk >= 1 && !focusing);
+        bar.classList.toggle('on', focusing);
+      });
       put('focusK', fk.toFixed(2), (v) => focusBtn.style.setProperty('--focus', v));
       if (fk >= 1) tip('focus');
       // 장의 특수 규칙 안내(처음 한 번): 왕녀의 얼음·세 숨은 그 결이 처음 보일 때, 나머지는 대결이 시작되고 조금 뒤
@@ -896,6 +1012,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     // 느린 화면: 끝 장면이면 0.25배, 집중(심안) 중이면 focusRate배
     fx.timeScale = rateAt(now);
     fx.uiScale = W / Math.max(1, canvas.clientWidth);
+    if (paused) {
+      draw(ctx, d, sp, fx, now);
+      raf = requestAnimationFrame(frame);
+      return;
+    }
     advanceTo(now);
     handleEvents();
     // 위기: 심장이 뛴다(가장자리 붉은 맥박과 같은 박자)
@@ -927,6 +1048,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     alive = false;
     cancelAnimationFrame(raf);
     window.removeEventListener('keydown', onKey);
+    document.removeEventListener('visibilitychange', onHide);
+    window.removeEventListener('blur', onBlur);
     resizeObs.disconnect();
     void wake?.release().catch(() => undefined);
     stopLoop = null;
