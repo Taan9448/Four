@@ -10,6 +10,8 @@ import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { loadSave, writeSave, type Quality } from './save';
+import { askWhich } from './account';
+import { bootCloud } from './cloud';
 import { openSettings } from './settings';
 import { renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
@@ -924,6 +926,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
 
 initAudio();
 applySettings();
+// 계정(7-6절): 로그인해 둔 적이 있으면 계정 기록과 맞춘다(둘 다 있고 다르면 묻는다, 계정 것을 받으면 다시 연다)
+void bootCloud(askWhich);
 applyUiArt();
 const params = new URLSearchParams(location.search);
 // 점검·개발용: ?foe=<id>[&rhythm|&practice[=drill]][&diff=easy|main|hard] 바로 대결, ?screen=lobby|story|arena|rhythm|practice|records|calibrate

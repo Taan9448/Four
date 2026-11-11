@@ -4,6 +4,7 @@ import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
 import { accountState, loginPanel, playerPlate } from './account';
+import { onCloudChange } from './cloud';
 import { condMet, condText, newAchievements, progress, starTotal } from './progress';
 import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
@@ -71,7 +72,7 @@ function header(title: string, nav: Nav, sub?: string): HTMLElement {
 export function renderTitle(app: HTMLElement, nav: Nav): void {
   document.documentElement.classList.add('on-title');
   const redraw = () => renderTitle(app, nav);
-  // 「천외귀환」과 같은 흐름(2026-11-10 목업): 이 탭에서 로그인도 게스트도 고르지 않았으면 메뉴 대신 로그인 판
+  // 「천외귀환」과 같은 흐름: 로그인해 둔 적도 없고 이 탭에서 게스트도 고르지 않았으면 메뉴 대신 로그인 판
   const gate = accountState().kind === 'none';
   const enter = button('들어가기', 'btn primary big', () => nav.go('lobby'));
   const logo = el('h1', { class: 'logo', 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決'));
@@ -98,6 +99,15 @@ export function renderTitle(app: HTMLElement, nav: Nav): void {
   });
   if (gate) (app.querySelector('.login-input') as HTMLInputElement | null)?.focus();
   else enter.focus();
+  // 로그인해 둔 세션이 풀렸으면(만료·다른 탭에서 로그아웃) 로그인 판으로
+  const section = app.querySelector('section.title');
+  const off = onCloudChange(() => {
+    if (!section?.isConnected) return off();
+    if ((accountState().kind === 'none') !== gate) {
+      off();
+      redraw();
+    }
+  });
 }
 
 /* ───────── 로비: 운곡루 뒤뜰 ───────── */
