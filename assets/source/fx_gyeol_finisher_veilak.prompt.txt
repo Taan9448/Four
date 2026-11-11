@@ -1,0 +1,18 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: many thin black smoke threads converge from every side of the cell into one tight dark knot in the center, a red glow inside it
+Cell 2: impact: a short white-violet horizontal flash pierces the knot, a blinding white core
+Cell 3: the knot bursts, the black smoke threads snapping and whipping outward in every direction, red sparks
+Cell 4: the cut threads unraveling and fading into grey smoke, the red glow dimming
+Cell 5: loose grey smoke strands drifting apart
+Cell 6: faint smoke wisps
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: BLACK SMOKE THREADS are the MAIN subject; the per-cell smoke descriptions override the generic no-smoke style sentence. The first attempt wrongly copied the reference's three bright violet crescent slashes. Do NOT copy those crescents, X marks or sweeping violet light blades into ANY cell. Use the reference ONLY for blocky pixel rendering. Cell 1 is many tangled dark charcoal smoke cords converging into a tight knot with a small red inner glow. Cell 2 alone has ONE SHORT straight horizontal white-violet flash piercing that knot, no crescent. In cell 3 the DARK SMOKE knot bursts into whipping, ragged charcoal cords and small RED sparks; no white core, no violet glowing arcs or fresh slash. Cells 4-6 are ONLY unraveling grey-black smoke strands with fading red light, then sparse faint wisps. Give black smoke readable charcoal-grey pixel edges (#2b2b3a, #3d4459, #5d6478), so its silhouette remains visible on pure #000000, with crisp 4x4px blocks and no blur. Keep all smoke inside each cell.
