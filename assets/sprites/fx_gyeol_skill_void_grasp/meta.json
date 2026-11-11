@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_skill_void_grasp",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 12.787,
+  "gridDetected": true,
+  "nativeSize": [
+    40,
+    40
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "c4b1e073ca6089b5",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.676
+}
