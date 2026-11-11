@@ -5,6 +5,7 @@ import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
 import { accountState, loginPanel, playerPlate } from './account';
 import { onCloudChange } from './cloud';
+import { lobbyStage } from './lobby-fx';
 import { condMet, condText, newAchievements, progress, starTotal } from './progress';
 import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
@@ -98,7 +99,8 @@ export const CHEONOE_URL = new URL('../', location.href).href;
 
 /**
  * 메인(2026-11-11 사용자 요청 — 「천외귀환」 시작 화면과 같은 구성): 가운데 제목과 메뉴, 왼쪽 아래 명패(계정·수련),
- * 오른쪽 아래 둥근 표식(옷장 · 도감 · 설정 · 「천외귀환」 바로가기). 양옆 인물(하운·왕일검)은 없앴다(2026-11-11 사용자 요청) — 뒤뜰 그림만
+ * 오른쪽 아래 둥근 표식(옷장 · 도감 · 설정 · 「천외귀환」 바로가기). 양옆 인물·장소 글·메뉴 설명·아래 기록 줄은 없앴다(2026-11-11 사용자 요청 — 깔끔하게).
+ * 메뉴 설명은 단추에 마우스를 올리면 뜬다(title). 뒤뜰 그림 위에는 잔잔한 움직임 층
  */
 export function renderLobby(app: HTMLElement, nav: Nav): void {
   if (accountState().kind === 'none') return nav.go('title');
@@ -116,24 +118,25 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
     const icon = realArt('icons_gyeol_menu', i + 1);
-    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
-    return el('li', { class: locked ? 'locked' : '' }, b, el('small', { id: `note-${m.id}` }, locked ? `🔒 ${m.locked}` : m.note));
+    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', title: `🔒 ${m.locked}` } : { title: m.note });
+    return el('li', { class: locked ? 'locked' : '' }, b);
   });
   const corner = lobby.corner.map((c) =>
     button([el('b', {}, c.hanja), el('span', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` }),
   );
-  const st = save.stats;
+  // 뒤뜰 그림 위 잔잔한 움직임(달무리·등불·안개·별·반딧불·댓잎 — lobby-fx.ts). 그림이 아직 없으면 CSS 바탕 그대로
+  const bg = realArt('bg_gyeol_lobby', 1);
   const section = el(
     'section',
-    { class: `lobby main${dawn ? ' dawn' : ''}` },
+    { class: `lobby main${dawn ? ' dawn' : ''}${bg ? ' has-stage' : ''}` },
+    bg ? lobbyStage(bg, dawn) : '',
+    el('div', { class: 'lobby-shade', 'aria-hidden': 'true' }),
     el(
       'div',
       { class: 'lobby-center' },
       el('h1', { class: 'lobby-logo', 'aria-label': '결' }, el('span', { class: 'ink-han', 'aria-hidden': 'true' }, '決')),
-      el('p', { class: 'lobby-place' }, dawn ? '운곡루 뒤뜰 · 새벽' : '운곡루 뒤뜰 · 밤'),
       el('ol', { class: 'lobby-menu' }, ...items),
     ),
-    el('p', { class: 'lobby-foot' }, !save.story.cleared.includes('prologue') ? '처음 왔구나. 이야기 › 서장에서 손부터 풀어 보아라.' : `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries} · 최대 연속 박자 ${st.maxStreak}`),
     // 계정·수련은 왼쪽 아래 명패로(「천외귀환」과 같다). 로그인하기를 누르면 로그인 판으로
     playerPlate(() => nav.go(accountState().kind === 'none' ? 'title' : 'lobby')),
     el('nav', { class: 'lobby-corner', 'aria-label': '옷장 · 도감 · 설정 · 천외귀환' }, ...corner),
