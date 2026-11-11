@@ -38,9 +38,6 @@ export interface Nav {
 }
 
 interface LobbyData {
-  wang: string[];
-  /** 에필로그를 마친 뒤(새벽) 왕일검의 말 */
-  wangDawn?: string[];
   menu: { id: string; name: string; note: string; locked?: string }[];
   /** 오른쪽 아래 둥근 표식(옷장·도감·설정·「천외귀환」 바로가기) */
   corner: { id: string; hanja: string; name: string; note: string }[];
@@ -58,7 +55,6 @@ export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
 const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
 /** 결투장 상대: 처음부터 있던 다섯(악보가 있는 상대) + 이야기에서 겨뤄 본 상대(이야기 전용 빼고) */
 const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.starter || seen.includes(f.id)));
-const portrait = (id: string, n = 1) => frameUrl(id, n);
 
 function header(title: string, nav: Nav, sub?: string): HTMLElement {
   return el(
@@ -102,7 +98,7 @@ export const CHEONOE_URL = new URL('../', location.href).href;
 
 /**
  * 메인(2026-11-11 사용자 요청 — 「천외귀환」 시작 화면과 같은 구성): 가운데 제목과 메뉴, 왼쪽 아래 명패(계정·수련),
- * 오른쪽 아래 둥근 표식(옷장 · 도감 · 설정 · 「천외귀환」 바로가기). 뒤뜰의 하운(왼쪽)과 왕일검(오른쪽)은 그대로
+ * 오른쪽 아래 둥근 표식(옷장 · 도감 · 설정 · 「천외귀환」 바로가기). 양옆 인물(하운·왕일검)은 없앴다(2026-11-11 사용자 요청) — 뒤뜰 그림만
  */
 export function renderLobby(app: HTMLElement, nav: Nav): void {
   if (accountState().kind === 'none') return nav.go('title');
@@ -110,63 +106,17 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const save = loadSave();
   // 에필로그를 마치면 운곡루 뒤뜰에 새벽이 온다(7-2)
   const dawn = save.story.cleared.includes('epilogue');
-  const wangLines = dawn && lobby.wangDawn?.length ? lobby.wangDawn : lobby.wang;
-  let line = Math.floor(Date.now() / 1000) % wangLines.length;
-  const say = el('p', { class: 'lobby-say' }, wangLines[line]);
-  // 로비 그림(2026-11-10): Codex 결 전용 그림(haun_gyeol_stand·wang_gyeol_stand)이 오면 그것으로, 그 전에는 「천외귀환」 반신 그림
-  const stand = (id: string, old: string) => (n: number) => realArt(id, n) ?? (n === 1 ? (portrait(old) ?? '') : null);
-  const haunArt = stand('haun_gyeol_stand', 'haun_sword_stand');
-  const wangArt = stand('wang_gyeol_stand', 'wang_stand');
-  const gyeolArt = !!realArt('haun_gyeol_stand');
-  const haunImg = el('img', { class: 'lobby-haun', src: haunArt(1) ?? '', alt: '진하운' });
-  const wangImg = el('img', { src: wangArt(1) ?? '', alt: '' });
-  /** 칸 n으로 잠깐 바꿨다가 돌아온다(그림이 없는 칸이면 그대로) */
-  let back = 0;
-  const pose = (img: HTMLImageElement, art: (n: number) => string | null, n: number, ms = 0) => {
-    const u = art(n);
-    if (!u) return;
-    img.src = u;
-    if (ms) {
-      clearTimeout(back);
-      back = window.setTimeout(() => {
-        haunImg.src = haunArt(1) ?? haunImg.src;
-        wangImg.src = wangArt(1) ?? wangImg.src;
-      }, ms);
-    }
-  };
-  const wang = el('button', { class: 'lobby-wang', type: 'button', 'aria-label': '왕일검에게 말 걸기' }, wangImg, say);
-  wang.addEventListener('click', () => {
-    line = (line + 1) % wangLines.length;
-    say.textContent = wangLines[line];
-    say.classList.remove('pop');
-    void say.offsetWidth;
-    say.classList.add('pop');
-    // 왕일검은 가르치고, 하운은 듣는다
-    pose(wangImg, wangArt, 2, 2600);
-    pose(haunImg, haunArt, 3, 2600);
-  });
   const go = (id: string) => {
     sfx('click');
     if (id === 'settings') nav.settings();
     else if (id === 'cheonoe') location.href = CHEONOE_URL;
     else nav.go(id as Screen);
   };
-  let armed = false;
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
     const icon = realArt('icons_gyeol_menu', i + 1);
     const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', 'aria-describedby': `note-${m.id}` } : { 'aria-describedby': `note-${m.id}` });
-    // 싸우러 가는 메뉴에 손이 가면 하운이 칼자루에 손을 얹는다
-    if (m.id === 'story' || m.id === 'arena') {
-      // 들어올 때 첫 메뉴에 저절로 가는 초점은 빼고, 마우스를 올리거나 키보드로 옮겼을 때만
-      const ready = () => pose(haunImg, haunArt, 2);
-      const calm = () => pose(haunImg, haunArt, 1);
-      b.addEventListener('pointerenter', ready);
-      b.addEventListener('focus', () => armed && ready());
-      b.addEventListener('pointerleave', calm);
-      b.addEventListener('blur', calm);
-    }
     return el('li', { class: locked ? 'locked' : '' }, b, el('small', { id: `note-${m.id}` }, locked ? `🔒 ${m.locked}` : m.note));
   });
   const corner = lobby.corner.map((c) =>
@@ -176,7 +126,6 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const section = el(
     'section',
     { class: `lobby main${dawn ? ' dawn' : ''}` },
-    el('div', { class: `lobby-scene${gyeolArt ? ' gyeol-art' : ''}` }, haunImg, wang),
     el(
       'div',
       { class: 'lobby-center' },
@@ -195,7 +144,6 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     if (n >= 1 && n <= lobby.menu.length && !lobby.menu[n - 1].locked) go(lobby.menu[n - 1].id);
   });
   (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
-  armed = true;
   // 로그인해 둔 세션이 풀렸으면(만료·다른 탭에서 로그아웃) 로그인 판으로
   const off = onCloudChange(() => {
     if (!section.isConnected) return off();
