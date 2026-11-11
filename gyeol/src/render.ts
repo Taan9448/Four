@@ -6,7 +6,7 @@ import { loadSprite, type SpriteAsset } from '../../src/render/assets';
 import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element, type Judgement } from './duel';
 import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
-import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W } from './layout';
+import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W, WORLD_ZOOM } from './layout';
 export { CONTACT, FOE_X, H, PLAYER_X, W } from './layout';
 
 /** icons_gyeol 칸 번호(명세 frame_notes와 같다) */
@@ -255,6 +255,13 @@ export function drawIcon(ctx: CanvasRenderingContext2D, sp: Sprites, n: number, 
   return true;
 }
 
+/** 인물 층 배율(layout WORLD_ZOOM)을 건다 */
+function worldZoom(ctx: CanvasRenderingContext2D): void {
+  ctx.translate(W / 2, GROUND);
+  ctx.scale(WORLD_ZOOM, WORLD_ZOOM);
+  ctx.translate(-W / 2, -GROUND);
+}
+
 export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx, now: number): void {
   // 캔버스가 W×H보다 크면(고해상도 화면, 품질 high) 그만큼 키워 그린다 — 좌표는 언제나 W×H 기준
   const k = ctx.canvas.width / W;
@@ -294,6 +301,9 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   fx.weatherLast = now;
   drawBackground(ctx, sp);
   drawWeather(ctx, fx.weather, false, now, density);
+  // 인물 층: 땅 가운데를 축으로 줄인다(배경은 그대로 화면을 채운다)
+  ctx.save();
+  worldZoom(ctx);
   foeScale = d.foeDef.scale ?? 1;
   readyFx = sp.fx.fx_gyeol_tech_ready ?? null;
   actorScale = d.data.player.scale ?? 1;
@@ -308,15 +318,20 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   if (fx.labels) drawCueLabels(ctx, d);
   drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
+  ctx.restore();
   drawWeather(ctx, fx.weather, true, now, density);
   ctx.restore();
   drawFocus(ctx, d, now);
   if (d.crisis && !d.result) drawCrisis(ctx, fx.crisisBeat, now);
+  // 판정 글자·연환·띠·말풍선도 인물 곁에 — 같은 배율로(말풍선 글자는 화면에서 같은 크기가 되게 되돌린다)
+  ctx.save();
+  worldZoom(ctx);
   drawCombo(ctx, fx, now);
   drawChain(ctx, fx);
   drawBanner(ctx, fx, now);
+  drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale / WORLD_ZOOM);
+  ctx.restore();
   drawClashBar(ctx, d, now);
-  drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale);
   if (fx.practice) drawPracticeBar(ctx, d.data.rules, fx.practice, now);
   drawFinisherName(ctx, fx.finisher, now);
   if (fx.finale) {

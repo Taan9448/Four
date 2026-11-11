@@ -123,22 +123,28 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
   if (cur < 0 || !openAt(cur)) cur = chs.findIndex((_, i) => openAt(i) && !isCleared(i));
   if (cur < 0) cur = chs.length - 1;
   const art = frameUrl('journey_band', 1, { realOnly: true });
-  const pos = (i: number) => chs[i].map ?? { x: 6 + (88 * i) / Math.max(1, chs.length - 1), y: 55, place: '' };
+  // 지도는 그림의 20~95% 높이만 보인다(위아래 빈 종이를 자름, CSS .story-map 2:1) — 장 자리(그림 기준 %)를 보이는 칸 기준으로 옮긴다
+  const CROP_TOP = 20;
+  const CROP_H = 75;
+  const pos = (i: number) => {
+    const m = chs[i].map ?? { x: 6 + (88 * i) / Math.max(1, chs.length - 1), y: 55, place: '' };
+    return { ...m, y: ((m.y - CROP_TOP) / CROP_H) * 100 };
+  };
 
   // 길: 장 순서대로 잇는 선(지나온 구간은 붉은 먹)
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'story-path');
-  svg.setAttribute('viewBox', '0 0 150 100');
+  svg.setAttribute('viewBox', '0 0 200 100');
   svg.setAttribute('preserveAspectRatio', 'none');
   for (let i = 1; i < chs.length; i++) {
     const a = pos(i - 1);
     const b = pos(i);
     const line = document.createElementNS(NS, 'path');
     // 살짝 휘어진 붓길
-    const mx = ((a.x + b.x) / 2) * 1.5;
-    const my = (a.y + b.y) / 2 - 6;
-    line.setAttribute('d', `M ${a.x * 1.5} ${a.y} Q ${mx} ${my} ${b.x * 1.5} ${b.y}`);
+    const mx = ((a.x + b.x) / 2) * 2;
+    const my = (a.y + b.y) / 2 - 8;
+    line.setAttribute('d', `M ${a.x * 2} ${a.y} Q ${mx} ${my} ${b.x * 2} ${b.y}`);
     line.setAttribute('class', isCleared(i - 1) && openAt(i) ? (isCleared(i) ? 'walked' : 'walked next') : 'ahead');
     svg.append(line);
   }

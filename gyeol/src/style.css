@@ -708,3 +708,78 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 @keyframes inkBreathe { 0%, 100% { filter: url(#ink-bleed); } 50% { filter: url(#ink-bleed) drop-shadow(0 0 6px rgba(200, 40, 30, 0.45)); } }
 @media (max-height: 820px) { .lobby-logo { width: 170px; height: 170px; font-size: 96px; margin-bottom: 12px; } }
 @media (prefers-reduced-motion: reduce) { .lobby-logo .ink-han { animation: none; } }
+
+/* ───────── 화면 최적화 2026-11-11(사용자 요청 — 「천외귀환」 참고) ─────────
+   전투: 배경이 창을 꽉 채우고(넘치는 쪽은 잘림), 인물 층은 render.ts WORLD_ZOOM으로 작게. 버튼은 아래 가운데에 겹쳐 띄운다.
+   이름판·창·버튼은 캔버스가 아니라 창 크기(--hud: 1280×720 = 1, 최대 1.3)로 키운다 */
+@media (min-width: 641px) and (min-height: 521px) {
+  #app:has(> .duel) { padding: 0; }
+  .duel { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; padding: 0; gap: 0; overflow: hidden; background: #050407; }
+  .duel .stage { position: absolute; inset: 0; width: auto; max-width: none; margin: 0; overflow: hidden; border-radius: 0; aspect-ratio: auto; }
+  .duel .stage > canvas.field { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); width: max(100vw, 177.78dvh); height: max(100vh, 56.25vw); height: max(100dvh, 56.25vw); translate: -50% -50%; max-width: none; border-radius: 0; }
+  .duel .pads { position: absolute; z-index: 5; left: 50%; bottom: 16px; translate: -50% 0; width: min(980px, 76vw); padding: 0; gap: 10px; grid-template-columns: repeat(5, 1fr); transform: scale(var(--hud, 1)); transform-origin: bottom center; }
+  .duel .pad { min-height: 60px; height: 60px; font-size: 21px; }
+  .duel .pad small { font-size: 12px; }
+  .duel .pad .pad-icon { width: 26px; height: 26px; }
+  .duel .foe-bar { top: 14px; width: 420px; transform: translateX(-50%) scale(var(--hud, 1)); transform-origin: top center; }
+  .duel .me-bar { left: 20px; bottom: calc(96px * var(--hud, 1)); width: 320px; transform: scale(var(--hud, 1)); transform-origin: bottom left; }
+  .duel .streak { transform: scale(var(--hud, 1)); transform-origin: top left; }
+  .duel .score { transform: translateX(-50%) scale(var(--hud, 1)); transform-origin: bottom center; bottom: calc(96px * var(--hud, 1)); }
+  .duel .survive { top: calc(110px * var(--hud, 1)); transform: translateX(-50%) scale(var(--hud, 1)); }
+  .duel .tut-panel { top: calc(80px * var(--hud, 1)); transform: scale(var(--hud, 1)); }
+  .duel .tip-card { transform: translate(-50%, -50%) scale(var(--hud, 1)); }
+  .duel .result > * { zoom: var(--hud, 1); }
+  .duel .pause-box { zoom: var(--hud, 1); }
+  .duel .pause-btn, .duel .fs { transform: scale(var(--hud, 1)); }
+  .duel .pause-btn { right: calc(14px + 48px * var(--hud, 1)); top: 14px; transform-origin: top right; }
+  .duel .fs { right: 14px; top: 14px; transform-origin: top right; }
+  .duel .result { background: rgba(6, 5, 8, 0.6); }
+  .duel .loading { position: absolute; inset: 0; }
+}
+
+/* 결투장·수련장 상대 카드: 한 줄에 더 많이, 카드는 작게 */
+.screen.arena, .screen.practice { width: min(1280px, 100%); }
+.foes { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.art-frames .foe-card { padding: 26px 22px 28px; }
+.foe-card img { max-height: 84px; }
+.foe-card .foe-text small { font-size: 13px; line-height: 1.45; }
+.foe-card .foe-text b { font-size: 17px; }
+
+/* 이야기 지도: 그림 위아래의 빈 종이를 잘라(그림 20~95% 높이만) 2:1로, 쪽지는 지도 아래에 — 한 화면에 다 들어오게 */
+.story-frame { width: min(100%, calc((100vh - 270px) * 2)); width: min(100%, calc((100dvh - 270px) * 2)); min-width: min(100%, 760px); }
+.story-map { aspect-ratio: 2 / 1; }
+.story-map.has-art { background-size: 100% auto; background-position: center 80%; }
+.story-card { position: relative; left: auto; bottom: auto; translate: none; width: 100%; margin-top: 12px; }
+.screen.story-screen { padding-bottom: 12px; }
+/* 설정 창: 넓은 화면이면 두 칸(왼쪽 계정 · 오른쪽 소리·화면) — 768px 높이에서도 한눈에 */
+@media (min-width: 900px) {
+  .settings-box { width: min(860px, 100%); display: grid; grid-template-columns: 320px 1fr; column-gap: 28px; align-content: start; }
+  .settings-box > h2 { grid-column: 1 / -1; }
+  .settings-box > .acct-row { grid-column: 1; grid-row: 2 / span 30; margin: 0; padding: 0 28px 0 0; border-bottom: 0; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+  .settings-box > :not(h2):not(.acct-row) { grid-column: 2; }
+}
+/* 낮은 화면(휴대폰 가로·작은 노트북 창, 높이 520px 이하): 전투 배경은 꽉 채우고 이름판·버튼을 줄인다, 메인은 한 화면에 */
+@media (orientation: landscape) and (max-height: 520px) {
+  .duel .stage { position: absolute; inset: 0; width: auto; }
+  .duel .stage > canvas.field { position: absolute; left: 50%; top: 50%; width: max(100vw, 177.78vh); width: max(100vw, 177.78dvh); height: max(100vh, 56.25vw); height: max(100dvh, 56.25vw); translate: -50% -50%; max-width: none; }
+  .duel .foe-bar { top: 6px; transform: translateX(-50%) scale(0.72); transform-origin: top center; }
+  .duel .me-bar { top: auto; left: calc(50% - 150px); bottom: 6px; width: 300px; transform: scale(0.66); transform-origin: bottom center; }
+  .duel .pad, .duel .back { white-space: nowrap; font-size: 15px; width: 24vh; min-width: 104px; }
+  .duel .pad.parry, .duel .pad.attack { font-size: 17px; }
+  .duel .pad .pad-icon { width: 20px; height: 20px; }
+  .duel .pause-btn { right: 54px; top: 6px; }
+  .duel .fs { top: 6px; }
+  .duel .result > *, .duel .pause-box { zoom: 0.8; }
+  .lobby.main { height: 100vh; height: 100dvh; min-height: 0; padding-bottom: 0; grid-template-columns: 1fr minmax(240px, 300px) 1fr; }
+  .lobby-logo { width: 104px; height: 104px; font-size: 58px; margin-bottom: 6px; }
+  .lobby.main .lobby-menu { gap: 6px; }
+  .lobby.main .lobby-menu .menu-btn { width: 220px; min-height: 0; height: 52px; }
+  .title-plate { transform: scale(0.72); transform-origin: bottom left; left: 10px; bottom: 10px; }
+  .lobby-corner { transform: scale(0.75); transform-origin: bottom right; right: 10px; bottom: 26px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .duel { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; padding: 0; overflow: hidden; }
+}
+/* 결과·일시 정지 창이 뜨면 아래 버튼·이름판은 옅게 물러난다 */
+.duel:has(.result:not([hidden])) .pads, .duel:has(.pause:not([hidden])) .pads { opacity: 0.2; pointer-events: none; transition: opacity 0.3s; }
+.duel:has(.result:not([hidden])) .me-bar { opacity: 0.35; transition: opacity 0.3s; }
