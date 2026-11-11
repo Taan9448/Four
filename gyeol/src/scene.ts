@@ -546,7 +546,7 @@ export function drawFinisherName(ctx: CanvasRenderingContext2D, f: Finisher | nu
   ctx.shadowBlur = 16;
   ctx.lineWidth = 5;
   ctx.strokeStyle = 'rgba(0,0,0,0.9)';
-  const label = `「${f.def.hanja}」 ${f.def.name}`;
+  const label = f.def.name;
   ctx.strokeText(label, 0, 1);
   ctx.fillStyle = '#ffe9b0';
   ctx.fillText(label, 0, 1);
@@ -718,7 +718,7 @@ export function drawFocus(ctx: CanvasRenderingContext2D, d: Duel, now: number): 
   ctx.font = '800 22px "Song Myung", serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = `rgba(200,225,255,${0.85 * k})`;
-  ctx.fillText('심안(心眼)', W / 2, H - 22);
+  ctx.fillText('심안', W / 2, H - 22);
   ctx.restore();
 }
 

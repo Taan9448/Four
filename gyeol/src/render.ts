@@ -255,6 +255,9 @@ export function drawIcon(ctx: CanvasRenderingContext2D, sp: Sprites, n: number, 
   return true;
 }
 
+/** 결 위 표식 글자(2026-11-11: 한자 대신 한글 — 위험·겨루기·보호·숨·반격 자세·가짜) */
+const MARK_FONT = '800 28px "Nanum Myeongjo", serif';
+
 /** 인물 층 배율(layout WORLD_ZOOM)을 건다 */
 function worldZoom(ctx: CanvasRenderingContext2D): void {
   ctx.translate(W / 2, GROUND);
@@ -662,13 +665,13 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   if (c.unblockable) {
     ctx.shadowBlur = 0;
     const pulse = 0.6 + 0.4 * Math.sin(now / 80);
-    ctx.font = '800 34px "Song Myung", serif';
+    ctx.font = MARK_FONT;
     ctx.textAlign = 'center';
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-    ctx.strokeText('危', FOE_X, GROUND - 230 * foeScale);
+    ctx.strokeText('위험', FOE_X, GROUND - 230 * foeScale);
     ctx.fillStyle = `rgba(255,70,60,${pulse})`;
-    ctx.fillText('危', FOE_X, GROUND - 230 * foeScale);
+    ctx.fillText('위험', FOE_X, GROUND - 230 * foeScale);
   }
   // 왕녀의 얼음(護 — 받아치지 말고 막거나 피한다) · 흐름이 멈추는 숨(息 — 이어서 세 번 받는다)
   // 겨루기 기회: 칼 표식(劍)과 '맞받아치기 J' — 고리가 겹치는 순간에 노려 베면 칼끼리 맞부딪힌다
@@ -676,13 +679,13 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
     ctx.shadowBlur = 0;
     const near = c.left <= r.clashWindow * 2.5;
     const pulse = 0.65 + 0.35 * Math.sin(now / 70);
-    ctx.font = '800 34px "Song Myung", serif';
+    ctx.font = MARK_FONT;
     ctx.textAlign = 'center';
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-    ctx.strokeText('劍', FOE_X, GROUND - 230 * foeScale);
+    ctx.strokeText('겨루기', FOE_X, GROUND - 230 * foeScale);
     ctx.fillStyle = `rgba(255,190,90,${pulse})`;
-    ctx.fillText('劍', FOE_X, GROUND - 230 * foeScale);
+    ctx.fillText('겨루기', FOE_X, GROUND - 230 * foeScale);
     ctx.font = '800 15px "Nanum Myeongjo", serif';
     const label = near ? '지금 베기 J!' : '겨루기 — 맞부딪힐 때 J';
     ctx.lineWidth = 4;
@@ -700,8 +703,8 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   }
   if (c.fragile || c.breath || c.stance) {
     ctx.shadowBlur = 0;
-    const mark = c.fragile ? '護' : c.breath ? '息' : '構';
-    ctx.font = '800 34px "Song Myung", serif';
+    const mark = c.fragile ? '보호' : c.breath ? '숨' : '반격 자세';
+    ctx.font = MARK_FONT;
     ctx.textAlign = 'center';
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
@@ -716,13 +719,13 @@ function drawCue(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   // 집중(심안): 속임수의 가짜 결이 드러난다(虛)
   if (c.focus && c.faking) {
     ctx.shadowBlur = 0;
-    ctx.font = '800 30px "Song Myung", serif';
+    ctx.font = MARK_FONT;
     ctx.textAlign = 'center';
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-    ctx.strokeText('虛', cx, cy - 46);
+    ctx.strokeText('가짜', cx, cy - 46);
     ctx.fillStyle = 'rgba(190,220,255,0.95)';
-    ctx.fillText('虛', cx, cy - 46);
+    ctx.fillText('가짜', cx, cy - 46);
   }
   // 속임수: 가짜 순간이 지나면 진짜 결이 다시 좁혀 든다는 표시
   if (!c.faking && d.foe.fakeAt !== null) {

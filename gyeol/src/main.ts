@@ -9,6 +9,7 @@ import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
+import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
 import { loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
@@ -49,6 +50,7 @@ const currentQuality = (): Exclude<Quality, 'auto'> => {
 function applySettings(): void {
   const st = loadSave().settings;
   setVolumes({ master: st.master, bgm: st.bgm, sfx: st.sfx });
+  setMusicVolumes(st.master, st.bgm, st.sfx);
   setShakeScale(st.shake);
 }
 
@@ -60,6 +62,10 @@ const nav: Nav = {
     document.querySelector('.settings-panel')?.remove();
     if (s !== 'title') document.documentElement.classList.remove('on-title');
     window.scrollTo(0, 0);
+    // 화면마다 곡(music.json screens) — 에필로그를 마치면 뒤뜰은 새벽 곡
+    const tune = MUSIC.screens[s] ?? null;
+    setMusic(tune === 'yard' && loadSave().story.cleared.includes('epilogue') ? 'dawn' : tune);
+    setDuck(false);
     if (s === 'title') renderTitle(app, nav);
     else if (s === 'lobby') renderLobby(app, nav);
     else if (s === 'arena') renderArena(app, nav, data);
@@ -128,7 +134,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       : el(
           'div',
           { class: 'me-bar' },
-          el('div', { class: 'me-face', style: face ? `background-image:url("${face}")` : '' }, face ? '' : el('b', {}, '雲')),
+          el('div', { class: 'me-face', style: face ? `background-image:url("${face}")` : '' }, face ? '' : el('b', {}, '하운')),
           el(
             'div',
             { class: 'me-body' },
@@ -159,7 +165,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const pauseEl = el(
     'div',
     { class: 'pause', hidden: '', role: 'dialog', 'aria-modal': 'true', 'aria-label': '일시 정지' },
-    el('div', { class: 'pause-box' }, el('p', { class: 'pause-mark', 'aria-hidden': 'true' }, '止'), el('h2', {}, '일시 정지'), el('p', { class: 'kicker' }, opts.title ?? foeDef.title), el('div', { class: 'res-row' }, resumeBtn, pauseAgain, pauseLeave)),
+    el('div', { class: 'pause-box' }, el('h2', {}, '일시 정지'), el('p', { class: 'kicker' }, opts.title ?? foeDef.title), el('div', { class: 'res-row' }, resumeBtn, pauseAgain, pauseLeave)),
   );
   const overlay = el('div', { class: 'result', hidden: '' });
   // 버티기(곽도진): 받아 낸 수, 처음 나오는 순간 안내 카드, 서장 튜토리얼 판
@@ -182,6 +188,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
   const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave()));
   loading.remove();
+  // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
+  setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : battleTrack(foeDef), rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
+  setDuck(false);
   // 대결 중 화면이 꺼지지 않게(지원하는 브라우저만)
   let wake: { release(): Promise<void> } | null = null;
   void (navigator as Navigator & { wakeLock?: { request(t: 'screen'): Promise<{ release(): Promise<void> }> } }).wakeLock
@@ -225,6 +234,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     if (on && (d.result || !overlay.hidden)) return;
     paused = on;
     pauseEl.hidden = !on;
+    setDuck(on);
     pauseBtn.classList.toggle('on', on);
     const now = performance.now();
     if (on) {
@@ -459,6 +469,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       switch (ev.type) {
         case 'parry': {
           mark(ev.lead, ev.judgement);
+          musicalHit(ev.judgement === 'perfect' ? 'perfect' : 'parry', d.streak);
           sfx('block');
           sfx(ev.element === 'lightning' ? 'lightning' : ev.element === 'ice' ? 'ice' : ev.element === 'fire' ? 'fire' : 'snap', { volume: 0.8 });
           fx.blooms.push({ x: CONTACT.x - 20, y: CONTACT.y, born: now, color: bloomColor(ev.element), big: ev.heavy });
@@ -509,6 +520,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         case 'hit': {
           if (!ev.unblockable) mark(ev.lead, 'miss');
+          musicalHit('miss');
+          setIntensity(streakTier(d));
           sfx(ev.heavy ? 'hit_heavy' : 'hit');
           const sprite = ev.element === 'fire' ? 'fx_hit_fire' : ev.element === 'ice' ? 'fx_hit_ice' : ev.element === 'lightning' ? 'fx_hit_shock' : 'fx_hit_blunt';
           fx.bursts.push({ x: PLAYER_X + 10, y: CONTACT.y + 10, sprite, born: now, scale: ev.heavy ? 1.1 : 0.8 });
@@ -572,7 +585,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           cutin.className = `cutin tech-${t.id}${cg ? ' has-cg' : ''}`;
           cutin.replaceChildren(
             cg ? el('img', { class: 'cg', src: cg, alt: '' }) : stand ? el('img', { src: stand, alt: '' }) : '',
-            el('div', { class: 'cutin-text' }, el('div', { class: 'hanja' }, t.hanja), el('div', { class: 'tname' }, t.name), el('div', { class: 'tline' }, t.line)),
+            el('div', { class: 'cutin-text' }, el('div', { class: 'tname' }, t.name), el('div', { class: 'tline' }, t.line)),
           );
           cutin.hidden = false;
           setTimeout(() => (cutin.hidden = true), 1150);
@@ -627,7 +640,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', 30);
           break;
         case 'crisis':
-          // 배수의 진: 붉은 가장자리와 심장 소리, PERFECT 폭이 넓어진다
+          // 배수의 진: 붉은 가장자리와 심장 소리, PERFECT 폭이 넓어진다 — 곡은 물속처럼 멀어진다
+          setCrisis(true);
           sfx('power', { volume: 0.9 });
           flash('#ff2a2a', 320, 0.35);
           fx.crisisBeat = now;
@@ -648,6 +662,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         case 'streak': {
           const tier = streakTier(d);
+          // 연속 박자 단계만큼 곡에 층이 쌓인다(작은 북 → 선율 겹침 → 종)
+          setIntensity(tier);
           fx.combo = { n: ev.streak, tier, born: now, up: tier > lastTier };
           if (tier > lastTier) {
             const names = ['', '결이 보인다', '결을 탄다', '결과 하나가 된다'];
@@ -660,6 +676,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'stagger':
           sfx('snap');
+          musicalHit('stagger');
           // 베지 않는다(7장): 결정타 대신 비틀거림을 센다
           if (d.opts.finish === 'stagger' && d.mode === 'duel') {
             judge(fx, 'BREAK', '비틀거린다 — 베지 않는다', now, 'foe');
@@ -677,6 +694,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         case 'deathblow':
           sfx('slam_9');
+          musicalHit('deathblow');
           lastDeathblow = ev.t;
           // 적마다 다른 결정타(Codex fx_gyeol_finisher_<id>가 오면 그 그림만, 없으면 공통 일섬 + 적별 코드 연출)
           if (foeDef.finisher) fx.finisher = { def: foeDef.finisher, sprite: `fx_gyeol_finisher_${foeDef.id}`, born: now };
@@ -692,6 +710,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         case 'lose':
           // 끝 장면: 느린 화면으로 쓰러지는 쪽에 다가가고, 위아래로 검은 띠
           sfx(ev.type === 'win' ? 'victory' : 'defeat');
+          musicalHit(ev.type);
+          setIntensity(0);
+          setCrisis(false);
+          setDuck(true);
           slowUntil = now + 1600;
           fx.finale = { born: now, x: ev.type === 'win' && !(ev.type === 'win' && ev.survived) ? FOE_X - 60 : PLAYER_X + 20 };
           fx.combo = null;
@@ -711,6 +733,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           break;
         case 'phase':
           // 다단계: 격퇴했지만 다시 일어선다 — 패턴·기믹이 바뀐다
+          musicalHit('phase');
           sfx('roar');
           sfx('enrage', { volume: 0.8 });
           // 결정타로 넘어가면 결정타 이름이 먼저 — 단계 띠는 조금 뒤에
@@ -728,7 +751,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           sfx('hit_heavy');
           flash('#3a0000', 260, 0.5);
           addShake(fx, now, 12, 300);
-          text(PLAYER_X, CONTACT.y - 140, `構 — 되받아 맞았다 -${ev.damage}`, '#ff9a8a', 26);
+          text(PLAYER_X, CONTACT.y - 140, `반격 자세 — 되받아 맞았다 -${ev.damage}`, '#ff9a8a', 26);
           break;
         case 'stanceBreak':
           sfx('snap');

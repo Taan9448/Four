@@ -41,7 +41,7 @@ export interface Nav {
 interface LobbyData {
   menu: { id: string; name: string; note: string; locked?: string }[];
   /** 오른쪽 아래 둥근 표식(옷장·도감·설정·「천외귀환」 바로가기) */
-  corner: { id: string; hanja: string; name: string; note: string }[];
+  corner: { id: string; name: string; note: string }[];
 }
 const lobby = lobbyRaw as LobbyData;
 
@@ -124,7 +124,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     return el('li', { class: locked ? 'locked' : '' }, b);
   });
   const corner = lobby.corner.map((c) =>
-    button([el('b', {}, c.hanja), el('span', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` }),
+    button([el('b', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` }),
   );
   // 뒤뜰 그림 위 잔잔한 움직임(달무리·등불·안개·별·반딧불·댓잎 — lobby-fx.ts). 그림이 아직 없으면 CSS 바탕 그대로
   const bg = realArt('bg_gyeol_lobby', 1);
@@ -205,7 +205,7 @@ function helpBox(): HTMLElement {
     { class: 'help' },
     el('summary', {}, '조작과 규칙'),
     el('p', {}, el('kbd', {}, 'K'), '·', el('kbd', {}, 'Space'), ' 받기 — 좁혀 드는 고리가 과녁 고리와 겹칠 때(금빛) 누르면 패링. 이르면 막기.'),
-    el('p', {}, el('kbd', {}, 'L'), '·', el('kbd', {}, 'Shift'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(危)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
+    el('p', {}, el('kbd', {}, 'L'), '·', el('kbd', {}, 'Shift'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(위험)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
     el('p', {}, el('kbd', {}, 'J'), '·화면 클릭 베기 — 패링·간파 뒤 적에게 금이 보이는 동안 베면 반격(3배). 적 체간이 가득 차면 결정타.'),
     el('p', {}, el('kbd', {}, 'I'), ' 기술 — 결 연환(끊기지 않고 받은 수)이 차면 열린다. ', el('kbd', {}, 'U'), ' 집중 — 게이지가 차면 시간이 느려지고 결이 처음부터 보인다.'),
     el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
@@ -231,8 +231,8 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
   const dummy = data.foes.find((f) => f.practice);
   const save = loadSave();
   const redraw = () => renderPractice(app, nav, data);
-  const tab = (id: 'drill' | 'rhythm', label: string, han: string) => {
-    const b = button([el('b', { class: 'tab-han', 'aria-hidden': 'true' }, han), el('span', {}, label)], `prac-tab${practiceTab === id ? ' on' : ''}`, () => {
+  const tab = (id: 'drill' | 'rhythm', label: string) => {
+    const b = button([el('span', {}, label)], `prac-tab${practiceTab === id ? ' on' : ''}`, () => {
       practiceTab = id;
       redraw();
     }, { role: 'tab', 'aria-selected': String(practiceTab === id) });
@@ -275,7 +275,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
       'section',
       { class: 'screen practice' },
       header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다.'),
-      el('div', { class: 'prac-tabs', role: 'tablist' }, tab('drill', '수련', '修'), tab('rhythm', '박자 도전', '拍')),
+      el('div', { class: 'prac-tabs', role: 'tablist' }, tab('drill', '수련'), tab('rhythm', '박자 도전')),
       body,
     ),
   );
@@ -389,13 +389,13 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       img ? el('img', { src: img, alt: '' }) : '',
       el('b', {}, seen ? f.title : '???'),
       el('small', {}, seen ? f.note : '아직 겨뤄 보지 않았다.'),
-      seen && f.finisher ? el('small', { class: 'fin' }, `결정타 「${f.finisher.hanja}」 ${f.finisher.name}`) : '',
+      seen && f.finisher ? el('small', { class: 'fin' }, `결정타 「${f.finisher.name}」`) : '',
       el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell' }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`])))),
     );
   });
   const techs = data.techs.map((t) => {
     const cg = realArt(`cg_gyeol_tech_${t.id}`);
-    return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', { class: 'hanja' }, t.hanja), el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
+    return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
   });
   const st = save.stats;
   const min = Math.round(st.playMs / 60000);
