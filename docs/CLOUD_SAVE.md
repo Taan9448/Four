@@ -68,3 +68,33 @@ create policy "saves: update own" on public.saves for update to authenticated us
 2. 로그인하면 시작 화면 왼쪽 아래 명패에 아이디·저장 상태·로그아웃이 보이고, 설정 › 저장 맨 위에 「계정과 맞춤 · 시각」이 보인다.
 3. Supabase → Table Editor → `saves`에 행 하나가 생긴다(`rev`가 진행할 때마다 오른다).
 4. 다른 기기·브라우저에서 같은 계정으로 로그인하면 그 기록으로 이어진다(둘 다 기록이 있으면 어느 쪽을 쓸지 묻는다).
+
+## 5. 「결」 저장 테이블 (2026-11-11, 한 번만)
+
+「결」(`/Four/gyeol/`)은 같은 프로젝트·같은 계정(아이디 그대로)으로 로그인하고, 기록은 「천외귀환」 `saves`와 따로 이 표에 올린다. 모양과 행 보안은 `saves`와 같다.
+SQL Editor → New query → 붙여 넣고 Run. 이 SQL을 실행하기 전에는 「결」에서 로그인해도 "계정 표(gyeol_saves)가 아직 없다"고 나오고 기록은 이 기기에만 저장된다.
+
+```sql
+create table if not exists public.gyeol_saves (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  data jsonb not null,
+  rev bigint not null default 1,
+  updated_at timestamptz not null default now(),
+  device text
+);
+
+alter table public.gyeol_saves enable row level security;
+
+drop policy if exists "gyeol_saves: read own" on public.gyeol_saves;
+create policy "gyeol_saves: read own" on public.gyeol_saves for select to authenticated using ((select auth.uid()) = user_id);
+
+drop policy if exists "gyeol_saves: insert own" on public.gyeol_saves;
+create policy "gyeol_saves: insert own" on public.gyeol_saves for insert to authenticated with check ((select auth.uid()) = user_id);
+
+drop policy if exists "gyeol_saves: update own" on public.gyeol_saves;
+create policy "gyeol_saves: update own" on public.gyeol_saves for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+```
+
+- `data`는 「결」 저장(`gyeol.save`)에서 설정(소리·판정 보정·화면 품질 — 기기마다 다르다)을 뺀 것이다. 수련 Lv.은 이 기록(이김·PERFECT·마친 장)으로 셈하므로 함께 따라간다.
+- 로그인 상태는 「천외귀환」과 같은 브라우저 키를 써서, 같은 주소에서 한쪽에 로그인하면 다른 쪽도 로그인돼 있다(로그아웃도 함께).
+- 확인: 「결」 시작 화면에서 로그인 → Table Editor → `gyeol_saves`에 행 하나, 대결을 마칠 때마다 `rev`가 오른다.

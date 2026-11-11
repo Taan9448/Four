@@ -1,75 +1,161 @@
-// 「결」 계정·수련(2026-11-10 목업): 「천외귀환」 시작 화면과 같은 방식 — 로그인 · 회원가입 두 탭 + 「게스트로 시작」 글자 한 줄,
+// 「결」 계정·수련(2026-11-10 목업 → 2026-11-11 실제 연결): 「천외귀환」 시작 화면과 같은 방식 — 로그인 · 회원가입 두 탭 + 「게스트로 시작」 글자 한 줄,
 // 들어간 뒤에는 시작 화면 왼쪽 아래 명패(인장 + 아이디·저장 상태·로그아웃 + 修 수련 Lv.). 설정 맨 위에도 「계정」 칸.
-// 지금은 서버(Supabase)에 닿지 않는 목업이다: 규칙 검사(아이디·비밀번호)는 「천외귀환」 것을 그대로 쓰고, 로그인 상태는 이 탭에만 둔다.
-// 실제로 잇는 계획은 gyeol/docs/GAME_DESIGN.md 7-6절.
+// 로그인·올리기는 cloud.ts(같은 Supabase 계정, 「결」 기록은 gyeol_saves 표). 설계는 gyeol/docs/GAME_DESIGN.md 7-6절.
 import lobbyRaw from '../data/lobby.json';
-import { checkId, checkPassword, ID_RULE, normalizeId, PASSWORD_MIN } from '../../src/ui/cloud-id';
+import storyRaw from '../data/story.json';
+import { ID_RULE, PASSWORD_MIN } from '../../src/ui/cloud-id';
+import { cloudEnabled, cloudState, hasStoredSession, onCloudChange, signInWithId, signOut as cloudSignOut, syncNow } from './cloud';
+import type { CloudData, Remote, SyncStatus } from './cloud-sync';
 import { el } from './dom';
 import { loadSave } from './save';
 
 interface AccountData {
-  mock: boolean;
   training: { xp: { win: number; perfect: number; chapter: number }; need: { base: number; step: number } };
 }
 const ACCOUNT = (lobbyRaw as unknown as { account: AccountData }).account;
+const CHAPTERS = (storyRaw as unknown as { chapters: unknown[] }).chapters.length;
 
-export type AccountKind = 'signed-in' | 'guest' | 'none';
+/** signed-in: 로그인함 · pending: 로그인해 둔 세션을 확인하는 중(또는 오프라인) · guest: 이번 탭에서 게스트를 골랐다 · none: 아직 고르지 않았다 */
+export type AccountKind = 'signed-in' | 'pending' | 'guest' | 'none';
 export interface AccountState {
   kind: AccountKind;
   name: string;
 }
 
-const KEY = 'gyeol.mockAccount';
+/** 이번 탭에서 게스트를 골랐는가(다음 접속에는 다시 묻는다 — 「천외귀환」과 같다) */
 const GUEST_KEY = 'gyeol.guest';
-
-function session(): Storage | null {
+let guestMemory = false;
+function guestChosen(): boolean {
   try {
-    return typeof sessionStorage === 'undefined' ? null : sessionStorage;
+    return sessionStorage.getItem(GUEST_KEY) === '1';
   } catch {
-    return null;
+    return guestMemory;
   }
 }
-/** 저장이 막힌 창이면 이번 화면 동안만 */
-let memory: { name: string | null; guest: boolean } = { name: null, guest: false };
-
-export function accountState(): AccountState {
-  const s = session();
-  let name = memory.name;
-  let guest = memory.guest;
+function setGuest(on: boolean): void {
+  guestMemory = on;
   try {
-    if (s) {
-      name = s.getItem(KEY);
-      guest = s.getItem(GUEST_KEY) === '1';
-    }
-  } catch {
-    /* 메모리 값 */
-  }
-  if (name) return { kind: 'signed-in', name };
-  return guest ? { kind: 'guest', name: '게스트' } : { kind: 'none', name: '' };
-}
-
-function put(name: string | null, guest: boolean): void {
-  memory = { name, guest };
-  const s = session();
-  try {
-    if (name) s?.setItem(KEY, name);
-    else s?.removeItem(KEY);
-    if (guest) s?.setItem(GUEST_KEY, '1');
-    else s?.removeItem(GUEST_KEY);
+    if (on) sessionStorage.setItem(GUEST_KEY, '1');
+    else sessionStorage.removeItem(GUEST_KEY);
   } catch {
     /* 메모리만 */
   }
 }
 
-export const signOut = (): void => put(null, false);
-export const chooseGuest = (): void => put(null, true);
+export function accountState(): AccountState {
+  const { user } = cloudState();
+  if (user) return { kind: 'signed-in', name: user.name };
+  if (cloudEnabled() && hasStoredSession()) return { kind: 'pending', name: '' };
+  if (!cloudEnabled() || guestChosen()) return { kind: 'guest', name: '게스트' };
+  return { kind: 'none', name: '' };
+}
 
-/** 목업 로그인: 「천외귀환」과 같은 규칙으로 검사만 하고 이 탭에 이름을 둔다 */
-export function mockSignIn(id: string, pw: string, mode: 'login' | 'signup', pw2?: string): { ok: true } | { ok: false; message: string } {
-  const bad = checkId(id) ?? checkPassword(pw, mode === 'signup' ? (pw2 ?? '') : undefined);
-  if (bad) return { ok: false, message: bad };
-  put(normalizeId(id), false);
-  return { ok: true };
+export const chooseGuest = (): void => setGuest(true);
+
+/** 로그아웃(바뀐 것을 먼저 올린다). 게스트도 고르지 않은 상태로 돌아가 로그인 판이 다시 뜬다 */
+export async function signOut(): Promise<void> {
+  if (cloudState().user) await cloudSignOut().catch(() => undefined);
+  setGuest(false);
+}
+
+/** el이 화면에서 빠지면 그만 듣는다 */
+function whileShown(node: HTMLElement, fn: () => void): void {
+  const off = onCloudChange(() => {
+    if (!node.isConnected) return off();
+    fn();
+  });
+}
+
+const when = (t: string | null | undefined): string => {
+  const d = t ? new Date(t) : null;
+  return !d || Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+};
+
+function statusText(s: SyncStatus, last: string | null): string {
+  switch (s.state) {
+    case 'syncing':
+      return '맞추는 중…';
+    case 'offline':
+      return '서버에 닿지 않는다 — 이 기기에 저장하고, 연결되면 올린다';
+    case 'held':
+      return '기록을 고르지 않아 멈췄다 — 「지금 동기화」로 다시 고른다';
+    case 'error':
+      return `올리지 못했다 — ${s.message}`;
+    case 'synced':
+      return `계정과 맞춤 · ${when(s.at)}`;
+    default:
+      return last ? `계정과 맞춤 · ${when(last)}` : '';
+  }
+}
+
+const PLATE_SYNC: Partial<Record<SyncStatus['state'], string>> = { syncing: '☁ 맞추는 중', offline: '오프라인', held: '동기화 멈춤', error: '올리지 못함' };
+
+/* ───────── 어느 기록으로 이어 할까 ───────── */
+
+function side(title: string, d: CloudData | null, foot: string): HTMLElement {
+  if (!d) return el('div', { class: 'cloud-side' }, el('h3', {}, title), el('p', { class: 'cloud-empty' }, '기록 없음 — 처음부터'), el('small', {}, foot));
+  const t = trainingLevel(xpOf(d));
+  return el(
+    'div',
+    { class: 'cloud-side' },
+    el('h3', {}, title),
+    el(
+      'ul',
+      {},
+      el('li', {}, `수련 Lv.${t.level}`),
+      el('li', {}, `이야기 ${d.story.cleared.length} / ${CHAPTERS}장`),
+      el('li', {}, `이긴 대결 ${d.stats.wins} / ${d.stats.duels}`),
+      el('li', {}, `업적 ${d.achievements.length}`),
+    ),
+    el('small', {}, foot),
+  );
+}
+
+/** 이 기기 기록과 계정 기록이 다를 때 어느 쪽을 쓸지. 닫으면 null(「지금 동기화」 전까지 멈춤) */
+export function askWhich(local: CloudData, remote: Remote | null): Promise<'local' | 'remote' | null> {
+  return new Promise((resolve) => {
+    let picked: 'local' | 'remote' | null = null;
+    const mine = el('button', { class: 'btn', type: 'button' }, remote ? '이 기기 기록으로(계정을 덮는다)' : '이 기록을 이 계정에 올린다');
+    const theirs = el('button', { class: 'btn primary', type: 'button' }, remote ? '계정 기록으로(이 기기를 덮는다)' : '처음부터 시작');
+    const box = el(
+      'div',
+      { class: 'acct-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': '어느 기록으로 이어 할까' },
+      el(
+        'div',
+        { class: 'acct-modal-box wide' },
+        el('span', { class: 'acct-seal', 'aria-hidden': 'true' }, '名'),
+        el('h2', {}, '어느 기록으로 이어 할까'),
+        el(
+          'p',
+          {},
+          remote
+            ? '이 기기의 기록과 계정의 기록이 다르다. 고르지 않은 쪽은 이 브라우저에 한 벌(gyeol.backup) 남는다.'
+            : '이 기기의 기록은 다른 계정에서 쓰던 것이다. 이 계정에 올릴까, 이 계정은 처음부터 시작할까? (처음부터를 고르면 이 기록은 한 벌 남는다)',
+        ),
+        el(
+          'div',
+          { class: 'cloud-sides' },
+          side('이 기기', local, '지금 이 브라우저'),
+          side(remote ? '계정' : '이 계정', remote?.data ?? null, remote ? `마지막으로 올린 때 ${when(remote.updatedAt)}${remote.device ? ` · ${remote.device}` : ''}` : '아직 올린 기록이 없다'),
+        ),
+        el('div', { class: 'acct-actions' }, mine, theirs),
+      ),
+    );
+    const close = () => {
+      window.removeEventListener('keydown', onKey, true);
+      box.remove();
+      resolve(picked);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      e.stopPropagation();
+      if (e.key === 'Escape') close();
+    };
+    mine.addEventListener('click', () => ((picked = 'local'), close()));
+    theirs.addEventListener('click', () => ((picked = 'remote'), close()));
+    window.addEventListener('keydown', onKey, true);
+    document.body.append(box);
+    requestAnimationFrame(() => theirs.focus());
+  });
 }
 
 /* ───────── 수련 Lv. ───────── */
@@ -81,12 +167,13 @@ export interface Training {
   xp: number;
 }
 
-/** 수련 경험치: 이 기기 기록(이김·PERFECT·마친 장)으로 셈한다 */
-export function trainingXp(): number {
-  const s = loadSave();
+/** 수련 경험치: 기록(이김·PERFECT·마친 장)으로 셈한다. 기록이 계정에 올라가므로 경험치도 함께 따라간다 */
+export function xpOf(d: Pick<CloudData, 'stats' | 'story'>): number {
   const x = ACCOUNT.training.xp;
-  return s.stats.wins * x.win + s.stats.perfect * x.perfect + s.story.cleared.length * x.chapter;
+  return d.stats.wins * x.win + d.stats.perfect * x.perfect + d.story.cleared.length * x.chapter;
 }
+
+export const trainingXp = (): number => xpOf(loadSave());
 
 export function trainingLevel(xp: number): Training {
   const { base, step } = ACCOUNT.training.need;
@@ -180,14 +267,25 @@ export function loginPanel(opts: { onDone: () => void; onGuest?: () => void; com
     msg.textContent = '';
   };
   const form = el('form', { class: 'login-form' }, id, pw, pw2, hint, msg, submit);
-  form.addEventListener('submit', (e) => {
+  let busy = false;
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const r = mockSignIn(id.value, pw.value, mode, pw2.value);
+    if (busy) return;
+    busy = true;
+    submit.disabled = true;
+    const label = submit.textContent;
+    submit.textContent = mode === 'login' ? '들어가는 중…' : '가입하는 중…';
+    msg.textContent = '';
+    const r = await signInWithId(id.value, pw.value, mode, pw2.value);
+    busy = false;
+    submit.disabled = false;
+    submit.textContent = label;
     if (!r.ok) {
       msg.textContent = r.message;
       return;
     }
     pw.value = pw2.value = '';
+    setGuest(false);
     opts.onDone();
   });
   // 키 입력이 화면 단축키(Enter = 들어가기 등)로 새지 않게
@@ -208,49 +306,76 @@ export function loginPanel(opts: { onDone: () => void; onGuest?: () => void; com
     el('div', { class: 'login-tabs', role: 'tablist' }, tabs.login, tabs.signup),
     form,
     guest,
-    ACCOUNT.mock ? el('p', { class: 'mock-tag' }, '목업 — 아직 서버에 올리지 않는다. 기록은 이 브라우저에 그대로 저장된다.') : '',
   );
 }
 
 /* ───────── 명패(시작 화면 왼쪽 아래) ───────── */
 
-/** 인장 + 아이디·저장 상태·로그아웃 + 修 수련 Lv. onChange: 로그아웃·로그인하기를 누르면 화면을 다시 그린다 */
+/** 인장 + 아이디·저장 상태·로그아웃 + 修 수련 Lv. onChange: 로그아웃·로그인하기를 누르면 화면을 다시 그린다. 저장 상태는 저절로 바뀐다 */
 export function playerPlate(onChange: () => void): HTMLElement {
-  const a = accountState();
-  const signed = a.kind === 'signed-in';
-  const action = el('button', { class: 'link-btn', type: 'button' }, signed ? '로그아웃' : '로그인 · 회원가입');
-  action.addEventListener('click', () => {
-    signOut();
-    onChange();
-  });
-  return el(
-    'div',
-    { class: `title-plate ${signed ? 'signed-in' : 'guest'}` },
-    el('span', { class: 'plate-seal', 'aria-hidden': 'true' }, signed ? '名' : '客'),
-    el(
-      'div',
-      { class: 'plate-body' },
-      el('div', { class: 'plate-name' }, el('b', {}, a.name || '게스트'), el('small', { class: `plate-sync ${signed ? 'sync-synced' : 'sync-guest'}` }, signed ? (ACCOUNT.mock ? '☁ 저장됨(목업)' : '☁ 저장됨') : '이 기기에만 저장')),
-      trainingLine(),
-      el('div', { class: 'plate-actions' }, action),
-    ),
-  );
+  const plate = el('div', { class: 'title-plate' });
+  const paint = () => {
+    const a = accountState();
+    const { status } = cloudState();
+    let seal = '客';
+    let name = '게스트';
+    let sync = '이 기기에만 저장';
+    let syncClass = 'sync-guest';
+    let action: HTMLElement | string = '';
+    if (a.kind === 'signed-in') {
+      [seal, name, sync, syncClass] = ['名', a.name, PLATE_SYNC[status.state] ?? '☁ 저장됨', `sync-${status.state}`];
+      action = el('button', { class: 'link-btn', type: 'button' }, '로그아웃');
+      action.addEventListener('click', () => void signOut().then(onChange));
+    } else if (a.kind === 'pending') {
+      const off = status.state === 'offline';
+      [seal, name, sync, syncClass] = ['名', off ? '오프라인' : '로그인 확인 중…', off ? '이 기기에 저장, 연결되면 올린다' : '', off ? 'sync-offline' : 'sync-syncing'];
+    } else if (cloudEnabled()) {
+      action = el('button', { class: 'link-btn', type: 'button' }, '로그인 · 회원가입');
+      action.addEventListener('click', () => (setGuest(false), onChange()));
+    }
+    plate.className = `title-plate ${a.kind === 'none' ? 'guest' : a.kind}`;
+    plate.replaceChildren(
+      el('span', { class: 'plate-seal', 'aria-hidden': 'true' }, seal),
+      el(
+        'div',
+        { class: 'plate-body' },
+        el('div', { class: 'plate-name' }, el('b', {}, name), el('small', { class: `plate-sync ${syncClass}` }, sync)),
+        trainingLine(),
+        action ? el('div', { class: 'plate-actions' }, action) : '',
+      ),
+    );
+  };
+  paint();
+  whileShown(plate, paint);
+  return plate;
 }
 
 /** 설정 맨 위 「계정」 칸 */
 export function accountRows(redraw: () => void): HTMLElement {
   const a = accountState();
-  if (a.kind === 'signed-in') {
+  if (a.kind === 'signed-in' || a.kind === 'pending') {
     const sync = el('button', { class: 'btn small', type: 'button' }, '지금 동기화');
     const out = el('button', { class: 'btn small', type: 'button' }, '로그아웃');
-    const status = el('p', { class: 'note' }, ACCOUNT.mock ? '계정과 맞춤(목업) — 실제 올리기는 다음 단계' : '계정과 맞춤');
-    sync.addEventListener('click', () => (status.textContent = `계정과 맞춤(목업) · ${new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`));
-    out.addEventListener('click', () => {
-      signOut();
-      redraw();
-    });
-    return el('div', { class: 'acct-row' }, el('div', { class: 'row acct' }, el('span', {}, '계정'), el('b', {}, a.name), el('span', { class: 'acct-btns' }, sync, out)), status, trainingLine());
+    const status = el('p', { class: 'note acct-status' });
+    const paint = () => {
+      const st = cloudState();
+      status.textContent = st.user ? statusText(st.status, st.lastSync) || '계정과 맞춤' : st.status.state === 'offline' ? statusText(st.status, null) : '로그인 확인 중…';
+      sync.disabled = !st.user || st.status.state === 'syncing';
+    };
+    sync.addEventListener('click', () => void syncNow());
+    out.addEventListener('click', () => void signOut().then(redraw));
+    const row = el(
+      'div',
+      { class: 'acct-row' },
+      el('div', { class: 'row acct' }, el('span', {}, '계정'), el('b', {}, a.name || '…'), el('span', { class: 'acct-btns' }, sync, out)),
+      status,
+      trainingLine(),
+    );
+    paint();
+    whileShown(row, () => (accountState().kind === a.kind ? paint() : redraw()));
+    return row;
   }
+  if (!cloudEnabled()) return el('div', { class: 'acct-row' }, el('div', { class: 'row acct' }, el('span', {}, '계정'), el('small', {}, '이 판에는 계정 기능이 없다 — 이 브라우저에만 저장된다')), trainingLine());
   return el(
     'div',
     { class: 'acct-row' },

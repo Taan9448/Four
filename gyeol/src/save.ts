@@ -128,6 +128,14 @@ export function loadSave(st: Store | null = store()): SaveData {
   return data;
 }
 
+const writeListeners = new Set<() => void>();
+
+/** 저장할 때마다 부른다(계정 올리기가 모아서 올린다 — cloud.ts). 돌려준 함수로 그만 듣는다 */
+export function onSaveWrite(fn: () => void): () => void {
+  writeListeners.add(fn);
+  return () => writeListeners.delete(fn);
+}
+
 export function writeSave(data: SaveData, st: Store | null = store()): void {
   cache = data;
   try {
@@ -135,6 +143,7 @@ export function writeSave(data: SaveData, st: Store | null = store()): void {
   } catch {
     // 저장이 막힌 브라우저면 이번 판만
   }
+  for (const fn of writeListeners) fn();
 }
 
 /** 시험용: 메모리 저장을 비운다 */
