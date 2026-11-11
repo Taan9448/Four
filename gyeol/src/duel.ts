@@ -112,6 +112,8 @@ export interface MoveDef {
   fragile?: boolean;
   /** 세 숨(10장): 흐름이 멈추는 숨 — 이어서 세 번 받아 내면 매듭이 드러나 곧장 비틀거린다 */
   breath?: boolean;
+  /** 반격 자세(構): 치지 않고 기다린다 — 그동안 베면 되받아 맞고(피해 damage), 참으면 끝에 틈이 열린다 */
+  stance?: boolean;
 }
 
 export interface PatternDef {
@@ -145,19 +147,56 @@ export interface FoeDef {
   chart?: ChartDef;
   /** 겨루기에서 초마다 미는 힘(없으면 0.45) */
   clashPower?: number;
+  /** 1단계의 기믹(갑옷·재생·가속·결 가림) */
+  gimmicks?: Gimmicks;
   /**
-   * 2단계(2026-11-10 이야기): 체력이 at(최대 대비) 아래로 처음 떨어지면 포효하며 숨을 고르고(roar ms),
-   * 공격 준비가 speed배(작을수록 빠름), 피해가 damageMul배가 된다.
+   * 다단계(2026-11-11 5단계 — "정예는 한 번 격퇴 뒤 2단계, 보스는 3단계 이상"): 체력이 다 떨어지면 쓰러지지 않고
+   * 다시 일어나(roar ms) 다음 단계로 — 체력·체간을 새로 채우고, 수를 더하거나 바꾸고, 패턴과 기믹을 갈아 낀다.
    */
-  phase2?: { at: number; name: string; line?: string; speed: number; damageMul: number; roar: number };
+  phases?: PhaseDef[];
   /** 수련장 상대(결투장·박자 도전·도감 목록에 안 나온다)와 수련 종류(종류마다 공격 패턴을 바꿔 낀다) */
   practice?: boolean;
+  /** 처음부터 결투장·박자 도전에 열려 있는 상대(나머지는 이야기에서 겨뤄 본 뒤 열린다) */
+  starter?: boolean;
   /** 이야기에만 나오는 상대(결투장에 안 나온다 — 귀곡애 곽도진 버티기 등) */
   storyOnly?: boolean;
   drills?: { id: string; name: string; note: string; patterns: PatternDef[] }[];
   finisher?: FinisherDef;
   weather?: Weather;
   lines?: Lines;
+}
+
+/** 단계마다 바뀌는 기믹 */
+export interface Gimmicks {
+  /** 갑옷: 이 단계에서 한 번 비틀거리기 전까지 베기·기술 피해가 이 배율 */
+  armor?: number;
+  /** 재생: 피해를 받지 않은 지 2.5초가 지나면 초마다 이만큼 체력이 찬다 */
+  regen?: number;
+  /** 가속: 패턴을 시작할 때마다 공격 준비가 step배(최소 min배)로 빨라진다 */
+  accelerate?: { step: number; min: number };
+  /** 결 가림: 집중하지 않으면 결이 이 비율만큼만 보인다 */
+  veil?: number;
+}
+
+export interface PhaseDef {
+  name: string;
+  /** 다시 일어서며 하는 말 */
+  line?: string;
+  hp: number;
+  posture?: number;
+  postureRegen?: number;
+  idle?: [number, number];
+  /** 더하거나 바꿀 수(앞 단계까지의 수에 덧붙는다) */
+  moves?: Record<string, MoveDef>;
+  /** 이 단계의 패턴(없으면 앞 단계 그대로) */
+  patterns?: PatternDef[];
+  /** 모든 수의 공격 준비 배율(작을수록 빠름)·피해 배율 */
+  speed?: number;
+  damageMul?: number;
+  /** 다시 일어서는 동안(ms) */
+  roar?: number;
+  gimmicks?: Gimmicks;
+  weather?: Weather;
 }
 
 export interface PlayerDef {
@@ -240,7 +279,10 @@ export type DuelEvent =
   | { type: 'guardBreak'; t: number }
   | { type: 'hit'; t: number; move: string; damage: number; element?: Element; heavy: boolean; unblockable: boolean; lead: number | null }
   | { type: 'refill'; t: number }
-  | { type: 'phase'; t: number; name: string; line?: string }
+  | { type: 'phase'; t: number; name: string; line?: string; n: number; of: number }
+  | { type: 'stanceCounter'; t: number; damage: number }
+  | { type: 'stanceBreak'; t: number }
+  | { type: 'armorBreak'; t: number }
   | { type: 'endure'; t: number; got: number; need: number }
   | { type: 'mikiri'; t: number; move: string; judgement: Judgement }
   | { type: 'evade'; t: number; move: string }
@@ -284,8 +326,15 @@ export interface Duel {
   difficulty: string;
   /** 덧붙임(DuelOptions) — 튜토리얼이 대결 중에 바꿀 수 있다 */
   opts: DuelOptions;
-  /** 지금 단계(phase2가 있는 상대) */
-  phase: 1 | 2;
+  /** 지금 단계(1부터)와 전체 단계 수, 단계를 갈아 낄 때 쓰는 처음 상대 정의와 배율(난이도·열쇠) */
+  phase: number;
+  phaseCount: number;
+  baseDef: FoeDef;
+  phaseScale: { damage: number; regen: number };
+  /** 가속 기믹의 지금 배율 · 마지막으로 적이 다친 시각(재생 기믹) · 이 단계 갑옷이 깨졌나 */
+  tempo: number;
+  lastFoeHurt: number;
+  armorBroken: boolean;
   /** 버티기: 해낸 수 */
   endured: number;
   /** 쪼개지 않기: 금 간 수 · 베지 않는다: 비틀거린 수 · 세 숨: 이어서 받은 숨 · 운해귀종 안내를 띄웠나 */
@@ -419,7 +468,8 @@ function withDifficulty(data: DuelData, foe: FoeDef, diff: DifficultyDef | undef
 export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode: Mode = 'duel', difficulty = 'main', opts: DuelOptions = {}): Duel {
   const foe0 = data0.foes.find((f) => f.id === foeId);
   if (!foe0) throw new Error(`알 수 없는 상대: ${foeId}`);
-  const dd = withDifficulty(data0, foe0, (data0.difficulties ?? []).find((x) => x.id === difficulty));
+  const diffDef = (data0.difficulties ?? []).find((x) => x.id === difficulty);
+  const dd = withDifficulty(data0, foe0, diffDef);
   const data = dd.data;
   let foeDef = dd.foeDef;
   if (opts.foeDamageMul && opts.foeDamageMul !== 1) {
@@ -435,6 +485,12 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
     difficulty,
     opts,
     phase: 1,
+    phaseCount: mode === 'duel' ? 1 + (foeDef.phases?.length ?? 0) : 1,
+    baseDef: foeDef,
+    phaseScale: { damage: (diffDef?.foeDamageMul ?? 1) * (opts.foeDamageMul ?? 1), regen: diffDef?.postureRegenMul ?? 1 },
+    tempo: 1,
+    lastFoeHurt: -Infinity,
+    armorBroken: false,
     endured: 0,
     cracks: 0,
     staggers: 0,
@@ -580,6 +636,10 @@ export interface Cue {
   /** 왕녀의 얼음(받아치면 안 된다) · 흐름이 멈추는 숨 */
   fragile?: boolean;
   breath?: boolean;
+  /** 반격 자세(構): 베지 말고 기다린다 */
+  stance?: boolean;
+  /** 겨루기가 되는 공격: 결 연환이 이어졌고 무거운 공격 — 타격 순간에 노려 베면 칼끼리 맞부딪힌다 */
+  clash?: boolean;
 }
 
 /** 화면용: 지금 결(타격 예고)이 보이는가와 고리 비율 */
@@ -594,7 +654,8 @@ export function cue(d: Duel): Cue {
   const target = faking ? f.fakeAt! : f.hitAt;
   // 집중 중이면 공격을 시작할 때부터 결이 보인다
   // 붉은 장력: 집중하지 않으면 결이 늦게(veil 비율만큼만) 보인다
-  const lead = focus ? Math.max(d.data.rules.cueLead, target - f.stateStart) : d.data.rules.cueLead * (d.opts.veil ?? 1);
+  const veil = Math.min(d.opts.veil ?? 1, d.foeDef.gimmicks?.veil ?? 1);
+  const lead = focus ? Math.max(d.data.rules.cueLead, target - f.stateStart) : d.data.rules.cueLead * veil;
   const span = faking || f.fakeAt === null ? lead : Math.min(lead, f.hitAt - f.fakeAt);
   const left = target - d.t;
   let ratio = Math.max(0, Math.min(1, left / span));
@@ -611,6 +672,8 @@ export function cue(d: Duel): Cue {
     focus,
     fragile: !!m.fragile,
     breath: !!m.breath,
+    stance: !!m.stance,
+    clash: clashChance(d),
   };
 }
 
@@ -631,6 +694,9 @@ function regen(d: Duel, dt: number): void {
   if (d.t - p.lastGuard > 600 && p.action !== 'broken') p.posture = Math.max(0, p.posture - (d.data.player.postureRegen * dt) / 1000);
   const f = d.foe;
   if (f.state === 'idle' && !f.pending) f.posture = Math.max(0, f.posture - (d.foeDef.postureRegen * dt) / 1000);
+  // 재생 기믹: 몰아치지 않으면 체력이 다시 찬다
+  const hpRegen = d.foeDef.gimmicks?.regen;
+  if (hpRegen && d.mode === 'duel' && f.state !== 'dead' && f.state !== 'stagger' && d.t - d.lastFoeHurt > 2500) f.hp = Math.min(d.foeDef.hp, f.hp + (hpRegen * dt) / 1000);
 }
 
 /** 기술 동작 길이와 피해가 들어가는 순간(그림 연출과 맞춘다) */
@@ -661,6 +727,25 @@ function landStrike(d: Duel): void {
   const r = d.data.rules;
   const a = d.data.player.attack;
   if (f.state === 'dead') return;
+  // 반격 자세(構)에 베면 되받아 맞는다
+  if (f.state === 'windup' && f.move && d.foeDef.moves[f.move].stance) {
+    const m = d.foeDef.moves[f.move];
+    hurt(d, m.damage);
+    d.stats.hits++;
+    d.streak = 0;
+    breakChain(d);
+    updateCrisis(d);
+    d.events.push({ type: 'stanceCounter', t: d.t, damage: m.damage });
+    f.state = 'recover';
+    f.stateStart = d.t;
+    f.stateEnd = d.t + m.recover;
+    f.fakeAt = null;
+    if (d.player.hp <= 0 && !d.result) {
+      d.result = 'lose';
+      d.events.push({ type: 'lose', t: d.t });
+    }
+    return;
+  }
   // 노려 벤 칼이 적의 타격과 거의 동시에 닿으면 칼끼리 맞부딪힌다
   if (f.state === 'windup' && canClash(d) && Math.abs(f.hitAt - d.t) <= r.clashWindow) {
     startClash(d);
@@ -675,7 +760,7 @@ function landStrike(d: Duel): void {
   }
   if (f.state === 'stagger') {
     const dmg = Math.round(d.foeDef.hp * r.deathblow);
-    damageFoe(d, dmg);
+    damageFoe(d, dmg, undefined, true);
     f.posture = 0;
     d.stats.deathblows++;
     d.events.push({ type: 'deathblow', t: d.t, damage: dmg });
@@ -744,7 +829,9 @@ function stepFoe(d: Duel): void {
       if (d.t >= f.stateEnd) {
         f.posture = d.foeDef.posture * 0.5;
         d.events.push({ type: 'recover', t: d.t });
-        setFoeIdle(d, 400);
+        // 베지 않는다: 비틀거림마다 한 단계씩 넘어간다(체력은 1 밑으로 안 내려가므로)
+        if (d.opts.finish === 'stagger' && d.mode === 'duel' && d.phase < d.phaseCount && d.staggers >= d.phase) nextPhase(d);
+        else setFoeIdle(d, 400);
       }
       break;
   }
@@ -777,6 +864,8 @@ function stepChart(d: Duel): void {
 function startPattern(d: Duel): void {
   const pat = d.rng.weighted(d.foeDef.patterns, (p) => p.weight);
   if (!pat) return;
+  const acc = d.foeDef.gimmicks?.accelerate;
+  if (acc && d.mode === 'duel') d.tempo = Math.max(acc.min, d.tempo * acc.step);
   d.foe.pattern = pat;
   d.foe.step = 0;
   startMove(d, pat.steps[0].move);
@@ -790,7 +879,7 @@ function startMove(d: Duel, moveId: string, hitAt?: number): void {
   f.move = moveId;
   f.stateStart = d.t;
   const feint = m.feint ?? 0;
-  let H = hitAt ?? d.t + m.windup + feint;
+  let H = hitAt ?? d.t + Math.round(m.windup * d.tempo) + feint;
   // 번개: 대결에서는 박자가 튄다(악보에서는 악보대로)
   if (hitAt === undefined && m.element === 'lightning' && r.lightningJitter > 0) H += d.rng.int(-r.lightningJitter, r.lightningJitter);
   f.hitAt = Math.max(d.t + r.parry + 40, H);
@@ -815,12 +904,28 @@ function gainFocus(d: Duel, judgement: Judgement): void {
 }
 
 /** 겨루기가 될 수 있는 베기인가: 대결에서, 베는 중이고, 앞 베기에서 clashCalm 넘게 쉬었다가 노려 벤 칼 */
+/**
+ * 겨루기 기회(화면 안내용, 2026-11-11): 지금 다가오는 공격이 겨루기가 될 수 있는가 — 하운이 연타 중이 아닐 때.
+ * canClash의 조건 중 '이번 베기' 쪽만 뺀 것. 속임수는 가짜 순간을 지난 뒤에만.
+ */
+export function clashChance(d: Duel): boolean {
+  const f = d.foe;
+  const p = d.player;
+  if (d.mode !== 'duel' || d.opts.clash === false || f.state !== 'windup' || !f.move) return false;
+  const m = d.foeDef.moves[f.move];
+  if (m.unblockable || m.stance || m.fragile || m.breath || !(m.clash ?? m.damage >= HEAVY_DAMAGE)) return false;
+  if (f.fakeAt !== null && d.t < f.fakeAt) return false;
+  if (d.chain < d.data.rules.clashMinChain) return false;
+  return p.action !== 'attack' && d.t - p.lastAttackEnd >= d.data.rules.clashCalm * 0.5;
+}
+
 function canClash(d: Duel): boolean {
   const p = d.player;
   const f = d.foe;
   if (d.mode === 'rhythm' || d.opts.clash === false || p.action !== 'attack' || !f.move) return false;
   const m = d.foeDef.moves[f.move];
-  if (m.unblockable) return false;
+  // 받을 수 없는 공격·반격 자세·왕녀의 얼음·세 숨은 겨루기가 되지 않는다
+  if (m.unblockable || m.stance || m.fragile || m.breath) return false;
   // 특수한 순간에만: 결 연환이 이어진 채, 적의 무거운 공격에 노려 벤 칼
   if (d.chain < d.data.rules.clashMinChain) return false;
   if (!(m.clash ?? m.damage >= HEAVY_DAMAGE)) return false;
@@ -990,6 +1095,20 @@ function resolveHit(d: Duel): void {
   const m = d.foeDef.moves[moveId];
   const H = f.hitAt;
   const heavy = m.damage >= HEAVY_DAMAGE;
+  // 반격 자세를 끝까지 참았다: 치지 않고 자세가 풀리며 틈이 열린다
+  if (m.stance) {
+    p.parryAt = null;
+    f.posture += m.posture;
+    d.openingUntil = H + r.counterWindow;
+    d.events.push({ type: 'stanceBreak', t: H });
+    endure(d, H);
+    f.state = 'recover';
+    f.stateStart = H;
+    f.stateEnd = H + m.recover;
+    f.fakeAt = null;
+    checkStagger(d);
+    return;
+  }
   // 노려 벤 칼이 아직 닿기 전인데 곧(clashWindow 안) 닿는다면 칼끼리 맞부딪힌다
   if (canClash(d) && !p.attackLanded && p.actionStart + d.data.player.attack.hitAt - H <= r.clashWindow) {
     startClash(d);
@@ -1097,10 +1216,16 @@ function resolveHit(d: Duel): void {
  * 적이 다친다. 끝내는 법(opts.finish)이 있으면 체력이 1 밑으로 내려가지 않는다:
  * stagger(베지 않는다)는 언제나, unhae는 운해귀종이 아닌 피해일 때(처음 막히면 안내 사건을 한 번 낸다).
  */
-function damageFoe(d: Duel, dmg: number, tech?: string): void {
+function damageFoe(d: Duel, dmg: number, tech?: string, deathblow = false): void {
   const f = d.foe;
   const fin = d.mode === 'duel' ? d.opts.finish : undefined;
-  const floor = fin === 'stagger' || (fin === 'unhae' && tech !== 'unhae') ? 1 : 0;
+  // 운해귀종으로만: 마지막 단계에서만 막는다(앞 단계는 보통처럼 넘어간다)
+  const last = d.phase >= d.phaseCount;
+  const floor = fin === 'stagger' || (fin === 'unhae' && last && tech !== 'unhae') ? 1 : 0;
+  // 갑옷 기믹: 이 단계에서 한 번 비틀거리기 전까지 베기·기술 피해가 줄어든다(결정타는 그대로)
+  const armor = d.foeDef.gimmicks?.armor;
+  if (armor && !d.armorBroken && !deathblow) dmg = Math.max(1, Math.round(dmg * armor));
+  if (dmg > 0) d.lastFoeHurt = d.t;
   f.hp = Math.max(floor, f.hp - dmg);
   if (fin === 'unhae' && floor && f.hp === 1 && !d.finishHinted) {
     d.finishHinted = true;
@@ -1148,18 +1273,43 @@ function endure(d: Duel, t: number): void {
   }
 }
 
-/** 2단계: 체력이 문턱 아래로 처음 떨어지면 포효하며 빨라지고 세진다(상대 정의를 바꾼 사본으로 갈아 낀다) */
-function maybePhase(d: Duel): void {
-  const ph = d.foeDef.phase2;
+/**
+ * 다음 단계: 처음 상대 정의에 지금 단계까지의 수를 덧붙이고, 패턴·기믹·체력·체간을 그 단계 것으로 갈아 낀다.
+ * 피해·체간 회복 배율(난이도·열쇠)은 새 수에도 똑같이 든다. 다시 일어서는 동안(roar)은 치지 않는다.
+ */
+function nextPhase(d: Duel): void {
+  const base = d.baseDef;
+  const phases = base.phases ?? [];
+  const ph = phases[d.phase - 1];
+  if (!ph) return;
+  d.phase++;
+  const added: Record<string, MoveDef> = {};
+  for (const p of phases.slice(0, d.phase - 1)) for (const [k, m] of Object.entries(p.moves ?? {})) added[k] = { ...m, damage: Math.max(m.damage > 0 ? 1 : 0, Math.round(m.damage * d.phaseScale.damage)) };
+  const speed = ph.speed ?? 1;
+  const dm = ph.damageMul ?? 1;
+  const moves = Object.fromEntries(Object.entries({ ...base.moves, ...added }).map(([k, m]) => [k, { ...m, windup: Math.round(m.windup * speed), damage: m.damage > 0 ? Math.max(1, Math.round(m.damage * dm)) : 0 }]));
+  const patterns = phases.slice(0, d.phase - 1).reduce((acc, p) => p.patterns ?? acc, base.patterns);
+  d.foeDef = {
+    ...base,
+    hp: ph.hp,
+    posture: ph.posture ?? base.posture,
+    postureRegen: (ph.postureRegen ?? base.postureRegen / d.phaseScale.regen) * d.phaseScale.regen,
+    idle: ph.idle ?? base.idle,
+    moves,
+    patterns,
+    gimmicks: ph.gimmicks ?? {},
+    weather: ph.weather ?? base.weather,
+  };
   const f = d.foe;
-  if (!ph || d.phase !== 1 || f.hp <= 0 || f.hp > d.foeDef.hp * ph.at) return;
-  d.phase = 2;
-  const moves = Object.fromEntries(Object.entries(d.foeDef.moves).map(([k, m]) => [k, { ...m, windup: Math.round(m.windup * ph.speed), damage: Math.max(1, Math.round(m.damage * ph.damageMul)) }]));
-  d.foeDef = { ...d.foeDef, moves };
+  f.hp = ph.hp;
   f.posture = 0;
+  d.tempo = 1;
+  d.armorBroken = false;
+  d.breathRun = 0;
   d.openingUntil = -1;
-  setFoeIdle(d, ph.roar);
-  d.events.push({ type: 'phase', t: d.t, name: ph.name, line: ph.line });
+  d.lastFoeHurt = d.t;
+  setFoeIdle(d, ph.roar ?? 1600);
+  d.events.push({ type: 'phase', t: d.t, name: ph.name, line: ph.line, n: d.phase, of: d.phaseCount });
 }
 
 function burn(d: Duel, dmg: number, t: number): void {
@@ -1217,6 +1367,10 @@ function checkStagger(d: Duel): void {
     d.openingUntil = -1;
     d.staggers++;
     d.events.push({ type: 'stagger', t: d.t });
+    if (d.foeDef.gimmicks?.armor && !d.armorBroken) {
+      d.armorBroken = true;
+      d.events.push({ type: 'armorBreak', t: d.t });
+    }
     // 베지 않는다: 비틀거림이 다 차면 결정타 없이 끝난다(데려 내려온다)
     if (d.opts.finish === 'stagger' && d.mode === 'duel' && d.staggers >= (d.opts.staggerWin ?? 3)) {
       f.state = 'dead';
@@ -1229,8 +1383,10 @@ function checkStagger(d: Duel): void {
 
 function checkFoeDown(d: Duel): boolean {
   const f = d.foe;
-  if (f.hp > 0) {
-    maybePhase(d);
+  if (f.hp > 0) return false;
+  // 다단계: 격퇴해도 다음 단계가 남았으면 다시 일어선다
+  if (d.mode === 'duel' && d.phase < d.phaseCount) {
+    nextPhase(d);
     return false;
   }
   if (d.mode === 'practice') {

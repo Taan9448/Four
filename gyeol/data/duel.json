@@ -522,7 +522,8 @@
         "lose": [
           "…끼잉."
         ]
-      }
+      },
+      "starter": true
     },
     {
       "id": "chain_overseer",
@@ -732,7 +733,85 @@
         "lose": [
           "사슬이… 끊어지다니…"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "사슬을 둘 다 든다",
+          "line": "두 손이면 피할 데가 없다.",
+          "hp": 95,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "coil": {
+              "name": "사슬 감기",
+              "windup": 950,
+              "recover": 420,
+              "damage": 20,
+              "posture": 24,
+              "stance": true
+            },
+            "twin": {
+              "name": "두 사슬",
+              "windup": 520,
+              "recover": 320,
+              "damage": 13,
+              "posture": 13,
+              "element": "fire"
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "twin",
+                  "after": 160
+                },
+                {
+                  "move": "lash",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "coil"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "drag_feint"
+                },
+                {
+                  "move": "lash",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "chain_sweep",
+                  "after": 260
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "starter": true
     },
     {
       "id": "ice_knight",
@@ -924,7 +1003,84 @@
         "lose": [
           "…녹는구나."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "빙갑을 두른다",
+          "line": "얼음은 두 번 깨지지 않는다.",
+          "hp": 110,
+          "speed": 0.92,
+          "roar": 1500,
+          "moves": {
+            "shards": {
+              "name": "얼음 조각 찌르기",
+              "windup": 360,
+              "recover": 220,
+              "damage": 8,
+              "posture": 8,
+              "element": "ice"
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "shards"
+                },
+                {
+                  "move": "shards",
+                  "after": 120
+                },
+                {
+                  "move": "shards",
+                  "after": 120
+                },
+                {
+                  "move": "thrust",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "frost_cleave"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "frozen_feint"
+                },
+                {
+                  "move": "thrust",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "thrust"
+                },
+                {
+                  "move": "glacier_lance",
+                  "after": 260
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "armor": 0.35
+          }
+        }
+      ],
+      "starter": true
     },
     {
       "id": "shadow_assassin",
@@ -1124,7 +1280,89 @@
         "lose": [
           "…보였, 다고?"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "그림자가 갈라진다",
+          "line": "보이는 칼은 하나가 아니다.",
+          "hp": 90,
+          "speed": 0.9,
+          "roar": 1400,
+          "moves": {
+            "mirror": {
+              "name": "분신 베기",
+              "windup": 420,
+              "recover": 260,
+              "damage": 12,
+              "posture": 14,
+              "element": "lightning",
+              "feint": 320
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "mirror"
+                },
+                {
+                  "move": "spark_slash",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "blink_feint"
+                },
+                {
+                  "move": "mirror",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "spark_slash"
+                },
+                {
+                  "move": "spark_slash",
+                  "after": 80
+                },
+                {
+                  "move": "storm_dive",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "chain_bolt"
+                },
+                {
+                  "move": "chain_bolt",
+                  "after": 160
+                },
+                {
+                  "move": "chain_bolt",
+                  "after": 160
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.6
+          }
+        }
+      ],
+      "starter": true
     },
     {
       "id": "ignis",
@@ -1132,7 +1370,7 @@
       "sprite": "ignis",
       "bg": "bg_volcano_canyon",
       "note": "느리지만 무겁다(화염). 불길의 손 세 번은 점점 빨라지고, 움켜쥐는 척 멈췄다 친다. 붉은 결의 녹아내리는 협곡은 피해야 한다.",
-      "hp": 200,
+      "hp": 170,
       "posture": 140,
       "postureRegen": 6,
       "idle": [
@@ -1333,14 +1571,145 @@
           "불이… 꺼진다…"
         ]
       },
-      "phase2": {
-        "at": 0.5,
-        "name": "흰 불이 커진다",
-        "line": "…빼앗아 간 것이 꽤 되는구나.",
-        "speed": 0.82,
-        "damageMul": 1.15,
-        "roar": 1500
-      }
+      "phases": [
+        {
+          "name": "흰 불이 커진다",
+          "line": "…빼앗아 간 것이 꽤 되는구나.",
+          "hp": 140,
+          "speed": 0.85,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "hand"
+                },
+                {
+                  "move": "hand_fast",
+                  "after": 160
+                },
+                {
+                  "move": "hand_fast",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "whip"
+                },
+                {
+                  "move": "whip",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "hand_feint"
+                },
+                {
+                  "move": "hand",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "hand_fast"
+                },
+                {
+                  "move": "canyon",
+                  "after": 260
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 4
+          }
+        },
+        {
+          "name": "녹아내리는 협곡",
+          "line": "모두 녹아라.",
+          "hp": 110,
+          "speed": 0.78,
+          "damageMul": 1.2,
+          "roar": 1700,
+          "moves": {
+            "pillar": {
+              "name": "불기둥",
+              "windup": 780,
+              "recover": 420,
+              "damage": 22,
+              "posture": 24,
+              "element": "fire"
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "pillar"
+                },
+                {
+                  "move": "hand_fast",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "whip"
+                },
+                {
+                  "move": "pillar",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "canyon"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "hand_feint"
+                },
+                {
+                  "move": "hand_fast",
+                  "after": 140
+                },
+                {
+                  "move": "hand_fast",
+                  "after": 140
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.6
+          }
+        }
+      ],
+      "starter": true
     },
     {
       "id": "inner_senior",
@@ -1656,7 +2025,93 @@
         "win": [
           "(거미줄이 하운을 감는다)"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "다리가 다시 돋는다",
+          "line": "(꺾인 마디에서 은빛 다리가 다시 돋는다)",
+          "hp": 85,
+          "speed": 0.9,
+          "roar": 1400,
+          "moves": {
+            "frenzy": {
+              "name": "다리 난타",
+              "windup": 300,
+              "recover": 200,
+              "damage": 6,
+              "posture": 6
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "frenzy"
+                },
+                {
+                  "move": "frenzy",
+                  "after": 110
+                },
+                {
+                  "move": "frenzy",
+                  "after": 110
+                },
+                {
+                  "move": "frenzy",
+                  "after": 110
+                },
+                {
+                  "move": "legs",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "bite"
+                },
+                {
+                  "move": "web",
+                  "after": 260
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "lure"
+                },
+                {
+                  "move": "legs",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "web"
+                },
+                {
+                  "move": "bite",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.82
+            }
+          }
+        }
+      ]
     },
     {
       "id": "veilak",
@@ -1667,7 +2122,7 @@
       "weather": "ash",
       "clashPower": 0.575,
       "note": "실바렌을 둘러싼 그림자 군단의 군단장. 연기의 대검은 무겁고, 말 돌격은 받을 수 없다.",
-      "hp": 160,
+      "hp": 140,
       "posture": 110,
       "postureRegen": 10,
       "idle": [
@@ -1774,7 +2229,152 @@
         "lose": [
           "군단이… 흩어진다…"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "군단이 모인다",
+          "line": "모든 실이 나에게 모인다.",
+          "hp": 110,
+          "speed": 0.9,
+          "roar": 1600,
+          "moves": {
+            "lance": {
+              "name": "연기 창",
+              "windup": 640,
+              "recover": 360,
+              "damage": 16,
+              "posture": 16
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "greatsword"
+                },
+                {
+                  "move": "lance",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "sweep"
+                },
+                {
+                  "move": "sweep",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "smoke"
+                },
+                {
+                  "move": "greatsword",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "lance"
+                },
+                {
+                  "move": "charge",
+                  "after": 260
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "armor": 0.4
+          }
+        },
+        {
+          "name": "매듭이 드러난다",
+          "line": "…그 매듭을, 보았느냐.",
+          "hp": 90,
+          "speed": 0.82,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "moves": {
+            "knot": {
+              "name": "연기 매듭",
+              "windup": 950,
+              "recover": 420,
+              "damage": 24,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "lance"
+                },
+                {
+                  "move": "lance",
+                  "after": 160
+                },
+                {
+                  "move": "greatsword",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "knot"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "smoke"
+                },
+                {
+                  "move": "charge",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "sweep"
+                },
+                {
+                  "move": "knot",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
     },
     {
       "id": "ash_bat",
@@ -1971,7 +2571,7 @@
       "weather": "snow",
       "clashPower": 0.55,
       "note": "왕녀의 얼음 바로 바깥에 자기 결을 붙여 두었다. 셀리아스의 결만 받아친다 — 푸른 「護」 결(왕녀의 얼음)은 받아치지 말고 막거나 피한다.",
-      "hp": 190,
+      "hp": 150,
       "posture": 120,
       "postureRegen": 8,
       "idle": [
@@ -2112,7 +2712,140 @@
         "lose": [
           "놓아… 주는 것인가."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "왕녀의 얼음이 짙어진다",
+          "line": "보고 나서 말하라 했다.",
+          "hp": 120,
+          "speed": 0.9,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "lance"
+                },
+                {
+                  "move": "ward_fast",
+                  "after": 200
+                },
+                {
+                  "move": "lance",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "ward"
+                },
+                {
+                  "move": "ward_fast",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "wave"
+                },
+                {
+                  "move": "ward",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "hail"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "빙결",
+          "line": "멈춰라. 모두 멈춰라.",
+          "hp": 100,
+          "speed": 0.82,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "moves": {
+            "mirror": {
+              "name": "얼음 거울",
+              "windup": 950,
+              "recover": 420,
+              "damage": 22,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "ward_fast"
+                },
+                {
+                  "move": "lance",
+                  "after": 160
+                },
+                {
+                  "move": "ward_fast",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "mirror"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "wave"
+                },
+                {
+                  "move": "hail",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "lance"
+                },
+                {
+                  "move": "mirror",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
     },
     {
       "id": "rock_golem",
@@ -2322,7 +3055,80 @@
         "win": [
           "(도끼가 땅에 박힌다)"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "오천의 북소리",
+          "line": "(투구 안의 북소리가 빨라진다)",
+          "hp": 95,
+          "speed": 0.9,
+          "roar": 1400,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "double"
+                },
+                {
+                  "move": "double",
+                  "after": 120
+                },
+                {
+                  "move": "axe",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "bash"
+                },
+                {
+                  "move": "axe",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "axe"
+                },
+                {
+                  "move": "grave",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "double"
+                },
+                {
+                  "move": "double",
+                  "after": 120
+                },
+                {
+                  "move": "double",
+                  "after": 120
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.96,
+              "min": 0.78
+            }
+          }
+        }
+      ]
     },
     {
       "id": "gormon",
@@ -2333,7 +3139,7 @@
       "weather": "ash",
       "clashPower": 0.62,
       "note": "산과 몸이 붙은 거인. 산이 메운다 — 체간이 아주 빨리 돌아온다. 연속 박자로 쉬지 않고 몰아쳐야 비틀거린다.",
-      "hp": 250,
+      "hp": 200,
       "posture": 150,
       "postureRegen": 34,
       "idle": [
@@ -2459,6 +3265,236 @@
         "lose": [
           "두린… 너였구나."
         ]
+      },
+      "phases": [
+        {
+          "name": "산이 메운다",
+          "line": "산은 무너지지 않는다.",
+          "hp": 160,
+          "speed": 0.92,
+          "roar": 1700,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "pebble"
+                },
+                {
+                  "move": "pebble",
+                  "after": 110
+                },
+                {
+                  "move": "pebble",
+                  "after": 110
+                },
+                {
+                  "move": "fist",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "sweep"
+                },
+                {
+                  "move": "crush",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "fist"
+                },
+                {
+                  "move": "hand",
+                  "after": 260
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "crush"
+                },
+                {
+                  "move": "fist",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "armor": 0.4,
+            "regen": 6
+          }
+        },
+        {
+          "name": "산이 떨어진다",
+          "line": "…산이, 떨어진다.",
+          "hp": 120,
+          "speed": 0.8,
+          "damageMul": 1.15,
+          "postureRegen": 20,
+          "roar": 1700,
+          "moves": {
+            "quake": {
+              "name": "땅울림",
+              "windup": 900,
+              "recover": 480,
+              "damage": 24,
+              "posture": 26
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "quake"
+                },
+                {
+                  "move": "pebble",
+                  "after": 140
+                },
+                {
+                  "move": "pebble",
+                  "after": 110
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "fist"
+                },
+                {
+                  "move": "fist",
+                  "after": 180
+                },
+                {
+                  "move": "hand",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "crush"
+                },
+                {
+                  "move": "quake",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "sweep"
+                },
+                {
+                  "move": "sweep",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ],
+      "chart": {
+        "title": "산의 맥박",
+        "steps": [
+          {
+            "move": "fist",
+            "at": 2400
+          },
+          {
+            "move": "pebble",
+            "at": 3440
+          },
+          {
+            "move": "pebble",
+            "at": 3960
+          },
+          {
+            "move": "pebble",
+            "at": 4480
+          },
+          {
+            "move": "sweep",
+            "at": 5540
+          },
+          {
+            "move": "crush",
+            "at": 7100
+          },
+          {
+            "move": "fist",
+            "at": 8140
+          },
+          {
+            "move": "pebble",
+            "at": 9180
+          },
+          {
+            "move": "pebble",
+            "at": 9700
+          },
+          {
+            "move": "hand",
+            "at": 10760
+          },
+          {
+            "move": "fist",
+            "at": 12320
+          },
+          {
+            "move": "sweep",
+            "at": 13380
+          },
+          {
+            "move": "pebble",
+            "at": 14420
+          },
+          {
+            "move": "pebble",
+            "at": 14940
+          },
+          {
+            "move": "pebble",
+            "at": 15460
+          },
+          {
+            "move": "crush",
+            "at": 16700
+          },
+          {
+            "move": "hand",
+            "at": 18260
+          },
+          {
+            "move": "fist",
+            "at": 19300
+          }
+        ]
       }
     },
     {
@@ -2568,7 +3604,7 @@
       "weather": "rain",
       "clashPower": 0.66,
       "note": "문을 닫은 고대인. 상처를 내는 동안 다른 곳에서 채운다. 붉은 결의 공허의 손은 피해야 하고, 절반이 꺾이면 모은 것을 터뜨린다.",
-      "hp": 270,
+      "hp": 200,
       "posture": 160,
       "postureRegen": 10,
       "idle": [
@@ -2692,13 +3728,220 @@
           "네가 연 것은…… 네가 닫아야 한다."
         ]
       },
-      "phase2": {
-        "at": 0.5,
-        "name": "모은 것을 터뜨린다",
-        "line": "내가 모은 것을…….",
-        "speed": 0.84,
-        "damageMul": 1.12,
-        "roar": 1500
+      "phases": [
+        {
+          "name": "모은 것을 터뜨린다",
+          "line": "내가 모은 것을…….",
+          "hp": 160,
+          "speed": 0.85,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "drain"
+                },
+                {
+                  "move": "drain",
+                  "after": 140
+                },
+                {
+                  "move": "claw",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "horn"
+                },
+                {
+                  "move": "feint",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "claw"
+                },
+                {
+                  "move": "void",
+                  "after": 260
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "drain"
+                },
+                {
+                  "move": "horn",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 5
+          }
+        },
+        {
+          "name": "문을 연다",
+          "line": "네가 연 것은…… 네가 닫아야 한다.",
+          "hp": 130,
+          "speed": 0.78,
+          "damageMul": 1.15,
+          "roar": 1700,
+          "moves": {
+            "key": {
+              "name": "열쇠를 쥔 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 26,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "claw"
+                },
+                {
+                  "move": "drain",
+                  "after": 140
+                },
+                {
+                  "move": "claw",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "key"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "void",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "horn"
+                },
+                {
+                  "move": "key",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.6
+          }
+        }
+      ],
+      "chart": {
+        "title": "문 앞의 선택",
+        "steps": [
+          {
+            "move": "claw",
+            "at": 2400
+          },
+          {
+            "move": "drain",
+            "at": 3480
+          },
+          {
+            "move": "drain",
+            "at": 4040
+          },
+          {
+            "move": "horn",
+            "at": 5120
+          },
+          {
+            "move": "feint",
+            "at": 6200
+          },
+          {
+            "move": "claw",
+            "at": 7820
+          },
+          {
+            "move": "void",
+            "at": 8900
+          },
+          {
+            "move": "claw",
+            "at": 9980
+          },
+          {
+            "move": "drain",
+            "at": 11060
+          },
+          {
+            "move": "drain",
+            "at": 11620
+          },
+          {
+            "move": "drain",
+            "at": 12180
+          },
+          {
+            "move": "horn",
+            "at": 13260
+          },
+          {
+            "move": "feint",
+            "at": 14340
+          },
+          {
+            "move": "claw",
+            "at": 15420
+          },
+          {
+            "move": "void",
+            "at": 17040
+          },
+          {
+            "move": "horn",
+            "at": 18120
+          },
+          {
+            "move": "claw",
+            "at": 19200
+          },
+          {
+            "move": "drain",
+            "at": 19760
+          }
+        ]
       }
     },
     {
@@ -2913,7 +4156,82 @@
         "lose": [
           "…돌담을, 얕봤군."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "흑풍이 인다",
+          "line": "바람은 멈추는 순간이 제일 빠르다.",
+          "hp": 115,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "calm": {
+              "name": "바람 멈춤",
+              "windup": 900,
+              "recover": 420,
+              "damage": 22,
+              "posture": 24,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "saber"
+                },
+                {
+                  "move": "saber",
+                  "after": 160
+                },
+                {
+                  "move": "gust",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "calm"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "saber",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "saber"
+                },
+                {
+                  "move": "black_gust",
+                  "after": 240
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.82
+            }
+          }
+        }
+      ]
     },
     {
       "id": "jo_myeonggak",
@@ -3039,7 +4357,139 @@
         "hanja": "按鞘",
         "style": "cross",
         "line": "엉킨 곳에서 갈라진다."
-      }
+      },
+      "phases": [
+        {
+          "name": "두 기운이 꼬인다",
+          "line": "…검이, 아직 엉키지 않았다.",
+          "hp": 170,
+          "speed": 0.88,
+          "roar": 1500,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "reverse"
+                },
+                {
+                  "move": "twin",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "reverse",
+                  "after": 160
+                },
+                {
+                  "move": "cut",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "cut"
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "knot",
+                  "after": 240
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "엉킨 검",
+          "line": "이름을 대라!",
+          "hp": 170,
+          "speed": 0.82,
+          "roar": 1500,
+          "moves": {
+            "hold": {
+              "name": "엉킨 자세",
+              "windup": 900,
+              "recover": 420,
+              "damage": 20,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "twin",
+                  "after": 140
+                },
+                {
+                  "move": "reverse",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "hold"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "cut"
+                },
+                {
+                  "move": "knot",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "reverse"
+                },
+                {
+                  "move": "hold",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.82
+            }
+          }
+        }
+      ]
     },
     {
       "id": "blood_cultist",
@@ -3260,7 +4710,81 @@
         "lose": [
           "…바람이 바뀌었군."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "독이 퍼진다",
+          "line": "이제 숨 쉴 때마다 독이다.",
+          "hp": 110,
+          "speed": 0.9,
+          "roar": 1400,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "needle"
+                },
+                {
+                  "move": "needle",
+                  "after": 90
+                },
+                {
+                  "move": "needle",
+                  "after": 90
+                },
+                {
+                  "move": "needle",
+                  "after": 90
+                },
+                {
+                  "move": "palm",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "palm",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "mist",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "needle"
+                },
+                {
+                  "move": "mist",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.65
+          }
+        }
+      ]
     },
     {
       "id": "yeomtak",
@@ -3271,7 +4795,7 @@
       "weather": "embers",
       "clashPower": 0.6,
       "note": "바닥 아래에서 올라오는 붉은 힘을 손에 모은다. 붉은 장력 — 결이 늦게 보인다. 붉은 결의 바닥 내려치기는 피해야 한다.",
-      "hp": 210,
+      "hp": 170,
       "posture": 135,
       "postureRegen": 9,
       "idle": [
@@ -3382,7 +4906,147 @@
         "lose": [
           "…붉은 힘이, 갈라진다."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "붉은 물이 솟는다",
+          "line": "홈마다 붉은 물이다.",
+          "hp": 130,
+          "speed": 0.88,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "twin",
+                  "after": 140
+                },
+                {
+                  "move": "palm",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "floor",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "palm",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "floor",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 5
+          }
+        },
+        {
+          "name": "출구를 노린다",
+          "line": "다 가두면 그만이다.",
+          "hp": 110,
+          "speed": 0.8,
+          "damageMul": 1.15,
+          "roar": 1700,
+          "moves": {
+            "grip": {
+              "name": "팔 꺾는 자세",
+              "windup": 900,
+              "recover": 420,
+              "damage": 22,
+              "posture": 24,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "palm",
+                  "after": 160
+                },
+                {
+                  "move": "twin",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "grip"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "floor"
+                },
+                {
+                  "move": "palm",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "grip",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
     },
     {
       "id": "stair_elder",
@@ -3502,7 +5166,80 @@
         "lose": [
           "…저 위는 더 험하다."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "일곱째 굽이",
+          "line": "이 계단은 내려가는 사람만 있다.",
+          "hp": 120,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "wait": {
+              "name": "계단 위의 자세",
+              "windup": 900,
+              "recover": 420,
+              "damage": 20,
+              "posture": 22,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "quick"
+                },
+                {
+                  "move": "quick",
+                  "after": 110
+                },
+                {
+                  "move": "quick",
+                  "after": 110
+                },
+                {
+                  "move": "palm",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "wait"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "ice_palm",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "wait",
+                  "after": 200
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "kwak_dojin_peak",
@@ -3513,7 +5250,7 @@
       "weather": "ash",
       "clashPower": 0.7,
       "note": "천마봉의 곽도진(재대결). 송문고검은 운해귀종으로만 부러진다 — 다른 수로는 끝나지 않는다.",
-      "hp": 230,
+      "hp": 180,
       "posture": 140,
       "postureRegen": 10,
       "idle": [
@@ -3632,7 +5369,144 @@
         "lose": [
           "…너무 멀리 왔다."
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "학창의 그림자",
+          "line": "너무 멀리 왔다고 했지.",
+          "hp": 140,
+          "speed": 0.88,
+          "roar": 1600,
+          "moves": {
+            "pine_stance": {
+              "name": "송문 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 24,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "crane"
+                },
+                {
+                  "move": "qi",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "pine_stance"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "grip"
+                },
+                {
+                  "move": "qi",
+                  "after": 200
+                },
+                {
+                  "move": "qi",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "qi"
+                },
+                {
+                  "move": "pine",
+                  "after": 260
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "송문고검 마지막 초식",
+          "line": "청운문의 검이다!",
+          "hp": 120,
+          "speed": 0.8,
+          "damageMul": 1.12,
+          "roar": 1700,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "last"
+                },
+                {
+                  "move": "qi",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "crane"
+                },
+                {
+                  "move": "last",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "pine"
+                },
+                {
+                  "move": "pine_stance",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "grip"
+                },
+                {
+                  "move": "grip",
+                  "after": 160
+                },
+                {
+                  "move": "last",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
     },
     {
       "id": "sa_giant",
@@ -3643,7 +5517,7 @@
       "weather": "embers",
       "clashPower": 0.7,
       "note": "청동 그릇이 갈라지며 사무결의 몸에 붉은 힘이 겹겹이 모였다. 위의 틈에서 힘을 받아 절반이 꺾이면 더 빨라진다.",
-      "hp": 290,
+      "hp": 220,
       "posture": 170,
       "postureRegen": 9,
       "idle": [
@@ -3773,14 +5647,152 @@
           "장작 패던 것이…… 네 해도 못 되어."
         ]
       },
-      "phase2": {
-        "at": 0.5,
-        "name": "위의 틈에서 힘이 내려온다",
-        "line": "더. 조금만 더.",
-        "speed": 0.82,
-        "damageMul": 1.15,
-        "roar": 1500
-      }
+      "phases": [
+        {
+          "name": "위의 틈에서 힘이 내려온다",
+          "line": "더. 조금만 더.",
+          "hp": 180,
+          "speed": 0.84,
+          "damageMul": 1.12,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "palm",
+                  "after": 140
+                },
+                {
+                  "move": "fist",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "stomp"
+                },
+                {
+                  "move": "feint",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "fist"
+                },
+                {
+                  "move": "wave",
+                  "after": 260
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "palm",
+                  "after": 140
+                },
+                {
+                  "move": "palm",
+                  "after": 140
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "armor": 0.45
+          }
+        },
+        {
+          "name": "붉은 해일",
+          "line": "받아 봐라. 이 산 전체를.",
+          "hp": 140,
+          "speed": 0.78,
+          "damageMul": 1.2,
+          "roar": 1700,
+          "moves": {
+            "pull": {
+              "name": "위에서 받는 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 26,
+              "posture": 28,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "wave"
+                },
+                {
+                  "move": "palm",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "pull"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "fist"
+                },
+                {
+                  "move": "stomp",
+                  "after": 200
+                },
+                {
+                  "move": "wave",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "pull",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 6,
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
     },
     {
       "id": "bone_giant",
@@ -3887,7 +5899,69 @@
         "win": [
           "(뼈 손이 하운을 붙든다)"
         ]
-      }
+      },
+      "phases": [
+        {
+          "name": "뼈가 다시 맞물린다",
+          "line": "(흩어진 뼈가 다시 맞물린다)",
+          "hp": 160,
+          "speed": 0.92,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "club"
+                },
+                {
+                  "move": "sweep",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "club",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "club"
+                },
+                {
+                  "move": "rain",
+                  "after": 260
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "sweep"
+                },
+                {
+                  "move": "sweep",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 5
+          }
+        }
+      ]
     },
     {
       "id": "rift_beast",
@@ -4013,7 +6087,7 @@
       "weather": "ash",
       "clashPower": 0.75,
       "note": "힘을 쓰는 쪽을 따라온다. 베어도 가닥이 메운다 — 체간이 거의 쌓이지 않는다. 흐름이 멈추는 숨(하얀 「息」 결)을 이어서 세 번 받아 내면 매듭이 드러난다.",
-      "hp": 320,
+      "hp": 240,
       "posture": 200,
       "postureRegen": 40,
       "idle": [
@@ -4139,6 +6213,302 @@
         ],
         "lose": [
           "…매듭이, 풀린다."
+        ]
+      },
+      "phases": [
+        {
+          "name": "가닥이 메운다",
+          "line": "더 써라. 더 흘려라.",
+          "hp": 180,
+          "speed": 0.9,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "strand"
+                },
+                {
+                  "move": "fold",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "strand",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "breath"
+                },
+                {
+                  "move": "breath",
+                  "after": 320
+                },
+                {
+                  "move": "breath",
+                  "after": 320
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "strand"
+                },
+                {
+                  "move": "grasp",
+                  "after": 260
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 6,
+            "veil": 0.7
+          }
+        },
+        {
+          "name": "얼굴이 흩어진다",
+          "line": "흐르는 쪽을 따라간다.",
+          "hp": 150,
+          "speed": 0.85,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "moves": {
+            "follow": {
+              "name": "따라오는 구멍",
+              "windup": 950,
+              "recover": 420,
+              "damage": 24,
+              "posture": 6,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "strand"
+                },
+                {
+                  "move": "strand",
+                  "after": 160
+                },
+                {
+                  "move": "fold",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "follow"
+                }
+              ]
+            },
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "breath"
+                },
+                {
+                  "move": "breath",
+                  "after": 300
+                },
+                {
+                  "move": "breath",
+                  "after": 300
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "fold"
+                },
+                {
+                  "move": "grasp",
+                  "after": 240
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "마지막 매듭",
+          "line": "…두 세계의 숨을, 다.",
+          "hp": 120,
+          "speed": 0.78,
+          "damageMul": 1.15,
+          "roar": 1800,
+          "patterns": [
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "strand"
+                },
+                {
+                  "move": "fold",
+                  "after": 180
+                },
+                {
+                  "move": "strand",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "follow"
+                },
+                {
+                  "move": "grasp",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 4,
+              "steps": [
+                {
+                  "move": "breath"
+                },
+                {
+                  "move": "breath",
+                  "after": 280
+                },
+                {
+                  "move": "breath",
+                  "after": 280
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "fold",
+                  "after": 180
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.78
+            }
+          }
+        }
+      ],
+      "chart": {
+        "title": "세 숨",
+        "steps": [
+          {
+            "move": "strand",
+            "at": 2400
+          },
+          {
+            "move": "fold",
+            "at": 3440
+          },
+          {
+            "move": "breath",
+            "at": 4480
+          },
+          {
+            "move": "breath",
+            "at": 5180
+          },
+          {
+            "move": "breath",
+            "at": 5880
+          },
+          {
+            "move": "strand",
+            "at": 7440
+          },
+          {
+            "move": "feint",
+            "at": 8480
+          },
+          {
+            "move": "fold",
+            "at": 9520
+          },
+          {
+            "move": "grasp",
+            "at": 10580
+          },
+          {
+            "move": "breath",
+            "at": 12140
+          },
+          {
+            "move": "breath",
+            "at": 12840
+          },
+          {
+            "move": "breath",
+            "at": 13540
+          },
+          {
+            "move": "strand",
+            "at": 14580
+          },
+          {
+            "move": "strand",
+            "at": 15260
+          },
+          {
+            "move": "fold",
+            "at": 16300
+          },
+          {
+            "move": "grasp",
+            "at": 17860
+          },
+          {
+            "move": "breath",
+            "at": 18900
+          },
+          {
+            "move": "breath",
+            "at": 19600
+          },
+          {
+            "move": "breath",
+            "at": 20300
+          },
+          {
+            "move": "fold",
+            "at": 21340
+          }
         ]
       }
     },
