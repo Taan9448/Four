@@ -1,6 +1,7 @@
 // 「결」 이야기(2026-11-10 3단계, 설계 7-2절): 운곡루 회상 — 장 고르기 → 장면 → 대결 → 장면 → 장 결과(별 셋).
 // 장·대결·장면은 gyeol/data/story.json. 대결 화면은 main.ts의 play를 nav로 부른다.
 import storyRaw from '../data/story.json';
+import { frameUrl } from '../../src/render/assets';
 import { button, el, rankBadge } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { loadSave, writeSave } from './save';
@@ -52,6 +53,8 @@ export interface Chapter {
   outroIf?: { flag: string; lines: SceneLine[] };
   /** 결과 화면 머리글 대신(에필로그) */
   ending?: string[];
+  /** 이야기 지도에서의 자리(journey_band 그림 기준 %)와 땅 이름 */
+  map?: { x: number; y: number; place: string };
 }
 
 export interface StoryData {
@@ -102,34 +105,115 @@ const stars = (n: number, of = 3) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 
 
 /* ───────── 장 고르기 ───────── */
 
+/** 이야기 지도에서 고른 장(다시 들어오면 그 장을 다시 고른다) */
+let pickedChapter: string | null = null;
+
+/**
+ * 이야기 지도(2026-11-11 사용자 요청 — 「천외귀환」처럼 목록 대신 지도): 「천외귀환」 여정 띠 그림(journey_band) 위에 장마다 인장을 찍고
+ * 지나온 길은 붉은 먹, 남은 길은 옅은 점선으로 잇는다. 인장을 누르면 아래 두루마리 쪽지에 그 장(제목·회상·별·도전)과 「들어가기」.
+ * 그림이 아직 없으면 같은 자리에 빛바랜 종이 바탕만 깐다. ←→로 장을 옮기고 Enter로 들어간다
+ */
 export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
   const save = loadSave();
-  const cards = story.chapters.map((ch, i) => {
-    const open = chapterOpen(i, save.story.cleared);
-    const cleared = save.story.cleared.includes(ch.id);
+  const chs = story.chapters;
+  const openAt = (i: number) => chapterOpen(i, save.story.cleared);
+  const isCleared = (i: number) => save.story.cleared.includes(chs[i].id);
+  // 처음 고를 장: 지난번 고른 장, 없으면 아직 안 깬 열린 장 중 첫째, 다 깼으면 마지막
+  let cur = chs.findIndex((c) => c.id === pickedChapter);
+  if (cur < 0 || !openAt(cur)) cur = chs.findIndex((_, i) => openAt(i) && !isCleared(i));
+  if (cur < 0) cur = chs.length - 1;
+  const art = frameUrl('journey_band', 1, { realOnly: true });
+  const pos = (i: number) => chs[i].map ?? { x: 6 + (88 * i) / Math.max(1, chs.length - 1), y: 55, place: '' };
+
+  // 길: 장 순서대로 잇는 선(지나온 구간은 붉은 먹)
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'story-path');
+  svg.setAttribute('viewBox', '0 0 150 100');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  for (let i = 1; i < chs.length; i++) {
+    const a = pos(i - 1);
+    const b = pos(i);
+    const line = document.createElementNS(NS, 'path');
+    // 살짝 휘어진 붓길
+    const mx = ((a.x + b.x) / 2) * 1.5;
+    const my = (a.y + b.y) / 2 - 6;
+    line.setAttribute('d', `M ${a.x * 1.5} ${a.y} Q ${mx} ${my} ${b.x * 1.5} ${b.y}`);
+    line.setAttribute('class', isCleared(i - 1) && openAt(i) ? (isCleared(i) ? 'walked' : 'walked next') : 'ahead');
+    svg.append(line);
+  }
+
+  const card = el('div', { class: 'story-card' });
+  const pins: HTMLButtonElement[] = [];
+  const select = (i: number, focus = false) => {
+    cur = i;
+    pickedChapter = chs[i].id;
+    pins.forEach((p, j) => p.classList.toggle('picked', j === i));
+    if (focus) pins[i]?.focus();
+    const ch = chs[i];
+    const open = openAt(i);
+    const cleared = isCleared(i);
     const got = save.story.stars[ch.id] ?? 0;
-    const b = button(
-      [
-        el('span', { class: 'ch-no' }, ch.no === 0 ? '序' : ch.id === 'epilogue' ? '終' : String(ch.no)),
-        el('span', { class: 'ch-text' }, el('b', {}, `${ch.title} · ${ch.subtitle}`), el('small', {}, ch.recall)),
-        el('span', { class: 'ch-state' }, ch.tutorial ? (cleared ? '마침' : '튜토리얼') : cleared ? stars(got) : open ? '새 장' : '🔒'),
-      ],
-      `chapter${cleared ? ' cleared' : ''}`,
-      () => void runChapter(app, nav, data, ch),
-      open ? {} : { disabled: '' },
+    const go = button([el('b', {}, cleared ? '다시 들어가기' : '들어가기'), el('small', {}, 'Enter')], 'res-btn primary', () => void runChapter(app, nav, data, ch), open ? {} : { disabled: '' });
+    card.replaceChildren(
+      el('div', { class: 'sc-seal', 'aria-hidden': 'true' }, sealOf(ch)),
+      el(
+        'div',
+        { class: 'sc-text' },
+        el('p', { class: 'sc-place' }, ch.map?.place ?? ''),
+        el('h2', {}, `${ch.title} · ${ch.subtitle}`),
+        el('p', { class: 'sc-recall' }, open ? ch.recall : '앞 장을 마치면 열린다.'),
+        el(
+          'p',
+          { class: 'sc-meta' },
+          ch.tutorial ? el('span', {}, cleared ? '튜토리얼 · 마침' : '튜토리얼') : el('span', { class: 'sc-stars' }, stars(got)),
+          ch.bouts?.length ? el('span', {}, `대결 ${ch.bouts.length}`) : '',
+          ch.challenge && open ? el('span', { class: 'sc-chal' }, `☆ ${ch.challenge.text}`) : '',
+        ),
+      ),
+      el('div', { class: 'sc-go' }, go),
     );
-    return el('li', {}, b);
+  };
+  chs.forEach((ch, i) => {
+    const p = pos(i);
+    const open = openAt(i);
+    const cleared = isCleared(i);
+    const got = save.story.stars[ch.id] ?? 0;
+    const state = cleared ? 'cleared' : open ? 'open' : 'locked';
+    const pin = button(
+      [el('span', { class: 'pin-seal' }, sealOf(ch)), el('span', { class: 'pin-name' }, ch.map?.place || ch.subtitle), cleared && !ch.tutorial ? el('span', { class: 'pin-stars' }, stars(got)) : ''],
+      `story-pin ${state}`,
+      () => (cur === i && open ? void runChapter(app, nav, data, ch) : select(i)),
+      { style: `left:${p.x}%;top:${p.y}%`, 'aria-label': `${ch.title} ${ch.subtitle}${open ? '' : ' (잠김)'}` },
+    ) as HTMLButtonElement;
+    pins.push(pin);
   });
-  const later = story.upcoming.map((u) => el('li', {}, el('div', { class: 'chapter upcoming' }, el('span', { class: 'ch-no' }, String(u.no)), el('span', { class: 'ch-text' }, el('b', {}, `${u.no}장 · ${u.subtitle}`), el('small', {}, '다음 단계에서 열린다')), el('span', { class: 'ch-state' }, '🔒'))));
   const head = el(
     'header',
     { class: 'screen-head' },
     button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')),
-    el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, '운곡루의 밤 — 왕일검에게 놓는 연습을 배우며, 지나온 싸움을 하나씩 떠올린다.')),
+    el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, '운곡루의 밤 — 지나온 싸움을 하나씩 떠올린다.')),
   );
-  app.replaceChildren(el('section', { class: 'screen story' }, head, el('ol', { class: 'chapters' }, ...cards, ...later)));
-  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
-  (app.querySelector('.chapter:not([disabled]):not(.cleared)') as HTMLButtonElement | null)?.focus();
+  const map = el('div', { class: `story-map${art ? ' has-art' : ''}`, style: art ? `background-image:url("${art}")` : '' }, svg, ...pins);
+  app.replaceChildren(el('section', { class: 'screen story story-screen' }, head, el('div', { class: 'story-frame' }, map, card)));
+  select(cur, true);
+  setKeys((e) => {
+    if (e.key === 'Escape') nav.go('lobby');
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (cur + 1 < chs.length && openAt(cur + 1)) select(cur + 1, true);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (cur > 0) select(cur - 1, true);
+    }
+    // Enter: 초점이 간 인장을 누른 것과 같다(고른 장이면 들어간다)
+  });
+}
+
+/** 장 인장 글자: 서장 序, 에필로그 終, 그 밖은 장 번호 한자 */
+const HAN_NO = ['序', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+function sealOf(ch: Chapter): string {
+  return ch.id === 'epilogue' ? '終' : (HAN_NO[ch.no] ?? String(ch.no));
 }
 
 /* ───────── 장 하나 ───────── */

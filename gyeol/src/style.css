@@ -1,4 +1,4 @@
-/* 「결」 손맛 시제품 화면 */
+/* 「결(決) — 천외귀환 외전」 화면 */
 :root {
   --ink: #efe8dc;
   --ink-dim: #b9b0a2;
@@ -553,3 +553,158 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
   .lobby-corner { right: 12px; bottom: 46px; gap: 10px; }
   .medal.lobby-medal { width: 48px; height: 48px; font-size: 24px; }
 }
+
+/* ───────── 전투 화면 2026-11-11(사용자 요청): 큰 버튼 · 일시 정지 · 하운 이름판 · 움직이는 막대 · 결과 단추 ───────── */
+/* 버튼: 나가기를 빼고 다섯을 크게 */
+.duel .pads { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (min-width: 641px) {
+  .duel { width: min(100%, calc((100vh - 116px) * 16 / 9)); width: min(100%, calc((100dvh - 116px) * 16 / 9)); }
+  .duel .pad { min-height: 84px; font-size: 26px; }
+  .duel .pad small { font-size: 15px; }
+  .duel .pad .pad-icon { width: 34px; height: 34px; }
+}
+@media (max-width: 640px) { .duel .pads { grid-template-columns: repeat(3, 1fr); } .duel .pad.focus { grid-column: auto; grid-row: auto; } }
+
+/* 일시 정지 단추(오른쪽 위, 전체 화면 단추 왼쪽)와 창 */
+.pause-btn { position: absolute; top: 10px; right: 58px; z-index: 6; width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(10, 8, 14, 0.55); color: var(--ink); font-size: 14px; letter-spacing: -2px; cursor: pointer; }
+.pause-btn:hover, .pause-btn.on { border-color: var(--gold); color: #ffe08a; }
+.pause { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; background: rgba(6, 5, 8, 0.66); backdrop-filter: blur(3px) grayscale(0.5); animation: pauseIn 0.18s ease-out; }
+.pause[hidden] { display: none; }
+.pause-box { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 34px 28px; border-radius: 16px; border: 1px solid rgba(226, 180, 92, 0.4); background: linear-gradient(180deg, rgba(31, 26, 20, 0.95), rgba(12, 10, 8, 0.96)); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7); }
+.pause-box h2 { margin: 0; font-family: 'Song Myung', serif; font-weight: 400; font-size: 34px; letter-spacing: 0.2em; }
+.pause-mark { position: absolute; right: 16px; top: 12px; margin: 0; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 6px; background: #8e1f1a; color: #f6e7cf; font-family: 'Song Myung', serif; font-size: 24px; transform: rotate(-4deg); }
+.pause-box .kicker { margin: 0 0 12px; color: #c9b98f; font-size: 14px; }
+@keyframes pauseIn { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 641px) { .duel .pause-box { zoom: max(1, min(1.5, var(--ui, 1))); } .duel .pause-btn { transform: scale(max(1, min(1.4, var(--ui, 1)))); transform-origin: top right; } }
+
+/* 결과·일시 정지 단추: 모두 같은 크기의 먹 판, 앞에 오는 단추만 붉은 인장 테 */
+.res-row { display: grid; grid-template-columns: repeat(auto-fit, 188px); justify-content: center; gap: 12px; margin-top: 14px; width: min(640px, 92vw); }
+.res-btn { position: relative; height: 58px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; border: 1px solid rgba(226, 180, 92, 0.45); background: linear-gradient(180deg, #2a241c, #15110c); box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.12), 0 4px 12px rgba(0, 0, 0, 0.5); color: #efe3c8; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s; }
+.res-btn b { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 19px; white-space: nowrap; }
+.res-btn small { font-size: 11px; color: #a89c84; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 4px; padding: 1px 5px; }
+.res-btn::before { content: ''; position: absolute; inset: 4px; border-radius: 7px; border: 1px solid rgba(226, 180, 92, 0.16); pointer-events: none; }
+.res-btn:hover, .res-btn:focus-visible { transform: translateY(-2px); border-color: #ffd27a; box-shadow: 0 0 16px rgba(255, 210, 122, 0.35), 0 6px 16px rgba(0, 0, 0, 0.55); outline: none; }
+.res-btn.primary { background: linear-gradient(180deg, #6b1d18, #36100c); border-color: #e0574a; color: #fff1e0; }
+.res-btn.primary::before { border-color: rgba(255, 180, 160, 0.3); }
+.res-btn.primary::after { content: ''; position: absolute; left: -6px; top: 50%; width: 12px; height: 12px; margin-top: -6px; background: #e0574a; transform: rotate(45deg); box-shadow: 0 0 10px rgba(224, 87, 74, 0.8); }
+.res-btn.primary:hover, .res-btn.primary:focus-visible { border-color: #ff9a7a; box-shadow: 0 0 18px rgba(224, 87, 74, 0.55), 0 6px 16px rgba(0, 0, 0, 0.55); }
+.result .res-row { margin-top: 16px; }
+
+/* 하운 이름판: 얼굴 인장 + 이름·체력 숫자 + 굵은 체력 막대 + 체간·집중 */
+.duel .me-bar { width: 340px; display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border-radius: 14px; border: 1px solid rgba(226, 180, 92, 0.45); background: linear-gradient(180deg, rgba(24, 20, 16, 0.92), rgba(10, 8, 7, 0.92)); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 230, 180, 0.1); }
+.art-frames .duel .me-bar b { display: inline; width: auto; height: auto; line-height: 1; background: none; color: #fff1d6; text-shadow: 0 1px 3px #000; }
+.me-face { flex: none; width: 64px; height: 64px; border-radius: 50%; border: 2px solid #e2b45c; background: #2a1d14 center 6% / 260% no-repeat; box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.6), 0 0 14px rgba(226, 180, 92, 0.35); display: grid; place-items: center; font-family: 'Song Myung', serif; font-size: 30px; color: #f6e7cf; }
+.me-body { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.me-name { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.me-name b { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 20px; letter-spacing: 0.05em; }
+.hp-num { font: 700 13px/1 'IBM Plex Sans KR', sans-serif; color: #ffd0c4; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+.bar-row { display: grid; grid-template-columns: 2.4em 1fr; align-items: center; gap: 6px; }
+.bar-row em { font-style: normal; font-size: 12px; color: #cbbf9f; text-align: right; }
+.duel .bar { height: 10px; border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.7); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8); }
+.duel .me-bar .bar.hp { height: 16px; border-radius: 8px; }
+.duel .foe-bar .bar.hp { height: 14px; border-radius: 7px; }
+.duel .bar.posture, .duel .bar.focus { height: 8px; }
+.duel .bar .fill { z-index: 2; }
+.duel .bar .lag { z-index: 1; position: absolute; inset: 0 auto 0 0; display: block; background: linear-gradient(90deg, #fff4d6, #ffcf7a); transition: width 0.5s cubic-bezier(0.3, 0, 0.3, 1); }
+.duel .bar.hp .fill { background: linear-gradient(180deg, #ff8a72 0%, #e0453a 45%, #9c1f1a 100%); box-shadow: 0 0 8px rgba(255, 90, 70, 0.6); }
+.duel .foe-bar .bar.hp .fill { background: linear-gradient(180deg, #ff9a6a 0%, #d43b2f 45%, #7a1612 100%); }
+.duel .me-bar .bar.posture .fill { background: linear-gradient(90deg, #8e95c4, #e4e8ff); }
+.duel .me-bar .bar.focus .fill { background: linear-gradient(90deg, #2f6fd0, #9fdcff); box-shadow: 0 0 6px rgba(120, 190, 255, 0.6); }
+.duel .bar .hp-num { position: absolute; right: 6px; top: 50%; z-index: 4; transform: translateY(-50%); font-size: 10px; }
+/* 윤기: 빛줄기가 막대를 천천히 훑고 지나간다 */
+.duel .bar .gloss { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(105deg, transparent 0 40%, rgba(255, 255, 255, 0.45) 48%, transparent 56% 100%); background-size: 250% 100%; animation: gloss 3.4s ease-in-out infinite; mix-blend-mode: overlay; }
+.duel .bar.posture .gloss { animation-delay: -1.2s; }
+.duel .bar.focus .gloss { animation-delay: -2.1s; }
+@keyframes gloss { 0% { background-position: 120% 0; } 60%, 100% { background-position: -40% 0; } }
+/* 맞음: 막대가 흔들리며 하얗게 번쩍 — 크게 깎이면 더 세게 */
+.duel .bar.hit { animation: barHit 0.38s ease-out; }
+.duel .bar.hit-big { animation: barHitBig 0.6s ease-out; }
+@keyframes barHit { 0% { filter: brightness(2.4); transform: translateX(-3px); } 25% { transform: translateX(3px); } 50% { transform: translateX(-2px); } 100% { filter: none; transform: none; } }
+@keyframes barHitBig { 0% { filter: brightness(3) saturate(0.4); transform: translateX(-6px) scaleY(1.5); box-shadow: 0 0 20px #fff; } 20% { transform: translateX(6px) scaleY(1.3); } 40% { transform: translateX(-4px); } 60% { transform: translateX(3px); } 100% { filter: none; transform: none; box-shadow: none; } }
+.duel .me-bar.shake { animation: plateShake 0.35s ease-out; }
+@keyframes plateShake { 0% { translate: -5px 2px; } 30% { translate: 4px -2px; } 60% { translate: -2px 1px; } 100% { translate: 0 0; } }
+/* 차오름: 초록빛이 번진다 */
+.duel .bar.heal { animation: barHeal 0.7s ease-out; }
+@keyframes barHeal { 0% { box-shadow: 0 0 16px #7dff9a; filter: brightness(1.8) hue-rotate(80deg); } 100% { box-shadow: none; filter: none; } }
+/* 위기(30% 아래): 막대와 이름판이 붉게 맥박친다, 얼굴 인장도 같이 뛴다 */
+.duel .bar.hp.danger { animation: dangerPulse 0.86s ease-in-out infinite; border-color: #ff6a5a; }
+.duel .bar.hp.danger.hit, .duel .bar.hp.danger.hit-big { animation: barHitBig 0.6s ease-out; }
+@keyframes dangerPulse { 0%, 100% { box-shadow: 0 0 4px rgba(255, 60, 40, 0.4); } 50% { box-shadow: 0 0 16px rgba(255, 60, 40, 0.95), inset 0 0 6px rgba(255, 120, 90, 0.7); } }
+.duel .me-bar.danger { border-color: rgba(255, 106, 90, 0.75); }
+.duel .me-bar.danger .me-face { animation: faceBeat 0.86s ease-in-out infinite; border-color: #ff6a5a; }
+@keyframes faceBeat { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 60, 40, 0.5); } 15% { transform: scale(1.07); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.6), 0 0 22px rgba(255, 60, 40, 0.95); } }
+/* 체간이 거의 참: 적은 금빛이 타오르고(무너뜨릴 때), 하운은 붉게 깜박인다(무너지기 직전) */
+.duel .foe-bar .bar.posture.near { animation: postureFlare 0.5s ease-in-out infinite alternate; border-color: #ffe08a; }
+@keyframes postureFlare { from { box-shadow: 0 0 6px rgba(255, 210, 122, 0.5); } to { box-shadow: 0 0 18px rgba(255, 230, 150, 1); filter: brightness(1.3); } }
+.duel .me-bar .bar.posture.near { animation: postureWarn 0.4s steps(2) infinite; }
+.duel .me-bar .bar.posture.near .fill { background: linear-gradient(90deg, #ff9a6a, #ffe0c0); }
+@keyframes postureWarn { 50% { border-color: #ff6a5a; box-shadow: 0 0 10px rgba(255, 106, 90, 0.9); } }
+/* 집중이 가득: 푸른 불꽃이 한 번 터지고, 그 뒤 은은하게 반짝인다 */
+.duel .bar.focus.burst { animation: focusBurst 0.7s ease-out; }
+@keyframes focusBurst { 0% { box-shadow: 0 0 0 rgba(160, 220, 255, 0); transform: scaleY(1); } 30% { box-shadow: 0 0 22px rgba(160, 220, 255, 1); transform: scaleY(1.8); filter: brightness(2); } 100% { box-shadow: 0 0 6px rgba(160, 220, 255, 0.5); transform: none; } }
+.duel .bar.focus.full { border-color: #bfe4ff; box-shadow: 0 0 8px rgba(160, 220, 255, 0.7); }
+.duel .bar.focus.full .gloss { animation-duration: 1.2s; background: linear-gradient(105deg, transparent 0 40%, rgba(255, 255, 255, 0.85) 48%, transparent 56% 100%); background-size: 250% 100%; }
+.duel .bar.focus.on .fill { background: linear-gradient(90deg, #ffe08a, #fff6d0); box-shadow: 0 0 10px rgba(255, 224, 138, 0.9); }
+/* 적 이름판 아래 체력 숫자 */
+.duel .foe-bar { gap: 6px; }
+@media (prefers-reduced-motion: reduce) { .duel .bar, .duel .bar *, .duel .me-bar, .me-face { animation: none !important; } }
+.result:not([hidden]) ~ .pause-btn { display: none; }
+/* 수련장 칸: 수련 · 박자 도전 */
+.prac-tabs { display: flex; gap: 8px; margin: 4px 0 18px; border-bottom: 1px solid rgba(226, 180, 92, 0.25); }
+.prac-tab { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 22px; border: 1px solid transparent; border-bottom: 0; border-radius: 10px 10px 0 0; background: none; color: var(--ink-dim); cursor: pointer; font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 18px; }
+.prac-tab .tab-han { font-family: 'Song Myung', serif; font-weight: 400; font-size: 22px; color: #a89c84; }
+.prac-tab.on { color: #ffe08a; border-color: rgba(226, 180, 92, 0.4); background: linear-gradient(180deg, rgba(60, 46, 22, 0.6), rgba(20, 16, 10, 0.2)); }
+.prac-tab.on .tab-han { color: #e0574a; }
+.prac-lead { margin: 0 0 14px; color: var(--ink-dim); }
+
+/* 이야기 지도(2026-11-11): 「천외귀환」 여정 띠 그림 위 장 인장 + 길 + 아래 두루마리 쪽지 */
+.story-screen { width: min(1500px, 100%); }
+.story-frame { position: relative; width: min(100%, calc((100vh - 120px) * 1.5)); margin: 0 auto; }
+.story-map { position: relative; width: 100%; aspect-ratio: 3 / 2; border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 50% 50%, #e8d6b0, #c9ad7c); background-size: 100% 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 60px rgba(90, 60, 20, 0.45); }
+.story-map.has-art { background-position: center; background-repeat: no-repeat; }
+.story-map::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 80px rgba(60, 35, 10, 0.55); }
+.story-path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.story-path path { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.story-path .walked { stroke: #8e1f1a; stroke-width: 4; opacity: 0.85; }
+.story-path .walked.next { stroke-dasharray: 10 8; animation: pathFlow 1.2s linear infinite; }
+.story-path .ahead { stroke: #5a4a32; stroke-width: 2; stroke-dasharray: 3 7; opacity: 0.45; }
+@keyframes pathFlow { to { stroke-dashoffset: -18; } }
+.story-pin { position: absolute; z-index: 2; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0; border: 0; background: none; cursor: pointer; }
+.pin-seal { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 8px; background: #8e1f1a; color: #f6e7cf; font-family: 'Song Myung', serif; font-size: 26px; transform: rotate(-4deg); box-shadow: 0 3px 8px rgba(40, 20, 5, 0.6), inset 0 0 0 2px rgba(255, 220, 190, 0.3); transition: transform 0.15s; }
+.pin-name { padding: 1px 8px; border-radius: 4px; background: rgba(246, 236, 214, 0.9); color: #3a2a18; font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 14px; white-space: nowrap; box-shadow: 0 1px 4px rgba(40, 20, 5, 0.4); }
+.pin-stars { color: #c48a1a; font-size: 13px; letter-spacing: 1px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7); }
+.story-pin.cleared .pin-seal { background: #6a1813; }
+.story-pin.open:not(.cleared) .pin-seal { animation: pinCall 1.4s ease-in-out infinite; }
+@keyframes pinCall { 0%, 100% { box-shadow: 0 3px 8px rgba(40, 20, 5, 0.6), 0 0 0 0 rgba(224, 87, 74, 0.7); } 50% { box-shadow: 0 3px 8px rgba(40, 20, 5, 0.6), 0 0 0 10px rgba(224, 87, 74, 0); } }
+.story-pin.locked .pin-seal { background: #6b6258; color: #d8d0c2; filter: grayscale(1); opacity: 0.75; }
+.story-pin.locked .pin-name { opacity: 0.6; }
+.story-pin:hover .pin-seal, .story-pin:focus-visible .pin-seal, .story-pin.picked .pin-seal { transform: rotate(0) scale(1.18); }
+.story-pin.picked .pin-seal { outline: 3px solid #ffd27a; outline-offset: 3px; }
+.story-pin:focus-visible { outline: none; }
+/* 두루마리 쪽지: 지도 아래 빈 종이 자리에 */
+.story-card { position: absolute; left: 50%; bottom: 3%; translate: -50% 0; z-index: 3; width: min(760px, 86%); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(226, 180, 92, 0.55); background: linear-gradient(180deg, rgba(30, 24, 18, 0.95), rgba(14, 11, 8, 0.96)); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); }
+.sc-seal { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 10px; background: #8e1f1a; color: #f6e7cf; font-family: 'Song Myung', serif; font-size: 32px; transform: rotate(-4deg); }
+.sc-text { min-width: 0; }
+.sc-place { margin: 0; color: #c9b98f; font-size: 13px; letter-spacing: 0.2em; }
+.sc-text h2 { margin: 2px 0 4px; font-family: 'Song Myung', serif; font-weight: 400; font-size: 24px; color: #f4ead6; }
+.sc-recall { margin: 0; color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+.sc-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 6px 0 0; font-size: 13px; color: #cbbf9f; }
+.sc-stars { color: #ffd27a; letter-spacing: 2px; }
+.sc-chal { color: #a8c8e8; }
+.sc-go .res-btn { width: 188px; }
+.res-btn[disabled] { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+@media (max-width: 760px) { .story-card { position: static; translate: none; width: auto; margin-top: 10px; grid-template-columns: auto 1fr; } .sc-go { grid-column: 1 / -1; } .pin-name { font-size: 11px; } .pin-seal { width: 32px; height: 32px; font-size: 18px; } }
+@media (prefers-reduced-motion: reduce) { .story-path .walked.next, .story-pin .pin-seal { animation: none !important; } }
+
+/* 決 — 붉은 먹(2026-11-11 사용자 요청 "처음의 빨간 먹 디자인으로"): 먹 원(ui_gyeol_frames 5번 칸, 붉은 낙관) 안에 주홍 먹 글씨.
+   시작 화면(로그인 판)과 메인 가운데 모두 같은 모양 */
+.lobby-logo { position: relative; display: grid; place-items: center; width: 210px; height: 210px; margin: 0 0 18px; font-size: 118px; line-height: 1; }
+.art-frames .lobby-logo { background: var(--enso) center / contain no-repeat; }
+.lobby-logo::before { content: ''; position: absolute; inset: 15%; border-radius: 50%; background: radial-gradient(circle, rgba(246, 238, 222, 0.96) 0 60%, rgba(232, 220, 196, 0.6) 66%, rgba(232, 220, 196, 0) 71%); filter: blur(2px); z-index: -1; }
+.art-frames .lobby-logo { filter: drop-shadow(0 0 18px rgba(255, 236, 200, 0.35)); }
+.art-frames .lobby-logo::before { z-index: 0; }
+.lobby-logo .ink-han, .art-title .title h1.logo .ink-han, .title h1.logo .ink-han { position: relative; z-index: 1; color: #a3171a; text-shadow: 0 0 1px rgba(90, 8, 8, 0.8), 0 2px 10px rgba(163, 23, 26, 0.35); transform: translate(-4px, -6px) rotate(-3deg); }
+.lobby-logo .ink-han { animation: inkBreathe 6s ease-in-out infinite; }
+@keyframes inkBreathe { 0%, 100% { filter: url(#ink-bleed); } 50% { filter: url(#ink-bleed) drop-shadow(0 0 6px rgba(200, 40, 30, 0.45)); } }
+@media (max-height: 820px) { .lobby-logo { width: 170px; height: 170px; font-size: 96px; margin-bottom: 12px; } }
+@media (prefers-reduced-motion: reduce) { .lobby-logo .ink-han { animation: none; } }
