@@ -199,8 +199,15 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       canvas.width = W * k;
       canvas.height = H * k;
     }
-    // 화면 위 글·이름판(HUD)도 캔버스가 960px보다 커진 만큼 키운다(PC 전체 화면)
-    if (canvas.clientWidth) canvas.parentElement?.style.setProperty('--ui', (canvas.clientWidth / W).toFixed(3));
+    // 화면 위 글·이름판(HUD)은 캔버스가 아니라 창 크기로(2026-11-11 최적화): 1280×720을 1로, 1~1.3배 사이.
+    // 캔버스는 창을 꽉 채우느라 창보다 클 수 있다 — 그만큼 키우면 이름판·창이 너무 커진다
+    const stage = canvas.parentElement;
+    if (stage) {
+      const hud = Math.max(1, Math.min(1.3, Math.min(stage.clientWidth / 1280, stage.clientHeight / 720)));
+      stage.style.setProperty('--ui', hud.toFixed(3));
+      stage.style.setProperty('--hud', hud.toFixed(3));
+    }
+    // 캔버스 글자(말풍선)의 배율: 캔버스가 실제로 그려지는 크기 기준
   };
   fitCanvas();
   const resizeObs = new ResizeObserver(() => fitCanvas());
