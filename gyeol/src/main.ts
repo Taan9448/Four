@@ -3,7 +3,7 @@
 // 4차(2026-11-09): 칼 맞부딪힘 겨루기(J·K 연타), 위기(배수의 진), 집중(심안), 적별 결정타, 날씨 입자, 적 도발·하운 대사.
 import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
-import { applyUiArt, el, padIcon, rankBadge } from './dom';
+import { applyUiArt, el, padIcon, rankBadge, toast } from './dom';
 import { announceAchievements } from './screens';
 import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
@@ -11,10 +11,11 @@ import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, pr
 import { heartbeat } from './heart';
 import { loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
-import { bootCloud } from './cloud';
+import { bootCloud, trainingTarget } from './cloud';
+import { duelXp, gainXp } from './training';
 import { openSettings } from './settings';
 import { renderStory, story } from './story';
-import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
+import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
@@ -65,6 +66,7 @@ const nav: Nav = {
     else if (s === 'rhythm') renderRhythm(app, nav, data);
     else if (s === 'practice') renderPractice(app, nav, data);
     else if (s === 'records') renderRecords(app, nav, data);
+    else if (s === 'wardrobe') renderWardrobe(app, nav);
     else if (s === 'calibrate') renderCalibrate(app, nav);
     else if (s === 'story') renderStory(app, nav, data);
   },
@@ -725,6 +727,13 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     }
     writeSave(save);
     announceAchievements(data);
+    // 수련 Lv.(「천외귀환」과 같은 계정 수련): 이긴 대결마다 — 일반·정예(2단계)·보스(3단계 이상)
+    if (mode === 'duel' && d.result === 'win') {
+      const { row, user } = trainingTarget();
+      void gainXp(duelXp(foeDef.phases?.length ?? 0), row, user).then(({ from, to }) => {
+        if (to > from) toast(`수련 Lv.${to}`, '「천외귀환」과 함께 쓰는 계정 수련이 올랐다');
+      });
+    }
   };
   const finish = () => {
     if (tutorial) {

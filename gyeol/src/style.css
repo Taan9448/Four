@@ -523,3 +523,41 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .ach.met { border-color: rgba(255, 224, 138, 0.45); color: var(--ink); }
 .ach.met b { color: #ffe08a; }
 .ach small { font-size: 13px; }
+
+/* 메인(2026-11-11 — 「천외귀환」 시작 화면과 같은 구성): 가운데 제목·메뉴, 왼쪽 아래 명패, 오른쪽 아래 둥근 표식. 하운은 왼쪽, 왕일검은 오른쪽 */
+.lobby.main { display: grid; grid-template-columns: 1fr minmax(300px, 380px) 1fr; grid-template-rows: 1fr auto; height: 100vh; min-height: 640px; }
+.art-lobby .lobby.main { background: radial-gradient(ellipse 34% 60% at 50% 46%, rgba(8, 7, 10, 0.62), rgba(8, 7, 10, 0.12) 100%), linear-gradient(180deg, rgba(8, 7, 10, 0.05), rgba(8, 7, 10, 0.55)), var(--lobby-bg) center / cover no-repeat; }
+.lobby.main > .lobby-scene { position: absolute; inset: 0; grid-row: 1 / -1; grid-column: 1 / -1; z-index: 0; min-height: 0; pointer-events: none; }
+.lobby.main .lobby-haun, .lobby.main .lobby-scene.gyeol-art .lobby-haun { left: 2%; right: auto; bottom: 0; height: 92%; max-height: 820px; }
+.lobby.main .lobby-wang, .lobby.main .lobby-scene.gyeol-art .lobby-wang { left: auto; right: 3%; bottom: 0; height: 74%; pointer-events: auto; }
+.lobby.main .lobby-say { top: 8%; }
+.lobby.main > .lobby-center { position: relative; z-index: 1; grid-column: 2; grid-row: 1; align-self: center; display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 12px; }
+.lobby-logo { margin: 0; font-size: 104px; line-height: 1; }
+.lobby-logo .ink-han { color: #f4ead6; text-shadow: 0 0 22px rgba(226, 180, 92, 0.45), 0 2px 6px #000; }
+.lobby-place { margin: 6px 0 20px; color: #e2d6bd; font-family: 'Nanum Myeongjo', serif; font-size: 16px; letter-spacing: 0.3em; text-shadow: 0 1px 3px #000; }
+.lobby.main .lobby-menu { grid-row: auto; grid-column: auto; padding: 0; gap: 8px; align-items: center; width: 100%; }
+.lobby.main .lobby-menu li { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.lobby.main .lobby-menu .menu-btn { width: 260px; }
+.lobby.main .lobby-menu small { font-size: 13px; text-align: center; }
+.lobby.main > .lobby-foot { position: relative; z-index: 1; grid-column: 1 / -1; grid-row: 2; padding: 0 340px 18px; text-align: center; font-size: 13px; text-shadow: 0 1px 3px #000; }
+.lobby-corner { position: fixed; right: 24px; bottom: 34px; z-index: 3; display: flex; gap: 14px; }
+.medal.lobby-medal { position: relative; width: 58px; height: 58px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 40% 35%, #232736, #0c0d12 72%); border: 1.5px solid #c9a24f; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(201, 162, 79, 0.12); color: #f5d98c; font-family: 'Song Myung', serif; font-size: 30px; line-height: 1; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
+.medal.lobby-medal:hover, .medal.lobby-medal:focus-visible { transform: translateY(-2px); box-shadow: 0 0 12px rgba(245, 217, 140, 0.45), 0 3px 10px rgba(0, 0, 0, 0.55); outline: none; }
+.medal.lobby-medal:active { transform: scale(0.94); }
+.medal.lobby-medal b { font-weight: 400; }
+.medal.lobby-medal span { position: absolute; left: 50%; bottom: -19px; transform: translateX(-50%); font: 700 12px/1 'Pretendard', system-ui, sans-serif; color: #e8dcc0; white-space: nowrap; text-shadow: 0 1px 3px #000; letter-spacing: 0.08em; }
+.medal.lobby-medal.to-cheonoe { margin-left: 10px; background: radial-gradient(circle at 40% 35%, #3a1d1a, #140808 72%); border-color: #d06a4f; color: #ffd8b8; }
+.medal.lobby-medal.to-cheonoe::before { content: ''; position: absolute; left: -13px; top: 12px; bottom: 12px; border-left: 1px solid rgba(226, 180, 92, 0.3); }
+.wardrobe .outfit-grid { margin-top: 12px; }
+@media (max-width: 1100px) {
+  .lobby.main .lobby-wang { display: none; }
+  .lobby.main .lobby-haun { opacity: 0.55; }
+  .lobby.main > .lobby-foot { padding: 0 16px 120px; }
+}
+@media (max-width: 640px) {
+  .lobby.main { grid-template-columns: 1fr; min-height: 0; height: auto; padding-bottom: 150px; }
+  .lobby.main > .lobby-center { grid-column: 1; }
+  .lobby.main .lobby-haun { display: none; }
+  .lobby-corner { right: 12px; bottom: 46px; gap: 10px; }
+  .medal.lobby-medal { width: 48px; height: 48px; font-size: 24px; }
+}
