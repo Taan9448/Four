@@ -1,0 +1,428 @@
+{
+  "method": "one uniform nearest-neighbor scale for all six frames chosen to match idle main-body WIDTH, then integer placement; first-frame feet anchored to idle main-body bottom; no painting or clipping",
+  "sizeCriterion": "first-frame connected body width",
+  "sourceFormat": {
+    "method": "Serialize imagegen artwork as exact 4x4 constant-color blocks on the unchanged 1536x1024 canvas; choose majority nearest-master-palette color per block; no painting, extra shapes, or per-cell geometry changes",
+    "generatedSource": "/workspace/generated_images/exec-b882e0a1-69a4-4eab-be61-26a3040bbff9.png",
+    "canvas": [
+      1536,
+      1024
+    ],
+    "block": 4,
+    "foregroundPalette": [
+      "#0b0b10",
+      "#1d2433",
+      "#2b2b3a",
+      "#3d4459",
+      "#5d6478",
+      "#8a90a3",
+      "#c2c6d1",
+      "#f1efe6",
+      "#4b3a6b",
+      "#6b4fa3",
+      "#a35cff",
+      "#d4b8ff"
+    ],
+    "foregroundColorsPerCell": [
+      12,
+      12,
+      12,
+      12,
+      7,
+      6
+    ],
+    "occupiedSourcePixels": [
+      45088,
+      52576,
+      35216,
+      31376,
+      4848,
+      3296
+    ],
+    "fillRatios": [
+      0.1719970703125,
+      0.2005615234375,
+      0.13433837890625,
+      0.11968994140625,
+      0.01849365234375,
+      0.0125732421875
+    ],
+    "changedChannels": 4700673
+  },
+  "source": "assets/source/rift_beast_death.png",
+  "measurementNote": null,
+  "idleBody": {
+    "minX": 23,
+    "minY": 68,
+    "maxX": 140,
+    "maxY": 139,
+    "width": 118,
+    "height": 72,
+    "count": 3810
+  },
+  "firstBodyBefore": {
+    "minX": 31,
+    "minY": 92,
+    "maxX": 130,
+    "maxY": 143,
+    "width": 100,
+    "height": 52,
+    "count": 2568
+  },
+  "firstBodyAfter": {
+    "minX": 23,
+    "minY": 78,
+    "maxX": 140,
+    "maxY": 139,
+    "width": 118,
+    "height": 62,
+    "count": 3588
+  },
+  "idleGround": 139,
+  "scaleCanvas": [
+    189,
+    189
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 31,
+        "minY": 79,
+        "maxX": 130,
+        "maxY": 143,
+        "width": 100,
+        "height": 65,
+        "count": 2818
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -31
+      ],
+      "after": {
+        "minX": 23,
+        "minY": 63,
+        "maxX": 140,
+        "maxY": 139,
+        "width": 118,
+        "height": 77,
+        "count": 3938
+      },
+      "bodyAfter": {
+        "minX": 23,
+        "minY": 78,
+        "maxX": 140,
+        "maxY": 139,
+        "width": 118,
+        "height": 62,
+        "count": 3588
+      },
+      "visibleBefore": 3938,
+      "visibleAfter": 3938
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 31,
+        "minY": 89,
+        "maxX": 127,
+        "maxY": 143,
+        "width": 97,
+        "height": 55,
+        "count": 3286
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -31
+      ],
+      "after": {
+        "minX": 23,
+        "minY": 75,
+        "maxX": 137,
+        "maxY": 139,
+        "width": 115,
+        "height": 65,
+        "count": 4589
+      },
+      "bodyAfter": {
+        "minX": 23,
+        "minY": 75,
+        "maxX": 137,
+        "maxY": 139,
+        "width": 115,
+        "height": 65,
+        "count": 4589
+      },
+      "visibleBefore": 4589,
+      "visibleAfter": 4589
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 28,
+        "minY": 104,
+        "maxX": 128,
+        "maxY": 143,
+        "width": 101,
+        "height": 40,
+        "count": 2201
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -31
+      ],
+      "after": {
+        "minX": 20,
+        "minY": 92,
+        "maxX": 138,
+        "maxY": 139,
+        "width": 119,
+        "height": 48,
+        "count": 3051
+      },
+      "bodyAfter": {
+        "minX": 20,
+        "minY": 97,
+        "maxX": 138,
+        "maxY": 139,
+        "width": 119,
+        "height": 43,
+        "count": 2992
+      },
+      "visibleBefore": 3051,
+      "visibleAfter": 3051
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 30,
+        "minY": 98,
+        "maxX": 127,
+        "maxY": 143,
+        "width": 98,
+        "height": 46,
+        "count": 1961
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -31
+      ],
+      "after": {
+        "minX": 22,
+        "minY": 85,
+        "maxX": 137,
+        "maxY": 139,
+        "width": 116,
+        "height": 55,
+        "count": 2730
+      },
+      "bodyAfter": {
+        "minX": 22,
+        "minY": 90,
+        "maxX": 134,
+        "maxY": 139,
+        "width": 113,
+        "height": 50,
+        "count": 2593
+      },
+      "visibleBefore": 2730,
+      "visibleAfter": 2730
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 37,
+        "minY": 107,
+        "maxX": 117,
+        "maxY": 140,
+        "width": 81,
+        "height": 34,
+        "count": 303
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -27
+      ],
+      "after": {
+        "minX": 30,
+        "minY": 100,
+        "maxX": 125,
+        "maxY": 139,
+        "width": 96,
+        "height": 40,
+        "count": 421
+      },
+      "bodyAfter": {
+        "minX": 54,
+        "minY": 108,
+        "maxX": 80,
+        "maxY": 121,
+        "width": 27,
+        "height": 14,
+        "count": 152
+      },
+      "visibleBefore": 421,
+      "visibleAfter": 421
+    },
+    {
+      "frame": 6,
+      "before": {
+        "minX": 40,
+        "minY": 116,
+        "maxX": 118,
+        "maxY": 134,
+        "width": 79,
+        "height": 19,
+        "count": 206
+      },
+      "resize": [
+        189,
+        189
+      ],
+      "offset": [
+        -14,
+        -20
+      ],
+      "after": {
+        "minX": 34,
+        "minY": 118,
+        "maxX": 126,
+        "maxY": 139,
+        "width": 93,
+        "height": 22,
+        "count": 277
+      },
+      "bodyAfter": {
+        "minX": 34,
+        "minY": 118,
+        "maxX": 56,
+        "maxY": 128,
+        "width": 23,
+        "height": 11,
+        "count": 103
+      },
+      "visibleBefore": 277,
+      "visibleAfter": 277
+    }
+  ],
+  "reviewMeasurements": {
+    "sourceGridInvalidPixels": 0,
+    "sourceExactBlock": 4,
+    "idleBody": {
+      "minX": 23,
+      "minY": 68,
+      "maxX": 140,
+      "maxY": 139,
+      "width": 118,
+      "height": 72,
+      "count": 3810
+    },
+    "firstBody": {
+      "minX": 23,
+      "minY": 78,
+      "maxX": 140,
+      "maxY": 139,
+      "width": 118,
+      "height": 62,
+      "count": 3588
+    },
+    "frames": [
+      {
+        "frame": 1,
+        "colors": 12,
+        "visiblePixels": 3938,
+        "bbox": {
+          "minX": 23,
+          "minY": 63,
+          "maxX": 140,
+          "maxY": 139
+        },
+        "minimumMargin": 19
+      },
+      {
+        "frame": 2,
+        "colors": 12,
+        "visiblePixels": 4589,
+        "bbox": {
+          "minX": 23,
+          "minY": 75,
+          "maxX": 137,
+          "maxY": 139
+        },
+        "minimumMargin": 20
+      },
+      {
+        "frame": 3,
+        "colors": 12,
+        "visiblePixels": 3051,
+        "bbox": {
+          "minX": 20,
+          "minY": 92,
+          "maxX": 138,
+          "maxY": 139
+        },
+        "minimumMargin": 20
+      },
+      {
+        "frame": 4,
+        "colors": 12,
+        "visiblePixels": 2730,
+        "bbox": {
+          "minX": 22,
+          "minY": 85,
+          "maxX": 137,
+          "maxY": 139
+        },
+        "minimumMargin": 20
+      },
+      {
+        "frame": 5,
+        "colors": 7,
+        "visiblePixels": 421,
+        "bbox": {
+          "minX": 30,
+          "minY": 100,
+          "maxX": 125,
+          "maxY": 139
+        },
+        "minimumMargin": 20
+      },
+      {
+        "frame": 6,
+        "colors": 6,
+        "visiblePixels": 277,
+        "bbox": {
+          "minX": 34,
+          "minY": 118,
+          "maxX": 126,
+          "maxY": 139
+        },
+        "minimumMargin": 20
+      }
+    ],
+    "validation": {
+      "failures": 0,
+      "warnings": 0
+    }
+  }
+}
