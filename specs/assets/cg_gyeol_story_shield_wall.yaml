@@ -1,0 +1,10 @@
+id: cg_gyeol_story_shield_wall
+type: story-cg
+character: kyle_red
+summary: 「결」 이야기 회상 일러스트(먹 그림) — 낙안봉 골짜기 — 삼천을 받아 내는 방패벽 삼백과 카일(S7, 3권 9장) · 「천외귀환」 cg_shield_wall의 「결」판(2026-11-12)
+frame_notes:
+  1: 'Dawn in a narrow rocky valley below Nakan peak of Mount Hua: a wall of three hundred farmers-turned-soldiers with big round wooden shields locked edge to edge, braced shoulder to shoulder, the second row pushing on the first, taking the charge of a dark tide of blood-cult fighters in black and crimson. In the middle of the wall stands Kyle Rowen, blond young knight in silver plate armor, shouting with his crimson-bladed long sword raised high, the blade glowing like embers in the grey dawn light. Banners of Wudang and Shaolin on the valley flanks; on the cliff above, a short red-bearded dwarf with a hammer looks down at a marked point in the rock. Dust, arrows, the peak''s fortress far above.'
+framing: 'A cinematic story illustration for a visual-novel scene, wide 3:2 frame. The bottom quarter will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Same moment and composition idea as the original scene, but painted as Jin Haun''s memory: strong readable silhouettes, the edges of the picture dissolve into blank paper. No text.'
+style: 'Gyeol story recollection: an East Asian ink-wash (sumi-e) painting on warm aged rice paper — confident black ink brush lines, soft grey and muted indigo washes, a restrained palette of ink black, warm paper beige and muted indigo with exactly ONE vermilion red accent in the picture, visible brush texture and ink bleeding at the edges, the scene fading softly into blank paper at the outer borders like a remembered moment told at night; faces and hands still clear and expressive; a small plain square vermilion seal stamp with no characters in one lower corner; not anime cel shading, not pixel art, not a photograph'
+placeholder:
+  color: '#2b2620'

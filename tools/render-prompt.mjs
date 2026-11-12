@@ -267,7 +267,8 @@ export function renderPrompt(spec, style) {
         (spec.type === 'portrait' ? 'Framing: bust portrait, character centered, simple softly painted background.\n' : '') +
         (spec.type === 'card-art' ? 'Framing: vertical card illustration; keep the important subject in the upper two thirds.\n' : '') +
         (spec.framing ? `Composition: ${spec.framing}\n` : '') +
-        `Style: ${style.illustration_style}.\n` +
+        // spec.style(2026-11-12): 「결」 이야기 회상 일러스트처럼 그 그림만의 화풍
+        `Style: ${spec.style ?? style.illustration_style}.\n` +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border.'
       );
   }

@@ -50,7 +50,8 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
     const show = () => {
       const line = lines[i];
       if (line.cg) {
-        const u = line.cg === 'none' ? null : realArt(line.cg);
+        // 「결」 전용 회상 그림(Codex cg_gyeol_story_<이름>, 먹 그림)이 오면 그것, 없으면 「천외귀환」 장면 그림(2026-11-12)
+        const u = line.cg === 'none' ? null : (realArt(line.cg.replace(/^cg_/, 'cg_gyeol_story_')) ?? realArt(line.cg));
         cg.hidden = !u;
         if (u) cg.src = u;
       }

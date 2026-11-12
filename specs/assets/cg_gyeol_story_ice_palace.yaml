@@ -1,0 +1,9 @@
+id: cg_gyeol_story_ice_palace
+type: story-cg
+summary: 「결」 이야기 회상 일러스트(먹 그림) — 얼음 궁전 — 호수에 갇힌 왕도와 남쪽 성문(S3, 2권 6장) · 「천외귀환」 cg_ice_palace의 「결」판(2026-11-12)
+frame_notes:
+  1: 'The old royal capital Ardenheim, encased whole in its risen lake: a vast transparent wall of ice holds the city walls, towers, roofs and banners — blue banners with a white snowflake frozen mid-flutter. Inside the clear ice, people stand frozen in place: soldiers with spears, merchants pulling handcarts, children playing in a square, someone holding a child close. Before the south gate stand seven knights made entirely of ice — ice armor and ice bodies — their shields bearing a white snowflake over a silver sword on a blue field; the one in the middle has opened eyes with no pupils, only frozen blue light. Beautiful and horrible, cold blue-white light under a grey sky.'
+framing: 'A cinematic story illustration for a visual-novel scene, wide 3:2 frame. The bottom quarter will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Same moment and composition idea as the original scene, but painted as Jin Haun''s memory: strong readable silhouettes, the edges of the picture dissolve into blank paper. No text.'
+style: 'Gyeol story recollection: an East Asian ink-wash (sumi-e) painting on warm aged rice paper — confident black ink brush lines, soft grey and muted indigo washes, a restrained palette of ink black, warm paper beige and muted indigo with exactly ONE vermilion red accent in the picture, visible brush texture and ink bleeding at the edges, the scene fading softly into blank paper at the outer borders like a remembered moment told at night; faces and hands still clear and expressive; a small plain square vermilion seal stamp with no characters in one lower corner; not anime cel shading, not pixel art, not a photograph'
+placeholder:
+  color: '#2b2620'

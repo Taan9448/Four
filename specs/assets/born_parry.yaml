@@ -1,0 +1,24 @@
+id: born_parry
+type: character-anim
+character: born
+summary: 「결」 보른 받기(패링) 6프레임 — 「결」에서 고를 수 있는 동료의 받아치기 동작(2026-11-12)
+depends_on:
+- born_ref
+reference: assets/source/born_ref.png
+facing: right
+frames: 6
+fps: 14
+events:
+  deflect: 3
+bbox_tolerance: 0.25
+frame_notes:
+  1: low wide stance, heavy axe held across the body with both hands, eyes on the incoming blow
+  2: the axe haft snaps up horizontally in front of the chest to catch the blow, feet rooted like stone
+  3: 'the moment of the deflection: the blow slams into the axe haft, a burst of orange-white sparks and small stone chips at the point of contact on the right, the dwarf does not move an inch, braids flying'
+  4: he shoves the force away to the right with the axe head, a short dust puff at his feet
+  5: settling back, axe returning low across the body, a faint warm afterglow on the blade
+  6: settled low wide stance again
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

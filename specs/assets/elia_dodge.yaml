@@ -1,0 +1,22 @@
+id: elia_dodge
+type: character-anim
+character: elia
+summary: 「결」 엘리아 피하기 5프레임 — 「결」에서 고를 수 있는 동료의 비켜서기 동작(2026-11-12)
+depends_on:
+- elia_ref
+reference: assets/source/elia_ref.png
+facing: right
+frames: 5
+fps: 14
+events: {}
+bbox_tolerance: 0.35
+frame_notes:
+  1: ready stance, staff upright, knees bending
+  2: a light quick step back and to the side, cloak trailing forward, body turning slightly away, staff held close
+  3: 'lowest point: crouched low, the cloak spread like a wing, a faint translucent pale-blue afterimage of the standing pose left behind'
+  4: rising and turning back to face right, staff coming up
+  5: back in the ready stance
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ff6a5a'
