@@ -7,7 +7,7 @@ import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
 import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
-import { advance, betterRank, createDuel, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
 import { loadSave, writeSave, type Quality } from './save';
@@ -149,6 +149,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const attackBtn = el('button', { class: 'pad attack', type: 'button' }, padIcon('attack'), '베기', el('small', {}, 'J'));
   const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, padIcon('dodge'), '피하기', el('small', {}, 'L'));
   const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, 'K'));
+  // 강베기(2026-11-11): 늦게 떨어지지만 세다 — 버튼 그림은 베기 판을 쓰고 금빛 테
+  const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('attack'), '강베기', el('small', {}, 'H'));
+  if (rhythm || !data.player.heavy) heavyBtn.disabled = true;
   const techName = el('span', { class: 'tech-name' }, '기술');
   const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, 'I'));
   const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
@@ -181,7 +184,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   });
   if (!document.fullscreenEnabled) fsBtn.hidden = true;
   const hint = el('p', { class: 'rotate-hint' }, '휴대폰을 가로로 돌리면 화면이 커지고 버튼이 양손 엄지 자리로 갑니다');
-  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, surviveEl, tutPanel, tipEl, cutin, overlay, pauseEl, loading, pauseBtn, fsBtn), el('div', { class: 'pads' }, attackBtn, dodgeBtn, parryBtn, techBtn, focusBtn), hint));
+  app.replaceChildren(el('section', { class: 'duel' }, el('div', { class: 'stage' }, canvas, hud, surviveEl, tutPanel, tipEl, cutin, overlay, pauseEl, loading, pauseBtn, fsBtn), el('div', { class: 'pads' }, attackBtn, heavyBtn, dodgeBtn, parryBtn, techBtn, focusBtn), hint));
 
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
@@ -312,25 +315,27 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
    * 입력 시각 보정(7-4절): 누른 순간(event.timeStamp − 판정 보정)까지 대결 시계를 먼저 민 다음 누른다.
    * 화면이 그보다 이미 앞서 있으면(입력이 늦게 닿음) 그만큼 거슬러 올라간 시각으로 받기·피하기를 판정한다.
    */
-  const doPress = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus', stamp: number) => {
+  const doPress = (input: Input, stamp: number) => {
     if (!alive || paused) return;
     const real = stamp - loadSave().settings.inputOffset;
     advanceTo(real);
     const at = real < lastReal ? d.t - (lastReal - real) * rateAt(real) : d.t;
     if (press(d, input, at) && input === 'parry') fx.guardPose = performance.now();
   };
-  const onPad = (input: 'parry' | 'attack' | 'dodge' | 'tech' | 'focus') => (e: PointerEvent) => (e.preventDefault(), doPress(input, e.timeStamp));
+  const onPad = (input: Input) => (e: PointerEvent) => (e.preventDefault(), doPress(input, e.timeStamp));
   attackBtn.addEventListener('pointerdown', onPad('attack'));
   dodgeBtn.addEventListener('pointerdown', onPad('dodge'));
   parryBtn.addEventListener('pointerdown', onPad('parry'));
   techBtn.addEventListener('pointerdown', onPad('tech'));
   focusBtn.addEventListener('pointerdown', onPad('focus'));
+  heavyBtn.addEventListener('pointerdown', onPad('heavy'));
   canvas.addEventListener('pointerdown', (e) => doPress('attack', e.timeStamp));
   const onKey = (e: KeyboardEvent) => {
     if (e.repeat) return;
     const k = e.key.toLowerCase();
     if (k === 'k' || k === ' ') (e.preventDefault(), doPress('parry', e.timeStamp));
     else if (k === 'j') doPress('attack', e.timeStamp);
+    else if (k === 'h') doPress('heavy', e.timeStamp);
     else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge', e.timeStamp));
     else if (k === 'i') doPress('tech', e.timeStamp);
     else if (k === 'u') doPress('focus', e.timeStamp);
@@ -538,15 +543,31 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'strike':
           if (ev.blocked) {
-            // 틈 밖의 베기: 적이 칼을 막는다(쇳소리, 작은 불꽃, 피해 1)
-            sfx('block', { volume: 0.5 });
-            spark(FOE_X - 40, CONTACT.y, 6, '#d8dde8', 160, 3);
-            text(FOE_X - 10, CONTACT.y - 60, `막힘 ${ev.damage}`, '#b8bcc8', 20);
+            // 틈 밖의 베기: 적이 칼을 막는다(쇳소리, 작은 불꽃, 피해 1) — 강베기는 막혀도 막는 칼을 짓누른다
+            const heavy = ev.kind === 'heavy';
+            sfx(heavy ? 'slam_8' : 'block', { volume: heavy ? 0.8 : 0.5 });
+            spark(FOE_X - 40, CONTACT.y, heavy ? 18 : 6, heavy ? '#ffd27a' : '#d8dde8', heavy ? 280 : 160, 3);
+            text(FOE_X - 10, CONTACT.y - 60, heavy ? `강베기 — 막는 칼을 누른다 ${ev.damage}` : `막힘 ${ev.damage}`, heavy ? '#ffd27a' : '#b8bcc8', heavy ? 22 : 20);
+            if (heavy) addShake(fx, now, 7, 200);
             break;
           }
-          sfx(ev.counter ? 'crit' : 'slash');
-          fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: ev.counter ? 1.1 : 0.8 });
-          judge(fx, ev.counter ? 'COUNTER' : 'HIT', ev.counter ? '반격' : '', now, 'foe');
+          {
+            // 베기 종류: 연베기 둘째·셋째 칼, 강베기는 크게
+            const heavy = ev.kind === 'heavy';
+            const step = ev.kind === 'slash' ? (ev.step ?? 0) : 0;
+            sfx(heavy ? 'slam_8' : ev.counter ? 'crit' : 'slash');
+            fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: (ev.counter ? 1.1 : 0.8) * (heavy ? 1.6 : 1 + step * 0.15) });
+            const sub = heavy ? '강베기' : step >= 2 ? '연베기 마무리' : step === 1 ? '연베기 2' : ev.counter ? '반격' : '';
+            judge(fx, ev.counter ? 'COUNTER' : 'HIT', sub, now, 'foe');
+            if (heavy) {
+              addShake(fx, now, 10, 240);
+              hitstopUntil = now + 110;
+              spark(FOE_X - 20, CONTACT.y, 22, '#ffd27a', 340, 5);
+              musicalHit('stagger');
+            }
+            // 연베기 둘째·셋째 칼은 곡의 음계 위로 한 칸씩
+            if (step >= 1) musicalHit('parry', d.streak + step + 1);
+          }
           text(FOE_X + 50, CONTACT.y - 40, `${ev.damage}`, ev.counter ? '#ffb15c' : '#ffffff', ev.counter ? 30 : 22);
           if (ev.counter) {
             spark(FOE_X - 20, CONTACT.y, 14, '#ffb15c', 260);

@@ -743,7 +743,8 @@ export function drawPracticeBar(ctx: CanvasRenderingContext2D, rules: { parry: n
   const w = 400;
   const x1 = W / 2 + 40 + w / 2;
   const x0 = x1 - w;
-  const y = H - 44;
+  // 화면 아래는 버튼이 겹쳐 뜬다(2026-11-11) — 적 이름판 아래로
+  const y = 150;
   const xAt = (lead: number) => x1 - (Math.min(span, Math.max(0, lead)) / span) * w;
   ctx.save();
   ctx.fillStyle = 'rgba(0,0,0,0.6)';

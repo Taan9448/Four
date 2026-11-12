@@ -783,6 +783,14 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 /* 결과·일시 정지 창이 뜨면 아래 버튼·이름판은 옅게 물러난다 */
 .duel:has(.result:not([hidden])) .pads, .duel:has(.pause:not([hidden])) .pads { opacity: 0.2; pointer-events: none; transition: opacity 0.3s; }
 .duel:has(.result:not([hidden])) .me-bar { opacity: 0.35; transition: opacity 0.3s; }
+/* 강베기 버튼(2026-11-11): 베기 판 그림에 금빛 테 — 버튼이 여섯이 된다 */
+.duel .pads { grid-template-columns: repeat(6, 1fr); }
+@media (min-width: 641px) and (min-height: 521px) { .duel .pads { width: min(1120px, 86vw); } }
+.pad.heavy { background: linear-gradient(180deg, #4a3214, #241806); border-color: rgba(255, 210, 122, 0.5); }
+.art-pads .pad.heavy { background: var(--pad-attack) center / 103.6% 283% no-repeat; border-color: transparent; filter: sepia(0.6) saturate(1.5) hue-rotate(-14deg) brightness(1.08); }
+.pad.heavy:disabled { opacity: 0.35; }
+@media (max-width: 640px) { .duel .pads { grid-template-columns: repeat(3, 1fr); } }
+@media (orientation: landscape) and (max-height: 520px) { .duel .pad.heavy { right: calc(2vw + 26vh); bottom: 5vh; height: 15vh; } }
 /* 한글 표식(2026-11-11 접근성: 한자 대신 한글) — 둥근 표식은 이름을 안에, 명패 인장은 글자 수에 맞춰 */
 .medal.lobby-medal { width: 64px; height: 64px; font-family: 'Nanum Myeongjo', serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }
 .medal.lobby-medal b { font-weight: 800; line-height: 1.15; white-space: nowrap; }

@@ -102,6 +102,37 @@
       "lose": [
         "…결을, 놓쳤다."
       ]
+    },
+    "combo": {
+      "$comment": "연베기(2026-11-11): 칼이 끝나기 lead ms 전부터 끝나고 window ms 안에 다시 J — 박자에 맞춰 이어 베면 둘째·셋째 칼이 세진다. 그보다 일찍 누르면(연타) 이번 칼은 이어지지 않는다",
+      "lead": 140,
+      "window": 220,
+      "steps": [
+        {
+          "damageMul": 1,
+          "postureMul": 1
+        },
+        {
+          "damageMul": 1.2,
+          "postureMul": 1.4,
+          "duration": 300,
+          "hitAt": 140
+        },
+        {
+          "damageMul": 1.7,
+          "postureMul": 2.4,
+          "duration": 420,
+          "hitAt": 200
+        }
+      ]
+    },
+    "heavy": {
+      "$comment": "강베기(H): 늦게 떨어지지만 세다. 막혀도 체간을 크게 깎는다(guardPostureMul) — 대신 떨어지기 전에 맞으면 그대로 맞는다",
+      "duration": 660,
+      "hitAt": 480,
+      "damageMul": 2.4,
+      "postureMul": 2.2,
+      "guardPostureMul": 3.5
     }
   },
   "foes": [
