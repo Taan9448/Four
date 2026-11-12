@@ -791,3 +791,12 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .pad.heavy:disabled { opacity: 0.35; }
 @media (max-width: 640px) { .duel .pads { grid-template-columns: repeat(3, 1fr); } }
 @media (orientation: landscape) and (max-height: 520px) { .duel .pad.heavy { right: calc(2vw + 26vh); bottom: 5vh; height: 15vh; } }
+/* 한글 표식(2026-11-11 접근성: 한자 대신 한글) — 둥근 표식은 이름을 안에, 명패 인장은 글자 수에 맞춰 */
+.medal.lobby-medal { width: 64px; height: 64px; font-family: 'Nanum Myeongjo', serif; font-size: 15px; font-weight: 800; letter-spacing: 0; }
+.medal.lobby-medal b { font-weight: 800; line-height: 1.15; white-space: nowrap; }
+.medal.lobby-medal.to-cheonoe b { font-size: 12px; }
+.plate-seal { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 22px; }
+.title-plate.guest .plate-seal { font-size: 15px; }
+.pin-seal, .sc-seal { font-family: 'Nanum Myeongjo', serif; font-weight: 800; }
+.pin-seal { font-size: 20px; }
+.sc-seal { font-size: 24px; }

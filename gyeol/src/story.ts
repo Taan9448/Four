@@ -4,6 +4,7 @@ import storyRaw from '../data/story.json';
 import { frameUrl } from '../../src/render/assets';
 import { button, el, rankBadge } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
+import { setDuck, setMusic } from './music';
 import { loadSave, writeSave } from './save';
 import { announceAchievements, setKeys, type Nav } from './screens';
 import { playScene, type SceneLine, type Speaker } from './vn';
@@ -216,10 +217,10 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
   });
 }
 
-/** 장 인장 글자: 서장 序, 에필로그 終, 그 밖은 장 번호 한자 */
-const HAN_NO = ['序', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+/** 장 인장 글자(2026-11-11 한글로): 서장 '서', 에필로그 '끝', 그 밖은 장 번호 */
+const HAN_NO = ['서', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 function sealOf(ch: Chapter): string {
-  return ch.id === 'epilogue' ? '終' : (HAN_NO[ch.no] ?? String(ch.no));
+  return ch.id === 'epilogue' ? '끝' : (HAN_NO[ch.no] ?? String(ch.no));
 }
 
 /* ───────── 장 하나 ───────── */
@@ -228,6 +229,12 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
   setKeys(null);
   dataRef = data;
   const label = `${ch.title} · ${ch.subtitle}`;
+  // 장면 곡: 대결 사이 장면은 여정 곡(에필로그는 새벽 곡) — 대결이 시작되면 main.ts가 대결 곡으로 바꾼다
+  const calm = () => {
+    setMusic(ch.id === 'epilogue' ? 'epilogue' : 'journey');
+    setDuck(false);
+  };
+  calm();
   /** 이 장에서 고른 것 + 지난 장까지 저장된 것 */
   const flags = new Set<string>(loadSave().story.flags);
   const pick = (got: string[]) => got.forEach((f) => flags.add(f));
@@ -268,6 +275,7 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
         label: last ? '장 마치기' : '다음',
         go: async (d) => {
           results[i] = summarize(d);
+          calm();
           pick(await playScene(document.body, bout.outro ?? [], story.speakers, foe.bg));
           if (!last) void runBout(i + 1);
           else {
