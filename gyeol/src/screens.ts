@@ -11,7 +11,8 @@ import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from 
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
-import { loadSave, writeSave } from './save';
+import { characterOf, characters, chosen, faceStyle, joined, partyOpen, recordKey } from './party';
+import { emptyStats, loadSave, writeSave } from './save';
 
 export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
 
@@ -28,6 +29,8 @@ export interface PlayOpts {
   /** 서장 튜토리얼 단계와 끝났을 때(건너뛰었으면 skipped) */
   tutorial?: TutorialStep[];
   onTutorialDone?: (skipped: boolean) => void;
+  /** 고른 인물(duel.json characters, 없으면 진하운) */
+  character?: string;
 }
 
 export interface Nav {
@@ -56,6 +59,43 @@ export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
 const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
 /** 결투장 상대: 처음부터 있던 다섯(악보가 있는 상대) + 이야기에서 겨뤄 본 상대(이야기 전용 빼고) */
 const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.starter || seen.includes(f.id)));
+
+/**
+ * 인물 고르기(2026-11-11 사용자 요청 — 동료와 합류하면 인물을 골라 들어간다): 얼굴 · 이름 · 특성. 합류 전 동료는 잠김.
+ * 고르면 저장(save.character)하고 onPick으로 화면을 다시 그린다. 합류한 동료가 없으면 아무것도 그리지 않는다
+ */
+export function charPicker(data: DuelData, onPick: () => void, compact = false): HTMLElement | '' {
+  const save = loadSave();
+  const cleared = save.story.cleared;
+  if (!partyOpen(data, cleared)) return '';
+  const now = chosen(data, save.character, cleared);
+  const cards = characters(data).map((c) => {
+    const open = joined(c, cleared);
+    const face = realArt(c.stand) ?? (c.fallbackStand ? frameUrl(c.fallbackStand, 1) : null);
+    const b = button(
+      [
+        el('span', { class: 'cp-face', style: faceStyle(c, face) }),
+        el('span', { class: 'cp-text' }, el('b', {}, c.name), el('small', { class: 'cp-trait' }, open ? c.trait : '합류 전')),
+      ],
+      `cp-card${c.id === now ? ' on' : ''}${open ? '' : ' locked'}`,
+      () => {
+        const s = loadSave();
+        s.character = c.id;
+        writeSave(s);
+        onPick();
+      },
+      { ...(open ? {} : { disabled: '' }), title: open ? `${c.name} — ${c.title}\n· ${c.traits.join('\n· ')}` : `${c.joinAfter ?? ''} 이후 합류`, 'aria-pressed': String(c.id === now) },
+    );
+    return b;
+  });
+  const cur = characterOf(data, now);
+  return el(
+    'div',
+    { class: `char-pick${compact ? ' compact' : ''}` },
+    el('div', { class: 'cp-row', role: 'group', 'aria-label': '들어갈 인물' }, ...cards),
+    !compact && cur ? el('ul', { class: 'cp-traits' }, ...cur.traits.map((t) => el('li', {}, t))) : '',
+  );
+}
 
 function header(title: string, nav: Nav, sub?: string): HTMLElement {
   return el(
@@ -165,6 +205,7 @@ let arenaDifficulty = 'main';
 
 export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
   const save = loadSave();
+  const who = chosen(data, save.character, save.story.cleared);
   const diffs = data.difficulties ?? [];
   const seg = el('div', { class: 'seg', role: 'radiogroup', 'aria-label': '난이도' });
   const draw = () => {
@@ -181,20 +222,20 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
       ...arenaFoes(data, save.seen).map((f) => {
         const img = frameUrl(`${f.sprite}_idle`, 1);
         const tags = elementsOf(f).map((e) => el('span', { class: `tag el-${e}` }, ELEMENT_NAME[e]));
-        const best = el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell', title: `${d.name} 최고 등급` }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`]))));
+        const best = el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell', title: `${d.name} 최고 등급` }, el('small', {}, d.name), rankBadge(save.duelBest[recordKey(`${f.id}:${d.id}`, who)]))));
         return el(
           'article',
           { class: 'foe-card' },
           img ? el('img', { src: img, alt: '' }) : '',
           el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, f.note)),
           best,
-          el('div', { class: 'foe-actions' }, button('대결', 'btn primary', () => nav.play(f, 'duel', { difficulty: arenaDifficulty, back: 'arena' }))),
+          el('div', { class: 'foe-actions' }, button('대결', 'btn primary', () => nav.play(f, 'duel', { difficulty: arenaDifficulty, back: 'arena', character: who }))),
         );
       }),
     );
   };
   const grid = el('div', { class: 'foes' });
-  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 PERFECT가 많을수록 높은 등급.'), seg, grid, helpBox()));
+  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 PERFECT가 많을수록 높은 등급. 등급은 인물마다 따로.'), charPicker(data, () => renderArena(app, nav, data)), seg, grid, helpBox()));
   draw();
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
@@ -232,6 +273,7 @@ let practiceTab: 'drill' | 'rhythm' = 'drill';
 export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void {
   const dummy = data.foes.find((f) => f.practice);
   const save = loadSave();
+  const who = chosen(data, save.character, save.story.cleared);
   const redraw = () => renderPractice(app, nav, data);
   const tab = (id: 'drill' | 'rhythm', label: string) => {
     const b = button([el('span', {}, label)], `prac-tab${practiceTab === id ? ' on' : ''}`, () => {
@@ -244,7 +286,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
     el(
       'li',
       {},
-      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' })),
+      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice', character: who })),
       el('small', {}, dr.note),
     ),
   );
@@ -252,14 +294,14 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
     .filter((f) => f.chart && !f.storyOnly && (f.starter || save.seen.includes(f.id)))
     .map((f) => {
       const img = frameUrl(`${f.sprite}_idle`, 1);
-      const b = save.rhythmBest[f.id];
+      const b = save.rhythmBest[recordKey(f.id, who)];
       return el(
         'article',
         { class: 'foe-card' },
         img ? el('img', { src: img, alt: '' }) : '',
         el('div', { class: 'foe-text' }, el('b', {}, f.chart!.title), el('small', {}, `${f.title} · ${f.chart!.steps.length}박`)),
         el('div', { class: 'best-row' }, el('span', { class: 'best-cell' }, el('small', {}, '최고'), rankBadge(b?.rank)), el('small', { class: 'best' }, b ? `정확도 ${Math.round(b.accuracy * 100)}%` : '아직 없음')),
-        el('div', { class: 'foe-actions' }, button('도전', 'btn primary', () => nav.play(f, 'rhythm', { back: 'practice' }))),
+        el('div', { class: 'foe-actions' }, button('도전', 'btn primary', () => nav.play(f, 'rhythm', { back: 'practice', character: who }))),
       );
     });
   const off = save.settings.inputOffset;
@@ -277,6 +319,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
       'section',
       { class: 'screen practice' },
       header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다.'),
+      charPicker(data, redraw),
       el('div', { class: 'prac-tabs', role: 'tablist' }, tab('drill', '수련'), tab('rhythm', '박자 도전')),
       body,
     ),
@@ -284,7 +327,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
   setKeys((e) => {
     const n = Number(e.key);
     const dr = dummy?.drills?.[n - 1];
-    if (practiceTab === 'drill' && dr && dummy) nav.play(dummy, 'practice', { drill: dr.id, back: 'practice' });
+    if (practiceTab === 'drill' && dr && dummy) nav.play(dummy, 'practice', { drill: dr.id, back: 'practice', character: who });
     else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       practiceTab = practiceTab === 'drill' ? 'rhythm' : 'drill';
       redraw();
@@ -416,6 +459,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       { class: 'screen records' },
       header('도감', nav),
       ...achievementSection(data),
+      ...characterSection(data),
       el('h2', {}, '상대 도감'),
       el('div', { class: 'codex-grid' }, ...foes),
       el('h2', {}, '진하운의 기술'),
@@ -437,6 +481,35 @@ export function announceAchievements(data: DuelData): void {
   if (!got.length) return;
   writeSave(save);
   got.forEach((a, i) => setTimeout(() => toast(`업적 — ${a.name}`, a.text), 600 + i * 900));
+}
+
+/** 도감: 인물별 기록(2026-11-11 — 인물마다 따로 잰다) */
+function characterSection(data: DuelData): HTMLElement[] {
+  const save = loadSave();
+  const list = characters(data);
+  if (list.length < 2) return [];
+  const cards = list.map((c) => {
+    const open = joined(c, save.story.cleared);
+    const st = save.charStats[c.id] ?? emptyStats();
+    const face = realArt(c.stand) ?? (c.fallbackStand ? frameUrl(c.fallbackStand, 1) : null);
+    const grades = Object.entries(save.duelBest).filter(([k]) => (c.id === 'haun' ? !k.includes('@') : k.endsWith(`@${c.id}`))).length;
+    return el(
+      'article',
+      { class: `char-card${open ? '' : ' locked'}` },
+      el('span', { class: 'cp-face big', style: faceStyle(c, face) }),
+      el(
+        'div',
+        { class: 'cc-text' },
+        el('b', {}, c.name),
+        el('small', { class: 'cc-title' }, `${c.title} · ${c.trait}`),
+        open
+          ? el('p', { class: 'cc-stats' }, `대결 ${st.duels} · 이김 ${st.wins} · 패링 ${st.parries}(PERFECT ${st.perfect}) · 결정타 ${st.deathblows} · 최대 연속 ${st.maxStreak} · 등급 ${grades}`)
+          : el('p', { class: 'cc-stats' }, '아직 합류하지 않았다'),
+        el('ul', { class: 'cp-traits' }, ...c.traits.map((t) => el('li', {}, t))),
+      ),
+    );
+  });
+  return [el('h2', {}, '인물'), el('div', { class: 'char-grid' }, ...cards)];
 }
 
 /** 도감: 업적 */

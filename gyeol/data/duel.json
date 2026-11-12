@@ -6779,5 +6779,192 @@
       "foeDamageMul": 1.15,
       "postureRegenMul": 1.5
     }
-  ]
+  ],
+  "characters": {
+    "$comment": "고를 수 있는 인물(2026-11-11 사용자 요청 — 동료와 합류하면 인물을 골라 들어간다, 인물마다 특성·기록 따로). joinAfter: 이 장을 마치면 합류(없으면 처음부터). player·rules: 진하운 기준 값을 덮어쓴다(heavy·combo는 필드별로). techs: 쓸 수 있는 기술(null이면 모두). stand: 이름판 얼굴 그림(없으면 fallbackStand). 「천외귀환」 그림(<sprite>_idle·attack·hit)을 쓰고, 받기·피하기 동작은 Codex 그림이 오기 전까지 대체 연출. facePos: 얼굴 동그라미에서 반신 그림의 어디를 보일지(background-position).",
+    "list": [
+      {
+        "id": "haun",
+        "name": "진하운",
+        "title": "운곡루의 장작 패는 검객",
+        "sprite": "haun_sword",
+        "stand": "haun_gyeol_stand",
+        "fallbackStand": "haun_sword_stand",
+        "trait": "균형",
+        "traits": [
+          "기술 셋 — 낙운무흔 · 벽운단하 · 운해귀종",
+          "모든 판정 폭이 기본",
+          "연베기·강베기 모두 기본"
+        ],
+        "techs": null,
+        "facePos": "50% 6%"
+      },
+      {
+        "id": "kyle",
+        "name": "카일 로웬",
+        "title": "로웬 가문의 마지막 기사",
+        "sprite": "kyle",
+        "stand": "kyle_stand",
+        "joinAfter": "ch2",
+        "trait": "철벽",
+        "traits": [
+          "막기가 단단하다 — 이르게 눌러도 피해 1/10, 막기 폭이 넓다",
+          "체력·체간이 크다(130)",
+          "베기가 무겁고 느리다 · 강베기 피해 2.8배",
+          "받기 폭이 조금 좁다",
+          "기술 없음"
+        ],
+        "player": {
+          "hp": 130,
+          "posture": 130,
+          "attack": {
+            "duration": 400,
+            "hitAt": 210,
+            "damage": 8,
+            "posture": 5
+          },
+          "heavy": {
+            "damageMul": 2.8
+          }
+        },
+        "rules": {
+          "guard": 520,
+          "guardChip": 0.1,
+          "guardPosture": 14,
+          "parry": 135
+        },
+        "techs": [],
+        "lines": {
+          "start": [
+            "로웬의 검은 물러서지 않는다.",
+            "왼편은 내가 맡지.",
+            "덤벼라."
+          ],
+          "stagger": [
+            "지금이다!",
+            "무너졌군."
+          ],
+          "clash": [
+            "버틴다…!"
+          ],
+          "crisis": [
+            "아직이다…!"
+          ]
+        },
+        "facePos": "50% 6%"
+      },
+      {
+        "id": "elia",
+        "name": "엘리아",
+        "title": "하프엘프 마법사",
+        "sprite": "elia",
+        "stand": "elia_stand",
+        "joinAfter": "ch2",
+        "trait": "심안",
+        "traits": [
+          "결이 잘 보인다 — PERFECT 폭 1.4배",
+          "집중이 빨리 차고(처음 60) 더 오래·더 느리게",
+          "불을 받아도 화상이 없다(결계)",
+          "마나 화살 — 베기가 빠르다",
+          "체력·체간이 작다(80) · 기술 없음"
+        ],
+        "player": {
+          "hp": 80,
+          "posture": 80,
+          "attack": {
+            "duration": 300,
+            "hitAt": 120,
+            "damage": 5,
+            "posture": 3
+          }
+        },
+        "rules": {
+          "perfect": 56,
+          "focusStart": 60,
+          "focusGain": {
+            "perfect": 32,
+            "excellent": 22,
+            "good": 10
+          },
+          "focusDuration": 3200,
+          "focusRate": 0.38,
+          "fireParryChip": 0,
+          "fireGuardExtra": 0
+        },
+        "techs": [],
+        "lines": {
+          "start": [
+            "결이 보여요.",
+            "마나가 흔들려요 — 조심해요.",
+            "같이 해요, 하운."
+          ],
+          "stagger": [
+            "지금이에요!",
+            "열렸어요!"
+          ],
+          "clash": [
+            "밀리지 않아요…!"
+          ],
+          "crisis": [
+            "아직… 할 수 있어요."
+          ]
+        },
+        "facePos": "70% 24%"
+      },
+      {
+        "id": "born",
+        "name": "보른",
+        "title": "카즈둠의 드워프",
+        "sprite": "born",
+        "stand": "born_stand",
+        "joinAfter": "ch2",
+        "trait": "산의 결",
+        "traits": [
+          "받을 때마다 적 체간을 크게 깎는다(1.6 → 2.2배)",
+          "체간이 단단하고 빨리 돈다(170)",
+          "강베기가 막는 칼을 부순다(체간 5배)",
+          "피하기가 느리다(무적이 짧다)",
+          "기술 없음"
+        ],
+        "player": {
+          "hp": 140,
+          "posture": 170,
+          "postureRegen": 20,
+          "attack": {
+            "duration": 420,
+            "hitAt": 230,
+            "damage": 9,
+            "posture": 6
+          },
+          "heavy": {
+            "guardPostureMul": 5
+          }
+        },
+        "rules": {
+          "parryPostureMul": 2.2,
+          "dodgeIframe": 220,
+          "dodgeLockout": 800
+        },
+        "techs": [],
+        "lines": {
+          "start": [
+            "같이 가.",
+            "돌의 결.",
+            "…온다."
+          ],
+          "stagger": [
+            "깨졌다.",
+            "지금."
+          ],
+          "clash": [
+            "안 밀려."
+          ],
+          "crisis": [
+            "…버틴다."
+          ]
+        },
+        "facePos": "50% 34%"
+      }
+    ]
+  }
 }

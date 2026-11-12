@@ -6,7 +6,8 @@ import { button, el, rankBadge } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
 import { loadSave, writeSave } from './save';
-import { announceAchievements, setKeys, type Nav } from './screens';
+import { announceAchievements, charPicker, setKeys, type Nav } from './screens';
+import { chosen, HAUN, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
 
 export interface TutorialStep {
@@ -54,6 +55,8 @@ export interface Chapter {
   outroIf?: { flag: string; lines: SceneLine[] };
   /** 결과 화면 머리글 대신(에필로그) */
   ending?: string[];
+  /** 이 장은 진하운만(합류 전 · 운해귀종으로 끝내는 9장 · 에필로그) */
+  haunOnly?: boolean;
   /** 이야기 지도에서의 자리(journey_band 그림 기준 %)와 땅 이름 */
   map?: { x: number; y: number; place: string };
 }
@@ -179,6 +182,12 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
         ),
       ),
       el('div', { class: 'sc-go' }, go),
+      // 동료가 합류했으면 들어갈 인물을 고른다(진하운만인 장은 안내만)
+      open && !ch.tutorial && partyOpen(data, save.story.cleared)
+        ? ch.haunOnly
+          ? el('p', { class: 'sc-solo' }, '이 장은 진하운 혼자 들어간다.')
+          : el('div', { class: 'sc-party' }, charPicker(data, () => renderStory(app, nav, data), true))
+        : '',
     );
   };
   chs.forEach((ch, i) => {
@@ -266,7 +275,9 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
     const flagged = bout.ifFlag && flags.has(bout.ifFlag.flag) ? bout.ifFlag : null;
     if (flagged?.intro) pick(await playScene(document.body, flagged.intro, story.speakers, foe.bg));
     const last = i + 1 >= bouts.length;
+    const sv = loadSave();
     nav.play(foe, bout.mode ?? 'duel', {
+      character: ch.haunOnly ? HAUN : chosen(data, sv.character, sv.story.cleared),
       back: 'story',
       title: `${label} · ${i + 1}/${bouts.length}`,
       duel: { ...ch.rules, survive: bout.survive, ...bout.duel, ...flagged?.duel },
