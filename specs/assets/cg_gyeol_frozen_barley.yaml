@@ -1,0 +1,8 @@
+id: cg_gyeol_frozen_barley
+type: story-cg
+character: kyle
+summary: '「결」 이야기 그림 — 얼음 속의 보리밭(4장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'The border of the kingdom of Arden: a wide barley field encased in clear ice, the ripe ears standing frozen inside it, a farmer''s scythe stuck mid-swing. Along the road at the edge of the field walk Kyle (blond young knight in silver plate armor with a snowflake-and-sword crest) in front, his face grim at the sight of his homeland, followed by Elia (silver-haired half-elf mage woman in a grey hooded travelling cloak, long wooden staff with a blue stone), Born (short, very broad dwarf warrior with a red beard in three braids) and Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard), breath white. Behind them the sky is spring blue; ahead it turns iron grey.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

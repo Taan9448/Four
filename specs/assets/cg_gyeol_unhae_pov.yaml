@@ -1,0 +1,8 @@
+id: cg_gyeol_unhae_pov
+type: story-cg
+character: kwak_dojin
+summary: '「결」 이야기 그림 — 눈앞에 펼쳐지는 운해귀종(1장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'First-person view through the eyes of a boy on a moonlit cliff: in the near foreground his own two cloth-wrapped forearms are raised and crossed in front of him, gripping an axe handle, trembling. Beyond them, Kwak Dojin in his white crane robe stands calm and small in the center, and his single pine-grain sword unfolds into a vast sea of silver-white sword arcs, layered like clouds, filling the whole sky from edge to edge and rolling toward the viewer without a sound.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

@@ -1,0 +1,8 @@
+id: cg_gyeol_elder_descends
+type: story-cg
+character: poison_palm_elder
+summary: '「결」 이야기 그림 — 여섯째 굽이를 내려오는 장로(9장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Night on a steep torch-lit stone stairway winding around a black mountain. Seen from below: on the steps above, an old cult elder in black robes layered with a moss-green outer robe, long white beard, slowly descends, his right hand stained blue-black to the wrist and held low. On the lower steps, seen from behind, a lone young swordsman in grey waits. Torchlight, green haze around the elder''s hand.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

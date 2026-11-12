@@ -1,0 +1,8 @@
+id: cg_gyeol_vargas_back
+type: story-cg
+character: vargas
+summary: '「결」 이야기 그림 — 창밖을 내려다보는 마왕의 등(6장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Inside an obsidian throne hall, seen from behind the Demon King Vargas: his towering gaunt back, torn bat wings and seven twisted horns fill the right half of the picture as he stands at a shattered tall window, looking down at a burning battlefield far below. The throne behind him is empty. At the far end of the hall, small in the doorway, a young swordsman in grey with a narrow plain sword has just entered.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

@@ -1,0 +1,8 @@
+id: cg_gyeol_white_flame
+type: story-cg
+character: ignis
+summary: '「결」 이야기 그림 — 화로 입에서 일어서는 흰 불길(3장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'The innermost forge of the volcanic canyon, seen from far behind four small dark silhouettes of travelers standing at the rim of a pit (a knight, a dwarf, a hooded mage, a young swordsman): across the pit, in the mouth of a tower-sized furnace, a figure of white flame rises — human-shaped, three times a man''s height, shoulders as wide as the furnace mouth, black lava veins, a crown of flames, two holes of hottest white for eyes. Heat haze bends the air between them.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }
