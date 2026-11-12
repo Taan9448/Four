@@ -35,6 +35,9 @@ export interface SaveData {
   /** 이룬 업적 id · 입은 하운 옷 id(5단계, gyeol/data/progress.json) */
   achievements: string[];
   outfit: string;
+  /** 고른 인물(2026-11-11, duel.json characters) · 인물별 쌓인 기록 */
+  character: string;
+  charStats: Record<string, Stats>;
 }
 
 export interface Stats {
@@ -58,7 +61,7 @@ const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto' });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base' });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
 
 interface Store {
   getItem(k: string): string | null;
@@ -105,6 +108,13 @@ export function normalize(raw: unknown): SaveData {
   if (Array.isArray(r.tips)) s.tips = r.tips.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.achievements)) s.achievements = r.achievements.filter((x): x is string => typeof x === 'string');
   if (typeof r.outfit === 'string') s.outfit = r.outfit;
+  if (typeof r.character === 'string') s.character = r.character;
+  if (r.charStats && typeof r.charStats === 'object')
+    for (const [id, st] of Object.entries(r.charStats)) {
+      const base = emptyStats();
+      for (const k of Object.keys(base) as (keyof Stats)[]) base[k] = clamp((st as Partial<Stats>)?.[k], 0, Number.MAX_SAFE_INTEGER, 0);
+      s.charStats[id] = base;
+    }
   return s;
 }
 

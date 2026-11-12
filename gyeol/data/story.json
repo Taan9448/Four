@@ -1,5 +1,5 @@
 {
-  "$comment": "「결」 이야기(2026-11-10 3단계, 설계 7-2절). 운곡루에서 왕일검에게 놓는 연습을 배우며 지나온 싸움을 떠올린다. speakers: 화자 이름·반신 그림(stand, 없으면 이름만). 장면 줄: speaker 없으면 내레이션, cg는 장면 일러스트(none이면 걷음), face는 반신 그림 칸(1 기본·2 결의·3 놀람). chapters: intro → bouts(각 intro·outro) → outro. 대결 규칙: survive(버티기 횟수), techs·focus·clash(그 장에서 쓸 수 있는 것), tips(처음 나오는 순간 안내). challenge: 별 셋째 칸 — noHitsInBout(bout 번호, 0부터)·noRedHits·clashWin. tutorial: 서장 단계(7-2-1절). upcoming: 다음 단계에서 열 장. map: 이야기 지도(「천외귀환」 여정 띠 그림 journey_band 위, 2026-11-11)에서 이 장의 자리(그림 기준 %)와 땅 이름.",
+  "$comment": "「결」 이야기(2026-11-10 3단계, 설계 7-2절). 운곡루에서 왕일검에게 놓는 연습을 배우며 지나온 싸움을 떠올린다. speakers: 화자 이름·반신 그림(stand, 없으면 이름만). 장면 줄: speaker 없으면 내레이션, cg는 장면 일러스트(none이면 걷음), face는 반신 그림 칸(1 기본·2 결의·3 놀람). chapters: intro → bouts(각 intro·outro) → outro. 대결 규칙: survive(버티기 횟수), techs·focus·clash(그 장에서 쓸 수 있는 것), tips(처음 나오는 순간 안내). challenge: 별 셋째 칸 — noHitsInBout(bout 번호, 0부터)·noRedHits·clashWin. tutorial: 서장 단계(7-2-1절). upcoming: 다음 단계에서 열 장. map: 이야기 지도(「천외귀환」 여정 띠 그림 journey_band 위, 2026-11-11)에서 이 장의 자리(그림 기준 %)와 땅 이름. haunOnly: 이 장은 진하운만(합류 전 · 운해귀종으로 끝내는 9장 · 에필로그).",
   "speakers": {
     "haun": {
       "name": "진하운",
@@ -326,7 +326,8 @@
         "x": 12,
         "y": 60,
         "place": "운곡루"
-      }
+      },
+      "haunOnly": true
     },
     {
       "id": "ch1",
@@ -455,7 +456,8 @@
         "x": 47,
         "y": 72,
         "place": "귀곡애"
-      }
+      },
+      "haunOnly": true
     },
     {
       "id": "ch2",
@@ -600,7 +602,8 @@
         "x": 60,
         "y": 64,
         "place": "은빛 숲"
-      }
+      },
+      "haunOnly": true
     },
     {
       "id": "ch3",
@@ -1485,7 +1488,8 @@
         "x": 22,
         "y": 30,
         "place": "천마봉"
-      }
+      },
+      "haunOnly": true
     },
     {
       "id": "ch10",
@@ -1697,7 +1701,8 @@
         "x": 8,
         "y": 74,
         "place": "운곡루 뒤뜰"
-      }
+      },
+      "haunOnly": true
     }
   ],
   "upcoming": [],

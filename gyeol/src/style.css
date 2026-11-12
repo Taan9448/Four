@@ -800,3 +800,34 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .pin-seal, .sc-seal { font-family: 'Nanum Myeongjo', serif; font-weight: 800; }
 .pin-seal { font-size: 20px; }
 .sc-seal { font-size: 24px; }
+
+/* 인물 고르기(2026-11-11): 얼굴 동그라미 + 이름 + 특성, 고른 인물은 금빛 테 */
+.char-pick { margin: 6px 0 16px; }
+.cp-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cp-card { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 6px 14px 6px 6px; border-radius: 40px; border: 1px solid rgba(226, 180, 92, 0.3); background: linear-gradient(180deg, #221c15, #120f0b); color: var(--ink); cursor: pointer; transition: transform 0.12s, border-color 0.12s; }
+.cp-card:hover:not([disabled]), .cp-card:focus-visible { transform: translateY(-2px); border-color: #ffd27a; outline: none; }
+.cp-card.on { border-color: #ffd27a; background: linear-gradient(180deg, #4a3818, #241a0a); box-shadow: 0 0 14px rgba(255, 210, 122, 0.35); }
+.cp-card.locked { opacity: 0.4; cursor: default; }
+.cp-face { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 2px solid rgba(226, 180, 92, 0.6); background: #2a1d14 center 6% / 260% no-repeat; }
+.cp-face.big { width: 84px; height: 84px; }
+.cp-card.on .cp-face { border-color: #ffd27a; }
+.cp-text { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.cp-text b { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 16px; }
+.cp-trait { color: #e2b45c; font-size: 12px; }
+.cp-traits { margin: 10px 0 0; padding-left: 18px; color: var(--ink-dim); font-size: 13px; line-height: 1.6; columns: 2; }
+.char-pick.compact .cp-card { min-height: 46px; padding: 4px 10px 4px 4px; }
+.char-pick.compact .cp-face { width: 38px; height: 38px; }
+.char-pick.compact .cp-text b { font-size: 14px; }
+.sc-party { grid-column: 1 / -1; }
+.sc-party .char-pick { margin: 2px 0 0; }
+.sc-solo { grid-column: 1 / -1; margin: 0; color: var(--ink-dim); font-size: 13px; }
+.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 12px; }
+.char-card { display: flex; gap: 14px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(226, 180, 92, 0.3); background: linear-gradient(180deg, #1d1813, #110e0b); }
+.char-card.locked { opacity: 0.45; }
+.cc-text b { font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 18px; }
+.cc-title { display: block; color: #e2b45c; font-size: 13px; margin: 2px 0 4px; }
+.cc-stats { margin: 0; color: var(--ink); font-size: 13px; }
+.char-card .cp-traits { columns: 1; margin-top: 6px; }
+@media (max-width: 760px) { .cp-traits { columns: 1; } .char-grid { grid-template-columns: 1fr; } }
+/* 이야기 쪽지에 인물 고르기가 붙으면 지도를 조금 줄여 한 화면에 */
+.story-frame:has(.sc-party) { width: min(100%, calc((100vh - 340px) * 2)); width: min(100%, calc((100dvh - 340px) * 2)); }
