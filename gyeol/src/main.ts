@@ -9,8 +9,9 @@ import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
+import { characterOf, faceStyle, HAUN, recordKey, techsFor, withCharacter } from './party';
 import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
-import { loadSave, writeSave, type Quality } from './save';
+import { emptyStats, loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
 import { duelXp, gainXp } from './training';
@@ -100,7 +101,12 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const drill = foeDef0.drills?.find((x) => x.id === opts.drill);
   const foeDef: FoeDef = drill ? { ...foeDef0, patterns: drill.patterns } : foeDef0;
   const playData: DuelData = drill ? { ...data, foes: data.foes.map((f) => (f.id === foeDef.id ? foeDef : f)) } : data;
-  const d = createDuel(playData, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}) });
+  // 고른 인물(2026-11-11): 진하운 기준 값을 그 인물로 덮어쓴 데이터로 대결 — 기술은 장 규칙과 인물 기술의 겹침
+  const charId = characterOf(data, opts.character)?.id ?? HAUN;
+  const char = characterOf(data, charId);
+  const pdata = withCharacter(playData, charId);
+  const techs = techsFor(data, charId, opts.duel?.techs);
+  const d = createDuel(pdata, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}), ...(techs !== undefined ? { techs } : {}) });
   const tutorial = opts.tutorial;
   const practice = mode === 'practice';
   const leave = () => (tutorial ? (stopLoop?.(), opts.onTutorialDone?.(true)) : nav.go(opts.back));
@@ -111,7 +117,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 잔상 막대(2026-11-11): 깎인 만큼 밝은 띠가 잠깐 남았다가 따라 줄어든다
   const foeHpLag = el('i', { class: 'lag' }), myHpLag = el('i', { class: 'lag' });
   const myHpNum = el('span', { class: 'hp-num' }), foeHpNum = el('span', { class: 'hp-num' });
-  const face = realArt('haun_gyeol_stand') ?? frameUrl('haun_sword_stand', 1);
+  const face = (char ? realArt(char.stand) ?? (char.fallbackStand ? frameUrl(char.fallbackStand, 1) : null) : null) ?? frameUrl('haun_sword_stand', 1);
   const streakEl = el('div', { class: 'streak' });
   const phasePips = el('span', { class: 'phase-pips' });
   const gimmickEl = el('span', { class: 'gimmicks' });
@@ -134,11 +140,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       : el(
           'div',
           { class: 'me-bar' },
-          el('div', { class: 'me-face', style: face ? `background-image:url("${face}")` : '' }, face ? '' : el('b', {}, '하운')),
+          el('div', { class: 'me-face', style: faceStyle(char, face) }, face ? '' : el('b', {}, '하운')),
           el(
             'div',
             { class: 'me-body' },
-            el('div', { class: 'me-name' }, el('b', {}, data.player.name), myHpNum),
+            el('div', { class: 'me-name' }, el('b', {}, pdata.player.name), myHpNum),
             el('div', { class: 'bar hp' }, myHpLag, myHp, el('span', { class: 'gloss' })),
             el('div', { class: 'bar-row' }, el('em', {}, '체간'), el('div', { class: 'bar posture' }, myPosture, el('span', { class: 'gloss' }))),
             el('div', { class: 'bar-row' }, el('em', {}, '집중'), el('div', { class: 'bar focus' }, myFocus, el('span', { class: 'gloss' }))),
@@ -151,7 +157,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, 'K'));
   // 강베기(2026-11-11): 늦게 떨어지지만 세다 — 버튼 그림은 베기 판을 쓰고 금빛 테
   const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('attack'), '강베기', el('small', {}, 'H'));
-  if (rhythm || !data.player.heavy) heavyBtn.disabled = true;
+  if (rhythm || !pdata.player.heavy) heavyBtn.disabled = true;
   const techName = el('span', { class: 'tech-name' }, '기술');
   const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, 'I'));
   const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
@@ -189,7 +195,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
-  const sp: Sprites = await loadSprites(data.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave()));
+  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, charId === HAUN ? outfitPrefix(loadSave()) : null);
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
   setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : battleTrack(foeDef), rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
@@ -286,7 +292,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const lineTurn: Partial<Record<string, number>> = {};
   const say = (who: 'player' | 'foe', key: LineKey, delay = 0, text?: string) => {
     if (rhythm) return;
-    const pool = who === 'player' ? data.player.lines?.[key] : foeDef.lines?.[key];
+    const pool = who === 'player' ? pdata.player.lines?.[key] : foeDef.lines?.[key];
     const id = `${who}:${key}`;
     const n = lineTurn[id] ?? lineSeed;
     lineTurn[id] = n + 1;
@@ -302,7 +308,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   let lastClashFx = 0;
 
   /** 지금 대결 시계가 실제 시간의 몇 배로 흐르는가(끝 장면·집중이면 느리게) */
-  const rateAt = (real: number) => (real < slowUntil ? slowRate : isFocusing(d) ? data.rules.focusRate : tutSlow);
+  const rateAt = (real: number) => (real < slowUntil ? slowRate : isFocusing(d) ? pdata.rules.focusRate : tutSlow);
   /** 대결 시계를 실제 시각 real까지 민다(멈칫 동안은 멈춰 있다) */
   const advanceTo = (real: number) => {
     if (real <= lastReal) return;
@@ -824,20 +830,23 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     const save = loadSave();
     if (!save.seen.includes(foeDef.id)) save.seen.push(foeDef.id);
     if (mode === 'duel') {
-      const st = save.stats;
       const s = d.stats;
-      st.duels++;
-      if (d.result === 'win') st.wins++;
-      st.parries += s.parries;
-      st.perfect += s.perfect;
-      st.deathblows += s.deathblows;
-      st.techs += s.techs;
-      st.clashWins += s.clashWins;
-      st.maxStreak = Math.max(st.maxStreak, s.maxStreak);
-      st.playMs += Math.round(d.t);
+      // 모두 합친 기록(업적)과 인물별 기록(2026-11-11 — 인물마다 따로 잰다)
+      save.charStats[charId] ??= emptyStats();
+      for (const st of [save.stats, save.charStats[charId]]) {
+        st.duels++;
+        if (d.result === 'win') st.wins++;
+        st.parries += s.parries;
+        st.perfect += s.perfect;
+        st.deathblows += s.deathblows;
+        st.techs += s.techs;
+        st.clashWins += s.clashWins;
+        st.maxStreak = Math.max(st.maxStreak, s.maxStreak);
+        st.playMs += Math.round(d.t);
+      }
       const g = duelGrade(d);
       if (g) {
-        const key = `${foeDef.id}:${d.difficulty}`;
+        const key = recordKey(`${foeDef.id}:${d.difficulty}`, charId);
         const prev = save.duelBest[key] as DuelRank | undefined;
         const next = betterRank(prev, g.rank);
         bestUp = next !== prev;
@@ -883,7 +892,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       pick.addEventListener('click', leave);
       if (rhythm) {
         const sc = rhythmScore(d);
-        const newBest = writeBest(foeDef.id, sc.accuracy, sc.rank);
+        const newBest = writeBest(recordKey(foeDef.id, charId), sc.accuracy, sc.rank);
         const rankIcon = frameUrl('icons_gyeol', ICON[sc.rank], { realOnly: true });
         overlay.replaceChildren(
           el('p', { class: 'kicker' }, `${foeDef.chart!.title} — 박자 도전`),
@@ -977,15 +986,15 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       const gm = d.foeDef.gimmicks ?? {};
       const tags = [gm.armor && !d.armorBroken ? '갑옷' : '', gm.regen ? '재생' : '', gm.accelerate ? `가속 ×${(1 / d.tempo).toFixed(2)}` : '', gm.veil ? '결 가림' : ''].filter(Boolean);
       put('gimmicks', tags.join('|'), () => gimmickEl.replaceChildren(...tags.map((x) => el('i', {}, x))));
-      animHp('me', myHp, myHpLag, d.player.hp / data.player.hp, myHpNum, d.player.hp, data.player.hp);
-      put('myPosture', pct(d.player.posture / data.player.posture), (v) => {
+      animHp('me', myHp, myHpLag, d.player.hp / pdata.player.hp, myHpNum, d.player.hp, pdata.player.hp);
+      put('myPosture', pct(d.player.posture / pdata.player.posture), (v) => {
         myPosture.style.width = v;
         // 내 체간이 거의 찼다 = 무너지기 직전 — 붉게 깜박인다
-        myPosture.parentElement!.classList.toggle('near', d.player.posture / data.player.posture >= 0.75);
+        myPosture.parentElement!.classList.toggle('near', d.player.posture / pdata.player.posture >= 0.75);
       });
-      const fk = d.focus / data.rules.focusMax;
+      const fk = d.focus / pdata.rules.focusMax;
       const focusing = isFocusing(d);
-      put('myFocus', pct(focusing ? (d.focusUntil - d.t) / data.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
+      put('myFocus', pct(focusing ? (d.focusUntil - d.t) / pdata.rules.focusDuration : fk), (v) => (myFocus.style.width = v));
       put('focusFull', `${fk >= 1}|${focusing}`, () => {
         const bar = myFocus.parentElement!;
         if (fk >= 1 && !focusing && !bar.classList.contains('full')) replay(bar, 'burst');
