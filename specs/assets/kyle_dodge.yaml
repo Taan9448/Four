@@ -1,0 +1,22 @@
+id: kyle_dodge
+type: character-anim
+character: kyle
+summary: 「결」 카일 피하기 5프레임 — 「결」에서 고를 수 있는 동료의 비켜서기 동작(2026-11-12)
+depends_on:
+- kyle_ref
+reference: assets/source/kyle_ref.png
+facing: right
+frames: 5
+fps: 14
+events: {}
+bbox_tolerance: 0.35
+frame_notes:
+  1: ready guard stance, knees bending
+  2: a quick heavy side-step back, armored body turning slightly away, the sword held close, cape swinging forward
+  3: lowest point of the evasion, crouched low behind the raised forearm, a faint translucent afterimage of the standing pose left behind
+  4: rising and turning back to face right, sword coming up
+  5: back in the ready guard stance
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ff6a5a'

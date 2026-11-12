@@ -1,0 +1,9 @@
+id: cg_gyeol_story_nine_stairs
+type: story-cg
+summary: 「결」 이야기 회상 일러스트(먹 그림) — 구천 계단 — 그믐밤의 천마봉(S8, 3권 13장) · 「천외귀환」 cg_nine_stairs의 「결」판(2026-11-12)
+frame_notes:
+  1: 'A moonless night in the Hundred Thousand Mountains: the Heavenly Demon Peak, a black crag, with a single stone stairway winding nine times around its waist up to the Blood Hall at the summit. Torches burn on every turn of the stairs, thousands of tiny points of fire. At the summit a blood-red light shoots up from the Blood Hall into the black sky as the ritual begins. At the foot of the stairs waits an army of three thousand with shields, under a banner of a white cloud on a blue field. Vast and dark, points of fire against black.'
+framing: 'A cinematic story illustration for a visual-novel scene, wide 3:2 frame. The bottom quarter will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Same moment and composition idea as the original scene, but painted as Jin Haun''s memory: strong readable silhouettes, the edges of the picture dissolve into blank paper. No text.'
+style: 'Gyeol story recollection: an East Asian ink-wash (sumi-e) painting on warm aged rice paper — confident black ink brush lines, soft grey and muted indigo washes, a restrained palette of ink black, warm paper beige and muted indigo with exactly ONE vermilion red accent in the picture, visible brush texture and ink bleeding at the edges, the scene fading softly into blank paper at the outer borders like a remembered moment told at night; faces and hands still clear and expressive; a small plain square vermilion seal stamp with no characters in one lower corner; not anime cel shading, not pixel art, not a photograph'
+placeholder:
+  color: '#2b2620'
