@@ -1,0 +1,43 @@
+{
+  "$comment": "「결」 음악(2026-11-11 사용자 요청 — 패링 리듬 액션에 맞게 모든 화면에 음악). 곡은 「천외귀환」 합성 음악의 악보 함수(src/render/music.ts composeBar)로 마디를 만들고 gyeol/src/music.ts가 소리 낸다. tracks: bpm·root(MIDI)·scale(이름)·progression(음계 안 화음 근음)·lead(선율 악기)·density(한 마디 음 수)·rest(쉼표 확률)·backing(drone·pad·harp·battle·boss·rift)·gain(곡 크기). screens: 화면별 곡(null이면 멈춤). regions: 대결 배경 그림 → 지역 곡. bossTrack·finalTrack: 정예(2단계)·보스(3단계 이상)·마지막 보스. layers: 연속 박자 단계(0~3)에 더하는 층. notes: 받기·PERFECT·맞음·결정타 소리를 곡의 음계 위 음으로(받을수록 선율이 올라간다).",
+  "scales": {
+    "penta": [0, 3, 5, 7, 10],
+    "majorPenta": [0, 2, 4, 7, 9],
+    "dorian": [0, 2, 3, 5, 7, 9, 10],
+    "phrygian": [0, 1, 3, 5, 7, 8, 10],
+    "harmonicMinor": [0, 2, 3, 5, 7, 8, 11],
+    "rift": [0, 1, 4, 6, 7, 10]
+  },
+  "tracks": {
+    "yard": { "bpm": 68, "root": 57, "scale": "penta", "progression": [0, 3, 2, 4], "lead": "pluck", "density": 4, "rest": 0.4, "backing": "pad", "gain": 2.1 },
+    "dawn": { "bpm": 62, "root": 60, "scale": "majorPenta", "progression": [0, 3, 4, 0], "lead": "bell", "density": 3, "rest": 0.4, "backing": "harp", "gain": 2.1 },
+    "journey": { "bpm": 78, "root": 55, "scale": "penta", "progression": [0, 2, 3, 4], "lead": "pluck", "density": 5, "rest": 0.35, "backing": "harp", "gain": 2 },
+    "practice": { "bpm": 96, "root": 57, "scale": "penta", "progression": [0, 0, 3, 4], "lead": "pluck", "density": 4, "rest": 0.5, "backing": "drone", "gain": 1.7 },
+    "murim": { "bpm": 120, "root": 57, "scale": "penta", "progression": [0, 0, 3, 4], "lead": "pluck", "density": 8, "rest": 0.25, "backing": "battle", "gain": 1 },
+    "elheim": { "bpm": 124, "root": 62, "scale": "dorian", "progression": [0, 6, 5, 6], "lead": "harp", "density": 8, "rest": 0.25, "backing": "battle", "gain": 1 },
+    "nocturna": { "bpm": 112, "root": 52, "scale": "phrygian", "progression": [0, 1, 0, 5], "lead": "bell", "density": 6, "rest": 0.3, "backing": "battle", "gain": 1.1 },
+    "rift": { "bpm": 108, "root": 50, "scale": "rift", "progression": [0, 3, 0, 2], "lead": "glass", "density": 6, "rest": 0.3, "backing": "boss", "gain": 1.2 },
+    "boss": { "bpm": 132, "root": 52, "scale": "harmonicMinor", "progression": [0, 5, 3, 4], "lead": "pluck", "density": 8, "rest": 0.2, "backing": "boss", "gain": 1 },
+    "final": { "bpm": 140, "root": 50, "scale": "harmonicMinor", "progression": [0, 1, 5, 4], "lead": "bell", "density": 8, "rest": 0.15, "backing": "boss", "gain": 1 },
+    "rhythm": { "bpm": 100, "root": 57, "scale": "penta", "progression": [0, 3, 4, 0], "lead": "pluck", "density": 4, "rest": 0.45, "backing": "battle", "gain": 0.9 },
+    "epilogue": { "bpm": 60, "root": 60, "scale": "majorPenta", "progression": [0, 3, 4, 0], "lead": "bell", "density": 3, "rest": 0.4, "backing": "harp", "gain": 2 }
+  },
+  "screens": { "title": "yard", "lobby": "yard", "story": "journey", "arena": "yard", "rhythm": "practice", "practice": "practice", "records": "yard", "wardrobe": "yard", "calibrate": null },
+  "regions": {
+    "bg_cheongun": "murim",
+    "bg_blood_road": "murim",
+    "bg_nakan": "murim",
+    "bg_heavenly_peak": "murim",
+    "bg_elheim_forest": "elheim",
+    "bg_volcano_canyon": "elheim",
+    "bg_arden": "elheim",
+    "bg_kazdum": "elheim",
+    "bg_nocturna": "nocturna",
+    "bg_rift": "rift"
+  },
+  "bossTrack": "boss",
+  "finalTrack": "final",
+  "finalFoes": ["mordecai", "sa_giant"],
+  "layers": { "hat": 1, "double": 2, "bell": 3 },
+  "notes": { "parryStep": 1, "parryTop": 9, "perfectChord": [0, 2, 4] }
+}

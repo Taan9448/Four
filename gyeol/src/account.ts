@@ -116,7 +116,7 @@ export function askWhich(local: CloudData, remote: Remote | null): Promise<'loca
       el(
         'div',
         { class: 'acct-modal-box wide' },
-        el('span', { class: 'acct-seal', 'aria-hidden': 'true' }, '名'),
+        
         el('h2', {}, '어느 기록으로 이어 할까'),
         el(
           'p',
@@ -163,7 +163,6 @@ export function trainingLine(): HTMLElement {
     const max = t.need === 0;
     line.title = `「천외귀환」과 같은 계정 수련 — 이긴 전투·대결마다 오른다(일반 ${XP.battle} · 정예 ${XP.elite} · 보스 ${XP.boss}).${max ? '' : ` 다음 레벨까지 ${t.need - t.into}`}`;
     line.replaceChildren(
-      el('b', { 'aria-hidden': 'true' }, '修'),
       el('span', {}, `수련 Lv.${t.level}`),
       max
         ? ''
@@ -189,7 +188,7 @@ function guestNotice(): Promise<boolean> {
       el(
         'div',
         { class: 'acct-modal-box' },
-        el('span', { class: 'acct-seal muted', 'aria-hidden': 'true' }, '客'),
+        
         el('h2', {}, '저장 안 됨'),
         el('p', {}, '게스트 기록은 ', el('b', {}, '계정에 저장되지 않는다.'), ' 이 브라우저에만 남아서'),
         el('ul', {}, el('li', {}, '다른 기기·브라우저에서는 이어 할 수 없고'), el('li', {}, '브라우저 기록을 지우면 함께 사라진다.')),
@@ -293,18 +292,18 @@ export function playerPlate(onChange: () => void): HTMLElement {
   const paint = () => {
     const a = accountState();
     const { status } = cloudState();
-    let seal = '客';
+    let seal = '손님';
     let name = '게스트';
     let sync = '이 기기에만 저장';
     let syncClass = 'sync-guest';
     let action: HTMLElement | string = '';
     if (a.kind === 'signed-in') {
-      [seal, name, sync, syncClass] = ['名', a.name, PLATE_SYNC[status.state] ?? '☁ 저장됨', `sync-${status.state}`];
+      [seal, name, sync, syncClass] = [(a.name[0] ?? '나').toUpperCase(), a.name, PLATE_SYNC[status.state] ?? '☁ 저장됨', `sync-${status.state}`];
       action = el('button', { class: 'link-btn', type: 'button' }, '로그아웃');
       action.addEventListener('click', () => void signOut().then(onChange));
     } else if (a.kind === 'pending') {
       const off = status.state === 'offline';
-      [seal, name, sync, syncClass] = ['名', off ? '오프라인' : '로그인 확인 중…', off ? '이 기기에 저장, 연결되면 올린다' : '', off ? 'sync-offline' : 'sync-syncing'];
+      [seal, name, sync, syncClass] = ['…', off ? '오프라인' : '로그인 확인 중…', off ? '이 기기에 저장, 연결되면 올린다' : '', off ? 'sync-offline' : 'sync-syncing'];
     } else if (cloudEnabled()) {
       action = el('button', { class: 'link-btn', type: 'button' }, '로그인 · 회원가입');
       action.addEventListener('click', () => (setGuest(false), onChange()));
