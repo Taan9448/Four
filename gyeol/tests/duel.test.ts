@@ -793,12 +793,22 @@ describe('「결」 3단계 — 이야기 규칙(버티기·2단계·잠금·튜
   });
 
   it('이야기 데이터: 장마다 상대·화자·장면 그림이 있고, 튜토리얼 목표가 알맞다', () => {
-    const s = storyRaw as unknown as { speakers: Record<string, { stand: string | null }>; chapters: { id: string; intro: { speaker?: string; cg?: string }[]; outro: { speaker?: string; cg?: string }[]; bouts?: { foe: string; intro?: { speaker?: string; cg?: string }[]; outro?: { speaker?: string; cg?: string }[] }[]; tutorial?: { goal: { type: string } }[] }[] };
+    const s = storyRaw as unknown as { speakers: Record<string, { stand: string | null }>; chapters: { id: string; intro: { speaker?: string; cg?: string; art?: string }[]; outro: { speaker?: string; cg?: string; art?: string }[]; bouts?: { foe: string; intro?: { speaker?: string; cg?: string; art?: string }[]; outro?: { speaker?: string; cg?: string; art?: string }[] }[]; tutorial?: { goal: { type: string } }[] }[] };
     const lines = s.chapters.flatMap((c) => [...c.intro, ...c.outro, ...(c.bouts ?? []).flatMap((b) => [...(b.intro ?? []), ...(b.outro ?? [])])]);
     for (const l of lines) {
       if (l.speaker) expect(s.speakers[l.speaker], l.speaker).toBeTruthy();
       if (l.cg && l.cg !== 'none') expect(existsSync(`assets/sprites/${l.cg}`), l.cg).toBe(true);
+      // 「결」 이야기 그림(2026-11-12): 명세와 임시 그림이 있어야 Codex가 그리고 장면 창이 바꿔 낀다
+      if (l.art) {
+        expect(l.art, l.art).toMatch(/^cg_gyeol_/);
+        expect(existsSync(`specs/assets/${l.art}.yaml`), l.art).toBe(true);
+        expect(existsSync(`assets/placeholders/${l.art}`), l.art).toBe(true);
+      }
     }
+    // 같은 그림을 두 줄에 쓰지 않는다(장면마다 새 그림)
+    const arts = lines.flatMap((l) => (l.art ? [l.art] : []));
+    expect(new Set(arts).size).toBe(arts.length);
+    expect(arts.length).toBeGreaterThanOrEqual(40);
     for (const sp of Object.values(s.speakers)) if (sp.stand) expect(existsSync(`assets/sprites/${sp.stand}`), sp.stand).toBe(true);
     for (const c of s.chapters) for (const b of c.bouts ?? []) expect(real.foes.find((f) => f.id === b.foe), b.foe).toBeTruthy();
     const tut = s.chapters[0].tutorial!;

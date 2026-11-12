@@ -1,0 +1,8 @@
+id: cg_gyeol_short_roster
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 짧아진 출발 명부(6장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'A camp on the snowy shore of a half-melted northern sea at dawn. On a rough wooden table lies a short roster scroll with only a few names, held flat by a dagger; a knight''s silver gauntlet rests beside it. Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard) stands at the table, not reading it, looking out across black water and broken ice floes toward the far dark silhouette of an obsidian castle with faint purple lightning around its spires.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

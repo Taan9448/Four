@@ -91,11 +91,13 @@
           "text": "그 칼, 들고만 있지 말고 이리 와 봐라."
         },
         {
-          "text": "다리를 잃은 노인이 바퀴 달린 의자에 앉아 나무토막을 쥐고 있었다. 주방의 왕 노인 — 아니, 왕일검."
+          "text": "다리를 잃은 노인이 바퀴 달린 의자에 앉아 나무토막을 쥐고 있었다. 주방의 왕 노인 — 아니, 왕일검.",
+          "art": "cg_gyeol_wang_stick"
         },
         {
           "speaker": "wang",
-          "text": "베는 법은 이미 알지. 오늘은 받는 법을 보자."
+          "text": "베는 법은 이미 알지. 오늘은 받는 법을 보자.",
+          "cg": "none"
         },
         {
           "speaker": "wang",
@@ -319,7 +321,8 @@
           "text": "…처음은, 귀곡애였습니다."
         },
         {
-          "text": "하운은 눈을 감았다. 절벽 위로 바람이 울던 밤이 떠올랐다."
+          "text": "하운은 눈을 감았다. 절벽 위로 바람이 울던 밤이 떠올랐다.",
+          "art": "cg_gyeol_night_tale"
         }
       ],
       "map": {
@@ -351,7 +354,8 @@
           "text": "청운문 외문의 잡역, 열일곱 살 진하운. 관운각에서 장문인과 천마신교의 밀담을 엿들은 밤이었다."
         },
         {
-          "text": "쥐도, 새끼도. 그 한마디를 들은 뒤로 숲은 횃불로 가득 찼다."
+          "text": "쥐도, 새끼도. 그 한마디를 들은 뒤로 숲은 횃불로 가득 찼다.",
+          "art": "cg_gyeol_torch_forest"
         }
       ],
       "bouts": [
@@ -384,7 +388,8 @@
             },
             {
               "text": "등 뒤에서 낙엽 밟는 소리가 들렸다. 곽도진이 숲의 경계에 서 있었다. 학창의에는 나뭇잎 하나 붙어 있지 않았다.",
-              "cg": "cg_cliff_kwak"
+              "cg": "cg_cliff_kwak",
+              "art": "cg_gyeol_kwak_leaves"
             },
             {
               "speaker": "kwak_dojin",
@@ -414,11 +419,13 @@
           "outro": [
             {
               "text": "다섯 번째 검을 받아 냈을 때, 곽도진의 검이 구름처럼 펼쳐졌다. 운해귀종.",
-              "cg": "cg_cliff_unhae"
+              "cg": "cg_cliff_unhae",
+              "art": "cg_gyeol_unhae_pov"
             },
             {
               "text": "발밑의 바위가 무너졌다. 하운은 귀곡애 아래로 떨어졌다.",
-              "cg": "cg_fall"
+              "cg": "cg_fall",
+              "art": "cg_gyeol_kwak_edge"
             },
             {
               "speaker": "kwak_dojin",
@@ -479,7 +486,8 @@
       "intro": [
         {
           "text": "눈을 떴을 때, 하늘에는 달이 두 개 떠 있었다. 하나는 은빛이었다. 다른 하나는 옅은 푸른빛이었다.",
-          "cg": "cg_two_moons"
+          "cg": "cg_two_moons",
+          "art": "cg_gyeol_stone_gate"
         },
         {
           "text": "뒤를 돌아보니 그곳에도 석문이 있었다. 손바닥 홈에 피 묻은 손을 대 보아도, 석문은 굳게 닫힌 채 침묵했다."
@@ -498,7 +506,8 @@
             },
             {
               "text": "하운의 손에는 아무것도 없었다. 그는 땅에 떨어진 나뭇가지를 집어 들었다.",
-              "cg": "cg_branch_knot"
+              "cg": "cg_branch_knot",
+              "art": "cg_gyeol_wolf_feints"
             },
             {
               "text": "세 번 짧게, 한 번 길게. 결이 보였다. 장작을 패듯이.",
@@ -520,7 +529,8 @@
           "foe": "ore_spider",
           "intro": [
             {
-              "text": "하일론의 은 광산. 광부 셋이 갇혔다는 말을 듣고 일행은 갱도로 내려갔다."
+              "text": "하일론의 은 광산. 광부 셋이 갇혔다는 말을 듣고 일행은 갱도로 내려갔다.",
+              "art": "cg_gyeol_mine_rope"
             },
             {
               "speaker": "born",
@@ -550,7 +560,8 @@
           "intro": [
             {
               "text": "실바렌. 아름드리 은빛 나무 일곱 그루를 감싼 초록빛 결계가 여기저기 금이 간 채 깜빡이고 있었다.",
-              "cg": "cg_silvaren_siege"
+              "cg": "cg_silvaren_siege",
+              "art": "cg_gyeol_barrier_inside"
             },
             {
               "text": "그 한가운데, 검은 연기로 빚은 말과 기사가 서 있었다. 그림자 군단장 베일락."
@@ -625,14 +636,16 @@
       ],
       "intro": [
         {
-          "text": "벨칸의 화산 협곡. 사슬에 묶인 사람들이 여섯 구역의 화로에 망치를 내리치고 있었다."
+          "text": "벨칸의 화산 협곡. 사슬에 묶인 사람들이 여섯 구역의 화로에 망치를 내리치고 있었다.",
+          "art": "cg_gyeol_chain_rows"
         },
         {
           "text": "보른은 스스로 사슬에 들어갔다. 안에서 연락하겠다고. 대답은 짧았다."
         },
         {
           "speaker": "born",
-          "text": "같이 가."
+          "text": "같이 가.",
+          "cg": "none"
         }
       ],
       "bouts": [
@@ -661,7 +674,8 @@
           "intro": [
             {
               "text": "가장 안쪽에서 흰 불길이 높아졌다. 사람처럼 서 있었지만 어깨가 화로의 폭만 했다.",
-              "cg": "cg_great_furnace"
+              "cg": "cg_great_furnace",
+              "art": "cg_gyeol_white_flame"
             },
             {
               "speaker": "ignis",
@@ -669,11 +683,13 @@
               "cg": "none"
             },
             {
-              "text": "내공과 함께 쓸 힘을 당기려는 생각을 하자마자 팔 안쪽이 뜨거워졌다. 하운은 즉시 멈췄다."
+              "text": "내공과 함께 쓸 힘을 당기려는 생각을 하자마자 팔 안쪽이 뜨거워졌다. 하운은 즉시 멈췄다.",
+              "art": "cg_gyeol_hot_arm"
             },
             {
               "speaker": "elia",
-              "text": "당기지 말아요."
+              "text": "당기지 말아요.",
+              "cg": "none"
             },
             {
               "speaker": "kyle",
@@ -686,7 +702,8 @@
             },
             {
               "text": "이그니스의 가슴에 있던 붉은 돌이 갈라졌다. 쇠를 식히다 금이 가는 것과 비슷한, 짧고 높은 소리였다.",
-              "cg": "cg_ignis_split"
+              "cg": "cg_ignis_split",
+              "art": "cg_gyeol_flat_blade"
             },
             {
               "speaker": "kyle",
@@ -748,11 +765,13 @@
       ],
       "intro": [
         {
-          "text": "아르덴의 국경을 넘자 봄이 사라졌다. 얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다."
+          "text": "아르덴의 국경을 넘자 봄이 사라졌다. 얼음 속의 보리밭은 이삭이 팬 채로 멈춰 있었다.",
+          "art": "cg_gyeol_frozen_barley"
         },
         {
           "speaker": "haun",
-          "text": "탑 꼭대기에서 왕녀를 붙잡은 얼음을 먼저 봤습니다."
+          "text": "탑 꼭대기에서 왕녀를 붙잡은 얼음을 먼저 봤습니다.",
+          "cg": "none"
         },
         {
           "speaker": "wang",
@@ -781,7 +800,8 @@
           "intro": [
             {
               "text": "북문 한가운데, 계단 위에서 기사가 검을 들었다. 칼끝이 느리게 오다가 마지막에 갑자기 빨라졌다.",
-              "cg": "cg_ice_palace"
+              "cg": "cg_ice_palace",
+              "art": "cg_gyeol_knight_heel"
             },
             {
               "speaker": "haun",
@@ -799,7 +819,8 @@
           "intro": [
             {
               "text": "탑의 마지막 계단은 지붕 없는 방으로 이어졌다. 왕은 검을 빼려다 멈췄고, 왕비는 옆의 소녀를 붙잡으려 손을 뻗고 있었다. 리나 왕녀였다.",
-              "cg": "cg_princess_ice"
+              "cg": "cg_princess_ice",
+              "art": "cg_gyeol_frozen_family"
             },
             {
               "speaker": "celias",
@@ -807,7 +828,8 @@
               "cg": "none"
             },
             {
-              "text": "셀리아스의 몸으로 이어지는 선은 소녀의 손을 뚫고 가지 않았다. 손을 감싼 얼음 바로 밖에 붙어 있었다."
+              "text": "셀리아스의 몸으로 이어지는 선은 소녀의 손을 뚫고 가지 않았다. 손을 감싼 얼음 바로 밖에 붙어 있었다.",
+              "art": "cg_gyeol_ice_hand"
             },
             {
               "speaker": "elia",
@@ -899,7 +921,8 @@
           "intro": [
             {
               "text": "위의 돌을 움직이면 아래에서 갑옷이 찌그러지는 소리가 났다. 오천의 무덤에서 전사 하나가 일어섰다.",
-              "cg": "cg_durin_rest"
+              "cg": "cg_durin_rest",
+              "art": "cg_gyeol_tomb_helm"
             },
             {
               "speaker": "born",
@@ -914,7 +937,8 @@
           "intro": [
             {
               "text": "검은 벽에서 붉은 빛이 켜졌다. 동굴 전체가 큰 짐승의 등처럼 울렁였다.",
-              "cg": "cg_gormon_wakes"
+              "cg": "cg_gormon_wakes",
+              "art": "cg_gyeol_cave_breath"
             },
             {
               "speaker": "gormon",
@@ -986,7 +1010,8 @@
       "intro": [
         {
           "text": "두 번째 원정의 출발 명부는 첫 번째보다 짧았다.",
-          "cg": "cg_nocturna"
+          "cg": "cg_nocturna",
+          "art": "cg_gyeol_short_roster"
         },
         {
           "speaker": "haun",
@@ -1022,7 +1047,8 @@
           "intro": [
             {
               "text": "마왕 바르가스는 왕좌에 앉아 있지 않았다. 방 한가운데 서서 깨진 창밖의 전장을 내려다보고 있었다.",
-              "cg": "cg_vargas_throne"
+              "cg": "cg_vargas_throne",
+              "art": "cg_gyeol_vargas_back"
             },
             {
               "speaker": "vargas",
@@ -1035,7 +1061,8 @@
             },
             {
               "text": "바르가스의 가슴에서 검은 수정이 나왔다. 공허의 열쇠. 빛 가운데에서 낯선 바위와 나무의 그림자가 비쳤다. 하운은 소나무 냄새를 맡은 것 같았다.",
-              "cg": "cg_vargas_deal"
+              "cg": "cg_vargas_deal",
+              "art": "cg_gyeol_key_light"
             },
             {
               "speaker": "vargas",
@@ -1070,7 +1097,8 @@
           "outro": [
             {
               "text": "검끝이 가슴의 매듭을 찔렀다. 이미 드러난 한 점에 닿을 만큼만.",
-              "cg": "cg_cheonoe_gwiun"
+              "cg": "cg_cheonoe_gwiun",
+              "art": "cg_gyeol_one_point"
             },
             {
               "speaker": "vargas",
@@ -1099,7 +1127,8 @@
         },
         {
           "speaker": "wang",
-          "text": "…그 말을 한 녀석이 지금 내 앞에서 장작을 패고 있군. 다음."
+          "text": "…그 말을 한 녀석이 지금 내 앞에서 장작을 패고 있군. 다음.",
+          "art": "cg_gyeol_yard_listen"
         }
       ],
       "outroIf": {
@@ -1152,7 +1181,8 @@
       "intro": [
         {
           "text": "산 아래로 가는 길은 하운이 기억한 곳에서 끊겼다. 소나무 사이로 낮은 지붕들이 보였다.",
-          "cg": "cg_tax_office"
+          "cg": "cg_tax_office",
+          "art": "cg_gyeol_down_mountain"
         },
         {
           "speaker": "wang",
@@ -1170,7 +1200,8 @@
           "intro": [
             {
               "text": "배진은 골짜기 입구로 들어가지 않았다. 위쪽 능선에서 돌담과 목책, 솥의 연기를 보았다.",
-              "cg": "cg_charcoal_valley"
+              "cg": "cg_charcoal_valley",
+              "art": "cg_gyeol_ridge_bae"
             }
           ],
           "outro": []
@@ -1209,7 +1240,8 @@
           ],
           "outro": [
             {
-              "text": "검집이 그 매듭을 눌렀다. 검이 떨어졌다. 하운은 그를 베지 않았다."
+              "text": "검집이 그 매듭을 눌렀다. 검이 떨어졌다. 하운은 그를 베지 않았다.",
+              "art": "cg_gyeol_sheath_knot"
             },
             {
               "speaker": "seokdu",
@@ -1265,7 +1297,8 @@
       "intro": [
         {
           "text": "정찰대가 가져온 물은 병 속에서도 얼지 않았다. 낙안봉의 배수로에서 담아 온 물이었다.",
-          "cg": "cg_shield_wall"
+          "cg": "cg_shield_wall",
+          "art": "cg_gyeol_red_bottle"
         },
         {
           "speaker": "haun",
@@ -1326,7 +1359,8 @@
           "outro": [
             {
               "text": "하운은 염탁의 팔 아래, 힘이 한곳으로 모인 매듭을 짧게 찔렀다. 갈라진 자리는 닫히지 않았다.",
-              "cg": "cg_nakan_crack"
+              "cg": "cg_nakan_crack",
+              "art": "cg_gyeol_child_crack"
             },
             {
               "speaker": "haun",
@@ -1384,7 +1418,8 @@
       "intro": [
         {
           "text": "천마봉의 소식은 한 장의 비밀문서로 오지 않았다. 청동 그릇을 실은 수레가 산 안으로 들어갔다.",
-          "cg": "cg_nine_stairs"
+          "cg": "cg_nine_stairs",
+          "art": "cg_gyeol_bronze_carts"
         },
         {
           "speaker": "haun",
@@ -1402,7 +1437,8 @@
           "intro": [
             {
               "text": "여섯째 굽이. 계단 위에서 장로 하나가 천천히 내려왔다. 검은 옷 위에 녹빛 겉옷을 겹쳐 입었다.",
-              "cg": "cg_poison_palm_ice"
+              "cg": "cg_poison_palm_ice",
+              "art": "cg_gyeol_elder_descends"
             }
           ],
           "outro": []
@@ -1424,11 +1460,13 @@
           ],
           "outro": [
             {
-              "text": "하운은 버티지 않았다. 나무토막처럼, 밀어 오는 쪽으로 흘렸다. 운해귀종. 송문고검의 끝이 부러졌다."
+              "text": "하운은 버티지 않았다. 나무토막처럼, 밀어 오는 쪽으로 흘렸다. 운해귀종. 송문고검의 끝이 부러졌다.",
+              "art": "cg_gyeol_pine_sword_breaks"
             },
             {
               "speaker": "kwak_dojin",
-              "text": "너무 멀리 왔다."
+              "text": "너무 멀리 왔다.",
+              "cg": "none"
             },
             {
               "speaker": "wang",
@@ -1460,7 +1498,8 @@
             },
             {
               "text": "하늘의 문은 닫히지 않았다.",
-              "cg": "cg_sky_splits"
+              "cg": "cg_sky_splits",
+              "art": "cg_gyeol_open_door"
             }
           ]
         }
@@ -1513,7 +1552,8 @@
       "intro": [
         {
           "text": "틈 속에는 위도 아래도 없었다. 검은 허공에 부서진 세계의 조각들이 떠 있었다.",
-          "cg": "cg_rift_void"
+          "cg": "cg_rift_void",
+          "art": "cg_gyeol_still_float"
         },
         {
           "speaker": "haun",
@@ -1540,7 +1580,8 @@
           "intro": [
             {
               "text": "종을 친 사람은 종소리를 듣지 못했다. 검은 금에서 나온 것이 풀밭을 건넜다.",
-              "cg": "cg_dolnae_evac"
+              "cg": "cg_dolnae_evac",
+              "art": "cg_gyeol_silent_bell"
             }
           ],
           "outro": []
@@ -1550,7 +1591,8 @@
           "intro": [
             {
               "text": "모르데카이는 가까이서 보니 얼굴이 없었다. 눈처럼 보였던 자리는 흐름이 안으로 접히는 구멍이었다.",
-              "cg": "cg_mordecai"
+              "cg": "cg_mordecai",
+              "art": "cg_gyeol_back_to_back"
             },
             {
               "speaker": "elia",
@@ -1572,7 +1614,8 @@
           "outro": [
             {
               "text": "세 숨에 세 걸음. 장작을 세우던 발처럼 왼발을 붙였다. 검은 두 가닥이 새로 맞물리는 틈에 들어가 있었다. 더 깊이 찌르지 않고, 옆으로 틀었다.",
-              "cg": "cg_sealing"
+              "cg": "cg_sealing",
+              "art": "cg_gyeol_three_steps"
             },
             {
               "text": "놓고 계시오.",
@@ -1595,7 +1638,8 @@
         },
         {
           "speaker": "wang",
-          "text": "…비었구나. 그래도 네 몸은 남았다. 이제 장작이나 패러 가자."
+          "text": "…비었구나. 그래도 네 몸은 남았다. 이제 장작이나 패러 가자.",
+          "art": "cg_gyeol_empty_yard"
         }
       ],
       "challenge": {
@@ -1621,7 +1665,8 @@
       "intro": [
         {
           "text": "늦겨울, 운곡촌. 장작 패는 날.",
-          "cg": "cg_firewood_day"
+          "cg": "cg_firewood_day",
+          "art": "cg_gyeol_crooked_log"
         },
         {
           "text": "첫 장작은 비뚤어졌다. 하운은 예전처럼 내공으로 누르려다 멈췄다. 나무를 다시 세우고 발을 조금 옮겼다. 급하게 쪼갤 필요는 없었다.",
@@ -1658,7 +1703,8 @@
         },
         {
           "text": "하운은 마당의 남은 나무를 보았다. 오늘 다 하지 못하면 내일 하면 되었다. 잠깐 쉬고 나서, 그는 다시 도끼를 들었다.",
-          "cg": "cg_firewood_day"
+          "cg": "cg_firewood_day",
+          "art": "cg_gyeol_axe_again"
         }
       ],
       "outroIf": {

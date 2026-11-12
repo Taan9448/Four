@@ -7,8 +7,10 @@ import { button, el, realArt } from './dom';
 export interface SceneLine {
   speaker?: string;
   text: string;
-  /** 장면 일러스트 id(none이면 걷는다) */
+  /** 「천외귀환」 장면 일러스트 id(none이면 걷는다) — art가 아직 실제 그림이 아니면 이것 */
   cg?: string;
+  /** 「결」 이야기 그림 id(Codex cg_gyeol_<장면>, 2026-11-12 — 「천외귀환」에 없는 새 장면·구도). 실제 그림이 오면 cg 대신 이것 */
+  art?: string;
   /** 반신 그림 칸(1 기본 · 2 결의 · 3 놀람) */
   face?: number;
   /** 고르기(2026-11-10 6장 바르가스의 거래): 고른 쪽의 flag가 장 안에 남는다. 건너뛰면 아무것도 고르지 않은 것 */
@@ -49,9 +51,9 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
     const side = (who: string) => (who.startsWith('haun') ? left : right);
     const show = () => {
       const line = lines[i];
-      if (line.cg) {
-        // 「결」 전용 회상 그림(Codex cg_gyeol_story_<이름>, 먹 그림)이 오면 그것, 없으면 「천외귀환」 장면 그림(2026-11-12)
-        const u = line.cg === 'none' ? null : (realArt(line.cg.replace(/^cg_/, 'cg_gyeol_story_')) ?? realArt(line.cg));
+      if (line.art || line.cg) {
+        // 「결」 이야기 그림(art)이 실제로 왔으면 그것, 아니면 「천외귀환」 장면 그림(cg) — 둘 다 없으면 걷는다(2026-11-12)
+        const u = (line.art ? realArt(line.art) : null) ?? (line.cg && line.cg !== 'none' ? realArt(line.cg) : null);
         cg.hidden = !u;
         if (u) cg.src = u;
       }

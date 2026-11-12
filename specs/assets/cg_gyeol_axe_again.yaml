@@ -1,0 +1,8 @@
+id: cg_gyeol_axe_again
+type: story-cg
+character: haun
+summary: '「결」 이야기 그림 — 다시 드는 도끼(에필로그) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Dusk in a village inn''s back yard in late winter: Jin Haun, now a young man in a simple grey work outfit, alone, raising his axe again over a log on the chopping block; a modest pile of unsplit wood remains. Behind him the inn''s windows glow warm, and inside them the soft silhouettes of a silver-haired woman, a very tall boy and an old man in a wheeled chair. First stars above the mountains.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

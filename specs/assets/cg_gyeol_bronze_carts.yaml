@@ -1,0 +1,8 @@
+id: cg_gyeol_bronze_carts
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 산으로 들어가는 청동 그릇 수레(9장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Dusk at the foot of a black crag: a line of ox carts loaded with large bronze bowls rolls into a tunnel in the rock, escorted by cult fighters in black and crimson with torches. Seen from hiding among rocks above: in the foreground only a young swordsman''s hand gripping the rock and part of his grey sleeve.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

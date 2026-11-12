@@ -1,0 +1,8 @@
+id: cg_gyeol_torch_forest
+type: story-cg
+character: haun
+summary: '「결」 이야기 그림 — 횃불로 가득 찬 숲(1장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'A dense pine forest on Cheongun Mountain at night. Jin Haun at seventeen (lean servant boy, long straight black hair with long bangs, grey servant outfit, cloth-wrapped hands) runs toward the viewer between the trunks, glancing back over his shoulder, breath steaming, a woodcutting axe in one hand. Behind him, deep among the trees, dozens of torches move in a long line, and between them glimpses of white-robed sect disciples with drawn swords. Orange torchlight from behind rims his silhouette; the forest ahead of him is dark blue.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

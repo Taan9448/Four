@@ -1,0 +1,8 @@
+id: cg_gyeol_night_tale
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 이야기를 시작하는 밤(서장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Late at night in the inn''s back yard after practice: Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard) sits on the chopping block with the sheathed sword across his knees, eyes closed, about to begin a story. Beside him Wang Ilgeom (a very old man with a sickle-bent back, thin white hair tied back, worn grey-brown robe, no legs, sitting in a plain wooden chair with cart wheels, a blanket flat over his lap) sits in his chair by a small iron brazier, a steaming cup in his hands, watching him quietly. Above the bamboo grove the night sky opens; thin clouds stream toward a distant dark mountain where the faint shape of a sheer cliff can be seen under the moon — the memory beginning. Calm, intimate, warm brazier glow against a deep blue night.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

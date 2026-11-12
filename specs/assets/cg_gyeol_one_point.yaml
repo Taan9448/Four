@@ -1,0 +1,8 @@
+id: cg_gyeol_one_point
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 한 점에 닿은 검끝(6장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Extreme close-up: the tip of a narrow plain sword just touching a single small bright knot of light on the dark obsidian-armored chest of a giant; a tiny ring of ripples spreads from the touch point. Reflected along the polished blade, the calm eyes of the young swordsman holding it. Everything else falls into darkness. Silent, precise, enormous stillness.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

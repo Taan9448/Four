@@ -1,0 +1,8 @@
+id: cg_gyeol_flat_blade
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 흐름과 나란한 칼날(3장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+frame_notes:
+  1: 'Macro close-up: the flat side of a narrow plain sword lies parallel alongside a river of flowing red-orange mana, the swordsman''s hand light and relaxed on the crude grip. Out of focus behind it, in the white-flame chest of a fire giant, a red stone has just cracked with a thin bright line. At the side of the frame a blond knight in silver armor holds up one finger, counting, eyes wide.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }
