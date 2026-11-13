@@ -1,0 +1,19 @@
+id: born_death
+type: character-anim
+character: born
+summary: '「결」 보른 쓰러짐 6프레임 — 대결에서 졌을 때 느린 화면으로 재생한다(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 대기 그림과 같은 크기·같은 발 위치'
+depends_on: [born_ref]
+reference: assets/source/born_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck hard, beard braids flying, the axe jolting in his hands'
+  2: 'staggering back a heavy step, boots skidding'
+  3: 'dropping onto one knee, the axe head on the ground, both hands on the haft'
+  4: 'his grip slips, the stocky body tipping sideways'
+  5: 'falling onto his side with a thud, the axe lying beside him'
+  6: 'lying still, eyes closed, one hand still near the axe haft'
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#a02634' }

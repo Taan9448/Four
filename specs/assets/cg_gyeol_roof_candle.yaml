@@ -1,0 +1,8 @@
+id: cg_gyeol_roof_candle
+type: story-cg
+character: elia
+summary: '「결」 이야기 그림 — 지붕 위 촛불 하나(2장) · 장면 사이를 잇는 원작 장면(2026-11-13 매끄러운 이야기)'
+frame_notes:
+  1: 'Night on the tiled roof of the Silver Bell inn in Hailon under two moons (one silver, one pale blue). Elia (silver-haired half-elf mage woman in a grey hooded travelling cloak, long wooden staff with a blue stone) sits cross-legged on the roof ridge with her palm open, holding a tiny calm flame of blue-white mana no bigger than a candle flame. Beside her Jin Haun, a young man with long black hair in a grey servant outfit, copies her with his own open palm, a tiny flame flickering too big and unsteady. Town lights below, quiet and warm.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

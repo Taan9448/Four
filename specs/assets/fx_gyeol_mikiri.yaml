@@ -1,0 +1,15 @@
+id: fx_gyeol_mikiri
+type: fx
+summary: '「결」 간파 이펙트 6프레임 — 받을 수 없는 붉은 결을 제때 비켜섰을 때 하운 옆에 터진다(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 붉은 결이 갈라져 빗나간다'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a jagged crimson line of force rushing in from the right'
+  2: 'impact: the crimson line splits in two around an empty space with a sharp red-white flash, a faint ghostly afterimage of a dodging figure in pale blue'
+  3: 'the two red halves streaking past and away to the left'
+  4: 'red streaks thinning, the pale afterimage fading'
+  5: 'a few red and blue motes'
+  6: 'faint motes'
+placeholder: { accent: '#ff9a8a' }

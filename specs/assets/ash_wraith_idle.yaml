@@ -1,0 +1,18 @@
+id: ash_wraith_idle
+type: character-anim
+size: large
+character: ash_wraith
+chroma: magenta
+summary: '잿물 망령 대기 4프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [ash_wraith_ref]
+reference: assets/source/ash_wraith_ref.png
+facing: left
+frames: 4
+fps: 6
+events: {}
+frame_notes:
+  1: 'hovering facing left, ash-water dripping from the arms, ice cracking inside the body'
+  2: 'the body sways like a wave, slush sliding down'
+  3: 'the arms sink and rise again'
+  4: 'settles, water trailing below'
+placeholder: { shape: humanoid, color: '#6a7a88', accent: '#bfe4ff' }

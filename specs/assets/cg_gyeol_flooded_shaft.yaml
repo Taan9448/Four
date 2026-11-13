@@ -1,0 +1,8 @@
+id: cg_gyeol_flooded_shaft
+type: story-cg
+character: born
+summary: '「결」 이야기 그림 — 물 높이를 재는 줄(5장) · 장면 사이를 잇는 원작 장면(2026-11-13 매끄러운 이야기)'
+frame_notes:
+  1: 'Inside a collapsed dwarven mine tunnel lit by lanterns: rubble blocks the passage and dark water is rising. Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard) kneels at the edge of the water lowering a knotted rope to measure its depth, a ledger open beside him with tally marks. Born (short, very broad dwarf warrior with a red beard in three braids, a two-handed axe) and a stout dwarf woman engineer (Herda) dig at the rubble with picks. Through a gap in the stones, faint hands of trapped miners reach out. Tense, dim, warm lantern light on cold stone.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

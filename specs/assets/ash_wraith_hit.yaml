@@ -1,0 +1,17 @@
+id: ash_wraith_hit
+type: character-anim
+size: large
+character: ash_wraith
+chroma: magenta
+summary: '잿물 망령 피격 3프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [ash_wraith_ref]
+reference: assets/source/ash_wraith_ref.png
+facing: left
+frames: 3
+fps: 10
+events: {}
+frame_notes:
+  1: 'struck, the ice body cracks, a spray of water'
+  2: 'the shape wavers and splits for a moment'
+  3: 'reforms, slush flowing back together'
+placeholder: { shape: humanoid, color: '#6a7a88', accent: '#bfe4ff' }

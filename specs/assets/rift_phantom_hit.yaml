@@ -1,0 +1,17 @@
+id: rift_phantom_hit
+type: character-anim
+size: large
+character: rift_phantom
+chroma: magenta
+summary: '틈의 환영 피격 3프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [rift_phantom_ref]
+reference: assets/source/rift_phantom_ref.png
+facing: left
+frames: 3
+fps: 10
+events: {}
+frame_notes:
+  1: 'struck, the figure tears like mist around the cut'
+  2: 'the face blurs badly, the outline breaking'
+  3: 'the mist pulls back together'
+placeholder: { shape: humanoid, color: '#7a8a9a', accent: '#cfe6ff' }

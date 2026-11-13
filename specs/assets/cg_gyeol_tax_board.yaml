@@ -1,0 +1,8 @@
+id: cg_gyeol_tax_board
+type: story-cg
+character: haun_sword
+summary: '「결」 이야기 그림 — 장터 벽의 새 방(7장) · 장면 사이를 잇는 원작 장면(2026-11-13 매끄러운 이야기)'
+frame_notes:
+  1: 'The grey, joyless market of Ungok village at the foot of Cheongun Mountain: a posted proclamation board on a stone wall (no readable text, just blurred brush marks), villagers with lowered heads passing by. Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard) in a travel-worn grey outfit stands reading the board, his jaw tight. An old woman (Yeonbun) behind him has recognized his face and lifts a trembling hand. Overcast sky, pines on the hills.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

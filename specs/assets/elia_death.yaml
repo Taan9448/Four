@@ -1,0 +1,19 @@
+id: elia_death
+type: character-anim
+character: elia
+summary: '「결」 엘리아 쓰러짐 6프레임 — 대결에서 졌을 때 느린 화면으로 재생한다(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 대기 그림과 같은 크기·같은 발 위치'
+depends_on: [elia_ref]
+reference: assets/source/elia_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck hard, the blue stone of her staff flickering, hood flying back'
+  2: 'staggering backward, silver hair whipping, the staff slipping'
+  3: 'dropping to her knees, leaning on the staff'
+  4: 'the staff falls from her hand, her body tipping sideways'
+  5: 'falling onto her side, the grey cloak spreading, the staff lying beside her'
+  6: 'lying still, eyes closed, the blue stone of the staff faintly glowing'
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#8fd3ff' }

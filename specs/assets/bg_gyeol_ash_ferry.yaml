@@ -1,0 +1,6 @@
+id: bg_gyeol_ash_ferry
+type: background
+summary: '전투 배경 — 잿물 나루, 얼음이 터진 북쪽 강(2026-11-13 「결」 전용 새 상대)'
+frame_notes:
+  1: 'The Ash-Water Ferry on a northern river at grey dawn, the moment the ice breaks: a wide river of grey ash-tinted water with heaving slabs of broken ice; on the left edge a snapped wooden ferry dock with a tilted rope post; on the right edge the far bank lost in fog with the faint black silhouette of a fortress. The ground is a narrow strip of frozen shore with cracks. Cold greys, slate blue, dirty white, a single faint warm lantern on the dock.'
+placeholder: { color: '#2e343a' }

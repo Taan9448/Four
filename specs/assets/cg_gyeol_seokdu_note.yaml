@@ -1,0 +1,8 @@
+id: cg_gyeol_seokdu_note
+type: story-cg
+character: seokdu
+summary: '「결」 이야기 그림 — 현판 아래의 쪽지(7장) · 장면 사이를 잇는 원작 장면(2026-11-13 매끄러운 이야기)'
+frame_notes:
+  1: 'Night at the gate of the Cheongun sect on the mountain: a huge plaque hangs over the gate (its characters blurred, unreadable). Below it, the giant boy Seokdu, a head taller than anyone, sits chained to a stone pillar in a torn white robe, lowering a small folded paper on a long thread down the cliff wall. Far below in the dark trees, Jin Haun (lean young man, long straight black hair with long bangs over calm black eyes, worn grey servant outfit, a narrow plain unadorned sword with a plain black scabbard) reaches up to catch it. Moonlight, torches on the walls.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

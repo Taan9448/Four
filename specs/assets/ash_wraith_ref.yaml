@@ -1,0 +1,11 @@
+id: ash_wraith_ref
+type: character-ref
+size: large
+character: ash_wraith
+chroma: magenta
+summary: '잿물 나루의 얼음 망령 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-11-13 「결」 전용 새 상대'
+facing: left
+frame_notes:
+  1: 'full body, three-quarter front view, a looming wraith of breaking river ice and grey ash-water, taller than a man, two long slushy arms with clawed ice hands, a drowned pale mask face, trailing water below instead of legs'
+  2: 'full body, side view facing left, same proportions, leaning forward with one icy hand reaching'
+placeholder: { shape: humanoid, color: '#6a7a88', accent: '#bfe4ff' }

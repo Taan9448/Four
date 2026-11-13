@@ -1,0 +1,20 @@
+id: wudang_warden_death
+type: character-anim
+size: large
+character: wudang_warden
+chroma: magenta
+summary: '진무전 호법 쓰러짐 6프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [wudang_warden_ref]
+reference: assets/source/wudang_warden_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+frame_notes:
+  1: 'struck hard, the sword flying from his hand'
+  2: 'staggers back, the whisk dropping'
+  3: 'sinks to one knee, head bowed'
+  4: 'lowers himself to sit cross-legged on the ground'
+  5: 'sits still, eyes closed, hands resting on the knees like meditation'
+  6: 'sitting in peace, defeated but calm (not dead)'
+placeholder: { shape: humanoid, color: '#8a8a80', accent: '#e8e4d8' }

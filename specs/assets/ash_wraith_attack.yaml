@@ -1,0 +1,20 @@
+id: ash_wraith_attack
+type: character-anim
+size: large
+character: ash_wraith
+chroma: magenta
+summary: '잿물 망령 「얼음 물결」 6프레임(4번 타격) — 2026-11-13 「결」 전용 새 상대'
+depends_on: [ash_wraith_ref]
+reference: assets/source/ash_wraith_ref.png
+facing: left
+frames: 6
+fps: 12
+events: { hit: 4 }
+frame_notes:
+  1: 'rears back, the whole body swelling like a rising wave'
+  2: 'lifts both icy arms high, ice shards cracking free'
+  3: 'the body crests forward like a breaking wave'
+  4: 'THE HIT: both arms crash down to the left in a burst of ice and grey water'
+  5: 'the water spreads low along the ground'
+  6: 'pulls back into the hovering shape'
+placeholder: { shape: humanoid, color: '#6a7a88', accent: '#bfe4ff' }

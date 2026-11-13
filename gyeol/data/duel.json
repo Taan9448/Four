@@ -6556,6 +6556,482 @@
       }
     },
     {
+      "id": "wudang_warden",
+      "title": "진무전 호법",
+      "sprite": "wudang_warden",
+      "bg": "bg_gyeol_wudang",
+      "scale": 1,
+      "weather": "leaves",
+      "clashPower": 0.5,
+      "note": "무당 봉쇄진을 지키는 호법. 태극의 원을 느리게 그리다 끝에서 빨라진다. 진을 펴면(構) 기다려야 한다.",
+      "hp": 150,
+      "posture": 100,
+      "postureRegen": 10,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "circle": {
+          "name": "태극 원",
+          "windup": 760,
+          "recover": 380,
+          "damage": 15,
+          "posture": 15
+        },
+        "twin": {
+          "name": "쌍검",
+          "windup": 380,
+          "recover": 240,
+          "damage": 8,
+          "posture": 9
+        },
+        "whisk": {
+          "name": "불진 휘감기",
+          "windup": 560,
+          "recover": 340,
+          "damage": 13,
+          "posture": 13,
+          "feint": 340
+        },
+        "press": {
+          "name": "봉쇄진 누르기",
+          "windup": 940,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_array_press"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "circle"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "twin"
+            },
+            {
+              "move": "twin",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "whisk"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "circle"
+            },
+            {
+              "move": "press",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "진 풀기",
+        "hanja": "解陣",
+        "style": "cross",
+        "line": "검을 먼저 내려놓지 않는다. 함께 든다."
+      },
+      "lines": {
+        "start": [
+          "진무전에 들어올 수 없다.",
+          "곽도진의 제자인가."
+        ],
+        "stagger": [
+          "…진이 흔들린다."
+        ],
+        "crisis": [
+          "돌자리는 셋이다. 하나로는 못 연다."
+        ],
+        "win": [
+          "물러가라."
+        ],
+        "lose": [
+          "…도겸을, 부탁하오."
+        ]
+      },
+      "phases": [
+        {
+          "name": "세 돌자리",
+          "line": "진이 닫힌다. 이제 원 안이다.",
+          "hp": 120,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "array": {
+              "name": "진을 편 자세",
+              "windup": 900,
+              "recover": 420,
+              "damage": 20,
+              "posture": 22,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "twin"
+                },
+                {
+                  "move": "twin",
+                  "after": 110
+                },
+                {
+                  "move": "circle",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "array"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "whisk"
+                },
+                {
+                  "move": "press",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "circle"
+                },
+                {
+                  "move": "array",
+                  "after": 200
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ash_wraith",
+      "title": "잿물 나루의 얼음 망령",
+      "sprite": "ash_wraith",
+      "bg": "bg_gyeol_ash_ferry",
+      "scale": 1.15,
+      "weather": "snow",
+      "clashPower": 1.0,
+      "note": "첫 원정을 덮친 잿물 나루의 범람. 이길 수 없다 — 사람들이 건너갈 때까지 여섯 번 받아 내며 버틴다.",
+      "hp": 9999,
+      "posture": 9999,
+      "postureRegen": 50,
+      "idle": [
+        700,
+        1100
+      ],
+      "moves": {
+        "wave": {
+          "name": "얼음 물결",
+          "windup": 640,
+          "recover": 400,
+          "damage": 13,
+          "posture": 10,
+          "element": "ice"
+        },
+        "hand": {
+          "name": "끌어당기는 손",
+          "windup": 560,
+          "recover": 360,
+          "damage": 14,
+          "posture": 10,
+          "element": "ice",
+          "feint": 320
+        },
+        "double": {
+          "name": "두 물결",
+          "windup": 420,
+          "recover": 260,
+          "damage": 9,
+          "posture": 8,
+          "element": "ice"
+        },
+        "flood": {
+          "name": "범람",
+          "windup": 960,
+          "recover": 540,
+          "damage": 20,
+          "posture": 0,
+          "element": "ice",
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_ice_flood"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "wave"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "double"
+            },
+            {
+              "move": "double",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "hand"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "wave"
+            },
+            {
+              "move": "flood",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "lines": {
+        "start": [
+          "(얼음이 한꺼번에 터지며 강이 넘친다)"
+        ],
+        "crisis": [
+          "(잿물이 발목까지 올라온다)"
+        ],
+        "win": [
+          "(물이 모든 것을 덮는다)"
+        ],
+        "stagger": [
+          "(물결이 잠시 갈라진다)"
+        ]
+      },
+      "storyOnly": true
+    },
+    {
+      "id": "rift_phantom",
+      "title": "틈의 환영",
+      "sprite": "rift_phantom",
+      "bg": "bg_rift",
+      "scale": 1.05,
+      "weather": "ash",
+      "clashPower": 0.55,
+      "note": "틈 안에서 마주친 환영. 보는 사람이 그리워하는 얼굴로 선다. 거의 모든 칼이 속임수다 — 끝까지 보고 받는다.",
+      "hp": 140,
+      "posture": 95,
+      "postureRegen": 11,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "father": {
+          "name": "아버지의 검",
+          "windup": 820,
+          "recover": 420,
+          "damage": 16,
+          "posture": 17,
+          "element": "ice"
+        },
+        "echo": {
+          "name": "메아리 칼",
+          "windup": 520,
+          "recover": 320,
+          "damage": 12,
+          "posture": 12,
+          "feint": 360
+        },
+        "scatter": {
+          "name": "흩어지는 칼",
+          "windup": 360,
+          "recover": 240,
+          "damage": 8,
+          "posture": 8
+        },
+        "name": {
+          "name": "잊힌 이름",
+          "windup": 920,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_phantom_name"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "echo"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "scatter"
+            },
+            {
+              "move": "echo",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "father"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "echo"
+            },
+            {
+              "move": "name",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "환영 걷기",
+        "hanja": "散影",
+        "style": "shadow",
+        "line": "그 옆을 지나간다. 돌아보지 않고."
+      },
+      "lines": {
+        "start": [
+          "(틈 안의 안개가 사람의 모습으로 모인다)",
+          "…아들아."
+        ],
+        "stagger": [
+          "(얼굴이 흐려진다)"
+        ],
+        "crisis": [
+          "너는 왜 그때 오지 않았느냐."
+        ],
+        "win": [
+          "여기 남아라."
+        ],
+        "lose": [
+          "(환영이 흩어진다. 아무것도 남지 않는다)"
+        ]
+      },
+      "phases": [
+        {
+          "name": "그리운 얼굴",
+          "line": "이번엔 네가 아는 얼굴이다.",
+          "hp": 110,
+          "speed": 0.88,
+          "roar": 1500,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "echo"
+                },
+                {
+                  "move": "echo",
+                  "after": 160
+                },
+                {
+                  "move": "father",
+                  "after": 200
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "scatter"
+                },
+                {
+                  "move": "scatter",
+                  "after": 100
+                },
+                {
+                  "move": "scatter",
+                  "after": 100
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "echo"
+                },
+                {
+                  "move": "name",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "father"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "firewood",
       "title": "장작 패는 날",
       "sprite": "oak_stump",

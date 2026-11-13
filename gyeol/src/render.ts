@@ -44,7 +44,7 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
   const fxIds = ['fx_hit_slash', 'fx_hit_blunt', 'fx_hit_fire', 'fx_hit_ice', 'fx_hit_shock', 'fx_hit_grain'];
   const techFx = TECH_IDS.flatMap((t) => [`fx_gyeol_tech_${t}_a`, `fx_gyeol_tech_${t}_b`]);
   const finisher = foeId ? [`fx_gyeol_finisher_${foeId}`] : [];
-  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_stance', 'fx_gyeol_revive', 'fx_gyeol_armor_break', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', ...techFx, ...skillFx, ...finisher];
+  const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_stance', 'fx_gyeol_revive', 'fx_gyeol_armor_break', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', 'fx_gyeol_heavy_impact', 'fx_gyeol_combo_finish', 'fx_gyeol_mikiri', ...techFx, ...skillFx, ...finisher];
   const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, pHeavy, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
     real(`${playerPrefix}_tech`),

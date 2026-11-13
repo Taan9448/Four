@@ -1,0 +1,20 @@
+id: rift_phantom_death
+type: character-anim
+size: large
+character: rift_phantom
+chroma: magenta
+summary: '틈의 환영 흩어짐 6프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [rift_phantom_ref]
+reference: assets/source/rift_phantom_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+frame_notes:
+  1: 'struck, the frost sword shatters into motes'
+  2: 'the armor outline fades from the edges'
+  3: 'the face becomes clear for a moment, calm, then blurs'
+  4: 'the figure dissolves into rising mist'
+  5: 'wisps of pale blue mist'
+  6: 'nothing left but a few drifting motes'
+placeholder: { shape: humanoid, color: '#7a8a9a', accent: '#cfe6ff' }

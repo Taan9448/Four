@@ -1,0 +1,20 @@
+id: ash_wraith_death
+type: character-anim
+size: large
+character: ash_wraith
+chroma: magenta
+summary: '잿물 망령 흩어짐 6프레임(이야기에서는 버티기라 거의 안 쓴다) — 2026-11-13 「결」 전용 새 상대'
+depends_on: [ash_wraith_ref]
+reference: assets/source/ash_wraith_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+frame_notes:
+  1: 'the ice body cracks all over'
+  2: 'the shape collapses downward like melting slush'
+  3: 'a heap of broken ice and grey water'
+  4: 'the water spreading flat'
+  5: 'a few floating ice chunks'
+  6: 'still water with a thin film of ash'
+placeholder: { shape: humanoid, color: '#6a7a88', accent: '#bfe4ff' }
