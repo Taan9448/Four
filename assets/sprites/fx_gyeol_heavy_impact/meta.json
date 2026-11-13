@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_heavy_impact",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 9.825,
+  "gridDetected": true,
+  "nativeSize": [
+    52,
+    52
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "4e5caac322c1b6f4",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.612
+}
