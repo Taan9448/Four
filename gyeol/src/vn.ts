@@ -3,6 +3,7 @@
 import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import { button, el, realArt } from './dom';
+import { withKeys } from './save';
 
 export interface SceneLine {
   speaker?: string;
@@ -73,7 +74,7 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       for (const s of [left, right]) s.classList.toggle('dim', s !== speaking);
       // 일러스트가 깔린 동안은 반신 그림을 숨긴다
       root.classList.toggle('has-cg', !cg.hidden);
-      full = line.text;
+      full = withKeys(line.text);
       shown = 0;
       text.textContent = '';
       more.hidden = true;

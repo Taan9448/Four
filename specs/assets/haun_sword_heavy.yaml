@@ -1,0 +1,24 @@
+id: haun_sword_heavy
+type: character-anim
+character: haun_sword
+summary: '「결」 진하운 강베기 6프레임 — 늦게 떨어지는 무거운 일격(4프레임에 타격, 앞 세 칸은 0.48초 동안 모으기, 2026-11-13)'
+depends_on:
+- haun_sword_ref
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 6
+fps: 10
+events:
+  hit: 4
+bbox_tolerance: 0.35
+frame_notes:
+  1: 'draws the sword far back behind the right shoulder with BOTH hands, body twisting away, weight sinking onto the back foot, eyes on the target'
+  2: 'sword raised high beside the head (not far above it) in both hands, knees bent deep, a faint golden glow gathering along the blade, hair lifting'
+  3: 'a long lunging step forward, the blade starting to fall, body leaning in, the golden glow bright'
+  4: 'THE HIT: a heavy two-handed downward cut to the right, the blade ends low in front, a thick golden-white arc trailing the edge, small dust kicked up at the front foot'
+  5: 'deep follow-through, body low and forward, sword point near the ground, the golden arc fading'
+  6: 'straightening back into the ready stance, sword lowered'
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

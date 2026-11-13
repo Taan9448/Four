@@ -75,7 +75,14 @@ export function chosen(data: DuelData, picked: string | undefined, cleared: stri
   return c && joined(c, cleared) ? c.id : HAUN;
 }
 
-/** 얼굴 동그라미 스타일(반신 그림 + 자리) */
-export function faceStyle(c: CharacterDef | undefined, url: string | null): string {
+/** 얼굴 동그라미 전용 그림 id(2026-11-13, Codex face_gyeol_<인물>) */
+export const faceId = (id: string): string => `face_gyeol_${id}`;
+
+/**
+ * 얼굴 동그라미 스타일. round: 동그라미 전용 얼굴 그림(face_gyeol_<인물>)이 실제로 왔으면 그 url — 동그라미에 꽉 차게(cover).
+ * 없으면 반신 그림(url)을 크게 키워 얼굴 자리(facePos)만 보인다.
+ */
+export function faceStyle(c: CharacterDef | undefined, url: string | null, round: string | null = null): string {
+  if (round) return `background-image:url("${round}");background-size:cover;background-position:50% 50%`;
   return url ? `background-image:url("${url}");background-position:${c?.facePos ?? '50% 6%'}` : '';
 }

@@ -1,0 +1,8 @@
+id: face_gyeol_born
+type: portrait
+character: born
+summary: '「결」 보른 얼굴 동그라미 그림 — 대결 이름판·인물 고르기의 원형 얼굴(2026-11-13 사용자 요청 "얼굴이 원형 안에 제대로 안 들어간다")'
+frame_notes:
+  1: 'A close-up face portrait for a round avatar: gruff determined look, the big red beard in three braids filling the lower part of the circle but the eyes and nose clearly visible, very broad shoulders.'
+framing: 'Made to be cropped into a small CIRCLE for a game avatar (shown as small as 40 px): head and the top of the shoulders only, front or slight three-quarter view, the face large and exactly centered horizontally, the eyes at about 42% of the height, the whole head including the hair and ears inside the central circle (diameter about 80% of the image), nothing important near the corners. Plain dark warm background: deep brown #2a1d14 with a soft lighter glow right behind the head, no scenery, no props in front of the face, no frame, no text. Clear readable face with strong contrast so it still reads when tiny.'
+placeholder: { color: '#2a1d14' }

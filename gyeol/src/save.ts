@@ -1,6 +1,8 @@
 // 「결」 저장(2026-11-09, 7-3절): localStorage `gyeol.save` 하나에 설정·진행·기록을 담는다. 판 번호(v)로 옛 저장을 옮긴다.
 // 저장이 막힌 브라우저(사생활 보호 창 등)에서는 이번 판 메모리에만 둔다.
 
+import { defaultKeys, keyText, normalizeKeys, type KeyMap } from './keys';
+
 export type Quality = 'auto' | 'high' | 'normal' | 'low';
 
 export interface Settings {
@@ -15,6 +17,8 @@ export interface Settings {
   /** 판정 보정 ms: 늦게 누르는 버릇·화면 지연만큼 누른 시각을 앞당긴다(+면 앞당김) */
   inputOffset: number;
   quality: Quality;
+  /** 대결 키(2026-11-13): 입력마다 물리 키 둘(KeyboardEvent.code) */
+  keys: KeyMap;
 }
 
 export interface SaveData {
@@ -59,7 +63,7 @@ export const emptyStats = (): Stats => ({ duels: 0, wins: 0, parries: 0, perfect
 export const KEY = 'gyeol.save';
 const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
-export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto' });
+export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto', keys: defaultKeys() });
 
 export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
 
@@ -93,6 +97,7 @@ export function normalize(raw: unknown): SaveData {
     reduceFlash: typeof st.reduceFlash === 'boolean' ? st.reduceFlash : d.reduceFlash,
     inputOffset: Math.round(clamp(st.inputOffset, -120, 120, d.inputOffset)),
     quality: st.quality === 'high' || st.quality === 'normal' || st.quality === 'low' || st.quality === 'auto' ? st.quality : d.quality,
+    keys: normalizeKeys(st.keys),
   };
   if (r.rhythmBest && typeof r.rhythmBest === 'object') s.rhythmBest = { ...r.rhythmBest };
   if (r.story && Array.isArray(r.story.cleared)) s.story = { cleared: [...r.story.cleared], stars: { ...(r.story.stars ?? {}) }, flags: Array.isArray(r.story.flags) ? r.story.flags.filter((x): x is string => typeof x === 'string') : [] };
@@ -160,3 +165,6 @@ export function writeSave(data: SaveData, st: Store | null = store()): void {
 export function resetSaveCache(): void {
   cache = null;
 }
+
+/** 안내 글의 {attack}·{parry}… 자리표를 지금 설정한 키 이름으로(2026-11-13 키 바꾸기) */
+export const withKeys = (s: string): string => keyText(loadSave().settings.keys, s);

@@ -1,0 +1,24 @@
+id: born_heavy
+type: character-anim
+character: born
+summary: '「결」 보른 강베기 6프레임 — 늦게 떨어지는 무거운 일격(4프레임에 타격, 앞 세 칸은 0.48초 동안 모으기, 2026-11-13)'
+depends_on:
+- born_ref
+reference: assets/source/born_ref.png
+facing: right
+frames: 6
+fps: 10
+events:
+  hit: 4
+bbox_tolerance: 0.35
+frame_notes:
+  1: 'heaves the axe back behind the right shoulder with both hands, body twisting, beard braids swinging'
+  2: 'axe raised high beside the head (not far above it), legs planted wide, muscles bulging, a faint golden glow on the axe head'
+  3: 'a heavy stomping step forward, the axe starting to fall, the glow bright'
+  4: 'THE HIT: a crushing overhead chop down to the right, the axe head ends near the ground in front, a thick golden-white arc trailing it, stone chips and dust bursting at the impact point'
+  5: 'follow-through, body low, axe head on the ground, dust settling'
+  6: 'lifts the axe back to the ready stance'
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#a02634'

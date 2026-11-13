@@ -11,8 +11,9 @@ import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from 
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
-import { characterOf, characters, chosen, faceStyle, joined, partyOpen, recordKey } from './party';
-import { emptyStats, loadSave, writeSave } from './save';
+import { characterOf, characters, chosen, faceId, faceStyle, joined, partyOpen, recordKey } from './party';
+import { emptyStats, loadSave, withKeys, writeSave } from './save';
+import { actionFor, keyNames } from './keys';
 
 export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
 
@@ -74,7 +75,7 @@ export function charPicker(data: DuelData, onPick: () => void, compact = false):
     const face = realArt(c.stand) ?? (c.fallbackStand ? frameUrl(c.fallbackStand, 1) : null);
     const b = button(
       [
-        el('span', { class: 'cp-face', style: faceStyle(c, face) }),
+        el('span', { class: 'cp-face', style: faceStyle(c, face, realArt(faceId(c.id))) }),
         el('span', { class: 'cp-text' }, el('b', {}, c.name), el('small', { class: 'cp-trait' }, open ? c.trait : '합류 전')),
       ],
       `cp-card${c.id === now ? ' on' : ''}${open ? '' : ' locked'}`,
@@ -227,7 +228,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
           'article',
           { class: 'foe-card' },
           img ? el('img', { src: img, alt: '' }) : '',
-          el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, f.note)),
+          el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, withKeys(f.note))),
           best,
           el('div', { class: 'foe-actions' }, button('대결', 'btn primary', () => nav.play(f, 'duel', { difficulty: arenaDifficulty, back: 'arena', character: who }))),
         );
@@ -240,17 +241,22 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
 
+/** 입력의 키(설정에서 고른 것) — kbd 둘이면 가운뎃점으로 */
+function kbds(a: Parameters<typeof keyNames>[1]): (HTMLElement | string)[] {
+  return keyNames(loadSave().settings.keys, a).flatMap((k, i) => (i ? ['·', el('kbd', {}, k)] : [el('kbd', {}, k)]));
+}
+
 function helpBox(): HTMLElement {
   return el(
     'details',
     { class: 'help' },
     el('summary', {}, '조작과 규칙'),
-    el('p', {}, el('kbd', {}, 'K'), '·', el('kbd', {}, 'Space'), ' 받기 — 좁혀 드는 고리가 과녁 고리와 겹칠 때(금빛) 누르면 패링. 이르면 막기.'),
-    el('p', {}, el('kbd', {}, 'L'), '·', el('kbd', {}, 'Shift'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(위험)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
-    el('p', {}, el('kbd', {}, 'J'), '·화면 클릭 베기 — 패링·간파 뒤 적에게 금이 보이는 동안 베면 반격(3배). 적 체간이 가득 차면 결정타.'),
+    el('p', {}, ...kbds('parry'), ' 받기 — 좁혀 드는 고리가 과녁 고리와 겹칠 때(금빛) 누르면 패링. 이르면 막기.'),
+    el('p', {}, ...kbds('dodge'), ' 피하기 — ', el('b', { class: 'danger' }, '붉은 결(위험)'), '은 받을 수 없다. 제때 피하면 간파로 틈이 열린다.'),
+    el('p', {}, ...kbds('attack'), '·화면 클릭 베기 — 패링·간파 뒤 적에게 금이 보이는 동안 베면 반격(3배). 적 체간이 가득 차면 결정타.'),
     el('p', {}, el('b', {}, '연베기'), ' — 칼이 맞은 뒤 박자에 맞춰 다시 ', el('kbd', {}, 'J'), ': 둘째·셋째 칼로 이어지고 셋째(마무리)는 피해 1.7배·체간 2.4배. 맞기 전에 누르면 이어지지 않는다.'),
-    el('p', {}, el('kbd', {}, 'H'), ' 강베기 — 늦게 떨어지지만 피해 2.4배. 막혀도 막는 칼을 짓눌러 체간을 크게 깎는다. 떨어지기 전에 맞으면 그대로 맞는다.'),
-    el('p', {}, el('kbd', {}, 'I'), ' 기술 — 결 연환(끊기지 않고 받은 수)이 차면 열린다. ', el('kbd', {}, 'U'), ' 집중 — 게이지가 차면 시간이 느려지고 결이 처음부터 보인다.'),
+    el('p', {}, ...kbds('heavy'), ' 강베기 — 늦게 떨어지지만 피해 2.4배. 막혀도 막는 칼을 짓눌러 체간을 크게 깎는다. 떨어지기 전에 맞으면 그대로 맞는다.'),
+    el('p', {}, ...kbds('tech'), ' 기술 — 결 연환(끊기지 않고 받은 수)이 차면 열린다. ', ...kbds('focus'), ' 집중 — 게이지가 차면 시간이 느려지고 결이 처음부터 보인다.'),
     el('p', {}, '속임수: 고리가 과녁에 닿아도 치지 않고 멈춘다. "…지금!"이 뜨면 다시 좁혀 드는 진짜 결을 받는다.'),
     el('p', {}, '원소: ', el('span', { class: 'tag el-fire' }, '화염'), ' 받아도 화상 · ', el('span', { class: 'tag el-ice' }, '냉기'), ' 느리다 마지막에 빨라진다 · ', el('span', { class: 'tag el-lightning' }, '번개'), ' 박자가 튄다.'),
     el('p', {}, '판정: PERFECT(타격 바로 앞) · EXCELLENT(받기) · GOOD(막기·피함) · MISS. 기술은 이어 받은 판정 단계로 열린다.'),
@@ -287,7 +293,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
       'li',
       {},
       button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, dr.name)], 'menu-btn plate-focus', () => dummy && nav.play(dummy, 'practice', { drill: dr.id, back: 'practice', character: who })),
-      el('small', {}, dr.note),
+      el('small', {}, withKeys(dr.note)),
     ),
   );
   const charts = duelFoes(data)
@@ -406,7 +412,7 @@ export function renderCalibrate(app: HTMLElement, nav: Nav): void {
   };
   setKeys((e) => {
     if (e.repeat) return;
-    if (e.key === ' ' || e.key.toLowerCase() === 'k') {
+    if (e.key === ' ' || actionFor(loadSave().settings.keys, e.code) === 'parry') {
       e.preventDefault();
       tap(e.timeStamp);
     } else if (e.key === 'Escape') {
@@ -433,7 +439,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       { class: `codex-card${seen ? '' : ' unseen'}` },
       img ? el('img', { src: img, alt: '' }) : '',
       el('b', {}, seen ? f.title : '???'),
-      el('small', {}, seen ? f.note : '아직 겨뤄 보지 않았다.'),
+      el('small', {}, seen ? withKeys(f.note) : '아직 겨뤄 보지 않았다.'),
       seen && f.finisher ? el('small', { class: 'fin' }, `결정타 「${f.finisher.name}」`) : '',
       el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell' }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`])))),
     );
@@ -496,7 +502,7 @@ function characterSection(data: DuelData): HTMLElement[] {
     return el(
       'article',
       { class: `char-card${open ? '' : ' locked'}` },
-      el('span', { class: 'cp-face big', style: faceStyle(c, face) }),
+      el('span', { class: 'cp-face big', style: faceStyle(c, face, realArt(faceId(c.id))) }),
       el(
         'div',
         { class: 'cc-text' },

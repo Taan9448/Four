@@ -434,6 +434,16 @@
   - 명세 framing에 "earlier illustration의 구도를 쓰지 말 것"을 넣고, 참조 첨부는 인물 반신 그림만(「천외귀환」 장면 그림은 첨부하지 않는다).
 - **동료 동작 6**: `kyle_parry`·`kyle_dodge`·`elia_parry`·`elia_dodge`·`born_parry`·`born_dodge`(character-anim, 받기 6칸 3번이 받는 순간 · 피하기 5칸). 실제 그림이 오면 대결이 저절로 쓴다(loadSprites `<sprite>_parry·_dodge`), 그 전에는 대체 연출.
 
+### 7-18. 강베기 동작 · 얼굴 동그라미 그림 · 키 바꾸기(2026-11-13 사용자 요청)
+
+> "강베기 모션도 추가해 주고, 인물에서 얼굴이 원형 안에 제대로 안 들어가는데 인물 원형이 들어갈 디자인도 새로 추가해 주고, 설정에서 키 바꾸는 기능도 추가해 줘"
+
+- **강베기 동작**(Codex `haun_sword_heavy`·`kyle_heavy`·`elia_heavy`·`born_heavy`, character-anim 6칸, 4번이 타격): 1~3번(모으기)을 강베기 `hitAt`(480ms) 동안, 4~6번을 남은 180ms 동안 보인다. 모으는 동안 옅은 금빛, 내려칠 때 잔상 한 장. 오기 전에는 지금처럼 베기 그림에 금빛·잔상을 입혀 대신한다(`render.ts` drawPlayer).
+- **얼굴 동그라미 그림**(Codex `face_gyeol_<인물>`, portrait 1:1): 대결 이름판(`.me-face`)·인물 고르기(`.cp-face`)의 원형 얼굴. 동그라미에 맞춰 얼굴을 가운데에 크게(눈높이 42%, 머리 전체가 가운데 80% 원 안). 실제 그림이 오면 꽉 차게(cover), 오기 전에는 반신 그림을 키워 `facePos` 자리만 보인다(`party.ts` faceStyle).
+- **키 바꾸기**(`gyeol/src/keys.ts`, 설정 창 「키」): 베기·강베기·받기·피하기·기술·집중·멈춤마다 키 두 칸(주·보조). 칸을 누르고 쓸 키를 누른다 — 다른 동작이 쓰던 키면 그쪽에서 빠진다(왼·오른 Shift는 같은 키), Delete는 비우기, 「키 처음대로」. Esc·Tab·Enter는 바꿀 수 없다(Esc는 언제나 멈춤).
+  - 물리 키(`KeyboardEvent.code`)로 맞춘다 — 한글 입력기가 켜져 있어도 J는 J(예전 `e.key` 방식은 한글 입력 중에 'ㅓ'가 되어 먹지 않았다).
+  - 저장: `gyeol.save` settings.keys. 대결 버튼 아래 키 이름·조작 도움말·튜토리얼 말·처음 안내·상대 설명의 키 글자는 `{attack}`·`{parry}`… 자리표로 두고 지금 키 이름으로 바꿔 보인다(`keyText`, 테스트가 박힌 키 글자를 막는다).
+
 ### 7-5. 만드는 순서(확정)
 
 | 단계 | 내용 | 새 Codex 그림 |

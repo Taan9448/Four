@@ -5,7 +5,7 @@ import { frameUrl } from '../../src/render/assets';
 import { button, el, rankBadge } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
-import { loadSave, writeSave } from './save';
+import { loadSave, withKeys, writeSave } from './save';
 import { announceAchievements, charPicker, setKeys, type Nav } from './screens';
 import { chosen, HAUN, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
@@ -335,7 +335,7 @@ function showResult(app: HTMLElement, nav: Nav, data: DuelData, ch: Chapter, res
       ch.tutorial ? el('p', { class: 'big-note' }, '서장을 마쳤다. 이제 지나온 싸움을 떠올릴 차례다.') : el('p', { class: 'stars' }, stars(got)),
       rows.length ? el('ul', { class: 'star-rows' }, ...rows.map((r) => el('li', { class: r.met ? 'met' : '' }, `${r.met ? '★' : '☆'} ${r.text}`))) : '',
       results.length ? el('div', { class: 'bout-ranks' }, ...results.map((r, k) => el('span', {}, el('small', {}, `${k + 1}번째`), rankBadge(r.rank ?? undefined)))) : '',
-      ch.unlockText ? el('p', { class: 'unlock' }, `열림 — ${ch.unlockText}`) : '',
+      ch.unlockText ? el('p', { class: 'unlock' }, `열림 — ${withKeys(ch.unlockText)}`) : '',
       ch.ending ? el('div', { class: 'credits' }, ...ch.ending.map((l) => el('p', {}, l))) : '',
       el('div', { class: 'row' }, toNext ?? '', button('이야기 목록', 'btn', () => nav.go('story'))),
     ),
