@@ -1,0 +1,24 @@
+Create ONE PNG sheet of game interface pieces, 1024x1024 px.
+Grid: 4 columns x 4 rows. Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. No scenery, no floor, no cast shadow on the background, no glow, no gradient.
+Subject: sixteen small brush-ink icons for "Gyeol", a wuxia parry-action game: each one is drawn with a few confident brush strokes in warm off-white ink (#ece2cc, like white ink on dark paper - the game shows them on dark ink panels), like the icons in a calligraphy manual; dry-brush edges, no outlines, no shading; one vermilion accent only where noted.
+Cell 1: SLASH: one swift diagonal brush stroke from upper right to lower left, sharp tapered ends, like a sword cut
+Cell 2: HEAVY SLASH: two thick parallel diagonal brush strokes, the second heavier, with a small ink splash at the lower end
+Cell 3: DODGE: a curved sweeping stroke like a swirl of wind, open on the right, with a faint dry-brush trail
+Cell 4: PARRY: a short vertical blade stroke crossed by one curved stroke bending around it, like a blow turned aside
+Cell 5: TECHNIQUE: a single flowing S-shaped stroke like a river or wood grain, with three tiny dots of ink beside it
+Cell 6: FOCUS: an open brush circle (enso) with a single dot of ink in the center, like a calm eye
+Cell 7: STORY: a half-unrolled scroll drawn in three simple strokes
+Cell 8: ARENA: two crossed straight swords drawn in two strokes each
+Cell 9: TRAINING: a wooden training dummy (a post with two short arms) drawn in four strokes
+Cell 10: WARDROBE: a folded robe with a crossed collar, drawn in a few strokes
+Cell 11: RECORDS: a closed bound book with a thread binding on the left, drawn in a few strokes
+Cell 12: SETTINGS: a round brush circle with six short strokes around it, like a simple gear or sun
+Cell 13: LOCK: a simple padlock: a round shackle stroke over a solid ink block
+Cell 14: SEAL: a small square vermilion (#b3261e) seal stamp, slightly rotated, grainy edges, no characters inside - the only red icon
+Cell 15: STAR: a five-pointed star drawn with five quick strokes, slightly uneven, ink black
+Cell 16: BACK: an arrow pointing left drawn in two strokes, a long horizontal stroke and a short angled head
+Style: hand-drawn 2D animated feature film look; clean, lively hand-inked line art with gentle line weight variation and warm dark-brown outlines; simple cel shading with one shadow tone and small highlights; light, airy, natural colors; softly painted watercolor-like backgrounds with rich natural detail and warm daylight; gentle, nostalgic atmosphere; East Asian wuxia world blended with a European fantasy forest; not photorealistic, not 3D, no heavy oil-paint texture. Crisp clean edge around every piece so it separates cleanly from the background.
+Never use magenta, pink or purple in the pieces.
+Rules: no text, no letters, no numbers, no signature, no watermark, nothing crosses into the next cell.
+Fix: All sixteen icons must be extremely simple real calligraphy BRUSH MARKS, not illustrated 3D objects. Use only flat warm off-white #ece2cc strokes on pure magenta, with dry-brush edges; NO brown outlines, NO shading, NO paper texture fill, NO perspective or volume. Render scroll, swords, dummy, robe, book, gear and lock with just a few thick strokes, instantly readable at 24px. Only cell 14 is vermilion; cell 15 star is also bright off-white so it remains visible on a dark panel. Keep all icons centered within the central 70% of their 256px cells. No cell dividers or grid lines. Preserve all sixteen subjects in the exact specified order.
