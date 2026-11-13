@@ -1,0 +1,11 @@
+id: rift_phantom_ref
+type: character-ref
+size: large
+character: rift_phantom
+chroma: magenta
+summary: '틈의 환영 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-11-13 「결」 전용 새 상대'
+facing: left
+frame_notes:
+  1: 'full body, three-quarter front view, a tall ghostly knight of grey mist and pale frost, faded silver plate outline with a snowflake-and-sword crest, a long frost sword, the face blurred like a reflection in water'
+  2: 'full body, side view facing left, same proportions, sword raised to guard, mist trailing behind'
+placeholder: { shape: humanoid, color: '#7a8a9a', accent: '#cfe6ff' }

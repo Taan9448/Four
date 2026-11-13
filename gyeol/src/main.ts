@@ -501,6 +501,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'mikiri':
           skillBurst(ev.move, now, PLAYER_X + 70);
+          // 간파 이펙트(Codex fx_gyeol_mikiri, 2026-11-13): 붉은 결을 비켜선 자리에 붉은 잔상이 갈라진다
+          if (sp.fx.fx_gyeol_mikiri) fx.bursts.push({ x: PLAYER_X + 40, y: CONTACT.y, sprite: 'fx_gyeol_mikiri', born: now, scale: 1.6 });
           sfx('swirl');
           sfx('snap', { volume: 0.7 });
           spark(PLAYER_X + 40, CONTACT.y + 20, 16, '#ff9a8a', 260);
@@ -558,6 +560,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             spark(FOE_X - 40, CONTACT.y, heavy ? 18 : 6, heavy ? '#ffd27a' : '#d8dde8', heavy ? 280 : 160, 3);
             text(FOE_X - 10, CONTACT.y - 60, heavy ? `강베기 — 막는 칼을 누른다 ${ev.damage}` : `막힘 ${ev.damage}`, heavy ? '#ffd27a' : '#b8bcc8', heavy ? 22 : 20);
             if (heavy) addShake(fx, now, 7, 200);
+            if (heavy && sp.fx.fx_gyeol_heavy_impact) fx.bursts.push({ x: FOE_X - 30, y: CONTACT.y, sprite: 'fx_gyeol_heavy_impact', born: now, scale: 1.3 });
             break;
           }
           {
@@ -566,6 +569,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             const step = ev.kind === 'slash' ? (ev.step ?? 0) : 0;
             sfx(heavy ? 'slam_8' : ev.counter ? 'crit' : 'slash');
             fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: (ev.counter ? 1.1 : 0.8) * (heavy ? 1.6 : 1 + step * 0.15) });
+            // 강베기 타격·연베기 마무리 이펙트(Codex, 2026-11-13) — 오기 전에는 위의 베기 자국을 키워 대신한다
+            if (heavy && sp.fx.fx_gyeol_heavy_impact) fx.bursts.push({ x: FOE_X - 20, y: CONTACT.y, sprite: 'fx_gyeol_heavy_impact', born: now, scale: 2 });
+            else if (step >= 2 && sp.fx.fx_gyeol_combo_finish) fx.bursts.push({ x: FOE_X - 20, y: CONTACT.y, sprite: 'fx_gyeol_combo_finish', born: now, scale: 1.7 });
             const sub = heavy ? '강베기' : step >= 2 ? '연베기 마무리' : step === 1 ? '연베기 2' : ev.counter ? '반격' : '';
             judge(fx, ev.counter ? 'COUNTER' : 'HIT', sub, now, 'foe');
             if (heavy) {

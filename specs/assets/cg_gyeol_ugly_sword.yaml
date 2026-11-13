@@ -1,0 +1,8 @@
+id: cg_gyeol_ugly_sword
+type: story-cg
+character: haun
+summary: '「결」 이야기 그림 — 보른이 던져 준 못생긴 검(2장) · 장면 사이를 잇는 원작 장면(2026-11-13 매끄러운 이야기)'
+frame_notes:
+  1: 'A small blacksmith stall in Hailon, an elven-dwarven trading town of the other world, warm afternoon light through a canvas awning, racks of ornate swords behind. Born (short, very broad dwarf warrior with a red beard in three braids, a two-handed axe) grins and tosses a narrow, plain, completely unadorned straight sword (crude grip, no decoration) in a low arc toward Jin Haun at seventeen (lean servant boy, long straight black hair with long bangs, grey servant outfit, cloth-wrapped hands), who catches it by the scabbard, surprised. A pile of shiny decorated swords on the counter is ignored.'
+framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
+placeholder: { color: '#2a2630' }

@@ -389,3 +389,37 @@ small, .note { color: var(--paper-dim); }
   .screen, .lobby.main > .lobby-center, .story-screen, .chapter-result, .settings-box, .acct-modal-box, .pause-box { animation: none; }
   .btn, .res-btn { transition: none; }
 }
+
+/* ───────── 장면 창: 지금(운곡루)과 회상, 그림 스며들기, 규칙 쪽지, 자동 진행(2026-11-13 매끄러운 이야기) ───────── */
+.vn { animation: vnOpen 0.45s ease-out both; }
+@keyframes vnOpen { from { opacity: 0; } }
+.vn.out { animation: vnClose 0.38s ease-in forwards; }
+@keyframes vnClose { to { opacity: 0; filter: brightness(0); } }
+.vn-bg { transition: opacity 0.7s ease, filter 0.7s ease; }
+.vn-bg.now { opacity: 0; image-rendering: auto; filter: brightness(0.5) saturate(0.8) sepia(0.15); background-size: cover; background-position: center; }
+.vn.now .vn-bg.now { opacity: 1; }
+.vn.now .vn-bg:not(.now) { opacity: 0; }
+/* 회상은 가장자리를 먹빛으로 감싼다 — 지금과 한눈에 다르게 */
+.vn::after { content: ''; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 160px 40px rgba(8, 6, 4, 0.85); transition: opacity 0.7s; }
+.vn.now::after { opacity: 0.35; }
+.vn-cg { opacity: 0; transition: opacity 0.65s ease; animation: none; }
+.vn-cg.on { opacity: 1; }
+.vn-cg[hidden] { display: block; }
+.vn-stand { transition: filter 0.2s, opacity 0.35s; }
+.vn-tools { position: absolute; top: 18px; right: 18px; display: flex; gap: 8px; z-index: 2; }
+.vn-tools .vn-skip { position: static; }
+.vn-auto small { opacity: 0.6; }
+.vn-auto.on { border-color: var(--shu); background-color: var(--shu-soft); }
+/* 규칙 쪽지: 대사가 아니라 대결 앞에 붙는 안내 */
+.vn-box.rule { width: min(720px, 88vw); min-height: 0; padding: 16px 24px 18px; border-color: var(--shu); background: var(--grain), rgba(26, 12, 9, 0.92); }
+.vn-box.rule .vn-name { font-size: 15px; color: var(--shu-hi); letter-spacing: 0.1em; }
+.vn-box.rule .vn-name::before { background: var(--shu); }
+.vn-box.rule .vn-text { font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--paper); }
+.vn-box.narration .vn-text { color: #dcd2bd; }
+.vn.now .vn-box { border-color: rgba(236, 226, 204, 0.28); }
+@media (prefers-reduced-motion: reduce) { .vn, .vn.out, .vn-bg, .vn-cg { animation: none; transition: none; } }
+
+/* 대결 화면은 어둠에서 떠오른다(장면 창이 어둠으로 가라앉은 다음) */
+.duel .stage { animation: duelRise 0.7s ease-out both; }
+@keyframes duelRise { from { filter: brightness(0); } }
+@media (prefers-reduced-motion: reduce) { .duel .stage { animation: none; } }

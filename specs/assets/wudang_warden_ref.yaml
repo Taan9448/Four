@@ -1,0 +1,11 @@
+id: wudang_warden_ref
+type: character-ref
+size: large
+character: wudang_warden
+chroma: magenta
+summary: '진무전 호법 기준 시트(3/4 정면 + 왼쪽 측면) — 2026-11-13 「결」 전용 새 상대'
+facing: left
+frame_notes:
+  1: 'full body, three-quarter front view, a calm Taoist warden in layered grey-white robes with a taiji emblem, tall black hat, fly-whisk in the left hand, slim sword in the right held low'
+  2: 'full body, side view facing left, same proportions, sword point forward, whisk raised behind'
+placeholder: { shape: humanoid, color: '#8a8a80', accent: '#e8e4d8' }

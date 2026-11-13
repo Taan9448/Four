@@ -73,3 +73,30 @@ describe('먹·한지 UI 그림 명세(2026-11-13)', () => {
     expect(loadSpec('ui_gyeol_ink').frames).toBe(6);
   });
 });
+
+describe('매끄러운 이야기(2026-11-13)', () => {
+  type Line = { speaker?: string; text: string; now?: boolean; kind?: string; art?: string };
+  type Ch = { id: string; intro: Line[]; outro: Line[]; bouts?: { foe: string; survive?: number; intro?: Line[]; outro?: Line[] }[] };
+  it('장마다 운곡루의 지금과 회상이 함께 있고, 규칙 쪽지는 화자 없이 대결 앞에만', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { chapters: Ch[] };
+    for (const ch of story.chapters) {
+      const all = [...ch.intro, ...ch.outro, ...(ch.bouts ?? []).flatMap((b) => [...(b.intro ?? []), ...(b.outro ?? [])])];
+      if (ch.id !== 'epilogue') expect(all.some((l) => l.now), `${ch.id} 지금`).toBe(true);
+      expect(all.some((l) => !l.now && l.kind !== 'rule'), `${ch.id} 회상`).toBe(true);
+      for (const l of all) {
+        if (l.kind === 'rule') expect(l.speaker, l.text).toBeUndefined();
+        // 옛 방식의 괄호·화살표 안내가 대사로 남지 않는다
+        expect(l.text.startsWith('(') || l.text.startsWith('▶'), l.text).toBe(false);
+      }
+      for (const b of ch.bouts ?? []) for (const l of b.outro ?? []) expect(l.kind, `${ch.id} ${b.foe} 끝 장면에 규칙 쪽지`).not.toBe('rule');
+    }
+  });
+  it('10장은 돌내마을 → 틈 안 순서, 새 상대가 이야기에 들어 있다', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { chapters: Ch[] };
+    const foes = (id: string) => story.chapters.find((c) => c.id === id)!.bouts!.map((b) => b.foe);
+    expect(foes('ch10')).toEqual(['rift_beast', 'rift_phantom', 'bone_giant', 'mordecai']);
+    expect(foes('ch6')[0]).toBe('ash_wraith');
+    expect(story.chapters.find((c) => c.id === 'ch6')!.bouts![0].survive).toBe(6);
+    expect(foes('ch8')[0]).toBe('wudang_warden');
+  });
+});

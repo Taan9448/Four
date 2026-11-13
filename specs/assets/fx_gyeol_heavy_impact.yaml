@@ -1,0 +1,15 @@
+id: fx_gyeol_heavy_impact
+type: fx
+summary: '「결」 강베기 타격 이펙트 6프레임 — 무거운 칼이 떨어지는 순간 적 쪽에 터진다(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 베기 자국(fx_hit_slash)보다 확실히 크고 무겁게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a thick golden-white vertical blade trail coming down from the top of the cell'
+  2: 'impact: a heavy downward slash mark with a bright golden flash, a flat shockwave ring spreading along the ground, sparks bursting out sideways'
+  3: 'the shockwave ring widening, dust and small stone chips flying low'
+  4: 'the golden slash mark lingering, sparks falling'
+  5: 'fading golden embers and dust'
+  6: 'faint dust'
+placeholder: { accent: '#ffd27a' }

@@ -1,0 +1,17 @@
+id: wudang_warden_hit
+type: character-anim
+size: large
+character: wudang_warden
+chroma: magenta
+summary: '진무전 호법 피격 3프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [wudang_warden_ref]
+reference: assets/source/wudang_warden_ref.png
+facing: left
+frames: 3
+fps: 10
+events: {}
+frame_notes:
+  1: 'struck, the tall hat tilting, a step back'
+  2: 'the circle breaks, he catches himself with the whisk arm out'
+  3: 'straightens, calm again but wary'
+placeholder: { shape: humanoid, color: '#8a8a80', accent: '#e8e4d8' }

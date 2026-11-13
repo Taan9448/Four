@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_wudang_warden
+type: fx
+summary: '「결」 결정타 진 풀기(解陣) — 진무전 호법 전용 마무리 — 겹쳐 돌던 세 진이 금빛 일섬 한 줄에 풀려 흩어진다(2026-11-13 「결」 전용 새 상대). 화려하게, 칸을 크게 쓴다'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three overlapping glowing array circles turning slowly'
+  2: 'impact: one straight golden slash cuts across all three circles with a bright flash'
+  3: 'the circles unravel into loose golden threads'
+  4: 'threads drifting apart'
+  5: 'a few golden motes'
+  6: 'faint motes'
+placeholder: { accent: '#ffd27a' }

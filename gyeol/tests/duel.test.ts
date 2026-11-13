@@ -953,10 +953,12 @@ describe('「결」 4단계 — 4~10장 특수 규칙', () => {
       if (ch.challenge?.flag) expect(flags.has(ch.challenge.flag)).toBe(true);
     }
     expect(flags).toEqual(new Set(['took_key']));
-    // 새 상대의 그림(대기·피격)은 「천외귀환」 것이 있다
+    // 상대의 그림(대기·피격): 실제 그림 또는 「결」 전용 새 상대(2026-11-13)라면 Codex 명세의 임시 그림
+    const has = (id: string) => existsSync(`assets/sprites/${id}/meta.json`) || (existsSync(`specs/assets/${id}.yaml`) && existsSync(`assets/placeholders/${id}/meta.json`));
     for (const f of real.foes) {
-      expect(existsSync(`assets/sprites/${f.sprite}_idle/meta.json`), `${f.id} 대기`).toBe(true);
-      expect(existsSync(`assets/sprites/${f.sprite}_hit/meta.json`), `${f.id} 피격`).toBe(true);
+      expect(has(`${f.sprite}_idle`), `${f.id} 대기`).toBe(true);
+      expect(has(`${f.sprite}_hit`), `${f.id} 피격`).toBe(true);
+      expect(has(f.bg) || existsSync(`assets/sprites/${f.bg}`), `${f.id} 배경`).toBe(true);
     }
   });
 });

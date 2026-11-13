@@ -1,0 +1,18 @@
+id: wudang_warden_idle
+type: character-anim
+size: large
+character: wudang_warden
+chroma: magenta
+summary: '진무전 호법 대기 4프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [wudang_warden_ref]
+reference: assets/source/wudang_warden_ref.png
+facing: left
+frames: 4
+fps: 6
+events: {}
+frame_notes:
+  1: 'standing calmly facing left, sword low, whisk resting on the arm'
+  2: 'the whisk sways slightly, robes stir'
+  3: 'a slow breath, the sword tip draws a tiny circle'
+  4: 'settles back into the calm stance'
+placeholder: { shape: humanoid, color: '#8a8a80', accent: '#e8e4d8' }

@@ -1,0 +1,6 @@
+id: bg_gyeol_wudang
+type: background
+summary: '전투 배경 — 무당 진무전 앞 봉쇄진(2026-11-13 「결」 전용 새 상대)'
+frame_notes:
+  1: 'The courtyard in front of Zhenwu Hall on Wudang Mountain at dawn, sealed by an array: on the right edge the grey stone steps and red pillars of a Taoist hall with a dark tiled roof; on the left edge an old pine and a bronze incense burner with thin smoke; three round stone array seats set in the stone floor glowing faintly with taiji lines. Misty green mountain peaks far behind. Muted greys, deep green, a little vermilion on the pillars.'
+placeholder: { color: '#4a5048' }

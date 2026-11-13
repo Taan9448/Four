@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_ice_flood
+type: fx
+summary: '「결」 받을 수 없는 기술 잿물 망령 「범람」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-13 「결」 전용 새 상대)'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a wall of grey ash-water and broken ice rushing in from the right'
+  2: 'impact: the wave crashes in the center, ice chunks and grey spray flying'
+  3: 'churning grey water filling the lower half of the cell'
+  4: 'the water draining away, ice chunks tumbling'
+  5: 'scattered ice shards'
+  6: 'faint mist'
+placeholder: { accent: '#bfe4ff' }

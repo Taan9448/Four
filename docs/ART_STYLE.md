@@ -666,4 +666,16 @@ subjects:
     a frozen shard of Arden ice drifting in the dark void of the rift, a large jagged hexagonal shard of
     pale blue ice with a faint inner light like a frozen star, frost mist trailing from its edges; an
     inanimate object, no face
+  wudang_warden: >-
+    a Wudang sect warden (hobeop) guarding the sealed Zhenwu Hall; a calm middle-aged Taoist in layered grey-white Taoist robes with a
+    black-and-white taiji emblem on the back, a tall black Taoist hat, a horsetail fly-whisk in the left hand and a slim straight
+    sword in the right, a long dark beard, cloth shoes; moves in slow circles like water
+  ash_wraith: >-
+    the flood wraith of the Ash-Water Ferry, a looming shape of breaking river ice and grey ash-water that rises taller than a man,
+    a hunched torso of cracked translucent ice full of floating ash, two long dripping arms of slush ending in clawed ice hands, a
+    faint pale face like a drowned mask, ragged ash-grey water trailing below instead of legs; no clear eyes, only two dim blue hollows
+  rift_phantom: >-
+    a phantom inside the rift between worlds that takes the shape of someone longed for: a tall knight made of grey mist and pale blue
+    frost, wearing the ghostly outline of silver plate armor with a faded snowflake-and-sword crest, a long straight sword of frost,
+    the face blurred and shifting like a reflection in moving water, wisps of mist trailing from the edges
 ```

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_rift_phantom
+type: fx
+summary: '「결」 결정타 환영 걷기(散影) — 틈의 환영 전용 마무리 — 금빛 일섬이 환영의 한가운데를 지나고, 환영이 안개로 흩어진다(2026-11-13 「결」 전용 새 상대). 화려하게, 칸을 크게 쓴다'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a ghostly misty silhouette of a knight standing'
+  2: 'impact: a clean golden vertical slash passes straight through it with a bright flash'
+  3: 'the silhouette splits and dissolves into mist'
+  4: 'the mist rising and thinning'
+  5: 'a few golden motes'
+  6: 'faint motes'
+placeholder: { accent: '#ffd27a' }

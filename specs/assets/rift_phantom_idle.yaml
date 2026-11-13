@@ -1,0 +1,18 @@
+id: rift_phantom_idle
+type: character-anim
+size: large
+character: rift_phantom
+chroma: magenta
+summary: '틈의 환영 대기 4프레임 — 2026-11-13 「결」 전용 새 상대'
+depends_on: [rift_phantom_ref]
+reference: assets/source/rift_phantom_ref.png
+facing: left
+frames: 4
+fps: 6
+events: {}
+frame_notes:
+  1: 'standing facing left, sword point down, the outline flickering'
+  2: 'the face blurs and shifts, mist trailing'
+  3: 'the whole figure fades slightly then returns'
+  4: 'settles, sword raised a little'
+placeholder: { shape: humanoid, color: '#7a8a9a', accent: '#cfe6ff' }

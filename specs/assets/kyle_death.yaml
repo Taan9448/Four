@@ -1,0 +1,19 @@
+id: kyle_death
+type: character-anim
+character: kyle
+summary: '「결」 카일 쓰러짐 6프레임 — 대결에서 졌을 때 느린 화면으로 재생한다(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 대기 그림과 같은 크기·같은 발 위치'
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck hard, head thrown back, the longsword slipping in his grip, cape flaring'
+  2: 'staggering backward, armored knees buckling'
+  3: 'dropping to one knee, the sword point digging into the ground, holding himself up'
+  4: 'the sword hand loosens, his body tipping sideways'
+  5: 'falling onto his side with a clatter of armor, the cape spreading'
+  6: 'lying still on the ground, eyes closed, the sword beside his open hand'
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#3a6ea5' }

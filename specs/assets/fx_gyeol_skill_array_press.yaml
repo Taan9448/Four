@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_array_press
+type: fx
+summary: '「결」 받을 수 없는 기술 진무전 호법 「봉쇄진 누르기」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-13 「결」 전용 새 상대)'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three pale stone-grey array circles with taiji lines glowing on the ground from the right'
+  2: 'impact: the three circles slam together in the center with a heavy grey-white shockwave'
+  3: 'a ring of pale light pressing down, dust rising'
+  4: 'the ring cracking apart'
+  5: 'fading grey motes'
+  6: 'faint motes'
+placeholder: { accent: '#e8e4d8' }

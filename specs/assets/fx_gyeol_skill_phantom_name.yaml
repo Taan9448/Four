@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_phantom_name
+type: fx
+summary: '「결」 받을 수 없는 기술 틈의 환영 「잊힌 이름」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-13 「결」 전용 새 상대)'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a swirl of grey mist forming a faint ghostly silhouette reaching from the right'
+  2: 'impact: the silhouette bursts into a cold blue-white flash with shards of frost'
+  3: 'a ring of frost mist spreading outward'
+  4: 'the mist curling like smoke'
+  5: 'fading frost motes'
+  6: 'faint motes'
+placeholder: { accent: '#cfe6ff' }

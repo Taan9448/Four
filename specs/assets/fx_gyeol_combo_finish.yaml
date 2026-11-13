@@ -1,0 +1,15 @@
+id: fx_gyeol_combo_finish
+type: fx
+summary: '「결」 연베기 셋째 칼(마무리) 이펙트 6프레임 — 박자에 맞춰 이어 벤 세 번째 칼이 닿는 순간(2026-11-13 사용자 요청 "모션이 중요한 게임 — 이펙트·모션 그림 추가"). 푸른 결 세 줄이 하나로 모인다'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three thin pale-blue slash lines appearing one after another in a fan'
+  2: 'impact: the three lines snap together into one bright blue-white diagonal slash with a crisp flash'
+  3: 'the single slash glowing, small wood-grain-like curls of light peeling off it'
+  4: 'the slash fading into flowing grain lines'
+  5: 'a few blue motes'
+  6: 'faint motes'
+placeholder: { accent: '#8fd3ff' }

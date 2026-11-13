@@ -1,0 +1,20 @@
+id: rift_phantom_attack
+type: character-anim
+size: large
+character: rift_phantom
+chroma: magenta
+summary: '틈의 환영 「메아리 칼」 6프레임(4번 타격) — 2026-11-13 「결」 전용 새 상대'
+depends_on: [rift_phantom_ref]
+reference: assets/source/rift_phantom_ref.png
+facing: left
+frames: 6
+fps: 12
+events: { hit: 4 }
+frame_notes:
+  1: 'raises the frost sword high, two faint afterimages of the same pose beside it'
+  2: 'steps forward, the afterimages lagging behind'
+  3: 'the sword falls, the afterimages swinging a moment later'
+  4: 'THE HIT: a long frost slash to the left, two ghostly echo slashes trailing behind it'
+  5: 'follow-through, echoes fading'
+  6: 'returns to the guard stance'
+placeholder: { shape: humanoid, color: '#7a8a9a', accent: '#cfe6ff' }
