@@ -10,6 +10,7 @@ facing: left
 frames: 6
 fps: 10
 events: {}
+bbox_tolerance: null
 frame_notes:
   1: 'struck, the frost sword shatters into motes'
   2: 'the armor outline fades from the edges'

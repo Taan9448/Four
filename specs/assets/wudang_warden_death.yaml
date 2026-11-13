@@ -10,6 +10,7 @@ facing: left
 frames: 6
 fps: 10
 events: {}
+bbox_tolerance: null
 frame_notes:
   1: 'struck hard, the sword flying from his hand'
   2: 'staggers back, the whisk dropping'

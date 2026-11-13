@@ -10,6 +10,7 @@ facing: left
 frames: 6
 fps: 10
 events: {}
+bbox_tolerance: null
 frame_notes:
   1: 'the ice body cracks all over'
   2: 'the shape collapses downward like melting slush'
