@@ -14,7 +14,7 @@ export const ICON = { S: 1, A: 2, B: 3, C: 4, perfect: 5, good: 6, miss: 7, evad
 
 type Anim = SpriteAsset | null;
 export interface Sprites {
-  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim; death: Anim; tech: Anim; clash: Anim };
+  player: { idle: Anim; attack: Anim; hit: Anim; parry: Anim; dodge: Anim; death: Anim; tech: Anim; clash: Anim; heavy: Anim };
   foe: { idle: Anim; attack: Anim; hit: Anim; death: Anim };
   bg: Anim;
   fx: Record<string, Anim>;
@@ -45,18 +45,20 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
   const techFx = TECH_IDS.flatMap((t) => [`fx_gyeol_tech_${t}_a`, `fx_gyeol_tech_${t}_b`]);
   const finisher = foeId ? [`fx_gyeol_finisher_${foeId}`] : [];
   const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_stance', 'fx_gyeol_revive', 'fx_gyeol_armor_break', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', ...techFx, ...skillFx, ...finisher];
-  const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, ...fx] = await Promise.all([
+  const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, pHeavy, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
     real(`${playerPrefix}_tech`),
     real(`${playerPrefix}_death`),
     real(`${foePrefix}_death`),
     real(`${playerPrefix}_clash`),
+    // 강베기 동작(2026-11-13, Codex <인물>_heavy): 오기 전에는 베기 그림에 금빛을 입혀 대신한다
+    real(`${playerPrefix}_heavy`),
     ...fxIds.map((id) => loadSprite(id)),
     ...gyeolFx.map((id) => real(id)),
   ]);
   const all = [...fxIds, ...gyeolFx];
   return {
-    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd, death: pDeath, tech: pTech, clash: pClash },
+    player: { idle: pi, attack: pa, hit: ph, parry: pp, dodge: pd, death: pDeath, tech: pTech, clash: pClash, heavy: pHeavy },
     foe: { idle: fi, attack: fa, hit: fh, death: fDeath },
     bg: b,
     fx: Object.fromEntries(all.map((id, i) => [id, fx[i]])),
@@ -469,8 +471,15 @@ function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx,
     const duration = p.actionEnd - p.actionStart;
     const el = t - p.actionStart;
     const f = el < hitAt ? strikeFrame(sp.player.attack, 'windup', el, hitAt) : strikeFrame(sp.player.attack, 'recover', el - hitAt, duration - hitAt);
-    if (p.attackKind === 'heavy') {
-      // 강베기: 칼을 모으는 동안 금빛이 차오르고, 떨어질 때 잔상 둘과 함께 한 걸음 크게 내딛는다
+    if (p.attackKind === 'heavy' && sp.player.heavy) {
+      // 강베기 전용 동작: 모으는 칸들을 hitAt까지, 내려친 뒤 칸들을 끝까지(타격 칸 = meta events.hit). 모으는 동안 옅은 금빛
+      const a = sp.player.heavy;
+      const hf = el < hitAt ? strikeFrame(a, 'windup', el, hitAt) : strikeFrame(a, 'recover', el - hitAt, duration - hitAt);
+      const k = Math.min(1, el / hitAt);
+      if (el >= hitAt && el - hitAt < 120) drawSprite(ctx, a, Math.max(1, hf - 1), PLAYER_X + 4, { alpha: 0.3, tint: 'rgba(255,214,120,0.6)' });
+      drawSprite(ctx, a, hf, PLAYER_X, el < hitAt ? { tint: `rgba(255,214,120,${0.08 + 0.25 * k})` } : undefined);
+    } else if (p.attackKind === 'heavy') {
+      // 강베기(대체): 칼을 모으는 동안 금빛이 차오르고, 떨어질 때 잔상 둘과 함께 한 걸음 크게 내딛는다
       const k = Math.min(1, el / hitAt);
       if (el < hitAt) drawSprite(ctx, sp.player.attack, f, PLAYER_X - 6 * k, { tint: `rgba(255,214,120,${0.15 + 0.45 * k})` });
       else {

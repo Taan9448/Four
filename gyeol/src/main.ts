@@ -9,7 +9,8 @@ import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
-import { characterOf, faceStyle, HAUN, recordKey, techsFor, withCharacter } from './party';
+import { actionFor, keyNames, keyText, type KeyAction } from './keys';
+import { characterOf, faceId, faceStyle, HAUN, recordKey, techsFor, withCharacter } from './party';
 import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
 import { emptyStats, loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
@@ -140,7 +141,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       : el(
           'div',
           { class: 'me-bar' },
-          el('div', { class: 'me-face', style: faceStyle(char, face) }, face ? '' : el('b', {}, '하운')),
+          el('div', { class: 'me-face', style: faceStyle(char, face, realArt(faceId(char?.id ?? HAUN))) }, face ? '' : el('b', {}, '하운')),
           el(
             'div',
             { class: 'me-body' },
@@ -152,15 +153,18 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         ),
     streakEl,
   );
-  const attackBtn = el('button', { class: 'pad attack', type: 'button' }, padIcon('attack'), '베기', el('small', {}, 'J'));
-  const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, padIcon('dodge'), '피하기', el('small', {}, 'L'));
-  const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, 'K'));
+  // 버튼 아래 키 이름은 설정에서 고른 키(2026-11-13)
+  const keyMap = loadSave().settings.keys;
+  const kname = (a: KeyAction) => keyNames(keyMap, a).join('·');
+  const attackBtn = el('button', { class: 'pad attack', type: 'button' }, padIcon('attack'), '베기', el('small', {}, kname('attack')));
+  const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, padIcon('dodge'), '피하기', el('small', {}, kname('dodge')));
+  const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, kname('parry')));
   // 강베기(2026-11-11): 늦게 떨어지지만 세다 — 버튼 그림은 베기 판을 쓰고 금빛 테
-  const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('attack'), '강베기', el('small', {}, 'H'));
+  const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('attack'), '강베기', el('small', {}, kname('heavy')));
   if (rhythm || !pdata.player.heavy) heavyBtn.disabled = true;
   const techName = el('span', { class: 'tech-name' }, '기술');
-  const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, 'I'));
-  const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, 'U'));
+  const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, kname('tech')));
+  const focusBtn = el('button', { class: 'pad focus', type: 'button', disabled: '' }, padIcon('focus'), '집중', el('small', {}, kname('focus')));
   // 이야기에서 아직 배우지 않은 것은 잠가 둔다
   if (opts.duel?.focus === false) focusBtn.classList.add('locked');
   const cutin = el('div', { class: 'cutin', hidden: '' });
@@ -336,16 +340,14 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   focusBtn.addEventListener('pointerdown', onPad('focus'));
   heavyBtn.addEventListener('pointerdown', onPad('heavy'));
   canvas.addEventListener('pointerdown', (e) => doPress('attack', e.timeStamp));
+  // 키(2026-11-13): 설정에서 바꾼 물리 키로 — Esc는 언제나 멈춤
   const onKey = (e: KeyboardEvent) => {
-    if (e.repeat) return;
-    const k = e.key.toLowerCase();
-    if (k === 'k' || k === ' ') (e.preventDefault(), doPress('parry', e.timeStamp));
-    else if (k === 'j') doPress('attack', e.timeStamp);
-    else if (k === 'h') doPress('heavy', e.timeStamp);
-    else if (k === 'l' || k === 'shift') (e.preventDefault(), doPress('dodge', e.timeStamp));
-    else if (k === 'i') doPress('tech', e.timeStamp);
-    else if (k === 'u') doPress('focus', e.timeStamp);
-    else if (k === 'escape' || k === 'p') {
+    if (e.repeat || e.ctrlKey || e.metaKey) return;
+    const a = e.key === 'Escape' ? 'pause' : actionFor(keyMap, e.code);
+    if (a && a !== 'pause') {
+      e.preventDefault();
+      doPress(a, e.timeStamp);
+    } else if (a === 'pause') {
       e.preventDefault();
       // 결과가 떠 있으면 Esc = 나가기, 아니면 멈춤·계속
       if (!overlay.hidden) leave();
@@ -403,7 +405,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     if (!t) return;
     save.tips.push(id);
     writeSave(save);
-    tipEl.replaceChildren(el('kbd', {}, t.key), el('p', {}, t.text));
+    tipEl.replaceChildren(el('kbd', {}, keyText(keyMap, t.key)), el('p', {}, keyText(keyMap, t.text)));
     tipEl.hidden = false;
     slowUntil = performance.now() + 1400;
     setTimeout(() => (tipEl.hidden = true), 4200);
@@ -435,7 +437,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       d.foe.posture = 0;
     }
     tutTitle.textContent = `서장 · ${tutStep + 1}/${tutorial!.length}  ${st.title}`;
-    tutSay.textContent = `왕일검: "${st.say}"`;
+    tutSay.textContent = `왕일검: "${keyText(keyMap, st.say)}"`;
     tutGoalText();
     tutPanel.hidden = false;
     tutPanel.classList.remove('pass');

@@ -1,0 +1,24 @@
+id: elia_heavy
+type: character-anim
+character: elia
+summary: '「결」 엘리아 강베기 6프레임 — 늦게 떨어지는 무거운 일격(4프레임에 타격, 앞 세 칸은 0.48초 동안 모으기, 2026-11-13)'
+depends_on:
+- elia_ref
+reference: assets/source/elia_ref.png
+facing: right
+frames: 6
+fps: 10
+events:
+  hit: 4
+bbox_tolerance: 0.35
+frame_notes:
+  1: 'swings the staff back behind her with both hands, cloak swirling, motes of blue light streaming into the stone'
+  2: 'staff raised high beside the head (not far above it), the blue stone blazing with gathered golden-white light, a ring of light at her feet'
+  3: 'a strong step forward, the staff starting to swing down, light trailing from the stone'
+  4: 'THE HIT: brings the staff down hard to the right, a heavy burst of golden-white and blue light explodes from the stone, a short shockwave arc in front (drawn whole inside the cell)'
+  5: 'follow-through, staff low in front, the light burst fading into sparks, cloak settling'
+  6: 'returns to the ready stance, staff upright'
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#8fd3ff'

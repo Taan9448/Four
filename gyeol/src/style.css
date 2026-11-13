@@ -176,6 +176,17 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .settings-box select { min-height: 40px; border-radius: 8px; background: #1d1a22; color: var(--ink); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0 8px; font: inherit; }
 .settings-box output { text-align: right; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
 .settings-box .note { margin: 0 0 6px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; }
+/* 키 바꾸기(2026-11-13) */
+.settings-box h3 { margin: 16px 0 8px; font-family: 'Nanum Myeongjo', serif; font-weight: 800; font-size: 18px; color: #ffe08a; border-top: 1px solid rgba(226, 180, 92, 0.25); padding-top: 12px; }
+.key-grid { display: grid; grid-template-columns: 6.5em 1fr 1fr; gap: 6px 8px; align-items: center; }
+.key-name { font-size: 15px; }
+.key-slot { min-height: 40px; border-radius: 8px; border: 1px solid rgba(226, 180, 92, 0.45); background: #1d1a22; color: var(--ink); font: 700 15px/1 'IBM Plex Sans KR', sans-serif; cursor: pointer; }
+.key-slot:hover { border-color: #ffd27a; }
+.key-slot.empty { color: var(--ink-dim); border-style: dashed; }
+.key-slot.wait { border-color: #ffd27a; background: #3a2c14; color: #ffe08a; font-size: 13px; animation: keyWait 0.9s ease-in-out infinite alternate; }
+@keyframes keyWait { to { box-shadow: 0 0 12px rgba(255, 210, 122, 0.7); } }
+.settings-box .row.end .note { margin: 0 auto 0 0; }
+.settings-box .row.end .btn { white-space: nowrap; flex: none; }
 .loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0b0a0e; }
 .loading span { font-family: 'Song Myung', serif; font-size: 22px; color: var(--ink-dim); animation: inkPulse 1.2s ease-in-out infinite; }
 @keyframes inkPulse { 50% { opacity: 0.35; letter-spacing: 0.08em; } }
