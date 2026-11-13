@@ -5,10 +5,11 @@ frames: 6
 fps: 18
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a wide column of red power pouring down from the top of the cell into the center"
+  1: "a wide column of red power pouring down from high in the cell into the center, its top fading into scattered blocks"
   2: "impact: a curved white-gold blade edge touches the side of the column with a bright flash"
-  3: "the red column bends and turns, rushing back upward to the top of the cell in a great arc, red sparks"
+  3: "the red column bends and turns, rushing back upward in a great arc that fades out before the top of the cell, red sparks"
   4: "the red stream disappearing upward, white steam left below"
   5: "a few red embers rising, thin steam"
   6: "faint embers"

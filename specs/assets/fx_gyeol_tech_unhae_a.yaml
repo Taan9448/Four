@@ -5,11 +5,12 @@ frames: 6
 fps: 20
 events: { impact: 3 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a great slow whirlpool of golden-white cloud sea forming across the whole cell, many curved golden streams rotating around the center"
+  1: "a great slow whirlpool of golden-white cloud sea forming as a round shape in the middle of the cell, many curved golden streams rotating around the center"
   2: "the golden streams gather and twist into a single thick spiraling river of golden light rushing toward the center"
   3: "impact: the river of light strikes the center and blooms into a gigantic golden lotus of curved wood-grain light petals, white-gold blinding core, two shockwave rings"
-  4: "the giant golden lotus at full size filling most of the cell, petals of light rotating, golden sparks and cloud wisps flying outward"
+  4: "the giant golden lotus at full size as a round shape in the middle of the cell, petals of light rotating, golden sparks and cloud wisps flying outward"
   5: "the lotus petals separating into many flowing golden streams that curve back outward like returning tides"
-  6: "the streams wide and thinning, a huge faint golden ring and drifting motes"
+  6: "the streams wide and thinning, a large faint golden ring fully inside the cell and drifting motes"
 placeholder: { accent: '#ffd27a' }

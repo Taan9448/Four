@@ -5,10 +5,11 @@ frames: 6
 fps: 18
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a thin vertical blue-white line from the top of the cell to the bottom through a wall of orange flame"
+  1: "a thin vertical blue-white line running down most of the cell through a wall of orange flame"
   2: "impact: the line becomes a blinding vertical blue-white cleave with a white core, the fire split in two and pushed to both sides"
-  3: "the two halves of the fire blown outward into a huge spray of embers, a blue shockwave at the bottom"
+  3: "the two halves of the fire blown outward into a wide spray of embers that stays inside the cell, a blue shockwave at the bottom"
   4: "embers raining down, the flames shrinking, the first puffs of white steam rising from the center"
   5: "big soft clouds of white steam rising, a few dim embers"
   6: "faint steam wisps"

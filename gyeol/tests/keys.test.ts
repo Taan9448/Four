@@ -55,10 +55,10 @@ describe('키 바꾸기(2026-11-13)', () => {
   });
 
   it('안내 글에 키 글자를 박아 두지 않는다(자리표만)', async () => {
-    const story = (await import('../data/story.json')).default as { tips: Record<string, { key: string; text: string }> };
+    const story = (await import('../data/story.json')).default as unknown as { tips: Record<string, { key: string; what: string; how: string }> };
     for (const t of Object.values(story.tips)) {
       expect(t.key, t.key).not.toMatch(/(^|[^A-Za-z{])[JKHLIU]([^A-Za-z}]|$)/);
-      expect(t.text, t.text).not.toMatch(/(^|[^A-Za-z{])[JKHLIU]([(를을·로]|$)/);
+      for (const x of [t.what, t.how]) expect(x, x).not.toMatch(/(^|[^A-Za-z{])[JKHLIU]([(를을·로]|$)/);
     }
   });
 });
@@ -98,5 +98,47 @@ describe('매끄러운 이야기(2026-11-13)', () => {
     expect(foes('ch6')[0]).toBe('ash_wraith');
     expect(story.chapters.find((c) => c.id === 'ch6')!.bouts![0].survive).toBe(6);
     expect(foes('ch8')[0]).toBe('wudang_warden');
+  });
+});
+
+describe('이야기 전환·동료의 장·쉬운 안내(2026-11-13)', () => {
+  type Ch = { id: string; haunOnly?: boolean; lead?: { character: string; why: string; how: string[] } };
+  it('3장 엘리아 · 4장 카일 · 5장 보른 — 동료의 장은 그 인물로만 싸우고, 왜·알아 둘 것이 있다', async () => {
+    const { chapterCharacter, leadLine } = await import('../src/party');
+    const story = (await import('../data/story.json')).default as unknown as { chapters: Ch[]; speakers: Record<string, unknown> };
+    const data = (await import('../data/duel.json')).default as unknown as import('../src/duel').DuelData;
+    const { emptySave } = await import('../src/save');
+    const by = (id: string) => story.chapters.find((c) => c.id === id)!;
+    const save = emptySave();
+    save.character = 'kyle';
+    save.story.cleared = ['prologue', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5'];
+    expect(chapterCharacter(data, by('ch3'), save)).toBe('elia');
+    expect(chapterCharacter(data, by('ch4'), save)).toBe('kyle');
+    expect(chapterCharacter(data, by('ch5'), save)).toBe('born');
+    // 그 밖의 장은 고른 인물, 진하운만의 장은 진하운
+    expect(chapterCharacter(data, by('ch6'), save)).toBe('kyle');
+    expect(chapterCharacter(data, by('ch9'), save)).toBe('haun');
+    const leads = story.chapters.filter((c) => c.lead).map((c) => c.lead!.character);
+    expect(new Set(leads)).toEqual(new Set(['kyle', 'elia', 'born']));
+    for (const c of story.chapters) {
+      if (!c.lead) continue;
+      expect(c.haunOnly, c.id).toBeFalsy();
+      expect(c.lead.why.length).toBeGreaterThan(10);
+      expect(c.lead.how.length).toBeGreaterThanOrEqual(2);
+      const line = leadLine(data, c)!;
+      expect(line.kind).toBe('lead');
+      expect(line.speaker).toBe(c.lead.character);
+      expect(story.speakers[c.lead.character]).toBeTruthy();
+    }
+  });
+  it('안내는 제목 · 무엇이 다른가 · 어떻게 하나가 다 있고 짧다', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { tips: Record<string, { title: string; what: string; how: string }> };
+    for (const [id, t] of Object.entries(story.tips)) {
+      expect(t.title, id).toBeTruthy();
+      expect(t.what.length, id).toBeGreaterThan(8);
+      expect(t.how.length, id).toBeGreaterThan(8);
+      // 한 번에 읽히게: 문장 하나가 너무 길지 않게
+      for (const x of [t.what, t.how]) expect(x.length, `${id}: ${x}`).toBeLessThan(110);
+    }
   });
 });

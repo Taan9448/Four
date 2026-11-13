@@ -5,11 +5,12 @@ frames: 6
 fps: 12
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a red-hot glowing iron chain sweeping in low from the right along the ground"
+  1: "a red-hot glowing iron chain sweeping in low from the right side of the effect, its end already inside the cell"
   2: "impact: the chain whips across the center at ankle height in a wide arc, orange sparks bursting"
   3: "the glowing chain coiling around the impact point, a ring of fire and sparks on the ground"
-  4: "the chain pulled back to the right, a burning trail line on the ground"
+  4: "the chain pulled back toward the right but still fully inside the cell, a burning trail line on the ground"
   5: "embers and smoke along the burnt line"
   6: "faint embers fading"
 placeholder: { accent: '#f2a93b' }

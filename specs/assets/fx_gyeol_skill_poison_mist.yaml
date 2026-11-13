@@ -5,10 +5,11 @@ frames: 6
 fps: 12
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a thick green poison cloud billowing in from the right"
+  1: "a thick green poison cloud billowing in from the right, its edge rounded and inside the cell"
   2: "impact: the cloud bursts in the center into a wide green fog with dark green droplets"
-  3: "green fog filling most of the cell"
+  3: "a rounded green fog cloud in the middle of the cell with soft broken edges"
   4: "the fog thinning"
   5: "green wisps"
   6: "faint wisps"

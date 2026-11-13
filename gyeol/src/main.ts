@@ -244,7 +244,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   let paused = false;
   let pausedAt = 0;
   const setPause = (on: boolean) => {
-    if (on === paused || !alive) return;
+    if (on === paused || !alive || tipOpen) return;
     if (on && (d.result || !overlay.hidden)) return;
     paused = on;
     pauseEl.hidden = !on;
@@ -283,7 +283,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const skillBurst = (moveId: string, now: number, x: number) => {
     const m = d.foeDef.moves[moveId];
     if (!m?.unblockable) return;
-    if (m.fx && sp.fx[m.fx]) fx.bursts.push({ x, y: CONTACT.y, sprite: m.fx, born: now, scale: 1.7 });
+    if (m.fx && sp.fx[m.fx]) fx.bursts.push({ x, y: CONTACT.y, sprite: m.fx, born: now, scale: 1.7, ground: true });
     else {
       const sprite = m.element === 'fire' ? 'fx_hit_fire' : m.element === 'ice' ? 'fx_hit_ice' : m.element === 'lightning' ? 'fx_hit_shock' : 'fx_hit_blunt';
       fx.bursts.push({ x, y: CONTACT.y, sprite, born: now, scale: 1.9 });
@@ -344,6 +344,12 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 키(2026-11-13): 설정에서 바꾼 물리 키로 — Esc는 언제나 멈춤
   const onKey = (e: KeyboardEvent) => {
     if (e.repeat || e.ctrlKey || e.metaKey) return;
+    // 안내 카드가 떠 있으면 Enter·Space·Esc로 닫는다(그 밖의 키는 대결에 닿지 않는다)
+    if (tipOpen) {
+      e.preventDefault();
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') closeTip();
+      return;
+    }
     const a = e.key === 'Escape' ? 'pause' : actionFor(keyMap, e.code);
     if (a && a !== 'pause') {
       e.preventDefault();
@@ -396,20 +402,52 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     void surviveEl.offsetWidth;
     surviveEl.classList.add('bump');
   };
-  /** 처음 한 번 안내. global이면 이야기 장이 아니어도(결투장에서도) 띄운다 — 단계·기믹 */
+  /**
+   * 처음 한 번 안내. global이면 이야기 장이 아니어도(결투장에서도) 띄운다 — 단계·기믹.
+   * 2026-11-13(사용자 요청 "초기에 잠깐 나오는 설명이 이해하기 어렵다"): 4초 뒤 사라지던 쪽지를,
+   * 대결을 멈추고 「제목 · 무엇이 다른가 · 어떻게 하나」로 읽는 카드로 — 알겠다(Enter·Space·클릭)를 누르면 이어진다.
+   */
+  let tipOpen = false;
+  let tipAt = 0;
+  const closeTip = () => {
+    // 연타하던 손에 바로 닫히지 않게 잠깐은 그대로
+    if (!tipOpen || performance.now() - tipAt < 500) return;
+    tipOpen = false;
+    tipEl.hidden = true;
+    tipEl.classList.remove('hold');
+    const now = performance.now();
+    const gap = now - pausedAt;
+    hitstopUntil += gap;
+    slowUntil += gap;
+    lastReal = now;
+    paused = false;
+    setDuck(false);
+  };
   const tip = (id: string, global = false) => {
     if (!global && !opts.tips?.includes(id)) return;
-    if (tutorial) return;
+    if (tutorial || tipOpen || paused || d.result) return;
     const save = loadSave();
     if (save.tips.includes(id)) return;
     const t = story.tips[id];
     if (!t) return;
     save.tips.push(id);
     writeSave(save);
-    tipEl.replaceChildren(el('kbd', {}, keyText(keyMap, t.key)), el('p', {}, keyText(keyMap, t.text)));
+    const ok = el('button', { class: 'btn primary tip-ok', type: 'button' }, '알겠다 ', el('small', {}, 'Enter'));
+    ok.addEventListener('click', closeTip);
+    tipEl.replaceChildren(
+      el('p', { class: 'tip-kicker' }, '처음 보는 것'),
+      el('h3', {}, t.title),
+      el('p', { class: 'tip-what' }, keyText(keyMap, t.what)),
+      el('div', { class: 'tip-how' }, el('kbd', {}, keyText(keyMap, t.key)), el('p', {}, keyText(keyMap, t.how))),
+      ok,
+    );
+    tipEl.classList.add('hold');
     tipEl.hidden = false;
-    slowUntil = performance.now() + 1400;
-    setTimeout(() => (tipEl.hidden = true), 4200);
+    tipOpen = true;
+    tipAt = performance.now();
+    paused = true;
+    pausedAt = tipAt;
+    setDuck(true);
   };
 
   // 서장 튜토리얼(7-2-1): 단계마다 설명 → 따라 하기 → 통과
@@ -890,11 +928,18 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       // 이야기에서 이기면 '다음'이 앞에, 지면 '다시'가 앞에
       // 결과 단추(2026-11-11): 모두 같은 크기의 먹 판 — 앞에 오는 단추만 붉은 인장 테
       const nextBtn = won && opts.next ? el('button', { class: 'res-btn primary', type: 'button' }, el('b', {}, opts.next.label), el('small', {}, 'Enter')) : null;
-      nextBtn?.addEventListener('click', () => {
-        stopLoop?.();
-        setKeys(null);
-        opts.next!.go(d);
-      });
+      // 한 번만(2026-11-13): 초점이 남은 단추가 장면 사이에 Enter를 또 받아 다음 대결이 두 번 열리던 문제
+      nextBtn?.addEventListener(
+        'click',
+        () => {
+          nextBtn.disabled = true;
+          nextBtn.blur();
+          stopLoop?.();
+          setKeys(null);
+          opts.next!.go(d);
+        },
+        { once: true },
+      );
       const again = el('button', { class: nextBtn ? 'res-btn' : 'res-btn primary', type: 'button' }, el('b', {}, '다시'), nextBtn ? '' : el('small', {}, 'Enter'));
       again.addEventListener('click', () => void play(foeDef0, mode, opts));
       const pick = el('button', { class: 'res-btn', type: 'button' }, el('b', {}, BACK_LABEL[opts.back] ?? '나가기'), el('small', {}, 'Esc'));

@@ -98,6 +98,8 @@ export function renderPrompt(spec, style) {
           ? `Background: flat solid ${key.name} ${key.hex} in every cell; it will be removed to transparency. Never use ${key.name}, pink or purple in the effect.\n`
           : `Background: flat solid black #000000 in every cell.\n`) +
         `Subject: a glowing visual effect only; no character, no ground, no background elements.\n` +
+        // 2026-11-13(「결」 적 기술 이펙트가 칸 끝에서 가위로 자른 듯 잘렸다): 큰 파도·기둥·연기도 칸 안쪽에서 끝나게
+        `Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.\n` +
         `Style: ${spec.style ?? (style.fx_style ?? style.sprite_style).replace(key && key.name !== 'black' ? ' on black' : '\u0000', '')}.\n` +
         paletteLine(spec, style) +
         `Frames:\n${frameLines}\n${spec.frames < cols * rows ? `Cells ${spec.frames + 1} to ${cols * rows} are completely ${key && key.name !== 'black' ? key.name : 'black'}.\n` : ''}${rulesFor(spec)}`

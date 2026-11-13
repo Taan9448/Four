@@ -2,12 +2,12 @@
 // 장·대결·장면은 gyeol/data/story.json. 대결 화면은 main.ts의 play를 nav로 부른다.
 import storyRaw from '../data/story.json';
 import { frameUrl } from '../../src/render/assets';
-import { button, el, rankBadge } from './dom';
+import { button, el, rankBadge, realArt } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
 import { loadSave, withKeys, writeSave } from './save';
 import { announceAchievements, charPicker, setKeys, type Nav } from './screens';
-import { chosen, HAUN, partyOpen } from './party';
+import { chapterCharacter, characterOf, faceId, faceStyle, leadLine, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
 
 export interface TutorialStep {
@@ -57,6 +57,11 @@ export interface Chapter {
   ending?: string[];
   /** 이 장은 진하운만(합류 전 · 운해귀종으로 끝내는 9장 · 에필로그) */
   haunOnly?: boolean;
+  /**
+   * 동료의 장(2026-11-13 사용자 요청 "카즈둠 = 보른 같은 장은 그 인물을 꼭 쓰게"): 이 장은 이 인물로만 싸운다.
+   * why는 왜 이 인물인지, how는 이 인물로 싸울 때 알아 둘 것 — 지도 카드와 장 시작 전 쪽지에 보인다.
+   */
+  lead?: { character: string; why: string; how: string[] };
   /** 이야기 지도에서의 자리(journey_band 그림 기준 %)와 땅 이름 */
   map?: { x: number; y: number; place: string };
 }
@@ -65,7 +70,15 @@ export interface StoryData {
   speakers: Record<string, Speaker>;
   chapters: Chapter[];
   upcoming: { no: number; subtitle: string }[];
-  tips: Record<string, { key: string; text: string }>;
+  /** 처음 보는 규칙 안내(2026-11-13 쉽게): 제목 · 무엇이 다른가 · 어떻게 하나 — 대결을 멈추고 읽게 한다 */
+  tips: Record<string, StoryTip>;
+}
+
+export interface StoryTip {
+  key: string;
+  title: string;
+  what: string;
+  how: string;
 }
 
 export const story = storyRaw as unknown as StoryData;
@@ -184,9 +197,11 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
       el('div', { class: 'sc-go' }, go),
       // 동료가 합류했으면 들어갈 인물을 고른다(진하운만인 장은 안내만)
       open && !ch.tutorial && partyOpen(data, save.story.cleared)
-        ? ch.haunOnly
-          ? el('p', { class: 'sc-solo' }, '이 장은 진하운 혼자 들어간다.')
-          : el('div', { class: 'sc-party' }, charPicker(data, () => renderStory(app, nav, data), true))
+        ? ch.lead
+          ? leadCard(data, ch)
+          : ch.haunOnly
+            ? el('p', { class: 'sc-solo' }, '이 장은 진하운 혼자 들어간다.')
+            : el('div', { class: 'sc-party' }, charPicker(data, () => renderStory(app, nav, data), true))
         : '',
     );
   };
@@ -226,6 +241,19 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
   });
 }
 
+/** 지도 카드의 동료 쪽지: 얼굴 · 「이 장은 ○○로 싸운다」 · 왜 */
+function leadCard(data: DuelData, ch: Chapter): HTMLElement | '' {
+  const c = characterOf(data, ch.lead!.character);
+  if (!c) return '';
+  const face = realArt(c.stand) ?? (c.fallbackStand ? frameUrl(c.fallbackStand, 1) : null);
+  return el(
+    'div',
+    { class: 'sc-lead' },
+    el('span', { class: 'cp-face', style: faceStyle(c, face, realArt(faceId(c.id))) }),
+    el('p', {}, el('b', {}, `이 장은 ${c.name}(으)로 싸운다`), el('small', {}, ch.lead!.why)),
+  );
+}
+
 /** 장 인장 글자(2026-11-11 한글로): 서장 '서', 에필로그 '끝', 그 밖은 장 번호 */
 const HAN_NO = ['서', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 function sealOf(ch: Chapter): string {
@@ -233,6 +261,27 @@ function sealOf(ch: Chapter): string {
 }
 
 /* ───────── 장 하나 ───────── */
+
+/**
+ * 장이 도는 동안 장면과 장면·대결 사이를 덮는 어둠(2026-11-13 사용자 보고 "화면이 휙휙 넘어간다"):
+ * 장면 창이 닫히고 다음 장면·대결이 뜨기 전 그 틈에 지도나 지난 대결 화면이 번쩍 비치지 않게 한다.
+ * 대결이 시작되거나 장 결과가 뜨면 걷힌다.
+ */
+let curtainEl: HTMLElement | null = null;
+export function curtain(on: boolean): void {
+  if (on) {
+    if (!curtainEl) {
+      curtainEl = el('div', { class: 'story-curtain', 'aria-hidden': 'true' });
+      document.body.append(curtainEl);
+    }
+    return;
+  }
+  const c = curtainEl;
+  if (!c) return;
+  curtainEl = null;
+  c.classList.add('lift');
+  setTimeout(() => c.remove(), 520);
+}
 
 export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch: Chapter): Promise<void> {
   setKeys(null);
@@ -247,10 +296,14 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
   /** 이 장에서 고른 것 + 지난 장까지 저장된 것 */
   const flags = new Set<string>(loadSave().story.flags);
   const pick = (got: string[]) => got.forEach((f) => flags.add(f));
-  pick(await playScene(document.body, ch.intro, story.speakers, ch.bg, label));
+  curtain(true);
+  // 동료의 장이면 장면 맨 앞에 '이번 장' 쪽지(누구로 싸우는지·왜·알아 둘 것)
+  const lead = leadLine(data, ch);
+  pick(await playScene(document.body, lead ? [lead, ...ch.intro] : ch.intro, story.speakers, ch.bg, label));
   if (ch.tutorial) {
     const dummy = data.foes.find((f) => f.practice);
     if (!dummy) return;
+    curtain(false);
     nav.play(dummy, 'practice', {
       back: 'story',
       title: label,
@@ -258,6 +311,7 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
       duel: { techs: [], focus: false, clash: false },
       tutorial: ch.tutorial,
       onTutorialDone: async (skipped) => {
+        curtain(true);
         if (!skipped) await playScene(document.body, ch.outro, story.speakers, ch.bg);
         complete(ch, []);
         showResult(app, nav, data, ch, []);
@@ -275,9 +329,9 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
     const flagged = bout.ifFlag && flags.has(bout.ifFlag.flag) ? bout.ifFlag : null;
     if (flagged?.intro) pick(await playScene(document.body, flagged.intro, story.speakers, foe.bg));
     const last = i + 1 >= bouts.length;
-    const sv = loadSave();
+    curtain(false);
     nav.play(foe, bout.mode ?? 'duel', {
-      character: ch.haunOnly ? HAUN : chosen(data, sv.character, sv.story.cleared),
+      character: chapterCharacter(data, ch, loadSave()),
       back: 'story',
       title: `${label} · ${i + 1}/${bouts.length}`,
       duel: { ...ch.rules, survive: bout.survive, ...bout.duel, ...flagged?.duel },
@@ -286,6 +340,7 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
         label: last ? '장 마치기' : '다음',
         go: async (d) => {
           results[i] = summarize(d);
+          curtain(true);
           calm();
           pick(await playScene(document.body, bout.outro ?? [], story.speakers, foe.bg));
           if (!last) void runBout(i + 1);
@@ -321,6 +376,7 @@ let dataRef: DuelData | null = null;
 
 function showResult(app: HTMLElement, nav: Nav, data: DuelData, ch: Chapter, results: BoutResult[], flags: string[] = []): void {
   nav.stop();
+  curtain(false);
   const i = story.chapters.indexOf(ch);
   const next = story.chapters[i + 1];
   const rows = ch.tutorial ? [] : chapterStars(ch, results, flags);

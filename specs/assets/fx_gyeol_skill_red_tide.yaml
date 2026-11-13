@@ -5,10 +5,11 @@ frames: 6
 fps: 12
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a huge red wave of power rising from the right"
+  1: "a huge red wave of power rising on the right side, its crest fully inside the cell"
   2: "impact: the red wave crashes down in the center with a burst of red spray"
-  3: "red spray and streaks flooding across the cell"
+  3: "red spray and streaks spreading outward from the center, thinning before the cell edge"
   4: "the red tide receding"
   5: "red embers and steam"
   6: "faint embers"

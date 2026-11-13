@@ -6,7 +6,7 @@ import { loadSprite, type SpriteAsset } from '../../src/render/assets';
 import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element, type Judgement } from './duel';
 import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
-import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W, WORLD_ZOOM } from './layout';
+import { CONTACT, FOE_X, fitFx, GROUND, H, PLAYER_X, SCALE, W, WORLD_ZOOM } from './layout';
 export { CONTACT, FOE_X, H, PLAYER_X, W } from './layout';
 
 /** icons_gyeol 칸 번호(명세 frame_notes와 같다) */
@@ -85,7 +85,8 @@ export const ELEMENT_COLOR: Record<Element | 'none' | 'danger', { line: string; 
 export interface Fx {
   sparks: { x: number; y: number; vx: number; vy: number; born: number; life: number; color: string; size: number }[];
   texts: { x: number; y: number; text: string; color: string; born: number; size: number; icon?: number }[];
-  bursts: { x: number; y: number; sprite: string; born: number; scale: number }[];
+  /** ground: 땅에 선 그림(적 기술 — 그림 아래쪽 anchor 줄이 땅에 닿게). 아니면 (x, y)가 가운데 */
+  bursts: { x: number; y: number; sprite: string; born: number; scale: number; ground?: boolean }[];
   /** 결 패링 연출(Codex 12프레임이 없으면 코드로 그린 금빛 연꽃) */
   blooms: { x: number; y: number; born: number; color: string; big: boolean }[];
   slashes: { born: number }[];
@@ -865,7 +866,9 @@ function drawEffects(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: nu
     const img = frameOf(a, n);
     if (!img) continue;
     const s = SCALE * b.scale;
-    ctx.drawImage(img, b.x - (a.meta.frameW * s) / 2, b.y - (a.meta.frameH * s) / 2, a.meta.frameW * s, a.meta.frameH * s);
+    // 화면 밖으로 나가 잘리지 않게 맞춘다(2026-11-13)
+    const r = b.ground ? fitFx(b.x, GROUND, a.meta.frameW * s, a.meta.frameH * s, a.meta.anchor[0], a.meta.anchor[1]) : fitFx(b.x, b.y, a.meta.frameW * s, a.meta.frameH * s);
+    ctx.drawImage(img, r.x, r.y, r.w, r.h);
   }
   for (const b of fx.blooms) drawBloom(ctx, sp, b, now);
   for (const s of fx.slashes) drawSlash(ctx, sp, s.born, now);
@@ -1292,7 +1295,8 @@ function paintBanner(ctx: CanvasRenderingContext2D, name: string, col: { line: s
 export function pruneFx(fx: Fx, now: number): void {
   fx.sparks = fx.sparks.filter((s) => now - s.born < s.life);
   fx.texts = fx.texts.filter((t) => now - t.born < 900);
-  fx.bursts = fx.bursts.filter((b) => now - b.born < 600);
+  // 그림이 다 돌 때까지 남긴다(느린 그림이 600ms에 끊기던 것 — drawEffects가 마지막 칸 뒤로는 그리지 않는다)
+  fx.bursts = fx.bursts.filter((b) => now - b.born < 1500);
   fx.blooms = fx.blooms.filter((b) => now - b.born < 700);
   fx.slashes = fx.slashes.filter((s) => now - s.born < 600);
   fx.judges = fx.judges.filter((j) => now - j.born < JUDGE_STYLE[j.word].life);
