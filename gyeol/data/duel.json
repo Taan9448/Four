@@ -1747,7 +1747,7 @@
       "title": "내원 사형",
       "sprite": "inner_senior",
       "bg": "bg_cheongun",
-      "scale": 1.0,
+      "scale": 0.92,
       "weather": "leaves",
       "clashPower": 0.345,
       "note": "청운문 내원의 사형. 잡역을 깔보지만 검은 곧다. 내려베고 곧장 찌른다.",
@@ -3633,7 +3633,7 @@
       "title": "마왕 바르가스",
       "sprite": "vargas",
       "bg": "bg_nocturna",
-      "scale": 1.55,
+      "scale": 1.35,
       "weather": "rain",
       "clashPower": 0.66,
       "note": "문을 닫은 고대인. 상처를 내는 동안 다른 곳에서 채운다. 붉은 결의 공허의 손은 피해야 하고, 절반이 꺾이면 모은 것을 터뜨린다.",
@@ -4273,7 +4273,7 @@
       "title": "조명각",
       "sprite": "jo_myeonggak",
       "bg": "bg_blood_road",
-      "scale": 1.0,
+      "scale": 1.08,
       "weather": "leaves",
       "clashPower": 0.55,
       "note": "청운문의 조명각. 검에 두 기운이 반대로 꼬여 있다. 베지 않는다 — 결정타 없이 비틀거리게 세 번 만들면 데려 내려온다.",
@@ -4532,7 +4532,7 @@
       "title": "신교 교도",
       "sprite": "blood_cultist",
       "bg": "bg_nakan",
-      "scale": 1,
+      "scale": 1.12,
       "weather": "embers",
       "clashPower": 0.4,
       "note": "신교의 교도. 붉은 장력 — 결이 피에 가려 늦게 보인다. 집중을 쓰면 처음부터 보인다.",
@@ -4828,7 +4828,7 @@
       "title": "분타주 염탁",
       "sprite": "branch_lord",
       "bg": "bg_nakan",
-      "scale": 1.15,
+      "scale": 0.97,
       "weather": "embers",
       "clashPower": 0.6,
       "note": "바닥 아래에서 올라오는 붉은 힘을 손에 모은다. 붉은 장력 — 결이 늦게 보인다. 붉은 결의 바닥 내려치기는 피해야 한다.",
@@ -5839,7 +5839,7 @@
       "title": "뼈 거인",
       "sprite": "bone_giant",
       "bg": "bg_rift",
-      "scale": 1.45,
+      "scale": 1.75,
       "weather": "ash",
       "clashPower": 0.62,
       "note": "틈 속에 떠 있는 뼈 거인. 느리고 무겁다. 붉은 결의 뼈 비는 피해야 한다.",
@@ -6009,7 +6009,7 @@
       "title": "틈의 짐승",
       "sprite": "rift_beast",
       "bg": "bg_rift",
-      "scale": 1.1,
+      "scale": 1.2,
       "weather": "ash",
       "clashPower": 0.48,
       "note": "틈에서 기어 나온 짐승. 박자가 뚝뚝 튄다(번개).",
@@ -7301,7 +7301,8 @@
           },
           "heavy": {
             "damageMul": 2.8
-          }
+          },
+          "scale": 0.96
         },
         "rules": {
           "guard": 520,
@@ -7352,7 +7353,8 @@
             "hitAt": 120,
             "damage": 5,
             "posture": 3
-          }
+          },
+          "scale": 0.93
         },
         "rules": {
           "perfect": 56,
@@ -7414,7 +7416,8 @@
           },
           "heavy": {
             "guardPostureMul": 5
-          }
+          },
+          "scale": 1.1
         },
         "rules": {
           "parryPostureMul": 2.2,

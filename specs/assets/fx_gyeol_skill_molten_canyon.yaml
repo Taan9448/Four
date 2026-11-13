@@ -5,10 +5,11 @@ frames: 6
 fps: 12
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
   1: "the ground in the cell glowing orange, cracks of lava opening"
   2: "impact: a pillar of molten lava and white flame erupting upward from the center"
-  3: "the eruption at full height, lava globs flying outward, the ground split open"
+  3: "the eruption at full height, its top still well below the top of the cell, lava globs flying outward, the ground split open"
   4: "the pillar collapsing into a pool of molten lava with tall flames"
   5: "the lava pool cooling to dark red, smoke rising"
   6: "a dark cooling crack in the ground with thin smoke"

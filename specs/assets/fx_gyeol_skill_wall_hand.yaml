@@ -5,8 +5,9 @@ frames: 6
 fps: 12
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a huge rock hand bursting out from the right with rocks and dust"
+  1: "a huge rock hand bursting out on the right side, the whole hand inside the cell with rocks and dust"
   2: "impact: the rock fingers slam shut in the center with a burst of rubble and orange sparks"
   3: "rubble and dust flying outward"
   4: "the rock hand crumbling into falling stones"

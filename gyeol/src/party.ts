@@ -1,6 +1,7 @@
 // 고를 수 있는 인물(2026-11-11 사용자 요청 — "동료와 합류하면 인물을 골라 스테이지에 들어간다. 인물마다 특성, 기록은 따로").
 // 인물 정의는 duel.json characters(진하운 기준 값을 덮어쓰는 player·rules). 판정 엔진(duel.ts)은 그대로 — 덮어쓴 데이터로 대결을 만든다.
 import type { DuelData, Lines, PlayerDef } from './duel';
+import type { SceneLine } from './vn';
 
 export interface CharacterDef {
   id: string;
@@ -85,4 +86,23 @@ export const faceId = (id: string): string => `face_gyeol_${id}`;
 export function faceStyle(c: CharacterDef | undefined, url: string | null, round: string | null = null): string {
   if (round) return `background-image:url("${round}");background-size:cover;background-position:50% 50%`;
   return url ? `background-image:url("${url}");background-position:${c?.facePos ?? '50% 6%'}` : '';
+}
+
+/** 장이 정한 인물(2026-11-13): lead = 동료의 장(그 인물로만), haunOnly = 진하운만 */
+export interface ChapterCast {
+  lead?: { character: string; why: string; how: string[] };
+  haunOnly?: boolean;
+}
+
+/** 이 장에 들어갈 인물: 동료의 장이면 그 동료, 진하운만의 장이면 진하운, 그 밖은 고른 인물 */
+export function chapterCharacter(data: DuelData, ch: ChapterCast, save: { character?: string; story: { cleared: string[] } }): string {
+  if (ch.lead) return ch.lead.character;
+  if (ch.haunOnly) return HAUN;
+  return chosen(data, save.character, save.story.cleared);
+}
+
+/** 동료의 장 쪽지(장 시작 전 장면 맨 앞): 왜 이 인물인가 + 알아 둘 것. 화자 = 그 인물(반신 그림이 선다) */
+export function leadLine(data: DuelData, ch: ChapterCast): SceneLine | null {
+  if (!ch.lead || !characterOf(data, ch.lead.character)) return null;
+  return { kind: 'lead', speaker: ch.lead.character, now: true, text: `${ch.lead.why}\n${ch.lead.how.map((x) => `· ${x}`).join('\n')}` };
 }

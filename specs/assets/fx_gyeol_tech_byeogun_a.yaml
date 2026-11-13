@@ -5,10 +5,11 @@ frames: 6
 fps: 20
 events: { impact: 2 }
 min_fill: 0.0005
+# 2026-11-13 다시 그림: 그림이 칸 끝에서 잘렸다(가위로 자른 듯한 직선) — 칸 안쪽 80%에서 끝나게
 frame_notes:
-  1: "a single hair-thin vertical line of blue-white light running from the very top to the very bottom of the cell, small sparks at the top"
+  1: "a single hair-thin vertical line of blue-white light running down from high in the cell to near the bottom, both ends tapering, small sparks at the top"
   2: "impact: the line explodes into a huge vertical blade of light, white core and bright azure edges, filling a third of the cell width, a blinding flash at the bottom where it meets the ground"
-  3: "the vertical blade at full power, the cell split in two by it, clouds at the top torn apart to both sides, a fan of water spray bursting out at the bottom"
+  3: "the vertical blade at full power, splitting the effect in two, its top fading into sparks, small clouds near its top torn apart to both sides, a fan of water spray bursting out at the bottom"
   4: "the blade thinning, jagged crack lines of blue light branching left and right from it like a split sky, water spray arcing outward"
   5: "the crack lines glowing, the central line thin and bright, spray droplets falling"
   6: "a thin glowing vertical seam with blue crack lines fading, droplets"

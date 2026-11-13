@@ -2,7 +2,7 @@
 // 화면만 다룬다(판정은 duel.ts). 무작위가 필요한 입자는 자체 LCG로 정해진 순서대로 뽑는다.
 import type { SpriteAsset } from '../../src/render/assets';
 import type { Duel, FinisherDef, Weather } from './duel';
-import { CONTACT, FOE_X, GROUND, H, PLAYER_X, SCALE, W } from './layout';
+import { CONTACT, FOE_X, fitFx, GROUND, H, PLAYER_X, SCALE, W } from './layout';
 
 /* ───────────── 날씨·환경 입자 ───────────── */
 
@@ -353,7 +353,9 @@ export function drawFinisher(ctx: CanvasRenderingContext2D, fx: Record<string, S
     const img = real.images[n - 1];
     if (!img) return;
     const s = SCALE * 2.2;
-    ctx.drawImage(img, FOE_X - (real.meta.frameW * s) / 2, CONTACT.y - (real.meta.frameH * s) / 2, real.meta.frameW * s, real.meta.frameH * s);
+    // 화면보다 커서 위아래가 잘리던 것(2026-11-13): 화면 안에 들게 줄이고 민다
+    const r = fitFx(FOE_X, CONTACT.y, real.meta.frameW * s, real.meta.frameH * s);
+    ctx.drawImage(img, r.x, r.y, r.w, r.h);
     return;
   }
   if (e > 1300) return;

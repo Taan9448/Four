@@ -23,8 +23,8 @@ export interface SceneLine {
   choices?: { text: string; flag?: string }[];
   /** 운곡루의 지금(회상 밖) — 뒤뜰 그림 위에서 */
   now?: boolean;
-  /** rule: 대결 규칙 쪽지 */
-  kind?: 'rule';
+  /** rule: 대결 규칙 쪽지 · lead: 동료의 장 쪽지(누구로 싸우는지, 화자 = 그 인물) */
+  kind?: 'rule' | 'lead';
 }
 
 export interface Speaker {
@@ -65,6 +65,8 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
     const box = el('div', { class: 'vn-box' }, name, text, more, choiceBox);
     const root = el('div', { class: 'vn', role: 'dialog', 'aria-label': title ?? '장면' }, back, backNow, ...cgs, left, right, title ? el('div', { class: 'vn-title' }, title) : '', box, el('div', { class: 'vn-tools' }, auto, skip));
     host.append(root);
+    // 뒤 화면에 남은 초점(지도 인장·결과 단추)이 Enter·Space를 받지 않게 내려놓는다
+    (document.activeElement as HTMLElement | null)?.blur?.();
     let i = -1;
     const offered = new Set<number>();
     let typing = 0;
@@ -116,11 +118,13 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
         // 「결」 이야기 그림(art)이 실제로 왔으면 그것, 아니면 「천외귀환」 장면 그림(cg) — 둘 다 없으면 걷는다(2026-11-12)
         setCg((line.art ? realArt(line.art) : null) ?? (line.cg && line.cg !== 'none' ? realArt(line.cg) : null));
       }
-      const rule = line.kind === 'rule';
-      const sp = !rule && line.speaker ? speakers[line.speaker] : undefined;
-      name.textContent = rule ? '이번 대결' : (sp?.name ?? '');
+      const lead = line.kind === 'lead';
+      const rule = line.kind === 'rule' || lead;
+      const sp = (!rule || lead) && line.speaker ? speakers[line.speaker] : undefined;
+      name.textContent = lead ? `이번 장 — ${sp?.name ?? ''}` : rule ? '이번 대결' : (sp?.name ?? '');
       box.classList.toggle('narration', !sp && !rule);
       box.classList.toggle('rule', rule);
+      box.classList.toggle('lead', lead);
       if (sp?.stand) {
         const img = side(line.speaker!);
         const u = frameUrl(sp.stand, line.face ?? 1);
@@ -130,7 +134,7 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
         }
       }
       // 말하는 쪽은 밝게, 듣는 쪽은 어둡게, 내레이션이면 둘 다 흐리게
-      const speaking = line.speaker && !rule ? side(line.speaker) : null;
+      const speaking = line.speaker && (!rule || lead) ? side(line.speaker) : null;
       for (const s of [left, right]) s.classList.toggle('dim', s !== speaking);
       // 일러스트가 깔린 동안은 반신 그림을 숨긴다
       root.classList.toggle('has-cg', cgShown);
@@ -201,6 +205,13 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       }
     };
     const onKey = (e: KeyboardEvent) => {
+      // 장면이 떠 있는 동안(닫히는 중 포함) 키는 뒤 화면으로 새지 않는다 — 결과 창의 '다음'(Enter)이 두 번 눌려
+      // 다음 대결이 겹쳐 열리던 문제(2026-11-13 사용자 보고 "화면이 휙휙 넘어간다·인물이 겹친다")
+      if (done) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       if (choosing) {
         const k = Number(e.key);
         const btns = choiceBox.querySelectorAll<HTMLButtonElement>('.vn-choice');
@@ -228,6 +239,10 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
         e.preventDefault();
         e.stopPropagation();
         finish();
+      } else if (!e.ctrlKey && !e.metaKey && !e.altKey && !/^F\d+$/.test(e.key)) {
+        // 그 밖의 키도 뒤 화면(대결·지도)에 닿지 않게
+        e.preventDefault();
+        e.stopPropagation();
       }
     };
     let done = false;
@@ -236,12 +251,12 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       done = true;
       clearInterval(typing);
       clearTimeout(autoTimer);
-      window.removeEventListener('keydown', onKey, true);
       // 어둠으로 가라앉은 뒤 닫는다(다음 화면이 어둠에서 떠오른다). 움직임 줄이기면 바로
       const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
       root.classList.add('out');
       setTimeout(
         () => {
+          window.removeEventListener('keydown', onKey, true);
           root.remove();
           resolve(picked);
         },
