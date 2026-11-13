@@ -38,14 +38,20 @@ export function applyUiArt(): void {
     for (const [k, u] of vars) root.style.setProperty(k, `url("${u}")`);
     root.classList.add(cls);
   };
-  use('art-pads', PAD_ART.map((p, i): [string, string | null] => [`--pad-${p}`, realArt('ui_gyeol_pads', i + 1)]));
-  use('art-frames', [['--plate-foe', realArt('ui_gyeol_frames', 1)], ['--plate-me', realArt('ui_gyeol_frames', 2)], ['--plate-result', realArt('ui_gyeol_frames', 3)], ['--plate-card', realArt('ui_gyeol_frames', 4)], ['--enso', realArt('ui_gyeol_frames', 5)]]);
+  // 2026-11-13 먹·한지 통일: 옻칠·금속 판(ui_gyeol_pads·ui_gyeol_frames 1~4)은 더 쓰지 않는다. 먹 원(5번)만 「決」 뒤에.
+  // 먹·한지 그림(ui_gyeol_ink: 1 먹 붓 판 · 2 주홍 붓 판 · 3 옅은 먹 판 · 4 이름 붓 띠 · 5 한지 결 · 6 붓 가름줄)이 오면 CSS가 그것을 쓴다
+  use('art-enso', [['--enso', realArt('ui_gyeol_frames', 5)]]);
+  use('art-ink', [1, 2, 3, 4, 5, 6].map((n): [string, string | null] => [`--ink-art-${n}`, realArt('ui_gyeol_ink', n)]));
   use('art-title', [['--title-bg', realArt('title_gyeol', 1)]]);
   use('art-lobby', [['--lobby-bg', realArt('bg_gyeol_lobby', 1)]]);
 }
-/** 버튼 아이콘(icons_gyeol_pads가 오면) */
-export function padIcon(kind: PadArt): HTMLImageElement | '' {
-  const u = realArt('icons_gyeol_pads', PAD_ART.indexOf(kind) + 1);
+/** 먹 아이콘(icons_gyeol_ink, 2026-11-13) 칸 번호 */
+export const INK_ICON = { attack: 1, heavy: 2, dodge: 3, parry: 4, tech: 5, focus: 6, story: 7, arena: 8, practice: 9, wardrobe: 10, records: 11, settings: 12, lock: 13, seal: 14, star: 15, back: 16 } as const;
+export const inkIcon = (k: keyof typeof INK_ICON): string | null => realArt('icons_gyeol_ink', INK_ICON[k]);
+
+/** 버튼 아이콘: 먹 아이콘(icons_gyeol_ink)이 오면 그것, 아니면 예전 icons_gyeol_pads, 둘 다 없으면 글자만 */
+export function padIcon(kind: PadArt | 'heavy'): HTMLImageElement | '' {
+  const u = inkIcon(kind === 'back' ? 'back' : kind) ?? (kind === 'heavy' ? null : realArt('icons_gyeol_pads', PAD_ART.indexOf(kind) + 1));
   return u ? el('img', { class: 'pad-icon', src: u, alt: '' }) : '';
 }
 

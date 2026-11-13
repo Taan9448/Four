@@ -1,0 +1,391 @@
+/*
+ * 「결」 먹·한지 디자인 층(2026-11-13 사용자 요청 "UI/UX가 촌스럽다 — 전체 점검", 설계 7-19).
+ * style.css는 @layer base 안에 있고, 이 파일은 층 밖이라 겹치는 속성은 언제나 이쪽이 이긴다.
+ *
+ * 기준 — 재질 하나(먹 판), 강조색 하나(주홍), 글꼴 셋(제목 송명 · 본문 Plex · 대사 명조):
+ *  - 판(panel): 반투명 먹빛 + 옅은 한지 결 + 가는 한지빛 테두리. 그라데이션·금테·빛 번짐 없음, 모서리 3px.
+ *  - 단추 셋: 보조(.btn) = 가는 테두리 · 주(.primary) = 주홍 · 글자(.link-btn·.back-lobby) = 테두리 없음.
+ *    마우스를 올리면 아래에 붓 밑줄이 그어진다.
+ *  - 고른 것(.on): 주홍 테 + 아주 옅은 주홍 바탕. 금빛은 등급·PERFECT 같은 '보상' 한두 곳에만.
+ *  - 먹 붓 판(로비 메뉴·전투 버튼): CSS 붓 자국(--brush 가면), Codex ui_gyeol_ink가 오면 그 그림.
+ */
+:root {
+  --sumi: #15120e;
+  --sumi-2: #1e1914;
+  --sumi-a: rgba(21, 18, 14, 0.84);
+  --line: rgba(236, 226, 204, 0.16);
+  --line-2: rgba(236, 226, 204, 0.32);
+  --paper: #ece2cc;
+  --paper-dim: #b4a88f;
+  --paper-faint: #7a705f;
+  --shu: #a8241c;
+  --shu-hi: #cf3b30;
+  --shu-soft: rgba(168, 36, 28, 0.16);
+  --gold: #c9a45c;
+  --ink: var(--paper);
+  --ink-dim: var(--paper-dim);
+  --bg: #0d0b09;
+  --radius: 3px;
+  /* 한지 결: 아주 옅은 섬유 무늬(배경 위에 겹친다) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.35' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.89 0 0 0 0 0.8 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  /* 붓 자국 가면: 가로로 긴 먹 획(가장자리가 거칠다) */
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100' preserveAspectRatio='none'%3E%3Cfilter id='r' x='-5%25' y='-20%25' width='110%25' height='140%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.5' numOctaves='3' seed='11' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='14' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Cpath filter='url(%23r)' fill='%23fff' d='M10 30 C60 14 150 18 210 16 S350 14 390 24 C396 44 394 62 388 78 C320 88 230 84 170 86 S50 90 14 80 C6 62 6 46 10 30Z'/%3E%3C/svg%3E");
+  /* 붓 밑줄 가면 */
+  --stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 C40 2 120 3 198 4 L196 6 C120 7 50 8 4 7Z' fill='%23fff'/%3E%3C/svg%3E");
+}
+::selection { background: var(--shu); color: #fff; }
+:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+
+/* ── 판(먹 판 + 한지 결) ── */
+.panel, .foe-card, .codex-card, .outfit-card, .char-card, .calib-card, .settings-box, .acct-modal-box, .login-panel, .title-plate, .story-card, .vn-box, .toast, .tip-card, .tut-panel, .pause-box, .cloud-side, .chapter, .cal-stage {
+  background: var(--grain), var(--sumi-a);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+.ach { background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+
+/* ── 단추 ── */
+.btn, .res-btn, .seg-btn, .key-slot, .login-tab, .prac-tab, .vn-choice {
+  border-radius: var(--radius);
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--paper);
+}
+.btn, .res-btn {
+  border: 1px solid var(--line-2);
+  background-image: var(--stroke);
+  background-repeat: no-repeat;
+  background-position: 50% calc(100% - 7px);
+  background-size: 0% 3px;
+  transition: background-size 0.22s ease-out, border-color 0.15s, background-color 0.15s, transform 0.12s;
+  font-family: var(--font-title);
+  font-size: 17px;
+  font-weight: 400;
+}
+/* 붓 밑줄은 흰 가면 모양 그대로 쓸 수 없어(배경 그림) 한지빛·주홍 두 벌로 */
+.btn, .res-btn { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 C40 2 120 3 198 4 L196 6 C120 7 50 8 4 7Z' fill='%23ece2cc'/%3E%3C/svg%3E"); }
+.btn:hover:not(:disabled), .res-btn:hover:not(:disabled), .btn:focus-visible, .res-btn:focus-visible { border-color: rgba(236, 226, 204, 0.6); background-color: rgba(236, 226, 204, 0.05); background-size: 60% 3px; transform: none; box-shadow: none; }
+.btn:disabled, .res-btn[disabled] { opacity: 0.4; cursor: default; }
+.btn.primary, .res-btn.primary { background-color: var(--shu); border-color: var(--shu); color: #fbf3e4; }
+.btn.primary:hover:not(:disabled), .res-btn.primary:hover, .res-btn.primary:focus-visible { background-color: var(--shu-hi); border-color: var(--shu-hi); box-shadow: none; }
+.res-btn::before, .res-btn::after, .res-btn.primary::before, .res-btn.primary::after { content: none; }
+.res-btn { height: 52px; }
+.res-btn b { font-family: var(--font-title); font-weight: 400; font-size: 19px; }
+.res-btn small, .btn small { border: 0; padding: 0; font: 11px/1 var(--font-body); color: currentColor; opacity: 0.55; }
+.link-btn, .login-guest-link { color: var(--paper-dim); }
+.link-btn:hover, .link-btn:focus-visible, .login-guest-link:hover { color: var(--paper); }
+/* ‹ 로비: 글자 단추 */
+.back-lobby { border-color: transparent; padding: 0 10px 0 4px; color: var(--paper-dim); font-size: 16px; }
+.back-lobby:hover { color: var(--paper); border-color: transparent; background-color: transparent; }
+kbd { border: 1px solid var(--line-2); border-bottom-width: 1px; border-radius: 2px; background: rgba(0, 0, 0, 0.35); color: var(--paper); font: 600 0.85em/1.4 var(--font-body); }
+
+/* 고른 것: 주홍 테 */
+.seg-btn { border: 1px solid var(--line); background: var(--sumi-a); }
+.seg-btn b { font-family: var(--font-title); font-weight: 400; }
+.seg-btn.on, .cp-card.on, .outfit-card.on, .wd-item.on, .key-slot.wait { border-color: var(--shu); background-color: var(--shu-soft); box-shadow: none; }
+.seg-btn:hover:not(.on), .cp-card:hover:not([disabled]):not(.on) { border-color: var(--line-2); }
+.prac-tabs, .login-tabs { border-bottom-color: var(--line); }
+.prac-tab, .login-tab { border: 0; border-bottom: 2px solid transparent; background: none; font-family: var(--font-title); font-weight: 400; }
+.prac-tab.on, .login-tab[aria-selected='true'] { color: var(--paper); border-bottom-color: var(--shu); background: none; }
+.prac-tab .tab-han { display: none; }
+.key-slot { border: 1px solid var(--line-2); background: rgba(0, 0, 0, 0.3); font-family: var(--font-body); }
+.key-slot.wait { color: var(--paper); animation: none; }
+
+/* ── 글자 ── */
+.screen-head h1, .screen h2, .settings-box h2, .acct-modal-box h2, .pause-box h2, .result h2, .sc-text h2, .chapter-result h1 { font-family: var(--font-title); font-weight: 400; color: var(--paper); letter-spacing: 0.02em; }
+.pause-box h2 { letter-spacing: 0.06em; }
+.settings-box h3 { font-family: var(--font-title); font-weight: 400; color: var(--paper); border-top-color: var(--line); }
+.screen > h2 { font-size: 22px; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.screen-head .sub, .sub { color: var(--paper-dim); }
+small, .note { color: var(--paper-dim); }
+.cp-trait, .cc-title, .sc-place, .chapter-result .kicker, .result .kicker, .pause-box .kicker { color: var(--paper-dim); }
+.tag { border-radius: 2px; }
+
+/* ── 메뉴 화면 = 장소: 뒤뜰 그림을 흐리게 깔고 그 위에 먹 판 ── */
+#app:has(> .screen)::before {
+  content: '';
+  position: fixed;
+  inset: -20px;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(13, 11, 9, 0.55), rgba(13, 11, 9, 0.88)), var(--lobby-bg, none) center / cover no-repeat, var(--bg);
+  filter: blur(5px) saturate(0.7);
+}
+.screen { position: relative; }
+.screen-head { padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+.screen-head h1 { font-size: 38px; }
+
+/* ── 로비 메뉴: 먹 붓 판 셋(같은 재질), 마우스를 올리면 주홍 ── */
+.lobby.main .lobby-menu .menu-btn, .lobby-menu.drills .menu-btn {
+  isolation: isolate;
+  border: 0;
+  background: none;
+  color: var(--paper);
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  transition: transform 0.15s, filter 0.15s;
+}
+.menu-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(10, 8, 6, 0.86);
+  -webkit-mask: var(--brush) center / 100% 100% no-repeat;
+  mask: var(--brush) center / 100% 100% no-repeat;
+  transition: background-color 0.18s;
+}
+.art-ink .menu-btn::before { -webkit-mask: none; mask: none; background: var(--ink-art-1) center / 103% 341% no-repeat; }
+.art-ink .menu-btn[disabled]::before { background-image: var(--ink-art-3); }
+.menu-btn:hover:not([disabled])::before, .menu-btn:focus-visible::before { background-color: var(--shu); }
+.art-ink .menu-btn:hover:not([disabled])::before, .art-ink .menu-btn:focus-visible::before { background-image: var(--ink-art-2); }
+.menu-btn:hover:not([disabled]), .menu-btn:focus-visible { transform: none; filter: none; }
+.menu-btn .key { color: var(--paper-dim); opacity: 0.7; left: 22px; }
+.menu-btn .pad-icon { width: 30px; height: 30px; image-rendering: auto; filter: grayscale(0.4) sepia(0.25); }
+.menu-btn[disabled] { opacity: 0.4; }
+.lobby.main .lobby-menu .menu-btn { width: 300px; height: 70px; }
+.lobby-menu.drills .menu-btn { height: 62px; font-size: 22px; }
+/* 로비 오른쪽 아래 둥근 표식: 먹 원, 천외귀환만 주홍 */
+.medal.lobby-medal { background: var(--grain), rgba(14, 12, 10, 0.86); border: 1px solid var(--line-2); color: var(--paper); font-family: var(--font-title); font-weight: 400; font-size: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+.medal.lobby-medal b { font-weight: 400; }
+.medal.lobby-medal:hover, .medal.lobby-medal:focus-visible { border-color: var(--paper); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+.medal.lobby-medal.to-cheonoe { background: var(--shu); border-color: var(--shu); color: #fbf3e4; }
+.medal.lobby-medal.to-cheonoe b { font-size: 13px; }
+.medal.lobby-medal.to-cheonoe::before { border-left-color: var(--line); }
+.medal.lobby-medal.has-icon { grid-template-rows: 1fr auto; padding: 8px 0 6px; }
+.medal-icon { width: 28px; height: 28px; }
+.medal.lobby-medal.has-icon b { font-size: 11px; }
+/* 명패: 먹 판, 인장만 주홍 */
+.plate-seal { background: var(--shu); border-radius: 2px; box-shadow: none; font-family: var(--font-title); font-weight: 400; }
+.title-plate.guest .plate-seal, .acct-seal.muted { background: #3d372f; }
+.plate-name b { font-family: var(--font-title); font-weight: 400; }
+.training-bar { border-color: var(--line); }
+.training-bar i { background: var(--paper-dim); }
+.plate-training b { color: var(--paper); }
+
+/* ── 인물 고르기 ── */
+.cp-card { border: 1px solid var(--line); border-radius: 40px; background: var(--sumi-a); }
+.cp-card.on { border-color: var(--shu); }
+.cp-face, .me-face { border: 1.5px solid var(--line-2); box-shadow: none; }
+.cp-card.on .cp-face { border-color: var(--shu-hi); }
+.cp-text b { font-family: var(--font-title); font-weight: 400; font-size: 17px; }
+.cp-note { margin: 8px 0 0; color: var(--paper-dim); font-size: 13px; }
+
+/* ── 결투장 ── */
+/* 상대 카드의 「대결」은 보조 단추(주홍은 마우스를 올린 카드에만) — 한 화면에 붉은 단추가 줄지어 서지 않게 */
+.foe-actions .btn.primary { background-color: transparent; border-color: var(--line-2); color: var(--paper); }
+.foe-card:hover .foe-actions .btn.primary, .foe-actions .btn.primary:focus-visible { background-color: var(--shu); border-color: var(--shu); color: #fbf3e4; }
+.foe-card { padding: 18px 16px 18px; gap: 6px; }
+.foe-card:focus-within, .foe-card:hover { border-color: var(--line-2); }
+.foe-card .foe-text b, .codex-card b, .outfit-card b { font-family: var(--font-title); font-weight: 400; font-size: 20px; }
+.foe-card .foe-text small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.foe-card .best-cell small { color: var(--paper-faint); }
+.rank-none { color: #4a443b; }
+.screen .help { border-top: 1px solid var(--line); padding-top: 12px; }
+.screen .help summary { font-family: var(--font-title); color: var(--paper-dim); }
+
+/* ── 수련장 ── */
+.lobby-menu.drills li small { color: var(--paper-dim); text-shadow: none; }
+.calib-card { color: var(--paper-dim); }
+.calib-card .now { color: var(--paper); }
+.cal-ring { border-color: var(--line-2); }
+
+/* ── 도감 ── */
+.ach-grid { gap: 0 24px; }
+.ach { display: grid; grid-template-columns: 22px 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; padding: 10px 2px; color: var(--paper-faint); }
+.ach b { grid-column: 2; font-family: var(--font-title); font-weight: 400; font-size: 17px; }
+.ach small { grid-column: 2; }
+.ach-mark { grid-row: 1 / span 2; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--paper-faint); }
+.ach.met { color: var(--paper); border-color: var(--line); }
+.ach.met b { color: var(--paper); }
+.ach.met .ach-mark { border-radius: 2px; border-color: var(--shu); background: var(--shu); transform: rotate(-6deg); }
+.art-ink .ach.met .ach-mark { background: var(--ink-art-6) center / 170% 170% no-repeat; border: 0; transform: none; }
+.art-ink .vn-name:not(:empty)::before, .art-ink .toast b::before { background: var(--ink-art-6) center / 170% 170% no-repeat; transform: none; }
+.art-ink .screen-head, .art-ink .screen > h2 { border-bottom: 0; background: var(--ink-art-5) left bottom / 100% 6px no-repeat; }
+.codex-card { padding: 14px 12px; }
+.codex-card .fin { color: var(--gold); }
+.char-card { padding: 14px 16px; }
+.cc-stats { color: var(--paper-dim); }
+.char-card .cp-traits { color: var(--paper-faint); }
+.tech-card { border: 1px solid var(--line); border-radius: var(--radius); }
+.tech-card .hanja, .tech-card b { font-family: var(--font-title); font-weight: 400; }
+.stats dt { color: var(--paper); }
+
+/* ── 옷장: 왼쪽 큰 미리보기 · 오른쪽 목록 ── */
+.wd-layout { display: grid; grid-template-columns: 1fr minmax(300px, 380px); gap: 24px; align-items: stretch; min-height: min(560px, calc(100vh - 200px)); }
+.wd-preview { position: relative; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 70%, rgba(236, 226, 204, 0.08), transparent 65%); }
+.wd-stand { position: absolute; bottom: 0; left: 50%; translate: -50% 0; height: 100%; max-width: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6)); }
+.wd-preview.locked .wd-stand { filter: brightness(0) drop-shadow(0 0 1px rgba(236, 226, 204, 0.5)); opacity: 0.7; }
+.wd-info { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; margin: 0 16px 16px; padding: 14px 18px; width: min(520px, 100%); }
+.wd-info h2 { margin: 0 0 4px; padding: 0; border: 0; font-size: 26px; }
+.wd-info p { margin: 0 0 10px; color: var(--paper-dim); font-size: 14px; line-height: 1.5; }
+.wd-idle { width: 96px; height: 96px; image-rendering: pixelated; flex: none; }
+.wd-preview.locked .wd-idle { filter: brightness(0.2); }
+.wd-list { display: flex; flex-direction: column; padding: 6px; overflow: auto; }
+.wd-item { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; min-height: 68px; padding: 4px 12px 4px 4px; border: 1px solid transparent; border-radius: var(--radius); background: none; color: var(--paper); text-align: left; cursor: pointer; }
+.wd-item + .wd-item { margin-top: 2px; }
+.wd-item:hover { background: rgba(236, 226, 204, 0.05); }
+.wd-item img { width: 56px; height: 56px; image-rendering: pixelated; }
+.wd-item span { display: flex; flex-direction: column; gap: 2px; }
+.wd-item b { font-family: var(--font-title); font-weight: 400; font-size: 18px; }
+.wd-item small { font-size: 12px; }
+.wd-item.worn small { color: var(--shu-hi); }
+.wd-item.locked img { filter: brightness(0) opacity(0.5); }
+.wd-item.locked b { color: var(--paper-dim); }
+.ink-lock { width: 16px; height: 16px; color: var(--paper-faint); }
+@media (max-width: 760px) { .wd-layout { grid-template-columns: 1fr; } .wd-preview { min-height: 360px; } }
+
+/* ── 이야기 지도·쪽지 ── */
+.story-map { border-radius: var(--radius); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55); }
+.pin-seal, .sc-seal { background: var(--shu); border-radius: 2px; box-shadow: 0 2px 4px rgba(40, 20, 5, 0.5); font-family: var(--font-title); font-weight: 400; }
+.story-pin.cleared .pin-seal { background: #6e1a14; }
+.story-pin.picked .pin-seal { outline: 2px solid #1a1410; outline-offset: 2px; }
+.pin-name { font-family: var(--font-title); font-weight: 400; background: rgba(240, 230, 208, 0.92); border-radius: 1px; }
+.sc-stars, .pin-stars, .chapter-result .stars { color: var(--gold); }
+.sc-chal { color: var(--paper-dim); }
+
+/* ── 장면 창(대화) ── */
+.vn-box { border-color: var(--line); background: var(--grain), rgba(14, 12, 10, 0.88); }
+.vn-name { font-family: var(--font-title); font-weight: 400; color: var(--paper); font-size: 22px; }
+.vn-name:not(:empty)::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 10px; background: var(--shu); transform: rotate(-6deg) translateY(-2px); }
+.vn-more { color: var(--paper-dim); }
+.vn-choice { border: 1px solid var(--line-2); background: rgba(14, 12, 10, 0.9); }
+.vn-choice:hover, .vn-choice:focus-visible { border-color: var(--shu); background-color: var(--shu-soft); box-shadow: none; }
+
+/* ── 창(설정·계정·일시 정지·안내) ── */
+.settings-panel, .acct-modal { background: rgba(6, 5, 4, 0.7); }
+.settings-box, .acct-modal-box, .pause-box { background: var(--grain), rgba(17, 14, 11, 0.96); }
+.settings-box select, .login-input { border-radius: var(--radius); border-color: var(--line-2); background: rgba(0, 0, 0, 0.35); }
+.login-input:focus { border-color: var(--paper); box-shadow: none; }
+.pause-mark, .acct-seal { background: var(--shu); border-radius: 2px; font-family: var(--font-title); font-weight: 400; }
+.toast { border-color: var(--line-2); }
+.toast b { font-family: var(--font-title); font-weight: 400; color: var(--paper); }
+.toast b::before { content: ''; display: inline-block; width: 9px; height: 9px; margin-right: 8px; background: var(--shu); transform: rotate(-6deg); }
+.tip-card { border-color: var(--line-2); }
+.tut-panel { border-color: var(--line-2); }
+.tut-panel b { color: var(--paper); font-family: var(--font-title); font-weight: 400; }
+.tut-goal { color: var(--paper); }
+.tut-panel.pass { border-color: var(--shu); box-shadow: none; }
+.tut-panel.pass .tut-goal { color: var(--shu-hi); }
+.survive { border-color: var(--line-2); background: var(--sumi-a); color: var(--paper); font-family: var(--font-title); }
+.chapter-result .unlock { color: var(--paper); }
+.star-rows li.met { color: var(--paper); }
+
+/* ───────── 전투 화면 ───────── */
+/* 적 이름판: 금속 판 대신 이름 + 붓 띠, 막대는 얇게 */
+.duel .foe-bar b { display: block; padding: 4px 34px 6px; font-family: var(--font-title); font-weight: 400; font-size: 22px; letter-spacing: 0.06em; color: var(--paper); text-shadow: 0 1px 3px #000, 0 0 12px rgba(0, 0, 0, 0.8); background: none; }
+.duel .foe-bar b::after { content: ''; display: block; height: 6px; margin: 4px -10px 0; background: rgba(8, 6, 4, 0.75); -webkit-mask: var(--brush) center / 100% 100% no-repeat; mask: var(--brush) center / 100% 100% no-repeat; }
+.art-ink .duel .foe-bar b { background: var(--ink-art-4) center bottom / 104% 28px no-repeat; }
+.art-ink .duel .foe-bar b::after { content: none; }
+.hud.open .foe-bar b { color: #fff3d6; }
+.duel .bar { border: 0; border-radius: 1px; background: rgba(0, 0, 0, 0.55); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.duel .foe-bar .bar.hp { height: 6px; border-radius: 1px; }
+.duel .foe-bar .bar.posture { height: 4px; }
+.duel .bar .gloss { display: none; }
+.duel .bar.hp .fill, .duel .foe-bar .bar.hp .fill { background: #b8322a; box-shadow: none; }
+.duel .bar .lag { background: #e9dcc0; }
+.duel .foe-bar .bar.posture .fill, .foe-bar .bar.posture i { background: #e9d7a6; }
+.duel .me-bar .bar.posture .fill { background: #c9c4b4; }
+.duel .me-bar .bar.focus .fill { background: #8fb6d9; box-shadow: none; }
+.duel .bar.focus.on .fill { background: #f0e2b0; box-shadow: none; }
+.duel .foe-bar .bar .hp-num { display: none; }
+/* 하운 이름판: 판 없이 얼굴 + 이름 + 얇은 막대(아래쪽 먹 그림자만) */
+.duel .me-bar { border: 0; border-radius: 0; padding: 8px 18px 8px 8px; background: radial-gradient(ellipse 80% 100% at 30% 50%, rgba(8, 6, 4, 0.7), transparent 75%); box-shadow: none; backdrop-filter: none; }
+.duel .me-bar .bar.hp { height: 8px; border-radius: 1px; }
+.duel .bar.posture, .duel .bar.focus { height: 4px; }
+.me-name b { font-family: var(--font-title); font-weight: 400; font-size: 21px; }
+.hp-num { color: var(--paper-dim); }
+.bar-row em { color: var(--paper-dim); }
+.duel .me-bar.danger { border: 0; }
+.me-face { background-color: var(--sumi-2); }
+.streak.tier-1 { color: var(--paper); }
+.streak.tier-2, .streak.tier-3 { color: #f0dba0; }
+.streak { font-family: var(--font-title); }
+
+/* 버튼: 먹 붓 판(터치 화면). 기술·집중은 준비되면 주홍 */
+.duel .pad {
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--paper);
+  font-family: var(--font-title);
+  font-weight: 400;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: none;
+  filter: none;
+}
+.duel .pad::before { content: ''; position: absolute; inset: 0; z-index: -1; background: rgba(10, 8, 6, 0.8); -webkit-mask: var(--brush) center / 100% 100% no-repeat; mask: var(--brush) center / 100% 100% no-repeat; }
+.art-ink .duel .pad::before { -webkit-mask: none; mask: none; background: var(--ink-art-1) center / 103% 341% no-repeat; }
+.art-ink .duel .pad:disabled::before { background-image: var(--ink-art-3); }
+@media not all and (orientation: landscape) and (max-height: 520px) { .duel .pad { position: relative; } }
+.duel .pad.parry::before { background-color: rgba(10, 8, 6, 0.9); }
+.duel .pad:active::before { background-color: var(--shu); }
+.duel .pad.tech.ready::before, .duel .pad.focus.ready::before, .duel .pad.focus.on::before { background-color: var(--shu); }
+.art-ink .duel .pad.tech.ready::before, .art-ink .duel .pad.focus.ready::before, .art-ink .duel .pad.focus.on::before { background-image: var(--ink-art-2); }
+.duel .pad.tech.ready, .duel .pad.focus.ready { animation: inkReady 1.2s ease-in-out infinite; border: 0; box-shadow: none; }
+@keyframes inkReady { 50% { transform: translateY(-2px); } }
+.duel .pad.focus { background: linear-gradient(90deg, #8fb6d9 calc(var(--focus) * 100%), rgba(0, 0, 0, 0.4) 0) center bottom 6px / 56% 3px no-repeat; }
+.duel .pad.hint::before { background-color: var(--shu); }
+.duel .pad.hint { animation: inkReady 0.9s ease-in-out infinite; box-shadow: none; }
+.duel .pad small { font-family: var(--font-body); opacity: 0.55; }
+.duel .pad .pad-icon { image-rendering: auto; filter: grayscale(0.5) sepia(0.2); }
+
+/* PC(마우스·키보드): 큰 버튼 판 대신 아래 가운데에 작은 키 안내 띠 — 버튼 상태(기술 준비·집중 게이지)는 그대로 보인다 */
+@media (hover: hover) and (pointer: fine) and (min-height: 521px) {
+  .duel .pads { bottom: 14px; width: auto; gap: 4px; display: flex; justify-content: center; padding: 6px 10px; border-radius: 2px; background: rgba(8, 6, 4, 0.55); transform: scale(var(--hud, 1)); transform-origin: bottom center; }
+  .duel .pad { min-height: 0; height: 34px; padding: 0 12px; font-size: 15px; gap: 7px; flex-direction: row-reverse; opacity: 0.85; }
+  .duel .pad::before { display: none; }
+  .duel .pad .pad-icon { display: none; }
+  .duel .pad small { order: 0; display: inline-block; min-width: 22px; padding: 2px 5px; border: 1px solid var(--line-2); border-radius: 2px; font: 600 11px/1.2 var(--font-body); opacity: 0.9; text-align: center; }
+  .duel .pad:hover:not(:disabled) { opacity: 1; background-color: rgba(236, 226, 204, 0.06); }
+  .duel .pad:disabled { opacity: 0.3; }
+  .duel .pad.tech.ready, .duel .pad.focus.ready, .duel .pad.focus.on, .duel .pad.hint { opacity: 1; color: #fff; background-color: var(--shu); animation: none; }
+  .duel .pad.focus { background-position: center bottom 3px; background-size: 70% 2px; }
+  .duel .pad.focus.ready, .duel .pad.focus.on { background-image: none; }
+  .duel .me-bar { bottom: calc(68px * var(--hud, 1)); }
+  .duel .score { bottom: calc(68px * var(--hud, 1)); }
+}
+
+/* 휴대폰 가로: 내 이름판은 왼쪽 위 구석(가운데 아래에서 하운 다리를 가리지 않게), 연속 박자는 그 아래 */
+@media (orientation: landscape) and (max-height: 520px) {
+  .duel .me-bar { top: 4px; bottom: auto; left: 4px; transform: scale(0.62); transform-origin: top left; }
+  .duel .streak { top: 64px; left: 10px; }
+  .duel .foe-bar b { font-size: 18px; }
+}
+
+/* 결과·일시 정지 */
+.result { background: rgba(8, 6, 4, 0.7); }
+.duel .result { background: rgba(8, 6, 4, 0.62); backdrop-filter: blur(2px); }
+.result h2 { background: none; aspect-ratio: auto; width: auto; padding: 0; font-size: clamp(30px, 4.6vw, 46px); }
+.result h2::after { content: ''; display: block; width: 70%; height: 6px; margin: 6px auto 0; background: var(--shu); -webkit-mask: var(--brush) center / 100% 100% no-repeat; mask: var(--brush) center / 100% 100% no-repeat; }
+.pause { background: rgba(6, 5, 4, 0.6); }
+.pause-box { border-color: var(--line-2); }
+.rank-S { color: #f0d890; text-shadow: none; }
+.j-perfect { color: #f0d890; text-shadow: none; }
+.j-excellent { color: var(--paper); }
+.j-good { color: var(--paper-dim); }
+.j-miss { color: #c0534a; }
+.judge-row { font-family: var(--font-title); font-weight: 400; }
+.loading { background: var(--bg); }
+.loading span { font-family: var(--font-title); color: var(--paper-dim); }
+.pause-btn, .fs { border-color: var(--line-2); border-radius: 2px; background: rgba(8, 6, 4, 0.55); color: var(--paper); }
+.pause-btn:hover, .pause-btn.on, .fs:hover { border-color: var(--paper); color: var(--paper); }
+
+/* ───────── 움직임: 화면이 바뀔 때 먹이 번지듯 ───────── */
+.screen, .lobby.main > .lobby-center, .story-screen, .chapter-result { animation: inkIn 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes inkIn {
+  from { opacity: 0; filter: blur(8px); clip-path: circle(12% at 50% 46%); }
+  60% { opacity: 1; }
+  to { opacity: 1; filter: blur(0); clip-path: circle(150% at 50% 46%); }
+}
+.settings-box, .acct-modal-box, .pause-box { animation: inkPop 0.22s ease-out both; }
+@keyframes inkPop { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  .screen, .lobby.main > .lobby-center, .story-screen, .chapter-result, .settings-box, .acct-modal-box, .pause-box { animation: none; }
+  .btn, .res-btn { transition: none; }
+}

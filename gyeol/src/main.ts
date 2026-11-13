@@ -22,6 +22,7 @@ import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecord
 import { createWeather, gust } from './scene';
 import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
+import './ink.css';
 
 const data = raw as unknown as DuelData;
 const app = document.getElementById('app')!;
@@ -160,7 +161,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const dodgeBtn = el('button', { class: 'pad dodge', type: 'button' }, padIcon('dodge'), '피하기', el('small', {}, kname('dodge')));
   const parryBtn = el('button', { class: 'pad parry', type: 'button' }, padIcon('parry'), '받기', el('small', {}, kname('parry')));
   // 강베기(2026-11-11): 늦게 떨어지지만 세다 — 버튼 그림은 베기 판을 쓰고 금빛 테
-  const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('attack'), '강베기', el('small', {}, kname('heavy')));
+  const heavyBtn = el('button', { class: 'pad heavy', type: 'button' }, padIcon('heavy'), '강베기', el('small', {}, kname('heavy')));
   if (rhythm || !pdata.player.heavy) heavyBtn.disabled = true;
   const techName = el('span', { class: 'tech-name' }, '기술');
   const techBtn = el('button', { class: 'pad tech', type: 'button', disabled: '' }, padIcon('tech'), techName, el('small', {}, kname('tech')));

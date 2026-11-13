@@ -62,3 +62,14 @@ describe('키 바꾸기(2026-11-13)', () => {
     }
   });
 });
+
+describe('먹·한지 UI 그림 명세(2026-11-13)', () => {
+  it('먹 아이콘 칸 수가 명세와 같고, 먹 붓 그림은 6칸', async () => {
+    const { INK_ICON } = await import('../src/dom');
+    const { loadSpec } = await import('../../tools/lib/specs.mjs');
+    const icons = loadSpec('icons_gyeol_ink');
+    expect(icons.frames).toBe(Object.keys(INK_ICON).length);
+    expect(Math.max(...Object.values(INK_ICON))).toBe(icons.frames);
+    expect(loadSpec('ui_gyeol_ink').frames).toBe(6);
+  });
+});

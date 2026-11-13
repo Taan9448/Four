@@ -7,7 +7,7 @@ import { accountState, loginPanel, playerPlate } from './account';
 import { onCloudChange } from './cloud';
 import { lobbyStage } from './lobby-fx';
 import { condMet, condText, newAchievements, progress, starTotal } from './progress';
-import { button, el, ELEMENT_NAME, elementsOf, rankBadge, realArt, toast } from './dom';
+import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
@@ -94,7 +94,8 @@ export function charPicker(data: DuelData, onPick: () => void, compact = false):
     'div',
     { class: `char-pick${compact ? ' compact' : ''}` },
     el('div', { class: 'cp-row', role: 'group', 'aria-label': '들어갈 인물' }, ...cards),
-    !compact && cur ? el('ul', { class: 'cp-traits' }, ...cur.traits.map((t) => el('li', {}, t))) : '',
+    // 특성 목록은 길어서 화면에 늘어놓지 않는다 — 고른 인물의 한 줄 소개만, 자세한 건 카드에 마우스를 올리면(2026-11-13)
+    !compact && cur ? el('p', { class: 'cp-note' }, `${cur.title} — ${cur.trait}`) : '',
   );
 }
 
@@ -160,12 +161,16 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const items = lobby.menu.map((m, i) => {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
-    const icon = realArt('icons_gyeol_menu', MENU_ICON[m.id] ?? i + 1);
-    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', title: `🔒 ${m.locked}` } : { title: m.note });
+    // 먹 아이콘(icons_gyeol_ink, 2026-11-13)이 오면 그것
+    const icon = (m.id in INK_ICON ? inkIcon(m.id as keyof typeof INK_ICON) : null) ?? realArt('icons_gyeol_menu', MENU_ICON[m.id] ?? i + 1);
+    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', title: `잠김 — ${m.locked}` } : { title: m.note });
     return el('li', { class: locked ? 'locked' : '' }, b);
   });
   const corner = lobby.corner.map((c) =>
-    button([el('b', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` }),
+    {
+      const ic = c.id in INK_ICON ? inkIcon(c.id as keyof typeof INK_ICON) : null;
+      return button([ic ? el('img', { class: 'medal-icon', src: ic, alt: '' }) : '', el('b', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}${ic ? ' has-icon' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` });
+    },
   );
   // 뒤뜰 그림 위 잔잔한 움직임(달무리·등불·안개·별·반딧불·댓잎 — lobby-fx.ts). 그림이 아직 없으면 CSS 바탕 그대로
   const bg = realArt('bg_gyeol_lobby', 1);
@@ -236,7 +241,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
     );
   };
   const grid = el('div', { class: 'foes' });
-  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다. 맞지 않고 PERFECT가 많을수록 높은 등급. 등급은 인물마다 따로.'), charPicker(data, () => renderArena(app, nav, data)), seg, grid, helpBox()));
+  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다'), charPicker(data, () => renderArena(app, nav, data)), seg, grid, helpBox()));
   draw();
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
@@ -324,7 +329,7 @@ export function renderPractice(app: HTMLElement, nav: Nav, data: DuelData): void
     el(
       'section',
       { class: 'screen practice' },
-      header('수련장', nav, '왕일검이 나무토막으로 철목인을 움직인다. 다치지 않고, 철목인은 쓰러져도 다시 선다.'),
+      header('수련장', nav, '철목인은 쓰러져도 다시 선다'),
       charPicker(data, redraw),
       el('div', { class: 'prac-tabs', role: 'tablist' }, tab('drill', '수련'), tab('rhythm', '박자 도전')),
       body,
@@ -524,7 +529,7 @@ function achievementSection(data: DuelData): HTMLElement[] {
   const ids = chartIds(data);
   const ach = progress.achievements.map((a) => {
     const met = save.achievements.includes(a.id) || condMet(a.cond, save, ids);
-    return el('li', { class: `ach${met ? ' met' : ''}` }, el('b', {}, met ? '✦ ' + a.name : '◇ ' + a.name), el('small', {}, a.text));
+    return el('li', { class: `ach${met ? ' met' : ''}` }, el('i', { class: 'ach-mark', 'aria-hidden': 'true' }), el('b', {}, a.name), el('small', {}, a.text));
   });
   const got = progress.achievements.filter((a) => save.achievements.includes(a.id) || condMet(a.cond, save, ids)).length;
   return [el('h2', {}, `업적 ${got} / ${progress.achievements.length}`), el('ul', { class: 'ach-grid' }, ...ach)];
@@ -532,20 +537,58 @@ function achievementSection(data: DuelData): HTMLElement[] {
 
 /* ───────── 옷장: 하운 옷 ───────── */
 
-export function renderWardrobe(app: HTMLElement, nav: Nav): void {
+/**
+ * 옷장(2026-11-13 먹·한지 개편): 왼쪽에 고른 옷을 크게(반신 그림 + 전투 모습), 오른쪽에 옷 목록.
+ * 목록을 누르면 미리 보고, 연 옷이면 「입기」로 입는다. 잠긴 옷은 조건만 보인다
+ */
+export function renderWardrobe(app: HTMLElement, nav: Nav, previewId?: string): void {
   const save = loadSave();
-  const outfits = progress.outfits.map((o) => {
+  const worn = save.outfit || 'base';
+  const shown = progress.outfits.find((o) => o.id === (previewId ?? worn)) ?? progress.outfits[0];
+  const standOf = (id: string) => realArt(id === 'base' ? 'haun_gyeol_stand' : `skin_${id}_haun_stand`) ?? frameUrl('haun_sword_stand', 1);
+  const idleOf = (id: string) => frameUrl(id === 'base' ? 'haun_sword_idle' : `skin_${id}_haun_idle`, 1);
+  const openShown = condMet(shown.unlock, save);
+  const stand = standOf(shown.id);
+  const idle = idleOf(shown.id);
+  const wear = button(shown.id === worn ? '입는 중' : openShown ? '입기' : '잠김', `btn${shown.id === worn ? '' : ' primary'}`, () => {
+    const s = loadSave();
+    s.outfit = shown.id;
+    writeSave(s);
+    renderWardrobe(app, nav, shown.id);
+  }, openShown && shown.id !== worn ? {} : { disabled: '' });
+  const preview = el(
+    'div',
+    { class: `wd-preview${openShown ? '' : ' locked'}` },
+    stand ? el('img', { class: 'wd-stand', src: stand, alt: '' }) : '',
+    el(
+      'div',
+      { class: 'wd-info panel' },
+      idle ? el('img', { class: 'wd-idle', src: idle, alt: '' }) : '',
+      el('div', {}, el('h2', {}, shown.name), el('p', {}, openShown ? shown.text : condText(shown.unlock)), wear),
+    ),
+  );
+  const list = progress.outfits.map((o) => {
     const open = condMet(o.unlock, save);
-    const on = (save.outfit || 'base') === o.id;
-    const img = frameUrl(o.id === 'base' ? 'haun_sword_idle' : `skin_${o.id}_haun_idle`, 1);
-    const pick = button(on ? '입는 중' : open ? '입기' : '🔒', `btn small${on ? ' primary' : ''}`, () => {
-      const s = loadSave();
-      s.outfit = o.id;
-      writeSave(s);
-      renderWardrobe(app, nav);
-    }, open && !on ? {} : { disabled: '' });
-    return el('article', { class: `outfit-card${open ? '' : ' locked'}${on ? ' on' : ''}` }, img ? el('img', { src: img, alt: '' }) : '', el('b', {}, o.name), el('small', {}, open ? o.text : condText(o.unlock)), pick);
+    const img = idleOf(o.id);
+    return button(
+      [img ? el('img', { src: img, alt: '' }) : '', el('span', {}, el('b', {}, o.name), el('small', {}, o.id === worn ? '입는 중' : open ? '열림' : condText(o.unlock))), open ? '' : lockIcon()],
+      `wd-item${o.id === shown.id ? ' on' : ''}${open ? '' : ' locked'}${o.id === worn ? ' worn' : ''}`,
+      () => renderWardrobe(app, nav, o.id),
+      { 'aria-pressed': String(o.id === shown.id) },
+    );
   });
-  app.replaceChildren(el('section', { class: 'screen wardrobe' }, header('옷장', nav, `하운이 입는 옷 — 이야기 별 ${starTotal(save)}개로 연다`), el('div', { class: 'outfit-grid' }, ...outfits)));
+  app.replaceChildren(el('section', { class: 'screen wardrobe' }, header('옷장', nav, `이야기 별 ${starTotal(save)}개`), el('div', { class: 'wd-layout' }, preview, el('div', { class: 'wd-list panel' }, ...list))));
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+}
+
+/** 먹 자물쇠(🔒 대신, 2026-11-13) */
+export function lockIcon(): SVGSVGElement | HTMLImageElement {
+  const u = inkIcon('lock');
+  if (u) return el('img', { class: 'ink-lock', src: u, alt: '잠김' });
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'ink-lock');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = '<path d="M7 10V7.5a5 5 0 0 1 10 0V10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="2" fill="currentColor"/><circle cx="12" cy="15.2" r="1.6" fill="#15120e"/>';
+  return svg;
 }
