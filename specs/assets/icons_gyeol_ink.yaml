@@ -1,0 +1,31 @@
+id: icons_gyeol_ink
+type: ui-parts
+canvas: [1024, 1024]
+grid: [4, 4]
+frames: 16
+summary: >-
+  sixteen small brush-ink icons for "Gyeol", a wuxia parry-action game: each one is drawn with a few confident brush strokes in warm
+  off-white ink (#ece2cc, like white ink on dark paper - the game shows them on dark ink panels), like the icons in a calligraphy manual;
+  dry-brush edges, no outlines, no shading; one vermilion accent only where noted
+# 2026-11-13 사용자 요청(설계 7-19): 버튼·메뉴·잠금·업적 표식을 먹 아이콘으로(🔒·◇ 글자와 색색의 아이콘을 대신한다).
+# 칸 번호 = gyeol/src/dom.ts INK_ICON. 게임에서는 24~32px로 줄여 쓰므로 굵고 단순한 붓 획으로, 칸 가운데 약 70%에 그린다.
+frame_notes:
+  1: 'SLASH: one swift diagonal brush stroke from upper right to lower left, sharp tapered ends, like a sword cut'
+  2: 'HEAVY SLASH: two thick parallel diagonal brush strokes, the second heavier, with a small ink splash at the lower end'
+  3: 'DODGE: a curved sweeping stroke like a swirl of wind, open on the right, with a faint dry-brush trail'
+  4: 'PARRY: a short vertical blade stroke crossed by one curved stroke bending around it, like a blow turned aside'
+  5: 'TECHNIQUE: a single flowing S-shaped stroke like a river or wood grain, with three tiny dots of ink beside it'
+  6: 'FOCUS: an open brush circle (enso) with a single dot of ink in the center, like a calm eye'
+  7: 'STORY: a half-unrolled scroll drawn in three simple strokes'
+  8: 'ARENA: two crossed straight swords drawn in two strokes each'
+  9: 'TRAINING: a wooden training dummy (a post with two short arms) drawn in four strokes'
+  10: 'WARDROBE: a folded robe with a crossed collar, drawn in a few strokes'
+  11: 'RECORDS: a closed bound book with a thread binding on the left, drawn in a few strokes'
+  12: 'SETTINGS: a round brush circle with six short strokes around it, like a simple gear or sun'
+  13: 'LOCK: a simple padlock: a round shackle stroke over a solid ink block'
+  14: 'SEAL: a small square vermilion (#b3261e) seal stamp, slightly rotated, grainy edges, no characters inside - the only red icon'
+  15: 'STAR: a five-pointed star drawn with five quick strokes, slightly uneven, ink black'
+  16: 'BACK: an arrow pointing left drawn in two strokes, a long horizontal stroke and a short angled head'
+placeholder:
+  color: '#15120e'
+  accent: '#a8241c'

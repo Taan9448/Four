@@ -1,0 +1,34 @@
+id: ui_gyeol_ink
+type: ui-parts
+frames: 6
+summary: >-
+  sumi-ink brush strokes for the screens of "Gyeol", a wuxia parry-action game, painted with a real East Asian calligraphy brush on
+  nothing (transparent); every stroke is left BLANK in the middle because the game writes Korean labels on top of it
+# 2026-11-13 사용자 요청 "UI가 촌스럽다 — 먹·한지 하나로 통일"(설계 7-19): 옻칠·금속 판(ui_gyeol_pads·ui_gyeol_frames 1~4)을 대신한다.
+# 칸 번호 = gyeol/src/dom.ts applyUiArt --ink-art-N, gyeol/src/ink.css(.art-ink …).
+# 칸1·2·3은 버튼 바탕(로비 메뉴·전투 버튼): 게임이 버튼 상자에 맞춰 늘린다(가로 약 103%, 세로 약 340%). 칸4는 적 이름 아래 붓 띠, 칸5는 가름줄, 칸6은 빈 낙관.
+frame_notes:
+  1: >-
+    PLAIN BUTTON STROKE: one single wide horizontal stroke of deep black sumi ink, about 496 px wide and 150 px tall, centered in the cell,
+    painted left to right with one confident movement: a slightly heavier, blunt start on the left, a long even body, and a dry-brush
+    finish on the right where the bristles split into fine streaks. Edges are rough and fibrous like ink on rice paper, with a few tiny
+    ink flecks. Mostly opaque (about 85%), the middle 70% calm and even so text on top stays readable. No outline, no shadow, no gold.
+  2: >-
+    PRIMARY BUTTON STROKE: the same stroke shape, size and position as cell 1, painted in vermilion cinnabar ink (#a8241c to #8e1c15),
+    like the red of a seal stamp. Same dry-brush right end and fibrous edges. Calm, even middle.
+  3: >-
+    FADED BUTTON STROKE: the same stroke shape, size and position as cell 1, but a thin pale grey ink wash (about 35% opacity, warm grey
+    #4a443c), as if painted with a nearly dry brush - used for locked or secondary buttons.
+  4: >-
+    NAME BAND: one very long thin horizontal brush line of black ink, about 500 px wide and only 36 px tall, centered, slightly thicker in
+    the middle and tapering to sharp dry points at both ends, with a few dry-brush streaks. Drawn under an enemy's name in battle.
+  5: >-
+    DIVIDER: one long hair-thin brush line of warm grey ink (#6a6156), about 500 px wide and 10 px tall, centered, with a tiny blob where
+    the brush touched down on the left and a feathered fade on the right.
+  6: >-
+    BLANK SEAL: one small square seal impression in vermilion cinnabar (#b3261e), about 150 x 150 px, centered, slightly rotated
+    (about -6 degrees), with the uneven, grainy edges of a stone seal pressed on paper and a thin carved border inside. The inside is
+    a plain flat red with NO characters, no letters, no symbols.
+placeholder:
+  color: '#15120e'
+  accent: '#a8241c'
