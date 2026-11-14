@@ -4,10 +4,11 @@ Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell n
 PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
 Background: flat solid black #000000 in every cell.
 Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
 Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
 Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
 Frames:
-Cell 1: a blazing white-gold aura of flame-like light filling the lower two thirds of the cell around an empty vertical space in the center (where a standing figure will be), and behind it a large round halo made of concentric golden wood-grain rings
+Cell 1: a blazing white-gold aura of flame-like light rising around the lower half of the cell around an empty vertical space in the center (where a standing figure will be), and behind it a round halo that stays fully inside the cell made of concentric golden wood-grain rings
 Cell 2: the aura flames flicker upward, the halo rings rotating slowly, white sparks rising
 Cell 3: the aura at its brightest, flames licking higher, the halo glowing
 Cell 4: the flames shift to the left, sparks streaming up
@@ -15,3 +16,4 @@ Cell 5: the flames shift to the right, the halo rings rotated further
 Cell 6: the flames close to frame 1, looping smoothly
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Keep every halo ring, flame and spark inside local x=96..416 and y=96..416 in all six cells, with wide pure-black margins. The BOTTOM of the flames must NOT end on a straight horizontal crop line: draw a naturally curved, broken U-shaped lower contour tapering into a few floating ember blocks, with black below and no floor. Leave the central vertical oval clearly empty black for a standing character. Behind it, preserve complete round concentric wood-grain golden halo rings, not a doorway frame. Flames flicker around the sides and lower curve; cell 3 is brightest, 4 shifts left, 5 right, and 6 matches 1 closely in center, size, silhouette and brightness for a smooth loop. No straight cut edges at top, sides OR base; keep crisp 4px blocks.
