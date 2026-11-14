@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_tech_guardian_vow_a",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 9.38,
+  "gridDetected": true,
+  "nativeSize": [
+    54,
+    54
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 20,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 3
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "4aa36ba8b1ad0b0c",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.54
+}
