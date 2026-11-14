@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_tech_shield_rush_a",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 9.315,
+  "gridDetected": true,
+  "nativeSize": [
+    55,
+    55
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 20,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 3
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "405683876b1fb9c7",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.582
+}
