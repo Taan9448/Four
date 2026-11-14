@@ -450,3 +450,8 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 .tip-card.hold .tip-how p { margin: 0; color: var(--paper); font-size: 16px; line-height: 1.6; }
 .tip-card.hold .tip-how kbd { flex: none; font-size: 16px; padding: 4px 10px; }
 .tip-card.hold .tip-ok { align-self: flex-end; }
+
+/* 2026-11-14 먹 붓 판(ui_gyeol_ink)이 온 뒤: 판 없을 때 쓰던 바탕색이 그림 뒤에 네모로 깔리지 않게 —
+   눌림·안내·준비 상태는 바탕색 대신 주홍 붓 판(2번)으로 */
+.art-ink .menu-btn::before, .art-ink .duel .pad::before { background-color: transparent !important; }
+.art-ink .duel .pad:active::before, .art-ink .duel .pad.hint::before { background-image: var(--ink-art-2); }
