@@ -6,6 +6,7 @@ import { loadSprite, type SpriteAsset } from '../../src/render/assets';
 import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element, type Judgement } from './duel';
 import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
+import { fxBoost } from './fxfill';
 import { CONTACT, FOE_X, fitFx, GROUND, H, PLAYER_X, SCALE, W, WORLD_ZOOM } from './layout';
 export { CONTACT, FOE_X, H, PLAYER_X, W } from './layout';
 
@@ -865,7 +866,8 @@ function drawEffects(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: nu
     if (n > a.meta.frames) continue;
     const img = frameOf(a, n);
     if (!img) continue;
-    const s = SCALE * b.scale;
+    // 땅에 선 적 기술 그림은 칸을 덜 채운 만큼 키운다(2026-11-14, fxfill)
+    const s = SCALE * b.scale * (b.ground ? fxBoost(a) : 1);
     // 화면 밖으로 나가 잘리지 않게 맞춘다(2026-11-13)
     const r = b.ground ? fitFx(b.x, GROUND, a.meta.frameW * s, a.meta.frameH * s, a.meta.anchor[0], a.meta.anchor[1]) : fitFx(b.x, b.y, a.meta.frameW * s, a.meta.frameH * s);
     ctx.drawImage(img, r.x, r.y, r.w, r.h);
@@ -1051,9 +1053,11 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
     if (f > sheet.meta.frames) return;
     const img = frameOf(sheet, f);
     if (!img) return;
-    const s = SCALE * 2.6;
+    // 앞뒤 두 장이 같은 크기로 보이게 덜 키우는 쪽(더 크게 그려진 장)에 맞춘다(2026-11-14)
+    const s = SCALE * 2.6 * Math.min(fxBoost(A), fxBoost(B));
     const cx = tc.id === 'unhae' ? CONTACT.x + 40 : FOE_X;
-    ctx.drawImage(img, cx - (sheet.meta.frameW * s) / 2, CONTACT.y - (sheet.meta.frameH * s) / 2, sheet.meta.frameW * s, sheet.meta.frameH * s);
+    const r = fitFx(cx, CONTACT.y, sheet.meta.frameW * s, sheet.meta.frameH * s);
+    ctx.drawImage(img, r.x, r.y, r.w, r.h);
     return;
   }
   if (e < -500 || e > 1100) return;
