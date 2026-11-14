@@ -4,14 +4,16 @@ Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell n
 PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
 Background: flat solid black #000000 in every cell.
 Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
 Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
 Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
 Frames:
-Cell 1: a single hair-thin vertical line of blue-white light running from the very top to the very bottom of the cell, small sparks at the top
+Cell 1: a single hair-thin vertical line of blue-white light running down from high in the cell to near the bottom, both ends tapering, small sparks at the top
 Cell 2: impact: the line explodes into a huge vertical blade of light, white core and bright azure edges, filling a third of the cell width, a blinding flash at the bottom where it meets the ground
-Cell 3: the vertical blade at full power, the cell split in two by it, clouds at the top torn apart to both sides, a fan of water spray bursting out at the bottom
+Cell 3: the vertical blade at full power, splitting the effect in two, its top fading into sparks, small clouds near its top torn apart to both sides, a fan of water spray bursting out at the bottom
 Cell 4: the blade thinning, jagged crack lines of blue light branching left and right from it like a split sky, water spray arcing outward
 Cell 5: the crack lines glowing, the central line thin and bright, spray droplets falling
 Cell 6: a thin glowing vertical seam with blue crack lines fading, droplets
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Leave the TOP FIFTH and BOTTOM FIFTH of every cell COMPLETELY BLACK. Draw each COMPLETE effect, including tip sparks, spray and crack branches, only within local x=104..408 and y=104..408, maximum total span 304px. The vertical blade in cells 2 and 3 is a finite pointed light stroke, never a rectangle cut flat at the top. Both ends visibly taper into separate stepped pixels before the black margins. Cell 2 has the strongest white flash, cell 3 tears small clouds and fans water, then the blade thins to branching blue cracks and a fine seam in cell 6. Keep the same azure-white palette, center, six stages and crisp 4px blocks.
