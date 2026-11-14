@@ -20,7 +20,7 @@ import { openSettings } from './settings';
 import { renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
-import { addShake, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
+import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
 import './ink.css';
 
@@ -765,6 +765,16 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           // 연속 박자 단계만큼 곡에 층이 쌓인다(작은 북 → 선율 겹침 → 종)
           setIntensity(tier);
           fx.combo = { n: ev.streak, tier, born: now, up: tier > lastTier };
+          // 고비(5·10·20·30…): 숫자가 쾅 — 흔들림·번쩍임·불꽃이 숫자만큼 세진다(2026-11-14)
+          if (comboMilestone(ev.streak)) {
+            const st = comboStyle(ev.streak);
+            const power = Math.min(1, ev.streak / 40);
+            addShake(fx, now, 5 + power * 9, 220);
+            flash(st.glow, 180, 0.18 + power * 0.2);
+            spark(PLAYER_X - 150, CONTACT.y - 150, 24 + Math.round(power * 30), st.glow, 320 + power * 200, 4);
+            sfx('power', { volume: 0.5 + power * 0.4 });
+            if (ev.streak >= 10) sfx('crit', { volume: 0.5 });
+          }
           if (tier > lastTier) {
             const names = ['', '결이 보인다', '결을 탄다', '결과 하나가 된다'];
             text(PLAYER_X, CONTACT.y - 160, names[Math.min(3, tier)], tier >= 3 ? '#fff0c0' : tier === 2 ? '#ffd27a' : '#9fd8ff', 26);

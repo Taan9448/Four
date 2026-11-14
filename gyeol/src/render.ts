@@ -1277,44 +1277,138 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
 }
 
 /** 연속 받기 숫자: 받을 때마다 크게 튀어나오고, 단계가 오르면 더 크게 빛난다 */
+/**
+ * 연속 박자 숫자(2026-11-14 사용자 요청 "30회 연속인데도 이펙트가 떨어진다 — 숫자가 커질수록 쾅쾅, 메이플스토리처럼").
+ * - 숫자가 클수록 글자가 커지고(로그 곡선, 최대 약 1.9배) 색이 단계마다 바뀐다: 흰 → 하늘 → 금 → 주황 → 불꽃 붉음 → 무지개
+ * - 오를 때마다 숫자가 크게 떨어져 박힌다(2.2배 → 0.9 → 1, 글자마다 30ms씩 늦게 위에서 떨어진다)
+ * - 10마다(그리고 5) 고비: 빛 고리가 터지고 금빛 살이 퍼지며 「N 연속!」 띠가 크게 뜬다
+ * - 높은 숫자는 글자가 미세하게 떨린다
+ */
+const COMBO_FONT = '"Cinzel", serif';
+export function comboStyle(n: number): { size: number; top: string; bottom: string; glow: string; label: string } {
+  const size = Math.round(64 * Math.min(1.9, 1 + Math.log2(1 + n / 4) * 0.2));
+  if (n >= 50) return { size, top: '#ffffff', bottom: '#ff7ad9', glow: '#ff9af0', label: '결의 끝' };
+  if (n >= 30) return { size, top: '#fff3d6', bottom: '#ff3b2a', glow: '#ff5a2a', label: '불꽃' };
+  if (n >= 20) return { size, top: '#fff1c4', bottom: '#ff8a1a', glow: '#ffa640', label: '격류' };
+  if (n >= 10) return { size, top: '#ffffff', bottom: '#ffc83a', glow: '#ffe08a', label: '하나' };
+  if (n >= 5) return { size, top: '#eaf7ff', bottom: '#4fb4ff', glow: '#8fd3ff', label: '' };
+  return { size, top: '#f2efe8', bottom: '#a8a093', glow: '#d8d0c0', label: '' };
+}
+export const comboMilestone = (n: number): boolean => n >= 5 && (n === 5 || n % 10 === 0);
+
 function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   const c = fx.combo;
   if (!c) return;
   const el = now - c.born;
-  if (el > 2200) return;
-  const pop = 1 + (c.up ? 0.9 : 0.55) * Math.max(0, 1 - el / 140) ** 2;
-  const alpha = el < 1600 ? 1 : 1 - (el - 1600) / 600;
-  const color = c.tier >= 3 ? ['#ffffff', '#ffe08a'] : c.tier === 2 ? ['#fff1c4', '#e8a53a'] : c.tier === 1 ? ['#eaf7ff', '#6fb8ff'] : ['#f2efe8', '#a8a093'];
+  if (el > 2400) return;
+  const st = comboStyle(c.n);
+  const rainbow = c.n >= 50;
+  const alpha = el < 1800 ? 1 : 1 - (el - 1800) / 600;
+  const big = comboMilestone(c.n);
+  const cx = PLAYER_X - 150;
+  const cy = GROUND - 250;
   ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.translate(PLAYER_X - 150, GROUND - 260);
-  ctx.scale(pop, pop);
+  ctx.globalAlpha = Math.max(0, alpha);
+  // 고비: 빛 고리 두 겹 + 금빛 살
+  if (big && el < 700) {
+    const k = el / 700;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let r = 0; r < 2; r++) {
+      const kk = Math.min(1, k * (1.3 - r * 0.3));
+      ctx.strokeStyle = st.glow;
+      ctx.globalAlpha = (1 - kk) * 0.9;
+      ctx.lineWidth = 10 * (1 - kk) + 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy - st.size * 0.35, 30 + kk * (140 + r * 60), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    const rays = 14;
+    ctx.globalAlpha = (1 - k) * 0.8;
+    ctx.fillStyle = st.glow;
+    for (let i = 0; i < rays; i++) {
+      const a = (i / rays) * Math.PI * 2 + c.n;
+      const r0 = 40 + k * 60;
+      const r1 = r0 + 70 * (1 - k * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a - 0.05) * r0, cy - st.size * 0.35 + Math.sin(a - 0.05) * r0);
+      ctx.lineTo(cx + Math.cos(a) * r1, cy - st.size * 0.35 + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a + 0.05) * r0, cy - st.size * 0.35 + Math.sin(a + 0.05) * r0);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  // 숫자: 글자마다 위에서 떨어져 박힌다
+  const text = String(c.n);
+  ctx.font = `900 ${st.size}px ${COMBO_FONT}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
-  ctx.font = '900 64px "Cinzel", serif';
-  const nw = ctx.measureText(String(c.n)).width;
-  const halo = cached(`combo:${c.n}:${c.tier}`, nw + 80, 120, (g) => {
-    g.font = '900 64px "Cinzel", serif';
-    g.textAlign = 'center';
-    g.lineJoin = 'round';
-    g.shadowColor = color[1];
-    g.shadowBlur = c.tier >= 1 ? 20 : 8;
-    g.lineWidth = 10;
-    g.strokeStyle = '#120c06';
-    g.strokeText(String(c.n), nw / 2 + 40, 80);
+  const widths = [...text].map((ch) => ctx.measureText(ch).width * 0.92);
+  const total = widths.reduce((a, b) => a + b, 0);
+  let x = cx - total / 2;
+  const slamMax = big ? 2.6 : c.up ? 2.2 : 1.7;
+  const jitter = c.n >= 20 ? Math.min(3, (c.n - 15) / 10) : 0;
+  [...text].forEach((ch, i) => {
+    const w = widths[i];
+    const t = el - i * 30;
+    const mid = x + w / 2;
+    x += w;
+    if (t < 0) return;
+    // 2.2배 → 0.9 → 1(튕김)
+    const k = Math.min(1, t / 160);
+    const s = k < 1 ? slamMax + (0.88 - slamMax) * (1 - (1 - k) ** 3) : 0.88 + 0.12 * Math.min(1, (t - 160) / 90);
+    const drop = k < 1 ? -60 * (1 - k) ** 2 : 0;
+    const beat = 1 + 0.035 * Math.sin(now / 90) * (c.n >= 10 ? 1 : 0);
+    const jx = jitter ? (Math.sin(now / 23 + i * 7) * jitter) : 0;
+    const jy = jitter ? (Math.cos(now / 29 + i * 5) * jitter) : 0;
+    ctx.save();
+    ctx.translate(mid + jx, cy + drop + jy);
+    ctx.scale(s * beat, s * beat);
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(8, st.size * 0.16);
+    ctx.strokeStyle = '#120c06';
+    ctx.strokeText(ch, 0, 0);
+    const g = ctx.createLinearGradient(0, -st.size * 0.8, 0, 4);
+    const top = rainbow ? `hsl(${(now / 6 + i * 40) % 360},100%,85%)` : st.top;
+    const bottom = rainbow ? `hsl(${(now / 6 + i * 40 + 120) % 360},100%,60%)` : st.bottom;
+    g.addColorStop(0, top);
+    g.addColorStop(1, bottom);
+    ctx.fillStyle = g;
+    ctx.fillText(ch, 0, 0);
+    // 박히는 순간 흰 번쩍임
+    if (t < 120) {
+      ctx.globalAlpha = (1 - t / 120) * 0.8;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(ch, 0, 0);
+    }
+    ctx.restore();
   });
-  ctx.drawImage(halo, -nw / 2 - 40, -80);
-  const g = ctx.createLinearGradient(0, -52, 0, 4);
-  g.addColorStop(0, color[0]);
-  g.addColorStop(1, color[1]);
-  ctx.fillStyle = g;
-  ctx.fillText(String(c.n), 0, 0);
-  ctx.font = '800 18px "Song Myung", serif';
+  // 아래 글자: 연속 박자 (+ 고비 이름)
+  const sub = st.label ? `연속 박자 · ${st.label}` : '연속 박자';
+  ctx.font = `800 ${Math.round(18 + Math.min(10, st.size / 16))}px "Song Myung", serif`;
   ctx.lineWidth = 4;
   ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-  ctx.strokeText('연속 박자', 0, 24);
-  ctx.fillStyle = color[0];
-  ctx.fillText('연속 박자', 0, 24);
+  ctx.strokeText(sub, cx, cy + 26);
+  ctx.fillStyle = st.top;
+  ctx.fillText(sub, cx, cy + 26);
+  // 고비 띠: 「N 연속!」
+  if (big && el < 1400) {
+    const k = el / 1400;
+    const pop = el < 160 ? 1.6 - 0.6 * (el / 160) : 1;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, alpha * (k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25));
+    ctx.translate(cx + 30, cy - st.size - 30 - k * 20);
+    ctx.scale(pop, pop);
+    ctx.rotate(-0.06);
+    ctx.font = `900 ${Math.round(30 + Math.min(16, c.n / 4))}px "Song Myung", serif`;
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#120c06';
+    const label = `${c.n} 연속!`;
+    ctx.strokeText(label, 0, 0);
+    ctx.fillStyle = st.glow;
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
   ctx.restore();
 }
 
