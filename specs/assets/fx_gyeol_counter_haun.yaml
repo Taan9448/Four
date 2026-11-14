@@ -1,0 +1,15 @@
+id: fx_gyeol_counter_haun
+type: fx
+summary: "「결」 진하운의 반격 이펙트 6프레임 — 받은 뒤 되돌려 치는 순간 적 몸에 터진다. 인물마다 다르게, 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin diagonal white-gold slash line appearing"
+  2: "impact: a bright crossing pair of white-gold slashes with a flash in the center"
+  3: "the slashes widening, small gold wood-grain splinters flying"
+  4: "the slashes fading, splinters drifting"
+  5: "faint gold streaks"
+  6: "a few motes"
+placeholder: { accent: '#ffb15c' }

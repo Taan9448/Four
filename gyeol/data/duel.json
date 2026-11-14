@@ -7205,7 +7205,9 @@
       "damage": 0.06,
       "posture": 0.45,
       "returnMul": 0,
-      "line": "떨어지는 구름은 자국을 남기지 않는다."
+      "line": "떨어지는 구름은 자국을 남기지 않는다.",
+      "slot": 1,
+      "owner": "haun"
     },
     {
       "id": "byeogun",
@@ -7216,7 +7218,9 @@
       "damage": 0.22,
       "posture": 0.35,
       "returnMul": 0,
-      "line": "운하검 제일식, 벽운단하."
+      "line": "운하검 제일식, 벽운단하.",
+      "slot": 2,
+      "owner": "haun"
     },
     {
       "id": "unhae",
@@ -7227,7 +7231,128 @@
       "damage": 0.1,
       "posture": 1.0,
       "returnMul": 0.75,
-      "line": "운해귀종은 베는 초식이 아니다. 돌려보내는 초식이다."
+      "line": "운해귀종은 베는 초식이 아니다. 돌려보내는 초식이다.",
+      "slot": 3,
+      "owner": "haun"
+    },
+    {
+      "id": "shield_rush",
+      "name": "방패 돌진",
+      "hanja": "盾突",
+      "chain": 5,
+      "min": "excellent",
+      "damage": 0.05,
+      "posture": 0.5,
+      "returnMul": 0,
+      "line": "방패는 막기만 하는 게 아니야.",
+      "slot": 1,
+      "owner": "kyle"
+    },
+    {
+      "id": "rowen_oath",
+      "name": "로웬의 일격",
+      "hanja": "誓劍",
+      "chain": 5,
+      "min": "perfect",
+      "damage": 0.24,
+      "posture": 0.3,
+      "returnMul": 0,
+      "line": "로웬 가의 검은 한 번에 끝낸다.",
+      "slot": 2,
+      "owner": "kyle"
+    },
+    {
+      "id": "guardian_vow",
+      "name": "수호 서약",
+      "hanja": "守護誓約",
+      "chain": 10,
+      "min": "excellent",
+      "damage": 0.12,
+      "posture": 0.7,
+      "returnMul": 0.5,
+      "line": "잘못된 명령엔 칼을 들지 않는다. 지킬 사람 앞에서만.",
+      "slot": 3,
+      "owner": "kyle",
+      "heal": 0.25
+    },
+    {
+      "id": "mana_rain",
+      "name": "마나 화살비",
+      "hanja": "魔矢雨",
+      "chain": 5,
+      "min": "excellent",
+      "damage": 0.08,
+      "posture": 0.3,
+      "returnMul": 0,
+      "line": "하나로 안 되면, 열 개로.",
+      "slot": 1,
+      "owner": "elia"
+    },
+    {
+      "id": "frost_ward",
+      "name": "서리 결계",
+      "hanja": "霜結界",
+      "chain": 5,
+      "min": "perfect",
+      "damage": 0.16,
+      "posture": 0.55,
+      "returnMul": 0,
+      "line": "멈춰요. 그 자리에서.",
+      "slot": 2,
+      "owner": "elia"
+    },
+    {
+      "id": "starfall",
+      "name": "별의 낙하",
+      "hanja": "星落",
+      "chain": 10,
+      "min": "excellent",
+      "damage": 0.2,
+      "posture": 0.8,
+      "returnMul": 0.3,
+      "line": "흐르는 걸 보고 있었어요. 이제 돌려줄게요.",
+      "slot": 3,
+      "owner": "elia",
+      "heal": 0.15
+    },
+    {
+      "id": "earth_quake",
+      "name": "대지 울림",
+      "hanja": "地鳴",
+      "chain": 5,
+      "min": "excellent",
+      "damage": 0.05,
+      "posture": 0.55,
+      "returnMul": 0,
+      "line": "산이 한 번 숨을 쉰다.",
+      "slot": 1,
+      "owner": "born"
+    },
+    {
+      "id": "mountain_cleave",
+      "name": "산 가르기",
+      "hanja": "斷山",
+      "chain": 5,
+      "min": "perfect",
+      "damage": 0.26,
+      "posture": 0.3,
+      "returnMul": 0,
+      "line": "산도 결대로 쪼개면 갈라진다.",
+      "slot": 2,
+      "owner": "born"
+    },
+    {
+      "id": "kazdum_heart",
+      "name": "카즈둠의 심장",
+      "hanja": "山心",
+      "chain": 10,
+      "min": "excellent",
+      "damage": 0.12,
+      "posture": 1.0,
+      "returnMul": 0.6,
+      "line": "오천의 망치가 같이 내려친다.",
+      "slot": 3,
+      "owner": "born"
     }
   ],
   "difficulties": [
@@ -7272,7 +7397,17 @@
           "모든 판정 폭이 기본",
           "연베기·강베기 모두 기본"
         ],
-        "techs": null,
+        "techs": [
+          "nakun",
+          "byeogun",
+          "unhae"
+        ],
+        "counterFx": {
+          "sprite": "fx_gyeol_counter_haun",
+          "hit": "fx_hit_slash",
+          "color": "#ffb15c",
+          "label": "반격"
+        },
         "facePos": "50% 6%"
       },
       {
@@ -7284,11 +7419,11 @@
         "joinAfter": "ch2",
         "trait": "철벽",
         "traits": [
+          "기술 셋 — 방패 돌진 · 로웬의 일격 · 수호 서약",
           "막기가 단단하다 — 이르게 눌러도 피해 1/10, 막기 폭이 넓다",
           "체력·체간이 크다(130)",
           "베기가 무겁고 느리다 · 강베기 피해 2.8배",
-          "받기 폭이 조금 좁다",
-          "기술 없음"
+          "받기 폭이 조금 좁다"
         ],
         "player": {
           "hp": 130,
@@ -7310,7 +7445,17 @@
           "guardPosture": 14,
           "parry": 135
         },
-        "techs": [],
+        "techs": [
+          "shield_rush",
+          "rowen_oath",
+          "guardian_vow"
+        ],
+        "counterFx": {
+          "sprite": "fx_gyeol_counter_kyle",
+          "hit": "fx_hit_blunt",
+          "color": "#ffe08a",
+          "label": "방패 반격"
+        },
         "lines": {
           "start": [
             "로웬의 검은 물러서지 않는다.",
@@ -7339,11 +7484,13 @@
         "joinAfter": "ch2",
         "trait": "심안",
         "traits": [
+          "기술 셋 — 마나 화살비 · 서리 결계 · 별의 낙하",
+          "마력 구슬 반격 — 받을 때마다 구슬이 쌓이고(PERFECT 2개), 베면 구슬을 쏘아 막히지 않는 반격(최대 3개)",
           "결이 잘 보인다 — PERFECT 폭 1.4배",
           "집중이 빨리 차고(처음 60) 더 오래·더 느리게",
           "불을 받아도 화상이 없다(결계)",
           "마나 화살 — 베기가 빠르다",
-          "체력·체간이 작다(80) · 기술 없음"
+          "체력·체간이 작다(80)"
         ],
         "player": {
           "hp": 80,
@@ -7367,9 +7514,27 @@
           "focusDuration": 3200,
           "focusRate": 0.38,
           "fireParryChip": 0,
-          "fireGuardExtra": 0
+          "fireGuardExtra": 0,
+          "counterMode": "orb",
+          "orbMax": 3,
+          "orbPerParry": {
+            "perfect": 2,
+            "excellent": 1
+          },
+          "orbDamage": 0.6,
+          "orbPosture": 0.7
         },
-        "techs": [],
+        "techs": [
+          "mana_rain",
+          "frost_ward",
+          "starfall"
+        ],
+        "counterFx": {
+          "sprite": "fx_gyeol_counter_elia",
+          "hit": "fx_hit_shock",
+          "color": "#c9a6ff",
+          "label": "마력 반격"
+        },
         "lines": {
           "start": [
             "결이 보여요.",
@@ -7398,11 +7563,11 @@
         "joinAfter": "ch2",
         "trait": "산의 결",
         "traits": [
+          "기술 셋 — 대지 울림 · 산 가르기 · 카즈둠의 심장",
           "받을 때마다 적 체간을 크게 깎는다(1.6 → 2.2배)",
           "체간이 단단하고 빨리 돈다(170)",
           "강베기가 막는 칼을 부순다(체간 5배)",
-          "피하기가 느리다(무적이 짧다)",
-          "기술 없음"
+          "피하기가 느리다(무적이 짧다)"
         ],
         "player": {
           "hp": 140,
@@ -7424,7 +7589,17 @@
           "dodgeIframe": 220,
           "dodgeLockout": 800
         },
-        "techs": [],
+        "techs": [
+          "earth_quake",
+          "mountain_cleave",
+          "kazdum_heart"
+        ],
+        "counterFx": {
+          "sprite": "fx_gyeol_counter_born",
+          "hit": "fx_hit_blunt",
+          "color": "#ff9a4a",
+          "label": "도끼 반격"
+        },
         "lines": {
           "start": [
             "같이 가.",

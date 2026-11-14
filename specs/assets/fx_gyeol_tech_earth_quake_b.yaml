@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_earth_quake_b
+type: fx
+summary: "「결」 동료 기술 대지 울림(地鳴) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "dust drifting low"
+  2: "small pebbles on the ground"
+  3: "faint orange cracks cooling"
+  4: "thin dust"
+  5: "almost nothing"
+  6: "faint dust"
+placeholder: { accent: '#c98a4a' }

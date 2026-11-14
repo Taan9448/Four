@@ -67,11 +67,21 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
 }
 
 /** 진하운의 기술(duel.json techs) — 색과 Codex 이펙트 id(fx_gyeol_tech_<id>_a·b) */
-export const TECH_IDS = ['nakun', 'byeogun', 'unhae'] as const;
+// 2026-11-14: 동료(카일·엘리아·보른)도 기술 셋씩
+export const TECH_IDS = ['nakun', 'byeogun', 'unhae', 'shield_rush', 'rowen_oath', 'guardian_vow', 'mana_rain', 'frost_ward', 'starfall', 'earth_quake', 'mountain_cleave', 'kazdum_heart'] as const;
 export const TECH_COLOR: Record<string, { core: string; glow: string; rgb: string }> = {
   nakun: { core: '#f2f8ff', glow: '#a8d8ff', rgb: '190,225,255' },
   byeogun: { core: '#e6f6ff', glow: '#4fb4ff', rgb: '90,180,255' },
   unhae: { core: '#fff6d6', glow: '#ffd27a', rgb: '255,214,120' },
+  shield_rush: { core: '#fff4d0', glow: '#e8c060', rgb: '232,192,96' },
+  rowen_oath: { core: '#eef4ff', glow: '#6f9cff', rgb: '111,156,255' },
+  guardian_vow: { core: '#fffbe8', glow: '#ffe08a', rgb: '255,224,138' },
+  mana_rain: { core: '#e6f8ff', glow: '#5fd0ff', rgb: '95,208,255' },
+  frost_ward: { core: '#f0fbff', glow: '#9fe6ff', rgb: '159,230,255' },
+  starfall: { core: '#f6eeff', glow: '#b48cff', rgb: '180,140,255' },
+  earth_quake: { core: '#ffe9cc', glow: '#c98a4a', rgb: '201,138,74' },
+  mountain_cleave: { core: '#fff0dc', glow: '#ff9a4a', rgb: '255,154,74' },
+  kazdum_heart: { core: '#fff4e0', glow: '#ff6a3a', rgb: '255,106,58' },
 };
 
 export const ELEMENT_COLOR: Record<Element | 'none' | 'danger', { line: string; glow: string; spark: string }> = {
@@ -88,6 +98,10 @@ export interface Fx {
   texts: { x: number; y: number; text: string; color: string; born: number; size: number; icon?: number }[];
   /** ground: 땅에 선 그림(적 기술 — 그림 아래쪽 anchor 줄이 땅에 닿게). 아니면 (x, y)가 가운데 */
   bursts: { x: number; y: number; sprite: string; born: number; scale: number; ground?: boolean }[];
+  /** 마력 구슬 반격(엘리아): 하운 쪽에서 적에게 날아가는 빛 구슬 n개(2026-11-14) */
+  bolts: { born: number; n: number; color: string }[];
+  /** 기술 준비 표식에 적을 키 이름(설정의 키 — main이 넣는다) */
+  techKey: string;
   /** 결 패링 연출(Codex 12프레임이 없으면 코드로 그린 금빛 연꽃) */
   blooms: { x: number; y: number; born: number; color: string; big: boolean }[];
   slashes: { born: number }[];
@@ -124,7 +138,7 @@ export interface Fx {
   labels?: boolean;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, min: 'perfect' }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], bolts: [], techKey: '', blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, min: 'perfect' }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
 
 export type JudgeWord = 'PERFECT' | 'EXCELLENT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
 
@@ -317,6 +331,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawAura(ctx, d, sp, now);
   drawTechAura(ctx, d, now);
   drawPlayer(ctx, d, sp, fx, now);
+  drawOrbs(ctx, d, now);
   actorScale = foeScale;
   drawFoe(ctx, d, sp);
   actorScale = 1;
@@ -325,6 +340,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   if (fx.labels) drawCueLabels(ctx, d);
   drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
+  drawBolts(ctx, fx, now);
   ctx.restore();
   drawWeather(ctx, fx.weather, true, now, density);
   ctx.restore();
@@ -337,6 +353,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawChain(ctx, fx);
   drawBanner(ctx, fx, now);
   drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale / WORLD_ZOOM);
+  drawTechBadge(ctx, d, fx, now);
   ctx.restore();
   drawClashBar(ctx, d, now);
   if (fx.practice) drawPracticeBar(ctx, d.data.rules, fx.practice, now);
@@ -1034,6 +1051,111 @@ function drawTechAura(ctx: CanvasRenderingContext2D, d: Duel, now: number): void
 }
 let readyFx: Anim = null;
 
+/**
+ * 기술 준비 표식(2026-11-14 사용자 요청 "스킬이 활성화되면 캐릭터 위에 표시"): 준비된 동안 머리 위에
+ * 기술 색의 먹 띠 + 「기술 이름」 + 누를 키가 떠 있다(살짝 위아래로 흔들린다)
+ */
+function drawTechBadge(ctx: CanvasRenderingContext2D, d: Duel, fx: Fx, now: number): void {
+  if (!d.techReady || d.result || d.player.action === 'tech') return;
+  const tech = d.data.techs.find((t) => t.id === d.techReady);
+  if (!tech) return;
+  const col = TECH_COLOR[tech.id] ?? TECH_COLOR.unhae;
+  const scale = d.data.player.scale ?? 1;
+  const bob = Math.sin(now / 260) * 3;
+  const y = GROUND - 150 * SCALE * 0.6 * scale - 28 + bob;
+  const label = `「${tech.name}」`;
+  const key = fx.techKey;
+  ctx.save();
+  ctx.font = '700 22px "Nanum Myeongjo", serif';
+  const w = ctx.measureText(label).width;
+  ctx.font = '800 16px system-ui, sans-serif';
+  const kw = key ? ctx.measureText(key).width + 14 : 0;
+  const total = w + (key ? kw + 10 : 0) + 28;
+  const x0 = PLAYER_X - total / 2;
+  const pulse = 0.55 + 0.45 * Math.sin(now / 180);
+  // 띠
+  ctx.shadowColor = col.glow;
+  ctx.shadowBlur = 14 * pulse;
+  ctx.fillStyle = 'rgba(12,9,7,0.82)';
+  ctx.beginPath();
+  ctx.roundRect(x0, y - 18, total, 36, 6);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = `rgba(${col.rgb},${0.6 + 0.4 * pulse})`;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // 이름
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 22px "Nanum Myeongjo", serif';
+  ctx.fillStyle = col.core;
+  ctx.fillText(label, x0 + 14, y + 1);
+  // 키
+  if (key) {
+    const kx = x0 + 14 + w + 10;
+    ctx.fillStyle = `rgba(${col.rgb},0.9)`;
+    ctx.beginPath();
+    ctx.roundRect(kx, y - 12, kw, 24, 4);
+    ctx.fill();
+    ctx.font = '800 16px system-ui, sans-serif';
+    ctx.fillStyle = '#120e0a';
+    ctx.fillText(key, kx + 7, y + 1);
+  }
+  // 아래로 향한 작은 꼬리
+  ctx.fillStyle = `rgba(${col.rgb},${0.6 + 0.4 * pulse})`;
+  ctx.beginPath();
+  ctx.moveTo(PLAYER_X - 6, y + 18);
+  ctx.lineTo(PLAYER_X + 6, y + 18);
+  ctx.lineTo(PLAYER_X, y + 25);
+  ctx.fill();
+  ctx.restore();
+}
+
+/** 마력 구슬(엘리아): 쌓인 구슬이 몸 둘레를 돈다 */
+function drawOrbs(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
+  if (!d.orbs || d.result) return;
+  const scale = d.data.player.scale ?? 1;
+  const cy = GROUND - 150 * SCALE * 0.32 * scale;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < d.orbs; i++) {
+    const a = now / 420 + (i / d.orbs) * Math.PI * 2;
+    const x = PLAYER_X + Math.cos(a) * 58;
+    const y = cy + Math.sin(a) * 18;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 16);
+    g.addColorStop(0, 'rgba(245,235,255,0.95)');
+    g.addColorStop(0.35, 'rgba(180,140,255,0.8)');
+    g.addColorStop(1, 'rgba(120,80,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, 16, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/** 마력 구슬 반격: 구슬이 하나씩 적에게 날아간다(140ms, 구슬마다 50ms 늦게) */
+function drawBolts(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  if (!fx.bolts.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const b of fx.bolts) {
+    for (let i = 0; i < b.n; i++) {
+      const k = (now - b.born - i * 50) / 140;
+      if (k < 0 || k > 1) continue;
+      const x = PLAYER_X + 40 + (FOE_X - 30 - PLAYER_X - 40) * k;
+      const y = CONTACT.y - 10 - Math.sin(k * Math.PI) * (30 + i * 14);
+      for (let t = 0; t < 5; t++) {
+        const r = 14 - t * 2.4;
+        ctx.fillStyle = b.color.replace('ALPHA', String(0.85 - t * 0.16));
+        ctx.beginPath();
+        ctx.arc(x - t * 16, y + t * Math.cos(k * Math.PI) * 4, Math.max(2, r), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+}
+
 /** 기술 연출: Codex fx_gyeol_tech_<id>_a·b(12프레임)가 오면 적 위에 크게, 없으면 코드로 그린 연출 */
 function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: number): void {
   const tc = fx.tech;
@@ -1155,44 +1277,138 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
 }
 
 /** 연속 받기 숫자: 받을 때마다 크게 튀어나오고, 단계가 오르면 더 크게 빛난다 */
+/**
+ * 연속 박자 숫자(2026-11-14 사용자 요청 "30회 연속인데도 이펙트가 떨어진다 — 숫자가 커질수록 쾅쾅, 메이플스토리처럼").
+ * - 숫자가 클수록 글자가 커지고(로그 곡선, 최대 약 1.9배) 색이 단계마다 바뀐다: 흰 → 하늘 → 금 → 주황 → 불꽃 붉음 → 무지개
+ * - 오를 때마다 숫자가 크게 떨어져 박힌다(2.2배 → 0.9 → 1, 글자마다 30ms씩 늦게 위에서 떨어진다)
+ * - 10마다(그리고 5) 고비: 빛 고리가 터지고 금빛 살이 퍼지며 「N 연속!」 띠가 크게 뜬다
+ * - 높은 숫자는 글자가 미세하게 떨린다
+ */
+const COMBO_FONT = '"Cinzel", serif';
+export function comboStyle(n: number): { size: number; top: string; bottom: string; glow: string; label: string } {
+  const size = Math.round(64 * Math.min(1.9, 1 + Math.log2(1 + n / 4) * 0.2));
+  if (n >= 50) return { size, top: '#ffffff', bottom: '#ff7ad9', glow: '#ff9af0', label: '결의 끝' };
+  if (n >= 30) return { size, top: '#fff3d6', bottom: '#ff3b2a', glow: '#ff5a2a', label: '불꽃' };
+  if (n >= 20) return { size, top: '#fff1c4', bottom: '#ff8a1a', glow: '#ffa640', label: '격류' };
+  if (n >= 10) return { size, top: '#ffffff', bottom: '#ffc83a', glow: '#ffe08a', label: '하나' };
+  if (n >= 5) return { size, top: '#eaf7ff', bottom: '#4fb4ff', glow: '#8fd3ff', label: '' };
+  return { size, top: '#f2efe8', bottom: '#a8a093', glow: '#d8d0c0', label: '' };
+}
+export const comboMilestone = (n: number): boolean => n >= 5 && (n === 5 || n % 10 === 0);
+
 function drawCombo(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   const c = fx.combo;
   if (!c) return;
   const el = now - c.born;
-  if (el > 2200) return;
-  const pop = 1 + (c.up ? 0.9 : 0.55) * Math.max(0, 1 - el / 140) ** 2;
-  const alpha = el < 1600 ? 1 : 1 - (el - 1600) / 600;
-  const color = c.tier >= 3 ? ['#ffffff', '#ffe08a'] : c.tier === 2 ? ['#fff1c4', '#e8a53a'] : c.tier === 1 ? ['#eaf7ff', '#6fb8ff'] : ['#f2efe8', '#a8a093'];
+  if (el > 2400) return;
+  const st = comboStyle(c.n);
+  const rainbow = c.n >= 50;
+  const alpha = el < 1800 ? 1 : 1 - (el - 1800) / 600;
+  const big = comboMilestone(c.n);
+  const cx = PLAYER_X - 150;
+  const cy = GROUND - 250;
   ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.translate(PLAYER_X - 150, GROUND - 260);
-  ctx.scale(pop, pop);
+  ctx.globalAlpha = Math.max(0, alpha);
+  // 고비: 빛 고리 두 겹 + 금빛 살
+  if (big && el < 700) {
+    const k = el / 700;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let r = 0; r < 2; r++) {
+      const kk = Math.min(1, k * (1.3 - r * 0.3));
+      ctx.strokeStyle = st.glow;
+      ctx.globalAlpha = (1 - kk) * 0.9;
+      ctx.lineWidth = 10 * (1 - kk) + 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy - st.size * 0.35, 30 + kk * (140 + r * 60), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    const rays = 14;
+    ctx.globalAlpha = (1 - k) * 0.8;
+    ctx.fillStyle = st.glow;
+    for (let i = 0; i < rays; i++) {
+      const a = (i / rays) * Math.PI * 2 + c.n;
+      const r0 = 40 + k * 60;
+      const r1 = r0 + 70 * (1 - k * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a - 0.05) * r0, cy - st.size * 0.35 + Math.sin(a - 0.05) * r0);
+      ctx.lineTo(cx + Math.cos(a) * r1, cy - st.size * 0.35 + Math.sin(a) * r1);
+      ctx.lineTo(cx + Math.cos(a + 0.05) * r0, cy - st.size * 0.35 + Math.sin(a + 0.05) * r0);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  // 숫자: 글자마다 위에서 떨어져 박힌다
+  const text = String(c.n);
+  ctx.font = `900 ${st.size}px ${COMBO_FONT}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
-  ctx.font = '900 64px "Cinzel", serif';
-  const nw = ctx.measureText(String(c.n)).width;
-  const halo = cached(`combo:${c.n}:${c.tier}`, nw + 80, 120, (g) => {
-    g.font = '900 64px "Cinzel", serif';
-    g.textAlign = 'center';
-    g.lineJoin = 'round';
-    g.shadowColor = color[1];
-    g.shadowBlur = c.tier >= 1 ? 20 : 8;
-    g.lineWidth = 10;
-    g.strokeStyle = '#120c06';
-    g.strokeText(String(c.n), nw / 2 + 40, 80);
+  const widths = [...text].map((ch) => ctx.measureText(ch).width * 0.92);
+  const total = widths.reduce((a, b) => a + b, 0);
+  let x = cx - total / 2;
+  const slamMax = big ? 2.6 : c.up ? 2.2 : 1.7;
+  const jitter = c.n >= 20 ? Math.min(3, (c.n - 15) / 10) : 0;
+  [...text].forEach((ch, i) => {
+    const w = widths[i];
+    const t = el - i * 30;
+    const mid = x + w / 2;
+    x += w;
+    if (t < 0) return;
+    // 2.2배 → 0.9 → 1(튕김)
+    const k = Math.min(1, t / 160);
+    const s = k < 1 ? slamMax + (0.88 - slamMax) * (1 - (1 - k) ** 3) : 0.88 + 0.12 * Math.min(1, (t - 160) / 90);
+    const drop = k < 1 ? -60 * (1 - k) ** 2 : 0;
+    const beat = 1 + 0.035 * Math.sin(now / 90) * (c.n >= 10 ? 1 : 0);
+    const jx = jitter ? (Math.sin(now / 23 + i * 7) * jitter) : 0;
+    const jy = jitter ? (Math.cos(now / 29 + i * 5) * jitter) : 0;
+    ctx.save();
+    ctx.translate(mid + jx, cy + drop + jy);
+    ctx.scale(s * beat, s * beat);
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(8, st.size * 0.16);
+    ctx.strokeStyle = '#120c06';
+    ctx.strokeText(ch, 0, 0);
+    const g = ctx.createLinearGradient(0, -st.size * 0.8, 0, 4);
+    const top = rainbow ? `hsl(${(now / 6 + i * 40) % 360},100%,85%)` : st.top;
+    const bottom = rainbow ? `hsl(${(now / 6 + i * 40 + 120) % 360},100%,60%)` : st.bottom;
+    g.addColorStop(0, top);
+    g.addColorStop(1, bottom);
+    ctx.fillStyle = g;
+    ctx.fillText(ch, 0, 0);
+    // 박히는 순간 흰 번쩍임
+    if (t < 120) {
+      ctx.globalAlpha = (1 - t / 120) * 0.8;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(ch, 0, 0);
+    }
+    ctx.restore();
   });
-  ctx.drawImage(halo, -nw / 2 - 40, -80);
-  const g = ctx.createLinearGradient(0, -52, 0, 4);
-  g.addColorStop(0, color[0]);
-  g.addColorStop(1, color[1]);
-  ctx.fillStyle = g;
-  ctx.fillText(String(c.n), 0, 0);
-  ctx.font = '800 18px "Song Myung", serif';
+  // 아래 글자: 연속 박자 (+ 고비 이름)
+  const sub = st.label ? `연속 박자 · ${st.label}` : '연속 박자';
+  ctx.font = `800 ${Math.round(18 + Math.min(10, st.size / 16))}px "Song Myung", serif`;
   ctx.lineWidth = 4;
   ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-  ctx.strokeText('연속 박자', 0, 24);
-  ctx.fillStyle = color[0];
-  ctx.fillText('연속 박자', 0, 24);
+  ctx.strokeText(sub, cx, cy + 26);
+  ctx.fillStyle = st.top;
+  ctx.fillText(sub, cx, cy + 26);
+  // 고비 띠: 「N 연속!」
+  if (big && el < 1400) {
+    const k = el / 1400;
+    const pop = el < 160 ? 1.6 - 0.6 * (el / 160) : 1;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, alpha * (k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25));
+    ctx.translate(cx + 30, cy - st.size - 30 - k * 20);
+    ctx.scale(pop, pop);
+    ctx.rotate(-0.06);
+    ctx.font = `900 ${Math.round(30 + Math.min(16, c.n / 4))}px "Song Myung", serif`;
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#120c06';
+    const label = `${c.n} 연속!`;
+    ctx.strokeText(label, 0, 0);
+    ctx.fillStyle = st.glow;
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1301,6 +1517,7 @@ export function pruneFx(fx: Fx, now: number): void {
   fx.texts = fx.texts.filter((t) => now - t.born < 900);
   // 그림이 다 돌 때까지 남긴다(느린 그림이 600ms에 끊기던 것 — drawEffects가 마지막 칸 뒤로는 그리지 않는다)
   fx.bursts = fx.bursts.filter((b) => now - b.born < 1500);
+  fx.bolts = fx.bolts.filter((b) => now - b.born < 140 + b.n * 50 + 40);
   fx.blooms = fx.blooms.filter((b) => now - b.born < 700);
   fx.slashes = fx.slashes.filter((s) => now - s.born < 600);
   fx.judges = fx.judges.filter((j) => now - j.born < JUDGE_STYLE[j.word].life);

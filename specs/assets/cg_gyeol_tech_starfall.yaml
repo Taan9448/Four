@@ -1,0 +1,14 @@
+id: cg_gyeol_tech_starfall
+type: story-cg
+summary: "「결」 기술 컷인 일러스트 — 별의 낙하(星落). 기술을 쓸 때 화면을 덮는다(2026-11-14)"
+frame_notes:
+  1: >-
+    Elia, a slender half-elf mage girl with long silver-white hair, pointed ears, calm grey eyes, a grey hooded travelling cloak over
+    a brown leather dress with belts, holding a gnarled wooden staff topped with a glowing blue crystal, lifting her staff to a night
+    sky full of stars, a great violet-white star falling toward the enemy in a long trail, her hair floating, calm eyes reflecting
+    starlight.
+framing: >-
+  A wide, dynamic cinematic cut-in illustration for an action game special move. The character is large and in the left half of the
+  picture, from the knees up; the effect fills the right half and the background. Strong diagonal composition, motion and light,
+  readable at a glance. The left and right edges may be cropped by the game. No text, no letters.
+placeholder: { color: '#1a2233' }

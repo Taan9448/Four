@@ -459,3 +459,12 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 /* 장(스테이지) 결과 화면은 화면 한가운데에(2026-11-14 사용자 요청 — 위에 붙어 있었다). 내용이 길면(에필로그 크레딧) 위에서부터 스크롤 */
 .chapter-result { box-sizing: border-box; min-height: 100vh; min-height: 100dvh; margin-inline: auto; display: flex; flex-direction: column; align-items: center; justify-content: safe center; }
 .chapter-result > * { max-width: 100%; }
+/* 도감 기술: 인물별 묶음(2026-11-14) */
+.records h3.tech-owner { margin: 18px 0 8px; font-family: var(--font-title); font-weight: 400; font-size: 18px; color: var(--paper-dim); }
+/* 장면 반신 그림: 빠질 때·바뀔 때 부드럽게(2026-11-14 — 확확 넘어가던 것) */
+.vn-stand { transition: filter 0.25s ease, opacity 0.28s ease, transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.vn-stand.left.off { opacity: 0; transform: translateX(-28px); }
+.vn-stand.right { transform: scaleX(-1); }
+.vn-stand.right.off { opacity: 0; transform: scaleX(-1) translateX(-28px); }
+.vn.has-cg .vn-stand { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .vn-stand { transition: opacity 0.15s linear; } .vn-stand.left.off { transform: none; } .vn-stand.right.off { transform: scaleX(-1); } }

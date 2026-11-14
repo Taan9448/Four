@@ -70,3 +70,15 @@ describe('이펙트 크기 맞추기(2026-11-14)', () => {
     expect(boostFor(0)).toBe(1);
   });
 });
+
+describe('연속 박자 숫자(2026-11-14)', () => {
+  it('숫자가 클수록 크게, 단계마다 색이 바뀌고, 5·10·20…이 고비', async () => {
+    const { comboStyle, comboMilestone } = await import('../src/render');
+    const sizes = [1, 5, 10, 20, 30, 50, 100].map((n) => comboStyle(n).size);
+    for (let i = 1; i < sizes.length; i++) expect(sizes[i]).toBeGreaterThan(sizes[i - 1]);
+    expect(sizes.at(-1)!).toBeLessThanOrEqual(Math.round(64 * 1.9));
+    expect(new Set([1, 5, 10, 20, 30, 50].map((n) => comboStyle(n).bottom)).size).toBe(6);
+    expect([5, 10, 20, 30, 40].every(comboMilestone)).toBe(true);
+    expect([1, 4, 6, 11, 25].some(comboMilestone)).toBe(false);
+  });
+});

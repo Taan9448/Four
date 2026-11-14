@@ -1,0 +1,15 @@
+id: fx_gyeol_counter_born
+type: fx
+summary: "「결」 보른의 반격 이펙트 6프레임 — 받은 뒤 되돌려 치는 순간 적 몸에 터진다. 인물마다 다르게, 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a heavy orange curved axe arc appearing"
+  2: "impact: the axe arc smashing down into the center with an orange flash and flying rock chips"
+  3: "rock chips and sparks spraying outward, a short ground crack"
+  4: "dust and sparks"
+  5: "settling dust"
+  6: "a few embers"
+placeholder: { accent: '#ff9a4a' }

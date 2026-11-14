@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_shield_rush_b
+type: fx
+summary: "「결」 동료 기술 방패 돌진(盾突) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "golden dust drifting down"
+  2: "a few gold sparks falling"
+  3: "a faint golden ring on the ground"
+  4: "thin gold motes"
+  5: "almost nothing: a few motes"
+  6: "empty but for two faint motes"
+placeholder: { accent: '#e8c060' }

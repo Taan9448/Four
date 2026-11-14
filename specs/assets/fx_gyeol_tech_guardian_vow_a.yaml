@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_guardian_vow_a
+type: fx
+summary: "「결」 동료 기술 수호 서약(守護誓約) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a soft golden glow gathering on the ground in the center"
+  2: "a rising half-dome of golden light lines like a woven shield forming"
+  3: "impact: the golden dome flaring bright, a pulse ring bursting outward"
+  4: "the dome at full brightness, golden feathers of light rising from it"
+  5: "the dome softening, warm motes rising"
+  6: "a faint golden half-ring"
+placeholder: { accent: '#ffe08a' }

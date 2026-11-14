@@ -1,0 +1,13 @@
+id: cg_gyeol_tech_mountain_cleave
+type: story-cg
+summary: "「결」 기술 컷인 일러스트 — 산 가르기(斷山). 기술을 쓸 때 화면을 덮는다(2026-11-14)"
+frame_notes:
+  1: >-
+    Born, a broad, short dwarf warrior with a huge braided red beard and red hair, thick arms, brown leather and grey wool clothes
+    with iron studs, holding a heavy double-bladed battle axe, bringing his huge axe down overhead in a mighty blow that splits a
+    boulder in two, an orange arc of force following the axe, chips of rock flying, braided beard swinging.
+framing: >-
+  A wide, dynamic cinematic cut-in illustration for an action game special move. The character is large and in the left half of the
+  picture, from the knees up; the effect fills the right half and the background. Strong diagonal composition, motion and light,
+  readable at a glance. The left and right edges may be cropped by the game. No text, no letters.
+placeholder: { color: '#1a2233' }

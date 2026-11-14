@@ -20,6 +20,11 @@ export interface CharacterDef {
   rules?: Partial<DuelData['rules']>;
   /** 쓸 수 있는 기술(null이면 모두) */
   techs: string[] | null;
+  /**
+   * 반격 이펙트(2026-11-14 사용자 요청 "반격 이펙트가 4명 다 같다"): Codex 그림(sprite)이 오면 그것,
+   * 오기 전에는 hit(타격 그림) + color(불꽃·숫자 색) + label(판정 아래 글자)로 인물마다 다르게
+   */
+  counterFx?: { sprite: string; hit: string; color: string; label: string };
   lines?: Lines;
 }
 
@@ -64,7 +69,11 @@ export function withCharacter(data: DuelData, id: string | undefined): DuelData 
 export function techsFor(data: DuelData, id: string | undefined, allowed?: string[]): string[] | undefined {
   const c = characterOf(data, id);
   if (!c || c.techs === null) return allowed;
-  return allowed ? allowed.filter((t) => c.techs!.includes(t)) : c.techs;
+  if (!allowed) return c.techs;
+  // 장 규칙은 진하운 기술 id로 열린 자리를 적는다(1장 낙운무흔 = 1번 자리) — 동료는 같은 자리의 자기 기술을 쓴다(2026-11-14)
+  const slotOf = (t: string) => data.techs.find((x) => x.id === t)?.slot;
+  const open = new Set(allowed.map(slotOf).filter((x): x is number => x !== undefined));
+  return c.techs.filter((t) => allowed.includes(t) || open.has(slotOf(t) ?? -1));
 }
 
 /** 인물별 기록 키: 진하운은 예전 키 그대로(옛 저장과 이어진다), 동료는 @인물 */

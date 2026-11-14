@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_frost_ward_a
+type: fx
+summary: "「결」 동료 기술 서리 결계(霜結界) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a faint pale-blue hexagonal rune circle on the ground in the center"
+  2: "the rune circle glowing brighter, frost lines spreading"
+  3: "impact: sharp ice crystal spikes bursting up from the circle, a flash of white"
+  4: "the ice spikes at full size, frost mist around them"
+  5: "the spikes cracking, ice shards falling"
+  6: "frost mist and small shards"
+placeholder: { accent: '#9fe6ff' }

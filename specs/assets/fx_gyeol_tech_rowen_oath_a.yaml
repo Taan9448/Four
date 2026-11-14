@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_rowen_oath_a
+type: fx
+summary: "「결」 동료 기술 로웬의 일격(誓劍) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin vertical line of blue-white light high in the cell"
+  2: "impact: a tall blue-white blade of light cutting straight down through the center, a blinding flash at the bottom"
+  3: "the light blade at full height with a white core and blue edges, a cross-shaped glint at the impact point"
+  4: "the blade fading from the top, blue sparks scattering sideways"
+  5: "a fading cross-shaped afterglow"
+  6: "faint blue motes"
+placeholder: { accent: '#6f9cff' }

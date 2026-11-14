@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_frost_ward_b
+type: fx
+summary: "「결」 동료 기술 서리 결계(霜結界) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "frost mist drifting"
+  2: "small ice shards on the ground"
+  3: "the rune circle fading"
+  4: "faint frost sparkles"
+  5: "almost nothing"
+  6: "two faint sparkles"
+placeholder: { accent: '#9fe6ff' }

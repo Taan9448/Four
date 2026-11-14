@@ -39,11 +39,58 @@ describe('인물 고르기', () => {
     expect(withCharacter(real, 'born').rules.parryPostureMul).toBeGreaterThan(real.rules.parryPostureMul);
   });
 
-  it('기술: 진하운은 장 규칙 그대로, 동료는 없다', () => {
+  it('기술(2026-11-14): 인물마다 셋 — 장 규칙이 연 자리(1·2·3)를 동료도 같은 자리로 따른다', () => {
     expect(techsFor(real, HAUN, ['nakun'])).toEqual(['nakun']);
-    expect(techsFor(real, HAUN, undefined)).toBeUndefined();
-    expect(techsFor(real, 'kyle', ['nakun'])).toEqual([]);
-    expect(techsFor(real, 'kyle', undefined)).toEqual([]);
+    expect(techsFor(real, HAUN, undefined)).toEqual(['nakun', 'byeogun', 'unhae']);
+    expect(techsFor(real, 'kyle', ['nakun'])).toEqual(['shield_rush']);
+    expect(techsFor(real, 'elia', ['nakun', 'byeogun'])).toEqual(['mana_rain', 'frost_ward']);
+    expect(techsFor(real, 'born', ['nakun', 'byeogun', 'unhae'])).toEqual(['earth_quake', 'mountain_cleave', 'kazdum_heart']);
+    expect(techsFor(real, 'kyle', [])).toEqual([]);
+    // 기술마다 자리·주인이 있고, 인물마다 1·2·3 자리가 하나씩
+    for (const c of ['haun', 'kyle', 'elia', 'born']) {
+      const own = real.techs.filter((t) => t.owner === c);
+      expect(own.map((t) => t.slot).sort(), c).toEqual([1, 2, 3]);
+    }
+  });
+
+  it('엘리아 마력 구슬 반격: 받으면 틈 대신 구슬이 쌓이고, 베면 구슬을 쏘아 막히지 않는 반격', () => {
+    const foe = real.foes.find((f) => f.id === 'inner_senior')!;
+    const d = createDuel(withCharacter(real, 'elia'), foe.id, 'orb');
+    // 첫 공격을 타격 직전에 받는다
+    let parried = false;
+    for (let t = 0; t < 12000 && !parried; t += 5) {
+      advance(d, t);
+      if (d.foe.state === 'windup' && d.foe.fakeAt === null && d.foe.hitAt - d.t <= 20 && d.foe.hitAt - d.t > 0) {
+        press(d, 'parry', d.t);
+        advance(d, d.foe.hitAt + 1);
+        parried = d.events.some((e) => e.type === 'parry');
+      }
+    }
+    expect(parried).toBe(true);
+    expect(d.orbs).toBeGreaterThan(0);
+    // 틈은 열리지 않았다
+    expect(d.openingUntil).toBeLessThan(d.t);
+    const orbs = d.orbs;
+    press(d, 'attack', d.t);
+    advance(d, d.t + 400);
+    const strike = d.events.find((e) => e.type === 'strike') as { counter: boolean; orbs?: number } | undefined;
+    expect(strike?.counter).toBe(true);
+    expect(strike?.orbs).toBe(orbs);
+    expect(d.orbs).toBe(0);
+  });
+
+  it('하운은 받으면 틈이 열린다(구슬 없음)', () => {
+    const foe = real.foes.find((f) => f.id === 'inner_senior')!;
+    const d = createDuel(real, foe.id, 'orb');
+    for (let t = 0; t < 12000 && !d.events.some((e) => e.type === 'parry'); t += 5) {
+      advance(d, t);
+      if (d.foe.state === 'windup' && d.foe.fakeAt === null && d.foe.hitAt - d.t <= 20 && d.foe.hitAt - d.t > 0) {
+        press(d, 'parry', d.t);
+        advance(d, d.foe.hitAt + 1);
+      }
+    }
+    expect(d.orbs).toBe(0);
+    expect(d.openingUntil).toBeGreaterThan(d.t);
   });
 
   it('인물 특성이 판정에 든다: 카일은 이르게 막아도 피해가 적다', () => {

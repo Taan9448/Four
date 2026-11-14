@@ -1,0 +1,14 @@
+id: cg_gyeol_tech_frost_ward
+type: story-cg
+summary: "「결」 기술 컷인 일러스트 — 서리 결계(霜結界). 기술을 쓸 때 화면을 덮는다(2026-11-14)"
+frame_notes:
+  1: >-
+    Elia, a slender half-elf mage girl with long silver-white hair, pointed ears, calm grey eyes, a grey hooded travelling cloak over
+    a brown leather dress with belts, holding a gnarled wooden staff topped with a glowing blue crystal, holding her staff out with
+    both hands, a hexagonal frost rune circle spreading on the ground before her and pillars of ice crystals rising from it, frost
+    breath in the air.
+framing: >-
+  A wide, dynamic cinematic cut-in illustration for an action game special move. The character is large and in the left half of the
+  picture, from the knees up; the effect fills the right half and the background. Strong diagonal composition, motion and light,
+  readable at a glance. The left and right edges may be cropped by the game. No text, no letters.
+placeholder: { color: '#1a2233' }

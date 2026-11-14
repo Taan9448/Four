@@ -1,0 +1,14 @@
+id: cg_gyeol_tech_rowen_oath
+type: story-cg
+summary: "「결」 기술 컷인 일러스트 — 로웬의 일격(誓劍). 기술을 쓸 때 화면을 덮는다(2026-11-14)"
+frame_notes:
+  1: >-
+    Kyle Rowen, a young knight with short tousled blond hair and clear blue eyes, polished silver plate armor with a deep blue surcoat
+    and a long blue cape, a white-gold Rowen crest on the chest, holding a long straight knight's sword and a round steel shield,
+    raising his long sword high in both hands and bringing it down in one great vertical cut, a tall blade of blue-white light
+    following the sword, the Rowen crest glowing on his chest, solemn face.
+framing: >-
+  A wide, dynamic cinematic cut-in illustration for an action game special move. The character is large and in the left half of the
+  picture, from the knees up; the effect fills the right half and the background. Strong diagonal composition, motion and light,
+  readable at a glance. The left and right edges may be cropped by the game. No text, no letters.
+placeholder: { color: '#1a2233' }

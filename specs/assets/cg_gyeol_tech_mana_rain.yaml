@@ -1,0 +1,14 @@
+id: cg_gyeol_tech_mana_rain
+type: story-cg
+summary: "「결」 기술 컷인 일러스트 — 마나 화살비(魔矢雨). 기술을 쓸 때 화면을 덮는다(2026-11-14)"
+frame_notes:
+  1: >-
+    Elia, a slender half-elf mage girl with long silver-white hair, pointed ears, calm grey eyes, a grey hooded travelling cloak over
+    a brown leather dress with belts, holding a gnarled wooden staff topped with a glowing blue crystal, raising her staff, the blue
+    crystal blazing, dozens of thin glowing blue mana arrows forming in the air above her and raining down diagonally, her silver hair
+    and cloak blown by the magic.
+framing: >-
+  A wide, dynamic cinematic cut-in illustration for an action game special move. The character is large and in the left half of the
+  picture, from the knees up; the effect fills the right half and the background. Strong diagonal composition, motion and light,
+  readable at a glance. The left and right edges may be cropped by the game. No text, no letters.
+placeholder: { color: '#1a2233' }

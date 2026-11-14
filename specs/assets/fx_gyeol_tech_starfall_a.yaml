@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_starfall_a
+type: fx
+summary: "「결」 동료 기술 별의 낙하(星落) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a small violet-white star high in the cell with a short trail"
+  2: "the star falling closer, its trail long and glowing"
+  3: "impact: the star striking the center in a big violet-white burst with a ring"
+  4: "a wide starburst with many small stars flying out"
+  5: "the burst fading into drifting violet stars"
+  6: "faint violet motes"
+placeholder: { accent: '#b48cff' }
