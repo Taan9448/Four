@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import data from '../data/duel.json';
+import { boostFor, FX_MAX_BOOST, FX_TARGET } from '../src/fxfill';
 import { fitFx, GROUND, H, SCALE, W, worldToScreen } from '../src/layout';
 
 /** 서 있는 그림(idle 첫 칸)에서 보이는 키(px) */
@@ -57,5 +58,15 @@ describe('이펙트는 화면 안에 든다(fitFx)', () => {
   it('이미 화면 안이면 그대로', () => {
     const r = fitFx(480, 300, 100, 100);
     expect(r).toEqual({ x: 430, y: 250, w: 100, h: 100 });
+  });
+});
+
+describe('이펙트 크기 맞추기(2026-11-14)', () => {
+  it('칸을 덜 채운 그림일수록 키우고, 충분히 큰 그림은 그대로, 너무 많이는 키우지 않는다', () => {
+    expect(boostFor(FX_TARGET)).toBe(1);
+    expect(boostFor(0.9)).toBe(1);
+    expect(boostFor(0.64)).toBeCloseTo(1.25, 2);
+    expect(boostFor(0.3)).toBe(FX_MAX_BOOST);
+    expect(boostFor(0)).toBe(1);
   });
 });

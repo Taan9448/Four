@@ -455,3 +455,7 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
    눌림·안내·준비 상태는 바탕색 대신 주홍 붓 판(2번)으로 */
 .art-ink .menu-btn::before, .art-ink .duel .pad::before { background-color: transparent !important; }
 .art-ink .duel .pad:active::before, .art-ink .duel .pad.hint::before { background-image: var(--ink-art-2); }
+
+/* 장(스테이지) 결과 화면은 화면 한가운데에(2026-11-14 사용자 요청 — 위에 붙어 있었다). 내용이 길면(에필로그 크레딧) 위에서부터 스크롤 */
+.chapter-result { box-sizing: border-box; min-height: 100vh; min-height: 100dvh; margin-inline: auto; display: flex; flex-direction: column; align-items: center; justify-content: safe center; }
+.chapter-result > * { max-width: 100%; }
