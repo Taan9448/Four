@@ -4,13 +4,13 @@
   "frameW": 160,
   "frameH": 160,
   "track": "pixel",
-  "pixelScale": 4,
-  "gridDetected": false,
+  "pixelScale": 10.148,
+  "gridDetected": true,
   "nativeSize": [
-    128,
-    128
+    51,
+    51
   ],
-  "fit": "pad",
+  "fit": "upscale",
   "frames": 6,
   "fps": 12,
   "loop": false,
@@ -25,12 +25,12 @@
   "facing": "right",
   "fallbackLevel": 1,
   "virtualFrames": 6,
-  "sourceHash": "d3087f312d92959f",
+  "sourceHash": "e2708ef2b4cf8659",
   "placeholder": false,
   "resizedFrom": null,
   "sourceSize": [
     1536,
     1024
   ],
-  "gridPurity": 0.795
+  "gridPurity": 0.557
 }
