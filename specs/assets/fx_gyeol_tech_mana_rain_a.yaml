@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_mana_rain_a
+type: fx
+summary: "「결」 동료 기술 마나 화살비(魔矢雨) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a few small blue magic circles appearing in the upper part of the cell"
+  2: "many thin glowing blue arrows of light forming, pointing down diagonally"
+  3: "impact: the arrows raining down diagonally onto the center, small blue bursts where they land"
+  4: "more arrows striking, a cluster of blue impact flashes"
+  5: "the last arrows landing, blue sparks"
+  6: "fading blue sparks"
+placeholder: { accent: '#5fd0ff' }

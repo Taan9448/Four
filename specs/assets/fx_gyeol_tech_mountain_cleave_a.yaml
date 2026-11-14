@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_mountain_cleave_a
+type: fx
+summary: "「결」 동료 기술 산 가르기(斷山) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a curved orange arc forming high on the right"
+  2: "impact: the arc slamming down into the center, a bright orange flash and a vertical crack"
+  3: "the crack splitting the ground in two, rock chips flying left and right"
+  4: "the split glowing, sparks and dust"
+  5: "the glow cooling, dust"
+  6: "faint embers"
+placeholder: { accent: '#ff9a4a' }

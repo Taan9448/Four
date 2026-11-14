@@ -21,6 +21,19 @@ export interface Rules {
   counterWindow: number;
   counterMul: number;
   counterPosture: number;
+  /**
+   * 반격 방식(2026-11-14 사용자 요청 "엘리아는 마법사인 만큼 반격이 다르게"). 기본(없음)은 받으면 틈이 열려 그 틈에 벤다.
+   * orb: 받아도 틈이 열리지 않고 마력 구슬이 쌓인다(orbPerParry) — 베면 쌓인 구슬을 모두 쏘아, 틈이 없어도 막히지 않는 반격이 된다
+   */
+  counterMode?: 'open' | 'orb';
+  /** 마력 구슬 최대 개수 */
+  orbMax?: number;
+  /** 받기 판정별로 쌓이는 구슬 수 */
+  orbPerParry?: Partial<Record<Judgement, number>>;
+  /** 구슬 하나가 반격 피해(counterMul)의 몇 배인가 */
+  orbDamage?: number;
+  /** 구슬 하나가 반격 체간(counterPosture)의 몇 배인가 */
+  orbPosture?: number;
   guardChip: number;
   guardPosture: number;
   parryPostureMul: number;
@@ -236,6 +249,12 @@ export interface TechDef {
   returnMul: number;
   /** 시전 대사(「천외귀환」 카드 castLine) */
   line: string;
+  /** 기술 자리(1·2·3) — 장 규칙(techs)이 진하운 기술 id로 막아 둔 자리를 동료도 같은 자리로 따른다(2026-11-14) */
+  slot?: number;
+  /** 누구의 기술인가(characters id) */
+  owner?: string;
+  /** 쓰면 자기 최대 체력의 이 비율만큼 회복(수호 서약·별의 낙하) */
+  heal?: number;
 }
 
 /**
@@ -296,13 +315,14 @@ export type DuelEvent =
   | { type: 'feint'; t: number; move: string }
   | { type: 'streak'; t: number; streak: number; tier: number }
   | { type: 'judge'; t: number; grade: Grade; judgement: Judgement }
-  | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean; kind?: AttackKind; step?: number }
+  | { type: 'strike'; t: number; damage: number; counter: boolean; blocked: boolean; kind?: AttackKind; step?: number; orbs?: number }
   | { type: 'punish'; t: number; move: string }
   | { type: 'skill'; t: number; move: string; name: string }
   | { type: 'link'; t: number; chain: number; min: Judgement }
   | { type: 'techReady'; t: number; tech: string }
   | { type: 'tech'; t: number; tech: string; damage: number }
-  | { type: 'techHit'; t: number; tech: string; damage: number }
+  | { type: 'techHit'; t: number; tech: string; damage: number; heal?: number }
+  | { type: 'orb'; t: number; orbs: number; added: number }
   | { type: 'stagger'; t: number }
   | { type: 'recover'; t: number }
   | { type: 'deathblow'; t: number; damage: number }
@@ -353,6 +373,8 @@ export interface Duel {
   result: 'win' | 'lose' | null;
   /** 운해귀종의 되돌아오는 틈: 이 시각까지 베기가 반격이 된다 */
   openingUntil: number;
+  /** 마력 구슬(counterMode orb) */
+  orbs: number;
   /** 연속 박자: 패링·간파가 이어진 수(맞거나 막으면 0) */
   streak: number;
   /** 적이 이어서 막은 베기 수(틈에 베거나 패링하면 0) */
@@ -520,6 +542,7 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
     chainForce: 0,
     techReady: null,
     techForce: 0,
+    orbs: 0,
     techUsing: null,
     techLanded: false,
     clash: null,
@@ -821,7 +844,13 @@ function landStrike(d: Duel): void {
     if (!checkFoeDown(d) && d.foe.state === 'stagger') setFoeIdle(d, 900);
     return;
   }
-  const counter = isOpen(d);
+  // 마력 구슬: 쌓인 구슬을 모두 쏘면 틈이 없어도 막히지 않는 반격(엘리아)
+  const orbs = r.counterMode === 'orb' ? d.orbs : 0;
+  if (orbs > 0) {
+    d.orbs = 0;
+    d.events.push({ type: 'orb', t: d.t, orbs: 0, added: -orbs });
+  }
+  const counter = orbs > 0 || isOpen(d);
   // 틈 밖의 베기는 적이 막는다: 피해는 조금, 체간도 조금. 연타하면 되받아친다
   const blocked = !counter;
   // 베기 종류: 연베기는 칼마다 배율, 강베기는 크게(막혀도 체간을 크게 깎는다)
@@ -830,14 +859,16 @@ function landStrike(d: Duel): void {
   const st = p.attackKind === 'slash' ? d.data.player.combo?.steps[p.comboStep] : undefined;
   const dMul = heavy ? heavy.damageMul : (st?.damageMul ?? 1);
   const pMul = heavy ? (counter ? heavy.postureMul : heavy.guardPostureMul) : (st?.postureMul ?? 1);
-  const dmg = counter ? Math.round(a.damage * r.counterMul * dMul) : Math.max(1, Math.round(a.damage * r.foeGuardMul * dMul));
+  const orbDmg = orbs > 0 ? Math.max(1, orbs * (r.orbDamage ?? 1)) : 1;
+  const orbPos = orbs > 0 ? Math.max(1, orbs * (r.orbPosture ?? 1)) : 1;
+  const dmg = counter ? Math.round(a.damage * r.counterMul * dMul * orbDmg) : Math.max(1, Math.round(a.damage * r.foeGuardMul * dMul));
   damageFoe(d, dmg);
-  f.posture += (counter ? r.counterPosture : r.foeGuardPosture) * pMul;
+  f.posture += (counter ? r.counterPosture * orbPos : r.foeGuardPosture) * pMul;
   if (counter) {
     d.stats.counters++;
     d.blockedRun = 0;
   } else d.blockedRun++;
-  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter, blocked, kind: p.attackKind, step: p.comboStep });
+  d.events.push({ type: 'strike', t: d.t, damage: dmg, counter, blocked, kind: p.attackKind, step: p.comboStep, ...(orbs ? { orbs } : {}) });
   if (checkFoeDown(d)) return;
   checkStagger(d);
   if (blocked && d.blockedRun >= r.punishAfter) punish(d);
@@ -1109,6 +1140,14 @@ function link(d: Duel, judgement: Judgement, force: number, t: number): void {
   }
 }
 
+/** 마력 구슬을 쌓는다(최대 orbMax) */
+function addOrbs(d: Duel, n: number, t: number): void {
+  const max = d.data.rules.orbMax ?? 3;
+  const before = d.orbs;
+  d.orbs = Math.min(max, d.orbs + n);
+  if (d.orbs !== before) d.events.push({ type: 'orb', t, orbs: d.orbs, added: d.orbs - before });
+}
+
 function breakChain(d: Duel): void {
   d.chain = 0;
   d.chainMin = 'perfect';
@@ -1122,7 +1161,14 @@ function landTech(d: Duel): void {
   const dmg = Math.round(d.foeDef.hp * tech.damage + d.techForce * tech.returnMul);
   damageFoe(d, dmg, tech.id);
   f.posture += d.foeDef.posture * tech.posture;
-  d.events.push({ type: 'techHit', t: d.t, tech: tech.id, damage: dmg });
+  // 회복 기술(수호 서약·별의 낙하): 자기 최대 체력의 heal만큼
+  let heal = 0;
+  if (tech.heal && d.mode === 'duel') {
+    const max = d.data.player.hp;
+    heal = Math.min(max - d.player.hp, Math.round(max * tech.heal));
+    d.player.hp += heal;
+  }
+  d.events.push({ type: 'techHit', t: d.t, tech: tech.id, damage: dmg, ...(heal > 0 ? { heal } : {}) });
   breakChain(d);
   d.techForce = 0;
   if (checkFoeDown(d)) return;
@@ -1205,10 +1251,12 @@ function resolveHit(d: Duel): void {
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.parry) {
     const tier = streakTier(d);
     f.posture += m.posture * (r.parryPostureMul + tier * r.streakPostureBonus);
-    d.openingUntil = H + r.counterWindow;
+    const judgement: Judgement = since <= r.perfect * ex ? 'perfect' : 'excellent';
+    // 마력 구슬 방식이면 틈 대신 구슬이 쌓인다
+    if (r.counterMode === 'orb') addOrbs(d, r.orbPerParry?.[judgement] ?? 1, H);
+    else d.openingUntil = H + r.counterWindow;
     d.stats.parries++;
     d.blockedRun = 0;
-    const judgement: Judgement = since <= r.perfect * ex ? 'perfect' : 'excellent';
     d.events.push({ type: 'parry', t: H, move: moveId, element: m.element, heavy, judgement, lead: since });
     if (m.fragile && !rhythm) crack(d, H);
     if (m.breath) breathe(d, H);
@@ -1223,7 +1271,7 @@ function resolveHit(d: Duel): void {
     let dmg = m.fragile ? 0 : Math.round(m.damage * r.guardChip);
     d.breathRun = 0;
     if (m.element === 'fire') dmg += r.fireGuardExtra;
-    hurt(d, dmg);
+    hurt(d, dmg, false);
     p.posture += rhythm ? 0 : r.guardPosture;
     p.lastGuard = H;
     d.stats.guards++;
@@ -1316,8 +1364,13 @@ function breathe(d: Duel, t: number): void {
 }
 
 /** 하운이 다친다(대결에서만 — 박자 도전·수련장은 다치지 않는다) */
-function hurt(d: Duel, dmg: number): void {
+function hurt(d: Duel, dmg: number, scatter = true): void {
   if (d.mode === 'duel') d.player.hp = Math.max(d.opts.noLose ? 1 : 0, d.player.hp - dmg);
+  // 맞으면 마력 구슬이 흩어진다(쌓아 두기만 하면 손해 없이 이기지 않게)
+  if (scatter && dmg > 0 && d.orbs > 0) {
+    d.orbs = 0;
+    d.events.push({ type: 'orb', t: d.t, orbs: 0, added: 0 });
+  }
 }
 
 /** 버티기: 받기·막기·피하기를 해낼 때마다 센다. 다 채우면 이긴 것으로 끝(상대는 쓰러지지 않는다) */
@@ -1373,7 +1426,7 @@ function nextPhase(d: Duel): void {
 
 function burn(d: Duel, dmg: number, t: number): void {
   if (dmg <= 0) return;
-  hurt(d, dmg);
+  hurt(d, dmg, false);
   d.events.push({ type: 'burn', t, damage: dmg });
   updateCrisis(d);
 }

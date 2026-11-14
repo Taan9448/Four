@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_kazdum_heart_a
+type: fx
+summary: "「결」 동료 기술 카즈둠의 심장(山心) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a red-orange glow deep in the center like a forge heart"
+  2: "the glow pulsing larger, ghostly hammer shapes appearing around it"
+  3: "impact: the heart erupting in a huge red-orange burst with a ring of hammer silhouettes"
+  4: "a wide fiery shockwave with flying rocks and sparks"
+  5: "the fire sinking, glowing rocks falling"
+  6: "embers and smoke"
+placeholder: { accent: '#ff6a3a' }

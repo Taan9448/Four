@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_shield_rush_a
+type: fx
+summary: "「결」 동료 기술 방패 돌진(盾突) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "a small golden glint and a faint curved shield outline appearing on the left"
+  2: "impact: a wide golden wedge of light slamming forward from the left into the center, a bright flash where it hits"
+  3: "a golden shockwave ring spreading from the center, small shards of light flying right"
+  4: "the shockwave widening, golden dust and sparks"
+  5: "the ring fading, a few gold sparks"
+  6: "faint gold motes"
+placeholder: { accent: '#e8c060' }

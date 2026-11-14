@@ -67,11 +67,21 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
 }
 
 /** 진하운의 기술(duel.json techs) — 색과 Codex 이펙트 id(fx_gyeol_tech_<id>_a·b) */
-export const TECH_IDS = ['nakun', 'byeogun', 'unhae'] as const;
+// 2026-11-14: 동료(카일·엘리아·보른)도 기술 셋씩
+export const TECH_IDS = ['nakun', 'byeogun', 'unhae', 'shield_rush', 'rowen_oath', 'guardian_vow', 'mana_rain', 'frost_ward', 'starfall', 'earth_quake', 'mountain_cleave', 'kazdum_heart'] as const;
 export const TECH_COLOR: Record<string, { core: string; glow: string; rgb: string }> = {
   nakun: { core: '#f2f8ff', glow: '#a8d8ff', rgb: '190,225,255' },
   byeogun: { core: '#e6f6ff', glow: '#4fb4ff', rgb: '90,180,255' },
   unhae: { core: '#fff6d6', glow: '#ffd27a', rgb: '255,214,120' },
+  shield_rush: { core: '#fff4d0', glow: '#e8c060', rgb: '232,192,96' },
+  rowen_oath: { core: '#eef4ff', glow: '#6f9cff', rgb: '111,156,255' },
+  guardian_vow: { core: '#fffbe8', glow: '#ffe08a', rgb: '255,224,138' },
+  mana_rain: { core: '#e6f8ff', glow: '#5fd0ff', rgb: '95,208,255' },
+  frost_ward: { core: '#f0fbff', glow: '#9fe6ff', rgb: '159,230,255' },
+  starfall: { core: '#f6eeff', glow: '#b48cff', rgb: '180,140,255' },
+  earth_quake: { core: '#ffe9cc', glow: '#c98a4a', rgb: '201,138,74' },
+  mountain_cleave: { core: '#fff0dc', glow: '#ff9a4a', rgb: '255,154,74' },
+  kazdum_heart: { core: '#fff4e0', glow: '#ff6a3a', rgb: '255,106,58' },
 };
 
 export const ELEMENT_COLOR: Record<Element | 'none' | 'danger', { line: string; glow: string; spark: string }> = {
@@ -88,6 +98,10 @@ export interface Fx {
   texts: { x: number; y: number; text: string; color: string; born: number; size: number; icon?: number }[];
   /** ground: 땅에 선 그림(적 기술 — 그림 아래쪽 anchor 줄이 땅에 닿게). 아니면 (x, y)가 가운데 */
   bursts: { x: number; y: number; sprite: string; born: number; scale: number; ground?: boolean }[];
+  /** 마력 구슬 반격(엘리아): 하운 쪽에서 적에게 날아가는 빛 구슬 n개(2026-11-14) */
+  bolts: { born: number; n: number; color: string }[];
+  /** 기술 준비 표식에 적을 키 이름(설정의 키 — main이 넣는다) */
+  techKey: string;
   /** 결 패링 연출(Codex 12프레임이 없으면 코드로 그린 금빛 연꽃) */
   blooms: { x: number; y: number; born: number; color: string; big: boolean }[];
   slashes: { born: number }[];
@@ -124,7 +138,7 @@ export interface Fx {
   labels?: boolean;
 }
 
-export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, min: 'perfect' }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
+export const emptyFx = (): Fx => ({ sparks: [], texts: [], bursts: [], bolts: [], techKey: '', blooms: [], slashes: [], judges: [], combo: null, banner: null, tech: null, chain: { n: 0, min: 'perfect' }, finale: null, flash: null, shake: null, guardPose: -Infinity, weather: null, weatherLast: -1, timeScale: 1, bubbles: [], finisher: null, crisisBeat: -Infinity, uiScale: 1 });
 
 export type JudgeWord = 'PERFECT' | 'EXCELLENT' | 'GOOD' | 'MISS' | 'HIT' | 'COUNTER' | 'BREAK';
 
@@ -317,6 +331,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawAura(ctx, d, sp, now);
   drawTechAura(ctx, d, now);
   drawPlayer(ctx, d, sp, fx, now);
+  drawOrbs(ctx, d, now);
   actorScale = foeScale;
   drawFoe(ctx, d, sp);
   actorScale = 1;
@@ -325,6 +340,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   if (fx.labels) drawCueLabels(ctx, d);
   drawFinisher(ctx, sp.fx, fx.finisher, now);
   drawEffects(ctx, sp, fx, now);
+  drawBolts(ctx, fx, now);
   ctx.restore();
   drawWeather(ctx, fx.weather, true, now, density);
   ctx.restore();
@@ -337,6 +353,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawChain(ctx, fx);
   drawBanner(ctx, fx, now);
   drawBubbles(ctx, fx.bubbles, now, foeScale, fx.uiScale / WORLD_ZOOM);
+  drawTechBadge(ctx, d, fx, now);
   ctx.restore();
   drawClashBar(ctx, d, now);
   if (fx.practice) drawPracticeBar(ctx, d.data.rules, fx.practice, now);
@@ -1034,6 +1051,111 @@ function drawTechAura(ctx: CanvasRenderingContext2D, d: Duel, now: number): void
 }
 let readyFx: Anim = null;
 
+/**
+ * 기술 준비 표식(2026-11-14 사용자 요청 "스킬이 활성화되면 캐릭터 위에 표시"): 준비된 동안 머리 위에
+ * 기술 색의 먹 띠 + 「기술 이름」 + 누를 키가 떠 있다(살짝 위아래로 흔들린다)
+ */
+function drawTechBadge(ctx: CanvasRenderingContext2D, d: Duel, fx: Fx, now: number): void {
+  if (!d.techReady || d.result || d.player.action === 'tech') return;
+  const tech = d.data.techs.find((t) => t.id === d.techReady);
+  if (!tech) return;
+  const col = TECH_COLOR[tech.id] ?? TECH_COLOR.unhae;
+  const scale = d.data.player.scale ?? 1;
+  const bob = Math.sin(now / 260) * 3;
+  const y = GROUND - 150 * SCALE * 0.6 * scale - 28 + bob;
+  const label = `「${tech.name}」`;
+  const key = fx.techKey;
+  ctx.save();
+  ctx.font = '700 22px "Nanum Myeongjo", serif';
+  const w = ctx.measureText(label).width;
+  ctx.font = '800 16px system-ui, sans-serif';
+  const kw = key ? ctx.measureText(key).width + 14 : 0;
+  const total = w + (key ? kw + 10 : 0) + 28;
+  const x0 = PLAYER_X - total / 2;
+  const pulse = 0.55 + 0.45 * Math.sin(now / 180);
+  // 띠
+  ctx.shadowColor = col.glow;
+  ctx.shadowBlur = 14 * pulse;
+  ctx.fillStyle = 'rgba(12,9,7,0.82)';
+  ctx.beginPath();
+  ctx.roundRect(x0, y - 18, total, 36, 6);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = `rgba(${col.rgb},${0.6 + 0.4 * pulse})`;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // 이름
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 22px "Nanum Myeongjo", serif';
+  ctx.fillStyle = col.core;
+  ctx.fillText(label, x0 + 14, y + 1);
+  // 키
+  if (key) {
+    const kx = x0 + 14 + w + 10;
+    ctx.fillStyle = `rgba(${col.rgb},0.9)`;
+    ctx.beginPath();
+    ctx.roundRect(kx, y - 12, kw, 24, 4);
+    ctx.fill();
+    ctx.font = '800 16px system-ui, sans-serif';
+    ctx.fillStyle = '#120e0a';
+    ctx.fillText(key, kx + 7, y + 1);
+  }
+  // 아래로 향한 작은 꼬리
+  ctx.fillStyle = `rgba(${col.rgb},${0.6 + 0.4 * pulse})`;
+  ctx.beginPath();
+  ctx.moveTo(PLAYER_X - 6, y + 18);
+  ctx.lineTo(PLAYER_X + 6, y + 18);
+  ctx.lineTo(PLAYER_X, y + 25);
+  ctx.fill();
+  ctx.restore();
+}
+
+/** 마력 구슬(엘리아): 쌓인 구슬이 몸 둘레를 돈다 */
+function drawOrbs(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
+  if (!d.orbs || d.result) return;
+  const scale = d.data.player.scale ?? 1;
+  const cy = GROUND - 150 * SCALE * 0.32 * scale;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < d.orbs; i++) {
+    const a = now / 420 + (i / d.orbs) * Math.PI * 2;
+    const x = PLAYER_X + Math.cos(a) * 58;
+    const y = cy + Math.sin(a) * 18;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 16);
+    g.addColorStop(0, 'rgba(245,235,255,0.95)');
+    g.addColorStop(0.35, 'rgba(180,140,255,0.8)');
+    g.addColorStop(1, 'rgba(120,80,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, 16, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/** 마력 구슬 반격: 구슬이 하나씩 적에게 날아간다(140ms, 구슬마다 50ms 늦게) */
+function drawBolts(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  if (!fx.bolts.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const b of fx.bolts) {
+    for (let i = 0; i < b.n; i++) {
+      const k = (now - b.born - i * 50) / 140;
+      if (k < 0 || k > 1) continue;
+      const x = PLAYER_X + 40 + (FOE_X - 30 - PLAYER_X - 40) * k;
+      const y = CONTACT.y - 10 - Math.sin(k * Math.PI) * (30 + i * 14);
+      for (let t = 0; t < 5; t++) {
+        const r = 14 - t * 2.4;
+        ctx.fillStyle = b.color.replace('ALPHA', String(0.85 - t * 0.16));
+        ctx.beginPath();
+        ctx.arc(x - t * 16, y + t * Math.cos(k * Math.PI) * 4, Math.max(2, r), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  ctx.restore();
+}
+
 /** 기술 연출: Codex fx_gyeol_tech_<id>_a·b(12프레임)가 오면 적 위에 크게, 없으면 코드로 그린 연출 */
 function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: number): void {
   const tc = fx.tech;
@@ -1301,6 +1423,7 @@ export function pruneFx(fx: Fx, now: number): void {
   fx.texts = fx.texts.filter((t) => now - t.born < 900);
   // 그림이 다 돌 때까지 남긴다(느린 그림이 600ms에 끊기던 것 — drawEffects가 마지막 칸 뒤로는 그리지 않는다)
   fx.bursts = fx.bursts.filter((b) => now - b.born < 1500);
+  fx.bolts = fx.bolts.filter((b) => now - b.born < 140 + b.n * 50 + 40);
   fx.blooms = fx.blooms.filter((b) => now - b.born < 700);
   fx.slashes = fx.slashes.filter((s) => now - s.born < 600);
   fx.judges = fx.judges.filter((j) => now - j.born < JUDGE_STYLE[j.word].life);

@@ -55,8 +55,38 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
     const cgs = [el('img', { class: 'vn-cg', alt: '' }), el('img', { class: 'vn-cg', alt: '' })];
     let cgFront = 0;
     let cgShown = false;
-    const left = el('img', { class: 'vn-stand left', alt: '', hidden: '' });
-    const right = el('img', { class: 'vn-stand right', alt: '', hidden: '' });
+    // 반신 그림(2026-11-14 사용자 보고 "반신 캐릭터 대화가 확확 넘어간다"): hidden으로 툭 끄고 켜던 것을,
+    // 미리 받아 두고 · 바뀔 때는 살짝 빠졌다가 새 그림이 다 그려진 뒤 미끄러져 들어오게(off 클래스)
+    const left = el('img', { class: 'vn-stand left off', alt: '' });
+    const right = el('img', { class: 'vn-stand right off', alt: '' });
+    const standSeq = new WeakMap<HTMLImageElement, number>();
+    const standOff = (img: HTMLImageElement) => img.classList.add('off');
+    const standOn = (img: HTMLImageElement, url: string) => {
+      const seq = (standSeq.get(img) ?? 0) + 1;
+      standSeq.set(img, seq);
+      if (img.dataset.src === url) {
+        img.classList.remove('off');
+        return;
+      }
+      const wasOn = !img.classList.contains('off');
+      img.classList.add('off');
+      const swap = () => {
+        if (standSeq.get(img) !== seq) return;
+        img.src = url;
+        img.dataset.src = url;
+        const show = () => standSeq.get(img) === seq && requestAnimationFrame(() => img.classList.remove('off'));
+        img.decode ? img.decode().then(show, show) : show();
+      };
+      // 다른 인물이 같은 자리에 서면 앞 인물이 빠지는 것을 잠깐 보인 뒤 바꾼다
+      if (wasOn) window.setTimeout(swap, 140);
+      else swap();
+    };
+    // 이 장면의 반신 그림을 미리 받아 둔다(처음 나올 때 빈 칸으로 깜빡이지 않게)
+    for (const l of lines) {
+      const st = l.speaker ? speakers[l.speaker]?.stand : null;
+      const u = st ? frameUrl(st, l.face ?? 1) : null;
+      if (u) new Image().src = u;
+    }
     const name = el('b', { class: 'vn-name' });
     const text = el('p', { class: 'vn-text' });
     const more = el('span', { class: 'vn-more', 'aria-hidden': 'true' }, '▼');
@@ -108,9 +138,9 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       // 지금 ↔ 회상: 배경이 바뀌고, 그 줄에 그림 지정이 없으면 앞의 그림은 걷는다
       if (wasNow !== null && isNow !== wasNow) {
         if (!line.art && !line.cg) setCg(null);
-        // 지금의 인물(운곡루의 왕일검)이 회상 속에 남지 않게 — 말하는 사람만 다시 선다
-        left.hidden = true;
-        right.hidden = true;
+        // 지금의 인물(운곡루의 왕일검)이 회상 속에 남지 않게 — 말하는 사람만 다시 선다(천천히 빠진다)
+        standOff(left);
+        standOff(right);
       }
       root.classList.toggle('now', isNow);
       wasNow = isNow;
@@ -128,10 +158,7 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       if (sp?.stand) {
         const img = side(line.speaker!);
         const u = frameUrl(sp.stand, line.face ?? 1);
-        if (u) {
-          img.src = u;
-          img.hidden = false;
-        }
+        if (u) standOn(img, u);
       }
       // 말하는 쪽은 밝게, 듣는 쪽은 어둡게, 내레이션이면 둘 다 흐리게
       const speaking = line.speaker && (!rule || lead) ? side(line.speaker) : null;

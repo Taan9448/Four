@@ -1,0 +1,15 @@
+id: fx_gyeol_counter_elia
+type: fx
+summary: "「결」 엘리아의 반격 이펙트 6프레임 — 받은 뒤 되돌려 치는 순간 적 몸에 터진다. 인물마다 다르게, 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a small violet-white magic circle with runes in the center"
+  2: "impact: violet-white orbs of light bursting in the center with a flash"
+  3: "a ring of violet runes spinning outward, small star sparks"
+  4: "the runes fading, violet motes"
+  5: "faint violet sparkles"
+  6: "a few motes"
+placeholder: { accent: '#c9a6ff' }

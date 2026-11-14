@@ -1,0 +1,15 @@
+id: fx_gyeol_counter_kyle
+type: fx
+summary: "「결」 카일의 반격 이펙트 6프레임 — 받은 뒤 되돌려 치는 순간 적 몸에 터진다. 인물마다 다르게, 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a golden curved shield outline appearing in the center"
+  2: "impact: the shield outline slamming forward with a bright golden flash and a short sword glint across it"
+  3: "a golden shockwave ring with a cross-shaped glint"
+  4: "the ring widening, gold sparks"
+  5: "fading gold sparks"
+  6: "a few motes"
+placeholder: { accent: '#ffe08a' }

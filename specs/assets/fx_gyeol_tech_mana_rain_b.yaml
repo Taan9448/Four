@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_mana_rain_b
+type: fx
+summary: "「결」 동료 기술 마나 화살비(魔矢雨) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "blue sparks drifting"
+  2: "small blue rings fading on the ground"
+  3: "a few faint arrow trails"
+  4: "thin blue motes"
+  5: "almost nothing"
+  6: "two faint motes"
+placeholder: { accent: '#5fd0ff' }

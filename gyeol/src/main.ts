@@ -200,6 +200,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 점검용(?debug): 화면 점검 도구가 대결 상태를 읽어 제때 누를 수 있게
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
+  // 인물별 반격 이펙트(Codex fx_gyeol_counter_<인물>, 2026-11-14)도 같이 부른다
+  const counterFx = char?.counterFx;
+  if (counterFx) skillFx.push(counterFx.sprite);
   const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, charId === HAUN ? outfitPrefix(loadSave()) : null);
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
@@ -236,6 +239,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const resizeObs = new ResizeObserver(() => fitCanvas());
   resizeObs.observe(canvas);
   const fx: Fx = emptyFx();
+  fx.techKey = keyNames(keyMap, 'tech')[0] ?? '';
   fx.weather = createWeather(foeDef.weather);
   fx.clashOn = mode === 'duel' && opts.duel?.clash !== false;
   if (practice) fx.practice = { marks: [], drill: drill?.name ?? '수련' };
@@ -606,11 +610,19 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             const heavy = ev.kind === 'heavy';
             const step = ev.kind === 'slash' ? (ev.step ?? 0) : 0;
             sfx(heavy ? 'slam_8' : ev.counter ? 'crit' : 'slash');
-            fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: 'fx_hit_slash', born: now, scale: (ev.counter ? 1.1 : 0.8) * (heavy ? 1.6 : 1 + step * 0.15) });
+            // 반격은 인물마다 다른 이펙트(2026-11-14): Codex 그림이 오면 그것, 아니면 인물의 타격 그림
+            const cf = ev.counter && !heavy ? counterFx : undefined;
+            const hitSprite = cf ? (sp.fx[cf.sprite] ? cf.sprite : cf.hit) : 'fx_hit_slash';
+            fx.bursts.push({ x: FOE_X - 10, y: CONTACT.y + 10, sprite: hitSprite, born: now, scale: (ev.counter ? (cf && sp.fx[cf.sprite] ? 1.8 : 1.1) : 0.8) * (heavy ? 1.6 : 1 + step * 0.15) });
+            // 마력 구슬 반격: 구슬이 적에게 날아간다
+            if (ev.orbs) {
+              fx.bolts.push({ born: now - 120, n: ev.orbs, color: 'rgba(200,170,255,ALPHA)' });
+              sfx('lightning', { volume: 0.6 });
+            }
             // 강베기 타격·연베기 마무리 이펙트(Codex, 2026-11-13) — 오기 전에는 위의 베기 자국을 키워 대신한다
             if (heavy && sp.fx.fx_gyeol_heavy_impact) fx.bursts.push({ x: FOE_X - 20, y: CONTACT.y, sprite: 'fx_gyeol_heavy_impact', born: now, scale: 2 });
             else if (step >= 2 && sp.fx.fx_gyeol_combo_finish) fx.bursts.push({ x: FOE_X - 20, y: CONTACT.y, sprite: 'fx_gyeol_combo_finish', born: now, scale: 1.7 });
-            const sub = heavy ? '강베기' : step >= 2 ? '연베기 마무리' : step === 1 ? '연베기 2' : ev.counter ? '반격' : '';
+            const sub = heavy ? '강베기' : step >= 2 ? '연베기 마무리' : step === 1 ? '연베기 2' : ev.counter ? (ev.orbs ? `마력 구슬 ${ev.orbs}` : (counterFx?.label ?? '반격')) : '';
             judge(fx, ev.counter ? 'COUNTER' : 'HIT', sub, now, 'foe');
             if (heavy) {
               addShake(fx, now, 10, 240);
@@ -621,12 +633,20 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             // 연베기 둘째·셋째 칼은 곡의 음계 위로 한 칸씩
             if (step >= 1) musicalHit('parry', d.streak + step + 1);
           }
-          text(FOE_X + 50, CONTACT.y - 40, `${ev.damage}`, ev.counter ? '#ffb15c' : '#ffffff', ev.counter ? 30 : 22);
+          text(FOE_X + 50, CONTACT.y - 40, `${ev.damage}`, ev.counter ? (counterFx?.color ?? '#ffb15c') : '#ffffff', ev.counter ? 30 : 22);
           if (ev.counter) {
-            spark(FOE_X - 20, CONTACT.y, 14, '#ffb15c', 260);
+            spark(FOE_X - 20, CONTACT.y, ev.orbs ? 14 + ev.orbs * 8 : 14, counterFx?.color ?? '#ffb15c', 260);
             addShake(fx, now, 6, 160);
             hitstopUntil = now + 60;
           }
+          break;
+        case 'orb':
+          // 마력 구슬(엘리아): 받을 때마다 쌓이고, 맞으면 흩어진다
+          if (ev.added > 0) tip('orb', true);
+          if (ev.added > 0) {
+            sfx('power', { volume: 0.35 });
+            text(PLAYER_X, CONTACT.y - 150, `마력 구슬 ${ev.orbs}`, '#d4b8ff', 20);
+          } else if (ev.added === 0 && ev.orbs === 0) text(PLAYER_X, CONTACT.y - 150, '구슬이 흩어졌다', '#a89cc0', 18);
           break;
         case 'punish':
           sfx('enrage', { volume: 0.7 });
@@ -643,7 +663,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           tip('tech');
           const t = techOf(d, ev.tech)!;
           sfx('power', { volume: 0.8 });
-          text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — I`, TECH_COLOR[t.id]?.core ?? '#fff6d6', 24);
+          text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — ${kname('tech')}`, TECH_COLOR[t.id]?.core ?? '#fff6d6', 24);
           flash(TECH_COLOR[t.id]?.glow ?? '#ffd27a', 220, 0.25);
           break;
         }
@@ -653,9 +673,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           sfx('cutin');
           hitstopUntil = now + 700;
           fx.tech = { id: t.id, born: now };
-          // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 하운 반신 그림(결의)
+          // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 그 인물의 반신 그림(결의)
           const cg = frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
-          const stand = cg ? null : frameUrl('haun_sword_stand', 2);
+          const stand = cg ? null : frameUrl(char && char.id !== HAUN ? char.stand : 'haun_sword_stand', 2);
           cutin.className = `cutin tech-${t.id}${cg ? ' has-cg' : ''}`;
           cutin.replaceChildren(
             cg ? el('img', { class: 'cg', src: cg, alt: '' }) : stand ? el('img', { src: stand, alt: '' }) : '',
@@ -667,12 +687,18 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'techHit': {
           const t = techOf(d, ev.tech)!;
-          sfx(t.id === 'unhae' ? 'slam_10' : t.id === 'byeogun' ? 'slam_9' : 'slam_8');
+          // 기술 자리(1·2·3)가 클수록 크게 — 동료 기술도 같은 자리면 같은 무게(2026-11-14)
+          const slot = t.slot ?? 1;
+          sfx(slot >= 3 ? 'slam_10' : slot === 2 ? 'slam_9' : 'slam_8');
           const c = TECH_COLOR[t.id];
           flash(c?.core ?? '#ffffff', 360, 0.7);
-          addShake(fx, now, t.id === 'nakun' ? 10 : 20, 480);
+          addShake(fx, now, slot === 1 ? 10 : 20, 480);
           hitstopUntil = now + 160;
-          if (t.id === 'unhae') fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: 'rgba(255,214,120,ALPHA)', big: true });
+          if (slot >= 3) fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: `rgba(${c?.rgb ?? '255,214,120'},ALPHA)`, big: true });
+          if (ev.heal) {
+            text(PLAYER_X, CONTACT.y - 120, `+${ev.heal}`, '#8fe39a', 30);
+            spark(PLAYER_X, CONTACT.y - 40, 18, '#bff2c4', 220, 3);
+          }
           spark(FOE_X, CONTACT.y, 44, c?.core ?? '#ffffff', 480, 5);
           text(FOE_X - 30, CONTACT.y + 50, `${t.name} ${ev.damage}`, c?.core ?? '#ffffff', 34);
           gust(fx.weather, FOE_X, CONTACT.y, 800);
@@ -1181,5 +1207,5 @@ const direct = data.foes.find((f) => f.id === params.get('foe'));
 const screen = params.get('screen') as Screen | null;
 if (direct) {
   const mode: Mode = params.has('rhythm') ? 'rhythm' : params.has('practice') || direct.practice ? 'practice' : 'duel';
-  void play(direct, mode, { difficulty: params.get('diff') ?? 'main', drill: params.get('practice') || undefined, back: mode === 'practice' ? 'practice' : mode === 'rhythm' ? 'rhythm' : 'arena' });
+  void play(direct, mode, { character: params.get('char') ?? undefined, difficulty: params.get('diff') ?? 'main', drill: params.get('practice') || undefined, back: mode === 'practice' ? 'practice' : mode === 'rhythm' ? 'rhythm' : 'arena' });
 } else nav.go(screen ?? 'title');

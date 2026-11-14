@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_earth_quake_a
+type: fx
+summary: "「결」 동료 기술 대지 울림(地鳴) 앞 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: "small cracks appearing on the ground in the center"
+  2: "the cracks glowing orange and spreading outward"
+  3: "impact: the ground bursting upward in a ring of rocks and dust"
+  4: "rocks flying, a low wave of dust spreading along the ground"
+  5: "rocks falling back, dust settling"
+  6: "settling dust"
+placeholder: { accent: '#c98a4a' }

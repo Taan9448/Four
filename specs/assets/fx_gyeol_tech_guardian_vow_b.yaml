@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_guardian_vow_b
+type: fx
+summary: "「결」 동료 기술 수호 서약(守護誓約) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "warm golden motes rising slowly"
+  2: "a faint dome outline"
+  3: "motes drifting up"
+  4: "a thin golden ring on the ground"
+  5: "a few rising motes"
+  6: "faint glow"
+placeholder: { accent: '#ffe08a' }

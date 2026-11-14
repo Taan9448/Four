@@ -11,7 +11,7 @@ import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, rea
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
-import { characterOf, characters, chosen, faceId, faceStyle, joined, partyOpen, recordKey } from './party';
+import { characterOf, characters, chosen, faceId, faceStyle, HAUN, joined, partyOpen, recordKey } from './party';
 import { emptyStats, loadSave, withKeys, writeSave } from './save';
 import { actionFor, keyNames } from './keys';
 
@@ -449,9 +449,14 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell' }, el('small', {}, d.name), rankBadge(save.duelBest[`${f.id}:${d.id}`])))),
     );
   });
-  const techs = data.techs.map((t) => {
+  const techCard = (t: (typeof data.techs)[number]) => {
     const cg = realArt(`cg_gyeol_tech_${t.id}`);
     return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
+  };
+  // 인물마다 기술 셋(2026-11-14): 진하운 · 카일 · 엘리아 · 보른
+  const techGroups = characters(data).flatMap((c) => {
+    const own = data.techs.filter((t) => (t.owner ?? HAUN) === c.id);
+    return own.length ? [el('h3', { class: 'tech-owner' }, `${c.name}의 기술`), el('div', { class: 'tech-grid' }, ...own.map(techCard))] : [];
   });
   const st = save.stats;
   const min = Math.round(st.playMs / 60000);
@@ -473,8 +478,8 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       ...characterSection(data),
       el('h2', {}, '상대 도감'),
       el('div', { class: 'codex-grid' }, ...foes),
-      el('h2', {}, '진하운의 기술'),
-      el('div', { class: 'tech-grid' }, ...techs),
+      el('h2', {}, '기술'),
+      ...techGroups,
       el('h2', {}, '쌓인 기록'),
       el('dl', { class: 'stats' }, ...rows.flatMap(([k, v]) => [el('dt', {}, k), el('dd', {}, v)])),
     ),

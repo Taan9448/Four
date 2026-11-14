@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_rowen_oath_b
+type: fx
+summary: "「결」 동료 기술 로웬의 일격(誓劍) 뒤 6프레임(_a·_b 이어 12프레임) — 칸 안쪽에서 끝나게(2026-11-14)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "blue sparks drifting"
+  2: "a faint vertical afterimage line"
+  3: "blue motes sinking"
+  4: "a faint cross glint"
+  5: "almost nothing"
+  6: "two faint motes"
+placeholder: { accent: '#6f9cff' }
