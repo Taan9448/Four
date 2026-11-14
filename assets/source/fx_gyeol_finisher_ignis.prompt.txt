@@ -4,14 +4,16 @@ Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell n
 PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
 Background: flat solid black #000000 in every cell.
 Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
 Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
 Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
 Frames:
-Cell 1: a thin vertical blue-white line from the top of the cell to the bottom through a wall of orange flame
+Cell 1: a thin vertical blue-white line running down most of the cell through a wall of orange flame
 Cell 2: impact: the line becomes a blinding vertical blue-white cleave with a white core, the fire split in two and pushed to both sides
-Cell 3: the two halves of the fire blown outward into a huge spray of embers, a blue shockwave at the bottom
+Cell 3: the two halves of the fire blown outward into a wide spray of embers that stays inside the cell, a blue shockwave at the bottom
 Cell 4: embers raining down, the flames shrinking, the first puffs of white steam rising from the center
 Cell 5: big soft clouds of white steam rising, a few dim embers
 Cell 6: faint steam wisps
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: In EVERY cell the TOP QUARTER and BOTTOM QUARTER are COMPLETELY EMPTY pure black, including all sparks. Draw the entire effect only in the middle half: local y=128..384, local x=112..400. The blue-white slash in cells 1 and 2 is a SHORT finite pointed stroke about 220px tall INCLUDING both tip sparks, not a beam spanning the cell. Do not extend any blue mote above or below that area. All flames, the outward spray in cell 3, and the complete steam clouds in cells 4 to 6 fit inside the same middle-half box. Cell 2 remains the brightest impact splitting the orange fire; the slash ends taper naturally to points without flat cut caps. Preserve the six stages, colors and clean 4px pixel blocks.
