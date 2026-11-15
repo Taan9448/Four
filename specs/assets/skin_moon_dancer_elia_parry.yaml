@@ -1,0 +1,24 @@
+id: skin_moon_dancer_elia_parry
+type: character-anim
+character: skin_moon_dancer_elia
+summary: 「결」 엘리아 옷 「달빛 무희」 받기 6프레임 — 기본 옷 elia_parry와 같은 동작, 옷만 기준 시트대로(2026-11-14)
+depends_on:
+- skin_moon_dancer_elia_ref
+reference: assets/source/skin_moon_dancer_elia_ref.png
+facing: right
+frames: 6
+fps: 14
+events:
+  deflect: 3
+bbox_tolerance: 0.25
+frame_notes:
+  1: ready stance, staff held upright in front, free hand open, eyes on the incoming blow
+  2: the staff sweeps up diagonally in front of her, a thin pale-blue mana barrier ring blooming in front of the crystal
+  3: 'the moment of the deflection: the blow strikes the hexagon-patterned blue barrier, which flashes bright white-blue with a ring of sparks on the right, hood and hair flicking back'
+  4: the barrier pushes the force aside to the right and starts to fade into blue motes, staff still raised
+  5: a calm half step back, staff lowering to the middle, a few blue motes drifting
+  6: settled ready stance again, staff upright
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

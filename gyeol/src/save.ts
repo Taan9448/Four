@@ -59,6 +59,8 @@ export interface SaveData {
   /** 이룬 업적 id · 입은 하운 옷 id(5단계, gyeol/data/progress.json) */
   achievements: string[];
   outfit: string;
+  /** 동료 옷(2026-11-14): 인물 id → 옷 id(진하운은 outfit) */
+  outfits?: Record<string, string>;
   /** 고른 인물(2026-11-11, duel.json characters) · 인물별 쌓인 기록 */
   character: string;
   charStats: Record<string, Stats>;
@@ -150,6 +152,7 @@ export function normalize(raw: unknown): SaveData {
   if (Array.isArray(r.tips)) s.tips = r.tips.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.achievements)) s.achievements = r.achievements.filter((x): x is string => typeof x === 'string');
   if (typeof r.outfit === 'string') s.outfit = r.outfit;
+  if (r.outfits && typeof r.outfits === 'object') s.outfits = Object.fromEntries(Object.entries(r.outfits).filter(([, v]) => typeof v === 'string'));
   if (typeof r.character === 'string') s.character = r.character;
   if (r.charStats && typeof r.charStats === 'object')
     for (const [id, st] of Object.entries(r.charStats)) {

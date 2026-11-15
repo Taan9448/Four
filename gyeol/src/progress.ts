@@ -15,6 +15,8 @@ export interface Outfit {
   name: string;
   text: string;
   unlock: Cond | null;
+  /** 입을 수 있는 인물(2026-11-14 동료 옷장 — 없으면 모두, 기본 옷 base는 모두) */
+  chars?: string[];
 }
 export interface Achievement {
   id: string;
@@ -62,10 +64,20 @@ export function newAchievements(save: SaveData, chartIds: string[]): Achievement
 }
 
 /** 입은 옷의 그림 접두어(기본 옷이면 null) — 열리지 않은 옷이면 기본 */
-export function outfitPrefix(save: SaveData): string | null {
-  const o = progress.outfits.find((x) => x.id === save.outfit);
+/** 이 인물이 고른 옷 id(진하운은 예전 outfit 칸 그대로) */
+export function outfitOf(save: SaveData, char = 'haun'): string {
+  return (char === 'haun' ? save.outfit : save.outfits?.[char]) || 'base';
+}
+
+/** 이 인물이 입을 수 있는 옷 */
+export const outfitsFor = (char: string): Outfit[] => progress.outfits.filter((o) => o.id === 'base' || !o.chars || o.chars.includes(char));
+
+/** 전투 그림 이름 앞머리(skin_<옷>_<인물>) — 기본 옷이거나 잠겼으면 null */
+export function outfitPrefix(save: SaveData, char = 'haun'): string | null {
+  const id = outfitOf(save, char);
+  const o = outfitsFor(char).find((x) => x.id === id);
   if (!o || o.id === 'base' || !condMet(o.unlock, save)) return null;
-  return `skin_${o.id}_haun`;
+  return `skin_${o.id}_${char}`;
 }
 
 export function condText(c: Cond | null): string {

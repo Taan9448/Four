@@ -1,0 +1,25 @@
+id: skin_cheonma_born_death
+type: character-anim
+character: skin_cheonma_born
+summary: 「결」 보른 옷 「천마를 넘어」 쓰러짐 6프레임 — 기본 옷 born_death와 같은 동작, 옷만 기준 시트대로(2026-11-14)
+depends_on:
+- skin_cheonma_born_ref
+reference: assets/source/skin_cheonma_born_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+size_note: 'IMPORTANT size: draw Born SMALLER than in the attached reference sheet, at the same on-screen size as his normal battle animations (born_hammer_idle/attack/hit): about 70 px tall from the top
+  of the head to the soles in the 160 px frame, about 87% of the reference sheet figure; keep the same proportions, only scale the whole figure down'
+frame_notes:
+  1: struck hard, beard braids flying, the axe jolting in his hands
+  2: staggering back a heavy step, boots skidding
+  3: dropping onto one knee, the axe head on the ground, both hands on the haft
+  4: his grip slips, the stocky body tipping sideways
+  5: falling onto his side with a thud, the axe lying beside him
+  6: lying still, eyes closed, one hand still near the axe haft
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#a02634'
