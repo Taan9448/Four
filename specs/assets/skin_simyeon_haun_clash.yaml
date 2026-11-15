@@ -1,0 +1,22 @@
+id: skin_simyeon_haun_clash
+type: character-anim
+character: skin_simyeon_haun
+summary: 「결」 진하운 옷 「심연을 걷는 자」 겨루기 6프레임 — 기본 옷 haun_sword_clash와 같은 동작, 옷만 기준 시트대로(2026-11-14)
+depends_on:
+- skin_simyeon_haun_ref
+reference: assets/source/skin_simyeon_haun_ref.png
+facing: right
+frames: 4
+fps: 10
+events: {}
+bbox_tolerance: 0.35
+frame_notes:
+  1: low wide stance leaning hard to the right, both hands on the sword grip, the blade held out horizontally at chest height to the right as if pressed against an unseen blade, teeth gritted, long hair
+    streaming back
+  2: the same pose pushed a little further forward, back foot sliding, arms trembling, the blade edge glinting
+  3: the same pose pushed back slightly, knees bending deeper, straining
+  4: close to frame 1 so the loop is seamless
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffe6a0'

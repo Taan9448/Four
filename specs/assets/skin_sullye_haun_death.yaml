@@ -1,0 +1,23 @@
+id: skin_sullye_haun_death
+type: character-anim
+character: skin_sullye_haun
+summary: 「결」 진하운 옷 「순례의 끝」 쓰러짐 6프레임 — 기본 옷 haun_sword_death와 같은 동작, 옷만 기준 시트대로(2026-11-14)
+depends_on:
+- skin_sullye_haun_ref
+reference: assets/source/skin_sullye_haun_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: struck hard, head thrown back, the plain sword slipping in his grip
+  2: staggering backward, knees buckling, one hand reaching out
+  3: dropping to one knee, the sword point digging into the ground to hold himself up
+  4: the sword hand loosens, his body tipping sideways
+  5: falling onto his side, long black hair spreading on the ground, the sword lying beside him
+  6: lying still on the ground, eyes closed, the sword beside his open hand
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ff3b3b'

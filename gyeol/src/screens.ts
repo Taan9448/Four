@@ -6,7 +6,7 @@ import lobbyRaw from '../data/lobby.json';
 import { accountState, loginPanel, playerPlate } from './account';
 import { onCloudChange } from './cloud';
 import { lobbyStage } from './lobby-fx';
-import { condMet, condText, newAchievements, progress, starTotal } from './progress';
+import { condMet, condText, newAchievements, outfitOf, outfitsFor, progress, starTotal } from './progress';
 import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
@@ -546,20 +546,29 @@ function achievementSection(data: DuelData): HTMLElement[] {
  * 옷장(2026-11-13 먹·한지 개편): 왼쪽에 고른 옷을 크게(반신 그림 + 전투 모습), 오른쪽에 옷 목록.
  * 목록을 누르면 미리 보고, 연 옷이면 「입기」로 입는다. 잠긴 옷은 조건만 보인다
  */
-export function renderWardrobe(app: HTMLElement, nav: Nav, previewId?: string): void {
+export function renderWardrobe(app: HTMLElement, nav: Nav, previewId?: string, charId?: string): void {
   const save = loadSave();
-  const worn = save.outfit || 'base';
-  const shown = progress.outfits.find((o) => o.id === (previewId ?? worn)) ?? progress.outfits[0];
-  const standOf = (id: string) => realArt(id === 'base' ? 'haun_gyeol_stand' : `skin_${id}_haun_stand`) ?? frameUrl('haun_sword_stand', 1);
-  const idleOf = (id: string) => frameUrl(id === 'base' ? 'haun_sword_idle' : `skin_${id}_haun_idle`, 1);
+  // 인물(2026-11-14 사용자 요청 "다른 캐릭터들도 천외귀환 스킨을 고르게"): 위에서 인물을 고르고 그 인물의 옷을 본다
+  const data = wardrobeData;
+  const cs = data ? characters(data).filter((c) => joined(c, save.story.cleared)) : [];
+  const cur = (cs.find((c) => c.id === charId) ?? cs.find((c) => c.id === HAUN) ?? cs[0])?.id ?? HAUN;
+  const curDef = data ? characterOf(data, cur) : undefined;
+  const outfits = outfitsFor(cur);
+  const worn = outfitOf(save, cur);
+  const shown = outfits.find((o) => o.id === (previewId ?? worn)) ?? outfits[0];
+  const baseStand = cur === HAUN ? 'haun_gyeol_stand' : (curDef?.stand ?? `${cur}_stand`);
+  const baseIdle = curDef?.sprite ?? 'haun_sword';
+  const standOf = (id: string) => realArt(id === 'base' ? baseStand : `skin_${id}_${cur}_stand`) ?? frameUrl(cur === HAUN ? 'haun_sword_stand' : baseStand, 1);
+  const idleOf = (id: string) => frameUrl(id === 'base' ? `${baseIdle}_idle` : `skin_${id}_${cur}_idle`, 1);
   const openShown = condMet(shown.unlock, save);
   const stand = standOf(shown.id);
   const idle = idleOf(shown.id);
   const wear = button(shown.id === worn ? '입는 중' : openShown ? '입기' : '잠김', `btn${shown.id === worn ? '' : ' primary'}`, () => {
     const s = loadSave();
-    s.outfit = shown.id;
+    if (cur === HAUN) s.outfit = shown.id;
+    else s.outfits = { ...(s.outfits ?? {}), [cur]: shown.id };
     writeSave(s);
-    renderWardrobe(app, nav, shown.id);
+    renderWardrobe(app, nav, shown.id, cur);
   }, openShown && shown.id !== worn ? {} : { disabled: '' });
   const preview = el(
     'div',
@@ -572,19 +581,37 @@ export function renderWardrobe(app: HTMLElement, nav: Nav, previewId?: string): 
       el('div', {}, el('h2', {}, shown.name), el('p', {}, openShown ? shown.text : condText(shown.unlock)), wear),
     ),
   );
-  const list = progress.outfits.map((o) => {
+  const list = outfits.map((o) => {
     const open = condMet(o.unlock, save);
     const img = idleOf(o.id);
     return button(
       [img ? el('img', { src: img, alt: '' }) : '', el('span', {}, el('b', {}, o.name), el('small', {}, o.id === worn ? '입는 중' : open ? '열림' : condText(o.unlock))), open ? '' : lockIcon()],
       `wd-item${o.id === shown.id ? ' on' : ''}${open ? '' : ' locked'}${o.id === worn ? ' worn' : ''}`,
-      () => renderWardrobe(app, nav, o.id),
+      () => renderWardrobe(app, nav, o.id, cur),
       { 'aria-pressed': String(o.id === shown.id) },
     );
   });
-  app.replaceChildren(el('section', { class: 'screen wardrobe' }, header('옷장', nav, `이야기 별 ${starTotal(save)}개`), el('div', { class: 'wd-layout' }, preview, el('div', { class: 'wd-list panel' }, ...list))));
+  // 인물 고르기 줄(합류한 인물만)
+  const tabs =
+    cs.length > 1 && data
+      ? el(
+          'div',
+          { class: 'wd-chars', role: 'tablist', 'aria-label': '인물' },
+          ...cs.map((c) => {
+            const face = realArt(c.stand) ?? (c.fallbackStand ? frameUrl(c.fallbackStand, 1) : null);
+            return button([el('span', { class: 'cp-face', style: faceStyle(c, face, realArt(faceId(c.id))) }), el('b', {}, c.name)], `wd-char${c.id === cur ? ' on' : ''}`, () => renderWardrobe(app, nav, undefined, c.id), { role: 'tab', 'aria-selected': String(c.id === cur) });
+          }),
+        )
+      : '';
+  app.replaceChildren(el('section', { class: 'screen wardrobe' }, header('옷장', nav, `이야기 별 ${starTotal(save)}개`), tabs, el('div', { class: 'wd-layout' }, preview, el('div', { class: 'wd-list panel' }, ...list))));
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
+
+/** 옷장이 인물 목록을 읽는 대결 데이터(main이 넣는다) */
+let wardrobeData: DuelData | null = null;
+export const setWardrobeData = (d: DuelData): void => {
+  wardrobeData = d;
+};
 
 /** 먹 자물쇠(🔒 대신, 2026-11-13) */
 export function lockIcon(): SVGSVGElement | HTMLImageElement {

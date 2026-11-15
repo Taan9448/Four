@@ -27,16 +27,18 @@ const real = async (id: string): Promise<Anim> => {
   return a && a.source === 'sprites' ? a : null;
 };
 
-/** 하운 옷(5단계): 옷 그림(대기·베기·피격)이 실제로 있으면 그것, 없으면 기본 옷 */
+/** 옷(5단계, 2026-11-14 동료도): 옷 그림(대기·베기·피격)이 실제로 있으면 그것, 없으면 기본 옷 */
 const worn = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? loadSprite(`${base}_${kind}`)) : loadSprite(`${base}_${kind}`));
+/** 실제 그림만 쓰는 동작(받기·피하기·쓰러짐·기술·겨루기·강베기): 옷 그림이 오면 그것, 없으면 기본 옷 그림 */
+const wornReal = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? real(`${base}_${kind}`)) : real(`${base}_${kind}`));
 
 export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null): Promise<Sprites> {
   const ids = {
     pi: worn(outfit, playerPrefix, 'idle'),
     pa: worn(outfit, playerPrefix, 'attack'),
     ph: worn(outfit, playerPrefix, 'hit'),
-    pp: real(`${playerPrefix}_parry`),
-    pd: real(`${playerPrefix}_dodge`),
+    pp: wornReal(outfit, playerPrefix, 'parry'),
+    pd: wornReal(outfit, playerPrefix, 'dodge'),
     fi: loadSprite(`${foePrefix}_idle`),
     fa: real(`${foePrefix}_attack`),
     fh: loadSprite(`${foePrefix}_hit`),
@@ -48,12 +50,12 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
   const gyeolFx = ['fx_gyeol_parry_a', 'fx_gyeol_parry_b', 'fx_gyeol_deathblow', 'fx_gyeol_stance', 'fx_gyeol_revive', 'fx_gyeol_armor_break', 'fx_gyeol_aura_1', 'fx_gyeol_aura_2', 'fx_gyeol_aura_3', 'icons_gyeol', 'fx_gyeol_danger_charge', 'fx_gyeol_tech_ready', 'fx_gyeol_clash', 'fx_gyeol_heavy_impact', 'fx_gyeol_combo_finish', 'fx_gyeol_mikiri', ...techFx, ...skillFx, ...finisher];
   const [pi, pa, ph, pp, pd, fi, fa, fh, b, pTech, pDeath, fDeath, pClash, pHeavy, ...fx] = await Promise.all([
     ids.pi, ids.pa, ids.ph, ids.pp, ids.pd, ids.fi, ids.fa, ids.fh, ids.bg,
-    real(`${playerPrefix}_tech`),
-    real(`${playerPrefix}_death`),
+    wornReal(outfit, playerPrefix, 'tech'),
+    wornReal(outfit, playerPrefix, 'death'),
     real(`${foePrefix}_death`),
-    real(`${playerPrefix}_clash`),
+    wornReal(outfit, playerPrefix, 'clash'),
     // 강베기 동작(2026-11-13, Codex <인물>_heavy): 오기 전에는 베기 그림에 금빛을 입혀 대신한다
-    real(`${playerPrefix}_heavy`),
+    wornReal(outfit, playerPrefix, 'heavy'),
     ...fxIds.map((id) => loadSprite(id)),
     ...gyeolFx.map((id) => real(id)),
   ]);

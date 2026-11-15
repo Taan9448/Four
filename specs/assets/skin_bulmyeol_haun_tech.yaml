@@ -1,0 +1,24 @@
+id: skin_bulmyeol_haun_tech
+type: character-anim
+character: skin_bulmyeol_haun
+summary: 「결」 진하운 옷 「불멸」 기술 6프레임 — 기본 옷 haun_sword_tech와 같은 동작, 옷만 기준 시트대로(2026-11-14)
+depends_on:
+- skin_bulmyeol_haun_ref
+reference: assets/source/skin_bulmyeol_haun_ref.png
+facing: right
+frames: 6
+fps: 8
+events:
+  hit: 4
+bbox_tolerance: 0.35
+frame_notes:
+  1: stands still with eyes closed, sword held low at his side, a faint blue-white glow rising around his feet and hair lifting slightly
+  2: eyes snap open, sword drawn back behind him in both hands, body coiled low, the glow brighter
+  3: steps forward, the sword rising in a wide arc beside the head (not far above it), a trail of white-blue light following the blade
+  4: a huge clean sweeping cut forward to the right, the whole blade glowing white-blue, a long bright arc of light trailing from it
+  5: follow-through, body low and turned, the sword held out to the right, the light arc fading into motes
+  6: straightening calmly, sword lowered, a few motes drifting around him
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

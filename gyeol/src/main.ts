@@ -18,7 +18,7 @@ import { bootCloud, trainingTarget } from './cloud';
 import { duelXp, gainXp } from './training';
 import { openSettings } from './settings';
 import { renderStory, story } from './story';
-import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
+import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
 import './style.css';
@@ -75,7 +75,7 @@ const nav: Nav = {
     else if (s === 'rhythm') renderRhythm(app, nav, data);
     else if (s === 'practice') renderPractice(app, nav, data);
     else if (s === 'records') renderRecords(app, nav, data);
-    else if (s === 'wardrobe') renderWardrobe(app, nav);
+    else if (s === 'wardrobe') (setWardrobeData(data), renderWardrobe(app, nav));
     else if (s === 'calibrate') renderCalibrate(app, nav);
     else if (s === 'story') renderStory(app, nav, data);
   },
@@ -203,7 +203,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 인물별 반격 이펙트(Codex fx_gyeol_counter_<인물>, 2026-11-14)도 같이 부른다
   const counterFx = char?.counterFx;
   if (counterFx) skillFx.push(counterFx.sprite);
-  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, charId === HAUN ? outfitPrefix(loadSave()) : null);
+  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId));
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
   setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : battleTrack(foeDef), rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);

@@ -1036,7 +1036,17 @@ describe('「결」 5단계 — 하운 옷·업적', () => {
     expect(outfitPrefix(s)).toBeNull(); // 5장을 아직 안 마쳤다
     s.story.cleared.push('ch5');
     expect(outfitPrefix(s)).toBe('skin_cheongun_haun');
-    for (const o of progress.outfits) if (o.id !== 'base') expect(existsSync(`assets/sprites/skin_${o.id}_haun_idle/meta.json`), o.id).toBe(true);
+    // 옷마다 입을 수 있는 인물의 대기·베기·피격·반신 그림이 있다(「천외귀환」 옷 그림, 2026-11-14 동료 옷장)
+    for (const o of progress.outfits) {
+      if (o.id === 'base') continue;
+      for (const c of o.chars ?? ['haun']) for (const k of ['idle', 'attack', 'hit', 'stand']) expect(existsSync(`assets/sprites/skin_${o.id}_${c}_${k}/meta.json`), `${o.id} ${c} ${k}`).toBe(true);
+    }
+    // 동료 옷은 그 인물 칸에 따로
+    const t = structuredClone(s);
+    t.story.cleared.push('ch3');
+    t.outfits = { kyle: 'ignis_scale', elia: 'ignis_scale' };
+    expect(outfitPrefix(t, 'kyle')).toBe('skin_ignis_scale_kyle');
+    expect(outfitPrefix(t, 'elia')).toBeNull(); // 엘리아는 이그니스의 비늘을 입지 못한다
     s.stats.wins = 1;
     expect(newAchievements(s, []).map((a) => a.id)).toEqual(['first_win']);
     expect(newAchievements(s, [])).toEqual([]);
