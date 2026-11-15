@@ -82,3 +82,11 @@ describe('연속 박자 숫자(2026-11-14)', () => {
     expect([1, 4, 6, 11, 25].some(comboMilestone)).toBe(false);
   });
 });
+
+describe('새벽 로비(2026-11-15 사용자 보고 — 엔딩 뒤 로비가 반쪽으로 밀렸다)', () => {
+  it('새벽 로비 규칙이 모든 자식의 자리(position)를 바꾸지 않는다', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync('gyeol/src/style.css', 'utf8') + readFileSync('gyeol/src/ink.css', 'utf8');
+    expect(css).not.toMatch(/\.lobby\.dawn\s*>\s*\*\s*\{[^}]*position/);
+  });
+});
