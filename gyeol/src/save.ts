@@ -21,13 +21,33 @@ export interface Settings {
   keys: KeyMap;
 }
 
+export interface StoryProgress {
+  cleared: string[];
+  stars: Record<string, number>;
+  flags: string[];
+}
+export type StoryDifficulty = 'normal' | 'hard';
+export interface StorySlot {
+  story: StoryProgress;
+  difficulty: StoryDifficulty;
+  /** 마지막으로 저장한 때(ms) */
+  updatedAt: number;
+}
+export const SLOT_COUNT = 3;
+
 export interface SaveData {
   v: 1;
   settings: Settings;
   /** 박자 도전 최고 기록(상대 id별) */
   rhythmBest: Record<string, { accuracy: number; rank: string }>;
   /** 이야기 진행(7-2): 깬 장·별 — 3단계에서 채운다 */
-  story: { cleared: string[]; stars: Record<string, number>; flags: string[] };
+  story: StoryProgress;
+  /**
+   * 이야기 불러오기 3칸(2026-11-14 사용자 요청 "천외귀환처럼 3개의 불러오기 창, 보통·어려움"): 칸마다 이야기 진행과 난이도.
+   * story는 지금 고른 칸(slot)의 진행을 그대로 담는다 — 저장할 때 slots[slot]에도 옮겨 적는다. 설정·기록·업적·옷은 칸과 상관없이 하나
+   */
+  slots: (StorySlot | null)[];
+  slot: number;
   /** 상대·난이도별 최고 대결 등급(`<상대 id>:<난이도 id>` → S·A·B·C) */
   duelBest: Record<string, string>;
   /** 쌓인 기록(기록 화면) */
@@ -65,7 +85,7 @@ const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto', keys: defaultKeys() });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, slots: [{ story: { cleared: [], stars: {}, flags: [] }, difficulty: 'normal', updatedAt: 0 }, null, null], slot: 0, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
 
 interface Store {
   getItem(k: string): string | null;
@@ -100,7 +120,24 @@ export function normalize(raw: unknown): SaveData {
     keys: normalizeKeys(st.keys),
   };
   if (r.rhythmBest && typeof r.rhythmBest === 'object') s.rhythmBest = { ...r.rhythmBest };
-  if (r.story && Array.isArray(r.story.cleared)) s.story = { cleared: [...r.story.cleared], stars: { ...(r.story.stars ?? {}) }, flags: Array.isArray(r.story.flags) ? r.story.flags.filter((x): x is string => typeof x === 'string') : [] };
+  const readStory = (x: Partial<StoryProgress> | undefined): StoryProgress | null =>
+    x && Array.isArray(x.cleared) ? { cleared: x.cleared.filter((c): c is string => typeof c === 'string'), stars: { ...(x.stars ?? {}) }, flags: Array.isArray(x.flags) ? x.flags.filter((f): f is string => typeof f === 'string') : [] } : null;
+  const story = readStory(r.story);
+  if (story) s.story = story;
+  // 불러오기 칸: 옛 저장(칸 없음)은 지금 진행을 1번 칸(보통)으로 옮긴다
+  if (Array.isArray(r.slots)) {
+    s.slots = Array.from({ length: SLOT_COUNT }, (_, i) => {
+      const x = r.slots![i] as Partial<StorySlot> | null | undefined;
+      const st = x ? readStory(x.story) : null;
+      return st ? { story: st, difficulty: x!.difficulty === 'hard' ? 'hard' : 'normal', updatedAt: typeof x!.updatedAt === 'number' ? x!.updatedAt : 0 } : null;
+    });
+    s.slot = typeof r.slot === 'number' && r.slot >= 0 && r.slot < SLOT_COUNT ? r.slot : 0;
+    if (!s.slots[s.slot]) s.slots[s.slot] = { story: s.story, difficulty: 'normal', updatedAt: 0 };
+    s.story = s.slots[s.slot]!.story;
+  } else {
+    s.slots = [{ story: s.story, difficulty: 'normal', updatedAt: 0 }, null, null];
+    s.slot = 0;
+  }
   if (r.duelBest && typeof r.duelBest === 'object') s.duelBest = { ...r.duelBest };
   if (r.stats && typeof r.stats === 'object') {
     const base = emptyStats();
@@ -124,6 +161,29 @@ export function normalize(raw: unknown): SaveData {
 }
 
 let cache: SaveData | null = null;
+
+/** 지금 칸의 난이도 */
+export const storyDifficulty = (save: SaveData): StoryDifficulty => save.slots?.[save.slot]?.difficulty ?? 'normal';
+
+/** 칸을 고른다(이어하기). 빈 칸이면 difficulty로 새로 시작 */
+export function useSlot(save: SaveData, i: number, difficulty?: StoryDifficulty): SaveData {
+  const slot = save.slots[i] ?? { story: { cleared: [], stars: {}, flags: [] }, difficulty: difficulty ?? 'normal', updatedAt: Date.now() };
+  save.slots[i] = slot;
+  save.slot = i;
+  save.story = slot.story;
+  return save;
+}
+
+/** 칸을 지운다(지금 칸이면 빈 보통 칸으로) */
+export function clearSlot(save: SaveData, i: number): SaveData {
+  save.slots[i] = null;
+  if (save.slot === i) {
+    const next = save.slots.findIndex((x) => x);
+    if (next >= 0) useSlot(save, next);
+    else useSlot(save, i, 'normal');
+  }
+  return save;
+}
 
 export function loadSave(st: Store | null = store()): SaveData {
   if (cache) return cache;
@@ -153,6 +213,12 @@ export function onSaveWrite(fn: () => void): () => void {
 
 export function writeSave(data: SaveData, st: Store | null = store()): void {
   cache = data;
+  // 지금 칸에 이야기 진행을 옮겨 적는다
+  const cur = data.slots?.[data.slot];
+  if (cur) {
+    cur.story = data.story;
+    cur.updatedAt = Date.now();
+  }
   try {
     st?.setItem(KEY, JSON.stringify(data));
   } catch {

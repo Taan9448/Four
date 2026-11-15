@@ -17,7 +17,7 @@ import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
 import { duelXp, gainXp } from './training';
 import { openSettings } from './settings';
-import { renderStory, story } from './story';
+import { renderSlots, renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
@@ -78,6 +78,7 @@ const nav: Nav = {
     else if (s === 'wardrobe') renderWardrobe(app, nav);
     else if (s === 'calibrate') renderCalibrate(app, nav);
     else if (s === 'story') renderStory(app, nav, data);
+    else if (s === 'slots') renderSlots(app, nav, data);
   },
   stop() {
     stopLoop?.();
@@ -92,7 +93,7 @@ const nav: Nav = {
   },
 };
 
-const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '수련장으로', practice: '수련장으로', lobby: '로비로', story: '이야기 지도' };
+const BACK_LABEL: Partial<Record<Screen, string>> = { slots: '불러오기', arena: '결투장으로', rhythm: '수련장으로', practice: '수련장으로', lobby: '로비로', story: '이야기 지도' };
 
 async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby' }): Promise<void> {
   stopLoop?.();
