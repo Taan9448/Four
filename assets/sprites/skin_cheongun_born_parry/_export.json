@@ -1,0 +1,282 @@
+{
+  "basisFrame": 1,
+  "targetBodyHeight": 72,
+  "footRowsBefore": null,
+  "method": "one uniform nearest-neighbor scale for all frames, then integer anchored placement; no painting or clipping",
+  "source": "assets/source/skin_cheongun_born_parry.png",
+  "measurementNote": null,
+  "idleBody": {
+    "minX": 45,
+    "minY": 72,
+    "maxX": 121,
+    "maxY": 143,
+    "width": 77,
+    "height": 72,
+    "count": 3683
+  },
+  "firstBodyBefore": {
+    "minX": 48,
+    "minY": 79,
+    "maxX": 125,
+    "maxY": 143,
+    "width": 78,
+    "height": 65,
+    "count": 2932
+  },
+  "firstBodyAfter": {
+    "minX": 46,
+    "minY": 72,
+    "maxX": 131,
+    "maxY": 143,
+    "width": 86,
+    "height": 72,
+    "count": 3588
+  },
+  "idleGround": 143,
+  "scaleCanvas": [
+    177,
+    177
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 48,
+        "minY": 79,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 78,
+        "height": 65,
+        "count": 2932
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 46,
+        "minY": 72,
+        "maxX": 131,
+        "maxY": 143,
+        "width": 86,
+        "height": 72,
+        "count": 3588
+      },
+      "bodyAfter": {
+        "minX": 46,
+        "minY": 72,
+        "maxX": 131,
+        "maxY": 143,
+        "width": 86,
+        "height": 72,
+        "count": 3588
+      },
+      "visibleBefore": 3588,
+      "visibleAfter": 3588
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 43,
+        "minY": 78,
+        "maxX": 121,
+        "maxY": 143,
+        "width": 79,
+        "height": 66,
+        "count": 3010
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 40,
+        "minY": 71,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 87,
+        "height": 73,
+        "count": 3700
+      },
+      "bodyAfter": {
+        "minX": 40,
+        "minY": 71,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 87,
+        "height": 73,
+        "count": 3700
+      },
+      "visibleBefore": 3700,
+      "visibleAfter": 3700
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 33,
+        "minY": 70,
+        "maxX": 133,
+        "maxY": 143,
+        "width": 101,
+        "height": 74,
+        "count": 3788
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 29,
+        "minY": 62,
+        "maxX": 140,
+        "maxY": 143,
+        "width": 112,
+        "height": 82,
+        "count": 4679
+      },
+      "bodyAfter": {
+        "minX": 29,
+        "minY": 71,
+        "maxX": 131,
+        "maxY": 143,
+        "width": 103,
+        "height": 73,
+        "count": 4395
+      },
+      "visibleBefore": 4679,
+      "visibleAfter": 4679
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 26,
+        "minY": 78,
+        "maxX": 136,
+        "maxY": 143,
+        "width": 111,
+        "height": 66,
+        "count": 3424
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 21,
+        "minY": 71,
+        "maxX": 143,
+        "maxY": 143,
+        "width": 123,
+        "height": 73,
+        "count": 4225
+      },
+      "bodyAfter": {
+        "minX": 23,
+        "minY": 71,
+        "maxX": 143,
+        "maxY": 143,
+        "width": 121,
+        "height": 73,
+        "count": 4146
+      },
+      "visibleBefore": 4225,
+      "visibleAfter": 4225
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 44,
+        "minY": 78,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 77,
+        "height": 66,
+        "count": 3002
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 41,
+        "minY": 71,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 85,
+        "height": 73,
+        "count": 3692
+      },
+      "bodyAfter": {
+        "minX": 41,
+        "minY": 71,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 85,
+        "height": 73,
+        "count": 3692
+      },
+      "visibleBefore": 3692,
+      "visibleAfter": 3692
+    },
+    {
+      "frame": 6,
+      "before": {
+        "minX": 43,
+        "minY": 78,
+        "maxX": 119,
+        "maxY": 143,
+        "width": 77,
+        "height": 66,
+        "count": 3008
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 40,
+        "minY": 71,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 85,
+        "height": 73,
+        "count": 3688
+      },
+      "bodyAfter": {
+        "minX": 40,
+        "minY": 71,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 85,
+        "height": 73,
+        "count": 3688
+      },
+      "visibleBefore": 3688,
+      "visibleAfter": 3688
+    }
+  ]
+}
