@@ -342,7 +342,9 @@ export function accountRows(redraw: () => void): HTMLElement {
     const row = el(
       'div',
       { class: 'acct-row' },
-      el('div', { class: 'row acct' }, el('span', {}, '계정'), el('b', {}, a.name || '…'), el('span', { class: 'acct-btns' }, sync, out)),
+      // 지금 동기화·로그아웃은 계정 이름 옆이 아니라 아래 줄에 나란히(2026-11-14 — 이름 옆에 붙어 글자가 깨졌다)
+      el('div', { class: 'row acct' }, el('span', {}, '계정'), el('b', {}, a.name || '…')),
+      el('div', { class: 'acct-btns acct-btns-row' }, sync, out),
       status,
       trainingLine(),
     );

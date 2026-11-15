@@ -468,3 +468,7 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 .vn-stand.right.off { opacity: 0; transform: scaleX(-1) translateX(-28px); }
 .vn.has-cg .vn-stand { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .vn-stand { transition: opacity 0.15s linear; } .vn-stand.left.off { transform: none; } .vn-stand.right.off { transform: scaleX(-1); } }
+/* 설정 계정 칸: 지금 동기화·로그아웃을 이름 아래 한 줄로(2026-11-14 — 이름 옆에서 글자가 깨졌다) */
+.acct-btns-row { display: flex; gap: 8px; margin: 8px 0 2px; }
+.acct-btns-row .btn { flex: 1 1 0; white-space: nowrap; word-break: keep-all; }
+.row.acct b { min-width: 0; overflow-wrap: anywhere; }

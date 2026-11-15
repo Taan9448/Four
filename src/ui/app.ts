@@ -568,6 +568,8 @@ export class App {
             : null,
           h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
+          // 「결」 바로가기(2026-11-14 사용자 요청): 같은 배포의 gyeol/ — 계정·수련 Lv.은 함께 쓴다
+          h('button', { class: 'medal title-medal to-gyeol', 'aria-label': '「결」로', ...tipAttrs('결', '진하운의 결 읽기 대결 — 같은 계정으로'), onclick: () => (location.href = new URL('gyeol/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '決'), h('span', {}, '결')),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
         h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),
