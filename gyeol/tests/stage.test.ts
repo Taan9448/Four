@@ -132,3 +132,30 @@ describe('불러오기 3칸 · 어려움(2026-11-14)', () => {
     }
   });
 });
+
+describe('원작 상대 20종 · 기술 다섯(2026-11-15)', () => {
+  type F = { id: string; sprite: string; arenaAfter?: string; moves: Record<string, { fx?: string }>; finisher?: unknown };
+  const foes = (data as unknown as { foes: F[] }).foes;
+  it('결투장 새 상대: 있는 장에서 열리고, 그림·결정타·기술 이펙트 명세가 있다', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { chapters: { id: string }[] };
+    const chapters = new Set(story.chapters.map((c) => c.id));
+    const fresh = foes.filter((f) => f.arenaAfter);
+    expect(fresh.length).toBe(20);
+    for (const f of fresh) {
+      expect(chapters.has(f.arenaAfter!), f.id).toBe(true);
+      for (const a of ['idle', 'attack', 'hit']) expect(existsSync(`specs/assets/${f.sprite}_${a}.yaml`), `${f.sprite}_${a}`).toBe(true);
+      expect(existsSync(`specs/assets/${f.sprite}_death.yaml`), `${f.sprite}_death`).toBe(true);
+      expect(existsSync(`specs/assets/fx_gyeol_finisher_${f.id}.yaml`), f.id).toBe(true);
+      for (const m of Object.values(f.moves)) if (m.fx) expect(existsSync(`specs/assets/${m.fx}.yaml`), m.fx).toBe(true);
+    }
+  });
+  it('기술마다 이펙트(_a·_b)·컷인 명세와 색이 있다', async () => {
+    const { TECH_IDS, TECH_COLOR } = await import('../src/render');
+    const techs = (data as unknown as { techs: { id: string }[] }).techs;
+    expect([...TECH_IDS].sort()).toEqual(techs.map((t) => t.id).sort());
+    for (const t of techs) {
+      expect(TECH_COLOR[t.id], t.id).toBeTruthy();
+      for (const s of [`fx_gyeol_tech_${t.id}_a`, `fx_gyeol_tech_${t.id}_b`, `cg_gyeol_tech_${t.id}`]) expect(existsSync(`specs/assets/${s}.yaml`), s).toBe(true);
+    }
+  });
+});
