@@ -79,6 +79,36 @@ describe('인물 고르기', () => {
     expect(d.orbs).toBe(0);
   });
 
+  it('기술 조건이 인물마다 다르다(2026-11-14): 카일 막아 낸 수 · 엘리아 PERFECT · 보른 체간 깎기', () => {
+    const foe = real.foes.find((f) => f.id === 'inner_senior')!;
+    // 매 공격을 타격 20ms 전에 받는다(PERFECT), 기술이 준비될 때까지
+    const parryUntilTech = (id: string, max = 40) => {
+      const d = createDuel(withCharacter(real, id), foe.id, 'cond', 'duel', 'main', { techs: techsFor(real, id, undefined) });
+      d.player.hp = 9999;
+      let parries = 0;
+      for (let t = 0; t < 120000 && !d.techReady && parries < max; t += 5) {
+        advance(d, t);
+        d.player.hp = 9999;
+        if (d.foe.state === 'windup' && d.foe.fakeAt === null && d.foe.hitAt - d.t <= 20 && d.foe.hitAt - d.t > 0 && !d.foeDef.moves[d.foe.move!].unblockable) {
+          const before = d.events.filter((e) => e.type === 'parry').length;
+          press(d, 'parry', d.t);
+          advance(d, d.foe.hitAt + 1);
+          if (d.events.filter((e) => e.type === 'parry').length > before) parries++;
+        }
+      }
+      return { d, parries };
+    };
+    const k = parryUntilTech('kyle');
+    expect(k.d.techReady).toBe('shield_rush');
+    expect(k.d.defends).toBeGreaterThanOrEqual(6);
+    const e = parryUntilTech('elia');
+    expect(e.d.techReady).toBe('mana_rain');
+    expect(e.d.perfects).toBeGreaterThanOrEqual(3);
+    const b = parryUntilTech('born');
+    expect(b.d.techReady).toBe('earth_quake');
+    expect(b.d.postureDealt).toBeGreaterThanOrEqual(0.6);
+  });
+
   it('하운은 받으면 틈이 열린다(구슬 없음)', () => {
     const foe = real.foes.find((f) => f.id === 'inner_senior')!;
     const d = createDuel(real, foe.id, 'orb');

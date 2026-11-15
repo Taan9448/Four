@@ -430,7 +430,17 @@ export function renderCalibrate(app: HTMLElement, nav: Nav): void {
 /* ───────── 기록 ───────── */
 
 function techCondition(t: TechDef): string {
-  return t.min === 'perfect' ? `PERFECT만 ${t.chain}연속` : t.min === 'excellent' ? `EXCELLENT 이상 ${t.chain}연속` : `GOOD 이상 ${t.chain}연속`;
+  // 인물마다 조건이 다르다(2026-11-14)
+  switch (t.cond ?? 'chain') {
+    case 'defend':
+      return `맞지 않고 받기·막기·피하기 ${t.chain}번`;
+    case 'perfect':
+      return `PERFECT ${t.chain}번(맞아도 줄지 않는다)`;
+    case 'posture':
+      return `적 체간을 ${t.chain}%만큼 깎으면`;
+    default:
+      return `${t.min === 'perfect' ? 'PERFECT만' : t.min === 'excellent' ? 'EXCELLENT 이상' : '받기'} ${t.chain}연속`;
+  }
 }
 
 export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void {

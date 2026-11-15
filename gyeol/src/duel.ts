@@ -249,12 +249,20 @@ export interface TechDef {
   returnMul: number;
   /** 시전 대사(「천외귀환」 카드 castLine) */
   line: string;
+  /**
+   * 준비 조건(2026-11-14 사용자 요청 "기술이 캐릭터마다 발동하는 조건을 다르게"): chain의 뜻이 바뀐다.
+   * chain(기본) = 마지막으로 이어 받은 판정 chain개가 모두 min 이상(진하운 결 연환) · defend = 맞지 않고 받기·막기·피하기 chain번(카일)
+   * perfect = PERFECT를 chain번(맞아도 줄지 않는다, 엘리아) · posture = 적 체간을 최대치의 chain%만큼 깎았다(보른)
+   */
+  cond?: 'chain' | 'defend' | 'perfect' | 'posture';
   /** 기술 자리(1·2·3) — 장 규칙(techs)이 진하운 기술 id로 막아 둔 자리를 동료도 같은 자리로 따른다(2026-11-14) */
   slot?: number;
   /** 누구의 기술인가(characters id) */
   owner?: string;
   /** 쓰면 자기 최대 체력의 이 비율만큼 회복(수호 서약·별의 낙하) */
   heal?: number;
+  /** 광역 기술(엘리아의 마법): 이펙트가 판 전체에 여러 곳 터진다 */
+  area?: boolean;
 }
 
 /**
@@ -383,6 +391,14 @@ export interface Duel {
   chain: number;
   chainMin: Judgement;
   chainForce: number;
+  /** 결 연환의 판정 기록(최근 30개) — 사이에 GOOD이 섞여도 그 뒤로 다시 이어 받으면 기술이 준비된다(2026-11-14 버그: 한 번 GOOD이면 맞기 전까지 기술이 안 생겼다) */
+  judgeLog: Judgement[];
+  /** 맞지 않고 받기·막기·피하기를 해낸 수(카일) */
+  defends: number;
+  /** 지난 기술 뒤로 PERFECT 수(엘리아) */
+  perfects: number;
+  /** 지난 기술 뒤로 적 체간을 깎은 양(최대 체간 대비, 보른) */
+  postureDealt: number;
   /** 준비된 기술과, 준비됐을 때의 받아낸 힘(운해귀종이 돌려보낸다) */
   techReady: string | null;
   techForce: number;
@@ -540,6 +556,10 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
     chain: 0,
     chainMin: 'perfect',
     chainForce: 0,
+    judgeLog: [],
+    defends: 0,
+    perfects: 0,
+    postureDealt: 0,
     techReady: null,
     techForce: 0,
     orbs: 0,
@@ -863,7 +883,7 @@ function landStrike(d: Duel): void {
   const orbPos = orbs > 0 ? Math.max(1, orbs * (r.orbPosture ?? 1)) : 1;
   const dmg = counter ? Math.round(a.damage * r.counterMul * dMul * orbDmg) : Math.max(1, Math.round(a.damage * r.foeGuardMul * dMul));
   damageFoe(d, dmg);
-  f.posture += (counter ? r.counterPosture * orbPos : r.foeGuardPosture) * pMul;
+  postureFoe(d, (counter ? r.counterPosture * orbPos : r.foeGuardPosture) * pMul);
   if (counter) {
     d.stats.counters++;
     d.blockedRun = 0;
@@ -1074,7 +1094,7 @@ function endClash(d: Duel, won: boolean): void {
     // 밀어냈다: 적이 크게 비틀대며 물러나고, 되돌아오는 틈이 열린다
     const dmg = Math.round(d.data.player.attack.damage * r.clashWinDamage);
     damageFoe(d, dmg);
-    f.posture += d.foeDef.posture * r.clashWinPosture;
+    postureFoe(d, d.foeDef.posture * r.clashWinPosture);
     f.stateEnd = t + r.counterWindow;
     d.openingUntil = t + r.counterWindow;
     p.action = 'idle';
@@ -1124,19 +1144,60 @@ function link(d: Duel, judgement: Judgement, force: number, t: number): void {
   d.chain++;
   if (!atLeast(judgement, d.chainMin)) d.chainMin = judgement;
   d.chainForce += force;
+  d.judgeLog.push(judgement);
+  if (d.judgeLog.length > 30) d.judgeLog.shift();
+  d.defends++;
+  if (judgement === 'perfect') d.perfects++;
   d.events.push({ type: 'link', t, chain: d.chain, min: d.chainMin });
+  refreshTech(d, t);
+}
+
+/** 이 기술의 조건이 지금 얼마나 찼나(조건 단위: 개수 또는 %) */
+export function techMeter(d: Duel, tech: TechDef): number {
+  switch (tech.cond ?? 'chain') {
+    case 'defend':
+      return d.defends;
+    case 'perfect':
+      return d.perfects;
+    case 'posture':
+      return Math.floor(d.postureDealt * 100);
+    default: {
+      // 끝에서부터 min 이상인 판정이 몇 개 이어졌나
+      let n = 0;
+      for (let i = d.judgeLog.length - 1; i >= 0 && atLeast(d.judgeLog[i], tech.min); i--) n++;
+      return n;
+    }
+  }
+}
+
+/** 이 인물이 지금 쓸 수 있는 기술(장 규칙·인물 기술) */
+export function usableTechs(d: Duel): TechDef[] {
   const allowed = d.opts.techs;
-  const best = [...d.data.techs]
-    .filter((x) => !allowed || allowed.includes(x.id))
-    .filter((x) => d.chain >= x.chain && atLeast(d.chainMin, x.min))
-    .sort((a, b) => b.chain - a.chain || JUDGE_RANK[b.min] - JUDGE_RANK[a.min])[0];
+  // 기술 목록을 따로 주지 않았으면 진하운의 기술(동료 대결은 화면이 늘 인물 기술 목록을 준다)
+  return d.data.techs.filter((x) => (allowed ? allowed.includes(x.id) : (x.owner ?? 'haun') === 'haun'));
+}
+
+/** 조건이 찬 기술 중 가장 높은 자리의 것을 준비한다(이미 더 높은 것이 준비돼 있으면 그대로) */
+function refreshTech(d: Duel, t: number): void {
+  if (d.mode === 'rhythm') return;
+  const rank = (x: TechDef) => (x.slot ?? 1) * 100 + x.chain;
+  const best = usableTechs(d)
+    .filter((x) => techMeter(d, x) >= x.chain)
+    .sort((a, b) => rank(b) - rank(a))[0];
   if (!best) return;
   const cur = techOf(d, d.techReady);
-  const better = !cur || best.chain > cur.chain || (best.chain === cur.chain && JUDGE_RANK[best.min] > JUDGE_RANK[cur.min]);
-  if (better) {
-    d.techReady = best.id;
-    d.techForce = d.chainForce;
-    d.events.push({ type: 'techReady', t, tech: best.id });
+  if (cur && rank(cur) >= rank(best)) return;
+  d.techReady = best.id;
+  d.techForce = d.chainForce;
+  d.events.push({ type: 'techReady', t, tech: best.id });
+}
+
+/** 적 체간을 깎는다(보른 기술 조건이 함께 찬다) */
+function postureFoe(d: Duel, amount: number): void {
+  d.foe.posture += amount;
+  if (amount > 0) {
+    d.postureDealt += amount / d.foeDef.posture;
+    refreshTech(d, d.t);
   }
 }
 
@@ -1152,6 +1213,8 @@ function breakChain(d: Duel): void {
   d.chain = 0;
   d.chainMin = 'perfect';
   d.chainForce = 0;
+  d.judgeLog = [];
+  d.defends = 0;
 }
 
 function landTech(d: Duel): void {
@@ -1171,6 +1234,8 @@ function landTech(d: Duel): void {
   d.events.push({ type: 'techHit', t: d.t, tech: tech.id, damage: dmg, ...(heal > 0 ? { heal } : {}) });
   breakChain(d);
   d.techForce = 0;
+  d.perfects = 0;
+  d.postureDealt = 0;
   if (checkFoeDown(d)) return;
   // 기술은 공격을 끊는다: 비틀거리지 않으면 잠깐 거두는 자세로
   if (f.state === 'windup') {
@@ -1203,7 +1268,7 @@ function resolveHit(d: Duel): void {
   // 반격 자세를 끝까지 참았다: 치지 않고 자세가 풀리며 틈이 열린다
   if (m.stance) {
     p.parryAt = null;
-    f.posture += m.posture;
+    postureFoe(d, m.posture);
     d.openingUntil = H + r.counterWindow;
     d.events.push({ type: 'stanceBreak', t: H });
     endure(d, H);
@@ -1232,7 +1297,7 @@ function resolveHit(d: Duel): void {
     d.stats.dodges++;
     if (m.unblockable) {
       // 간파: 받을 수 없는 공격을 피하면 틈이 열린다
-      f.posture += r.mikiriPosture;
+      postureFoe(d, r.mikiriPosture);
       d.openingUntil = H + r.counterWindow;
       // 간파 정밀도: 무적 시간 한가운데 즈음(누르고 60~180ms 뒤 타격)이면 PERFECT
       const after = H - (p.iframeUntil - r.dodgeIframe);
@@ -1250,7 +1315,7 @@ function resolveHit(d: Duel): void {
     }
   } else if (!m.unblockable && p.action !== 'broken' && since >= 0 && since <= r.parry) {
     const tier = streakTier(d);
-    f.posture += m.posture * (r.parryPostureMul + tier * r.streakPostureBonus);
+    postureFoe(d, m.posture * (r.parryPostureMul + tier * r.streakPostureBonus));
     const judgement: Judgement = since <= r.perfect * ex ? 'perfect' : 'excellent';
     // 마력 구슬 방식이면 틈 대신 구슬이 쌓인다
     if (r.counterMode === 'orb') addOrbs(d, r.orbPerParry?.[judgement] ?? 1, H);

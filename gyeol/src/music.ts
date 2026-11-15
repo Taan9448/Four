@@ -26,7 +26,7 @@ interface MusicData {
   finalTrack: string;
   finalFoes: string[];
   layers: { hat: number; double: number; bell: number };
-  notes: { parryStep: number; parryTop: number; perfectChord: number[] };
+  notes: { parryStep: number; parryTop: number; perfectChord: number[]; layers?: number[]; comboRun?: number[] };
 }
 export const MUSIC = musicRaw as unknown as MusicData;
 
@@ -289,7 +289,7 @@ let parryDegree = 0;
  * 판정 소리: parry(받기 — 연속 박자만큼 음계를 오른다, PERFECT면 종 화음) · miss(맞음 — 반음 부딪힘) ·
  * deathblow(결정타 — 마침 화음) · stagger(체간 붕괴 — 북) · phase(다음 단계 — 낮은 울림 + 북 굴림) · win · lose
  */
-export function musicalHit(kind: 'parry' | 'perfect' | 'miss' | 'deathblow' | 'stagger' | 'phase' | 'win' | 'lose', streak = 0): void {
+export function musicalHit(kind: 'parry' | 'perfect' | 'miss' | 'deathblow' | 'stagger' | 'phase' | 'win' | 'lose' | 'combo', streak = 0): void {
   const c = audio();
   if (!c || c.state !== 'running' || !noteBus) return;
   const tr = current();
@@ -301,8 +301,22 @@ export function musicalHit(kind: 'parry' | 'perfect' | 'miss' | 'deathblow' | 's
     case 'perfect': {
       parryDegree = streak <= 1 ? 0 : Math.min(N.parryTop, parryDegree + N.parryStep);
       const deg = n + parryDegree;
-      play({ voice: 'pluck', beat: 0, length: 0.5, midi: degreeToMidi(tr, deg, 1), velocity: 0.9 }, t, 0.4, noteBus);
+      // 연속 박자가 쌓일수록 소리가 고조된다(2026-11-14): 10·20·30에서 층이 하나씩 — 옥타브 위 종 · 화음 · 북
+      const layers = (N.layers ?? []).filter((x) => streak >= x).length;
+      const vel = Math.min(1, 0.85 + streak * 0.006);
+      play({ voice: 'pluck', beat: 0, length: 0.5, midi: degreeToMidi(tr, deg, 1), velocity: vel }, t, 0.4, noteBus);
+      if (layers >= 1) play({ voice: 'bell', beat: 0, length: 0.7, midi: degreeToMidi(tr, deg + n, 1), velocity: 0.45 }, t + 0.01, 0.35, noteBus);
+      if (layers >= 2) for (const k of [2, 4]) play({ voice: 'glass', beat: 0, length: 0.6, midi: degreeToMidi(tr, deg + k, 1), velocity: 0.4 }, t + 0.015, 0.35, noteBus);
+      if (layers >= 3) play({ voice: 'drum', beat: 0, length: 0.3, midi: 0, velocity: 0.7 }, t, 0.3, noteBus);
       if (kind === 'perfect') for (const k of N.perfectChord) play({ voice: 'bell', beat: 0, length: 1, midi: degreeToMidi(tr, deg + k, 1), velocity: 0.55 }, t + 0.02, 0.4, noteBus);
+      break;
+    }
+    case 'combo': {
+      // 고비(5·10·20·30…): 빠른 상승 아르페지오 — 숫자가 클수록 더 높이·더 많이, 끝에 북
+      const run = N.comboRun ?? [0, 2, 4, 7];
+      const len = Math.min(run.length, 3 + Math.floor(streak / 10));
+      for (let i = 0; i < len; i++) play({ voice: 'bell', beat: 0, length: 0.5, midi: degreeToMidi(tr, n + run[i] + Math.min(7, Math.floor(streak / 20) * 2), 1), velocity: 0.5 + i * 0.06 }, t + i * 0.045, 0.35, noteBus);
+      play({ voice: 'drum', beat: 0, length: 0.4, midi: 0, velocity: Math.min(1, 0.6 + streak / 60) }, t + len * 0.045, 0.4, noteBus);
       break;
     }
     case 'miss':
