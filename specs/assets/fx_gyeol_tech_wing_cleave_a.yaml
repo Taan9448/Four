@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_wing_cleave_a
+type: fx
+summary: '「결」 동료 기술 날개 베기(斬翼) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a red glowing blade rising from the bottom'
+  2: 'the blade at the top of an arc, red light trailing'
+  3: 'impact: a huge red diagonal slash cuts across the center with a burst of black feathers'
+  4: 'black feathers and red sparks flying'
+  5: 'feathers falling'
+  6: 'faint red sparks'
+placeholder: { accent: '#ff5a4a' }

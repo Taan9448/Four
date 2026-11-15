@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_shield_wall_b
+type: fx
+summary: '「결」 동료 기술 방패벽(盾壁) 뒤 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: 'golden shield outlines fading'
+  2: 'a few golden motes'
+  3: 'thin light lines'
+  4: 'faint motes'
+  5: 'almost nothing'
+  6: 'a faint glow'
+placeholder: { accent: '#c8b48a' }

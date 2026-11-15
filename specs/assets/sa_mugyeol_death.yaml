@@ -1,0 +1,21 @@
+id: sa_mugyeol_death
+type: character-anim
+size: large
+character: sa_mugyeol
+chroma: green
+summary: '「결」 교주 사무결 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [sa_mugyeol_ref]
+reference: assets/source/sa_mugyeol_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the red blood-light around him tearing apart'
+  2: 'staggers back, a hand to his chest, red eyes wide'
+  3: 'sinks to one knee, the blood-light fading'
+  4: 'kneels, looking up with a strange calm smile'
+  5: 'kneels still, eyes closed'
+  6: 'kneeling, defeated, the red light gone (not dead)'
+placeholder: { shape: humanoid, color: '#1a1418', accent: '#c0102a' }

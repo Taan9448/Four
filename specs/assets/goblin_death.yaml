@@ -1,0 +1,21 @@
+id: goblin_death
+type: character-anim
+size: large
+character: goblin
+chroma: magenta
+summary: '「결」 고블린 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [goblin_ref]
+reference: assets/source/goblin_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the rusty dagger flying from its hand'
+  2: 'stumbles back with a yelp, ears flat'
+  3: 'falls on its backside, arms flailing'
+  4: 'rolls over onto its belly'
+  5: 'lies sprawled on the ground, dazed'
+  6: 'lies still, knocked out (not dead), the dagger beside it'
+placeholder: { shape: humanoid, color: '#6a7a3a', accent: '#b8741a' }

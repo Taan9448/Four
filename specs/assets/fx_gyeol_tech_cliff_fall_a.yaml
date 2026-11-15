@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_cliff_fall_a
+type: fx
+summary: '「결」 동료 기술 절벽 무너뜨리기(崩崖) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'cracks running down a cliff at the top of the cell'
+  2: 'great slabs of rock breaking loose'
+  3: 'impact: the rocks crash down onto the center with a huge burst of dust'
+  4: 'dust and rocks rolling outward'
+  5: 'dust settling'
+  6: 'faint dust'
+placeholder: { accent: '#a07850' }

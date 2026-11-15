@@ -1,0 +1,21 @@
+id: rock_eater_death
+type: character-anim
+size: large
+character: rock_eater
+chroma: magenta
+summary: '「결」 바위 먹는 벌레 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [rock_eater_ref]
+reference: assets/source/rock_eater_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, its jaws snapping shut'
+  2: 'the worm body recoiling and writhing'
+  3: 'curls up in a tight coil'
+  4: 'its head drooping to the ground'
+  5: 'lies curled and still, dust settling'
+  6: 'lies still (knocked out)'
+placeholder: { shape: beast, color: '#8a6a4a', accent: '#c2c6d1' }

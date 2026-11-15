@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_cult_swordsman
+type: fx
+summary: '「결」 결정타 연환 끊기(斷環) — 천마신교 도객 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three arcs of a chained sword combo linked like a ring'
+  2: 'impact: a single clean slash cuts the ring of arcs with a bright flash'
+  3: 'the arcs breaking apart into fading streaks'
+  4: 'streaks fading'
+  5: 'faint streaks'
+  6: 'almost nothing'
+placeholder: { accent: '#ffd0c0' }

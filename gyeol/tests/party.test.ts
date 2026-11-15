@@ -39,17 +39,18 @@ describe('인물 고르기', () => {
     expect(withCharacter(real, 'born').rules.parryPostureMul).toBeGreaterThan(real.rules.parryPostureMul);
   });
 
-  it('기술(2026-11-14): 인물마다 셋 — 장 규칙이 연 자리(1·2·3)를 동료도 같은 자리로 따른다', () => {
+  it('기술(2026-11-14 셋 → 2026-11-15 다섯): 장 규칙이 연 자리(1~5)를 동료도 같은 자리로 따른다', () => {
     expect(techsFor(real, HAUN, ['nakun'])).toEqual(['nakun']);
-    expect(techsFor(real, HAUN, undefined)).toEqual(['nakun', 'byeogun', 'unhae']);
+    expect(techsFor(real, HAUN, undefined)).toEqual(['nakun', 'byeogun', 'cheongun_chulsu', 'unhae', 'cheonoe_gwiun']);
     expect(techsFor(real, 'kyle', ['nakun'])).toEqual(['shield_rush']);
     expect(techsFor(real, 'elia', ['nakun', 'byeogun'])).toEqual(['mana_rain', 'frost_ward']);
-    expect(techsFor(real, 'born', ['nakun', 'byeogun', 'unhae'])).toEqual(['earth_quake', 'mountain_cleave', 'kazdum_heart']);
+    expect(techsFor(real, 'born', ['nakun', 'byeogun', 'unhae'])).toEqual(['earth_quake', 'mountain_cleave', 'cliff_fall']);
+    expect(techsFor(real, 'elia', ['nakun', 'byeogun', 'cheongun_chulsu', 'unhae', 'cheonoe_gwiun'])).toEqual(['mana_rain', 'frost_ward', 'frost_bloom', 'violet_bolt', 'starfall']);
     expect(techsFor(real, 'kyle', [])).toEqual([]);
-    // 기술마다 자리·주인이 있고, 인물마다 1·2·3 자리가 하나씩
+    // 기술마다 자리·주인이 있고, 인물마다 1~5 자리가 하나씩
     for (const c of ['haun', 'kyle', 'elia', 'born']) {
       const own = real.techs.filter((t) => t.owner === c);
-      expect(own.map((t) => t.slot).sort(), c).toEqual([1, 2, 3]);
+      expect(own.map((t) => t.slot).sort(), c).toEqual([1, 2, 3, 4, 5]);
     }
   });
 

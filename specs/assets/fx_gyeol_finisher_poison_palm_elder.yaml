@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_poison_palm_elder
+type: fx
+summary: '「결」 결정타 얼음 벽(氷壁) — 독장 장로 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a dark green poisoned palm print glowing'
+  2: 'impact: a wall of pale blue ice rises and the palm print shatters against it'
+  3: 'ice shards and green mist bursting apart'
+  4: 'shards falling, the mist fading'
+  5: 'a few shards'
+  6: 'faint frost'
+placeholder: { accent: '#bfe8ff' }

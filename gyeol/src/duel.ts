@@ -175,6 +175,8 @@ export interface FoeDef {
   starter?: boolean;
   /** 이야기에만 나오는 상대(결투장에 안 나온다 — 귀곡애 곽도진 버티기 등) */
   storyOnly?: boolean;
+  /** 결투장 상대(2026-11-15 원작 상대 20종): 이 장을 (어느 칸에서든) 마치면 결투장에 열린다 — 이야기 대결에는 안 나온다 */
+  arenaAfter?: string;
   drills?: { id: string; name: string; note: string; patterns: PatternDef[] }[];
   finisher?: FinisherDef;
   weather?: Weather;
@@ -266,7 +268,7 @@ export interface TechDef {
    * perfect = PERFECT를 chain번(맞아도 줄지 않는다, 엘리아) · posture = 적 체간을 최대치의 chain%만큼 깎았다(보른)
    */
   cond?: 'chain' | 'defend' | 'perfect' | 'posture';
-  /** 기술 자리(1·2·3) — 장 규칙(techs)이 진하운 기술 id로 막아 둔 자리를 동료도 같은 자리로 따른다(2026-11-14) */
+  /** 기술 자리(1~5, 2026-11-15) — 장 규칙(techs)이 진하운 기술 id로 막아 둔 자리를 동료도 같은 자리로 따른다(2026-11-14) */
   slot?: number;
   /** 누구의 기술인가(characters id) */
   owner?: string;
@@ -824,6 +826,8 @@ function regen(d: Duel, dt: number): void {
 }
 
 /** 기술 동작 길이와 피해가 들어가는 순간(그림 연출과 맞춘다) */
+/** 마지막 기술 자리(2026-11-15 인물마다 기술 다섯 — 판이 어두워지고 하늘에서 쏟아지는 연출) */
+export const ULT_SLOT = 5;
 export const TECH_DURATION = 900;
 export const TECH_HIT = 420;
 

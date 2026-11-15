@@ -1,0 +1,21 @@
+id: fire_scale_hound_death
+type: character-anim
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: '「결」 불비늘 삼두견 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [fire_scale_hound_ref]
+reference: assets/source/fire_scale_hound_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck at the joint of the three necks, sparks flying'
+  2: 'the three heads tangling and howling'
+  3: 'the burning scales dimming'
+  4: 'collapses onto its side'
+  5: 'lies still, the scales going dark'
+  6: 'a still beast with dark cooled scales'
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }

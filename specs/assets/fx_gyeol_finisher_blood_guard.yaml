@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_blood_guard
+type: fx
+summary: '「결」 결정타 칼등 치기(刀背) — 청운산 경비 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a sword flat-side gleaming'
+  2: 'impact: a short heavy white arc with a dull flash (a strike with the back of the blade)'
+  3: 'a ring of dust and white streaks'
+  4: 'dust drifting'
+  5: 'faint dust'
+  6: 'almost nothing'
+placeholder: { accent: '#e8e0d0' }

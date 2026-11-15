@@ -17636,6 +17636,2830 @@
       }
     },
     {
+      "id": "goblin",
+      "title": "고블린",
+      "sprite": "goblin",
+      "bg": "bg_elheim_forest",
+      "scale": 0.78,
+      "weather": "leaves",
+      "clashPower": 0.32,
+      "note": "하일론 의뢰판의 단골. 녹슨 단검을 빠르게 두세 번 찌르고, 겁먹은 척 물러섰다가 찌른다. 돌을 던질 때는 조금 느리다.",
+      "hp": 70,
+      "posture": 55,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "stab": {
+          "name": "녹슨 단검",
+          "windup": 380,
+          "recover": 240,
+          "damage": 8,
+          "posture": 8
+        },
+        "rock": {
+          "name": "돌 던지기",
+          "windup": 540,
+          "recover": 300,
+          "damage": 9,
+          "posture": 10
+        },
+        "feint": {
+          "name": "겁먹은 척",
+          "windup": 440,
+          "recover": 300,
+          "damage": 10,
+          "posture": 10,
+          "feint": 360
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "stab"
+            },
+            {
+              "move": "stab",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "rock"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "stab"
+            },
+            {
+              "move": "stab",
+              "after": 100
+            },
+            {
+              "move": "stab",
+              "after": 100
+            },
+            {
+              "move": "rock",
+              "after": 160
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "단검 걷어내기",
+        "hanja": "挑刃",
+        "style": "cross",
+        "line": "녹슨 날은 손목부터 놓는다."
+      },
+      "lines": {
+        "start": [
+          "(녹슨 단검 끝이 떨린다)"
+        ],
+        "stagger": [
+          "(키득거리던 소리가 멎는다)"
+        ],
+        "lose": [
+          "(고블린이 숲 가장자리로 줄행랑친다)"
+        ],
+        "win": [
+          "(고블린 무리가 키득거린다)"
+        ]
+      },
+      "arenaAfter": "ch2"
+    },
+    {
+      "id": "swamp_toad",
+      "title": "늪지 독두꺼비",
+      "sprite": "swamp_toad",
+      "bg": "bg_elheim_forest",
+      "scale": 1.05,
+      "weather": "rain",
+      "clashPower": 0.4,
+      "note": "늪지의 커다란 두꺼비. 혀를 두 번 채찍처럼 날리고, 몸을 부풀리다 멈추는 척. 누런 독 혀(붉은 결)는 피해야 한다.",
+      "hp": 95,
+      "posture": 75,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "tongue": {
+          "name": "혀 채찍",
+          "windup": 440,
+          "recover": 280,
+          "damage": 10,
+          "posture": 10
+        },
+        "belly": {
+          "name": "몸통 박치기",
+          "windup": 700,
+          "recover": 420,
+          "damage": 16,
+          "posture": 18
+        },
+        "puff": {
+          "name": "부풀리는 척",
+          "windup": 520,
+          "recover": 360,
+          "damage": 13,
+          "posture": 13,
+          "feint": 360
+        },
+        "venom": {
+          "name": "누런 독 혀",
+          "windup": 860,
+          "recover": 500,
+          "damage": 20,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_toad_venom"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "tongue"
+            },
+            {
+              "move": "tongue",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "belly"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "puff"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "tongue"
+            },
+            {
+              "move": "venom",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "늪 가르기",
+        "hanja": "斷沼",
+        "style": "quench",
+        "line": "혀끝이 아니다. 숨 쉬는 목이다."
+      },
+      "lines": {
+        "start": [
+          "(누런 혀가 수렁 위를 날름거린다)"
+        ],
+        "stagger": [
+          "(부풀었던 몸이 푹 꺼진다)"
+        ],
+        "lose": [
+          "(두꺼비가 수렁 속으로 가라앉는다)"
+        ],
+        "win": [
+          "(꺽, 하고 운다)"
+        ]
+      },
+      "arenaAfter": "ch2"
+    },
+    {
+      "id": "empty_armor",
+      "title": "빈 갑옷",
+      "sprite": "empty_armor",
+      "bg": "bg_elheim_forest",
+      "scale": 1.0,
+      "weather": "leaves",
+      "clashPower": 0.45,
+      "note": "몸 없는 검은 갑옷. 같은 박자로 창을 세 번 내지른다 — 박자를 세면 받기 쉽다. 갑옷이라 처음 비틀거리기 전까지 베기가 덜 들어간다.",
+      "hp": 100,
+      "posture": 80,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "thrust": {
+          "name": "창 찌르기",
+          "windup": 560,
+          "recover": 320,
+          "damage": 12,
+          "posture": 12
+        },
+        "sweep": {
+          "name": "창 휘두르기",
+          "windup": 720,
+          "recover": 420,
+          "damage": 16,
+          "posture": 18
+        },
+        "feint": {
+          "name": "멈춘 창",
+          "windup": 520,
+          "recover": 340,
+          "damage": 13,
+          "posture": 13,
+          "feint": 320
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "thrust",
+              "after": 200
+            },
+            {
+              "move": "thrust",
+              "after": 200
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "sweep"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "sweep",
+              "after": 220
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "투구 열기",
+        "hanja": "開兜",
+        "style": "shatter",
+        "line": "안에는 아무것도 없었다. 불빛 두 점뿐."
+      },
+      "lines": {
+        "start": [
+          "(투구 안쪽에 붉은 불빛 두 점이 켜진다)"
+        ],
+        "stagger": [
+          "(갑옷 이음매가 덜컹 벌어진다)"
+        ],
+        "lose": [
+          "(빈 갑옷이 무너져 내린다)"
+        ],
+        "win": [
+          "(같은 박자로 다시 창을 세운다)"
+        ]
+      },
+      "arenaAfter": "ch2",
+      "gimmicks": {
+        "armor": 0.6
+      }
+    },
+    {
+      "id": "fire_spirit",
+      "title": "불의 정령",
+      "sprite": "fire_spirit",
+      "bg": "bg_volcano_canyon",
+      "scale": 1.0,
+      "weather": "embers",
+      "clashPower": 0.4,
+      "note": "화로에서 떨어져 나온 불길. 불꽃을 세 번 튀기고, 일렁이다 멈추는 척. 가만두면 불씨가 다시 차오른다(재생) — 쉬지 말고 몰아쳐야 한다. 불기둥(붉은 결)은 피한다.",
+      "hp": 95,
+      "posture": 70,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "burst": {
+          "name": "불꽃 튀기기",
+          "windup": 360,
+          "recover": 240,
+          "damage": 7,
+          "posture": 7,
+          "element": "fire"
+        },
+        "lash": {
+          "name": "불 채찍",
+          "windup": 480,
+          "recover": 300,
+          "damage": 11,
+          "posture": 11,
+          "element": "fire"
+        },
+        "flare": {
+          "name": "일렁이는 척",
+          "windup": 500,
+          "recover": 340,
+          "damage": 13,
+          "posture": 13,
+          "feint": 340,
+          "element": "fire"
+        },
+        "pillar": {
+          "name": "불기둥",
+          "windup": 900,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_flame_pillar",
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "burst"
+            },
+            {
+              "move": "burst",
+              "after": 100
+            },
+            {
+              "move": "burst",
+              "after": 100
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lash"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "flare"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "lash"
+            },
+            {
+              "move": "pillar",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "불씨 끄기",
+        "hanja": "滅燼",
+        "style": "quench",
+        "line": "불로 불을 칠 수는 없다."
+      },
+      "lines": {
+        "start": [
+          "(불길이 사람의 모양으로 일어선다)"
+        ],
+        "stagger": [
+          "(불길이 낮게 가라앉는다)"
+        ],
+        "lose": [
+          "(불씨 하나만 남기고 꺼진다)"
+        ],
+        "win": [
+          "(화로 쪽으로 불길이 번진다)"
+        ]
+      },
+      "arenaAfter": "ch3",
+      "gimmicks": {
+        "regen": 3
+      }
+    },
+    {
+      "id": "ice_gatekeeper",
+      "title": "얼음 궁전의 문지기",
+      "sprite": "ice_gatekeeper",
+      "bg": "bg_arden",
+      "scale": 1.15,
+      "weather": "snow",
+      "clashPower": 0.55,
+      "note": "십 년 전 그 밤에 멈춘 아르덴의 기사. 같은 궤적으로 두 번 내려벤다. 서리꽃 방패는 밀다 멈추는 척. 성문 닫기(붉은 결)는 피한다. 다시 일어서면 얼음 갑옷을 두른다.",
+      "hp": 140,
+      "posture": 100,
+      "postureRegen": 10,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "strike": {
+          "name": "같은 궤적",
+          "windup": 640,
+          "recover": 360,
+          "damage": 15,
+          "posture": 16,
+          "element": "ice"
+        },
+        "shield": {
+          "name": "방패 밀기",
+          "windup": 520,
+          "recover": 320,
+          "damage": 12,
+          "posture": 14
+        },
+        "frost": {
+          "name": "서리꽃 방패",
+          "windup": 560,
+          "recover": 360,
+          "damage": 13,
+          "posture": 13,
+          "feint": 340,
+          "element": "ice"
+        },
+        "gate": {
+          "name": "성문 닫기",
+          "windup": 980,
+          "recover": 540,
+          "damage": 24,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_frost_gate",
+          "element": "ice"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "strike"
+            },
+            {
+              "move": "strike",
+              "after": 220
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "shield"
+            },
+            {
+              "move": "strike",
+              "after": 180
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "frost"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "strike"
+            },
+            {
+              "move": "gate",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "그 밤을 닫다",
+        "hanja": "閉夜",
+        "style": "shatter",
+        "line": "그날 밤은 끝났다. 쉬시오."
+      },
+      "lines": {
+        "start": [
+          "…성문을, 지킨다.",
+          "아르덴의 문은 열리지 않는다."
+        ],
+        "stagger": [
+          "(서리꽃이 방패에서 떨어진다)"
+        ],
+        "crisis": [
+          "…가렛 경, 아직이오?"
+        ],
+        "win": [
+          "돌아가라."
+        ],
+        "lose": [
+          "…교대, 인가."
+        ]
+      },
+      "arenaAfter": "ch4",
+      "phases": [
+        {
+          "name": "그 밤의 검",
+          "line": "성문은, 닫혀 있어야 한다.",
+          "hp": 110,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "stand": {
+              "name": "성문 앞의 자세",
+              "windup": 900,
+              "recover": 420,
+              "damage": 20,
+              "posture": 22,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "strike"
+                },
+                {
+                  "move": "strike",
+                  "after": 160
+                },
+                {
+                  "move": "strike",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "stand"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "frost"
+                },
+                {
+                  "move": "shield",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "shield"
+                },
+                {
+                  "move": "gate",
+                  "after": 220
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "armor": 0.4
+          }
+        }
+      ]
+    },
+    {
+      "id": "edric_rowen",
+      "title": "에드릭 로웬",
+      "sprite": "edric_rowen",
+      "bg": "bg_arden",
+      "scale": 1.18,
+      "weather": "snow",
+      "clashPower": 0.6,
+      "note": "카일의 아버지. 방패로 치고 곧장 로웬의 검이 따라온다. 맹세의 일격은 드는 척 늦게 내린다. 흰 눈송이 문장(붉은 결)은 피한다.",
+      "hp": 150,
+      "posture": 110,
+      "postureRegen": 11,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "bash": {
+          "name": "방패 치기",
+          "windup": 460,
+          "recover": 300,
+          "damage": 11,
+          "posture": 13
+        },
+        "sword": {
+          "name": "로웬의 검",
+          "windup": 580,
+          "recover": 340,
+          "damage": 15,
+          "posture": 16,
+          "element": "ice"
+        },
+        "oath": {
+          "name": "맹세의 일격",
+          "windup": 620,
+          "recover": 380,
+          "damage": 18,
+          "posture": 18,
+          "feint": 360,
+          "element": "ice"
+        },
+        "crest": {
+          "name": "흰 눈송이 문장",
+          "windup": 960,
+          "recover": 540,
+          "damage": 26,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_rowen_crest",
+          "element": "ice"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "bash"
+            },
+            {
+              "move": "sword",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "sword"
+            },
+            {
+              "move": "sword",
+              "after": 200
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "oath"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "sword"
+            },
+            {
+              "move": "crest",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "문장을 내리다",
+        "hanja": "降紋",
+        "style": "cross",
+        "line": "로웬의 일은 로웬이 끝낸다."
+      },
+      "lines": {
+        "start": [
+          "(눈동자 대신 푸른 빛이 얼어붙어 있다)",
+          "…남쪽 성문."
+        ],
+        "stagger": [
+          "…카일?"
+        ],
+        "crisis": [
+          "(방패의 눈송이 문장이 빛난다)"
+        ],
+        "win": [
+          "(검을 다시 세운다)"
+        ],
+        "lose": [
+          "…잘 컸구나."
+        ]
+      },
+      "arenaAfter": "ch4",
+      "phases": [
+        {
+          "name": "로웬의 일은 로웬이",
+          "line": "(얼어붙은 눈이 카일 쪽을 본다)",
+          "hp": 120,
+          "speed": 0.88,
+          "roar": 1600,
+          "moves": {
+            "guard": {
+              "name": "방패를 세운 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 22,
+              "posture": 24,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "bash"
+                },
+                {
+                  "move": "sword",
+                  "after": 140
+                },
+                {
+                  "move": "sword",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "guard"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "oath"
+                },
+                {
+                  "move": "bash",
+                  "after": 140
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "sword"
+                },
+                {
+                  "move": "crest",
+                  "after": 220
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mountain_hand",
+      "title": "벽에서 솟은 손",
+      "sprite": "mountain_hand",
+      "bg": "bg_kazdum",
+      "scale": 1.35,
+      "weather": "ash",
+      "clashPower": 0.6,
+      "note": "벽이 아니었다. 바위로 된 손. 손가락을 두 번 튕기고, 크게 움켜쥐거나 내려친다. 베어 낸 자리를 돌이 메운다(재생).",
+      "hp": 110,
+      "posture": 100,
+      "postureRegen": 10,
+      "idle": [
+        900,
+        1400
+      ],
+      "moves": {
+        "flick": {
+          "name": "손가락 튕기기",
+          "windup": 380,
+          "recover": 260,
+          "damage": 8,
+          "posture": 8
+        },
+        "grab": {
+          "name": "움켜쥐기",
+          "windup": 760,
+          "recover": 420,
+          "damage": 16,
+          "posture": 18
+        },
+        "slap": {
+          "name": "손바닥 내려치기",
+          "windup": 900,
+          "recover": 500,
+          "damage": 20,
+          "posture": 22
+        },
+        "creep": {
+          "name": "기어오는 척",
+          "windup": 600,
+          "recover": 380,
+          "damage": 14,
+          "posture": 14,
+          "feint": 400
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "flick"
+            },
+            {
+              "move": "flick",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "grab"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "slap"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "creep"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "grab"
+            },
+            {
+              "move": "slap",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "손목 끊기",
+        "hanja": "斷腕",
+        "style": "shatter",
+        "line": "산과 이어진 자리부터 끊는다."
+      },
+      "lines": {
+        "start": [
+          "(갱도의 벽이 움직인다)"
+        ],
+        "stagger": [
+          "(손가락 하나가 부서져 떨어진다)"
+        ],
+        "lose": [
+          "(손이 벽 속으로 무너져 들어간다)"
+        ],
+        "win": [
+          "(바위 손이 땅을 움켜쥔다)"
+        ]
+      },
+      "arenaAfter": "ch5",
+      "gimmicks": {
+        "regen": 4
+      }
+    },
+    {
+      "id": "vein_golem",
+      "title": "용암 핏줄 골렘",
+      "sprite": "vein_golem",
+      "bg": "bg_kazdum",
+      "scale": 1.3,
+      "weather": "ash",
+      "clashPower": 0.65,
+      "note": "핏줄이 산의 뿌리와 이어진 골렘. 쿵, 심장이 뛰는 척 멈췄다가 친다. 핏줄 터뜨리기(붉은 결)는 피한다. 다시 일어서면 깨진 자리를 산이 메우고 점점 빨라진다.",
+      "hp": 160,
+      "posture": 130,
+      "postureRegen": 9,
+      "idle": [
+        900,
+        1400
+      ],
+      "moves": {
+        "punch": {
+          "name": "용암 주먹",
+          "windup": 700,
+          "recover": 400,
+          "damage": 18,
+          "posture": 20,
+          "element": "fire"
+        },
+        "stomp": {
+          "name": "짓밟기",
+          "windup": 880,
+          "recover": 480,
+          "damage": 22,
+          "posture": 24
+        },
+        "pulse": {
+          "name": "심장 박동",
+          "windup": 640,
+          "recover": 400,
+          "damage": 18,
+          "posture": 18,
+          "feint": 380,
+          "element": "fire"
+        },
+        "magma": {
+          "name": "핏줄 터뜨리기",
+          "windup": 1000,
+          "recover": 560,
+          "damage": 28,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_magma_vein",
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "punch"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "stomp"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "pulse"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "punch"
+            },
+            {
+              "move": "punch",
+              "after": 200
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "stomp"
+            },
+            {
+              "move": "magma",
+              "after": 280
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "핏줄 식히기",
+        "hanja": "冷脈",
+        "style": "quench",
+        "line": "용암도 결대로 식는다."
+      },
+      "lines": {
+        "start": [
+          "(산 깊은 곳에서 쿵, 소리가 울린다)"
+        ],
+        "stagger": [
+          "(핏줄의 붉은 빛이 꺼진다)"
+        ],
+        "crisis": [
+          "(쿵. 쿵. 쿵.)"
+        ],
+        "win": [
+          "(용암이 발밑으로 흐른다)"
+        ],
+        "lose": [
+          "(골렘이 식은 바위가 되어 무너진다)"
+        ]
+      },
+      "arenaAfter": "ch5",
+      "phases": [
+        {
+          "name": "쿵, 심장이 뛴다",
+          "line": "(쿵. 산 전체가 한 번 뛴다)",
+          "hp": 130,
+          "speed": 0.9,
+          "roar": 1600,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "punch"
+                },
+                {
+                  "move": "punch",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "pulse"
+                },
+                {
+                  "move": "punch",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "stomp"
+                },
+                {
+                  "move": "magma",
+                  "after": 240
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "punch"
+                },
+                {
+                  "move": "punch",
+                  "after": 160
+                },
+                {
+                  "move": "stomp",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "regen": 5,
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.82
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "rock_eater",
+      "title": "바위 먹는 벌레",
+      "sprite": "rock_eater",
+      "bg": "bg_kazdum",
+      "scale": 1.0,
+      "weather": "ash",
+      "clashPower": 0.35,
+      "note": "갱도 벽을 갉아 길을 내는 벌레. 네 번 빠르게 갉고, 땅속으로 파고드는 척 멈춘다. 쇠를 뱉을 때는 조금 느리다.",
+      "hp": 85,
+      "posture": 65,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "gnaw": {
+          "name": "갉기",
+          "windup": 340,
+          "recover": 220,
+          "damage": 6,
+          "posture": 8
+        },
+        "burrow": {
+          "name": "파고들기",
+          "windup": 620,
+          "recover": 380,
+          "damage": 14,
+          "posture": 15
+        },
+        "spit": {
+          "name": "쇠 뱉기",
+          "windup": 520,
+          "recover": 320,
+          "damage": 11,
+          "posture": 11
+        },
+        "dig": {
+          "name": "파고드는 척",
+          "windup": 480,
+          "recover": 340,
+          "damage": 12,
+          "posture": 12,
+          "feint": 360
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "gnaw"
+            },
+            {
+              "move": "gnaw",
+              "after": 90
+            },
+            {
+              "move": "gnaw",
+              "after": 90
+            },
+            {
+              "move": "gnaw",
+              "after": 90
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "burrow"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "spit"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "dig"
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "광맥 찾기",
+        "hanja": "探脈",
+        "style": "cross",
+        "line": "지나간 자리에 쇠가 남는다."
+      },
+      "lines": {
+        "start": [
+          "(바위 갉는 소리가 사방에서 난다)"
+        ],
+        "stagger": [
+          "(턱이 바위에 박혀 버둥댄다)"
+        ],
+        "lose": [
+          "(벌레가 굴 속으로 사라진다)"
+        ],
+        "win": [
+          "(방패 가장자리를 갉아 먹는다)"
+        ]
+      },
+      "arenaAfter": "ch5"
+    },
+    {
+      "id": "blood_guard",
+      "title": "청운산 경비",
+      "sprite": "blood_guard",
+      "bg": "bg_blood_road",
+      "scale": 1.03,
+      "weather": "leaves",
+      "clashPower": 0.42,
+      "note": "붉은 깃발 아래 청운산을 지키는 경비. 몇은 삼 년 전까지 청운문 제자였다. 찌르고 곧장 벤다. 장부를 내미는 척 멈춘다.",
+      "hp": 90,
+      "posture": 70,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "thrust": {
+          "name": "찌르기",
+          "windup": 420,
+          "recover": 260,
+          "damage": 9,
+          "posture": 9
+        },
+        "cut": {
+          "name": "청운검 베기",
+          "windup": 520,
+          "recover": 320,
+          "damage": 12,
+          "posture": 12
+        },
+        "ledger": {
+          "name": "장부 내미는 척",
+          "windup": 480,
+          "recover": 320,
+          "damage": 11,
+          "posture": 11,
+          "feint": 340
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "cut",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "cut"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "ledger"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "thrust",
+              "after": 110
+            },
+            {
+              "move": "thrust",
+              "after": 110
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "칼등 치기",
+        "hanja": "刀背",
+        "style": "cross",
+        "line": "죽이지 않는다. 같은 밥을 먹었다."
+      },
+      "lines": {
+        "start": [
+          "다섯 집이 한 줄이다. 곡식을 내놓아라."
+        ],
+        "stagger": [
+          "…그 검, 어디서 배웠소?"
+        ],
+        "lose": [
+          "(칼을 떨어뜨리고 물러선다)"
+        ],
+        "win": [
+          "장부에 적어 둔다."
+        ]
+      },
+      "arenaAfter": "ch7"
+    },
+    {
+      "id": "pockmark_vice",
+      "title": "마맛자국 사형",
+      "sprite": "pockmark_vice",
+      "bg": "bg_blood_road",
+      "scale": 1.0,
+      "weather": "leaves",
+      "clashPower": 0.5,
+      "note": "관운각에 숯 심부름을 시켰던 사형. 문을 걷어차고 칼이 따라온다. 호통치는 척 멈추고, 체면을 구길수록 점점 빨라진다.",
+      "hp": 115,
+      "posture": 90,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "kick": {
+          "name": "문 걷어차기",
+          "windup": 480,
+          "recover": 300,
+          "damage": 11,
+          "posture": 13
+        },
+        "slash": {
+          "name": "사형의 칼",
+          "windup": 600,
+          "recover": 360,
+          "damage": 15,
+          "posture": 15
+        },
+        "rage": {
+          "name": "체면 구긴 칼질",
+          "windup": 340,
+          "recover": 220,
+          "damage": 8,
+          "posture": 8
+        },
+        "shout": {
+          "name": "호통치는 척",
+          "windup": 520,
+          "recover": 340,
+          "damage": 14,
+          "posture": 14,
+          "feint": 380
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "slash"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "kick"
+            },
+            {
+              "move": "slash",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "shout"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "rage"
+            },
+            {
+              "move": "rage",
+              "after": 90
+            },
+            {
+              "move": "rage",
+              "after": 90
+            },
+            {
+              "move": "rage",
+              "after": 90
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "숯 심부름",
+        "hanja": "送炭",
+        "style": "cross",
+        "line": "관운각에 숯은 제가 갖다 놓았습니다, 사형."
+      },
+      "lines": {
+        "start": [
+          "잡역 놈이? 네가?",
+          "곡식이 모자라면 사람을 센다."
+        ],
+        "stagger": [
+          "…이, 이놈이!"
+        ],
+        "crisis": [
+          "다들 뭐 하느냐! 쳐라!"
+        ],
+        "win": [
+          "무릎 꿇어라."
+        ],
+        "lose": [
+          "(대열이 흔들린다)"
+        ]
+      },
+      "arenaAfter": "ch7",
+      "gimmicks": {
+        "accelerate": {
+          "step": 0.97,
+          "min": 0.84
+        }
+      }
+    },
+    {
+      "id": "cult_guardian",
+      "title": "신교 호법",
+      "sprite": "cult_guardian",
+      "bg": "bg_nakan",
+      "scale": 1.07,
+      "weather": "embers",
+      "clashPower": 0.5,
+      "note": "세 돌자리를 지키는 호법. 손바닥이 피처럼 붉다. 붉은 장력이라 결이 늦게 보인다 — 집중을 쓰면 처음부터 보인다. 매듭 장력(붉은 결)은 피한다.",
+      "hp": 115,
+      "posture": 90,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "palm": {
+          "name": "붉은 장",
+          "windup": 600,
+          "recover": 360,
+          "damage": 14,
+          "posture": 15,
+          "element": "fire"
+        },
+        "twin": {
+          "name": "쌍장",
+          "windup": 420,
+          "recover": 280,
+          "damage": 9,
+          "posture": 9,
+          "element": "fire"
+        },
+        "seat": {
+          "name": "돌자리 서는 척",
+          "windup": 560,
+          "recover": 360,
+          "damage": 14,
+          "posture": 14,
+          "feint": 360,
+          "element": "fire"
+        },
+        "knot": {
+          "name": "매듭 장력",
+          "windup": 940,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_blood_knot",
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "palm"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "twin"
+            },
+            {
+              "move": "twin",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "seat"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "palm"
+            },
+            {
+              "move": "knot",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "돌자리 비우기",
+        "hanja": "空位",
+        "style": "quench",
+        "line": "하나가 쓰러지면 매듭이 풀린다."
+      },
+      "lines": {
+        "start": [
+          "돌자리는 셋이다.",
+          "진무전엔 아무도 못 들어간다."
+        ],
+        "stagger": [
+          "…매듭이 느슨해진다."
+        ],
+        "win": [
+          "(붉은 손바닥을 거둔다)"
+        ],
+        "lose": [
+          "…진이, 풀린다."
+        ]
+      },
+      "arenaAfter": "ch8",
+      "gimmicks": {
+        "veil": 0.55
+      }
+    },
+    {
+      "id": "branch_elite",
+      "title": "분타 정예",
+      "sprite": "branch_elite",
+      "bg": "bg_nakan",
+      "scale": 1.07,
+      "weather": "embers",
+      "clashPower": 0.52,
+      "note": "분타주 곁을 지키는 정예. 칼을 두 번 잇고 장력을 친다. 물문 닫는 척 멈추고, 끝에 몸을 던진다(무거운 공격 — 겨루기가 된다).",
+      "hp": 120,
+      "posture": 95,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "blade": {
+          "name": "정예의 칼",
+          "windup": 480,
+          "recover": 300,
+          "damage": 12,
+          "posture": 12
+        },
+        "palm": {
+          "name": "장력",
+          "windup": 620,
+          "recover": 360,
+          "damage": 15,
+          "posture": 16,
+          "element": "fire"
+        },
+        "body": {
+          "name": "몸 던지기",
+          "windup": 760,
+          "recover": 420,
+          "damage": 18,
+          "posture": 20,
+          "clash": true
+        },
+        "feint": {
+          "name": "물문 닫는 척",
+          "windup": 500,
+          "recover": 340,
+          "damage": 13,
+          "posture": 13,
+          "feint": 340
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "blade"
+            },
+            {
+              "move": "blade",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "palm"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "blade"
+            },
+            {
+              "move": "body",
+              "after": 200
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "물문 열기",
+        "hanja": "開閘",
+        "style": "cross",
+        "line": "잠긴 방에 아이 서른이 있다."
+      },
+      "lines": {
+        "start": [
+          "분타주께 다가가지 마라."
+        ],
+        "stagger": [
+          "(물문 쪽으로 밀려난다)"
+        ],
+        "win": [
+          "물러가라."
+        ],
+        "lose": [
+          "(계단에 무릎을 꿇는다)"
+        ]
+      },
+      "arenaAfter": "ch8"
+    },
+    {
+      "id": "needle_cultist",
+      "title": "신교 독침수",
+      "sprite": "needle_cultist",
+      "bg": "bg_nakan",
+      "scale": 1.1,
+      "weather": "embers",
+      "clashPower": 0.32,
+      "note": "기둥 뒤에서 가장 약한 자를 노리는 독침수. 독침을 세 번, 다섯 번 잇달아 날린다 — 빠르니 박자를 세자. 침통 터뜨리기(붉은 결)는 피한다.",
+      "hp": 80,
+      "posture": 60,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "needle": {
+          "name": "독침",
+          "windup": 300,
+          "recover": 200,
+          "damage": 5,
+          "posture": 6
+        },
+        "hide": {
+          "name": "기둥 뒤 숨는 척",
+          "windup": 460,
+          "recover": 320,
+          "damage": 10,
+          "posture": 10,
+          "feint": 400
+        },
+        "cloud": {
+          "name": "침통 터뜨리기",
+          "windup": 820,
+          "recover": 480,
+          "damage": 18,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_needle_rain"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "needle"
+            },
+            {
+              "move": "needle",
+              "after": 80
+            },
+            {
+              "move": "needle",
+              "after": 80
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "hide"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "needle"
+            },
+            {
+              "move": "needle",
+              "after": 80
+            },
+            {
+              "move": "needle",
+              "after": 80
+            },
+            {
+              "move": "needle",
+              "after": 80
+            },
+            {
+              "move": "needle",
+              "after": 80
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "needle"
+            },
+            {
+              "move": "cloud",
+              "after": 220
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "침통 빼앗기",
+        "hanja": "奪筒",
+        "style": "cross",
+        "line": "기둥 뒤는 이제 없다."
+      },
+      "lines": {
+        "start": [
+          "(소매 속 침통이 달그락거린다)"
+        ],
+        "stagger": [
+          "(침통이 바닥에 쏟아진다)"
+        ],
+        "win": [
+          "(가장 약한 자를 고른다)"
+        ],
+        "lose": [
+          "(기둥 뒤로 기어 숨는다)"
+        ]
+      },
+      "arenaAfter": "ch8",
+      "gimmicks": {
+        "veil": 0.6
+      }
+    },
+    {
+      "id": "stair_archer",
+      "title": "계단의 궁수",
+      "sprite": "stair_archer",
+      "bg": "bg_heavenly_peak",
+      "scale": 0.9,
+      "weather": "ash",
+      "clashPower": 0.3,
+      "note": "구천 계단 절벽 위 궁수. 화살을 둘, 넷 잇달아 쏜다. 시위를 오래 당기는 척 멈춘다. 화살비(붉은 결)는 피한다.",
+      "hp": 85,
+      "posture": 65,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "arrow": {
+          "name": "화살",
+          "windup": 440,
+          "recover": 260,
+          "damage": 9,
+          "posture": 9
+        },
+        "draw": {
+          "name": "시위 당기는 척",
+          "windup": 560,
+          "recover": 360,
+          "damage": 12,
+          "posture": 12,
+          "feint": 420
+        },
+        "rain": {
+          "name": "화살비",
+          "windup": 900,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_arrow_rain"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "arrow"
+            },
+            {
+              "move": "arrow",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "draw"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "arrow"
+            },
+            {
+              "move": "arrow",
+              "after": 100
+            },
+            {
+              "move": "arrow",
+              "after": 100
+            },
+            {
+              "move": "arrow",
+              "after": 100
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "draw"
+            },
+            {
+              "move": "rain",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "시위 끊기",
+        "hanja": "斷弦",
+        "style": "cross",
+        "line": "빗소리가 멎었다."
+      },
+      "lines": {
+        "start": [
+          "(절벽 위에서 시위 당기는 소리)"
+        ],
+        "stagger": [
+          "(활이 부러진다)"
+        ],
+        "win": [
+          "(화살이 빗소리처럼 꽂힌다)"
+        ],
+        "lose": [
+          "(계단 아래로 굴러 떨어진다)"
+        ]
+      },
+      "arenaAfter": "ch9"
+    },
+    {
+      "id": "poison_palm_elder",
+      "title": "독장 장로",
+      "sprite": "poison_palm_elder",
+      "bg": "bg_heavenly_peak",
+      "scale": 1.02,
+      "weather": "ash",
+      "clashPower": 0.58,
+      "note": "아홉 장로 가운데 독장을 쓰는 이. 손바닥이 검푸르다. 스미는 장을 둘 잇고, 손을 뻗는 척 멈춘다. 검푸른 독장(붉은 결)은 피한다. 다시 일어서면 독무가 결을 가린다.",
+      "hp": 150,
+      "posture": 110,
+      "postureRegen": 10,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "palm": {
+          "name": "독장",
+          "windup": 640,
+          "recover": 380,
+          "damage": 16,
+          "posture": 17
+        },
+        "seep": {
+          "name": "스미는 장",
+          "windup": 520,
+          "recover": 320,
+          "damage": 12,
+          "posture": 14
+        },
+        "feint": {
+          "name": "손 뻗는 척",
+          "windup": 560,
+          "recover": 360,
+          "damage": 14,
+          "posture": 14,
+          "feint": 380
+        },
+        "venom": {
+          "name": "검푸른 독장",
+          "windup": 960,
+          "recover": 540,
+          "damage": 26,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_dark_palm"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "palm"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "seep"
+            },
+            {
+              "move": "seep",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "palm"
+            },
+            {
+              "move": "venom",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "얼음 벽",
+        "hanja": "氷壁",
+        "style": "shatter",
+        "line": "독은 얼음을 녹이지 못했다."
+      },
+      "lines": {
+        "start": [
+          "약한 자부터다.",
+          "방장은 어디 있느냐."
+        ],
+        "stagger": [
+          "…독이, 안 스민다고?"
+        ],
+        "crisis": [
+          "숨을 쉬어라. 숨마다 독이다."
+        ],
+        "win": [
+          "눕거라."
+        ],
+        "lose": [
+          "…얼음이라니."
+        ]
+      },
+      "arenaAfter": "ch9",
+      "phases": [
+        {
+          "name": "독이 스민다",
+          "line": "숨을 쉬어라. 숨마다 독이다.",
+          "hp": 120,
+          "speed": 0.9,
+          "roar": 1500,
+          "moves": {
+            "wait": {
+              "name": "검푸른 손의 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 22,
+              "posture": 24,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "seep"
+                },
+                {
+                  "move": "seep",
+                  "after": 130
+                },
+                {
+                  "move": "palm",
+                  "after": 180
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "wait"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "feint"
+                },
+                {
+                  "move": "venom",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "palm",
+                  "after": 160
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "array_statue",
+      "title": "구천 계단 진법 석인",
+      "sprite": "array_statue",
+      "bg": "bg_heavenly_peak",
+      "scale": 1.2,
+      "weather": "ash",
+      "clashPower": 0.62,
+      "note": "진법을 이루는 돌사람. 진법을 따라 두 번 돌며 치고, 짝을 바꾸는 척 멈춘다. 돌 몸이라 처음 비틀거리기 전까지 베기가 덜 들어간다. 진법 봉인(붉은 결)은 피한다.",
+      "hp": 110,
+      "posture": 100,
+      "postureRegen": 10,
+      "idle": [
+        900,
+        1400
+      ],
+      "moves": {
+        "fist": {
+          "name": "돌 주먹",
+          "windup": 720,
+          "recover": 420,
+          "damage": 17,
+          "posture": 19
+        },
+        "turn": {
+          "name": "진법 돌기",
+          "windup": 520,
+          "recover": 340,
+          "damage": 12,
+          "posture": 13
+        },
+        "pair": {
+          "name": "짝 바꾸는 척",
+          "windup": 620,
+          "recover": 380,
+          "damage": 15,
+          "posture": 15,
+          "feint": 400
+        },
+        "seal": {
+          "name": "진법 봉인",
+          "windup": 980,
+          "recover": 540,
+          "damage": 24,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_stone_seal"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "fist"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "turn"
+            },
+            {
+              "move": "turn",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "pair"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "turn"
+            },
+            {
+              "move": "seal",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "진의 결",
+        "hanja": "陣理",
+        "style": "shatter",
+        "line": "진법에도 결이 있다."
+      },
+      "lines": {
+        "start": [
+          "(석인의 눈에 진법의 빛이 켜진다)"
+        ],
+        "stagger": [
+          "(돌 몸에 금이 간다)"
+        ],
+        "lose": [
+          "(석인이 계단에 주저앉는다)"
+        ],
+        "win": [
+          "(짝이 빈자리를 메운다)"
+        ]
+      },
+      "arenaAfter": "ch9",
+      "gimmicks": {
+        "armor": 0.5
+      }
+    },
+    {
+      "id": "cult_swordsman",
+      "title": "천마신교 도객",
+      "sprite": "cult_swordsman",
+      "bg": "bg_heavenly_peak",
+      "scale": 0.95,
+      "weather": "ash",
+      "clashPower": 0.5,
+      "note": "세 번 잇는 연환도. 첫 칼을 막으면 둘째가, 둘째를 막으면 셋째가 온다 — 셋째가 가장 무겁다. 칼집 소리만 내는 척도 한다.",
+      "hp": 110,
+      "posture": 85,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "c1": {
+          "name": "연환도 첫 칼",
+          "windup": 460,
+          "recover": 240,
+          "damage": 10,
+          "posture": 10
+        },
+        "c2": {
+          "name": "둘째 칼",
+          "windup": 380,
+          "recover": 220,
+          "damage": 10,
+          "posture": 10
+        },
+        "c3": {
+          "name": "셋째 칼",
+          "windup": 520,
+          "recover": 320,
+          "damage": 15,
+          "posture": 16
+        },
+        "feint": {
+          "name": "칼집 소리",
+          "windup": 480,
+          "recover": 320,
+          "damage": 12,
+          "posture": 12,
+          "feint": 340
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "c1"
+            },
+            {
+              "move": "c2",
+              "after": 90
+            },
+            {
+              "move": "c3",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "c1"
+            },
+            {
+              "move": "c2",
+              "after": 90
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "feint"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "c3"
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "연환 끊기",
+        "hanja": "斷環",
+        "style": "cross",
+        "line": "셋째 칼은 오지 않는다."
+      },
+      "lines": {
+        "start": [
+          "여기서부터는 베고 지나간다."
+        ],
+        "stagger": [
+          "…셋째가, 막혔다?"
+        ],
+        "win": [
+          "다음."
+        ],
+        "lose": [
+          "(칼을 칼집에 넣는다)"
+        ]
+      },
+      "arenaAfter": "ch9"
+    },
+    {
+      "id": "fire_scale_hound",
+      "title": "불비늘 삼두견",
+      "sprite": "fire_scale_hound",
+      "bg": "bg_rift",
+      "scale": 1.15,
+      "weather": "ash",
+      "clashPower": 0.5,
+      "note": "틈에서 쏟아진 머리 셋 달린 짐승. 세 머리가 차례로 물고, 짖는 척 멈춘다. 비늘이 칼을 튕겨 내 처음 비틀거리기 전까지 베기가 덜 들어간다 — 받아 내 체간을 무너뜨리자. 세 갈래 불길(붉은 결)은 피한다.",
+      "hp": 110,
+      "posture": 85,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1200
+      ],
+      "moves": {
+        "bite": {
+          "name": "세 머리 물기",
+          "windup": 360,
+          "recover": 220,
+          "damage": 8,
+          "posture": 8,
+          "element": "fire"
+        },
+        "lunge": {
+          "name": "불비늘 덮치기",
+          "windup": 640,
+          "recover": 380,
+          "damage": 16,
+          "posture": 17,
+          "element": "fire"
+        },
+        "howl": {
+          "name": "짖는 척",
+          "windup": 500,
+          "recover": 340,
+          "damage": 13,
+          "posture": 13,
+          "feint": 380,
+          "element": "fire"
+        },
+        "breath": {
+          "name": "세 갈래 불길",
+          "windup": 920,
+          "recover": 520,
+          "damage": 24,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_triple_flame",
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "bite"
+            },
+            {
+              "move": "bite",
+              "after": 90
+            },
+            {
+              "move": "bite",
+              "after": 90
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lunge"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "howl"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "bite"
+            },
+            {
+              "move": "breath",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "이음매 베기",
+        "hanja": "斷合",
+        "style": "cross",
+        "line": "결만 보고, 날만 얹는다."
+      },
+      "lines": {
+        "start": [
+          "(세 머리가 동시에 으르렁거린다)"
+        ],
+        "stagger": [
+          "(세 머리가 엉킨다)"
+        ],
+        "lose": [
+          "(불비늘이 꺼지며 쓰러진다)"
+        ],
+        "win": [
+          "(세 머리가 하늘을 보고 짖는다)"
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "armor": 0.5
+      }
+    },
+    {
+      "id": "sa_mugyeol",
+      "title": "교주 사무결",
+      "sprite": "sa_mugyeol",
+      "bg": "bg_heavenly_peak",
+      "scale": 1.08,
+      "weather": "embers",
+      "clashPower": 0.7,
+      "note": "천마신교 교주. 손날을 둘 잇고 핏빛 장력. '아직 베지 마시오' — 드는 척 오래 멈춘다. 피가 결을 덮어 늦게 보이니 집중을 쓰자. 하늘 찢기(붉은 결)는 피한다. 두 번 다시 일어선다.",
+      "hp": 180,
+      "posture": 140,
+      "postureRegen": 10,
+      "idle": [
+        900,
+        1400
+      ],
+      "moves": {
+        "cut": {
+          "name": "손날",
+          "windup": 420,
+          "recover": 260,
+          "damage": 10,
+          "posture": 11
+        },
+        "palm": {
+          "name": "핏빛 장력",
+          "windup": 560,
+          "recover": 320,
+          "damage": 14,
+          "posture": 15,
+          "element": "fire"
+        },
+        "wait": {
+          "name": "아직 베지 마시오",
+          "windup": 680,
+          "recover": 400,
+          "damage": 18,
+          "posture": 18,
+          "feint": 420
+        },
+        "tear": {
+          "name": "하늘 찢기",
+          "windup": 1000,
+          "recover": 560,
+          "damage": 30,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_gyeol_skill_sky_tear",
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "cut"
+            },
+            {
+              "move": "cut",
+              "after": 110
+            },
+            {
+              "move": "palm",
+              "after": 180
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "palm"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "wait"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "palm"
+            },
+            {
+              "move": "tear",
+              "after": 280
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "결을 돌려주다",
+        "hanja": "還理",
+        "style": "quench",
+        "line": "재료가 아니다. 사람이다."
+      },
+      "lines": {
+        "start": [
+          "아직 베지 마시오.",
+          "두 세계를 담고도 사는 재료로군."
+        ],
+        "clash": [
+          "피가 결을 덮는다."
+        ],
+        "stagger": [
+          "…흥미롭군."
+        ],
+        "crisis": [
+          "하늘이 찢어지는 소리를 들어 보았소?"
+        ],
+        "win": [
+          "좋은 재료요."
+        ],
+        "lose": [
+          "…베지 않는 건가."
+        ]
+      },
+      "arenaAfter": "ch9",
+      "gimmicks": {
+        "veil": 0.5
+      },
+      "phases": [
+        {
+          "name": "피가 결을 덮는다",
+          "line": "피가 결을 덮는다. 보이시오?",
+          "hp": 150,
+          "speed": 0.88,
+          "damageMul": 1.1,
+          "roar": 1600,
+          "moves": {
+            "blood": {
+              "name": "피를 두른 자세",
+              "windup": 950,
+              "recover": 420,
+              "damage": 24,
+              "posture": 26,
+              "stance": true
+            }
+          },
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "cut"
+                },
+                {
+                  "move": "cut",
+                  "after": 100
+                },
+                {
+                  "move": "cut",
+                  "after": 100
+                },
+                {
+                  "move": "palm",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "blood"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "wait"
+                },
+                {
+                  "move": "palm",
+                  "after": 160
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "tear",
+                  "after": 240
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "veil": 0.4,
+            "armor": 0.45
+          }
+        },
+        {
+          "name": "두 세계의 흐름",
+          "line": "두 세계를 담고도 사는가. 보여 주시오.",
+          "hp": 130,
+          "speed": 0.8,
+          "damageMul": 1.2,
+          "roar": 1700,
+          "patterns": [
+            {
+              "weight": 3,
+              "steps": [
+                {
+                  "move": "palm"
+                },
+                {
+                  "move": "cut",
+                  "after": 120
+                },
+                {
+                  "move": "tear",
+                  "after": 220
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "blood"
+                }
+              ]
+            },
+            {
+              "weight": 2,
+              "steps": [
+                {
+                  "move": "cut"
+                },
+                {
+                  "move": "cut",
+                  "after": 100
+                },
+                {
+                  "move": "cut",
+                  "after": 100
+                },
+                {
+                  "move": "cut",
+                  "after": 100
+                }
+              ]
+            },
+            {
+              "weight": 1,
+              "steps": [
+                {
+                  "move": "wait"
+                },
+                {
+                  "move": "tear",
+                  "after": 200
+                }
+              ]
+            }
+          ],
+          "gimmicks": {
+            "accelerate": {
+              "step": 0.97,
+              "min": 0.8
+            }
+          }
+        }
+      ]
+    },
+    {
       "id": "firewood",
       "title": "장작 패는 날",
       "sprite": "oak_stump",
@@ -17952,6 +20776,19 @@
       "owner": "haun"
     },
     {
+      "id": "cheongun_chulsu",
+      "name": "청운출수",
+      "hanja": "靑雲出手",
+      "chain": 7,
+      "min": "excellent",
+      "damage": 0.14,
+      "posture": 0.5,
+      "returnMul": 0,
+      "line": "청운십팔식 제일식. 찌르지 않고 피어오른다.",
+      "slot": 3,
+      "owner": "haun"
+    },
+    {
       "id": "unhae",
       "name": "운해귀종",
       "hanja": "雲海歸宗",
@@ -17961,8 +20798,22 @@
       "posture": 1.0,
       "returnMul": 0.75,
       "line": "운해귀종은 베는 초식이 아니다. 돌려보내는 초식이다.",
-      "slot": 3,
+      "slot": 4,
       "owner": "haun"
+    },
+    {
+      "id": "cheonoe_gwiun",
+      "name": "천외귀운",
+      "hanja": "天外歸雲",
+      "chain": 12,
+      "min": "excellent",
+      "damage": 0.24,
+      "posture": 1.0,
+      "returnMul": 1.0,
+      "line": "운하검 최종식, 천외귀운.",
+      "slot": 5,
+      "owner": "haun",
+      "area": true
     },
     {
       "id": "shield_rush",
@@ -17993,17 +20844,46 @@
       "owner": "kyle"
     },
     {
+      "id": "shield_wall",
+      "name": "방패벽",
+      "hanja": "盾壁",
+      "cond": "defend",
+      "chain": 11,
+      "min": "excellent",
+      "damage": 0.1,
+      "posture": 0.6,
+      "returnMul": 0,
+      "line": "벽이 무너지지 않는 한, 아무도 죽지 않아.",
+      "slot": 3,
+      "owner": "kyle",
+      "heal": 0.1
+    },
+    {
+      "id": "wing_cleave",
+      "name": "날개 베기",
+      "hanja": "斬翼",
+      "cond": "defend",
+      "chain": 13,
+      "min": "perfect",
+      "damage": 0.26,
+      "posture": 0.35,
+      "returnMul": 0,
+      "line": "살아서 돌아가면, 이 이야기를 백 번은 우려먹을 거야.",
+      "slot": 4,
+      "owner": "kyle"
+    },
+    {
       "id": "guardian_vow",
       "name": "수호 서약",
       "hanja": "守護誓約",
       "cond": "defend",
-      "chain": 14,
+      "chain": 16,
       "min": "excellent",
       "damage": 0.12,
       "posture": 0.7,
       "returnMul": 0.5,
       "line": "잘못된 명령엔 칼을 들지 않는다. 지킬 사람 앞에서만.",
-      "slot": 3,
+      "slot": 5,
       "owner": "kyle",
       "heal": 0.25
     },
@@ -18038,17 +20918,47 @@
       "area": true
     },
     {
+      "id": "frost_bloom",
+      "name": "서리꽃",
+      "hanja": "霜花",
+      "cond": "perfect",
+      "chain": 7,
+      "min": "excellent",
+      "damage": 0.12,
+      "posture": 0.6,
+      "returnMul": 0,
+      "line": "피어나요, 서리꽃.",
+      "slot": 3,
+      "owner": "elia",
+      "area": true
+    },
+    {
+      "id": "violet_bolt",
+      "name": "보랏빛 번개",
+      "hanja": "紫雷",
+      "cond": "perfect",
+      "chain": 9,
+      "min": "perfect",
+      "damage": 0.2,
+      "posture": 0.45,
+      "returnMul": 0,
+      "line": "첨탑의 번개도 결이에요. 읽을 수 있어요.",
+      "slot": 4,
+      "owner": "elia",
+      "area": true
+    },
+    {
       "id": "starfall",
       "name": "별의 낙하",
       "hanja": "星落",
       "cond": "perfect",
-      "chain": 8,
+      "chain": 11,
       "min": "excellent",
       "damage": 0.2,
       "posture": 0.8,
       "returnMul": 0.3,
       "line": "흐르는 걸 보고 있었어요. 이제 돌려줄게요.",
-      "slot": 3,
+      "slot": 5,
       "owner": "elia",
       "heal": 0.15,
       "area": true
@@ -18082,17 +20992,46 @@
       "owner": "born"
     },
     {
+      "id": "durin_hammer",
+      "name": "두린의 망치",
+      "hanja": "兄槌",
+      "cond": "posture",
+      "chain": 150,
+      "min": "excellent",
+      "damage": 0.18,
+      "posture": 0.4,
+      "returnMul": 0,
+      "line": "두린의 동생, 보른. 카즈둠을 돌려받으러 왔다.",
+      "slot": 3,
+      "owner": "born"
+    },
+    {
+      "id": "cliff_fall",
+      "name": "절벽 무너뜨리기",
+      "hanja": "崩崖",
+      "cond": "posture",
+      "chain": 190,
+      "min": "excellent",
+      "damage": 0.16,
+      "posture": 0.9,
+      "returnMul": 0,
+      "line": "산은 정면으로 안 무너진다.",
+      "slot": 4,
+      "owner": "born",
+      "area": true
+    },
+    {
       "id": "kazdum_heart",
       "name": "카즈둠의 심장",
       "hanja": "山心",
       "cond": "posture",
-      "chain": 180,
+      "chain": 230,
       "min": "excellent",
       "damage": 0.12,
       "posture": 1.0,
       "returnMul": 0.6,
       "line": "오천의 망치가 같이 내려친다.",
-      "slot": 3,
+      "slot": 5,
       "owner": "born"
     }
   ],
@@ -18134,15 +21073,17 @@
         "fallbackStand": "haun_sword_stand",
         "trait": "균형",
         "traits": [
-          "기술 셋 — 낙운무흔 · 벽운단하 · 운해귀종",
-          "기술 조건 — 결 연환: 끊기지 않고 이어 받기(5·5 PERFECT·10)",
+          "기술 다섯 — 낙운무흔 · 벽운단하 · 청운출수 · 운해귀종 · 천외귀운",
+          "기술 조건 — 결 연환: 끊기지 않고 이어 받기(5·5 PERFECT·7·10·12)",
           "모든 판정 폭이 기본",
           "연베기·강베기 모두 기본"
         ],
         "techs": [
           "nakun",
           "byeogun",
-          "unhae"
+          "cheongun_chulsu",
+          "unhae",
+          "cheonoe_gwiun"
         ],
         "counterFx": {
           "sprite": "fx_gyeol_counter_haun",
@@ -18161,8 +21102,8 @@
         "joinAfter": "ch2",
         "trait": "철벽",
         "traits": [
-          "기술 셋 — 방패 돌진 · 로웬의 일격 · 수호 서약",
-          "기술 조건 — 막아 낸 수: 맞지 않고 받기·막기·피하기 6·9·14번",
+          "기술 다섯 — 방패 돌진 · 로웬의 일격 · 방패벽 · 날개 베기 · 수호 서약",
+          "기술 조건 — 막아 낸 수: 맞지 않고 받기·막기·피하기 6·9·11·13·16번",
           "막기가 단단하다 — 이르게 눌러도 피해 1/10, 막기 폭이 넓다",
           "체력·체간이 크다(130)",
           "베기가 무겁고 느리다 · 강베기 피해 2.8배",
@@ -18191,6 +21132,8 @@
         "techs": [
           "shield_rush",
           "rowen_oath",
+          "shield_wall",
+          "wing_cleave",
           "guardian_vow"
         ],
         "counterFx": {
@@ -18227,8 +21170,8 @@
         "joinAfter": "ch2",
         "trait": "심안",
         "traits": [
-          "기술 셋 — 마나 화살비 · 서리 결계 · 별의 낙하",
-          "기술 조건 — PERFECT 3·5·8번(맞아도 줄지 않는다)",
+          "기술 다섯 — 마나 화살비 · 서리 결계 · 서리꽃 · 보랏빛 번개 · 별의 낙하",
+          "기술 조건 — PERFECT 3·5·7·9·11번(맞아도 줄지 않는다)",
           "마력 구슬 반격 — 받을 때마다 구슬이 쌓이고(PERFECT 2개), 베면 구슬을 쏘아 막히지 않는 반격(최대 3개)",
           "결이 잘 보인다 — PERFECT 폭 1.4배",
           "집중이 빨리 차고(처음 60) 더 오래·더 느리게",
@@ -18271,6 +21214,8 @@
         "techs": [
           "mana_rain",
           "frost_ward",
+          "frost_bloom",
+          "violet_bolt",
           "starfall"
         ],
         "counterFx": {
@@ -18307,8 +21252,8 @@
         "joinAfter": "ch2",
         "trait": "산의 결",
         "traits": [
-          "기술 셋 — 대지 울림 · 산 가르기 · 카즈둠의 심장",
-          "기술 조건 — 체간 깎기: 적 체간을 60·110·180%만큼",
+          "기술 다섯 — 대지 울림 · 산 가르기 · 두린의 망치 · 절벽 무너뜨리기 · 카즈둠의 심장",
+          "기술 조건 — 체간 깎기: 적 체간을 60·110·150·190·230%만큼",
           "받을 때마다 적 체간을 크게 깎는다(1.6 → 2.2배)",
           "체간이 단단하고 빨리 돈다(170)",
           "강베기가 막는 칼을 부순다(체간 5배)",
@@ -18337,6 +21282,8 @@
         "techs": [
           "earth_quake",
           "mountain_cleave",
+          "durin_hammer",
+          "cliff_fall",
           "kazdum_heart"
         ],
         "counterFx": {

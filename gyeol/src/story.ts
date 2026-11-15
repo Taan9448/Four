@@ -6,7 +6,7 @@ import { button, el, rankBadge, realArt } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
 import { clearSlot, loadSave, SLOT_COUNT, storyDifficulty, useSlot, withKeys, writeSave, type StoryDifficulty } from './save';
-import { announceAchievements, charPicker, setKeys, type Nav } from './screens';
+import { announceAchievements, charPicker, getSlotsMode, setKeys, setSlotsMode, type Nav } from './screens';
 import { chapterCharacter, characterOf, faceId, faceStyle, leadLine, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
 
@@ -224,7 +224,10 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
     { class: 'screen-head' },
     button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')),
     el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, `${save.slot + 1}번 칸 · ${DIFF_NAME[storyDifficulty(save)]} — 운곡루의 밤, 지나온 싸움을 하나씩 떠올린다.`)),
-    button('칸 바꾸기', 'btn small slot-switch', () => nav.go('slots')),
+    button('칸 바꾸기', 'btn small slot-switch', () => {
+      setSlotsMode('load');
+      nav.go('slots');
+    }),
   );
   const map = el('div', { class: `story-map${art ? ' has-art' : ''}`, style: art ? `background-image:url("${art}")` : '' }, svg, ...pins);
   app.replaceChildren(el('section', { class: 'screen story story-screen' }, head, el('div', { class: 'story-frame' }, map, card)));
@@ -269,19 +272,36 @@ const DIFF_NOTE: Record<StoryDifficulty, string> = {
   hard: '모든 상대가 처음과 다른 패턴으로 싸운다 — 체력 1.4배 · 공격력 1.3배 · 단계 하나 더.',
 };
 
+/**
+ * 저장 3칸(2026-11-14 → 2026-11-15 「천외귀환」처럼 메인의 새로 시작·불러오기로 나눔):
+ * new = 저장할 칸 고르기(빈 칸은 보통·어려움으로 시작, 찬 칸은 덮어쓰기 확인) · load = 찬 칸을 이어하기·지우기
+ */
 export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const mode = getSlotsMode();
   const save = loadSave();
   const titleOf = (id: string) => story.chapters.find((c) => c.id === id);
+  const begin = (i: number, diff: StoryDifficulty, overwrite: boolean) => {
+    if (overwrite && !confirm(`${i + 1}번 칸의 이야기 진행을 지우고 처음부터 시작한다. 기록·업적·옷은 남는다.`)) return;
+    let s = loadSave();
+    if (overwrite) s = clearSlot(s, i);
+    s.slots[i] = null;
+    writeSave(useSlot(s, i, diff));
+    renderStory(app, nav, data);
+  };
+  const startBtns = (i: number, overwrite: boolean) =>
+    (['normal', 'hard'] as const).map((diff) =>
+      button([el('b', {}, `${overwrite ? '덮어쓰기' : '새로 시작'} — ${DIFF_NAME[diff]}`), el('small', {}, DIFF_NOTE[diff])], `res-btn${diff === 'normal' && !overwrite ? ' primary' : ''} slot-new`, () => begin(i, diff, overwrite)),
+    );
   const card = (i: number) => {
     const sl = save.slots[i];
     if (!sl) {
-      const start = (diff: StoryDifficulty) =>
-        button([el('b', {}, `새로 시작 — ${DIFF_NAME[diff]}`), el('small', {}, DIFF_NOTE[diff])], `res-btn${diff === 'normal' ? ' primary' : ''} slot-new`, () => {
-          const s = useSlot(loadSave(), i, diff);
-          writeSave(s);
-          renderStory(app, nav, data);
-        });
-      return el('article', { class: 'slot-card empty panel' }, el('p', { class: 'slot-no' }, `${i + 1}번 칸`), el('h2', {}, '빈 칸'), el('div', { class: 'slot-actions' }, start('normal'), start('hard')));
+      return el(
+        'article',
+        { class: `slot-card empty panel${mode === 'load' ? ' dim' : ''}` },
+        el('p', { class: 'slot-no' }, `${i + 1}번 칸`),
+        el('h2', {}, '빈 칸'),
+        mode === 'new' ? el('div', { class: 'slot-actions' }, ...startBtns(i, false)) : el('p', { class: 'slot-meta' }, '저장된 이야기가 없다'),
+      );
     }
     const done = story.chapters.filter((c) => sl.story.cleared.includes(c.id));
     const last = done.at(-1);
@@ -305,18 +325,21 @@ export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
       el('p', { class: 'slot-no' }, `${i + 1}번 칸`, el('span', { class: `slot-diff ${sl.difficulty}` }, DIFF_NAME[sl.difficulty])),
       el('h2', {}, next ? `${next.title} · ${next.subtitle}` : '모두 마쳤다'),
       el('p', { class: 'slot-meta' }, `${last ? `${titleOf(last.id)?.title ?? ''}까지 마침` : '아직 시작 전'} · 별 ${stars}${when ? ` · ${when}` : ''}`),
-      el('div', { class: 'slot-actions' }, go, del),
+      mode === 'new' ? el('div', { class: 'slot-actions' }, ...startBtns(i, true)) : el('div', { class: 'slot-actions' }, go, del),
     );
   };
+  const title = mode === 'new' ? '새로 시작' : '불러오기';
+  const sub = mode === 'new' ? '이야기를 저장할 칸을 고른다. 빈 칸이 좋다 — 찬 칸을 고르면 그 진행을 지우고 처음부터.' : '이야기를 이어 갈 칸을 고른다. 기록·업적·옷은 모든 칸이 함께 쓴다.';
   app.replaceChildren(
     el(
       'section',
-      { class: 'screen slots' },
-      el('header', { class: 'screen-head' }, button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')), el('div', {}, el('h1', {}, '불러오기'), el('p', { class: 'sub' }, '이야기를 이어 갈 칸을 고른다. 기록·업적·옷은 모든 칸이 함께 쓴다.'))),
+      { class: `screen slots ${mode}` },
+      el('header', { class: 'screen-head' }, button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')), el('div', {}, el('h1', {}, title), el('p', { class: 'sub' }, sub))),
       el('div', { class: 'slot-grid' }, ...Array.from({ length: SLOT_COUNT }, (_, i) => card(i))),
     ),
   );
-  (app.querySelector('.slot-card.on .res-btn.primary, .slot-card .res-btn.primary') as HTMLButtonElement | null)?.focus();
+  const focus = mode === 'new' ? '.slot-card.empty .res-btn.primary, .slot-card .res-btn' : '.slot-card.on .res-btn.primary, .slot-card .res-btn.primary';
+  (app.querySelector(focus) as HTMLButtonElement | null)?.focus();
   setKeys((e) => {
     if (e.key === 'Escape') nav.go('lobby');
   });

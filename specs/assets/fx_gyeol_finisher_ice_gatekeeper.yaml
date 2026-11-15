@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_ice_gatekeeper
+type: fx
+summary: '「결」 결정타 그 밤을 닫다(閉夜) — 얼음 궁전의 문지기 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a tall frosted gate outline glowing pale blue'
+  2: 'impact: a golden vertical slash closes the gate with a ring of frost'
+  3: 'the frost ring spreading and breaking into falling snowflakes'
+  4: 'snowflakes falling softly'
+  5: 'a few snowflakes'
+  6: 'faint sparkle'
+placeholder: { accent: '#bfe8ff' }

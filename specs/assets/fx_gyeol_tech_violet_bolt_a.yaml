@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_violet_bolt_a
+type: fx
+summary: '「결」 동료 기술 보랏빛 번개(紫雷) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'violet sparks gathering at the top of the cell'
+  2: 'a jagged violet lightning bolt forking down'
+  3: 'impact: several violet bolts strike the center with a bright flash'
+  4: 'electric arcs crackling outward'
+  5: 'small violet sparks'
+  6: 'faint arcs'
+placeholder: { accent: '#9a5cff' }

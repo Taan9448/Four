@@ -1,0 +1,21 @@
+id: cult_guardian_death
+type: character-anim
+size: large
+character: cult_guardian
+chroma: green
+summary: '「결」 신교 호법 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [cult_guardian_ref]
+reference: assets/source/cult_guardian_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the red glow on his palms bursting into mist'
+  2: 'staggers back, hands shaking'
+  3: 'sinks to one knee, the red glow fading'
+  4: 'both hands on the ground'
+  5: 'kneels with head bowed, palms pale again'
+  6: 'kneeling defeated (not dead)'
+placeholder: { shape: humanoid, color: '#5a1a24', accent: '#ff3b3b' }

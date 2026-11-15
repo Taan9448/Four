@@ -1,0 +1,21 @@
+id: fire_spirit_death
+type: character-anim
+size: large
+character: fire_spirit
+chroma: magenta
+summary: '「결」 불의 정령 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [fire_spirit_ref]
+reference: assets/source/fire_spirit_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the flame body splitting apart'
+  2: 'the flames shrinking and flickering wildly'
+  3: 'the flame figure sinking down into itself'
+  4: 'only a low pile of flames remains'
+  5: 'a few small embers glowing on the ground'
+  6: 'a single faint ember and a thin wisp of smoke'
+placeholder: { shape: humanoid, color: '#f2a03a', accent: '#ffe08a' }

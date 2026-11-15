@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_needle_cultist
+type: fx
+summary: '「결」 결정타 침통 빼앗기(奪筒) — 신교 독침수 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a small needle case with green needles'
+  2: 'impact: a quick slash knocks the case away, needles scattering in a starburst'
+  3: 'green needles spinning away'
+  4: 'needles falling'
+  5: 'a few needles'
+  6: 'almost nothing'
+placeholder: { accent: '#a8e08a' }

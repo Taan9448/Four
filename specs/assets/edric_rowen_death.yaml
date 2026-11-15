@@ -1,0 +1,21 @@
+id: edric_rowen_death
+type: character-anim
+size: large
+character: edric_rowen
+chroma: magenta
+summary: '「결」 에드릭 로웬 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [edric_rowen_ref]
+reference: assets/source/edric_rowen_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the shield with the snowflake crest knocked aside'
+  2: 'staggers back, the frozen blue light in his eyes flickering'
+  3: 'sinks to one knee, sword planted in the ground'
+  4: 'the ice on his armor cracking and falling away'
+  5: 'kneels with head bowed, the blue light fading from his eyes'
+  6: 'kneeling in peace, both hands on the sword hilt (not dead)'
+placeholder: { shape: humanoid, color: '#7fb6d6', accent: '#4fb4ff' }

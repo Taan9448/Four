@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_stone_seal
+type: fx
+summary: '「결」 받을 수 없는 기술 구천 계단 진법 석인 「진법 봉인」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-15 결투장 새 상대). 칸 안쪽 80%에서 끝나게'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'golden array lines drawing a circle on the ground'
+  2: 'impact: the array flashes and stone pillars rise around the center'
+  3: 'golden light and stone dust'
+  4: 'the light fading, dust falling'
+  5: 'dust'
+  6: 'faint motes'
+placeholder: { accent: '#ffe08a' }

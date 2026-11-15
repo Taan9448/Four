@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_cheongun_chulsu_a
+type: fx
+summary: '「결」 진하운 기술 청운출수(靑雲出手) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a soft teal ring of cloud blooming from below'
+  2: 'teal cloud ribbons rising upward like a flower opening'
+  3: 'impact: a rising teal-white slash bursts upward through the center with a bright flash'
+  4: 'cloud petals spreading out'
+  5: 'teal petals drifting'
+  6: 'faint teal motes'
+placeholder: { accent: '#7fd6c8' }

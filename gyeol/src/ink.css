@@ -496,3 +496,22 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 .acct-btns-row { display: flex; gap: 8px; margin: 8px 0 2px; }
 .acct-btns-row .btn { flex: 1 1 0; white-space: nowrap; word-break: keep-all; }
 .row.acct b { min-width: 0; overflow-wrap: anywhere; }
+
+/* ── 메인 메뉴 다섯(2026-11-15 「천외귀환」처럼 이어하기·새로 시작·불러오기·결투장·수련장) ── */
+.lobby.main .lobby-menu { gap: 10px; }
+.lobby.main .lobby-menu .menu-btn { height: 62px; font-size: 24px; }
+.menu-btn .menu-label { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.menu-btn .menu-sub { font-family: var(--font-body); font-size: 12px; letter-spacing: 0; color: var(--paper-dim); margin-top: 3px; white-space: nowrap; }
+.lobby.main .lobby-menu .menu-btn.primary::before { background-color: rgba(120, 30, 22, 0.9); }
+.art-ink .lobby.main .lobby-menu .menu-btn.primary { filter: drop-shadow(0 0 8px rgba(214, 64, 46, 0.45)); }
+.lobby.main .lobby-menu .menu-btn.primary:has(.menu-sub) { height: 72px; }
+.slot-card.dim { opacity: 0.55; }
+@media (max-width: 720px), (max-height: 560px) {
+  .lobby.main .lobby-menu li + li { margin-top: 0; }
+  .lobby.main .lobby-center .lobby-menu { gap: 4px; }
+  .lobby.main .lobby-center .lobby-menu li .menu-btn { height: 42px; font-size: 18px; }
+  .lobby.main .lobby-center .lobby-menu li .menu-btn.primary:has(.menu-sub) { height: 52px; }
+  .lobby.main .lobby-center .lobby-logo { width: 84px; height: 84px; font-size: 46px; margin-bottom: 4px; }
+  .menu-btn .menu-sub { font-size: 11px; }
+}
+.tag.new-foe { margin-left: 8px; background: var(--shu); color: #fbf3e4; border: 0; font-size: 11px; vertical-align: middle; }

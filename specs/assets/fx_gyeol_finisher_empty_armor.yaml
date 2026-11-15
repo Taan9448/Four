@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_empty_armor
+type: fx
+summary: '「결」 결정타 투구 열기(開兜) — 빈 갑옷 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'two small red lights glowing in a dark helmet shape'
+  2: 'impact: a clean slash splits the helmet outline, the red lights flaring'
+  3: 'the helmet pieces flying apart, the red lights fading into sparks'
+  4: 'dark metal shards and dim red sparks'
+  5: 'a few dim sparks'
+  6: 'faint smoke'
+placeholder: { accent: '#ff6a5a' }

@@ -1401,7 +1401,8 @@
       "rules": {
         "techs": [
           "nakun",
-          "byeogun"
+          "byeogun",
+          "cheongun_chulsu"
         ],
         "focus": true,
         "clash": true
@@ -1660,7 +1661,8 @@
       "rules": {
         "techs": [
           "nakun",
-          "byeogun"
+          "byeogun",
+          "cheongun_chulsu"
         ],
         "focus": true,
         "clash": true
@@ -1844,7 +1846,8 @@
       "rules": {
         "techs": [
           "nakun",
-          "byeogun"
+          "byeogun",
+          "cheongun_chulsu"
         ],
         "focus": true,
         "clash": true
@@ -2069,6 +2072,7 @@
         "techs": [
           "nakun",
           "byeogun",
+          "cheongun_chulsu",
           "unhae"
         ],
         "focus": true,
@@ -2236,7 +2240,9 @@
         "techs": [
           "nakun",
           "byeogun",
-          "unhae"
+          "cheongun_chulsu",
+          "unhae",
+          "cheonoe_gwiun"
         ],
         "focus": true,
         "clash": true

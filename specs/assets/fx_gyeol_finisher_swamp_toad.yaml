@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_swamp_toad
+type: fx
+summary: '「결」 결정타 늪 가르기(斷沼) — 늪지 독두꺼비 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a curved line of murky green water splashing up'
+  2: 'impact: one clean pale slash splits the splash in two with a bright flash'
+  3: 'two halves of green water falling apart in droplets'
+  4: 'droplets falling'
+  5: 'a few droplets'
+  6: 'faint mist'
+placeholder: { accent: '#9fd07a' }

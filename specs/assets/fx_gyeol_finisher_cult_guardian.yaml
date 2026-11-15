@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_cult_guardian
+type: fx
+summary: '「결」 결정타 돌자리 비우기(空位) — 신교 호법 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three small red glowing seats of an array in a triangle'
+  2: 'impact: one golden slash breaks the triangle, the red knot bursting'
+  3: 'red threads unraveling and fading'
+  4: 'threads drifting'
+  5: 'a few red motes'
+  6: 'faint motes'
+placeholder: { accent: '#ff6a6a' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_cheonoe_gwiun_a
+type: fx
+summary: '「결」 진하운 기술 천외귀운(天外歸雲) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a crack of violet light opening high in the sky'
+  2: 'violet-white cloud streams spiralling down toward the center'
+  3: 'impact: a huge violet-white burst in the center as the clouds turn and rush back upward'
+  4: 'a great spiral of clouds rising, light filling the cell'
+  5: 'the spiral thinning, stars glittering'
+  6: 'violet motes rising'
+placeholder: { accent: '#c8b4ff' }

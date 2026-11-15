@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_vein_golem
+type: fx
+summary: '「결」 결정타 핏줄 식히기(冷脈) — 용암 핏줄 골렘 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'glowing red-orange lava veins pulsing'
+  2: 'impact: a cool blue-white slash crosses the veins with a burst of steam'
+  3: 'the veins darkening into cooled black rock lines, steam rising'
+  4: 'steam clouds'
+  5: 'thin steam'
+  6: 'faint wisps'
+placeholder: { accent: '#ff7a4a' }
