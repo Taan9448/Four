@@ -1,0 +1,242 @@
+{
+  "basisFrame": 1,
+  "targetBodyHeight": 106,
+  "footRowsBefore": null,
+  "method": "one uniform nearest-neighbor scale for all frames, then integer anchored placement; no painting or clipping",
+  "source": "assets/source/skin_cheonma_kyle_dodge.png",
+  "measurementNote": null,
+  "idleBody": {
+    "minX": 33,
+    "minY": 38,
+    "maxX": 131,
+    "maxY": 143,
+    "width": 99,
+    "height": 106,
+    "count": 4868
+  },
+  "firstBodyBefore": {
+    "minX": 39,
+    "minY": 48,
+    "maxX": 127,
+    "maxY": 143,
+    "width": 89,
+    "height": 96,
+    "count": 4286
+  },
+  "firstBodyAfter": {
+    "minX": 36,
+    "minY": 38,
+    "maxX": 133,
+    "maxY": 143,
+    "width": 98,
+    "height": 106,
+    "count": 5251
+  },
+  "idleGround": 143,
+  "scaleCanvas": [
+    177,
+    177
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 39,
+        "minY": 48,
+        "maxX": 127,
+        "maxY": 143,
+        "width": 89,
+        "height": 96,
+        "count": 4286
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 36,
+        "minY": 38,
+        "maxX": 133,
+        "maxY": 143,
+        "width": 98,
+        "height": 106,
+        "count": 5251
+      },
+      "bodyAfter": {
+        "minX": 36,
+        "minY": 38,
+        "maxX": 133,
+        "maxY": 143,
+        "width": 98,
+        "height": 106,
+        "count": 5251
+      },
+      "visibleBefore": 5251,
+      "visibleAfter": 5251
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 37,
+        "minY": 46,
+        "maxX": 112,
+        "maxY": 142,
+        "width": 76,
+        "height": 97,
+        "count": 4365
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -15
+      ],
+      "after": {
+        "minX": 33,
+        "minY": 36,
+        "maxX": 117,
+        "maxY": 143,
+        "width": 85,
+        "height": 108,
+        "count": 5357
+      },
+      "bodyAfter": {
+        "minX": 33,
+        "minY": 36,
+        "maxX": 117,
+        "maxY": 143,
+        "width": 85,
+        "height": 108,
+        "count": 5357
+      },
+      "visibleBefore": 5357,
+      "visibleAfter": 5357
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 22,
+        "minY": 42,
+        "maxX": 120,
+        "maxY": 142,
+        "width": 99,
+        "height": 101,
+        "count": 4037
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -15
+      ],
+      "after": {
+        "minX": 17,
+        "minY": 32,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 109,
+        "height": 112,
+        "count": 4962
+      },
+      "bodyAfter": {
+        "minX": 41,
+        "minY": 64,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 85,
+        "height": 80,
+        "count": 4390
+      },
+      "visibleBefore": 4962,
+      "visibleAfter": 4962
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 32,
+        "minY": 50,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 95,
+        "height": 94,
+        "count": 4299
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 28,
+        "minY": 40,
+        "maxX": 132,
+        "maxY": 143,
+        "width": 105,
+        "height": 104,
+        "count": 5288
+      },
+      "bodyAfter": {
+        "minX": 28,
+        "minY": 40,
+        "maxX": 132,
+        "maxY": 143,
+        "width": 105,
+        "height": 104,
+        "count": 5288
+      },
+      "visibleBefore": 5288,
+      "visibleAfter": 5288
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 37,
+        "minY": 47,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 89,
+        "height": 97,
+        "count": 4304
+      },
+      "resize": [
+        177,
+        177
+      ],
+      "offset": [
+        -8,
+        -16
+      ],
+      "after": {
+        "minX": 33,
+        "minY": 36,
+        "maxX": 131,
+        "maxY": 143,
+        "width": 99,
+        "height": 108,
+        "count": 5290
+      },
+      "bodyAfter": {
+        "minX": 33,
+        "minY": 36,
+        "maxX": 131,
+        "maxY": 143,
+        "width": 99,
+        "height": 108,
+        "count": 5290
+      },
+      "visibleBefore": 5290,
+      "visibleAfter": 5290
+    }
+  ]
+}
