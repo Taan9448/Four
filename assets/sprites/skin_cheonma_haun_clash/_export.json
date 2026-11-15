@@ -1,0 +1,202 @@
+{
+  "basisFrame": 1,
+  "targetBodyHeight": 83,
+  "footRowsBefore": null,
+  "method": "one uniform nearest-neighbor scale for all frames, then integer anchored placement; no painting or clipping",
+  "source": "assets/source/skin_cheonma_haun_clash.png",
+  "measurementNote": null,
+  "idleBody": {
+    "minX": 39,
+    "minY": 40,
+    "maxX": 107,
+    "maxY": 143,
+    "width": 69,
+    "height": 104,
+    "count": 3459
+  },
+  "firstBodyBefore": {
+    "minX": 26,
+    "minY": 56,
+    "maxX": 138,
+    "maxY": 143,
+    "width": 113,
+    "height": 88,
+    "count": 3739
+  },
+  "firstBodyAfter": {
+    "minX": 30,
+    "minY": 61,
+    "maxX": 135,
+    "maxY": 143,
+    "width": 106,
+    "height": 83,
+    "count": 3344
+  },
+  "idleGround": 143,
+  "scaleCanvas": [
+    151,
+    151
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 26,
+        "minY": 56,
+        "maxX": 138,
+        "maxY": 143,
+        "width": 113,
+        "height": 88,
+        "count": 3739
+      },
+      "resize": [
+        151,
+        151
+      ],
+      "offset": [
+        5,
+        8
+      ],
+      "after": {
+        "minX": 30,
+        "minY": 61,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 106,
+        "height": 83,
+        "count": 3344
+      },
+      "bodyAfter": {
+        "minX": 30,
+        "minY": 61,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 106,
+        "height": 83,
+        "count": 3344
+      },
+      "visibleBefore": 3344,
+      "visibleAfter": 3344
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 28,
+        "minY": 57,
+        "maxX": 137,
+        "maxY": 143,
+        "width": 110,
+        "height": 87,
+        "count": 3629
+      },
+      "resize": [
+        151,
+        151
+      ],
+      "offset": [
+        5,
+        8
+      ],
+      "after": {
+        "minX": 31,
+        "minY": 62,
+        "maxX": 134,
+        "maxY": 143,
+        "width": 104,
+        "height": 82,
+        "count": 3258
+      },
+      "bodyAfter": {
+        "minX": 31,
+        "minY": 62,
+        "maxX": 134,
+        "maxY": 143,
+        "width": 104,
+        "height": 82,
+        "count": 3258
+      },
+      "visibleBefore": 3258,
+      "visibleAfter": 3258
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 27,
+        "minY": 58,
+        "maxX": 137,
+        "maxY": 143,
+        "width": 111,
+        "height": 86,
+        "count": 3602
+      },
+      "resize": [
+        151,
+        151
+      ],
+      "offset": [
+        5,
+        8
+      ],
+      "after": {
+        "minX": 30,
+        "minY": 63,
+        "maxX": 134,
+        "maxY": 143,
+        "width": 105,
+        "height": 81,
+        "count": 3226
+      },
+      "bodyAfter": {
+        "minX": 30,
+        "minY": 63,
+        "maxX": 134,
+        "maxY": 143,
+        "width": 105,
+        "height": 81,
+        "count": 3225
+      },
+      "visibleBefore": 3226,
+      "visibleAfter": 3226
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 26,
+        "minY": 56,
+        "maxX": 138,
+        "maxY": 143,
+        "width": 113,
+        "height": 88,
+        "count": 3790
+      },
+      "resize": [
+        151,
+        151
+      ],
+      "offset": [
+        5,
+        8
+      ],
+      "after": {
+        "minX": 30,
+        "minY": 61,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 106,
+        "height": 83,
+        "count": 3389
+      },
+      "bodyAfter": {
+        "minX": 30,
+        "minY": 61,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 106,
+        "height": 83,
+        "count": 3389
+      },
+      "visibleBefore": 3389,
+      "visibleAfter": 3389
+    }
+  ]
+}
