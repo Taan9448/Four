@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_arrow_rain
+type: fx
+summary: '「결」 받을 수 없는 기술 계단의 궁수 「화살비」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-15 결투장 새 상대). 칸 안쪽 80%에서 끝나게'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'many arrows falling from the top right like rain'
+  2: 'impact: the arrows slam into the center in a dense cluster with dust'
+  3: 'arrows stuck, dust rising'
+  4: 'dust settling'
+  5: 'a few arrows'
+  6: 'faint dust'
+placeholder: { accent: '#f2c27a' }

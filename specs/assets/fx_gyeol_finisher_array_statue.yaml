@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_array_statue
+type: fx
+summary: '「결」 결정타 진의 결(陣理) — 구천 계단 진법 석인 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'glowing golden array lines in a circle with stone markers'
+  2: 'impact: a golden slash cuts across the array lines with a bright flash'
+  3: 'the array lines unraveling into golden threads'
+  4: 'threads drifting'
+  5: 'a few motes'
+  6: 'faint motes'
+placeholder: { accent: '#ffe08a' }

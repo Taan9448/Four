@@ -20,7 +20,7 @@ import { openSettings } from './settings';
 import { renderSlots, renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
-import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites } from './render';
+import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites, type TechRow } from './render';
 import './style.css';
 import './ink.css';
 
@@ -98,15 +98,21 @@ function techGauge(d: Duel): Fx['chain'] {
   const ts = usableTechs(d);
   const cond = ts[0]?.cond ?? 'chain';
   const marks = [...new Set(ts.map((t) => t.chain))].sort((a, b) => a - b);
+  const unit = cond === 'posture' ? '%' : '';
+  // 연속 박자 아래 기술 줄(2026-11-15): 기술마다 찬 만큼
+  const techs: TechRow[] =
+    d.mode === 'rhythm'
+      ? []
+      : [...ts].sort((a, b) => (a.slot ?? 1) - (b.slot ?? 1)).map((t) => ({ id: t.id, name: t.name, slot: t.slot ?? 1, n: techMeter(d, t), need: t.chain, unit, ready: d.techReady === t.id }));
   if (cond === 'chain') {
     const last = d.judgeLog.slice(-5);
     const min: Judgement = last.includes('good') ? 'good' : last.includes('excellent') ? 'excellent' : 'perfect';
-    return { n: d.chain, min, marks: marks.length ? marks : [5, 10], max: Math.max(10, ...marks) };
+    return { n: d.chain, min, marks: marks.length ? marks : [5, 10], max: Math.max(10, ...marks), techs };
   }
   const n = techMeter(d, ts[0]);
   const max = Math.max(...marks);
   const label = cond === 'defend' ? '막아 낸 수' : cond === 'perfect' ? 'PERFECT' : '체간 깎기';
-  return { n, min: n >= max ? 'perfect' : 'excellent', label, max, marks, unit: cond === 'posture' ? '%' : '' };
+  return { n, min: n >= max ? 'perfect' : 'excellent', label, max, marks, unit, techs };
 }
 
 const BACK_LABEL: Partial<Record<Screen, string>> = { slots: '불러오기', arena: '결투장으로', rhythm: '수련장으로', practice: '수련장으로', lobby: '로비로', story: '이야기 지도' };
@@ -704,14 +710,14 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         }
         case 'techHit': {
           const t = techOf(d, ev.tech)!;
-          // 기술 자리(1·2·3)가 클수록 크게 — 동료 기술도 같은 자리면 같은 무게(2026-11-14)
+          // 기술 자리(1~5)가 클수록 크게 — 동료 기술도 같은 자리면 같은 무게(2026-11-14)
           const slot = t.slot ?? 1;
-          sfx(slot >= 3 ? 'slam_10' : slot === 2 ? 'slam_9' : 'slam_8');
+          sfx(slot >= 4 ? 'slam_10' : slot >= 2 ? 'slam_9' : 'slam_8');
           const c = TECH_COLOR[t.id];
           flash(c?.core ?? '#ffffff', 360, 0.7);
           addShake(fx, now, slot === 1 ? 10 : 20, 480);
           hitstopUntil = now + 160;
-          if (slot >= 3) fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: `rgba(${c?.rgb ?? '255,214,120'},ALPHA)`, big: true });
+          if (slot >= 4) fx.blooms.push({ x: FOE_X, y: CONTACT.y, born: now, color: `rgba(${c?.rgb ?? '255,214,120'},ALPHA)`, big: true });
           if (ev.heal) {
             text(PLAYER_X, CONTACT.y - 120, `+${ev.heal}`, '#8fe39a', 30);
             spark(PLAYER_X, CONTACT.y - 40, 18, '#bff2c4', 220, 3);

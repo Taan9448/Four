@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_frost_bloom_b
+type: fx
+summary: '「결」 동료 기술 서리꽃(霜花) 뒤 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: 'frost petals drifting'
+  2: 'small ice sparkles'
+  3: 'a few white petals'
+  4: 'thin frost mist'
+  5: 'almost nothing'
+  6: 'a faint sparkle'
+placeholder: { accent: '#cdeeff' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_rock_eater
+type: fx
+summary: '「결」 결정타 광맥 찾기(探脈) — 바위 먹는 벌레 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a winding tunnel line through rock'
+  2: 'impact: a golden slash reveals a shining vein of metal in the rock with a flash'
+  3: 'glittering metal flecks scattering'
+  4: 'flecks drifting'
+  5: 'a few flecks'
+  6: 'faint glitter'
+placeholder: { accent: '#d8c08a' }

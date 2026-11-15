@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_edric_rowen
+type: fx
+summary: '「결」 결정타 문장을 내리다(降紋) — 에드릭 로웬 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a glowing white snowflake crest on a blue shield shape'
+  2: 'impact: a clean silver slash cuts down through the crest with a bright flash'
+  3: 'the crest breaking into blue and white light petals'
+  4: 'petals drifting down'
+  5: 'a few faint petals'
+  6: 'faint glow'
+placeholder: { accent: '#9fc4ff' }

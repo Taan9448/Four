@@ -1,0 +1,21 @@
+id: empty_armor_death
+type: character-anim
+size: large
+character: empty_armor
+chroma: magenta
+summary: '「결」 빈 갑옷 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [empty_armor_ref]
+reference: assets/source/empty_armor_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the spear knocked aside, the helmet jolted'
+  2: 'the two red lights inside the helmet flicker'
+  3: 'the armor pieces start to come apart at the joints'
+  4: 'the breastplate and greaves collapse downward'
+  5: 'an empty heap of black armor plates, the helmet rolling'
+  6: 'a still heap of empty armor, the red lights gone out'
+placeholder: { shape: humanoid, color: '#2e2e38', accent: '#ff3b3b' }

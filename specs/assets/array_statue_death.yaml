@@ -1,0 +1,21 @@
+id: array_statue_death
+type: character-anim
+size: large
+character: array_statue
+chroma: magenta
+summary: '「결」 구천 계단 진법 석인 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [array_statue_ref]
+reference: assets/source/array_statue_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, a crack running across the stone chest'
+  2: 'the glowing array lines in its eyes flickering'
+  3: 'pieces of stone falling from the arms'
+  4: 'sits down heavily on the stone step'
+  5: 'sits still, the glow gone from its eyes'
+  6: 'a still stone statue sitting on the step, cracked'
+placeholder: { shape: humanoid, color: '#7a7068', accent: '#ffe08a' }

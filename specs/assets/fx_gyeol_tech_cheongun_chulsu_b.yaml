@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_cheongun_chulsu_b
+type: fx
+summary: '「결」 진하운 기술 청운출수(靑雲出手) 뒤 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: 'teal cloud wisps drifting'
+  2: 'small teal petals falling'
+  3: 'a few glowing grain lines fading'
+  4: 'thin wisps'
+  5: 'almost nothing'
+  6: 'two faint motes'
+placeholder: { accent: '#7fd6c8' }

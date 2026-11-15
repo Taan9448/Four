@@ -1,0 +1,21 @@
+id: cult_swordsman_death
+type: character-anim
+size: large
+character: cult_swordsman
+chroma: magenta
+summary: '「결」 천마신교 도객 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [cult_swordsman_ref]
+reference: assets/source/cult_swordsman_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the sword knocked from his hand'
+  2: 'staggers back'
+  3: 'drops to one knee'
+  4: 'falls to the side'
+  5: 'lies on the ground'
+  6: 'lies defeated but alive, the sword out of reach'
+placeholder: { shape: humanoid, color: '#3a2a2a', accent: '#a02634' }

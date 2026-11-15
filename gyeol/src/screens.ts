@@ -3,16 +3,17 @@
 import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import lobbyRaw from '../data/lobby.json';
+import storyRaw from '../data/story.json';
 import { accountState, loginPanel, playerPlate } from './account';
 import { onCloudChange } from './cloud';
 import { lobbyStage } from './lobby-fx';
-import { condMet, condText, newAchievements, outfitOf, outfitsFor, progress, starTotal } from './progress';
+import { clearedAnywhere, condMet, condText, newAchievements, outfitOf, outfitsFor, progress, starTotal } from './progress';
 import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
 import { characterOf, characters, chosen, faceId, faceStyle, HAUN, joined, partyOpen, recordKey } from './party';
-import { emptyStats, loadSave, withKeys, writeSave } from './save';
+import { emptyStats, loadSave, useSlot, withKeys, writeSave, type SaveData } from './save';
 import { actionFor, keyNames } from './keys';
 
 export type Screen = 'title' | 'lobby' | 'slots' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
@@ -43,7 +44,8 @@ export interface Nav {
 }
 
 interface LobbyData {
-  menu: { id: string; name: string; note: string; locked?: string }[];
+  /** needs: current = 지금 칸에 진행이 있을 때만(이어하기) · any = 찬 칸이 하나라도 있을 때만(불러오기) */
+  menu: { id: string; name: string; note: string; locked?: string; needs?: 'current' | 'any' }[];
   /** 오른쪽 아래 둥근 표식(옷장·도감·설정·「천외귀환」 바로가기) */
   corner: { id: string; name: string; note: string }[];
 }
@@ -59,7 +61,8 @@ export function setKeys(fn: ((e: KeyboardEvent) => void) | null): void {
 
 const duelFoes = (data: DuelData) => data.foes.filter((f) => !f.practice);
 /** 결투장 상대: 처음부터 있던 다섯(악보가 있는 상대) + 이야기에서 겨뤄 본 상대(이야기 전용 빼고) */
-const arenaFoes = (data: DuelData, seen: string[]) => duelFoes(data).filter((f) => !f.storyOnly && (f.starter || seen.includes(f.id)));
+const arenaFoes = (data: DuelData, save: SaveData) =>
+  duelFoes(data).filter((f) => !f.storyOnly && (f.starter || save.seen.includes(f.id) || (!!f.arenaAfter && clearedAnywhere(save, f.arenaAfter))));
 
 /**
  * 인물 고르기(2026-11-11 사용자 요청 — 동료와 합류하면 인물을 골라 들어간다): 얼굴 · 이름 · 특성. 합류 전 동료는 잠김.
@@ -134,9 +137,28 @@ export function renderTitle(app: HTMLElement, nav: Nav): void {
 
 /* ───────── 메인: 운곡루 뒤뜰 ───────── */
 
-const MENU_PLATE: Record<string, string> = { story: 'parry', arena: 'attack', rhythm: 'tech', practice: 'focus' };
+const MENU_PLATE: Record<string, string> = { story: 'parry', continue: 'parry', new: 'tech', load: 'back', arena: 'attack', rhythm: 'tech', practice: 'focus' };
 /** 메뉴 아이콘 칸(Codex icons_gyeol_menu는 처음 메뉴 순서: 이야기·결투장·박자 도전·수련장·기록·설정) */
-const MENU_ICON: Record<string, number> = { story: 1, arena: 2, rhythm: 3, practice: 4 };
+const MENU_ICON: Record<string, number> = { story: 1, continue: 1, new: 1, load: 1, arena: 2, rhythm: 3, practice: 4 };
+/** 이야기 메뉴의 먹 아이콘(icons_gyeol_ink 칸 이름) */
+const MENU_INK: Record<string, keyof typeof INK_ICON> = { continue: 'story', new: 'seal', load: 'star' };
+
+/** 저장 3칸 화면을 무엇으로 여나(2026-11-15): new = 새로 시작(빈 칸·덮어쓰기) · load = 불러오기(이어하기·지우기) */
+export type SlotsMode = 'new' | 'load';
+let slotsMode: SlotsMode = 'load';
+export const setSlotsMode = (m: SlotsMode): void => {
+  slotsMode = m;
+};
+export const getSlotsMode = (): SlotsMode => slotsMode;
+
+/** 이어하기 아래 작은 글: "2번 칸 · 어려움 · 4장 아르덴" */
+function continueNote(save: ReturnType<typeof loadSave>): string {
+  const sl = save.slots[save.slot];
+  if (!sl) return '';
+  const chs = (storyRaw as unknown as { chapters: { id: string; title: string; subtitle: string }[] }).chapters;
+  const next = chs.find((c) => !sl.story.cleared.includes(c.id));
+  return `${save.slot + 1}번 칸 · ${sl.difficulty === 'hard' ? '어려움' : '보통'} · ${next ? `${next.title} ${next.subtitle}` : '모두 마쳤다'}`;
+}
 
 /** 「천외귀환」 주소(같은 배포의 한 단계 위 — 개발 서버에서는 /) */
 export const CHEONOE_URL = new URL('../', location.href).href;
@@ -156,16 +178,29 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     sfx('click');
     if (id === 'settings') nav.settings();
     else if (id === 'cheonoe') location.href = CHEONOE_URL;
-    // 이야기는 불러오기 3칸부터(2026-11-14)
-    else if (id === 'story') nav.go('slots');
+    // 2026-11-15 「천외귀환」처럼: 이어하기 = 지금 칸의 이야기 지도 · 새로 시작·불러오기 = 저장 3칸
+    else if (id === 'continue') {
+      writeSave(useSlot(loadSave(), loadSave().slot));
+      nav.go('story');
+    } else if (id === 'new' || id === 'load') {
+      setSlotsMode(id);
+      nav.go('slots');
+    } else if (id === 'story') nav.go('slots');
     else nav.go(id as Screen);
   };
-  const items = lobby.menu.map((m, i) => {
+  const filled = save.slots.some((x) => x);
+  const current = save.slots[save.slot];
+  const menu = lobby.menu.filter((m) => (m.needs === 'current' ? !!current : m.needs === 'any' ? filled : true));
+  const items = menu.map((m, i) => {
     const locked = !!m.locked;
     // 메뉴 아이콘(Codex icons_gyeol_menu — 칸 = 처음 lobby.json menu 순서: 이야기·결투장·박자 도전·수련장·기록·설정)이 오면 이름 왼쪽에
     // 먹 아이콘(icons_gyeol_ink, 2026-11-13)이 오면 그것
-    const icon = (m.id in INK_ICON ? inkIcon(m.id as keyof typeof INK_ICON) : null) ?? realArt('icons_gyeol_menu', MENU_ICON[m.id] ?? i + 1);
-    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('b', {}, m.name)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}`, () => go(m.id), locked ? { disabled: '', title: `잠김 — ${m.locked}` } : { title: m.note });
+    const ink = MENU_INK[m.id] ?? (m.id in INK_ICON ? (m.id as keyof typeof INK_ICON) : null);
+    const icon = (ink ? inkIcon(ink) : null) ?? realArt('icons_gyeol_menu', MENU_ICON[m.id] ?? i + 1);
+    // 이어하기 아래 작은 글: 몇 번 칸 · 난이도 · 다음 장
+    const sub = m.id === 'continue' && current ? el('small', { class: 'menu-sub' }, continueNote(save)) : '';
+    const primary = m.id === 'continue' || (m.id === 'new' && !current) ? ' primary' : '';
+    const b = button([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'pad-icon', src: icon, alt: '' }) : '', el('span', { class: 'menu-label' }, el('b', {}, m.name), sub)], `menu-btn plate-${MENU_PLATE[m.id] ?? 'back'}${primary}`, () => go(m.id), locked ? { disabled: '', title: `잠김 — ${m.locked}` } : { title: m.note });
     return el('li', { class: locked ? 'locked' : '' }, b);
   });
   const corner = lobby.corner.map((c) =>
@@ -194,7 +229,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   app.replaceChildren(section);
   setKeys((e) => {
     const n = Number(e.key);
-    if (n >= 1 && n <= lobby.menu.length && !lobby.menu[n - 1].locked) go(lobby.menu[n - 1].id);
+    if (n >= 1 && n <= menu.length && !menu[n - 1].locked) go(menu[n - 1].id);
   });
   (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
   // 로그인해 둔 세션이 풀렸으면(만료·다른 탭에서 로그아웃) 로그인 판으로
@@ -227,7 +262,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
       }),
     );
     grid.replaceChildren(
-      ...arenaFoes(data, save.seen).map((f) => {
+      ...arenaFoes(data, save).map((f) => {
         const img = frameUrl(`${f.sprite}_idle`, 1);
         const tags = elementsOf(f).map((e) => el('span', { class: `tag el-${e}` }, ELEMENT_NAME[e]));
         const best = el('div', { class: 'best-row' }, ...diffs.map((d) => el('span', { class: 'best-cell', title: `${d.name} 최고 등급` }, el('small', {}, d.name), rankBadge(save.duelBest[recordKey(`${f.id}:${d.id}`, who)]))));
@@ -235,7 +270,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
           'article',
           { class: 'foe-card' },
           img ? el('img', { src: img, alt: '' }) : '',
-          el('div', { class: 'foe-text' }, el('b', {}, f.title), el('div', { class: 'tags' }, ...tags), el('small', {}, withKeys(f.note))),
+          el('div', { class: 'foe-text' }, el('b', {}, f.title, f.arenaAfter && !save.seen.includes(f.id) ? el('span', { class: 'tag new-foe' }, '새 상대') : ''), el('div', { class: 'tags' }, ...tags), el('small', {}, withKeys(f.note))),
           best,
           el('div', { class: 'foe-actions' }, button('대결', 'btn primary', () => nav.play(f, 'duel', { difficulty: arenaDifficulty, back: 'arena', character: who }))),
         );
@@ -243,7 +278,7 @@ export function renderArena(app: HTMLElement, nav: Nav, data: DuelData): void {
     );
   };
   const grid = el('div', { class: 'foes' });
-  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다'), charPicker(data, () => renderArena(app, nav, data)), seg, grid, helpBox()));
+  app.replaceChildren(el('section', { class: 'screen arena' }, header('결투장', nav, '이긴 상대와 다시 겨룬다 · 장을 마치면 원작의 새 상대가 열린다'), charPicker(data, () => renderArena(app, nav, data)), seg, grid, helpBox()));
   draw();
   setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
 }
@@ -465,7 +500,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
     const cg = realArt(`cg_gyeol_tech_${t.id}`);
     return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
   };
-  // 인물마다 기술 셋(2026-11-14): 진하운 · 카일 · 엘리아 · 보른
+  // 인물마다 기술 다섯(2026-11-14 셋 → 2026-11-15 다섯): 진하운 · 카일 · 엘리아 · 보른
   const techGroups = characters(data).flatMap((c) => {
     const own = data.techs.filter((t) => (t.owner ?? HAUN) === c.id);
     return own.length ? [el('h3', { class: 'tech-owner' }, `${c.name}의 기술`), el('div', { class: 'tech-grid' }, ...own.map(techCard))] : [];

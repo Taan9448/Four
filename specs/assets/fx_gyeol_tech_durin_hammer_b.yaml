@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_durin_hammer_b
+type: fx
+summary: '「결」 동료 기술 두린의 망치(兄槌) 뒤 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: 'orange sparks falling'
+  2: 'rock chips settling'
+  3: 'a few embers'
+  4: 'thin dust'
+  5: 'almost nothing'
+  6: 'a faint ember'
+placeholder: { accent: '#e0a040' }

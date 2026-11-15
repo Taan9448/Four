@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_sa_mugyeol
+type: fx
+summary: '「결」 결정타 결을 돌려주다(還理) — 교주 사무결 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a swirl of red blood-light covering a pattern of fine golden grain lines'
+  2: 'impact: a calm golden slash parts the red light, revealing the grain beneath'
+  3: 'the red light dissolving upward into the sky, golden grain shining'
+  4: 'red motes rising'
+  5: 'a few motes'
+  6: 'faint glow'
+placeholder: { accent: '#ff5a6a' }

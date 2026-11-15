@@ -1,0 +1,21 @@
+id: pockmark_vice_death
+type: character-anim
+size: large
+character: pockmark_vice
+chroma: magenta
+summary: '「결」 마맛자국 사형 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [pockmark_vice_ref]
+reference: assets/source/pockmark_vice_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the sword knocked away, face twisted in shock'
+  2: 'stumbles back, arms flailing'
+  3: 'falls on his backside'
+  4: 'sprawls on the ground'
+  5: 'lies on his back, dazed'
+  6: 'lies defeated but alive'
+placeholder: { shape: beast, color: '#8a6a5a', accent: '#a02634' }

@@ -1,0 +1,21 @@
+id: vein_golem_death
+type: character-anim
+size: large
+character: vein_golem
+chroma: green
+summary: '「결」 용암 핏줄 골렘 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [vein_golem_ref]
+reference: assets/source/vein_golem_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, a lava vein bursting with sparks'
+  2: 'the glowing veins flickering and dimming'
+  3: 'the golem sagging, rocks sliding off its body'
+  4: 'falls to its knees, the veins going dark'
+  5: 'collapses forward into a heap of cooling rock'
+  6: 'a still heap of dark cooled rock, faint smoke'
+placeholder: { shape: humanoid, color: '#7a3b2a', accent: '#ff8a5c' }

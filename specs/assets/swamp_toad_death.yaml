@@ -1,0 +1,21 @@
+id: swamp_toad_death
+type: character-anim
+size: large
+character: swamp_toad
+chroma: magenta
+summary: '「결」 늪지 독두꺼비 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [swamp_toad_ref]
+reference: assets/source/swamp_toad_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, its puffed body jolting, tongue hanging out'
+  2: 'the puffed skin deflating with a gush of air'
+  3: 'sinks down heavily onto its belly'
+  4: 'rolls onto its side, legs twitching'
+  5: 'flat on the ground, eyes half-closed'
+  6: 'lies still and deflated'
+placeholder: { shape: beast, color: '#5a6a3a', accent: '#d8c25a' }

@@ -3,7 +3,7 @@
 // 「결」 전용 그림(받기·피하기 동작, 결 이펙트 12프레임, 결정타, 연속 박자 기운, 아이콘)은 Codex 실제 그림이 왔을 때만 쓰고,
 // 오기 전에는 코드로 그린 대체 연출을 쓴다(임시 상자 그림은 쓰지 않는다).
 import { loadSprite, type SpriteAsset } from '../../src/render/assets';
-import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, type Duel, type Element, type Judgement } from './duel';
+import { cue, isOpen, streakTier, TECH_DURATION, TECH_HIT, ULT_SLOT, type Duel, type Element, type Judgement } from './duel';
 import { clashShift, drawBubbles, drawPracticeBar, type PracticeMark, drawClashBar, drawClashSparks, drawCrisis, drawFinisher, drawFinisherName, drawFocus, drawWeather, stepWeather, type Bubble, type Finisher, type WeatherState } from './scene';
 
 import { fxBoost } from './fxfill';
@@ -69,20 +69,28 @@ export async function loadSprites(playerPrefix: string, foePrefix: string, bg: s
 }
 
 /** 진하운의 기술(duel.json techs) — 색과 Codex 이펙트 id(fx_gyeol_tech_<id>_a·b) */
-// 2026-11-14: 동료(카일·엘리아·보른)도 기술 셋씩
-export const TECH_IDS = ['nakun', 'byeogun', 'unhae', 'shield_rush', 'rowen_oath', 'guardian_vow', 'mana_rain', 'frost_ward', 'starfall', 'earth_quake', 'mountain_cleave', 'kazdum_heart'] as const;
+// 2026-11-14: 동료(카일·엘리아·보른)도 기술 셋씩 → 2026-11-15 인물마다 다섯
+export const TECH_IDS = ['nakun', 'byeogun', 'cheongun_chulsu', 'unhae', 'cheonoe_gwiun', 'shield_rush', 'rowen_oath', 'shield_wall', 'wing_cleave', 'guardian_vow', 'mana_rain', 'frost_ward', 'frost_bloom', 'violet_bolt', 'starfall', 'earth_quake', 'mountain_cleave', 'durin_hammer', 'cliff_fall', 'kazdum_heart'] as const;
 export const TECH_COLOR: Record<string, { core: string; glow: string; rgb: string }> = {
   nakun: { core: '#f2f8ff', glow: '#a8d8ff', rgb: '190,225,255' },
   byeogun: { core: '#e6f6ff', glow: '#4fb4ff', rgb: '90,180,255' },
+  cheongun_chulsu: { core: '#eefaff', glow: '#7fd6c8', rgb: '127,214,200' },
   unhae: { core: '#fff6d6', glow: '#ffd27a', rgb: '255,214,120' },
+  cheonoe_gwiun: { core: '#ffffff', glow: '#c8b4ff', rgb: '200,180,255' },
   shield_rush: { core: '#fff4d0', glow: '#e8c060', rgb: '232,192,96' },
   rowen_oath: { core: '#eef4ff', glow: '#6f9cff', rgb: '111,156,255' },
+  shield_wall: { core: '#f4f0e6', glow: '#c8b48a', rgb: '200,180,138' },
+  wing_cleave: { core: '#ffe8e0', glow: '#ff5a4a', rgb: '255,90,74' },
   guardian_vow: { core: '#fffbe8', glow: '#ffe08a', rgb: '255,224,138' },
   mana_rain: { core: '#e6f8ff', glow: '#5fd0ff', rgb: '95,208,255' },
   frost_ward: { core: '#f0fbff', glow: '#9fe6ff', rgb: '159,230,255' },
+  frost_bloom: { core: '#ffffff', glow: '#cdeeff', rgb: '205,238,255' },
+  violet_bolt: { core: '#f2e6ff', glow: '#9a5cff', rgb: '154,92,255' },
   starfall: { core: '#f6eeff', glow: '#b48cff', rgb: '180,140,255' },
   earth_quake: { core: '#ffe9cc', glow: '#c98a4a', rgb: '201,138,74' },
   mountain_cleave: { core: '#fff0dc', glow: '#ff9a4a', rgb: '255,154,74' },
+  durin_hammer: { core: '#fff2d8', glow: '#e0a040', rgb: '224,160,64' },
+  cliff_fall: { core: '#f0e4d4', glow: '#a07850', rgb: '160,120,80' },
   kazdum_heart: { core: '#fff4e0', glow: '#ff6a3a', rgb: '255,106,58' },
 };
 
@@ -93,6 +101,20 @@ export const ELEMENT_COLOR: Record<Element | 'none' | 'danger', { line: string; 
   lightning: { line: '200,150,255', glow: '#b07cff', spark: '#e8d4ff' },
   danger: { line: '255,70,60', glow: '#ff3b30', spark: '#ff9a8a' },
 };
+
+/**
+ * 연속 박자 아래 기술 줄(2026-11-15 사용자 요청 "어떤 기술이 차고 있는지 알 수가 없다"): 쓸 수 있는 기술마다
+ * 이름 · 찬 만큼의 막대 · 지금/필요. 준비된 기술은 그 색으로 빛나고, 다음에 찰 기술은 밝게
+ */
+export interface TechRow {
+  id: string;
+  name: string;
+  slot: number;
+  n: number;
+  need: number;
+  unit: string;
+  ready: boolean;
+}
 
 /** 화면 효과(실제 시간 기준) */
 export interface Fx {
@@ -115,11 +137,11 @@ export interface Fx {
   banner: { name: string; born: number; element?: Element } | null;
   /** 결 연환 표시(끊기지 않고 받은 수, 그 사이 가장 낮은 판정) */
   /** 기술 계기(2026-11-14 인물마다 조건이 다르다): label 이름 · n 지금 값 · max 구슬 열 끝 · marks 기술이 준비되는 값 · unit 단위 */
-  chain: { n: number; min: Judgement; label?: string; max?: number; marks?: number[]; unit?: string };
+  chain: { n: number; min: Judgement; label?: string; max?: number; marks?: number[]; unit?: string; techs?: TechRow[] };
   /** 이 대결에서 겨루기가 켜져 있나(결 연환 '겨루기 준비' 표시) */
   clashOn?: boolean;
   /** 기술 연출(쓴 순간부터, 실제 시간) */
-  /** 기술 연출: slot 3(마지막 기술)이면 판이 어두워지고 하늘에서 빛이 떨어진다 · area(엘리아 마법·마지막 기술)면 판 여러 곳에 터진다 */
+  /** 기술 연출: 마지막 자리(ULT_SLOT=5)면 판이 어두워지고 하늘에서 빛이 떨어진다 · area(엘리아 마법·마지막 기술)면 판 여러 곳에 터진다 */
   tech: { id: string; born: number; slot?: number; area?: boolean } | null;
   /** 끝 장면: 느린 화면 동안 위아래 검은 띠와 쓰러지는 쪽으로 다가가기 */
   finale: { born: number; x: number } | null;
@@ -361,6 +383,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   drawTechBadge(ctx, d, fx, now);
   ctx.restore();
   drawClashBar(ctx, d, now);
+  drawTechRows(ctx, fx, now);
   if (fx.practice) drawPracticeBar(ctx, d.data.rules, fx.practice, now);
   drawFinisherName(ctx, fx.finisher, now);
   if (fx.finale) {
@@ -1162,13 +1185,13 @@ function drawBolts(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
 }
 
 /**
- * 마지막 기술(자리 3) 연출(2026-11-14 사용자 요청 "맵이 어두워지거나 하늘에서 뭐가 떨어지거나 광역으로"):
+ * 마지막 기술(자리 ULT_SLOT — 2026-11-15부터 5) 연출(2026-11-14 사용자 요청 "맵이 어두워지거나 하늘에서 뭐가 떨어지거나 광역으로"):
  * 컷인부터 판이 어두워지고(배경 위·인물 아래), 터지는 순간 하늘에서 기술 색의 빛줄기가 판 전체로 쏟아진다
  */
 const ULT_START = 700;
 function ultPhase(fx: Fx, now: number): number | null {
   const tc = fx.tech;
-  if (!tc || (tc.slot ?? 1) < 3) return null;
+  if (!tc || (tc.slot ?? 1) < ULT_SLOT) return null;
   return now - tc.born;
 }
 function drawUltDark(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
@@ -1267,7 +1290,7 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
     const s = SCALE * 2.6 * Math.min(fxBoost(A), fxBoost(B));
     const cx = tc.id === 'unhae' ? CONTACT.x + 40 : FOE_X;
     // 광역(엘리아 마법·마지막 기술): 판 세 곳에서 조금씩 늦게 터진다(2026-11-14)
-    const spots = tc.area || (tc.slot ?? 1) >= 3 ? [{ dx: 0, delay: 0, k: 1 }, { dx: -230, delay: 90, k: 0.72 }, { dx: 190, delay: 170, k: 0.78 }] : [{ dx: 0, delay: 0, k: 1 }];
+    const spots = tc.area || (tc.slot ?? 1) >= 4 ? [{ dx: 0, delay: 0, k: 1 }, { dx: -230, delay: 90, k: 0.72 }, { dx: 190, delay: 170, k: 0.78 }] : [{ dx: 0, delay: 0, k: 1 }];
     for (const sp0 of spots) {
       const ee = e - sp0.delay;
       if (ee < 0) continue;
@@ -1519,7 +1542,8 @@ const CHAIN_PIPS = 10;
 
 function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
   const c = fx.chain;
-  if (c.n <= 0 || fx.finale) return;
+  // 기술 줄(drawTechRows)이 있으면 그 판의 맨 위 줄이 연환 값을 보인다
+  if (c.n <= 0 || fx.finale || c.techs?.length) return;
   const max = c.max ?? CHAIN_PIPS;
   const marks = c.marks ?? [5, 10];
   const x0 = PLAYER_X - 150 - 19 * 4.5;
@@ -1559,6 +1583,90 @@ function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
   ctx.strokeText(label, x0 + gap * 4.5, y + 26);
   ctx.fillStyle = c.min === 'perfect' ? '#ffe9b0' : c.min === 'excellent' ? '#d8e2f2' : '#bdb6aa';
   ctx.fillText(label, x0 + gap * 4.5, y + 26);
+  ctx.restore();
+}
+
+/**
+ * 기술 줄: 인물 층 밖, 화면에 고정된 판(인물·버튼과 겹치지 않게) — PC는 왼쪽 아래 명패 위, 휴대폰(화면이 작아 uiScale>0.95)은
+ * 왼쪽 위 명패 아래. 맨 위 줄은 계기 이름·값(결 연환 7 · 겨루기 준비), 아래로 자리 순서대로(아래로 갈수록 큰 기술)
+ */
+function drawTechRows(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  const c = fx.chain;
+  const rows = c.techs;
+  if (!rows?.length || fx.finale) return;
+  const small = fx.uiScale > 0.95;
+  const k = small ? Math.min(1.35, fx.uiScale) : 1;
+  const rowH = 19 * k;
+  const w = 226 * k;
+  const h = rowH * (rows.length + 1) + 10 * k;
+  const x0 = 10;
+  const y0 = small ? 126 : 418 - h;
+  const barW = 70 * k;
+  const next = rows.filter((r) => r.n < r.need).sort((a, b) => a.slot - b.slot)[0]?.id;
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,8,6,0.58)';
+  ctx.beginPath();
+  ctx.roundRect(x0, y0, w, h, 8);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,240,210,0.12)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  // 맨 위 줄: 계기 이름 · 값(겨루기가 켜진 대결에서 결 연환이 3을 넘으면 '겨루기 준비')
+  const head = `${c.label ?? '결 연환'} ${c.n}${c.unit ?? ''}`;
+  const headText = fx.clashOn && !c.label && c.n >= 3 ? `${head} · 겨루기 준비` : head;
+  ctx.font = `800 ${Math.round(13 * k)}px "Song Myung", serif`;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = c.min === 'perfect' ? '#ffe9b0' : c.min === 'excellent' ? '#d8e2f2' : '#bdb6aa';
+  ctx.strokeText(headText, x0 + 8 * k, y0 + 5 * k + rowH / 2);
+  ctx.fillText(headText, x0 + 8 * k, y0 + 5 * k + rowH / 2);
+  rows.forEach((r, i) => {
+    const y = y0 + 5 * k + rowH * (i + 1.5);
+    const col = TECH_COLOR[r.id] ?? TECH_COLOR.unhae;
+    const fill = Math.max(0, Math.min(1, r.n / r.need));
+    const full = fill >= 1;
+    const pulse = r.ready ? 0.6 + 0.4 * Math.sin(now / 160) : 1;
+    // 준비된 줄: 기술 색 띠
+    if (r.ready) {
+      ctx.fillStyle = `rgba(${col.rgb},${0.18 + 0.12 * pulse})`;
+      ctx.fillRect(x0 + 2, y - rowH / 2 + 1, w - 4, rowH - 2);
+    }
+    ctx.font = `800 ${Math.round(11 * k)}px system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = r.ready ? col.core : 'rgba(255,255,255,0.5)';
+    ctx.fillText(String(r.slot), x0 + 12 * k, y);
+    ctx.textAlign = 'left';
+    ctx.font = `${r.ready || r.id === next ? 800 : 600} ${Math.round(13 * k)}px "Song Myung", serif`;
+    const name = r.name.length > 6 ? `${r.name.slice(0, 6)}…` : r.name;
+    ctx.strokeText(name, x0 + 22 * k, y);
+    ctx.fillStyle = r.ready ? col.core : r.id === next ? '#f3ead8' : full ? `rgba(${col.rgb},0.9)` : 'rgba(225,215,200,0.62)';
+    ctx.fillText(name, x0 + 22 * k, y);
+    // 막대
+    const bx = x0 + 104 * k;
+    const bh = 7 * k;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.beginPath();
+    ctx.roundRect(bx, y - bh / 2, barW, bh, bh / 2);
+    ctx.fill();
+    if (fill > 0) {
+      if (r.ready) {
+        ctx.shadowColor = col.glow;
+        ctx.shadowBlur = 10 * pulse;
+      }
+      ctx.fillStyle = full ? col.glow : `rgba(${col.rgb},${r.id === next ? 0.95 : 0.55})`;
+      ctx.beginPath();
+      ctx.roundRect(bx, y - bh / 2, Math.max(bh, barW * fill), bh, bh / 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    ctx.font = `700 ${Math.round(11 * k)}px system-ui, sans-serif`;
+    const tail = r.ready ? '준비!' : full ? '찼다' : `${Math.min(r.n, r.need)}/${r.need}${r.unit}`;
+    ctx.strokeText(tail, bx + barW + 5 * k, y + 1);
+    ctx.fillStyle = r.ready ? col.core : 'rgba(235,228,214,0.85)';
+    ctx.fillText(tail, bx + barW + 5 * k, y + 1);
+  });
   ctx.restore();
 }
 

@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_durin_hammer_a
+type: fx
+summary: '「결」 동료 기술 두린의 망치(兄槌) 앞 6프레임(_a·_b 이어 12프레임) — 2026-11-15 기술 다섯. 칸 안쪽에서 끝나게'
+frames: 6
+fps: 20
+events: { impact: 3 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a heavy hammer shape rising with orange light'
+  2: 'the hammer at the top of a great swing, sparks trailing'
+  3: 'impact: the hammer slams down in the center with an orange shockwave and flying sparks'
+  4: 'sparks and rock chips flying'
+  5: 'sparks falling'
+  6: 'faint embers'
+placeholder: { accent: '#e0a040' }

@@ -1,0 +1,21 @@
+id: mountain_hand_death
+type: character-anim
+size: large
+character: mountain_hand
+chroma: magenta
+summary: '「결」 벽에서 솟은 손 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [mountain_hand_ref]
+reference: assets/source/mountain_hand_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, one huge stone finger cracking'
+  2: 'the stone hand recoiling, rocks falling'
+  3: 'the fingers curling, the wrist crumbling'
+  4: 'the hand sinking back into the rock'
+  5: 'a pile of rubble and one stone finger'
+  6: 'a still heap of rubble'
+placeholder: { shape: object, color: '#4e443d', accent: '#ff8a5c' }

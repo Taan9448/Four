@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_fire_scale_hound
+type: fx
+summary: '「결」 결정타 이음매 베기(斷合) — 불비늘 삼두견 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three burning scaled necks joining at one point'
+  2: 'impact: a precise thin golden slash at the joint with a burst of sparks'
+  3: 'burning scales scattering'
+  4: 'sparks falling'
+  5: 'a few embers'
+  6: 'faint smoke'
+placeholder: { accent: '#ffb050' }

@@ -1,0 +1,21 @@
+id: ice_gatekeeper_death
+type: character-anim
+size: large
+character: ice_gatekeeper
+chroma: magenta
+summary: '「결」 얼음 궁전의 문지기 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [ice_gatekeeper_ref]
+reference: assets/source/ice_gatekeeper_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck hard, the frost-flowered shield cracking'
+  2: 'staggers back, ice shards falling from the armor'
+  3: 'sinks to one knee, the sword point into the ground'
+  4: 'kneels, head bowed, the frost slowly melting'
+  5: 'kneels still, holding the sword upright like a knight at rest'
+  6: 'kneeling in peace, at rest at last (not dead)'
+placeholder: { shape: humanoid, color: '#8ab4cc', accent: '#dff4ff' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_skill_triple_flame
+type: fx
+summary: '「결」 받을 수 없는 기술 불비늘 삼두견 「세 갈래 불길」 이펙트 6프레임 — 타격 순간 하운 쪽에 터진다(2026-11-15 결투장 새 상대). 칸 안쪽 80%에서 끝나게'
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'three streams of fire coming in from the right'
+  2: 'impact: the three streams cross at the center in a big fire burst'
+  3: 'fire spreading in a rounded blaze'
+  4: 'flames shrinking, smoke'
+  5: 'embers and smoke'
+  6: 'faint embers'
+placeholder: { accent: '#ff9a3a' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_goblin
+type: fx
+summary: '「결」 결정타 단검 걷어내기(挑刃) — 고블린 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a small rusty dagger spinning in the air'
+  2: 'impact: a quick silver flick of light knocks the dagger away with a bright spark'
+  3: 'the spark scattering into small silver flecks'
+  4: 'flecks drifting down'
+  5: 'a few faint flecks'
+  6: 'almost nothing'
+placeholder: { accent: '#e8d8a8' }

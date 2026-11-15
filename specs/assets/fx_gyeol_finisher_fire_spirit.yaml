@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_fire_spirit
+type: fx
+summary: '「결」 결정타 불씨 끄기(滅燼) — 불의 정령 전용 마무리(2026-11-15 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a flame in the shape of a person'
+  2: 'impact: a pale blue-white slash crosses the flame and snuffs it with a burst of steam'
+  3: 'the flame shrinking into embers and white steam'
+  4: 'steam rising, a few embers'
+  5: 'thin steam'
+  6: 'faint wisps'
+placeholder: { accent: '#ffb070' }

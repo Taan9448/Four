@@ -1,0 +1,21 @@
+id: needle_cultist_death
+type: character-anim
+size: large
+character: needle_cultist
+chroma: magenta
+summary: '「결」 신교 독침수 쓰러짐 6프레임 — 2026-11-15 결투장 새 상대(원작 「천외귀환」 적). 대기·피격 그림과 같은 크기·같은 발 위치'
+depends_on: [needle_cultist_ref]
+reference: assets/source/needle_cultist_ref.png
+facing: left
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: 'struck, the needle case spilling needles'
+  2: 'stumbles back, clutching the sleeve'
+  3: 'falls to the ground'
+  4: 'curls up'
+  5: 'lies on the ground, the empty needle case beside him'
+  6: 'lies defeated but alive'
+placeholder: { shape: humanoid, color: '#5a2a3a', accent: '#6aa84f' }
