@@ -499,7 +499,8 @@ describe('저장소의 실제 명세와 임시 시트', () => {
   });
 
   // 명세가 300개를 넘어 전부 검사하면 70초쯤 걸린다. 평소에는 규격(유형·크기·키 색·프레임 수)마다 대표 한 건만,
-  // CI(FULL_ASSETS=1)에서는 전부 검사한다
+  // CI(FULL_ASSETS=1)에서는 아직 실제 그림이 없는 명세를 전부 검사한다(2026-11-15: 명세 1000개를 넘어 전부는 180초를 넘었다 —
+  // 실제 그림이 들어온 명세는 그 그림을 아트 PR의 에셋 검증이 이미 보았다)
   it('임시 시트가 검증을 통과한다(파이프라인 자체 시험)', async () => {
     const full = process.env.FULL_ASSETS === '1';
     const seen = new Set<string>();
@@ -507,7 +508,8 @@ describe('저장소의 실제 명세와 임시 시트', () => {
       if (!existsSync(paths().placeholderSheet(id))) continue;
       const spec = loadSpec(id);
       const kind = `${spec.type}|${spec.size}|${spec.chroma}|${spec.frames}`;
-      if (!full && seen.has(kind)) continue;
+      const pending = !existsSync(paths().sprites(id));
+      if (seen.has(kind) && !(full && pending)) continue;
       seen.add(kind);
       const r = await validateAsset(id, { placeholder: true, previews: false });
       expect(r.errors, id).toEqual([]);
