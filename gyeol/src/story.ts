@@ -5,7 +5,7 @@ import { frameUrl } from '../../src/render/assets';
 import { button, el, rankBadge, realArt } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
-import { loadSave, withKeys, writeSave } from './save';
+import { clearSlot, loadSave, SLOT_COUNT, storyDifficulty, useSlot, withKeys, writeSave, type StoryDifficulty } from './save';
 import { announceAchievements, charPicker, setKeys, type Nav } from './screens';
 import { chapterCharacter, characterOf, faceId, faceStyle, leadLine, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
@@ -223,7 +223,8 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
     'header',
     { class: 'screen-head' },
     button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')),
-    el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, '운곡루의 밤 — 지나온 싸움을 하나씩 떠올린다.')),
+    el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, `${save.slot + 1}번 칸 · ${DIFF_NAME[storyDifficulty(save)]} — 운곡루의 밤, 지나온 싸움을 하나씩 떠올린다.`)),
+    button('칸 바꾸기', 'btn small slot-switch', () => nav.go('slots')),
   );
   const map = el('div', { class: `story-map${art ? ' has-art' : ''}`, style: art ? `background-image:url("${art}")` : '' }, svg, ...pins);
   app.replaceChildren(el('section', { class: 'screen story story-screen' }, head, el('div', { class: 'story-frame' }, map, card)));
@@ -258,6 +259,67 @@ function leadCard(data: DuelData, ch: Chapter): HTMLElement | '' {
 const HAN_NO = ['서', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 function sealOf(ch: Chapter): string {
   return ch.id === 'epilogue' ? '끝' : (HAN_NO[ch.no] ?? String(ch.no));
+}
+
+/* ───────── 불러오기 3칸(2026-11-14 사용자 요청 "천외귀환처럼 3개의 불러오기 창, 보통·어려움") ───────── */
+
+const DIFF_NAME: Record<StoryDifficulty, string> = { normal: '보통', hard: '어려움' };
+const DIFF_NOTE: Record<StoryDifficulty, string> = {
+  normal: '원래의 이야기.',
+  hard: '모든 상대가 처음과 다른 패턴으로 싸운다 — 체력 1.4배 · 공격력 1.3배 · 단계 하나 더.',
+};
+
+export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
+  const save = loadSave();
+  const titleOf = (id: string) => story.chapters.find((c) => c.id === id);
+  const card = (i: number) => {
+    const sl = save.slots[i];
+    if (!sl) {
+      const start = (diff: StoryDifficulty) =>
+        button([el('b', {}, `새로 시작 — ${DIFF_NAME[diff]}`), el('small', {}, DIFF_NOTE[diff])], `res-btn${diff === 'normal' ? ' primary' : ''} slot-new`, () => {
+          const s = useSlot(loadSave(), i, diff);
+          writeSave(s);
+          renderStory(app, nav, data);
+        });
+      return el('article', { class: 'slot-card empty panel' }, el('p', { class: 'slot-no' }, `${i + 1}번 칸`), el('h2', {}, '빈 칸'), el('div', { class: 'slot-actions' }, start('normal'), start('hard')));
+    }
+    const done = story.chapters.filter((c) => sl.story.cleared.includes(c.id));
+    const last = done.at(-1);
+    const next = story.chapters.find((c) => !sl.story.cleared.includes(c.id));
+    const stars = Object.values(sl.story.stars).reduce((a, b) => a + b, 0);
+    const when = sl.updatedAt ? new Date(sl.updatedAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+    const go = button([el('b', {}, save.slot === i ? '이어하기' : '불러오기'), el('small', {}, 'Enter')], 'res-btn primary', () => {
+      const s = useSlot(loadSave(), i);
+      writeSave(s);
+      renderStory(app, nav, data);
+    });
+    const del = button('지우기', 'btn small slot-del', () => {
+      if (!confirm(`${i + 1}번 칸의 이야기 진행을 지운다. 기록·업적·옷은 남는다.`)) return;
+      const s = clearSlot(loadSave(), i);
+      writeSave(s);
+      renderSlots(app, nav, data);
+    });
+    return el(
+      'article',
+      { class: `slot-card panel${save.slot === i ? ' on' : ''} ${sl.difficulty}` },
+      el('p', { class: 'slot-no' }, `${i + 1}번 칸`, el('span', { class: `slot-diff ${sl.difficulty}` }, DIFF_NAME[sl.difficulty])),
+      el('h2', {}, next ? `${next.title} · ${next.subtitle}` : '모두 마쳤다'),
+      el('p', { class: 'slot-meta' }, `${last ? `${titleOf(last.id)?.title ?? ''}까지 마침` : '아직 시작 전'} · 별 ${stars}${when ? ` · ${when}` : ''}`),
+      el('div', { class: 'slot-actions' }, go, del),
+    );
+  };
+  app.replaceChildren(
+    el(
+      'section',
+      { class: 'screen slots' },
+      el('header', { class: 'screen-head' }, button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')), el('div', {}, el('h1', {}, '불러오기'), el('p', { class: 'sub' }, '이야기를 이어 갈 칸을 고른다. 기록·업적·옷은 모든 칸이 함께 쓴다.'))),
+      el('div', { class: 'slot-grid' }, ...Array.from({ length: SLOT_COUNT }, (_, i) => card(i))),
+    ),
+  );
+  (app.querySelector('.slot-card.on .res-btn.primary, .slot-card .res-btn.primary') as HTMLButtonElement | null)?.focus();
+  setKeys((e) => {
+    if (e.key === 'Escape') nav.go('lobby');
+  });
 }
 
 /* ───────── 장 하나 ───────── */
@@ -334,7 +396,8 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
       character: chapterCharacter(data, ch, loadSave()),
       back: 'story',
       title: `${label} · ${i + 1}/${bouts.length}`,
-      duel: { ...ch.rules, survive: bout.survive, ...bout.duel, ...flagged?.duel },
+      // 어려움 칸이면 상대가 새 패턴·체력·공격력·단계 하나 더(hard)
+      duel: { ...ch.rules, survive: bout.survive, ...bout.duel, ...flagged?.duel, ...(storyDifficulty(loadSave()) === 'hard' ? { hard: true } : {}) },
       tips: ch.tips,
       next: {
         label: last ? '장 마치기' : '다음',

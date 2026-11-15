@@ -30,14 +30,19 @@ const atLeastRank = (r: string | undefined, need: string) => !!r && RANK.indexOf
 
 export const starTotal = (save: SaveData): number => Object.values(save.story.stars).reduce((a, b) => a + b, 0);
 
+/** 옷·업적은 칸과 상관없이(2026-11-14 불러오기 3칸): 어느 칸에서든 깬 장 · 가장 많이 모은 칸의 별 */
+const allStories = (save: SaveData) => [save.story, ...(save.slots ?? []).filter((x) => x).map((x) => x!.story)];
+const clearedAnywhere = (save: SaveData, ch: string) => allStories(save).some((st) => st.cleared.includes(ch));
+const bestStars = (save: SaveData) => Math.max(...allStories(save).map((st) => Object.values(st.stars).reduce((a, b) => a + b, 0)));
+
 /** 조건을 채웠나. 박자 도전 all은 chartIds(악보가 있는 상대) 모두 */
 export function condMet(c: Cond | null, save: SaveData, chartIds: string[] = []): boolean {
   if (!c) return true;
   switch (c.kind) {
     case 'cleared':
-      return save.story.cleared.includes(c.chapter);
+      return clearedAnywhere(save, c.chapter);
     case 'stars':
-      return starTotal(save) >= c.n;
+      return bestStars(save) >= c.n;
     case 'stat':
       return (save.stats[c.key] ?? 0) >= c.n;
     case 'duelBest':
@@ -45,7 +50,7 @@ export function condMet(c: Cond | null, save: SaveData, chartIds: string[] = [])
     case 'rhythm':
       return c.all ? chartIds.length > 0 && chartIds.every((id) => atLeastRank(save.rhythmBest[id]?.rank, c.rank)) : Object.values(save.rhythmBest).some((b) => atLeastRank(b.rank, c.rank));
     case 'flagNot':
-      return save.story.cleared.includes(c.chapter) && !save.story.flags.includes(c.flag);
+      return allStories(save).some((st) => st.cleared.includes(c.chapter) && !st.flags.includes(c.flag));
   }
 }
 

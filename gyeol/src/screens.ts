@@ -15,7 +15,7 @@ import { characterOf, characters, chosen, faceId, faceStyle, HAUN, joined, party
 import { emptyStats, loadSave, withKeys, writeSave } from './save';
 import { actionFor, keyNames } from './keys';
 
-export type Screen = 'title' | 'lobby' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
+export type Screen = 'title' | 'lobby' | 'slots' | 'story' | 'arena' | 'rhythm' | 'practice' | 'records' | 'wardrobe' | 'calibrate';
 
 export interface PlayOpts {
   difficulty?: string;
@@ -156,6 +156,8 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     sfx('click');
     if (id === 'settings') nav.settings();
     else if (id === 'cheonoe') location.href = CHEONOE_URL;
+    // 이야기는 불러오기 3칸부터(2026-11-14)
+    else if (id === 'story') nav.go('slots');
     else nav.go(id as Screen);
   };
   const items = lobby.menu.map((m, i) => {

@@ -167,6 +167,8 @@ export interface FoeDef {
    * 다시 일어나(roar ms) 다음 단계로 — 체력·체간을 새로 채우고, 수를 더하거나 바꾸고, 패턴과 기믹을 갈아 낀다.
    */
   phases?: PhaseDef[];
+  /** 어려움 이야기에서 바꿔 끼우는 정의 */
+  hard?: HardDef;
   /** 수련장 상대(결투장·박자 도전·도감 목록에 안 나온다)와 수련 종류(종류마다 공격 패턴을 바꿔 낀다) */
   practice?: boolean;
   /** 처음부터 결투장·박자 도전에 열려 있는 상대(나머지는 이야기에서 겨뤄 본 뒤 열린다) */
@@ -189,6 +191,15 @@ export interface Gimmicks {
   accelerate?: { step: number; min: number };
   /** 결 가림: 집중하지 않으면 결이 이 비율만큼만 보인다 */
   veil?: number;
+}
+
+/** 어려움 이야기의 상대(2026-11-14): 처음과 완전히 다른 패턴, 체력·공격력 배율, 단계 하나 더 */
+export interface HardDef {
+  hpMul: number;
+  damageMul: number;
+  patterns: PatternDef[];
+  /** 원래 단계(새 패턴) + 마지막에 더하는 단계 */
+  phases: PhaseDef[];
 }
 
 export interface PhaseDef {
@@ -504,6 +515,8 @@ export interface DuelOptions {
   veil?: number;
   /** 적 피해 배율(바르가스의 열쇠를 받으면 쉬워진다) */
   foeDamageMul?: number;
+  /** 어려움 이야기(2026-11-14): 상대의 hard 정의(새 패턴·체력·공격력·단계 하나 더)로 싸운다 */
+  hard?: boolean;
 }
 
 /** 난이도를 입힌 데이터·상대(원본은 고치지 않는다) */
@@ -516,6 +529,18 @@ function withDifficulty(data: DuelData, foe: FoeDef, diff: DifficultyDef | undef
   return { data: { ...data, rules, foes: data.foes.map((f) => (f.id === foe.id ? foeDef : f)) }, foeDef };
 }
 
+/** 어려움 상대: 체력·공격력을 올리고 패턴·단계를 hard 것으로 바꿔 낀다(원본은 고치지 않는다) */
+export function withHard(foe: FoeDef, h: HardDef): FoeDef {
+  const dmg = (ms: Record<string, MoveDef> | undefined) => (ms ? Object.fromEntries(Object.entries(ms).map(([k, m]) => [k, { ...m, damage: Math.max(1, Math.round(m.damage * h.damageMul)) }])) : ms);
+  return {
+    ...foe,
+    hp: Math.round(foe.hp * h.hpMul),
+    moves: dmg(foe.moves)!,
+    patterns: h.patterns,
+    phases: h.phases.map((ph) => ({ ...ph, moves: dmg(ph.moves) })),
+  };
+}
+
 export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode: Mode = 'duel', difficulty = 'main', opts: DuelOptions = {}): Duel {
   const foe0 = data0.foes.find((f) => f.id === foeId);
   if (!foe0) throw new Error(`알 수 없는 상대: ${foeId}`);
@@ -526,6 +551,11 @@ export function createDuel(data0: DuelData, foeId: string, seed = 'gyeol', mode:
   if (opts.foeDamageMul && opts.foeDamageMul !== 1) {
     const k = opts.foeDamageMul;
     foeDef = { ...foeDef, moves: Object.fromEntries(Object.entries(foeDef.moves).map(([id, m]) => [id, { ...m, damage: Math.max(1, Math.round(m.damage * k)) }])) };
+  }
+  if (opts.hard && foeDef.hard && mode === 'duel') {
+    foeDef = withHard(foeDef, foeDef.hard);
+    // 베지 않는 대결(비틀거림으로 끝)은 늘어난 단계까지 가도록 비틀거림도 하나 더
+    if (opts.finish === 'stagger' && opts.staggerWin) opts = { ...opts, staggerWin: opts.staggerWin + 1 };
   }
   if (mode === 'rhythm' && !foeDef.chart) throw new Error(`${foeId}에는 박자 도전 악보가 없다`);
   const rng = createRng(seed).fork(foeId);
