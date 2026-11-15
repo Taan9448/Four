@@ -474,6 +474,24 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 .wd-char .cp-face { width: 34px; height: 34px; }
 .wd-char.on { border-color: var(--shu-hi); color: var(--paper); background: rgba(168, 36, 28, 0.18); }
 .wd-char b { font-family: var(--font-title); font-weight: 400; font-size: 16px; }
+
+/* 불러오기 3칸(2026-11-14) */
+.slots .slot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+@media (max-width: 820px) { .slots .slot-grid { grid-template-columns: 1fr; } }
+.slot-card { display: flex; flex-direction: column; gap: 8px; padding: 18px 18px 16px; min-height: 220px; }
+.slot-card.on { border-color: var(--shu-hi); }
+.slot-card.hard { background: var(--grain), linear-gradient(180deg, rgba(90, 16, 20, 0.35), rgba(18, 12, 9, 0.92)); }
+.slot-card .slot-no { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 0.12em; color: var(--paper-dim); }
+.slot-diff { padding: 1px 8px; border-radius: 999px; font-size: 12px; letter-spacing: 0.05em; border: 1px solid var(--line-2); color: var(--paper); }
+.slot-diff.hard { border-color: var(--shu-hi); color: #ffb0a0; background: rgba(168, 36, 28, 0.25); }
+.slot-card h2 { margin: 0; font-family: var(--font-title); font-weight: 400; font-size: 22px; color: var(--paper); }
+.slot-card.empty h2 { color: var(--paper-dim); }
+.slot-meta { margin: 0; color: var(--paper-dim); font-size: 13px; line-height: 1.5; }
+.slot-actions { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+.slot-actions .res-btn { width: 100%; }
+.slot-actions .res-btn small { display: block; font-size: 12px; opacity: 0.75; white-space: normal; }
+.slot-del { align-self: flex-end; }
+.story-screen .slot-switch { margin-left: auto; }
 /* 설정 계정 칸: 지금 동기화·로그아웃을 이름 아래 한 줄로(2026-11-14 — 이름 옆에서 글자가 깨졌다) */
 .acct-btns-row { display: flex; gap: 8px; margin: 8px 0 2px; }
 .acct-btns-row .btn { flex: 1 1 0; white-space: nowrap; word-break: keep-all; }

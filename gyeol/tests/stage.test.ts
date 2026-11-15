@@ -90,3 +90,45 @@ describe('새벽 로비(2026-11-15 사용자 보고 — 엔딩 뒤 로비가 반
     expect(css).not.toMatch(/\.lobby\.dawn\s*>\s*\*\s*\{[^}]*position/);
   });
 });
+
+describe('불러오기 3칸 · 어려움(2026-11-14)', () => {
+  it('옛 저장은 1번 칸(보통)으로 옮기고, 칸을 바꾸면 이야기 진행이 따로 간다', async () => {
+    const { normalize, useSlot, clearSlot, storyDifficulty } = await import('../src/save');
+    const s = normalize({ v: 1, story: { cleared: ['prologue', 'ch1'], stars: { ch1: 2 }, flags: [] } });
+    expect(s.slots[0]?.story.cleared).toEqual(['prologue', 'ch1']);
+    expect(s.slot).toBe(0);
+    useSlot(s, 1, 'hard');
+    expect(s.story.cleared).toEqual([]);
+    expect(storyDifficulty(s)).toBe('hard');
+    s.story.cleared.push('prologue');
+    useSlot(s, 0);
+    expect(s.story.cleared).toEqual(['prologue', 'ch1']);
+    expect(s.slots[1]?.story.cleared).toEqual(['prologue']);
+    clearSlot(s, 1);
+    expect(s.slots[1]).toBeNull();
+    // 다시 읽어도 칸이 남는다
+    const back = normalize(JSON.parse(JSON.stringify(s)));
+    expect(back.slots[0]?.story.cleared).toEqual(['prologue', 'ch1']);
+  });
+  it('어려움 상대: 체력·공격력이 오르고, 패턴이 처음과 다르며, 단계가 하나 더', async () => {
+    const { createDuel } = await import('../src/duel');
+    const real = data as unknown as import('../src/duel').DuelData;
+    for (const f of real.foes) {
+      if (!f.hard) continue;
+      const n = createDuel(real, f.id, 'h');
+      const h = createDuel(real, f.id, 'h', 'duel', 'main', { hard: true });
+      expect(h.foeDef.hp, f.id).toBeGreaterThan(n.foeDef.hp);
+      expect(h.phaseCount, f.id).toBe(n.phaseCount + 1);
+      expect(JSON.stringify(h.foeDef.patterns), f.id).not.toBe(JSON.stringify(n.foeDef.patterns));
+      const anyMove = Object.keys(f.moves)[0];
+      expect(h.foeDef.moves[anyMove].damage, f.id).toBeGreaterThanOrEqual(n.foeDef.moves[anyMove].damage);
+      // 패턴의 모든 수가 그 단계까지 있는 수다
+      const known = new Set(Object.keys(f.moves));
+      for (const p of f.hard.patterns) for (const st of p.steps) expect(known.has(st.move), `${f.id} ${st.move}`).toBe(true);
+      f.hard.phases.forEach((ph) => {
+        for (const k of Object.keys(ph.moves ?? {})) known.add(k);
+        for (const p of ph.patterns ?? []) for (const st of p.steps) expect(known.has(st.move), `${f.id} ${ph.name} ${st.move}`).toBe(true);
+      });
+    }
+  });
+});
