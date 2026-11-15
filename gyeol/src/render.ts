@@ -114,11 +114,13 @@ export interface Fx {
   /** 받을 수 없는 기술 이름 띠 */
   banner: { name: string; born: number; element?: Element } | null;
   /** 결 연환 표시(끊기지 않고 받은 수, 그 사이 가장 낮은 판정) */
-  chain: { n: number; min: Judgement };
+  /** 기술 계기(2026-11-14 인물마다 조건이 다르다): label 이름 · n 지금 값 · max 구슬 열 끝 · marks 기술이 준비되는 값 · unit 단위 */
+  chain: { n: number; min: Judgement; label?: string; max?: number; marks?: number[]; unit?: string };
   /** 이 대결에서 겨루기가 켜져 있나(결 연환 '겨루기 준비' 표시) */
   clashOn?: boolean;
   /** 기술 연출(쓴 순간부터, 실제 시간) */
-  tech: { id: string; born: number } | null;
+  /** 기술 연출: slot 3(마지막 기술)이면 판이 어두워지고 하늘에서 빛이 떨어진다 · area(엘리아 마법·마지막 기술)면 판 여러 곳에 터진다 */
+  tech: { id: string; born: number; slot?: number; area?: boolean } | null;
   /** 끝 장면: 느린 화면 동안 위아래 검은 띠와 쓰러지는 쪽으로 다가가기 */
   finale: { born: number; x: number } | null;
   flash: { color: string; born: number; life: number; strength: number } | null;
@@ -324,6 +326,7 @@ export function draw(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx
   fx.weatherLast = now;
   drawBackground(ctx, sp);
   drawWeather(ctx, fx.weather, false, now, density);
+  drawUltDark(ctx, fx, now);
   // 인물 층: 땅 가운데를 축으로 줄인다(배경은 그대로 화면을 채운다)
   ctx.save();
   worldZoom(ctx);
@@ -1158,6 +1161,94 @@ function drawBolts(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.restore();
 }
 
+/**
+ * 마지막 기술(자리 3) 연출(2026-11-14 사용자 요청 "맵이 어두워지거나 하늘에서 뭐가 떨어지거나 광역으로"):
+ * 컷인부터 판이 어두워지고(배경 위·인물 아래), 터지는 순간 하늘에서 기술 색의 빛줄기가 판 전체로 쏟아진다
+ */
+const ULT_START = 700;
+function ultPhase(fx: Fx, now: number): number | null {
+  const tc = fx.tech;
+  if (!tc || (tc.slot ?? 1) < 3) return null;
+  return now - tc.born;
+}
+function drawUltDark(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  const el = ultPhase(fx, now);
+  if (el === null || el > 2600) return;
+  const a = el < 500 ? el / 500 : el < 2000 ? 1 : 1 - (el - 2000) / 600;
+  const col = TECH_COLOR[fx.tech!.id] ?? TECH_COLOR.unhae;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, a) * 0.62;
+  ctx.fillStyle = '#05040a';
+  ctx.fillRect(0, 0, W, H);
+  // 가장자리에서 기술 색이 번진다
+  const g = ctx.createRadialGradient(W / 2, GROUND, 40, W / 2, GROUND, W * 0.7);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(1, `rgba(${col.rgb},0.35)`);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+function drawUltFall(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
+  const el = ultPhase(fx, now);
+  if (el === null) return;
+  const e = el - ULT_START;
+  if (e < -350 || e > 1300) return;
+  const col = TECH_COLOR[fx.tech!.id] ?? TECH_COLOR.unhae;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // 빛줄기 16개: 하늘에서 비스듬히 떨어져 땅에 닿으면 작은 불꽃
+  for (let i = 0; i < 22; i++) {
+    const delay = ((i * 7) % 22) * 40 - 350;
+    const k = (e - delay) / 420;
+    if (k < 0 || k > 1.6) continue;
+    const x0 = -60 + (i / 21) * (W + 140) + ((i * 37) % 50) - 25;
+    const yTop = -200;
+    const land = GROUND - 10;
+    const kk = Math.min(1, k);
+    const y = yTop + (land - yTop) * kk;
+    const x = x0 - (1 - kk) * 120;
+    if (k <= 1) {
+      const len = 240;
+      const g = ctx.createLinearGradient(x + 60, y - len, x, y);
+      g.addColorStop(0, `rgba(${col.rgb},0)`);
+      g.addColorStop(1, `rgba(${col.rgb},0.95)`);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 11;
+      ctx.beginPath();
+      ctx.moveTo(x + 60, y - len);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath();
+      ctx.moveTo(x + 25, y - len * 0.4);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // 땅에 닿은 빛
+      const f = (k - 1) / 0.6;
+      ctx.fillStyle = `rgba(${col.rgb},${0.7 * (1 - f)})`;
+      ctx.beginPath();
+      ctx.ellipse(x, land, 20 + 50 * f, 6 + 10 * f, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // 터지는 순간 판 전체로 퍼지는 충격 고리
+  if (e >= 0 && e < 800) {
+    const k = e / 800;
+    ctx.strokeStyle = `rgba(${col.rgb},${0.9 * (1 - k)})`;
+    ctx.lineWidth = 14 * (1 - k) + 2;
+    ctx.beginPath();
+    ctx.ellipse(FOE_X - 80, GROUND - 10, 60 + 820 * k, 18 + 90 * k, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 /** 기술 연출: Codex fx_gyeol_tech_<id>_a·b(12프레임)가 오면 적 위에 크게, 없으면 코드로 그린 연출 */
 function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: number): void {
   const tc = fx.tech;
@@ -1170,20 +1261,29 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
   const e = el - start;
   const col = TECH_COLOR[tc.id] ?? TECH_COLOR.unhae;
   if (A && B) {
+    drawUltFall(ctx, fx, now);
     if (e < 0) return;
-    const n = 1 + Math.floor(e / (1000 / A.meta.fps));
-    const sheet = n <= A.meta.frames ? A : B;
-    const f = n <= A.meta.frames ? n : n - A.meta.frames;
-    if (f > sheet.meta.frames) return;
-    const img = frameOf(sheet, f);
-    if (!img) return;
     // 앞뒤 두 장이 같은 크기로 보이게 덜 키우는 쪽(더 크게 그려진 장)에 맞춘다(2026-11-14)
     const s = SCALE * 2.6 * Math.min(fxBoost(A), fxBoost(B));
     const cx = tc.id === 'unhae' ? CONTACT.x + 40 : FOE_X;
-    const r = fitFx(cx, CONTACT.y, sheet.meta.frameW * s, sheet.meta.frameH * s);
-    ctx.drawImage(img, r.x, r.y, r.w, r.h);
+    // 광역(엘리아 마법·마지막 기술): 판 세 곳에서 조금씩 늦게 터진다(2026-11-14)
+    const spots = tc.area || (tc.slot ?? 1) >= 3 ? [{ dx: 0, delay: 0, k: 1 }, { dx: -230, delay: 90, k: 0.72 }, { dx: 190, delay: 170, k: 0.78 }] : [{ dx: 0, delay: 0, k: 1 }];
+    for (const sp0 of spots) {
+      const ee = e - sp0.delay;
+      if (ee < 0) continue;
+      const nn = 1 + Math.floor(ee / (1000 / A.meta.fps));
+      const sh = nn <= A.meta.frames ? A : B;
+      const ff = nn <= A.meta.frames ? nn : nn - A.meta.frames;
+      if (ff > sh.meta.frames) continue;
+      const im = frameOf(sh, ff);
+      if (!im) continue;
+      const ss = s * sp0.k;
+      const r = fitFx(cx + sp0.dx, CONTACT.y, sh.meta.frameW * ss, sh.meta.frameH * ss);
+      ctx.drawImage(im, r.x, r.y, r.w, r.h);
+    }
     return;
   }
+  drawUltFall(ctx, fx, now);
   if (e < -500 || e > 1100) return;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
@@ -1420,13 +1520,17 @@ const CHAIN_PIPS = 10;
 function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
   const c = fx.chain;
   if (c.n <= 0 || fx.finale) return;
+  const max = c.max ?? CHAIN_PIPS;
+  const marks = c.marks ?? [5, 10];
   const x0 = PLAYER_X - 150 - 19 * 4.5;
   const y = GROUND - 210;
   ctx.save();
-  // 구슬 열 개: 5(낙운무흔·벽운단하)와 10(운해귀종)에 금테
+  // 구슬 열 개: 값을 max에 맞춰 채우고, 기술이 준비되는 자리에 금테
   const gap = 19;
+  const filled = Math.min(CHAIN_PIPS, Math.round((c.n / max) * CHAIN_PIPS));
+  const markPips = new Set(marks.map((m) => Math.max(0, Math.min(CHAIN_PIPS, Math.round((m / max) * CHAIN_PIPS))) - 1));
   for (let i = 0; i < CHAIN_PIPS; i++) {
-    const on = i < c.n;
+    const on = i < filled;
     const x = x0 + i * gap;
     ctx.beginPath();
     ctx.arc(x, y, 7, 0, Math.PI * 2);
@@ -1442,15 +1546,16 @@ function drawChain(ctx: CanvasRenderingContext2D, fx: Fx): void {
     ctx.fillStyle = on ? (c.min === 'perfect' ? '#ffd27a' : c.min === 'excellent' ? '#c9d4e6' : '#8f8a82') : 'rgba(0,0,0,0.45)';
     ctx.fill();
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = i === 4 || i === 9 ? '#fff0c0' : 'rgba(255,255,255,0.4)';
+    ctx.strokeStyle = markPips.has(i) ? '#fff0c0' : 'rgba(255,255,255,0.4)';
     ctx.stroke();
   }
   ctx.font = '800 15px "Song Myung", serif';
   ctx.textAlign = 'center';
   ctx.lineWidth = 3;
   ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  const name = `${c.label ?? '결 연환'} ${c.n}${c.unit ?? ''}`;
   // 겨루기가 켜진 대결에서 결 연환이 3을 넘으면 '겨루기 준비' — 무거운 공격(劍)을 기다린다
-  const label = fx.clashOn && c.n >= 3 ? `결 연환 ${c.n} · 겨루기 준비` : `결 연환 ${c.n}`;
+  const label = fx.clashOn && !c.label && c.n >= 3 ? `${name} · 겨루기 준비` : name;
   ctx.strokeText(label, x0 + gap * 4.5, y + 26);
   ctx.fillStyle = c.min === 'perfect' ? '#ffe9b0' : c.min === 'excellent' ? '#d8e2f2' : '#bdb6aa';
   ctx.fillText(label, x0 + gap * 4.5, y + 26);

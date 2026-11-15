@@ -7,7 +7,7 @@ import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
 import { outfitPrefix } from './progress';
 import raw from '../data/duel.json';
-import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techOf, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { actionFor, keyNames, keyText, type KeyAction } from './keys';
 import { characterOf, faceId, faceStyle, HAUN, recordKey, techsFor, withCharacter } from './party';
@@ -91,6 +91,22 @@ const nav: Nav = {
     openSettings(applySettings);
   },
 };
+
+/** 기술 계기 값(HUD 구슬 열) */
+function techGauge(d: Duel): Fx['chain'] {
+  const ts = usableTechs(d);
+  const cond = ts[0]?.cond ?? 'chain';
+  const marks = [...new Set(ts.map((t) => t.chain))].sort((a, b) => a - b);
+  if (cond === 'chain') {
+    const last = d.judgeLog.slice(-5);
+    const min: Judgement = last.includes('good') ? 'good' : last.includes('excellent') ? 'excellent' : 'perfect';
+    return { n: d.chain, min, marks: marks.length ? marks : [5, 10], max: Math.max(10, ...marks) };
+  }
+  const n = techMeter(d, ts[0]);
+  const max = Math.max(...marks);
+  const label = cond === 'defend' ? '막아 낸 수' : cond === 'perfect' ? 'PERFECT' : '체간 깎기';
+  return { n, min: n >= max ? 'perfect' : 'excellent', label, max, marks, unit: cond === 'posture' ? '%' : '' };
+}
 
 const BACK_LABEL: Partial<Record<Screen, string>> = { arena: '결투장으로', rhythm: '수련장으로', practice: '수련장으로', lobby: '로비로', story: '이야기 지도' };
 
@@ -672,7 +688,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           const t = techOf(d, ev.tech)!;
           sfx('cutin');
           hitstopUntil = now + 700;
-          fx.tech = { id: t.id, born: now };
+          fx.tech = { id: t.id, born: now, slot: t.slot, area: t.area };
           // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 그 인물의 반신 그림(결의)
           const cg = frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
           const stand = cg ? null : frameUrl(char && char.id !== HAUN ? char.stand : 'haun_sword_stand', 2);
@@ -774,6 +790,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
             spark(PLAYER_X - 150, CONTACT.y - 150, 24 + Math.round(power * 30), st.glow, 320 + power * 200, 4);
             sfx('power', { volume: 0.5 + power * 0.4 });
             if (ev.streak >= 10) sfx('crit', { volume: 0.5 });
+            // 고비마다 상승 아르페지오(숫자가 클수록 더 높이·더 많이)
+            musicalHit('combo', ev.streak);
           }
           if (tier > lastTier) {
             const names = ['', '결이 보인다', '결을 탄다', '결과 하나가 된다'];
@@ -1120,7 +1138,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
         focusBtn.classList.toggle('on', focusing);
       });
     }
-    fx.chain = { n: d.chain, min: d.chainMin };
+    // 기술 계기: 인물마다 조건이 다르다(진하운 결 연환 · 카일 막아 낸 수 · 엘리아 PERFECT · 보른 체간 깎기)
+    fx.chain = techGauge(d);
     const ready = techOf(d, d.techReady);
     put('tech', `${ready?.id ?? ''}|${!!d.result}`, () => {
       techBtn.disabled = rhythm || !ready || !!d.result;
