@@ -428,7 +428,10 @@ describe('「결」 목업 2차 — 원소·받을 수 없는 공격·속임수�
     expect(run([30, 100, 30, 30, 30]).techReady).toBe('nakun'); // EXCELLENT 섞임
     expect(run([30, 300, 30, 30, 30]).techReady).toBeNull(); // GOOD(막기)이 섞이면 아무것도 아니다
     expect(run(ex(5)).techReady).toBe('byeogun');
-    expect(run([100, ...ex(8)]).techReady).toBe('nakun');
+    // 2026-11-14: 최근에 이어 받은 판정만 본다 — 앞에 EXCELLENT가 있어도 뒤 PERFECT 다섯이면 벽운단하
+    expect(run([100, ...ex(8)]).techReady).toBe('byeogun');
+    // 버그 수정: 사이에 GOOD(막기)이 섞여도, 그 뒤로 다시 다섯을 이어 받으면 기술이 준비된다(예전엔 맞기 전까지 안 생겼다)
+    expect(run([30, 300, 100, 100, 100, 100, 100]).techReady).toBe('nakun');
     const pure = run([100, ...ex(9)]);
     expect(pure.techReady).toBe('unhae');
     // 쓰면: 무적, 피해 = 최대 체력 × damage + 받아낸 힘(10×10) × returnMul, 체간은 가득(비틀거림)
