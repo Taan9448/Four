@@ -1045,8 +1045,21 @@ describe('「결」 5단계 — 하운 옷·업적', () => {
     // 옷마다 입을 수 있는 인물의 대기·베기·피격·반신 그림이 있다(「천외귀환」 옷 그림, 2026-11-14 동료 옷장)
     for (const o of progress.outfits) {
       if (o.id === 'base') continue;
-      for (const c of o.chars ?? ['haun']) for (const k of ['idle', 'attack', 'hit', 'stand']) expect(existsSync(`assets/sprites/skin_${o.id}_${c}_${k}/meta.json`), `${o.id} ${c} ${k}`).toBe(true);
+      for (const c of o.chars ?? ['haun'])
+        for (const k of ['idle', 'attack', 'hit', 'stand']) {
+          const id = o.sprite ? (k === 'stand' ? o.stand : `${o.sprite}_${k}`) : `skin_${o.id}_${c}_${k}`;
+          expect(existsSync(`assets/sprites/${id}/meta.json`), `${o.id} ${c} ${k}`).toBe(true);
+        }
     }
+    // 화산의 매설(2026-11-16): 수련 Lv.20에 열리고, 진하운 그림을 통째로 매설 그림으로
+    const { setTrainingLevel, wornOutfit } = await import('../src/progress');
+    const m = structuredClone(s);
+    m.outfit = 'maeseol';
+    expect(outfitPrefix(m)).toBeNull();
+    setTrainingLevel(() => 20);
+    expect(outfitPrefix(m)).toBe('maeseol');
+    expect(wornOutfit(m)?.stand).toBe('maeseol_stand');
+    setTrainingLevel(() => 1);
     // 동료 옷은 그 인물 칸에 따로
     const t = structuredClone(s);
     t.story.cleared.push('ch3');

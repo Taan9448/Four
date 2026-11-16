@@ -1,0 +1,20 @@
+id: maeseol_death
+type: character-anim
+character: maeseol
+summary: '「결」 매설(진하운 옷장 「화산의 매설」) death — 진하운 haun_sword_death와 같은 동작·프레임·events, 사람만 매설(2026-11-16)'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+# 진하운 동작(haun_sword_death)을 매설로 — 매설은 칼집 없이 매화 술 달린 직검(jian)을 든다
+frame_notes:
+  1: "struck hard, head thrown back, the jian slipping in her grip"
+  2: "staggering backward, knees buckling, one hand reaching out"
+  3: "dropping to one knee, the jian point digging into the ground to hold herself up"
+  4: "the jian hand loosens, her body tipping sideways"
+  5: "falling onto her side, her short bob and red headband ends spreading on the ground, the jian lying beside her"
+  6: "lying still on the ground, eyes closed, the jian beside her open hand"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ff3b3b' }

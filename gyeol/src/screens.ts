@@ -650,8 +650,10 @@ export function renderWardrobe(app: HTMLElement, nav: Nav, previewId?: string, c
   const shown = outfits.find((o) => o.id === (previewId ?? worn)) ?? outfits[0];
   const baseStand = cur === HAUN ? 'haun_gyeol_stand' : (curDef?.stand ?? `${cur}_stand`);
   const baseIdle = curDef?.sprite ?? 'haun_sword';
-  const standOf = (id: string) => realArt(id === 'base' ? baseStand : `skin_${id}_${cur}_stand`) ?? frameUrl(cur === HAUN ? 'haun_sword_stand' : baseStand, 1);
-  const idleOf = (id: string) => frameUrl(id === 'base' ? `${baseIdle}_idle` : `skin_${id}_${cur}_idle`, 1);
+  // 인물을 통째로 바꾸는 옷(화산의 매설)은 그 그림(sprite·stand)
+  const def = (id: string) => outfits.find((o) => o.id === id);
+  const standOf = (id: string) => realArt(id === 'base' ? baseStand : (def(id)?.stand ?? `skin_${id}_${cur}_stand`)) ?? frameUrl(cur === HAUN ? 'haun_sword_stand' : baseStand, 1);
+  const idleOf = (id: string) => frameUrl(id === 'base' ? `${baseIdle}_idle` : `${def(id)?.sprite ?? `skin_${id}_${cur}`}_idle`, 1);
   const openShown = condMet(shown.unlock, save);
   const stand = standOf(shown.id);
   const idle = idleOf(shown.id);

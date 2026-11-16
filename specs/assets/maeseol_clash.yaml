@@ -1,0 +1,19 @@
+id: maeseol_clash
+type: character-anim
+character: maeseol
+summary: '「결」 매설(진하운 옷장 「화산의 매설」) clash — 진하운 haun_sword_clash와 같은 동작·프레임·events, 사람만 매설(2026-11-16)'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 4
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.35
+# 진하운 동작(haun_sword_clash)을 매설로 — 매설은 칼집 없이 매화 술 달린 직검(jian)을 든다
+frame_notes:
+  1: "low wide stance leaning hard to the right, both hands on the jian grip, the blade held out horizontally at chest height to the right as if pressed against an unseen blade, teeth gritted, long hair streaming back"
+  2: "the same pose pushed a little further forward, back foot sliding, arms trembling, the blade edge glinting"
+  3: "the same pose pushed back slightly, knees bending deeper, straining"
+  4: "close to frame 1 so the loop is seamless"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ffe6a0' }

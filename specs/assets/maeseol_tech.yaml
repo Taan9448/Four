@@ -1,0 +1,20 @@
+id: maeseol_tech
+type: character-anim
+character: maeseol
+summary: '「결」 매설(진하운 옷장 「화산의 매설」) tech — 진하운 haun_sword_tech와 같은 동작·프레임·events, 사람만 매설(2026-11-16)'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 6
+fps: 8
+events: { hit: 4 }
+bbox_tolerance: 0.35
+# 진하운 동작(haun_sword_tech)을 매설로 — 매설은 칼집 없이 매화 술 달린 직검(jian)을 든다
+frame_notes:
+  1: "stands still with eyes closed, jian held low at her side, a faint blue-white glow rising around her feet and hair lifting slightly"
+  2: "eyes snap open, jian drawn back behind her in both hands, body coiled low, the glow brighter"
+  3: "steps forward, the jian rising in a wide arc beside the head (not far above it), a trail of white-blue light following the blade"
+  4: "a huge clean sweeping cut forward to the right, the whole blade glowing white-blue, a long bright arc of light trailing from it"
+  5: "follow-through, body low and turned, the jian held out to the right, the light arc fading into motes"
+  6: "straightening calmly, jian lowered, a few motes drifting around her"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ffd27a' }

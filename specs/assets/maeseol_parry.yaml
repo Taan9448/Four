@@ -1,0 +1,20 @@
+id: maeseol_parry
+type: character-anim
+character: maeseol
+summary: '「결」 매설(진하운 옷장 「화산의 매설」) parry — 진하운 haun_sword_parry와 같은 동작·프레임·events, 사람만 매설(2026-11-16)'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 6
+fps: 14
+events: { deflect: 3 }
+bbox_tolerance: 0.25
+# 진하운 동작(haun_sword_parry)을 매설로 — 매설은 칼집 없이 매화 술 달린 직검(jian)을 든다
+frame_notes:
+  1: "ready stance, eyes narrowed on the incoming blow, the jian held low in front"
+  2: "the jian snaps up diagonally in front of the chest, edge angled to the right, both hands on the grip, front foot planted"
+  3: "the moment of the deflection: the blade meets the blow at an angle, a small burst of blue-white light and two sparks at the point of contact on the right of the blade, body braced, hair, red headband ends and skirt panels flicking back"
+  4: "the deflected force slides off, the jian turned flat and pushed outward to the right, weight still forward"
+  5: "a calm half step back, the jian returning to the middle, a faint blue afterglow along the edge"
+  6: "settled ready stance again, jian low in front"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ffd27a' }
