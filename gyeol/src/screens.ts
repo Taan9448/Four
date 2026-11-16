@@ -151,6 +151,11 @@ export const setSlotsMode = (m: SlotsMode): void => {
   slotsMode = m;
 };
 export const getSlotsMode = (): SlotsMode => slotsMode;
+/** 저장 3칸 창 여는 함수(main.ts가 data와 함께 넣는다 — screens.ts가 story.ts를 부르면 순환하므로) */
+let slotsOpener: ((m: SlotsMode, onClose: () => void) => void) | null = null;
+export const setSlotsOpener = (fn: (m: SlotsMode, onClose: () => void) => void): void => {
+  slotsOpener = fn;
+};
 
 /** 이어하기 아래 작은 글: "2번 칸 · 어려움 · 4장 아르덴" */
 function continueNote(save: ReturnType<typeof loadSave>): string {
@@ -183,10 +188,12 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     else if (id === 'continue') {
       writeSave(useSlot(loadSave(), loadSave().slot));
       nav.go('story');
-    } else if (id === 'new' || id === 'load') {
-      setSlotsMode(id);
-      nav.go('slots');
-    } else if (id === 'story') nav.go('slots');
+    } else if (id === 'new' || id === 'load' || id === 'story') {
+      // 2026-11-16 사용자 요청 "천외귀환처럼 팝업으로": 메인 위에 저장 3칸 창. 칸을 지웠으면 닫을 때 메인을 다시 그린다(이어하기·불러오기 보이기)
+      const m = id === 'new' ? 'new' : 'load';
+      setSlotsMode(m);
+      slotsOpener?.(m, () => renderLobby(app, nav));
+    }
     else nav.go(id as Screen);
   };
   const filled = save.slots.some((x) => x);
