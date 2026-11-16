@@ -94,10 +94,11 @@ describe('매끄러운 이야기(2026-11-13)', () => {
   it('10장은 돌내마을 → 틈 안 순서, 새 상대가 이야기에 들어 있다', async () => {
     const story = (await import('../data/story.json')).default as unknown as { chapters: Ch[] };
     const foes = (id: string) => story.chapters.find((c) => c.id === id)!.bouts!.map((b) => b.foe);
-    expect(foes('ch10')).toEqual(['rift_beast', 'rift_phantom', 'bone_giant', 'mordecai']);
+    expect(foes('ch10')).toEqual(['rift_beast', 'fire_scale_hound', 'rift_phantom', 'bone_giant', 'mordecai']);
     expect(foes('ch6')[0]).toBe('ash_wraith');
     expect(story.chapters.find((c) => c.id === 'ch6')!.bouts![0].survive).toBe(6);
-    expect(foes('ch8')[0]).toBe('wudang_warden');
+    // 2026-11-16: 진무전 앞 세 돌자리의 신교 호법이 먼저, 그다음 진무전 호법
+    expect(foes('ch8').slice(0, 2)).toEqual(['cult_guardian', 'wudang_warden']);
   });
 });
 

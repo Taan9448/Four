@@ -17745,7 +17745,196 @@
           "(고블린 무리가 키득거린다)"
         ]
       },
-      "arenaAfter": "ch2"
+      "arenaAfter": "ch2",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "stab"
+              },
+              {
+                "move": "stab",
+                "after": 110
+              },
+              {
+                "move": "rock",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "stab"
+              },
+              {
+                "move": "stab",
+                "after": 110
+              },
+              {
+                "move": "stab",
+                "after": 110
+              },
+              {
+                "move": "stab",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "rock"
+              },
+              {
+                "move": "stab",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "stab",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "stab"
+              },
+              {
+                "move": "stab",
+                "after": 110
+              },
+              {
+                "move": "stab",
+                "after": 110
+              },
+              {
+                "move": "rock",
+                "after": 128
+              },
+              {
+                "move": "stab",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 78,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "stab"
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "rock",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "stab"
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "rock"
+                  },
+                  {
+                    "move": "stab",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "stab",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "stab"
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "stab",
+                    "after": 110
+                  },
+                  {
+                    "move": "rock",
+                    "after": 112
+                  },
+                  {
+                    "move": "stab",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "swamp_toad",
@@ -17858,7 +18047,192 @@
           "(꺽, 하고 운다)"
         ]
       },
-      "arenaAfter": "ch2"
+      "arenaAfter": "ch2",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "tongue"
+              },
+              {
+                "move": "tongue",
+                "after": 112
+              },
+              {
+                "move": "belly",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "tongue"
+              },
+              {
+                "move": "tongue",
+                "after": 110
+              },
+              {
+                "move": "tongue",
+                "after": 110
+              },
+              {
+                "move": "tongue",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "belly"
+              },
+              {
+                "move": "tongue",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "puff"
+              },
+              {
+                "move": "tongue",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "tongue"
+              },
+              {
+                "move": "venom",
+                "after": 208
+              },
+              {
+                "move": "tongue",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 106,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "tongue"
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 110
+                  },
+                  {
+                    "move": "belly",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "tongue"
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 110
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 110
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 110
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "belly"
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "puff"
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "tongue"
+                  },
+                  {
+                    "move": "venom",
+                    "after": 182
+                  },
+                  {
+                    "move": "tongue",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "tongue"
+                  },
+                  {
+                    "move": "venom",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "empty_armor",
@@ -17969,6 +18343,187 @@
       "arenaAfter": "ch2",
       "gimmicks": {
         "armor": 0.6
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "thrust"
+              },
+              {
+                "move": "thrust",
+                "after": 160
+              },
+              {
+                "move": "thrust",
+                "after": 160
+              },
+              {
+                "move": "feint",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "feint",
+                "after": 110
+              },
+              {
+                "move": "feint",
+                "after": 110
+              },
+              {
+                "move": "feint",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "sweep"
+              },
+              {
+                "move": "feint",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "sweep",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "thrust"
+              },
+              {
+                "move": "sweep",
+                "after": 176
+              },
+              {
+                "move": "feint",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 112,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "thrust"
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 140
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 140
+                  },
+                  {
+                    "move": "feint",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "feint",
+                    "after": 110
+                  },
+                  {
+                    "move": "feint",
+                    "after": 110
+                  },
+                  {
+                    "move": "feint",
+                    "after": 110
+                  },
+                  {
+                    "move": "feint",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "sweep"
+                  },
+                  {
+                    "move": "feint",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "sweep",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "thrust"
+                  },
+                  {
+                    "move": "sweep",
+                    "after": 154
+                  },
+                  {
+                    "move": "feint",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -18093,6 +18648,199 @@
       "arenaAfter": "ch3",
       "gimmicks": {
         "regen": 3
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "burst"
+              },
+              {
+                "move": "burst",
+                "after": 110
+              },
+              {
+                "move": "burst",
+                "after": 110
+              },
+              {
+                "move": "lash",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "burst"
+              },
+              {
+                "move": "burst",
+                "after": 110
+              },
+              {
+                "move": "burst",
+                "after": 110
+              },
+              {
+                "move": "burst",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "lash"
+              },
+              {
+                "move": "burst",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "flare"
+              },
+              {
+                "move": "burst",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "lash"
+              },
+              {
+                "move": "pillar",
+                "after": 192
+              },
+              {
+                "move": "burst",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 106,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "burst"
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  },
+                  {
+                    "move": "lash",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "burst"
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  },
+                  {
+                    "move": "burst",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "lash"
+                  },
+                  {
+                    "move": "burst",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "flare"
+                  },
+                  {
+                    "move": "burst",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "lash"
+                  },
+                  {
+                    "move": "pillar",
+                    "after": 168
+                  },
+                  {
+                    "move": "burst",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "burst"
+                  },
+                  {
+                    "move": "pillar",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -18289,7 +19037,310 @@
             "armor": 0.4
           }
         }
-      ]
+      ],
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "strike"
+              },
+              {
+                "move": "strike",
+                "after": 176
+              },
+              {
+                "move": "shield",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "shield"
+              },
+              {
+                "move": "shield",
+                "after": 110
+              },
+              {
+                "move": "shield",
+                "after": 110
+              },
+              {
+                "move": "shield",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "shield"
+              },
+              {
+                "move": "strike",
+                "after": 144
+              },
+              {
+                "move": "shield",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "frost"
+              },
+              {
+                "move": "shield",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "strike"
+              },
+              {
+                "move": "gate",
+                "after": 208
+              },
+              {
+                "move": "shield",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "그 밤의 검",
+            "line": "성문은, 닫혀 있어야 한다.",
+            "hp": 154,
+            "speed": 0.9,
+            "roar": 1500,
+            "moves": {
+              "stand": {
+                "name": "성문 앞의 자세",
+                "windup": 900,
+                "recover": 420,
+                "damage": 20,
+                "posture": 22,
+                "stance": true
+              }
+            },
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "strike"
+                  },
+                  {
+                    "move": "strike",
+                    "after": 120
+                  },
+                  {
+                    "move": "strike",
+                    "after": 120
+                  },
+                  {
+                    "move": "shield",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "shield"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "stand"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "frost"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "strike",
+                    "after": 144
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "shield"
+                  },
+                  {
+                    "move": "gate",
+                    "after": 165
+                  },
+                  {
+                    "move": "shield",
+                    "after": 120
+                  }
+                ]
+              }
+            ],
+            "gimmicks": {
+              "armor": 0.4
+            }
+          },
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 123,
+            "speed": 0.765,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "strike"
+                  },
+                  {
+                    "move": "strike",
+                    "after": 112
+                  },
+                  {
+                    "move": "strike",
+                    "after": 112
+                  },
+                  {
+                    "move": "shield",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "shield"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "stand"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "frost"
+                  },
+                  {
+                    "move": "shield",
+                    "after": 110
+                  },
+                  {
+                    "move": "strike",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "shield"
+                  },
+                  {
+                    "move": "gate",
+                    "after": 154
+                  },
+                  {
+                    "move": "shield",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "shield"
+                  },
+                  {
+                    "move": "gate",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "edric_rowen",
@@ -18482,7 +19533,307 @@
             }
           ]
         }
-      ]
+      ],
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "bash"
+              },
+              {
+                "move": "sword",
+                "after": 128
+              },
+              {
+                "move": "bash",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "bash"
+              },
+              {
+                "move": "bash",
+                "after": 110
+              },
+              {
+                "move": "bash",
+                "after": 110
+              },
+              {
+                "move": "bash",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "sword"
+              },
+              {
+                "move": "sword",
+                "after": 160
+              },
+              {
+                "move": "bash",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "oath"
+              },
+              {
+                "move": "bash",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "sword"
+              },
+              {
+                "move": "crest",
+                "after": 208
+              },
+              {
+                "move": "bash",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "로웬의 일은 로웬이",
+            "line": "(얼어붙은 눈이 카일 쪽을 본다)",
+            "hp": 168,
+            "speed": 0.88,
+            "roar": 1600,
+            "moves": {
+              "guard": {
+                "name": "방패를 세운 자세",
+                "windup": 950,
+                "recover": 420,
+                "damage": 22,
+                "posture": 24,
+                "stance": true
+              }
+            },
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "bash"
+                  },
+                  {
+                    "move": "sword",
+                    "after": 110
+                  },
+                  {
+                    "move": "sword",
+                    "after": 120
+                  },
+                  {
+                    "move": "bash",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bash"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "guard"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "oath"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "sword",
+                    "after": 144
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "sword"
+                  },
+                  {
+                    "move": "crest",
+                    "after": 165
+                  },
+                  {
+                    "move": "bash",
+                    "after": 120
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 134,
+            "speed": 0.748,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "bash"
+                  },
+                  {
+                    "move": "sword",
+                    "after": 110
+                  },
+                  {
+                    "move": "sword",
+                    "after": 112
+                  },
+                  {
+                    "move": "bash",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bash"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "guard"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "oath"
+                  },
+                  {
+                    "move": "bash",
+                    "after": 110
+                  },
+                  {
+                    "move": "sword",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "sword"
+                  },
+                  {
+                    "move": "crest",
+                    "after": 154
+                  },
+                  {
+                    "move": "bash",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bash"
+                  },
+                  {
+                    "move": "crest",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "mountain_hand",
@@ -18604,6 +19955,203 @@
       "arenaAfter": "ch5",
       "gimmicks": {
         "regen": 4
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "flick"
+              },
+              {
+                "move": "flick",
+                "after": 110
+              },
+              {
+                "move": "slap",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "flick"
+              },
+              {
+                "move": "flick",
+                "after": 110
+              },
+              {
+                "move": "flick",
+                "after": 110
+              },
+              {
+                "move": "flick",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "grab"
+              },
+              {
+                "move": "flick",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "slap"
+              },
+              {
+                "move": "flick",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "creep"
+              },
+              {
+                "move": "flick",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "grab"
+              },
+              {
+                "move": "slap",
+                "after": 192
+              },
+              {
+                "move": "flick",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 123,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "flick"
+                  },
+                  {
+                    "move": "flick",
+                    "after": 110
+                  },
+                  {
+                    "move": "slap",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "flick"
+                  },
+                  {
+                    "move": "flick",
+                    "after": 110
+                  },
+                  {
+                    "move": "flick",
+                    "after": 110
+                  },
+                  {
+                    "move": "flick",
+                    "after": 110
+                  },
+                  {
+                    "move": "flick",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "grab"
+                  },
+                  {
+                    "move": "flick",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "slap"
+                  },
+                  {
+                    "move": "flick",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "creep"
+                  },
+                  {
+                    "move": "flick",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "grab"
+                  },
+                  {
+                    "move": "slap",
+                    "after": 168
+                  },
+                  {
+                    "move": "flick",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -18801,7 +20349,320 @@
             }
           }
         }
-      ]
+      ],
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "punch"
+              },
+              {
+                "move": "pulse",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "pulse"
+              },
+              {
+                "move": "pulse",
+                "after": 110
+              },
+              {
+                "move": "pulse",
+                "after": 110
+              },
+              {
+                "move": "pulse",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "stomp"
+              },
+              {
+                "move": "pulse",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "pulse"
+              },
+              {
+                "move": "stomp",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "punch"
+              },
+              {
+                "move": "punch",
+                "after": 160
+              },
+              {
+                "move": "pulse",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "stomp"
+              },
+              {
+                "move": "magma",
+                "after": 224
+              },
+              {
+                "move": "pulse",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "쿵, 심장이 뛴다",
+            "line": "(쿵. 산 전체가 한 번 뛴다)",
+            "hp": 182,
+            "speed": 0.9,
+            "roar": 1600,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "punch"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 135
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "pulse"
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "pulse"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 120
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "stomp"
+                  },
+                  {
+                    "move": "magma",
+                    "after": 180
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "punch"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 120
+                  },
+                  {
+                    "move": "stomp",
+                    "after": 150
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 120
+                  }
+                ]
+              }
+            ],
+            "gimmicks": {
+              "regen": 5,
+              "accelerate": {
+                "step": 0.97,
+                "min": 0.82
+              }
+            }
+          },
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 146,
+            "speed": 0.765,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "punch"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 126
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "pulse"
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "pulse"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 112
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "stomp"
+                  },
+                  {
+                    "move": "magma",
+                    "after": 168
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "punch"
+                  },
+                  {
+                    "move": "punch",
+                    "after": 112
+                  },
+                  {
+                    "move": "stomp",
+                    "after": 140
+                  },
+                  {
+                    "move": "pulse",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "pulse"
+                  },
+                  {
+                    "move": "magma",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "rock_eater",
@@ -18916,7 +20777,188 @@
           "(방패 가장자리를 갉아 먹는다)"
         ]
       },
-      "arenaAfter": "ch5"
+      "arenaAfter": "ch5",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "gnaw"
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              },
+              {
+                "move": "burrow",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "gnaw"
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              },
+              {
+                "move": "gnaw",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "burrow"
+              },
+              {
+                "move": "gnaw",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "spit"
+              },
+              {
+                "move": "gnaw",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "dig"
+              },
+              {
+                "move": "gnaw",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 95,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "gnaw"
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "burrow",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "gnaw"
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "burrow"
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "spit"
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "dig"
+                  },
+                  {
+                    "move": "gnaw",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "blood_guard",
@@ -19024,7 +21066,188 @@
           "장부에 적어 둔다."
         ]
       },
-      "arenaAfter": "ch7"
+      "arenaAfter": "ch7",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "thrust"
+              },
+              {
+                "move": "cut",
+                "after": 128
+              },
+              {
+                "move": "thrust",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "thrust"
+              },
+              {
+                "move": "thrust",
+                "after": 110
+              },
+              {
+                "move": "thrust",
+                "after": 110
+              },
+              {
+                "move": "thrust",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "cut"
+              },
+              {
+                "move": "thrust",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "ledger"
+              },
+              {
+                "move": "thrust",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "thrust"
+              },
+              {
+                "move": "thrust",
+                "after": 110
+              },
+              {
+                "move": "thrust",
+                "after": 110
+              },
+              {
+                "move": "cut",
+                "after": 154
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 101,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "thrust"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 112
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "thrust"
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "ledger"
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "thrust"
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  },
+                  {
+                    "move": "thrust",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 134
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "pockmark_vice",
@@ -19153,6 +21376,195 @@
           "step": 0.97,
           "min": 0.84
         }
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "slash"
+              },
+              {
+                "move": "rage",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "rage"
+              },
+              {
+                "move": "rage",
+                "after": 110
+              },
+              {
+                "move": "rage",
+                "after": 110
+              },
+              {
+                "move": "rage",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "kick"
+              },
+              {
+                "move": "slash",
+                "after": 128
+              },
+              {
+                "move": "rage",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "shout"
+              },
+              {
+                "move": "rage",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "rage"
+              },
+              {
+                "move": "rage",
+                "after": 110
+              },
+              {
+                "move": "rage",
+                "after": 110
+              },
+              {
+                "move": "rage",
+                "after": 110
+              },
+              {
+                "move": "slash",
+                "after": 154
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 129,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "slash"
+                  },
+                  {
+                    "move": "rage",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "rage"
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "kick"
+                  },
+                  {
+                    "move": "slash",
+                    "after": 112
+                  },
+                  {
+                    "move": "rage",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "shout"
+                  },
+                  {
+                    "move": "rage",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "rage"
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "rage",
+                    "after": 110
+                  },
+                  {
+                    "move": "slash",
+                    "after": 134
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -19274,6 +21686,191 @@
       "arenaAfter": "ch8",
       "gimmicks": {
         "veil": 0.55
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "twin",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "twin"
+              },
+              {
+                "move": "twin",
+                "after": 110
+              },
+              {
+                "move": "twin",
+                "after": 110
+              },
+              {
+                "move": "twin",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "twin"
+              },
+              {
+                "move": "twin",
+                "after": 110
+              },
+              {
+                "move": "palm",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "seat"
+              },
+              {
+                "move": "twin",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "knot",
+                "after": 208
+              },
+              {
+                "move": "twin",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 129,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "twin",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "twin"
+                  },
+                  {
+                    "move": "twin",
+                    "after": 110
+                  },
+                  {
+                    "move": "twin",
+                    "after": 110
+                  },
+                  {
+                    "move": "twin",
+                    "after": 110
+                  },
+                  {
+                    "move": "twin",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "twin"
+                  },
+                  {
+                    "move": "twin",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "seat"
+                  },
+                  {
+                    "move": "twin",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "knot",
+                    "after": 182
+                  },
+                  {
+                    "move": "twin",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "twin"
+                  },
+                  {
+                    "move": "knot",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -19387,7 +21984,180 @@
           "(계단에 무릎을 꿇는다)"
         ]
       },
-      "arenaAfter": "ch8"
+      "arenaAfter": "ch8",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "blade"
+              },
+              {
+                "move": "blade",
+                "after": 112
+              },
+              {
+                "move": "body",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "blade"
+              },
+              {
+                "move": "blade",
+                "after": 110
+              },
+              {
+                "move": "blade",
+                "after": 110
+              },
+              {
+                "move": "blade",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "blade",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "blade",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "blade"
+              },
+              {
+                "move": "body",
+                "after": 160
+              },
+              {
+                "move": "blade",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 134,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "blade"
+                  },
+                  {
+                    "move": "blade",
+                    "after": 110
+                  },
+                  {
+                    "move": "body",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "blade"
+                  },
+                  {
+                    "move": "blade",
+                    "after": 110
+                  },
+                  {
+                    "move": "blade",
+                    "after": 110
+                  },
+                  {
+                    "move": "blade",
+                    "after": 110
+                  },
+                  {
+                    "move": "blade",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "blade",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "blade",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "blade"
+                  },
+                  {
+                    "move": "body",
+                    "after": 140
+                  },
+                  {
+                    "move": "blade",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "needle_cultist",
@@ -19516,6 +22286,231 @@
       "arenaAfter": "ch8",
       "gimmicks": {
         "veil": 0.6
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "needle"
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "needle"
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "hide"
+              },
+              {
+                "move": "needle",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "needle"
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 110
+              },
+              {
+                "move": "needle",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "needle"
+              },
+              {
+                "move": "cloud",
+                "after": 176
+              },
+              {
+                "move": "needle",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 90,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "needle"
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "needle"
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "hide"
+                  },
+                  {
+                    "move": "needle",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "needle"
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 110
+                  },
+                  {
+                    "move": "needle",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "needle"
+                  },
+                  {
+                    "move": "cloud",
+                    "after": 154
+                  },
+                  {
+                    "move": "needle",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "needle"
+                  },
+                  {
+                    "move": "cloud",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -19634,7 +22629,216 @@
           "(계단 아래로 굴러 떨어진다)"
         ]
       },
-      "arenaAfter": "ch9"
+      "arenaAfter": "ch9",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "arrow"
+              },
+              {
+                "move": "arrow",
+                "after": 112
+              },
+              {
+                "move": "arrow",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "arrow"
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "draw"
+              },
+              {
+                "move": "arrow",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "arrow"
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              },
+              {
+                "move": "arrow",
+                "after": 110
+              },
+              {
+                "move": "arrow",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "draw"
+              },
+              {
+                "move": "rain",
+                "after": 192
+              },
+              {
+                "move": "arrow",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 95,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "arrow"
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "arrow"
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "draw"
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "arrow"
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 110
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "draw"
+                  },
+                  {
+                    "move": "rain",
+                    "after": 168
+                  },
+                  {
+                    "move": "arrow",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "arrow"
+                  },
+                  {
+                    "move": "rain",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "poison_palm_elder",
@@ -19823,7 +23027,306 @@
             "veil": 0.6
           }
         }
-      ]
+      ],
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "seep",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "seep"
+              },
+              {
+                "move": "seep",
+                "after": 110
+              },
+              {
+                "move": "seep",
+                "after": 110
+              },
+              {
+                "move": "seep",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "seep"
+              },
+              {
+                "move": "seep",
+                "after": 112
+              },
+              {
+                "move": "palm",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "seep",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "venom",
+                "after": 208
+              },
+              {
+                "move": "seep",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "독이 스민다",
+            "line": "숨을 쉬어라. 숨마다 독이다.",
+            "hp": 168,
+            "speed": 0.9,
+            "roar": 1500,
+            "moves": {
+              "wait": {
+                "name": "검푸른 손의 자세",
+                "windup": 950,
+                "recover": 420,
+                "damage": 22,
+                "posture": 24,
+                "stance": true
+              }
+            },
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "seep"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 135
+                  },
+                  {
+                    "move": "seep",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "seep"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "wait"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "venom",
+                    "after": 165
+                  },
+                  {
+                    "move": "seep",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "palm",
+                    "after": 120
+                  },
+                  {
+                    "move": "seep",
+                    "after": 120
+                  }
+                ]
+              }
+            ],
+            "gimmicks": {
+              "veil": 0.6
+            }
+          },
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 134,
+            "speed": 0.765,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "seep"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 126
+                  },
+                  {
+                    "move": "seep",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "seep"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  },
+                  {
+                    "move": "seep",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "wait"
+                  },
+                  {
+                    "move": "seep",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "venom",
+                    "after": 154
+                  },
+                  {
+                    "move": "seep",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "palm",
+                    "after": 112
+                  },
+                  {
+                    "move": "seep",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "seep"
+                  },
+                  {
+                    "move": "venom",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "array_statue",
@@ -19939,6 +23442,191 @@
       "arenaAfter": "ch9",
       "gimmicks": {
         "armor": 0.5
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "fist"
+              },
+              {
+                "move": "turn",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "turn"
+              },
+              {
+                "move": "turn",
+                "after": 110
+              },
+              {
+                "move": "turn",
+                "after": 110
+              },
+              {
+                "move": "turn",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "turn"
+              },
+              {
+                "move": "turn",
+                "after": 128
+              },
+              {
+                "move": "fist",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "pair"
+              },
+              {
+                "move": "turn",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "turn"
+              },
+              {
+                "move": "seal",
+                "after": 208
+              },
+              {
+                "move": "turn",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 123,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "fist"
+                  },
+                  {
+                    "move": "turn",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "turn"
+                  },
+                  {
+                    "move": "turn",
+                    "after": 110
+                  },
+                  {
+                    "move": "turn",
+                    "after": 110
+                  },
+                  {
+                    "move": "turn",
+                    "after": 110
+                  },
+                  {
+                    "move": "turn",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "turn"
+                  },
+                  {
+                    "move": "turn",
+                    "after": 112
+                  },
+                  {
+                    "move": "fist",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "pair"
+                  },
+                  {
+                    "move": "turn",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "turn"
+                  },
+                  {
+                    "move": "seal",
+                    "after": 182
+                  },
+                  {
+                    "move": "turn",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "turn"
+                  },
+                  {
+                    "move": "seal",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -20054,7 +23742,188 @@
           "(칼을 칼집에 넣는다)"
         ]
       },
-      "arenaAfter": "ch9"
+      "arenaAfter": "ch9",
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "c1"
+              },
+              {
+                "move": "c2",
+                "after": 110
+              },
+              {
+                "move": "c3",
+                "after": 110
+              },
+              {
+                "move": "c2",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "c2"
+              },
+              {
+                "move": "c2",
+                "after": 110
+              },
+              {
+                "move": "c2",
+                "after": 110
+              },
+              {
+                "move": "c2",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "c1"
+              },
+              {
+                "move": "c2",
+                "after": 110
+              },
+              {
+                "move": "c3",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "feint"
+              },
+              {
+                "move": "c2",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "c3"
+              },
+              {
+                "move": "c2",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 123,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "c1"
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  },
+                  {
+                    "move": "c3",
+                    "after": 110
+                  },
+                  {
+                    "move": "c2",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "c2"
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "c1"
+                  },
+                  {
+                    "move": "c2",
+                    "after": 110
+                  },
+                  {
+                    "move": "c3",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "feint"
+                  },
+                  {
+                    "move": "c2",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "c3"
+                  },
+                  {
+                    "move": "c2",
+                    "after": 112
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "fire_scale_hound",
@@ -20178,6 +24047,199 @@
       "arenaAfter": "ch10",
       "gimmicks": {
         "armor": 0.5
+      },
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "bite"
+              },
+              {
+                "move": "bite",
+                "after": 110
+              },
+              {
+                "move": "bite",
+                "after": 110
+              },
+              {
+                "move": "lunge",
+                "after": 154
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "bite"
+              },
+              {
+                "move": "bite",
+                "after": 110
+              },
+              {
+                "move": "bite",
+                "after": 110
+              },
+              {
+                "move": "bite",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "lunge"
+              },
+              {
+                "move": "bite",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "howl"
+              },
+              {
+                "move": "bite",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "bite"
+              },
+              {
+                "move": "breath",
+                "after": 192
+              },
+              {
+                "move": "bite",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 123,
+            "speed": 0.85,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "bite"
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  },
+                  {
+                    "move": "lunge",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bite"
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  },
+                  {
+                    "move": "bite",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "lunge"
+                  },
+                  {
+                    "move": "bite",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "howl"
+                  },
+                  {
+                    "move": "bite",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bite"
+                  },
+                  {
+                    "move": "breath",
+                    "after": 168
+                  },
+                  {
+                    "move": "bite",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "bite"
+                  },
+                  {
+                    "move": "breath",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -20457,7 +24519,432 @@
             }
           }
         }
-      ]
+      ],
+      "hard": {
+        "hpMul": 1.4,
+        "damageMul": 1.3,
+        "patterns": [
+          {
+            "weight": 3,
+            "steps": [
+              {
+                "move": "cut"
+              },
+              {
+                "move": "cut",
+                "after": 110
+              },
+              {
+                "move": "palm",
+                "after": 144
+              },
+              {
+                "move": "cut",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "cut"
+              },
+              {
+                "move": "cut",
+                "after": 110
+              },
+              {
+                "move": "cut",
+                "after": 110
+              },
+              {
+                "move": "cut",
+                "after": 110
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "cut",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 2,
+            "steps": [
+              {
+                "move": "wait"
+              },
+              {
+                "move": "cut",
+                "after": 128
+              }
+            ]
+          },
+          {
+            "weight": 1,
+            "steps": [
+              {
+                "move": "palm"
+              },
+              {
+                "move": "tear",
+                "after": 224
+              },
+              {
+                "move": "cut",
+                "after": 128
+              }
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "name": "피가 결을 덮는다",
+            "line": "피가 결을 덮는다. 보이시오?",
+            "hp": 210,
+            "speed": 0.88,
+            "damageMul": 1.1,
+            "roar": 1600,
+            "moves": {
+              "blood": {
+                "name": "피를 두른 자세",
+                "windup": 950,
+                "recover": 420,
+                "damage": 24,
+                "posture": 26,
+                "stance": true
+              }
+            },
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 120
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "blood"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "wait"
+                  },
+                  {
+                    "move": "palm",
+                    "after": 120
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "tear",
+                    "after": 180
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              }
+            ],
+            "gimmicks": {
+              "veil": 0.4,
+              "armor": 0.45
+            }
+          },
+          {
+            "name": "두 세계의 흐름",
+            "line": "두 세계를 담고도 사는가. 보여 주시오.",
+            "hp": 182,
+            "speed": 0.8,
+            "damageMul": 1.2,
+            "roar": 1700,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "tear",
+                    "after": 165
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "blood"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 144
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "wait"
+                  },
+                  {
+                    "move": "tear",
+                    "after": 150
+                  },
+                  {
+                    "move": "cut",
+                    "after": 120
+                  }
+                ]
+              }
+            ],
+            "gimmicks": {
+              "accelerate": {
+                "step": 0.97,
+                "min": 0.8
+              }
+            }
+          },
+          {
+            "name": "끝나지 않은 결",
+            "line": "…아직이다. 아직 끝나지 않았다.",
+            "hp": 146,
+            "speed": 0.68,
+            "roar": 1500,
+            "patterns": [
+              {
+                "weight": 3,
+                "steps": [
+                  {
+                    "move": "palm"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "tear",
+                    "after": 154
+                  },
+                  {
+                    "move": "cut",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "blood"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 2,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "cut",
+                    "after": 110
+                  },
+                  {
+                    "move": "palm",
+                    "after": 134
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "wait"
+                  },
+                  {
+                    "move": "tear",
+                    "after": 140
+                  },
+                  {
+                    "move": "cut",
+                    "after": 112
+                  }
+                ]
+              },
+              {
+                "weight": 1,
+                "steps": [
+                  {
+                    "move": "cut"
+                  },
+                  {
+                    "move": "tear",
+                    "after": 150
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "firewood",
