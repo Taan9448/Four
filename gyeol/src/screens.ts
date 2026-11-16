@@ -481,6 +481,9 @@ function techCondition(t: TechDef): string {
   }
 }
 
+type RecordsTab = 'foes' | 'techs' | 'chars' | 'art' | 'ach' | 'stats';
+let recordsTab: RecordsTab = 'foes';
+
 export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void {
   const save = loadSave();
   const diffs = data.difficulties ?? [];
@@ -517,23 +520,56 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
     ['최대 연속 박자', `${st.maxStreak}`],
     ['대결 시간', `${min}분`],
   ];
-  app.replaceChildren(
-    el(
-      'section',
-      { class: 'screen records' },
-      header('도감', nav),
-      ...achievementSection(data),
-      ...characterSection(data),
-      ...gallerySection(save),
-      el('h2', {}, '상대 도감'),
-      el('div', { class: 'codex-grid' }, ...foes),
-      el('h2', {}, '기술'),
-      ...techGroups,
-      el('h2', {}, '쌓인 기록'),
-      el('dl', { class: 'stats' }, ...rows.flatMap(([k, v]) => [el('dt', {}, k), el('dd', {}, v)])),
+  // 탭(2026-11-16 사용자 요청 "도감이 너무 길다 — 천외귀환처럼 탭으로"): 한 번에 한 갈래만. 고른 탭은 다음에 열 때도 그대로
+  const seenN = duelFoes(data).filter((f) => save.seen.includes(f.id)).length;
+  const strip = (xs: HTMLElement[]) => xs.filter((x, i) => !(i === 0 && x.tagName === 'H2'));
+  const ach = achievementSection(data);
+  const gal = gallerySection(save);
+  const tabs: { id: RecordsTab; name: string; count?: string; body: () => HTMLElement[] }[] = [
+    { id: 'foes', name: '상대', count: `${seenN}/${duelFoes(data).length}`, body: () => [el('div', { class: 'codex-grid' }, ...foes)] },
+    { id: 'techs', name: '기술', count: String(data.techs.length), body: () => techGroups },
+    { id: 'chars', name: '인물', body: () => strip(characterSection(data)) },
+    { id: 'art', name: '이야기 그림', count: gal.length ? (gal[0].querySelector('.gallery-count')?.textContent ?? '').trim().replace(/\s/g, '') : undefined, body: () => strip(gal) },
+    { id: 'ach', name: '업적', count: (ach[0]?.textContent ?? '').replace('업적', '').replace(/\s/g, ''), body: () => strip(ach) },
+    { id: 'stats', name: '쌓인 기록', body: () => [el('dl', { class: 'stats' }, ...rows.flatMap(([k, v]) => [el('dt', {}, k), el('dd', {}, v)]))] },
+  ].filter((t) => t.id !== 'art' || gal.length) as { id: RecordsTab; name: string; count?: string; body: () => HTMLElement[] }[];
+  if (!tabs.some((t) => t.id === recordsTab)) recordsTab = 'foes';
+  const bar = el('nav', { class: 'rec-tabs', role: 'tablist', 'aria-label': '도감 갈래' });
+  const panel = el('div', { class: 'rec-panel', role: 'tabpanel' });
+  const show = (id: RecordsTab, focus = false) => {
+    recordsTab = id;
+    const t = tabs.find((x) => x.id === id)!;
+    for (const b of bar.children) {
+      const on = (b as HTMLElement).dataset.tab === id;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+      (b as HTMLElement).tabIndex = on ? 0 : -1;
+      if (on && focus) (b as HTMLElement).focus();
+      // 휴대폰: 가로로 넘치는 탭 줄에서 고른 탭이 보이게
+      if (on) (b as HTMLElement).scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    }
+    panel.setAttribute('aria-label', t.name);
+    panel.replaceChildren(...t.body());
+    panel.scrollTop = 0;
+  };
+  bar.append(
+    ...tabs.map((t, i) =>
+      button([el('span', { class: 'key' }, String(i + 1)), el('b', {}, t.name), t.count ? el('small', {}, t.count) : ''], 'rec-tab', () => {
+        sfx('click');
+        show(t.id);
+      }, { role: 'tab', 'data-tab': t.id }),
     ),
   );
-  setKeys((e) => e.key === 'Escape' && nav.go('lobby'));
+  app.replaceChildren(el('section', { class: 'screen records' }, header('도감', nav), bar, panel));
+  show(recordsTab);
+  setKeys((e) => {
+    if (e.key === 'Escape') return nav.go('lobby');
+    const i = tabs.findIndex((t) => t.id === recordsTab);
+    const n = Number(e.key);
+    if (n >= 1 && n <= tabs.length) show(tabs[n - 1].id, true);
+    else if (e.key === 'ArrowRight' && document.activeElement?.closest('.rec-tabs')) show(tabs[(i + 1) % tabs.length].id, true);
+    else if (e.key === 'ArrowLeft' && document.activeElement?.closest('.rec-tabs')) show(tabs[(i - 1 + tabs.length) % tabs.length].id, true);
+  });
 }
 
 /** 박자 도전 악보가 있는 결투장 상대 */
