@@ -5,12 +5,12 @@ import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
-import { outfitPrefix } from './progress';
+import { clearedAnywhere, outfitPrefix } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { actionFor, keyNames, keyText, type KeyAction } from './keys';
-import { characterOf, faceId, faceStyle, HAUN, recordKey, techsFor, withCharacter } from './party';
+import { characterOf, faceId, faceStyle, HAUN, recordKey, spriteFor, techsFor, withCharacter } from './party';
 import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
 import { emptyStats, loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
@@ -129,7 +129,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 고른 인물(2026-11-11): 진하운 기준 값을 그 인물로 덮어쓴 데이터로 대결 — 기술은 장 규칙과 인물 기술의 겹침
   const charId = characterOf(data, opts.character)?.id ?? HAUN;
   const char = characterOf(data, charId);
-  const pdata = withCharacter(playData, charId);
+  const pdata0 = withCharacter(playData, charId);
+  // 카일 붉은 검(3장 뒤): 이야기는 지금 칸의 진행, 결투장·수련은 어느 칸이든
+  const sv = loadSave();
+  const swapped = char ? spriteFor(char, (ch) => (opts.back === 'story' ? sv.story.cleared.includes(ch) : clearedAnywhere(sv, ch)), (id) => !!frameUrl(id, 1, { realOnly: true })) : null;
+  const pdata = swapped && swapped !== pdata0.player.sprite ? { ...pdata0, player: { ...pdata0.player, sprite: swapped } } : pdata0;
   const techs = techsFor(data, charId, opts.duel?.techs);
   const d = createDuel(pdata, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}), ...(techs !== undefined ? { techs } : {}) });
   const tutorial = opts.tutorial;
