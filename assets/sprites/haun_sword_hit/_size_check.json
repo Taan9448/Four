@@ -1,38 +1,69 @@
 {
-  "note": "Bounding box includes held sword and effects; crouched/fallen pose is naturally lower. Foot rows are visually verified separately when effects extend below feet.",
+  "note": "Engineering comparison only; actual art was edited by image generation. Bbox includes weapons and effects. Pose/cloth/scabbard are also inspected visually.",
+  "geometryWithinTwoPixels": true,
   "frames": [
     {
       "frame": 1,
-      "bbox": [
+      "before": [
         31,
         40,
         115,
         144
       ],
-      "silhouetteHeight": 104,
-      "bottom": 143
+      "after": [
+        32,
+        40,
+        115,
+        144
+      ],
+      "beforeHeight": 104,
+      "afterHeight": 104,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9844,
+      "maximumBboxDelta": 1
     },
     {
       "frame": 2,
-      "bbox": [
+      "before": [
         25,
         39,
         119,
         144
       ],
-      "silhouetteHeight": 105,
-      "bottom": 143
+      "after": [
+        25,
+        40,
+        119,
+        144
+      ],
+      "beforeHeight": 105,
+      "afterHeight": 104,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9781,
+      "maximumBboxDelta": 1
     },
     {
       "frame": 3,
-      "bbox": [
+      "before": [
         42,
         38,
         119,
         144
       ],
-      "silhouetteHeight": 106,
-      "bottom": 143
+      "after": [
+        42,
+        38,
+        119,
+        144
+      ],
+      "beforeHeight": 106,
+      "afterHeight": 106,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9853,
+      "maximumBboxDelta": 0
     }
   ]
 }
