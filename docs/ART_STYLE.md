@@ -220,7 +220,10 @@ subjects:
     falling past the shoulders with long bangs partly covering sharp, calm black eyes; pale skin; the same
     plain grey servant's outfit, a little worn and mended at the side — a knee-length grey jacket tied with a
     cord sash, grey trousers, cloth shoes; a narrow, thin, completely unadorned straight sword with a plain
-    crude grip ("the ugly sword"), and a plain black scabbard at the hip
+    crude grip ("the ugly sword"), and a plain black scabbard at the left hip — the scabbard is always drawn
+    WHOLE, one long straight black sheath slanting back from the sash down past the thigh, about as long as
+    the blade; when the sword is drawn the scabbard stays there EMPTY (no hilt in it), never a short stub or a
+    lone hilt at the waist (2026-11-16)
   elia: >-
     Elia, a nineteen-year-old half-elf mage woman; silver hair tied back, ears slightly pointed at the tips,
     grey eyes with a faint green tint; a grey travelling cloak with a hood (she tends to pull it over her ears)

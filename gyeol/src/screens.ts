@@ -7,6 +7,7 @@ import storyRaw from '../data/story.json';
 import { accountState, loginPanel, playerPlate } from './account';
 import { onCloudChange } from './cloud';
 import { lobbyStage } from './lobby-fx';
+import { gallerySection } from './gallery';
 import { clearedAnywhere, condMet, condText, newAchievements, outfitOf, outfitsFor, progress, starTotal } from './progress';
 import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, realArt, toast } from './dom';
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
@@ -523,6 +524,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
       header('도감', nav),
       ...achievementSection(data),
       ...characterSection(data),
+      ...gallerySection(save),
       el('h2', {}, '상대 도감'),
       el('div', { class: 'codex-grid' }, ...foes),
       el('h2', {}, '기술'),

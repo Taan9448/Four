@@ -159,3 +159,23 @@ describe('원작 상대 20종 · 기술 다섯(2026-11-15)', () => {
     }
   });
 });
+
+describe('도감 이야기 그림(2026-11-15)', () => {
+  it('장 순서대로 겹치지 않게 모이고, 본 그림이나 마친 장의 그림이 열린다', async () => {
+    const { storyArt, artOpen } = await import('../src/gallery');
+    const { emptySave } = await import('../src/save');
+    const list = storyArt();
+    expect(list.length).toBeGreaterThan(40);
+    expect(new Set(list.map((a) => a.id)).size).toBe(list.length);
+    expect(list[0].chapter).toBe('prologue');
+    for (const a of list) expect(existsSync(`specs/assets/${a.id}.yaml`) || existsSync(`assets/sprites/${a.id}`), a.id).toBe(true);
+    const s = emptySave();
+    const ch1 = list.find((a) => a.chapter === 'ch1')!;
+    expect(artOpen(s, ch1)).toBe(false);
+    s.gallery.push(ch1.id);
+    expect(artOpen(s, ch1)).toBe(true);
+    const ch2 = list.find((a) => a.chapter === 'ch2')!;
+    s.slots[2] = { story: { cleared: ['ch2'], stars: {}, flags: [] }, difficulty: 'hard', updatedAt: 0 };
+    expect(artOpen(s, ch2)).toBe(true);
+  });
+});

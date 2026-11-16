@@ -5,6 +5,7 @@ summary: 진하운(못생긴 검) 피격 3프레임
 depends_on: [haun_sword_ref]
 reference: assets/source/haun_sword_ref.png
 facing: right
+# 2026-11-16 다시 그림(사용자 보고 "허리에 찬 칼이 칼머리만 있거나 잘려 있다"): 허리 칼집이 짧은 토막·손잡이만으로 보였다 — ART_STYLE haun_sword에 "칼집은 늘 통째로, 칼을 뽑으면 빈 칼집" 규칙
 frame_notes:
   1: "struck in the chest, upper body snapping backward, eyes shut"
   2: "staggering back one step, sword arm flung out, long hair whipping"
