@@ -544,3 +544,25 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
   .gv-nav { width: 34px; height: 56px; font-size: 30px; }
   .gv-cap { font-size: 14px; }
 }
+
+/* ── 도감 탭(2026-11-16 사용자 요청 "도감이 너무 길다 — 천외귀환처럼 탭으로") ── */
+.screen.records .screen-head { margin-bottom: 12px; }
+.rec-tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 0 10px; margin-bottom: 14px; background: linear-gradient(180deg, var(--bg, #0d0b09) 80%, transparent); border-bottom: 1px solid var(--line); }
+.rec-tab { position: relative; display: inline-flex; align-items: baseline; gap: 6px; padding: 9px 16px 9px 30px; border: 1px solid var(--line); border-radius: 6px; background: var(--sumi-a, #14110e); color: var(--paper-dim); cursor: pointer; transition: border-color 0.15s, background-color 0.15s, color 0.15s; }
+.rec-tab .key { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; opacity: 0.6; }
+.rec-tab b { font-family: var(--font-title); font-weight: 400; font-size: 17px; color: var(--paper); }
+.rec-tab small { font-size: 12px; color: var(--paper-dim); }
+.rec-tab:hover:not(.on) { border-color: var(--line-2); }
+.rec-tab:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
+.rec-tab.on { border-color: var(--shu); background-color: var(--shu-soft); }
+.rec-tab.on b { color: #fbf3e4; }
+.rec-panel { animation: rec-in 0.18s ease-out; }
+.rec-panel > h3:first-child, .rec-panel > .gallery > h3:first-child { margin-top: 0; }
+@keyframes rec-in { from { opacity: 0; transform: translateY(4px); } }
+@media (max-width: 720px) {
+  .rec-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px; }
+  .rec-tabs::-webkit-scrollbar { display: none; }
+  .rec-tab { flex: none; padding: 8px 12px 8px 24px; }
+  .rec-tab .key { left: 8px; }
+  .rec-tab b { font-size: 15px; }
+}
