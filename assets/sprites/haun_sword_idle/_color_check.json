@@ -1,0 +1,90 @@
+{
+  "note": "Engineering comparison only; actual art was edited by image generation. Bbox includes weapons and effects. Pose/cloth/scabbard are also inspected visually.",
+  "geometryWithinTwoPixels": true,
+  "frames": [
+    {
+      "frame": 1,
+      "before": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "after": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9874,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 2,
+      "before": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "after": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9846,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 3,
+      "before": [
+        53,
+        35,
+        108,
+        144
+      ],
+      "after": [
+        53,
+        35,
+        108,
+        144
+      ],
+      "beforeHeight": 109,
+      "afterHeight": 109,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9878,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 4,
+      "before": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "after": [
+        53,
+        36,
+        108,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9764,
+      "maximumBboxDelta": 0
+    }
+  ]
+}
