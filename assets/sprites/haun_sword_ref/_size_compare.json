@@ -1,0 +1,50 @@
+[
+  {
+    "frame": 1,
+    "version": "old",
+    "bbox": [
+      31,
+      34,
+      102,
+      144
+    ],
+    "height": 110,
+    "baseline": 143
+  },
+  {
+    "frame": 1,
+    "version": "new",
+    "bbox": [
+      43,
+      39,
+      107,
+      144
+    ],
+    "height": 105,
+    "baseline": 143
+  },
+  {
+    "frame": 2,
+    "version": "old",
+    "bbox": [
+      60,
+      34,
+      121,
+      144
+    ],
+    "height": 110,
+    "baseline": 143
+  },
+  {
+    "frame": 2,
+    "version": "new",
+    "bbox": [
+      56,
+      39,
+      109,
+      144
+    ],
+    "height": 105,
+    "baseline": 143
+  }
+]
