@@ -6,7 +6,7 @@ import { button, el, rankBadge, realArt } from './dom';
 import { duelGrade, rhythmScore, type Duel, type DuelData, type DuelOptions, type DuelRank } from './duel';
 import { setDuck, setMusic } from './music';
 import { clearSlot, loadSave, SLOT_COUNT, storyDifficulty, useSlot, withKeys, writeSave, type StoryDifficulty } from './save';
-import { announceAchievements, charPicker, getSlotsMode, setKeys, setSlotsMode, type Nav } from './screens';
+import { announceAchievements, charPicker, getSlotsMode, setKeys, type Nav } from './screens';
 import { chapterCharacter, characterOf, faceId, faceStyle, leadLine, partyOpen } from './party';
 import { playScene, type SceneLine, type Speaker } from './vn';
 
@@ -224,10 +224,7 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
     { class: 'screen-head' },
     button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')),
     el('div', {}, el('h1', {}, '이야기'), el('p', { class: 'sub' }, `${save.slot + 1}번 칸 · ${DIFF_NAME[storyDifficulty(save)]} — 운곡루의 밤, 지나온 싸움을 하나씩 떠올린다.`)),
-    button('칸 바꾸기', 'btn small slot-switch', () => {
-      setSlotsMode('load');
-      nav.go('slots');
-    }),
+    button('칸 바꾸기', 'btn small slot-switch', () => openSlots(app, nav, data, 'load', () => renderStory(app, nav, data))),
   );
   const map = el('div', { class: `story-map${art ? ' has-art' : ''}`, style: art ? `background-image:url("${art}")` : '' }, svg, ...pins);
   app.replaceChildren(el('section', { class: 'screen story story-screen' }, head, el('div', { class: 'story-frame' }, map, card)));
@@ -273,26 +270,36 @@ const DIFF_NOTE: Record<StoryDifficulty, string> = {
 };
 
 /**
- * 저장 3칸(2026-11-14 → 2026-11-15 「천외귀환」처럼 메인의 새로 시작·불러오기로 나눔):
- * new = 저장할 칸 고르기(빈 칸은 보통·어려움으로 시작, 찬 칸은 덮어쓰기 확인) · load = 찬 칸을 이어하기·지우기
+ * 저장 3칸(2026-11-14 → 2026-11-15 메인의 새로 시작·불러오기로 나눔 → 2026-11-16 사용자 요청 "천외귀환처럼 팝업으로"):
+ * 메인(또는 이야기 지도) 위에 뜨는 창. new = 저장할 칸 고르기(빈 칸은 보통·어려움으로 시작, 찬 칸은 덮어쓰기 확인) ·
+ * load = 찬 칸을 이어하기·지우기. 칸을 고르면 창이 닫히고 이야기 지도로, 그냥 닫으면(Esc·바깥·닫기) onClose
  */
-export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
-  const mode = getSlotsMode();
-  const save = loadSave();
+export function openSlots(app: HTMLElement, nav: Nav, data: DuelData, mode = getSlotsMode(), onClose?: () => void): void {
+  document.querySelector('.slots-modal')?.remove();
   const titleOf = (id: string) => story.chapters.find((c) => c.id === id);
+  let changed = false;
+  const grid = el('div', { class: 'slot-grid' });
+  const close = (go?: () => void) => {
+    window.removeEventListener('keydown', onKey, true);
+    root.classList.add('closing');
+    setTimeout(() => root.remove(), 160);
+    if (go) go();
+    else if (changed) onClose?.();
+  };
+  const toStory = () => close(() => renderStory(app, nav, data));
   const begin = (i: number, diff: StoryDifficulty, overwrite: boolean) => {
     if (overwrite && !confirm(`${i + 1}번 칸의 이야기 진행을 지우고 처음부터 시작한다. 기록·업적·옷은 남는다.`)) return;
     let s = loadSave();
     if (overwrite) s = clearSlot(s, i);
     s.slots[i] = null;
     writeSave(useSlot(s, i, diff));
-    renderStory(app, nav, data);
+    toStory();
   };
   const startBtns = (i: number, overwrite: boolean) =>
     (['normal', 'hard'] as const).map((diff) =>
       button([el('b', {}, `${overwrite ? '덮어쓰기' : '새로 시작'} — ${DIFF_NAME[diff]}`), el('small', {}, DIFF_NOTE[diff])], `res-btn${diff === 'normal' && !overwrite ? ' primary' : ''} slot-new`, () => begin(i, diff, overwrite)),
     );
-  const card = (i: number) => {
+  const card = (i: number, save: ReturnType<typeof loadSave>) => {
     const sl = save.slots[i];
     if (!sl) {
       return el(
@@ -309,15 +316,14 @@ export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
     const stars = Object.values(sl.story.stars).reduce((a, b) => a + b, 0);
     const when = sl.updatedAt ? new Date(sl.updatedAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
     const go = button([el('b', {}, save.slot === i ? '이어하기' : '불러오기'), el('small', {}, 'Enter')], 'res-btn primary', () => {
-      const s = useSlot(loadSave(), i);
-      writeSave(s);
-      renderStory(app, nav, data);
+      writeSave(useSlot(loadSave(), i));
+      toStory();
     });
     const del = button('지우기', 'btn small slot-del', () => {
       if (!confirm(`${i + 1}번 칸의 이야기 진행을 지운다. 기록·업적·옷은 남는다.`)) return;
-      const s = clearSlot(loadSave(), i);
-      writeSave(s);
-      renderSlots(app, nav, data);
+      writeSave(clearSlot(loadSave(), i));
+      changed = true;
+      draw();
     });
     return el(
       'article',
@@ -328,21 +334,42 @@ export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
       mode === 'new' ? el('div', { class: 'slot-actions' }, ...startBtns(i, true)) : el('div', { class: 'slot-actions' }, go, del),
     );
   };
-  const title = mode === 'new' ? '새로 시작' : '불러오기';
-  const sub = mode === 'new' ? '이야기를 저장할 칸을 고른다. 빈 칸이 좋다 — 찬 칸을 고르면 그 진행을 지우고 처음부터.' : '이야기를 이어 갈 칸을 고른다. 기록·업적·옷은 모든 칸이 함께 쓴다.';
-  app.replaceChildren(
+  const draw = () => {
+    const save = loadSave();
+    grid.replaceChildren(...Array.from({ length: SLOT_COUNT }, (_, i) => card(i, save)));
+    const focus = mode === 'new' ? '.slot-card.empty .res-btn.primary, .slot-card .res-btn' : '.slot-card.on .res-btn.primary, .slot-card .res-btn.primary';
+    ((grid.querySelector(focus) as HTMLButtonElement | null) ?? (root.querySelector('.slots-close') as HTMLButtonElement | null))?.focus();
+  };
+  const title = mode === 'new' ? '새로 시작 — 저장할 칸' : '불러오기';
+  const sub = mode === 'new' ? '빈 칸이 좋다 — 찬 칸을 고르면 그 진행을 지우고 처음부터.' : '이야기를 이어 갈 칸을 고른다. 기록·업적·옷은 모든 칸이 함께 쓴다.';
+  const root = el(
+    'div',
+    { class: `slots-modal ${mode}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     el(
-      'section',
-      { class: `screen slots ${mode}` },
-      el('header', { class: 'screen-head' }, button(['‹ 로비'], 'btn back-lobby', () => nav.go('lobby')), el('div', {}, el('h1', {}, title), el('p', { class: 'sub' }, sub))),
-      el('div', { class: 'slot-grid' }, ...Array.from({ length: SLOT_COUNT }, (_, i) => card(i))),
+      'div',
+      { class: 'slots-modal-box slots' },
+      el('header', { class: 'slots-head' }, el('div', {}, el('h2', {}, title), el('p', { class: 'sub' }, sub)), button('닫기', 'btn small slots-close', () => close(), { 'aria-label': '닫기' })),
+      grid,
     ),
   );
-  const focus = mode === 'new' ? '.slot-card.empty .res-btn.primary, .slot-card .res-btn' : '.slot-card.on .res-btn.primary, .slot-card .res-btn.primary';
-  (app.querySelector(focus) as HTMLButtonElement | null)?.focus();
-  setKeys((e) => {
-    if (e.key === 'Escape') nav.go('lobby');
-  });
+  // 창이 떠 있는 동안 키는 창이 먼저 받는다(메인 숫자 키·Esc가 뒤에서 움직이지 않게)
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      close();
+    } else if (/^[0-9]$/.test(e.key)) e.stopImmediatePropagation();
+  };
+  root.addEventListener('click', (e) => e.target === root && close());
+  window.addEventListener('keydown', onKey, true);
+  document.body.append(root);
+  draw();
+}
+
+/** 주소 ?screen=slots·예전 길: 메인을 그리고 그 위에 창 */
+export function renderSlots(app: HTMLElement, nav: Nav, data: DuelData): void {
+  nav.go('lobby');
+  openSlots(app, nav, data, getSlotsMode(), () => nav.go('lobby'));
 }
 
 /* ───────── 장 하나 ───────── */
