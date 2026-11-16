@@ -1,0 +1,132 @@
+{
+  "note": "Engineering comparison only; artwork generated with original silver-sword sheet and kyle_red_ref attached. Bbox includes weapons and effects. No source pixel repaint or resizing.",
+  "geometryWithinTwoPixels": true,
+  "frames": [
+    {
+      "frame": 1,
+      "before": [
+        38,
+        37,
+        135,
+        144
+      ],
+      "after": [
+        39,
+        37,
+        133,
+        144
+      ],
+      "beforeHeight": 107,
+      "afterHeight": 107,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9665,
+      "maximumBboxDelta": 2
+    },
+    {
+      "frame": 2,
+      "before": [
+        38,
+        34,
+        119,
+        144
+      ],
+      "after": [
+        38,
+        34,
+        119,
+        144
+      ],
+      "beforeHeight": 110,
+      "afterHeight": 110,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9738,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 3,
+      "before": [
+        31,
+        26,
+        138,
+        144
+      ],
+      "after": [
+        29,
+        25,
+        139,
+        144
+      ],
+      "beforeHeight": 118,
+      "afterHeight": 119,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9303,
+      "maximumBboxDelta": 2
+    },
+    {
+      "frame": 4,
+      "before": [
+        26,
+        36,
+        144,
+        144
+      ],
+      "after": [
+        26,
+        36,
+        143,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9606,
+      "maximumBboxDelta": 1
+    },
+    {
+      "frame": 5,
+      "before": [
+        38,
+        36,
+        116,
+        144
+      ],
+      "after": [
+        38,
+        36,
+        116,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9682,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 6,
+      "before": [
+        36,
+        36,
+        126,
+        144
+      ],
+      "after": [
+        36,
+        36,
+        125,
+        144
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 108,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9615,
+      "maximumBboxDelta": 1
+    }
+  ]
+}
