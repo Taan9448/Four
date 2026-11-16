@@ -29,10 +29,27 @@ function paletteLine(spec, style) {
 }
 
 // 2026-11-16 사용자 보고 "정면인데 팔이 돌아가 있거나, 검이 휘어 있거나": 사람 그림(반신·이야기 그림·컷인)에 몸·소품 규칙
+/**
+ * 무기 모양(2026-11-16 사용자 보고 "무기 일러스트마다 통일이 안 된다"): 그림 글에 이름이 나온 사람의 무기 모양을
+ * ART_STYLE prompt-data weapon_designs에서 그대로 붙인다. 카일은 붉은 검(3장부터) — 명세 kyle_sword: silver면 은빛 검
+ */
+export function weaponLines(spec, style, text) {
+  const wd = style.weapon_designs;
+  if (!wd) return '';
+  const has = (re) => re.test(text);
+  const out = [];
+  if (has(/\bHaun\b/)) out.push(wd.haun);
+  if (has(/\bKyle\b/)) out.push(spec.kyle_sword === 'silver' ? wd.kyle_silver : wd.kyle_red);
+  if (has(/\bElia\b/)) out.push(wd.elia);
+  if (has(/\bBorn\b/)) out.push(wd.born);
+  return out.length ? `Weapon designs (draw them exactly like this): ${out.join(' ')}\n` : '';
+}
+
 const ANATOMY =
   'Anatomy and props: every arm comes from its own shoulder and bends only the natural way at the elbow and wrist; a body facing the viewer never has an arm twisted around behind or across from the wrong side. ' +
   'Hands have five fingers and really close around what they hold. Every sword, spear, staff and axe handle is ONE straight rigid object of believable length — never bent, wavy, doubled or with a guard at both ends (a curved saber keeps one smooth even curve) — and it passes beside the face, never through or in front of it. ' +
-  'A sword worn at the hip shows its WHOLE scabbard, as long as the blade, never a lone hilt or a cut-off stub; if the sword is in the hand, the scabbard at the hip is empty — there is only ONE sword.\n';
+  'A sword worn at the hip shows its WHOLE scabbard, as long as the blade, never a lone hilt or a cut-off stub; if the sword is in the hand, the scabbard at the hip is empty — there is only ONE sword. ' +
+  'A weapon carried on the back or shoulder shows its whole length (a staff from its top down past the waist, an axe head AND its handle), and a weapon partly hidden by clothes continues on the other side at the right length.\n';
 
 export function renderPrompt(spec, style) {
   const [W, H] = spec.canvas;
@@ -249,6 +266,7 @@ export function renderPrompt(spec, style) {
         `${frameLines}\n` +
         `Style: ${spec.style ?? style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
         ANATOMY +
+        weaponLines(spec, style, `${subject} ${frameLines}`) +
         `Never use ${key.name}, pink or purple on the character.\n` +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
       );
@@ -279,6 +297,7 @@ export function renderPrompt(spec, style) {
         // spec.style(2026-11-12): 「결」 이야기 회상 일러스트처럼 그 그림만의 화풍
         `Style: ${spec.style ?? style.illustration_style}.\n` +
         (spec.type === 'card-art' && !subject ? '' : ANATOMY) +
+        weaponLines(spec, style, `${subject ?? ''} ${notes(1) || spec.summary || ''}`) +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border.'
       );
   }

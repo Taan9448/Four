@@ -1,0 +1,23 @@
+id: kyle_red_dodge
+type: character-anim
+character: kyle_red
+summary: '「결」 카일(붉은 검 — 3장 이그니스 뒤, 2026-11-16) 피하기 5프레임 — 「결」에서 고를 수 있는 동료의 비켜서기 동작(2026-11-12)'
+depends_on:
+- kyle_red_ref
+reference: assets/source/kyle_red_ref.png
+facing: right
+frames: 5
+fps: 14
+events: {}
+bbox_tolerance: 0.35
+# 카일 kyle_<동작>과 같은 동작 — 검만 붉은 검(kyle_red_ref). 3장 뒤 「결」 대결에서 쓴다
+frame_notes:
+  1: ready guard stance, knees bending
+  2: a quick heavy side-step back, armored body turning slightly away, the sword held close, cape swinging forward
+  3: lowest point of the evasion, crouched low behind the raised forearm, a faint translucent afterimage of the standing pose left behind
+  4: rising and turning back to face right, sword coming up
+  5: back in the ready guard stance
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ff6a5a'

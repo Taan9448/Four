@@ -208,6 +208,31 @@ palette:
   - '#6b4fa3'
   - '#a35cff'
   - '#d4b8ff'
+# 2026-11-16 사용자 보고 "무기 일러스트마다 통일이 안 되고 바뀐다" — 사람 그림(이야기 그림·컷인·반신)에 이름이 나오면 그 사람의 무기 모양을 그대로 붙인다(render-prompt.mjs).
+# 카일은 3장(이그니스의 심장으로 벼린 뒤)부터 붉은 검 — 그 앞 장면은 명세에 kyle_sword: silver
+weapon_designs:
+  haun: >-
+    Jin Haun's weapons never change design. His woodcutting AXE: one plain single-bladed iron wedge head, dull
+    grey with a worn edge, on a perfectly straight dark-brown wooden handle about as long as his arm. His
+    SWORD ("the ugly sword"): a narrow, thin, straight single-edged blade with no decoration, a small plain
+    round dark-iron guard, a short grip wrapped in dark cord, and a plain matte-black scabbard of the same
+    narrow width — never a broad, brown, wooden-looking or ornate sword.
+  kyle_red: >-
+    Kyle's sword never changes design: a long straight double-edged knight's sword whose WHOLE blade is deep
+    crimson, glowing faintly like cooling embers along the edges, with a plain dark steel crossguard and a
+    dark leather grip; his round steel shield bears the Rowen crest (white snowflake over a silver sword on blue).
+  kyle_silver: >-
+    Kyle's sword never changes design: a long straight double-edged silver knight's sword with a gold
+    crossguard and a blue-wrapped grip; his round steel shield bears the Rowen crest (white snowflake over a
+    silver sword on blue).
+  elia: >-
+    Elia's staff never changes design: one long staff of twisted, gnarled brown wood as tall as she is, its
+    top curling around a single blue crystal; it always shows its full length — when it rests on her back or
+    shoulder, the crystal end rises above her shoulder AND the wooden shaft continues down past her waist.
+  born: >-
+    Born's axe never changes design: a two-handed battle axe as tall as he is — a perfectly straight, thick
+    wooden haft bound with dark leather bands and a steel cap at the bottom, and one steel head with two
+    crescent blades engraved with simple dwarven knotwork; plain steel, never gold or jeweled.
 subjects:
   haun: >-
     Jin Haun, a lean, wiry seventeen-year-old East Asian woodcutter, a lowly servant of the Cheongun sect, with a
