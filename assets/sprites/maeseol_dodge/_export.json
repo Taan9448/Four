@@ -1,0 +1,241 @@
+{
+  "footRowsBefore": null,
+  "method": "one uniform nearest-neighbor scale for all frames, then integer anchored placement; no painting or clipping",
+  "source": "assets/source/maeseol_dodge.png",
+  "targetFirstBodyHeight": 115,
+  "measurementNote": null,
+  "idleBody": {
+    "minX": 48,
+    "minY": 29,
+    "maxX": 124,
+    "maxY": 143,
+    "width": 77,
+    "height": 115,
+    "count": 3442
+  },
+  "firstBodyBefore": {
+    "minX": 43,
+    "minY": 36,
+    "maxX": 121,
+    "maxY": 143,
+    "width": 79,
+    "height": 108,
+    "count": 3439
+  },
+  "firstBodyAfter": {
+    "minX": 41,
+    "minY": 29,
+    "maxX": 125,
+    "maxY": 143,
+    "width": 85,
+    "height": 115,
+    "count": 3926
+  },
+  "idleGround": 143,
+  "scaleCanvas": [
+    171,
+    171
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 43,
+        "minY": 36,
+        "maxX": 121,
+        "maxY": 143,
+        "width": 79,
+        "height": 108,
+        "count": 3439
+      },
+      "resize": [
+        171,
+        171
+      ],
+      "offset": [
+        -5,
+        -10
+      ],
+      "after": {
+        "minX": 41,
+        "minY": 29,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 85,
+        "height": 115,
+        "count": 3926
+      },
+      "bodyAfter": {
+        "minX": 41,
+        "minY": 29,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 85,
+        "height": 115,
+        "count": 3926
+      },
+      "visibleBefore": 3926,
+      "visibleAfter": 3926
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 36,
+        "minY": 53,
+        "maxX": 116,
+        "maxY": 143,
+        "width": 81,
+        "height": 91,
+        "count": 2963
+      },
+      "resize": [
+        171,
+        171
+      ],
+      "offset": [
+        -5,
+        -10
+      ],
+      "after": {
+        "minX": 34,
+        "minY": 47,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 87,
+        "height": 97,
+        "count": 3379
+      },
+      "bodyAfter": {
+        "minX": 34,
+        "minY": 47,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 87,
+        "height": 97,
+        "count": 3379
+      },
+      "visibleBefore": 3379,
+      "visibleAfter": 3379
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 24,
+        "minY": 36,
+        "maxX": 130,
+        "maxY": 143,
+        "width": 107,
+        "height": 108,
+        "count": 4939
+      },
+      "resize": [
+        171,
+        171
+      ],
+      "offset": [
+        -5,
+        -10
+      ],
+      "after": {
+        "minX": 21,
+        "minY": 29,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 115,
+        "height": 115,
+        "count": 5643
+      },
+      "bodyAfter": {
+        "minX": 21,
+        "minY": 29,
+        "maxX": 135,
+        "maxY": 143,
+        "width": 115,
+        "height": 115,
+        "count": 5643
+      },
+      "visibleBefore": 5643,
+      "visibleAfter": 5643
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 39,
+        "minY": 50,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 82,
+        "height": 94,
+        "count": 2988
+      },
+      "resize": [
+        171,
+        171
+      ],
+      "offset": [
+        -5,
+        -10
+      ],
+      "after": {
+        "minX": 37,
+        "minY": 44,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 88,
+        "height": 100,
+        "count": 3400
+      },
+      "bodyAfter": {
+        "minX": 37,
+        "minY": 44,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 88,
+        "height": 100,
+        "count": 3400
+      },
+      "visibleBefore": 3400,
+      "visibleAfter": 3400
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 43,
+        "minY": 35,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 78,
+        "height": 109,
+        "count": 3379
+      },
+      "resize": [
+        171,
+        171
+      ],
+      "offset": [
+        -5,
+        -10
+      ],
+      "after": {
+        "minX": 41,
+        "minY": 28,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 84,
+        "height": 116,
+        "count": 3854
+      },
+      "bodyAfter": {
+        "minX": 41,
+        "minY": 28,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 84,
+        "height": 116,
+        "count": 3854
+      },
+      "visibleBefore": 3854,
+      "visibleAfter": 3854
+    }
+  ]
+}
