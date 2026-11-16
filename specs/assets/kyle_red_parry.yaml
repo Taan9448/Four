@@ -1,0 +1,25 @@
+id: kyle_red_parry
+type: character-anim
+character: kyle_red
+summary: '「결」 카일(붉은 검 — 3장 이그니스 뒤, 2026-11-16) 받기(패링) 6프레임 — 「결」에서 고를 수 있는 동료의 받아치기 동작(2026-11-12)'
+depends_on:
+- kyle_red_ref
+reference: assets/source/kyle_red_ref.png
+facing: right
+frames: 6
+fps: 14
+events:
+  deflect: 3
+bbox_tolerance: 0.25
+# 카일 kyle_<동작>과 같은 동작 — 검만 붉은 검(kyle_red_ref). 3장 뒤 「결」 대결에서 쓴다
+frame_notes:
+  1: ready guard stance, longsword held in both hands in front, knees bent, eyes on the incoming blow
+  2: the longsword snaps up across the body at an angle, flat of the blade facing the blow, shoulders squared, front foot planted
+  3: 'the moment of the deflection: the blade meets the blow, a burst of warm golden-white light and sparks at the point of contact on the right of the blade, body braced and unmoved, cape flaring back'
+  4: the deflected force slides off; the sword is pushed outward to the right with a strong turn of the wrists, weight still forward
+  5: a firm half step back, sword returning to the middle, a faint golden afterglow along the edge
+  6: settled ready guard stance again
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

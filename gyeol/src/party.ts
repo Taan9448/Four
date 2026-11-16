@@ -26,9 +26,21 @@ export interface CharacterDef {
    */
   counterFx?: { sprite: string; hit: string; color: string; label: string };
   lines?: Lines;
+  /**
+   * 장을 마치면 바뀌는 전투 그림(2026-11-16 사용자 보고 "로웬은 붉은 검 설정"): 카일은 3장(이그니스의 심장으로 벼린 뒤)부터 붉은 검.
+   * anims의 실제 그림이 모두 있을 때만 바꾼다(한 대결에 은빛·붉은 검이 섞이지 않게)
+   */
+  swap?: { after: string; sprite: string; anims: string[] };
 }
 
 export const HAUN = 'haun';
+
+/** 지금 쓸 전투 그림 접두어: swap 장을 마쳤고 그 그림이 모두 있으면 바뀐 그림 */
+export function spriteFor(c: CharacterDef, cleared: (ch: string) => boolean, hasArt: (id: string) => boolean): string {
+  const sw = c.swap;
+  if (sw && cleared(sw.after) && sw.anims.every((a) => hasArt(`${sw.sprite}_${a}`))) return sw.sprite;
+  return c.sprite;
+}
 
 export function characters(data: DuelData): CharacterDef[] {
   return (data as DuelData & { characters?: { list: CharacterDef[] } }).characters?.list ?? [];
