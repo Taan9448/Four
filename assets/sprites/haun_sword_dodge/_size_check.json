@@ -1,60 +1,111 @@
 {
-  "note": "Bounding box includes held sword and effects; crouched/fallen pose is naturally lower. Foot rows are visually verified separately when effects extend below feet.",
+  "note": "Engineering comparison only; actual art was edited by image generation. Bbox includes weapons and effects. Pose/cloth/scabbard are also inspected visually.",
+  "geometryWithinTwoPixels": true,
   "frames": [
     {
       "frame": 1,
-      "bbox": [
+      "before": [
         42,
         42,
         107,
         144
       ],
-      "silhouetteHeight": 102,
-      "bottom": 143
+      "after": [
+        42,
+        42,
+        107,
+        144
+      ],
+      "beforeHeight": 102,
+      "afterHeight": 102,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9836,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 2,
-      "bbox": [
+      "before": [
         36,
         52,
         115,
         144
       ],
-      "silhouetteHeight": 92,
-      "bottom": 143
+      "after": [
+        36,
+        52,
+        115,
+        144
+      ],
+      "beforeHeight": 92,
+      "afterHeight": 92,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9727,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 3,
-      "bbox": [
+      "before": [
         19,
         41,
         140,
         143
       ],
-      "silhouetteHeight": 102,
-      "bottom": 142
+      "after": [
+        19,
+        41,
+        140,
+        143
+      ],
+      "beforeHeight": 102,
+      "afterHeight": 102,
+      "beforeBottom": 142,
+      "afterBottom": 142,
+      "maskIoU": 0.9409,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 4,
-      "bbox": [
+      "before": [
         43,
         53,
         121,
         144
       ],
-      "silhouetteHeight": 91,
-      "bottom": 143
+      "after": [
+        43,
+        53,
+        121,
+        144
+      ],
+      "beforeHeight": 91,
+      "afterHeight": 91,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9802,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 5,
-      "bbox": [
+      "before": [
         41,
         43,
         106,
         144
       ],
-      "silhouetteHeight": 101,
-      "bottom": 143
+      "after": [
+        41,
+        43,
+        106,
+        144
+      ],
+      "beforeHeight": 101,
+      "afterHeight": 101,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9855,
+      "maximumBboxDelta": 0
     }
   ]
 }
