@@ -1,0 +1,132 @@
+{
+  "note": "Engineering comparison only; actual art was edited by image generation. Bbox includes weapons and effects. Pose/cloth/scabbard are also inspected visually.",
+  "geometryWithinTwoPixels": true,
+  "frames": [
+    {
+      "frame": 1,
+      "before": [
+        42,
+        38,
+        117,
+        144
+      ],
+      "after": [
+        42,
+        38,
+        117,
+        144
+      ],
+      "beforeHeight": 106,
+      "afterHeight": 106,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9787,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 2,
+      "before": [
+        25,
+        55,
+        122,
+        144
+      ],
+      "after": [
+        25,
+        55,
+        122,
+        144
+      ],
+      "beforeHeight": 89,
+      "afterHeight": 89,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9797,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 3,
+      "before": [
+        30,
+        37,
+        123,
+        144
+      ],
+      "after": [
+        30,
+        37,
+        123,
+        144
+      ],
+      "beforeHeight": 107,
+      "afterHeight": 107,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.973,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 4,
+      "before": [
+        22,
+        46,
+        140,
+        144
+      ],
+      "after": [
+        22,
+        46,
+        140,
+        144
+      ],
+      "beforeHeight": 98,
+      "afterHeight": 98,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9704,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 5,
+      "before": [
+        25,
+        48,
+        138,
+        144
+      ],
+      "after": [
+        25,
+        48,
+        138,
+        144
+      ],
+      "beforeHeight": 96,
+      "afterHeight": 96,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9643,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 6,
+      "before": [
+        46,
+        42,
+        116,
+        144
+      ],
+      "after": [
+        46,
+        42,
+        116,
+        144
+      ],
+      "beforeHeight": 102,
+      "afterHeight": 102,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9825,
+      "maximumBboxDelta": 0
+    }
+  ]
+}
