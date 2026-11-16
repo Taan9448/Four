@@ -179,3 +179,18 @@ describe('도감 이야기 그림(2026-11-15)', () => {
     expect(artOpen(s, ch2)).toBe(true);
   });
 });
+
+describe('원작 상대 20종 이야기 배치(2026-11-16)', () => {
+  it('20종이 모두 그 장의 이야기 대결에 있고, 어려움 정의가 있다', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { chapters: { id: string; bouts?: { foe: string; intro?: unknown[] }[] }[] };
+    type F = { id: string; arenaAfter?: string; hard?: unknown };
+    const fresh = (data as unknown as { foes: F[] }).foes.filter((f) => f.arenaAfter);
+    for (const f of fresh) {
+      const ch = story.chapters.find((c) => c.id === f.arenaAfter)!;
+      const bout = ch.bouts?.find((b) => b.foe === f.id);
+      expect(bout, `${f.id} in ${ch.id}`).toBeTruthy();
+      expect(bout!.intro?.length, f.id).toBeGreaterThan(0);
+      expect(f.hard, f.id).toBeTruthy();
+    }
+  });
+});
