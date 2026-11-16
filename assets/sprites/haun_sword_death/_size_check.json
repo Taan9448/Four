@@ -1,71 +1,132 @@
 {
-  "note": "Bounding box includes held sword and effects; crouched/fallen pose is naturally lower. Foot rows are visually verified separately when effects extend below feet.",
+  "note": "Engineering comparison only; actual art was edited by image generation. Bbox includes weapons and effects. Pose/cloth/scabbard are also inspected visually.",
+  "geometryWithinTwoPixels": true,
   "frames": [
     {
       "frame": 1,
-      "bbox": [
+      "before": [
         32,
         34,
         117,
         142
       ],
-      "silhouetteHeight": 108,
-      "bottom": 141
+      "after": [
+        32,
+        36,
+        117,
+        143
+      ],
+      "beforeHeight": 108,
+      "afterHeight": 107,
+      "beforeBottom": 141,
+      "afterBottom": 142,
+      "maskIoU": 0.9132,
+      "maximumBboxDelta": 2
     },
     {
       "frame": 2,
-      "bbox": [
+      "before": [
         37,
         40,
         115,
         142
       ],
-      "silhouetteHeight": 102,
-      "bottom": 141
+      "after": [
+        37,
+        41,
+        115,
+        143
+      ],
+      "beforeHeight": 102,
+      "afterHeight": 102,
+      "beforeBottom": 141,
+      "afterBottom": 142,
+      "maskIoU": 0.9086,
+      "maximumBboxDelta": 1
     },
     {
       "frame": 3,
-      "bbox": [
+      "before": [
         34,
         61,
         117,
         144
       ],
-      "silhouetteHeight": 83,
-      "bottom": 143
+      "after": [
+        34,
+        62,
+        117,
+        144
+      ],
+      "beforeHeight": 83,
+      "afterHeight": 82,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9245,
+      "maximumBboxDelta": 1
     },
     {
       "frame": 4,
-      "bbox": [
+      "before": [
         32,
         69,
         122,
         144
       ],
-      "silhouetteHeight": 75,
-      "bottom": 143
+      "after": [
+        32,
+        69,
+        122,
+        144
+      ],
+      "beforeHeight": 75,
+      "afterHeight": 75,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.984,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 5,
-      "bbox": [
+      "before": [
         27,
         95,
         136,
         144
       ],
-      "silhouetteHeight": 49,
-      "bottom": 143
+      "after": [
+        27,
+        95,
+        136,
+        144
+      ],
+      "beforeHeight": 49,
+      "afterHeight": 49,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9855,
+      "maximumBboxDelta": 0
     },
     {
       "frame": 6,
-      "bbox": [
+      "before": [
         28,
         101,
         136,
         144
       ],
-      "silhouetteHeight": 43,
-      "bottom": 143
+      "after": [
+        28,
+        101,
+        136,
+        144
+      ],
+      "beforeHeight": 43,
+      "afterHeight": 43,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9829,
+      "maximumBboxDelta": 0
     }
   ]
 }
