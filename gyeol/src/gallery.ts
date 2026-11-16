@@ -96,7 +96,8 @@ function viewer(list: ArtEntry[], start: number): void {
     if (e.key === 'Escape') close();
     else if (e.key === 'ArrowLeft') step(-1);
     else if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') step(1);
-    else return;
+    // 크게 보는 동안 숫자 키(도감 탭 바꾸기)는 먹는다
+    else if (!/^[0-9]$/.test(e.key)) return;
     e.preventDefault();
     e.stopImmediatePropagation();
   };
