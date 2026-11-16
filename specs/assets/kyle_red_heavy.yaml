@@ -1,0 +1,25 @@
+id: kyle_red_heavy
+type: character-anim
+character: kyle_red
+summary: '「결」 카일(붉은 검 — 3장 이그니스 뒤, 2026-11-16) 강베기 6프레임 — 늦게 떨어지는 무거운 일격(4프레임에 타격, 앞 세 칸은 0.48초 동안 모으기, 2026-11-13)'
+depends_on:
+- kyle_red_ref
+reference: assets/source/kyle_red_ref.png
+facing: right
+frames: 6
+fps: 10
+events:
+  hit: 4
+bbox_tolerance: 0.35
+# 카일 kyle_<동작>과 같은 동작 — 검만 붉은 검(kyle_red_ref). 3장 뒤 「결」 대결에서 쓴다
+frame_notes:
+  1: 'heaves the longsword back over the right shoulder with both hands, cape swinging, weight on the back foot'
+  2: 'sword raised high beside the head (not far above it), shoulders squared, knees bent, a faint golden glow along the blade'
+  3: 'a big armored step forward, the blade starting to fall, body leaning in, the glow bright'
+  4: 'THE HIT: a crushing two-handed downward cleave to the right, the blade ends low in front, a thick golden-white arc trailing the edge, dust at the front foot'
+  5: 'follow-through, body low, sword point near the ground, tabard and cape swinging forward'
+  6: 'pulls back into the ready guard stance'
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

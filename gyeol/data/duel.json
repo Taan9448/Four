@@ -21159,7 +21159,20 @@
             "아직이다…!"
           ]
         },
-        "facePos": "50% 6%"
+        "facePos": "50% 6%",
+        "swap": {
+          "after": "ch3",
+          "sprite": "kyle_red",
+          "anims": [
+            "idle",
+            "attack",
+            "hit",
+            "parry",
+            "dodge",
+            "heavy",
+            "death"
+          ]
+        }
       },
       {
         "id": "elia",
