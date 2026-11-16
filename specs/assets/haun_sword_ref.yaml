@@ -5,7 +5,8 @@ summary: 진하운(못생긴 검) 기준 시트(3/4 정면 + 오른쪽 측면)
 depends_on: [haun_ref]
 reference: assets/source/haun_ref.png
 facing: right
+# 2026-11-16 다시 그림(사용자 보고 "허리에 찬 칼이 칼머리만 있거나 잘려 있다"): 허리 칼집이 짧은 토막·손잡이만으로 보였다 — ART_STYLE haun_sword에 "칼집은 늘 통째로, 칼을 뽑으면 빈 칼집" 규칙
 frame_notes:
-  1: "full body, three-quarter front view, calm upright standing pose, the same grey servant outfit mended at the side, the narrow unadorned sword held low in the right hand, a plain black scabbard at the left hip"
-  2: "full body, side view facing right, same outfit and proportions, standing ready with the sword point lowered toward the ground"
+  1: "full body, three-quarter front view, calm upright standing pose, the same grey servant outfit mended at the side, the narrow unadorned sword held low in the right hand, the whole plain black scabbard EMPTY at the left hip, one long straight sheath as long as the blade slanting back from the sash past the thigh"
+  2: "full body, side view facing right, same outfit and proportions, standing ready with the sword point lowered toward the ground; the whole empty black scabbard hangs at the hip, slanting back behind the thigh, its full length visible from the sash to its tip"
 placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

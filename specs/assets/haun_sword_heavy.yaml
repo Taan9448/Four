@@ -11,6 +11,7 @@ fps: 10
 events:
   hit: 4
 bbox_tolerance: 0.35
+# 2026-11-16 다시 그림(사용자 보고 "허리에 찬 칼이 칼머리만 있거나 잘려 있다"): 허리 칼집이 짧은 토막·손잡이만으로 보였다 — ART_STYLE haun_sword에 "칼집은 늘 통째로, 칼을 뽑으면 빈 칼집" 규칙
 frame_notes:
   1: 'draws the sword far back behind the right shoulder with BOTH hands, body twisting away, weight sinking onto the back foot, eyes on the target'
   2: 'sword raised high beside the head (not far above it) in both hands, knees bent deep, a faint golden glow gathering along the blade, hair lifting'
