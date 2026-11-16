@@ -1,0 +1,111 @@
+{
+  "note": "Engineering comparison only; artwork generated with original silver-sword sheet and kyle_red_ref attached. Bbox includes weapons and effects. No source pixel repaint or resizing.",
+  "geometryWithinTwoPixels": true,
+  "frames": [
+    {
+      "frame": 1,
+      "before": [
+        37,
+        37,
+        130,
+        144
+      ],
+      "after": [
+        37,
+        37,
+        130,
+        144
+      ],
+      "beforeHeight": 107,
+      "afterHeight": 107,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9881,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 2,
+      "before": [
+        35,
+        44,
+        130,
+        144
+      ],
+      "after": [
+        35,
+        44,
+        130,
+        144
+      ],
+      "beforeHeight": 100,
+      "afterHeight": 100,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.988,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 3,
+      "before": [
+        11,
+        34,
+        128,
+        144
+      ],
+      "after": [
+        13,
+        35,
+        128,
+        144
+      ],
+      "beforeHeight": 110,
+      "afterHeight": 109,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9866,
+      "maximumBboxDelta": 2
+    },
+    {
+      "frame": 4,
+      "before": [
+        37,
+        42,
+        130,
+        144
+      ],
+      "after": [
+        37,
+        42,
+        130,
+        144
+      ],
+      "beforeHeight": 102,
+      "afterHeight": 102,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9882,
+      "maximumBboxDelta": 0
+    },
+    {
+      "frame": 5,
+      "before": [
+        37,
+        35,
+        130,
+        144
+      ],
+      "after": [
+        37,
+        35,
+        130,
+        144
+      ],
+      "beforeHeight": 109,
+      "afterHeight": 109,
+      "beforeBottom": 143,
+      "afterBottom": 143,
+      "maskIoU": 0.9736,
+      "maximumBboxDelta": 0
+    }
+  ]
+}

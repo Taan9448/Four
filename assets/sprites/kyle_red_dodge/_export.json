@@ -1,0 +1,167 @@
+{
+  "method": "Replay the approved original animation export: one shared nearest-neighbor scale, original per-frame integer offsets, no painting or clipping.",
+  "source": "assets/source/kyle_red_dodge.png",
+  "originalAnimation": "kyle_dodge",
+  "originalExport": "assets/sprites/kyle_dodge/_export.json",
+  "scaleCanvas": [
+    199,
+    199
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 45,
+        "minY": 58,
+        "maxX": 118,
+        "maxY": 143,
+        "width": 74,
+        "height": 86,
+        "count": 3020
+      },
+      "resize": [
+        199,
+        199
+      ],
+      "offset": [
+        -19,
+        -36
+      ],
+      "after": {
+        "minX": 37,
+        "minY": 37,
+        "maxX": 129,
+        "maxY": 143,
+        "width": 93,
+        "height": 107,
+        "count": 4659
+      },
+      "visibleBefore": 4659,
+      "visibleAfter": 4659
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 43,
+        "minY": 62,
+        "maxX": 118,
+        "maxY": 142,
+        "width": 76,
+        "height": 81,
+        "count": 3103
+      },
+      "resize": [
+        199,
+        199
+      ],
+      "offset": [
+        -19,
+        -34
+      ],
+      "after": {
+        "minX": 35,
+        "minY": 44,
+        "maxX": 129,
+        "maxY": 143,
+        "width": 95,
+        "height": 100,
+        "count": 4784
+      },
+      "visibleBefore": 4784,
+      "visibleAfter": 4784
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 25,
+        "minY": 57,
+        "maxX": 117,
+        "maxY": 143,
+        "width": 93,
+        "height": 87,
+        "count": 4178
+      },
+      "resize": [
+        199,
+        199
+      ],
+      "offset": [
+        -19,
+        -36
+      ],
+      "after": {
+        "minX": 13,
+        "minY": 35,
+        "maxX": 127,
+        "maxY": 143,
+        "width": 115,
+        "height": 109,
+        "count": 6494
+      },
+      "visibleBefore": 6494,
+      "visibleAfter": 6494
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 45,
+        "minY": 60,
+        "maxX": 118,
+        "maxY": 141,
+        "width": 74,
+        "height": 82,
+        "count": 2883
+      },
+      "resize": [
+        199,
+        199
+      ],
+      "offset": [
+        -19,
+        -33
+      ],
+      "after": {
+        "minX": 37,
+        "minY": 42,
+        "maxX": 129,
+        "maxY": 143,
+        "width": 93,
+        "height": 102,
+        "count": 4449
+      },
+      "visibleBefore": 4449,
+      "visibleAfter": 4449
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 45,
+        "minY": 57,
+        "maxX": 118,
+        "maxY": 143,
+        "width": 74,
+        "height": 87,
+        "count": 2999
+      },
+      "resize": [
+        199,
+        199
+      ],
+      "offset": [
+        -19,
+        -36
+      ],
+      "after": {
+        "minX": 37,
+        "minY": 35,
+        "maxX": 129,
+        "maxY": 143,
+        "width": 93,
+        "height": 109,
+        "count": 4610
+      },
+      "visibleBefore": 4610,
+      "visibleAfter": 4610
+    }
+  ]
+}
