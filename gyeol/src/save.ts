@@ -56,6 +56,8 @@ export interface SaveData {
   seen: string[];
   /** 이미 본 안내(기술·집중·겨루기 — 처음 나오는 순간 한 번) */
   tips: string[];
+  /** 이야기에서 본 그림 id(2026-11-15 도감 그림 모음) — 칸과 상관없이 하나 */
+  gallery: string[];
   /** 이룬 업적 id · 입은 하운 옷 id(5단계, gyeol/data/progress.json) */
   achievements: string[];
   outfit: string;
@@ -87,7 +89,7 @@ const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
 export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto', keys: defaultKeys() });
 
-export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, slots: [{ story: { cleared: [], stars: {}, flags: [] }, difficulty: 'normal', updatedAt: 0 }, null, null], slot: 0, duelBest: {}, stats: emptyStats(), seen: [], tips: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
+export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, slots: [{ story: { cleared: [], stars: {}, flags: [] }, difficulty: 'normal', updatedAt: 0 }, null, null], slot: 0, duelBest: {}, stats: emptyStats(), seen: [], tips: [], gallery: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
 
 interface Store {
   getItem(k: string): string | null;
@@ -150,6 +152,7 @@ export function normalize(raw: unknown): SaveData {
   }
   if (Array.isArray(r.seen)) s.seen = r.seen.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.tips)) s.tips = r.tips.filter((x): x is string => typeof x === 'string');
+  if (Array.isArray(r.gallery)) s.gallery = r.gallery.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.achievements)) s.achievements = r.achievements.filter((x): x is string => typeof x === 'string');
   if (typeof r.outfit === 'string') s.outfit = r.outfit;
   if (r.outfits && typeof r.outfits === 'object') s.outfits = Object.fromEntries(Object.entries(r.outfits).filter(([, v]) => typeof v === 'string'));
@@ -237,3 +240,11 @@ export function resetSaveCache(): void {
 
 /** 안내 글의 {attack}·{parry}… 자리표를 지금 설정한 키 이름으로(2026-11-13 키 바꾸기) */
 export const withKeys = (s: string): string => keyText(loadSave().settings.keys, s);
+
+/** 이야기 그림을 봤다(도감 그림 모음에 열린다) */
+export function rememberArt(id: string): void {
+  const s = loadSave();
+  if (s.gallery.includes(id)) return;
+  s.gallery.push(id);
+  writeSave(s);
+}

@@ -28,6 +28,11 @@ function paletteLine(spec, style) {
   return `Palette: use at most ${spec.max_colors} colors per cell, only from this list: ${style.palette.join(', ')}.\n`;
 }
 
+// 2026-11-16 사용자 보고 "정면인데 팔이 돌아가 있거나, 검이 휘어 있거나": 사람 그림(반신·이야기 그림·컷인)에 몸·소품 규칙
+const ANATOMY =
+  'Anatomy and props: every arm comes from its own shoulder and bends only the natural way at the elbow and wrist; a body facing the viewer never has an arm twisted around behind or across from the wrong side. ' +
+  'Hands have five fingers and really close around what they hold. Every sword, spear, staff and axe handle is ONE straight rigid object of believable length — never bent, wavy, doubled or with a guard at both ends (a curved saber keeps one smooth even curve) — and it passes beside the face, never through or in front of it.\n';
+
 export function renderPrompt(spec, style) {
   const [W, H] = spec.canvas;
   const [cols, rows] = spec.grid;
@@ -242,6 +247,7 @@ export function renderPrompt(spec, style) {
           : `Keep every figure INSIDE its own cell: leave at least 40 px of empty background between the hair, shoulders, sleeves or any held object and the LEFT and RIGHT edges of the cell. Long hair falls behind the shoulders, not out to the sides; nothing may touch or cross into the neighbouring cell.\n`) +
         `${frameLines}\n` +
         `Style: ${spec.style ?? style.illustration_style}. Crisp clean outline around the whole silhouette so it separates cleanly from the background.\n` +
+        ANATOMY +
         `Never use ${key.name}, pink or purple on the character.\n` +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border, nothing crosses into the next cell.'
       );
@@ -271,6 +277,7 @@ export function renderPrompt(spec, style) {
         (spec.framing ? `Composition: ${spec.framing}\n` : '') +
         // spec.style(2026-11-12): 「결」 이야기 회상 일러스트처럼 그 그림만의 화풍
         `Style: ${spec.style ?? style.illustration_style}.\n` +
+        (spec.type === 'card-art' && !subject ? '' : ANATOMY) +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border.'
       );
   }

@@ -8,7 +8,7 @@
 import { frameUrl } from '../../src/render/assets';
 import { sfx } from '../../src/render/audio';
 import { button, el, realArt } from './dom';
-import { withKeys } from './save';
+import { rememberArt, withKeys } from './save';
 
 export interface SceneLine {
   speaker?: string;
@@ -146,7 +146,10 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
       wasNow = isNow;
       if (line.art || line.cg) {
         // 「결」 이야기 그림(art)이 실제로 왔으면 그것, 아니면 「천외귀환」 장면 그림(cg) — 둘 다 없으면 걷는다(2026-11-12)
-        setCg((line.art ? realArt(line.art) : null) ?? (line.cg && line.cg !== 'none' ? realArt(line.cg) : null));
+        const artId = line.art && realArt(line.art) ? line.art : line.cg && line.cg !== 'none' && realArt(line.cg) ? line.cg : null;
+        setCg(artId ? realArt(artId) : null);
+        // 도감 그림 모음(2026-11-15): 본 그림을 적어 둔다
+        if (artId) rememberArt(artId);
       }
       const lead = line.kind === 'lead';
       const rule = line.kind === 'rule' || lead;

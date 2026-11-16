@@ -2,7 +2,8 @@ id: cg_gyeol_pine_sword_breaks
 type: story-cg
 character: kwak_dojin
 summary: '「결」 이야기 그림 — 부러지는 송문고검(9장) · 「천외귀환」에 없는 새 장면(2026-11-12)'
+# 2026-11-16 다시 그림(사용자 보고 "팔이 돌아가 있거나 검이 휘어 있다"): 하운의 검 쥔 팔이 어깨 뒤로 꺾이고 몸은 정면이라 팔이 돌아간 것처럼 보였다
 frame_notes:
-  1: 'Night on a mountain peak. Mid-duel: the tip of Kwak Dojin''s pine-grain sword snaps off and spins away into the air, glittering. A young swordsman in grey does not resist — his body turns with the push like a log rolling in water, his narrow blade guiding the force aside. Kwak''s cold eyes widen for the first time. Wind tears at his white crane robe.'
+  1: 'Night on a mountain peak. Mid-duel: the tip of Kwak Dojin''s pine-grain sword snaps off and spins away into the air, glittering. A young swordsman in grey does not resist — his body turns with the push like a log rolling in water, his narrow blade guiding the force aside. Kwak''s cold eyes widen for the first time. Wind tears at his white crane robe. Pose (redrawn 2026-11-16): the young swordsman is seen in side view, turning his whole body with the push; his sword arm stays in FRONT of his body, the narrow blade angled down and to the side, both feet planted and his shoulders turning together with the hips. Kwak''s own sword is straight up to the broken point; only the snapped tip flies away.'
 framing: 'A cinematic story illustration for a visual-novel scene. This is a NEW, original scene: do not reuse the layout of any earlier illustration. The bottom quarter of the picture will be covered by a dialogue box, so keep faces, hands and the key action in the upper three quarters. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each.'
 placeholder: { color: '#2a2630' }
