@@ -1,0 +1,222 @@
+{
+  "method": "Replay the approved original animation export: one shared nearest-neighbor scale, original horizontal offsets and original per-frame ground anchor, no painting or clipping.",
+  "source": "assets/source/kyle_red_death.png",
+  "originalAnimation": "kyle_death",
+  "originalExport": "assets/sprites/kyle_death/_export.json",
+  "scaleCanvas": [
+    176,
+    176
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 27,
+        "minY": 46,
+        "maxX": 132,
+        "maxY": 142,
+        "width": 106,
+        "height": 97,
+        "count": 4732
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -14
+      ],
+      "originalOffset": [
+        -8,
+        -14
+      ],
+      "after": {
+        "minX": 22,
+        "minY": 37,
+        "maxX": 138,
+        "maxY": 143,
+        "width": 117,
+        "height": 107,
+        "count": 5748
+      },
+      "visibleBefore": 5748,
+      "visibleAfter": 5748
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 30,
+        "minY": 49,
+        "maxX": 121,
+        "maxY": 142,
+        "width": 92,
+        "height": 94,
+        "count": 4243
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -14
+      ],
+      "originalOffset": [
+        -8,
+        -14
+      ],
+      "after": {
+        "minX": 25,
+        "minY": 40,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 102,
+        "height": 104,
+        "count": 5153
+      },
+      "visibleBefore": 5153,
+      "visibleAfter": 5153
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 26,
+        "minY": 68,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 95,
+        "height": 76,
+        "count": 3960
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -15
+      ],
+      "originalOffset": [
+        -8,
+        -15
+      ],
+      "after": {
+        "minX": 21,
+        "minY": 60,
+        "maxX": 125,
+        "maxY": 143,
+        "width": 105,
+        "height": 84,
+        "count": 4830
+      },
+      "visibleBefore": 4830,
+      "visibleAfter": 4830
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 27,
+        "minY": 61,
+        "maxX": 133,
+        "maxY": 143,
+        "width": 107,
+        "height": 83,
+        "count": 4411
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -15
+      ],
+      "originalOffset": [
+        -8,
+        -15
+      ],
+      "after": {
+        "minX": 22,
+        "minY": 53,
+        "maxX": 139,
+        "maxY": 143,
+        "width": 118,
+        "height": 91,
+        "count": 5350
+      },
+      "visibleBefore": 5350,
+      "visibleAfter": 5350
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 24,
+        "minY": 93,
+        "maxX": 135,
+        "maxY": 139,
+        "width": 112,
+        "height": 47,
+        "count": 3431
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -10
+      ],
+      "originalOffset": [
+        -8,
+        -12
+      ],
+      "after": {
+        "minX": 19,
+        "minY": 93,
+        "maxX": 141,
+        "maxY": 143,
+        "width": 123,
+        "height": 51,
+        "count": 4121
+      },
+      "visibleBefore": 4121,
+      "visibleAfter": 4121
+    },
+    {
+      "frame": 6,
+      "before": {
+        "minX": 25,
+        "minY": 101,
+        "maxX": 135,
+        "maxY": 139,
+        "width": 111,
+        "height": 39,
+        "count": 2843
+      },
+      "resize": [
+        176,
+        176
+      ],
+      "offset": [
+        -8,
+        -10
+      ],
+      "originalOffset": [
+        -8,
+        -12
+      ],
+      "after": {
+        "minX": 20,
+        "minY": 102,
+        "maxX": 141,
+        "maxY": 143,
+        "width": 122,
+        "height": 42,
+        "count": 3411
+      },
+      "visibleBefore": 3411,
+      "visibleAfter": 3411
+    }
+  ]
+}
