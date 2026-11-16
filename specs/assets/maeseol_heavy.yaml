@@ -1,0 +1,25 @@
+id: maeseol_heavy
+type: character-anim
+character: maeseol
+summary: '「결」 매설(진하운 옷장 「화산의 매설」) heavy — 진하운 haun_sword_heavy와 같은 동작·프레임·events, 사람만 매설(2026-11-16)'
+depends_on:
+- maeseol_ref
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 6
+fps: 10
+events:
+  hit: 4
+bbox_tolerance: 0.35
+# 진하운 동작(haun_sword_heavy)을 매설로 — 매설은 칼집 없이 매화 술 달린 직검(jian)을 든다
+frame_notes:
+  1: 'draws the jian far back behind the right shoulder with BOTH hands, body twisting away, weight sinking onto the back foot, eyes on the target'
+  2: 'sword raised high beside the head (not far above it) in both hands, knees bent deep, a faint golden glow gathering along the blade, hair lifting'
+  3: 'a long lunging step forward, the blade starting to fall, body leaning in, the golden glow bright'
+  4: 'THE HIT: a heavy two-handed downward cut to the right, the blade ends low in front, a thick golden-white arc trailing the edge, small dust kicked up at the front foot'
+  5: 'deep follow-through, body low and forward, jian point near the ground, the golden arc fading'
+  6: 'straightening back into the ready stance, jian lowered'
+placeholder:
+  shape: humanoid
+  color: '#8a90a3'
+  accent: '#ffd27a'

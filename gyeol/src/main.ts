@@ -5,7 +5,7 @@ import { initAudio, setVolumes, sfx } from '../../src/render/audio';
 import { frameUrl } from '../../src/render/assets';
 import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
-import { clearedAnywhere, outfitPrefix } from './progress';
+import { clearedAnywhere, outfitPrefix, setTrainingLevel, wornOutfit } from './progress';
 import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
@@ -15,7 +15,7 @@ import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntens
 import { emptyStats, loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
-import { duelXp, gainXp } from './training';
+import { currentTraining, duelXp, gainXp } from './training';
 import { openSettings } from './settings';
 import { openSlots, renderSlots, renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setSlotsOpener, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
@@ -92,6 +92,8 @@ const nav: Nav = {
     openSettings(applySettings);
   },
 };
+// 수련 Lv.(옷 「화산의 매설」 조건)
+setTrainingLevel(() => currentTraining().level);
 // 메인의 새로 시작·불러오기 → 저장 3칸 창(2026-11-16)
 setSlotsOpener((m, onClose) => openSlots(app, nav, data, m, onClose));
 
@@ -148,7 +150,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 잔상 막대(2026-11-11): 깎인 만큼 밝은 띠가 잠깐 남았다가 따라 줄어든다
   const foeHpLag = el('i', { class: 'lag' }), myHpLag = el('i', { class: 'lag' });
   const myHpNum = el('span', { class: 'hp-num' }), foeHpNum = el('span', { class: 'hp-num' });
-  const face = (char ? realArt(char.stand) ?? (char.fallbackStand ? frameUrl(char.fallbackStand, 1) : null) : null) ?? frameUrl('haun_sword_stand', 1);
+  // 인물을 통째로 바꾸는 옷(화산의 매설): 대결 얼굴·기술 컷인도 그 옷의 반신 그림
+  const worn = wornOutfit(loadSave(), charId);
+  const wornStand = worn?.stand ? realArt(worn.stand) : null;
+  const face = wornStand ?? (char ? realArt(char.stand) ?? (char.fallbackStand ? frameUrl(char.fallbackStand, 1) : null) : null) ?? frameUrl('haun_sword_stand', 1);
   const streakEl = el('div', { class: 'streak' });
   const phasePips = el('span', { class: 'phase-pips' });
   const gimmickEl = el('span', { class: 'gimmicks' });
@@ -171,11 +176,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       : el(
           'div',
           { class: 'me-bar' },
-          el('div', { class: 'me-face', style: faceStyle(char, face, realArt(faceId(char?.id ?? HAUN))) }, face ? '' : el('b', {}, '하운')),
+          el('div', { class: 'me-face', style: faceStyle(char, face, wornStand ? null : realArt(faceId(char?.id ?? HAUN))) }, face ? '' : el('b', {}, '하운')),
           el(
             'div',
             { class: 'me-body' },
-            el('div', { class: 'me-name' }, el('b', {}, pdata.player.name), myHpNum),
+            el('div', { class: 'me-name' }, el('b', {}, worn?.sprite ? (worn.wearer ?? pdata.player.name) : pdata.player.name), myHpNum),
             el('div', { class: 'bar hp' }, myHpLag, myHp, el('span', { class: 'gloss' })),
             el('div', { class: 'bar-row' }, el('em', {}, '체간'), el('div', { class: 'bar posture' }, myPosture, el('span', { class: 'gloss' }))),
             el('div', { class: 'bar-row' }, el('em', {}, '집중'), el('div', { class: 'bar focus' }, myFocus, el('span', { class: 'gloss' }))),
@@ -232,7 +237,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 인물별 반격 이펙트(Codex fx_gyeol_counter_<인물>, 2026-11-14)도 같이 부른다
   const counterFx = char?.counterFx;
   if (counterFx) skillFx.push(counterFx.sprite);
-  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId));
+  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId), !!worn?.sprite);
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
   setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : battleTrack(foeDef), rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
@@ -703,8 +708,9 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           hitstopUntil = now + 700;
           fx.tech = { id: t.id, born: now, slot: t.slot, area: t.area };
           // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 그 인물의 반신 그림(결의)
-          const cg = frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
-          const stand = cg ? null : frameUrl(char && char.id !== HAUN ? char.stand : 'haun_sword_stand', 2);
+          // 인물을 바꾸는 옷이면 진하운이 그려진 기술 일러스트 대신 그 옷의 반신 그림
+          const cg = wornStand ? null : frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
+          const stand = cg ? null : worn?.stand && wornStand ? frameUrl(worn.stand, 2) : frameUrl(char && char.id !== HAUN ? char.stand : 'haun_sword_stand', 2);
           cutin.className = `cutin tech-${t.id}${cg ? ' has-cg' : ''}`;
           cutin.replaceChildren(
             cg ? el('img', { class: 'cg', src: cg, alt: '' }) : stand ? el('img', { src: stand, alt: '' }) : '',

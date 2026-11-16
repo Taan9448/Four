@@ -1,5 +1,5 @@
 {
-  "$comment": "「결」 5단계(2026-11-11): 하운 옷(「천외귀환」 하운 옷 그림 skin_<id>_haun_idle·attack·hit을 입힌다 — 받기·피하기·기술·겨루기·쓰러짐은 기본 옷 그림)과 업적. unlock·cond 종류: cleared(장 id) · stars(별 합) · stat(save.stats 칸 ≥ n) · duelBest(난이도 id의 등급 rank가 하나라도) · rhythm(박자 도전 rank 이상 — all이면 모든 악보) · flagNot(장을 마쳤고 flag가 없다)",
+  "$comment": "「결」 5단계(2026-11-11): 하운 옷(「천외귀환」 하운 옷 그림 skin_<id>_haun_idle·attack·hit을 입힌다 — 받기·피하기·기술·겨루기·쓰러짐은 기본 옷 그림)과 업적. unlock·cond 종류: cleared(장 id) · stars(별 합) · stat(save.stats 칸 ≥ n) · duelBest(난이도 id의 등급 rank가 하나라도) · rhythm(박자 도전 rank 이상 — all이면 모든 악보) · flagNot(장을 마쳤고 flag가 없다) · training(수련 Lv. — 「천외귀환」과 같이 쓰는 수련 레벨, 2026-11-16) · outfits[].sprite·stand: 옷 그림 대신 인물 그림을 통째로 바꾸는 옷(화산의 매설 — 매설 그림에 없는 동작은 진하운 그림을 섞지 않고 대체 연출)",
   "outfits": [
     {
       "id": "base",
@@ -118,6 +118,21 @@
       "chars": [
         "elia"
       ]
+    },
+    {
+      "id": "maeseol",
+      "name": "화산의 매설",
+      "text": "진하운 대신 화산파 여검수 매설이 검을 든다 — 대결 그림과 기술 컷인·대결 얼굴이 매설로. 이야기 장면은 그대로 진하운.",
+      "unlock": {
+        "kind": "training",
+        "level": 20
+      },
+      "chars": [
+        "haun"
+      ],
+      "sprite": "maeseol",
+      "stand": "maeseol_stand",
+      "wearer": "매설"
     }
   ],
   "achievements": [

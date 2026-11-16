@@ -30,9 +30,12 @@ const real = async (id: string): Promise<Anim> => {
 /** 옷(5단계, 2026-11-14 동료도): 옷 그림(대기·베기·피격)이 실제로 있으면 그것, 없으면 기본 옷 */
 const worn = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? loadSprite(`${base}_${kind}`)) : loadSprite(`${base}_${kind}`));
 /** 실제 그림만 쓰는 동작(받기·피하기·쓰러짐·기술·겨루기·강베기): 옷 그림이 오면 그것, 없으면 기본 옷 그림 */
-const wornReal = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? real(`${base}_${kind}`)) : real(`${base}_${kind}`));
+// replace(화산의 매설처럼 인물을 통째로 바꾸는 옷): 그 옷에 없는 동작은 원래 인물 그림을 섞지 않고 null(코드 대체 연출)
+let replaceOutfit = false;
+const wornReal = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? (replaceOutfit ? null : real(`${base}_${kind}`))) : real(`${base}_${kind}`));
 
-export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null): Promise<Sprites> {
+export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null, replace = false): Promise<Sprites> {
+  replaceOutfit = replace;
   const ids = {
     pi: worn(outfit, playerPrefix, 'idle'),
     pa: worn(outfit, playerPrefix, 'attack'),
