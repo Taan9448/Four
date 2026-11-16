@@ -17,8 +17,8 @@ import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
 import { duelXp, gainXp } from './training';
 import { openSettings } from './settings';
-import { renderSlots, renderStory, story } from './story';
-import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
+import { openSlots, renderSlots, renderStory, story } from './story';
+import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setSlotsOpener, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
 import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites, type TechRow } from './render';
 import './style.css';
@@ -92,6 +92,8 @@ const nav: Nav = {
     openSettings(applySettings);
   },
 };
+// 메인의 새로 시작·불러오기 → 저장 3칸 창(2026-11-16)
+setSlotsOpener((m, onClose) => openSlots(app, nav, data, m, onClose));
 
 /** 기술 계기 값(HUD 구슬 열) */
 function techGauge(d: Duel): Fx['chain'] {
