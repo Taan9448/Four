@@ -1,0 +1,92 @@
+{
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "cellSize": [
+    512,
+    512
+  ],
+  "contentRule": "luminance > 24, same as pipeline black-background content detection",
+  "allowed": [
+    52,
+    52,
+    460,
+    460
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        159,
+        178,
+        387,
+        380
+      ],
+      "count": 4288,
+      "outside": 0,
+      "contained": true
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        167,
+        194,
+        344,
+        350
+      ],
+      "count": 1697,
+      "outside": 0,
+      "contained": true
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        165,
+        216,
+        328,
+        345
+      ],
+      "count": 1679,
+      "outside": 0,
+      "contained": true
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        183,
+        183,
+        369,
+        304
+      ],
+      "count": 1883,
+      "outside": 0,
+      "contained": true
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        167,
+        190,
+        351,
+        312
+      ],
+      "count": 1979,
+      "outside": 0,
+      "contained": true
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        170,
+        183,
+        321,
+        294
+      ],
+      "count": 1684,
+      "outside": 0,
+      "contained": true
+    }
+  ],
+  "allContained": true
+}
