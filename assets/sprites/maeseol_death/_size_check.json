@@ -1,0 +1,83 @@
+{
+  "calibrationFrame": 1,
+  "timingIdentical": true,
+  "idleHeight": 115,
+  "idleBottom": 143,
+  "baselineExclusive": 144,
+  "targetFirstBodyHeight": 115,
+  "actualFirstBodyHeight": 115,
+  "uniformScale": [
+    182,
+    182
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        32,
+        29,
+        118,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        34,
+        36,
+        119,
+        144
+      ],
+      "height": 108,
+      "bottom": 143
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        32,
+        56,
+        112,
+        144
+      ],
+      "height": 88,
+      "bottom": 143
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        32,
+        71,
+        125,
+        144
+      ],
+      "height": 73,
+      "bottom": 143
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        22,
+        101,
+        131,
+        144
+      ],
+      "height": 43,
+      "bottom": 143
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        24,
+        104,
+        137,
+        144
+      ],
+      "height": 40,
+      "bottom": 143
+    }
+  ],
+  "note": "Standing size is calibrated to maeseol_idle; crouched poses and collapse naturally become lower. Source unpainted/unresized. One common nearest-neighbor export scale and integer placement, no clipping.",
+  "sizeAndGroundPass": true
+}
