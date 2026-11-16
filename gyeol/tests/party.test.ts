@@ -146,3 +146,16 @@ describe('인물 고르기', () => {
     expect(s.charStats.elia.wins).toBe(3);
   });
 });
+
+describe('카일 붉은 검(2026-11-16)', () => {
+  it('3장을 마치고 붉은 검 그림이 모두 있을 때만 kyle_red', async () => {
+    const { spriteFor, characterOf } = await import('../src/party');
+    const kyle = characterOf(real, 'kyle')!;
+    const all = () => true;
+    expect(spriteFor(kyle, (ch) => ch === 'ch3', all)).toBe('kyle_red');
+    expect(spriteFor(kyle, () => false, all)).toBe('kyle');
+    // 한 동작이라도 없으면 섞이지 않게 은빛 그대로
+    expect(spriteFor(kyle, () => true, (id) => id !== 'kyle_red_death')).toBe('kyle');
+    expect(spriteFor(characterOf(real, 'elia')!, () => true, all)).toBe('elia');
+  });
+});
