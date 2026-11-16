@@ -1,0 +1,60 @@
+{
+  "note": "Bounding box includes held sword and effects; crouched/fallen pose is naturally lower. Foot rows are visually verified separately when effects extend below feet.",
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        42,
+        42,
+        107,
+        144
+      ],
+      "silhouetteHeight": 102,
+      "bottom": 143
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        36,
+        52,
+        115,
+        144
+      ],
+      "silhouetteHeight": 92,
+      "bottom": 143
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        19,
+        41,
+        140,
+        143
+      ],
+      "silhouetteHeight": 102,
+      "bottom": 142
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        43,
+        53,
+        121,
+        144
+      ],
+      "silhouetteHeight": 91,
+      "bottom": 143
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        41,
+        43,
+        106,
+        144
+      ],
+      "silhouetteHeight": 101,
+      "bottom": 143
+    }
+  ]
+}
