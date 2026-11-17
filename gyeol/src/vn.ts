@@ -24,7 +24,7 @@ export interface SceneLine {
   /** 운곡루의 지금(회상 밖) — 뒤뜰 그림 위에서 */
   now?: boolean;
   /** rule: 대결 규칙 쪽지 · lead: 동료의 장 쪽지(누구로 싸우는지, 화자 = 그 인물) */
-  kind?: 'rule' | 'lead';
+  kind?: 'rule' | 'lead' | 'theme';
 }
 
 export interface Speaker {
@@ -152,9 +152,11 @@ export function playScene(host: HTMLElement, lines: SceneLine[], speakers: Recor
         if (artId) rememberArt(artId);
       }
       const lead = line.kind === 'lead';
-      const rule = line.kind === 'rule' || lead;
+      const theme = line.kind === 'theme';
+      const rule = line.kind === 'rule' || lead || theme;
       const sp = (!rule || lead) && line.speaker ? speakers[line.speaker] : undefined;
-      name.textContent = lead ? `이번 장 — ${sp?.name ?? ''}` : rule ? '이번 대결' : (sp?.name ?? '');
+      // theme(2026-11-17): 이 장의 대표 규칙 쪽지 — 이름 칸에 「이 장의 결 — 불」
+      name.textContent = lead ? `이번 장 — ${sp?.name ?? ''}` : theme ? `이 장의 결 — ${line.speaker ?? ''}` : rule ? '이번 대결' : (sp?.name ?? '');
       box.classList.toggle('narration', !sp && !rule);
       box.classList.toggle('rule', rule);
       box.classList.toggle('lead', lead);

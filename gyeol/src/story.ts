@@ -62,6 +62,8 @@ export interface Chapter {
    * why는 왜 이 인물인지, how는 이 인물로 싸울 때 알아 둘 것 — 지도 카드와 장 시작 전 쪽지에 보인다.
    */
   lead?: { character: string; why: string; how: string[] };
+  /** 이 장의 대표 규칙(2026-11-17 — 장마다 깊게 쓰는 결 하나) */
+  theme?: { name: string; rule: string };
   /** 이야기 지도에서의 자리(journey_band 그림 기준 %)와 땅 이름 */
   map?: { x: number; y: number; place: string };
 }
@@ -186,6 +188,7 @@ export function renderStory(app: HTMLElement, nav: Nav, data: DuelData): void {
         el('p', { class: 'sc-place' }, ch.map?.place ?? ''),
         el('h2', {}, `${ch.title} · ${ch.subtitle}`),
         el('p', { class: 'sc-recall' }, open ? ch.recall : '앞 장을 마치면 열린다.'),
+        open && ch.theme ? el('p', { class: 'sc-theme' }, el('b', {}, `이 장의 결 · ${ch.theme.name}`), ' ', withKeys(ch.theme.rule)) : '',
         el(
           'p',
           { class: 'sc-meta' },
@@ -411,7 +414,10 @@ export async function runChapter(app: HTMLElement, nav: Nav, data: DuelData, ch:
   curtain(true);
   // 동료의 장이면 장면 맨 앞에 '이번 장' 쪽지(누구로 싸우는지·왜·알아 둘 것)
   const lead = leadLine(data, ch);
-  pick(await playScene(document.body, lead ? [lead, ...ch.intro] : ch.intro, story.speakers, ch.bg, label));
+  // 이 장의 결(대표 규칙) 쪽지를 맨 앞에 — 동료의 장이면 그 쪽지 다음에
+  const theme: SceneLine | null = ch.theme ? { kind: 'theme', speaker: ch.theme.name, now: true, text: withKeys(ch.theme.rule) } : null;
+  const head = [lead, theme].filter((x): x is SceneLine => !!x);
+  pick(await playScene(document.body, [...head, ...ch.intro], story.speakers, ch.bg, label));
   if (ch.tutorial) {
     const dummy = data.foes.find((f) => f.practice);
     if (!dummy) return;

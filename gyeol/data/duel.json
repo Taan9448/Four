@@ -800,7 +800,8 @@
           "windup": 900,
           "recover": 420,
           "damage": 22,
-          "posture": 26
+          "posture": 26,
+          "element": "fire"
         },
         "drag_feint": {
           "name": "끄는 척",
@@ -1061,8 +1062,8 @@
       ],
       "starter": true,
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.16,
+        "damageMul": 1.06,
         "patterns": [
           {
             "weight": 3,
@@ -1304,7 +1305,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 106,
+            "hp": 45,
             "speed": 0.765,
             "roar": 1500,
             "patterns": [
@@ -3002,8 +3003,8 @@
       ],
       "starter": true,
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -3334,7 +3335,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 123,
+            "hp": 40,
             "speed": 0.663,
             "roar": 1500,
             "patterns": [
@@ -4791,8 +4792,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.16,
+        "damageMul": 1.06,
         "patterns": [
           {
             "weight": 3,
@@ -5150,7 +5151,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 101,
+            "hp": 43,
             "speed": 0.697,
             "roar": 1500,
             "patterns": [
@@ -5301,14 +5302,16 @@
           "windup": 380,
           "recover": 300,
           "damage": 8,
-          "posture": 8
+          "posture": 8,
+          "element": "fire"
         },
         "wings": {
           "name": "날개 치기",
           "windup": 300,
           "recover": 200,
           "damage": 6,
-          "posture": 5
+          "posture": 5,
+          "element": "fire"
         },
         "ember": {
           "name": "불티 뿌리기",
@@ -6742,6 +6745,9 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "armor": 0.6
       }
     },
     {
@@ -7255,6 +7261,9 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "armor": 0.55
       }
     },
     {
@@ -7625,8 +7634,8 @@
         ]
       },
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -7641,26 +7650,6 @@
               {
                 "move": "fist",
                 "after": 160
-              }
-            ]
-          },
-          {
-            "weight": 1,
-            "steps": [
-              {
-                "move": "pebble"
-              },
-              {
-                "move": "pebble",
-                "after": 110
-              },
-              {
-                "move": "pebble",
-                "after": 110
-              },
-              {
-                "move": "pebble",
-                "after": 110
               }
             ]
           },
@@ -7729,7 +7718,7 @@
           {
             "name": "산이 메운다",
             "line": "산은 무너지지 않는다.",
-            "hp": 224,
+            "hp": 160,
             "speed": 0.92,
             "roar": 1700,
             "gimmicks": {
@@ -7750,26 +7739,6 @@
                   {
                     "move": "fist",
                     "after": 150
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "pebble"
-                  },
-                  {
-                    "move": "pebble",
-                    "after": 110
-                  },
-                  {
-                    "move": "pebble",
-                    "after": 110
-                  },
-                  {
-                    "move": "pebble",
-                    "after": 110
                   }
                 ]
               },
@@ -7838,7 +7807,7 @@
           {
             "name": "산이 떨어진다",
             "line": "…산이, 떨어진다.",
-            "hp": 168,
+            "hp": 120,
             "speed": 0.8,
             "damageMul": 1.15,
             "postureRegen": 20,
@@ -7960,8 +7929,8 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 134,
-            "speed": 0.68,
+            "hp": 40,
+            "speed": 0.76,
             "roar": 1500,
             "patterns": [
               {
@@ -8071,6 +8040,9 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "armor": 0.5
       }
     },
     {
@@ -8350,14 +8322,16 @@
           "windup": 700,
           "recover": 380,
           "damage": 20,
-          "posture": 20
+          "posture": 20,
+          "element": "lightning"
         },
         "horn": {
           "name": "뿔 들이받기",
           "windup": 900,
           "recover": 480,
           "damage": 24,
-          "posture": 26
+          "posture": 26,
+          "element": "lightning"
         },
         "feint": {
           "name": "날개 펼치는 척",
@@ -8678,8 +8652,8 @@
         ]
       },
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -8782,7 +8756,7 @@
           {
             "name": "모은 것을 터뜨린다",
             "line": "내가 모은 것을…….",
-            "hp": 224,
+            "hp": 184,
             "speed": 0.85,
             "damageMul": 1.1,
             "roar": 1600,
@@ -8891,7 +8865,7 @@
           {
             "name": "문을 연다",
             "line": "네가 연 것은…… 네가 닫아야 한다.",
-            "hp": 182,
+            "hp": 150,
             "speed": 0.78,
             "damageMul": 1.15,
             "roar": 1700,
@@ -9026,8 +9000,8 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 146,
-            "speed": 0.663,
+            "hp": 40,
+            "speed": 0.741,
             "roar": 1500,
             "patterns": [
               {
@@ -9401,6 +9375,12 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "accelerate": {
+          "step": 0.97,
+          "min": 0.85
+        }
       }
     },
     {
@@ -9602,8 +9582,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.24,
+        "damageMul": 1.14,
         "patterns": [
           {
             "weight": 3,
@@ -9843,7 +9823,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 129,
+            "hp": 73,
             "speed": 0.765,
             "roar": 1500,
             "patterns": [
@@ -10704,6 +10684,12 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "accelerate": {
+          "step": 0.98,
+          "min": 0.86
+        }
       }
     },
     {
@@ -11747,8 +11733,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.32,
+        "damageMul": 1.22,
         "patterns": [
           {
             "weight": 3,
@@ -12097,7 +12083,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 123,
+            "hp": 92,
             "speed": 0.68,
             "roar": 1500,
             "patterns": [
@@ -12248,7 +12234,8 @@
           "windup": 660,
           "recover": 380,
           "damage": 16,
-          "posture": 16
+          "posture": 16,
+          "clash": true
         },
         "quick": {
           "name": "빠른 장",
@@ -13830,8 +13817,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -13846,26 +13833,6 @@
               {
                 "move": "stomp",
                 "after": 160
-              }
-            ]
-          },
-          {
-            "weight": 1,
-            "steps": [
-              {
-                "move": "palm"
-              },
-              {
-                "move": "palm",
-                "after": 110
-              },
-              {
-                "move": "palm",
-                "after": 110
-              },
-              {
-                "move": "palm",
-                "after": 110
               }
             ]
           },
@@ -13934,7 +13901,7 @@
           {
             "name": "위의 틈에서 힘이 내려온다",
             "line": "더. 조금만 더.",
-            "hp": 252,
+            "hp": 207,
             "speed": 0.84,
             "damageMul": 1.12,
             "roar": 1600,
@@ -13955,26 +13922,6 @@
                   {
                     "move": "stomp",
                     "after": 150
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "palm"
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
                   }
                 ]
               },
@@ -14043,7 +13990,7 @@
           {
             "name": "붉은 해일",
             "line": "받아 봐라. 이 산 전체를.",
-            "hp": 196,
+            "hp": 161,
             "speed": 0.78,
             "damageMul": 1.2,
             "roar": 1700,
@@ -14078,26 +14025,6 @@
                   {
                     "move": "stomp",
                     "after": 150
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "palm"
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
                   }
                 ]
               },
@@ -14182,8 +14109,8 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 157,
-            "speed": 0.663,
+            "hp": 40,
+            "speed": 0.741,
             "roar": 1500,
             "patterns": [
               {
@@ -14199,30 +14126,6 @@
                   {
                     "move": "stomp",
                     "after": 130
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "palm"
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
-                  },
-                  {
-                    "move": "palm",
-                    "after": 110
                   }
                 ]
               },
@@ -14481,8 +14384,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -14585,7 +14488,7 @@
           {
             "name": "뼈가 다시 맞물린다",
             "line": "(흩어진 뼈가 다시 맞물린다)",
-            "hp": 224,
+            "hp": 184,
             "speed": 0.92,
             "roar": 1600,
             "gimmicks": {
@@ -14693,8 +14596,8 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 179,
-            "speed": 0.782,
+            "hp": 40,
+            "speed": 0.874,
             "roar": 1500,
             "patterns": [
               {
@@ -14922,8 +14825,8 @@
         ]
       },
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.7,
+        "damageMul": 1.8,
         "patterns": [
           {
             "weight": 3,
@@ -17313,8 +17216,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.5,
+        "damageMul": 1.5,
         "patterns": [
           {
             "weight": 3,
@@ -20351,8 +20254,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -20551,7 +20454,7 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 146,
+            "hp": 46,
             "speed": 0.765,
             "roar": 1500,
             "patterns": [
@@ -20958,6 +20861,9 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "regen": 3
       }
     },
     {
@@ -21247,6 +21153,12 @@
             ]
           }
         ]
+      },
+      "gimmicks": {
+        "accelerate": {
+          "step": 0.97,
+          "min": 0.85
+        }
       }
     },
     {
@@ -22862,7 +22774,8 @@
           "windup": 640,
           "recover": 380,
           "damage": 16,
-          "posture": 17
+          "posture": 17,
+          "clash": true
         },
         "seep": {
           "name": "스미는 장",
@@ -23350,7 +23263,8 @@
           "windup": 720,
           "recover": 420,
           "damage": 17,
-          "posture": 19
+          "posture": 19,
+          "clash": true
         },
         "turn": {
           "name": "진법 돌기",
@@ -23665,7 +23579,8 @@
           "windup": 520,
           "recover": 320,
           "damage": 15,
-          "posture": 16
+          "posture": 16,
+          "clash": true
         },
         "feint": {
           "name": "칼집 소리",
@@ -24049,8 +23964,8 @@
         "armor": 0.5
       },
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.5,
+        "damageMul": 1.5,
         "patterns": [
           {
             "weight": 3,
@@ -24521,8 +24436,8 @@
         }
       ],
       "hard": {
-        "hpMul": 1.4,
-        "damageMul": 1.3,
+        "hpMul": 1.15,
+        "damageMul": 1.0,
         "patterns": [
           {
             "weight": 3,
@@ -24541,26 +24456,6 @@
               {
                 "move": "cut",
                 "after": 128
-              }
-            ]
-          },
-          {
-            "weight": 1,
-            "steps": [
-              {
-                "move": "cut"
-              },
-              {
-                "move": "cut",
-                "after": 110
-              },
-              {
-                "move": "cut",
-                "after": 110
-              },
-              {
-                "move": "cut",
-                "after": 110
               }
             ]
           },
@@ -24609,7 +24504,7 @@
           {
             "name": "피가 결을 덮는다",
             "line": "피가 결을 덮는다. 보이시오?",
-            "hp": 210,
+            "hp": 172,
             "speed": 0.88,
             "damageMul": 1.1,
             "roar": 1600,
@@ -24645,26 +24540,6 @@
                   {
                     "move": "cut",
                     "after": 120
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "cut"
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
                   }
                 ]
               },
@@ -24721,7 +24596,7 @@
           {
             "name": "두 세계의 흐름",
             "line": "두 세계를 담고도 사는가. 보여 주시오.",
-            "hp": 182,
+            "hp": 150,
             "speed": 0.8,
             "damageMul": 1.2,
             "roar": 1700,
@@ -24743,26 +24618,6 @@
                   {
                     "move": "cut",
                     "after": 120
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "cut"
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
                   }
                 ]
               },
@@ -24829,8 +24684,8 @@
           {
             "name": "끝나지 않은 결",
             "line": "…아직이다. 아직 끝나지 않았다.",
-            "hp": 146,
-            "speed": 0.68,
+            "hp": 40,
+            "speed": 0.76,
             "roar": 1500,
             "patterns": [
               {
@@ -24850,30 +24705,6 @@
                   {
                     "move": "cut",
                     "after": 112
-                  }
-                ]
-              },
-              {
-                "weight": 1,
-                "steps": [
-                  {
-                    "move": "cut"
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
-                  },
-                  {
-                    "move": "cut",
-                    "after": 110
                   }
                 ]
               },
@@ -25268,7 +25099,7 @@
       "hanja": "靑雲出手",
       "chain": 7,
       "min": "excellent",
-      "damage": 0.14,
+      "damage": 0.24,
       "posture": 0.5,
       "returnMul": 0,
       "line": "청운십팔식 제일식. 찌르지 않고 피어오른다.",
@@ -25294,7 +25125,7 @@
       "hanja": "天外歸雲",
       "chain": 12,
       "min": "excellent",
-      "damage": 0.24,
+      "damage": 0.26,
       "posture": 1.0,
       "returnMul": 1.0,
       "line": "운하검 최종식, 천외귀운.",
@@ -25337,7 +25168,7 @@
       "cond": "defend",
       "chain": 11,
       "min": "excellent",
-      "damage": 0.1,
+      "damage": 0.25,
       "posture": 0.6,
       "returnMul": 0,
       "line": "벽이 무너지지 않는 한, 아무도 죽지 않아.",
@@ -25366,7 +25197,7 @@
       "cond": "defend",
       "chain": 16,
       "min": "excellent",
-      "damage": 0.12,
+      "damage": 0.28,
       "posture": 0.7,
       "returnMul": 0.5,
       "line": "잘못된 명령엔 칼을 들지 않는다. 지킬 사람 앞에서만.",
@@ -25411,7 +25242,7 @@
       "cond": "perfect",
       "chain": 7,
       "min": "excellent",
-      "damage": 0.12,
+      "damage": 0.18,
       "posture": 0.6,
       "returnMul": 0,
       "line": "피어나요, 서리꽃.",
@@ -25441,7 +25272,7 @@
       "cond": "perfect",
       "chain": 11,
       "min": "excellent",
-      "damage": 0.2,
+      "damage": 0.24,
       "posture": 0.8,
       "returnMul": 0.3,
       "line": "흐르는 걸 보고 있었어요. 이제 돌려줄게요.",
@@ -25485,7 +25316,7 @@
       "cond": "posture",
       "chain": 150,
       "min": "excellent",
-      "damage": 0.18,
+      "damage": 0.27,
       "posture": 0.4,
       "returnMul": 0,
       "line": "두린의 동생, 보른. 카즈둠을 돌려받으러 왔다.",
@@ -25499,7 +25330,7 @@
       "cond": "posture",
       "chain": 190,
       "min": "excellent",
-      "damage": 0.16,
+      "damage": 0.28,
       "posture": 0.9,
       "returnMul": 0,
       "line": "산은 정면으로 안 무너진다.",
@@ -25514,7 +25345,7 @@
       "cond": "posture",
       "chain": 230,
       "min": "excellent",
-      "damage": 0.12,
+      "damage": 0.3,
       "posture": 1.0,
       "returnMul": 0.6,
       "line": "오천의 망치가 같이 내려친다.",

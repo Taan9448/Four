@@ -346,3 +346,19 @@ export function musicalHit(kind: 'parry' | 'perfect' | 'miss' | 'deathblow' | 's
 
 /** 시험용 */
 export const musicState = () => ({ id: playing?.id ?? wanted?.id ?? null, intensity, unlocked });
+
+/** 지금 곡의 빠르기(곡이 없으면 null) */
+export const musicBpm = (): number | null => playing?.track.bpm ?? null;
+
+/**
+ * 곡을 대결 시계에 맞춘다(2026-11-17 — 공격을 음악 박자에 묶기): 대결 시계의 다음 박이 msToBeat 뒤에 오면,
+ * 아직 짜지 않은 다음 마디의 시작을 그 박 격자에 맞춰 옮긴다(반 박 안쪽으로만 — 멈칫·느린 화면으로 어긋난 만큼 되돌린다)
+ */
+export function alignMusicBeat(msToBeat: number, bpm: number): void {
+  if (!ctx || !playing || Math.abs(playing.track.bpm - bpm) > 0.5) return;
+  const beat = 60 / playing.track.bpm;
+  const target = ctx.currentTime + msToBeat / 1000;
+  const want = target + Math.round((playing.barStart - target) / beat) * beat;
+  const delta = want - playing.barStart;
+  if (Math.abs(delta) > 0.012 && want > ctx.currentTime + 0.05) playing.barStart = want;
+}

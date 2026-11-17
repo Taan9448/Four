@@ -1,6 +1,6 @@
 // 고를 수 있는 인물(2026-11-11 사용자 요청 — "동료와 합류하면 인물을 골라 스테이지에 들어간다. 인물마다 특성, 기록은 따로").
 // 인물 정의는 duel.json characters(진하운 기준 값을 덮어쓰는 player·rules). 판정 엔진(duel.ts)은 그대로 — 덮어쓴 데이터로 대결을 만든다.
-import type { DuelData, Lines, PlayerDef } from './duel';
+import type { DuelData, Lines, PlayerDef, TechDef } from './duel';
 import type { SceneLine } from './vn';
 
 export interface CharacterDef {
@@ -126,4 +126,15 @@ export function chapterCharacter(data: DuelData, ch: ChapterCast, save: { charac
 export function leadLine(data: DuelData, ch: ChapterCast): SceneLine | null {
   if (!ch.lead || !characterOf(data, ch.lead.character)) return null;
   return { kind: 'lead', speaker: ch.lead.character, now: true, text: `${ch.lead.why}\n${ch.lead.how.map((x) => `· ${x}`).join('\n')}` };
+}
+
+/**
+ * 기술의 쓸모를 한 줄로(2026-11-17 — 높은 자리가 무엇을 더 주는지 보이게): 「피해 24% · 체간 무너뜨림 · 받은 힘 되돌림 · 광역」
+ */
+export function techRole(t: Pick<TechDef, 'damage' | 'posture' | 'returnMul' | 'heal' | 'area'>): string {
+  const parts = [`피해 ${Math.round(t.damage * 100)}%`, t.posture >= 1 ? '체간 무너뜨림' : `체간 ${Math.round(t.posture * 100)}%`];
+  if (t.returnMul > 0) parts.push('받은 힘 되돌림');
+  if (t.heal) parts.push(`회복 ${Math.round(t.heal * 100)}%`);
+  if (t.area) parts.push('광역');
+  return parts.join(' · ');
 }

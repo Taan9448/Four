@@ -13,7 +13,7 @@ import { button, el, ELEMENT_NAME, elementsOf, INK_ICON, inkIcon, rankBadge, rea
 import type { Duel, DuelData, DuelOptions, FoeDef, Mode, TechDef } from './duel';
 import type { TutorialStep } from './story';
 import { calibrationOffset } from './calibrate';
-import { characterOf, characters, chosen, faceId, faceStyle, HAUN, joined, partyOpen, recordKey } from './party';
+import { characterOf, characters, chosen, faceId, faceStyle, HAUN, joined, partyOpen, recordKey, techRole } from './party';
 import { emptyStats, loadSave, useSlot, withKeys, writeSave, type SaveData } from './save';
 import { actionFor, keyNames } from './keys';
 
@@ -509,7 +509,7 @@ export function renderRecords(app: HTMLElement, nav: Nav, data: DuelData): void 
   });
   const techCard = (t: (typeof data.techs)[number]) => {
     const cg = realArt(`cg_gyeol_tech_${t.id}`);
-    return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', {}, t.name), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
+    return el('article', { class: `tech-card tech-${t.id}` }, cg ? el('img', { src: cg, alt: '' }) : '', el('div', {}, el('b', {}, el('span', { class: 'slot-no' }, String(t.slot ?? 1)), t.name), el('small', { class: 'role' }, techRole(t)), el('small', {}, techCondition(t)), el('small', { class: 'line' }, `"${t.line}"`)));
   };
   // 인물마다 기술 다섯(2026-11-14 셋 → 2026-11-15 다섯): 진하운 · 카일 · 엘리아 · 보른
   const techGroups = characters(data).flatMap((c) => {
