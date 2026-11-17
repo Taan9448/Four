@@ -45,6 +45,9 @@ export function openSettings(onChange: () => void): void {
   const flash = h('input', { type: 'checkbox', 'aria-label': '번쩍임 줄이기' });
   flash.checked = st.reduceFlash;
   flash.addEventListener('change', () => commit({ reduceFlash: flash.checked }));
+  const timing = h('input', { type: 'checkbox', id: 'set-timing' }) as HTMLInputElement;
+  timing.checked = st.showTiming;
+  timing.addEventListener('change', () => commit({ showTiming: timing.checked }));
   const quality = h('select', { 'aria-label': '화면 품질' }, ...QUALITY.map(([v, t]) => h('option', { value: v }, t)));
   quality.value = st.quality;
   quality.addEventListener('change', () => commit({ quality: quality.value as Quality }));
@@ -96,6 +99,7 @@ export function openSettings(onChange: () => void): void {
       slider('효과음', 'sfx'),
       slider('화면 흔들림', 'shake'),
       h('label', { class: 'row' }, h('span', {}, '번쩍임 줄이기'), flash, h('output', {}, '')),
+      h('label', { class: 'row' }, h('span', {}, '판정 오차 숫자'), timing, h('output', {}, '')),
       h('label', { class: 'row' }, h('span', {}, '판정 보정'), offset, offsetOut),
       h('p', { class: 'note' }, '받기가 늘 늦게 판정되면 +로 올린다(누른 시각을 그만큼 앞당긴다). 수련장에서 박자에 맞춰 재는 기능은 다음 단계에 들어간다.'),
       h('label', { class: 'row' }, h('span', {}, '화면 품질'), quality, h('output', {}, '')),

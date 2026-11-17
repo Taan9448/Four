@@ -586,3 +586,14 @@ body:has(.vn) .toasts { top: 78px; bottom: auto; }
 .slots-close { white-space: nowrap; flex: none; }
 .slots-modal-box .slot-new { flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: auto; min-height: 52px; padding: 8px 12px; }
 .slots-modal-box .slot-new small { display: block; max-width: none; font-size: 12px; line-height: 1.35; text-align: center; white-space: normal; opacity: 0.85; }
+
+/* ── 이 장의 결(2026-11-17) ── */
+.sc-theme { margin: 6px 0 0; font-size: 13px; line-height: 1.55; color: var(--paper-dim); max-width: 46ch; }
+.sc-theme b { color: var(--shu-hi, #e0674c); font-family: var(--font-title); font-weight: 400; margin-right: 4px; }
+/* 기술 쓸모 한 줄(2026-11-17) */
+.cutin .trole { font: 600 14px var(--font-body, system-ui); letter-spacing: 0.02em; color: #fbe7c4; text-shadow: 0 1px 3px #000; margin: 2px 0 4px; }
+.tech-card .role { color: var(--shu-hi, #e0674c); font-weight: 600; }
+.tech-card .slot-no { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-right: 6px; border-radius: 3px; background: var(--shu); color: #fbf3e4; font: 700 11px system-ui; vertical-align: 2px; }
+/* 결과 화면 조언(2026-11-17) */
+.result .res-tip { margin: 2px auto 0; max-width: 46ch; font-size: 14px; line-height: 1.5; color: var(--paper-dim); }
+.result .res-tip b { color: var(--paper); font-weight: 600; }

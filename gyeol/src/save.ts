@@ -14,6 +14,8 @@ export interface Settings {
   shake: number;
   /** 번쩍임 줄이기(광과민) */
   reduceFlash: boolean;
+  /** 받기마다 몇 ms 일찍 눌렀는지 숫자로(2026-11-17) */
+  showTiming: boolean;
   /** 판정 보정 ms: 늦게 누르는 버릇·화면 지연만큼 누른 시각을 앞당긴다(+면 앞당김) */
   inputOffset: number;
   quality: Quality;
@@ -87,7 +89,7 @@ export const emptyStats = (): Stats => ({ duels: 0, wins: 0, parries: 0, perfect
 export const KEY = 'gyeol.save';
 const OLD_RHYTHM_KEY = 'gyeol.rhythmBest';
 
-export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, inputOffset: 0, quality: 'auto', keys: defaultKeys() });
+export const defaultSettings = (): Settings => ({ master: 0.8, bgm: 0.55, sfx: 0.8, shake: 1, reduceFlash: false, showTiming: true, inputOffset: 0, quality: 'auto', keys: defaultKeys() });
 
 export const emptySave = (): SaveData => ({ v: 1, settings: defaultSettings(), rhythmBest: {}, story: { cleared: [], stars: {}, flags: [] }, slots: [{ story: { cleared: [], stars: {}, flags: [] }, difficulty: 'normal', updatedAt: 0 }, null, null], slot: 0, duelBest: {}, stats: emptyStats(), seen: [], tips: [], gallery: [], achievements: [], outfit: 'base', character: 'haun', charStats: {} });
 
@@ -119,6 +121,7 @@ export function normalize(raw: unknown): SaveData {
     sfx: clamp(st.sfx, 0, 1, d.sfx),
     shake: clamp(st.shake, 0, 1, d.shake),
     reduceFlash: typeof st.reduceFlash === 'boolean' ? st.reduceFlash : d.reduceFlash,
+    showTiming: typeof st.showTiming === 'boolean' ? st.showTiming : d.showTiming,
     inputOffset: Math.round(clamp(st.inputOffset, -120, 120, d.inputOffset)),
     quality: st.quality === 'high' || st.quality === 'normal' || st.quality === 'low' || st.quality === 'auto' ? st.quality : d.quality,
     keys: normalizeKeys(st.keys),

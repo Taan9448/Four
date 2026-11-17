@@ -10,8 +10,8 @@ import raw from '../data/duel.json';
 import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { actionFor, keyNames, keyText, type KeyAction } from './keys';
-import { characterOf, faceId, faceStyle, HAUN, recordKey, spriteFor, techsFor, withCharacter } from './party';
-import { battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
+import { characterOf, faceId, faceStyle, HAUN, recordKey, spriteFor, techRole, techsFor, withCharacter } from './party';
+import { alignMusicBeat, battleTrack, chartBpm, MUSIC, musicalHit, setCrisis, setDuck, setIntensity, setMusic, setMusicVolumes } from './music';
 import { emptyStats, loadSave, writeSave, type Quality } from './save';
 import { askWhich } from './account';
 import { bootCloud, trainingTarget } from './cloud';
@@ -139,7 +139,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const swapped = char ? spriteFor(char, (ch) => (opts.back === 'story' ? sv.story.cleared.includes(ch) : clearedAnywhere(sv, ch)), (id) => !!frameUrl(id, 1, { realOnly: true })) : null;
   const pdata = swapped && swapped !== pdata0.player.sprite ? { ...pdata0, player: { ...pdata0.player, sprite: swapped } } : pdata0;
   const techs = techsFor(data, charId, opts.duel?.techs);
-  const d = createDuel(pdata, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}), ...(techs !== undefined ? { techs } : {}) });
+  // 공격을 음악 박자에 묶는다(2026-11-17): 대결 곡의 한 박 — 박자 도전(악보)과 서장 튜토리얼은 빼고
+  const tuneId = mode === 'practice' ? 'practice' : battleTrack(foeDef);
+  const tuneBpm = (MUSIC.tracks as Record<string, { bpm: number }>)[tuneId]?.bpm;
+  const beat = mode !== 'rhythm' && !opts.tutorial && tuneBpm ? 60000 / tuneBpm : undefined;
+  const d = createDuel(pdata, foeDef.id, seed, mode, opts.difficulty ?? 'main', { ...(opts.duel ?? {}), ...(techs !== undefined ? { techs } : {}), ...(beat ? { beat } : {}) });
   const tutorial = opts.tutorial;
   const practice = mode === 'practice';
   const leave = () => (tutorial ? (stopLoop?.(), opts.onTutorialDone?.(true)) : nav.go(opts.back));
@@ -240,7 +244,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId), !!worn?.sprite);
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
-  setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : battleTrack(foeDef), rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
+  setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : tuneId, rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
   setDuck(false);
   // 대결 중 화면이 꺼지지 않게(지원하는 브라우저만)
   let wake: { release(): Promise<void> } | null = null;
@@ -425,6 +429,11 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   const bloomColor = (e?: Element) => (e === 'fire' ? 'rgba(255,170,80,ALPHA)' : e === 'ice' ? 'rgba(170,235,255,ALPHA)' : e === 'lightning' ? 'rgba(210,160,255,ALPHA)' : 'rgba(255,214,120,ALPHA)');
 
   // 수련장: 누른 시점(타격 몇 ms 전)을 화면 아래 막대에 찍는다
+  // 판정 오차 숫자(2026-11-17): 받기마다 몇 ms 일찍 눌렀는지 · 진 대결 끝에 가장 많이 맞은 공격
+  const showTiming = loadSave().settings.showTiming !== false;
+  const missBy = new Map<string, number>();
+  const leads: number[] = [];
+  const ms = (lead: number) => `${Math.round(lead)}ms`;
   const mark = (lead: number | null, kind: Judgement) => {
     if (!practice || !fx.practice) return;
     fx.practice.marks.push({ lead, kind, born: performance.now() });
@@ -564,7 +573,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           sfx(ev.element === 'lightning' ? 'lightning' : ev.element === 'ice' ? 'ice' : ev.element === 'fire' ? 'fire' : 'snap', { volume: 0.8 });
           fx.blooms.push({ x: CONTACT.x - 20, y: CONTACT.y, born: now, color: bloomColor(ev.element), big: ev.heavy });
           spark(CONTACT.x - 20, CONTACT.y, ev.heavy ? 30 : 20, elColor(ev.element).spark, ev.heavy ? 380 : 300);
-          judge(fx, WORD[ev.judgement], '결', now);
+          leads.push(ev.lead);
+          judge(fx, WORD[ev.judgement], showTiming ? (ev.judgement === 'perfect' ? `결 · ${ms(ev.lead)}` : `결 · ${ms(ev.lead)} 이름`) : '결', now);
           // 무거운 공격을 받아칠수록 세게 흔들리고 오래 멈칫한다
           const dmg = d.foeDef.moves[ev.move].damage;
           addShake(fx, now, 3 + dmg * 0.4, ev.heavy ? 260 : 170);
@@ -595,7 +605,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           mark(ev.lead, 'good');
           sfx('block', { volume: 0.7 });
           spark(CONTACT.x - 30, CONTACT.y, 10, elColor(ev.element).spark, 180);
-          judge(fx, 'GOOD', '막음', now);
+          leads.push(ev.lead);
+          judge(fx, 'GOOD', showTiming ? `막음 · ${ms(ev.lead)} 이름` : '막음', now);
           if (!rhythm) text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#cfd6e6', 22);
           addShake(fx, now, 3 + d.foeDef.moves[ev.move].damage * 0.25, 160);
           break;
@@ -624,7 +635,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           if (ev.heavy) hitstopUntil = now + 90;
           if (ev.heavy || ev.unblockable) gust(fx.weather, PLAYER_X, CONTACT.y, 300 + ev.damage * 10);
           skillBurst(ev.move, now, PLAYER_X + 10);
-          judge(fx, 'MISS', '놓침', now);
+          missBy.set(ev.move, (missBy.get(ev.move) ?? 0) + 1);
+          judge(fx, 'MISS', !showTiming || ev.unblockable ? '놓침' : ev.lead === null ? '놓침 · 늦음' : `놓침 · ${ms(ev.lead)} 이름`, now);
           if (!rhythm) text(PLAYER_X - 50, CONTACT.y - 10, `-${ev.damage}`, '#ff8a7a', ev.heavy ? 34 : 28);
           break;
         }
@@ -714,7 +726,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           cutin.className = `cutin tech-${t.id}${cg ? ' has-cg' : ''}`;
           cutin.replaceChildren(
             cg ? el('img', { class: 'cg', src: cg, alt: '' }) : stand ? el('img', { src: stand, alt: '' }) : '',
-            el('div', { class: 'cutin-text' }, el('div', { class: 'tname' }, t.name), el('div', { class: 'tline' }, t.line)),
+            el('div', { class: 'cutin-text' }, el('div', { class: 'tname' }, t.name), el('div', { class: 'trole' }, techRole(t)), el('div', { class: 'tline' }, t.line)),
           );
           cutin.hidden = false;
           setTimeout(() => (cutin.hidden = true), 1150);
@@ -1045,6 +1057,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           g ? el('div', { class: 'grade-line' }, rankBadge(g.rank, 'lg'), el('span', {}, `${diffName} · 점수 ${g.score}${bestUp ? ' · 최고 등급!' : ''}`)) : '',
           el('p', {}, `패링 ${s.parries}(PERFECT ${s.perfect}) · 피하기 ${s.dodges} · 막기 ${s.guards} · 맞음 ${s.hits} · 반격 ${s.counters} · 결정타 ${s.deathblows}`),
           el('p', { class: 'time' }, `최대 연속 박자 ${s.maxStreak} · ${(d.t / 1000).toFixed(1)}초`),
+          ...resultAdvice(),
           el('div', { class: 'res-row' }, nextBtn ?? '', again, pick),
         );
       }
@@ -1052,6 +1065,35 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       (nextBtn ?? again).focus();
     }, 2600);
   };
+
+  /** 결과 화면의 한두 줄 조언: 가장 많이 맞은 공격과 그 공격을 받는 법 · 받기를 평균 얼마나 일찍 눌렀나 */
+  function resultAdvice(): HTMLElement[] {
+    const out: HTMLElement[] = [];
+    const top = [...missBy.entries()].sort((a, b) => b[1] - a[1])[0];
+    if (top) {
+      const m = d.foeDef.moves[top[0]];
+      const how = !m
+        ? ''
+        : m.unblockable
+          ? '붉은 결 — 받지 말고 피한다'
+          : m.feint
+            ? '속임수 — 고리가 한 번 멎었다가 다시 닫힐 때 받는다'
+            : m.element === 'ice'
+              ? '얼음 — 느리게 오다 끝에서 빨라진다. 끝까지 기다린다'
+              : m.element === 'lightning'
+                ? '번개 — 박자에서 튄다. 음악보다 고리를 끝까지 본다'
+                : m.windup < 450
+                  ? '빠른 공격 — 앞 박자를 듣고 다음 박자에 미리 누른다'
+                  : '고리가 닫히는 순간을 짐작해 조금 일찍 누른다';
+      out.push(el('p', { class: 'res-tip' }, el('b', {}, `가장 많이 맞은 공격 「${m?.name ?? top[0]}」 ${top[1]}번`), how ? ` — ${how}` : ''));
+    }
+    if (leads.length >= 3) {
+      const avg = Math.round(leads.reduce((a, b) => a + b, 0) / leads.length);
+      const note = avg > 60 ? '조금 더 늦게 눌러도 된다' : '좋은 박자다';
+      out.push(el('p', { class: 'res-tip' }, `받기는 평균 ${avg}ms 일찍 눌렀다(PERFECT는 0~40ms) — ${note}`));
+    }
+    return out;
+  }
 
   const steps = foeDef.chart?.steps ?? [];
   const chartEnd = steps.length ? steps[steps.length - 1].at : 1;
@@ -1194,6 +1236,13 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
     }
   };
 
+  // 곡을 대결 시계에 맞춘다: 멈칫·집중(느린 화면) 동안 어긋난 만큼, 시계가 제 속도일 때 다음 마디에서 되돌린다
+  let lastAlign = 0;
+  const alignBeat = (now: number) => {
+    if (!beat || !tuneBpm || now - lastAlign < 400 || now < hitstopUntil || rateAt(now) !== 1) return;
+    lastAlign = now;
+    alignMusicBeat(Math.ceil(d.t / beat) * beat - d.t, tuneBpm);
+  };
   const frame = (now: number) => {
     if (!alive) return;
     tuneQuality(now);
@@ -1206,6 +1255,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
       return;
     }
     advanceTo(now);
+    alignBeat(now);
     handleEvents();
     // 위기: 심장이 뛴다(가장자리 붉은 맥박과 같은 박자)
     if (d.crisis && !d.result && now - lastBeat > 860) {

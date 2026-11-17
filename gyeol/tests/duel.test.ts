@@ -1102,3 +1102,29 @@ describe('「결」 겨루기 기회 안내(2026-11-11)', () => {
     expect(cue(off).clash).toBe(false); // 겨루기가 꺼진 장
   });
 });
+
+describe('공격을 음악 박자에 묶기(2026-11-17)', () => {
+  it('beat가 있으면 타격 순간이 16분음표 자리에 놓이고(번개는 일부러 튄다), 없으면 예전 그대로', async () => {
+    const real = (await import('../data/duel.json')).default as unknown as import('../src/duel').DuelData;
+    const beat = 60000 / 120;
+    const grid = beat / 4;
+    for (const id of ['inner_senior', 'shadow_wolf', 'ignis']) {
+      const d = createDuel(real, id, 'beat', 'duel', 'main', { beat });
+      const hits: number[] = [];
+      let last = -1;
+      for (let t = 0; t < 20000; t += 5) {
+        advance(d, t);
+        if (d.foe.state === 'windup' && d.foe.hitAt !== last) {
+          last = d.foe.hitAt;
+          if (d.foeDef.moves[d.foe.move!].element !== 'lightning') hits.push(d.foe.hitAt);
+        }
+        if (d.result) break;
+      }
+      expect(hits.length, id).toBeGreaterThan(3);
+      for (const h of hits) expect(Math.abs(h / grid - Math.round(h / grid)), `${id} ${h}`).toBeLessThan(1e-6);
+    }
+    const plain = createDuel(real, 'inner_senior', 'beat');
+    advance(plain, 3000);
+    expect(plain.opts.beat).toBeUndefined();
+  });
+});

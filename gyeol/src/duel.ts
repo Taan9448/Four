@@ -502,6 +502,8 @@ export const HEAVY_DAMAGE = 20;
  * assistCue — 결이 공격 시작부터 보인다(튜토리얼 도움, 느려지지는 않는다).
  */
 export interface DuelOptions {
+  /** 곡의 한 박(ms, 2026-11-17): 있으면 적의 타격 순간이 16분음표 자리에 놓인다 */
+  beat?: number;
   survive?: number;
   noLose?: boolean;
   techs?: string[];
@@ -1024,7 +1026,13 @@ function startMove(d: Duel, moveId: string, hitAt?: number): void {
   f.stateStart = d.t;
   const feint = m.feint ?? 0;
   let H = hitAt ?? d.t + Math.round(m.windup * d.tempo) + feint;
-  // 번개: 대결에서는 박자가 튄다(악보에서는 악보대로)
+  // 박자 격자(2026-11-17 — 공격을 음악 박자에 묶는다): 타격 순간을 다음 16분음표 자리로 늦춘다(준비가 조금 길어질 뿐 짧아지지 않는다).
+  // 대결 시계 0이 곡의 박자 0 — main.ts가 곡을 대결 시계에 맞춘다
+  if (hitAt === undefined && d.opts.beat && d.mode !== 'rhythm') {
+    const grid = d.opts.beat / 4;
+    H = Math.ceil(H / grid - 1e-6) * grid;
+  }
+  // 번개: 대결에서는 박자가 튄다(악보에서는 악보대로) — 박자 격자에서 일부러 벗어난다
   if (hitAt === undefined && m.element === 'lightning' && r.lightningJitter > 0) H += d.rng.int(-r.lightningJitter, r.lightningJitter);
   f.hitAt = Math.max(d.t + r.parry + 40, H);
   f.fakeAt = feint > 0 ? f.hitAt - feint : null;
