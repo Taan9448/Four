@@ -1,0 +1,20 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art visual effect of pure light on black; a white core pixel line, then 2-3 bands of increasingly saturated color outward, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Frames:
+Cell 1: a few thin pink-white sword streaks converging on the center, tiny five-petal plum blossoms budding along them
+Cell 2: impact: a bright pink-white flash at the center, five or six plum blossoms bursting open around it in a ring, petals flying outward
+Cell 3: a large ring of plum blossoms in full bloom around the center, crossing pink sword streaks through them, many loose petals
+Cell 4: the blossoms at their widest, a soft pink glow, petals swirling around in a spiral
+Cell 5: blossoms breaking apart into a storm of drifting pink and white petals
+Cell 6: petals scattering outward and starting to fall, faint pink motes
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Additional requirement: attached image1 is the counter, for five-rounded-petal blossom design and colors only. This is a NEW skill with its own six-frame bloom/ring/petal sequence from the Frames above. Impact is cell2. Black background and central80percent containment.
+Fix: Image2 is the first six-frame NORMAL skill result. Keep its five-rounded-petal flowers, pink/soft-red/white colors, same six-frame evolution and center. Re-render the ENTIRE effect in ALL SIX cells at about85percent of its present size around each cell center256,256, with the SAME4px pixel blocks (do not use blur). This especially brings the outlying upper petal in CELL4 inside the safe region. Every bloom, slash, orbiting petal and stray spark must end inside x80..432,y80..432 of its512px cell. Keep cell4 slightly wider than cell3, the compact brightest white impact in cell2, then breakup5 and falling petals6. No figure, text, borders or clipped edges. Exact1536x1024,3x2 cells, pure black background.
