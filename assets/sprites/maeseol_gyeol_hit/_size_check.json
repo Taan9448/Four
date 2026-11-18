@@ -1,0 +1,42 @@
+{
+  "timingIdentical": true,
+  "idleHeight": 115,
+  "baselineExclusive": 144,
+  "standingHeightTolerance": 2,
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        38,
+        29,
+        115,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        17,
+        30,
+        119,
+        144
+      ],
+      "height": 114,
+      "bottom": 143
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        39,
+        29,
+        111,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    }
+  ],
+  "standingAndGroundPass": true
+}
