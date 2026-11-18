@@ -10,7 +10,7 @@ Style: crisp detailed 128x128 pixel art in the style of a late 16-bit era game s
 Palette: use at most 16 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
 Never use magenta or similar hues on the character.
 Frames:
-Cell 1: brisk walk cycle, contact pose: right foot forward touching the ground heel first, left foot behind, longsword held low at the side, shield on the left arm, cape swaying
+Cell 1: brisk walk cycle, contact pose: right foot forward touching the ground heel first, left foot behind, longsword held low in the right hand, NO shield (exactly the same gear as kyle_idle: armor, blue tabard, blue cape, longsword only), cape swaying
 Cell 2: walk cycle, down pose: weight on the right foot, knee slightly bent, body a little lower, arms swinging opposite to the legs
 Cell 3: walk cycle, passing pose: left leg passing the right, body at its highest, head level
 Cell 4: walk cycle, contact pose: left foot forward touching the ground heel first, right foot behind (mirror of frame 1)
@@ -18,3 +18,4 @@ Cell 5: walk cycle, down pose: weight on the left foot, knee slightly bent, body
 Cell 6: walk cycle, passing pose: right leg passing the left, body at its highest, loops back into frame 1
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Match the attached idle outfit with NO SHIELD in ALL six cells: silver armor, blue surcoat, blue cape and ONE straight longsword only. Attached image3 is the approved walk sheet for POSES ONLY: preserve its six walking contact/down/passing poses, alternate-leg sequence, head/body scale, foot placements, body bob and cape sway, removing the shield completely and showing the left arm swinging naturally instead. No shield on arm, back or belt, no shield fragments or spare props. Do not change the silver straight sword or the six-frame loop. Ground stays on the same row in every cell.
