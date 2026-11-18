@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_maeseol_a
+type: fx
+summary: "「결」 화산의 매설 기술 이펙트(진하운 기술 1~4자리 공통) 앞 6프레임(뒤 _b와 이어 12프레임) — 화산파 매화검법(梅花劍法): 검끝에서 매화가 피어나 적을 감싸며 터진다. 분홍·연홍·흰 꽃잎, 화려하게 칸을 크게 쓴다(2026-11-18 사용자 요청 \"화산의 매설인 만큼 화산 기술의 이펙트\")"
+frames: 6
+fps: 20
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a few thin pink-white sword streaks converging on the center, tiny five-petal plum blossoms budding along them"
+  2: "impact: a bright pink-white flash at the center, five or six plum blossoms bursting open around it in a ring, petals flying outward"
+  3: "a large ring of plum blossoms in full bloom around the center, crossing pink sword streaks through them, many loose petals"
+  4: "the blossoms at their widest, a soft pink glow, petals swirling around in a spiral"
+  5: "blossoms breaking apart into a storm of drifting pink and white petals"
+  6: "petals scattering outward and starting to fall, faint pink motes"
+placeholder: { accent: '#ff6f91' }

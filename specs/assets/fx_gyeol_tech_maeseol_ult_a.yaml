@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_maeseol_ult_a
+type: fx
+summary: "「결」 화산의 매설 마지막 기술(5자리) 이십사수매화검법(二十四手梅花劍法) 앞 6프레임(뒤 _b와 이어 12프레임) — 스물네 갈래 검빛이 한꺼번에 피어 매화 숲이 된다. 일반 기술(fx_gyeol_tech_maeseol_a)보다 훨씬 크고 빽빽하게, 칸을 가득(2026-11-18)"
+frames: 6
+fps: 20
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "many thin pink-white sword streaks (about twenty-four) shooting in from every direction toward the center, each tipped with a plum bud"
+  2: "impact: an intense white-pink flash at the center, a great many plum blossoms opening all at once in a wide dome"
+  3: "a dense forest of plum blossoms filling most of the cell, criss-crossing sword lines of light through them, deep pink centers"
+  4: "the blossom storm at its peak, a big ring of petals and a pink pressure wave flattening along the ground"
+  5: "the blossoms tearing apart into a blizzard of pink and white petals spiralling outward"
+  6: "the petal blizzard spreading wide, glowing pink motes"
+placeholder: { accent: '#ff4f7b' }

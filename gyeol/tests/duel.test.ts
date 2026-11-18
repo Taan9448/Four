@@ -1060,6 +1060,17 @@ describe('「결」 5단계 — 하운 옷·업적', () => {
     expect(outfitPrefix(m)).toBe('maeseol');
     expect(wornOutfit(m)?.stand).toBe('maeseol_stand');
     setTrainingLevel(() => 1);
+    // 2026-11-18 매설: 크기는 진하운에 맞춰 줄이고, 결 전용 베기·피격 명세가 있고 대신할 동작은 실제 그림, 기술 이름은 진하운 기술마다
+    const ms = progress.outfits.find((o) => o.id === 'maeseol')!;
+    expect(ms.scale).toBeLessThan(1);
+    for (const [k, alt] of Object.entries(ms.gyeolAnims ?? {})) {
+      expect(existsSync(`specs/assets/maeseol_gyeol_${k}.yaml`), k).toBe(true);
+      if (alt) expect(existsSync(`assets/sprites/maeseol_${alt}/meta.json`), alt).toBe(true);
+    }
+    const haun = (realRaw as unknown as { characters: { list: { id: string; techs: string[] }[] } }).characters.list.find((c) => c.id === 'haun')!;
+    expect(Object.keys(ms.techFx!.names!).sort()).toEqual([...haun.techs!].sort());
+    for (const f of [ms.techFx!.fx, ms.techFx!.ultFx!]) for (const h of ['a', 'b']) expect(existsSync(`specs/assets/fx_gyeol_tech_${f}_${h}.yaml`)).toBe(true);
+    expect(existsSync(`specs/assets/${ms.counterFx!.sprite}.yaml`)).toBe(true);
     // 동료 옷은 그 인물 칸에 따로
     const t = structuredClone(s);
     t.story.cleared.push('ch3');

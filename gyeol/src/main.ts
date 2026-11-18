@@ -7,7 +7,7 @@ import { applyUiArt, el, padIcon, rankBadge, realArt, toast } from './dom';
 import { announceAchievements } from './screens';
 import { clearedAnywhere, outfitPrefix, setTrainingLevel, wornOutfit } from './progress';
 import raw from '../data/duel.json';
-import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
+import { advance, betterRank, createDuel, type Input, cue, duelGrade, isFocusing, isOpen, press, rhythmScore, streakTier, techMeter, techOf, ULT_SLOT, usableTechs, type Duel, type DuelData, type DuelRank, type Element, type FoeDef, type Judgement, type LineKey, type Mode } from './duel';
 import { heartbeat } from './heart';
 import { actionFor, keyNames, keyText, type KeyAction } from './keys';
 import { characterOf, faceId, faceStyle, HAUN, recordKey, spriteFor, techRole, techsFor, withCharacter } from './party';
@@ -20,7 +20,7 @@ import { openSettings } from './settings';
 import { openSlots, renderSlots, renderStory, story } from './story';
 import { renderArena, renderCalibrate, renderLobby, renderPractice, renderRecords, renderRhythm, renderWardrobe, renderTitle, setSlotsOpener, setWardrobeData, setKeys, type Nav, type PlayOpts, type Screen } from './screens';
 import { createWeather, gust } from './scene';
-import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, TECH_COLOR, W, type Fx, type JudgeWord, type Sprites, type TechRow } from './render';
+import { addShake, comboMilestone, comboStyle, setRenderQuality, setShakeScale, CONTACT, draw, ELEMENT_COLOR, emptyFx, FOE_X, H, ICON, judge, loadSprites, PLAYER_X, pruneFx, setTechSkin, TECH_COLOR, techColor, W, type Fx, type JudgeWord, type Sprites, type TechRow } from './render';
 import './style.css';
 import './ink.css';
 
@@ -137,7 +137,20 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 카일 붉은 검(3장 뒤): 이야기는 지금 칸의 진행, 결투장·수련은 어느 칸이든
   const sv = loadSave();
   const swapped = char ? spriteFor(char, (ch) => (opts.back === 'story' ? sv.story.cleared.includes(ch) : clearedAnywhere(sv, ch)), (id) => !!frameUrl(id, 1, { realOnly: true })) : null;
-  const pdata = swapped && swapped !== pdata0.player.sprite ? { ...pdata0, player: { ...pdata0.player, sprite: swapped } } : pdata0;
+  const pdata1 = swapped && swapped !== pdata0.player.sprite ? { ...pdata0, player: { ...pdata0.player, sprite: swapped } } : pdata0;
+  // 인물을 통째로 바꾸는 옷(화산의 매설): 대결 얼굴·기술 컷인도 그 옷의 반신 그림, 크기·기술 이름·이펙트도 그 인물의 것(2026-11-18)
+  const worn = wornOutfit(sv, charId);
+  const techNames = worn?.techFx?.names;
+  const pdata: DuelData = worn?.sprite
+    ? {
+        ...pdata1,
+        player: { ...pdata1.player, scale: (pdata1.player.scale ?? 1) * (worn.scale ?? 1) },
+        techs: techNames ? pdata1.techs.map((t) => (techNames[t.id] ? { ...t, ...techNames[t.id] } : t)) : pdata1.techs,
+      }
+    : pdata1;
+  setTechSkin(worn?.techFx?.fx ?? null);
+  /** 기술 이펙트 id: 옷이 바꾸면 그 옷의 것(마지막 기술은 ultFx) */
+  const techFxId = (t: { id: string; slot?: number }): string => (worn?.techFx ? (t.slot === ULT_SLOT ? (worn.techFx.ultFx ?? worn.techFx.fx) : worn.techFx.fx) : t.id);
   const techs = techsFor(data, charId, opts.duel?.techs);
   // 공격을 음악 박자에 묶는다(2026-11-17): 대결 곡의 한 박 — 박자 도전(악보)과 서장 튜토리얼은 빼고
   const tuneId = mode === 'practice' ? 'practice' : battleTrack(foeDef);
@@ -154,8 +167,6 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   // 잔상 막대(2026-11-11): 깎인 만큼 밝은 띠가 잠깐 남았다가 따라 줄어든다
   const foeHpLag = el('i', { class: 'lag' }), myHpLag = el('i', { class: 'lag' });
   const myHpNum = el('span', { class: 'hp-num' }), foeHpNum = el('span', { class: 'hp-num' });
-  // 인물을 통째로 바꾸는 옷(화산의 매설): 대결 얼굴·기술 컷인도 그 옷의 반신 그림
-  const worn = wornOutfit(loadSave(), charId);
   const wornStand = worn?.stand ? realArt(worn.stand) : null;
   const face = wornStand ?? (char ? realArt(char.stand) ?? (char.fallbackStand ? frameUrl(char.fallbackStand, 1) : null) : null) ?? frameUrl('haun_sword_stand', 1);
   const streakEl = el('div', { class: 'streak' });
@@ -239,9 +250,10 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
   if (new URLSearchParams(location.search).has('debug')) (window as unknown as { __gyeol?: unknown }).__gyeol = d;
   const skillFx = [...new Set(Object.values(foeDef.moves).map((m) => m.fx).filter((x): x is string => !!x))];
   // 인물별 반격 이펙트(Codex fx_gyeol_counter_<인물>, 2026-11-14)도 같이 부른다
-  const counterFx = char?.counterFx;
+  const counterFx = worn?.counterFx ?? char?.counterFx;
   if (counterFx) skillFx.push(counterFx.sprite);
-  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId), !!worn?.sprite);
+  if (worn?.techFx) for (const f of new Set([worn.techFx.fx, worn.techFx.ultFx ?? worn.techFx.fx])) skillFx.push(`fx_gyeol_tech_${f}_a`, `fx_gyeol_tech_${f}_b`);
+  const sp: Sprites = await loadSprites(pdata.player.sprite, foeDef.sprite, foeDef.bg, skillFx, foeDef.id, outfitPrefix(loadSave(), charId), !!worn?.sprite, worn?.gyeolAnims);
   loading.remove();
   // 대결 곡: 수련장·서장은 수련 곡, 박자 도전은 악보 빠르기에 맞춘 곡, 그 밖은 지역·보스 곡(music.json)
   setMusic(practice || tutorial ? 'practice' : rhythm ? 'rhythm' : tuneId, rhythm && foeDef.chart ? chartBpm(foeDef.chart.steps) : undefined);
@@ -709,8 +721,8 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           tip('tech');
           const t = techOf(d, ev.tech)!;
           sfx('power', { volume: 0.8 });
-          text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — ${kname('tech')}`, TECH_COLOR[t.id]?.core ?? '#fff6d6', 24);
-          flash(TECH_COLOR[t.id]?.glow ?? '#ffd27a', 220, 0.25);
+          text(PLAYER_X + 60, CONTACT.y - 215, `「${t.name}」 준비 — ${kname('tech')}`, techColor(t.id).core, 24);
+          flash(techColor(t.id).glow, 220, 0.25);
           break;
         }
         case 'tech': {
@@ -718,7 +730,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           const t = techOf(d, ev.tech)!;
           sfx('cutin');
           hitstopUntil = now + 700;
-          fx.tech = { id: t.id, born: now, slot: t.slot, area: t.area };
+          fx.tech = { id: techFxId(t), born: now, slot: t.slot, area: t.area };
           // 컷인: Codex 기술 일러스트(cg_gyeol_tech_<id>)가 오면 화면을 덮는 그림으로, 없으면 그 인물의 반신 그림(결의)
           // 인물을 바꾸는 옷이면 진하운이 그려진 기술 일러스트 대신 그 옷의 반신 그림
           const cg = wornStand ? null : frameUrl(`cg_gyeol_tech_${t.id}`, 1, { realOnly: true });
@@ -737,7 +749,7 @@ async function play(foeDef0: FoeDef, mode: Mode, opts: PlayOpts = { back: 'lobby
           // 기술 자리(1~5)가 클수록 크게 — 동료 기술도 같은 자리면 같은 무게(2026-11-14)
           const slot = t.slot ?? 1;
           sfx(slot >= 4 ? 'slam_10' : slot >= 2 ? 'slam_9' : 'slam_8');
-          const c = TECH_COLOR[t.id];
+          const c = TECH_COLOR[techFxId(t)];
           flash(c?.core ?? '#ffffff', 360, 0.7);
           addShake(fx, now, slot === 1 ? 10 : 20, 480);
           hitstopUntil = now + 160;

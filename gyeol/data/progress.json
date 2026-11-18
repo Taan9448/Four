@@ -132,7 +132,29 @@
       ],
       "sprite": "maeseol",
       "stand": "maeseol_stand",
-      "wearer": "매설"
+      "wearer": "매설",
+      "scale": 0.94,
+      "gyeolAnims": {
+        "attack": "heavy",
+        "hit": null
+      },
+      "techFx": {
+        "fx": "maeseol",
+        "ultFx": "maeseol_ult",
+        "names": {
+          "nakun": { "name": "낙매", "hanja": "落梅", "line": "떨어지는 매화는 소리가 없다." },
+          "byeogun": { "name": "매화일섬", "hanja": "梅花一閃", "line": "한 송이, 한 칼." },
+          "cheongun_chulsu": { "name": "매화난무", "hanja": "梅花亂舞", "line": "꽃잎이 흩날리는 곳마다 검이 있다." },
+          "unhae": { "name": "암향", "hanja": "暗香", "line": "향기는 보이지 않아도 닿는다." },
+          "cheonoe_gwiun": { "name": "이십사수매화검법", "hanja": "二十四手梅花劍法", "line": "화산의 매화가 핀다 — 스물네 갈래로." }
+        }
+      },
+      "counterFx": {
+        "sprite": "fx_gyeol_counter_maeseol",
+        "hit": "fx_hit_slash",
+        "color": "#ff7aa2",
+        "label": "매화 반격"
+      }
     }
   ],
   "achievements": [

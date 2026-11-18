@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_maeseol_ult_b
+type: fx
+summary: "「결」 화산의 매설 마지막 기술 뒤 6프레임(fx_gyeol_tech_maeseol_ult_a 다음) — 매화 눈보라가 천천히 내려앉는다(2026-11-18)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "a wide curtain of plum petals falling slowly, pink light"
+  2: "petals drifting in big lazy swirls, a few whole blossoms"
+  3: "the curtain thinning, petals sinking"
+  4: "petals settling in a soft pink carpet along the bottom of the cell"
+  5: "the carpet fading, a few petals still drifting"
+  6: "almost nothing left: a few faint petals and motes"
+placeholder: { accent: '#ff4f7b' }
