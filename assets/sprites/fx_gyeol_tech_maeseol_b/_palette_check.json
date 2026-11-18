@@ -1,0 +1,77 @@
+{
+  "note": "Color comparison only, no artwork modifications. Pink heuristic for light pink: R>G+15,G>75,B>=G-10,R>=B-10; distinguishes requested light pink from coral/lavender master colors.",
+  "sourceCell": 2,
+  "sourceVisiblePixels": 5481,
+  "deliveryVisiblePixels": 380,
+  "sourceLightPinkFraction": 0.5933,
+  "deliveryLightPinkFraction": 0.0,
+  "dominantSource": [
+    {
+      "hex": "#fca5d3",
+      "pixels": 43
+    },
+    {
+      "hex": "#fca4d3",
+      "pixels": 29
+    },
+    {
+      "hex": "#fca9d4",
+      "pixels": 29
+    },
+    {
+      "hex": "#fca7d4",
+      "pixels": 28
+    },
+    {
+      "hex": "#fca6d3",
+      "pixels": 27
+    },
+    {
+      "hex": "#fda7d4",
+      "pixels": 25
+    },
+    {
+      "hex": "#fca5d2",
+      "pixels": 24
+    },
+    {
+      "hex": "#fca7d3",
+      "pixels": 24
+    }
+  ],
+  "dominantDelivery": [
+    {
+      "hex": "#d4b8ff",
+      "pixels": 120
+    },
+    {
+      "hex": "#ff3b3b",
+      "pixels": 102
+    },
+    {
+      "hex": "#f2c8a0",
+      "pixels": 56
+    },
+    {
+      "hex": "#f1efe6",
+      "pixels": 29
+    },
+    {
+      "hex": "#a02634",
+      "pixels": 25
+    },
+    {
+      "hex": "#5a1020",
+      "pixels": 17
+    },
+    {
+      "hex": "#ff8a5c",
+      "pixels": 11
+    },
+    {
+      "hex": "#c2c6d1",
+      "pixels": 4
+    }
+  ],
+  "resolution": "No specification, tool or master palette modified. Keep requested original and report delivery mismatch for review."
+}
