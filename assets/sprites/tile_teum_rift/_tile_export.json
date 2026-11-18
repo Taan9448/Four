@@ -1,0 +1,18 @@
+{
+  "method": "Remove only transparent padding introduced by sprite fitting, nearest-neighbor fit entire sampled full-bleed tile to256x256 (up to2px axis rounding compensated). No source resize/painting/blending or content removal.",
+  "before": [
+    256,
+    256
+  ],
+  "sampledContentBox": {
+    "left": 1,
+    "top": 1,
+    "width": 254,
+    "height": 254
+  },
+  "output": [
+    256,
+    256
+  ],
+  "opaque": true
+}
