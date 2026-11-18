@@ -133,12 +133,17 @@ export function renderPrompt(spec, style) {
         pixelGrid(spec, 'The whole image') +
         `(${lw}x${lh} sprite pixels in total.)\n` +
         `Scene: ${notes(1) || spec.summary || ''}\n` +
-        // 전투 화면 배치(GAME_DESIGN 13절): 인물은 아래쪽 땅 위, 맨 아래는 손패에 가려지고 위 가운데에는 균열 게이지가 온다
-        'Layout: a side-view battle stage seen straight from the front, no characters or creatures. A flat, open, walkable ground band runs across the whole width ' +
-        'with the ground line (where feet stand) at about 62% of the image height. The bottom 30% is plain, dark ground (the card hand covers it). ' +
-        'The upper part is open sky or distant scenery with no strong detail in the top center. Keep the middle third of the width free of tall objects; ' +
-        'put trees, pillars or rocks only near the left and right edges.\n' +
-        `Style: ${style.sprite_style}; a battle backdrop that stays calm and slightly darker than the characters in front of it, with low contrast in the far background.\n` +
+        // 「틈」 바닥 타일(2026-11-18, tile: true): 위에서 내려다본, 사방으로 이어 붙는 땅 무늬 한 장
+        (spec.tile
+          ? 'Layout: a TOP-DOWN ground texture seen straight from above (no horizon, no sky, no walls), a SEAMLESS TILE: the left edge continues exactly into the right edge and the top edge into the bottom edge, so copies placed side by side show no seam. ' +
+            'Even, low-contrast detail spread over the whole tile (no single large object, nothing in the middle that draws the eye), so many characters can run across it. No characters, no creatures.\n' +
+            `Style: ${style.sprite_style}; a calm, slightly dark game floor so bright characters and effects stand out on it.\n`
+          : // 전투 화면 배치(GAME_DESIGN 13절): 인물은 아래쪽 땅 위, 맨 아래는 손패에 가려지고 위 가운데에는 균열 게이지가 온다
+            'Layout: a side-view battle stage seen straight from the front, no characters or creatures. A flat, open, walkable ground band runs across the whole width ' +
+            'with the ground line (where feet stand) at about 62% of the image height. The bottom 30% is plain, dark ground (the card hand covers it). ' +
+            'The upper part is open sky or distant scenery with no strong detail in the top center. Keep the middle third of the width free of tall objects; ' +
+            'put trees, pillars or rocks only near the left and right edges.\n' +
+            `Style: ${style.sprite_style}; a battle backdrop that stays calm and slightly darker than the characters in front of it, with low contrast in the far background.\n`) +
         paletteLine(spec, style) +
         'Rules: no text, no letters, no numbers, no signature, no watermark, no frame or border.'
       );

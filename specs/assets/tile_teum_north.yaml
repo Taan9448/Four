@@ -1,0 +1,10 @@
+id: tile_teum_north
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 2막 바닥 타일 — 북쪽 틈(얼어붙은 아르덴·카즈둠의 돌길, 이어 붙는 무늬, 2026-11-18)'
+frame_notes:
+  1: 'Frozen stone ground seen from directly above: dark blue-grey flagstones half covered with thin snow and frost, a few cracked ice patches, small pebbles and frost-rimmed tufts of dead grass. Cold blues and greys, low contrast.'
+placeholder: { color: '#1c2430' }
