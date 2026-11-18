@@ -15,6 +15,6 @@ frame_notes:
   2: "steps forward, the jian rising in a smooth arc, body still upright (not crouching), feet on the ground"
   3: "jian at the top of the arc beside the head (not far above it), body coiled, standing tall, feet on the ground"
   4: "THE HIT: a single clean diagonal cut to the right, the blade laid along the grain, a thin pink-white streak with two or three tiny plum petals trailing the edge; upright, front foot planted ON the ground (not floating)"
-  5: "follow-through, the jian low, hair and red headband ends swept forward, feet still on the ground"
+  5: "follow-through, the jian low, short hair and the long red headband ends swept forward, feet still on the ground"
   6: "recovering to the ready stance, point lowered, same height as maeseol_idle"
 placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ff7aa2' }

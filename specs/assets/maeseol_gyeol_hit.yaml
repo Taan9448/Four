@@ -11,6 +11,6 @@ events: {}
 bbox_tolerance: 0.25
 frame_notes:
   1: "struck in the chest, upper body snapping backward, eyes shut, the jian held loosely, feet on the ground line"
-  2: "staggering back one step, sword arm flung out behind, long hair and red headband ends whipping forward, feet on the ground"
+  2: "staggering back one step, sword arm flung out behind, short hair and the long red headband ends whipping forward, feet on the ground"
   3: "regaining footing, the jian raised defensively before the chest, standing height like maeseol_idle"
 placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ff7aa2' }
