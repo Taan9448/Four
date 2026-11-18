@@ -1,0 +1,33 @@
+{
+  "frames": 12,
+  "fps": 20,
+  "events": {
+    "impact": 2
+  },
+  "a6": {
+    "frame": 6,
+    "bbox": [
+      60,
+      69,
+      421,
+      417
+    ],
+    "count": 43962,
+    "outside": 0,
+    "contained": true
+  },
+  "b1": {
+    "frame": 1,
+    "bbox": [
+      87,
+      83,
+      434,
+      425
+    ],
+    "count": 35276,
+    "outside": 0,
+    "contained": true
+  },
+  "sourceVisibleCountRatio": 0.802,
+  "note": "Unchanged delivered frames, a1..a6 then b1..b6. Source count ratio is measured to flag a restart/pop; actual continuity is also inspected visually."
+}
