@@ -1,0 +1,15 @@
+id: fx_gyeol_counter_maeseol
+type: fx
+summary: "「결」 화산의 매설 반격 이펙트 6프레임 — 받은 뒤 되돌려 치는 순간 적 몸에 매화 한 송이가 피며 베인다. 칸 안쪽에서 끝나게(2026-11-18)"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: "a thin diagonal pink-white slash line appearing"
+  2: "impact: a bright crossing pair of pink-white slashes with a single large five-petal plum blossom opening at the crossing point"
+  3: "the blossom fully open, slashes widening, a few petals flying"
+  4: "the blossom breaking into petals, slashes fading"
+  5: "drifting pink petals"
+  6: "a few petals and motes"
+placeholder: { accent: '#ff7aa2' }

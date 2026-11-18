@@ -1,0 +1,15 @@
+id: fx_gyeol_tech_maeseol_b
+type: fx
+summary: "「결」 화산의 매설 기술 이펙트 뒤 6프레임(fx_gyeol_tech_maeseol_a 다음) — 꽃잎이 흩날리며 진다(2026-11-18)"
+frames: 6
+fps: 20
+events: {}
+min_fill: 0.0005
+frame_notes:
+  1: "many pink and white plum petals drifting slowly downward and sideways"
+  2: "the petals thinning, a few whole small blossoms tumbling"
+  3: "loose petals falling, faint pink light"
+  4: "a few petals settling near the bottom of the cell"
+  5: "a handful of petals and faint pink motes"
+  6: "almost nothing left: two or three petals"
+placeholder: { accent: '#ff6f91' }

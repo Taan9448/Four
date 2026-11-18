@@ -1,0 +1,20 @@
+id: maeseol_gyeol_attack
+type: character-anim
+character: maeseol
+summary: '「결」 매설 베기 6프레임 — 「천외귀환」 maeseol_attack(낮게 웅크린 찌르기, 4·5칸 발이 떠 있음)은 결 대결에 맞지 않아 결 전용으로 다시: 진하운 haun_sword_attack과 같은 높이·동작·events, 발은 늘 땅(2026-11-18 사용자 보고 "막기나 반격할 때 그림이 깨진다, 중심점에서 아래로 내려간다")'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 6
+fps: 12
+events: { hit: 4 }
+bbox_tolerance: 0.25
+# 서 있는 키를 maeseol_idle과 같게(웅크리지 않는다), 두 발은 모든 칸에서 땅선(아래 기준선)에 닿는다
+frame_notes:
+  1: "upright ready stance at full standing height, the jian drawn back low at the right side, weight on the back foot, eyes on the target, BOTH feet on the ground line"
+  2: "steps forward, the jian rising in a smooth arc, body still upright (not crouching), feet on the ground"
+  3: "jian at the top of the arc beside the head (not far above it), body coiled, standing tall, feet on the ground"
+  4: "THE HIT: a single clean diagonal cut to the right, the blade laid along the grain, a thin pink-white streak with two or three tiny plum petals trailing the edge; upright, front foot planted ON the ground (not floating)"
+  5: "follow-through, the jian low, hair and red headband ends swept forward, feet still on the ground"
+  6: "recovering to the ready stance, point lowered, same height as maeseol_idle"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ff7aa2' }

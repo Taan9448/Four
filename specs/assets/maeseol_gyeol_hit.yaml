@@ -1,0 +1,16 @@
+id: maeseol_gyeol_hit
+type: character-anim
+character: maeseol
+summary: '「결」 매설 피격 3프레임 — 「천외귀환」 maeseol_hit은 칼을 휘두르는 그림이라 맞는 동작으로 보이지 않아 결 전용으로 다시: 진하운 haun_sword_hit과 같은 동작(2026-11-18)'
+depends_on: [maeseol_ref]
+reference: assets/source/maeseol_ref.png
+facing: right
+frames: 3
+fps: 10
+events: {}
+bbox_tolerance: 0.25
+frame_notes:
+  1: "struck in the chest, upper body snapping backward, eyes shut, the jian held loosely, feet on the ground line"
+  2: "staggering back one step, sword arm flung out behind, long hair and red headband ends whipping forward, feet on the ground"
+  3: "regaining footing, the jian raised defensively before the chest, standing height like maeseol_idle"
+placeholder: { shape: humanoid, color: '#e8e2d6', accent: '#ff7aa2' }

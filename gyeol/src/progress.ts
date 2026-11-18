@@ -24,6 +24,17 @@ export interface Outfit {
   stand?: string;
   /** 대결 이름판에 보일 이름(인물을 바꾸는 옷) */
   wearer?: string;
+  /** 그 옷 인물의 크기 배율(2026-11-18 매설이 진하운보다 커 보였다 — 서 있는 키 115 대 108) */
+  scale?: number;
+  /**
+   * 「천외귀환」에서 가져온 동작 중 결 대결에 맞지 않는 것(2026-11-18 매설 베기·피격): 결 전용 그림(<sprite>_gyeol_<동작>)이 오면 그것,
+   * 없으면 값의 동작(예 attack → heavy)을 대신 쓰고 null이면 코드 대체 연출
+   */
+  gyeolAnims?: Record<string, string | null>;
+  /** 기술 이펙트를 그 옷 인물의 무공으로(2026-11-18 화산 매화검): 1~4자리 fx_gyeol_tech_<fx>, 5자리 <ultFx>, 이름·대사도 바꿔 부른다 */
+  techFx?: { fx: string; ultFx?: string; names?: Record<string, { name: string; hanja: string; line: string }> };
+  /** 반격 이펙트(인물의 counterFx 대신) */
+  counterFx?: { sprite: string; hit: string; color: string; label: string };
 }
 export interface Achievement {
   id: string;

@@ -28,14 +28,23 @@ const real = async (id: string): Promise<Anim> => {
 };
 
 /** 옷(5단계, 2026-11-14 동료도): 옷 그림(대기·베기·피격)이 실제로 있으면 그것, 없으면 기본 옷 */
-const worn = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? loadSprite(`${base}_${kind}`)) : loadSprite(`${base}_${kind}`));
+const worn = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit && gyeolAnims && kind in gyeolAnims ? gyeolAnim(outfit, kind) : outfit ? ((await real(`${outfit}_${kind}`)) ?? loadSprite(`${base}_${kind}`)) : loadSprite(`${base}_${kind}`));
 /** 실제 그림만 쓰는 동작(받기·피하기·쓰러짐·기술·겨루기·강베기): 옷 그림이 오면 그것, 없으면 기본 옷 그림 */
 // replace(화산의 매설처럼 인물을 통째로 바꾸는 옷): 그 옷에 없는 동작은 원래 인물 그림을 섞지 않고 null(코드 대체 연출)
 let replaceOutfit = false;
-const wornReal = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit ? ((await real(`${outfit}_${kind}`)) ?? (replaceOutfit ? null : real(`${base}_${kind}`))) : real(`${base}_${kind}`));
+// 「천외귀환」 그림이 결 대결에 맞지 않는 동작(2026-11-18 매설 베기·피격): 결 전용 <옷>_gyeol_<동작>, 없으면 대신할 동작, null이면 코드 대체
+let gyeolAnims: Record<string, string | null> | undefined;
+const gyeolAnim = async (outfit: string, kind: string): Promise<Anim> => {
+  const own = await real(`${outfit}_gyeol_${kind}`);
+  if (own) return own;
+  const alt = gyeolAnims?.[kind];
+  return alt ? real(`${outfit}_${alt}`) : null;
+};
+const wornReal = async (outfit: string | null, base: string, kind: string): Promise<Anim> => (outfit && gyeolAnims && kind in gyeolAnims ? gyeolAnim(outfit, kind) : outfit ? ((await real(`${outfit}_${kind}`)) ?? (replaceOutfit ? null : real(`${base}_${kind}`))) : real(`${base}_${kind}`));
 
-export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null, replace = false): Promise<Sprites> {
+export async function loadSprites(playerPrefix: string, foePrefix: string, bg: string, skillFx: string[] = [], foeId = '', outfit: string | null = null, replace = false, anims?: Record<string, string | null>): Promise<Sprites> {
   replaceOutfit = replace;
+  gyeolAnims = outfit ? anims : undefined;
   const ids = {
     pi: worn(outfit, playerPrefix, 'idle'),
     pa: worn(outfit, playerPrefix, 'attack'),
@@ -95,7 +104,16 @@ export const TECH_COLOR: Record<string, { core: string; glow: string; rgb: strin
   durin_hammer: { core: '#fff2d8', glow: '#e0a040', rgb: '224,160,64' },
   cliff_fall: { core: '#f0e4d4', glow: '#a07850', rgb: '160,120,80' },
   kazdum_heart: { core: '#fff4e0', glow: '#ff6a3a', rgb: '255,106,58' },
+  // 화산의 매설(2026-11-18): 진하운 기술을 매화검법으로 — 분홍 매화
+  maeseol: { core: '#ffe4ec', glow: '#ff6f91', rgb: '255,111,145' },
+  maeseol_ult: { core: '#fff0f4', glow: '#ff4f7b', rgb: '255,79,123' },
 };
+/** 옷이 기술 이펙트를 바꾸면(화산의 매설) 기술 표시 색도 그 옷의 색으로 — main.ts가 대결마다 정한다 */
+let techSkin: string | null = null;
+export const setTechSkin = (fx: string | null): void => {
+  techSkin = fx;
+};
+export const techColor = (id: string | null | undefined): { core: string; glow: string; rgb: string } => TECH_COLOR[techSkin ?? id ?? ''] ?? TECH_COLOR.unhae;
 
 export const ELEMENT_COLOR: Record<Element | 'none' | 'danger', { line: string; glow: string; spark: string }> = {
   none: { line: '200,230,255', glow: '#9fd0ff', spark: '#e8f4ff' },
@@ -557,6 +575,11 @@ function drawPlayer(ctx: CanvasRenderingContext2D, d: Duel, sp: Sprites, fx: Fx,
   } else if ((p.action === 'hurt' || p.action === 'broken') && sp.player.hit) {
     const f = 1 + Math.min(sp.player.hit.meta.frames - 1, Math.floor((t - p.actionStart) / 90));
     drawSprite(ctx, sp.player.hit, f, PLAYER_X, { tint: p.action === 'broken' ? 'rgba(120,120,160,0.35)' : undefined });
+  } else if ((p.action === 'hurt' || p.action === 'broken') && sp.player.idle) {
+    // 피격 그림이 없으면(매설 결 전용 피격이 오기 전): 서 있는 그림이 붉게 번쩍이며 뒤로 밀렸다 돌아온다
+    const k = Math.min(1, (t - p.actionStart) / 270);
+    const push = Math.sin(Math.min(1, k * 1.6) * Math.PI) * 16;
+    drawSprite(ctx, sp.player.idle, 1, PLAYER_X - push, { rot: -0.08 * Math.sin(k * Math.PI), tint: p.action === 'broken' ? 'rgba(120,120,160,0.4)' : `rgba(255,90,80,${0.55 * (1 - k)})` });
   } else if (now - fx.guardPose < 260 && (sp.player.parry || sp.player.attack)) {
     if (sp.player.parry) {
       const k = (now - fx.guardPose) / 260;
@@ -1056,7 +1079,7 @@ function drawJudge(ctx: CanvasRenderingContext2D, j: Fx['judges'][number], now: 
 /** 기술 준비: 하운 둘레에 기술 색의 고리가 맥박친다(Codex fx_gyeol_tech_ready가 오면 그것) */
 function drawTechAura(ctx: CanvasRenderingContext2D, d: Duel, now: number): void {
   if (!d.techReady || d.result) return;
-  const col = TECH_COLOR[d.techReady] ?? TECH_COLOR.unhae;
+  const col = techColor(d.techReady);
   const real = readyFx;
   if (real) {
     drawSprite(ctx, real, loopFrame(real, now), PLAYER_X, { alpha: 0.95, tint: `rgba(${col.rgb},0.35)` });
@@ -1090,7 +1113,7 @@ function drawTechBadge(ctx: CanvasRenderingContext2D, d: Duel, fx: Fx, now: numb
   if (!d.techReady || d.result || d.player.action === 'tech') return;
   const tech = d.data.techs.find((t) => t.id === d.techReady);
   if (!tech) return;
-  const col = TECH_COLOR[tech.id] ?? TECH_COLOR.unhae;
+  const col = techColor(tech.id);
   const scale = d.data.player.scale ?? 1;
   const bob = Math.sin(now / 260) * 3;
   const y = GROUND - 150 * SCALE * 0.6 * scale - 28 + bob;
@@ -1275,6 +1298,21 @@ function drawUltFall(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void {
   ctx.restore();
 }
 
+/** 매화 한 송이(다섯 잎 + 노란 꽃술) — 매설 기술의 코드 대체 연출 */
+function plum(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, rot: number, col: { core: string; rgb: string }, alpha: number): void {
+  for (let j = 0; j < 5; j++) {
+    const a = rot + (j / 5) * Math.PI * 2;
+    ctx.fillStyle = `rgba(${col.rgb},${0.75 * alpha})`;
+    ctx.beginPath();
+    ctx.ellipse(x + Math.cos(a) * r * 0.55, y + Math.sin(a) * r * 0.55, r * 0.5, r * 0.36, a, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = `rgba(255,236,170,${0.9 * alpha})`;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 /** 기술 연출: Codex fx_gyeol_tech_<id>_a·b(12프레임)가 오면 적 위에 크게, 없으면 코드로 그린 연출 */
 function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: number): void {
   const tc = fx.tech;
@@ -1313,7 +1351,59 @@ function drawTech(ctx: CanvasRenderingContext2D, sp: Sprites, fx: Fx, now: numbe
   if (e < -500 || e > 1100) return;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
-  if (tc.id === 'nakun') {
+  if (tc.id === 'maeseol' || tc.id === 'maeseol_ult') {
+    // 매화검법(화산의 매설, Codex 그림 오기 전): 검빛이 모여 적 둘레에 매화가 피고 꽃잎이 흩날린다 — 마지막 기술은 스물네 송이
+    const ult = tc.id === 'maeseol_ult';
+    const n = ult ? 24 : 7;
+    const fade = 1 - Math.max(0, e - 500) / 600;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + i * 0.37;
+      if (e < 0) {
+        // 모이는 검빛
+        const k = Math.max(0, Math.min(1, (e + 500 - i * (ult ? 12 : 40)) / 500));
+        if (k <= 0) continue;
+        const r0 = (ult ? 420 : 300) * (1 - k);
+        ctx.strokeStyle = `rgba(${col.rgb},${0.75 * k})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(FOE_X + Math.cos(a) * (r0 + 60), CONTACT.y + Math.sin(a) * (r0 + 60) * 0.6);
+        ctx.lineTo(FOE_X + Math.cos(a) * r0, CONTACT.y + Math.sin(a) * r0 * 0.6);
+        ctx.stroke();
+        continue;
+      }
+      // 피는 매화: 다섯 잎
+      const k = Math.min(1, (e - i * (ult ? 10 : 30)) / 260);
+      if (k <= 0 || fade <= 0) continue;
+      const rr = (ult ? 60 + (i % 3) * 70 : 70 + (i % 2) * 40) * (0.6 + 0.4 * k);
+      const bx = FOE_X + Math.cos(a) * rr;
+      const by = CONTACT.y + Math.sin(a) * rr * 0.7 + Math.max(0, e - 300) * 0.05;
+      plum(ctx, bx, by, (ult ? 16 : 20) * k, a + e / 900, col, fade);
+    }
+    // 흩날리는 꽃잎
+    if (e > 0) {
+      const m = ult ? 60 : 26;
+      for (let i = 0; i < m; i++) {
+        const sd = (i * 97) % 360;
+        const a = (sd / 360) * Math.PI * 2;
+        const v = 0.25 + ((i * 31) % 10) / 20;
+        const x = FOE_X + Math.cos(a) * e * v;
+        const y = CONTACT.y + Math.sin(a) * e * v * 0.5 + (e * e) / 9000;
+        ctx.fillStyle = `rgba(${col.rgb},${0.8 * fade})`;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 4, 2.2, a + e / 200, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // 가운데 번쩍임
+      const k = Math.min(1, e / 220);
+      const g = ctx.createRadialGradient(FOE_X, CONTACT.y, 0, FOE_X, CONTACT.y, ult ? 220 : 130);
+      g.addColorStop(0, `rgba(255,240,245,${0.7 * (1 - k)})`);
+      g.addColorStop(1, 'rgba(255,111,145,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(FOE_X, CONTACT.y, ult ? 220 : 130, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (tc.id === 'nakun') {
     // 낙운무흔: 구름 띠가 하늘에서 소용돌이치며 적에게 내려앉는다
     for (let i = 0; i < 7; i++) {
       const k = Math.max(0, Math.min(1, (e + 400 - i * 50) / 600));
@@ -1627,7 +1717,7 @@ function drawTechRows(ctx: CanvasRenderingContext2D, fx: Fx, now: number): void 
   ctx.fillText(headText, x0 + 8 * k, y0 + 5 * k + rowH / 2);
   rows.forEach((r, i) => {
     const y = y0 + 5 * k + rowH * (i + 1.5);
-    const col = TECH_COLOR[r.id] ?? TECH_COLOR.unhae;
+    const col = techColor(r.id);
     const fill = Math.max(0, Math.min(1, r.n / r.need));
     const full = fill >= 1;
     const pulse = r.ready ? 0.6 + 0.4 * Math.sin(now / 160) : 1;
