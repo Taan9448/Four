@@ -14,7 +14,7 @@
     "traits": [{ "status": "blood_cover_fading", "stacks": 2 }],
     "moves": [
       { "id": "echo_palm", "name": "천마혈공의 잔향", "intent": "attack", "targeting": "haun", "effects": [{ "op": "damage", "amount": 130 }] },
-      { "id": "echo_taste", "name": "하늘 밖의 맛", "intent": "attack", "targeting": "random", "effects": [{ "op": "damage", "amount": 70 }, { "op": "heal", "amount": 100, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }] },
+      { "id": "echo_taste", "name": "하늘 밖의 맛", "fx": "fx_gyeol_skill_sky_tear", "intent": "attack", "targeting": "random", "effects": [{ "op": "damage", "amount": 70 }, { "op": "heal", "amount": 100, "target": "self" }, { "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }] },
       { "id": "echo_cover", "name": "피를 다시 두르다", "intent": "buff", "effects": [{ "op": "apply_status", "status": "blood_cover_fading", "stacks": 2, "target": "self" }, { "op": "block", "amount": 140, "target": "self" }, { "op": "damage", "amount": 60, "target": "all_enemies" }] }
     ],
     "flavor": "피로 산 젊음의 잔향. 덮개가 옅어지는 사이에만 결이 보인다."
@@ -35,7 +35,7 @@
     "moves": [
       { "id": "beast_bite", "name": "금을 문 이빨", "intent": "attack", "targeting": "random", "effects": [{ "op": "damage", "amount": 110 }, { "op": "rift", "amount": 1 }] },
       { "id": "beast_howl", "name": "틈의 울부짖음", "intent": "buff", "effects": [{ "op": "apply_status", "status": "strength", "stacks": 2, "target": "self" }, { "op": "block", "amount": 100, "target": "self" }] },
-      { "id": "beast_rend", "name": "찢어발기기", "intent": "attack", "targeting": "lowest_hp", "effects": [{ "op": "damage", "amount": 60, "times": 2 }] }
+      { "id": "beast_rend", "name": "찢어발기기", "fx": "fx_gyeol_skill_rift_leap", "intent": "attack", "targeting": "lowest_hp", "effects": [{ "op": "damage", "amount": 60, "times": 2 }] }
     ]
   }
 ]

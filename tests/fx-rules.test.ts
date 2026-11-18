@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cardFx, elementHitFx, fxRuleIds, fxSound, statusFx } from '../src/engine/fx-rules';
 import { data } from './helpers';
@@ -6,7 +7,7 @@ const fx = (id: string) => cardFx(data, data.cards.get(id)!);
 
 describe('이펙트 규칙(data/fx.json)', () => {
   it('카드에 적힌 fx·hitFx가 먼저다', () => {
-    expect(fx('haun_byeogun').fx).toBe('fx_slash_blue');
+    expect(fx('haun_byeogun').fx).toBe('fx_gyeol_tech_byeogun_a');
     expect(fx('elia_fireball').hitFx).toBe('fx_hit_fire');
   });
 
@@ -71,5 +72,26 @@ describe('이펙트 규칙(data/fx.json)', () => {
       return !f.fx && !f.hitFx;
     });
     expect(plain.map((c) => c.id)).toEqual([]);
+  });
+
+  // 「결」에서 가져온 연출(2026-11-18): 카드 기술 이펙트(앞뒤 두 장)·반격 이펙트·적 기술 이펙트·마무리 이펙트는 명세가 있는 에셋만
+  it('「결」 이펙트는 명세가 있는 에셋을 가리킨다', () => {
+    const spec = (id: string) => existsSync(`specs/assets/${id}.yaml`);
+    const gyeol = [...data.cards.values()].filter((c) => c.fx?.startsWith('fx_gyeol_') || c.hitFx?.startsWith('fx_gyeol_'));
+    expect(gyeol.length).toBeGreaterThanOrEqual(26);
+    for (const c of gyeol) {
+      if (c.fx?.startsWith('fx_gyeol_tech_')) {
+        expect(c.fx.endsWith('_a'), c.id).toBe(true);
+        expect(spec(c.fx) && spec(`${c.fx.slice(0, -2)}_b`), c.id).toBe(true);
+      }
+      if (c.hitFx?.startsWith('fx_gyeol_')) expect(spec(c.hitFx), c.id).toBe(true);
+    }
+    const moves = [...data.enemies.values()].flatMap((e) => e.moves.filter((m) => m.fx).map((m) => [e.id, m.fx!] as const));
+    expect(moves.length).toBeGreaterThanOrEqual(42);
+    for (const [e, f] of moves) expect(spec(f), `${e} ${f}`).toBe(true);
+    for (const [e, f] of Object.entries(data.fx.finisher ?? {})) {
+      expect(data.enemies.has(e), e).toBe(true);
+      expect(spec(f), f).toBe(true);
+    }
   });
 });

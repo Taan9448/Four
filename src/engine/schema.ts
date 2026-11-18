@@ -312,6 +312,11 @@ export const FxRules = z
     elementHit: z.object({ fire: z.string(), ice: z.string(), lightning: z.string() }).partial().strict().optional(),
     /** 상태 → 걸릴 때 이펙트(events.debuff·buff 대신) */
     statusFx: z.record(z.string(), z.string()).optional(),
+    /**
+     * 적 id → 쓰러질 때 마무리 이펙트(2026-11-18 「결」 마무리 이펙트 가져오기). 정예·보스는 늘, 일반 적은 마지막 하나가 쓰러질 때만.
+     * 적의 <sprite>_death 쓰러짐 그림은 따로 적지 않아도 실제 그림이 있으면 재생한다
+     */
+    finisher: z.record(z.string(), z.string()).optional(),
     /** 이펙트 → 효과음 이름(src/render/audio.ts SFX_NAMES). 그 이펙트가 나올 때 피격·상태 소리 위에 얹는다(2026-10-22) */
     sounds: z.record(z.string(), z.string()).optional(),
     /** 카드를 낼 때(2026-10-23): 등급별로 얹는 소리, 대강화 +8·+9·+10의 쾅(소리·흔들림 0~1·번쩍 색·타격 멈춤 ms·충격파 색) */
@@ -462,6 +467,8 @@ export const MoveDef = z
      * 순서(cycle)·무작위(random) 어느 패턴이든 끼어들고, 한 전투에 한 번. 평소 행동 고르기에는 끼지 않는다. oncePerBattle과 함께 쓴다
      */
     phase: z.boolean().optional(),
+    /** 연출(2026-11-18 「결」 적 기술 이펙트 가져오기): 공격이면 맞는 쪽 위에, 그 밖의 행동이면 대상(없으면 자기) 위에 겹칠 이펙트 에셋 id */
+    fx: z.string().optional(),
     effects: z.array(Effect),
   })
   .strict();

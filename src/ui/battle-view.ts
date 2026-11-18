@@ -137,6 +137,8 @@ export class BattleView {
   private handSig = new WeakMap<HTMLElement, string>();
   private busy = false;
   private lastCard: string | null = null;
+  /** 지금 행동 중인 적의 행동(「결」 적 기술 이펙트, 2026-11-18): 공격이면 맞는 쪽에, 해로운 상태면 걸리는 쪽에 move.fx */
+  private lastMove: { uid: string; fx: string; intent: string } | null = null;
   /** 손패 카드 요소(uid별). 손패를 떠난 카드를 더미로 날려 보내고, 새로 들어온 카드를 뽑을 더미에서 끌어오는 데 쓴다 */
   private handEls = new Map<string, HTMLElement>();
   /** 이미 따로 날려 보낸 카드(낸 카드·턴 끝에 버린 카드): 손패에서 사라져도 다시 날리지 않는다 */
@@ -342,6 +344,13 @@ export class BattleView {
     return id;
   }
 
+  /** 쓰러짐 동작(「결」에서 만든 <그림>_death, 2026-11-18): 지금 보이는 대기 그림의 짝이 실제로 있을 때만 */
+  private deathSprite(c: Combatant): string | null {
+    const idle = this.spriteFor(c, 'idle');
+    const id = idle?.endsWith('_idle') ? `${idle.slice(0, -5)}_death` : null;
+    return id && spriteSource(id) === 'sprites' ? id : null;
+  }
+
   /**
    * 상태 이름표는 두 줄까지(2026-10-14 사용자 요청 — 상태가 늘면 캐릭터가 위로 밀려 올라갔다): 넘치면 이름을 빼고 아이콘·스택만,
    * 그래도 넘치면 뒤에서부터 접어 +N 이름표 하나로(주석에 접힌 상태 이름)
@@ -442,7 +451,10 @@ export class BattleView {
       u.block.textContent = c.block > 0 ? String(c.block) : '';
       u.block.style.display = c.block > 0 ? '' : 'none';
       if (c.block > 0) Object.entries(tipAttrs(`방어 ${c.block}`, '받는 피해를 먼저 막는다. 자기 턴이 시작되면 사라진다.')).forEach(([k, v]) => v && u.block.setAttribute(k, v));
+      const wasDown = u.el.classList.contains('down');
       u.el.classList.toggle('down', shown?.downed ?? c.downed);
+      // 다시 일어서면(부활) 쓰러짐 동작의 마지막 칸에 멈춰 있던 그림을 대기 동작으로
+      if (wasDown && !u.el.classList.contains('down')) this.idle(u);
       u.el.classList.toggle('target-focus', this.selected !== null && this.targetFocus === c.uid);
       clear(u.statuses);
       for (const [id, n] of Object.entries(c.statuses)) if (n > 0 || this.data.statuses.get(id)?.kind === 'trait') u.statuses.appendChild(statusChip(this.data, id, n));
@@ -1285,7 +1297,8 @@ export class BattleView {
           if (def.castLine && settings.cutIn) await this.cutIn(ev.cardId, def.castLine);
           this.alive();
           // 피해 없는 카드(기술·파워): 쓴 사람 위에 시전 이펙트(data/fx.json castFx)
-          const cast = def.type !== 'attack' && ev.sourceUid ? this.realFx(cardFx(this.data, def).castFx) : null;
+          // 카드에 제 연출(「결」 기술 이펙트 등)이 있으면 그것을 쓴 사람 위에(2026-11-18)
+          const cast = def.type !== 'attack' && ev.sourceUid ? (this.realFx(def.fx) ?? this.realFx(cardFx(this.data, def).castFx)) : null;
           if (cast) void this.playFx(cast, ev.sourceUid!);
           break;
         }
@@ -1364,6 +1377,11 @@ export class BattleView {
           const u = this.units.get(ev.targetUid);
           if (u && ev.stacks > 0) {
             floatOver(this.fxLayer, u.el, this.data.statuses.get(ev.status)?.name ?? ev.status, 'status');
+            // 적의 해로운 기술(거미줄·사슬 채우기 등)의 「결」 이펙트는 처음 걸리는 쪽에
+            if (this.lastMove && u.c.side === 'party') {
+              void this.playFx(this.lastMove.fx, ev.targetUid);
+              this.lastMove = null;
+            }
             // 상태 이펙트: 독 → 독구름, 해로운 상태 → 보랏빛 문양, 이로운 상태 → 금빛 화살표(data/fx.json events)
             const kind = this.data.statuses.get(ev.status)?.kind;
             // 감전·마비처럼 상태마다 정한 이펙트가 있으면 그것(data/fx.json statusFx).
@@ -1462,9 +1480,16 @@ export class BattleView {
           const sh = this.shown.get(ev.uid);
           if (sh) sh.downed = true;
           if (u) {
-            u.player.stop();
-            u.el.classList.add('down');
             sfx('down', { pan: u.c.side === 'enemy' ? 0.35 : -0.35 });
+            // 「결」에서 가져온 연출(2026-11-18): 마무리 이펙트(정예·보스, 일반 적은 마지막 하나) + 쓰러짐 동작(<그림>_death)
+            const fin = u.c.side === 'enemy' ? this.realFx(this.data.fx.finisher?.[u.c.defId]) : null;
+            const tier = u.c.side === 'enemy' ? this.data.enemies.get(u.c.defId)?.tier : undefined;
+            const lastOne = u.c.side === 'enemy' && ![...this.units.values()].some((o) => o !== u && o.c.side === 'enemy' && !this.shown.get(o.c.uid)?.downed);
+            if (fin && (tier !== 'normal' || lastOne)) void this.playFx(fin, ev.uid);
+            const death = this.deathSprite(u.c);
+            if (death) await Promise.race([u.player.play(death), this.wait(1100)]);
+            else u.player.stop();
+            u.el.classList.add('down');
           }
           await this.wait(200);
           break;
@@ -1553,6 +1578,14 @@ export class BattleView {
           const u = this.units.get(ev.uid);
           if (u) floatOver(this.fxLayer, u.el, ev.moveName, 'status');
           this.lastCard = null;
+          // 적 기술 이펙트(「결」에서 가져옴): 공격은 맞을 때, 해로운 상태는 걸릴 때, 그 밖(방어·강화·특수)은 지금 자기 위에
+          const move = u ? this.data.enemies.get(u.c.defId)?.moves.find((m) => m.name === ev.moveName) : undefined;
+          const moveFx = this.realFx(move?.fx);
+          this.lastMove = moveFx && move ? { uid: ev.uid, fx: moveFx, intent: move.intent } : null;
+          if (moveFx && move && move.intent !== 'attack' && move.intent !== 'debuff') {
+            void this.playFx(moveFx, ev.uid);
+            this.lastMove = null;
+          }
           // 단계 기술(이그니스의 '협곡의 하늘이 찢어진다' 등): 검은 틈이 그어지듯 짧게 흔들리고 붉게 번쩍인다. 폭주 연출이 바로 이어진다
           if (u && this.data.enemies.get(u.c.defId)?.moves.some((m) => m.phase && m.name === ev.moveName)) {
             shake(this.field, 0.8);
@@ -1704,7 +1737,9 @@ export class BattleView {
       hitResolve();
       if (finished) this.idle(u);
     });
-    const fx = card ? this.realFx(cardFx(this.data, card).fx) : null;
+    const moveFx = u.c.side === 'enemy' && this.lastMove?.uid === sourceUid ? this.lastMove.fx : null;
+    if (moveFx) this.lastMove = null;
+    const fx = card ? this.realFx(cardFx(this.data, card).fx) : moveFx;
     if (fx) for (const t of targetUids) void this.playFx(fx, t);
     await Promise.race([hit, this.wait(900)]);
     this.alive();
@@ -1771,12 +1806,18 @@ export class BattleView {
     const canvas = h('canvas', { class: 'fx-canvas' }) as HTMLCanvasElement;
     const lr = this.fxLayer.getBoundingClientRect();
     const tr = t.el.getBoundingClientRect();
-    const size = Math.max(tr.width, tr.height * 0.8);
+    // 「결」 이펙트(기술·적 기술·마무리)는 넓은 판에 맞춰 그려서 조금 크게(2026-11-18)
+    const base = Math.max(tr.width, tr.height * 0.8);
+    const size = base * (fxId.startsWith('fx_gyeol_') ? 1.5 : 1);
     canvas.style.left = `${tr.left - lr.left + tr.width / 2 - size / 2}px`;
-    canvas.style.top = `${tr.top - lr.top + tr.height * 0.1}px`;
+    canvas.style.top = `${tr.top - lr.top + tr.height * 0.1 - (size - base) / 2}px`;
     canvas.style.width = canvas.style.height = `${size}px`;
     this.fxLayer.appendChild(canvas);
-    await new SpritePlayer(canvas).play(fxId);
+    const player = new SpritePlayer(canvas);
+    await player.play(fxId);
+    // 앞뒤 두 장으로 나뉜 이펙트(「결」 기술 _a → _b): 뒷장이 실제로 있으면 이어서
+    const next = fxId.endsWith('_a') ? this.realFx(`${fxId.slice(0, -2)}_b`) : null;
+    if (next && !this.disposed) await player.play(next);
     canvas.remove();
   }
 
