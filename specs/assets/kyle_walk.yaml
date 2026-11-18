@@ -10,9 +10,9 @@ fps: 10
 loop: true
 events: {}
 bbox_tolerance: 0.2
-# 걷기 한 바퀴(6칸 반복). 서 있는 키는 대기(idle)와 같게, 발 맨 아래 줄은 모든 칸에서 같은 줄
+# 걷기 한 바퀴(6칸 반복). 2026-11-18: 카일은 대기 그림처럼 방패 없이(첫 그림에 방패가 생겨 멈출 때 사라졌다). 서 있는 키는 대기(idle)와 같게, 발 맨 아래 줄은 모든 칸에서 같은 줄
 frame_notes:
-  1: "brisk walk cycle, contact pose: right foot forward touching the ground heel first, left foot behind, longsword held low at the side, shield on the left arm, cape swaying"
+  1: "brisk walk cycle, contact pose: right foot forward touching the ground heel first, left foot behind, longsword held low in the right hand, NO shield (exactly the same gear as kyle_idle: armor, blue tabard, blue cape, longsword only), cape swaying"
   2: "walk cycle, down pose: weight on the right foot, knee slightly bent, body a little lower, arms swinging opposite to the legs"
   3: "walk cycle, passing pose: left leg passing the right, body at its highest, head level"
   4: "walk cycle, contact pose: left foot forward touching the ground heel first, right foot behind (mirror of frame 1)"
