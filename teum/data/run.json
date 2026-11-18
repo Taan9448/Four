@@ -1,0 +1,41 @@
+{
+  "$comment": "「틈」 한 판(30분) 수치. 시간은 초. GAME_DESIGN 3·4·9절",
+  "length": 1800,
+  "player": { "hp": 100, "speed": 160, "radius": 16, "pickup": 70, "hurtCooldown": 0.4, "slots": { "weapons": 6, "passives": 6 } },
+  "dash": { "duration": 0.22, "speed": 560, "cooldown": 3, "graze": { "radius": 90, "damage": 18 } },
+  "ult": { "max": 100, "kill": 0.4, "elite": 12, "boss": 30, "radius": 700 },
+  "xp": { "base": 5, "perLevel": 7, "square": 0.18 },
+  "foes": { "max": 300, "spawnRadius": 640, "despawn": 1100, "hpPerMinute": 0.07, "overtimeDamagePerMinute": 0.5, "separation": 0.35 },
+  "drops": { "food": 0.008, "magnet": 0.002, "foodHeal": 30 },
+  "acts": [
+    { "from": 0, "name": "1막 · 엘하임 쪽 틈", "ground": "tile_teum_elheim", "color": ["#1f2a1c", "#2a3a24"], "spawns": [
+      { "from": 0, "to": 120, "rate": [0.9, 1.6], "foes": { "goblin": 3, "wolf": 2 } },
+      { "from": 120, "to": 300, "rate": [1.6, 2.4], "foes": { "goblin": 2, "wolf": 3, "ash_bat": 2, "swamp_toad": 1 } },
+      { "from": 300, "to": 600, "rate": [2.4, 3.4], "foes": { "wolf": 3, "ash_bat": 2, "swamp_toad": 2, "ore_spider": 2, "fire_spirit": 2 } }
+    ] },
+    { "from": 600, "name": "2막 · 북쪽 틈", "ground": "tile_teum_north", "color": ["#1c2430", "#2a3644"], "spawns": [
+      { "from": 600, "to": 900, "rate": [2.8, 3.6], "foes": { "ice_wolf": 3, "empty_armor": 2, "rock_eater": 2 } },
+      { "from": 900, "to": 1200, "rate": [3.4, 4.4], "foes": { "ice_wolf": 2, "ice_knight": 3, "empty_armor": 2, "tomb_warrior": 2, "rock_golem": 1 } }
+    ] },
+    { "from": 1200, "name": "3막 · 천마봉의 틈", "ground": "tile_teum_rift", "color": ["#22141c", "#34202a"], "spawns": [
+      { "from": 1200, "to": 1500, "rate": [3.8, 4.8], "foes": { "blood_cultist": 3, "cult_swordsman": 2, "needle_cultist": 2, "shadow_fragment": 2 } },
+      { "from": 1500, "to": 1800, "rate": [4.6, 5.6], "foes": { "cult_swordsman": 2, "shadow_fragment": 2, "fire_scale_hound": 2, "rift_phantom": 2, "bone_giant": 1, "needle_cultist": 1 } },
+      { "from": 1800, "to": 99999, "rate": [5.6, 5.6], "foes": { "fire_scale_hound": 2, "rift_phantom": 2, "bone_giant": 1 } }
+    ] }
+  ],
+  "events": [
+    { "at": 90, "kind": "swarm", "foe": "wolf", "count": 14, "text": "늑대 무리가 한쪽에서 몰려온다" },
+    { "at": 210, "kind": "ring", "foe": "goblin", "count": 24, "text": "고블린이 둘러싼다" },
+    { "at": 300, "kind": "elite", "foe": "chain_overseer", "text": "사슬 감독관" },
+    { "at": 450, "kind": "swarm", "foe": "ash_bat", "count": 30, "text": "재 박쥐 떼" },
+    { "at": 600, "kind": "boss", "foe": "ignis", "text": "화염군주 이그니스 — 첫째 매듭" },
+    { "at": 750, "kind": "ring", "foe": "ice_wolf", "count": 26, "text": "얼음 늑대가 둘러싼다" },
+    { "at": 900, "kind": "elite", "foe": "ice_gatekeeper", "text": "얼음 궁전의 문지기" },
+    { "at": 1050, "kind": "swarm", "foe": "rock_eater", "count": 28, "text": "바위 먹는 벌레가 밀려든다" },
+    { "at": 1200, "kind": "boss", "foe": "vargas", "text": "마왕 바르가스 — 둘째 매듭" },
+    { "at": 1350, "kind": "ring", "foe": "blood_cultist", "count": 30, "text": "신교 교도가 둘러싼다" },
+    { "at": 1500, "kind": "elite", "foe": "stair_elder", "text": "계단의 장로" },
+    { "at": 1620, "kind": "swarm", "foe": "shadow_fragment", "count": 36, "text": "그림자 조각이 쏟아진다" },
+    { "at": 1650, "kind": "boss", "foe": "mordecai", "text": "지옥왕 모르데카이 — 틈의 마지막 매듭", "final": true }
+  ]
+}

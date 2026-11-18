@@ -1,0 +1,11 @@
+id: icons_teum
+type: icon-sheet
+summary: '「틈」 줍는 것 아이콘 4종(2026-11-18) — 결 조각(경험)·상자·주먹밥(회복)·자석. 글자 없이 모양과 색으로. 칸 번호는 teum/src/render.ts ICON 표와 같다'
+frames: 4
+baseline: 0.5
+frame_notes:
+  1: "grain shard (experience): a small glowing blue-cyan crystal shard shaped like a sliver of wood split along the grain, with two thin white grain lines on it"
+  2: "chest dropped by elites and bosses: a small dark lacquered wooden box with gold corner fittings and a red tassel seal on the lid"
+  3: "rice ball (heal): a white triangular rice ball wrapped in a strip of dark green seaweed at the bottom"
+  4: "magnet (pull all shards): a small bronze water-yoke pole with two little buckets, glowing faint blue"
+placeholder: { color: '#3a3020', accent: '#8fd3ff' }

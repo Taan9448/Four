@@ -1,0 +1,1420 @@
+{
+ "$comment": "「틈」 무공·심법. 종류(kind)마다 움직임은 엔진이 정하고 무공별 코드는 없다(GAME_DESIGN 4절). levels[i] = Lv.i+1 값. area는 배율, duration은 초, speed는 탄 속도(px/s) 또는 회전 속도(rad/s). evolve: Lv.5 + 짝 심법으로 상자를 열면 각성",
+ "weapons": [
+  {
+   "id": "grain_cut",
+   "name": "결 따라 베기",
+   "owner": "haun",
+   "kind": "slash",
+   "desc": "바라보는 쪽을 결대로 벤다. Lv.3부터 뒤로도.",
+   "color": "#cfe6ff",
+   "levels": [
+    {
+     "damage": 14,
+     "cooldown": 1.0,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 18,
+     "cooldown": 0.95,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 22,
+     "cooldown": 0.9,
+     "area": 1.15,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 28,
+     "cooldown": 0.85,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 34,
+     "cooldown": 0.75,
+     "area": 1.35,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "knock": 10,
+   "evolve": {
+    "with": "grain",
+    "into": "eighteen"
+   }
+  },
+  {
+   "id": "nakun",
+   "name": "낙운무흔",
+   "owner": "haun",
+   "kind": "orbit",
+   "desc": "구름 띠가 둘레를 돌며 닿는 것을 친다.",
+   "color": "#a8d8ff",
+   "levels": [
+    {
+     "damage": 9,
+     "cooldown": 4,
+     "area": 1,
+     "count": 2,
+     "speed": 2.6,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 11,
+     "cooldown": 4,
+     "area": 1.1,
+     "count": 3,
+     "speed": 2.8,
+     "pierce": 0,
+     "duration": 3.2
+    },
+    {
+     "damage": 13,
+     "cooldown": 3.8,
+     "area": 1.15,
+     "count": 3,
+     "speed": 3,
+     "pierce": 0,
+     "duration": 3.6
+    },
+    {
+     "damage": 16,
+     "cooldown": 3.6,
+     "area": 1.25,
+     "count": 4,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 20,
+     "cooldown": 3.2,
+     "area": 1.35,
+     "count": 5,
+     "speed": 3.4,
+     "pierce": 0,
+     "duration": 4
+    }
+   ],
+   "fx": "fx_gyeol_tech_nakun_a"
+  },
+  {
+   "id": "byeogun",
+   "name": "벽운단하",
+   "owner": "haun",
+   "kind": "wave",
+   "desc": "구름을 쪼개는 검기가 길게 뻗는다.",
+   "color": "#4fb4ff",
+   "levels": [
+    {
+     "damage": 30,
+     "cooldown": 2.6,
+     "area": 1,
+     "count": 1,
+     "speed": 420,
+     "pierce": 8,
+     "duration": 1.2
+    },
+    {
+     "damage": 38,
+     "cooldown": 2.4,
+     "area": 1.1,
+     "count": 1,
+     "speed": 440,
+     "pierce": 10,
+     "duration": 1.2
+    },
+    {
+     "damage": 46,
+     "cooldown": 2.2,
+     "area": 1.15,
+     "count": 2,
+     "speed": 460,
+     "pierce": 12,
+     "duration": 1.3
+    },
+    {
+     "damage": 56,
+     "cooldown": 2.0,
+     "area": 1.25,
+     "count": 2,
+     "speed": 480,
+     "pierce": 14,
+     "duration": 1.4
+    },
+    {
+     "damage": 70,
+     "cooldown": 1.8,
+     "area": 1.35,
+     "count": 3,
+     "speed": 500,
+     "pierce": 99,
+     "duration": 1.5
+    }
+   ],
+   "evolve": {
+    "with": "breath",
+    "into": "cheonoe_blade"
+   }
+  },
+  {
+   "id": "chulsu",
+   "name": "청운출수",
+   "owner": "haun",
+   "kind": "nova",
+   "desc": "둘레로 결의 고리가 퍼진다.",
+   "color": "#7fd6c8",
+   "levels": [
+    {
+     "damage": 16,
+     "cooldown": 3.2,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 3.0,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 25,
+     "cooldown": 2.8,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 30,
+     "cooldown": 2.6,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 38,
+     "cooldown": 2.4,
+     "area": 1.45,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ]
+  },
+  {
+   "id": "unhae",
+   "name": "운해귀종",
+   "owner": "haun",
+   "kind": "aura",
+   "desc": "몸 둘레 구름바다에 닿은 것을 늘 깎는다.",
+   "color": "#ffd27a",
+   "levels": [
+    {
+     "damage": 5,
+     "cooldown": 0.5,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 7,
+     "cooldown": 0.5,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 9,
+     "cooldown": 0.5,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 11,
+     "cooldown": 0.45,
+     "area": 1.3,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 14,
+     "cooldown": 0.4,
+     "area": 1.45,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ]
+  },
+  {
+   "id": "cheonoe_blade",
+   "name": "천외귀운의 검",
+   "owner": "haun",
+   "kind": "wave",
+   "desc": "각성 — 벽운단하 + 청운호흡. 위에서 들어오는 힘을 돌려 네 갈래로 벤다.",
+   "color": "#e8f4ff",
+   "levels": [
+    {
+     "damage": 120,
+     "cooldown": 1.4,
+     "area": 1.6,
+     "count": 4,
+     "speed": 560,
+     "pierce": 99,
+     "duration": 1.6
+    }
+   ],
+   "evolved": true,
+   "fx": "fx_gyeol_tech_cheonoe_gwiun_a"
+  },
+  {
+   "id": "eighteen",
+   "name": "청운십팔식 연환",
+   "owner": "haun",
+   "kind": "slash",
+   "desc": "각성 — 결 따라 베기 + 결 읽기. 네 방향을 쉬지 않고 벤다.",
+   "color": "#ffffff",
+   "levels": [
+    {
+     "damage": 48,
+     "cooldown": 0.55,
+     "area": 1.6,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "knock": 14
+  },
+  {
+   "id": "knight_strike",
+   "name": "기사의 일격",
+   "owner": "kyle",
+   "kind": "slash",
+   "desc": "방패 뒤에서 넓게 벤다. 크게 밀어낸다.",
+   "color": "#ffe08a",
+   "levels": [
+    {
+     "damage": 16,
+     "cooldown": 1.1,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 1.05,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 25,
+     "cooldown": 1.0,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 31,
+     "cooldown": 0.95,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 38,
+     "cooldown": 0.85,
+     "area": 1.4,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "knock": 26
+  },
+  {
+   "id": "shield_rush",
+   "name": "방패 돌진",
+   "owner": "kyle",
+   "kind": "wave",
+   "desc": "방패 모양의 기세가 앞으로 밀고 나간다.",
+   "color": "#e8c060",
+   "levels": [
+    {
+     "damage": 24,
+     "cooldown": 2.4,
+     "area": 1.2,
+     "count": 1,
+     "speed": 360,
+     "pierce": 6,
+     "duration": 0.7
+    },
+    {
+     "damage": 30,
+     "cooldown": 2.2,
+     "area": 1.3,
+     "count": 1,
+     "speed": 380,
+     "pierce": 8,
+     "duration": 0.8
+    },
+    {
+     "damage": 36,
+     "cooldown": 2.0,
+     "area": 1.35,
+     "count": 2,
+     "speed": 400,
+     "pierce": 10,
+     "duration": 0.8
+    },
+    {
+     "damage": 44,
+     "cooldown": 1.9,
+     "area": 1.45,
+     "count": 2,
+     "speed": 420,
+     "pierce": 12,
+     "duration": 0.9
+    },
+    {
+     "damage": 54,
+     "cooldown": 1.7,
+     "area": 1.6,
+     "count": 3,
+     "speed": 440,
+     "pierce": 16,
+     "duration": 1
+    }
+   ],
+   "knock": 30
+  },
+  {
+   "id": "shield_wall",
+   "name": "방패벽",
+   "owner": "kyle",
+   "kind": "orbit",
+   "desc": "방패 그림자가 둘레를 돌며 막고 친다.",
+   "color": "#c8b48a",
+   "levels": [
+    {
+     "damage": 10,
+     "cooldown": 5,
+     "area": 1.1,
+     "count": 2,
+     "speed": 2,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 12,
+     "cooldown": 5,
+     "area": 1.15,
+     "count": 3,
+     "speed": 2.1,
+     "pierce": 0,
+     "duration": 4.2
+    },
+    {
+     "damage": 15,
+     "cooldown": 4.8,
+     "area": 1.2,
+     "count": 3,
+     "speed": 2.2,
+     "pierce": 0,
+     "duration": 4.6
+    },
+    {
+     "damage": 18,
+     "cooldown": 4.6,
+     "area": 1.3,
+     "count": 4,
+     "speed": 2.3,
+     "pierce": 0,
+     "duration": 5
+    },
+    {
+     "damage": 22,
+     "cooldown": 4.2,
+     "area": 1.4,
+     "count": 4,
+     "speed": 2.4,
+     "pierce": 0,
+     "duration": 5
+    }
+   ],
+   "evolve": {
+    "with": "vigor",
+    "into": "no_one_dies"
+   },
+   "knock": 20
+  },
+  {
+   "id": "wing_cleave",
+   "name": "날개 베기",
+   "owner": "kyle",
+   "kind": "nova",
+   "desc": "용의 날개를 끊은 큰 베기가 고리로 퍼진다.",
+   "color": "#ff5a4a",
+   "levels": [
+    {
+     "damage": 20,
+     "cooldown": 3.4,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 25,
+     "cooldown": 3.2,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 30,
+     "cooldown": 3.0,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 37,
+     "cooldown": 2.8,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 45,
+     "cooldown": 2.6,
+     "area": 1.45,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ]
+  },
+  {
+   "id": "rowen_oath",
+   "name": "로웬의 일격",
+   "owner": "kyle",
+   "kind": "strike",
+   "desc": "로웬 가의 검이 화면 안 적에게 내리꽂힌다.",
+   "color": "#6f9cff",
+   "levels": [
+    {
+     "damage": 40,
+     "cooldown": 2.6,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 48,
+     "cooldown": 2.4,
+     "area": 1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 56,
+     "cooldown": 2.2,
+     "area": 1.1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 66,
+     "cooldown": 2.0,
+     "area": 1.15,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 80,
+     "cooldown": 1.8,
+     "area": 1.25,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "fx": "fx_gyeol_tech_rowen_oath_a"
+  },
+  {
+   "id": "no_one_dies",
+   "name": "아무도 죽지 않아",
+   "owner": "kyle",
+   "kind": "orbit",
+   "desc": "각성 — 방패벽 + 굳은살. 방패 여섯이 쉬지 않고 돈다.",
+   "color": "#fff4d0",
+   "levels": [
+    {
+     "damage": 34,
+     "cooldown": 1,
+     "area": 1.6,
+     "count": 6,
+     "speed": 2.6,
+     "pierce": 0,
+     "duration": 1
+    }
+   ],
+   "evolved": true,
+   "knock": 26
+  },
+  {
+   "id": "fireball",
+   "name": "불덩이",
+   "owner": "elia",
+   "kind": "bolt",
+   "desc": "가장 가까운 적에게 불덩이를 던진다(태운다).",
+   "color": "#ff8a3a",
+   "levels": [
+    {
+     "damage": 14,
+     "cooldown": 0.9,
+     "area": 1,
+     "count": 1,
+     "speed": 320,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 17,
+     "cooldown": 0.85,
+     "area": 1,
+     "count": 2,
+     "speed": 330,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 21,
+     "cooldown": 0.8,
+     "area": 1.1,
+     "count": 2,
+     "speed": 340,
+     "pierce": 2,
+     "duration": 2
+    },
+    {
+     "damage": 25,
+     "cooldown": 0.75,
+     "area": 1.15,
+     "count": 3,
+     "speed": 350,
+     "pierce": 2,
+     "duration": 2
+    },
+    {
+     "damage": 30,
+     "cooldown": 0.7,
+     "area": 1.2,
+     "count": 3,
+     "speed": 360,
+     "pierce": 3,
+     "duration": 2
+    }
+   ],
+   "element": "fire"
+  },
+  {
+   "id": "frost_ward",
+   "name": "서리 결계",
+   "owner": "elia",
+   "kind": "aura",
+   "desc": "둘레의 적을 느리게 하고 깎는다.",
+   "color": "#9fe6ff",
+   "levels": [
+    {
+     "damage": 4,
+     "cooldown": 0.5,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 5,
+     "cooldown": 0.5,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 7,
+     "cooldown": 0.5,
+     "area": 1.3,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 9,
+     "cooldown": 0.45,
+     "area": 1.4,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 11,
+     "cooldown": 0.4,
+     "area": 1.55,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "ice"
+  },
+  {
+   "id": "frost_bloom",
+   "name": "서리꽃",
+   "owner": "elia",
+   "kind": "nova",
+   "desc": "서리꽃이 피며 퍼진다(느리게 한다).",
+   "color": "#cdeeff",
+   "levels": [
+    {
+     "damage": 18,
+     "cooldown": 3.4,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 22,
+     "cooldown": 3.2,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 27,
+     "cooldown": 3.0,
+     "area": 1.2,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 33,
+     "cooldown": 2.8,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 40,
+     "cooldown": 2.6,
+     "area": 1.45,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "ice",
+   "fx": "fx_gyeol_tech_frost_bloom_a"
+  },
+  {
+   "id": "violet_bolt",
+   "name": "보랏빛 번개",
+   "owner": "elia",
+   "kind": "strike",
+   "desc": "첨탑의 번개가 화면 안 적에게 떨어진다.",
+   "color": "#9a5cff",
+   "levels": [
+    {
+     "damage": 30,
+     "cooldown": 2.2,
+     "area": 1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 36,
+     "cooldown": 2.0,
+     "area": 1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 42,
+     "cooldown": 1.9,
+     "area": 1.1,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 50,
+     "cooldown": 1.7,
+     "area": 1.15,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 60,
+     "cooldown": 1.5,
+     "area": 1.25,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolve": {
+    "with": "haste",
+    "into": "spire_storm"
+   },
+   "fx": "fx_hit_shock"
+  },
+  {
+   "id": "mana_rain",
+   "name": "마나 화살비",
+   "owner": "elia",
+   "kind": "rain",
+   "desc": "화살비가 쏟아지는 자리를 만든다.",
+   "color": "#5fd0ff",
+   "levels": [
+    {
+     "damage": 8,
+     "cooldown": 4,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 10,
+     "cooldown": 3.8,
+     "area": 1.1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.6,
+     "area": 1.15,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 15,
+     "cooldown": 3.4,
+     "area": 1.25,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 18,
+     "cooldown": 3.2,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    }
+   ]
+  },
+  {
+   "id": "spire_storm",
+   "name": "첨탑의 번개",
+   "owner": "elia",
+   "kind": "strike",
+   "desc": "각성 — 보랏빛 번개 + 숨 고르기. 번개가 그치지 않는다.",
+   "color": "#d4b8ff",
+   "levels": [
+    {
+     "damage": 90,
+     "cooldown": 0.7,
+     "area": 1.4,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "fx": "fx_hit_shock"
+  },
+  {
+   "id": "axe_chop",
+   "name": "도끼질",
+   "owner": "born",
+   "kind": "slash",
+   "desc": "느리지만 무겁게 내려찍는다.",
+   "color": "#e0c090",
+   "levels": [
+    {
+     "damage": 24,
+     "cooldown": 1.5,
+     "area": 1.05,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 30,
+     "cooldown": 1.45,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 37,
+     "cooldown": 1.4,
+     "area": 1.2,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 45,
+     "cooldown": 1.3,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 55,
+     "cooldown": 1.2,
+     "area": 1.35,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "knock": 18
+  },
+  {
+   "id": "earth_quake",
+   "name": "대지 울림",
+   "owner": "born",
+   "kind": "nova",
+   "desc": "땅을 굴러 둘레를 흔든다.",
+   "color": "#c98a4a",
+   "levels": [
+    {
+     "damage": 22,
+     "cooldown": 3.6,
+     "area": 1.05,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 27,
+     "cooldown": 3.4,
+     "area": 1.15,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 33,
+     "cooldown": 3.2,
+     "area": 1.25,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 40,
+     "cooldown": 3.0,
+     "area": 1.35,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 48,
+     "cooldown": 2.8,
+     "area": 1.5,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "knock": 16
+  },
+  {
+   "id": "mountain_cleave",
+   "name": "산 가르기",
+   "owner": "born",
+   "kind": "wave",
+   "desc": "결대로 쪼갠 산줄기가 앞으로 갈라진다.",
+   "color": "#ff9a4a",
+   "levels": [
+    {
+     "damage": 34,
+     "cooldown": 2.8,
+     "area": 1.1,
+     "count": 1,
+     "speed": 380,
+     "pierce": 8,
+     "duration": 1.1
+    },
+    {
+     "damage": 42,
+     "cooldown": 2.6,
+     "area": 1.2,
+     "count": 1,
+     "speed": 390,
+     "pierce": 10,
+     "duration": 1.2
+    },
+    {
+     "damage": 50,
+     "cooldown": 2.4,
+     "area": 1.25,
+     "count": 2,
+     "speed": 400,
+     "pierce": 12,
+     "duration": 1.2
+    },
+    {
+     "damage": 60,
+     "cooldown": 2.2,
+     "area": 1.35,
+     "count": 2,
+     "speed": 420,
+     "pierce": 14,
+     "duration": 1.3
+    },
+    {
+     "damage": 74,
+     "cooldown": 2.0,
+     "area": 1.45,
+     "count": 3,
+     "speed": 440,
+     "pierce": 99,
+     "duration": 1.4
+    }
+   ]
+  },
+  {
+   "id": "durin_hammer",
+   "name": "두린의 망치",
+   "owner": "born",
+   "kind": "strike",
+   "desc": "망치가 화면 안 적에게 떨어져 둘레를 친다.",
+   "color": "#e0a040",
+   "levels": [
+    {
+     "damage": 50,
+     "cooldown": 3,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 60,
+     "cooldown": 2.8,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 70,
+     "cooldown": 2.6,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 82,
+     "cooldown": 2.4,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 96,
+     "cooldown": 2.2,
+     "area": 1.45,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolve": {
+    "with": "might",
+    "into": "five_thousand"
+   },
+   "fx": "fx_gyeol_tech_durin_hammer_a"
+  },
+  {
+   "id": "cliff_fall",
+   "name": "절벽 무너뜨리기",
+   "owner": "born",
+   "kind": "rain",
+   "desc": "둘레에 바위가 무너져 내리는 자리를 만든다.",
+   "color": "#a07850",
+   "levels": [
+    {
+     "damage": 12,
+     "cooldown": 4.2,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 15,
+     "cooldown": 4.0,
+     "area": 1.2,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 18,
+     "cooldown": 3.8,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 22,
+     "cooldown": 3.6,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 27,
+     "cooldown": 3.4,
+     "area": 1.45,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    }
+   ]
+  },
+  {
+   "id": "five_thousand",
+   "name": "오천의 망치",
+   "owner": "born",
+   "kind": "strike",
+   "desc": "각성 — 두린의 망치 + 벼린 날. 오천의 망치가 같이 내려친다.",
+   "color": "#ff6a3a",
+   "levels": [
+    {
+     "damage": 150,
+     "cooldown": 1.2,
+     "area": 1.6,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "fx": "fx_gyeol_tech_kazdum_heart_a"
+  },
+  {
+   "id": "waterwheel",
+   "name": "물레방아",
+   "owner": "*",
+   "kind": "orbit",
+   "desc": "물지게 두 동이가 빙글 돈다.",
+   "color": "#8fd3ff",
+   "levels": [
+    {
+     "damage": 8,
+     "cooldown": 3.6,
+     "area": 0.9,
+     "count": 1,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 2.4
+    },
+    {
+     "damage": 10,
+     "cooldown": 3.4,
+     "area": 1,
+     "count": 2,
+     "speed": 3.3,
+     "pierce": 0,
+     "duration": 2.6
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.2,
+     "area": 1.05,
+     "count": 2,
+     "speed": 3.4,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 14,
+     "cooldown": 3.0,
+     "area": 1.1,
+     "count": 3,
+     "speed": 3.5,
+     "pierce": 0,
+     "duration": 3.2
+    },
+    {
+     "damage": 17,
+     "cooldown": 2.8,
+     "area": 1.2,
+     "count": 3,
+     "speed": 3.6,
+     "pierce": 0,
+     "duration": 3.4
+    }
+   ]
+  },
+  {
+   "id": "blue_edge",
+   "name": "푸른 검광",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "칼끝에 맺힌 푸른 검광을 날린다.",
+   "color": "#4fb4ff",
+   "levels": [
+    {
+     "damage": 10,
+     "cooldown": 1.2,
+     "area": 1,
+     "count": 1,
+     "speed": 380,
+     "pierce": 2,
+     "duration": 1.6
+    },
+    {
+     "damage": 12,
+     "cooldown": 1.1,
+     "area": 1,
+     "count": 2,
+     "speed": 390,
+     "pierce": 2,
+     "duration": 1.6
+    },
+    {
+     "damage": 15,
+     "cooldown": 1.05,
+     "area": 1,
+     "count": 2,
+     "speed": 400,
+     "pierce": 3,
+     "duration": 1.8
+    },
+    {
+     "damage": 18,
+     "cooldown": 1.0,
+     "area": 1.05,
+     "count": 3,
+     "speed": 410,
+     "pierce": 3,
+     "duration": 1.8
+    },
+    {
+     "damage": 22,
+     "cooldown": 0.9,
+     "area": 1.1,
+     "count": 3,
+     "speed": 420,
+     "pierce": 4,
+     "duration": 2
+    }
+   ]
+  }
+ ],
+ "passives": [
+  {
+   "id": "might",
+   "name": "벼린 날",
+   "desc": "무공 피해 +10%",
+   "stat": "might",
+   "per": 0.1,
+   "max": 5
+  },
+  {
+   "id": "haste",
+   "name": "숨 고르기",
+   "desc": "무공 대기 시간 −7%",
+   "stat": "haste",
+   "per": 0.07,
+   "max": 5
+  },
+  {
+   "id": "area",
+   "name": "내공의 실",
+   "desc": "무공 범위 +10%",
+   "stat": "area",
+   "per": 0.1,
+   "max": 5
+  },
+  {
+   "id": "swift",
+   "name": "발 디딤",
+   "desc": "이동 속도 +8%",
+   "stat": "swift",
+   "per": 0.08,
+   "max": 5
+  },
+  {
+   "id": "vigor",
+   "name": "굳은살",
+   "desc": "받는 피해 −1 · 최대 체력 +10",
+   "stat": "vigor",
+   "per": 1,
+   "max": 5
+  },
+  {
+   "id": "breath",
+   "name": "청운호흡",
+   "desc": "초당 체력 +0.3",
+   "stat": "breath",
+   "per": 0.3,
+   "max": 5
+  },
+  {
+   "id": "grain",
+   "name": "결 읽기",
+   "desc": "치명(두 배) 확률 +6%",
+   "stat": "grain",
+   "per": 0.06,
+   "max": 5
+  },
+  {
+   "id": "yoke",
+   "name": "물지게",
+   "desc": "줍는 거리 +30% · 경험 +5%",
+   "stat": "yoke",
+   "per": 0.3,
+   "max": 5
+  }
+ ]
+}

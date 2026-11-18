@@ -1,0 +1,9 @@
+{
+  "$comment": "「틈」 인물. sprite는 「결」 대결 그림 접두어(<sprite>_idle·_walk·_death), ult는 「결」 마지막 기술(이펙트 fx_gyeol_tech_<ult>_a·b)",
+  "heroes": [
+    { "id": "haun", "name": "진하운", "title": "청운문 잡역 · 결을 읽는 자", "sprite": "haun_sword", "stand": "haun_gyeol_stand", "hp": 100, "speed": 1, "start": "grain_cut", "pool": ["grain_cut", "nakun", "byeogun", "chulsu", "unhae"], "ult": { "id": "cheonoe_gwiun", "name": "천외귀운", "damage": 260, "color": "#c8b4ff" }, "unlock": null },
+    { "id": "kyle", "name": "카일 로웬", "title": "로웬 가문의 마지막 기사", "sprite": "kyle", "stand": "kyle_stand", "hp": 130, "speed": 0.94, "armor": 1, "start": "knight_strike", "pool": ["knight_strike", "shield_rush", "shield_wall", "wing_cleave", "rowen_oath"], "ult": { "id": "guardian_vow", "name": "수호 서약", "damage": 220, "heal": 40, "color": "#ffe08a" }, "unlock": { "kind": "survive", "seconds": 600, "text": "한 판에서 10분 버티기" } },
+    { "id": "elia", "name": "엘리아", "title": "은빛 숲의 마법사", "sprite": "elia", "stand": "elia_stand", "hp": 80, "speed": 1.04, "start": "fireball", "pool": ["fireball", "frost_ward", "frost_bloom", "violet_bolt", "mana_rain"], "ult": { "id": "starfall", "name": "별의 낙하", "damage": 300, "color": "#b48cff" }, "unlock": { "kind": "boss", "foe": "ignis", "text": "화염군주 이그니스 쓰러뜨리기" } },
+    { "id": "born", "name": "보른", "title": "두린의 동생 · 드워프 전사", "sprite": "born", "stand": "born_stand", "hp": 140, "speed": 0.9, "armor": 2, "start": "axe_chop", "pool": ["axe_chop", "earth_quake", "mountain_cleave", "durin_hammer", "cliff_fall"], "ult": { "id": "kazdum_heart", "name": "카즈둠의 심장", "damage": 320, "color": "#ff6a3a" }, "unlock": { "kind": "survive", "seconds": 1200, "text": "한 판에서 20분 버티기" } }
+  ]
+}

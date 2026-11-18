@@ -1,0 +1,30 @@
+{
+  "$comment": "「틈」 그림자 무리. sprite는 「천외귀환」 적 그림(<sprite>_idle·_death), ref는 천외귀환 적 id(이름·설명). hp·dmg는 0분 기준(분마다 run.foes.hpPerMinute만큼 단단해진다). 크기 scale은 160칸 그림 배율",
+  "foes": [
+    { "id": "goblin", "name": "고블린", "ref": "goblin", "sprite": "goblin", "hp": 9, "speed": 78, "damage": 5, "xp": 1, "radius": 13, "scale": 0.4 },
+    { "id": "wolf", "name": "그림자늑대", "ref": "shadow_wolf", "sprite": "wolf", "hp": 12, "speed": 96, "damage": 6, "xp": 1, "radius": 14, "scale": 0.42, "move": "charge" },
+    { "id": "ash_bat", "name": "재 박쥐", "ref": "ash_bat", "sprite": "ash_bat", "hp": 7, "speed": 118, "damage": 4, "xp": 1, "radius": 11, "scale": 0.36 },
+    { "id": "swamp_toad", "name": "늪지 독두꺼비", "ref": "swamp_toad", "sprite": "swamp_toad", "hp": 26, "speed": 55, "damage": 8, "xp": 2, "radius": 16, "scale": 0.44 },
+    { "id": "ore_spider", "name": "광석거미", "ref": "ore_spider", "sprite": "ore_spider", "hp": 34, "speed": 72, "damage": 9, "xp": 2, "radius": 16, "scale": 0.46 },
+    { "id": "fire_spirit", "name": "불의 정령", "ref": "fire_spirit", "sprite": "fire_spirit", "hp": 22, "speed": 70, "damage": 7, "xp": 2, "radius": 13, "scale": 0.42, "move": "ranged", "shot": { "every": 3, "speed": 180, "damage": 7, "color": "#ff8a3a" } },
+    { "id": "chain_overseer", "name": "사슬 감독관", "ref": "chain_overseer", "sprite": "chain_overseer", "hp": 700, "speed": 70, "damage": 16, "xp": 40, "radius": 26, "scale": 0.72, "rank": "elite" },
+    { "id": "ignis", "name": "화염군주 이그니스", "ref": "ignis", "sprite": "ignis", "hp": 3200, "speed": 72, "damage": 24, "xp": 160, "radius": 40, "scale": 1.0, "rank": "boss", "shot": { "every": 2.6, "count": 10, "speed": 170, "damage": 14, "color": "#ff6a2a" } },
+    { "id": "ice_wolf", "name": "얼음 늑대", "ref": "ice_wolf", "sprite": "ice_wolf", "hp": 48, "speed": 100, "damage": 10, "xp": 2, "radius": 15, "scale": 0.44, "move": "charge" },
+    { "id": "empty_armor", "name": "빈 갑옷", "ref": "empty_armor", "sprite": "empty_armor", "hp": 80, "speed": 56, "damage": 12, "xp": 3, "radius": 16, "scale": 0.46 },
+    { "id": "rock_eater", "name": "바위 먹는 벌레", "ref": "rock_eater", "sprite": "rock_eater", "hp": 55, "speed": 78, "damage": 11, "xp": 2, "radius": 15, "scale": 0.42 },
+    { "id": "ice_knight", "name": "얼음 기사", "ref": "ice_knight", "sprite": "ice_knight", "hp": 95, "speed": 62, "damage": 14, "xp": 3, "radius": 16, "scale": 0.48 },
+    { "id": "tomb_warrior", "name": "무덤 망령 전사", "ref": "tomb_warrior", "sprite": "tomb_warrior", "hp": 110, "speed": 64, "damage": 14, "xp": 4, "radius": 17, "scale": 0.5 },
+    { "id": "rock_golem", "name": "바위 골렘", "ref": "rock_golem", "sprite": "rock_golem", "hp": 260, "speed": 44, "damage": 20, "xp": 8, "radius": 24, "scale": 0.64 },
+    { "id": "ice_gatekeeper", "name": "얼음 궁전의 문지기", "ref": "ice_gatekeeper", "sprite": "ice_gatekeeper", "hp": 3200, "speed": 66, "damage": 22, "xp": 60, "radius": 30, "scale": 0.8, "rank": "elite", "element": "ice" },
+    { "id": "vargas", "name": "마왕 바르가스", "ref": "vargas", "sprite": "vargas", "hp": 10000, "speed": 70, "damage": 32, "xp": 260, "radius": 44, "scale": 1.05, "rank": "boss", "shot": { "every": 2.2, "count": 14, "speed": 190, "damage": 20, "color": "#b06aff" } },
+    { "id": "blood_cultist", "name": "신교 교도", "ref": "blood_cultist", "sprite": "blood_cultist", "hp": 140, "speed": 80, "damage": 16, "xp": 4, "radius": 16, "scale": 0.48 },
+    { "id": "cult_swordsman", "name": "천마신교 도객", "ref": "cult_swordsman", "sprite": "cult_swordsman", "hp": 170, "speed": 92, "damage": 18, "xp": 5, "radius": 16, "scale": 0.48, "move": "charge" },
+    { "id": "needle_cultist", "name": "신교 독침수", "ref": "needle_cultist", "sprite": "needle_cultist", "hp": 120, "speed": 70, "damage": 12, "xp": 5, "radius": 15, "scale": 0.46, "move": "ranged", "shot": { "every": 2.4, "speed": 230, "damage": 12, "color": "#7fdc5a" } },
+    { "id": "shadow_fragment", "name": "그림자 조각", "ref": "shadow_fragment", "sprite": "shadow_fragment", "hp": 130, "speed": 112, "damage": 15, "xp": 4, "radius": 15, "scale": 0.46 },
+    { "id": "fire_scale_hound", "name": "불비늘 삼두견", "ref": "fire_scale_hound", "sprite": "fire_scale_hound", "hp": 210, "speed": 118, "damage": 20, "xp": 6, "radius": 18, "scale": 0.52, "move": "charge" },
+    { "id": "rift_phantom", "name": "틈의 환영", "ref": "rift_phantom", "sprite": "rift_phantom", "hp": 190, "speed": 96, "damage": 18, "xp": 6, "radius": 16, "scale": 0.48 },
+    { "id": "bone_giant", "name": "뼈 거인", "ref": "bone_giant", "sprite": "bone_giant", "hp": 900, "speed": 42, "damage": 28, "xp": 18, "radius": 30, "scale": 0.78 },
+    { "id": "stair_elder", "name": "계단의 장로", "ref": "stair_elder", "sprite": "stair_elder", "hp": 6000, "speed": 74, "damage": 30, "xp": 90, "radius": 30, "scale": 0.82, "rank": "elite", "shot": { "every": 3, "count": 8, "speed": 200, "damage": 18, "color": "#ff4a5a" } },
+    { "id": "mordecai", "name": "지옥왕 모르데카이", "ref": "mordecai", "sprite": "mordecai", "hp": 21000, "speed": 66, "damage": 40, "xp": 0, "radius": 50, "scale": 1.15, "rank": "boss", "shot": { "every": 1.8, "count": 18, "speed": 200, "damage": 26, "color": "#c02a3a" } }
+  ]
+}

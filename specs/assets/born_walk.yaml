@@ -1,0 +1,21 @@
+id: born_walk
+type: character-anim
+character: born
+summary: '「틈」 보른 걷기 6프레임 — 그림자 무리 사이를 달리며 싸우는 생존 액션의 이동 동작(2026-11-18). 오기 전에는 대기 그림이 통통 튄다'
+depends_on: [born_ref]
+reference: assets/source/born_ref.png
+facing: right
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 걷기 한 바퀴(6칸 반복). 서 있는 키는 대기(idle)와 같게, 발 맨 아래 줄은 모든 칸에서 같은 줄
+frame_notes:
+  1: "brisk walk cycle, contact pose: right foot forward touching the ground heel first, left foot behind, axe carried over the right shoulder, short heavy steps, braided beard bouncing"
+  2: "walk cycle, down pose: weight on the right foot, knee slightly bent, body a little lower, arms swinging opposite to the legs"
+  3: "walk cycle, passing pose: left leg passing the right, body at its highest, head level"
+  4: "walk cycle, contact pose: left foot forward touching the ground heel first, right foot behind (mirror of frame 1)"
+  5: "walk cycle, down pose: weight on the left foot, knee slightly bent, body a little lower"
+  6: "walk cycle, passing pose: right leg passing the left, body at its highest, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#8f7a63', accent: '#e0a040' }
