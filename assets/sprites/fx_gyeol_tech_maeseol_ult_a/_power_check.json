@@ -1,0 +1,28 @@
+{
+  "normalPeak": {
+    "frame": 4,
+    "bbox": [
+      119,
+      93,
+      405,
+      383
+    ],
+    "count": 33471,
+    "outside": 0,
+    "contained": true
+  },
+  "ultimatePeak": {
+    "frame": 2,
+    "bbox": [
+      66,
+      74,
+      440,
+      424
+    ],
+    "count": 96950,
+    "outside": 0,
+    "contained": true
+  },
+  "sourceVisibleAreaRatio": 2.897,
+  "note": "Same-scale delivered frames2,3,4 comparison; visible pixel counts from unchanged source, luminance>24. No artwork modification."
+}
