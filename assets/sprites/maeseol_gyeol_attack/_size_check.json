@@ -1,0 +1,75 @@
+{
+  "timingIdentical": true,
+  "idleHeight": 115,
+  "baselineExclusive": 144,
+  "standingHeightTolerance": 2,
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        38,
+        29,
+        111,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        52,
+        29,
+        119,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        52,
+        29,
+        138,
+        144
+      ],
+      "height": 115,
+      "bottom": 143
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        46,
+        30,
+        139,
+        144
+      ],
+      "height": 114,
+      "bottom": 143
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        53,
+        30,
+        128,
+        144
+      ],
+      "height": 114,
+      "bottom": 143
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        44,
+        30,
+        112,
+        144
+      ],
+      "height": 114,
+      "bottom": 143
+    }
+  ],
+  "standingAndGroundPass": true
+}
