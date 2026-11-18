@@ -1,0 +1,16 @@
+id: terrain_teum_ch02
+type: icon-sheet
+tiles: true
+summary: '「틈」 2장 은빛 숲 지형 조각 8칸(2026-11-18 2차 사용자 "평평한 맵보다 지형적인 구조") — 칸 번호는 teum/src/render.ts drawTerrain: 1·2 바닥 · 3 벽 윗면 · 4 벽 앞면 · 5 위험(물·용암·허공) · 6 느린 땅 · 7 다리 · 8 장식'
+frames: 8
+subject: 'top-down terrain tiles for a silver forest survival-action map, all in one consistent palette and pixel size so they fit together on one map'
+frame_notes:
+  1: 'floor tile A: dark mossy forest ground with silver moss, even and calm, seamless'
+  2: 'floor tile B: dark forest ground with fallen leaves and tiny pale flowers, a variation of tile 1 with the same colors, seamless'
+  3: 'wall top: the top of a dense tree crown and thick trunk cluster seen from above, dark green with silver leaves, fills the cell, slightly lighter on the upper left'
+  4: 'wall front face: the front of a tree trunk cluster with roots, darker, fills the cell, darker than tile 3'
+  5: 'hazard: a dark forest pond with moonlight ripples, seamless'
+  6: 'slow ground: a patch of thorny dark undergrowth, seamless'
+  7: 'bridge: a mossy log bridge, fills the cell'
+  8: 'decoration: a cluster of glowing pale mushrooms, on top of floor tile 1'
+placeholder: { color: '#2b2b3a', accent: '#8a90a3' }

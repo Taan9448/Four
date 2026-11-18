@@ -1,0 +1,10 @@
+id: tile_teum_nocturna
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 6장 노크투르나 바닥 타일(이어 붙는 무늬, 2026-11-18 2차 — 장마다 배경)'
+frame_notes:
+  1: 'Ruined shadow city floor seen from directly above: worn dark violet-grey flagstones with cracks, scattered black crystal shards, faint purple dust. Very dark, low contrast.'
+placeholder: { color: '#16141e' }

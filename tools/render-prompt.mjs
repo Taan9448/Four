@@ -153,7 +153,9 @@ export function renderPrompt(spec, style) {
         `Canvas: ${W}x${H} px. Grid: ${cols} columns x ${rows} rows.\n` +
         `Each cell is exactly ${cw}x${ch} px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.\n` +
         pixelGrid(spec, 'Every cell') +
-        `Background: flat solid ${key.name} ${key.hex} in every cell.\n` +
+        (spec.tiles
+          ? 'Every used cell is ONE square top-down terrain tile that FILLS THE WHOLE CELL edge to edge (no background color, no border, no gap, no rounded corners). Floor, water and lava tiles are SEAMLESS: their left edge continues into their right edge and their top edge into their bottom edge, so the same tile repeated side by side shows no seam. Seen straight from above, no horizon, no perspective, no characters.\n'
+          : `Background: flat solid ${key.name} ${key.hex} in every cell.\n`) +
         (spec.subject
           ? `Subject: ${spec.subject}\n`
           : `Subject: one game status icon per cell, a single bold symbol centered in the cell, about ${Math.round(lw * 0.75)}x${Math.round(lh * 0.75)} sprite pixels, readable when shown at 28x28 px on screen. ` +

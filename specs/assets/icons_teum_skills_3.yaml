@@ -1,0 +1,10 @@
+id: icons_teum_skills_3
+type: icon-sheet
+summary: '「틈」 무공·심법 아이콘 3/3 — 아래 상태창·레벨업 카드. 칸 번호 = teum/src/render.ts SKILL_ICON(무공 순서 다음 심법), 이 시트: breath, grain, yoke'
+frames: 3
+baseline: 0.5
+frame_notes:
+  1: 'a soft cloud breath circling a dantian glow on a belly'
+  2: 'an eye reading wood grain lines'
+  3: 'a water-carrying yoke pole with two buckets, blue glow'
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

@@ -1,0 +1,11 @@
+id: icons_teum_items
+type: icon-sheet
+summary: '「틈」 줍는 소모품 아이콘 4종(2026-11-18 2차) — 칸 번호는 teum/src/render.ts ICON_IDX: 1 약초 · 2 벽력탄 · 3 서리 부적 · 4 금화'
+frames: 4
+baseline: 0.5
+frame_notes:
+  1: 'healing herb: a small bundle of green medicinal herbs tied with red string, glowing faintly green'
+  2: 'thunder bomb: a round black iron bomb with a short lit fuse sparking, a red band around it'
+  3: 'frost charm: a small pale paper talisman with a blue ice-crystal pattern (no letters), frost around its edges'
+  4: 'gold coins: a short stack of round gold coins with square holes in the middle'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

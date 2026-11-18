@@ -1,0 +1,13 @@
+id: keyart_teum_lobby
+type: key-art
+summary: '「틈」 메인·들어가기 배경 — 천마봉 위 하늘이 갈라진 밤(2026-11-18 2차). 가운데에 인장과 메뉴, 왼쪽 아래 계정 판, 오른쪽 아래 둥근 표식을 얹는다. 「결」 bg_gyeol_lobby와 같은 화풍'
+frame_notes:
+  1: >-
+    A high mountain peak at night in a Chinese martial-arts world, painted like a calm hand-drawn anime background with soft watercolor
+    texture: jagged dark peaks and old pines in silhouette on both sides, a long stone stair climbing toward a ruined pavilion far away,
+    and above everything a huge glowing crimson crack splitting the night sky vertically, faint dark shadow-shapes drifting down out of
+    it like smoke. A few warm lantern lights on the stair. Cold blue night, crimson glow from the crack.
+framing: >-
+  The vertical crack sits in the upper center behind where the game puts a round ink seal and a column of four menu buttons, so keep
+  the center calm and darker below the crack. Bottom-left and bottom-right corners plain and dark (UI goes there). No people, no text.
+placeholder: { color: '#1a1020' }

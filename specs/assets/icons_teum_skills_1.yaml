@@ -1,0 +1,23 @@
+id: icons_teum_skills_1
+type: icon-sheet
+summary: '「틈」 무공·심법 아이콘 1/3 — 아래 상태창·레벨업 카드. 칸 번호 = teum/src/render.ts SKILL_ICON(무공 순서 다음 심법), 이 시트: grain_cut, nakun, byeogun, chulsu, unhae, cheonoe_blade, eighteen, knight_strike, shield_rush, shield_wall, wing_cleave, rowen_oath, no_one_dies, fireball, frost_ward, frost_bloom'
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: 'a straight sword cutting along the wood grain of a log, a blue streak'
+  2: 'pale blue cloud ribbons spiralling down'
+  3: 'a blue sword slash splitting a cloud in two'
+  4: 'a teal ring of wind spreading outward'
+  5: 'a golden sea of clouds swirling in a circle'
+  6: 'four white-gold sword beams crossing, a crack of light in a dark sky'
+  7: 'many white sword arcs in all four directions'
+  8: 'a longsword swinging behind a kite shield, gold'
+  9: 'a charging gold shield with speed lines'
+  10: 'three small shields circling in a ring'
+  11: 'a red slash cutting a dragon wing'
+  12: 'a blue knight sword falling from above with a snowflake crest'
+  13: 'six shields in a glowing circle around a heart'
+  14: 'an orange fireball with a flame tail'
+  15: 'a pale blue circle of frost around a small figure silhouette'
+  16: 'a white frost flower blooming'
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

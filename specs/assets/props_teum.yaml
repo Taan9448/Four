@@ -1,0 +1,13 @@
+id: props_teum
+type: icon-sheet
+summary: '「틈」 깨지는 것·상자 소품 6칸(2026-11-18 2차) — 칸 번호는 teum/src/render.ts: 1 항아리 · 2 등불 · 4 상자(닫힘). 위에서 약간 비스듬히 본 모습'
+frames: 6
+subject: 'small game props seen from slightly above (three-quarter top-down view), each centered and standing on the bottom of the cell, readable at 40x40 px'
+frame_notes:
+  1: 'a breakable clay storage jar with a cloth-tied lid, brown with a pale glaze band'
+  2: 'a breakable old stone lantern with a warm orange flame inside'
+  3: 'the shards of a broken clay jar on the ground'
+  4: 'a closed treasure chest: dark lacquered wood, gold corner fittings, a red tassel seal on the lid'
+  5: 'the same treasure chest open, golden light spilling out'
+  6: 'a breakable wooden barrel with iron hoops'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

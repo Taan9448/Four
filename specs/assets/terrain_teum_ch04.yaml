@@ -1,0 +1,16 @@
+id: terrain_teum_ch04
+type: icon-sheet
+tiles: true
+summary: '「틈」 4장 아르덴 지형 조각 8칸(2026-11-18 2차 사용자 "평평한 맵보다 지형적인 구조") — 칸 번호는 teum/src/render.ts drawTerrain: 1·2 바닥 · 3 벽 윗면 · 4 벽 앞면 · 5 위험(물·용암·허공) · 6 느린 땅 · 7 다리 · 8 장식'
+frames: 8
+subject: 'top-down terrain tiles for a frozen kingdom survival-action map, all in one consistent palette and pixel size so they fit together on one map'
+frame_notes:
+  1: 'floor tile A: frosty grey flagstones, even and calm, seamless'
+  2: 'floor tile B: grey flagstones with thin snow, a variation of tile 1 with the same colors, seamless'
+  3: 'wall top: the top of a frozen castle wall with snow on it, fills the cell, slightly lighter on the upper left'
+  4: 'wall front face: the front face of an ice-covered stone wall, icicles at the bottom, fills the cell, darker than tile 3'
+  5: 'hazard: a frozen lake surface, pale blue ice with cracks, seamless'
+  6: 'slow ground: a deep snow drift, seamless'
+  7: 'bridge: a stone bridge with snow, fills the cell'
+  8: 'decoration: a frozen banner pole and a broken shield, on top of floor tile 1'
+placeholder: { color: '#2b2b3a', accent: '#8a90a3' }
