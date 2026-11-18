@@ -1,0 +1,282 @@
+{
+  "footRowsBefore": null,
+  "method": "one uniform nearest-neighbor scale for all frames, then integer anchored placement; no painting or clipping",
+  "source": "assets/source/born_walk.png",
+  "targetFirstBodyHeight": 64,
+  "measurementNote": "Born body height is measured from the top red hair pixel minus its two-pixel outline to the foot row, excluding the raised idle axe; the axe pixels are retained.",
+  "idleBody": {
+    "minX": 44,
+    "minY": 80,
+    "maxX": 124,
+    "maxY": 143,
+    "width": 81,
+    "height": 64,
+    "count": 3696
+  },
+  "firstBodyBefore": {
+    "minX": 40,
+    "minY": 71,
+    "maxX": 128,
+    "maxY": 143,
+    "width": 89,
+    "height": 73,
+    "count": 4669
+  },
+  "calibrationFrame": 1,
+  "firstBodyAfter": {
+    "minX": 45,
+    "minY": 80,
+    "maxX": 122,
+    "maxY": 143,
+    "width": 78,
+    "height": 64,
+    "count": 3590
+  },
+  "idleGround": 143,
+  "scaleCanvas": [
+    140,
+    140
+  ],
+  "frames": [
+    {
+      "frame": 1,
+      "before": {
+        "minX": 40,
+        "minY": 53,
+        "maxX": 128,
+        "maxY": 143,
+        "width": 89,
+        "height": 91,
+        "count": 4669
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 45,
+        "minY": 64,
+        "maxX": 122,
+        "maxY": 143,
+        "width": 78,
+        "height": 80,
+        "count": 3590
+      },
+      "bodyAfter": {
+        "minX": 45,
+        "minY": 80,
+        "maxX": 122,
+        "maxY": 143,
+        "width": 78,
+        "height": 64,
+        "count": 3590
+      },
+      "visibleBefore": 3590,
+      "visibleAfter": 3590
+    },
+    {
+      "frame": 2,
+      "before": {
+        "minX": 39,
+        "minY": 55,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 88,
+        "height": 89,
+        "count": 4389
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 44,
+        "minY": 66,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 77,
+        "height": 78,
+        "count": 3370
+      },
+      "bodyAfter": {
+        "minX": 44,
+        "minY": 66,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 77,
+        "height": 78,
+        "count": 3370
+      },
+      "visibleBefore": 3370,
+      "visibleAfter": 3370
+    },
+    {
+      "frame": 3,
+      "before": {
+        "minX": 39,
+        "minY": 52,
+        "maxX": 124,
+        "maxY": 143,
+        "width": 86,
+        "height": 92,
+        "count": 4050
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 44,
+        "minY": 63,
+        "maxX": 118,
+        "maxY": 143,
+        "width": 75,
+        "height": 81,
+        "count": 3106
+      },
+      "bodyAfter": {
+        "minX": 44,
+        "minY": 63,
+        "maxX": 118,
+        "maxY": 143,
+        "width": 75,
+        "height": 81,
+        "count": 3106
+      },
+      "visibleBefore": 3106,
+      "visibleAfter": 3106
+    },
+    {
+      "frame": 4,
+      "before": {
+        "minX": 40,
+        "minY": 54,
+        "maxX": 128,
+        "maxY": 143,
+        "width": 89,
+        "height": 90,
+        "count": 4465
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 45,
+        "minY": 65,
+        "maxX": 122,
+        "maxY": 143,
+        "width": 78,
+        "height": 79,
+        "count": 3416
+      },
+      "bodyAfter": {
+        "minX": 45,
+        "minY": 65,
+        "maxX": 122,
+        "maxY": 143,
+        "width": 78,
+        "height": 79,
+        "count": 3416
+      },
+      "visibleBefore": 3416,
+      "visibleAfter": 3416
+    },
+    {
+      "frame": 5,
+      "before": {
+        "minX": 39,
+        "minY": 55,
+        "maxX": 126,
+        "maxY": 143,
+        "width": 88,
+        "height": 89,
+        "count": 4159
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 44,
+        "minY": 66,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 77,
+        "height": 78,
+        "count": 3191
+      },
+      "bodyAfter": {
+        "minX": 44,
+        "minY": 66,
+        "maxX": 120,
+        "maxY": 143,
+        "width": 77,
+        "height": 78,
+        "count": 3191
+      },
+      "visibleBefore": 3191,
+      "visibleAfter": 3191
+    },
+    {
+      "frame": 6,
+      "before": {
+        "minX": 40,
+        "minY": 52,
+        "maxX": 127,
+        "maxY": 143,
+        "width": 88,
+        "height": 92,
+        "count": 4038
+      },
+      "resize": [
+        140,
+        140
+      ],
+      "offset": [
+        10,
+        18
+      ],
+      "after": {
+        "minX": 45,
+        "minY": 63,
+        "maxX": 121,
+        "maxY": 143,
+        "width": 77,
+        "height": 81,
+        "count": 3092
+      },
+      "bodyAfter": {
+        "minX": 45,
+        "minY": 63,
+        "maxX": 121,
+        "maxY": 143,
+        "width": 77,
+        "height": 81,
+        "count": 3092
+      },
+      "visibleBefore": 3092,
+      "visibleAfter": 3092
+    }
+  ]
+}
