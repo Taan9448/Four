@@ -1,0 +1,75 @@
+{
+ "player": {
+  "hp": 100,
+  "speed": 160,
+  "radius": 16,
+  "pickup": 70,
+  "hurtCooldown": 0.4,
+  "slots": {
+   "weapons": 6,
+   "passives": 6
+  }
+ },
+ "dash": {
+  "duration": 0.22,
+  "speed": 560,
+  "cooldown": 3,
+  "graze": {
+   "radius": 90,
+   "damage": 18
+  }
+ },
+ "ult": {
+  "max": 100,
+  "kill": 0.4,
+  "elite": 12,
+  "boss": 30,
+  "radius": 700
+ },
+ "xp": {
+  "base": 5,
+  "perLevel": 7,
+  "square": 0.18
+ },
+ "drops": {
+  "food": 0.006,
+  "herb": 0.0008,
+  "magnet": 0.0015,
+  "bomb": 0.0008,
+  "frost": 0.0008,
+  "gold": 0.01,
+  "foodHeal": 30
+ },
+ "foes": {
+  "max": 350,
+  "spawnRadius": [
+   620,
+   820
+  ],
+  "despawn": 1100,
+  "hpPerMinute": 0.07,
+  "overtimeDamagePerMinute": 0.5,
+  "separation": 0.35
+ },
+ "props": {
+  "hp": 1,
+  "drops": {
+   "food": 4,
+   "herb": 1,
+   "magnet": 2,
+   "bomb": 2,
+   "frost": 2,
+   "gold": 6
+  }
+ },
+ "items": {
+  "bomb": {
+   "damage": 400,
+   "radius": 650
+  },
+  "frost": {
+   "seconds": 5
+  }
+ },
+ "$comment": "「틈」 공통 규칙(인물·보법·천외귀운·경험 곡선·그림자 상한·떨어뜨림·항아리·소모품). 1차 30분 판(run.json)의 값을 이어받았다"
+}

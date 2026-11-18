@@ -1,0 +1,10 @@
+id: tile_teum_kazdum
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 5장 카즈둠 바닥 타일(이어 붙는 무늬, 2026-11-18 2차 — 장마다 배경)'
+frame_notes:
+  1: 'Dwarven mine floor seen from directly above: rough dark stone with chisel marks, small rubble, a few rusty iron rail fragments and tiny glinting ore flecks. Dark brown-grey, low contrast.'
+placeholder: { color: '#1a1614' }

@@ -1,0 +1,945 @@
+{
+ "$comment": "「틈」 스토리 10장(GAME_DESIGN 2·3·4절). 장마다 15분(timeline.length초). timeline은 모든 장이 같은 틀: role(main·fast·tank·ranged·fly·prev)로 그 장의 그림자를 고른다. extra는 장마다 다른 이벤트(rain: 붉은 원 낙하 · blizzard: 느려짐 · swarm·ring). hp·dmg는 그 장 그림자 배율, rate는 나오는 빠르기·이벤트 무리 수 배율. terrainDef는 src/terrain.ts 짓기 재료. ground·terrain·cg는 Codex 그림 id(오기 전에는 color로 코드가 그린다)",
+ "difficulties": [
+  {
+   "id": "normal",
+   "name": "노말",
+   "open": true
+  },
+  {
+   "id": "hard",
+   "name": "하드",
+   "open": false,
+   "note": "준비 중 — 노말을 다 만든 뒤"
+  }
+ ],
+ "timeline": {
+  "length": 900,
+  "spawns": [
+   {
+    "from": 0,
+    "to": 150,
+    "rate": [
+     1.0,
+     1.8
+    ],
+    "mix": {
+     "main": 3,
+     "fast": 1
+    }
+   },
+   {
+    "from": 150,
+    "to": 420,
+    "rate": [
+     1.8,
+     2.8
+    ],
+    "mix": {
+     "main": 3,
+     "fast": 2,
+     "ranged": 1,
+     "fly": 1
+    }
+   },
+   {
+    "from": 420,
+    "to": 750,
+    "rate": [
+     2.8,
+     3.8
+    ],
+    "mix": {
+     "main": 2,
+     "fast": 2,
+     "tank": 1,
+     "ranged": 2,
+     "fly": 1,
+     "prev": 1
+    }
+   },
+   {
+    "from": 750,
+    "to": 900,
+    "rate": [
+     3.8,
+     4.6
+    ],
+    "mix": {
+     "main": 2,
+     "fast": 2,
+     "tank": 2,
+     "ranged": 2,
+     "fly": 2,
+     "prev": 1
+    }
+   },
+   {
+    "from": 900,
+    "to": 99999,
+    "rate": [
+     4.8,
+     4.8
+    ],
+    "mix": {
+     "main": 2,
+     "fast": 3,
+     "tank": 2,
+     "ranged": 2,
+     "fly": 2
+    }
+   }
+  ],
+  "events": [
+   {
+    "at": 120,
+    "kind": "swarm",
+    "role": "fast",
+    "count": 16,
+    "text": "한쪽에서 떼가 몰려온다"
+   },
+   {
+    "at": 210,
+    "kind": "ring",
+    "role": "main",
+    "count": 22,
+    "text": "그림자가 둘러싼다"
+   },
+   {
+    "at": 300,
+    "kind": "bigwave",
+    "mix": {
+     "main": 3,
+     "fast": 2,
+     "ranged": 1
+    },
+    "count": 70,
+    "text": "빅웨이브 — 사방에서 몰려온다!"
+   },
+   {
+    "at": 420,
+    "kind": "mid",
+    "count": 24,
+    "text": "중간 보스"
+   },
+   {
+    "at": 510,
+    "kind": "swarm",
+    "role": "fly",
+    "count": 24,
+    "text": "날쌘 놈들이 덮친다"
+   },
+   {
+    "at": 600,
+    "kind": "bigwave",
+    "mix": {
+     "main": 2,
+     "fast": 2,
+     "ranged": 2,
+     "tank": 1
+    },
+    "count": 100,
+    "text": "빅웨이브 — 더 크게 몰려온다!"
+   },
+   {
+    "at": 690,
+    "kind": "ring",
+    "role": "tank",
+    "count": 16,
+    "text": "단단한 놈들이 길을 막는다"
+   },
+   {
+    "at": 750,
+    "kind": "boss",
+    "count": 24,
+    "text": "보스"
+   }
+  ],
+  "chests": {
+   "every": 90,
+   "min": 400,
+   "max": 800
+  }
+ },
+ "chapters": [
+  {
+   "id": "ch01",
+   "name": "1장 청운산",
+   "stage": "s0",
+   "line": "귀곡애 위, 소나무 사이로 첫 금이 갔다.",
+   "ground": "tile_teum_cheongun",
+   "terrain": "terrain_teum_ch01",
+   "cg": "cg_teum_ch01",
+   "color": [
+    "#1f2a1c",
+    "#2b3a26",
+    "#5d6478",
+    "#2f5a3a"
+   ],
+   "roles": {
+    "main": [
+     "oak_stump"
+    ],
+    "fast": [
+     "inner_senior"
+    ],
+    "tank": [
+     "knotted_stump",
+     "iron_dummy"
+    ],
+    "ranged": [
+     "oak_stump"
+    ],
+    "fly": [
+     "inner_senior"
+    ],
+    "mid": "inner_senior_head",
+    "boss": "kwak_dojin_cliff"
+   },
+   "hp": 0.8,
+   "dmg": 1.0,
+   "rate": 0.65,
+   "extra": [
+    {
+     "at": 540,
+     "kind": "rain",
+     "dur": 25,
+     "every": 0.7,
+     "damage": 8,
+     "radius": 60,
+     "color": "#a8d8ff",
+     "text": "검기가 비처럼 쏟아진다 — 붉은 원을 피하라"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "bands",
+      "rows": 3,
+      "gaps": 5,
+      "gap": 7,
+      "thick": 2
+     },
+     {
+      "kind": "blobs",
+      "count": 18,
+      "r": [
+       1.5,
+       3
+      ]
+     },
+     {
+      "kind": "slow",
+      "count": 6,
+      "r": [
+       2,
+       4
+      ]
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch02",
+   "name": "2장 은빛 숲",
+   "stage": "s1",
+   "line": "두 개의 달 아래, 연기 같은 늑대가 숲을 에워싼다.",
+   "ground": "tile_teum_elheim",
+   "terrain": "terrain_teum_ch02",
+   "cg": "cg_teum_ch02",
+   "color": [
+    "#1c2a20",
+    "#24382a",
+    "#3d4459",
+    "#2f5a3a"
+   ],
+   "roles": {
+    "main": [
+     "goblin"
+    ],
+    "fast": [
+     "shadow_wolf"
+    ],
+    "tank": [
+     "empty_armor"
+    ],
+    "ranged": [
+     "swamp_toad"
+    ],
+    "fly": [
+     "dry_vine"
+    ],
+    "mid": "ore_spider",
+    "boss": "veilak",
+    "prev": [
+     "oak_stump"
+    ]
+   },
+   "hp": 1.3,
+   "dmg": 1.15,
+   "rate": 0.75,
+   "extra": [
+    {
+     "at": 330,
+     "kind": "swarm",
+     "role": "fast",
+     "count": 24,
+     "text": "늑대 무리가 덤불을 헤치고 온다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "blobs",
+      "count": 55,
+      "r": [
+       1.5,
+       3.6
+      ]
+     },
+     {
+      "kind": "slow",
+      "count": 14,
+      "r": [
+       2,
+       5
+      ]
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch03",
+   "name": "3장 화산 협곡",
+   "stage": "s2",
+   "line": "녹아내리는 협곡, 다리를 건너야 산다.",
+   "ground": "tile_teum_canyon",
+   "terrain": "terrain_teum_ch03",
+   "cg": "cg_teum_ch03",
+   "color": [
+    "#2a1a14",
+    "#3a2218",
+    "#4a3426",
+    "#e0521a"
+   ],
+   "roles": {
+    "main": [
+     "collared_wolf"
+    ],
+    "fast": [
+     "collared_wolf"
+    ],
+    "tank": [
+     "ash_armor",
+     "great_furnace"
+    ],
+    "ranged": [
+     "fire_spirit"
+    ],
+    "fly": [
+     "ash_bat",
+     "fire_spirit"
+    ],
+    "mid": "chain_overseer",
+    "boss": "ignis",
+    "prev": [
+     "goblin",
+     "empty_armor"
+    ]
+   },
+   "hp": 1.9,
+   "dmg": 1.3,
+   "rate": 0.85,
+   "extra": [
+    {
+     "at": 450,
+     "kind": "rain",
+     "dur": 30,
+     "every": 0.5,
+     "damage": 12,
+     "radius": 70,
+     "color": "#ff6a2a",
+     "text": "협곡의 하늘에서 불덩이가 떨어진다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "river",
+      "count": 2,
+      "width": 4,
+      "bridges": 4,
+      "dir": "v",
+      "type": "hazard"
+     },
+     {
+      "kind": "pillars",
+      "count": 40,
+      "size": 2
+     },
+     {
+      "kind": "blobs",
+      "count": 12,
+      "r": [
+       1.5,
+       2.5
+      ]
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch04",
+   "name": "4장 아르덴",
+   "stage": "s3",
+   "line": "멈춘 왕국. 얼어붙은 성벽 사이로 눈보라가 친다.",
+   "ground": "tile_teum_north",
+   "terrain": "terrain_teum_ch04",
+   "cg": "cg_teum_ch04",
+   "color": [
+    "#1c2430",
+    "#26303e",
+    "#8a90a3",
+    "#dff4ff"
+   ],
+   "roles": {
+    "main": [
+     "ice_knight",
+     "rowen_ice_brother"
+    ],
+    "fast": [
+     "ice_wolf"
+    ],
+    "tank": [
+     "princess_ice"
+    ],
+    "ranged": [
+     "princess_ice"
+    ],
+    "fly": [
+     "ice_wolf"
+    ],
+    "mid": "ice_gatekeeper",
+    "boss": "celias",
+    "prev": [
+     "collared_wolf",
+     "ash_armor"
+    ]
+   },
+   "hp": 2.7,
+   "dmg": 1.45,
+   "rate": 0.92,
+   "extra": [
+    {
+     "at": 480,
+     "kind": "blizzard",
+     "dur": 40,
+     "slow": 0.75,
+     "text": "눈보라 — 발이 무거워진다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "rooms",
+      "size": 14,
+      "door": 0.25,
+      "keep": 0.35
+     },
+     {
+      "kind": "slow",
+      "count": 18,
+      "r": [
+       2,
+       5
+      ]
+     },
+     {
+      "kind": "pillars",
+      "count": 16,
+      "size": 2
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch05",
+   "name": "5장 카즈둠",
+   "stage": "s4",
+   "line": "오천의 무덤이 잠든 갱도. 벽에서 손이 솟는다.",
+   "ground": "tile_teum_kazdum",
+   "terrain": "terrain_teum_ch05",
+   "cg": "cg_teum_ch05",
+   "color": [
+    "#1a1614",
+    "#262019",
+    "#4a3426",
+    "#c8641a"
+   ],
+   "roles": {
+    "main": [
+     "tomb_warrior"
+    ],
+    "fast": [
+     "rock_eater"
+    ],
+    "tank": [
+     "rock_golem"
+    ],
+    "ranged": [
+     "mountain_hand"
+    ],
+    "fly": [
+     "rock_eater"
+    ],
+    "mid": "vein_golem",
+    "boss": "gormon",
+    "prev": [
+     "ice_knight",
+     "ice_wolf"
+    ]
+   },
+   "hp": 3.7,
+   "dmg": 1.6,
+   "rate": 1.0,
+   "extra": [
+    {
+     "at": 420,
+     "kind": "rain",
+     "dur": 30,
+     "every": 0.45,
+     "damage": 16,
+     "radius": 65,
+     "color": "#c98a4a",
+     "text": "천장이 무너진다 — 낙석"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "caves",
+      "fill": 0.44,
+      "steps": 4
+     },
+     {
+      "kind": "blobs",
+      "count": 8,
+      "r": [
+       1,
+       2
+      ],
+      "type": "hazard"
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch06",
+   "name": "6장 노크투르나",
+   "stage": "s5",
+   "line": "돌아가는 길. 그림자에는 결이 없다.",
+   "ground": "tile_teum_nocturna",
+   "terrain": "terrain_teum_ch06",
+   "cg": "cg_teum_ch06",
+   "color": [
+    "#16141e",
+    "#201c2c",
+    "#4b3a6b",
+    "#a35cff"
+   ],
+   "roles": {
+    "main": [
+     "shadow_assassin_fading"
+    ],
+    "fast": [
+     "shadow_fragment"
+    ],
+    "tank": [
+     "black_crystal",
+     "obsidian_door"
+    ],
+    "ranged": [
+     "wedge",
+     "black_crystal"
+    ],
+    "fly": [
+     "wedge"
+    ],
+    "mid": "shadow_assassin",
+    "boss": "vargas",
+    "prev": [
+     "tomb_warrior",
+     "rock_eater"
+    ]
+   },
+   "hp": 5.0,
+   "dmg": 1.75,
+   "rate": 1.05,
+   "extra": [
+    {
+     "at": 510,
+     "kind": "swarm",
+     "role": "fly",
+     "count": 30,
+     "text": "쐐기가 첨탑에서 날아든다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "rooms",
+      "size": 12,
+      "door": 0.35,
+      "keep": 0.2
+     },
+     {
+      "kind": "pillars",
+      "count": 30,
+      "size": 2
+     },
+     {
+      "kind": "slow",
+      "count": 8,
+      "r": [
+       2,
+       4
+      ]
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch07",
+   "name": "7장 운곡촌",
+   "stage": "s6",
+   "line": "청운귀의 밤. 마을 골목마다 흑풍대가 숨었다.",
+   "ground": "tile_teum_ungok",
+   "terrain": "terrain_teum_ch07",
+   "cg": "cg_teum_ch07",
+   "color": [
+    "#1e1c18",
+    "#2a2620",
+    "#6e5440",
+    "#3a6ea5"
+   ],
+   "roles": {
+    "main": [
+     "blood_guard"
+    ],
+    "fast": [
+     "black_wind"
+    ],
+    "tank": [
+     "pockmark_vice"
+    ],
+    "ranged": [
+     "sleeping_sentry"
+    ],
+    "fly": [
+     "black_wind"
+    ],
+    "mid": "black_wind_captain",
+    "boss": "jo_myeonggak",
+    "prev": [
+     "shadow_fragment",
+     "shadow_assassin_fading"
+    ]
+   },
+   "hp": 6.6,
+   "dmg": 1.9,
+   "rate": 1.1,
+   "extra": [
+    {
+     "at": 360,
+     "kind": "ring",
+     "role": "fast",
+     "count": 30,
+     "text": "흑풍대가 골목을 막는다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "river",
+      "count": 1,
+      "width": 3,
+      "bridges": 5,
+      "dir": "h",
+      "type": "hazard"
+     },
+     {
+      "kind": "rooms",
+      "size": 10,
+      "door": 0.1,
+      "keep": 0.55
+     },
+     {
+      "kind": "blobs",
+      "count": 10,
+      "r": [
+       1,
+       2
+      ]
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch08",
+   "name": "8장 낙안봉",
+   "stage": "s7",
+   "line": "진무전을 가둔 세 돌자리. 담 너머로 핏빛 장력.",
+   "ground": "tile_teum_nakan",
+   "terrain": "terrain_teum_ch08",
+   "cg": "cg_teum_ch08",
+   "color": [
+    "#1c1e1a",
+    "#282a24",
+    "#8a90a3",
+    "#a02634"
+   ],
+   "roles": {
+    "main": [
+     "blood_cultist",
+     "wudang_warden"
+    ],
+    "fast": [
+     "branch_elite"
+    ],
+    "tank": [
+     "cult_guardian"
+    ],
+    "ranged": [
+     "needle_cultist"
+    ],
+    "fly": [
+     "branch_elite"
+    ],
+    "mid": "poison_hand",
+    "boss": "hyeolsu",
+    "prev": [
+     "blood_guard",
+     "black_wind"
+    ]
+   },
+   "hp": 8.5,
+   "dmg": 2.05,
+   "rate": 1.15,
+   "extra": [
+    {
+     "at": 480,
+     "kind": "rain",
+     "dur": 30,
+     "every": 0.45,
+     "damage": 20,
+     "radius": 70,
+     "color": "#6aa84f",
+     "text": "독무가 내려앉는다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "rooms",
+      "size": 18,
+      "door": 0.15,
+      "keep": 0.15
+     },
+     {
+      "kind": "blobs",
+      "count": 24,
+      "r": [
+       1.2,
+       2.6
+      ]
+     },
+     {
+      "kind": "pillars",
+      "count": 12,
+      "size": 2
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch09",
+   "name": "9장 천마봉",
+   "stage": "s8",
+   "line": "구천 계단 위 혈전. 하늘이 갈라지기 시작한다.",
+   "ground": "tile_teum_cheonma",
+   "terrain": "terrain_teum_ch09",
+   "cg": "cg_teum_ch09",
+   "color": [
+    "#1e1418",
+    "#2c1c22",
+    "#5a1020",
+    "#c0283a"
+   ],
+   "roles": {
+    "main": [
+     "cult_swordsman"
+    ],
+    "fast": [
+     "cult_swordsman"
+    ],
+    "tank": [
+     "array_statue",
+     "poison_palm_elder"
+    ],
+    "ranged": [
+     "stair_archer"
+    ],
+    "fly": [
+     "cult_swordsman"
+    ],
+    "mid": "stair_elder",
+    "boss": "sa_mugyeol",
+    "prev": [
+     "blood_cultist",
+     "needle_cultist"
+    ]
+   },
+   "hp": 11,
+   "dmg": 2.2,
+   "rate": 1.2,
+   "extra": [
+    {
+     "at": 420,
+     "kind": "rain",
+     "dur": 35,
+     "every": 0.4,
+     "damage": 24,
+     "radius": 75,
+     "color": "#ff3b3b",
+     "text": "계단 위에서 화살비"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "bands",
+      "rows": 8,
+      "gaps": 2,
+      "gap": 4,
+      "thick": 2
+     },
+     {
+      "kind": "slow",
+      "count": 16,
+      "r": [
+       2,
+       4
+      ]
+     },
+     {
+      "kind": "pillars",
+      "count": 14,
+      "size": 2
+     }
+    ],
+    "props": 60
+   }
+  },
+  {
+   "id": "ch10",
+   "name": "10장 세계의 틈",
+   "stage": "s9",
+   "line": "허공 위의 섬들. 틈의 마지막 매듭.",
+   "ground": "tile_teum_rift",
+   "terrain": "terrain_teum_ch10",
+   "cg": "cg_teum_ch10",
+   "color": [
+    "#1a1424",
+    "#241c30",
+    "#4b3a6b",
+    "#07050b"
+   ],
+   "roles": {
+    "main": [
+     "shadow_wraith"
+    ],
+    "fast": [
+     "fire_scale_hound"
+    ],
+    "tank": [
+     "bone_giant"
+    ],
+    "ranged": [
+     "frozen_shard"
+    ],
+    "fly": [
+     "rift_phantom",
+     "frozen_shard"
+    ],
+    "mid": "shadow_bridge",
+    "boss": "mordecai",
+    "prev": [
+     "cult_swordsman",
+     "stair_archer"
+    ]
+   },
+   "hp": 14,
+   "dmg": 2.4,
+   "rate": 1.25,
+   "extra": [
+    {
+     "at": 390,
+     "kind": "rain",
+     "dur": 40,
+     "every": 0.35,
+     "damage": 26,
+     "radius": 80,
+     "color": "#c02a3a",
+     "text": "찢긴 하늘이 떨어진다"
+    }
+   ],
+   "terrainDef": {
+    "w": 90,
+    "h": 90,
+    "steps": [
+     {
+      "kind": "islands",
+      "count": 16,
+      "r": [
+       5,
+       9
+      ],
+      "bridge": 3
+     },
+     {
+      "kind": "pillars",
+      "count": 10,
+      "size": 2
+     }
+    ],
+    "props": 60
+   }
+  }
+ ]
+}

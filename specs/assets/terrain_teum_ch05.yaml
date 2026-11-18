@@ -1,0 +1,16 @@
+id: terrain_teum_ch05
+type: icon-sheet
+tiles: true
+summary: '「틈」 5장 카즈둠 지형 조각 8칸(2026-11-18 2차 사용자 "평평한 맵보다 지형적인 구조") — 칸 번호는 teum/src/render.ts drawTerrain: 1·2 바닥 · 3 벽 윗면 · 4 벽 앞면 · 5 위험(물·용암·허공) · 6 느린 땅 · 7 다리 · 8 장식'
+frames: 8
+subject: 'top-down terrain tiles for a dwarven mine survival-action map, all in one consistent palette and pixel size so they fit together on one map'
+frame_notes:
+  1: 'floor tile A: rough dark mine floor, even and calm, seamless'
+  2: 'floor tile B: mine floor with rubble and an old rail, a variation of tile 1 with the same colors, seamless'
+  3: 'wall top: the top of a solid rock mass with ore veins, fills the cell, slightly lighter on the upper left'
+  4: 'wall front face: the front face of a carved mine wall with wooden support beams, fills the cell, darker than tile 3'
+  5: 'hazard: a pool of glowing molten ore, seamless'
+  6: 'slow ground: loose gravel and rubble, seamless'
+  7: 'bridge: a wooden plank walkway, fills the cell'
+  8: 'decoration: a mine cart and a pickaxe, on top of floor tile 1'
+placeholder: { color: '#2b2b3a', accent: '#8a90a3' }

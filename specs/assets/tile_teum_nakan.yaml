@@ -1,0 +1,10 @@
+id: tile_teum_nakan
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 8장 낙안봉 바닥 타일(이어 붙는 무늬, 2026-11-18 2차 — 장마다 배경)'
+frame_notes:
+  1: 'Taoist temple courtyard seen from directly above: large square grey stone pavers with moss in the gaps, faint taiji-circle scratch marks, a few dark red stains. Grey-green, low contrast.'
+placeholder: { color: '#1c1e1a' }

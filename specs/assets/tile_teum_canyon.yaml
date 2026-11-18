@@ -1,0 +1,10 @@
+id: tile_teum_canyon
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 3장 화산 협곡 바닥 타일(이어 붙는 무늬, 2026-11-18 2차 — 장마다 배경)'
+frame_notes:
+  1: 'Cracked dark volcanic canyon floor seen from directly above: black-brown basalt slabs, thin dim orange glowing cracks, grey ash patches and small cinders. Dark browns and black, low contrast so orange lava stands out.'
+placeholder: { color: '#2a1a14' }

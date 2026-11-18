@@ -1,0 +1,8 @@
+id: cg_teum_ch05
+type: story-cg
+character: haun
+summary: '「틈」 장 일러스트 05장 — 장을 시작할 때 장 카드 배경(2026-11-18 2차). 「결」 이야기 그림(cg_gyeol_*)과 같은 화풍'
+frame_notes:
+  1: 'A vast dwarven mine (Kazdum): torchlit tunnels, mine carts and wooden beams, stone hands bursting out of the walls; a red-bearded dwarf warrior with a war hammer stands ready beside Haun.'
+framing: 'A cinematic story illustration used as a full-screen chapter title card. The left third stays darker and calmer because the chapter title and buttons are placed over it; keep the key action in the center and right. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each; swords and staffs perfectly straight.'
+placeholder: { color: '#2a2630' }

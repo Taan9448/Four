@@ -109,7 +109,8 @@ export async function validateSheet(spec, { src, outDir, previews = true, root =
   const heights = [];
   const frameContent = (d, i) => d[i + 3] > 32;
   const paletteSet = palette ? new Set(palette.map(([r, g, b]) => (r << 16) | (g << 8) | b)) : null;
-  const checkEdges = !['card-art', 'background', 'portrait', 'card-frame', 'card-art-sheet'].includes(spec.type);
+  // 지형 조각 시트(icon-sheet tiles: true, 2026-11-18 「틈」)는 칸을 꽉 채우는 이음 타일이라 가장자리 검사를 하지 않는다
+  const checkEdges = !['card-art', 'background', 'portrait', 'card-frame', 'card-art-sheet'].includes(spec.type) && !spec.tiles;
   frames.forEach((img, i) => {
     const n = i + 1;
     if (img.width !== spec.logical[0] || img.height !== spec.logical[1]) {

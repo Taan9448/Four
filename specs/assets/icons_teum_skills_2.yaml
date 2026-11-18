@@ -1,0 +1,23 @@
+id: icons_teum_skills_2
+type: icon-sheet
+summary: '「틈」 무공·심법 아이콘 2/3 — 아래 상태창·레벨업 카드. 칸 번호 = teum/src/render.ts SKILL_ICON(무공 순서 다음 심법), 이 시트: violet_bolt, mana_rain, spire_storm, axe_chop, earth_quake, mountain_cleave, durin_hammer, cliff_fall, five_thousand, waterwheel, blue_edge, might, haste, area, swift, vigor'
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: 'a violet lightning bolt striking down'
+  2: 'many small cyan magic arrows falling'
+  3: 'a stone spire with violet lightning all around it'
+  4: 'a heavy dwarf axe chopping down'
+  5: 'cracked ground with a brown shock ring'
+  6: 'an orange split running through a small mountain'
+  7: 'a large war hammer slamming down with sparks'
+  8: 'falling boulders from a cliff edge'
+  9: 'many glowing hammers falling together, fiery orange'
+  10: 'two water buckets on a pole spinning in a circle'
+  11: 'a small blue sword light flying forward'
+  12: 'a sharpened blade on a whetstone with a gleam'
+  13: 'a calm breath swirl with a small hourglass'
+  14: 'a glowing thread of inner energy spreading in a wide circle'
+  15: 'a footprint with wind lines'
+  16: 'a calloused fist with a stone-like glow'
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

@@ -1,0 +1,14 @@
+id: icons_teum_menu
+type: icon-sheet
+summary: '「틈」 메인 메뉴·표식 아이콘 7종(2026-11-18 2차) — 칸 번호는 teum/src/main.ts MENU·CORNER icon. 「결」 icons_gyeol_menu와 같은 결'
+frames: 7
+baseline: 0.5
+frame_notes:
+  1: 'load — a half-unrolled old paper handscroll with a red bookmark ribbon'
+  2: 'save — a small wooden seal box with a red ink seal stamp beside it'
+  3: 'story — a mountain peak with a glowing red crack splitting the sky above it'
+  4: 'endless mode — a black ink brush circle (enso) with a small red crack inside'
+  5: 'codex — a closed bound book with a dark blue cover and a gold corner'
+  6: 'wardrobe — a folded martial robe on a small wooden rack'
+  7: 'options — a writing brush lying on an ink stone with a small pool of ink'
+placeholder: { color: '#2b2b3a', accent: '#ffd27a' }

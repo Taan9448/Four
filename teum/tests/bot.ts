@@ -1,115 +1,102 @@
-// 「틈」 자동 플레이 봇(밸런스 측정용, GAME_DESIGN 9절): 그림자 무리를 피해 돌며 결 조각을 줍고, 레벨업은 정한 방식으로 고른다.
-import { choose, createRun, step, WEAPONS, type Choice, type Input, type State } from '../src/sim';
+// 「틈」 자동 플레이 봇(밸런스 측정용, GAME_DESIGN 12절): 지형을 피해 원을 그리며 싸우고, 레벨업은 정한 방식으로 고른다.
+import { carryOf, choose, createChapter, freshCarry, step, WEAPONS, type Carry, type Choice, type Input, type State } from '../src/sim';
+import { CELL, moveCircle, walkable } from '../src/terrain';
 
 export type Picker = 'first' | 'smart';
 
 function pickIndex(s: State, how: Picker): number {
   const c = s.pending!;
   if (how === 'first') return 0;
-  // 가진 무공 올리기 > 새 무공(4칸까지) > 각성 짝 심법 > 그 밖 심법
   const want = new Set(s.weapons.map((w) => WEAPONS.get(w.id)!.evolve?.with).filter(Boolean) as string[]);
   const score = (x: Choice) =>
-    x.kind === 'weapon' ? (x.lv > 1 ? 30 + x.lv : s.weapons.length < 4 ? 25 : 8) : x.kind === 'passive' ? (want.has(x.id) ? 20 : ['might', 'haste', 'area', 'vigor'].includes(x.id) ? 12 : 6) : 0;
+    x.kind === 'weapon' ? (x.lv > 1 ? 30 + x.lv : s.weapons.length < 4 ? 25 : 8) : x.kind === 'passive' ? (want.has(x.id) ? 20 : ['might', 'haste', 'area', 'vigor'].includes(x.id) ? 12 : 6) : 1;
   let best = 0;
   c.forEach((x, i) => score(x) > score(c[best]) && (best = i));
   return best;
 }
 
+/** 16방향 중 위험이 적고 막히지 않은 쪽(가까운 무리·탄·예고 원은 밀어내고, 멀면 다가가고, 결 조각·물건은 끌린다) */
 export function botInput(s: State): Input {
   const p = s.player;
-  // 가까운 무리는 밀어내고(110 안), 멀면 다가가며(싸울 거리 유지), 둘레를 돈다(원을 그리며 결 조각을 줍는다)
-  let rx = 0;
-  let ry = 0;
+  let best = { x: 0, y: 0, v: -Infinity };
   let close = 0;
-  let nd = Infinity;
-  let nx = 0;
-  let ny = 0;
-  for (const f of s.foes) {
-    const dx = p.x - f.x;
-    const dy = p.y - f.y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < nd) {
-      nd = d2;
-      nx = f.x;
-      ny = f.y;
-    }
-    const keep = (f.def.rank ? 70 : 62) + f.def.radius;
-    if (d2 < keep * keep) {
-      const d = Math.sqrt(d2) || 1;
-      const w = (keep - d) / keep;
-      rx += (dx / d) * w * (f.def.rank ? 3 : 1);
-      ry += (dy / d) * w * (f.def.rank ? 3 : 1);
-      if (d < 34 + f.def.radius) close++;
-    }
-  }
-  for (const sh of s.shots) {
-    if (sh.weapon) continue;
-    const dx = p.x - sh.x;
-    const dy = p.y - sh.y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < 110 * 110) {
-      const d = Math.sqrt(d2) || 1;
-      rx += (dx / d) * 1.5;
-      ry += (dy / d) * 1.5;
-    }
-  }
-  let x = rx;
-  let y = ry;
-  const rm = Math.hypot(rx, ry);
-  if (rm > 0.05) {
-    // 밀리는 쪽 + 옆으로 돌기
-    x = rx / rm + (-ry / rm) * 0.7;
-    y = ry / rm + (rx / rm) * 0.7;
-  } else {
-    // 안전하면 결 조각·상자, 아니면 가장 가까운 적과 싸울 거리로
-    let g: { x: number; y: number } | null = null;
-    let gd = 260 * 260;
-    for (const it of s.items) {
-      const d = (it.x - p.x) ** 2 + (it.y - p.y) ** 2;
-      if (d < 600 * 600) {
-        gd = 0;
-        g = it;
-        break;
+  for (const f of s.foes) if ((p.x - f.x) ** 2 + (p.y - f.y) ** 2 < (34 + f.def.radius) ** 2) close++;
+  const near = s.foes.reduce<{ d: number; x: number; y: number } | null>((b, f) => {
+    const d = (f.x - p.x) ** 2 + (f.y - p.y) ** 2;
+    return !b || d < b.d ? { d, x: f.x, y: f.y } : b;
+  }, null);
+  let target: { x: number; y: number } | null = null;
+  for (const it of s.items) if ((it.x - p.x) ** 2 + (it.y - p.y) ** 2 < 700 * 700) target = it;
+  if (!target) {
+    let gd = 300 * 300;
+    for (const g of s.gems) {
+      const d = (g.x - p.x) ** 2 + (g.y - p.y) ** 2;
+      if (d < gd) {
+        gd = d;
+        target = g;
       }
     }
-    if (!g)
-      for (const gem of s.gems) {
-        const d = (gem.x - p.x) ** 2 + (gem.y - p.y) ** 2;
-        if (d < gd) {
-          gd = d;
-          g = gem;
-        }
-      }
-    if (g) {
-      x = g.x - p.x;
-      y = g.y - p.y;
-    } else if (nd < Infinity && nd > 100 * 100) {
-      x = nx - p.x;
-      y = ny - p.y;
-    } else {
-      x = Math.cos(s.t * 0.7);
-      y = Math.sin(s.t * 0.7);
-    }
   }
-  return { x, y, dash: close >= 2 || (p.hp < p.maxHp * 0.35 && close >= 1), ult: s.ult >= 100 };
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    const [nx, ny] = moveCircle(s.terrain, p.x, p.y, dx * 70, dy * 70, 13);
+    const moved = Math.hypot(nx - p.x, ny - p.y);
+    if (moved < 16) continue;
+    let v = 0;
+    // 트인 곳을 좋아한다(벽에 몰리지 않게): 둘레 5×5칸 중 걸을 수 있는 칸
+    let open = 0;
+    for (let gy = -2; gy <= 2; gy++) for (let gx = -2; gx <= 2; gx++) open += walkable(s.terrain, nx + gx * CELL, ny + gy * CELL) ? 1 : 0;
+    v += open * 0.08;
+    for (const f of s.foes) {
+      const d = Math.hypot(nx - f.x, ny - f.y);
+      const keep = (f.def.rank ? 110 : 62) + f.def.radius;
+      if (d < keep) v -= ((keep - d) / keep) * (f.def.rank ? 6 : 2);
+    }
+    for (const sh of s.shots) if (!sh.weapon && Math.hypot(nx - sh.x, ny - sh.y + 20) < 60) v -= 3;
+    for (const m of s.slams) if (Math.hypot(nx - m.x, ny - m.y) < m.r + 20) v -= 8;
+    if (target) v += (Math.hypot(p.x - target.x, p.y - target.y) - Math.hypot(nx - target.x, ny - target.y)) * 0.05;
+    else if (near && near.d > 120 * 120) v += (Math.sqrt(near.d) - Math.hypot(nx - near.x, ny - near.y)) * 0.03;
+    // 막다른 곳으로 덜 가게: 조금 덜 움직인 쪽은 깎는다
+    v -= (70 - moved) * 0.04;
+    if (v > best.v) best = { x: dx, y: dy, v };
+  }
+  return { x: best.x, y: best.y, dash: close >= 2 || (p.hp < p.maxHp * 0.35 && close >= 1), ult: s.ult >= 100 };
 }
 
-export interface BotRun extends State {
-  /** 보스·정예를 쓰러뜨린 때(초) */
-  marks: string[];
+export interface BotChapter {
+  chapter: number;
+  result: State['result'];
+  t: number;
+  level: number;
+  kills: number;
   minHp: number;
+  weapons: string;
 }
-export function runBot(hero: string, seed: string, how: Picker = 'smart', limit = 2100): BotRun {
-  const s = createRun(hero, seed) as BotRun;
-  s.marks = [];
-  s.minHp = s.player.hp;
-  const steps = limit * 60;
-  for (let i = 0; i < steps && !s.result; i++) {
+
+/** 한 장을 돌린다 */
+export function runChapter(chapter: number, seed: string, carry: Carry, how: Picker = 'smart', limit = 1500): { s: State; minHp: number } {
+  const s = createChapter(chapter, seed, carry);
+  let minHp = s.player.hp;
+  for (let i = 0; i < limit * 60 && !s.result; i++) {
     if (s.pending) choose(s, pickIndex(s, how));
     step(s, botInput(s));
-    for (const e of s.events) if (e.type === 'kill' && e.rank) s.marks.push(`${e.foe}@${Math.round(s.t)}`);
-    s.minHp = Math.min(s.minHp, s.player.hp);
+    minHp = Math.min(minHp, s.player.hp);
     s.events.length = 0;
   }
-  return s;
+  return { s, minHp };
+}
+
+/** 1장부터 이어서(지면 멈춘다) */
+export function runStory(hero: string, seed: string, how: Picker = 'smart', upTo = 10): BotChapter[] {
+  let carry = freshCarry(hero);
+  const out: BotChapter[] = [];
+  for (let c = 0; c < upTo; c++) {
+    const { s, minHp } = runChapter(c, seed, carry, how);
+    out.push({ chapter: c + 1, result: s.result, t: Math.round(s.t), level: s.level, kills: s.chapterKills, minHp: Math.round(minHp), weapons: s.weapons.map((w) => w.id + w.lv).join(',') });
+    if (s.result !== 'clear') break;
+    carry = carryOf(s);
+  }
+  return out;
 }
