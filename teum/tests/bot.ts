@@ -76,7 +76,7 @@ export interface BotChapter {
 }
 
 /** 한 장을 돌린다 */
-export function runChapter(chapter: number, seed: string, carry: Carry, how: Picker = 'smart', limit = 1500): { s: State; minHp: number } {
+export function runChapter(chapter: number, seed: string, carry: Carry, how: Picker = 'smart', limit = 600): { s: State; minHp: number } {
   const s = createChapter(chapter, seed, carry);
   let minHp = s.player.hp;
   for (let i = 0; i < limit * 60 && !s.result; i++) {

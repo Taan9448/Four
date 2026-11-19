@@ -156,6 +156,8 @@ button { font: inherit; }
 .choice .tag { font-size: 11px; color: var(--gold); }
 .choice .desc { font-size: 13px; color: var(--muted); }
 .choice .evo { font-size: 11px; color: #c8b4ff; }
+.choice .card-art { width: 100%; height: 64px; object-fit: cover; border-radius: 4px; image-rendering: pixelated; }
+.entry .thumb { width: 96px; height: 64px; object-fit: cover; image-rendering: pixelated; }
 .choice .key { position: absolute; right: 8px; top: 6px; font-size: 11px; color: var(--muted); }
 .result .seal-r { width: 72px; height: 72px; margin: 0 auto 8px; display: grid; place-items: center; border-radius: 8px; background: var(--shu); font: 400 40px 'Song Myung', serif; }
 .result.lose .seal-r { background: #3a3440; }
