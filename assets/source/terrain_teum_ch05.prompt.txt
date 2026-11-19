@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Every used cell is ONE square top-down terrain tile that FILLS THE WHOLE CELL edge to edge (no background color, no border, no gap, no rounded corners). Floor, water and lava tiles are SEAMLESS: their left edge continues into their right edge and their top edge into their bottom edge, so the same tile repeated side by side shows no seam. Seen straight from above, no horizon, no perspective, no characters.
+Subject: top-down terrain tiles for a dwarven mine survival-action map, all in one consistent palette and pixel size so they fit together on one map
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: floor tile A: rough dark mine floor, even and calm, seamless
+Cell 2: floor tile B: mine floor with rubble and an old rail, a variation of tile 1 with the same colors, seamless
+Cell 3: wall top: the top of a solid rock mass with ore veins, fills the cell, slightly lighter on the upper left
+Cell 4: wall front face: the front face of a carved mine wall with wooden support beams, fills the cell, darker than tile 3
+Cell 5: hazard: a pool of glowing molten ore, seamless
+Cell 6: slow ground: loose gravel and rubble, seamless
+Cell 7: bridge: a wooden plank walkway, fills the cell
+Cell 8: decoration: a mine cart and a pickaxe, on top of floor tile 1
+Cells 9 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: IGNORE the final generic 5px empty-margin rule: it is NOT for terrain. All eight used tiles must paint actual ground/material through every outermost row, column and corner, without any border or dark gutters. Keep the exact eight-cell order and correct overhead minecart and pickaxe from the attached sheet. Cell 5 must be a genuinely seamless uniform molten-ore surface: a fine even field of glowing orange molten metal with many small dark red inclusions, NOT broad diagonal yellow rivers, no large cut rocks, no central feature, and identical texture density and phase on opposite edges. The top edge continues into bottom and left into right. Cells 1,2,6 likewise seamless dark mine ground, with small evenly distributed details. Use the attached delivered mine floor's dark navy/slate colors for floors, keep floor2 old rails subtle. True 90-degree overhead for all except cell4 front wall. All eight tiles fill edge to edge. Only cells9–16 empty pure magenta.
