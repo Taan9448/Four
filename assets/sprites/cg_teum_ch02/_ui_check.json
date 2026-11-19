@@ -1,0 +1,10 @@
+{
+  "size": [
+    1152,
+    768
+  ],
+  "leftThirdLuminanceMean": 62.697,
+  "leftThirdLuminanceStd": 36.283,
+  "centerRightLuminanceMean": 130.12,
+  "note": "Visual review determines quiet text/button area; luminance statistics are supporting measurements only."
+}
