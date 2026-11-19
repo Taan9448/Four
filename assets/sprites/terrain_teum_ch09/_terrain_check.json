@@ -1,0 +1,37 @@
+{
+  "frames": [
+    {
+      "cell": 1,
+      "opaque": true,
+      "wrapX": 7.969,
+      "wrapY": 2.479,
+      "interiorX": 3.245,
+      "interiorY": 4.158
+    },
+    {
+      "cell": 2,
+      "opaque": true,
+      "wrapX": 7.292,
+      "wrapY": 3.938,
+      "interiorX": 3.145,
+      "interiorY": 4.354
+    },
+    {
+      "cell": 5,
+      "opaque": true,
+      "wrapX": 0.0,
+      "wrapY": 0.0,
+      "interiorX": 1.983,
+      "interiorY": 3.972
+    },
+    {
+      "cell": 6,
+      "opaque": true,
+      "wrapX": 13.891,
+      "wrapY": 8.682,
+      "interiorX": 5.75,
+      "interiorY": 7.524
+    }
+  ],
+  "note": "Unchanged delivered cells1,2,5,6 repeated2x2 for visual wrap review; numbers flag seams, not proof of continuity."
+}
