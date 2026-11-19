@@ -1,0 +1,21 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: load — a half-unrolled old paper handscroll with a red bookmark ribbon
+Cell 2: save — a small wooden seal box with a red ink seal stamp beside it
+Cell 3: story — a mountain peak with a glowing red crack splitting the sky above it
+Cell 4: endless mode — a black ink brush circle (enso) with a small red crack inside
+Cell 5: codex — a closed bound book with a dark blue cover and a gold corner
+Cell 6: wardrobe — a folded martial robe on a small wooden rack
+Cell 7: options — a writing brush lying on an ink stone with a small pool of ink
+Cells 8 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Remove ALL writing and letter-like symbols. Cell1 scroll must be completely BLANK cream paper with red bookmark, no strokes that resemble text. Cell2 sealbox lid and circular stamp face must be completely BLANK solid red/cream surfaces, no Chinese seal glyphs, no labyrinth/characters, no logos. Cell5 book cover blank blue with plain goldcorners, no label, picture or text. Othercells keep correct order:3mountains/redskycrack,4blackenso/redcrack,6robeonrack,7brushinkstone. Seven separate readable64pixel icons within their owncells with5nativepixel margin and puremagenta unused8–16. Noletters,numbers,symbols,watermark,labels anywhere. Same crisp pixelart masterpalette.
