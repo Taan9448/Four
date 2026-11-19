@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Every used cell is ONE square top-down terrain tile that FILLS THE WHOLE CELL edge to edge (no background color, no border, no gap, no rounded corners). Floor, water and lava tiles are SEAMLESS: their left edge continues into their right edge and their top edge into their bottom edge, so the same tile repeated side by side shows no seam. Seen straight from above, no horizon, no perspective, no characters.
+Subject: top-down terrain tiles for a frozen kingdom survival-action map, all in one consistent palette and pixel size so they fit together on one map
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: floor tile A: frosty grey flagstones, even and calm, seamless
+Cell 2: floor tile B: grey flagstones with thin snow, a variation of tile 1 with the same colors, seamless
+Cell 3: wall top: the top of a frozen castle wall with snow on it, fills the cell, slightly lighter on the upper left
+Cell 4: wall front face: the front face of an ice-covered stone wall, icicles at the bottom, fills the cell, darker than tile 3
+Cell 5: hazard: a frozen lake surface, pale blue ice with cracks, seamless
+Cell 6: slow ground: a deep snow drift, seamless
+Cell 7: bridge: a stone bridge with snow, fills the cell
+Cell 8: decoration: a frozen banner pole and a broken shield, on top of floor tile 1
+Cells 9 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: The second sheet has DARK RECTANGULAR BORDERS in cells5 and6 that become obvious black crosses in2x2 repeats. IMPORTANT: IGNORE the final generic sentence about keeping5 sprite pixels empty at cell edges; that margin rule DOES NOT APPLY to these full-bleed TERRAIN tiles. Paint actual content to EVERY pixel at each used cell boundary, including the outermost rows, columns and all corners. No dark separator even BETWEEN different used tiles: cell5 ice directly touches cell6 snow exactly at the cell boundary. Cell5 ice-blue and white crack texture wraps periodically, matching opposite edge crack positions/tones, no dark rim. Cell6 snow-blue/white texture similarly wraps with no dark rim or cut mound. Keep dark floor1/2 matching image1; frame4 front wall,7overhead bridge,8fallen banner/shield stay. Make cell3 only OVERHEAD flat snow-cap tops and a paved wall walkway, no visible front cube faces. Fixed4x4 sheet; used1-8 full-bleed,9-16 empty magenta. One4px block grid, no text.
