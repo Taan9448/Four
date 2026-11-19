@@ -1,0 +1,89 @@
+{
+  "idleBBox": [
+    36,
+    37,
+    129,
+    144
+  ],
+  "idleSilhouetteHeight": 107,
+  "idleGround": 143,
+  "timingIdentical": true,
+  "allFootBottomsSame": true,
+  "frames": [
+    {
+      "frame": 1,
+      "bbox": [
+        32,
+        37,
+        119,
+        144
+      ],
+      "height": 107,
+      "footBottom": 143
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        34,
+        40,
+        116,
+        144
+      ],
+      "height": 104,
+      "footBottom": 143
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        36,
+        34,
+        112,
+        144
+      ],
+      "height": 110,
+      "footBottom": 143
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        34,
+        37,
+        120,
+        144
+      ],
+      "height": 107,
+      "footBottom": 143
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        37,
+        38,
+        116,
+        144
+      ],
+      "height": 106,
+      "footBottom": 143
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        36,
+        32,
+        113,
+        144
+      ],
+      "height": 112,
+      "footBottom": 143
+    }
+  ],
+  "successivePixelDifferenceRatiosIncluding6To1": [
+    0.16102,
+    0.16191,
+    0.15535,
+    0.15402,
+    0.15445,
+    0.16809
+  ],
+  "note": "Silhouette height includes carried weapon; body scale is separately calibrated and recorded in _export.json. Natural walk down/passing pose may move head a few pixels. Visual loop review also required."
+}
