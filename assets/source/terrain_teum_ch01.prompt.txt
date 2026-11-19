@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Every used cell is ONE square top-down terrain tile that FILLS THE WHOLE CELL edge to edge (no background color, no border, no gap, no rounded corners). Floor, water and lava tiles are SEAMLESS: their left edge continues into their right edge and their top edge into their bottom edge, so the same tile repeated side by side shows no seam. Seen straight from above, no horizon, no perspective, no characters.
+Subject: top-down terrain tiles for a mountain sect forest survival-action map, all in one consistent palette and pixel size so they fit together on one map
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: floor tile A: mossy forest ground, even and calm, seamless
+Cell 2: floor tile B: mossy forest ground with pine needles, a variation of tile 1 with the same colors, seamless
+Cell 3: wall top: a block of stacked grey mountain rock and pine roots (top surface, seen from above), fills the cell, slightly lighter on the upper left
+Cell 4: wall front face: the front face of a low grey rock ledge with roots, seen from the front, darker, fills the cell, darker than tile 3
+Cell 5: hazard: a shallow mountain stream with pebbles, seamless
+Cell 6: slow ground: a patch of thick bamboo undergrowth, seamless
+Cell 7: bridge: a narrow wooden plank bridge (planks running left to right), fills the cell
+Cell 8: decoration: a small pine sapling and a stone lantern seen from above, on top of floor tile 1
+Cells 9 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Image1 is the delivered ground palette, image2 is the improved sheet. Preserve cells1,2,3,4,6,7,8 and their corrected overhead views and colors. Fix ONLY cell5 wrapping: the large river rocks at its TOP/LEFT edges are cut off and do not continue on the opposite edge. Make cell5 a full-bleed shallow mountain stream with just2-3 SMALL pebbles entirely in its interior (at least40px from every256px cell edge). Edge pixels contain ONLY continuous blue water and tiny short ripple grain, same colors/density as interior, no shoreline/bank, dark rectangular rim, frame or empty margin. Any ripple crossing left must continue right at the SAME Y; any ripple crossing top must continue bottom at the SAME X. Keep larger foam curls completely inside as well. All other used cells still fill their whole squares, cell6 remains overhead bamboo leaf crowns with no upright stalks. Fixed4x4 canvas with cells1-8 in first two rows,9-16 empty magenta.4px blocks; no labels.
