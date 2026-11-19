@@ -1,0 +1,19 @@
+{
+  "method": "Remove only transparent sprite-fitting padding, nearest-neighbor fit entire sampled content to specified full-bleed square. Up to2px native-axis rounding compensated. No source resize, painting, blending or content cropping.",
+  "opaque": true,
+  "frames": [
+    {
+      "cell": 1,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 254,
+        "height": 254
+      },
+      "output": [
+        256,
+        256
+      ]
+    }
+  ]
+}
