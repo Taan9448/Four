@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
-import { loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { CHAPTER_LENGTH, chapterEvents, FOES, PASSIVES, RULES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
+import { CHAPTER_LENGTH, chapterEvents, FOES, isExplored, PASSIVES, RULES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -24,8 +24,24 @@ export interface Options {
 
 const real = async (id: string): Promise<Anim> => (spriteSource(id) === 'sprites' ? loadSprite(id) : null);
 
-/** 무공·심법 아이콘 칸(icons_teum_skills_1·2·3, 16칸씩): 무공 순서 다음에 심법 */
-export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.keys()], ...[...PASSIVES.keys()]].map((id, i) => [id, i]));
+/** 무공·심법 아이콘 칸(icons_teum_skills_1·2·3, 16칸씩): 손으로 맞춘 무공 순서 다음에 심법(카드 무공은 카드 그림) */
+export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.values()].filter((w) => !w.card).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card).map((p) => p.id)].map((id, i) => [id, i]));
+/** 카드에서 온 무공·심법의 아이콘: 「천외귀환」 카드 그림(96×64)을 한 번 받아 둔다 */
+const cardImg = new Map<string, HTMLImageElement | null>();
+export function cardIcon(card: string | undefined): HTMLImageElement | null {
+  if (!card) return null;
+  if (!cardImg.has(card)) {
+    const url = cardArtUrl(card);
+    if (!url) cardImg.set(card, null);
+    else {
+      const img = new Image();
+      img.src = url;
+      cardImg.set(card, img);
+    }
+  }
+  const img = cardImg.get(card) ?? null;
+  return img && img.complete && img.naturalWidth ? img : null;
+}
 
 export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   const [idle, walk, death] = await Promise.all([loadSprite(`${sprite}_idle`), real(`${sprite}_walk`), real(`${sprite}_death`)]);
@@ -64,6 +80,7 @@ export interface View {
   ultFlash: { born: number; fx: string; color: string } | null;
   flash: { born: number; color: string } | null;
   minimap: HTMLCanvasElement | null;
+  minimapKnown?: number;
 }
 export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null });
 
@@ -206,6 +223,10 @@ function drawTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: numb
         ctx.fillRect(x + (h % 14), y - 12 + ((h >> 4) % 14), 8, 4);
       }
     }
+  // 안개: 아직 가 보지 않은 칸은 지형이 보이지 않는다(그림자·물건은 보인다)
+  ctx.fillStyle = 'rgba(6,5,10,0.9)';
+  for (let cy = cy0; cy <= cy1; cy++)
+    for (let cx = cx0; cx <= cx1; cx++) if (!s.explored[cy * t.w + cx]) ctx.fillRect(cx * CELL, cy * CELL - 14, CELL, CELL + 14);
 }
 
 const ICON_IDX: Partial<Record<ItemKind | 'gem', [keyof Art, number]>> = { gem: ['icons', 1], chest: ['icons', 2], food: ['icons', 3], magnet: ['icons', 4], herb: ['items', 1], bomb: ['items', 2], frost: ['items', 3], gold: ['items', 4] };
@@ -531,6 +552,40 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.beginPath();
       ctx.ellipse(e.x, e.y - 10, r * k, r * 0.7 * k, 0, 0, Math.PI * 2);
       ctx.stroke();
+    } else if (e.type === 'chain') {
+      const k = age / 0.25;
+      if (k > 1) continue;
+      ctx.strokeStyle = hexA(e.color, 1 - k);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      e.pts.forEach(([x, y], i) => {
+        // 번개처럼 꺾이게
+        const j = i ? ((hash(Math.round(x), Math.round(y)) % 17) - 8) : 0;
+        if (i) ctx.lineTo(x + j, y - j);
+        else ctx.moveTo(x, y);
+      });
+      ctx.stroke();
+      ctx.strokeStyle = `rgba(255,255,255,${0.8 * (1 - k)})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if (e.type === 'beam') {
+      const k = age / 0.22;
+      if (k > 1) continue;
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.rotate(e.angle);
+      ctx.fillStyle = hexA(e.color, 0.55 * (1 - k));
+      ctx.fillRect(0, -e.w * (1 - k * 0.5), e.len, e.w * 2 * (1 - k * 0.5));
+      ctx.fillStyle = `rgba(255,255,255,${0.85 * (1 - k)})`;
+      ctx.fillRect(0, -e.w * 0.25, e.len, e.w * 0.5);
+      ctx.restore();
+    } else if (e.type === 'heal') {
+      const k = age / 0.7;
+      if (k > 1) continue;
+      ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = `rgba(120,230,120,${1 - k})`;
+      ctx.fillText(`+${e.amount}`, p.x, p.y - 70 - k * 20);
     } else if (e.type === 'graze') {
       const k = age / 0.3;
       if (k > 1) continue;
@@ -628,8 +683,10 @@ function drawHero(ctx: CanvasRenderingContext2D, s: State, art: Art, now: number
 /** 오른쪽 위 지도: 지형은 장마다 한 번 그려 두고, 점(인물·그림자·보스·상자·물건)만 매번 */
 function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number, y: number, size: number, now: number): void {
   const t = s.terrain;
-  if (!v.minimap) {
-    const c = document.createElement('canvas');
+  // 가 본 곳만 그린다(안개) — 밝혀진 칸이 늘 때만 다시
+  const known = s.explored.reduce((a, b) => a + b, 0);
+  if (!v.minimap || v.minimapKnown !== known) {
+    const c = v.minimap ?? document.createElement('canvas');
     c.width = t.w;
     c.height = t.h;
     const g = c.getContext('2d')!;
@@ -637,11 +694,12 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
     const [floor, , wall, hazard] = s.chapter.color.map(rgb);
     for (let i = 0; i < t.w * t.h; i++) {
       const k = t.cells[i];
-      const col = k === T.Wall ? wall : k === T.Hazard ? hazard : k === T.Bridge ? [110, 84, 64] : k === T.Slow ? floor.map((n) => n * 0.7) : floor;
+      const col = !s.explored[i] ? [10, 9, 14] : k === T.Wall ? wall : k === T.Hazard ? hazard : k === T.Bridge ? [110, 84, 64] : k === T.Slow ? floor.map((n) => n * 0.7) : floor;
       img.data.set([col[0], col[1], col[2], 255], i * 4);
     }
     g.putImageData(img, 0, 0);
     v.minimap = c;
+    v.minimapKnown = known;
   }
   ctx.save();
   ctx.fillStyle = 'rgba(8,8,12,0.75)';
@@ -658,8 +716,10 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
     ctx.fillStyle = c;
     ctx.fillRect(x + wx * k - r / 2, y + wy * k - r / 2, r, r);
   };
-  for (const f of s.foes) if (!f.def.rank) dot(f.x, f.y, 2, '#ff5a4a');
-  for (const it of s.items) dot(it.x, it.y, it.kind === 'chest' ? 5 : 3, it.kind === 'chest' ? '#ffd27a' : '#f3ead8');
+  // 그림자는 화면 둘레만, 물건은 가 본 곳만 — 보스·중간 보스는 늘 보인다(어디서 오는지 알 수 있게)
+  const near = (x: number, y: number) => Math.abs(x - s.player.x) < s.view * 1.4 && Math.abs(y - s.player.y) < s.view;
+  for (const f of s.foes) if (!f.def.rank && near(f.x, f.y)) dot(f.x, f.y, 2, '#ff5a4a');
+  for (const it of s.items) if (isExplored(s, it.x, it.y)) dot(it.x, it.y, it.kind === 'chest' ? 5 : 3, it.kind === 'chest' ? '#ffd27a' : '#f3ead8');
   for (const f of s.foes) if (f.def.rank) dot(f.x, f.y, f.boss ? 8 : 6, f.boss ? '#ff2a3a' : '#ffb02e');
   // 화면에 보이는 범위
   ctx.strokeStyle = 'rgba(243,234,216,0.35)';
@@ -685,9 +745,12 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     ctx.strokeRect(cx + 0.5, y + 0.5, slot - 1, slot - 1);
     if (!id) return;
     const idx = SKILL_ICON.get(id) ?? -1;
-    const sheet = art.skills[Math.floor(idx / 16)];
+    const sheet = idx >= 0 ? art.skills[Math.floor(idx / 16)] : null;
     const img = sheet?.images[idx % 16];
-    if (img) ctx.drawImage(img, cx + 3, y + 3, slot - 6, slot - 6);
+    const card = cardIcon(WEAPONS.get(id)?.card ?? PASSIVES.get(id)?.card);
+    // 카드 그림(가로 3:2)은 가운데를 네모로 잘라 칸에
+    if (card) ctx.drawImage(card, card.naturalWidth * 0.17, 0, card.naturalWidth * 0.66, card.naturalHeight, cx + 3, y + 3, slot - 6, slot - 6);
+    else if (img) ctx.drawImage(img, cx + 3, y + 3, slot - 6, slot - 6);
     else {
       ctx.fillStyle = hexA(color, 0.35);
       ctx.fillRect(cx + 3, y + 3, slot - 6, slot - 6);

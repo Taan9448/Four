@@ -9,9 +9,9 @@ const real = (id: string) => existsSync(`assets/sprites/${id}/meta.json`);
 const spec = (id: string) => existsSync(`specs/assets/${id}.yaml`);
 
 describe('「틈」 데이터', () => {
-  it('스토리 10장 × 15분, 장마다 바닥·지형·일러스트 명세와 보스·중간 보스', () => {
+  it('스토리 10장 × 5분(2026-11-19 1/3로), 장마다 바닥·지형·일러스트 명세와 보스·중간 보스', () => {
     expect(STORY.chapters).toHaveLength(10);
-    expect(STORY.timeline.length).toBe(900);
+    expect(STORY.timeline.length).toBe(300);
     for (const c of STORY.chapters) {
       for (const id of [c.ground, c.terrain, c.cg]) expect(spec(id), `${c.id} ${id}`).toBe(true);
       expect(FOES.get(c.roles.boss)?.rank, c.id).toBe('boss');
@@ -48,7 +48,18 @@ describe('「틈」 데이터', () => {
     }
     for (const w of WEAPONS.values()) if (w.evolve) expect(WEAPONS.get(w.evolve.into)?.evolved && PASSIVES.has(w.evolve.with), w.id).toBe(true);
     for (const id of ['props_teum', 'icons_teum', 'icons_teum_items', 'icons_teum_skills_1', 'icons_teum_skills_2', 'icons_teum_skills_3', 'icons_teum_menu', 'keyart_teum_lobby']) expect(spec(id), id).toBe(true);
-    expect(WEAPONS.size + PASSIVES.size).toBeLessThanOrEqual(48);
+    // 스킬 10배(2026-11-19): 손으로 맞춘 35 + 「천외귀환」 카드 무공·심법 — 카드에서 온 것은 모두 카드 그림이 있다
+    expect(WEAPONS.size + PASSIVES.size).toBeGreaterThanOrEqual(320);
+    for (const w of WEAPONS.values()) expect(w.levels.every((l) => l.damage > 0 && l.cooldown > 0), w.id).toBe(true);
+  });
+
+  it('카드 무공: 인물마다 고를 무공이 80개 넘고, 종류가 고르게 섞인다', () => {
+    for (const h of HEROES) {
+      const pool = [...WEAPONS.values()].filter((w) => !w.evolved && (w.owner === '*' || w.owner === h.id));
+      expect(pool.length, h.id).toBeGreaterThan(80);
+      expect(new Set(pool.map((w) => w.kind)).size, h.id).toBeGreaterThanOrEqual(9);
+    }
+    for (const w of WEAPONS.values()) if (w.evolve) expect(WEAPONS.get(w.evolve.into)?.evolved, w.id).toBe(true);
   });
 
   it('필요 경험은 레벨마다 는다', () => {
@@ -131,6 +142,33 @@ describe('「틈」 엔진', () => {
     expect(s.weapons[0].id).toBe('cheonoe_blade');
   });
 
+  it('안개: 처음에는 시작 자리 둘레만 밝혀지고, 걸으면 넓어진다', () => {
+    const s = createChapter(0, 'fog', freshCarry('haun'));
+    const at0 = s.explored.reduce((a, b) => a + b, 0);
+    expect(at0).toBeGreaterThan(0);
+    expect(at0).toBeLessThan(s.terrain.w * s.terrain.h * 0.05);
+    for (let i = 0; i < 60 * 8; i++) {
+      if (s.pending) choose(s, 0);
+      step(s, { x: 1, y: 0.3 });
+    }
+    expect(s.explored.reduce((a, b) => a + b, 0)).toBeGreaterThan(at0);
+  });
+
+  it('새 종류(연쇄·일직선·회복)도 돈다', () => {
+    for (const kind of ['chain', 'beam', 'heal'] as const) {
+      const w = [...WEAPONS.values()].find((x) => x.kind === kind && !x.evolved)!;
+      const s = createChapter(0, `k-${kind}`, freshCarry('haun'));
+      s.weapons = [{ id: w.id, lv: 3, next: 0 }];
+      s.player.hp = 50;
+      for (let i = 0; i < 60 * 20; i++) {
+        if (s.pending) choose(s, 0);
+        step(s, { x: Math.cos(i / 90), y: Math.sin(i / 90) });
+      }
+      if (kind === 'heal') expect(s.player.hp, kind).toBeGreaterThan(0);
+      else expect(s.chapterKills, kind).toBeGreaterThan(0);
+    }
+  });
+
   it('소모품: 서리 부적은 그림자를 얼리고, 벽력탄은 둘레를 친다', () => {
     const s = createChapter(0, 'items', freshCarry('haun'));
     s.items.push({ x: s.player.x, y: s.player.y, kind: 'frost' });
@@ -140,7 +178,7 @@ describe('「틈」 엔진', () => {
 
   it('보스를 쓰러뜨리면 장을 넘는다', () => {
     const s = createChapter(0, 'boss', freshCarry('haun'));
-    s.t = 749.99;
+    s.t = 249.99;
     s.nextEvent = chapterEvents(s.chapter).findIndex((e) => e.kind === 'boss');
     step(s, { x: 0, y: 0 });
     expect(s.boss?.def.id).toBe(s.chapter.roles.boss);
@@ -154,9 +192,9 @@ describe('「틈」 엔진', () => {
     expect(s.result).toBe('clear');
   });
 
-  it('잘 고르는 봇은 대개 1장을 넘는다(인물 넷 중 셋 이상, GAME_DESIGN 12절)', () => {
-    const runs = HEROES.map((h) => runChapter(0, 'b', freshCarry(h.id), 'smart').s);
-    expect(runs.filter((s) => s.result === 'clear').length).toBeGreaterThanOrEqual(3);
-    for (const s of runs) if (s.result === 'clear') expect(s.t).toBeGreaterThan(12 * 60);
+  it('잘 고르는 봇도 1장이 만만하지 않다 — 인물 넷 중 둘 이상은 넘는다(2026-11-19 적 강화, GAME_DESIGN 12절)', () => {
+    const runs = HEROES.map((h) => runChapter(0, 'a', freshCarry(h.id), 'smart').s);
+    expect(runs.filter((s) => s.result === 'clear').length).toBeGreaterThanOrEqual(2);
+    for (const s of runs) if (s.result === 'clear') expect(s.t).toBeGreaterThan(4 * 60);
   }, 120000);
 });

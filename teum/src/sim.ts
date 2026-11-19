@@ -1,4 +1,4 @@
-// 「틈」 엔진(2026-11-18 2차): 스토리 한 장(15분)을 지형 판 위에서 돌린다. 순수 함수 + 시드 RNG — 화면(render.ts)·입력(main.ts)과 떨어져 있어
+// 「틈」 엔진(2026-11-18 2차, 2026-11-19 장 5분): 스토리 한 장(5분)을 지형 판 위에서 돌린다. 순수 함수 + 시드 RNG — 화면(render.ts)·입력(main.ts)과 떨어져 있어
 // 테스트·봇이 그대로 돌린다. 무공은 종류(kind)마다 움직임이 정해져 있고 수치는 data — 무공·적별 코드는 없다(GAME_DESIGN 4·8절).
 import { createRng, type Rng } from '../../src/engine/rng';
 import rulesRaw from '../data/rules.json';
@@ -6,9 +6,10 @@ import storyRaw from '../data/story.json';
 import foesRaw from '../data/foes.json';
 import weaponsRaw from '../data/weapons.json';
 import heroesRaw from '../data/heroes.json';
+import { cardSkills } from './cards';
 import { blocksShot, buildTerrain, CELL, cellAt, flowDir, moveCircle, T, updateFlow, walkable, type Terrain, type TerrainDef } from './terrain';
 
-export type Kind = 'slash' | 'bolt' | 'wave' | 'orbit' | 'nova' | 'aura' | 'strike' | 'rain';
+export type Kind = 'slash' | 'bolt' | 'wave' | 'orbit' | 'nova' | 'aura' | 'strike' | 'rain' | 'chain' | 'beam' | 'heal';
 export interface WeaponLevel {
   damage: number;
   cooldown: number;
@@ -26,11 +27,14 @@ export interface WeaponDef {
   desc: string;
   color: string;
   levels: WeaponLevel[];
-  element?: 'ice' | 'fire';
+  /** 맞은 적에게 남기는 것: ice 느림 · fire 태움 · shock 잠깐 멈춤 · vuln 받는 피해 +25% */
+  element?: 'ice' | 'fire' | 'shock' | 'vuln';
   knock?: number;
   fx?: string;
   evolved?: boolean;
   evolve?: { with: string; into: string };
+  /** 「천외귀환」 카드에서 온 무공(카드 그림이 아이콘) */
+  card?: string;
 }
 export interface PassiveDef {
   id: string;
@@ -39,6 +43,7 @@ export interface PassiveDef {
   stat: string;
   per: number;
   max: number;
+  card?: string;
 }
 export type FoeSkill =
   | { kind: 'aimed'; every: number; damage: number; speed: number; color: string; fx?: string }
@@ -127,6 +132,8 @@ export const RULES = rulesRaw as unknown as {
   drops: Record<'food' | 'herb' | 'magnet' | 'bomb' | 'frost' | 'gold', number> & { foodHeal: number };
   props: { hp: number; drops: Record<string, number> };
   items: { bomb: { damage: number; radius: number }; frost: { seconds: number } };
+  /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
+  sight: { cells: number; every: number };
 };
 export const STORY = storyRaw as unknown as {
   difficulties: { id: string; name: string; open: boolean; note?: string }[];
@@ -134,8 +141,12 @@ export const STORY = storyRaw as unknown as {
   chapters: ChapterDef[];
 };
 export const FOES = new Map((foesRaw.foes as unknown as FoeDef[]).map((f) => [f.id, f]));
-export const WEAPONS = new Map((weaponsRaw.weapons as unknown as WeaponDef[]).map((w) => [w.id, w]));
-export const PASSIVES = new Map((weaponsRaw.passives as PassiveDef[]).map((p) => [p.id, p]));
+// 손으로 맞춘 무공·심법(weapons.json) + 「천외귀환」 카드 286장에서 바꾼 것(cards.ts, 2026-11-19 스킬 10배)
+const handWeapons = weaponsRaw.weapons as unknown as WeaponDef[];
+const handPassives = weaponsRaw.passives as PassiveDef[];
+const fromCards = cardSkills(new Set([...handWeapons.map((w) => w.name), ...handPassives.map((p) => p.name)]));
+export const WEAPONS = new Map([...handWeapons, ...fromCards.weapons].map((w) => [w.id, w]));
+export const PASSIVES = new Map([...handPassives, ...fromCards.passives].map((p) => [p.id, p]));
 export const HEROES = heroesRaw.heroes as unknown as HeroDef[];
 export const CHAPTER_LENGTH = STORY.timeline.length;
 
@@ -154,6 +165,8 @@ export interface Foe {
   hitAt: number;
   slowUntil: number;
   burnUntil: number;
+  stunUntil: number;
+  vulnUntil: number;
   /** 기술마다 다음 쓸 때 */
   skillAt: number[];
   /** 돌진: 끝나는 때 */
@@ -176,7 +189,7 @@ export interface Shot {
   weapon?: string;
   pierce: number;
   hit?: Set<number>;
-  element?: 'ice' | 'fire';
+  element?: WeaponDef['element'];
   knock?: number;
 }
 export interface Zone {
@@ -189,7 +202,7 @@ export interface Zone {
   next: number;
   weapon: string;
   color: string;
-  element?: 'ice' | 'fire';
+  element?: WeaponDef['element'];
 }
 /** 붉게 예고한 원(내려찍기·낙석·화살비) — at에 맞는다 */
 export interface Slam {
@@ -244,6 +257,9 @@ export type FxEvent =
   | { type: 'ult'; x: number; y: number; fx: string; color: string }
   | { type: 'event'; text: string; kind: string }
   | { type: 'skill'; x: number; y: number; fx?: string; color: string }
+  | { type: 'chain'; pts: [number, number][]; color: string }
+  | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string }
+  | { type: 'heal'; amount: number }
   | { type: 'burst'; x: number; y: number; r: number }
   | { type: 'prop'; x: number; y: number }
   | { type: 'bomb'; x: number; y: number }
@@ -328,6 +344,9 @@ export interface State {
   rains: { until: number; every: number; next: number; damage: number; radius: number; color: string }[];
   /** 화면에 보이는 반지름(무작위 낙뢰 등) */
   view: number;
+  /** 가 본 칸(지도 안개) — 1이면 밝혀졌다 */
+  explored: Uint8Array;
+  exploredAt: number;
 }
 
 export function xpNeed(level: number): number {
@@ -335,7 +354,15 @@ export function xpNeed(level: number): number {
   return Math.round(x.base + x.perLevel * (level - 1) + x.square * (level - 1) ** 2);
 }
 
-const pv = (s: State, id: string): number => (s.passives.get(id) ?? 0) * (PASSIVES.get(id)?.per ?? 0);
+/** 심법 능력치: 같은 능력치(stat)를 올리는 심법을 모두 더한다(카드 심법도 같은 능력치를 나눠 쓴다) */
+const pv = (s: State, stat: string): number => {
+  let v = 0;
+  for (const [id, lv] of s.passives) {
+    const d = PASSIVES.get(id);
+    if (d && (d.stat ?? id) === stat) v += lv * d.per;
+  }
+  return v;
+};
 export const stat = {
   might: (s: State) => 1 + pv(s, 'might'),
   haste: (s: State) => Math.max(0.35, 1 - pv(s, 'haste')),
@@ -345,8 +372,17 @@ export const stat = {
   regen: (s: State) => pv(s, 'breath'),
   crit: (s: State) => pv(s, 'grain'),
   pickup: (s: State) => RULES.player.pickup * (1 + pv(s, 'yoke')),
-  xpMul: (s: State) => 1 + (s.passives.get('yoke') ?? 0) * 0.05,
+  xpMul: (s: State) => 1 + pv(s, 'yoke') * 0.17,
+  amount: (s: State) => Math.floor(pv(s, 'amount')),
+  duration: (s: State) => 1 + pv(s, 'duration'),
+  critMul: (s: State) => 2 + pv(s, 'critdmg'),
+  greed: (s: State) => 1 + pv(s, 'greed'),
+  thorns: (s: State) => pv(s, 'thorns'),
+  luck: (s: State) => pv(s, 'luck'),
 };
+
+/** 굳은살 같은(능력치 vigor) 심법 레벨의 합 — 레벨마다 최대 체력 +10 */
+export const vigorLevels = (passives: Map<string, number>): number => [...passives].reduce((a, [id, lv]) => a + ((PASSIVES.get(id)?.stat ?? id) === 'vigor' ? lv : 0), 0);
 
 export const freshCarry = (hero: string): Carry => {
   const h = HEROES.find((x) => x.id === hero) ?? HEROES[0];
@@ -360,7 +396,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry):
   const rng = createRng(`teum:${seed}:${chapter.id}`);
   const terrain = buildTerrain(chapter.terrainDef, rng.fork('terrain'));
   const passives = new Map(carry.passives);
-  const maxHp = hero.hp + carry.bonusHp + (passives.get('vigor') ?? 0) * 10;
+  const maxHp = hero.hp + carry.bonusHp + vigorLevels(passives) * 10;
   const s: State = {
     seed,
     rng: rng.fork('run'),
@@ -403,10 +439,28 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry):
     slowMul: 1,
     rains: [],
     view: 560,
+    explored: new Uint8Array(terrain.w * terrain.h),
+    exploredAt: 0,
   };
   updateFlow(terrain, s.player.x, s.player.y);
+  reveal(s);
   return s;
 }
+
+/** 인물 둘레를 밝힌다(가 본 곳만 지도에 보인다) */
+export function reveal(s: State): void {
+  const t = s.terrain;
+  const r = RULES.sight.cells;
+  const cx = Math.floor(s.player.x / CELL);
+  const cy = Math.floor(s.player.y / CELL);
+  for (let y = Math.max(0, cy - r); y <= Math.min(t.h - 1, cy + r); y++)
+    for (let x = Math.max(0, cx - r); x <= Math.min(t.w - 1, cx + r); x++) if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r) s.explored[y * t.w + x] = 1;
+}
+export const isExplored = (s: State, x: number, y: number): boolean => {
+  const cx = Math.floor(x / CELL);
+  const cy = Math.floor(y / CELL);
+  return cx >= 0 && cy >= 0 && cx < s.terrain.w && cy < s.terrain.h && s.explored[cy * s.terrain.w + cx] === 1;
+};
 
 /** 장 끝(또는 저장)에 이어 갈 것 */
 export function carryOf(s: State): Carry {
@@ -445,14 +499,16 @@ function nearest(s: State, x: number, y: number, skip?: Set<number>): Foe | null
   return best;
 }
 
-function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: 'ice' | 'fire'): void {
+function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element']): void {
   if (f.dead) return;
   const crit = s.rng.next() < stat.crit(s);
-  const dmg = Math.round(base * stat.might(s) * (crit ? 2 : 1));
+  const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * (s.t < f.vulnUntil ? 1.25 : 1));
   f.hp -= dmg;
   f.hitAt = s.t;
   if (element === 'ice') f.slowUntil = s.t + 1.2;
   if (element === 'fire') f.burnUntil = s.t + 2;
+  if (element === 'shock' && !f.def.rank) f.stunUntil = s.t + 0.35;
+  if (element === 'vuln') f.vulnUntil = s.t + 3;
   if (knock && !f.def.rank) {
     const dx = f.x - s.player.x;
     const dy = f.y - s.player.y;
@@ -524,6 +580,8 @@ function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe
     hitAt: -9,
     slowUntil: 0,
     burnUntil: 0,
+    stunUntil: 0,
+    vulnUntil: 0,
     skillAt: (def.skills ?? []).map((k) => s.t + k.every * (0.4 + s.rng.next() * 0.6)),
     dashUntil: 0,
     dashAt: s.t + 1 + s.rng.next() * 2,
@@ -723,7 +781,7 @@ function moveFoes(s: State): void {
       if (pt) [f.x, f.y] = pt;
       continue;
     }
-    if (frozen) continue;
+    if (frozen || s.t < f.stunUntil) continue;
     // 터지는 놈: 가까우면 멈춰 불이 붙었다가 터진다
     if (f.def.move === 'burst') {
       if (!f.fuseAt && d < 60) f.fuseAt = s.t + 0.6;
@@ -795,7 +853,12 @@ function moveFoes(s: State): void {
           s.events.push({ type: 'graze', x: f.x, y: f.y });
           for (const o of s.foes) if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < RULES.dash.graze.radius ** 2) damageFoe(s, o, RULES.dash.graze.damage);
         }
-      } else hurtPlayer(s, f.damage);
+      } else {
+        const before = p.hurtUntil;
+        hurtPlayer(s, f.damage);
+        // 되갚기(카드 심법): 몸으로 친 적에게 그대로 돌려준다
+        if (p.hurtUntil !== before && stat.thorns(s) > 0) damageFoe(s, f, stat.thorns(s));
+      }
     }
     useSkills(s, f, d);
   }
@@ -808,7 +871,10 @@ function fireWeapons(s: State): void {
   const aim = near && (near.x - p.x) ** 2 + (near.y - p.y) ** 2 < 420 * 420 ? Math.atan2(near.y - p.y, near.x - p.x) : p.facing;
   for (const w of s.weapons) {
     const d = WEAPONS.get(w.id)!;
-    const L = lvOf(w);
+    const L0 = lvOf(w);
+    // 개수(카드 심법)는 여러 개를 내는 종류에만, 지속 시간은 둘레 칼·장판에
+    const multi = d.kind === 'bolt' || d.kind === 'orbit' || d.kind === 'strike' || d.kind === 'rain' || d.kind === 'chain' || d.kind === 'wave';
+    const L = { ...L0, count: L0.count + (multi ? stat.amount(s) : 0), duration: L0.duration * (d.kind === 'orbit' || d.kind === 'rain' ? stat.duration(s) : 1) };
     const color = d.color;
     if (d.kind === 'orbit') {
       const period = L.cooldown * stat.haste(s);
@@ -914,6 +980,56 @@ function fireWeapons(s: State): void {
           hitProps(s, t.x, t.y, R);
           for (const f of s.foes) if (!f.dead && (f.x - t.x) ** 2 + (f.y - t.y) ** 2 < (R + f.def.radius) ** 2) damageFoe(s, f, L.damage, d.knock ?? 0, d.element);
         }
+        break;
+      }
+      case 'chain': {
+        // 가장 가까운 적에서 시작해 가까운 적으로 count번 튄다
+        let from: [number, number] = [p.x, p.y - 20];
+        const hit = new Set<number>();
+        const pts: [number, number][] = [from];
+        let t = nearest(s, p.x, p.y);
+        if (!t || (t.x - p.x) ** 2 + (t.y - p.y) ** 2 > 380 * 380) break;
+        for (let i = 0; i <= L.count && t; i++) {
+          hit.add(t.uid);
+          pts.push([t.x, t.y - 20]);
+          damageFoe(s, t, L.damage * (1 - i * 0.08), 0, d.element ?? 'shock');
+          from = [t.x, t.y];
+          let next: Foe | null = null;
+          let bd = (190 * L.area * area) ** 2;
+          for (const f of s.foes) {
+            if (f.dead || hit.has(f.uid)) continue;
+            const dd = (f.x - from[0]) ** 2 + (f.y - from[1]) ** 2;
+            if (dd < bd) {
+              bd = dd;
+              next = f;
+            }
+          }
+          t = next;
+        }
+        s.events.push({ type: 'chain', pts, color });
+        break;
+      }
+      case 'beam': {
+        // 겨눈 쪽으로 한 줄 — 길이·너비 안의 적을 모두 친다
+        const len = 520 * L.area * area;
+        const wdt = 18 * L.area * area;
+        const ux = Math.cos(aim);
+        const uy = Math.sin(aim);
+        s.events.push({ type: 'beam', x: p.x, y: p.y - 20, angle: aim, len, w: wdt, color });
+        for (const f of s.foes) {
+          if (f.dead) continue;
+          const rx = f.x - p.x;
+          const ry = f.y - 20 - (p.y - 20);
+          const along = rx * ux + ry * uy;
+          if (along < 0 || along > len) continue;
+          if (Math.abs(rx * uy - ry * ux) < wdt + f.def.radius) damageFoe(s, f, L.damage, d.knock ?? 4, d.element);
+        }
+        break;
+      }
+      case 'heal': {
+        const before = p.hp;
+        p.hp = Math.min(p.maxHp, p.hp + L.damage);
+        if (p.hp > before) s.events.push({ type: 'heal', amount: Math.round(p.hp - before) });
         break;
       }
       case 'rain': {
@@ -1028,7 +1144,7 @@ function pickups(s: State): void {
         s.events.push({ type: 'freeze' });
         break;
       case 'gold':
-        s.gold += 1 + s.rng.int(0, 4);
+        s.gold += Math.round((1 + s.rng.int(0, 4)) * stat.greed(s));
         break;
       case 'chest':
         openChest(s);
@@ -1082,7 +1198,7 @@ export function choicePool(s: State): Choice[] {
   if (s.weapons.length < RULES.player.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
-    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && (d.owner === '*' || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
+    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
   }
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
@@ -1105,8 +1221,12 @@ function offerChoices(s: State): void {
   }
   const picks: Choice[] = [];
   const rest = [...pool];
-  while (picks.length < 3 && rest.length) {
-    const c = s.rng.weighted(rest, (x) => (x.kind === 'weapon' && x.lv > 1 ? 1.6 : 1))!;
+  // 고를 것이 많아(카드 무공) 가진 것 올리기가 묻히지 않게: 올리기는 무겁게, 새 것은 하나하나 가볍게
+  const fresh = rest.filter((x) => x.lv === 1).length;
+  const ups = rest.length - fresh;
+  const many = s.rng.next() < stat.luck(s) ? 4 : 3;
+  while (picks.length < many && rest.length) {
+    const c = s.rng.weighted(rest, (x) => (x.lv > 1 ? Math.max(1.6, fresh / Math.max(1, ups) / 2) : 1))!;
     picks.push(c);
     rest.splice(rest.indexOf(c), 1);
   }
@@ -1122,7 +1242,7 @@ export function choose(s: State, i: number): void {
     else s.weapons.push({ id: c.id, lv: 1, next: s.t });
   } else if (c.kind === 'passive') {
     s.passives.set(c.id, c.lv);
-    if (c.id === 'vigor') {
+    if ((PASSIVES.get(c.id)?.stat ?? c.id) === 'vigor') {
       s.player.maxHp += 10;
       s.player.hp += 10;
     }
@@ -1174,6 +1294,10 @@ export function step(s: State, input: Input): void {
   }
   if (s.t < p.dashUntil) [p.x, p.y] = moveCircle(s.terrain, p.x, p.y, p.dashX * RULES.dash.speed * DT, p.dashY * RULES.dash.speed * DT, RULES.player.radius * 0.8);
   if (input.ult) useUlt(s);
+  if (s.t >= s.exploredAt) {
+    s.exploredAt = s.t + RULES.sight.every;
+    reveal(s);
+  }
   p.hp = Math.min(p.maxHp, p.hp + stat.regen(s) * DT);
   runTimeline(s);
   moveFoes(s);

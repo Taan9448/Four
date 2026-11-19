@@ -4,8 +4,9 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { carryOf, choose, createChapter, DT, FOES, freshCarry, HEROES, PASSIVES, RULES, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { CHAPTER_LENGTH, carryOf, choose, createChapter, DT, FOES, freshCarry, HEROES, PASSIVES, RULES, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, type Art, type View } from './render';
+import { cardArtUrl } from '../../src/render/assets';
 import { autosave, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
 
 const app = document.getElementById('app')!;
@@ -304,8 +305,13 @@ function codexPopup(): void {
           ),
         ];
       });
-    } else if (tab === 'weapons') list = [el('div', { class: 'grid text' }, ...[...WEAPONS.values()].map((w) => el('div', { class: 'entry', style: `--c:${w.color}` }, el('b', {}, `${w.name}${w.evolved ? ' ★' : ''}`), el('small', {}, w.owner === '*' ? '모두' : (HEROES.find((h) => h.id === w.owner)?.name ?? '')), el('small', {}, w.desc))))];
-    else list = [el('div', { class: 'grid text' }, ...[...PASSIVES.values()].map((p) => el('div', { class: 'entry' }, el('b', {}, p.name), el('small', {}, `${p.desc} · 최대 Lv.${p.max}`))))];
+    } else if (tab === 'weapons') {
+      const ws = [...WEAPONS.values()];
+      list = [el('p', { class: 'note' }, `무공 ${ws.length}개 — 손으로 맞춘 ${ws.filter((w) => !w.card).length} · 「천외귀환」 카드 ${ws.filter((w) => w.card).length}`), el('div', { class: 'grid text' }, ...ws.map((w) => { const a = cardArtUrl(w.card ?? ''); return el('div', { class: 'entry', style: `--c:${w.color}` }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, `${w.name}${w.evolved ? ' ★' : ''}`), el('small', {}, `${w.owner === '*' ? '모두' : (HEROES.find((h) => h.id === w.owner)?.name ?? '')} · ${KIND_NAME[w.kind]}`), el('small', {}, w.desc)); }))];
+    } else {
+      const ps = [...PASSIVES.values()];
+      list = [el('p', { class: 'note' }, `심법 ${ps.length}개`), el('div', { class: 'grid text' }, ...ps.map((p) => { const a = cardArtUrl(p.card ?? ''); return el('div', { class: 'entry' }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, p.name), el('small', {}, `${p.desc} · 최대 Lv.${p.max}`)); }))];
+    }
     body.replaceChildren(tabs, el('div', { class: 'codex-list' }, ...list));
   };
   render();
@@ -394,7 +400,7 @@ function chapterCard(slot: Slot): void {
     el(
       'section',
       { class: 'screen chapter-card', style: cg ? `--cg:url("${cg}")` : `--cg:linear-gradient(160deg, ${ch.color[2]}, ${ch.color[0]} 60%, ${ch.color[3]})` },
-      el('div', { class: 'cc-text' }, el('small', {}, `${slot.chapter + 1} / ${STORY.chapters.length}`), el('h2', {}, ch.name), el('p', {}, ch.line), el('p', { class: 'note' }, `15분 · 빅웨이브 둘 · 중간 보스 「${FOES.get(ch.roles.mid)?.name}」 · 보스 「${FOES.get(ch.roles.boss)?.name}」`), el('div', { class: 'menu-row' }, start, btn('메인으로', 'btn ghost', lobby))),
+      el('div', { class: 'cc-text' }, el('small', {}, `${slot.chapter + 1} / ${STORY.chapters.length}`), el('h2', {}, ch.name), el('p', {}, ch.line), el('p', { class: 'note' }, `${Math.round(CHAPTER_LENGTH / 60)}분 · 빅웨이브 둘 · 중간 보스 「${FOES.get(ch.roles.mid)?.name}」 · 보스 「${FOES.get(ch.roles.boss)?.name}」`), el('div', { class: 'menu-row' }, start, btn('메인으로', 'btn ghost', lobby))),
     ),
   );
   screenKeys = (e) => {
@@ -504,7 +510,9 @@ async function play(slot: Slot): Promise<void> {
     const desc = w ? (c.lv === 1 ? w.desc : levelDiff(c.id, c.lv)) : pd ? pd.desc : c.kind === 'gold' ? '금화를 15 얻는다' : `최대 체력 +10(다음 장에도) · 체력 ${RULES.drops.foodHeal} 회복`;
     const tag = w ? (c.lv === 1 ? '새 무공' : `무공 Lv.${c.lv}`) : pd ? (c.lv === 1 ? '새 심법' : `심법 Lv.${c.lv}`) : '보상';
     const evo = w?.evolve ? `각성: ${PASSIVES.get(w.evolve.with)?.name}와 함께 Lv.5 → 「${WEAPONS.get(w.evolve.into)?.name}」` : '';
-    const b = el('button', { class: `choice ${c.kind}`, type: 'button', style: w ? `--c:${w.color}` : '' }, el('span', { class: 'key' }, String(i + 1)), el('span', { class: 'tag' }, tag), el('b', {}, name), el('span', { class: 'desc' }, desc), evo ? el('span', { class: 'evo' }, evo) : '');
+    const art = cardArtUrl(w?.card ?? pd?.card ?? '');
+    const kind = w ? `${KIND_NAME[w.kind] ?? ''}${w.card ? ' · 천외귀환 카드' : ''}` : pd?.card ? '천외귀환 카드' : '';
+    const b = el('button', { class: `choice ${c.kind}`, type: 'button', style: w ? `--c:${w.color}` : '' }, el('span', { class: 'key' }, String(i + 1)), art ? el('img', { class: 'card-art', src: art, alt: '' }) : '', el('span', { class: 'tag' }, `${tag}${kind ? ` · ${kind}` : ''}`), el('b', {}, name), el('span', { class: 'desc' }, desc), evo ? el('span', { class: 'evo' }, evo) : '');
     b.addEventListener('click', () => pick(i));
     return b;
   };
@@ -655,6 +663,8 @@ async function fastForward(s: State, until: number): Promise<void> {
   s.player.maxHp = keep + s.bonusHp + (s.passives.get('vigor') ?? 0) * 10;
   s.player.hp = s.player.maxHp;
 }
+
+const KIND_NAME: Record<string, string> = { slash: '베기', bolt: '날리기', wave: '검기', orbit: '둘레 돌기', nova: '고리', aura: '결계', strike: '내리꽂기', rain: '장판', chain: '연쇄', beam: '일직선', heal: '회복' };
 
 function levelDiff(id: string, lv: number): string {
   const w = WEAPONS.get(id)!;
