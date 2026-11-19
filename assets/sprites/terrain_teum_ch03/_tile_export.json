@@ -1,0 +1,110 @@
+{
+  "method": "Remove only transparent sprite-fitting padding, nearest-neighbor fit entire sampled content to specified full-bleed square. Up to2px native-axis rounding compensated. No source resize, painting, blending or content cropping.",
+  "opaque": true,
+  "frames": [
+    {
+      "cell": 1,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 2,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 3,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 4,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 5,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 6,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 7,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    },
+    {
+      "cell": 8,
+      "sampledContentBox": {
+        "left": 1,
+        "top": 1,
+        "width": 62,
+        "height": 62
+      },
+      "output": [
+        64,
+        64
+      ]
+    }
+  ]
+}

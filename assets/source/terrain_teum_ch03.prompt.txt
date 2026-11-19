@@ -1,0 +1,22 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Every used cell is ONE square top-down terrain tile that FILLS THE WHOLE CELL edge to edge (no background color, no border, no gap, no rounded corners). Floor, water and lava tiles are SEAMLESS: their left edge continues into their right edge and their top edge into their bottom edge, so the same tile repeated side by side shows no seam. Seen straight from above, no horizon, no perspective, no characters.
+Subject: top-down terrain tiles for a volcanic canyon survival-action map, all in one consistent palette and pixel size so they fit together on one map
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: floor tile A: dark basalt ground, even and calm, seamless
+Cell 2: floor tile B: dark basalt ground with ash and cinders, a variation of tile 1 with the same colors, seamless
+Cell 3: wall top: the top of a tall black basalt pillar with a cracked top, fills the cell, slightly lighter on the upper left
+Cell 4: wall front face: the front face of a black basalt cliff with faint orange cracks, fills the cell, darker than tile 3
+Cell 5: hazard: bright flowing orange lava with darker crust swirls, seamless
+Cell 6: slow ground: a patch of hot grey ash, seamless
+Cell 7: bridge: an old wooden bridge with iron chains over lava, fills the cell
+Cell 8: decoration: a small rack of chains and a broken shackle, on top of floor tile 1
+Cells 9 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Image1 is the delivered canyon ground, image2 is the corrected sheet. Preserve cells1,2,3,4,7,8 including the corrected overhead3 and8. Correct ONLY seamless hazard5 and slow6: cell5 must be a full-cell molten-orange LAVA TEXTURE, not a large S-shaped river with black banks. Use evenly flowing small molten eddies and fine crust specks, all larger dark crust islands wholly inside at least40px from each256px cell edge; edges carry continuous mottled molten color with EXACT matching opposite-edge flow/tones, no dark rim or abrupt cut river. Cell6 must be evenly spread fine HOT GREY ASH powder with tiny cinders, not big diagonal slab-like clumps; grey #3d4459/#5d6478 with sparse small lighter flecks and a few dim orange embers, larger distinctive clumps inside40px. The fine ash grain is periodic in both axes. No border, gutter or blank pixel strip in any used cell. Check copies of5 and6 in2x2 for no obvious rectangular joins. Same4x4 grid,1-8 used,9-16 empty magenta,4px blocks.
