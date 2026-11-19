@@ -1,0 +1,18 @@
+{
+  "size": [
+    256,
+    256
+  ],
+  "luminanceMean": 37.314,
+  "luminanceStd": 5.242,
+  "luminancePercentiles": [
+    35.595,
+    35.595,
+    44.083
+  ],
+  "wrapXMeanRGBDifference": 0.62,
+  "wrapYMeanRGBDifference": 1.021,
+  "interiorXMeanRGBDifference": 0.835,
+  "interiorYMeanRGBDifference": 0.94,
+  "note": "Measurements flag unusually strong seams; they do not prove seamlessness. Inspect unmodified 2x2 and wrapped-offset previews as well."
+}
