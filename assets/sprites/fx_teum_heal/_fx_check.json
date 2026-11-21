@@ -1,0 +1,203 @@
+{
+  "sourceRotationMeasurement": [],
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "sourceCellCoordinateSystem": "source cell fractions; output adds native grid padding while preserving cell positions",
+  "palette": [
+    "#ffffff",
+    "#f1efe6",
+    "#c2c6d1",
+    "#8a90a3",
+    "#5d6478",
+    "#3d4459",
+    "#2b2b3a"
+  ],
+  "outsidePaletteColorCount": 0,
+  "frames": [
+    {
+      "frame": 1,
+      "sourceBBoxFraction": [
+        0.2383,
+        0.748,
+        0.7656,
+        0.8438
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        46,
+        125,
+        114,
+        137
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        79.17,
+        130.51
+      ]
+    },
+    {
+      "frame": 2,
+      "sourceBBoxFraction": [
+        0.1875,
+        0.3867,
+        0.7969,
+        0.8594
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        40,
+        78,
+        118,
+        139
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        79.55,
+        123.69
+      ]
+    },
+    {
+      "frame": 3,
+      "sourceBBoxFraction": [
+        0.2012,
+        0.1758,
+        0.7949,
+        0.8594
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        42,
+        51,
+        118,
+        139
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        80.72,
+        116.62
+      ]
+    },
+    {
+      "frame": 4,
+      "sourceBBoxFraction": [
+        0.2207,
+        0.1504,
+        0.7852,
+        0.8379
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        44,
+        48,
+        117,
+        136
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        78.88,
+        101.68
+      ]
+    },
+    {
+      "frame": 5,
+      "sourceBBoxFraction": [
+        0.2656,
+        0.1484,
+        0.7148,
+        0.332
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        50,
+        48,
+        108,
+        72
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        72.76,
+        57.78
+      ]
+    },
+    {
+      "frame": 6,
+      "sourceBBoxFraction": [
+        0.3145,
+        0.1797,
+        0.6504,
+        0.2734
+      ],
+      "sourceStrongHueFraction": 0.0,
+      "outputBBox": [
+        56,
+        52,
+        99,
+        64
+      ],
+      "paletteColors": [
+        "#2b2b3a",
+        "#3d4459",
+        "#5d6478"
+      ],
+      "outsidePalette": [],
+      "weightedCenter": [
+        81.59,
+        57.09
+      ]
+    }
+  ],
+  "successivePixelDifferenceIncludingLastToFirst": [
+    0.0473,
+    0.03984,
+    0.06148,
+    0.02605,
+    0.00391,
+    0.0166
+  ],
+  "loop": false,
+  "timingMatches": true,
+  "note": "Only measurement and inspection overlays; game frame PNGs unchanged. Green guide=central80%, blue=cellcenter, gold=strike75% height. Differences support visual loop review; not proof of smoothness."
+}
