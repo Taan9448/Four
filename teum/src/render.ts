@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { AFFIXES, CHAPTER_LENGTH, effOn, elementCounts, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { AFFIXES, CHAPTER_LENGTH, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -1352,7 +1352,7 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
 
 /** 아래 상태창: 무공 6칸 · 심법 6칸(아이콘 · Lv 점) */
 function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: number, y: number, slot: number): void {
-  const slots = RULES.player.slots;
+  const slots = s.slots;
   const gap = 4;
   const totalW = (slots.weapons + slots.passives) * (slot + gap) + 14;
   ctx.fillStyle = 'rgba(8,8,12,0.72)';
@@ -1441,10 +1441,11 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   ctx.textAlign = 'left';
   ctx.fillStyle = '#fff';
   ctx.fillText(`Lv.${s.level}`, 6, 10);
-  // 시계: 장에 남은 시간
+  // 시계: 장에 남은 시간(무한 모드는 버틴 시간)
+  const endless = s.mode === 'endless';
   const left = Math.max(0, CHAPTER_LENGTH - s.t);
-  const over = s.t > CHAPTER_LENGTH;
-  const clock = over ? `+${fmt(s.t - CHAPTER_LENGTH)}` : fmt(left);
+  const over = !endless && s.t > CHAPTER_LENGTH;
+  const clock = endless ? fmt(s.t) : over ? `+${fmt(s.t - CHAPTER_LENGTH)}` : fmt(left);
   ctx.textAlign = 'center';
   ctx.font = font(28, 800);
   ctx.lineWidth = 4;
@@ -1458,6 +1459,13 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   const nextName = next ? (next.kind === 'bigwave' ? '빅웨이브' : next.kind === 'mid' ? '중간 보스' : '보스') : '';
   // 좁은 화면(휴대폰 세로)에서는 지도와 겹치지 않게 다음 이정표만
   const narrow = W < 520;
+  if (endless) {
+    const info = endlessInfo(s);
+    const b = s.boss;
+    const enr = b && !b.dead && b.bornAt !== undefined ? RULES.endless.boss.enrage - (s.t - b.bornAt) : null;
+    ctx.fillStyle = info.enraged ? '#ff5a4a' : 'rgba(243,234,216,0.78)';
+    ctx.fillText(b && !b.dead ? (info.enraged ? '광폭화 — 어서 쓰러뜨려라!' : `광폭화까지 ${fmt(Math.max(0, enr ?? 0))}`) : `보스 ${info.stage}회 넘김 · 다음 보스까지 ${fmt(info.bossIn)}`, W / 2, 64);
+  } else
   ctx.fillText(over ? '틈 폭주 — 보스를 쓰러뜨려라' : `${narrow ? '' : s.chapter.name}${next ? `${narrow ? '' : ' · '}${nextName}까지 ${fmt(next.at - s.t)}` : ''}`, narrow ? W / 2 - 40 : W / 2, 64);
   // 보스 체력 띠
   if (s.boss && !s.boss.dead) {
@@ -1499,7 +1507,7 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   drawMinimap(ctx, s, v, W - mapSize - 12, 20, mapSize, now);
   // 아래 상태창
   const slot = W < 640 ? 26 : 34;
-  const barW = (RULES.player.slots.weapons + RULES.player.slots.passives) * (slot + 4) + 14;
+  const barW = (s.slots.weapons + s.slots.passives) * (slot + 4) + 14;
   drawStatusBar(ctx, s, art, Math.max(10, (W - barW) / 2), H - slot - 22, slot);
   // 알림 띠
   if (v.banner) {

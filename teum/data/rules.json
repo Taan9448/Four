@@ -508,5 +508,68 @@
    340
   ],
   "phasesFrom": 2
+ },
+ "endless": {
+  "$comment": "무한 모드 수치: hp·dmg는 분(m)마다 1 + perMin·m + sq·m² 배(체력은 hpPerMinute도 더해진다), 무리는 base + perMin·m(최대 max)마리/초",
+  "slots": {
+   "weapons": 5,
+   "passives": 5
+  },
+  "hp": {
+   "perMin": 0.05,
+   "sq": 0.012
+  },
+  "dmg": {
+   "perMin": 0.06,
+   "sq": 0.0025
+  },
+  "spawn": {
+   "base": 1.4,
+   "perMin": 0.45,
+   "max": 15
+  },
+  "event": [
+   60,
+   120
+  ],
+  "boss": {
+   "every": 180,
+   "first": 180,
+   "enrage": 150,
+   "speed": 1.45,
+   "damage": 1.8,
+   "skillHaste": 0.6,
+   "crowdSpeed": 1.25,
+   "crowdSpawn": 1.8,
+   "rampEvery": 15,
+   "ramp": 0.12,
+   "hpBase": 0.4,
+   "hpPerStage": 0.35,
+   "escort": [
+    6,
+    5
+   ],
+   "dmgBase": 0.55,
+   "dmgPerStage": 0.2
+  },
+  "shop": {
+   "every": 150
+  },
+  "dojo": {
+   "every": 210
+  },
+  "chests": 45,
+  "secrets": {
+   "steles": 0,
+   "altars": 5,
+   "merchants": 4
+  },
+  "dojoPrices": {
+   "buy": 40,
+   "buyPerMin": 4,
+   "up": 30,
+   "upPerLv": 12,
+   "sell": 20
+  }
  }
 }

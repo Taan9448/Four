@@ -217,16 +217,44 @@ export const RULES = rulesRaw as unknown as {
   vault: { cells: number };
   affix: { count: number; lateFrom: number; lateCount: number };
   boss: { phases: number[]; haste: number; speed: number; summon: number; arena: number; spawn: [number, number]; phasesFrom: number };
+  endless: {
+    slots: { weapons: number; passives: number };
+    hp: { perMin: number; sq: number };
+    dmg: { perMin: number; sq: number };
+    spawn: { base: number; perMin: number; max: number };
+    event: [number, number];
+    boss: { every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
+    shop: { every: number };
+    dojo: { every: number };
+    chests: number;
+    secrets: { steles: number; altars: number; merchants: number };
+    dojoPrices: { buy: number; buyPerMin: number; up: number; upPerLv: number; sell: number };
+  };
   /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
   sight: { cells: number; every: number };
 };
 export const STORY = storyRaw as unknown as {
-  difficulties: { id: string; name: string; open: boolean; note?: string }[];
+  difficulties: Difficulty[];
+  /** 무한 모드 판(2026-11-21) */
+  endless: { name: string; line: string; ground: string; terrain: string; cg: string; color: [string, string, string, string]; terrainDef: TerrainDef };
   timeline: { length: number; spawns: SpawnDef[]; events: TimelineEvent[]; chests: { every: number; min: number; max: number }; jitter: { seconds: number; roles: Record<string, Role[]> } };
   chapters: ChapterDef[];
   /** 돌발 이벤트(2026-11-21): 장마다 시드로 몇 개를 고른다 */
   random: { count: [number, number]; window: [number, number]; gap: number; events: (TimelineEvent & { id: string; weight: number })[] };
 };
+/** 스토리 난이도(2026-11-21 노말/하드): 그림자 체력·공격·무리 배율, 시계 앞당김 더하기, 정예 수식어 더하기, 보스 단계가 시작되는 장 */
+export interface Difficulty {
+  id: string;
+  name: string;
+  open: boolean;
+  note?: string;
+  hp: number;
+  dmg: number;
+  rate: number;
+  warm: number;
+  affix: number;
+  phasesFrom: number;
+}
 /** 줍는 것(data/items.json) — ops는 기본 동작(useItem)만 */
 export type ItemOp =
   | { op: 'heal'; amount?: number; full?: boolean }
@@ -250,7 +278,8 @@ export type ItemOp =
   | { op: 'ambush'; count: number }
   | { op: 'chest' }
   | { op: 'stele' }
-  | { op: 'trial' };
+  | { op: 'trial' }
+  | { op: 'skillshop'; count: number };
 export interface ItemDef {
   id: string;
   name: string;
@@ -314,6 +343,12 @@ export interface Foe {
   phase?: number;
   /** 위험 칸에 빠진 때(정예·보스는 every초에 한 번만 큰 피해) */
   fellAt?: number;
+  /** 나온 때(무한 모드 보스 광폭화) */
+  bornAt?: number;
+  /** 광폭화(무한 모드) */
+  enraged?: boolean;
+  /** 이 그림자의 기술(탄·예고 원) 피해 배율(무한 모드 보스) */
+  dmgMul?: number;
   /** 작은 그림자(갈라진 것): 다시 갈라지지 않는다 */
   small?: boolean;
 }
@@ -421,8 +456,8 @@ export type FxEvent =
   | { type: 'terrain' }
   | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string };
 export interface Choice {
-  /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 */
-  kind: 'weapon' | 'passive' | 'food' | 'gold' | 'buy' | 'leave';
+  /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 · buyskill/upskill/sellskill: 수련소(무한 모드, lv = 값/돌려받는 금화) */
+  kind: 'weapon' | 'passive' | 'food' | 'gold' | 'buy' | 'leave' | 'buyskill' | 'upskill' | 'sellskill';
   id: string;
   lv: number;
 }
@@ -567,6 +602,18 @@ export interface State {
   thornAt: number;
   /** 산바람: 이때까지 (dx, dy)로 밀린다 */
   gust: { until: number; dx: number; dy: number } | null;
+  /** 스토리 · 무한 */
+  mode: 'story' | 'endless';
+  /** 난이도 */
+  diff: Difficulty;
+  /** 무공·심법 칸(무한 모드는 5·5) */
+  slots: { weapons: number; passives: number };
+  /** 무한 모드: 넘긴 보스 수(그림자 무리가 다음 장 것으로 바뀐다) · 다음 보스·이벤트·상인·수련소 때 */
+  stage: number;
+  nextBossAt: number;
+  nextRandomAt: number;
+  nextShopAt: number;
+  nextDojoAt: number;
 }
 
 export function xpNeed(level: number): number {
@@ -667,10 +714,29 @@ export interface ChapterOpts {
   startAt?: number;
   /** 재편성: 장을 열자마자 고를 것 수 */
   rebuild?: number;
+  /** 스토리 난이도 id(normal · hard) */
+  difficulty?: string;
+  /** 무한 모드(2026-11-21) */
+  endless?: boolean;
+}
+
+/** 무한 모드 판: 장 틀을 빌려 쓰고 지형·바닥·이름만 바꾼다(그림자 무리는 stage마다 장을 따라 바뀐다) */
+function endlessChapter(): ChapterDef {
+  const E = STORY.endless;
+  const base = STORY.chapters[0];
+  return { ...base, id: 'endless', name: E.name, line: E.line, ground: E.ground, terrain: E.terrain, cg: E.cg, color: E.color, terrainDef: E.terrainDef, hp: 1, dmg: 1, rate: 1, extra: [], gimmick: undefined, steles: [], roles: { ...base.roles } };
+}
+/** 무한 모드를 연다 */
+export function createEndless(seed: string, hero: string, opts: Omit<ChapterOpts, 'endless' | 'startAt' | 'rebuild'> = {}): State {
+  return createChapter(0, seed, freshCarry(hero), { ...opts, endless: true });
 }
 export function createChapter(chapterIndex: number, seed: string, carry: Carry, opts: ChapterOpts = {}): State {
   const hero = HEROES.find((h) => h.id === carry.hero) ?? HEROES[0];
-  const chapter = STORY.chapters[Math.max(0, Math.min(STORY.chapters.length - 1, chapterIndex))];
+  const endless = !!opts.endless;
+  const diff = STORY.difficulties.find((d) => d.id === opts.difficulty) ?? STORY.difficulties[0];
+  const story = STORY.chapters[Math.max(0, Math.min(STORY.chapters.length - 1, chapterIndex))];
+  // 난이도는 장 배율에 곱한다
+  const chapter: ChapterDef = endless ? endlessChapter() : { ...story, hp: story.hp * diff.hp, dmg: story.dmg * diff.dmg, rate: story.rate * diff.rate };
   const rng = createRng(`teum:${seed}:${chapter.id}`);
   const terrain = buildTerrain(chapter.terrainDef, rng.fork('terrain'));
   const passives = new Map(carry.passives);
@@ -721,7 +787,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     view: 560,
     explored: new Uint8Array(terrain.w * terrain.h),
     exploredAt: 0,
-    timeline: buildTimeline(chapter, rng.fork('timeline')),
+    timeline: endless ? [] : buildTimeline(chapter, rng.fork('timeline')),
     locked: null,
     unlocks: [],
     goldStart: carry.gold,
@@ -729,7 +795,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     effects: [],
     storms: [],
     pulses: [],
-    warm: Math.min(RULES.story.warmMax, Math.max(0, chapterIndex) * RULES.story.warmSeconds),
+    warm: endless ? 0 : Math.min(RULES.story.warmMax + diff.warm, Math.max(0, chapterIndex) * RULES.story.warmSeconds + diff.warm),
     book: opts.book ? new Set(opts.book) : null,
     banished: new Set(carry.banished ?? []),
     rerolls: RULES.build.reroll + Math.round(metaVal({ meta }, 'reroll')),
@@ -754,13 +820,22 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     chillUntil: 0,
     thornAt: 0,
     gust: null,
+    mode: endless ? 'endless' : 'story',
+    diff,
+    slots: endless ? { ...RULES.endless.slots } : { ...RULES.player.slots },
+    stage: 0,
+    nextBossAt: RULES.endless.boss.first,
+    nextRandomAt: RULES.endless.event[0],
+    nextShopAt: RULES.endless.shop.every,
+    nextDojoAt: RULES.endless.dojo.every,
   };
+  if (endless) s.chestAt = RULES.endless.chests;
   if (opts.unlocked) {
     const open = new Set(opts.unlocked);
     s.locked = new Set(LOCKABLE.filter((id) => !open.has(id)));
   }
   updateFlow(terrain, s.player.x, s.player.y);
-  placeSecrets(s, rng.fork('secrets'));
+  placeSecrets(s, rng.fork('secrets'), endless ? RULES.endless.secrets : undefined);
   // 중간 보스 뒤에서 다시: 시계·시간표를 그 자리로
   if (opts.startAt) {
     s.t = opts.startAt;
@@ -771,7 +846,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
   }
   reveal(s);
   // 둘째 장부터는 그림자가 기다리고 있다(이미 쌓인 무공만큼 처음부터 어렵게)
-  const ow = chapterIndex > 0 || opts.startAt ? RULES.story.openWave.base + RULES.story.openWave.perChapter * chapterIndex : 0;
+  const ow = !endless && (chapterIndex > 0 || opts.startAt) ? RULES.story.openWave.base + RULES.story.openWave.perChapter * chapterIndex : 0;
   for (let i = 0; i < ow; i++) spawnAround(s, pickRole(s, { main: 3, fast: 1, ranged: 1 }), 400, 600, (i / ow) * Math.PI * 2);
   // 재편성: 버린 만큼 바로 고른다
   if (opts.rebuild) {
@@ -782,8 +857,8 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
 }
 
 /** 안개 속 숨은 것: 비석(이야기 조각) · 수련 제단 · 비밀 상인 — 시작 자리에서 멀리 */
-function placeSecrets(s: State, rng: Rng): void {
-  const E = RULES.explore;
+function placeSecrets(s: State, rng: Rng, counts?: { steles: number; altars: number; merchants: number }): void {
+  const E = { ...RULES.explore, ...(counts ?? {}) };
   const t = s.terrain;
   const spot = (): [number, number] | null => {
     for (let i = 0; i < 200; i++) {
@@ -952,7 +1027,7 @@ function fallFoe(s: State, f: Foe): void {
 function bossPhase(s: State, f: Foe): void {
   const B = RULES.boss;
   const ph = f.phase ?? 0;
-  if (s.chapterIndex + 1 < B.phasesFrom) return;
+  if (s.mode === 'story' ? s.chapterIndex + 1 < s.diff.phasesFrom : s.stage < 1) return;
   if (ph >= B.phases.length || f.hp > f.maxHp * B.phases[ph]) return;
   f.phase = ph + 1;
   s.events.push({ type: 'phase', phase: f.phase + 1, name: f.def.name });
@@ -1051,8 +1126,11 @@ function killFoe(s: State, f: Foe): void {
   if (f.boss) unlockRandom(s, RULES.unlock.boss);
   if (f.boss) {
     s.bossKills.push(f.def.id);
-    s.result = 'clear';
-    s.events.push({ type: 'clear' });
+    if (s.mode === 'endless') endlessBossDown(s, f);
+    else {
+      s.result = 'clear';
+      s.events.push({ type: 'clear' });
+    }
   }
 }
 
@@ -1095,7 +1173,7 @@ function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe
 /** 정예 수식어를 붙인다(뒤 장은 둘) */
 function giveAffixes(s: State, f: Foe): void {
   const A = RULES.affix;
-  const n = s.chapterIndex + 1 >= A.lateFrom ? A.lateCount : A.count;
+  const n = (s.mode === 'endless' ? Math.min(3, 1 + Math.floor(s.stage / 2)) : s.chapterIndex + 1 >= A.lateFrom ? A.lateCount : A.count) + s.diff.affix;
   const pool = AFFIXES.filter((a) => !(a.noBoss && f.boss));
   f.affixes = [];
   for (let i = 0; i < n && pool.length; i++) {
@@ -1270,6 +1348,89 @@ function runGimmick(s: State): void {
   }
 }
 
+/** 무한 모드 한 칸: 시계에 따라 강해지고, 1~2분마다 돌발 이벤트, 3분마다 보스(못 잡으면 광폭화), 상인·수련소 */
+function runEndless(s: State): void {
+  const E = RULES.endless;
+  const m = s.t / 60;
+  // 그림자 체력·공격은 분마다 오른다(장 틀 위에)
+  s.chapter.hp = 1 + E.hp.perMin * m + E.hp.sq * m * m;
+  s.chapter.dmg = 1 + E.dmg.perMin * m + E.dmg.sq * m * m;
+  // 그림자 무리는 보스를 넘길 때마다 다음 장 것으로
+  const src = STORY.chapters[s.stage % STORY.chapters.length];
+  if (s.chapter.roles !== src.roles) s.chapter.roles = src.roles;
+  if (s.t >= s.nextRandomAt) {
+    s.nextRandomAt = s.t + E.event[0] + s.rng.next() * (E.event[1] - E.event[0]);
+    // 처음 4분은 거센 이벤트(매복·쏟아짐·광폭·저주 상자)를 빼고 몸을 풀게 한다
+    const harsh = (e: TimelineEvent) => ['ambush', 'surge', 'frenzy'].includes(e.kind) || e.item === 'cursed' || e.kind === 'bigwave';
+    const pool = [...STORY.random.events, ...STORY.timeline.events.filter((e) => ['swarm', 'ring', 'bigwave'].includes(e.kind))].filter((e) => m >= 4 || !harsh(e));
+    const ev = s.rng.weighted(pool, (e) => ('weight' in e ? (e as { weight: number }).weight : 2))!;
+    s.timeline.push({ ...ev, at: s.t });
+  }
+  if (s.t >= s.nextBossAt && !s.boss) {
+    s.nextBossAt = Infinity;
+    s.timeline.push({ kind: 'boss', at: s.t, count: E.boss.escort[0] + s.stage * E.boss.escort[1], text: '보스' });
+  }
+  if (s.t >= s.nextShopAt) {
+    s.nextShopAt = s.t + E.shop.every;
+    if (placeItem(s, 'merchant', 300, 650)) s.events.push({ type: 'event', text: '떠돌이 상인이 왔다 — 지도를 보라', kind: 'chest' });
+  }
+  if (s.t >= s.nextDojoAt) {
+    s.nextDojoAt = s.t + E.dojo.every;
+    if (placeItem(s, 'dojo', 300, 650)) s.events.push({ type: 'event', text: '수련소가 열렸다 — 금화로 무공을 사고·올리고·내려놓는다', kind: 'chest' });
+  }
+  // 보스 광폭화: 나온 뒤 enrage초 안에 못 잡으면 보스와 무리가 거세진다(점점 더)
+  const b = s.boss;
+  if (b && !b.dead && b.bornAt !== undefined) {
+    const over = s.t - b.bornAt - E.boss.enrage;
+    if (over >= 0 && !b.enraged) {
+      b.enraged = true;
+      b.damage *= E.boss.damage;
+      b.dmgMul = (b.dmgMul ?? 1) * E.boss.damage;
+      s.effects.push({ kind: 'foeSpeed', mul: E.boss.crowdSpeed, until: Infinity }, { kind: 'spawn', mul: E.boss.crowdSpawn, until: Infinity });
+      s.events.push({ type: 'event', text: `${b.def.name} 광폭화 — 빨라지고 거세진다! 어서 쓰러뜨려라`, kind: 'boss' });
+      s.events.push({ type: 'phase', phase: 9, name: b.def.name });
+    }
+    if (b.enraged && Math.floor(over / E.boss.rampEvery) !== Math.floor((over - DT) / E.boss.rampEvery)) {
+      b.damage *= 1 + E.boss.ramp;
+      b.dmgMul = (b.dmgMul ?? 1) * (1 + E.boss.ramp);
+    }
+  }
+}
+/** 무한 모드 보스를 넘겼다: 광폭화를 풀고, 다음 장 무리로, 상자·비급 */
+function endlessBossDown(s: State, f: Foe): void {
+  s.stage++;
+  s.boss = null;
+  s.nextBossAt = s.t + RULES.endless.boss.every;
+  s.effects = s.effects.filter((e) => e.until !== Infinity);
+  s.items.push({ x: f.x + 30, y: f.y, kind: 'chest' }, { x: f.x - 30, y: f.y, kind: 'gold_bar' });
+  s.events.push({ type: 'event', text: `보스 ${s.stage}을 넘었다 — 그림자가 ${STORY.chapters[s.stage % STORY.chapters.length].name.replace(/^\d+장 /, '')}의 것으로 바뀐다`, kind: 'boss' });
+}
+/** 무한 모드 · 판 위 경과·다음 보스까지 */
+export const endlessInfo = (s: State): { stage: number; bossIn: number; enraged: boolean } => ({ stage: s.stage, bossIn: Math.max(0, s.nextBossAt - s.t), enraged: !!s.boss?.enraged });
+
+/** 수련소(무한 모드): 새 무공·심법 사기 · 가진 것 올리기 · 가진 것 내려놓기(금화를 돌려받고 칸을 비운다) + 지나가기 */
+function offerSkillShop(s: State, count: number): void {
+  const P = RULES.endless.dojoPrices;
+  const m = s.t / 60;
+  const out: Choice[] = [];
+  const fresh = choicePool(s).filter((c) => c.lv === 1);
+  for (let i = 0; i < count && fresh.length; i++) {
+    const c = fresh.splice(s.rng.int(0, fresh.length - 1), 1)[0];
+    out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
+  }
+  const ups = choicePool(s).filter((c) => c.lv > 1 && c.kind === 'weapon');
+  if (ups.length) {
+    const c = ups[s.rng.int(0, ups.length - 1)];
+    out.push({ kind: 'upskill', id: c.id, lv: P.up + P.upPerLv * c.lv });
+  }
+  if (s.weapons.length > 1) {
+    const w = s.weapons[s.rng.int(1, s.weapons.length - 1)];
+    out.push({ kind: 'sellskill', id: w.id, lv: P.sell + 10 * w.lv });
+  }
+  out.push({ kind: 'leave', id: 'leave', lv: 0 });
+  s.pending = out;
+}
+
 function runTimeline(s: State): void {
   const evs = s.timeline;
   while (s.nextEvent < evs.length && s.t >= evs[s.nextEvent].at) {
@@ -1296,8 +1457,15 @@ function runTimeline(s: State): void {
         const id = ev.kind === 'mid' ? c.roles.mid : c.roles.boss;
         const boss = ev.kind === 'boss';
         const pt = (boss ? spawnPoint(s, false, RULES.boss.spawn[0], RULES.boss.spawn[1]) : spawnPoint(s, false, 460, 560)) ?? [s.player.x + 300, s.player.y];
-        if (boss) closeArena(s);
+        if (boss && s.mode === 'story') closeArena(s);
         const big = spawnFoe(s, id, pt[0], pt[1], boss);
+        if (big) big.bornAt = s.t;
+        // 무한 모드 보스: 넘긴 보스 수만큼 단단해진다
+        if (big && boss && s.mode === 'endless') {
+          big.hp = big.maxHp = Math.round(big.maxHp * (RULES.endless.boss.hpBase + RULES.endless.boss.hpPerStage * s.stage));
+          big.dmgMul = RULES.endless.boss.dmgBase + RULES.endless.boss.dmgPerStage * s.stage;
+          big.damage *= big.dmgMul;
+        }
         if (big && ev.kind === 'mid') big.mid = true;
         for (let i = 0; i < n; i++) spawnAround(s, pickRole(s, { main: 2, fast: 1, ranged: 1 }), 520, 860, (i / n) * Math.PI * 2);
         break;
@@ -1347,12 +1515,15 @@ function runTimeline(s: State): void {
     }
   }
   // 늘 나오는 무리
+  if (s.mode === 'endless') runEndless(s);
   // 늦은 장은 무리 시계를 앞당겨 시작한다(장 끝 전까지만 — 넘어가면 진짜 시간)
-  const ts = s.t >= CHAPTER_LENGTH ? s.t : Math.min(CHAPTER_LENGTH - 1, s.t + s.warm);
+  const ts = s.mode === 'endless' ? Math.min(CHAPTER_LENGTH - 1, s.t) : s.t >= CHAPTER_LENGTH ? s.t : Math.min(CHAPTER_LENGTH - 1, s.t + s.warm);
   const sp = STORY.timeline.spawns.find((x) => ts >= x.from && ts < x.to);
   if (sp && s.foes.length < RULES.foes.max) {
     const k = Math.min(1, (ts - sp.from) / Math.max(1, Math.min(sp.to, CHAPTER_LENGTH) - sp.from));
-    s.spawnCarry += (sp.rate[0] + (sp.rate[1] - sp.rate[0]) * k) * s.chapter.rate * effMul(s, 'spawn') * DT;
+    const E = RULES.endless.spawn;
+    const rate = s.mode === 'endless' ? Math.min(E.max, E.base + (E.perMin * s.t) / 60) : sp.rate[0] + (sp.rate[1] - sp.rate[0]) * k;
+    s.spawnCarry += rate * s.chapter.rate * effMul(s, 'spawn') * DT;
     while (s.spawnCarry >= 1) {
       s.spawnCarry -= 1;
       spawnAround(s, pickRole(s, sp.mix));
@@ -1403,7 +1574,7 @@ function runTimeline(s: State): void {
 function hurtPlayer(s: State, raw: number, minor = false): void {
   const p = s.player;
   if ((!minor && s.t < p.hurtUntil) || s.t < p.dashUntil || s.t < p.shieldUntil || s.result) return;
-  const over = Math.max(0, (s.t - CHAPTER_LENGTH) / 60);
+  const over = s.mode === 'endless' ? 0 : Math.max(0, (s.t - CHAPTER_LENGTH) / 60);
   const dmg = Math.max(1, Math.round(raw * (1 + RULES.foes.overtimeDamagePerMinute * over) - (minor ? 0 : stat.armor(s))));
   p.hp -= dmg;
   if (!minor) p.hurtUntil = s.t + RULES.player.hurtCooldown;
@@ -1435,7 +1606,7 @@ function counter(s: State, x: number, y: number): void {
 }
 
 function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string): void {
-  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: 7, damage: damage * s.chapter.dmg, life: 4, color, pierce: 0 });
+  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: 7, damage: damage * s.chapter.dmg * (f.dmgMul ?? 1), life: 4, color, pierce: 0 });
 }
 
 function useSkills(s: State, f: Foe, d: number): void {
@@ -1461,7 +1632,7 @@ function useSkills(s: State, f: Foe, d: number): void {
         for (let j = 0; j < (k.count ?? 1); j++) {
           const ox = j ? (s.rng.next() - 0.5) * 240 : 0;
           const oy = j ? (s.rng.next() - 0.5) * 180 : 0;
-          s.slams.push({ x: p.x + ox, y: p.y + oy, r: k.radius, damage: k.damage * s.chapter.dmg, born: s.t, at: s.t + k.delay, color: k.color, fx: k.fx });
+          s.slams.push({ x: p.x + ox, y: p.y + oy, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, fx: k.fx });
         }
         break;
       case 'charge':
@@ -1973,6 +2144,9 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
     case 'shop':
       offerShop(s, op.count);
       break;
+    case 'skillshop':
+      offerSkillShop(s, op.count);
+      break;
     case 'ambush':
       for (let i = 0; i < op.count; i++) spawnElite(s, 220, 340);
       break;
@@ -2068,7 +2242,7 @@ export function choicePool(s: State): Choice[] {
     const d = WEAPONS.get(w.id)!;
     if (w.lv < d.levels.length) out.push({ kind: 'weapon', id: w.id, lv: w.lv + 1 });
   }
-  if (s.weapons.length < RULES.player.slots.weapons) {
+  if (s.weapons.length < s.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
     for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
@@ -2076,7 +2250,7 @@ export function choicePool(s: State): Choice[] {
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
     if (lv >= pd.max) continue;
-    if (lv === 0 && (s.passives.size >= RULES.player.slots.passives || !offerable(s, pd.id))) continue;
+    if (lv === 0 && (s.passives.size >= s.slots.passives || !offerable(s, pd.id))) continue;
     out.push({ kind: 'passive', id: pd.id, lv: lv + 1 });
   }
   return out;
@@ -2138,6 +2312,31 @@ export function skip(s: State): boolean {
 export function choose(s: State, i: number): void {
   const c = s.pending?.[i];
   if (!c) return;
+  // 수련소(무한 모드)
+  if (c.kind === 'buyskill' || c.kind === 'upskill' || c.kind === 'sellskill') {
+    if (c.kind !== 'sellskill' && s.gold < c.lv) return;
+    if (c.kind === 'buyskill') {
+      if (WEAPONS.has(c.id)) {
+        if (s.weapons.length >= s.slots.weapons) return;
+        s.weapons.push({ id: c.id, lv: 1, next: s.t });
+      } else {
+        if (s.passives.size >= s.slots.passives) return;
+        s.passives.set(c.id, 1);
+      }
+      s.gold -= c.lv;
+    } else if (c.kind === 'upskill') {
+      const w = s.weapons.find((x) => x.id === c.id);
+      if (!w || w.lv >= WEAPONS.get(w.id)!.levels.length) return;
+      w.lv++;
+      s.gold -= c.lv;
+    } else {
+      s.weapons = s.weapons.filter((x) => x.id !== c.id);
+      s.gold += c.lv;
+    }
+    s.pending = null;
+    if (s.queuedLevels > 0) offerChoices(s);
+    return;
+  }
   // 상인: 사거나(금화가 모자라면 그대로) 지나간다 — 레벨업 고르기와 따로 센다
   if (c.kind === 'buy' || c.kind === 'leave') {
     if (c.kind === 'buy') {

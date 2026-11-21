@@ -1,5 +1,5 @@
 // 「틈」 자동 플레이 봇(밸런스 측정용, GAME_DESIGN 12절): 지형을 피해 원을 그리며 싸우고, 레벨업은 정한 방식으로 고른다.
-import { carryOf, choose, createChapter, freshCarry, step, WEAPONS, type Carry, type Choice, type Input, type State } from '../src/sim';
+import { carryOf, choose, createChapter, createEndless, freshCarry, step, WEAPONS, type Carry, type Choice, type Input, type State } from '../src/sim';
 import { CELL, moveCircle, walkable } from '../src/terrain';
 
 export type Picker = 'first' | 'smart';
@@ -104,4 +104,16 @@ export function runStory(hero: string, seed: string, how: Picker = 'smart', upTo
     carry = carryOf(s);
   }
   return out;
+}
+
+/** 무한 모드: 쓰러질 때까지(limit초) — 몇 초 버텼나·보스 몇 */
+export function runEndlessBot(hero: string, seed: string, how: Picker = 'smart', limit = 2700): { t: number; stage: number; level: number; s: State } {
+  const s = createEndless(seed, hero);
+  for (let i = 0; i < limit * 60 && !s.result; i++) {
+    if (s.pending) choose(s, pickIndex(s, how));
+    if (s.pending && s.pending.some((c) => c.kind === 'leave')) choose(s, s.pending.length - 1);
+    step(s, botInput(s));
+    s.events.length = 0;
+  }
+  return { t: Math.round(s.t), stage: s.stage, level: s.level, s };
 }

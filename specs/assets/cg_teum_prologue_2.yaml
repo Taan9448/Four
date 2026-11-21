@@ -1,0 +1,7 @@
+id: cg_teum_prologue_2
+type: story-cg
+summary: '「틈」 프롤로그 그림 2/3 — 스토리를 새로 시작할 때 보여 주는 짧은 이야기(2026-11-21). 「틈」 장 일러스트(cg_teum_ch*)와 같은 화풍'
+frame_notes:
+  1: 'A huge jagged red crack tears open across the night sky above dark mountain ridges; from the crack, countless dark featureless shadow creatures pour down like smoke onto the pine forests and the small sect buildings below; dramatic red and violet light, a sense of dread, no characters in the foreground.'
+framing: 'A cinematic story illustration shown full-screen behind two lines of story text at the bottom. Keep the bottom quarter darker and calmer for the text; key subject in the upper and middle area. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each; swords and staffs perfectly straight.'
+placeholder: { color: '#2a2630' }
