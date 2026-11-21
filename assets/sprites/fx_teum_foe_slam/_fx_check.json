@@ -1,0 +1,220 @@
+{
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "sourceCellCoordinateSystem": "source cell fractions; delivery padded at native pixel scale",
+  "palette": [
+    "#ffffff",
+    "#f1efe6",
+    "#c2c6d1",
+    "#8a90a3",
+    "#5d6478",
+    "#3d4459",
+    "#1d2433"
+  ],
+  "outsidePaletteColorCount": 0,
+  "frames": [
+    {
+      "frame": 1,
+      "sourceBBoxFraction": [
+        0.3086,
+        0.4863,
+        0.6934,
+        0.752
+      ],
+      "sourceStrongHueFraction": 0.032142,
+      "outputBBox": [
+        55,
+        91,
+        105,
+        125
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 450,
+      "central40PercentDiskOpaquePixels": 328,
+      "weightedCenter": [
+        79.58,
+        112.21
+      ]
+    },
+    {
+      "frame": 2,
+      "sourceBBoxFraction": [
+        0.1367,
+        0.207,
+        0.8574,
+        0.875
+      ],
+      "sourceStrongHueFraction": 0.050313,
+      "outputBBox": [
+        33,
+        55,
+        126,
+        141
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 1486,
+      "central40PercentDiskOpaquePixels": 1572,
+      "weightedCenter": [
+        79.16,
+        102.48
+      ]
+    },
+    {
+      "frame": 3,
+      "sourceBBoxFraction": [
+        0.1191,
+        0.3027,
+        0.8652,
+        0.875
+      ],
+      "sourceStrongHueFraction": 0.045292,
+      "outputBBox": [
+        31,
+        68,
+        127,
+        141
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 1292,
+      "central40PercentDiskOpaquePixels": 859,
+      "weightedCenter": [
+        79.34,
+        109.3
+      ]
+    },
+    {
+      "frame": 4,
+      "sourceBBoxFraction": [
+        0.1172,
+        0.3711,
+        0.8789,
+        0.7637
+      ],
+      "sourceStrongHueFraction": 0.131403,
+      "outputBBox": [
+        31,
+        76,
+        129,
+        127
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 686,
+      "central40PercentDiskOpaquePixels": 380,
+      "weightedCenter": [
+        79.4,
+        105.75
+      ]
+    },
+    {
+      "frame": 5,
+      "sourceBBoxFraction": [
+        0.207,
+        0.543,
+        0.7988,
+        0.7539
+      ],
+      "sourceStrongHueFraction": 0.150334,
+      "outputBBox": [
+        42,
+        98,
+        118,
+        126
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 352,
+      "central40PercentDiskOpaquePixels": 174,
+      "weightedCenter": [
+        76.55,
+        108.58
+      ]
+    },
+    {
+      "frame": 6,
+      "sourceBBoxFraction": [
+        0.2148,
+        0.4707,
+        0.7754,
+        0.7305
+      ],
+      "sourceStrongHueFraction": 0.200872,
+      "outputBBox": [
+        43,
+        89,
+        115,
+        123
+      ],
+      "paletteColors": [
+        "#1d2433",
+        "#3d4459",
+        "#5d6478",
+        "#8a90a3",
+        "#c2c6d1",
+        "#f1efe6",
+        "#ffffff"
+      ],
+      "outsidePalette": [],
+      "navyOutlinePixels": 325,
+      "central40PercentDiskOpaquePixels": 177,
+      "weightedCenter": [
+        78.7,
+        104.79
+      ]
+    }
+  ],
+  "successivePixelDifferenceIncludingLastToFirst": [
+    0.12664,
+    0.1277,
+    0.1152,
+    0.05234,
+    0.0252,
+    0.04199
+  ],
+  "loop": false,
+  "timingMatches": true,
+  "note": "Inspection only: game PNGs unchanged. Green=10-90% containment; blue=cellcenter. Dark navy #1d2433 is the required outline. Loop differences are supporting measurements, not proof of smoothness."
+}
