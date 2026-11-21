@@ -1,0 +1,17 @@
+id: fx_teum_strike
+type: fx
+summary: '「틈」 무공 이펙트 — 내려치기(strike) 16개 — 하늘에서 적 하나 위로 내리꽂는 빛기둥. 바닥 닿는 곳은 칸 아래쪽 가운데. 무색(흰색·회색)으로 그리고 게임이 무공 색을 입힌다(2026-11-21)'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a hair-thin vertical line of light from the top of the cell (inside the margin) down to a point at 75% of the cell height in the middle; small sparks at the bottom"
+  2: "impact: a thick vertical pillar of light, white core, slamming into the ground point at 75% height; a wide flat oval flash and a starburst at the bottom"
+  3: "the pillar thinner, a ring of light spreading flat on the ground around the impact point, blocky debris sparks flying up and out"
+  4: "the pillar breaking into short stepped segments from the top down, the ground ring wider and thinner"
+  5: "a faint short pillar stub and a fading ground ring with sparks"
+  6: "a few fading sparks above the impact point"
+placeholder: { accent: '#f1efe6' }

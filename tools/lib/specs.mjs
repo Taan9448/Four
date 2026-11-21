@@ -204,7 +204,7 @@ export function checkSpecShape(spec, root = ROOT) {
   if (spec.track === 'pixel' && (spec.logical[0] < spec.draw[0] || spec.logical[1] < spec.draw[1])) {
     errors.push(`프레임(${spec.logical.join('×')})이 그림 격자(${spec.draw.join('×')})보다 작다`);
   }
-  if (!['master', 'free'].includes(spec.palette)) errors.push('palette는 master 또는 free');
+  if (!['master', 'free'].includes(spec.palette) && !(Array.isArray(spec.palette) && spec.palette.length > 0 && spec.palette.every((c) => /^#[0-9a-f]{6}$/i.test(c)))) errors.push('palette는 master·free 또는 #rrggbb 색 목록');
   if (!Number.isInteger(spec.frames) || spec.frames < 1) errors.push('frames가 없다');
   if (spec.frames > cols * rows) errors.push(`frames(${spec.frames})가 칸 수(${cols * rows})보다 많다`);
   if (!(spec.chroma in CHROMA)) errors.push(`알 수 없는 chroma "${spec.chroma}"`);

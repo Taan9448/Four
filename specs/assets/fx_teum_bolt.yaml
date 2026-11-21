@@ -1,0 +1,17 @@
+id: fx_teum_bolt
+type: fx
+summary: '「틈」 무공 이펙트 — 탄(bolt) 13개 — 앞으로 날아가는 작은 빛 탄. 오른쪽으로 날아가는 모습(게임이 방향대로 돌린다). 무색(흰색·회색)으로 그리고 게임이 무공 색을 입힌다(2026-11-21)'
+frames: 6
+fps: 15
+loop: true
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a small comet of light flying to the RIGHT: a round bright white head about 22% of the cell wide in the center, a tapering tail of 2-3 stepped grey bands streaming to the left"
+  2: "the same comet, its head flickering slightly larger, tail shorter"
+  3: "the same comet, two single-block sparks shed from the tail"
+  4: "the same comet, head smaller, tail longer"
+  5: "the same comet, sparks shed"
+  6: "the same comet as frame 1 so the loop is seamless"
+placeholder: { accent: '#f1efe6' }

@@ -1,0 +1,17 @@
+id: fx_teum_heal
+type: fx
+summary: '「틈」 무공 이펙트 — 회복(heal) 28개 — 인물 발밑에서 위로 피어오르는 빛 알갱이·잎. 인물이 칸 가운데 아래쪽에 서 있다고 보고 그 둘레에 그린다. 무색(흰색·회색)으로 그리고 게임이 무공 색을 입힌다(2026-11-21)'
+frames: 6
+fps: 14
+events: { impact: 2 }
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a flat thin oval ring of light on the ground at 80% of the cell height, 50% of the cell wide"
+  2: "impact: the ground ring brighter, many small diamond-shaped motes and tiny leaf shapes of light rising from it in a loose column up to the middle of the cell, the middle of the column left clear for the hero"
+  3: "the motes risen higher (to 30% of the cell height), a few small plus-shaped sparkles among them"
+  4: "the motes spread out and fading near the top, the ground ring fading"
+  5: "a few motes and plus sparkles near the top"
+  6: "one or two tiny fading sparkles"
+placeholder: { accent: '#f1efe6' }
