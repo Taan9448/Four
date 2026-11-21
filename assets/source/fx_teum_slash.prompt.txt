@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #ffffff, #f1efe6, #c2c6d1, #8a90a3, #5d6478, #3d4459, #2b2b3a.
+Frames:
+Cell 1: the cell center is where the hero stands (leave it empty). A thin bright crescent line starts on the upper right, curving around the right side of the center at about 35% of the cell width away from it
+Cell 2: impact: a wide crescent blade of light sweeping around the RIGHT side of the center from upper right to lower right (a 130-degree arc), thick white core in the middle of the arc, tapering to sharp points at both ends
+Cell 3: the crescent at full length and full thickness, a second thinner arc just inside it, a few single-block sparks flying outward to the right
+Cell 4: the crescent thinning and breaking into short stepped segments, sparks drifting outward
+Cell 5: faint thin arc fragments and a few sparks
+Cell 6: two or three tiny fading sparks on the right side
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: The third frame's sparks exceed the inner80% and its crescent tips reach left of the hero. Keep EVERY effect block including sparks inside x60%–88% and y15%–85% of EACH cell. The entire center area x35%–60%,y30%–70% stays completely BLACK in all6frames, so a hero can stand there. The crescent is ONLY a130-degree arc bulging RIGHT around the hero: both sharp tips also remain in the RIGHT half, not a long semicircle reaching the left side. Frame2impact thick white;3same fullarc plus thinner innerarc and onlyfew sparks inside88%;4breaks;5fades;6two/three tiny right-side sparks. Absolutely COLORLESS white/grey only from the specified7colors, pureblack background, all solid4pxblocks ononegrid, no bluegoldred/pink. No edgecutting; source1536x1024 3x2.
