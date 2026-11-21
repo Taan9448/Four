@@ -218,7 +218,93 @@
     "desc": "이 인물의 카드 무공을 먼저",
     "own": true
    }
-  ]
+  ],
+  "grade": {
+   "$comment": "무공·심법 등급(2026-11-21 사용자 \"스킬에 각각 등급을 부여\"): 무공은 Lv.5 피해×개수÷대기×종류 배율, 심법은 레벨당 값÷같은 능력치 최댓값×능력치 무게. 같은 무리 안에서 위에서부터 cut 비율로 S·A·B·C",
+   "cut": {
+    "S": 0.15,
+    "A": 0.35,
+    "B": 0.35
+   },
+   "kindMult": {
+    "slash": 3,
+    "bolt": 1.2,
+    "wave": 2.2,
+    "orbit": 1.6,
+    "nova": 4,
+    "aura": 3,
+    "strike": 2,
+    "rain": 3,
+    "chain": 2.4,
+    "beam": 3,
+    "heal": 1
+   },
+   "statWeight": {
+    "might": 1.3,
+    "haste": 1.3,
+    "area": 1.1,
+    "amount": 1.4,
+    "critdmg": 0.9,
+    "grain": 1,
+    "duration": 0.9,
+    "vigor": 1,
+    "breath": 0.8,
+    "swift": 0.8,
+    "yoke": 0.6,
+    "greed": 0.4,
+    "thorns": 0.6,
+    "luck": 0.5,
+    "graze": 0.9,
+    "dashcd": 0.9
+   }
+  },
+  "roles": {
+   "$comment": "쉬운 갈래(레벨업·무공록 아이콘): 종류 → 갈래",
+   "bolt": [
+    "shot",
+    "투사체"
+   ],
+   "wave": [
+    "shot",
+    "투사체"
+   ],
+   "beam": [
+    "line",
+    "관통"
+   ],
+   "chain": [
+    "line",
+    "연쇄"
+   ],
+   "strike": [
+    "drop",
+    "낙하"
+   ],
+   "rain": [
+    "drop",
+    "장판"
+   ],
+   "slash": [
+    "close",
+    "근접"
+   ],
+   "orbit": [
+    "spin",
+    "회전"
+   ],
+   "nova": [
+    "close",
+    "파동"
+   ],
+   "aura": [
+    "close",
+    "결계"
+   ],
+   "heal": [
+    "heal",
+    "회복"
+   ]
+  }
  },
  "sets": {
   "$comment": "속성 세트: 같은 효과(element)를 남기는 무공을 need개 들면 켜진다",
