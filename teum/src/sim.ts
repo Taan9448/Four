@@ -7,6 +7,8 @@ import foesRaw from '../data/foes.json';
 import weaponsRaw from '../data/weapons.json';
 import heroesRaw from '../data/heroes.json';
 import itemsRaw from '../data/items.json';
+import affixesRaw from '../data/affixes.json';
+import abyssAffixes from '../../data/abyss_affixes.json';
 import { cardSkills } from './cards';
 import { blocksShot, buildTerrain, CELL, cellAt, flowDir, moveCircle, T, updateFlow, walkable, type Terrain, type TerrainDef } from './terrain';
 
@@ -154,7 +156,46 @@ export interface ChapterDef {
   dmg: number;
   rate: number;
   extra: TimelineEvent[];
+  /** 장 대표 기믹(2026-11-21) */
+  gimmick?: Gimmick;
+  /** 안개 속 비석 이야기 조각 */
+  steles?: string[];
 }
+export interface Gimmick {
+  kind: 'gust' | 'howl' | 'lava' | 'whiteout' | 'hands' | 'eclipse' | 'alley' | 'palm' | 'meteor' | 'collapse';
+  name: string;
+  text: string;
+  every: number;
+  dur?: number;
+  force?: number;
+  count?: number;
+  cells?: number;
+  warn?: number;
+  slow?: number;
+  radius?: number;
+  damage?: number;
+  delay?: number;
+}
+/** 정예 수식어(data/affixes.json + 「천외귀환」 심연 이름·글자) */
+export interface AffixDef {
+  id: string;
+  name: string;
+  glyph: string;
+  desc: string;
+  hp?: number;
+  speed?: number;
+  damage?: number;
+  poison?: number;
+  thorns?: number;
+  split?: number;
+  chill?: number;
+  steadfast?: boolean;
+  noBoss?: boolean;
+  deathSlam?: { radius: number; damage: number; delay: number };
+}
+const abyssName = new Map((abyssAffixes as { id: string; name: string; glyph: string }[]).map((a) => [a.id, a]));
+export const AFFIXES: AffixDef[] = (affixesRaw.affixes as Omit<AffixDef, 'name' | 'glyph'>[]).map((a) => ({ ...a, name: abyssName.get(a.id)?.name ?? a.id, glyph: abyssName.get(a.id)?.glyph ?? '?' }));
+const AFFIX = new Map(AFFIXES.map((a) => [a.id, a]));
 
 export const RULES = rulesRaw as unknown as {
   player: { hp: number; speed: number; radius: number; pickup: number; hurtCooldown: number; slots: { weapons: number; passives: number } };
@@ -167,6 +208,15 @@ export const RULES = rulesRaw as unknown as {
   story: { warmSeconds: number; warmMax: number; openWave: { base: number; perChapter: number } };
   /** 무공 해금(2026-11-21): 카드 무공·심법은 잠겨 있다 — 보스·중간 보스·비급·무공서고 */
   unlock: { boss: number; mid: number; rarityWeight: Record<string, number>; ownWeight: number; price: Record<string, number>; shop: { offers: number; reroll: number } };
+  build: { bookMax: number; bookAuto: number; reroll: number; banish: number; skip: number; skipGold: number; partnerWeight: number };
+  sets: Record<'fire' | 'ice' | 'shock' | 'vuln', { need: number; name: string; desc: string; damage?: number; radius?: number; mul?: number; frac?: number; range?: number }>;
+  upgrades: { list: { id: string; name: string; desc: string; per: number; cost: number[] }[] };
+  counter: { window: number; might: number; slowmo: number; ult: number; shotRadius: number; cooldown: number; grazeUlt: number };
+  explore: { steles: number; altars: number; merchants: number; minDist: number; reward: number; gold: number; altar: { seconds: number; base: number; perChapter: number; chests: number } };
+  fall: { rank: number; every: number };
+  vault: { cells: number };
+  affix: { count: number; lateFrom: number; lateCount: number };
+  boss: { phases: number[]; haste: number; speed: number; summon: number; arena: number; spawn: [number, number]; phasesFrom: number };
   /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
   sight: { cells: number; every: number };
 };
@@ -198,7 +248,9 @@ export type ItemOp =
   | { op: 'unlock'; count: number }
   | { op: 'shop'; count: number }
   | { op: 'ambush'; count: number }
-  | { op: 'chest' };
+  | { op: 'chest' }
+  | { op: 'stele' }
+  | { op: 'trial' };
 export interface ItemDef {
   id: string;
   name: string;
@@ -256,6 +308,14 @@ export interface Foe {
   elite?: boolean;
   /** 금빛 그림자: 이때까지 달아나다 사라진다 */
   golden?: number;
+  /** 정예 수식어 id */
+  affixes?: string[];
+  /** 보스 단계(0부터) */
+  phase?: number;
+  /** 위험 칸에 빠진 때(정예·보스는 every초에 한 번만 큰 피해) */
+  fellAt?: number;
+  /** 작은 그림자(갈라진 것): 다시 갈라지지 않는다 */
+  small?: boolean;
 }
 export interface Shot {
   x: number;
@@ -301,6 +361,8 @@ export interface Gem {
   xp: number;
   pulled: boolean;
   taken?: boolean;
+  /** 끌려온 시간(곡선) */
+  pt?: number;
 }
 /** items.json의 id */
 export type ItemKind = string;
@@ -309,6 +371,10 @@ export interface Item {
   y: number;
   kind: ItemKind;
   taken?: boolean;
+  /** 안개 속 숨은 것(비석·제단·비밀 상인): 밝혀진 칸에서만 보인다 */
+  hidden?: boolean;
+  /** 비석 번호(장 안에서 0부터) */
+  stele?: number;
 }
 export interface Prop {
   x: number;
@@ -337,7 +403,7 @@ export type FxEvent =
   | { type: 'graze'; x: number; y: number }
   | { type: 'ult'; x: number; y: number; fx: string; color: string }
   | { type: 'event'; text: string; kind: string }
-  | { type: 'skill'; x: number; y: number; fx?: string; color: string }
+  | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam'; angle?: number }
   | { type: 'chain'; pts: [number, number][]; color: string }
   | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string }
   | { type: 'heal'; amount: number }
@@ -347,6 +413,12 @@ export type FxEvent =
   | { type: 'freeze' }
   | { type: 'clear' }
   | { type: 'unlock'; id: string; name: string }
+  | { type: 'counter'; x: number; y: number }
+  | { type: 'phase'; phase: number; name: string }
+  | { type: 'fall'; x: number; y: number }
+  | { type: 'stele'; id: string; text: string }
+  | { type: 'warn'; cells: number[]; at: number }
+  | { type: 'terrain' }
   | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string };
 export interface Choice {
   /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 */
@@ -371,6 +443,8 @@ export interface Carry {
   gold: number;
   kills: number;
   playTime: number;
+  /** 봉인한 것(장을 넘어도 이어 간다) */
+  banished?: string[];
 }
 export interface State {
   seed: string;
@@ -457,6 +531,42 @@ export interface State {
   pulses: { until: number; every: number; next: number; damage: number; r: number; color: string }[];
   /** 늦게 시작한 장의 앞당김(초) */
   warm: number;
+  /** 무공록: 들고 들어간 카드 무공·심법(그 밖의 카드 것은 레벨업에 안 나온다). null이면 제한 없음 */
+  book: Set<string> | null;
+  /** 봉인: 이번 이야기에서 다시 안 나온다 */
+  banished: Set<string>;
+  rerolls: number;
+  banishes: number;
+  skips: number;
+  /** 장터 수련 레벨 */
+  meta: Record<string, number>;
+  /** 되살아나는 숨(장터) 남은 횟수 */
+  revives: number;
+  /** 중간 보스를 쓰러뜨린 순간(이어 하기 자리) */
+  checkpoint: { t: number; carry: Carry } | null;
+  /** 간파 반격: 이때까지 위력 ↑, slowmoUntil까지 시간 느려짐(화면) */
+  counterUntil: number;
+  counterReadyAt: number;
+  slowmoUntil: number;
+  grazeCombo: number;
+  /** 수련 제단 도전 */
+  trial: { until: number; goal: number; start: number } | null;
+  exploredCount: number;
+  exploreRewarded: boolean;
+  /** 이 장에서 읽은 비석 id */
+  steles: string[];
+  /** 지형이 바뀐 횟수(기믹·보스 아레나 — 지도 다시 그리기) */
+  terrainRev: number;
+  gimmickAt: number;
+  /** 곧 바뀔 칸(용암·무너짐 예고) */
+  warnCells: { cells: number[]; at: number; to: number } | null;
+  /** 보스 아레나로 막은 칸 */
+  arena: number[];
+  poisonUntil: number;
+  chillUntil: number;
+  thornAt: number;
+  /** 산바람: 이때까지 (dx, dy)로 밀린다 */
+  gust: { until: number; dx: number; dy: number } | null;
 }
 
 export function xpNeed(level: number): number {
@@ -479,20 +589,27 @@ const buffAdd = (s: State, st: string): number => s.buffs.reduce((m, b) => (b.st
 /** 판 전체 효과 배율 */
 export const effMul = (s: State, kind: State['effects'][number]['kind']): number => s.effects.reduce((m, e) => (e.kind === kind && s.t < e.until ? m * e.mul : m), 1);
 export const effOn = (s: State, kind: State['effects'][number]['kind']): boolean => s.effects.some((e) => e.kind === kind && s.t < e.until);
+/** 장터 수련 값(레벨 × per) */
+const UPG = new Map(RULES.upgrades.list.map((u) => [u.id, u]));
+export const metaVal = (s: { meta: Record<string, number> }, id: string): number => (s.meta[id] ?? 0) * (UPG.get(id)?.per ?? 0);
 export const stat = {
-  might: (s: State) => (1 + pv(s, 'might')) * buffMul(s, 'might'),
+  might: (s: State) => (1 + pv(s, 'might') + metaVal(s, 'might')) * buffMul(s, 'might') * (s.t < s.counterUntil ? RULES.counter.might : 1),
   haste: (s: State) => Math.max(0.25, Math.max(0.35, 1 - pv(s, 'haste')) * buffMul(s, 'haste')),
   area: (s: State) => (1 + pv(s, 'area')) * buffMul(s, 'area'),
-  speed: (s: State) => RULES.player.speed * s.hero.speed * (1 + pv(s, 'swift')) * buffMul(s, 'speed') * (s.t < s.slowUntil ? s.slowMul : 1),
-  armor: (s: State) => (s.hero.armor ?? 0) + pv(s, 'vigor') + buffAdd(s, 'armor'),
+  speed: (s: State) => RULES.player.speed * s.hero.speed * (1 + pv(s, 'swift') + metaVal(s, 'speed')) * buffMul(s, 'speed') * (s.t < s.slowUntil ? s.slowMul : 1) * (s.t < s.chillUntil ? 0.7 : 1),
+  armor: (s: State) => (s.hero.armor ?? 0) + pv(s, 'vigor') + buffAdd(s, 'armor') + metaVal(s, 'armor'),
   regen: (s: State) => pv(s, 'breath'),
   crit: (s: State) => pv(s, 'grain'),
-  pickup: (s: State) => RULES.player.pickup * (1 + pv(s, 'yoke')),
+  pickup: (s: State) => RULES.player.pickup * (1 + pv(s, 'yoke') + metaVal(s, 'pickup')),
   xpMul: (s: State) => 1 + pv(s, 'yoke') * 0.17,
   amount: (s: State) => Math.floor(pv(s, 'amount')),
   duration: (s: State) => 1 + pv(s, 'duration'),
   critMul: (s: State) => 2 + pv(s, 'critdmg'),
-  greed: (s: State) => 1 + pv(s, 'greed'),
+  greed: (s: State) => 1 + pv(s, 'greed') + metaVal(s, 'greed'),
+  /** 보법 쿨타임 배율(잔영보) */
+  dashcd: (s: State) => Math.max(0.4, 1 - pv(s, 'dashcd')),
+  /** 간파 피해·반격 시간(간파의 눈) */
+  graze: (s: State) => 1 + pv(s, 'graze'),
   thorns: (s: State) => pv(s, 'thorns'),
   luck: (s: State) => pv(s, 'luck'),
 };
@@ -539,13 +656,26 @@ function buildTimeline(c: ChapterDef, rng: Rng): TimelineEvent[] {
 }
 
 /** 한 장을 연다. carry가 있으면 레벨·무공·심법을 이어받는다(체력은 가득). unlocked: 계정에서 연 카드 무공(주지 않으면 다 열림) */
-export function createChapter(chapterIndex: number, seed: string, carry: Carry, opts: { unlocked?: Iterable<string> } = {}): State {
+export interface ChapterOpts {
+  /** 계정에서 연 카드 무공(주지 않으면 다 열림) */
+  unlocked?: Iterable<string>;
+  /** 무공록(주지 않으면 제한 없음) */
+  book?: Iterable<string>;
+  /** 장터 수련 레벨 */
+  meta?: Record<string, number>;
+  /** 중간 보스 뒤에서 다시: 이 시각부터(시간표는 그 뒤 것만) */
+  startAt?: number;
+  /** 재편성: 장을 열자마자 고를 것 수 */
+  rebuild?: number;
+}
+export function createChapter(chapterIndex: number, seed: string, carry: Carry, opts: ChapterOpts = {}): State {
   const hero = HEROES.find((h) => h.id === carry.hero) ?? HEROES[0];
   const chapter = STORY.chapters[Math.max(0, Math.min(STORY.chapters.length - 1, chapterIndex))];
   const rng = createRng(`teum:${seed}:${chapter.id}`);
   const terrain = buildTerrain(chapter.terrainDef, rng.fork('terrain'));
   const passives = new Map(carry.passives);
-  const maxHp = hero.hp + carry.bonusHp + vigorLevels(passives) * 10;
+  const meta = opts.meta ?? {};
+  const maxHp = hero.hp + carry.bonusHp + vigorLevels(passives) * 10 + metaVal({ meta }, 'hp');
   const s: State = {
     seed,
     rng: rng.fork('run'),
@@ -600,17 +730,82 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     storms: [],
     pulses: [],
     warm: Math.min(RULES.story.warmMax, Math.max(0, chapterIndex) * RULES.story.warmSeconds),
+    book: opts.book ? new Set(opts.book) : null,
+    banished: new Set(carry.banished ?? []),
+    rerolls: RULES.build.reroll + Math.round(metaVal({ meta }, 'reroll')),
+    banishes: RULES.build.banish + Math.round(metaVal({ meta }, 'banish')),
+    skips: RULES.build.skip + Math.round(metaVal({ meta }, 'skip')),
+    meta,
+    revives: Math.round(metaVal({ meta }, 'revive')),
+    checkpoint: null,
+    counterUntil: 0,
+    counterReadyAt: 0,
+    slowmoUntil: 0,
+    grazeCombo: 0,
+    trial: null,
+    exploredCount: 0,
+    exploreRewarded: false,
+    steles: [],
+    terrainRev: 0,
+    gimmickAt: chapter.gimmick?.every ?? 1e9,
+    warnCells: null,
+    arena: [],
+    poisonUntil: 0,
+    chillUntil: 0,
+    thornAt: 0,
+    gust: null,
   };
   if (opts.unlocked) {
     const open = new Set(opts.unlocked);
     s.locked = new Set(LOCKABLE.filter((id) => !open.has(id)));
   }
   updateFlow(terrain, s.player.x, s.player.y);
+  placeSecrets(s, rng.fork('secrets'));
+  // 중간 보스 뒤에서 다시: 시계·시간표를 그 자리로
+  if (opts.startAt) {
+    s.t = opts.startAt;
+    s.nextEvent = s.timeline.findIndex((e) => e.at > opts.startAt!);
+    if (s.nextEvent < 0) s.nextEvent = s.timeline.length;
+    s.chestAt = s.t + STORY.timeline.chests.every;
+    s.gimmickAt = s.t + (chapter.gimmick?.every ?? 1e9);
+  }
   reveal(s);
   // 둘째 장부터는 그림자가 기다리고 있다(이미 쌓인 무공만큼 처음부터 어렵게)
-  const ow = chapterIndex > 0 ? RULES.story.openWave.base + RULES.story.openWave.perChapter * chapterIndex : 0;
+  const ow = chapterIndex > 0 || opts.startAt ? RULES.story.openWave.base + RULES.story.openWave.perChapter * chapterIndex : 0;
   for (let i = 0; i < ow; i++) spawnAround(s, pickRole(s, { main: 3, fast: 1, ranged: 1 }), 400, 600, (i / ow) * Math.PI * 2);
+  // 재편성: 버린 만큼 바로 고른다
+  if (opts.rebuild) {
+    s.queuedLevels += opts.rebuild;
+    offerChoices(s);
+  }
   return s;
+}
+
+/** 안개 속 숨은 것: 비석(이야기 조각) · 수련 제단 · 비밀 상인 — 시작 자리에서 멀리 */
+function placeSecrets(s: State, rng: Rng): void {
+  const E = RULES.explore;
+  const t = s.terrain;
+  const spot = (): [number, number] | null => {
+    for (let i = 0; i < 200; i++) {
+      const x = (rng.int(2, t.w - 3) + 0.5) * CELL;
+      const y = (rng.int(2, t.h - 3) + 0.5) * CELL;
+      if (walkable(t, x, y) && Math.hypot(x - s.player.x, y - s.player.y) > E.minDist && t.dist[Math.floor(y / CELL) * t.w + Math.floor(x / CELL)] >= 0) return [x, y];
+    }
+    return null;
+  };
+  const n = Math.min(E.steles, s.chapter.steles?.length ?? 0);
+  for (let i = 0; i < n; i++) {
+    const p = spot();
+    if (p) s.items.push({ x: p[0], y: p[1], kind: 'stele', hidden: true, stele: i });
+  }
+  for (let i = 0; i < E.altars; i++) {
+    const p = spot();
+    if (p) s.items.push({ x: p[0], y: p[1], kind: 'altar', hidden: true });
+  }
+  for (let i = 0; i < E.merchants; i++) {
+    const p = spot();
+    if (p) s.items.push({ x: p[0], y: p[1], kind: 'merchant', hidden: true });
+  }
 }
 
 /** 인물 둘레를 밝힌다(가 본 곳만 지도에 보인다) */
@@ -622,7 +817,11 @@ export function reveal(s: State, cells?: number, at?: { x: number; y: number }):
   const cx = Math.floor(o.x / CELL);
   const cy = Math.floor(o.y / CELL);
   for (let y = Math.max(0, cy - r); y <= Math.min(t.h - 1, cy + r); y++)
-    for (let x = Math.max(0, cx - r); x <= Math.min(t.w - 1, cx + r); x++) if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r) s.explored[y * t.w + x] = 1;
+    for (let x = Math.max(0, cx - r); x <= Math.min(t.w - 1, cx + r); x++)
+      if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r && !s.explored[y * t.w + x]) {
+        s.explored[y * t.w + x] = 1;
+        s.exploredCount++;
+      }
 }
 export const isExplored = (s: State, x: number, y: number): boolean => {
   const cx = Math.floor(x / CELL);
@@ -642,6 +841,7 @@ export function carryOf(s: State): Carry {
     gold: s.goldStart + s.gold,
     kills: s.kills,
     playTime: s.playTime,
+    banished: [...s.banished],
   };
 }
 
@@ -667,26 +867,102 @@ function nearest(s: State, x: number, y: number, skip?: Set<number>): Foe | null
   return best;
 }
 
-function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element']): void {
+/** 속성 세트: 같은 효과를 남기는 무공 수 */
+export function elementCounts(s: State): Record<string, number> {
+  const c: Record<string, number> = {};
+  for (const w of s.weapons) {
+    const el = WEAPONS.get(w.id)?.element;
+    if (el) c[el] = (c[el] ?? 0) + 1;
+  }
+  return c;
+}
+export const setOn = (s: State, el: keyof typeof RULES.sets): boolean => (elementCounts(s)[el] ?? 0) >= RULES.sets[el].need;
+const hasAffix = (f: Foe, id: string): boolean => !!f.affixes?.includes(id);
+
+function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false): void {
   if (f.dead) return;
   const crit = s.rng.next() < stat.crit(s);
-  const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * (s.t < f.vulnUntil ? 1.25 : 1));
+  const S = RULES.sets;
+  const vulnMul = s.t < f.vulnUntil ? (setOn(s, 'vuln') ? S.vuln.mul! : 1.25) : 1;
+  const iceMul = s.t < f.slowUntil && setOn(s, 'ice') ? S.ice.mul! : 1;
+  const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * vulnMul * iceMul);
   f.hp -= dmg;
   f.hitAt = s.t;
-  if (element === 'ice') f.slowUntil = s.t + 1.2;
+  const firm = hasAffix(f, 'steadfast');
+  if (element === 'ice' && !firm) f.slowUntil = s.t + 1.2;
   if (element === 'fire') f.burnUntil = s.t + 2;
-  if (element === 'shock' && !f.def.rank) f.stunUntil = s.t + 0.35;
-  if (element === 'vuln') f.vulnUntil = s.t + 3;
-  if (knock && !f.def.rank) {
+  if (element === 'shock' && !f.def.rank && !firm) f.stunUntil = s.t + 0.35;
+  if (element === 'vuln') f.vulnUntil = s.t + (setOn(s, 'vuln') ? 5 : 3);
+  // 가시 돋친(되돌리는) 정예: 때린 쪽이 조금 받는다
+  if (hasAffix(f, 'spiteful') && s.t >= s.thornAt) {
+    s.thornAt = s.t + 0.5;
+    hurtPlayer(s, AFFIX.get('spiteful')!.thorns ?? 3, true);
+  }
+  if (knock && !f.def.rank && !firm) {
     const dx = f.x - s.player.x;
     const dy = f.y - s.player.y;
     const d = Math.hypot(dx, dy) || 1;
-    const [nx, ny] = f.def.fly ? [f.x + (dx / d) * knock, f.y + (dy / d) * knock] : moveCircle(s.terrain, f.x, f.y, (dx / d) * knock, (dy / d) * knock, f.def.radius * 0.6);
-    f.x = nx;
-    f.y = ny;
+    // 위험 칸(용암·물·허공)으로 밀려나면 빠진다
+    const tx = f.x + (dx / d) * knock;
+    const ty = f.y + (dy / d) * knock;
+    if (!f.def.fly && cellAt(s.terrain, tx, ty) === T.Hazard) {
+      f.x = tx;
+      f.y = ty;
+      fallFoe(s, f);
+    } else {
+      const [nx, ny] = f.def.fly ? [tx, ty] : moveCircle(s.terrain, f.x, f.y, (dx / d) * knock, (dy / d) * knock, f.def.radius * 0.6);
+      f.x = nx;
+      f.y = ny;
+    }
   }
   if (s.events.length < 400) s.events.push({ type: 'hit', x: f.x, y: f.y, damage: dmg, crit });
+  // 뇌전 세트: 가까운 하나로 튄다
+  if (element === 'shock' && !chained && setOn(s, 'shock')) {
+    let best: Foe | null = null;
+    let bd = S.shock.range! ** 2;
+    for (const o of s.foes) {
+      if (o === f || o.dead) continue;
+      const dd = (o.x - f.x) ** 2 + (o.y - f.y) ** 2;
+      if (dd < bd) {
+        bd = dd;
+        best = o;
+      }
+    }
+    if (best) {
+      s.events.push({ type: 'chain', pts: [[f.x, f.y - 20], [best.x, best.y - 20]], color: '#cdb8ff' });
+      damageFoe(s, best, base * S.shock.frac!, 0, undefined, true);
+    }
+  }
+  if (f.boss && !f.dead) bossPhase(s, f);
+  if (f.hp <= 0 && !f.dead) killFoe(s, f);
+}
+
+/** 위험 칸에 빠짐: 보통 그림자는 끝, 정예·보스는 큰 피해(every초에 한 번) */
+function fallFoe(s: State, f: Foe): void {
+  if (f.dead) return;
+  s.events.push({ type: 'fall', x: f.x, y: f.y });
+  if (!f.def.rank && !f.elite && !f.golden) return killFoe(s, f);
+  if (s.t - (f.fellAt ?? -99) < RULES.fall.every) return;
+  f.fellAt = s.t;
+  f.hp -= f.maxHp * RULES.fall.rank;
   if (f.hp <= 0) killFoe(s, f);
+}
+
+/** 보스 단계: 체력이 줄 때마다 빨라지고 무리를 부른다 */
+function bossPhase(s: State, f: Foe): void {
+  const B = RULES.boss;
+  const ph = f.phase ?? 0;
+  if (s.chapterIndex + 1 < B.phasesFrom) return;
+  if (ph >= B.phases.length || f.hp > f.maxHp * B.phases[ph]) return;
+  f.phase = ph + 1;
+  s.events.push({ type: 'phase', phase: f.phase + 1, name: f.def.name });
+  s.events.push({ type: 'event', text: `${f.def.name}이(가) 분노한다 — ${f.phase + 1}단계`, kind: 'boss' });
+  for (let i = 0; i < B.summon; i++) {
+    const a = (i / B.summon) * Math.PI * 2;
+    const x = f.x + Math.cos(a) * 90;
+    const y = f.y + Math.sin(a) * 90;
+    if (walkable(s.terrain, x, y)) spawnFoe(s, pickRole(s, { main: 2, fast: 1 }), x, y);
+  }
 }
 
 /** 깨지는 것(항아리·등불): 무공이 닿으면 깨져 물건을 떨군다 */
@@ -723,6 +999,28 @@ function killFoe(s: State, f: Foe): void {
   f.dead = true;
   s.kills++;
   s.chapterKills++;
+  // 화염 세트: 불붙은 채 쓰러지면 둘레로 번진다
+  if (s.t < f.burnUntil && setOn(s, 'fire')) {
+    const F = RULES.sets.fire;
+    s.events.push({ type: 'burst', x: f.x, y: f.y, r: F.radius! });
+    for (const o of s.foes) if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < F.radius! ** 2) {
+      o.burnUntil = s.t + 2;
+      damageFoe(s, o, F.damage! * (1 + s.chapterIndex * 0.3), 0, undefined, true);
+    }
+  }
+  // 수식어: 갈라짐 · 죽으며 터짐
+  for (const id of f.affixes ?? []) {
+    const a = AFFIX.get(id);
+    if (a?.split && !f.small)
+      for (let i = 0; i < a.split; i++) {
+        const k = spawnFoe(s, rolePool(s.chapter, 'main')[0], f.x + (i ? 18 : -18), f.y);
+        if (k) {
+          k.small = true;
+          k.hp = k.maxHp = Math.round(k.maxHp * 0.6);
+        }
+      }
+    if (a?.deathSlam) s.slams.push({ x: f.x, y: f.y, r: a.deathSlam.radius, damage: a.deathSlam.damage * s.chapter.dmg, born: s.t, at: s.t + a.deathSlam.delay, color: '#ff4a6a' });
+  }
   const rank = f.def.rank;
   s.ult = Math.min(RULES.ult.max, s.ult + (rank === 'boss' ? RULES.ult.boss : rank === 'elite' ? RULES.ult.elite : RULES.ult.kill));
   s.events.push({ type: 'kill', x: f.x, y: f.y, foe: f.def.id, rank });
@@ -743,7 +1041,13 @@ function killFoe(s: State, f: Foe): void {
       }
     }
   }
-  if (f.mid) unlockRandom(s, RULES.unlock.mid);
+  if (f.mid) {
+    unlockRandom(s, RULES.unlock.mid);
+    // 이어 하기 자리: 여기서 지면 중간 보스 뒤에서 다시
+    s.checkpoint = { t: s.t, carry: carryOf(s) };
+    s.events.push({ type: 'event', text: '중간 보스를 넘었다 — 여기서부터 다시 할 수 있다', kind: 'checkpoint' });
+  }
+  if (f.boss && s.arena.length) openArena(s);
   if (f.boss) unlockRandom(s, RULES.unlock.boss);
   if (f.boss) {
     s.bossKills.push(f.def.id);
@@ -784,8 +1088,25 @@ function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe
   };
   s.foes.push(f);
   if (boss) s.boss = f;
+  if (def.rank === 'elite') giveAffixes(s, f);
   return f;
 }
+
+/** 정예 수식어를 붙인다(뒤 장은 둘) */
+function giveAffixes(s: State, f: Foe): void {
+  const A = RULES.affix;
+  const n = s.chapterIndex + 1 >= A.lateFrom ? A.lateCount : A.count;
+  const pool = AFFIXES.filter((a) => !(a.noBoss && f.boss));
+  f.affixes = [];
+  for (let i = 0; i < n && pool.length; i++) {
+    const a = pool.splice(s.rng.int(0, pool.length - 1), 1)[0];
+    f.affixes.push(a.id);
+    if (a.hp) f.hp = f.maxHp = Math.round(f.maxHp * a.hp);
+    if (a.damage) f.damage *= a.damage;
+  }
+}
+/** 수식어 걸음 배율 */
+const affixSpeed = (f: Foe): number => (f.affixes ?? []).reduce((m, id) => m * (AFFIX.get(id)?.speed ?? 1), 1);
 
 /** 인물 둘레(min~max) 걸을 수 있는 자리. 나는 놈은 벽만 아니면 */
 function spawnPoint(s: State, fly: boolean, min = RULES.foes.spawnRadius[0], max = RULES.foes.spawnRadius[1], angle?: number): [number, number] | null {
@@ -830,6 +1151,123 @@ function spawnElite(s: State, min: number, max: number): void {
   f.maxHp = f.hp;
   f.damage *= 1.4;
   f.elite = true;
+  giveAffixes(s, f);
+}
+
+/** 보스 아레나: 인물 둘레 arena칸 반지름 고리의 바닥을 벽으로 닫는다(보스가 쓰러지면 연다) */
+function closeArena(s: State): void {
+  const t = s.terrain;
+  const R = RULES.boss.arena;
+  const cx = Math.floor(s.player.x / CELL);
+  const cy = Math.floor(s.player.y / CELL);
+  for (let y = cy - R - 1; y <= cy + R + 1; y++)
+    for (let x = cx - R - 1; x <= cx + R + 1; x++) {
+      if (x < 0 || y < 0 || x >= t.w || y >= t.h) continue;
+      const d = Math.hypot(x - cx, y - cy);
+      const i = y * t.w + x;
+      if (d >= R - 0.5 && d < R + 0.7 && t.cells[i] !== T.Wall) {
+        s.arena.push(i * 8 + t.cells[i]);
+        t.cells[i] = T.Wall;
+      }
+    }
+  // 고리 밖 그림자는 틈 너머로 사라진다(보스와 호위만 남는다)
+  for (const f of s.foes) if (!f.dead && Math.hypot(f.x / CELL - cx, f.y / CELL - cy) > R - 1) f.dead = true;
+  s.terrainRev++;
+  s.events.push({ type: 'terrain' });
+  s.events.push({ type: 'event', text: '틈이 닫혔다 — 보스와 둘만 남았다', kind: 'boss' });
+}
+function openArena(s: State): void {
+  for (const v of s.arena) s.terrain.cells[v >> 3] = v & 7;
+  s.arena = [];
+  s.terrainRev++;
+  s.events.push({ type: 'terrain' });
+}
+
+/** 장 대표 기믹(story.json chapters[].gimmick) — every초마다 */
+function runGimmick(s: State): void {
+  const g = s.chapter.gimmick;
+  const p = s.player;
+  // 예고한 칸이 바뀐다(용암 범람·무너짐)
+  if (s.warnCells && s.t >= s.warnCells.at) {
+    for (const i of s.warnCells.cells) s.terrain.cells[i] = s.warnCells.to;
+    s.warnCells = null;
+    s.terrainRev++;
+    s.events.push({ type: 'terrain' });
+    // 그 칸에 있던 그림자는 빠진다
+    for (const f of s.foes) if (!f.dead && !f.def.fly && cellAt(s.terrain, f.x, f.y) === T.Hazard) fallFoe(s, f);
+  }
+  if (s.gust && s.t < s.gust.until) [p.x, p.y] = moveCircle(s.terrain, p.x, p.y, s.gust.dx * DT, s.gust.dy * DT, RULES.player.radius * 0.8);
+  if (!g || s.t < s.gimmickAt || s.result) return;
+  s.gimmickAt = s.t + g.every;
+  s.events.push({ type: 'event', text: g.text, kind: 'gimmick' });
+  const dmg = (g.damage ?? 15) * s.chapter.dmg;
+  switch (g.kind) {
+    case 'gust': {
+      const a = s.rng.next() * Math.PI * 2;
+      s.gust = { until: s.t + (g.dur ?? 5), dx: Math.cos(a) * (g.force ?? 70), dy: Math.sin(a) * (g.force ?? 70) };
+      break;
+    }
+    case 'howl':
+      for (let i = 0; i < (g.count ?? 10); i++) spawnAround(s, pickRole(s, { fast: 2, main: 1 }), 360, 430, (i / (g.count ?? 10)) * Math.PI * 2);
+      break;
+    case 'alley':
+      for (let i = 0; i < (g.count ?? 7); i++) spawnAround(s, pickRole(s, { fast: 2, main: 1 }), 150, 260);
+      break;
+    case 'whiteout':
+      s.effects.push({ kind: 'fog', mul: 1, until: s.t + (g.dur ?? 12) });
+      s.slowUntil = s.t + (g.dur ?? 12);
+      s.slowMul = g.slow ?? 0.85;
+      break;
+    case 'eclipse':
+      s.effects.push({ kind: 'fog', mul: 1, until: s.t + (g.dur ?? 10) }, { kind: 'foeSpeed', mul: 1.2, until: s.t + (g.dur ?? 10) });
+      break;
+    case 'meteor':
+      s.rains.push({ until: s.t + (g.dur ?? 8), every: 0.45, next: s.t, damage: dmg, radius: g.radius ?? 80, color: '#ff6a3a' });
+      break;
+    case 'palm':
+      s.slams.push({ x: p.x, y: p.y, r: g.radius ?? 150, damage: dmg, born: s.t, at: s.t + (g.delay ?? 1.5), color: '#c0283a' });
+      break;
+    case 'hands': {
+      // 인물 둘레 벽 옆 칸에서 손이 솟는다
+      const t = s.terrain;
+      const cx = Math.floor(p.x / CELL);
+      const cy = Math.floor(p.y / CELL);
+      const near: number[] = [];
+      for (let y = cy - 7; y <= cy + 7; y++)
+        for (let x = cx - 7; x <= cx + 7; x++) {
+          if (x < 1 || y < 1 || x >= t.w - 1 || y >= t.h - 1 || !walkable(t, (x + 0.5) * CELL, (y + 0.5) * CELL)) continue;
+          if ([t.cells[y * t.w + x - 1], t.cells[y * t.w + x + 1], t.cells[(y - 1) * t.w + x], t.cells[(y + 1) * t.w + x]].includes(T.Wall)) near.push(y * t.w + x);
+        }
+      for (let i = 0; i < (g.count ?? 3) && near.length; i++) {
+        const c = near.splice(s.rng.int(0, near.length - 1), 1)[0];
+        s.slams.push({ x: ((c % t.w) + 0.5) * CELL, y: (Math.floor(c / t.w) + 0.5) * CELL, r: g.radius ?? 70, damage: dmg, born: s.t, at: s.t + 1.1, color: '#8a6a4a' });
+      }
+      break;
+    }
+    case 'lava':
+    case 'collapse': {
+      // 위험 칸 옆 바닥을 몇 칸 골라 예고(인물 자리는 빼고) → warn초 뒤 위험 칸
+      const t = s.terrain;
+      const cand: number[] = [];
+      const cx = Math.floor(p.x / CELL);
+      const cy = Math.floor(p.y / CELL);
+      for (let y = cy - 14; y <= cy + 14; y++)
+        for (let x = cx - 14; x <= cx + 14; x++) {
+          if (x < 1 || y < 1 || x >= t.w - 1 || y >= t.h - 1) continue;
+          const i = y * t.w + x;
+          if (t.cells[i] !== T.Floor && t.cells[i] !== T.Slow) continue;
+          if (Math.abs(x - cx) <= 1 && Math.abs(y - cy) <= 1) continue;
+          if ([t.cells[i - 1], t.cells[i + 1], t.cells[i - t.w], t.cells[i + t.w]].includes(T.Hazard)) cand.push(i);
+        }
+      const cells: number[] = [];
+      for (let k = 0; k < (g.cells ?? 14) && cand.length; k++) cells.push(cand.splice(s.rng.int(0, cand.length - 1), 1)[0]);
+      if (cells.length) {
+        s.warnCells = { cells, at: s.t + (g.warn ?? 3), to: T.Hazard };
+        s.events.push({ type: 'warn', cells, at: s.warnCells.at });
+      }
+      break;
+    }
+  }
 }
 
 function runTimeline(s: State): void {
@@ -856,8 +1294,10 @@ function runTimeline(s: State): void {
       case 'mid':
       case 'boss': {
         const id = ev.kind === 'mid' ? c.roles.mid : c.roles.boss;
-        const pt = spawnPoint(s, false, 460, 560) ?? [s.player.x + 480, s.player.y];
-        const big = spawnFoe(s, id, pt[0], pt[1], ev.kind === 'boss');
+        const boss = ev.kind === 'boss';
+        const pt = (boss ? spawnPoint(s, false, RULES.boss.spawn[0], RULES.boss.spawn[1]) : spawnPoint(s, false, 460, 560)) ?? [s.player.x + 300, s.player.y];
+        if (boss) closeArena(s);
+        const big = spawnFoe(s, id, pt[0], pt[1], boss);
         if (big && ev.kind === 'mid') big.mid = true;
         for (let i = 0; i < n; i++) spawnAround(s, pickRole(s, { main: 2, fast: 1, ranged: 1 }), 520, 860, (i / n) * Math.PI * 2);
         break;
@@ -959,18 +1399,39 @@ function runTimeline(s: State): void {
   s.effects = s.effects.filter((e) => s.t < e.until);
 }
 
-function hurtPlayer(s: State, raw: number): void {
+/** minor: 가시·독처럼 작은 피해(무적 시간을 주지 않고, 무적 시간도 무시하지 않는다) */
+function hurtPlayer(s: State, raw: number, minor = false): void {
   const p = s.player;
-  if (s.t < p.hurtUntil || s.t < p.dashUntil || s.t < p.shieldUntil || s.result) return;
+  if ((!minor && s.t < p.hurtUntil) || s.t < p.dashUntil || s.t < p.shieldUntil || s.result) return;
   const over = Math.max(0, (s.t - CHAPTER_LENGTH) / 60);
-  const dmg = Math.max(1, Math.round(raw * (1 + RULES.foes.overtimeDamagePerMinute * over) - stat.armor(s)));
+  const dmg = Math.max(1, Math.round(raw * (1 + RULES.foes.overtimeDamagePerMinute * over) - (minor ? 0 : stat.armor(s))));
   p.hp -= dmg;
-  p.hurtUntil = s.t + RULES.player.hurtCooldown;
+  if (!minor) p.hurtUntil = s.t + RULES.player.hurtCooldown;
   s.events.push({ type: 'hurt', damage: dmg });
   if (p.hp <= 0) {
+    // 되살아나는 숨(장터)
+    if (s.revives > 0) {
+      s.revives--;
+      p.hp = p.maxHp / 2;
+      p.shieldUntil = s.t + 2.5;
+      s.events.push({ type: 'event', text: '되살아나는 숨 — 다시 일어섰다', kind: 'revive' });
+      for (const f of s.foes) if (!f.dead && (f.x - p.x) ** 2 + (f.y - p.y) ** 2 < 300 ** 2) damageFoe(s, f, 60, 60);
+      return;
+    }
     p.hp = 0;
     s.result = 'lose';
   }
+}
+
+/** 간파: 보법 무적 동안 아슬하게 피했다 — 시간이 느려지고 위력이 오른다 */
+function counter(s: State, x: number, y: number): void {
+  const C = RULES.counter;
+  if (s.t < s.counterReadyAt) return;
+  s.counterReadyAt = s.t + C.cooldown;
+  s.counterUntil = s.t + C.window + (stat.graze(s) - 1) * 1.25;
+  s.slowmoUntil = s.t + C.slowmo;
+  s.ult = Math.min(RULES.ult.max, s.ult + C.ult);
+  s.events.push({ type: 'counter', x, y });
 }
 
 function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string): void {
@@ -985,7 +1446,7 @@ function useSkills(s: State, f: Foe, d: number): void {
   const aim = Math.atan2(p.y - 20 - (f.y - 20), p.x - f.x);
   skills.forEach((k, i) => {
     if (s.t < f.skillAt[i]) return;
-    f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4);
+    f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4) * (f.boss ? RULES.boss.haste ** (f.phase ?? 0) : 1);
     switch (k.kind) {
       case 'aimed':
         shoot(s, f, aim, k.speed, k.damage, k.color);
@@ -1007,7 +1468,7 @@ function useSkills(s: State, f: Foe, d: number): void {
         f.dashUntil = s.t + 0.7;
         f.vx = Math.cos(aim);
         f.vy = Math.sin(aim);
-        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#ffffff' });
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#ffffff', kind: 'charge', angle: aim });
         break;
       case 'summon':
         for (let j = 0; j < k.count; j++) {
@@ -1016,7 +1477,7 @@ function useSkills(s: State, f: Foe, d: number): void {
           const y = f.y + Math.sin(a) * 70;
           if (FOES.get(k.foe)?.fly || walkable(s.terrain, x, y)) spawnFoe(s, k.foe, x, y);
         }
-        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#c0283a' });
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#c0283a', kind: 'summon' });
         break;
     }
   });
@@ -1074,7 +1535,7 @@ function moveFoes(s: State): void {
         continue;
       }
     }
-    let speed = f.def.speed * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed');
+    let speed = f.def.speed * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed') * affixSpeed(f) * (f.boss ? RULES.boss.speed ** (f.phase ?? 0) : 1);
     let ux = dx / d;
     let uy = dy / d;
     if (!f.def.fly) {
@@ -1131,13 +1592,22 @@ function moveFoes(s: State): void {
         if (!p.grazed.has(f.uid)) {
           p.grazed.add(f.uid);
           s.events.push({ type: 'graze', x: f.x, y: f.y });
-          for (const o of s.foes) if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < RULES.dash.graze.radius ** 2) damageFoe(s, o, RULES.dash.graze.damage);
+          // 간파: 스칠 때마다 마지막 기술이 차고, 돌진하던 정예·보스를 피하면 반격
+          s.grazeCombo++;
+          s.ult = Math.min(RULES.ult.max, s.ult + RULES.counter.grazeUlt);
+          if ((f.def.rank || f.elite) && s.t < f.dashUntil) counter(s, f.x, f.y);
+          const gd = RULES.dash.graze.damage * (1 + 0.06 * s.level) * stat.graze(s);
+          for (const o of s.foes) if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < RULES.dash.graze.radius ** 2) damageFoe(s, o, gd);
         }
       } else if (s.t < p.shieldUntil) {
         // 막고 있는 동안 닿은 놈은 살짝 밀려난다
       } else {
         const before = p.hurtUntil;
         hurtPlayer(s, f.damage);
+        if (p.hurtUntil !== before) {
+          if (hasAffix(f, 'venom')) s.poisonUntil = s.t + 3;
+          if (hasAffix(f, 'frosty')) s.chillUntil = s.t + (AFFIX.get('frosty')!.chill ?? 2);
+        }
         // 되갚기(카드 심법): 몸으로 친 적에게 그대로 돌려준다
         if (p.hurtUntil !== before && stat.thorns(s) > 0) damageFoe(s, f, stat.thorns(s));
       }
@@ -1343,9 +1813,14 @@ function moveShots(s: State): void {
     }
     if (!sh.weapon) {
       const rr = sh.r + RULES.player.radius;
-      if ((sh.x - p.x) ** 2 + (sh.y - p.y + 20) ** 2 < rr * rr && s.t >= p.dashUntil) {
+      const d2 = (sh.x - p.x) ** 2 + (sh.y - p.y + 20) ** 2;
+      if (d2 < rr * rr && s.t >= p.dashUntil) {
         hurtPlayer(s, sh.damage);
         sh.life = 0;
+      } else if (s.t < p.dashUntil && p.dashMove && d2 < RULES.counter.shotRadius ** 2) {
+        // 보법으로 탄을 아슬하게 비켰다
+        sh.life = 0;
+        counter(s, sh.x, sh.y);
       }
       continue;
     }
@@ -1373,7 +1848,11 @@ function moveShots(s: State): void {
   // 예고한 원이 떨어진다
   for (const m of s.slams) {
     if (s.t < m.at) continue;
-    if ((p.x - m.x) ** 2 + (p.y - m.y) ** 2 < (m.r + RULES.player.radius) ** 2) hurtPlayer(s, m.damage);
+    if ((p.x - m.x) ** 2 + (p.y - m.y) ** 2 < (m.r + RULES.player.radius) ** 2) {
+      // 내려찍기가 떨어지는 순간 보법 중이면 간파
+      if (s.t < p.dashUntil) counter(s, p.x, p.y);
+      else hurtPlayer(s, m.damage);
+    }
     s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color });
   }
   s.slams = s.slams.filter((m) => s.t < m.at);
@@ -1386,9 +1865,14 @@ function pickups(s: State): void {
     const d = Math.hypot(p.x - g.x, p.y - g.y);
     if (d < reach) g.pulled = true;
     if (!g.pulled) continue;
-    const v = Math.max(280, stat.speed(s) * 1.7) * DT;
-    g.x += ((p.x - g.x) / (d || 1)) * Math.min(v, d);
-    g.y += ((p.y - g.y) / (d || 1)) * Math.min(v, d);
+    // 빨려 드는 곡선: 처음엔 살짝 밀려났다가 점점 빨라지며 휘어 들어온다
+    g.pt = (g.pt ?? 0) + DT;
+    const v = Math.max(280, stat.speed(s) * 1.7) * Math.min(2.6, g.pt < 0.12 ? -0.6 : 0.4 + g.pt * 3) * DT;
+    const ux = (p.x - g.x) / (d || 1);
+    const uy = (p.y - g.y) / (d || 1);
+    const swirl = Math.max(0, 0.5 - g.pt) * 0.9;
+    g.x += (ux - uy * swirl) * Math.min(v, d);
+    g.y += (uy + ux * swirl) * Math.min(v, d);
     if (d < 18) {
       g.taken = true;
       gainXp(s, g.xp * effMul(s, 'xp'));
@@ -1408,13 +1892,13 @@ function pickups(s: State): void {
     it.taken = true;
     s.events.push({ type: 'item', kind: it.kind, x: it.x, y: it.y });
     const def = ITEMS.get(it.kind);
-    if (def) for (const op of def.ops) applyOp(s, op, def);
+    if (def) for (const op of def.ops) applyOp(s, op, def, it);
   }
   s.items = s.items.filter((it) => !it.taken);
 }
 
 /** 줍는 것의 기본 동작 하나(items.json ops) */
-function applyOp(s: State, op: ItemOp, def: ItemDef): void {
+function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
   const p = s.player;
   switch (op.op) {
     case 'heal':
@@ -1495,6 +1979,22 @@ function applyOp(s: State, op: ItemOp, def: ItemDef): void {
     case 'chest':
       openChest(s);
       break;
+    case 'stele': {
+      const n = it?.stele ?? 0;
+      const id = `${s.chapter.id}-${n}`;
+      if (!s.steles.includes(id)) s.steles.push(id);
+      s.events.push({ type: 'stele', id, text: s.chapter.steles?.[n] ?? '' });
+      s.gold += 10;
+      break;
+    }
+    case 'trial': {
+      const A = RULES.explore.altar;
+      s.trial = { until: s.t + A.seconds, goal: A.base + A.perChapter * s.chapterIndex, start: s.chapterKills };
+      s.events.push({ type: 'event', text: `수련 제단 — ${A.seconds}초 안에 그림자 ${s.trial.goal}을 쓰러뜨려라`, kind: 'trial' });
+      // 도전 동안 무리가 몰려든다
+      for (let i = 0; i < s.trial.goal; i++) spawnAround(s, pickRole(s, { main: 2, fast: 1 }), 320, 520, (i / s.trial.goal) * Math.PI * 2);
+      break;
+    }
   }
 }
 
@@ -1545,6 +2045,23 @@ function openChest(s: State): void {
   }
 }
 
+const LOCKABLE_SET = new Set(LOCKABLE);
+/** 새로 나올 수 있나: 잠기지 않았고, 봉인하지 않았고, 카드 것이면 무공록에 있어야 */
+function offerable(s: State, id: string): boolean {
+  if (s.locked?.has(id) || s.banished.has(id)) return false;
+  if (s.book && LOCKABLE_SET.has(id) && !s.book.has(id)) return false;
+  return true;
+}
+/** 가진 무공의 각성 짝 심법 id */
+export function partnersOf(s: State): Map<string, string> {
+  const m = new Map<string, string>();
+  for (const w of s.weapons) {
+    const ev = WEAPONS.get(w.id)?.evolve;
+    if (ev) m.set(ev.with, w.id);
+  }
+  return m;
+}
+
 export function choicePool(s: State): Choice[] {
   const out: Choice[] = [];
   for (const w of s.weapons) {
@@ -1554,12 +2071,12 @@ export function choicePool(s: State): Choice[] {
   if (s.weapons.length < RULES.player.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
-    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && !s.locked?.has(d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
+    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
   }
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
     if (lv >= pd.max) continue;
-    if (lv === 0 && (s.passives.size >= RULES.player.slots.passives || s.locked?.has(pd.id))) continue;
+    if (lv === 0 && (s.passives.size >= RULES.player.slots.passives || !offerable(s, pd.id))) continue;
     out.push({ kind: 'passive', id: pd.id, lv: lv + 1 });
   }
   return out;
@@ -1581,12 +2098,41 @@ function offerChoices(s: State): void {
   const fresh = rest.filter((x) => x.lv === 1).length;
   const ups = rest.length - fresh;
   const many = s.rng.next() < stat.luck(s) ? 4 : 3;
+  // 각성 짝 심법은 잘 나오게(2026-11-21 "각성을 노리고 키우는 게 사실상 불가능")
+  const partners = partnersOf(s);
   while (picks.length < many && rest.length) {
-    const c = s.rng.weighted(rest, (x) => (x.lv > 1 ? Math.max(1.6, fresh / Math.max(1, ups) / 2) : 1))!;
+    const c = s.rng.weighted(rest, (x) => (x.lv > 1 ? Math.max(1.6, fresh / Math.max(1, ups) / 2) : 1) * (x.kind === 'passive' && partners.has(x.id) ? RULES.build.partnerWeight : 1))!;
     picks.push(c);
     rest.splice(rest.indexOf(c), 1);
   }
   s.pending = picks;
+}
+
+/** 레벨업 후보 손보기(장마다 횟수 제한): 다시 뽑기 · 봉인(이 후보를 이번 이야기에서 빼고 다시 뽑기) · 건너뛰기(금화) */
+export function reroll(s: State): boolean {
+  if (!s.pending || s.rerolls <= 0 || s.pending.some((c) => c.kind === 'buy' || c.kind === 'leave')) return false;
+  s.rerolls--;
+  s.pending = null;
+  offerChoices(s);
+  return true;
+}
+export function banish(s: State, i: number): boolean {
+  const c = s.pending?.[i];
+  if (!c || s.banishes <= 0 || (c.kind !== 'weapon' && c.kind !== 'passive') || c.lv !== 1) return false;
+  s.banishes--;
+  s.banished.add(c.id);
+  s.pending = null;
+  offerChoices(s);
+  return true;
+}
+export function skip(s: State): boolean {
+  if (!s.pending || s.skips <= 0 || s.pending.some((c) => c.kind === 'buy' || c.kind === 'leave')) return false;
+  s.skips--;
+  s.gold += RULES.build.skipGold;
+  s.pending = null;
+  s.queuedLevels = Math.max(0, s.queuedLevels - 1);
+  if (s.queuedLevels > 0) offerChoices(s);
+  return true;
 }
 
 export function choose(s: State, i: number): void {
@@ -1670,8 +2216,9 @@ function useUlt(s: State): void {
 function useDash(s: State): void {
   const p = s.player;
   const D = s.hero.dash;
-  p.dashReady = s.t + D.cooldown;
+  p.dashReady = s.t + D.cooldown * stat.dashcd(s);
   p.grazed.clear();
+  s.grazeCombo = 0;
   p.dashFromX = p.x;
   p.dashFromY = p.y;
   p.dashMove = true;
@@ -1698,6 +2245,22 @@ function useDash(s: State): void {
     const r = D.radius ?? 130;
     s.events.push({ type: 'nova', x: p.dashFromX, y: p.dashFromY, r, color: '#9fe6ff', weapon: '' });
     for (const f of s.foes) if (!f.dead && (f.x - p.dashFromX) ** 2 + (f.y - p.dashFromY) ** 2 < r * r) f.slowUntil = s.t + (D.slow ?? 2.5);
+  }
+  // 얇은 벽·강 넘기: 바로 앞이 막혔으면 vault칸 안의 걸을 수 있는 곳으로 건너뛴다
+  if (p.dashMove) {
+    const ahead = (k: number) => [p.x + p.dashX * CELL * k, p.y + p.dashY * CELL * k] as const;
+    const [ax, ay] = ahead(1);
+    if (!walkable(s.terrain, ax, ay)) {
+      for (let k = 2; k <= RULES.vault.cells; k++) {
+        const [bx, by] = ahead(k);
+        if (walkable(s.terrain, bx, by)) {
+          p.x = bx;
+          p.y = by;
+          p.dashMove = false;
+          break;
+        }
+      }
+    }
   }
   s.events.push({ type: 'dash', kind: D.kind, x: p.dashFromX, y: p.dashFromY, x2: p.x, y2: p.y, color: s.hero.ult.color });
 }
@@ -1729,7 +2292,21 @@ function dashTick(s: State): void {
 }
 
 /** 보법 쿨타임(인물마다) */
-export const dashCooldown = (s: State): number => s.hero.dash.cooldown;
+export const dashCooldown = (s: State): number => s.hero.dash.cooldown * stat.dashcd(s);
+
+/** 판에서 벽이 아닌 칸 비율(다 밝히기 기준) — 장마다 한 번 */
+const walkShareCache = new WeakMap<Terrain, number>();
+function walkShare(s: State): number {
+  let v = walkShareCache.get(s.terrain);
+  if (v === undefined) {
+    let n = 0;
+    for (const c of s.terrain.cells) if (c !== T.Wall) n++;
+    v = n / s.terrain.cells.length;
+    walkShareCache.set(s.terrain, v);
+  }
+  return v;
+}
+export const exploredShare = (s: State): number => s.exploredCount / (s.terrain.w * s.terrain.h * walkShare(s));
 
 /** 한 칸(1/60초). 레벨업 고르기·끝난 장은 멈춰 있다 */
 export function step(s: State, input: Input): void {
@@ -1762,6 +2339,26 @@ export function step(s: State, input: Input): void {
     reveal(s);
   }
   p.hp = Math.min(p.maxHp, p.hp + stat.regen(s) * DT);
+  // 독(수식어): 초당 3
+  if (s.t < s.poisonUntil && Math.floor(s.t * 2) !== Math.floor((s.t - DT) * 2)) hurtPlayer(s, 1.5, true);
+  // 수련 제단
+  if (s.trial) {
+    if (s.chapterKills - s.trial.start >= s.trial.goal) {
+      s.trial = null;
+      for (let i = 0; i < RULES.explore.altar.chests; i++) s.items.push({ x: p.x + (i - 0.5) * 50, y: p.y + 40, kind: 'chest' });
+      s.events.push({ type: 'event', text: '수련 제단을 넘었다 — 상자 둘', kind: 'trial' });
+    } else if (s.t >= s.trial.until) {
+      s.trial = null;
+      s.events.push({ type: 'event', text: '수련 제단 — 시간이 다 됐다', kind: 'trial' });
+    }
+  }
+  // 판을 거의 다 밝히면 보상
+  if (!s.exploreRewarded && s.exploredCount >= s.terrain.w * s.terrain.h * RULES.explore.reward * walkShare(s)) {
+    s.exploreRewarded = true;
+    s.gold += RULES.explore.gold;
+    s.events.push({ type: 'event', text: `지도를 다 밝혔다 — 금화 ${RULES.explore.gold}`, kind: 'explore' });
+  }
+  runGimmick(s);
   runTimeline(s);
   moveFoes(s);
   fireWeapons(s);

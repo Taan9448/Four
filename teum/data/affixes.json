@@ -1,0 +1,60 @@
+{
+ "$comment": "「틈」 정예 수식어(2026-11-21 사용자 \"적 차이가 약하다 — 심연 수식어를 가져와\"): 이름·글자는 data/abyss_affixes.json(같은 id), 뜻은 「틈」에 맞게",
+ "affixes": [
+  {
+   "id": "tough",
+   "desc": "체력 ×1.6",
+   "hp": 1.6
+  },
+  {
+   "id": "swift",
+   "desc": "걸음 ×1.4",
+   "speed": 1.4
+  },
+  {
+   "id": "venom",
+   "desc": "닿으면 3초 동안 독(초당 3)",
+   "poison": 3
+  },
+  {
+   "id": "spiteful",
+   "desc": "때릴 때마다 가시 3을 되돌려 받는다(0.5초에 한 번)",
+   "thorns": 3
+  },
+  {
+   "id": "echoing",
+   "desc": "쓰러지면 작은 그림자 둘로 갈라진다",
+   "split": 2
+  },
+  {
+   "id": "brutal",
+   "desc": "공격 ×1.5",
+   "damage": 1.5
+  },
+  {
+   "id": "relentless",
+   "desc": "체력 ×2.2",
+   "hp": 2.2,
+   "noBoss": true
+  },
+  {
+   "id": "rift_born",
+   "desc": "쓰러진 자리에 붉은 원 — 잠시 뒤 터진다",
+   "deathSlam": {
+    "radius": 95,
+    "damage": 18,
+    "delay": 1
+   }
+  },
+  {
+   "id": "frosty",
+   "desc": "닿으면 2초 동안 걸음이 느려진다",
+   "chill": 2
+  },
+  {
+   "id": "steadfast",
+   "desc": "멈춤·느림·밀침이 듣지 않는다",
+   "steadfast": true
+  }
+ ]
+}

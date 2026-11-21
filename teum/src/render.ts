@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { CHAPTER_LENGTH, effOn, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { AFFIXES, CHAPTER_LENGTH, effOn, elementCounts, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -16,6 +16,8 @@ export interface Art {
   items: Anim;
   /** 2026-11-21 늘린 줍는 것 16칸(icons_teum_items_2) */
   items2: Anim;
+  /** 안개 속 표식(비석·제단·상인·샘·저주 상자): icons_teum_world */
+  world: Anim;
   skills: Anim[];
   /** 무공 종류별 이펙트(fx_teum_<종류>, 2026-11-21) — 흰색·회색으로 그려져 오고, 무공 색을 입혀 그린다. 오기 전에는 코드로 그린다 */
   kinds: Map<string, SpriteAsset>;
@@ -24,7 +26,10 @@ export interface Options {
   shake: boolean;
   numbers: boolean;
   map: 'small' | 'large';
+  /** 내 무공 이펙트 세기(2026-11-21 "이펙트 때문에 적 기술·내 움직임이 안 보인다") */
+  fx?: 'strong' | 'normal' | 'soft';
 }
+const FX_ALPHA = { strong: 1, normal: 0.7, soft: 0.42 };
 
 const real = async (id: string): Promise<Anim> => (spriteSource(id) === 'sprites' ? loadSprite(id) : null);
 
@@ -67,8 +72,9 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   fxIds.add(`fx_gyeol_tech_${s.hero.ult.id}_b`);
   const fx = new Map<string, Anim>();
   await Promise.all([...fxIds].map(async (id) => fx.set(id, await real(id))));
-  const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3')]);
+  const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3'), real('icons_teum_skills_4')]);
   const items2 = await real('icons_teum_items_2');
+  const world = await real('icons_teum_world');
   const kinds = new Map<string, SpriteAsset>();
   await Promise.all(
     KIND_FX.map(async (k) => {
@@ -76,7 +82,7 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       if (a) kinds.set(k, a);
     }),
   );
-  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, skills, kinds };
+  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds };
 }
 
 interface Mark {
@@ -93,20 +99,48 @@ export interface View {
   flash: { born: number; color: string } | null;
   minimap: HTMLCanvasElement | null;
   minimapKnown?: number;
+  minimapRev?: number;
+  /** 히트스톱: 이때까지 판을 멈춘다(main) */
+  stopUntil: number;
+  /** 상자 열기 연출(main이 띄운다) */
+  chestRoll: { text: string; evolve: boolean } | null;
+  /** 읽은 비석(main이 띄운다) */
+  stele: { id: string; text: string } | null;
+  /** 곧 바뀔 칸 예고 */
+  warn: { cells: number[]; at: number } | null;
+  counterAt: number;
 }
-export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null });
+export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null, stopUntil: 0, chestRoll: null, stele: null, warn: null, counterAt: -9 });
 
 
 export function absorb(v: View, s: State, now: number, opt: Options): void {
   for (const e of s.events) {
     if (e.type === 'event') v.banner = { text: e.text, born: now, kind: e.kind };
-    else if (e.type === 'chest') v.banner = { text: e.text, born: now, kind: 'chest' };
+    else if (e.type === 'chest') {
+      v.banner = { text: e.text, born: now, kind: 'chest' };
+      v.chestRoll = { text: e.text, evolve: e.text.startsWith('각성') };
+    } else if (e.type === 'counter') {
+      v.counterAt = now;
+      v.stopUntil = now + 90;
+      v.flash = { born: now, color: '#ffe08a' };
+      v.marks.push({ e, born: now });
+    } else if (e.type === 'stele') v.stele = { id: e.id, text: e.text };
+    else if (e.type === 'warn') v.warn = { cells: e.cells, at: e.at };
+    else if (e.type === 'terrain') {
+      v.minimap = null;
+      v.warn = null;
+    } else if (e.type === 'phase') {
+      v.flash = { born: now, color: '#ff5a4a' };
+      if (opt.shake) v.shake = 18;
+      v.stopUntil = now + 120;
+    }
     else if (e.type === 'hurt') {
       v.hurtFlash = now;
       if (opt.shake) v.shake = Math.max(v.shake, 6);
     } else if (e.type === 'ult') {
       v.ultFlash = { born: now, fx: e.fx, color: e.color };
       if (opt.shake) v.shake = 16;
+      v.stopUntil = now + 80;
     } else if (e.type === 'bomb') {
       v.flash = { born: now, color: '#fff2c0' };
       if (opt.shake) v.shake = 18;
@@ -120,16 +154,19 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
     }
     else if (e.type === 'hit') {
       if (opt.numbers && (e.crit || e.damage >= 40 || v.marks.length < 120)) v.marks.push({ e, born: now });
+      // 큰 치명타: 짧은 히트스톱
+      if (e.crit && e.damage >= 200) v.stopUntil = Math.max(v.stopUntil, now + 45);
     } else if (e.type === 'kill') {
       v.marks.push({ e, born: now, flip: e.x < s.player.x });
       if (e.rank && opt.shake) v.shake = Math.max(v.shake, e.rank === 'boss' ? 14 : 8);
+      if (e.rank) v.stopUntil = Math.max(v.stopUntil, now + (e.rank === 'boss' ? 260 : 90));
     } else v.marks.push({ e, born: now });
   }
   s.events.length = 0;
   if (v.marks.length > 300) v.marks.splice(0, v.marks.length - 300);
 }
 
-const KIND_FX = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal'];
+const KIND_FX = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal', 'foe_shot', 'foe_warn', 'foe_slam', 'foe_burst', 'foe_charge', 'foe_summon'];
 /**
  * 그림 안 자리(프레임 비율, 2026-11-21 Codex 그림을 재서 맞춤 — 160px 프레임에 128px 그림이 아래로 붙어 있다):
  * ax·ay 게임 위치에 오는 점, span 게임 크기에 맞출 그림 폭(또는 높이)
@@ -146,6 +183,13 @@ const KG = {
   beam: { ax: 0.19, ay: 0.575, span: 0.61, thick: 0.17 }, // 가로 길이 · 두께
   chain: { ax: 0.17, ay: 0.575, span: 0.64 },
   heal: { ax: 0.5, ay: 0.82, span: 0.42 },
+  // 적 기술(2026-11-21 명세 — 그림이 오면 다시 잰다)
+  foe_shot: { ax: 0.5, ay: 0.56, span: 0.34 },
+  foe_warn: { ax: 0.5, ay: 0.56, span: 0.62 },
+  foe_slam: { ax: 0.5, ay: 0.62, span: 0.6 },
+  foe_burst: { ax: 0.5, ay: 0.56, span: 0.6 },
+  foe_charge: { ax: 0.25, ay: 0.56, span: 0.6 },
+  foe_summon: { ax: 0.5, ay: 0.62, span: 0.55 },
 };
 /**
  * 무공 이펙트 한 프레임에 색 입히기: 회색 밝기 × 무공 색, 흰 심지는 더 하얗게. 프레임·색마다 한 번만 만든다(「결」 tinted와 같은 길).
@@ -182,12 +226,14 @@ function kindImg(art: Art, kind: string, color: string, at: { k?: number; ms?: n
 /** (x, y)를 그림의 (ax, ay) 비율 자리에 두고 w×h로 그린다 — 돌림은 (x, y) 둘레 */
 function blit(ctx: CanvasRenderingContext2D, img: CanvasImageSource, x: number, y: number, w: number, h: number, ax = 0.5, ay = 0.5, rot = 0, alpha = 1): void {
   ctx.save();
-  ctx.globalAlpha = alpha;
+  ctx.globalAlpha *= alpha;
   ctx.translate(x, y);
   if (rot) ctx.rotate(rot);
   ctx.drawImage(img, -w * ax, -h * ay, w, h);
   ctx.restore();
 }
+/** 내 무공 이펙트인가(세기 옵션이 듣는 것) */
+const PLAYER_FX = new Set(['slash', 'nova', 'strike', 'beam', 'chain', 'heal']);
 
 function frame(a: SpriteAsset, ms: number, offset = 0): CanvasImageSource | null {
   return a.images[Math.floor((ms + offset) / (1000 / a.meta.fps)) % a.meta.frames] ?? null;
@@ -334,7 +380,9 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   drawTerrain(ctx, s, art, p.x - vw / 2 - 60, p.y - vh / 2 - 60, p.x + vw / 2 + 60, p.y + vh / 2 + 60, now);
   const inView = (x: number, y: number, m = 80) => Math.abs(x - p.x) < vw / 2 + m && Math.abs(y - p.y) < vh / 2 + m;
 
-  // 무공 장판
+  const fxa = FX_ALPHA[opt.fx ?? 'normal'];
+  // 무공 장판(내 것 — 세기 옵션)
+  ctx.globalAlpha = fxa;
   for (const z of s.zones) {
     const k = Math.max(0, Math.min(1, (z.until - s.t) / 0.4));
     const zimg = z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
@@ -361,8 +409,20 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.stroke();
     }
   }
+  ctx.globalAlpha = 1;
+  // 곧 용암·허공이 될 칸: 붉게 깜빡인다
+  if (v.warn) {
+    const t = s.terrain;
+    ctx.fillStyle = `rgba(255,70,40,${0.25 + 0.25 * Math.abs(Math.sin(now / 120))})`;
+    for (const c of v.warn.cells) ctx.fillRect((c % t.w) * CELL, Math.floor(c / t.w) * CELL, CELL, CELL);
+  }
   // 예고 원(내려찍기·낙석): 안쪽이 차오르면 떨어진다
   for (const m of s.slams) {
+    const wimg = kindImg(art, 'foe_warn', m.color, { ms: now });
+    if (wimg) {
+      const S = (m.r * 2) / KG.foe_warn.span;
+      blit(ctx, wimg, m.x, m.y, S, S * 0.65, KG.foe_warn.ax, KG.foe_warn.ay, 0, 0.9);
+    }
     const k = Math.min(1, (s.t - m.born) / Math.max(0.01, m.at - m.born));
     ctx.strokeStyle = hexA(m.color, 0.85);
     ctx.fillStyle = hexA(m.color, 0.12 + 0.2 * k);
@@ -392,7 +452,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.fill();
   }
   for (const it of s.items) {
-    if (!inView(it.x, it.y)) continue;
+    if (!inView(it.x, it.y) || (it.hidden && !isExplored(s, it.x, it.y))) continue;
     const bob = Math.sin(now / 200 + it.x) * 3;
     // 빛기둥: 멀리서도 보이게
     const evItem = ITEMS.get(it.kind)?.event;
@@ -437,7 +497,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     if (!aimg) break;
     const L = d.levels[Math.min(w.lv, d.levels.length) - 1];
     const S = (90 * L.area * stat.area(s) * 2) / KG.aura.span;
-    blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5);
+    blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5 * fxa);
   }
   // 그림자·소품·쓰러짐·인물: y 순서
   const draws: { y: number; fn: () => void }[] = [];
@@ -520,6 +580,17 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           ctx.fillRect(f.x - w / 2, f.y + 6, w, 5);
           ctx.fillStyle = f.golden ? '#ffe08a' : '#ffb02e';
           ctx.fillRect(f.x - w / 2, f.y + 6, (w * Math.max(0, f.hp)) / f.maxHp, 5);
+          if (f.affixes?.length) {
+            // 수식어 글자(심연과 같은 글자)
+            ctx.font = '700 13px "Song Myung", serif';
+            ctx.textAlign = 'center';
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(10,6,8,0.9)';
+            ctx.fillStyle = '#ff8a5c';
+            const txt = f.affixes.map((id) => AFFIXES.find((a) => a.id === id)?.glyph ?? '').join(' ');
+            ctx.strokeText(txt, f.x, f.y + 26);
+            ctx.fillText(txt, f.x, f.y + 26);
+          }
         }
       },
     });
@@ -550,7 +621,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   draws.sort((a, b) => a.y - b.y);
   for (const d of draws) d.fn();
 
-  // 둘레 칼·결계
+  // 둘레 칼·결계(내 것 — 세기 옵션)
+  ctx.globalAlpha = fxa;
   const area = stat.area(s);
   for (const w of s.weapons) {
     const d = WEAPONS.get(w.id)!;
@@ -591,9 +663,9 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.stroke();
     }
   }
-  // 탄
+  // 내 탄(적 탄은 맨 위에 따로)
   for (const sh of s.shots) {
-    if (!inView(sh.x, sh.y)) continue;
+    if (!sh.weapon || !inView(sh.x, sh.y)) continue;
     const sk = sh.weapon ? WEAPONS.get(sh.weapon)?.kind : undefined;
     const simg = sk === 'wave' || sk === 'bolt' ? kindImg(art, sk, sh.color, { ms: now + sh.x }) : null;
     if (simg) {
@@ -623,10 +695,57 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     }
     ctx.restore();
   }
+  ctx.globalAlpha = 1;
   // 잠깐 남는 연출
   for (const m of v.marks) {
     const e = m.e;
     const age = (now - m.born) / 1000;
+    ctx.globalAlpha = PLAYER_FX.has(e.type) ? fxa : 1;
+    // 적 기술 그림(내려찍기 떨어짐·돌진·부르기·터짐)
+    if (e.type === 'skill' && !e.fx) {
+      const kind = e.kind === 'charge' ? 'foe_charge' : e.kind === 'summon' ? 'foe_summon' : 'foe_slam';
+      const g = KG[kind];
+      const img = kindImg(art, kind, e.color, { k: age / 0.4 });
+      if (img) {
+        if (age < 0.4) blit(ctx, img, e.x, e.y - (kind === 'foe_charge' ? 20 : 0), 90 / g.span, 90 / g.span, g.ax, g.ay, kind === 'foe_charge' ? (e.angle ?? 0) : 0);
+        continue;
+      }
+    }
+    if (e.type === 'burst') {
+      const img = kindImg(art, 'foe_burst', '#ff8a5c', { k: age / 0.35 });
+      if (img) {
+        if (age < 0.35) blit(ctx, img, e.x, e.y - 10, (e.r * 2) / KG.foe_burst.span, (e.r * 2) / KG.foe_burst.span, KG.foe_burst.ax, KG.foe_burst.ay);
+        continue;
+      }
+    }
+    if (e.type === 'counter') {
+      // 간파!
+      const k = age / 0.9;
+      if (k > 1) continue;
+      ctx.strokeStyle = `rgba(255,224,138,${1 - k})`;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y - 24, 40 + k * 120, (40 + k * 120) * 0.7, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.font = '800 26px "Song Myung", serif';
+      ctx.textAlign = 'center';
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = `rgba(20,10,10,${1 - k})`;
+      ctx.fillStyle = `rgba(255,224,138,${1 - k})`;
+      ctx.strokeText('看破', p.x, p.y - 90 - k * 20);
+      ctx.fillText('看破', p.x, p.y - 90 - k * 20);
+      continue;
+    }
+    if (e.type === 'fall') {
+      const k = age / 0.5;
+      if (k > 1) continue;
+      ctx.strokeStyle = `rgba(255,150,80,${1 - k})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(e.x, e.y, 10 + k * 30, (10 + k * 30) * 0.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      continue;
+    }
     if (e.type === 'slash') {
       const img = kindImg(art, 'slash', e.color, { k: age / 0.25 });
       if (img) {
@@ -778,7 +897,58 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.fillText(String(e.damage), e.x, y);
     }
   }
-  v.marks = v.marks.filter((m) => now - m.born < (m.e.type === 'kill' ? 1400 : 700));
+  ctx.globalAlpha = 1;
+  v.marks = v.marks.filter((m) => now - m.born < (m.e.type === 'kill' ? 1400 : m.e.type === 'counter' ? 900 : 700));
+  // ── 맨 위: 적 탄 · 예고 원 테두리 · 인물 발 고리(내 이펙트에 묻히지 않게) ──
+  for (const sh of s.shots) {
+    if (sh.weapon || !inView(sh.x, sh.y)) continue;
+    const img = kindImg(art, 'foe_shot', sh.color, { ms: now + sh.x });
+    if (img) {
+      const S = (sh.r * 2.4) / KG.foe_shot.span;
+      blit(ctx, img, sh.x, sh.y, S, S, KG.foe_shot.ax, KG.foe_shot.ay, Math.atan2(sh.vy, sh.vx));
+      continue;
+    }
+    // 대체: 검은 테두리 + 빛나는 알
+    ctx.fillStyle = 'rgba(20,10,10,0.85)';
+    ctx.beginPath();
+    ctx.arc(sh.x, sh.y, sh.r + 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = sh.color;
+    ctx.beginPath();
+    ctx.arc(sh.x, sh.y, sh.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.arc(sh.x - sh.r * 0.25, sh.y - sh.r * 0.25, sh.r * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  for (const m of s.slams) {
+    const k = Math.min(1, (s.t - m.born) / Math.max(0.01, m.at - m.born));
+    ctx.strokeStyle = `rgba(20,10,10,0.7)`;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(m.x, m.y, m.r, m.r * 0.65, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = hexA(m.color, 0.6 + 0.4 * k);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  {
+    // 인물 발 고리: 어디 있는지 늘 보이게
+    ctx.strokeStyle = 'rgba(10,10,16,0.85)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, 20, 8, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = s.t < s.counterUntil ? '#ffe08a' : '#f3ead8';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    const w = 46;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(p.x - w / 2, p.y + 8, w, 5);
+    ctx.fillStyle = p.hp / p.maxHp < 0.3 ? '#ff5a4a' : '#6fdc6a';
+    ctx.fillRect(p.x - w / 2, p.y + 8, (w * p.hp) / p.maxHp, 5);
+  }
   if (v.ultFlash) {
     const age = now - v.ultFlash.born;
     const a = art.fx.get(v.ultFlash.fx);
@@ -804,6 +974,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   }
   if (s.t < s.freezeUntil) {
     ctx.fillStyle = 'rgba(159,230,255,0.12)';
+    ctx.fillRect(0, 0, cw, ch);
+  }
+  if (s.t < s.counterUntil) {
+    // 간파 반격 시간: 가장자리가 금빛
+    const g = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * 0.3, cw / 2, ch / 2, Math.max(cw, ch) * 0.7);
+    g.addColorStop(0, 'rgba(255,224,138,0)');
+    g.addColorStop(1, `rgba(255,224,138,${s.t < s.slowmoUntil ? 0.35 : 0.18})`);
+    ctx.fillStyle = g;
     ctx.fillRect(0, 0, cw, ch);
   }
   if (effOn(s, 'fog')) {
@@ -935,8 +1113,9 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     ctx.strokeRect(cx + 0.5, y + 0.5, slot - 1, slot - 1);
     if (!id) return;
     const idx = SKILL_ICON.get(id) ?? -1;
-    const sheet = idx >= 0 ? art.skills[Math.floor(idx / 16)] : null;
-    const img = sheet?.images[idx % 16];
+    // 1~3번 시트는 손으로 맞춘 35개(16·16·3), 그 뒤(간파 심법 둘, 2026-11-21)는 4번 시트
+    const sheet = idx >= 0 ? art.skills[idx < 35 ? Math.floor(idx / 16) : 3] : null;
+    const img = sheet?.images[idx < 35 ? idx % 16 : idx - 35];
     const card = cardIcon(WEAPONS.get(id)?.card ?? PASSIVES.get(id)?.card);
     // 카드 그림(가로 3:2)은 가운데를 네모로 잘라 칸에
     if (card) ctx.drawImage(card, card.naturalWidth * 0.17, 0, card.naturalWidth * 0.66, card.naturalHeight, cx + 3, y + 3, slot - 6, slot - 6);
@@ -966,6 +1145,13 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     const w = s.weapons[i];
     const d = w ? WEAPONS.get(w.id)! : null;
     drawSlot(cellAt2(i, 0), w?.id ?? null, w?.lv ?? 0, d?.levels.length ?? 5, d?.color ?? '#888', d?.name[0] ?? '', !!d?.evolved);
+    // 각성 조건(Lv.5 + 짝 심법)이 갖춰지면 반짝 — 상자를 열면 각성
+    if (w && d?.evolve && w.lv >= d.levels.length && s.passives.has(d.evolve.with)) {
+      ctx.strokeStyle = '#ffd27a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cellAt2(i, 0) - 1, y - 1, slot + 2, slot + 2);
+      ctx.lineWidth = 1;
+    }
   }
   const ps = [...s.passives.entries()];
   for (let i = 0; i < slots.passives; i++) {
@@ -975,6 +1161,19 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
   }
   ctx.fillStyle = 'rgba(243,234,216,0.35)';
   ctx.fillRect(cellAt2(slots.weapons, 4), y + 4, 2, slot - 8);
+  // 속성 세트(같은 효과 무공 수) — 켜진 것은 금빛
+  const ec = elementCounts(s);
+  const sets = (Object.keys(RULES.sets).filter((k) => k !== '$comment') as (keyof typeof RULES.sets)[]).filter((k) => ec[k]);
+  ctx.font = '700 11px "IBM Plex Sans KR", sans-serif';
+  ctx.textAlign = 'left';
+  let sx = x - 8;
+  for (const k of sets) {
+    const on = (ec[k] ?? 0) >= RULES.sets[k].need;
+    const label = `${RULES.sets[k].name} ${ec[k]}/${RULES.sets[k].need}`;
+    ctx.fillStyle = on ? '#ffd27a' : 'rgba(243,234,216,0.6)';
+    ctx.fillText(label, sx, y - 14);
+    sx += ctx.measureText(label).width + 12;
+  }
 }
 
 function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now: number, W: number, H: number, opt: Options): void {
@@ -1027,6 +1226,19 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   ctx.fillText(`쓰러뜨림 ${s.chapterKills}`, 10, 32);
   ctx.fillStyle = '#ffd27a';
   ctx.fillText(`금화 ${s.gold}`, 10, 50);
+  ctx.fillStyle = 'rgba(243,234,216,0.7)';
+  ctx.font = font(11, 600);
+  ctx.fillText(`밝힌 땅 ${Math.min(100, Math.round(exploredShare(s) * 100))}% · 다시 뽑기 ${s.rerolls} · 봉인 ${s.banishes} · 건너뛰기 ${s.skips}`, 10, 66);
+  if (s.trial) {
+    ctx.font = font(14, 800);
+    ctx.fillStyle = '#ff8a5c';
+    ctx.fillText(`수련 제단 ${Math.ceil(s.trial.until - s.t)}초 · ${s.chapterKills - s.trial.start}/${s.trial.goal}`, 10, 86);
+  }
+  if (s.checkpoint) {
+    ctx.font = font(11, 600);
+    ctx.fillStyle = '#bfe3a0';
+    ctx.fillText('중간 보스 뒤에서 다시 할 수 있다', 10, s.trial ? 104 : 86);
+  }
   // 오른쪽 위 지도
   const mapSize = opt.map === 'large' ? Math.min(220, W * 0.3) : Math.min(150, W * 0.28);
   drawMinimap(ctx, s, v, W - mapSize - 12, 20, mapSize, now);
