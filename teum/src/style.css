@@ -215,3 +215,41 @@ button { font: inherit; }
 @keyframes reel { from { transform: translateX(600%); } to { transform: translateX(0); } }
 @keyframes cutin { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 2026-11-21 무공록 도우미: 추천 묶음 · 거르기 · 자세히 · 함께 쓰면 좋은 것 */
+.modal-box.book-box { width: min(1180px, calc(100vw - 24px)); }
+.book-recs { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin: 6px 0 10px; }
+.book-recs > small { flex-basis: 100%; color: var(--muted); font-size: 12px; }
+.book-recs .rec { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; max-width: 260px; padding: 6px 10px; border: 1px solid rgba(255, 210, 122, 0.45); border-radius: 6px; background: rgba(255, 210, 122, 0.06); color: var(--paper); font: inherit; text-align: left; cursor: pointer; }
+.book-recs .rec:hover, .book-recs .rec:focus-visible { background: rgba(255, 210, 122, 0.16); }
+.book-recs .rec b { color: var(--gold); font-size: 14px; }
+.book-recs .rec small { color: var(--muted); font-size: 11px; }
+.book-search { min-width: 160px; padding: 5px 10px; border: 1px solid rgba(243, 234, 216, 0.3); border-radius: 14px; background: rgba(0, 0, 0, 0.3); color: var(--paper); font: inherit; font-size: 13px; }
+.book-main { display: grid; grid-template-columns: 1fr minmax(240px, 320px); gap: 12px; align-items: start; margin-top: 8px; }
+.book-list { max-height: 56vh; overflow: auto; }
+.book-grid .entry { position: relative; cursor: pointer; padding-bottom: 36px; }
+.book-grid .entry.focus { outline: 2px solid var(--gold); outline-offset: -2px; }
+.book-grid .entry.on { background: rgba(255, 210, 122, 0.08); }
+.book-grid .entry .add { position: absolute; right: 6px; bottom: 6px; }
+.book-detail { position: sticky; top: 0; padding: 10px 12px; border: 1px solid rgba(243, 234, 216, 0.2); border-left: 3px solid var(--c, var(--gold)); border-radius: 6px; background: rgba(10, 10, 16, 0.6); color: var(--paper); }
+.book-detail .art { width: 100%; max-height: 140px; object-fit: cover; image-rendering: pixelated; border-radius: 4px; }
+.book-detail h4 { margin: 8px 0 2px; font: 400 20px 'Song Myung', serif; }
+.book-detail .tag { color: var(--muted); font-size: 12px; }
+.book-detail p { margin: 6px 0; font-size: 13px; line-height: 1.5; }
+.book-detail h5 { margin: 12px 0 4px; color: var(--gold); font-size: 13px; }
+.book-detail .mate { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+.book-detail .mate:hover { background: rgba(243, 234, 216, 0.06); }
+.book-detail .mate.on b { color: var(--gold); }
+.book-detail .mate span { display: flex; flex-direction: column; }
+.book-detail .mate small { color: var(--muted); font-size: 11px; }
+@media (max-width: 760px) {
+  .book-main { grid-template-columns: 1fr; }
+  .book-detail { position: static; order: -1; }
+  .book-list { max-height: 44vh; }
+}
+@media (max-width: 760px) {
+  .book-recs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .book-recs > small { display: none; }
+  .book-recs .rec { flex: none; max-width: none; }
+  .book-recs .rec small { display: none; }
+}
