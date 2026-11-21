@@ -16,7 +16,7 @@
   "cooldown": 3,
   "graze": {
    "radius": 90,
-   "damage": 18
+   "damage": 22
   }
  },
  "ult": {
@@ -82,5 +82,216 @@
    "offers": 8,
    "reroll": 15
   }
+ },
+ "build": {
+  "$comment": "빌드(2026-11-21 사용자 \"스킬이 너무 많아 빌드가 무너진다\"): 무공록에 bookMax장까지 들고 들어가고(그 밖의 카드 무공은 레벨업에 안 나온다), 장마다 다시 뽑기·봉인·건너뛰기를 몇 번 쓸 수 있다(장터 수련으로 늘린다). 각성 짝 심법은 partnerWeight배로 잘 나온다",
+  "bookMax": 16,
+  "bookAuto": 12,
+  "reroll": 2,
+  "banish": 1,
+  "skip": 1,
+  "skipGold": 5,
+  "partnerWeight": 4
+ },
+ "sets": {
+  "$comment": "속성 세트: 같은 효과(element)를 남기는 무공을 need개 들면 켜진다",
+  "fire": {
+   "need": 3,
+   "name": "화염",
+   "desc": "불붙은 그림자가 쓰러지면 둘레로 불이 번진다",
+   "damage": 30,
+   "radius": 90
+  },
+  "ice": {
+   "need": 3,
+   "name": "서리",
+   "desc": "느려진 그림자는 받는 피해 +35%",
+   "mul": 1.35
+  },
+  "shock": {
+   "need": 3,
+   "name": "뇌전",
+   "desc": "뇌전에 맞은 그림자에서 가까운 하나로 튄다(피해 절반)",
+   "frac": 0.5,
+   "range": 170
+  },
+  "vuln": {
+   "need": 3,
+   "name": "파쇄",
+   "desc": "약해진 그림자는 받는 피해 +50%(원래 +25%)",
+   "mul": 1.5
+  }
+ },
+ "upgrades": {
+  "$comment": "장터 수련(영구, 계정): 금화 지갑으로 산다. cost[레벨-1]이 다음 레벨 값",
+  "list": [
+   {
+    "id": "hp",
+    "name": "단련된 몸",
+    "desc": "최대 체력 +8",
+    "per": 8,
+    "cost": [
+     40,
+     70,
+     110,
+     160,
+     230
+    ]
+   },
+   {
+    "id": "might",
+    "name": "날 세우기",
+    "desc": "무공 피해 +5%",
+    "per": 0.05,
+    "cost": [
+     50,
+     90,
+     140,
+     200,
+     280
+    ]
+   },
+   {
+    "id": "armor",
+    "name": "굳은살",
+    "desc": "받는 피해 −1",
+    "per": 1,
+    "cost": [
+     80,
+     150,
+     260
+    ]
+   },
+   {
+    "id": "speed",
+    "name": "가벼운 발",
+    "desc": "걸음 +4%",
+    "per": 0.04,
+    "cost": [
+     50,
+     100,
+     170
+    ]
+   },
+   {
+    "id": "pickup",
+    "name": "끌어당김",
+    "desc": "결 조각 끌어오는 범위 +15%",
+    "per": 0.15,
+    "cost": [
+     30,
+     60,
+     100
+    ]
+   },
+   {
+    "id": "greed",
+    "name": "셈 밝은 눈",
+    "desc": "금화 +10%",
+    "per": 0.1,
+    "cost": [
+     40,
+     80,
+     130
+    ]
+   },
+   {
+    "id": "reroll",
+    "name": "다시 뽑기",
+    "desc": "장마다 다시 뽑기 +1",
+    "per": 1,
+    "cost": [
+     60,
+     120,
+     200
+    ]
+   },
+   {
+    "id": "banish",
+    "name": "봉인",
+    "desc": "장마다 봉인 +1",
+    "per": 1,
+    "cost": [
+     70,
+     140,
+     230
+    ]
+   },
+   {
+    "id": "skip",
+    "name": "건너뛰기",
+    "desc": "장마다 건너뛰기 +1",
+    "per": 1,
+    "cost": [
+     40,
+     90
+    ]
+   },
+   {
+    "id": "revive",
+    "name": "되살아나는 숨",
+    "desc": "장마다 한 번, 쓰러지면 체력 절반으로 일어난다",
+    "per": 1,
+    "cost": [
+     300
+    ]
+   }
+  ]
+ },
+ "counter": {
+  "$comment": "간파 반격(2026-11-21): 보법 무적 동안 보스·정예의 내려찍기·돌진·탄을 아슬하게 피하면 시간이 느려지고 잠깐 위력이 오른다",
+  "window": 2.5,
+  "might": 2,
+  "slowmo": 0.8,
+  "ult": 8,
+  "shotRadius": 34,
+  "cooldown": 1.2,
+  "grazeUlt": 1.5
+ },
+ "explore": {
+  "$comment": "안개 보상: 안개 속 비석(이야기 조각, 도감)·수련 제단(짧은 도전)·비밀 상인, 판을 reward만큼 밝히면 금화",
+  "steles": 3,
+  "altars": 1,
+  "merchants": 1,
+  "minDist": 700,
+  "reward": 0.85,
+  "gold": 60,
+  "altar": {
+   "seconds": 20,
+   "base": 25,
+   "perChapter": 6,
+   "chests": 2
+  }
+ },
+ "fall": {
+  "$comment": "밀쳐서 위험 칸(용암·물·허공)에 빠뜨리면: 보통 그림자는 끝, 정예·보스는 최대 체력 비율만큼",
+  "rank": 0.15,
+  "every": 2
+ },
+ "vault": {
+  "$comment": "보법으로 얇은 벽·강을 넘는다: 앞 칸이 막혔으면 cells칸 안의 걸을 수 있는 곳으로",
+  "cells": 3
+ },
+ "affix": {
+  "$comment": "정예 수식어(「천외귀환」 심연 수식어 이름·글자를 그대로): 정예·중간 보스는 count개, lateFrom장부터 lateCount개",
+  "count": 1,
+  "lateFrom": 5,
+  "lateCount": 2
+ },
+ "boss": {
+  "$comment": "보스 단계: 체력이 phases 아래로 내려가면 기술이 빨라지고 걸음이 빨라지며 무리를 부른다. arena칸 반지름 둘레를 벽으로 닫는다",
+  "phases": [
+   0.66,
+   0.33
+  ],
+  "haste": 0.72,
+  "speed": 1.15,
+  "summon": 6,
+  "arena": 13,
+  "spawn": [
+   260,
+   340
+  ],
+  "phasesFrom": 2
  }
 }

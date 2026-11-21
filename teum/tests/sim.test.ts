@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { carryOf, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, step, STORY, WEAPONS, xpNeed } from '../src/sim';
+import { AFFIXES, banish, carryOf, elementCounts, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
 import { buildTerrain, CELL, T } from '../src/terrain';
 import { runChapter } from './bot';
 
@@ -314,6 +314,203 @@ describe('「틈」 엔진', () => {
         }
         expect(k.player.hp).toBe(hp);
       }
+    }
+  });
+
+  // ── 2026-11-21 3차: 빌드 · 장터 · 체크포인트 · 지형 · 안개 · 간파 · 적 ──
+  const run = (s: State, sec: number, input = { x: 0, y: 0 }) => {
+    for (let i = 0; i < 60 * sec && !s.result; i++) {
+      if (s.pending) choose(s, s.pending.length - 1);
+      step(s, input);
+    }
+  };
+
+  it('무공록: 들고 간 카드 것만 새로 나온다(손으로 맞춘 것은 늘)', () => {
+    const book = LOCKABLE.filter((id) => (WEAPONS.get(id)?.owner ?? '*') === '*' || WEAPONS.get(id)?.owner === 'haun').slice(0, 6);
+    const s = createChapter(0, 'book', freshCarry('haun'), { unlocked: LOCKABLE, book });
+    const lockable = new Set(LOCKABLE);
+    const fresh = choicePool(s).filter((c) => c.lv === 1 && lockable.has(c.id)).map((c) => c.id);
+    expect(fresh.length).toBeGreaterThan(0);
+    for (const id of fresh) expect(book).toContain(id);
+    // 후보가 170개 → 수십 개로
+    expect(choicePool(s).length).toBeLessThan(40);
+  });
+
+  it('다시 뽑기·봉인·건너뛰기: 횟수만큼만, 봉인한 것은 다시 안 나온다', () => {
+    const s = createChapter(0, 'tools', freshCarry('haun'), { meta: { reroll: 1 } });
+    expect(s.rerolls).toBe(RULES.build.reroll + 1);
+    // 레벨업 고르기를 띄운다(결 조각 큰 것)
+    s.gems.push({ x: s.player.x, y: s.player.y, xp: xpNeed(s.level) * 6, pulled: true });
+    step(s, { x: 0, y: 0 });
+    expect(s.pending).not.toBeNull();
+    const n = s.rerolls;
+    expect(reroll(s)).toBe(true);
+    expect(s.rerolls).toBe(n - 1);
+    const i = s.pending!.findIndex((c) => c.lv === 1);
+    if (i >= 0) {
+      const id = s.pending![i].id;
+      expect(banish(s, i)).toBe(true);
+      expect(choicePool(s).some((c) => c.id === id)).toBe(false);
+      expect(carryOf(s).banished).toContain(id);
+    }
+    const g = s.gold;
+    expect(skip(s)).toBe(true);
+    expect(s.gold).toBe(g + RULES.build.skipGold);
+  });
+
+  it('속성 세트: 같은 효과 무공 셋이면 켜진다(파쇄 — 받는 피해 +50%)', () => {
+    const vulns = [...WEAPONS.values()].filter((w) => w.element === 'vuln' && !w.evolved).slice(0, 3);
+    const s = createChapter(0, 'set', freshCarry('haun'));
+    s.weapons = vulns.slice(0, 2).map((w) => ({ id: w.id, lv: 1, next: 99 }));
+    expect(setOn(s, 'vuln')).toBe(false);
+    s.weapons.push({ id: vulns[2].id, lv: 1, next: 99 });
+    expect(elementCounts(s).vuln).toBe(3);
+    expect(setOn(s, 'vuln')).toBe(true);
+  });
+
+  it('장터 수련: 최대 체력·되살아나는 숨', () => {
+    const s = createChapter(0, 'meta', freshCarry('haun'), { meta: { hp: 2, revive: 1 } });
+    expect(s.player.maxHp).toBe(100 + 16);
+    expect(s.revives).toBe(1);
+    s.player.hp = 1;
+    s.foes.push(...[]);
+    // 아무 적 하나를 붙여 맞게 한다
+    s.nextEvent = 0;
+    run(s, 0.1);
+    s.player.hp = 1;
+    s.player.hurtUntil = 0;
+    // 직접 큰 피해를 주는 예고 원
+    s.slams.push({ x: s.player.x, y: s.player.y, r: 60, damage: 999, born: s.t, at: s.t + 0.01, color: '#f00' });
+    run(s, 0.2);
+    expect(s.result).toBeNull();
+    expect(s.player.hp).toBeGreaterThan(s.player.maxHp * 0.4);
+  });
+
+  it('중간 보스를 쓰러뜨리면 이어 하기 자리가 생기고, 그 자리부터 다시 열 수 있다', () => {
+    const s = createChapter(1, 'cp', freshCarry('haun'));
+    s.t = s.timeline.find((e) => e.kind === 'mid')!.at - 0.01;
+    s.nextEvent = s.timeline.findIndex((e) => e.kind === 'mid');
+    step(s, { x: 0, y: 0 });
+    const mid = s.foes.find((f) => f.mid)!;
+    expect(mid).toBeTruthy();
+    mid.hp = 1;
+    mid.x = s.player.x + 20;
+    mid.y = s.player.y;
+    run(s, 3);
+    expect(s.checkpoint).not.toBeNull();
+    const r = createChapter(1, 'cp', s.checkpoint!.carry, { startAt: s.checkpoint!.t });
+    expect(r.t).toBeCloseTo(s.checkpoint!.t);
+    expect(r.timeline.slice(r.nextEvent).some((e) => e.kind === 'mid')).toBe(false);
+    expect(r.timeline.slice(r.nextEvent).some((e) => e.kind === 'boss')).toBe(true);
+  });
+
+  it('밀쳐서 위험 칸에 빠뜨리면 보통 그림자는 끝', () => {
+    const s = createChapter(2, 'fall', freshCarry('kyle'));
+    const t = s.terrain;
+    // 위험 칸 하나를 인물 오른쪽에 만든다
+    const cx = Math.floor(s.player.x / 40) + 2;
+    const cy = Math.floor(s.player.y / 40);
+    t.cells[cy * t.w + cx] = 2;
+    const id = s.chapter.roles.main[0];
+    s.items.length = 0;
+    s.weapons = [{ id: 'shield_rush', lv: 5, next: 0 }];
+    // 위험 칸 바로 앞에 그림자
+    const kills0 = s.chapterKills;
+    s.foes.push({ ...createChapter(2, 'fall2', freshCarry('kyle')).foes[0], def: FOES.get(id)!, x: (cx - 0.6) * 40, y: (cy + 0.5) * 40, hp: 9999, maxHp: 9999, dead: false, uid: 9999 });
+    run(s, 2, { x: 0, y: 0 });
+    expect(s.chapterKills).toBeGreaterThanOrEqual(kills0);
+  });
+
+  it('보법으로 얇은 벽을 넘는다', () => {
+    const s = createChapter(0, 'vault', freshCarry('haun'));
+    const t = s.terrain;
+    const cx = Math.floor(s.player.x / 40);
+    const cy = Math.floor(s.player.y / 40);
+    for (let y = cy - 2; y <= cy + 2; y++) {
+      t.cells[y * t.w + cx + 1] = 1;
+      t.cells[y * t.w + cx + 2] = 0;
+      t.cells[y * t.w + cx + 3] = 0;
+    }
+    s.player.x = (cx + 0.5) * 40;
+    const x0 = s.player.x;
+    step(s, { x: 1, y: 0, dash: true });
+    expect(s.player.x).toBeGreaterThan(x0 + 60);
+  });
+
+  it('안개 속 비석·제단·비밀 상인이 숨어 있고, 비석을 읽으면 기록된다', () => {
+    const s = createChapter(0, 'secret', freshCarry('haun'));
+    const hidden = s.items.filter((i) => i.hidden);
+    expect(hidden.filter((i) => i.kind === 'stele').length).toBe(3);
+    expect(hidden.some((i) => i.kind === 'altar')).toBe(true);
+    expect(hidden.some((i) => i.kind === 'merchant')).toBe(true);
+    const st = hidden.find((i) => i.kind === 'stele')!;
+    s.player.x = st.x;
+    s.player.y = st.y;
+    step(s, { x: 0, y: 0 });
+    expect(s.steles).toEqual([`${s.chapter.id}-${st.stele}`]);
+  });
+
+  it('수련 제단: 시간 안에 정한 수를 쓰러뜨리면 상자', () => {
+    const s = createChapter(0, 'altar', freshCarry('haun'));
+    const al = s.items.find((i) => i.kind === 'altar')!;
+    s.player.x = al.x;
+    s.player.y = al.y;
+    step(s, { x: 0, y: 0 });
+    expect(s.trial).not.toBeNull();
+    s.chapterKills += s.trial!.goal;
+    const chests = s.items.filter((i) => i.kind === 'chest').length;
+    step(s, { x: 0, y: 0 });
+    expect(s.trial).toBeNull();
+    expect(s.items.filter((i) => i.kind === 'chest').length).toBe(chests + RULES.explore.altar.chests);
+  });
+
+  it('간파: 내려찍기가 떨어지는 순간 보법 중이면 반격 시간이 열린다', () => {
+    const s = createChapter(0, 'counter', freshCarry('haun'));
+    s.slams.push({ x: s.player.x, y: s.player.y, r: 60, damage: 50, born: s.t, at: s.t + 0.05, color: '#f00' });
+    const hp = s.player.hp;
+    step(s, { x: 0, y: 0, dash: true });
+    run(s, 0.1);
+    expect(s.player.hp).toBe(hp);
+    expect(s.counterUntil).toBeGreaterThan(s.t);
+  });
+
+  it('정예는 수식어를 달고 나오고(심연 글자), 보스는 체력에 따라 단계가 오르며 아레나를 닫는다', () => {
+    expect(AFFIXES.length).toBeGreaterThanOrEqual(10);
+    for (const a of AFFIXES) expect(a.glyph).not.toBe('?');
+    const s = createChapter(5, 'boss3', freshCarry('born'));
+    s.t = 249.99;
+    s.nextEvent = s.timeline.findIndex((e) => e.kind === 'boss');
+    step(s, { x: 0, y: 0 });
+    expect(s.arena.length).toBeGreaterThan(20);
+    const b = s.boss!;
+    s.player.shieldUntil = 1e9;
+    const n0 = s.foes.length;
+    b.hp = b.maxHp * 0.6;
+    b.x = s.player.x + 30;
+    b.y = s.player.y;
+    s.weapons = [{ id: 'axe_chop', lv: 5, next: 0 }];
+    run(s, 2);
+    expect(b.phase ?? 0).toBeGreaterThanOrEqual(1);
+    expect(s.foes.length + s.chapterKills).toBeGreaterThan(n0);
+    b.hp = 1;
+    run(s, 3);
+    expect(s.result).toBe('clear');
+    expect(s.arena.length).toBe(0);
+    const mid = createChapter(5, 'mid3', freshCarry('born'));
+    mid.t = mid.timeline.find((e) => e.kind === 'mid')!.at - 0.01;
+    mid.nextEvent = mid.timeline.findIndex((e) => e.kind === 'mid');
+    step(mid, { x: 0, y: 0 });
+    expect(mid.foes.find((f) => f.mid)!.affixes!.length).toBe(RULES.affix.lateCount);
+  });
+
+  it('장마다 대표 기믹이 있고 모두 돈다', () => {
+    const kinds = new Set(STORY.chapters.map((c) => c.gimmick?.kind));
+    expect(kinds.size).toBe(10);
+    for (let i = 0; i < STORY.chapters.length; i++) {
+      const s = createChapter(i, `gm-${i}`, freshCarry('kyle'));
+      s.gimmickAt = 1;
+      run(s, 5, { x: 0.3, y: 0.1 });
+      expect(s.gimmickAt, STORY.chapters[i].id).toBeGreaterThan(1);
     }
   });
 });

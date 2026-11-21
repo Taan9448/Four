@@ -1,0 +1,18 @@
+id: fx_teum_foe_charge
+type: fx
+summary: '「틈」 적 기술 이펙트 — 돌진 예고 — 오른쪽으로 내달리는 자국(게임이 돌진 방향으로 돌린다). 흰색·회색 + 진한 남색 테두리, 게임이 적 기술 색을 입힌다(2026-11-21)'
+frames: 6
+fps: 20
+events: { impact: 1 }
+min_fill: 0.0005
+chroma: magenta
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#1d2433']
+style: "crisp pixel-art enemy attack effect, COLORLESS: only white and light-to-mid greys for the glowing parts (no hue at all), and a thick 1-2 block dark navy #1d2433 outline around every shape so it reads as DANGER on any background; the game tints the grey parts to each enemy skill's own color; clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "impact: a thick arrow-shaped streak pointing RIGHT across the middle of the cell, from 25% to 80% of the width, dark navy outline, bright grey core, a small dust kick-up puff of blocks at its left end"
+  2: "the streak longer with three parallel speed lines above and below it"
+  3: "the streak at full length, speed lines stretched, dust blocks scattering left"
+  4: "the streak thinning, speed lines broken into dashes"
+  5: "faint speed dashes"
+  6: "two tiny dust blocks"
+placeholder: { accent: '#c2c6d1' }

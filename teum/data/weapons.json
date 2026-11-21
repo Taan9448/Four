@@ -1415,6 +1415,22 @@
    "stat": "yoke",
    "per": 0.3,
    "max": 5
+  },
+  {
+   "id": "gyeol_eye",
+   "name": "간파의 눈",
+   "desc": "간파(보법으로 스치기) 피해 +40% · 간파 반격 시간 +0.5초",
+   "stat": "graze",
+   "per": 0.4,
+   "max": 5
+  },
+  {
+   "id": "afterimage",
+   "name": "잔영보",
+   "desc": "보법 쿨타임 −8%",
+   "stat": "dashcd",
+   "per": 0.08,
+   "max": 5
   }
  ]
 }

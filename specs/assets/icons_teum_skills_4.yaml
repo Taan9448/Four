@@ -1,0 +1,9 @@
+id: icons_teum_skills_4
+type: icon-sheet
+summary: '「틈」 간파 심법 아이콘 2종(2026-11-21) — 1 간파의 눈(gyeol_eye) · 2 잔영보(afterimage). icons_teum_skills_1~3과 같은 결'
+frames: 2
+baseline: 0.5
+frame_notes:
+  1: 'eye of reading: a single wide open eye with a golden iris, a thin silver wind line curving past it'
+  2: 'afterimage step: three fading ghost silhouettes of a running foot / footprints in a row, pale blue, motion lines'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

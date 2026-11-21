@@ -192,3 +192,26 @@ button { font: inherit; }
 .shop-grid .entry.rare-rare { border-left-color: #4fb4ff; }
 .shop-grid .entry.rare-epic { border-left-color: #a35cff; }
 .shop-grid .entry.rare-legendary { border-left-color: #f2a93b; }
+
+/* 2026-11-21 3차: 후보 손보기 · 무공록 · 재편성 · 장터 수련 · 상자 연출 · 비석 */
+.panel.levelup .tools { justify-content: center; margin-top: 10px; gap: 8px; flex-wrap: wrap; }
+.choice.partner { box-shadow: 0 0 0 2px var(--gold) inset, 0 0 16px rgba(255, 210, 122, 0.35); }
+.choice.ban { outline: 2px dashed #ff5a4a; outline-offset: -4px; }
+.choice .evo { color: var(--gold); }
+.entry .evo { color: var(--gold); }
+.entry.upg b { letter-spacing: 0.02em; }
+.entry.upg .done { color: #bfe3a0; }
+.cc-text .gimmick { color: #ffb08a; }
+.book .entry.pick, .rebuild .entry.pick { cursor: pointer; font: inherit; }
+.stele-toast { position: absolute; left: 12px; bottom: 96px; max-width: min(420px, calc(100vw - 24px)); padding: 10px 14px; border-left: 3px solid #c2c6d1; background: rgba(10, 10, 16, 0.86); color: var(--paper); animation: fadeIn 0.3s ease-out; pointer-events: none; }
+.stele-toast b { font: 400 15px 'Song Myung', serif; color: #c2c6d1; }
+.stele-toast p { margin: 4px 0 0; font-size: 13px; line-height: 1.5; }
+.chest-roll { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; background: rgba(8, 6, 10, 0.55); z-index: 5; cursor: pointer; }
+.chest-roll .reel { display: flex; gap: 10px; width: min(420px, 86vw); overflow: hidden; padding: 10px; border: 2px solid var(--gold); background: rgba(20, 16, 10, 0.9); mask: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent); }
+.chest-roll .reel img { width: 72px; height: 48px; object-fit: cover; flex: none; animation: reel 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.chest-roll b { font: 400 24px 'Song Myung', serif; color: var(--gold); text-shadow: 0 2px 6px #000; animation: fadeIn 0.4s 0.6s both; }
+.chest-roll.evolve { background: radial-gradient(circle, rgba(255, 210, 122, 0.35), rgba(8, 6, 10, 0.75) 70%); }
+.chest-roll .cut { position: absolute; left: 4%; bottom: 0; height: 80%; max-height: 520px; animation: cutin 0.5s ease-out both; filter: drop-shadow(0 0 18px rgba(255, 210, 122, 0.6)); }
+@keyframes reel { from { transform: translateX(600%); } to { transform: translateX(0); } }
+@keyframes cutin { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

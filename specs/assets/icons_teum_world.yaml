@@ -1,0 +1,12 @@
+id: icons_teum_world
+type: icon-sheet
+summary: '「틈」 안개 속 표식 5종(2026-11-21 "안개에 보상이 없으면 불편함") — 칸 번호는 teum/data/items.json icon ["world", n]: 1 비석 · 2 수련 제단 · 3 떠돌이(비밀) 상인 · 4 축복의 샘 · 5 저주받은 상자. 위에서 약간 비스듬히 본 모습, icons_teum_items와 같은 결'
+frames: 5
+baseline: 0.5
+frame_notes:
+  1: 'stele: an old weathered upright stone tablet with carved horizontal line patterns (no letters), moss at its base, a faint pale glow'
+  2: 'training altar: a low square stone altar with a small orange flame burning on top and two crossed straight swords leaning against it'
+  3: 'wandering merchant: a wooden peddler backpack frame piled with goods, small bags and a hanging lantern (no person)'
+  4: 'blessing spring: a small round stone-ringed spring pool with clear light-blue water and white sparkles rising'
+  5: 'cursed chest: a black lacquered chest bound with red chains, a glowing red seal on the lid, faint red glow'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }
