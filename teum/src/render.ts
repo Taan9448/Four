@@ -15,6 +15,8 @@ export interface Art {
   icons: Anim;
   items: Anim;
   skills: Anim[];
+  /** 무공 종류별 이펙트(fx_teum_<종류>, 2026-11-21) — 흰색·회색으로 그려져 오고, 무공 색을 입혀 그린다. 오기 전에는 코드로 그린다 */
+  kinds: Map<string, SpriteAsset>;
 }
 export interface Options {
   shake: boolean;
@@ -64,7 +66,14 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   const fx = new Map<string, Anim>();
   await Promise.all([...fxIds].map(async (id) => fx.set(id, await real(id))));
   const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3')]);
-  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, skills };
+  const kinds = new Map<string, SpriteAsset>();
+  await Promise.all(
+    KIND_FX.map(async (k) => {
+      const a = await real(`fx_teum_${k}`);
+      if (a) kinds.set(k, a);
+    }),
+  );
+  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, skills, kinds };
 }
 
 interface Mark {
@@ -110,6 +119,49 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
   }
   s.events.length = 0;
   if (v.marks.length > 300) v.marks.splice(0, v.marks.length - 300);
+}
+
+const KIND_FX = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal'];
+/**
+ * 무공 이펙트 한 프레임에 색 입히기: 회색 밝기 × 무공 색, 흰 심지는 더 하얗게. 프레임·색마다 한 번만 만든다(「결」 tinted와 같은 길).
+ * k: 한 번 재생(0~1), 아니면 ms로 되풀이
+ */
+const tintCache = new WeakMap<object, Map<string, HTMLCanvasElement>>();
+function kindImg(art: Art, kind: string, color: string, at: { k?: number; ms?: number }): CanvasImageSource | null {
+  const a = art.kinds.get(kind);
+  if (!a) return null;
+  const n = at.k !== undefined ? Math.max(0, Math.min(a.meta.frames - 1, Math.floor(at.k * a.meta.frames))) : Math.floor((at.ms ?? 0) / (1000 / a.meta.fps)) % a.meta.frames;
+  const img = a.images[n];
+  if (!img) return null;
+  let byColor = tintCache.get(img);
+  if (!byColor) tintCache.set(img, (byColor = new Map()));
+  let cv = byColor.get(color);
+  if (cv) return cv;
+  cv = document.createElement('canvas');
+  cv.width = a.meta.frameW;
+  cv.height = a.meta.frameH;
+  const c = cv.getContext('2d')!;
+  c.imageSmoothingEnabled = false;
+  c.drawImage(img, 0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'multiply';
+  c.fillStyle = color;
+  c.fillRect(0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'destination-in';
+  c.drawImage(img, 0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'lighter';
+  c.globalAlpha = 0.35;
+  c.drawImage(img, 0, 0, cv.width, cv.height);
+  byColor.set(color, cv);
+  return cv;
+}
+/** (x, y)를 그림의 (ax, ay) 비율 자리에 두고 w×h로 그린다 — 돌림은 (x, y) 둘레 */
+function blit(ctx: CanvasRenderingContext2D, img: CanvasImageSource, x: number, y: number, w: number, h: number, ax = 0.5, ay = 0.5, rot = 0, alpha = 1): void {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(x, y);
+  if (rot) ctx.rotate(rot);
+  ctx.drawImage(img, -w * ax, -h * ay, w, h);
+  ctx.restore();
 }
 
 function frame(a: SpriteAsset, ms: number, offset = 0): CanvasImageSource | null {
@@ -261,6 +313,13 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   // 무공 장판
   for (const z of s.zones) {
     const k = Math.max(0, Math.min(1, (z.until - s.t) / 0.4));
+    const zimg = z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
+    if (zimg) {
+      // 그림의 둥근 자리(칸 너비 70%)를 장판 크기에 맞춘다
+      const S = (z.r * 2) / 0.7;
+      blit(ctx, zimg, z.x, z.y, S, S, 0.5, 0.68, 0, 0.35 + 0.65 * k);
+      continue;
+    }
     ctx.fillStyle = hexA(z.color, 0.16 * k + 0.06);
     ctx.strokeStyle = hexA(z.color, 0.5 * k);
     ctx.lineWidth = 2;
@@ -457,6 +516,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         const a = s.t * L.speed + (i / L.count) * Math.PI * 2;
         const bx = p.x + Math.cos(a) * R;
         const by = p.y - 24 + Math.sin(a) * R * 0.8;
+        const oimg = kindImg(art, 'orbit', d.color, { ms: now + i * 37 });
+        if (oimg) {
+          const S = (36 * area) / 0.35;
+          blit(ctx, oimg, bx, by, S, S);
+          continue;
+        }
         const g = ctx.createRadialGradient(bx, by, 0, bx, by, 18 * area);
         g.addColorStop(0, 'rgba(255,255,255,0.95)');
         g.addColorStop(0.45, hexA(d.color, 0.8));
@@ -468,6 +533,11 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       }
     } else if (d.kind === 'aura') {
       const R = 90 * L.area * area;
+      const aimg = kindImg(art, 'aura', d.color, { ms: now });
+      if (aimg) {
+        blit(ctx, aimg, p.x, p.y - 10, (R * 2) / 0.8, ((R * 2) / 0.8) * 0.7, 0.5, 0.5, 0, 0.85);
+        continue;
+      }
       ctx.strokeStyle = hexA(d.color, 0.35 + 0.1 * Math.sin(now / 200));
       ctx.fillStyle = hexA(d.color, 0.07);
       ctx.lineWidth = 2;
@@ -480,6 +550,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   // 탄
   for (const sh of s.shots) {
     if (!inView(sh.x, sh.y)) continue;
+    const sk = sh.weapon ? WEAPONS.get(sh.weapon)?.kind : undefined;
+    const simg = sk === 'wave' || sk === 'bolt' ? kindImg(art, sk, sh.color, { ms: now + sh.x }) : null;
+    if (simg) {
+      // 검기: 초승달 높이(칸 55%)가 탄 지름, 탄: 머리(칸 22%)가 탄 지름의 1.3배
+      const S = sk === 'wave' ? (sh.r * 2.2) / 0.55 : (sh.r * 1.3) / 0.22;
+      blit(ctx, simg, sh.x, sh.y, S, S, 0.5, 0.5, Math.atan2(sh.vy, sh.vx));
+      continue;
+    }
     ctx.save();
     ctx.translate(sh.x, sh.y);
     ctx.rotate(Math.atan2(sh.vy, sh.vx));
@@ -505,6 +583,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const e = m.e;
     const age = (now - m.born) / 1000;
     if (e.type === 'slash') {
+      const img = kindImg(art, 'slash', e.color, { k: age / 0.25 });
+      if (img) {
+        // 초승달이 칸 가운데에서 칸 너비 35% 떨어져 돈다
+        if (age < 0.25) blit(ctx, img, e.x, e.y - 20, e.r / 0.35, e.r / 0.35, 0.5, 0.5, e.angle);
+        continue;
+      }
       const k = age / 0.18;
       if (k > 1) continue;
       ctx.strokeStyle = hexA(e.color, 0.9 * (1 - k));
@@ -520,6 +604,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'nova') {
       const k = age / 0.45;
       if (k > 1) continue;
+      const img = kindImg(art, 'nova', e.color, { k });
+      if (img) {
+        const S = (e.r * 2) / 0.8;
+        blit(ctx, img, e.x, e.y - 10, S, S * 0.75);
+        continue;
+      }
       ctx.strokeStyle = hexA(e.color, 0.8 * (1 - k));
       ctx.lineWidth = 8 * (1 - k) + 2;
       ctx.beginPath();
@@ -535,6 +625,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         const img = fx.images[n];
         const size = r * 3.2;
         if (img) ctx.drawImage(img, e.x - size / 2, e.y - size * 0.7, size, size);
+      } else if (e.type === 'strike' && art.kinds.has('strike')) {
+        // 바닥 닿는 곳이 칸 높이 75%, 땅 고리가 칸 너비 절반쯤
+        const img = kindImg(art, 'strike', e.color, { k });
+        if (img) blit(ctx, img, e.x, e.y, r * 4, r * 4, 0.5, 0.75);
       } else {
         ctx.fillStyle = hexA(e.color, 0.7 * (1 - k));
         if (e.type === 'strike') ctx.fillRect(e.x - 6 * (1 - k) - 2, e.y - 400, 12 * (1 - k) + 4, 400);
@@ -555,6 +649,17 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'chain') {
       const k = age / 0.25;
       if (k > 1) continue;
+      const img = kindImg(art, 'chain', e.color, { k });
+      if (img) {
+        // 그림은 칸 10%~90%를 가로지른다 — 두 적 사이에 늘인다
+        for (let i = 1; i < e.pts.length; i++) {
+          const [x0, y0] = e.pts[i - 1];
+          const [x1, y1] = e.pts[i];
+          const len = Math.hypot(x1 - x0, y1 - y0);
+          blit(ctx, img, x0, y0, len / 0.8, 90, 0.1, 0.5, Math.atan2(y1 - y0, x1 - x0));
+        }
+        continue;
+      }
       ctx.strokeStyle = hexA(e.color, 1 - k);
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -569,8 +674,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.lineWidth = 1;
       ctx.stroke();
     } else if (e.type === 'beam') {
-      const k = age / 0.22;
+      const k = age / 0.25;
       if (k > 1) continue;
+      const img = kindImg(art, 'beam', e.color, { k });
+      if (img) {
+        // 그림의 빛줄기(칸 10%~90%, 두께 18%)를 길이·너비에 맞춘다
+        blit(ctx, img, e.x, e.y, e.len / 0.8, (e.w * 2) / 0.18, 0.1, 0.5, e.angle);
+        continue;
+      }
       ctx.save();
       ctx.translate(e.x, e.y);
       ctx.rotate(e.angle);
@@ -582,6 +693,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'heal') {
       const k = age / 0.7;
       if (k > 1) continue;
+      const img = age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
+      if (img) blit(ctx, img, p.x, p.y, 150, 150, 0.5, 0.8);
       ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = `rgba(120,230,120,${1 - k})`;

@@ -25,6 +25,7 @@ function pixelGrid(spec, what) {
 
 function paletteLine(spec, style) {
   if (spec.palette === 'free') return `Use at most ${spec.max_colors} colors.\n`;
+  if (Array.isArray(spec.palette)) return `Palette: use at most ${spec.max_colors} colors per cell, only from this list: ${spec.palette.join(', ')}.\n`;
   return `Palette: use at most ${spec.max_colors} colors per cell, only from this list: ${style.palette.join(', ')}.\n`;
 }
 

@@ -20,6 +20,8 @@ const hexToRgb = (hex) => {
 /** 마스터 팔레트를 [r, g, b] 배열로. 명세가 palette: free면 null(색 맞춤 안 함) */
 export function paletteFor(spec, root = ROOT) {
   if (spec.palette === 'free') return null;
+  // 명세가 색 목록을 직접 주면 그 색만 쓴다(2026-11-21 「틈」 무공 이펙트: 흰색·회색만 그려 게임이 무공 색을 입힌다)
+  if (Array.isArray(spec.palette)) return spec.palette.map(hexToRgb);
   const list = loadStyleData(root).palette;
   if (!Array.isArray(list) || list.length === 0) throw new Error('ART_STYLE.md prompt-data에 palette가 없다');
   return list.map(hexToRgb);
