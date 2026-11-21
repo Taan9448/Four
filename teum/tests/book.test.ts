@@ -98,3 +98,37 @@ group('등급 · 갈래 · 숫자 · 추천(2026-11-21 전면 개편)', () => {
     expect(recommend(s, [{ kind: 'leave', id: 'leave', lv: 0 }])).toBeNull();
   });
 });
+
+import { advice, BOOK_SLOTS, splitBook, suggest } from '../src/book';
+
+group('무공록 편성 도우미(6차)', () => {
+  it('칸 나누기: 무공 10 · 심법 6을 넘지 않는다', () => {
+    const b = splitBook(LOCKABLE);
+    expect(b.weapons.length).toBe(BOOK_SLOTS.weapons);
+    expect(b.passives.length).toBe(BOOK_SLOTS.passives);
+  });
+
+  it('후보: 지금 무공록에 없는 것만, 이 인물이 쓸 수 있는 것만, 까닭이 붙는다', () => {
+    const deck = LOCKABLE.filter((id) => WEAPONS.get(id)?.owner === 'haun').slice(0, 3);
+    const sug = suggest('haun', LOCKABLE, deck, 'weapon');
+    expect(sug.length).toBeGreaterThan(5);
+    for (const x of sug) {
+      expect(deck).not.toContain(x.id);
+      expect(['*', 'haun']).toContain(WEAPONS.get(x.id)!.owner);
+      expect(x.why.length).toBeGreaterThan(0);
+    }
+    // 점수 순
+    for (let i = 1; i < sug.length; i++) expect(sug[i - 1].score).toBeGreaterThanOrEqual(sug[i].score);
+    const ps = suggest('haun', LOCKABLE, deck, 'passive');
+    for (const x of ps) expect(PASSIVES.has(x.id)).toBe(true);
+  });
+
+  it('세트 하나 남으면 그것을 밀어 주고 조언한다', () => {
+    const shock = LOCKABLE.filter((id) => WEAPONS.get(id)?.element === 'shock' && ['*', 'elia'].includes(WEAPONS.get(id)!.owner));
+    const deck = shock.slice(0, 2);
+    const top = suggest('elia', LOCKABLE, deck, 'weapon').slice(0, 5);
+    expect(top.some((x) => WEAPONS.get(x.id)?.element === 'shock')).toBe(true);
+    expect(advice(deck).some((t) => t.includes('하나만 더'))).toBe(true);
+    expect(advice([]).length).toBeGreaterThan(0);
+  });
+});
