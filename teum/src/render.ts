@@ -28,6 +28,8 @@ export interface Options {
   map: 'small' | 'large';
   /** 내 무공 이펙트 세기(2026-11-21 "이펙트 때문에 적 기술·내 움직임이 안 보인다") */
   fx?: 'strong' | 'normal' | 'soft';
+  /** 내 무공 이펙트 불투명도 0.15~1(설정 막대, 2026-11-21) — 있으면 fx보다 먼저 */
+  fxAlpha?: number;
   /** 몸 둘레 범위 기술(둘레 돌기·결계·고리·베기·장판·회복) 그림: simple 얇은 선만(기본, 2026-11-21 "빙글빙글·장판이 너무 화려해 눈이 아프다") · fancy 그림 */
   areaFx?: 'simple' | 'fancy';
 }
@@ -185,13 +187,13 @@ const KG = {
   beam: { ax: 0.19, ay: 0.575, span: 0.61, thick: 0.17 }, // 가로 길이 · 두께
   chain: { ax: 0.17, ay: 0.575, span: 0.64 },
   heal: { ax: 0.5, ay: 0.82, span: 0.42 },
-  // 적 기술(2026-11-21 명세 — 그림이 오면 다시 잰다)
-  foe_shot: { ax: 0.5, ay: 0.56, span: 0.34 },
-  foe_warn: { ax: 0.5, ay: 0.56, span: 0.62 },
-  foe_slam: { ax: 0.5, ay: 0.62, span: 0.6 },
-  foe_burst: { ax: 0.5, ay: 0.56, span: 0.6 },
-  foe_charge: { ax: 0.25, ay: 0.56, span: 0.6 },
-  foe_summon: { ax: 0.5, ay: 0.62, span: 0.55 },
+  // 적 기술(2026-11-21 Codex 그림을 재서 맞춤)
+  foe_shot: { ax: 0.57, ay: 0.585, span: 0.3 }, // 알 지름
+  foe_warn: { ax: 0.49, ay: 0.58, span: 0.7 }, // 고리 지름
+  foe_slam: { ax: 0.5, ay: 0.66, span: 0.6 },
+  foe_burst: { ax: 0.5, ay: 0.58, span: 0.55 },
+  foe_charge: { ax: 0.22, ay: 0.59, span: 0.58 }, // 자국 길이
+  foe_summon: { ax: 0.5, ay: 0.72, span: 0.5 },
 };
 /**
  * 무공 이펙트 한 프레임에 색 입히기: 회색 밝기 × 무공 색, 흰 심지는 더 하얗게. 프레임·색마다 한 번만 만든다(「결」 tinted와 같은 길).
@@ -234,6 +236,24 @@ function blit(ctx: CanvasRenderingContext2D, img: CanvasImageSource, x: number, 
   ctx.drawImage(img, -w * ax, -h * ay, w, h);
   ctx.restore();
 }
+/** 하얀 실루엣(맞은 그림자) — 프레임마다 한 번만 만든다 */
+const whiteCache = new WeakMap<object, HTMLCanvasElement>();
+function whiteOf(img: CanvasImageSource, w: number, h: number): CanvasImageSource {
+  let cv = whiteCache.get(img);
+  if (cv) return cv;
+  cv = document.createElement('canvas');
+  cv.width = w;
+  cv.height = h;
+  const c = cv.getContext('2d')!;
+  c.drawImage(img, 0, 0, w, h);
+  c.globalCompositeOperation = 'source-in';
+  c.fillStyle = '#ffffff';
+  c.fillRect(0, 0, w, h);
+  whiteCache.set(img, cv);
+  return cv;
+}
+/** 적 탄은 늘 같은 위험 색(내 이펙트와 확실히 다르게, 2026-11-21) */
+const DANGER = '#ff2f5f';
 /** 내 무공 이펙트인가(세기 옵션이 듣는 것) */
 const PLAYER_FX = new Set(['slash', 'nova', 'strike', 'beam', 'chain', 'heal']);
 
@@ -382,7 +402,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   drawTerrain(ctx, s, art, p.x - vw / 2 - 60, p.y - vh / 2 - 60, p.x + vw / 2 + 60, p.y + vh / 2 + 60, now);
   const inView = (x: number, y: number, m = 80) => Math.abs(x - p.x) < vw / 2 + m && Math.abs(y - p.y) < vh / 2 + m;
 
-  const fxa = FX_ALPHA[opt.fx ?? 'normal'];
+  const fxa = opt.fxAlpha ?? FX_ALPHA[opt.fx ?? 'normal'];
   const fancy = opt.areaFx === 'fancy';
   // 무공 장판(내 것 — 세기 옵션)
   ctx.globalAlpha = fxa;
@@ -563,10 +583,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           const flip = p.x > f.x;
           drawSpriteAt(ctx, a, img, f.x, f.y - bob, f.def.scale, flip, frozen ? 0 : Math.sin(now / 160 + f.uid) * 0.05);
           if (s.t - f.hitAt < 0.08 || fuse) {
-            ctx.save();
-            ctx.globalCompositeOperation = 'lighter';
-            drawSpriteAt(ctx, a, img, f.x, f.y - bob, f.def.scale, flip, 0, 0.55);
-            ctx.restore();
+            // 맞은 순간: 하얀 실루엣(2026-11-21 타격감)
+            drawSpriteAt(ctx, a, whiteOf(img, a.meta.frameW, a.meta.frameH), f.x, f.y - bob, f.def.scale, flip, frozen ? 0 : Math.sin(now / 160 + f.uid) * 0.05, 0.85);
           }
         } else {
           ctx.fillStyle = s.t - f.hitAt < 0.08 ? '#ffffff' : '#3a2a40';
@@ -950,7 +968,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   // ── 맨 위: 적 탄 · 예고 원 테두리 · 인물 발 고리(내 이펙트에 묻히지 않게) ──
   for (const sh of s.shots) {
     if (sh.weapon || !inView(sh.x, sh.y)) continue;
-    const img = kindImg(art, 'foe_shot', sh.color, { ms: now + sh.x });
+    const img = kindImg(art, 'foe_shot', DANGER, { ms: now + sh.x });
     if (img) {
       const S = (sh.r * 2.4) / KG.foe_shot.span;
       blit(ctx, img, sh.x, sh.y, S, S, KG.foe_shot.ax, KG.foe_shot.ay, Math.atan2(sh.vy, sh.vx));
@@ -961,7 +979,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.beginPath();
     ctx.arc(sh.x, sh.y, sh.r + 2.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = sh.color;
+    ctx.fillStyle = DANGER;
     ctx.beginPath();
     ctx.arc(sh.x, sh.y, sh.r, 0, Math.PI * 2);
     ctx.fill();
@@ -1276,7 +1294,8 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   ctx.fillText(`금화 ${s.gold}`, 10, 50);
   ctx.fillStyle = 'rgba(243,234,216,0.7)';
   ctx.font = font(11, 600);
-  ctx.fillText(`밝힌 땅 ${Math.min(100, Math.round(exploredShare(s) * 100))}% · 다시 뽑기 ${s.rerolls} · 봉인 ${s.banishes} · 건너뛰기 ${s.skips}`, 10, 66);
+  // 좁은 화면에서는 시계 줄과 겹치니 줄인다
+  if (W >= 640) ctx.fillText(`밝힌 땅 ${Math.min(100, Math.round(exploredShare(s) * 100))}% · 다시 뽑기 ${s.rerolls} · 봉인 ${s.banishes} · 건너뛰기 ${s.skips}`, 10, 66);
   if (s.trial) {
     ctx.font = font(14, 800);
     ctx.fillStyle = '#ff8a5c';

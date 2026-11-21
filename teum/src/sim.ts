@@ -2291,6 +2291,11 @@ function dashTick(s: State): void {
   }
 }
 
+/** 처음 안내용 연습 원(2026-11-21 튜토리얼): 인물 자리에 아주 약한 붉은 원 — 떨어지는 순간 보법으로 피하면 간파 */
+export function practiceSlam(s: State, delay = 1.4): void {
+  s.slams.push({ x: s.player.x, y: s.player.y, r: 70, damage: 1, born: s.t, at: s.t + delay, color: '#ff4a4a' });
+}
+
 /** 보법 쿨타임(인물마다) */
 export const dashCooldown = (s: State): number => s.hero.dash.cooldown * stat.dashcd(s);
 

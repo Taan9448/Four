@@ -39,6 +39,8 @@ export interface SaveData {
   upgrades: Record<string, number>;
   /** 읽은 비석 id(도감) */
   steles: string[];
+  /** 처음 안내(1장 30초 튜토리얼)를 마쳤나 */
+  tutorial?: boolean;
 }
 
 const KEY = 'teum.save';

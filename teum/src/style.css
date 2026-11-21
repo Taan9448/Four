@@ -253,3 +253,72 @@ button { font: inherit; }
   .book-recs .rec { flex: none; max-width: none; }
   .book-recs .rec small { display: none; }
 }
+
+/* 2026-11-21 전면 개편: 등급 배지 · 갈래 아이콘 · 레벨업 카드 · 무공록 줄 목록 */
+.grade { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 4px; border-radius: 5px; font: 800 16px 'IBM Plex Sans KR', sans-serif; color: #14100a; flex: none; }
+.grade.g-S { background: linear-gradient(160deg, #ffe7a0, #f2a93b); box-shadow: 0 0 10px rgba(242, 169, 59, 0.55); }
+.grade.g-A { background: #c9a6ff; }
+.grade.g-B { background: #8fd3ff; }
+.grade.g-C { background: #a8acb8; }
+.grade.g-X { background: linear-gradient(160deg, #fff, #ff8a5c); color: #3a0a0a; }
+.chip.g-S.on { background: #f2a93b; color: #14100a; }
+.role { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(243, 234, 216, 0.1); color: var(--c, #f3ead8); flex: none; }
+.role-passive { color: #c8b4ff; }
+.role-heal { color: #7fe08a; }
+/* 레벨업 카드 */
+.panel.levelup .choices { gap: 10px; }
+.choice { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 6px; text-align: left; }
+.choice .c-head { display: flex; align-items: center; gap: 8px; }
+.choice .c-kind { font-size: 12px; color: var(--muted); }
+.choice .c-title { display: flex; align-items: center; gap: 8px; }
+.choice .c-title b { font-size: 18px; line-height: 1.2; }
+.choice .c-art { width: 54px; height: 36px; object-fit: cover; border-radius: 3px; image-rendering: pixelated; flex: none; }
+.choice .c-nums { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 6px 8px; border-radius: 5px; background: rgba(0, 0, 0, 0.3); }
+.choice .num { display: inline-flex; align-items: baseline; gap: 4px; font-size: 13px; }
+.choice .num small { color: var(--muted); font-size: 11px; }
+.choice .num em { font-style: normal; color: var(--muted); }
+.choice .num strong { font: 800 17px 'IBM Plex Sans KR', sans-serif; color: var(--paper); }
+.choice .num.up strong { color: #7fe08a; }
+.choice .desc { font-size: 12px; color: #d6ccb8; line-height: 1.4; }
+.choice .c-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip-s { padding: 1px 7px; border: 1px solid rgba(243, 234, 216, 0.25); border-radius: 10px; font-size: 11px; color: var(--muted); }
+.chip-s.on { border-color: var(--gold); color: var(--gold); }
+.choice.rec { border-color: var(--gold) !important; box-shadow: 0 0 0 2px var(--gold) inset, 0 0 18px rgba(255, 210, 122, 0.4); }
+.choice .rec-tag { position: absolute; top: -10px; right: 10px; padding: 1px 8px; border-radius: 9px; background: var(--gold); color: #14100a; font-size: 11px; font-weight: 800; }
+/* 무공록 줄 목록 */
+.book-filters { display: flex; flex-direction: column; gap: 6px; }
+.book-filters .roles .chip { display: inline-flex; align-items: center; gap: 4px; }
+.book-filters .roles .ri svg { width: 16px; height: 16px; }
+.book-rows { display: flex; flex-direction: column; gap: 4px; }
+.brow { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 6px 8px; border: 1px solid rgba(243, 234, 216, 0.12); border-left: 3px solid var(--c, rgba(243, 234, 216, 0.3)); border-radius: 5px; background: rgba(243, 234, 216, 0.03); cursor: pointer; }
+.brow:hover { background: rgba(243, 234, 216, 0.07); }
+.brow.on { background: rgba(255, 210, 122, 0.09); border-color: rgba(255, 210, 122, 0.45); }
+.brow.focus { outline: 2px solid var(--gold); outline-offset: -2px; }
+.brow .bname { display: flex; flex-direction: column; min-width: 0; }
+.brow .bname b { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brow .bname small { color: var(--muted); font-size: 11px; }
+.brow .bnums { font-size: 12px; color: #d6ccb8; white-space: nowrap; }
+.brow .add { min-width: 34px; }
+@media (max-width: 760px) {
+  .brow { grid-template-columns: auto auto minmax(0, 1fr) auto; }
+  .brow .bnums { grid-column: 3 / 5; grid-row: 2; white-space: normal; }
+}
+
+/* 2026-11-21: 상자 슬롯머신 · 각성 컷인 · 처음 안내 · 불투명도 막대 */
+.chest-roll .reels { display: flex; gap: 8px; padding: 8px; border: 2px solid var(--gold); border-radius: 6px; background: rgba(20, 16, 10, 0.92); box-shadow: 0 0 24px rgba(255, 210, 122, 0.35); }
+.chest-roll .reel-col { width: 84px; height: 56px; overflow: hidden; border-radius: 4px; background: #0c0a08; }
+.chest-roll .strip { display: flex; flex-direction: column; animation: spin-reel ease-out both; }
+.chest-roll .strip img, .chest-roll .strip span { width: 84px; height: 56px; object-fit: cover; flex: none; display: grid; place-items: center; color: var(--gold); }
+@keyframes spin-reel { from { transform: translateY(0); } to { transform: translateY(-448px); } }
+.chest-roll .awaken { font: 400 min(18vw, 140px) 'Song Myung', serif; color: #fff4d0; text-shadow: 0 0 24px #ff8a5c, 0 0 60px #f2a93b; animation: awaken 0.6s ease-out both; line-height: 1; }
+@keyframes awaken { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
+.tutorial { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: min(560px, calc(100vw - 24px)); padding: 10px 16px; border: 1px solid var(--gold); border-radius: 8px; background: rgba(10, 8, 6, 0.88); color: var(--paper); text-align: center; z-index: 4; }
+.tutorial small { color: var(--gold); font-size: 12px; }
+.tutorial b { font-size: 15px; line-height: 1.45; font-weight: 600; }
+.opt .range { display: inline-flex; align-items: center; gap: 8px; }
+.opt .range .val { min-width: 36px; color: var(--muted); }
+@media (max-width: 760px) {
+  .book-detail { order: 0; }
+  .book-detail .art { max-height: 90px; }
+  .tutorial { top: auto; bottom: 150px; }
+}

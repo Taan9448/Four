@@ -2,7 +2,7 @@
 // 무공·심법 자세한 설명, 함께 쓰면 좋은 짝, 추천 묶음(세트·탄막·근접·극의·인물)을 데이터(rules.json build)에서 만든다.
 // 화면 없이 도는 순수 함수 — main.ts(무공록·레벨업 카드)와 테스트가 같이 쓴다.
 import table from '../data/cardskills.json';
-import { HEROES, LOCKABLE, PASSIVES, rarityOf, RULES, WEAPONS, type Kind } from './sim';
+import { elementCounts, HEROES, LOCKABLE, partnersOf, PASSIVES, rarityOf, RULES, WEAPONS, type Choice, type Kind, type State } from './sim';
 
 const T = table as unknown as { kindName: Record<string, string>; kindDesc: Record<string, string>; effectName: Record<string, string>; stats: { stat: string; name: string; unit: string }[] };
 export const KIND_NAME = T.kindName;
@@ -13,6 +13,8 @@ const STAT_NAME = new Map(T.stats.map((s) => [s.stat, s.name]));
 export const RANGED: Kind[] = ['bolt', 'wave', 'beam', 'chain', 'strike'];
 
 const B = RULES.build as typeof RULES.build & {
+  grade: { cut: Record<'S' | 'A' | 'B', number>; kindMult: Record<string, number>; statWeight: Record<string, number> };
+  roles: Record<string, [string, string]>;
   kindStats: Record<string, string[]>;
   presets: { id: string; name: string; desc: string; element?: string; kinds?: string[]; rarity?: string[]; own?: boolean }[];
 };
@@ -138,4 +140,130 @@ export function bookSummary(ids: Iterable<string>): { sets: { name: string; n: n
   }
   const sets = (['fire', 'ice', 'shock', 'vuln'] as const).filter((k) => c[k]).map((k) => ({ name: RULES.sets[k].name, n: c[k], need: RULES.sets[k].need }));
   return { sets, ranged, close, passives };
+}
+
+// ── 등급(2026-11-21 사용자 "스킬에 각각 등급을 부여하고 UI/UX 전면 개편") ──
+export type Grade = 'S' | 'A' | 'B' | 'C' | '극';
+/** 무공 힘: Lv.5 피해 × 개수 ÷ 대기 × 종류 배율(여럿 맞히는 종류일수록 크게) */
+export function weaponPower(id: string): number {
+  const w = WEAPONS.get(id);
+  if (!w) return 0;
+  const z = w.levels[w.levels.length - 1];
+  return ((z.damage * Math.max(1, z.count)) / Math.max(0.1, z.cooldown)) * (B.grade.kindMult[w.kind] ?? 1) * (w.element ? 1.1 : 1);
+}
+function passivePower(id: string): number {
+  const p = PASSIVES.get(id)!;
+  const best = Math.max(...[...PASSIVES.values()].filter((x) => x.stat === p.stat).map((x) => x.per));
+  return (p.per / best) * (B.grade.statWeight[p.stat] ?? 1);
+}
+const GRADES = new Map<string, Grade>();
+function rankInto(ids: string[], power: (id: string) => number): void {
+  const sorted = [...ids].sort((a, b) => power(b) - power(a));
+  const n = sorted.length;
+  const cS = Math.round(n * B.grade.cut.S);
+  const cA = cS + Math.round(n * B.grade.cut.A);
+  const cB = cA + Math.round(n * B.grade.cut.B);
+  sorted.forEach((id, i) => GRADES.set(id, i < cS ? 'S' : i < cA ? 'A' : i < cB ? 'B' : 'C'));
+}
+// 회복은 피해가 아니니 따로, 각성은 「극」
+rankInto([...WEAPONS.values()].filter((w) => !w.evolved && w.kind !== 'heal').map((w) => w.id), weaponPower);
+rankInto([...WEAPONS.values()].filter((w) => !w.evolved && w.kind === 'heal').map((w) => w.id), weaponPower);
+rankInto([...PASSIVES.keys()], passivePower);
+for (const w of WEAPONS.values()) if (w.evolved) GRADES.set(w.id, '극');
+export const gradeOf = (id: string): Grade => GRADES.get(id) ?? 'C';
+export const GRADE_ORDER: Record<Grade, number> = { 극: 5, S: 4, A: 3, B: 2, C: 1 };
+
+/** 쉬운 갈래: shot 투사체 · line 관통/연쇄 · drop 낙하/장판 · close 근접 · spin 회전 · heal 회복 */
+export function roleOf(id: string): { key: string; name: string } {
+  const w = WEAPONS.get(id);
+  if (!w) return { key: 'passive', name: '심법' };
+  const r = B.roles[w.kind] ?? ['close', '근접'];
+  return { key: r[0], name: r[1] };
+}
+
+/** 숫자 한눈에: 레벨 lv의 핵심 값(무공) / 레벨당 값(심법) */
+export function keyNumbers(id: string, lv: number): { label: string; from?: string; to: string; better?: boolean }[] {
+  const w = WEAPONS.get(id);
+  if (w) {
+    const b = w.levels[Math.min(lv, w.levels.length) - 1];
+    const a = lv > 1 ? w.levels[lv - 2] : undefined;
+    const out: { label: string; from?: string; to: string; better?: boolean }[] = [];
+    out.push({ label: w.kind === 'heal' ? '회복' : '피해', from: a ? String(a.damage) : undefined, to: String(b.damage), better: !!a && b.damage > a.damage });
+    out.push({ label: '대기', from: a ? `${a.cooldown}초` : undefined, to: `${b.cooldown}초`, better: !!a && b.cooldown < a.cooldown });
+    if (b.count > 1 || (a && a.count !== b.count)) out.push({ label: '개수', from: a ? String(a.count) : undefined, to: String(b.count), better: !!a && b.count > a.count });
+    if (a && a.area !== b.area) out.push({ label: '범위', from: `×${a.area}`, to: `×${b.area}`, better: b.area > a.area });
+    return out;
+  }
+  const p = PASSIVES.get(id);
+  if (!p) return [];
+  const stat = STAT_NAME.get(p.stat) ?? p.stat;
+  const v = (n: number) => (Math.abs(p.per) < 1 && !['breath', 'thorns', 'amount'].includes(p.stat) ? `${Math.round(p.per * n * 100)}%` : `${Math.round(p.per * n * 10) / 10}`);
+  return [{ label: stat, from: lv > 1 ? `+${v(lv - 1)}` : undefined, to: `+${v(lv)}`, better: true }];
+}
+
+/** 레벨업 추천(2026-11-21 "어떤 스킬을 골라야 하는지 이해가 어렵다"): 가장 좋은 하나와 그 까닭 */
+export function recommend(s: State, choices: Choice[]): { index: number; reason: string } | null {
+  if (choices.some((c) => c.kind === 'buy' || c.kind === 'leave')) return null;
+  const partners = partnersOf(s);
+  const ec = elementCounts(s);
+  const ownStats = new Set(s.weapons.flatMap((w) => B.kindStats[WEAPONS.get(w.id)?.kind ?? ''] ?? []));
+  const G: Record<Grade, number> = { 극: 30, S: 20, A: 12, B: 6, C: 0 };
+  let best = -1;
+  let bestV = -Infinity;
+  let why = '';
+  choices.forEach((c, i) => {
+    let v = 0;
+    let r = '';
+    if (c.kind === 'weapon') {
+      const w = WEAPONS.get(c.id)!;
+      if (c.lv > 1) {
+        v = 30 + c.lv * 2 + G[gradeOf(c.id)] * 0.6;
+        r = '가진 무공 강화';
+        if (c.lv >= w.levels.length && w.evolve && s.passives.has(w.evolve.with)) {
+          v += 25;
+          r = '각성 준비 완료';
+        }
+      } else {
+        v = G[gradeOf(c.id)] + (s.weapons.length < 3 ? 12 : 0);
+        r = `${gradeOf(c.id)}급 새 무공`;
+        if (w.element) {
+          const n = (ec[w.element] ?? 0) + 1;
+          if (n === RULES.sets[w.element].need) {
+            v += 28;
+            r = `${RULES.sets[w.element].name} 세트 완성`;
+          } else if (n < RULES.sets[w.element].need && n > 1) v += 8;
+        }
+      }
+    } else if (c.kind === 'passive') {
+      const p = PASSIVES.get(c.id)!;
+      v = G[gradeOf(c.id)] * 0.8 + (ownStats.has(p.stat) ? 8 : 0) + (c.lv > 1 ? 6 : 0);
+      r = ownStats.has(p.stat) ? '가진 무공과 잘 맞음' : `${gradeOf(c.id)}급 심법`;
+      const pw = partners.get(c.id);
+      if (pw && c.lv === 1) {
+        v += 40;
+        r = `「${WEAPONS.get(pw)?.name}」 각성 짝`;
+      }
+    } else v = -5;
+    if (v > bestV) {
+      bestV = v;
+      best = i;
+      why = r;
+    }
+  });
+  return best >= 0 ? { index: best, reason: why } : null;
+}
+
+/** 갈래 아이콘(SVG): 무협 이름·카드 그림만으로 모르는 「무엇을 하는지」를 모양으로 */
+export function roleIcon(key: string): string {
+  const s = 'stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  const body: Record<string, string> = {
+    shot: `<path ${s} d="M4 16h14"/><path ${s} d="M13 10l6 6-6 6"/><circle cx="6" cy="9" r="1.6" fill="currentColor"/>`,
+    line: `<path ${s} d="M3 16l6-6 4 6 4-6 4 6"/>`,
+    drop: `<path ${s} d="M16 4v14"/><path ${s} d="M10 13l6 6 6-6"/><ellipse ${s} cx="16" cy="25" rx="9" ry="3"/>`,
+    close: `<circle ${s} cx="16" cy="16" r="5"/><circle ${s} cx="16" cy="16" r="11" stroke-dasharray="4 3"/>`,
+    spin: `<circle ${s} cx="16" cy="16" r="9" stroke-dasharray="2 4"/><circle cx="25" cy="16" r="2.8" fill="currentColor"/><circle cx="7" cy="16" r="2.8" fill="currentColor"/>`,
+    heal: `<path ${s} d="M16 7v18M7 16h18"/>`,
+    passive: `<path ${s} d="M16 5l3 7 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z"/>`,
+  };
+  return `<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">${body[key] ?? body.close}</svg>`;
 }

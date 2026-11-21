@@ -53,3 +53,48 @@ group('추천 묶음 구성', () => {
     for (const h of ['haun', 'kyle', 'elia', 'born']) for (const p of presets(h, LOCKABLE)) expect(p.ids.filter((id) => WEAPONS.has(id)).length, `${h} ${p.id}`).toBeGreaterThanOrEqual(p.ids.length / 2);
   });
 });
+
+import { gradeOf, keyNumbers, recommend, roleIcon, roleOf } from '../src/book';
+import { createChapter, freshCarry } from '../src/sim';
+
+group('등급 · 갈래 · 숫자 · 추천(2026-11-21 전면 개편)', () => {
+  it('모든 무공·심법에 등급이 있고, S·A·B·C가 고루 나뉜다(각성은 극)', () => {
+    const count: Record<string, number> = {};
+    for (const id of [...WEAPONS.keys(), ...PASSIVES.keys()]) count[gradeOf(id)] = (count[gradeOf(id)] ?? 0) + 1;
+    for (const g of ['S', 'A', 'B', 'C', '극']) expect(count[g], g).toBeGreaterThan(0);
+    expect(count.S).toBeLessThan(count.B);
+    for (const w of WEAPONS.values()) if (w.evolved) expect(gradeOf(w.id)).toBe('극');
+  });
+
+  it('갈래 아이콘·이름이 모든 무공에 있다', () => {
+    for (const id of WEAPONS.keys()) {
+      const r = roleOf(id);
+      expect(r.name, id).toBeTruthy();
+      expect(roleIcon(r.key)).toContain('<svg');
+    }
+    expect(roleOf([...PASSIVES.keys()][0]).key).toBe('passive');
+  });
+
+  it('레벨업 숫자 비교: 올리면 이전 → 다음, 좋아진 것 표시', () => {
+    const w = [...WEAPONS.values()].find((x) => !x.evolved && x.kind !== 'heal')!;
+    const n = keyNumbers(w.id, 3);
+    expect(n[0].from).toBe(String(w.levels[1].damage));
+    expect(n[0].to).toBe(String(w.levels[2].damage));
+    expect(keyNumbers(w.id, 1)[0].from).toBeUndefined();
+  });
+
+  it('추천: 각성 짝 심법을 먼저 고른다', () => {
+    const s = createChapter(0, 'rec', freshCarry('haun'));
+    const w = [...WEAPONS.values()].find((x) => x.evolve && !x.card && x.owner === 'haun')!;
+    s.weapons = [{ id: w.id, lv: 2, next: 0 }];
+    const choices = [
+      { kind: 'passive' as const, id: [...PASSIVES.keys()].find((p) => p !== w.evolve!.with)!, lv: 1 },
+      { kind: 'passive' as const, id: w.evolve!.with, lv: 1 },
+      { kind: 'weapon' as const, id: w.id, lv: 3 },
+    ];
+    const r = recommend(s, choices)!;
+    expect(r.index).toBe(1);
+    expect(r.reason).toContain('각성 짝');
+    expect(recommend(s, [{ kind: 'leave', id: 'leave', lv: 0 }])).toBeNull();
+  });
+});
