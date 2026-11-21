@@ -28,6 +28,8 @@ export interface Options {
   map: 'small' | 'large';
   /** 내 무공 이펙트 세기(2026-11-21 "이펙트 때문에 적 기술·내 움직임이 안 보인다") */
   fx?: 'strong' | 'normal' | 'soft';
+  /** 몸 둘레 범위 기술(둘레 돌기·결계·고리·베기·장판·회복) 그림: simple 얇은 선만(기본, 2026-11-21 "빙글빙글·장판이 너무 화려해 눈이 아프다") · fancy 그림 */
+  areaFx?: 'simple' | 'fancy';
 }
 const FX_ALPHA = { strong: 1, normal: 0.7, soft: 0.42 };
 
@@ -381,24 +383,27 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   const inView = (x: number, y: number, m = 80) => Math.abs(x - p.x) < vw / 2 + m && Math.abs(y - p.y) < vh / 2 + m;
 
   const fxa = FX_ALPHA[opt.fx ?? 'normal'];
+  const fancy = opt.areaFx === 'fancy';
   // 무공 장판(내 것 — 세기 옵션)
   ctx.globalAlpha = fxa;
   for (const z of s.zones) {
     const k = Math.max(0, Math.min(1, (z.until - s.t) / 0.4));
-    const zimg = z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
+    const zimg = fancy && z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
     if (zimg) {
       // 그림의 둥근 자리(칸 너비 70%)를 장판 크기에 맞춘다
       const S = (z.r * 2) / KG.rain.span;
       blit(ctx, zimg, z.x, z.y, S, S, KG.rain.ax, KG.rain.ay, 0, 0.3 + 0.45 * k);
       continue;
     }
-    ctx.fillStyle = hexA(z.color, 0.16 * k + 0.06);
-    ctx.strokeStyle = hexA(z.color, 0.5 * k);
-    ctx.lineWidth = 2;
+    ctx.fillStyle = hexA(z.color, fancy ? 0.16 * k + 0.06 : 0.05);
+    ctx.strokeStyle = hexA(z.color, fancy ? 0.5 * k : 0.4 * k + 0.1);
+    ctx.lineWidth = fancy ? 2 : 1.5;
     ctx.beginPath();
     ctx.ellipse(z.x, z.y, z.r, z.r * 0.6, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+    // 단순: 테두리만(떨어지는 줄기 없음)
+    if (!fancy) continue;
     for (let i = 0; i < 4; i++) {
       const ph = (((now / 260 + i * 0.27 + z.x * 0.01) % 1) + 1) % 1;
       const ox = Math.sin(i * 2.3 + z.y) * z.r * 0.6;
@@ -493,11 +498,22 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   for (const w of s.weapons) {
     const d = WEAPONS.get(w.id)!;
     if (d.kind !== 'aura') continue;
-    const aimg = kindImg(art, 'aura', d.color, { ms: now + w.id.length * 53 });
-    if (!aimg) break;
     const L = d.levels[Math.min(w.lv, d.levels.length) - 1];
-    const S = (90 * L.area * stat.area(s) * 2) / KG.aura.span;
-    blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5 * fxa);
+    const R = 90 * L.area * stat.area(s);
+    const aimg = fancy ? kindImg(art, 'aura', d.color, { ms: now + w.id.length * 53 }) : null;
+    if (aimg) {
+      const S = (R * 2) / KG.aura.span;
+      blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5 * fxa);
+      continue;
+    }
+    // 단순: 움직이지 않는 얇은 테두리 하나
+    ctx.strokeStyle = hexA(d.color, 0.38 * fxa + 0.08);
+    ctx.fillStyle = hexA(d.color, 0.035);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y - 4, R, R * 0.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
   }
   // 그림자·소품·쓰러짐·인물: y 순서
   const draws: { y: number; fn: () => void }[] = [];
@@ -635,10 +651,22 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         const a = s.t * L.speed + (i / L.count) * Math.PI * 2;
         const bx = p.x + Math.cos(a) * R;
         const by = p.y - 24 + Math.sin(a) * R * 0.8;
-        const oimg = kindImg(art, 'orbit', d.color, { ms: now + i * 37 });
+        const oimg = fancy ? kindImg(art, 'orbit', d.color, { ms: now + i * 37 }) : null;
         if (oimg) {
           const S = (36 * area) / KG.orbit.span;
           blit(ctx, oimg, bx, by, S, S, KG.orbit.ax, KG.orbit.ay);
+          continue;
+        }
+        if (!fancy) {
+          // 단순: 작은 알 하나(빛 번짐·회전 그림 없음)
+          ctx.fillStyle = 'rgba(16,14,22,0.8)';
+          ctx.beginPath();
+          ctx.arc(bx, by, 7 * area + 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = d.color;
+          ctx.beginPath();
+          ctx.arc(bx, by, 7 * area, 0, Math.PI * 2);
+          ctx.fill();
           continue;
         }
         const g = ctx.createRadialGradient(bx, by, 0, bx, by, 18 * area);
@@ -652,8 +680,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       }
     } else if (d.kind === 'aura') {
       const R = 90 * L.area * area;
-      // 그림이 있으면 발밑에 이미 깔았다(아래 y 순서 앞)
-      if (art.kinds.has('aura')) continue;
+      // 결계는 발밑에 이미 깔았다(y 순서 앞) — 단순·그림 모두
+      continue;
       ctx.strokeStyle = hexA(d.color, 0.35 + 0.1 * Math.sin(now / 200));
       ctx.fillStyle = hexA(d.color, 0.07);
       ctx.lineWidth = 2;
@@ -746,6 +774,17 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.stroke();
       continue;
     }
+    if (e.type === 'slash' && !fancy) {
+      // 단순: 얇은 호 하나, 짧게
+      const k = age / 0.16;
+      if (k > 1) continue;
+      ctx.strokeStyle = hexA(e.color, 0.6 * (1 - k));
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y - 20, e.r * 0.85, e.angle - e.arc / 2, e.angle + e.arc / 2);
+      ctx.stroke();
+      continue;
+    }
     if (e.type === 'slash') {
       const img = kindImg(art, 'slash', e.color, { k: age / 0.25 });
       if (img) {
@@ -768,6 +807,15 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'nova') {
       const k = age / 0.45;
       if (k > 1) continue;
+      if (!fancy) {
+        // 단순: 퍼지는 얇은 고리 하나
+        ctx.strokeStyle = hexA(e.color, 0.45 * (1 - k));
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(e.x, e.y - 10, e.r * k, e.r * k * 0.75, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        continue;
+      }
       // 그림 앞 두 칸(가운데 번쩍임)은 크게 늘리면 인물을 가린다 — 고리 칸부터, 작게 시작해 퍼지게
       const img = kindImg(art, 'nova', e.color, { k: 0.34 + 0.66 * k });
       if (img) {
@@ -858,7 +906,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'heal') {
       const k = age / 0.7;
       if (k > 1) continue;
-      const img = age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
+      const img = fancy && age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
       if (img) blit(ctx, img, p.x, p.y, 60 / KG.heal.span, 60 / KG.heal.span, KG.heal.ax, KG.heal.ay);
       ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
       ctx.textAlign = 'center';

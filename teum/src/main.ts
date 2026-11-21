@@ -7,6 +7,7 @@ import progressRaw from '../../gyeol/data/progress.json';
 import { banish, CHAPTER_LENGTH, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
+import { bookSummary, describe, matches, presets, RANGED } from './book';
 import { autosave, bank, cheonoeCards, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
 import { createRng } from '../../src/engine/rng';
 
@@ -411,48 +412,121 @@ function shopPopup(initial: 'up' | 'book' = 'up'): void {
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
-/** 무공록(2026-11-21 "스킬이 너무 많아 빌드가 무너진다"): 연 카드 무공·심법 중 bookMax장을 골라 들고 들어간다 — 그 밖의 카드 것은 레벨업에 안 나온다 */
+/** 무공록(2026-11-21 "스킬이 너무 많아 빌드가 무너진다"): 연 카드 무공·심법 중 bookMax장을 골라 들고 들어간다 — 그 밖의 카드 것은 레벨업에 안 나온다.
+ *  2026-11-21 사용자 "무공록만 봐서는 이해가 안 간다": 추천 묶음 · 거르기·찾기 · 고른 것의 자세한 설명 · 함께 쓰면 좋은 짝 · 세트 미리 보기 */
 function bookPopup(slot: Slot, onDone: () => void): void {
   const sv = loadSave();
   const open = openCards(sv);
   const max = RULES.build.bookMax;
   let pick = new Set(bookOf(slot, sv));
   const ids = [...open].filter((id) => usable(slot.hero, id)).sort((a, b) => (RANK[rarityOf(b)] ?? 1) - (RANK[rarityOf(a)] ?? 1));
+  const recs = presets(slot.hero, open);
+  let filter = 'all';
+  let query = '';
+  let focus: string | null = ids[0] ?? null;
+  const FILTERS: [string, string][] = [['all', '전체'], ['weapon', '무공'], ['passive', '심법'], ['ranged', '멀리'], ['close', '둘레'], ['fire', '화염'], ['ice', '서리'], ['shock', '뇌전'], ['vuln', '파쇄'], ['picked', '고른 것']];
+  const pass = (id: string): boolean => {
+    const w = WEAPONS.get(id);
+    const name = w?.name ?? PASSIVES.get(id)?.name ?? '';
+    if (query && !name.includes(query) && !describe(id).tag.includes(query)) return false;
+    switch (filter) {
+      case 'weapon': return !!w;
+      case 'passive': return !w;
+      case 'ranged': return !!w && RANGED.includes(w.kind);
+      case 'close': return !!w && !RANGED.includes(w.kind);
+      case 'picked': return pick.has(id);
+      case 'all': return true;
+      default: return w?.element === filter;
+    }
+  };
+  const toggle = (id: string) => {
+    if (pick.has(id)) pick.delete(id);
+    else if (pick.size < max) pick.add(id);
+  };
   const body = el('div', { class: 'book' });
+  const search = el('input', { type: 'search', placeholder: '이름·종류로 찾기', class: 'book-search' }) as HTMLInputElement;
+  search.addEventListener('input', () => {
+    query = search.value.trim();
+    render();
+    // 다시 그려도 찾기 칸에서 계속 칠 수 있게
+    search.focus();
+    search.setSelectionRange(search.value.length, search.value.length);
+  });
   const render = () => {
+    const sum = bookSummary(pick);
+    const head = el(
+      'div',
+      { class: 'shop-head' },
+      el('b', { class: 'wallet' }, `${pick.size} / ${max}`),
+      el('small', {}, [`멀리 ${sum.ranged} · 둘레 ${sum.close} · 심법 ${sum.passives}`, ...sum.sets.map((x) => `${x.name} ${x.n}/${x.need}${x.n >= x.need ? ' ✓' : ''}`)].join(' · ') + ' — 이 인물의 기본 무공·기본 심법은 무공록과 상관없이 늘 나온다'),
+      btn('자동으로', 'btn small ghost', () => ((pick = new Set(autoBook(slot.hero, open))), render())),
+      btn('비우기', 'btn small ghost', () => ((pick = new Set()), render())),
+    );
+    const recRow = recs.length
+      ? el('div', { class: 'book-recs' }, el('small', {}, '추천 묶음'), ...recs.map((r) => btn([el('b', {}, r.name), el('small', {}, `${r.desc} (${r.ids.length}장)`)], 'rec', () => ((pick = new Set(r.ids.slice(0, max))), render()), { title: r.desc })))
+      : '';
+    const chips = el('div', { class: 'row-pick' }, ...FILTERS.map(([k, n]) => btn(n, `chip${filter === k ? ' on' : ''}`, () => ((filter = k), render()))), search);
+    const shown = ids.filter(pass);
     const grid = el(
       'div',
-      { class: 'grid text shop-grid' },
-      ...ids.map((id) => {
+      { class: 'grid text shop-grid book-grid' },
+      ...shown.map((id) => {
         const w = WEAPONS.get(id);
         const pd = PASSIVES.get(id);
         const a = cardArtUrl(w?.card ?? pd?.card ?? '');
         const on = pick.has(id);
-        const evo = w?.evolve ? `각성 짝: 「${PASSIVES.get(w.evolve.with)?.name}」` : '';
-        const b = el(
-          'button',
-          { class: `entry pick${on ? ' on' : ''} rare-${rarityOf(id)}`, type: 'button', style: w ? `--c:${w.color}` : '' },
+        const info = describe(id);
+        const card = el(
+          'div',
+          { class: `entry pick${on ? ' on' : ''}${focus === id ? ' focus' : ''} rare-${rarityOf(id)}`, style: w ? `--c:${w.color}` : '', tabindex: '0' },
           a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '',
-          el('b', {}, `${on ? '✓ ' : ''}${w?.name ?? pd?.name}`),
-          el('small', {}, `${w ? `무공 · ${KIND_NAME[w.kind]}${w.element ? ` · ${RULES.sets[w.element].name}` : ''}` : '심법'} · ${RARITY_NAME[rarityOf(id)]}`),
-          evo ? el('small', { class: 'evo' }, evo) : '',
+          el('b', {}, w?.name ?? pd?.name ?? id),
+          el('small', {}, info.tag),
+          el('small', {}, info.lines[0] ?? ''),
         );
-        b.addEventListener('click', () => {
-          if (on) pick.delete(id);
-          else if (pick.size < max) pick.add(id);
-          render();
-        });
-        return b;
+        const add = btn(on ? '빼기' : '넣기', `btn small ${on ? 'ghost' : 'primary'} add`, () => (toggle(id), render()), !on && pick.size >= max ? { disabled: '' } : {});
+        add.addEventListener('click', (e) => e.stopPropagation());
+        card.append(add);
+        card.addEventListener('click', () => ((focus = id), render()));
+        card.addEventListener('keydown', (e) => (e as KeyboardEvent).key === 'Enter' && (toggle(id), render()));
+        return card;
       }),
     );
+    // 고른 것 자세히 + 함께 쓰면 좋은 짝
+    let detail: HTMLElement | string = '';
+    if (focus) {
+      const info = describe(focus);
+      const w = WEAPONS.get(focus);
+      const pd = PASSIVES.get(focus);
+      const a = cardArtUrl(w?.card ?? pd?.card ?? '');
+      const mates = matches(focus, ids);
+      detail = el(
+        'aside',
+        { class: 'book-detail', style: w ? `--c:${w.color}` : '' },
+        a ? el('img', { class: 'art', src: a, alt: '' }) : '',
+        el('h4', {}, info.name),
+        el('small', { class: 'tag' }, info.tag),
+        ...info.lines.map((l) => el('p', {}, l)),
+        btn(pick.has(focus) ? '무공록에서 빼기' : '무공록에 넣기', `btn small ${pick.has(focus) ? 'ghost' : 'primary'}`, () => (toggle(focus!), render())),
+        mates.length ? el('h5', {}, '함께 쓰면 좋은 것') : '',
+        ...mates.map((m) => {
+          const mi = describe(m);
+          const row = el('div', { class: `mate${pick.has(m) ? ' on' : ''}` }, el('span', {}, el('b', {}, mi.name), el('small', {}, mi.tag)), btn(pick.has(m) ? '✓' : '+', 'btn small ghost', () => (toggle(m), render()), !pick.has(m) && pick.size >= max ? { disabled: '' } : {}));
+          row.addEventListener('click', (e) => (e.target as HTMLElement).tagName !== 'BUTTON' && ((focus = m), render()));
+          return row;
+        }),
+      );
+    }
     body.replaceChildren(
-      el('div', { class: 'shop-head' }, el('b', { class: 'wallet' }, `${pick.size} / ${max}`), el('small', {}, '들고 갈 「천외귀환」 카드 무공·심법. 이 인물의 손으로 맞춘 무공·기본 심법은 늘 나온다'), btn('자동으로', 'btn small ghost', () => ((pick = new Set(autoBook(slot.hero, open))), render())), btn('비우기', 'btn small ghost', () => ((pick = new Set()), render()))),
-      ids.length ? grid : el('p', {}, '아직 연 카드 무공이 없다 — 보스를 잡거나 장터에서 비급을 사라.'),
+      head,
+      recRow,
+      chips,
+      ids.length ? el('div', { class: 'book-main' }, el('div', { class: 'book-list' }, shown.length ? grid : el('p', { class: 'note' }, '맞는 것이 없다')), detail) : el('p', {}, '아직 연 카드 무공이 없다 — 보스를 잡거나 장터에서 비급을 사라.'),
     );
   };
   render();
   const { root, close } = modal('무공록 — 들고 갈 카드');
-  root.querySelector('.modal-box')!.classList.add('wide');
+  root.querySelector('.modal-box')!.classList.add('wide', 'book-box');
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
   const done = () => {
     slot.book = [...pick];
@@ -614,12 +688,18 @@ function optionsPopup(onClose?: () => void): void {
     sv.options.fx = fx.value as 'strong' | 'normal' | 'soft';
     writeSave(sv);
   });
+  const area = el('select', {}, el('option', { value: 'simple' }, '단순하게(눈이 편함)'), el('option', { value: 'fancy' }, '화려하게'));
+  area.value = sv.options.areaFx ?? 'simple';
+  area.addEventListener('change', () => {
+    sv.options.areaFx = area.value as 'simple' | 'fancy';
+    writeSave(sv);
+  });
   const reset = btn('이 기기의 「틈」 기록 모두 지우기', 'btn small danger', () => {
     if (!confirm('저장 칸·도감·옷장·옵션을 모두 지울까?')) return;
     localStorage.removeItem('teum.save');
     location.reload();
   });
-  const { root, close } = modal('옵션', el('div', { class: 'opts' }, row('화면 흔들림', check('shake')), row('피해 숫자', check('numbers')), row('지도 크기', map), row('내 무공 이펙트', fx), el('p', { class: 'note' }, '조작: WASD·방향키 이동 · Space/Shift 보법 · Q 마지막 기술 · ESC 멈춤 · 레벨업 1~4 · R 다시 뽑기 · B 봉인 · S 건너뛰기'), reset));
+  const { root, close } = modal('옵션', el('div', { class: 'opts' }, row('화면 흔들림', check('shake')), row('피해 숫자', check('numbers')), row('지도 크기', map), row('내 무공 이펙트', fx), row('몸 둘레 범위 기술', area), el('p', { class: 'note' }, '조작: WASD·방향키 이동 · Space/Shift 보법 · Q 마지막 기술 · ESC 멈춤 · 레벨업 1~4 · R 다시 뽑기 · B 봉인 · S 건너뛰기'), reset));
   if (onClose) {
     const btnClose = root.querySelector('.modal-close') as HTMLButtonElement;
     btnClose.addEventListener('click', onClose);
@@ -795,7 +875,8 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
     const w = c.kind === 'weapon' ? WEAPONS.get(c.id) : undefined;
     const pd = c.kind === 'passive' ? PASSIVES.get(c.id) : undefined;
     const name = w?.name ?? pd?.name ?? (c.kind === 'gold' ? '금화 15' : '굳센 몸');
-    const desc = w ? (c.lv === 1 ? w.desc : levelDiff(c.id, c.lv)) : pd ? pd.desc : c.kind === 'gold' ? '금화를 15 얻는다' : '최대 체력 +10(다음 장에도) · 체력 30 회복';
+    // 2026-11-21: 새 무공·심법은 무공록과 같은 자세한 설명(무엇을 하는지 · 수치)
+    const desc = w ? (c.lv === 1 ? describe(c.id).lines.slice(0, 2).join(' — ') : levelDiff(c.id, c.lv)) : pd ? describe(c.id).lines[0] : c.kind === 'gold' ? '금화를 15 얻는다' : '최대 체력 +10(다음 장에도) · 체력 30 회복';
     const tag = w ? (c.lv === 1 ? '새 무공' : `무공 Lv.${c.lv}`) : pd ? (c.lv === 1 ? '새 심법' : `심법 Lv.${c.lv}`) : '보상';
     const partner = pd ? partnersOf(s).get(pd.id) : undefined;
     const ec = elementCounts(s);

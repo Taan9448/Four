@@ -91,7 +91,134 @@
   "banish": 1,
   "skip": 1,
   "skipGold": 5,
-  "partnerWeight": 4
+  "partnerWeight": 4,
+  "kindStats": {
+   "$comment": "무공 종류마다 잘 맞는 심법 능력치(무공록 짝 추천)",
+   "slash": [
+    "might",
+    "area",
+    "grain",
+    "critdmg"
+   ],
+   "bolt": [
+    "amount",
+    "haste",
+    "might",
+    "grain"
+   ],
+   "wave": [
+    "amount",
+    "might",
+    "area"
+   ],
+   "orbit": [
+    "amount",
+    "duration",
+    "area",
+    "might"
+   ],
+   "nova": [
+    "area",
+    "haste",
+    "might"
+   ],
+   "aura": [
+    "area",
+    "might",
+    "thorns"
+   ],
+   "strike": [
+    "amount",
+    "might",
+    "grain",
+    "critdmg"
+   ],
+   "rain": [
+    "amount",
+    "duration",
+    "area"
+   ],
+   "chain": [
+    "amount",
+    "haste",
+    "might"
+   ],
+   "beam": [
+    "might",
+    "area",
+    "grain",
+    "critdmg"
+   ],
+   "heal": [
+    "haste",
+    "breath",
+    "vigor"
+   ]
+  },
+  "presets": [
+   {
+    "id": "fire",
+    "name": "화염 세트",
+    "desc": "불을 남기는 무공 셋 — 불붙은 적이 쓰러지면 불이 번진다",
+    "element": "fire"
+   },
+   {
+    "id": "ice",
+    "name": "서리 세트",
+    "desc": "느리게 하는 무공 셋 — 느려진 적은 피해 +35%",
+    "element": "ice"
+   },
+   {
+    "id": "shock",
+    "name": "뇌전 세트",
+    "desc": "멈추게 하는 무공 셋 — 맞으면 옆 적에게 튄다",
+    "element": "shock"
+   },
+   {
+    "id": "vuln",
+    "name": "파쇄 세트",
+    "desc": "약하게 하는 무공 셋 — 약해진 적은 피해 +50%",
+    "element": "vuln"
+   },
+   {
+    "id": "ranged",
+    "name": "원거리 탄막",
+    "desc": "날리기·검기·일직선·연쇄·내리꽂기 — 멀리서 쏘고 피한다",
+    "kinds": [
+     "bolt",
+     "wave",
+     "beam",
+     "chain",
+     "strike"
+    ]
+   },
+   {
+    "id": "close",
+    "name": "근접 난전",
+    "desc": "베기·둘레·고리·결계 — 몰려든 무리를 둘레에서 깎는다",
+    "kinds": [
+     "slash",
+     "orbit",
+     "nova",
+     "aura"
+    ]
+   },
+   {
+    "id": "grand",
+    "name": "극의 노리기",
+    "desc": "영웅·전설 카드 무공 — Lv.5 + 짝 심법 + 상자로 「극의」 각성",
+    "rarity": [
+     "epic",
+     "legendary"
+    ]
+   },
+   {
+    "id": "own",
+    "name": "인물 전용",
+    "desc": "이 인물의 카드 무공을 먼저",
+    "own": true
+   }
+  ]
  },
  "sets": {
   "$comment": "속성 세트: 같은 효과(element)를 남기는 무공을 need개 들면 켜진다",
