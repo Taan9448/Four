@@ -1,0 +1,8 @@
+id: icons_teum_menu_2
+type: icon-sheet
+summary: '「틈」 메인 메뉴 아이콘 더하기(2026-11-21) — 1 무공서고(teum/src/main.ts MENU shop). icons_teum_menu와 같은 결'
+frames: 1
+baseline: 0.5
+frame_notes:
+  1: 'martial library — a short stack of three old thread-bound books with a small red seal tag, one scroll lying on top'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

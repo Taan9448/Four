@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { CHAPTER_LENGTH, chapterEvents, FOES, isExplored, PASSIVES, RULES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { CHAPTER_LENGTH, effOn, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -14,6 +14,8 @@ export interface Art {
   props: Anim;
   icons: Anim;
   items: Anim;
+  /** 2026-11-21 늘린 줍는 것 16칸(icons_teum_items_2) */
+  items2: Anim;
   skills: Anim[];
   /** 무공 종류별 이펙트(fx_teum_<종류>, 2026-11-21) — 흰색·회색으로 그려져 오고, 무공 색을 입혀 그린다. 오기 전에는 코드로 그린다 */
   kinds: Map<string, SpriteAsset>;
@@ -66,6 +68,7 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   const fx = new Map<string, Anim>();
   await Promise.all([...fxIds].map(async (id) => fx.set(id, await real(id))));
   const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3')]);
+  const items2 = await real('icons_teum_items_2');
   const kinds = new Map<string, SpriteAsset>();
   await Promise.all(
     KIND_FX.map(async (k) => {
@@ -73,7 +76,7 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       if (a) kinds.set(k, a);
     }),
   );
-  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, skills, kinds };
+  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, skills, kinds };
 }
 
 interface Mark {
@@ -93,7 +96,6 @@ export interface View {
 }
 export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null });
 
-const ITEM_NAME: Record<ItemKind, string> = { food: '주먹밥', herb: '약초', magnet: '물지게', bomb: '벽력탄', frost: '서리 부적', gold: '금화', chest: '상자' };
 
 export function absorb(v: View, s: State, now: number, opt: Options): void {
   for (const e of s.events) {
@@ -109,7 +111,13 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
       v.flash = { born: now, color: '#fff2c0' };
       if (opt.shake) v.shake = 18;
     } else if (e.type === 'freeze') v.flash = { born: now, color: '#9fe6ff' };
-    else if (e.type === 'item' && e.kind !== 'gold' && e.kind !== 'chest') v.banner = { text: ITEM_NAME[e.kind], born: now, kind: 'item' };
+    else if (e.type === 'item' && e.kind !== 'gold' && e.kind !== 'chest') {
+      const d = ITEMS.get(e.kind);
+      if (d && e.kind !== 'merchant') v.banner = { text: `${d.name} — ${d.desc}`, born: now, kind: 'item' };
+    } else if (e.type === 'unlock') {
+      v.banner = { text: `비급을 얻었다 — 「${e.name}」가 열렸다`, born: now, kind: 'unlock' };
+      v.flash = { born: now, color: '#d4b8ff' };
+    }
     else if (e.type === 'hit') {
       if (opt.numbers && (e.crit || e.damage >= 40 || v.marks.length < 120)) v.marks.push({ e, born: now });
     } else if (e.type === 'kill') {
@@ -281,10 +289,9 @@ function drawTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: numb
     for (let cx = cx0; cx <= cx1; cx++) if (!s.explored[cy * t.w + cx]) ctx.fillRect(cx * CELL, cy * CELL - 14, CELL, CELL + 14);
 }
 
-const ICON_IDX: Partial<Record<ItemKind | 'gem', [keyof Art, number]>> = { gem: ['icons', 1], chest: ['icons', 2], food: ['icons', 3], magnet: ['icons', 4], herb: ['items', 1], bomb: ['items', 2], frost: ['items', 3], gold: ['items', 4] };
-const ITEM_COLOR: Record<ItemKind, string> = { food: '#f1efe6', herb: '#6aa84f', magnet: '#4fb4ff', bomb: '#ff6a3a', frost: '#9fe6ff', gold: '#ffd27a', chest: '#c89a3a' };
+/** 줍는 것 그림 칸: items.json icon [시트, 칸] — 시트 이름은 Art 열쇠(icons·items·items2) */
 function drawItemIcon(ctx: CanvasRenderingContext2D, art: Art, kind: ItemKind | 'gem', x: number, y: number, size: number): boolean {
-  const ref = ICON_IDX[kind];
+  const ref = (kind === 'gem' ? ['icons', 1] : ITEMS.get(kind)?.icon) as [keyof Art, number] | undefined;
   const sheet = ref ? (art[ref[0]] as Anim) : null;
   const img = sheet?.images[ref![1] - 1];
   if (!img) return false;
@@ -371,17 +378,20 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     if (!inView(it.x, it.y)) continue;
     const bob = Math.sin(now / 200 + it.x) * 3;
     // 빛기둥: 멀리서도 보이게
-    if (it.kind === 'chest') {
+    const evItem = ITEMS.get(it.kind)?.event;
+    if (evItem) {
+      const col = ITEMS.get(it.kind)!.color;
       const g = ctx.createLinearGradient(it.x, it.y - 120, it.x, it.y);
-      g.addColorStop(0, 'rgba(255,224,138,0)');
-      g.addColorStop(1, 'rgba(255,224,138,0.35)');
+      g.addColorStop(0, hexA(col, 0));
+      g.addColorStop(1, hexA(col, 0.4));
       ctx.fillStyle = g;
       ctx.fillRect(it.x - 10, it.y - 120, 20, 120);
     }
     const prop = it.kind === 'chest' ? art.props?.images[3] : null;
     if (prop) ctx.drawImage(prop, it.x - 22, it.y - 36 + bob, 44, 44);
     else if (!drawItemIcon(ctx, art, it.kind, it.x, it.y - 12 + bob, it.kind === 'chest' ? 34 : 26)) {
-      ctx.fillStyle = ITEM_COLOR[it.kind];
+      const d = ITEMS.get(it.kind);
+      ctx.fillStyle = d?.color ?? '#f1efe6';
       ctx.strokeStyle = '#1d2433';
       ctx.lineWidth = 2;
       if (it.kind === 'chest') {
@@ -391,13 +401,13 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         ctx.fillRect(it.x - 2, it.y - 17 + bob, 4, 6);
       } else {
         ctx.beginPath();
-        ctx.arc(it.x, it.y - 12 + bob, 9, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y - 12 + bob, it.kind === 'merchant' || it.kind === 'shrine' || it.kind === 'cursed' ? 15 : 11, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = '#1d2433';
-        ctx.font = '700 10px sans-serif';
+        ctx.font = '700 12px "Noto Serif KR", serif';
         ctx.textAlign = 'center';
-        ctx.fillText(ITEM_NAME[it.kind][0], it.x, it.y - 8 + bob);
+        ctx.fillText(d?.glyph ?? '?', it.x, it.y - 8 + bob);
       }
     }
   }
@@ -467,11 +477,21 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           ctx.ellipse(f.x, f.y - 2, f.def.radius, f.def.radius * 0.4, 0, 0, Math.PI * 2);
           ctx.fill();
         }
-        if (f.def.rank === 'elite') {
+        if (f.golden || f.elite) {
+          // 금빛 그림자·정예: 몸에 빛을 두른다
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.fillStyle = f.golden ? `rgba(255,210,90,${0.35 + 0.15 * Math.sin(now / 90)})` : 'rgba(255,90,74,0.22)';
+          ctx.beginPath();
+          ctx.ellipse(f.x, f.y - f.def.radius, f.def.radius * 1.3, f.def.radius * 1.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        if (f.def.rank === 'elite' || f.elite || f.golden) {
           const w = f.def.radius * 2.4;
           ctx.fillStyle = 'rgba(0,0,0,0.6)';
           ctx.fillRect(f.x - w / 2, f.y + 6, w, 5);
-          ctx.fillStyle = '#ffb02e';
+          ctx.fillStyle = f.golden ? '#ffe08a' : '#ffb02e';
           ctx.fillRect(f.x - w / 2, f.y + 6, (w * Math.max(0, f.hp)) / f.maxHp, 5);
         }
       },
@@ -640,7 +660,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       const life = e.type === 'bomb' ? 0.6 : 0.3;
       const k = age / life;
       if (k > 1) continue;
-      const r = e.type === 'bomb' ? RULES.items.bomb.radius : e.type === 'burst' ? e.r : 26;
+      const r = e.type === 'bomb' ? 650 : e.type === 'burst' ? e.r : 26;
       ctx.strokeStyle = e.type === 'prop' ? `rgba(220,180,120,${1 - k})` : `rgba(255,170,90,${1 - k})`;
       ctx.lineWidth = e.type === 'bomb' ? 10 * (1 - k) + 2 : 4;
       ctx.beginPath();
@@ -699,6 +719,18 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.textAlign = 'center';
       ctx.fillStyle = `rgba(120,230,120,${1 - k})`;
       ctx.fillText(`+${e.amount}`, p.x, p.y - 70 - k * 20);
+    } else if (e.type === 'dash') {
+      // 보법 자국: 베며 지나감·밀침은 길게, 점멸은 두 자리를 잇는 빛
+      const k = age / 0.35;
+      if (k > 1) continue;
+      ctx.strokeStyle = hexA(e.color, 0.8 * (1 - k));
+      ctx.lineWidth = (e.kind === 'charge' ? 26 : e.kind === 'cut' ? 10 : 4) * (1 - k * 0.6);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(e.x, e.y - 24);
+      ctx.lineTo(e.x + (e.x2 - e.x) * (e.kind === 'blink' ? 1 : Math.min(1, k * 3)), e.y2 - 24 + (e.y2 - e.y) * 0);
+      ctx.stroke();
+      ctx.lineCap = 'butt';
     } else if (e.type === 'graze') {
       const k = age / 0.3;
       if (k > 1) continue;
@@ -748,6 +780,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.fillStyle = 'rgba(159,230,255,0.12)';
     ctx.fillRect(0, 0, cw, ch);
   }
+  if (effOn(s, 'fog')) {
+    // 짙은 안개: 인물 둘레만 보인다
+    const g = ctx.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * 0.12, cw / 2, ch / 2, Math.min(cw, ch) * 0.42);
+    g.addColorStop(0, 'rgba(200,205,215,0)');
+    g.addColorStop(1, 'rgba(200,205,215,0.86)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, cw, ch);
+  }
   for (const f of [v.ultFlash && { born: v.ultFlash.born, color: v.ultFlash.color, life: 1200 }, v.flash && { ...v.flash, life: 500 }]) {
     if (!f) continue;
     const a = Math.max(0, 0.45 - (now - f.born) / f.life);
@@ -786,6 +826,17 @@ function drawHero(ctx: CanvasRenderingContext2D, s: State, art: Art, now: number
   const tilt = p.moving && !walk ? (flip ? -1 : 1) * (0.08 + Math.sin(now / 90) * 0.04) : 0;
   if (dashing) for (let i = 1; i <= 3; i++) drawSpriteAt(ctx, a, img, p.x - p.dashX * i * 16, p.y - p.dashY * i * 16, scale, flip, tilt, 0.18 * (4 - i));
   drawSpriteAt(ctx, a, img, p.x, p.y - bob, scale, flip, tilt, blink ? 0.4 : 1);
+  if (s.t < p.shieldUntil) {
+    // 막는 동안: 금빛 테두리(끝날 때 깜빡)
+    const left = p.shieldUntil - s.t;
+    if (left > 1 || Math.floor(now / 90) % 2 === 0) {
+      ctx.strokeStyle = hexA(s.hero.ult.color, 0.75);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y - 30, 34, 44, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
   const w = 46;
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(p.x - w / 2, p.y + 8, w, 5);
@@ -924,7 +975,7 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   ctx.fillText(clock, W / 2, 46);
   ctx.font = font(12, 600);
   ctx.fillStyle = 'rgba(243,234,216,0.78)';
-  const next = chapterEvents(s.chapter).find((e) => e.at > s.t && (e.kind === 'bigwave' || e.kind === 'mid' || e.kind === 'boss'));
+  const next = s.timeline.find((e) => e.at > s.t && (e.kind === 'bigwave' || e.kind === 'mid' || e.kind === 'boss'));
   const nextName = next ? (next.kind === 'bigwave' ? '빅웨이브' : next.kind === 'mid' ? '중간 보스' : '보스') : '';
   // 좁은 화면(휴대폰 세로)에서는 지도와 겹치지 않게 다음 이정표만
   const narrow = W < 520;

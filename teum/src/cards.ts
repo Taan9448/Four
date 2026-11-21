@@ -76,7 +76,7 @@ export function cardSkills(taken: Set<string>): CardSkills {
       if (c.type === 'power' || (!damage && !blocks && !heals && !debuff)) {
         const st = T.stats[h % T.stats.length];
         const per = st.per * (0.8 + 0.2 * rare);
-        passives.push({ id: `c_${c.id}`, name: c.name, desc: `${st.name} +${st.unit.includes('%') ? `${Math.round(per * 100)}%` : Math.round(per * 10) / 10}${st.unit === '-%' ? '(줄어듦)' : ''}(레벨마다)`, stat: st.stat, per, max: 5, card: c.id } as PassiveDef);
+        passives.push({ id: `c_${c.id}`, name: c.name, desc: `${st.name} +${st.unit.includes('%') ? `${Math.round(per * 100)}%` : Math.round(per * 10) / 10}${st.unit === '-%' ? '(줄어듦)' : ''}(레벨마다)`, stat: st.stat, per, max: 5, card: c.id, rarity: c.rarity } as PassiveDef);
         continue;
       }
       // 무공 종류: 대상·속성·효과로 고르고, 겹치면 주인의 결로
@@ -141,6 +141,7 @@ export function cardSkills(taken: Set<string>): CardSkills {
         ...(c.fx?.startsWith('fx_gyeol_') ? { fx: c.fx } : {}),
         knock: kind === 'slash' || kind === 'orbit' ? 8 : 4,
         card: c.id,
+        rarity: c.rarity,
       } as WeaponDef);
     }
   }

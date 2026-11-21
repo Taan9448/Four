@@ -5,7 +5,7 @@
 
 ## 기준 문서
 - **두 번째 게임 「결」(2026-11-09):** `gyeol/` 폴더. 「천외귀환」의 `assets/`·`data/enemies/`·`src/render/`를 가져다 쓰는 결 읽기 패링 액션. 설계 기준은 `gyeol/docs/GAME_DESIGN.md`. 「천외귀환」 코드는 고치지 않고 가져다 쓰기만 한다.
-- **세 번째 게임 「틈」(2026-11-18):** `teum/` 폴더. 「천외귀환」·「결」의 그림과 적을 가져다 쓰는 30분 생존 액션(뱀서라이크). 설계 기준은 `teum/docs/GAME_DESIGN.md`. 엔진 `teum/src/sim.ts`·지형 `teum/src/terrain.ts`는 순수 함수 + 시드 RNG, 수치는 `teum/data/*.json`. 스토리 10장 × 5분, 장 끝에만 자동 저장. 무공·심법은 손으로 맞춘 것 + 「천외귀환」 카드 286장을 `teum/src/cards.ts`가 바꾼 것(`teum/data/cardskills.json`).
+- **세 번째 게임 「틈」(2026-11-18):** `teum/` 폴더. 「천외귀환」·「결」의 그림과 적을 가져다 쓰는 30분 생존 액션(뱀서라이크). 설계 기준은 `teum/docs/GAME_DESIGN.md`. 엔진 `teum/src/sim.ts`·지형 `teum/src/terrain.ts`는 순수 함수 + 시드 RNG, 수치는 `teum/data/*.json`. 스토리 10장 × 5분, 장 끝에만 자동 저장. 무공·심법은 손으로 맞춘 것 + 「천외귀환」 카드 286장을 `teum/src/cards.ts`가 바꾼 것(`teum/data/cardskills.json`). 카드 무공은 잠겨 있다가 보스·비급·무공서고(금화)로 열린다. 줍는 것은 `teum/data/items.json`(기본 동작 ops), 돌발 이벤트는 `teum/data/story.json random`.
 - 게임 설계의 단일 기준은 `docs/GAME_DESIGN.md`다. 설계를 바꾸면 이 문서부터 고친다.
 - 경로·모듈: `docs/ROUTE_MODULES.md` / 카드·효과: `docs/CARD_EFFECTS.md` / 에셋: `docs/ASSET_PIPELINE.md` / 화풍: `docs/ART_STYLE.md` / 계정 저장(Supabase 설정·SQL): `docs/CLOUD_SAVE.md`
 - 이 저장소를 세팅한 프롬프트 원문: `docs/prompts/`(보관용, 수정하지 않는다)
@@ -17,7 +17,7 @@ npm run dev                 # 게임(http://localhost:5173), ?seed=XXXX[&stage=s
                             # ?screen=reward|choice|scene|clear|win|lose|deck|levelup|shop|bossloot|hub|codex|loadout|pilgrim|surgeguide|surgecut|wardrobe[&module=<id>][&pilgrim] (화면 하나만 띄우기, &pilgrim: 순례 길로, wardrobe&locked: 잠긴 옷장)
                             # ?screen=abyssclear|abyssend|abyssshop|abyssrest[&module=<id>] (심연 화면)
                             # &pxcards: Codex 카드 틀(card_frame_*)이 오기 전에 임시 틀로 픽셀 카드 미리 보기
-                            # http://localhost:5173/teum/ — 「틈」(?screen=lobby|story|load|save|codex|wardrobe|options, ?play=<장 1~10>&hero=<id>[&seed=][&t=초(빨리 감기)], &all: 모든 인물)
+                            # http://localhost:5173/teum/ — 「틈」(?screen=lobby|story|load|save|shop|codex|wardrobe|options, ?play=<장 1~10>&hero=<id>[&seed=][&t=초(빨리 감기)], &all: 모든 인물·무공 열림)
                             # http://localhost:5173/gyeol/ — 「결」(?screen=title|lobby|story|arena|rhythm|practice|records|calibrate, ?foe=<id>[&diff=easy|main|hard][&rhythm][&practice=<수련 id>][&debug] 바로 대결)
 npm test                    # Vitest(엔진·경로·런·데이터·에셋 도구 + gyeol/tests + teum/tests)
 npm run typecheck           # tsc

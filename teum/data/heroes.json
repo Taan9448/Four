@@ -1,5 +1,5 @@
 {
-  "$comment": "「틈」 인물. sprite는 「결」 대결 그림 접두어(<sprite>_idle·_walk·_death), ult는 「결」 마지막 기술(이펙트 fx_gyeol_tech_<ult>_a·b). unlock: 스토리 n장을 넘기면 열린다(어느 칸에서든)",
+  "$comment": "「틈」 인물. sprite는 「결」 대결 그림 접두어(<sprite>_idle·_walk·_death), ult는 「결」 마지막 기술(이펙트 fx_gyeol_tech_<ult>_a·b). unlock: 스토리 n장을 넘기면 열린다(어느 칸에서든). dash·ult kind(2026-11-21 사용자 \"오른쪽 아래 기술을 인물마다 특성 있게\"): 보법 cut 베며 지나감 · charge 밀쳐 냄 · blink 순간 이동 · stomp 내려찍기 / 마지막 기술 waves 검기 · vow 무적 결계 · starfall 별비 · quake 지진",
   "heroes": [
     {
       "id": "haun",
@@ -21,9 +21,24 @@
         "id": "cheonoe_gwiun",
         "name": "천외귀운",
         "damage": 260,
-        "color": "#c8b4ff"
+        "color": "#c8b4ff",
+        "kind": "waves",
+        "glyph": "歸",
+        "desc": "사방 여덟 갈래 검기 + 둘레 그림자 모두 베기, 1.5초 동안 몸이 결 속에 숨는다",
+        "waves": 8,
+        "waveDamage": 140,
+        "shield": 1.5
       },
-      "unlock": null
+      "unlock": null,
+      "dash": {
+        "kind": "cut",
+        "name": "낙운보",
+        "glyph": "落",
+        "desc": "구름처럼 미끄러지며 지나간 길의 그림자를 벤다",
+        "cooldown": 2.4,
+        "damage": 45,
+        "radius": 70
+      }
     },
     {
       "id": "kyle",
@@ -47,12 +62,30 @@
         "name": "수호 서약",
         "damage": 220,
         "heal": 40,
-        "color": "#ffe08a"
+        "color": "#ffe08a",
+        "kind": "vow",
+        "glyph": "誓",
+        "desc": "6초 동안 어떤 공격도 받지 않고, 다가오는 그림자를 밀치며 벤다 · 체력 40 회복",
+        "shield": 6,
+        "pulse": 0.5,
+        "pulseRadius": 230,
+        "pulseDamage": 45
       },
       "unlock": {
         "kind": "chapter",
         "chapter": 2,
         "text": "스토리 2장을 넘기"
+      },
+      "dash": {
+        "kind": "charge",
+        "name": "방패 돌진",
+        "glyph": "盾",
+        "desc": "방패로 들이받아 길의 그림자를 멀리 밀쳐 내고 1초 동안 막는다",
+        "cooldown": 3,
+        "damage": 30,
+        "radius": 60,
+        "knock": 120,
+        "shield": 1
       }
     },
     {
@@ -75,12 +108,28 @@
         "id": "starfall",
         "name": "별의 낙하",
         "damage": 300,
-        "color": "#b48cff"
+        "color": "#b48cff",
+        "kind": "starfall",
+        "glyph": "星",
+        "desc": "4초 동안 별 32개가 보이는 그림자 위로 떨어진다",
+        "count": 32,
+        "seconds": 4,
+        "radius": 90
       },
       "unlock": {
         "kind": "chapter",
         "chapter": 3,
         "text": "스토리 3장을 넘기"
+      },
+      "dash": {
+        "kind": "blink",
+        "name": "점멸",
+        "glyph": "閃",
+        "desc": "벽 너머로도 순간 이동하고, 떠난 자리에 서리를 남긴다",
+        "cooldown": 2.6,
+        "distance": 250,
+        "radius": 130,
+        "slow": 2.5
       }
     },
     {
@@ -104,12 +153,28 @@
         "id": "kazdum_heart",
         "name": "카즈둠의 심장",
         "damage": 320,
-        "color": "#ff6a3a"
+        "color": "#ff6a3a",
+        "kind": "quake",
+        "glyph": "震",
+        "desc": "땅을 뒤흔든다: 화면의 그림자를 치고 2.5초 멈춰 세움, 10초 동안 굳기 +6",
+        "stun": 2.5,
+        "armor": 6,
+        "seconds": 10
       },
       "unlock": {
         "kind": "chapter",
         "chapter": 5,
         "text": "스토리 5장을 넘기"
+      },
+      "dash": {
+        "kind": "stomp",
+        "name": "대지 박차기",
+        "glyph": "踏",
+        "desc": "뛰어올라 내려찍는다 — 둘레를 치고 잠깐 멈춰 세운다",
+        "cooldown": 3.2,
+        "damage": 55,
+        "radius": 160,
+        "stun": 1
       }
     }
   ]

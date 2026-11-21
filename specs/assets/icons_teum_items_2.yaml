@@ -1,0 +1,23 @@
+id: icons_teum_items_2
+type: icon-sheet
+summary: '「틈」 늘린 줍는 것 16종(2026-11-21 사용자 "아이템이 너무 단순 — 15개 이상") — 칸 번호는 teum/data/items.json icon ["items2", n]. icons_teum_items와 같은 결'
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: 'wild ginseng: a pale forked ginseng root with thin hair roots and a few green leaves and red berries on top'
+  2: 'vajra charm: a small golden paper talisman wrapped around a tiny golden vajra (double-ended ritual club), golden glow'
+  3: 'wind pill: a small round pale-green pill on a little paper wrapper, two curling wind lines around it'
+  4: 'blood pill: a glossy deep-red round pill with a faint red aura'
+  5: 'clarity pill: a clear light-blue round pill like a water drop, a tiny white sparkle'
+  6: 'grand elixir: a larger round golden pill in an open small red lacquer box, warm golden glow'
+  7: 'map scrap: a torn piece of old brown paper map with a dotted path and a small red cross'
+  8: 'book of insight: a small closed blue thread-bound book with a glowing violet bookmark'
+  9: 'thunder talisman: a yellow paper talisman with a violet lightning-bolt pattern (no letters), small violet sparks'
+  10: 'purifying water: a small white porcelain bottle with a cork, clear light-blue water drop above it'
+  11: 'gold ingot: a boat-shaped gold ingot (yuanbao), shiny'
+  12: 'lucky pouch: a small round red silk drawstring pouch with a gold tassel'
+  13: 'fire talisman: an orange paper talisman with a flame pattern (no letters), small flames at its corners'
+  14: 'whirlwind talisman: a grey-white paper talisman with a spiral pattern (no letters), a small whirl of wind around it'
+  15: 'hourglass: a small wooden hourglass with pale sand running down'
+  16: 'secret manual: an old tied scroll with a purple cord and a red wax seal, faint violet glow'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }
