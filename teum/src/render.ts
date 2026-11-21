@@ -131,6 +131,23 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
 
 const KIND_FX = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal'];
 /**
+ * 그림 안 자리(프레임 비율, 2026-11-21 Codex 그림을 재서 맞춤 — 160px 프레임에 128px 그림이 아래로 붙어 있다):
+ * ax·ay 게임 위치에 오는 점, span 게임 크기에 맞출 그림 폭(또는 높이)
+ */
+const KG = {
+  slash: { ax: 0.53, ay: 0.57, span: 0.28 }, // 초승달 바깥 반지름 = 베기 반지름, 돌림 중심
+  orbit: { ax: 0.5, ay: 0.58, span: 0.39 },
+  wave: { ax: 0.5, ay: 0.575, span: 0.47 }, // 초승달 높이
+  bolt: { ax: 0.68, ay: 0.51, span: 0.27 }, // 머리
+  nova: { ax: 0.5, ay: 0.56, span: 0.56 }, // 가장 큰 고리 지름
+  aura: { ax: 0.5, ay: 0.545, span: 0.68 },
+  strike: { ax: 0.5, ay: 0.84, span: 0.53 }, // 닿는 곳 · 땅 고리 지름
+  rain: { ax: 0.5, ay: 0.84, span: 0.56 }, // 둥근 자리 지름
+  beam: { ax: 0.19, ay: 0.575, span: 0.61, thick: 0.17 }, // 가로 길이 · 두께
+  chain: { ax: 0.17, ay: 0.575, span: 0.64 },
+  heal: { ax: 0.5, ay: 0.82, span: 0.42 },
+};
+/**
  * 무공 이펙트 한 프레임에 색 입히기: 회색 밝기 × 무공 색, 흰 심지는 더 하얗게. 프레임·색마다 한 번만 만든다(「결」 tinted와 같은 길).
  * k: 한 번 재생(0~1), 아니면 ms로 되풀이
  */
@@ -323,8 +340,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const zimg = z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
     if (zimg) {
       // 그림의 둥근 자리(칸 너비 70%)를 장판 크기에 맞춘다
-      const S = (z.r * 2) / 0.7;
-      blit(ctx, zimg, z.x, z.y, S, S, 0.5, 0.68, 0, 0.35 + 0.65 * k);
+      const S = (z.r * 2) / KG.rain.span;
+      blit(ctx, zimg, z.x, z.y, S, S, KG.rain.ax, KG.rain.ay, 0, 0.3 + 0.45 * k);
       continue;
     }
     ctx.fillStyle = hexA(z.color, 0.16 * k + 0.06);
@@ -412,6 +429,16 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     }
   }
 
+  // 결계(그림): 인물·그림자 밑, 반투명으로 발밑에 깐다(2026-11-21 — 위에 그리면 인물을 가린다)
+  for (const w of s.weapons) {
+    const d = WEAPONS.get(w.id)!;
+    if (d.kind !== 'aura') continue;
+    const aimg = kindImg(art, 'aura', d.color, { ms: now + w.id.length * 53 });
+    if (!aimg) break;
+    const L = d.levels[Math.min(w.lv, d.levels.length) - 1];
+    const S = (90 * L.area * stat.area(s) * 2) / KG.aura.span;
+    blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5);
+  }
   // 그림자·소품·쓰러짐·인물: y 순서
   const draws: { y: number; fn: () => void }[] = [];
   for (const pr of s.props) {
@@ -538,8 +565,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         const by = p.y - 24 + Math.sin(a) * R * 0.8;
         const oimg = kindImg(art, 'orbit', d.color, { ms: now + i * 37 });
         if (oimg) {
-          const S = (36 * area) / 0.35;
-          blit(ctx, oimg, bx, by, S, S);
+          const S = (36 * area) / KG.orbit.span;
+          blit(ctx, oimg, bx, by, S, S, KG.orbit.ax, KG.orbit.ay);
           continue;
         }
         const g = ctx.createRadialGradient(bx, by, 0, bx, by, 18 * area);
@@ -553,11 +580,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       }
     } else if (d.kind === 'aura') {
       const R = 90 * L.area * area;
-      const aimg = kindImg(art, 'aura', d.color, { ms: now });
-      if (aimg) {
-        blit(ctx, aimg, p.x, p.y - 10, (R * 2) / 0.8, ((R * 2) / 0.8) * 0.7, 0.5, 0.5, 0, 0.85);
-        continue;
-      }
+      // 그림이 있으면 발밑에 이미 깔았다(아래 y 순서 앞)
+      if (art.kinds.has('aura')) continue;
       ctx.strokeStyle = hexA(d.color, 0.35 + 0.1 * Math.sin(now / 200));
       ctx.fillStyle = hexA(d.color, 0.07);
       ctx.lineWidth = 2;
@@ -574,8 +598,9 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const simg = sk === 'wave' || sk === 'bolt' ? kindImg(art, sk, sh.color, { ms: now + sh.x }) : null;
     if (simg) {
       // 검기: 초승달 높이(칸 55%)가 탄 지름, 탄: 머리(칸 22%)가 탄 지름의 1.3배
-      const S = sk === 'wave' ? (sh.r * 2.2) / 0.55 : (sh.r * 1.3) / 0.22;
-      blit(ctx, simg, sh.x, sh.y, S, S, 0.5, 0.5, Math.atan2(sh.vy, sh.vx));
+      const g = sk === 'wave' ? KG.wave : KG.bolt;
+      const S = (sh.r * (sk === 'wave' ? 2.2 : 2.4)) / g.span;
+      blit(ctx, simg, sh.x, sh.y, S, S, g.ax, g.ay, Math.atan2(sh.vy, sh.vx));
       continue;
     }
     ctx.save();
@@ -606,7 +631,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       const img = kindImg(art, 'slash', e.color, { k: age / 0.25 });
       if (img) {
         // 초승달이 칸 가운데에서 칸 너비 35% 떨어져 돈다
-        if (age < 0.25) blit(ctx, img, e.x, e.y - 20, e.r / 0.35, e.r / 0.35, 0.5, 0.5, e.angle);
+        if (age < 0.25) blit(ctx, img, e.x, e.y - 20, e.r / KG.slash.span, e.r / KG.slash.span, KG.slash.ax, KG.slash.ay, e.angle);
         continue;
       }
       const k = age / 0.18;
@@ -624,10 +649,11 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'nova') {
       const k = age / 0.45;
       if (k > 1) continue;
-      const img = kindImg(art, 'nova', e.color, { k });
+      // 그림 앞 두 칸(가운데 번쩍임)은 크게 늘리면 인물을 가린다 — 고리 칸부터, 작게 시작해 퍼지게
+      const img = kindImg(art, 'nova', e.color, { k: 0.34 + 0.66 * k });
       if (img) {
-        const S = (e.r * 2) / 0.8;
-        blit(ctx, img, e.x, e.y - 10, S, S * 0.75);
+        const S = ((e.r * 2) / KG.nova.span) * (0.45 + 0.55 * Math.min(1, k * 2.5));
+        blit(ctx, img, e.x, e.y - 10, S, S * 0.75, KG.nova.ax, KG.nova.ay, 0, 0.9);
         continue;
       }
       ctx.strokeStyle = hexA(e.color, 0.8 * (1 - k));
@@ -648,7 +674,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       } else if (e.type === 'strike' && art.kinds.has('strike')) {
         // 바닥 닿는 곳이 칸 높이 75%, 땅 고리가 칸 너비 절반쯤
         const img = kindImg(art, 'strike', e.color, { k });
-        if (img) blit(ctx, img, e.x, e.y, r * 4, r * 4, 0.5, 0.75);
+        if (img) blit(ctx, img, e.x, e.y, (r * 2) / KG.strike.span, (r * 2) / KG.strike.span, KG.strike.ax, KG.strike.ay);
       } else {
         ctx.fillStyle = hexA(e.color, 0.7 * (1 - k));
         if (e.type === 'strike') ctx.fillRect(e.x - 6 * (1 - k) - 2, e.y - 400, 12 * (1 - k) + 4, 400);
@@ -676,7 +702,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           const [x0, y0] = e.pts[i - 1];
           const [x1, y1] = e.pts[i];
           const len = Math.hypot(x1 - x0, y1 - y0);
-          blit(ctx, img, x0, y0, len / 0.8, 90, 0.1, 0.5, Math.atan2(y1 - y0, x1 - x0));
+          blit(ctx, img, x0, y0, len / KG.chain.span, 90, KG.chain.ax, KG.chain.ay, Math.atan2(y1 - y0, x1 - x0));
         }
         continue;
       }
@@ -699,7 +725,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       const img = kindImg(art, 'beam', e.color, { k });
       if (img) {
         // 그림의 빛줄기(칸 10%~90%, 두께 18%)를 길이·너비에 맞춘다
-        blit(ctx, img, e.x, e.y, e.len / 0.8, (e.w * 2) / 0.18, 0.1, 0.5, e.angle);
+        blit(ctx, img, e.x, e.y, e.len / KG.beam.span, (e.w * 2) / KG.beam.thick, KG.beam.ax, KG.beam.ay, e.angle);
         continue;
       }
       ctx.save();
@@ -714,7 +740,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       const k = age / 0.7;
       if (k > 1) continue;
       const img = age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
-      if (img) blit(ctx, img, p.x, p.y, 150, 150, 0.5, 0.8);
+      if (img) blit(ctx, img, p.x, p.y, 60 / KG.heal.span, 60 / KG.heal.span, KG.heal.ax, KG.heal.ay);
       ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = `rgba(120,230,120,${1 - k})`;
