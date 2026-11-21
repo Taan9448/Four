@@ -322,3 +322,49 @@ button { font: inherit; }
   .book-detail .art { max-height: 90px; }
   .tutorial { top: auto; bottom: 150px; }
 }
+
+/* 2026-11-21 6차 무공록: 싸우는 방식 → 칸 → 추천 후보 */
+.book2 { display: flex; flex-direction: column; gap: 8px; }
+.book2 h4 { margin: 6px 0 0; font: 400 16px 'Song Myung', serif; color: var(--gold); }
+.b2-lead { margin: 0; font-size: 13px; color: var(--muted); }
+.b2-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.b2-style { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto; column-gap: 8px; align-items: center; padding: 8px 10px; border: 1px solid rgba(243, 234, 216, 0.2); border-radius: 8px; background: rgba(243, 234, 216, 0.04); color: var(--paper); font: inherit; text-align: left; cursor: pointer; }
+.b2-style .role { grid-row: 1 / 4; }
+.b2-style b { font-size: 15px; }
+.b2-style small { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.b2-style .cnt { color: var(--gold); }
+.b2-style:hover, .b2-style:focus-visible { background: rgba(255, 210, 122, 0.1); }
+.b2-style.on { border-color: var(--gold); background: rgba(255, 210, 122, 0.14); box-shadow: 0 0 0 1px var(--gold) inset; }
+.b2-sum { display: flex; flex-wrap: wrap; gap: 4px; }
+.b2-deck h5 { margin: 6px 0 4px; font-size: 12px; color: var(--muted); }
+.b2-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.b2-slot { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 8px; border: 1px solid rgba(243, 234, 216, 0.16); border-left: 3px solid var(--c, rgba(243, 234, 216, 0.3)); border-radius: 6px; background: rgba(243, 234, 216, 0.04); color: var(--paper); font: inherit; text-align: left; cursor: pointer; }
+.b2-slot:hover { background: rgba(243, 234, 216, 0.08); }
+.b2-slot.on { outline: 2px solid var(--gold); outline-offset: -2px; background: rgba(255, 210, 122, 0.1); }
+.b2-slot.empty { justify-content: center; border-style: dashed; border-left-width: 1px; color: var(--muted); }
+.b2-slot .plus { font-size: 20px; line-height: 1; }
+.b2-slot .sn, .b2-cand .sn { display: flex; flex-direction: column; min-width: 0; }
+.b2-slot .sn b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b2-slot .sn small, .b2-cand .sn small { color: var(--muted); font-size: 11px; }
+.b2-picker { padding: 10px; border: 1px solid var(--gold); border-radius: 8px; background: rgba(20, 16, 10, 0.6); }
+.b2-ph { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+.b2-ph b { margin-right: auto; color: var(--gold); }
+.b2-cur { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+.b2-cands { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 6px; max-height: 46vh; overflow: auto; }
+.b2-cand { display: grid; grid-template-columns: auto auto minmax(0, 1fr); grid-template-rows: auto auto; gap: 4px 8px; align-items: center; padding: 8px; border: 1px solid rgba(243, 234, 216, 0.16); border-left: 3px solid var(--c, rgba(243, 234, 216, 0.3)); border-radius: 6px; background: rgba(10, 10, 16, 0.6); color: var(--paper); font: inherit; text-align: left; cursor: pointer; }
+.b2-cand:hover, .b2-cand:focus-visible { background: rgba(255, 210, 122, 0.12); border-color: var(--gold); }
+.b2-cand .sn b { font-size: 15px; }
+.b2-cand .nums { color: #d6ccb8 !important; }
+.b2-cand .why { grid-column: 1 / 4; display: flex; flex-wrap: wrap; gap: 4px; }
+.b2-cand .why i { padding: 0 6px; border: 1px solid rgba(255, 210, 122, 0.5); border-radius: 8px; font-style: normal; font-size: 11px; color: var(--gold); }
+.b2-tips { margin: 4px 0 0; padding: 8px 12px 8px 26px; border-left: 3px solid #ff8a5c; background: rgba(255, 138, 92, 0.08); font-size: 13px; line-height: 1.6; }
+.b2-ok { margin: 4px 0 0; color: #7fe08a; font-size: 13px; }
+.book-box .modal-close { font-weight: 700; }
+@media (max-width: 760px) {
+  .b2-styles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .b2-style small:not(.cnt) { display: none; }
+  .b2-slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .b2-cands { grid-template-columns: 1fr; max-height: 52vh; }
+}
+.cc-book { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 8px; }
+.cc-book .grade { min-width: 20px; height: 20px; font-size: 12px; }

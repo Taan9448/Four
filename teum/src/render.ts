@@ -30,8 +30,9 @@ export interface Options {
   fx?: 'strong' | 'normal' | 'soft';
   /** 내 무공 이펙트 불투명도 0.15~1(설정 막대, 2026-11-21) — 있으면 fx보다 먼저 */
   fxAlpha?: number;
-  /** 몸 둘레 범위 기술(둘레 돌기·결계·고리·베기·장판·회복) 그림: simple 얇은 선만(기본, 2026-11-21 "빙글빙글·장판이 너무 화려해 눈이 아프다") · fancy 그림 */
-  areaFx?: 'simple' | 'fancy';
+  /** 몸 둘레 범위 기술(둘레 돌기·결계·고리·베기·장판·회복) 그림:
+   *  clean(기본, 2026-11-21 "원만 보여 밋밋 — 인물은 가리지 말고 범위가 보이게") 가운데가 빈 띠·눈금·날 모양 · simple 얇은 선만 · fancy Codex 그림 */
+  areaFx?: 'simple' | 'clean' | 'fancy';
 }
 const FX_ALPHA = { strong: 1, normal: 0.7, soft: 0.42 };
 
@@ -252,6 +253,169 @@ function whiteOf(img: CanvasImageSource, w: number, h: number): CanvasImageSourc
   whiteCache.set(img, cv);
   return cv;
 }
+// ── 깔끔한 범위 기술(2026-11-21 5차): 가운데는 비워 인물을 가리지 않고, 가장자리 띠·눈금·날로 범위를 보인다 ──
+/** 결계: 가운데가 빈 고리 띠 + 천천히 도는 눈금(발밑, 인물 밑) */
+function drawAuraClean(ctx: CanvasRenderingContext2D, x: number, y: number, R: number, color: string, now: number, a: number): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(1, 0.7);
+  const g = ctx.createRadialGradient(0, 0, R * 0.55, 0, 0, R);
+  g.addColorStop(0, hexA(color, 0));
+  g.addColorStop(0.75, hexA(color, 0.1 * a + 0.03));
+  g.addColorStop(1, hexA(color, 0.26 * a + 0.06));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, R, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = hexA(color, 0.55 * a + 0.15);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // 눈금 16개가 8초에 한 바퀴
+  const rot = (now / 8000) * Math.PI * 2;
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = hexA(color, 0.7 * a + 0.2);
+  for (let i = 0; i < 16; i++) {
+    const t = rot + (i / 16) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(t) * R * 0.9, Math.sin(t) * R * 0.9);
+    ctx.lineTo(Math.cos(t) * R, Math.sin(t) * R);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+/** 둘레 돌기: 날 모양(진행 방향으로 뾰족) + 뒤로 남는 짧은 호 꼬리 */
+function drawBladeClean(ctx: CanvasRenderingContext2D, bx: number, by: number, heading: number, len: number, color: string, R: number, ang: number, speed: number, cx: number, cy: number): void {
+  // 꼬리: 지나온 길 0.45라디안
+  const dir = Math.sign(speed || 1);
+  ctx.strokeStyle = hexA(color, 0.35);
+  ctx.lineWidth = len * 0.35;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, R, R * 0.8, 0, dir > 0 ? ang - 0.45 : ang, dir > 0 ? ang : ang + 0.45);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+  ctx.save();
+  ctx.translate(bx, by);
+  ctx.rotate(heading);
+  ctx.beginPath();
+  ctx.moveTo(len * 0.6, 0);
+  ctx.lineTo(0, len * 0.22);
+  ctx.lineTo(-len * 0.4, 0);
+  ctx.lineTo(0, -len * 0.22);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(16,14,22,0.85)';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(16,14,22,0.85)';
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.beginPath();
+  ctx.moveTo(len * 0.5, 0);
+  ctx.lineTo(0, len * 0.08);
+  ctx.lineTo(-len * 0.1, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+/** 베기: 인물에서 떨어진 초승달 날(가운데 두껍고 끝이 가늘다) — 안쪽은 비운다 */
+function drawSlashClean(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, angle: number, arc: number, color: string, k: number): void {
+  const a0 = angle - (arc / 2) * (0.6 + 0.4 * Math.min(1, k * 3));
+  const a1 = angle + (arc / 2) * (0.6 + 0.4 * Math.min(1, k * 3));
+  const ro = r * (0.88 + 0.12 * k);
+  const ri = ro * 0.74;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.beginPath();
+  ctx.arc(0, 0, ro, a0, a1);
+  // 안쪽 호는 가운데로 갈수록 두껍게(초승달)
+  const steps = 14;
+  for (let i = steps; i >= 0; i--) {
+    const t = a0 + ((a1 - a0) * i) / steps;
+    const mid = 1 - Math.abs(i / steps - 0.5) * 2;
+    const rr = ro - (ro - ri) * mid;
+    ctx.lineTo(Math.cos(t) * rr, Math.sin(t) * rr);
+  }
+  ctx.closePath();
+  const g = ctx.createRadialGradient(0, 0, ri, 0, 0, ro);
+  g.addColorStop(0, hexA(color, 0.05 * (1 - k)));
+  g.addColorStop(1, hexA(color, 0.75 * (1 - k)));
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = `rgba(255,255,255,${0.7 * (1 - k)})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, ro, a0, a1);
+  ctx.stroke();
+  ctx.restore();
+}
+/** 고리: 앞쪽이 밝고 뒤로 흐려지는 띠가 퍼진다(가운데는 빈다) */
+function drawNovaClean(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, k: number): void {
+  const rr = r * (0.15 + 0.85 * Math.sqrt(k));
+  const band = Math.max(4, r * 0.18 * (1 - k * 0.6));
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(1, 0.75);
+  const g = ctx.createRadialGradient(0, 0, Math.max(0, rr - band), 0, 0, rr);
+  g.addColorStop(0, hexA(color, 0));
+  g.addColorStop(0.8, hexA(color, 0.3 * (1 - k)));
+  g.addColorStop(1, hexA(color, 0.55 * (1 - k)));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, rr, 0, Math.PI * 2);
+  ctx.arc(0, 0, Math.max(0, rr - band), 0, Math.PI * 2, true);
+  ctx.fill();
+  ctx.strokeStyle = `rgba(255,255,255,${0.55 * (1 - k)})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, rr, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+/** 장판: 테두리 + 안쪽 옅은 빛 + 여기저기 작은 물결(떨어지는 자리) */
+function drawZoneClean(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, now: number, k: number): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(1, 0.6);
+  const g = ctx.createRadialGradient(0, 0, r * 0.3, 0, 0, r);
+  g.addColorStop(0, hexA(color, 0.04));
+  g.addColorStop(1, hexA(color, 0.2 * k + 0.05));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = hexA(color, 0.55 * k + 0.15);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // 물결 넷: 자리마다 0.9초 주기
+  for (let i = 0; i < 4; i++) {
+    const ph = (((now / 900 + i * 0.25 + x * 0.003) % 1) + 1) % 1;
+    const a = i * 2.4 + Math.floor(now / 900 + i * 0.25) * 1.7;
+    const d = r * (0.25 + 0.5 * ((i * 0.37 + Math.floor(now / 900)) % 1));
+    ctx.strokeStyle = hexA(color, 0.6 * (1 - ph) * k);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * d, Math.sin(a) * d, 4 + ph * r * 0.22, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+/** 회복: 발밑 고리 + 떠오르는 십자 넷 */
+function drawHealClean(ctx: CanvasRenderingContext2D, x: number, y: number, k: number): void {
+  ctx.strokeStyle = `rgba(127,224,138,${0.6 * (1 - k)})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(x, y, 26 + k * 10, 9 + k * 3, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = `rgba(160,240,160,${0.85 * (1 - k)})`;
+  for (let i = 0; i < 4; i++) {
+    const px = x + Math.cos(i * 1.7) * 24;
+    const py = y - 10 - k * 46 - i * 6;
+    ctx.fillRect(px - 1, py - 4, 2, 8);
+    ctx.fillRect(px - 4, py - 1, 8, 2);
+  }
+}
+
 /** 적 탄은 늘 같은 위험 색(내 이펙트와 확실히 다르게, 2026-11-21) */
 const DANGER = '#ff2f5f';
 /** 내 무공 이펙트인가(세기 옵션이 듣는 것) */
@@ -404,6 +568,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
 
   const fxa = opt.fxAlpha ?? FX_ALPHA[opt.fx ?? 'normal'];
   const fancy = opt.areaFx === 'fancy';
+  const clean = !opt.areaFx || opt.areaFx === 'clean';
   // 무공 장판(내 것 — 세기 옵션)
   ctx.globalAlpha = fxa;
   for (const z of s.zones) {
@@ -413,6 +578,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       // 그림의 둥근 자리(칸 너비 70%)를 장판 크기에 맞춘다
       const S = (z.r * 2) / KG.rain.span;
       blit(ctx, zimg, z.x, z.y, S, S, KG.rain.ax, KG.rain.ay, 0, 0.3 + 0.45 * k);
+      continue;
+    }
+    if (clean) {
+      drawZoneClean(ctx, z.x, z.y, z.r, z.color, now, k);
       continue;
     }
     ctx.fillStyle = hexA(z.color, fancy ? 0.16 * k + 0.06 : 0.05);
@@ -524,6 +693,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     if (aimg) {
       const S = (R * 2) / KG.aura.span;
       blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5 * fxa);
+      continue;
+    }
+    if (clean) {
+      drawAuraClean(ctx, p.x, p.y - 4, R, d.color, now, fxa);
       continue;
     }
     // 단순: 움직이지 않는 얇은 테두리 하나
@@ -675,6 +848,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           blit(ctx, oimg, bx, by, S, S, KG.orbit.ax, KG.orbit.ay);
           continue;
         }
+        if (clean) {
+          drawBladeClean(ctx, bx, by, a + Math.PI / 2 * Math.sign(L.speed || 1), 15 * area, d.color, R, a, L.speed, p.x, p.y - 24);
+          continue;
+        }
         if (!fancy) {
           // 단순: 작은 알 하나(빛 번짐·회전 그림 없음)
           ctx.fillStyle = 'rgba(16,14,22,0.8)';
@@ -792,6 +969,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.stroke();
       continue;
     }
+    if (e.type === 'slash' && clean) {
+      const k = age / 0.22;
+      if (k > 1) continue;
+      drawSlashClean(ctx, e.x, e.y - 20, e.r, e.angle, e.arc, e.color, k);
+      continue;
+    }
     if (e.type === 'slash' && !fancy) {
       // 단순: 얇은 호 하나, 짧게
       const k = age / 0.16;
@@ -825,6 +1008,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'nova') {
       const k = age / 0.45;
       if (k > 1) continue;
+      if (clean) {
+        drawNovaClean(ctx, e.x, e.y - 10, e.r, e.color, k);
+        continue;
+      }
       if (!fancy) {
         // 단순: 퍼지는 얇은 고리 하나
         ctx.strokeStyle = hexA(e.color, 0.45 * (1 - k));
@@ -926,6 +1113,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       if (k > 1) continue;
       const img = fancy && age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
       if (img) blit(ctx, img, p.x, p.y, 60 / KG.heal.span, 60 / KG.heal.span, KG.heal.ax, KG.heal.ay);
+      else if (clean) drawHealClean(ctx, p.x, p.y, k);
       ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = `rgba(120,230,120,${1 - k})`;

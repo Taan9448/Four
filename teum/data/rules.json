@@ -304,7 +304,9 @@
     "heal",
     "회복"
    ]
-  }
+  },
+  "bookWeapons": 10,
+  "bookPassives": 6
  },
  "sets": {
   "$comment": "속성 세트: 같은 효과(element)를 남기는 무공을 need개 들면 켜진다",

@@ -13,6 +13,8 @@ const STAT_NAME = new Map(T.stats.map((s) => [s.stat, s.name]));
 export const RANGED: Kind[] = ['bolt', 'wave', 'beam', 'chain', 'strike'];
 
 const B = RULES.build as typeof RULES.build & {
+  bookWeapons: number;
+  bookPassives: number;
   grade: { cut: Record<'S' | 'A' | 'B', number>; kindMult: Record<string, number>; statWeight: Record<string, number> };
   roles: Record<string, [string, string]>;
   kindStats: Record<string, string[]>;
@@ -266,4 +268,99 @@ export function roleIcon(key: string): string {
     passive: `<path ${s} d="M16 5l3 7 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z"/>`,
   };
   return `<svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">${body[key] ?? body.close}</svg>`;
+}
+
+// ── 무공록 편성 도우미(2026-11-21 6차 "무공록 고르기가 여전히 불편 — UI/UX 전면 개편"): 칸 중심 편성 ──
+export const BOOK_SLOTS = { weapons: B.bookWeapons, passives: B.bookPassives };
+
+/** 무공록을 칸으로 나눈다: 무공 칸 · 심법 칸(넘치는 것은 버린다) */
+export function splitBook(ids: Iterable<string>): { weapons: string[]; passives: string[] } {
+  const all = [...ids];
+  return { weapons: all.filter((id) => WEAPONS.has(id)).slice(0, B.bookWeapons), passives: all.filter((id) => PASSIVES.has(id)).slice(0, B.bookPassives) };
+}
+
+export interface Suggestion {
+  id: string;
+  score: number;
+  /** 왜 좋은지 짧게(칩) */
+  why: string[];
+}
+/** 칸에 넣을 후보: 지금 무공록과 잘 맞는 순서(등급 · 세트 · 멀리/둘레 균형 · 능력치) */
+export function suggest(heroId: string, open: Iterable<string>, deck: Iterable<string>, kind: 'weapon' | 'passive', replacing?: string): Suggestion[] {
+  const lock = new Set(LOCKABLE);
+  const cur = new Set(deck);
+  if (replacing) cur.delete(replacing);
+  const { weapons } = splitBook(cur);
+  const ec: Record<string, number> = {};
+  let ranged = 0;
+  for (const id of weapons) {
+    const w = WEAPONS.get(id)!;
+    if (w.element) ec[w.element] = (ec[w.element] ?? 0) + 1;
+    if (RANGED.includes(w.kind)) ranged++;
+  }
+  const stats = new Map<string, number>();
+  for (const id of weapons) for (const st of B.kindStats[WEAPONS.get(id)!.kind] ?? []) stats.set(st, (stats.get(st) ?? 0) + 1);
+  const out: Suggestion[] = [];
+  for (const id of open) {
+    if (!lock.has(id) || cur.has(id) || id === replacing) continue;
+    const w = WEAPONS.get(id);
+    const p = PASSIVES.get(id);
+    if (kind === 'weapon' ? !w || (w.owner !== '*' && w.owner !== heroId) : !p) continue;
+    const g = gradeOf(id);
+    let score = GRADE_ORDER[g] * 10;
+    const why: string[] = [`${g}급`];
+    if (w) {
+      if (w.element) {
+        const n = (ec[w.element] ?? 0) + 1;
+        const need = RULES.sets[w.element].need;
+        if (n >= need && (ec[w.element] ?? 0) < need) {
+          score += 14;
+          why.push(`${RULES.sets[w.element].name} 세트 완성`);
+        } else if (n > 1) {
+          score += 6;
+          why.push(`${RULES.sets[w.element].name} ${n}/${need}`);
+        }
+      }
+      if (RANGED.includes(w.kind) && ranged < 4) {
+        score += 5;
+        why.push('멀리 공격 보강');
+      }
+      if (w.owner === heroId) {
+        score += 3;
+        why.push('인물 전용');
+      }
+    } else if (p) {
+      const m = stats.get(p.stat) ?? 0;
+      if (m) {
+        score += Math.min(12, m * 3);
+        why.push(`든 무공 ${m}개와 잘 맞음`);
+      }
+    }
+    out.push({ id, score, why });
+  }
+  return out.sort((a, b) => b.score - a.score);
+}
+
+/** 무공록 조언(짧게, 많아야 셋): 모자란 것 · 세트 하나 남음 · 안 맞는 심법 */
+export function advice(deck: Iterable<string>): string[] {
+  const { weapons, passives } = splitBook(deck);
+  const tips: string[] = [];
+  const ec: Record<string, number> = {};
+  let ranged = 0;
+  let close = 0;
+  for (const id of weapons) {
+    const w = WEAPONS.get(id)!;
+    if (w.element) ec[w.element] = (ec[w.element] ?? 0) + 1;
+    if (RANGED.includes(w.kind)) ranged++;
+    else if (w.kind !== 'heal') close++;
+  }
+  for (const k of ['fire', 'ice', 'shock', 'vuln'] as const) if ((ec[k] ?? 0) === RULES.sets[k].need - 1) tips.push(`${RULES.sets[k].name} ${ec[k]}/${RULES.sets[k].need} — 하나만 더 넣으면 세트(${RULES.sets[k].desc})`);
+  if (weapons.length < 6) tips.push(`무공이 ${weapons.length}개뿐 — 레벨업에서 고를 것이 모자랄 수 있다`);
+  if (weapons.length >= 4 && ranged < 2) tips.push('멀리 공격이 적다 — 투사체·관통을 섞으면 안전하다');
+  if (weapons.length >= 4 && close === 0) tips.push('몸 둘레 공격이 없다 — 무리에 둘러싸이면 위험하다');
+  const stats = new Set(weapons.flatMap((id) => B.kindStats[WEAPONS.get(id)!.kind] ?? []));
+  const off = passives.filter((id) => !stats.has(PASSIVES.get(id)!.stat)).map((id) => PASSIVES.get(id)!.name);
+  if (off.length) tips.push(`든 무공과 잘 안 맞는 심법: ${off.slice(0, 3).join(' · ')}`);
+  if (weapons.length && !weapons.some((id) => ['S', '극'].includes(gradeOf(id))) && !weapons.some((id) => gradeOf(id) === 'A')) tips.push('S·A급 무공이 없다');
+  return tips.slice(0, 3);
 }
