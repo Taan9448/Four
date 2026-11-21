@@ -6,6 +6,11 @@ export type Picker = 'first' | 'smart';
 
 function pickIndex(s: State, how: Picker): number {
   const c = s.pending!;
+  // 떠돌이 상인: 살 수 있는 첫 물건, 없으면 지나간다
+  if (c.some((x) => x.kind === 'leave')) {
+    const i = c.findIndex((x) => x.kind === 'buy' && x.lv <= s.gold);
+    return i >= 0 && how === 'smart' ? i : c.findIndex((x) => x.kind === 'leave');
+  }
   if (how === 'first') return 0;
   const want = new Set(s.weapons.map((w) => WEAPONS.get(w.id)!.evolve?.with).filter(Boolean) as string[]);
   const score = (x: Choice) =>

@@ -156,9 +156,25 @@
    }
   ],
   "chests": {
-   "every": 40,
-   "min": 400,
-   "max": 800
+   "every": 35,
+   "min": 500,
+   "max": 1100
+  },
+  "jitter": {
+   "seconds": 10,
+   "roles": {
+    "swarm": [
+     "main",
+     "fast",
+     "fly",
+     "ranged"
+    ],
+    "ring": [
+     "main",
+     "tank",
+     "fast"
+    ]
+   }
   }
  },
  "chapters": [
@@ -212,19 +228,19 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "bands",
-      "rows": 3,
-      "gaps": 5,
+      "rows": 4,
+      "gaps": 8,
       "gap": 7,
       "thick": 2
      },
      {
       "kind": "blobs",
-      "count": 18,
+      "count": 40,
       "r": [
        1.5,
        3
@@ -232,14 +248,14 @@
      },
      {
       "kind": "slow",
-      "count": 6,
+      "count": 14,
       "r": [
        2,
        4
       ]
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -291,12 +307,12 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "blobs",
-      "count": 55,
+      "count": 124,
       "r": [
        1.5,
        3.6
@@ -304,14 +320,14 @@
      },
      {
       "kind": "slow",
-      "count": 14,
+      "count": 32,
       "r": [
        2,
        5
       ]
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -369,32 +385,32 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "river",
-      "count": 2,
+      "count": 3,
       "width": 4,
-      "bridges": 4,
+      "bridges": 6,
       "dir": "v",
       "type": "hazard"
      },
      {
       "kind": "pillars",
-      "count": 40,
+      "count": 90,
       "size": 2
      },
      {
       "kind": "blobs",
-      "count": 12,
+      "count": 27,
       "r": [
        1.5,
        2.5
       ]
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -448,8 +464,8 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "rooms",
@@ -459,7 +475,7 @@
      },
      {
       "kind": "slow",
-      "count": 18,
+      "count": 40,
       "r": [
        2,
        5
@@ -467,11 +483,11 @@
      },
      {
       "kind": "pillars",
-      "count": 16,
+      "count": 36,
       "size": 2
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -527,8 +543,8 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "caves",
@@ -537,7 +553,7 @@
      },
      {
       "kind": "blobs",
-      "count": 8,
+      "count": 18,
       "r": [
        1,
        2
@@ -545,7 +561,7 @@
       "type": "hazard"
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -600,8 +616,8 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "rooms",
@@ -611,19 +627,19 @@
      },
      {
       "kind": "pillars",
-      "count": 30,
+      "count": 68,
       "size": 2
      },
      {
       "kind": "slow",
-      "count": 8,
+      "count": 18,
       "r": [
        2,
        4
       ]
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -676,14 +692,14 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "river",
-      "count": 1,
+      "count": 2,
       "width": 3,
-      "bridges": 5,
+      "bridges": 8,
       "dir": "h",
       "type": "hazard"
      },
@@ -695,14 +711,14 @@
      },
      {
       "kind": "blobs",
-      "count": 10,
+      "count": 22,
       "r": [
        1,
        2
       ]
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -759,8 +775,8 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "rooms",
@@ -770,7 +786,7 @@
      },
      {
       "kind": "blobs",
-      "count": 24,
+      "count": 54,
       "r": [
        1.2,
        2.6
@@ -778,11 +794,11 @@
      },
      {
       "kind": "pillars",
-      "count": 12,
+      "count": 27,
       "size": 2
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -839,19 +855,19 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "bands",
-      "rows": 8,
-      "gaps": 2,
+      "rows": 12,
+      "gaps": 3,
       "gap": 4,
       "thick": 2
      },
      {
       "kind": "slow",
-      "count": 16,
+      "count": 36,
       "r": [
        2,
        4
@@ -859,11 +875,11 @@
      },
      {
       "kind": "pillars",
-      "count": 14,
+      "count": 32,
       "size": 2
      }
     ],
-    "props": 60
+    "props": 135
    }
   },
   {
@@ -920,12 +936,12 @@
     }
    ],
    "terrainDef": {
-    "w": 90,
-    "h": 90,
+    "w": 135,
+    "h": 135,
     "steps": [
      {
       "kind": "islands",
-      "count": 16,
+      "count": 36,
       "r": [
        5,
        9
@@ -934,12 +950,127 @@
      },
      {
       "kind": "pillars",
-      "count": 10,
+      "count": 22,
       "size": 2
      }
     ],
-    "props": 60
+    "props": 135
    }
   }
- ]
+ ],
+ "random": {
+  "$comment": "돌발 이벤트(2026-11-21 사용자 \"패턴이 거의 비슷해서 재미가 떨어진다\"): 장마다 시드로 count개를 window 안 무작위 때에 고른다(고정 이벤트와 gap초 떨어지게, 같은 것 두 번은 안 나온다)",
+  "count": [
+   3,
+   5
+  ],
+  "window": [
+   18,
+   240
+  ],
+  "gap": 12,
+  "events": [
+   {
+    "id": "golden",
+    "kind": "golden",
+    "text": "금빛 그림자 — 달아나기 전에 잡아라!",
+    "weight": 3,
+    "dur": 25,
+    "hp": 30
+   },
+   {
+    "id": "meteor",
+    "kind": "rain",
+    "text": "별똥이 쏟아진다 — 붉은 원을 피하라",
+    "weight": 2,
+    "dur": 14,
+    "every": 0.4,
+    "damage": 14,
+    "radius": 70,
+    "color": "#ff8a3a"
+   },
+   {
+    "id": "fog",
+    "kind": "fog",
+    "text": "짙은 안개 — 앞이 보이지 않는다",
+    "weight": 2,
+    "dur": 25
+   },
+   {
+    "id": "frenzy",
+    "kind": "frenzy",
+    "text": "그림자들이 미쳐 날뛴다 — 빨라졌다(결 조각 ×1.5)",
+    "weight": 2,
+    "dur": 20,
+    "mul": 1.35,
+    "xp": 1.5
+   },
+   {
+    "id": "wisdom",
+    "kind": "xp",
+    "text": "깨달음의 바람 — 결 조각 두 배",
+    "weight": 2,
+    "dur": 25,
+    "xp": 2
+   },
+   {
+    "id": "surge",
+    "kind": "surge",
+    "text": "틈이 벌어진다 — 그림자가 쏟아진다",
+    "weight": 2,
+    "dur": 18,
+    "mul": 2.5
+   },
+   {
+    "id": "ambush",
+    "kind": "ambush",
+    "text": "매복 — 정예가 숨어 있었다",
+    "weight": 2,
+    "count": 2
+   },
+   {
+    "id": "treasure",
+    "kind": "treasure",
+    "text": "보물 수레가 엎어졌다 — 상자 셋이 흩어졌다",
+    "weight": 2,
+    "count": 3
+   },
+   {
+    "id": "shrine",
+    "kind": "place",
+    "item": "shrine",
+    "text": "축복의 샘이 솟았다 — 지도를 보라",
+    "weight": 2
+   },
+   {
+    "id": "merchant",
+    "kind": "place",
+    "item": "merchant",
+    "text": "떠돌이 상인이 왔다 — 금화로 물건을 판다",
+    "weight": 2
+   },
+   {
+    "id": "cursed",
+    "kind": "place",
+    "item": "cursed",
+    "text": "저주받은 상자가 나타났다 — 열면 정예가 깨어난다",
+    "weight": 1
+   },
+   {
+    "id": "blizzard",
+    "kind": "blizzard",
+    "text": "눈보라 — 발이 무거워진다",
+    "weight": 1,
+    "dur": 20,
+    "slow": 0.8
+   },
+   {
+    "id": "supply",
+    "kind": "supply",
+    "text": "하늘에서 보급이 떨어졌다",
+    "weight": 2,
+    "count": 6
+   }
+  ]
+ }
 }

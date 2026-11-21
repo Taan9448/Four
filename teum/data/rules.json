@@ -31,15 +31,6 @@
   "perLevel": 3.5,
   "square": 0.09
  },
- "drops": {
-  "food": 0.006,
-  "herb": 0.0008,
-  "magnet": 0.0015,
-  "bomb": 0.0008,
-  "frost": 0.0008,
-  "gold": 0.01,
-  "foodHeal": 30
- },
  "foes": {
   "max": 350,
   "spawnRadius": [
@@ -51,29 +42,45 @@
   "overtimeDamagePerMinute": 1.5,
   "separation": 0.35
  },
- "props": {
-  "hp": 1,
-  "drops": {
-   "food": 4,
-   "herb": 1,
-   "magnet": 2,
-   "bomb": 2,
-   "frost": 2,
-   "gold": 6
-  }
- },
- "items": {
-  "bomb": {
-   "damage": 400,
-   "radius": 650
-  },
-  "frost": {
-   "seconds": 5
-  }
- },
  "$comment": "「틈」 공통 규칙(인물·보법·천외귀운·경험 곡선·그림자 상한·떨어뜨림·항아리·소모품). 1차 30분 판(run.json)의 값을 이어받았다",
  "sight": {
   "cells": 9,
   "every": 0.2
+ },
+ "props": {
+  "hp": 1
+ },
+ "story": {
+  "$comment": "장이 올라갈수록 이미 어려운 상태로 시작(2026-11-21 사용자 \"누적된 무공이 있으니 단계가 오를수록 난이도가 이미 있는 상태에서\"): 늘 나오는 무리·체력 시계를 장마다 warmSeconds씩 앞당기고(최대 warmMax), 장이 열리자마자 openWave 마리가 둘러싼다",
+  "warmSeconds": 22,
+  "warmMax": 150,
+  "openWave": {
+   "base": 4,
+   "perChapter": 6
+  }
+ },
+ "unlock": {
+  "$comment": "무공 해금(2026-11-21 사용자 \"처음부터 다 열지 말고 금화로 사거나 보스를 잡으면 열리게\"): 손으로 맞춘 무공·심법은 처음부터, 「천외귀환」 카드 무공·심법은 잠겨 있다",
+  "boss": 3,
+  "mid": 1,
+  "rarityWeight": {
+   "common": 1,
+   "uncommon": 0.8,
+   "rare": 0.6,
+   "epic": 0.35,
+   "legendary": 0.2
+  },
+  "ownWeight": 3,
+  "price": {
+   "common": 40,
+   "uncommon": 70,
+   "rare": 120,
+   "epic": 220,
+   "legendary": 380
+  },
+  "shop": {
+   "offers": 8,
+   "reroll": 15
+  }
  }
 }

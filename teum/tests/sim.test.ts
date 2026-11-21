@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { carryOf, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, PASSIVES, step, STORY, WEAPONS, xpNeed } from '../src/sim';
+import { carryOf, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, step, STORY, WEAPONS, xpNeed } from '../src/sim';
 import { buildTerrain, CELL, T } from '../src/terrain';
 import { runChapter } from './bot';
 
@@ -108,7 +108,7 @@ describe('「틈」 엔진', () => {
     expect(go()).toEqual(go());
   });
 
-  it('레벨·무공·심법·금화는 다음 장으로 이어진다(체력은 가득)', () => {
+  it('레벨·무공·심법은 다음 장으로 이어진다(체력은 가득) — 판 금화는 장마다 0부터(지갑으로 간다), 합계는 기록', () => {
     const s = createChapter(0, 'carry', freshCarry('kyle'));
     s.level = 12;
     s.weapons.push({ id: 'shield_wall', lv: 3, next: 0 });
@@ -119,7 +119,8 @@ describe('「틈」 엔진', () => {
     expect(n.level).toBe(12);
     expect(n.weapons.map((w) => [w.id, w.lv])).toEqual([['knight_strike', 1], ['shield_wall', 3]]);
     expect(n.passives.get('vigor')).toBe(2);
-    expect(n.gold).toBe(33);
+    expect(n.gold).toBe(0);
+    expect(carryOf(n).gold).toBe(33);
     expect(n.player.hp).toBe(n.player.maxHp);
     expect(n.player.maxHp).toBe(130 + 20);
   });
@@ -179,7 +180,7 @@ describe('「틈」 엔진', () => {
   it('보스를 쓰러뜨리면 장을 넘는다', () => {
     const s = createChapter(0, 'boss', freshCarry('haun'));
     s.t = 249.99;
-    s.nextEvent = chapterEvents(s.chapter).findIndex((e) => e.kind === 'boss');
+    s.nextEvent = s.timeline.findIndex((e) => e.kind === 'boss');
     step(s, { x: 0, y: 0 });
     expect(s.boss?.def.id).toBe(s.chapter.roles.boss);
     s.boss!.hp = 1;
@@ -197,4 +198,122 @@ describe('「틈」 엔진', () => {
     expect(runs.filter((s) => s.result === 'clear').length).toBeGreaterThanOrEqual(2);
     for (const s of runs) if (s.result === 'clear') expect(s.t).toBeGreaterThan(4 * 60);
   }, 120000);
+
+  // ── 2026-11-21 사용자 요청: 무공 해금 · 장 난이도 누적 · 맵 1.5배 · 줍는 것 · 인물 기술 · 돌발 이벤트 ──
+  it('줍는 것은 20가지가 넘고, 모두 주우면 탈 없이 돈다', () => {
+    const plain = [...ITEMS.values()].filter((d) => !d.event);
+    expect(plain.length).toBeGreaterThanOrEqual(21);
+    for (const d of ITEMS.values()) {
+      const s = createChapter(2, `it-${d.id}`, freshCarry('haun'), { unlocked: [] });
+      s.gold = 500;
+      s.items.push({ x: s.player.x, y: s.player.y, kind: d.id });
+      for (let i = 0; i < 60 * 4; i++) {
+        if (s.pending) choose(s, s.pending.length - 1);
+        step(s, { x: 0, y: 0 });
+      }
+      expect(s.items.some((it) => it.kind === d.id && it.x === s.player.x), d.id).toBe(false);
+    }
+  });
+
+  it('잠긴 카드 무공은 레벨업에 나오지 않고, 보스를 잡으면 셋이 열린다', () => {
+    const s = createChapter(0, 'lock', freshCarry('haun'), { unlocked: [] });
+    const lockable = new Set(LOCKABLE);
+    expect(choicePool(s).filter((c) => c.lv === 1 && lockable.has(c.id))).toEqual([]);
+    s.t = 249.99;
+    s.nextEvent = s.timeline.findIndex((e) => e.kind === 'boss');
+    step(s, { x: 0, y: 0 });
+    s.boss!.hp = 1;
+    s.boss!.x = s.player.x + 30;
+    s.boss!.y = s.player.y;
+    for (let i = 0; i < 240 && !s.result; i++) {
+      if (s.pending) choose(s, 0);
+      step(s, { x: 0, y: 0 });
+    }
+    expect(s.unlocks.length).toBeGreaterThanOrEqual(3);
+    for (const id of s.unlocks) expect(lockable.has(id)).toBe(true);
+    // 열어 둔 것은 나온다
+    const n = createChapter(1, 'lock2', freshCarry('haun'), { unlocked: s.unlocks });
+    expect(n.locked!.size).toBe(LOCKABLE.length - s.unlocks.length);
+  });
+
+  it('떠돌이 상인: 금화로 사고, 모자라면 못 사고, 지나갈 수 있다', () => {
+    const s = createChapter(0, 'shop', freshCarry('haun'), { unlocked: [] });
+    s.items.push({ x: s.player.x, y: s.player.y, kind: 'merchant' });
+    step(s, { x: 0, y: 0 });
+    expect(s.pending?.at(-1)?.kind).toBe('leave');
+    const buy = s.pending!.findIndex((c) => c.kind === 'buy');
+    choose(s, buy);
+    expect(s.pending).not.toBeNull();
+    s.gold = 999;
+    const price = s.pending![buy].lv;
+    choose(s, buy);
+    expect(s.gold).toBe(999 - price);
+  });
+
+  it('시간표는 시드마다 다르고 돌발 이벤트가 3~5개 섞인다', () => {
+    const ids = STORY.random.events.map((e) => e.id);
+    const a = createChapter(3, 'tl-a', freshCarry('haun')).timeline;
+    const b = createChapter(3, 'tl-b', freshCarry('haun')).timeline;
+    expect(a.map((e) => `${e.kind}@${e.at}`)).not.toEqual(b.map((e) => `${e.kind}@${e.at}`));
+    for (const tl of [a, b]) {
+      const n = tl.filter((e) => e.id && ids.includes(e.id)).length;
+      expect(n).toBeGreaterThanOrEqual(3);
+      expect(n).toBeLessThanOrEqual(5);
+      expect(tl.at(-1)?.kind).toBe('boss');
+    }
+  });
+
+  it('돌발 이벤트는 모두 돈다', () => {
+    for (const ev of STORY.random.events) {
+      const s = createChapter(1, `ev-${ev.id}`, freshCarry('kyle'));
+      s.timeline = [{ ...ev, at: 1 }];
+      for (let i = 0; i < 60 * 3; i++) {
+        if (s.pending) choose(s, 0);
+        step(s, { x: 0.3, y: 0.2 });
+      }
+      expect(s.nextEvent, ev.id).toBe(1);
+    }
+  });
+
+  it('장이 오를수록 이미 어려운 채 시작한다: 기다리는 무리 · 앞당긴 시계', () => {
+    const a = createChapter(0, 'warm', freshCarry('haun'));
+    const b = createChapter(6, 'warm', freshCarry('haun'));
+    expect(a.foes.length).toBe(0);
+    expect(b.foes.length).toBeGreaterThan(30);
+    expect(b.warm).toBeGreaterThan(a.warm);
+  });
+
+  it('맵은 135×135칸(1.5배)', () => {
+    for (const c of STORY.chapters) expect([c.terrainDef.w, c.terrainDef.h]).toEqual([135, 135]);
+    const s = createChapter(4, 'map', freshCarry('haun'));
+    expect(s.terrain.w).toBe(135);
+  });
+
+  it('인물마다 보법·마지막 기술이 다르다 — 모두 돌고, 카일 서약 동안은 맞지 않는다', () => {
+    expect(new Set(HEROES.map((h) => h.dash.kind)).size).toBe(HEROES.length);
+    expect(new Set(HEROES.map((h) => h.ult.kind)).size).toBe(HEROES.length);
+    for (const h of HEROES) {
+      const s = createChapter(1, `kit-${h.id}`, freshCarry(h.id));
+      s.ult = 100;
+      const x0 = s.player.x;
+      step(s, { x: 1, y: 0, dash: true, ult: true });
+      for (let i = 0; i < 60 * 5; i++) {
+        if (s.pending) choose(s, 0);
+        step(s, { x: 0, y: 0 });
+      }
+      expect(s.player.x, h.id).not.toBe(x0);
+      if (h.id === 'kyle') {
+        const k = createChapter(1, 'vow', freshCarry('kyle'));
+        k.ult = 100;
+        step(k, { x: 0, y: 0, ult: true });
+        const hp = k.player.hp;
+        for (let i = 0; i < 60 * 4; i++) {
+          if (k.pending) choose(k, 0);
+          for (const f of k.foes) [f.x, f.y] = [k.player.x + 10, k.player.y];
+          step(k, { x: 0, y: 0 });
+        }
+        expect(k.player.hp).toBe(hp);
+      }
+    }
+  });
 });

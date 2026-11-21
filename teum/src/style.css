@@ -172,3 +172,23 @@ button { font: inherit; }
   .slot { grid-template-columns: 18px 44px 1fr; }
   .slot .btn { grid-column: 3; justify-self: start; }
 }
+
+/* 2026-11-21: 무공서고 · 상인 · 인물 보법/마지막 기술 · 잠긴 비급 · 줍는 것 글자 */
+.menu-btn .mi-icon.glyph { display: inline-grid; place-items: center; font: 400 22px 'Song Myung', serif; color: var(--gold); }
+.pad.ult { background: conic-gradient(color-mix(in srgb, var(--uc, #c0392b) 75%, transparent) calc(var(--k, 0) * 360deg), rgba(10, 10, 16, 0.75) 0); font-family: 'Song Myung', serif; }
+.pad.dash { font-family: 'Song Myung', serif; }
+.hero small.kit { color: var(--paper); line-height: 1.35; }
+.hero small.kit b { color: var(--gold); font-weight: 600; }
+.entry.locked { opacity: 0.5; }
+.entry .thumb + b, .entry b { word-break: keep-all; }
+.glyph-big { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--c, #c2c6d1); color: #1d2433; font: 700 22px 'Song Myung', serif; }
+.choice.buy .glyph-big { margin: 4px auto; }
+.choice.buy.poor { opacity: 0.45; cursor: not-allowed; }
+.panel.levelup.shop h3 { color: var(--gold); }
+.shop-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 12px; }
+.shop-head .wallet { font: 400 22px 'Song Myung', serif; color: var(--gold); }
+.shop-head small { flex: 1 1 260px; color: var(--muted); font-size: 12px; }
+.shop-grid .entry .btn { margin-top: 6px; align-self: stretch; }
+.shop-grid .entry.rare-rare { border-left-color: #4fb4ff; }
+.shop-grid .entry.rare-epic { border-left-color: #a35cff; }
+.shop-grid .entry.rare-legendary { border-left-color: #f2a93b; }

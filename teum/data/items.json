@@ -1,0 +1,39 @@
+{
+  "$comment": "「틈」 줍는 것(2026-11-21 사용자 \"아이템이 너무 단순 — 15개 이상 늘려\"). drop: 그림자가 떨굴 확률, prop: 깨지는 것(항아리·등불)에서 나올 무게, ops: 주웠을 때 하는 일(sim.ts useItem — 기본 동작만, 아이템별 코드 없음). icon: [시트, 칸] 그림, 없으면 glyph 글자. event: 돌발 이벤트로만 놓인다",
+  "items": [
+    { "id": "food", "name": "주먹밥", "desc": "체력 30 회복", "glyph": "飯", "color": "#f1efe6", "icon": ["icons", 3], "drop": 0.006, "prop": 4, "ops": [{ "op": "heal", "amount": 30 }] },
+    { "id": "herb", "name": "약초", "desc": "체력을 모두 회복", "glyph": "草", "color": "#6aa84f", "icon": ["items", 1], "drop": 0.0007, "prop": 1, "ops": [{ "op": "heal", "full": true }] },
+    { "id": "magnet", "name": "자석", "desc": "판의 결 조각을 모두 끌어온다", "glyph": "磁", "color": "#4fb4ff", "icon": ["icons", 4], "drop": 0.0013, "prop": 2, "ops": [{ "op": "magnet" }] },
+    { "id": "bomb", "name": "벽력탄", "desc": "둘레 그림자를 한꺼번에 날린다", "glyph": "爆", "color": "#ff6a3a", "icon": ["items", 2], "drop": 0.0007, "prop": 2, "ops": [{ "op": "bomb", "damage": 400, "radius": 650 }] },
+    { "id": "frost", "name": "서리 부적", "desc": "그림자를 5초 얼린다", "glyph": "霜", "color": "#9fe6ff", "icon": ["items", 3], "drop": 0.0007, "prop": 2, "ops": [{ "op": "freeze", "seconds": 5 }] },
+    { "id": "gold", "name": "금화", "desc": "금화 1~5 — 무공서고에서 비급을 산다", "glyph": "金", "color": "#ffd27a", "icon": ["items", 4], "drop": 0.01, "prop": 6, "ops": [{ "op": "gold", "min": 1, "max": 5 }] },
+    { "id": "ginseng", "name": "산삼", "desc": "최대 체력 +15(다음 장에도) · 15 회복", "glyph": "蔘", "color": "#e0cfae", "icon": ["items2", 1], "drop": 0.0004, "prop": 1, "ops": [{ "op": "maxhp", "amount": 15 }, { "op": "heal", "amount": 15 }] },
+    { "id": "vajra", "name": "금강부", "desc": "6초 동안 어떤 공격도 받지 않는다", "glyph": "剛", "color": "#ffe08a", "icon": ["items2", 2], "drop": 0.0005, "prop": 1, "ops": [{ "op": "shield", "seconds": 6 }] },
+    { "id": "wind_pill", "name": "질풍환", "desc": "12초 동안 걸음 +40%", "glyph": "風", "color": "#bfe3a0", "icon": ["items2", 3], "drop": 0.0008, "prop": 2, "ops": [{ "op": "buff", "stat": "speed", "mul": 1.4, "seconds": 12 }] },
+    { "id": "blood_pill", "name": "혈기단", "desc": "12초 동안 무공 위력 +50%", "glyph": "血", "color": "#ff3b3b", "icon": ["items2", 4], "drop": 0.0006, "prop": 1, "ops": [{ "op": "buff", "stat": "might", "mul": 1.5, "seconds": 12 }] },
+    { "id": "clear_pill", "name": "청심환", "desc": "12초 동안 무공이 40% 빨리 돈다", "glyph": "淸", "color": "#8fd3ff", "icon": ["items2", 5], "drop": 0.0006, "prop": 1, "ops": [{ "op": "buff", "stat": "haste", "mul": 0.6, "seconds": 12 }] },
+    { "id": "elixir", "name": "대환단", "desc": "체력을 모두 되찾고 최대 체력 +10, 금강 3초", "glyph": "丹", "color": "#f2a93b", "icon": ["items2", 6], "drop": 0.0001, "prop": 0.2, "ops": [{ "op": "maxhp", "amount": 10 }, { "op": "heal", "full": true }, { "op": "shield", "seconds": 3 }] },
+    { "id": "map_scrap", "name": "지도 조각", "desc": "둘레 넓게 지도를 밝히고 상자를 보인다", "glyph": "圖", "color": "#b8a184", "icon": ["items2", 7], "drop": 0.0006, "prop": 2, "ops": [{ "op": "reveal", "cells": 30 }] },
+    { "id": "insight", "name": "깨달음의 서", "desc": "경험이 한 레벨의 60%만큼 찬다", "glyph": "悟", "color": "#d4b8ff", "icon": ["items2", 8], "drop": 0.0005, "prop": 1, "ops": [{ "op": "xp", "frac": 0.6 }] },
+    { "id": "thunder", "name": "뇌전부", "desc": "3초 동안 보이는 그림자에 벼락 18번", "glyph": "雷", "color": "#d4b8ff", "icon": ["items2", 9], "drop": 0.0006, "prop": 1, "ops": [{ "op": "storm", "count": 18, "seconds": 3, "damage": 90, "radius": 70, "color": "#cdb8ff" }] },
+    { "id": "purify", "name": "정화수", "desc": "날아오는 탄·붉은 원을 모두 지우고 20 회복", "glyph": "淨", "color": "#dff4ff", "icon": ["items2", 10], "drop": 0.0006, "prop": 1, "ops": [{ "op": "purge" }, { "op": "heal", "amount": 20 }] },
+    { "id": "gold_bar", "name": "금괴", "desc": "금화 25~40", "glyph": "錠", "color": "#ffd27a", "icon": ["items2", 11], "drop": 0.0004, "prop": 1, "ops": [{ "op": "gold", "min": 25, "max": 40 }] },
+    { "id": "pouch", "name": "복주머니", "desc": "무엇이 들었는지 열어 봐야 안다", "glyph": "福", "color": "#ff8a5c", "icon": ["items2", 12], "drop": 0.0006, "prop": 2, "ops": [{ "op": "random" }] },
+    { "id": "fire_charm", "name": "화염부", "desc": "발밑에 8초 동안 불 장판", "glyph": "炎", "color": "#ff8a3a", "icon": ["items2", 13], "drop": 0.0006, "prop": 1, "ops": [{ "op": "field", "seconds": 8, "radius": 160, "damage": 30, "element": "fire", "color": "#ff8a3a" }] },
+    { "id": "whirl_charm", "name": "회오리부", "desc": "둘레 그림자를 멀리 밀쳐 낸다", "glyph": "旋", "color": "#c2c6d1", "icon": ["items2", 14], "drop": 0.0006, "prop": 1, "ops": [{ "op": "push", "radius": 360, "force": 260, "damage": 40 }] },
+    { "id": "hourglass", "name": "모래시계", "desc": "10초 동안 그림자가 절반 빠르기로 걷는다", "glyph": "沙", "color": "#e0cfae", "icon": ["items2", 15], "drop": 0.0005, "prop": 1, "ops": [{ "op": "slowfoes", "seconds": 10, "mul": 0.5 }] },
+    { "id": "secret_book", "name": "비급", "desc": "잠긴 무공·심법 하나가 영원히 열린다", "glyph": "秘", "color": "#a35cff", "icon": ["items2", 16], "drop": 0.00015, "prop": 0.15, "ops": [{ "op": "unlock", "count": 1 }] },
+    { "id": "shrine", "name": "축복의 샘", "desc": "30초 동안 강한 축복 하나", "glyph": "泉", "color": "#8fd3ff", "event": true, "ops": [{ "op": "random", "pool": "blessing" }, { "op": "heal", "amount": 40 }] },
+    { "id": "merchant", "name": "떠돌이 상인", "desc": "금화로 물건을 산다", "glyph": "商", "color": "#f2a93b", "event": true, "ops": [{ "op": "shop", "count": 3 }] },
+    { "id": "cursed", "name": "저주받은 상자", "desc": "열면 정예가 깨어난다 — 대신 상자 둘 몫", "glyph": "呪", "color": "#a02634", "event": true, "ops": [{ "op": "ambush", "count": 2 }, { "op": "chest" }, { "op": "chest" }] },
+    { "id": "chest", "name": "보물상자", "desc": "무공 하나가 오르거나 각성한다", "glyph": "箱", "color": "#c89a3a", "icon": ["icons", 2], "event": true, "ops": [{ "op": "chest" }] }
+  ],
+  "blessing": [
+    { "op": "buff", "stat": "might", "mul": 1.6, "seconds": 30 },
+    { "op": "buff", "stat": "haste", "mul": 0.6, "seconds": 30 },
+    { "op": "buff", "stat": "speed", "mul": 1.35, "seconds": 30 },
+    { "op": "buff", "stat": "area", "mul": 1.4, "seconds": 30 },
+    { "op": "shield", "seconds": 8 }
+  ],
+  "prices": { "food": 6, "herb": 25, "magnet": 12, "bomb": 20, "frost": 18, "ginseng": 30, "vajra": 25, "wind_pill": 10, "blood_pill": 18, "clear_pill": 18, "elixir": 60, "map_scrap": 8, "insight": 22, "thunder": 20, "purify": 15, "fire_charm": 15, "whirl_charm": 12, "hourglass": 18, "secret_book": 90 }
+}

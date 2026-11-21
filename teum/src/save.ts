@@ -23,10 +23,16 @@ export interface SaveData {
   options: Options;
   /** 인물마다 입은 옷(옷장): 옷 id, 기본은 없음 */
   outfits: Record<string, string>;
+  /** 금화 지갑(2026-11-21): 장을 마칠 때(넘든 지든) 그 장에서 모은 금화가 들어온다 — 무공서고에서 쓴다 */
+  wallet: number;
+  /** 연 카드 무공·심법 id(보스·중간 보스·비급·무공서고) */
+  unlocked: string[];
+  /** 무공서고 진열(다시 펼치면 +1) */
+  shopSeed: number;
 }
 
 const KEY = 'teum.save';
-const fresh = (): SaveData => ({ v: 2, slots: [null, null, null], active: 0, seen: [], maxCleared: 0, options: { shake: true, numbers: true, map: 'small' }, outfits: {} });
+const fresh = (): SaveData => ({ v: 2, slots: [null, null, null], active: 0, seen: [], maxCleared: 0, options: { shake: true, numbers: true, map: 'small' }, outfits: {}, wallet: 0, unlocked: [], shopSeed: 1 });
 
 export function loadSave(): SaveData {
   try {
@@ -59,6 +65,12 @@ export const slotLabel = (s: Slot | null): string => {
   const t = Math.floor(s.carry.playTime / 60);
   return `${hero} · ${diff} · Lv.${s.carry.level} · ${where} · ${t}분`;
 };
+
+/** 판에서 번 것을 계정에 넣는다: 금화는 지갑으로, 연 무공은 목록으로(장을 넘든 지든 남는다 — 로그라이크) */
+export function bank(sv: SaveData, gold: number, unlocks: string[]): void {
+  sv.wallet = Math.max(0, (sv.wallet ?? 0) + Math.max(0, Math.round(gold)));
+  sv.unlocked = [...new Set([...(sv.unlocked ?? []), ...unlocks])];
+}
 
 /** 장을 넘은 순간: 지금 칸에 이어 갈 것을 적는다 */
 export function autosave(sv: SaveData, slot: Slot): void {

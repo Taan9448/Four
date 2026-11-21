@@ -4,10 +4,11 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { CHAPTER_LENGTH, carryOf, choose, createChapter, DT, FOES, freshCarry, HEROES, PASSIVES, RULES, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { CHAPTER_LENGTH, carryOf, choose, createChapter, dashCooldown, DT, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, rarityOf, RULES, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
-import { autosave, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
+import { autosave, bank, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
+import { createRng } from '../../src/engine/rng';
 
 const app = document.getElementById('app')!;
 const params = new URLSearchParams(location.search);
@@ -100,11 +101,13 @@ function backdrop(): HTMLElement {
 }
 
 // ── 2. 메인 ──
+// 2026-11-21 사용자 "메뉴 밑 설명은 다 지우고 간단 명료하게"
 const MENU = [
-  { id: 'load', name: '불러오기', note: '저장 3칸 중 하나를 골라 다음 장부터 잇는다', icon: 1 },
-  { id: 'save', name: '저장', note: '자동 저장할 칸 고르기 · 지우기(장을 넘을 때마다 자동)', icon: 2 },
-  { id: 'story', name: '스토리', note: '1장부터 새로 — 노말 · 하드(준비 중)', icon: 3 },
-  { id: 'endless', name: '무한 모드', note: '준비 중 — 스토리를 다 만든 뒤', icon: 4, locked: true },
+  { id: 'load', name: '불러오기', icon: 1 },
+  { id: 'save', name: '저장', icon: 2 },
+  { id: 'story', name: '스토리', icon: 3 },
+  { id: 'shop', name: '무공서고', icon: 0 },
+  { id: 'endless', name: '무한 모드', icon: 4, locked: true },
 ] as const;
 const CORNER = [
   { id: 'codex', name: '도감', icon: 5 },
@@ -118,9 +121,8 @@ function lobby(): void {
   const any = sv.slots.some(Boolean);
   const items = MENU.map((m, i) => {
     const locked = 'locked' in m || (m.id === 'load' && !any);
-    const icon = realArt('icons_teum_menu', m.icon);
-    const sub = m.id === 'load' && any ? slotLabel(sv.slots[sv.active] ?? sv.slots.find(Boolean)!) : locked && m.id === 'load' ? '저장된 칸이 없다' : m.note;
-    return btn([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'mi-icon', src: icon, alt: '' }) : '', el('span', { class: 'mi-label' }, el('b', {}, m.name), el('small', {}, sub))], `menu-btn${locked ? ' locked' : ''}${m.id === 'story' && !any ? ' primary' : ''}${m.id === 'load' && any ? ' primary' : ''}`, () => !locked && openMenu(m.id), locked ? { disabled: '' } : {});
+    const icon = m.icon ? realArt('icons_teum_menu', m.icon) : realArt('icons_teum_menu_2', 1);
+    return btn([el('span', { class: 'key' }, String(i + 1)), icon ? el('img', { class: 'mi-icon', src: icon, alt: '' }) : el('span', { class: 'mi-icon glyph' }, '書'), el('span', { class: 'mi-label' }, el('b', {}, m.name))], `menu-btn${locked ? ' locked' : ''}${m.id === 'story' && !any ? ' primary' : ''}${m.id === 'load' && any ? ' primary' : ''}`, () => !locked && openMenu(m.id), locked ? { disabled: '' } : {});
   });
   const corner = el(
     'nav',
@@ -156,6 +158,7 @@ function openMenu(id: string): void {
   if (id === 'load') return loadPopup();
   if (id === 'save') return savePopup();
   if (id === 'story') return storyPopup();
+  if (id === 'shop') return shopPopup();
   if (id === 'codex') return codexPopup();
   if (id === 'wardrobe') return wardrobePopup();
   if (id === 'options') return optionsPopup();
@@ -255,7 +258,9 @@ function storyPopup(): void {
             el('b', {}, h.name),
             el('small', {}, h.title),
             el('small', {}, `체력 ${h.hp} · 걸음 ${Math.round(h.speed * 100)}%${h.armor ? ` · 단단함 ${h.armor}` : ''}`),
-            el('small', {}, `「${WEAPONS.get(h.start)?.name}」 · 마지막 기술 「${h.ult.name}」`),
+            el('small', {}, `「${WEAPONS.get(h.start)?.name}」으로 시작`),
+            el('small', { class: 'kit' }, el('b', {}, `${h.dash.glyph} ${h.dash.name}`), ` — ${h.dash.desc}`),
+            el('small', { class: 'kit' }, el('b', {}, `${h.ult.glyph} ${h.ult.name}`), ` — ${h.ult.desc}`),
             open ? '' : el('small', { class: 'lock' }, `🔒 ${h.unlock?.text}`),
           ],
           `hero${open ? '' : ' locked'}`,
@@ -281,12 +286,80 @@ function storyPopup(): void {
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
+const RARITY_NAME: Record<string, string> = { common: '흔함', uncommon: '드묾', rare: '귀함', epic: '영웅', legendary: '전설' };
+
+/** 무공서고(2026-11-21 사용자 "스킬을 처음부터 다 열지 말고 돈으로 사거나 보스를 잡으면 열리게"):
+ *  금화 지갑으로 잠긴 「천외귀환」 카드 무공·심법을 연다. 진열은 지갑 시드로 정해지고, 다시 펼치면 바뀐다 */
+function shopPopup(): void {
+  const sv = loadSave();
+  const U = RULES.unlock;
+  const body = el('div', { class: 'shop' });
+  const render = () => {
+    const open = new Set(sv.unlocked);
+    const locked = LOCKABLE.filter((id) => !open.has(id));
+    const rng = createRng(`teum-shop:${sv.shopSeed}`);
+    const pool = [...locked];
+    const offers: string[] = [];
+    while (offers.length < U.shop.offers && pool.length) offers.push(pool.splice(rng.int(0, pool.length - 1), 1)[0]);
+    const reroll = btn(`다시 펼치기 · 금화 ${U.shop.reroll}`, 'btn small ghost', () => {
+      if (sv.wallet < U.shop.reroll) return;
+      sv.wallet -= U.shop.reroll;
+      sv.shopSeed++;
+      writeSave(sv);
+      render();
+    }, sv.wallet < U.shop.reroll ? { disabled: '' } : {});
+    const head = el(
+      'div',
+      { class: 'shop-head' },
+      el('b', { class: 'wallet' }, `금화 ${sv.wallet}`),
+      el('small', {}, `연 비급 ${LOCKABLE.length - locked.length} / ${LOCKABLE.length} — 장에서 모은 금화가 여기로 온다. 보스는 비급 ${U.boss}개, 중간 보스는 ${U.mid}개를 떨군다`),
+      reroll,
+    );
+    const grid = el(
+      'div',
+      { class: 'grid text shop-grid' },
+      ...offers.map((id) => {
+        const w = WEAPONS.get(id);
+        const pd = PASSIVES.get(id);
+        const r = rarityOf(id);
+        const price = U.price[r] ?? 60;
+        const a = cardArtUrl(w?.card ?? pd?.card ?? '');
+        const owner = w && w.owner !== '*' ? (HEROES.find((h) => h.id === w.owner)?.name ?? '') : '모두';
+        const poor = sv.wallet < price;
+        return el(
+          'div',
+          { class: `entry rare-${r}`, style: w ? `--c:${w.color}` : '' },
+          a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '',
+          el('b', {}, w?.name ?? pd?.name ?? id),
+          el('small', {}, `${w ? `무공 · ${KIND_NAME[w.kind]}` : '심법'} · ${owner} · ${RARITY_NAME[r] ?? r}`),
+          el('small', {}, w?.desc ?? pd?.desc ?? ''),
+          btn(`금화 ${price}에 연다`, `btn small${poor ? '' : ' primary'}`, () => {
+            if (sv.wallet < price) return;
+            sv.wallet -= price;
+            sv.unlocked = [...sv.unlocked, id];
+            writeSave(sv);
+            render();
+          }, poor ? { disabled: '' } : {}),
+        );
+      }),
+    );
+    body.replaceChildren(head, locked.length ? grid : el('p', {}, '모든 비급을 열었다.'));
+  };
+  render();
+  const { root } = modal('무공서고 — 비급 사기');
+  root.querySelector('.modal-box')!.classList.add('wide');
+  root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
+}
+
 function codexPopup(): void {
   const sv = loadSave();
-  let tab: 'foes' | 'weapons' | 'passives' = 'foes';
+  let tab: 'foes' | 'weapons' | 'passives' | 'items' = 'foes';
+  const openSet = new Set(sv.unlocked);
+  const lockable = new Set(LOCKABLE);
+  const isLocked = (id: string) => !ALL && lockable.has(id) && !openSet.has(id);
   const body = el('div', { class: 'codex' });
   const render = () => {
-    const tabs = el('div', { class: 'row-pick' }, ...([['foes', '그림자'], ['weapons', '무공'], ['passives', '심법']] as const).map(([k, n]) => btn(n, `chip${tab === k ? ' on' : ''}`, () => ((tab = k), render()))));
+    const tabs = el('div', { class: 'row-pick' }, ...([['foes', '그림자'], ['weapons', '무공'], ['passives', '심법'], ['items', '줍는 것']] as const).map(([k, n]) => btn(n, `chip${tab === k ? ' on' : ''}`, () => ((tab = k), render()))));
     let list: HTMLElement[];
     if (tab === 'foes') {
       list = STORY.chapters.flatMap((c) => {
@@ -307,10 +380,13 @@ function codexPopup(): void {
       });
     } else if (tab === 'weapons') {
       const ws = [...WEAPONS.values()];
-      list = [el('p', { class: 'note' }, `무공 ${ws.length}개 — 손으로 맞춘 ${ws.filter((w) => !w.card).length} · 「천외귀환」 카드 ${ws.filter((w) => w.card).length}`), el('div', { class: 'grid text' }, ...ws.map((w) => { const a = cardArtUrl(w.card ?? ''); return el('div', { class: 'entry', style: `--c:${w.color}` }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, `${w.name}${w.evolved ? ' ★' : ''}`), el('small', {}, `${w.owner === '*' ? '모두' : (HEROES.find((h) => h.id === w.owner)?.name ?? '')} · ${KIND_NAME[w.kind]}`), el('small', {}, w.desc)); }))];
+      list = [el('p', { class: 'note' }, `무공 ${ws.length}개 — 손으로 맞춘 ${ws.filter((w) => !w.card).length} · 「천외귀환」 카드 ${ws.filter((w) => w.card).length}`), el('div', { class: 'grid text' }, ...ws.map((w) => { const a = cardArtUrl(w.card ?? ''); const lk = isLocked(w.id); return el('div', { class: `entry${lk ? ' locked' : ''}`, style: `--c:${w.color}` }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, `${lk ? '🔒 ' : ''}${w.name}${w.evolved ? ' ★' : ''}`), el('small', {}, `${w.owner === '*' ? '모두' : (HEROES.find((h) => h.id === w.owner)?.name ?? '')} · ${KIND_NAME[w.kind]}`), el('small', {}, w.desc)); }))];
+    } else if (tab === 'items') {
+      const its = [...ITEMS.values()];
+      list = [el('p', { class: 'note' }, `줍는 것 ${its.length}가지 — 그림자·항아리에서 나오거나, 돌발 이벤트로 놓인다`), el('div', { class: 'grid text' }, ...its.map((it) => el('div', { class: 'entry', style: `--c:${it.color}` }, el('span', { class: 'glyph-big' }, it.glyph), el('b', {}, it.name), el('small', {}, it.desc), it.event ? el('small', {}, '돌발 이벤트') : '')))];
     } else {
       const ps = [...PASSIVES.values()];
-      list = [el('p', { class: 'note' }, `심법 ${ps.length}개`), el('div', { class: 'grid text' }, ...ps.map((p) => { const a = cardArtUrl(p.card ?? ''); return el('div', { class: 'entry' }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, p.name), el('small', {}, `${p.desc} · 최대 Lv.${p.max}`)); }))];
+      list = [el('p', { class: 'note' }, `심법 ${ps.length}개`), el('div', { class: 'grid text' }, ...ps.map((p) => { const a = cardArtUrl(p.card ?? ''); const lk = isLocked(p.id); return el('div', { class: `entry${lk ? ' locked' : ''}` }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, `${lk ? '🔒 ' : ''}${p.name}`), el('small', {}, `${p.desc} · 최대 Lv.${p.max}`)); }))];
     }
     body.replaceChildren(tabs, el('div', { class: 'codex-list' }, ...list));
   };
@@ -416,15 +492,16 @@ async function play(slot: Slot): Promise<void> {
   screenKeys = null;
   const sv = loadSave();
   const seed = params.get('seed') ?? `${slot.hero}-${slot.chapter}-${Date.now().toString(36)}`;
-  const s = createChapter(slot.chapter, seed, slot.carry);
+  const s = createChapter(slot.chapter, seed, slot.carry, ALL ? {} : { unlocked: sv.unlocked });
   const skip = Number(params.get('t') ?? 0);
   if (skip > 0) await fastForward(s, skip);
   const canvas = el('canvas', { class: 'field', 'aria-label': `틈 — ${s.chapter.name}` });
   const ctx = canvas.getContext('2d')!;
   const overlay = el('div', { class: 'overlay', hidden: '' });
   const stick = el('div', { class: 'stick', hidden: '' }, el('div', { class: 'knob' }));
-  const dashBtn = el('button', { class: 'pad dash', type: 'button', 'aria-label': '보법' }, '步');
-  const ultBtn = el('button', { class: 'pad ult', type: 'button', 'aria-label': s.hero.ult.name }, '天');
+  // 인물마다 다른 보법·마지막 기술(2026-11-21): 단추 글자도 인물 것
+  const dashBtn = el('button', { class: 'pad dash', type: 'button', 'aria-label': `${s.hero.dash.name}(Shift·Space)`, title: `${s.hero.dash.name} — ${s.hero.dash.desc}` }, s.hero.dash.glyph);
+  const ultBtn = el('button', { class: 'pad ult', type: 'button', 'aria-label': `${s.hero.ult.name}(E)`, title: `${s.hero.ult.name} — ${s.hero.ult.desc}`, style: `--uc:${s.hero.ult.color}` }, s.hero.ult.glyph);
   const pauseBtn = btn('Ⅱ', 'pad pause', () => pause(), { 'aria-label': '멈춤(ESC)' });
   app.replaceChildren(el('section', { class: 'screen run' }, canvas, stick, dashBtn, ultBtn, pauseBtn, overlay));
   const loading = el('div', { class: 'loading' }, `${s.chapter.name} — 그림을 불러오는 중…`);
@@ -442,7 +519,7 @@ async function play(slot: Slot): Promise<void> {
   let touch: { id: number; x0: number; y0: number; x: number; y: number } | null = null;
   const onKey = (e: KeyboardEvent) => {
     if (e.type === 'keydown') {
-      if (!overlay.hidden && /^[123]$/.test(e.key) && s.pending) return pick(Number(e.key) - 1);
+      if (!overlay.hidden && /^[1-4]$/.test(e.key) && s.pending) return pick(Number(e.key) - 1);
       if (e.code === 'Escape') {
         if (document.querySelector('.modal')) return;
         return void (paused ? resume() : pause());
@@ -504,10 +581,27 @@ async function play(slot: Slot): Promise<void> {
   };
 
   const choiceCard = (c: Choice, i: number): HTMLElement => {
+    // 떠돌이 상인: 물건(값) · 지나간다
+    if (c.kind === 'buy' || c.kind === 'leave') {
+      const it = ITEMS.get(c.id);
+      const poor = c.kind === 'buy' && s.gold < c.lv;
+      const b = el(
+        'button',
+        { class: `choice buy${poor ? ' poor' : ''}`, type: 'button', style: `--c:${it?.color ?? '#c2c6d1'}` },
+        el('span', { class: 'key' }, String(i + 1)),
+        c.kind === 'buy' ? el('span', { class: 'glyph-big' }, it?.glyph ?? '?') : '',
+        el('span', { class: 'tag' }, c.kind === 'buy' ? `금화 ${c.lv}${poor ? ' — 모자란다' : ''}` : '그냥 간다'),
+        el('b', {}, c.kind === 'buy' ? (it?.name ?? c.id) : '지나간다'),
+        el('span', { class: 'desc' }, c.kind === 'buy' ? (it?.desc ?? '') : '아무것도 사지 않는다'),
+      );
+      if (poor) b.setAttribute('disabled', '');
+      b.addEventListener('click', () => pick(i));
+      return b;
+    }
     const w = c.kind === 'weapon' ? WEAPONS.get(c.id) : undefined;
     const pd = c.kind === 'passive' ? PASSIVES.get(c.id) : undefined;
     const name = w?.name ?? pd?.name ?? (c.kind === 'gold' ? '금화 15' : '굳센 몸');
-    const desc = w ? (c.lv === 1 ? w.desc : levelDiff(c.id, c.lv)) : pd ? pd.desc : c.kind === 'gold' ? '금화를 15 얻는다' : `최대 체력 +10(다음 장에도) · 체력 ${RULES.drops.foodHeal} 회복`;
+    const desc = w ? (c.lv === 1 ? w.desc : levelDiff(c.id, c.lv)) : pd ? pd.desc : c.kind === 'gold' ? '금화를 15 얻는다' : '최대 체력 +10(다음 장에도) · 체력 30 회복';
     const tag = w ? (c.lv === 1 ? '새 무공' : `무공 Lv.${c.lv}`) : pd ? (c.lv === 1 ? '새 심법' : `심법 Lv.${c.lv}`) : '보상';
     const evo = w?.evolve ? `각성: ${PASSIVES.get(w.evolve.with)?.name}와 함께 Lv.5 → 「${WEAPONS.get(w.evolve.into)?.name}」` : '';
     const art = cardArtUrl(w?.card ?? pd?.card ?? '');
@@ -518,7 +612,8 @@ async function play(slot: Slot): Promise<void> {
   };
   const showChoices = () => {
     overlay.hidden = false;
-    overlay.replaceChildren(el('div', { class: 'panel levelup' }, el('h3', {}, `Lv.${s.level - s.queuedLevels + 1} — 하나를 고른다`), el('div', { class: 'choices' }, ...s.pending!.map(choiceCard))));
+    const shop = s.pending!.some((c) => c.kind === 'leave');
+    overlay.replaceChildren(el('div', { class: `panel levelup${shop ? ' shop' : ''}` }, el('h3', {}, shop ? `떠돌이 상인 — 가진 금화 ${s.gold}` : `Lv.${s.level - s.queuedLevels + 1} — 하나를 고른다`), el('div', { class: 'choices' }, ...s.pending!.map(choiceCard))));
   };
   const pick = (i: number) => {
     if (!s.pending) return;
@@ -544,7 +639,10 @@ async function play(slot: Slot): Promise<void> {
           btn('계속', 'btn primary', resume),
           btn('옵션', 'btn ghost', () => optionsPopup(() => Object.assign(opt, loadSave().options))),
           btn('메인으로(이 장은 처음부터)', 'btn ghost', () => {
-            if (confirm('메인으로 나갈까? 이 장의 진행은 저장되지 않는다(장을 넘을 때만 자동 저장).')) lobby();
+            if (confirm('메인으로 나갈까? 이 장의 진행은 저장되지 않는다(장을 넘을 때만 자동 저장). 번 금화·비급은 남는다.')) {
+              bankOnQuit();
+              lobby();
+            }
           }),
         ),
       ),
@@ -558,11 +656,23 @@ async function play(slot: Slot): Promise<void> {
   const opt = { ...sv.options };
 
   let ended = false;
+  let banked = false;
+  /** 장 도중 메인으로 나가도 번 금화·비급은 챙긴다 */
+  const bankOnQuit = () => {
+    if (banked) return;
+    banked = true;
+    const save = loadSave();
+    bank(save, s.gold, s.unlocks);
+    writeSave(save);
+  };
   const finish = () => {
     if (ended) return;
     ended = true;
     const save = loadSave();
     save.seen = [...new Set([...save.seen, ...seen])];
+    // 번 금화·연 비급은 장을 넘든 지든 계정에 남는다
+    bank(save, s.gold, s.unlocks);
+    banked = true;
     const xp = trainingXp(s);
     void gainXp(xp, null, null).catch(() => undefined);
     const clear = s.result === 'clear';
@@ -583,7 +693,8 @@ async function play(slot: Slot): Promise<void> {
         el('h3', {}, clear ? (done ? "틈을 꿰맸다 — 이야기 끝" : `${s.chapter.name}을 넘었다`) : '그림자에 묻혔다'),
         el('p', {}, `${fmt(s.t)} · Lv.${s.level} · 쓰러뜨림 ${s.chapterKills} · 금화 ${s.gold}`),
         el('p', { class: 'muted' }, clear ? `자동 저장 — ${save.active + 1}번 칸 · ${done ? "모든 장을 넘었다" : `다음: ${STORY.chapters[next.chapter].name}`}` : '이 장은 처음부터 다시 — 레벨·무공은 장을 시작할 때 그대로'),
-        el('p', { class: 'muted' }, `「천외귀환」 수련 경험치 +${xp}`),
+        el('p', { class: 'muted' }, `「천외귀환」 수련 경험치 +${xp} · 금화 지갑 +${s.gold}(${save.wallet})`),
+        s.unlocks.length ? el('p', { class: 'unlock' }, `새로 연 무공: ${s.unlocks.map((id) => `「${WEAPONS.get(id)?.name ?? PASSIVES.get(id)?.name}」`).join(' ')}`) : '',
         newly.length ? el('p', { class: 'unlock' }, `새 인물: ${newly.join(', ')}`) : '',
         el(
           'div',
@@ -626,7 +737,7 @@ async function play(slot: Slot): Promise<void> {
     last = now;
     absorb(view, s, now, opt);
     draw(ctx, s, art, view, now, W, H, zoom, dpr, opt);
-    dashBtn.style.setProperty('--k', String(1 - Math.max(0, s.player.dashReady - s.t) / RULES.dash.cooldown));
+    dashBtn.style.setProperty('--k', String(1 - Math.max(0, s.player.dashReady - s.t) / dashCooldown(s)));
     ultBtn.style.setProperty('--k', String(s.ult / RULES.ult.max));
     ultBtn.classList.toggle('ready', s.ult >= RULES.ult.max);
     if (s.pending && overlay.hidden) showChoices();
