@@ -1,0 +1,8 @@
+id: cg_teum_prologue_1
+type: story-cg
+character: haun
+summary: '「틈」 프롤로그 그림 1/3 — 스토리를 새로 시작할 때 보여 주는 짧은 이야기(2026-11-21). 「틈」 장 일러스트(cg_teum_ch*)와 같은 화풍'
+frame_notes:
+  1: 'At dusk on Cheongun mountain, Jin Haun, a young man in a plain grey work outfit, splits firewood with his woodcutting axe in the back courtyard of a humble mountain sect; tiled roofs and pine trees behind him, warm lantern light, a calm everyday moment, a faint thin red line just visible high in the evening sky.'
+framing: 'A cinematic story illustration shown full-screen behind two lines of story text at the bottom. Keep the bottom quarter darker and calmer for the text; key subject in the upper and middle area. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each; swords and staffs perfectly straight.'
+placeholder: { color: '#2a2630' }

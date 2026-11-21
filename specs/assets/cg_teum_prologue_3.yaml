@@ -1,0 +1,7 @@
+id: cg_teum_prologue_3
+type: story-cg
+summary: '「틈」 프롤로그 그림 3/3 — 스토리를 새로 시작할 때 보여 주는 짧은 이야기(2026-11-21). 「틈」 장 일러스트(cg_teum_ch*)와 같은 화풍'
+frame_notes:
+  1: 'Four companions stand together on a high cliff edge, seen from behind and slightly to the side, facing a distant glowing red crack in the sky: Jin Haun in a grey work outfit with his axe, the blond knight Kyle Rowen in silver armor and blue tabard with a straight sword, the silver-haired mage Elia with a long wooden staff, and the red-bearded dwarf Born with his two-handed battle axe; wind in their clothes, determined, dawn light on the horizon.'
+framing: 'A cinematic story illustration shown full-screen behind two lines of story text at the bottom. Keep the bottom quarter darker and calmer for the text; key subject in the upper and middle area. Wide 3:2 frame, strong readable silhouettes, dramatic light, no text. Correct human anatomy: two arms, two hands with five fingers each; swords and staffs perfectly straight.'
+placeholder: { color: '#2a2630' }

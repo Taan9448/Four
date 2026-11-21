@@ -4,8 +4,8 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { banish, CHAPTER_LENGTH, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
-import { absorb, draw, emptyView, loadArt, type Art, type View } from './render';
+import { banish, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { absorb, draw, emptyView, loadArt, SKILL_ICON, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
 import { autosave, bank, cheonoeCards, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
@@ -108,7 +108,7 @@ const MENU = [
   { id: 'save', name: '저장', icon: 2 },
   { id: 'story', name: '스토리', icon: 3 },
   { id: 'shop', name: '장터', icon: 0 },
-  { id: 'endless', name: '무한 모드', icon: 4, locked: true },
+  { id: 'endless', name: '무한 모드', icon: 4 },
 ] as const;
 const CORNER = [
   { id: 'codex', name: '도감', icon: 5 },
@@ -162,6 +162,7 @@ function openMenu(id: string): void {
   if (id === 'save') return savePopup();
   if (id === 'story') return storyPopup();
   if (id === 'shop' || id === 'market') return shopPopup();
+  if (id === 'endless') return endlessPopup();
   if (id === 'codex') return codexPopup();
   if (id === 'wardrobe') return wardrobePopup();
   if (id === 'options') return optionsPopup();
@@ -248,7 +249,8 @@ function storyPopup(): void {
   const body = el('div', { class: 'story-pick' });
   const render = () => {
     const slots = el('div', { class: 'row-pick' }, ...sv.slots.map((s, i) => btn(`${i + 1}번 칸${s ? ' (덮어씀)' : ''}`, `chip${slotIdx === i ? ' on' : ''}`, () => ((slotIdx = i), render()))));
-    const diffs = el('div', { class: 'row-pick' }, ...STORY.difficulties.map((d) => btn(d.open ? d.name : `${d.name} — ${d.note ?? '준비 중'}`, `chip${diff === d.id ? ' on' : ''}${d.open ? '' : ' locked'}`, () => d.open && ((diff = d.id), render()), d.open ? {} : { disabled: '' })));
+    // 난이도(2026-11-21 노말/하드): 카드 둘
+    const diffs = el('div', { class: 'diff-pick' }, ...STORY.difficulties.map((d) => btn([el('b', {}, d.name), el('small', {}, d.note ?? '')], `diff-card d-${d.id}${diff === d.id ? ' on' : ''}`, () => d.open && ((diff = d.id), render()), d.open ? {} : { disabled: '' })));
     const heroes = el(
       'div',
       { class: 'heroes' },
@@ -275,7 +277,8 @@ function storyPopup(): void {
             sv.active = slotIdx;
             writeSave(sv);
             close();
-            chapterCard(slot);
+            // 새 이야기: 짧은 프롤로그부터
+            prologue(() => chapterCard(slot));
           },
           open ? {} : { disabled: '' },
         );
@@ -289,7 +292,129 @@ function storyPopup(): void {
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
-const RARITY_NAME: Record<string, string> = { common: '흔함', uncommon: '드묾', rare: '귀함', epic: '영웅', legendary: '전설' };
+
+/** 무공 그림: 카드 무공은 카드 그림, 손으로 맞춘 무공·심법은 무공 아이콘 시트(icons_teum_skills_1~4) */
+function skillArt(id: string): string | null {
+  const card = WEAPONS.get(id)?.card ?? PASSIVES.get(id)?.card;
+  if (card) return cardArtUrl(card);
+  const i = SKILL_ICON.get(id);
+  if (i === undefined) return null;
+  return i < 35 ? realArt(`icons_teum_skills_${Math.floor(i / 16) + 1}`, (i % 16) + 1) : realArt('icons_teum_skills_4', i - 35 + 1);
+}
+/** 효과 배지(2026-11-21 7차 "효과 표시를 명확하게"): 속성마다 색·글자가 다르다 */
+const ELEM = { fire: ['炎', '화염'], ice: ['霜', '서리'], shock: ['雷', '뇌전'], vuln: ['破', '파쇄'] } as const;
+function elemBadge(e: keyof typeof ELEM | undefined, withName = true): HTMLElement | string {
+  if (!e) return '';
+  return el('span', { class: `elem e-${e}`, title: RULES.sets[e].desc }, el('i', {}, ELEM[e][0]), withName ? ELEM[e][1] : '');
+}
+/** 무공·심법 카드(그림 · 등급 · 갈래 · 이름 · 효과 · 한 줄 설명 · 숫자) — 재편성·무공록·장터가 같이 쓴다 */
+function skillCard(id: string, opts: { lv?: number; extra?: (HTMLElement | string)[]; cls?: string; compact?: boolean } = {}): HTMLElement {
+  const w = WEAPONS.get(id);
+  const pd = PASSIVES.get(id);
+  const g = gradeOf(id);
+  const r = roleOf(id);
+  const ic = el('span', { class: `role role-${r.key}` });
+  ic.innerHTML = roleIcon(r.key);
+  const art = skillArt(id);
+  const info = describe(id);
+  const lv = opts.lv;
+  const nums = lv ? keyNumbers(id, lv).map((n) => `${n.label} ${n.to}`).join(' · ') : w ? `피해 ${w.levels[0].damage}→${w.levels[w.levels.length - 1].damage} · 대기 ${w.levels[w.levels.length - 1].cooldown}초` : keyNumbers(id, pd!.max).map((n) => `${n.label} ${n.to}(최대)`).join('');
+  return el(
+    'div',
+    { class: `skc${opts.compact ? ' compact' : ''} ${opts.cls ?? ''}`, style: w ? `--c:${w.color}` : '' },
+    el('div', { class: 'skc-art' }, art ? el('img', { src: art, alt: '', loading: 'lazy' }) : el('span', { class: 'skc-glyph' }, (w?.name ?? pd?.name ?? '?')[0]), el('span', { class: `grade g-${g === '극' ? 'X' : g}` }, g)),
+    el(
+      'div',
+      { class: 'skc-body' },
+      el('div', { class: 'skc-head' }, ic, el('b', {}, w?.name ?? pd?.name ?? id), lv ? el('span', { class: 'lv' }, `Lv.${lv}`) : ''),
+      el('div', { class: 'skc-tags' }, el('span', { class: 'kind' }, r.name), elemBadge(w?.element), w?.evolve ? el('span', { class: 'evo-t' }, '각성 가능') : ''),
+      opts.compact ? '' : el('p', {}, info.lines[0] ?? ''),
+      el('small', { class: 'nums' }, nums),
+      ...(opts.extra ?? []),
+    ),
+  );
+}
+
+/** 프롤로그(2026-11-21 7차): 스토리를 새로 시작할 때 그림 넷 + 두 줄 이야기 — 누르면 다음, 건너뛰기 */
+function prologue(onDone: () => void): void {
+  stopRun?.();
+  const pages = (STORY as unknown as { prologue: { cg: string; fallback: string; text: string }[] }).prologue ?? [];
+  let i = 0;
+  const show = () => {
+    if (i >= pages.length) return onDone();
+    const pg = pages[i];
+    const img = realArt(pg.cg) ?? realArt(pg.fallback);
+    const next = btn(i === pages.length - 1 ? '시작한다' : '다음', 'btn primary', () => (i++, show()));
+    app.replaceChildren(
+      el(
+        'section',
+        { class: 'screen prologue', style: img ? `--cg:url("${img}")` : '' },
+        el('div', { class: 'pro-text' }, el('small', {}, `${i + 1} / ${pages.length}`), el('p', {}, pg.text), el('div', { class: 'menu-row' }, next, btn('건너뛰기', 'btn ghost', onDone))),
+      ),
+    );
+    screenKeys = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') next.click();
+      if (e.key === 'Escape') onDone();
+    };
+    next.focus();
+  };
+  show();
+}
+
+/** 무한 모드(2026-11-21 7차): 인물 고르기 · 무공록 · 기록 · 규칙 요약 */
+function endlessPopup(): void {
+  const sv = loadSave();
+  let hero = sv.endless?.hero ?? HEROES[0].id;
+  const body = el('div', { class: 'endless' });
+  const slotOf = (): Slot => ({ hero, difficulty: 'normal', chapter: 0, carry: freshCarry(hero), updatedAt: Date.now(), book: sv.endless?.hero === hero ? sv.endless.book : undefined });
+  const E = RULES.endless;
+  const render = () => {
+    const best = sv.endlessBest ?? {};
+    const heroes = el(
+      'div',
+      { class: 'heroes compact' },
+      ...HEROES.map((h) => {
+        const open = heroOpen(sv, h.id, ALL);
+        const art = realArt(h.stand) ?? frameUrl(`${h.sprite}_idle`, 1);
+        return btn([el('div', { class: 'portrait' }, art ? el('img', { src: art, alt: '' }) : ''), el('b', {}, h.name), el('small', {}, best[h.id] ? `최고 ${fmt(best[h.id])}` : '기록 없음'), open ? '' : el('small', { class: 'lock' }, `🔒 ${h.unlock?.text}`)], `hero${open ? '' : ' locked'}${hero === h.id ? ' on' : ''}`, () => open && ((hero = h.id), render()), open ? {} : { disabled: '' });
+      }),
+    );
+    const slot = slotOf();
+    body.replaceChildren(
+      el('p', { class: 'b2-lead' }, '틈은 닫히지 않는다 — 얼마나 버티는가. 30분을 넘기기 어렵다.'),
+      el(
+        'ul',
+        { class: 'rules' },
+        el('li', {}, `${E.event[0] / 60}~${E.event[1] / 60}분마다 돌발 이벤트, ${E.boss.every / 60}분마다 보스`),
+        el('li', {}, `보스를 ${Math.floor(E.boss.enrage / 60)}분 ${E.boss.enrage % 60}초 안에 못 잡으면 광폭화 — 보스와 무리가 빨라지고 거세진다`),
+        el('li', {}, `무공 ${E.slots.weapons}칸 · 심법 ${E.slots.passives}칸 · 맵은 스토리의 다섯 배 넘게 넓다`),
+        el('li', {}, '떠돌이 상인과 수련소(무공 사기·올리기·내려놓기)가 때때로 나온다'),
+      ),
+      el('h4', {}, '누가 버티는가'),
+      heroes,
+      el(
+        'div',
+        { class: 'menu-row' },
+        btn('들어간다', 'btn primary', () => {
+          close();
+          void play(slotOf(), false, true);
+        }),
+        btn(`무공록 편성 · ${splitBook(bookOf(slot, sv)).weapons.length + splitBook(bookOf(slot, sv)).passives.length}장`, 'btn ghost', () =>
+          bookPopup(slot, () => render(), (book) => {
+            const s2 = loadSave();
+            s2.endless = { hero, book };
+            writeSave(s2);
+            sv.endless = { hero, book };
+          }),
+        ),
+      ),
+    );
+  };
+  render();
+  const { root, close } = modal('무한 모드');
+  root.querySelector('.modal-box')!.classList.add('wide');
+  root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
+}
 
 const LOCK_SET = new Set(LOCKABLE);
 /** 연 카드 무공·심법: 「틈」에서 연 것 + 「천외귀환」에서 모은 카드(2026-11-21) */
@@ -316,19 +441,25 @@ const bookOf = (slot: Slot, sv: SaveData): string[] => (slot.book ?? autoBook(sl
 /** 무공서고(2026-11-21 사용자 "스킬을 처음부터 다 열지 말고 돈으로 사거나 보스를 잡으면 열리게"):
  *  금화 지갑으로 잠긴 「천외귀환」 카드 무공·심법을 연다. 진열은 지갑 시드로 정해지고, 다시 펼치면 바뀐다 */
 function shopPopup(initial: 'up' | 'book' = 'up'): void {
+  // 2026-11-21 7차 전면 개편: 장터 = 가게 둘(수련 도장 · 비급 서고), 물건은 값표 붙은 판, 지갑은 엽전 주머니
   const sv = loadSave();
   sv.upgrades ??= {};
   const U = RULES.unlock;
   let tab = initial;
-  const body = el('div', { class: 'shop' });
+  const body = el('div', { class: 'market' });
   const render = () => {
-    const tabs = el('div', { class: 'row-pick' }, btn('수련(영구 능력)', `chip${tab === 'up' ? ' on' : ''}`, () => ((tab = 'up'), render())), btn('비급(무공 열기)', `chip${tab === 'book' ? ' on' : ''}`, () => ((tab = 'book'), render())));
-    const wallet = el('b', { class: 'wallet' }, `금화 ${sv.wallet}`);
+    const purse = el('div', { class: 'purse' }, el('span', { class: 'coin' }, '錢'), el('b', {}, String(sv.wallet)), el('small', {}, '금화'));
+    const signs = el(
+      'div',
+      { class: 'signs' },
+      btn([el('i', {}, '道'), el('b', {}, '수련 도장'), el('small', {}, '영구 능력')], `sign${tab === 'up' ? ' on' : ''}`, () => ((tab = 'up'), render())),
+      btn([el('i', {}, '書'), el('b', {}, '비급 서고'), el('small', {}, '카드 무공 열기')], `sign${tab === 'book' ? ' on' : ''}`, () => ((tab = 'book'), render())),
+    );
+    const head = el('div', { class: 'market-head' }, signs, purse);
     if (tab === 'up') {
-      // 장터 수련(2026-11-21 "금화를 쓸 곳이 없다"): 영구 능력 — 판에서 져도 조금씩 강해진다
-      const grid = el(
+      const goods = el(
         'div',
-        { class: 'grid text shop-grid' },
+        { class: 'goods' },
         ...RULES.upgrades.list.map((u) => {
           const lv = sv.upgrades[u.id] ?? 0;
           const max = u.cost.length;
@@ -336,12 +467,13 @@ function shopPopup(initial: 'up' | 'book' = 'up'): void {
           const poor = price === undefined || sv.wallet < price;
           return el(
             'div',
-            { class: 'entry upg' },
-            el('b', {}, `${u.name} ${'●'.repeat(lv)}${'○'.repeat(max - lv)}`),
-            el('small', {}, u.desc),
+            { class: `good up${price === undefined ? ' done' : ''}` },
+            el('b', {}, u.name),
+            el('p', {}, u.desc),
+            el('div', { class: 'pips' }, ...Array.from({ length: max }, (_, i) => el('span', { class: i < lv ? 'on' : '' }))),
             price === undefined
-              ? el('small', { class: 'done' }, '다 배웠다')
-              : btn(`금화 ${price}`, `btn small${poor ? '' : ' primary'}`, () => {
+              ? el('span', { class: 'tag done' }, '다 배웠다')
+              : btn([el('span', { class: 'coin' }, '錢'), String(price)], `tag${poor ? ' poor' : ''}`, () => {
                   if (sv.wallet < price) return;
                   sv.wallet -= price;
                   sv.upgrades[u.id] = lv + 1;
@@ -351,7 +483,7 @@ function shopPopup(initial: 'up' | 'book' = 'up'): void {
           );
         }),
       );
-      body.replaceChildren(tabs, el('div', { class: 'shop-head' }, wallet, el('small', {}, '장에서 모은 금화가 여기로 온다. 배운 수련은 모든 인물·모든 장에 듣는다')), grid);
+      body.replaceChildren(head, el('p', { class: 'market-note' }, '장에서 모은 금화가 지갑으로 온다. 배운 수련은 모든 인물 · 모든 장 · 무한 모드에 듣는다.'), goods);
       return;
     }
     const open = openCards(sv);
@@ -360,61 +492,57 @@ function shopPopup(initial: 'up' | 'book' = 'up'): void {
     const pool = [...locked];
     const offers: string[] = [];
     while (offers.length < U.shop.offers && pool.length) offers.push(pool.splice(rng.int(0, pool.length - 1), 1)[0]);
-    const rerollBtn = btn(`다시 펼치기 · 금화 ${U.shop.reroll}`, 'btn small ghost', () => {
-      if (sv.wallet < U.shop.reroll) return;
-      sv.wallet -= U.shop.reroll;
-      sv.shopSeed++;
-      writeSave(sv);
-      render();
-    }, sv.wallet < U.shop.reroll ? { disabled: '' } : {});
-    const linked = cheonoeCards().length;
-    const head = el(
+    const goods = el(
       'div',
-      { class: 'shop-head' },
-      wallet,
-      el('small', {}, `연 비급 ${LOCKABLE.length - locked.length} / ${LOCKABLE.length}${linked ? ` — 「천외귀환」에서 모은 카드도 열린 것으로 친다` : ''}. 보스는 비급 ${U.boss}개, 중간 보스는 ${U.mid}개를 떨군다`),
-      rerollBtn,
-    );
-    const grid = el(
-      'div',
-      { class: 'grid text shop-grid' },
+      { class: 'goods books' },
       ...offers.map((id) => {
         const w = WEAPONS.get(id);
-        const pd = PASSIVES.get(id);
         const r = rarityOf(id);
         const price = U.price[r] ?? 60;
-        const a = cardArtUrl(w?.card ?? pd?.card ?? '');
-        const owner = w && w.owner !== '*' ? (HEROES.find((h) => h.id === w.owner)?.name ?? '') : '모두';
         const poor = sv.wallet < price;
-        return el(
-          'div',
-          { class: `entry rare-${r}`, style: w ? `--c:${w.color}` : '' },
-          a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '',
-          el('b', {}, w?.name ?? pd?.name ?? id),
-          el('small', {}, `${w ? `무공 · ${KIND_NAME[w.kind]}` : '심법'} · ${owner} · ${RARITY_NAME[r] ?? r}`),
-          el('small', {}, w?.desc ?? pd?.desc ?? ''),
-          btn(`금화 ${price}에 연다`, `btn small${poor ? '' : ' primary'}`, () => {
-            if (sv.wallet < price) return;
-            sv.wallet -= price;
-            sv.unlocked = [...sv.unlocked, id];
-            writeSave(sv);
-            render();
-          }, poor ? { disabled: '' } : {}),
-        );
+        const owner = w && w.owner !== '*' ? `${HEROES.find((h) => h.id === w.owner)?.name ?? ''} 전용` : '';
+        return skillCard(id, {
+          cls: 'good',
+          extra: [
+            owner ? el('small', { class: 'owner' }, owner) : '',
+            btn([el('span', { class: 'coin' }, '錢'), String(price)], `tag${poor ? ' poor' : ''}`, () => {
+              if (sv.wallet < price) return;
+              sv.wallet -= price;
+              sv.unlocked = [...sv.unlocked, id];
+              writeSave(sv);
+              render();
+            }, poor ? { disabled: '' } : {}),
+          ],
+        });
       }),
     );
-    body.replaceChildren(tabs, head, locked.length ? grid : el('p', {}, '모든 비급을 열었다.'));
+    body.replaceChildren(
+      head,
+      el(
+        'div',
+        { class: 'market-note row' },
+        el('span', {}, `연 비급 ${LOCKABLE.length - locked.length} / ${LOCKABLE.length} — 보스는 ${U.boss}개, 중간 보스는 ${U.mid}개를 떨군다. 「천외귀환」에서 모은 카드도 열린 것으로 친다.`),
+        btn('새 물건 펼치기 · 錢 ' + U.shop.reroll, 'btn small ghost', () => {
+          if (sv.wallet < U.shop.reroll) return;
+          sv.wallet -= U.shop.reroll;
+          sv.shopSeed++;
+          writeSave(sv);
+          render();
+        }, sv.wallet < U.shop.reroll ? { disabled: '' } : {}),
+      ),
+      locked.length ? goods : el('p', {}, '모든 비급을 열었다.'),
+    );
   };
   render();
   const { root } = modal('장터');
-  root.querySelector('.modal-box')!.classList.add('wide');
+  root.querySelector('.modal-box')!.classList.add('wide', 'market-box');
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
 /** 무공록(2026-11-21 6차 전면 개편 — "무공록 고르기가 여전히 불편"):
  *  긴 목록에서 찾는 대신 ① 싸우는 방식 고르기 → ② 무공 10칸·심법 6칸 보기 → ③ 칸을 누르면 그 칸에 잘 맞는 후보 8개(까닭 칩)에서 바꾸기.
  *  전체 목록은 「모두 보기」에서만. 조언 줄이 모자란 것을 알려 준다. */
-function bookPopup(slot: Slot, onDone: () => void): void {
+function bookPopup(slot: Slot, onDone: () => void, saveTo?: (book: string[]) => void): void {
   const sv = loadSave();
   const open = openCards(sv);
   let pick = new Set(bookOf(slot, sv));
@@ -438,6 +566,11 @@ function bookPopup(slot: Slot, onDone: () => void): void {
     return i;
   };
   const gradeEl = (id: string) => el('span', { class: `grade g-${gradeOf(id) === '극' ? 'X' : gradeOf(id)}` }, gradeOf(id));
+  // 카드 그림 + 등급(2026-11-21 7차 "스킬 사진이 다 없어졌다")
+  const thumb = (id: string) => {
+    const a = skillArt(id);
+    return el('span', { class: 'thumb2' }, a ? el('img', { src: a, alt: '' }) : el('i', {}, (WEAPONS.get(id)?.name ?? PASSIVES.get(id)?.name ?? '?')[0]), gradeEl(id));
+  };
   const shortNums = (id: string) => {
     const w = WEAPONS.get(id);
     if (w) {
@@ -485,7 +618,7 @@ function bookPopup(slot: Slot, onDone: () => void): void {
       const w = WEAPONS.get(id);
       const pd = PASSIVES.get(id);
       return btn(
-        [gradeEl(id), iconOf(id), el('span', { class: 'sn' }, el('b', {}, w?.name ?? pd?.name ?? id), el('small', {}, `${roleOf(id).name}${w?.element ? ` · ${RULES.sets[w.element].name}` : ''}`))],
+        [thumb(id), iconOf(id), el('span', { class: 'sn' }, el('b', {}, w?.name ?? pd?.name ?? id), el('small', {}, roleOf(id).name, ' ', elemBadge(w?.element, false)))],
         `b2-slot${on ? ' on' : ''}`,
         () => ((active = on ? null : { kind, id }), render()),
         { style: w ? `--c:${w.color}` : '', title: describe(id).lines.join('\n') },
@@ -527,9 +660,9 @@ function bookPopup(slot: Slot, onDone: () => void): void {
             const info = describe(x.id);
             return btn(
               [
-                gradeEl(x.id),
+                thumb(x.id),
                 iconOf(x.id),
-                el('span', { class: 'sn' }, el('b', {}, info.name), el('small', {}, info.lines[0] ?? ''), el('small', { class: 'nums' }, shortNums(x.id))),
+                el('span', { class: 'sn' }, el('b', {}, info.name, ' ', elemBadge(w?.element)), el('small', {}, info.lines[0] ?? ''), el('small', { class: 'nums' }, shortNums(x.id))),
                 el('span', { class: 'why' }, ...x.why.slice(0, 3).map((t) => el('i', {}, t))),
               ],
               'b2-cand',
@@ -561,9 +694,12 @@ function bookPopup(slot: Slot, onDone: () => void): void {
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
   const done = () => {
     slot.book = [...pick];
-    const s2 = loadSave();
-    s2.slots[s2.active] = { ...slot };
-    writeSave(s2);
+    if (saveTo) saveTo(slot.book);
+    else {
+      const s2 = loadSave();
+      s2.slots[s2.active] = { ...slot };
+      writeSave(s2);
+    }
     onDone();
   };
   const closeBtn = root.querySelector('.modal-close') as HTMLButtonElement;
@@ -573,37 +709,54 @@ function bookPopup(slot: Slot, onDone: () => void): void {
   void close;
 }
 
-/** 재편성(2026-11-21): 장을 열기 전에 무공·심법을 둘까지 버리면, 장을 열자마자 그만큼 새로 고른다 */
+/** 재편성(2026-11-21 7차 전면 개편 — "효과 설명 없이 레벨만"): 가진 무공·심법을 카드로(그림·등급·효과·지금 수치),
+ *  둘까지 골라 내려놓으면 장을 열자마자 그만큼 새로 고른다. 무엇을 잃고 무엇을 받는지 아래에 적는다 */
 function rebuildPopup(slot: Slot, onDone: () => void): void {
   const drop = new Set<string>();
-  const body = el('div', { class: 'rebuild' });
+  const body = el('div', { class: 'rebuild2' });
   const render = () => {
-    const items = [...slot.carry.weapons.map((w) => ({ id: w.id, name: WEAPONS.get(w.id)?.name ?? w.id, lv: w.lv, kind: '무공' })), ...slot.carry.passives.map(([id, lv]) => ({ id, name: PASSIVES.get(id)?.name ?? id, lv, kind: '심법' }))];
+    const card = (id: string, lv: number) => {
+      const on = drop.has(id);
+      const c = skillCard(id, { lv, cls: `pickable${on ? ' dropped' : ''}`, extra: [el('span', { class: 'drop-mark' }, on ? '내려놓는다' : '')] });
+      c.tabIndex = 0;
+      c.addEventListener('click', () => {
+        if (on) drop.delete(id);
+        else if (drop.size < 2) drop.add(id);
+        render();
+      });
+      return c;
+    };
+    const lost = [...drop].map((id) => WEAPONS.get(id)?.name ?? PASSIVES.get(id)?.name ?? id);
     body.replaceChildren(
-      el('p', { class: 'note' }, `버릴 것을 둘까지 고른다(${drop.size}/2). 장을 열자마자 버린 수만큼 레벨업 고르기가 나온다.`),
-      el('div', { class: 'grid text' }, ...items.map((it) => {
-        const b = el('button', { class: `entry pick${drop.has(it.id) ? ' on' : ''}`, type: 'button' }, el('b', {}, `${drop.has(it.id) ? '✕ ' : ''}${it.name}`), el('small', {}, `${it.kind} Lv.${it.lv}`));
-        b.addEventListener('click', () => {
-          if (drop.has(it.id)) drop.delete(it.id);
-          else if (drop.size < 2) drop.add(it.id);
-          render();
-        });
-        return b;
-      })),
-      btn('이대로 재편성', 'btn primary', () => {
-        if (!drop.size) return void close();
-        slot.carry = { ...slot.carry, weapons: slot.carry.weapons.filter((w) => !drop.has(w.id)), passives: slot.carry.passives.filter(([id]) => !drop.has(id)) };
-        slot.rebuild = (slot.rebuild ?? 0) + drop.size;
-        const sv = loadSave();
-        sv.slots[sv.active] = { ...slot };
-        writeSave(sv);
-        close();
-        onDone();
-      }),
+      el('p', { class: 'b2-lead' }, '쓸모없어진 무공·심법을 둘까지 내려놓는다. 장을 열자마자 내려놓은 수만큼 레벨업 고르기가 나온다(무공록에서).'),
+      el('h4', {}, `무공 ${slot.carry.weapons.length}`),
+      el('div', { class: 'skc-grid' }, ...slot.carry.weapons.map((w) => card(w.id, w.lv))),
+      slot.carry.passives.length ? el('h4', {}, `심법 ${slot.carry.passives.length}`) : '',
+      el('div', { class: 'skc-grid' }, ...slot.carry.passives.map(([id, lv]) => card(id, lv))),
+      el(
+        'div',
+        { class: 'rb-foot' },
+        el('p', {}, drop.size ? `잃는 것: ${lost.join(' · ')} → 받는 것: 장을 열자마자 레벨업 고르기 ${drop.size}번` : '내려놓을 것을 누른다(둘까지)'),
+        el(
+          'div',
+          { class: 'menu-row' },
+          btn(drop.size ? `${drop.size}개 내려놓고 재편성` : '재편성 안 함', 'btn primary', () => {
+            if (!drop.size) return void close();
+            slot.carry = { ...slot.carry, weapons: slot.carry.weapons.filter((w) => !drop.has(w.id)), passives: slot.carry.passives.filter(([id]) => !drop.has(id)) };
+            slot.rebuild = (slot.rebuild ?? 0) + drop.size;
+            const sv = loadSave();
+            sv.slots[sv.active] = { ...slot };
+            writeSave(sv);
+            close();
+            onDone();
+          }),
+        ),
+      ),
     );
   };
   render();
-  const { root, close } = modal('재편성');
+  const { root, close } = modal('재편성 — 내려놓고 새로 받기');
+  root.querySelector('.modal-box')!.classList.add('wide');
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
@@ -755,35 +908,45 @@ function chapterCard(slot: Slot): void {
   stopRun?.();
   const ch = STORY.chapters[slot.chapter];
   const cg = realArt(ch.cg);
-  const start = btn('들어간다', 'btn primary', () => void play(slot));
   const sv = loadSave();
   const book = bookOf(slot, sv);
-  const extra = el(
+  const hero = HEROES.find((h) => h.id === slot.hero)!;
+  const diff = STORY.difficulties.find((d) => d.id === slot.difficulty) ?? STORY.difficulties[0];
+  const start = btn('들어간다', 'btn primary big', () => void play(slot));
+  // 2026-11-21 7차: 왼쪽은 이야기와 입장, 오른쪽은 무공(가진 것 · 무공록 · 편성 · 재편성)
+  const left = el(
     'div',
-    { class: 'menu-row' },
-    btn(`무공록 편성 · 무공 ${splitBook(book).weapons.length} · 심법 ${splitBook(book).passives.length}`, 'btn ghost', () => bookPopup(slot, () => chapterCard(slot))),
-    slot.chapter > 0 && slot.carry.weapons.length + slot.carry.passives.length > 1 ? btn(slot.rebuild ? `재편성 (${slot.rebuild})` : '재편성', 'btn ghost', () => rebuildPopup(slot, () => chapterCard(slot))) : '',
-    slot.checkpoint ? btn('중간 보스 뒤에서 이어 하기', 'btn ghost', () => void play(slot, true)) : '',
+    { class: 'cc-left' },
+    el('div', { class: 'cc-chip' }, el('span', {}, `${slot.chapter + 1} / ${STORY.chapters.length}`), el('span', { class: `dz d-${diff.id}` }, diff.name)),
+    el('h2', {}, ch.name),
+    el('p', { class: 'cc-intro' }, (ch as unknown as { intro?: string }).intro ?? ch.line),
+    el('ul', { class: 'cc-facts' }, el('li', {}, `${Math.round(CHAPTER_LENGTH / 60)}분 · 빅웨이브 둘`), el('li', {}, `중간 보스 「${FOES.get(ch.roles.mid)?.name}」 · 보스 「${FOES.get(ch.roles.boss)?.name}」`), ch.gimmick ? el('li', { class: 'gimmick' }, `기믹 — ${ch.gimmick.name}: ${ch.gimmick.text}`) : ''),
+    el('div', { class: 'cc-actions' }, start, slot.checkpoint ? btn('중간 보스 뒤에서', 'btn ghost', () => void play(slot, true)) : '', btn('메인으로', 'btn ghost', lobby)),
   );
-  app.replaceChildren(
+  const { weapons, passives } = splitBook(book);
+  const mini = (id: string) => {
+    const w = WEAPONS.get(id);
+    const pd = PASSIVES.get(id);
+    const a = skillArt(id);
+    return el('span', { class: 'mini', title: `${describe(id).name} — ${describe(id).lines[0] ?? ''}` }, a ? el('img', { src: a, alt: '' }) : el('i', {}, (w?.name ?? pd?.name ?? '?')[0]), el('span', { class: `grade g-${gradeOf(id) === '극' ? 'X' : gradeOf(id)}` }, gradeOf(id)));
+  };
+  const owned = slot.carry.weapons.map((w) => el('span', { class: 'own' }, el('b', {}, WEAPONS.get(w.id)?.name ?? w.id), ` Lv.${w.lv}`));
+  const right = el(
+    'aside',
+    { class: 'cc-right' },
+    el('div', { class: 'cc-hero' }, el('img', { src: realArt(hero.stand) ?? frameUrl(`${hero.sprite}_idle`, 1) ?? '', alt: '' }), el('div', {}, el('b', {}, hero.name), el('small', {}, `Lv.${slot.carry.level} · ${hero.dash.glyph} ${hero.dash.name} · ${hero.ult.glyph} ${hero.ult.name}`))),
+    el('h4', {}, '가진 무공'),
+    el('div', { class: 'cc-owned' }, ...(owned.length ? owned : [el('small', {}, '시작 무공 하나')])),
+    el('h4', {}, `무공록 — 무공 ${weapons.length} · 심법 ${passives.length}`),
+    el('div', { class: 'cc-book2' }, ...weapons.map(mini), ...passives.map(mini)),
     el(
-      'section',
-      { class: 'screen chapter-card', style: cg ? `--cg:url("${cg}")` : `--cg:linear-gradient(160deg, ${ch.color[2]}, ${ch.color[0]} 60%, ${ch.color[3]})` },
-      el(
-        'div',
-        { class: 'cc-text' },
-        el('small', {}, `${slot.chapter + 1} / ${STORY.chapters.length}`),
-        el('h2', {}, ch.name),
-        el('p', {}, ch.line),
-        el('p', { class: 'note' }, `${Math.round(CHAPTER_LENGTH / 60)}분 · 빅웨이브 둘 · 중간 보스 「${FOES.get(ch.roles.mid)?.name}」 · 보스 「${FOES.get(ch.roles.boss)?.name}」`),
-        ch.gimmick ? el('p', { class: 'note gimmick' }, `이 장의 기믹 — ${ch.gimmick.name}: ${ch.gimmick.text}`) : '',
-        el('div', { class: 'menu-row' }, start, btn('메인으로', 'btn ghost', lobby)),
-        extra,
-        // 무공록 미리 보기: 등급 배지(누르면 편성)
-        book.length ? el('div', { class: 'cc-book', title: '무공록 — 누르면 편성' }, ...book.map((id) => el('span', { class: `grade g-${gradeOf(id) === '극' ? 'X' : gradeOf(id)}`, title: describe(id).name }, gradeOf(id)))) : '',
-      ),
+      'div',
+      { class: 'cc-tools' },
+      btn('무공록 편성', 'btn', () => bookPopup(slot, () => chapterCard(slot))),
+      slot.chapter > 0 && slot.carry.weapons.length + slot.carry.passives.length > 1 ? btn(slot.rebuild ? `재편성 (${slot.rebuild})` : '재편성', 'btn', () => rebuildPopup(slot, () => chapterCard(slot))) : '',
     ),
   );
+  app.replaceChildren(el('section', { class: 'screen chapter-card', style: cg ? `--cg:url("${cg}")` : `--cg:linear-gradient(160deg, ${ch.color[2]}, ${ch.color[0]} 60%, ${ch.color[3]})` }, el('div', { class: 'cc-layout' }, left, right)));
   screenKeys = (e) => {
     if (e.key === 'Enter' || e.key === ' ') start.click();
     if (e.key === 'Escape') lobby();
@@ -792,16 +955,16 @@ function chapterCard(slot: Slot): void {
 }
 
 // ── 4. 판 ──
-async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
+async function play(slot: Slot, fromCheckpoint = false, endless = false): Promise<void> {
   stopRun?.();
   screenKeys = null;
   const sv = loadSave();
   const cp = fromCheckpoint ? slot.checkpoint : undefined;
-  const seed = cp?.seed ?? params.get('seed') ?? `${slot.hero}-${slot.chapter}-${Date.now().toString(36)}`;
-  const opts = ALL ? { meta: sv.upgrades } : { unlocked: openCards(sv), book: bookOf(slot, sv), meta: sv.upgrades, rebuild: cp ? 0 : slot.rebuild, startAt: cp?.t };
-  const s = createChapter(slot.chapter, seed, cp?.carry ?? slot.carry, opts);
+  const seed = cp?.seed ?? params.get('seed') ?? `${endless ? 'endless' : slot.hero}-${slot.chapter}-${Date.now().toString(36)}`;
+  const opts = ALL ? { meta: sv.upgrades, difficulty: slot.difficulty } : { unlocked: openCards(sv), book: bookOf(slot, sv), meta: sv.upgrades, rebuild: cp ? 0 : slot.rebuild, startAt: cp?.t, difficulty: slot.difficulty };
+  const s = endless ? createEndless(seed, slot.hero, { unlocked: opts.unlocked, book: opts.book, meta: opts.meta }) : createChapter(slot.chapter, seed, cp?.carry ?? slot.carry, opts);
   // 재편성은 한 번만
-  if (slot.rebuild && !cp) {
+  if (slot.rebuild && !cp && !endless) {
     slot.rebuild = 0;
     const s2 = loadSave();
     s2.slots[s2.active] = { ...slot };
@@ -931,7 +1094,7 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
     const info = describe(c.id);
     const partner = pd ? partnersOf(s).get(pd.id) : undefined;
     const ec = elementCounts(s);
-    const art = cardArtUrl(w?.card ?? pd?.card ?? '');
+    const art = skillArt(c.id);
     const icon = el('span', { class: `role role-${role.key}` });
     icon.innerHTML = roleIcon(role.key);
     const chips: (HTMLElement | string)[] = [];
@@ -1015,8 +1178,8 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
           { class: 'menu-col' },
           btn('계속', 'btn primary', resume),
           btn('옵션', 'btn ghost', () => optionsPopup(() => Object.assign(opt, loadSave().options))),
-          btn('메인으로(이 장은 처음부터)', 'btn ghost', () => {
-            if (confirm('메인으로 나갈까? 이 장의 진행은 저장되지 않는다(장을 넘을 때만 자동 저장). 번 금화·비급은 남는다.')) {
+          btn(endless ? '그만두기' : '메인으로(이 장은 처음부터)', 'btn ghost', () => {
+            if (confirm(endless ? '그만둘까? 번 금화·비급은 남는다(기록은 남지 않는다).' : '메인으로 나갈까? 이 장의 진행은 저장되지 않는다(장을 넘을 때만 자동 저장). 번 금화·비급은 남는다.')) {
               bankOnQuit();
               lobby();
             }
@@ -1052,6 +1215,28 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
     banked = true;
     const xp = trainingXp(s);
     void gainXp(xp, null, null).catch(() => undefined);
+    // 무한 모드: 버틴 시간 기록
+    if (endless) {
+      const best = (save.endlessBest ??= {});
+      const prev = best[s.hero.id] ?? 0;
+      if (s.t > prev) best[s.hero.id] = Math.floor(s.t);
+      writeSave(save);
+      overlay.hidden = false;
+      overlay.replaceChildren(
+        el(
+          'div',
+          { class: 'panel result lose' },
+          el('div', { class: 'seal-r' }, '終'),
+          el('h3', {}, `${fmt(s.t)} 버텼다`),
+          el('p', {}, `보스 ${s.stage}회 넘김 · Lv.${s.level} · 쓰러뜨림 ${s.chapterKills} · 금화 ${s.gold}`),
+          el('p', { class: s.t > prev ? 'unlock' : 'muted' }, s.t > prev ? `새 최고 기록! (이전 ${fmt(prev)})` : `최고 기록 ${fmt(prev)}`),
+          el('p', { class: 'muted' }, `「천외귀환」 수련 경험치 +${xp} · 금화 지갑 +${s.gold}(${save.wallet})`),
+          s.unlocks.length ? el('p', { class: 'unlock' }, `새로 연 무공: ${s.unlocks.map((id) => `「${WEAPONS.get(id)?.name ?? PASSIVES.get(id)?.name}」`).join(' ')}`) : '',
+          el('div', { class: 'menu-row' }, btn('다시 도전', 'btn primary', () => void play(slot, false, true)), btn('메인으로', 'btn ghost', lobby)),
+        ),
+      );
+      return;
+    }
     const clear = s.result === 'clear';
     let next: Slot = slot;
     if (clear) {
@@ -1132,7 +1317,7 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
     setTimeout(() => box.remove(), r.evolve ? 1900 : 1300);
   };
   // 처음 안내(2026-11-21): 1장을 처음 열면 30초 — 이동 · 보법 · 간파 · 마지막 기술 · 레벨업 고르기
-  const tut = slot.chapter === 0 && !sv.tutorial && !cp && !params.has('t') ? { step: -1, moved: 0, tries: 0, next: 0, counter: view.counterAt, until: 0 } : null;
+  const tut = !endless && slot.chapter === 0 && !sv.tutorial && !cp && !params.has('t') ? { step: -1, moved: 0, tries: 0, next: 0, counter: view.counterAt, until: 0 } : null;
   const tutBox = el('div', { class: 'tutorial', hidden: '' });
   const TUT = [
     '이동 — WASD·방향키(휴대폰은 화면 왼쪽을 끌어서)',
@@ -1201,7 +1386,7 @@ async function play(slot: Slot, fromCheckpoint = false): Promise<void> {
     last = now;
     absorb(view, s, now, opt);
     // 중간 보스를 넘은 자리를 칸에 적어 둔다(나가도 이어 할 수 있게)
-    if (s.checkpoint && !cpSaved) {
+    if (s.checkpoint && !cpSaved && !endless) {
       cpSaved = true;
       slot.checkpoint = { seed, t: s.checkpoint.t, carry: s.checkpoint.carry };
       const s2 = loadSave();

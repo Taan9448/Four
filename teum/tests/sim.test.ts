@@ -514,3 +514,69 @@ describe('「틈」 엔진', () => {
     }
   });
 });
+
+import { createEndless, endlessInfo } from '../src/sim';
+describe('「틈」 7차: 무한 모드 · 난이도', () => {
+  const run = (s: ReturnType<typeof createEndless>, sec: number) => {
+    for (let i = 0; i < 60 * sec && !s.result; i++) {
+      if (s.pending) choose(s, s.pending.length - 1);
+      step(s, { x: Math.cos(i / 120), y: Math.sin(i / 120) });
+    }
+  };
+  it('무한 모드: 맵 5배 이상 · 무공 5칸·심법 5칸 · 시간표 없이 시작', () => {
+    const s = createEndless('e1', 'haun');
+    expect(s.mode).toBe('endless');
+    expect(s.terrain.w * s.terrain.h).toBeGreaterThan(135 * 135 * 5);
+    expect(s.slots).toEqual({ weapons: 5, passives: 5 });
+    expect(s.timeline.length).toBe(0);
+  });
+
+  it('무한 모드: 3분에 보스가 나오고, 못 잡으면 광폭화, 잡으면 다음 단계', () => {
+    const s = createEndless('e2', 'kyle');
+    s.player.shieldUntil = 1e9;
+    run(s, 185);
+    expect(s.boss?.boss).toBe(true);
+    expect(endlessInfo(s).enraged).toBe(false);
+    s.boss!.hp = s.boss!.maxHp = 1e9;
+    run(s, RULES.endless.boss.enrage);
+    expect(endlessInfo(s).enraged).toBe(true);
+    s.boss!.hp = 1;
+    s.boss!.x = s.player.x + 20;
+    s.boss!.y = s.player.y;
+    s.weapons = [{ id: 'knight_strike', lv: 5, next: 0 }];
+    run(s, 3);
+    expect(s.stage).toBe(1);
+    expect(s.result).toBeNull();
+    expect(endlessInfo(s).enraged).toBe(false);
+    expect(s.nextBossAt).toBeGreaterThan(s.t + 100);
+  });
+
+  it('무한 모드: 시간이 갈수록 그림자가 강해지고 돌발 이벤트가 1~2분마다 쌓인다', () => {
+    const s = createEndless('e3', 'born');
+    s.player.shieldUntil = 1e9;
+    run(s, 60 * 6);
+    expect(s.chapter.hp).toBeGreaterThan(1.5);
+    expect(s.timeline.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('수련소: 무공을 사고 내려놓을 수 있다', () => {
+    const s = createEndless('e4', 'haun');
+    s.gold = 999;
+    s.weapons.push({ id: 'nakun', lv: 2, next: 0 });
+    s.items.push({ x: s.player.x, y: s.player.y, kind: 'dojo' });
+    step(s, { x: 0, y: 0 });
+    expect(s.pending?.some((c) => c.kind === 'buyskill')).toBe(true);
+    const sell = s.pending!.findIndex((c) => c.kind === 'sellskill');
+    const n = s.weapons.length;
+    choose(s, sell);
+    expect(s.weapons.length).toBe(n - 1);
+  });
+
+  it('하드: 그림자가 더 단단하고 정예 수식어가 하나 더', () => {
+    const n = createChapter(4, 'df', freshCarry('haun'), { difficulty: 'normal' });
+    const h = createChapter(4, 'df', freshCarry('haun'), { difficulty: 'hard' });
+    expect(h.chapter.hp).toBeGreaterThan(n.chapter.hp * 1.5);
+    expect(h.diff.affix).toBe(1);
+    expect(STORY.difficulties.every((d) => d.open)).toBe(true);
+  });
+});

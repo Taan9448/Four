@@ -551,6 +551,24 @@
       ]
     },
     {
+      "id": "dojo",
+      "name": "수련소",
+      "desc": "금화로 무공을 사고·올리고·내려놓는다(무한 모드)",
+      "glyph": "武",
+      "color": "#8fd3ff",
+      "icon": [
+        "world",
+        2
+      ],
+      "event": true,
+      "ops": [
+        {
+          "op": "skillshop",
+          "count": 3
+        }
+      ]
+    },
+    {
       "id": "chest",
       "name": "보물상자",
       "desc": "무공 하나가 오르거나 각성한다",

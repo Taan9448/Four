@@ -41,6 +41,9 @@ export interface SaveData {
   steles: string[];
   /** 처음 안내(1장 30초 튜토리얼)를 마쳤나 */
   tutorial?: boolean;
+  /** 무한 모드: 인물마다 최고 버틴 시간(초) · 무한 모드 무공록 */
+  endlessBest?: Record<string, number>;
+  endless?: { hero: string; book?: string[] };
 }
 
 const KEY = 'teum.save';
