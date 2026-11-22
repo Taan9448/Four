@@ -11,6 +11,7 @@ frames: 6
 fps: 10
 loop: false
 events: {}
+bbox_tolerance: null
 frame_notes:
   1: "hit hard, recoiling"
   2: "curling up and swelling, the cracks flaring white-orange, then bursting into chunks and a ring of orange fire — beginning"

@@ -11,6 +11,7 @@ frames: 6
 fps: 10
 loop: false
 events: {}
+bbox_tolerance: null
 frame_notes:
   1: "hit hard, recoiling"
   2: "dropping the hammer, falling to one knee and breaking apart into black rock and orange sparks — beginning"
