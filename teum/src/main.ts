@@ -4,7 +4,7 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { banish, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, SKILL_ICON, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
@@ -982,7 +982,15 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   const view: View = emptyView();
   const seen = new Set(sv.seen);
   // 점검용(?debug): 화면 점검 도구가 판 상태를 읽고 바꿀 수 있게
-  if (params.has('debug')) (window as unknown as { __teum?: State }).__teum = s;
+  if (params.has('debug')) {
+    (window as unknown as { __teum?: State }).__teum = s;
+    // 점검용: 그림자 하나 놓기(변종 id를 주면 변종으로)
+    (window as unknown as { __spawn?: (id: string, x: number, y: number, v?: string) => void }).__spawn = (id, x, y, v) => {
+      const f = spawnFoe(s, id, x, y);
+      const vd = v ? RULES.variants.list.find((d) => d.id === v) : undefined;
+      if (f && vd) applyVariant(f, vd);
+    };
+  }
 
   const keys = new Set<string>();
   let wantDash = false;

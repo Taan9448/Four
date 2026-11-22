@@ -35,7 +35,8 @@ describe('「틈」 데이터', () => {
 
   it('그림자·인물·무공 그림과 기술 이펙트', () => {
     for (const f of FOES.values()) {
-      expect(real(`${f.sprite}_idle`), f.id).toBe(true);
+      // 새 그림자(Codex teum_*)는 그림이 오기 전엔 「천외귀환」 그림(fallback)을 쓴다
+      expect(real(`${f.sprite}_idle`) || (!!f.fallback && real(`${f.fallback}_idle`)), f.id).toBe(true);
       for (const k of f.skills ?? []) {
         if ('fx' in k && k.fx) expect(real(k.fx), `${f.id} ${k.fx}`).toBe(true);
         if (k.kind === 'summon') expect(FOES.has(k.foe), `${f.id} → ${k.foe}`).toBe(true);

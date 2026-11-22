@@ -1,5 +1,5 @@
 // 「틈」 자동 플레이 봇(밸런스 측정용, GAME_DESIGN 12절): 지형을 피해 원을 그리며 싸우고, 레벨업은 정한 방식으로 고른다.
-import { carryOf, choose, createChapter, createEndless, freshCarry, step, WEAPONS, type Carry, type Choice, type Input, type State } from '../src/sim';
+import { carryOf, choose, createChapter, createEndless, freshCarry, inSlam, step, WEAPONS, type Carry, type Choice, type Input, type State } from '../src/sim';
 import { CELL, moveCircle, walkable } from '../src/terrain';
 
 export type Picker = 'first' | 'smart';
@@ -60,7 +60,10 @@ export function botInput(s: State): Input {
       if (d < keep) v -= ((keep - d) / keep) * (f.def.rank ? 6 : 2);
     }
     for (const sh of s.shots) if (!sh.weapon && Math.hypot(nx - sh.x, ny - sh.y + 20) < 60) v -= 3;
-    for (const m of s.slams) if (Math.hypot(nx - m.x, ny - m.y) < m.r + 20) v -= 8;
+    // 예고(원·띠·부채꼴·고리)와 웅덩이, 불붙은 자폭병은 피한다(사람도 보고 피한다)
+    for (const m of s.slams) if (inSlam(m, nx, ny, 20)) v -= 8;
+    for (const z of s.foeZones) if (Math.hypot(nx - z.x, ny - z.y) < z.r + 14) v -= 3;
+    for (const f of s.foes) if (f.fuseAt && Math.hypot(nx - f.x, ny - f.y) < 120) v -= 6;
     if (target) v += (Math.hypot(p.x - target.x, p.y - target.y) - Math.hypot(nx - target.x, ny - target.y)) * 0.05;
     else if (near && near.d > 120 * 120) v += (Math.sqrt(near.d) - Math.hypot(nx - near.x, ny - near.y)) * 0.03;
     // 막다른 곳으로 덜 가게: 조금 덜 움직인 쪽은 깎는다

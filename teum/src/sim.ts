@@ -51,10 +51,28 @@ export interface PassiveDef {
   card?: string;
   rarity?: string;
 }
+/** 적 탄 모양(2026-11-22 "원거리 공격이 다 똑같다"): orb 알 · arrow 화살 · flame 불덩이 · shard 얼음 조각 · spark 번개 · bubble 독 거품 · shadow 그림자 · bone 뼈 · needle 독침 · blade 검기 */
+export type ShotStyle = 'orb' | 'arrow' | 'flame' | 'shard' | 'spark' | 'bubble' | 'shadow' | 'bone' | 'needle' | 'blade';
+/** 탄 꾸밈: style 모양 · homing 초당 꺾는 정도(라디안) · zone 사라질 때 남기는 웅덩이 */
+interface ShotMod {
+  style?: ShotStyle;
+  homing?: number;
+  r?: number;
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+}
 export type FoeSkill =
-  | { kind: 'aimed'; every: number; damage: number; speed: number; color: string; fx?: string }
-  | { kind: 'fan'; every: number; count: number; spread: number; damage: number; speed: number; color: string }
-  | { kind: 'radial'; every: number; count: number; damage: number; speed: number; color: string }
+  | ({ kind: 'aimed'; every: number; damage: number; speed: number; color: string; fx?: string } & ShotMod)
+  | ({ kind: 'fan'; every: number; count: number; spread: number; damage: number; speed: number; color: string } & ShotMod)
+  | ({ kind: 'radial'; every: number; count: number; damage: number; speed: number; color: string } & ShotMod)
+  /** 광역 예고(2026-11-22): line 그림자에서 인물 쪽 곧은 띠 · cone 앞쪽 부채꼴 · ring 제 둘레 고리 충격파 · lob 인물 자리에 던져 웅덩이 */
+  | { kind: 'line'; every: number; damage: number; len: number; width: number; delay: number; color: string }
+  | { kind: 'cone'; every: number; damage: number; radius: number; spread: number; delay: number; color: string; range?: number }
+  | { kind: 'ring'; every: number; damage: number; radius: number; width: number; delay: number; color: string; range?: number }
+  | { kind: 'lob'; every: number; damage: number; radius: number; delay: number; color: string; zone?: { seconds: number; dps: number; radius: number; element?: string } }
+  /** 돕는 기술: heal 둘레 그림자 체력 회복 · shield 둘레 그림자가 받는 피해 줄임 · burrow 땅속으로 숨었다가 인물 곁에서 솟는다 */
+  | { kind: 'heal'; every: number; radius: number; amount: number }
+  | { kind: 'shield'; every: number; radius: number; seconds: number; mul: number }
+  | { kind: 'burrow'; every: number; delay: number; radius: number; damage: number; color: string }
   | { kind: 'slam'; every: number; damage: number; radius: number; delay: number; color: string; count: number; fx?: string }
   | { kind: 'charge'; every: number; damage: number }
   | { kind: 'summon'; every: number; foe: string; count: number };
@@ -75,6 +93,43 @@ export interface FoeDef {
   fly?: boolean;
   element?: string;
   skills?: FoeSkill[];
+  /** 자폭(2026-11-22): 가까우면 내달려 불이 붙고 delay초 뒤 radius 안을 터뜨린다(다른 그림자도 다친다) */
+  fuse?: FuseDef;
+  /** 쓰러지면 작은 것 n으로 갈라진다 */
+  split?: number;
+  /** 특수 그림자(2026-11-22): 장 무리와 따로 from장(0부터)부터 섞여 나온다 */
+  special?: { from: number; weight: number };
+  /** Codex 그림이 오기 전에 쓸 「천외귀환」 그림 */
+  fallback?: string;
+  /** 다른 그림자 탄이 아닌 제 몸 빛(변종·속성 색) */
+  tint?: string;
+}
+export interface FuseDef {
+  range: number;
+  delay: number;
+  radius: number;
+  damage: number;
+  sprint: number;
+}
+/** 변종(rules.json variants, 2026-11-22 사용자 "강화된 적·특성 적·속성 적·자폭병"): 보통 그림자에 덧붙는 성질 */
+export interface VariantDef {
+  id: string;
+  name: string;
+  color: string;
+  weight: number;
+  from?: number;
+  hp?: number;
+  damage?: number;
+  speed?: number;
+  scale?: number;
+  xp?: number;
+  armor?: number;
+  regen?: number;
+  split?: number;
+  element?: 'fire' | 'ice' | 'shock' | 'poison';
+  fuse?: FuseDef;
+  firm?: boolean;
+  shots?: { every: number; speed: number; damage: number; style: ShotStyle };
 }
 export interface HeroDef {
   id: string;
@@ -240,6 +295,10 @@ export const RULES = rulesRaw as unknown as {
   };
   /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
   sight: { cells: number; every: number };
+  /** 변종(2026-11-22): 보통 그림자가 이 확률로 변종이 된다(장·분마다 오른다) */
+  variants: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number }; list: VariantDef[]; element: Record<string, { trail?: { every: number; radius: number; seconds: number; dps: number }; deathZone?: { radius: number; seconds: number; dps: number }; chill?: number; poison?: number; zap?: { every: number; range: number; delay: number; damage: number; width: number }; deathRing?: { radius: number; delay: number; damage: number } }> };
+  /** 특수 그림자(2026-11-22): 장 무리 대신 이 확률로 섞인다 */
+  specials: { chance: { base: number; perChapter: number; perMin: number; max: number } };
 };
 export const STORY = storyRaw as unknown as {
   difficulties: Difficulty[];
@@ -361,6 +420,19 @@ export interface Foe {
   dmgMul?: number;
   /** 작은 그림자(갈라진 것): 다시 갈라지지 않는다 */
   small?: boolean;
+  /** 변종 id · 속성(변종이나 정의) */
+  variant?: string;
+  element?: string;
+  /** 크기 배율(변종) */
+  scale?: number;
+  /** 방패 그림자가 씌운 보호: 이때까지 받는 피해 ×guardMul */
+  guardUntil?: number;
+  guardMul?: number;
+  /** 땅속(burrow): 이때 솟는다 — 그 전엔 맞지 않고 닿지 않는다 */
+  burrowUntil?: number;
+  /** 불타는 그림자가 다음에 불 자국을 남길 때 · 번개 품은 그림자가 다음에 번개를 칠 때 */
+  trailAt?: number;
+  zapAt?: number;
 }
 export interface Shot {
   x: number;
@@ -376,6 +448,21 @@ export interface Shot {
   hit?: Set<number>;
   element?: WeaponDef['element'];
   knock?: number;
+  /** 적 탄 모양 · 따라옴 · 끝에 남기는 웅덩이(2026-11-22) */
+  style?: ShotStyle;
+  homing?: number;
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+}
+/** 적이 남긴 웅덩이(불·독·서리): 안에 있으면 0.5초마다 피해(방어 무시 작은 피해) */
+export interface FoeZone {
+  x: number;
+  y: number;
+  r: number;
+  dps: number;
+  until: number;
+  born: number;
+  element: string;
+  next: number;
 }
 export interface Zone {
   x: number;
@@ -399,6 +486,18 @@ export interface Slam {
   at: number;
   color: string;
   fx?: string;
+  /** 모양(2026-11-22): circle(기본) · line(x,y에서 angle로 len, 반폭 w) · cone(반지름 r, 반각 w) · ring(r0~r) */
+  shape?: 'circle' | 'line' | 'cone' | 'ring';
+  angle?: number;
+  len?: number;
+  w?: number;
+  r0?: number;
+  /** 떨어진 뒤 남기는 웅덩이 */
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+  /** 그림자도 다친다(자폭) */
+  hurtsFoes?: boolean;
+  /** 이 그림자가 떨어뜨리는 것(땅굴: 솟는 자리) */
+  owner?: number;
 }
 export interface Gem {
   x: number;
@@ -452,7 +551,7 @@ export type FxEvent =
   | { type: 'graze'; x: number; y: number }
   | { type: 'ult'; x: number; y: number; fx: string; color: string }
   | { type: 'event'; text: string; kind: string }
-  | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam'; angle?: number }
+  | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam' | 'heal' | 'shield' | 'burrow' | 'line' | 'cone' | 'ring' | 'zone'; angle?: number; r?: number; len?: number; w?: number; r0?: number }
   | { type: 'chain'; pts: [number, number][]; color: string }
   | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string }
   | { type: 'heal'; amount: number }
@@ -532,6 +631,8 @@ export interface State {
   passives: Map<string, number>;
   bonusHp: number;
   foes: Foe[];
+  /** 적이 남긴 웅덩이(불·독·서리, 2026-11-22) */
+  foeZones: FoeZone[];
   shots: Shot[];
   zones: Zone[];
   slams: Slam[];
@@ -805,6 +906,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     passives,
     bonusHp: carry.bonusHp,
     foes: [],
+    foeZones: [],
     shots: [],
     zones: [],
     slams: [],
@@ -1009,6 +1111,11 @@ const hasAffix = (f: Foe, id: string): boolean => !!f.affixes?.includes(id);
 
 function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false): void {
   if (f.dead) return;
+  // 땅속에 있는 동안은 맞지 않는다
+  if (f.burrowUntil && s.t < f.burrowUntil) return;
+  // 갑옷 두른(변종) · 방패 그림자의 보호
+  const va = variantOf(f);
+  base *= (1 - (va?.armor ?? 0)) * (f.guardUntil && s.t < f.guardUntil ? (f.guardMul ?? 0.5) : 1);
   const crit = s.rng.next() < stat.crit(s);
   const S = RULES.sets;
   const vulnMul = s.t < f.vulnUntil ? (setOn(s, 'vuln') ? S.vuln.mul! : 1.25) : 1;
@@ -1016,9 +1123,10 @@ function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDe
   const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * vulnMul * iceMul);
   f.hp -= dmg;
   f.hitAt = s.t;
-  const firm = hasAffix(f, 'steadfast');
-  if (element === 'ice' && !firm) f.slowUntil = s.t + 1.2;
-  if (element === 'fire') f.burnUntil = s.t + 2;
+  const firm = hasAffix(f, 'steadfast') || !!va?.firm;
+  // 같은 속성의 그림자는 그 속성이 듣지 않는다(불타는 놈은 안 탄다)
+  if (element === 'ice' && !firm && f.element !== 'ice') f.slowUntil = s.t + 1.2;
+  if (element === 'fire' && f.element !== 'fire') f.burnUntil = s.t + 2;
   if (element === 'shock' && !f.def.rank && !firm) f.stunUntil = s.t + 0.35;
   if (element === 'vuln') f.vulnUntil = s.t + (setOn(s, 'vuln') ? 5 : 3);
   // 가시 돋친(되돌리는) 정예: 때린 쪽이 조금 받는다
@@ -1127,6 +1235,30 @@ function killFoe(s: State, f: Foe): void {
   f.dead = true;
   s.kills++;
   s.chapterKills++;
+  // 갈라지는(정의·변종): 작은 것 n
+  const nSplit = f.small ? 0 : (f.def.split ?? variantOf(f)?.split ?? 0);
+  for (let i = 0; i < nSplit; i++) {
+    const a = (i / nSplit) * Math.PI * 2;
+    const k = spawnFoe(s, f.def.id, f.x + Math.cos(a) * 20, f.y + Math.sin(a) * 20);
+    if (k) {
+      k.small = true;
+      k.variant = undefined;
+      k.scale = 0.7;
+      k.hp = k.maxHp = Math.max(1, Math.round(f.maxHp * 0.3));
+      k.damage = f.damage * 0.6;
+      k.element = f.element;
+    }
+  }
+  // 속성 그림자가 쓰러지며 남기는 것: 불 웅덩이 · 독 구름 · 서리 고리
+  const EL = f.element ? RULES.variants.element[f.element] : undefined;
+  if (EL?.deathZone) addFoeZone(s, f.x, f.y, EL.deathZone.radius, EL.deathZone.dps * s.chapter.dmg, EL.deathZone.seconds, f.element!);
+  if (EL?.deathRing) s.slams.push({ x: f.x, y: f.y, r: EL.deathRing.radius, damage: EL.deathRing.damage * s.chapter.dmg, born: s.t, at: s.t + EL.deathRing.delay, color: '#8fd3ff', shape: 'ring', r0: EL.deathRing.radius * 0.55 });
+  // 자폭병을 먼저 쓰러뜨리면: 그 자리에서 터져 둘레 그림자만 다친다(인물은 안 다친다)
+  const fz = fuseOf(f);
+  if (fz) {
+    s.events.push({ type: 'burst', x: f.x, y: f.y, r: fz.radius });
+    for (const o of s.foes) if (!o.dead && o !== f && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < fz.radius ** 2) damageFoe(s, o, f.maxHp * 1.5 + 20, 30, undefined, true);
+  }
   // 화염 세트: 불붙은 채 쓰러지면 둘레로 번진다
   if (s.t < f.burnUntil && setOn(s, 'fire')) {
     const F = RULES.sets.fire;
@@ -1187,7 +1319,7 @@ function killFoe(s: State, f: Foe): void {
   }
 }
 
-function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe | null {
+export function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe | null {
   const def = FOES.get(id);
   if (!def) return null;
   if (!boss && !def.rank && s.foes.length >= RULES.foes.max) return null;
@@ -1220,8 +1352,32 @@ function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe
   s.foes.push(f);
   if (boss) s.boss = f;
   if (def.rank === 'elite') giveAffixes(s, f);
+  f.element = def.element;
+  if (!def.rank && !boss) giveVariant(s, f);
   return f;
 }
+
+/** 변종: 보통 그림자에 강화·특성·속성·자폭 중 하나(장·분마다 확률이 오른다) */
+const VARIANTS = new Map(RULES.variants.list.map((v) => [v.id, v]));
+function giveVariant(s: State, f: Foe): void {
+  const V = RULES.variants;
+  if (s.mode === 'endless' && s.t / 60 < V.chance.endlessFrom) return;
+  const level = s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex;
+  const chance = Math.min(V.chance.max, V.chance.base + V.chance.perChapter * level + (V.chance.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
+  if (s.rng.next() >= chance) return;
+  const pool = V.list.filter((v) => (v.from ?? 0) <= level && !(v.element && f.def.element) && !(v.fuse && f.def.fuse));
+  const v = s.rng.weighted(pool, (x) => x.weight);
+  if (v) applyVariant(f, v);
+}
+export function applyVariant(f: Foe, v: VariantDef): void {
+  f.variant = v.id;
+  if (v.hp) f.hp = f.maxHp = Math.round(f.maxHp * v.hp);
+  if (v.damage) f.damage *= v.damage;
+  if (v.scale) f.scale = v.scale;
+  if (v.element) f.element = v.element;
+}
+const variantOf = (f: Foe): VariantDef | undefined => (f.variant ? VARIANTS.get(f.variant) : undefined);
+const fuseOf = (f: Foe): FuseDef | undefined => f.def.fuse ?? variantOf(f)?.fuse;
 
 /** 정예 수식어를 붙인다(뒤 장은 둘) */
 function giveAffixes(s: State, f: Foe): void {
@@ -1255,7 +1411,18 @@ function spawnPoint(s: State, fly: boolean, min = RULES.foes.spawnRadius[0], max
 }
 
 const rolePool = (c: ChapterDef, role: Role): string[] => (c.roles[role]?.length ? c.roles[role] : c.roles.main);
+/** 특수 그림자(자폭병·저격수·무녀…): 장마다·분마다 오르는 확률로 장 무리 대신 */
+const SPECIALS = [...FOES.values()].filter((f) => f.special);
 function pickRole(s: State, mix: Partial<Record<Role, number>>): string {
+  const SC = RULES.specials.chance;
+  const level = s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex;
+  // 1장은 덜(처음 만나는 장이 너무 거칠지 않게)
+  const chance = Math.min(SC.max, SC.base + SC.perChapter * level + (SC.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
+  if (SPECIALS.length && s.rng.next() < chance) {
+    const open = SPECIALS.filter((f) => f.special!.from <= level);
+    const pick = open.length ? s.rng.weighted(open, (f) => f.special!.weight) : null;
+    if (pick) return pick.id;
+  }
   const roles = Object.keys(mix) as Role[];
   const role = s.rng.weighted(roles, (r) => mix[r] ?? 0) ?? 'main';
   const pool = rolePool(s.chapter, role);
@@ -1687,8 +1854,31 @@ function counter(s: State, x: number, y: number): void {
   s.events.push({ type: 'counter', x, y });
 }
 
-function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string): void {
-  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: 7, damage: damage * s.chapter.dmg * (f.dmgMul ?? 1), life: 4, color, pierce: 0 });
+const ELEMENT_STYLE: Record<string, ShotStyle> = { fire: 'flame', ice: 'shard', shock: 'spark', poison: 'bubble' };
+function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string, mod: ShotMod = {}): void {
+  const style = mod.style ?? (f.element ? ELEMENT_STYLE[f.element] : undefined) ?? 'orb';
+  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: mod.r ?? (style === 'needle' || style === 'arrow' ? 5 : style === 'flame' ? 9 : 7), damage: damage * s.chapter.dmg * (f.dmgMul ?? 1), life: 4, color, pierce: 0, style, homing: mod.homing, zone: mod.zone });
+}
+/** 웅덩이(불·독·서리)를 놓는다 — 너무 많으면 오래된 것부터 */
+function addFoeZone(s: State, x: number, y: number, r: number, dps: number, seconds: number, element: string): void {
+  if (s.foeZones.length > 60) s.foeZones.shift();
+  s.foeZones.push({ x, y, r, dps, until: s.t + seconds, born: s.t, element, next: s.t + 0.3 });
+}
+/** 속성 그림자의 걸음: 불 자국 · 번개 치기 */
+function elementTick(s: State, f: Foe, d: number): void {
+  const el = f.element ? RULES.variants.element[f.element] : undefined;
+  if (!el) return;
+  if (el.trail && s.t >= (f.trailAt ?? 0)) {
+    f.trailAt = s.t + el.trail.every;
+    if (d < 700) addFoeZone(s, f.x, f.y, el.trail.radius, el.trail.dps * s.chapter.dmg, el.trail.seconds, f.element!);
+  }
+  if (el.zap && d < el.zap.range && s.t >= (f.zapAt ?? s.t + 1)) {
+    f.zapAt = s.t + el.zap.every * (0.8 + s.rng.next() * 0.4);
+    const p = s.player;
+    const a = Math.atan2(p.y - f.y, p.x - f.x);
+    s.slams.push({ x: f.x, y: f.y, r: 0, damage: el.zap.damage * s.chapter.dmg, born: s.t, at: s.t + el.zap.delay, color: '#ffe45a', shape: 'line', angle: a, len: d + 60, w: el.zap.width });
+  }
+  if (f.zapAt === undefined) f.zapAt = s.t + 1 + s.rng.next() * 2;
 }
 
 function useSkills(s: State, f: Foe, d: number): void {
@@ -1702,14 +1892,66 @@ function useSkills(s: State, f: Foe, d: number): void {
     f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4) * (f.boss ? RULES.boss.haste ** (f.phase ?? 0) : 1);
     switch (k.kind) {
       case 'aimed':
-        shoot(s, f, aim, k.speed, k.damage, k.color);
+        shoot(s, f, aim, k.speed, k.damage, k.color, k);
         break;
       case 'fan':
-        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (k.count > 1 ? (j / (k.count - 1) - 0.5) * k.spread * 2 : 0), k.speed, k.damage, k.color);
+        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (k.count > 1 ? (j / (k.count - 1) - 0.5) * k.spread * 2 : 0), k.speed, k.damage, k.color, k);
         break;
       case 'radial':
-        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (j / k.count) * Math.PI * 2, k.speed, k.damage, k.color);
+        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (j / k.count) * Math.PI * 2, k.speed, k.damage, k.color, k);
         break;
+      case 'line':
+        s.slams.push({ x: f.x, y: f.y - 10, r: 0, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'line', angle: Math.atan2(p.y - f.y, p.x - f.x), len: k.len, w: k.width });
+        break;
+      case 'cone':
+        if (k.range && d > k.range) {
+          f.skillAt[i] = s.t + 0.5;
+          break;
+        }
+        s.slams.push({ x: f.x, y: f.y, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'cone', angle: Math.atan2(p.y - f.y, p.x - f.x), w: k.spread });
+        break;
+      case 'ring':
+        if (k.range && d > k.range) {
+          f.skillAt[i] = s.t + 0.5;
+          break;
+        }
+        s.slams.push({ x: f.x, y: f.y, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'ring', r0: k.radius - k.width });
+        break;
+      case 'lob':
+        s.slams.push({ x: p.x + (s.rng.next() - 0.5) * 60, y: p.y + (s.rng.next() - 0.5) * 60, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, zone: k.zone });
+        break;
+      case 'heal': {
+        let healed = 0;
+        for (const o of s.foes)
+          if (!o.dead && o !== f && o.hp < o.maxHp && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < k.radius ** 2) {
+            o.hp = Math.min(o.maxHp, o.hp + o.maxHp * k.amount);
+            healed++;
+          }
+        if (healed) s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#7dff9a', kind: 'heal', r: k.radius });
+        break;
+      }
+      case 'shield': {
+        for (const o of s.foes)
+          if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < k.radius ** 2) {
+            o.guardUntil = s.t + k.seconds;
+            o.guardMul = k.mul;
+          }
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#9fd8ff', kind: 'shield', r: k.radius });
+        break;
+      }
+      case 'burrow': {
+        if (d > 520) {
+          f.skillAt[i] = s.t + 1;
+          break;
+        }
+        const tx = p.x + (s.rng.next() - 0.5) * 80;
+        const ty = p.y + (s.rng.next() - 0.5) * 80;
+        if (!f.def.fly && !walkable(s.terrain, tx, ty)) break;
+        f.burrowUntil = s.t + k.delay;
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: k.color, kind: 'burrow' });
+        s.slams.push({ x: tx, y: ty, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, owner: f.uid });
+        break;
+      }
       case 'slam':
         for (let j = 0; j < (k.count ?? 1); j++) {
           const ox = j ? (s.rng.next() - 0.5) * 240 : 0;
@@ -1776,19 +2018,28 @@ function moveFoes(s: State): void {
       continue;
     }
     if (frozen || s.t < f.stunUntil) continue;
-    // 터지는 놈: 가까우면 멈춰 불이 붙었다가 터진다
-    if (f.def.move === 'burst') {
-      if (!f.fuseAt && d < 60) f.fuseAt = s.t + 0.6;
+    // 땅속(땅굴 그림자): 솟을 때까지 숨어 있다
+    if (f.burrowUntil) {
+      if (s.t < f.burrowUntil) continue;
+      f.burrowUntil = 0;
+    }
+    const va = variantOf(f);
+    if (va?.regen && f.hp < f.maxHp) f.hp = Math.min(f.maxHp, f.hp + f.maxHp * va.regen * DT);
+    // 자폭(터지는 놈·자폭병·자폭 변종): 가까우면 내달리고, 붙으면 멈춰 불이 붙었다가 터진다(둘레 그림자도 다친다)
+    const fz = f.def.move === 'burst' ? (f.def.fuse ?? { range: 60, delay: 0.6, radius: 80, damage: 1, sprint: 1 }) : fuseOf(f);
+    if (fz) {
+      if (!f.fuseAt && d < fz.range) f.fuseAt = s.t + fz.delay;
       if (f.fuseAt) {
         if (s.t >= f.fuseAt) {
-          s.events.push({ type: 'burst', x: f.x, y: f.y, r: 80 });
-          if (d < 80 + RULES.player.radius) hurtPlayer(s, f.damage);
+          if (d < fz.radius + RULES.player.radius && s.t >= p.dashUntil) hurtPlayer(s, f.damage * fz.damage);
+          else if (d < fz.radius + RULES.player.radius) counter(s, p.x, p.y);
           killFoe(s, f);
         }
         continue;
       }
     }
-    let speed = f.def.speed * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed') * affixSpeed(f) * (f.boss ? RULES.boss.speed ** (f.phase ?? 0) : 1);
+    elementTick(s, f, d);
+    let speed = f.def.speed * (va?.speed ?? 1) * (fz && d < 280 ? fz.sprint : 1) * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed') * affixSpeed(f) * (f.boss ? RULES.boss.speed ** (f.phase ?? 0) : 1);
     let ux = dx / d;
     let uy = dy / d;
     if (!f.def.fly) {
@@ -1860,6 +2111,9 @@ function moveFoes(s: State): void {
         if (p.hurtUntil !== before) {
           if (hasAffix(f, 'venom')) s.poisonUntil = s.t + 3;
           if (hasAffix(f, 'frosty')) s.chillUntil = s.t + (AFFIX.get('frosty')!.chill ?? 2);
+          const el = f.element ? RULES.variants.element[f.element] : undefined;
+          if (el?.chill) s.chillUntil = Math.max(s.chillUntil, s.t + el.chill);
+          if (el?.poison) s.poisonUntil = Math.max(s.poisonUntil, s.t + el.poison);
         }
         // 되갚기(카드 심법): 몸으로 친 적에게 그대로 돌려준다
         if (p.hurtUntil !== before && stat.thorns(s) > 0) damageFoe(s, f, stat.thorns(s));
@@ -2054,14 +2308,30 @@ function fireWeapons(s: State): void {
 function moveShots(s: State): void {
   const p = s.player;
   for (const sh of s.shots) {
+    // 따라오는 탄(그림자 탄): 인물 쪽으로 조금씩 꺾는다
+    if (sh.homing && !sh.weapon && sh.life > 1) {
+      const want = Math.atan2(p.y - 20 - sh.y, p.x - sh.x);
+      const cur = Math.atan2(sh.vy, sh.vx);
+      let da = want - cur;
+      while (da > Math.PI) da -= Math.PI * 2;
+      while (da < -Math.PI) da += Math.PI * 2;
+      const turn = Math.max(-sh.homing * DT, Math.min(sh.homing * DT, da));
+      const sp = Math.hypot(sh.vx, sh.vy);
+      sh.vx = Math.cos(cur + turn) * sp;
+      sh.vy = Math.sin(cur + turn) * sp;
+    }
     sh.x += sh.vx * DT;
     sh.y += sh.vy * DT;
     sh.life -= DT;
-    if (sh.life <= 0) continue;
+    if (sh.life <= 0) {
+      if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
+      continue;
+    }
     // 벽은 적 탄과 불덩이·검광(관통이 적은 탄)을 막는다 — 검기(wave)는 넘는다
     const wallStop = !sh.weapon || WEAPONS.get(sh.weapon)?.kind === 'bolt';
     if (wallStop && blocksShot(s.terrain, sh.x, sh.y + 20)) {
       sh.life = 0;
+      if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
       continue;
     }
     if (!sh.weapon) {
@@ -2070,6 +2340,7 @@ function moveShots(s: State): void {
       if (d2 < rr * rr && s.t >= p.dashUntil) {
         hurtPlayer(s, sh.damage);
         sh.life = 0;
+        if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
       } else if (s.t < p.dashUntil && p.dashMove && d2 < RULES.counter.shotRadius ** 2) {
         // 보법으로 탄을 아슬하게 비켰다
         sh.life = 0;
@@ -2098,17 +2369,68 @@ function moveShots(s: State): void {
     for (const f of s.foes) if (!f.dead && (f.x - z.x) ** 2 + (f.y - z.y) ** 2 < (z.r + f.def.radius) ** 2) damageFoe(s, f, z.damage, 0, z.element);
   }
   s.zones = s.zones.filter((z) => s.t < z.until);
-  // 예고한 원이 떨어진다
+  // 예고한 자리(원·띠·부채꼴·고리)가 떨어진다
   for (const m of s.slams) {
     if (s.t < m.at) continue;
-    if ((p.x - m.x) ** 2 + (p.y - m.y) ** 2 < (m.r + RULES.player.radius) ** 2) {
+    if (inSlam(m, p.x, p.y, RULES.player.radius)) {
       // 내려찍기가 떨어지는 순간 보법 중이면 간파
       if (s.t < p.dashUntil) counter(s, p.x, p.y);
       else hurtPlayer(s, m.damage);
     }
-    s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color });
+    if (m.hurtsFoes) for (const f of s.foes) if (!f.dead && inSlam(m, f.x, f.y, f.def.radius)) damageFoe(s, f, m.damage * 2, 20, undefined, true);
+    if (m.zone) addFoeZone(s, m.x, m.y, m.zone.radius, m.zone.dps * s.chapter.dmg, m.zone.seconds, m.zone.element ?? 'poison');
+    // 땅굴 그림자: 이 자리에서 솟는다
+    if (m.owner !== undefined) {
+      const f = s.foes.find((x) => x.uid === m.owner);
+      if (f && !f.dead) {
+        f.x = m.x;
+        f.y = m.y;
+        f.burrowUntil = 0;
+      }
+    }
+    s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color, kind: m.shape && m.shape !== 'circle' ? m.shape : m.zone ? 'zone' : undefined, angle: m.angle, r: m.r, len: m.len, w: m.w, r0: m.r0 });
   }
   s.slams = s.slams.filter((m) => s.t < m.at);
+  // 웅덩이: 안에 있으면 0.5초마다(보법 중엔 안 다친다)
+  for (const z of s.foeZones) {
+    if (s.t < z.next) continue;
+    z.next = s.t + 0.5;
+    if ((p.x - z.x) ** 2 + (p.y - z.y) ** 2 < (z.r + RULES.player.radius * 0.5) ** 2 && s.t >= p.dashUntil) {
+      hurtPlayer(s, z.dps * 0.5, true);
+      if (z.element === 'ice') s.chillUntil = Math.max(s.chillUntil, s.t + 1);
+    }
+  }
+  s.foeZones = s.foeZones.filter((z) => s.t < z.until);
+}
+
+/** 예고 모양 안인가(pad: 맞는 쪽 반지름) */
+export function inSlam(m: Slam, x: number, y: number, pad: number): boolean {
+  const dx = x - m.x;
+  const dy = y - m.y;
+  switch (m.shape ?? 'circle') {
+    case 'line': {
+      const c = Math.cos(m.angle ?? 0);
+      const sn = Math.sin(m.angle ?? 0);
+      const along = dx * c + dy * sn;
+      const perp = Math.abs(-dx * sn + dy * c);
+      return along > -pad && along < (m.len ?? 0) + pad && perp < (m.w ?? 20) + pad;
+    }
+    case 'cone': {
+      const d = Math.hypot(dx, dy);
+      if (d > m.r + pad) return false;
+      if (d < pad) return true;
+      let da = Math.atan2(dy, dx) - (m.angle ?? 0);
+      while (da > Math.PI) da -= Math.PI * 2;
+      while (da < -Math.PI) da += Math.PI * 2;
+      return Math.abs(da) < (m.w ?? 0.6) + pad / d;
+    }
+    case 'ring': {
+      const d = Math.hypot(dx, dy);
+      return d < m.r + pad && d > (m.r0 ?? 0) - pad;
+    }
+    default:
+      return dx * dx + dy * dy < (m.r + pad) ** 2;
+  }
 }
 
 function pickups(s: State): void {
