@@ -17,3 +17,4 @@ Cell 4: FRONT VIEW, standing still facing the viewer, calm breathing; the narrow
 Cells 5 to 6 are completely empty magenta.
 Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
 Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Fix the JACKET COLOR: the entire outer jacket body and sleeves must be COOL BLUE-GREY, use #8a90a3 as the main cloth and #5d6478 as the single shadow, with #c2c6d1 highlights. Match the attached approved parry sheet's grey clothes. Absolutely NO beige, tan, yellow, brown, khaki or olive on the outer jacket. Only the narrow inner collar and bandages can stay off-white; retain the patched cloth, dark sash, long black hair, one narrow sword and one WHOLE matte-BLACK EMPTY long scabbard. Keep the FRONT VIEW idle breathing in cells1-4, same height about108pixels and all foot soles on source row y=460; cells5-6 empty magenta. No extra actions or equipment.
