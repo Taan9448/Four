@@ -568,7 +568,10 @@ export type FxEvent =
   | { type: 'warn'; cells: number[]; at: number }
   | { type: 'terrain' }
   | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string }
-  | { type: 'buy'; id: string; kind: string };
+  | { type: 'buy'; id: string; kind: string }
+  /** 소리용(2026-11-22): 결 조각 주움 · 그림자가 쏨/예고함 */
+  | { type: 'gem' }
+  | { type: 'foeAct'; act: 'shot' | 'warn'; x: number; y: number };
 export interface Choice {
   /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 · buyskill/upskill/sellskill: 수련소(무한 모드, lv = 값/돌려받는 금화) */
   kind: 'weapon' | 'passive' | 'food' | 'gold' | 'buy' | 'leave' | 'buyskill' | 'upskill' | 'sellskill';
@@ -1890,6 +1893,7 @@ function useSkills(s: State, f: Foe, d: number): void {
   skills.forEach((k, i) => {
     if (s.t < f.skillAt[i]) return;
     f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4) * (f.boss ? RULES.boss.haste ** (f.phase ?? 0) : 1);
+    if (s.events.length < 400) s.events.push({ type: 'foeAct', act: k.kind === 'aimed' || k.kind === 'fan' || k.kind === 'radial' ? 'shot' : 'warn', x: f.x, y: f.y });
     switch (k.kind) {
       case 'aimed':
         shoot(s, f, aim, k.speed, k.damage, k.color, k);
@@ -2450,6 +2454,7 @@ function pickups(s: State): void {
     g.y += (uy + ux * swirl) * Math.min(v, d);
     if (d < 18) {
       g.taken = true;
+      if (s.events.length < 400) s.events.push({ type: 'gem' });
       gainXp(s, g.xp * effMul(s, 'xp'));
     }
   }

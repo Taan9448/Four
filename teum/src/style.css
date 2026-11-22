@@ -576,3 +576,24 @@ button { font: inherit; }
   .shop-place .npc-line { flex: 1 1 60%; }
   .shop-place .leave { grid-column: 1; justify-self: stretch; }
 }
+
+/* ── 메인 잔잔한 움직임(2026-11-22): 키 아트를 3:2로 꽉 채우고, 그 위에 균열 빛·안개·입자·등불 ── */
+.backdrop.art { background: #0b0b10; }
+.lobby-stage { position: absolute; left: 50%; top: 50%; width: max(100vw, 150vh); height: max(100vh, 66.667vw); transform: translate(-50%, -50%); overflow: hidden; pointer-events: none; }
+.lobby-art { position: absolute; inset: -2%; background: center / cover no-repeat; animation: lobby-drift 40s ease-in-out infinite alternate; }
+@keyframes lobby-drift { from { transform: scale(1.02) translate(0, 0); } to { transform: scale(1.06) translate(-0.8%, 0.6%); } }
+.lobby-glow { position: absolute; left: 47%; top: -6%; width: 26%; height: 52%; background: radial-gradient(ellipse at 50% 45%, rgba(255, 60, 80, 0.38), rgba(192, 40, 58, 0.12) 45%, transparent 70%); mix-blend-mode: screen; animation: lobby-breath 6s ease-in-out infinite; }
+@keyframes lobby-breath { 0%, 100% { opacity: 0.55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+.lobby-mist { position: absolute; left: -20%; width: 140%; height: 30%; background: radial-gradient(ellipse at 30% 50%, rgba(150, 160, 200, 0.12), transparent 60%), radial-gradient(ellipse at 75% 60%, rgba(150, 160, 200, 0.1), transparent 55%); filter: blur(6px); }
+.lobby-mist.a { top: 52%; animation: lobby-mist 48s linear infinite; }
+.lobby-mist.b { top: 68%; opacity: 0.8; animation: lobby-mist 70s linear infinite reverse; }
+@keyframes lobby-mist { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+.lobby-fx { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lobby-flash { position: absolute; inset: 0; background: radial-gradient(ellipse at 61% 18%, rgba(255, 120, 130, 0.55), transparent 45%); opacity: 0; mix-blend-mode: screen; }
+.lobby-flash.on { animation: lobby-flash 1.1s ease-out; }
+@keyframes lobby-flash { 0% { opacity: 0; } 8% { opacity: 1; } 20% { opacity: 0.3; } 30% { opacity: 0.8; } 100% { opacity: 0; } }
+.lobby-lantern { position: absolute; width: 5%; height: 7%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(255, 200, 110, 0.45), transparent 65%); mix-blend-mode: screen; animation: lobby-lantern 3.2s ease-in-out infinite; }
+@keyframes lobby-lantern { 0%, 100% { opacity: 0.7; } 30% { opacity: 1; } 55% { opacity: 0.55; } 70% { opacity: 0.95; } }
+.backdrop-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 7, 10, 0.15), rgba(8, 7, 10, 0.62)); pointer-events: none; }
+:root.idle .lobby-art, :root.idle .lobby-glow, :root.idle .lobby-mist, :root.idle .lobby-lantern { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .lobby-art, .lobby-glow, .lobby-mist, .lobby-lantern { animation: none; } }

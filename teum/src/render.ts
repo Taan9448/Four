@@ -50,6 +50,9 @@ export interface Options {
   /** 몸 둘레 범위 기술(둘레 돌기·결계·고리·베기·장판·회복) 그림:
    *  clean(기본, 2026-11-21 "원만 보여 밋밋 — 인물은 가리지 말고 범위가 보이게") 가운데가 빈 띠·눈금·날 모양 · simple 얇은 선만 · fancy Codex 그림 */
   areaFx?: 'simple' | 'clean' | 'fancy';
+  /** 키 설정(2026-11-22) · 소리 크기(2026-11-22) */
+  keys?: Partial<Record<string, [string, string?]>>;
+  sound?: { master: number; bgm: number; sfx: number };
 }
 const FX_ALPHA = { strong: 1, normal: 0.7, soft: 0.42 };
 
@@ -145,8 +148,35 @@ export interface View {
   /** 곧 바뀔 칸 예고 */
   warn: { cells: number[]; at: number } | null;
   counterAt: number;
+  /** 타격감(2026-11-22 "아직도 타격감이 부족"): 불티·조각 입자 · 연격(잇달아 쓰러뜨린 수) · 화면 당김(줌 펀치) */
+  parts: Part[];
+  combo: { n: number; at: number; best: number; pop: number };
+  punch: number;
+  /** 한 프레임에 쓰러뜨린 수(몰살 흔들림) */
+  burstKills: number;
 }
-export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null, stopUntil: 0, chestRoll: null, stele: null, warn: null, counterAt: -9 });
+interface Part {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  max: number;
+  color: string;
+  size: number;
+  grav: number;
+  kind: 'spark' | 'chunk' | 'soul' | 'ring';
+}
+export const emptyView = (): View => ({ marks: [], banner: null, shake: 0, hurtFlash: -9, ultFlash: null, flash: null, minimap: null, stopUntil: 0, chestRoll: null, stele: null, warn: null, counterAt: -9, parts: [], combo: { n: 0, at: -9e9, best: 0, pop: -9e9 }, punch: 0, burstKills: 0 });
+/** 입자 뿌리기(장식이라 Math.random) */
+function spray(v: View, x: number, y: number, n: number, color: string, speed: number, kind: Part['kind'] = 'spark', size = 2.5, grav = 380): void {
+  if (v.parts.length > 520) return;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const sp = speed * (0.4 + Math.random() * 0.8);
+    v.parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - speed * 0.4, life: 0, max: 0.35 + Math.random() * 0.35, color, size: size * (0.6 + Math.random() * 0.8), grav, kind });
+  }
+}
 
 
 export function absorb(v: View, s: State, now: number, opt: Options): void {
@@ -177,6 +207,7 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
       v.ultFlash = { born: now, fx: e.fx, color: e.color };
       if (opt.shake) v.shake = 16;
       v.stopUntil = now + 80;
+      v.punch = 1;
     } else if (e.type === 'bomb') {
       v.flash = { born: now, color: '#fff2c0' };
       if (opt.shake) v.shake = 18;
@@ -189,15 +220,37 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
       v.flash = { born: now, color: '#d4b8ff' };
     }
     else if (e.type === 'hit') {
-      if (opt.numbers && (e.crit || e.damage >= 40 || v.marks.length < 120)) v.marks.push({ e, born: now });
+      if (opt.numbers && (e.crit || e.damage >= 40 || v.marks.length < 120)) v.marks.push({ e, born: now, flip: Math.random() < 0.5 });
+      // 맞힌 자리에 불티(치명은 금빛 + 흔들림)
+      spray(v, e.x, e.y - 20, e.crit ? 7 : 3, e.crit ? '#ffd27a' : '#fff4e0', e.crit ? 260 : 170);
+      if (e.crit && opt.shake) v.shake = Math.max(v.shake, e.damage >= 120 ? 5 : 2.5);
       // 큰 치명타: 짧은 히트스톱
       if (e.crit && e.damage >= 200) v.stopUntil = Math.max(v.stopUntil, now + 45);
     } else if (e.type === 'kill') {
       v.marks.push({ e, born: now, flip: e.x < s.player.x });
+      // 쓰러짐: 먹 조각이 튀고 넋(붉은 빛)이 올라간다
+      spray(v, e.x, e.y - 18, e.rank ? 26 : 9, e.rank ? '#ff5a4a' : '#2a1a24', e.rank ? 360 : 230, 'chunk', e.rank ? 5 : 3.5, 620);
+      spray(v, e.x, e.y - 18, e.rank ? 10 : 3, '#ff7a8a', 120, 'soul', 3, -90);
+      v.burstKills++;
+      // 연격: 2.5초 안에 잇달아 쓰러뜨린 수
+      v.combo.n = now - v.combo.at < 2500 ? v.combo.n + 1 : 1;
+      v.combo.at = now;
+      v.combo.best = Math.max(v.combo.best, v.combo.n);
+      if (v.combo.n % 25 === 0) v.combo.pop = now;
       if (e.rank && opt.shake) v.shake = Math.max(v.shake, e.rank === 'boss' ? 14 : 8);
       if (e.rank) v.stopUntil = Math.max(v.stopUntil, now + (e.rank === 'boss' ? 260 : 90));
+      if (e.rank === 'boss') v.punch = 1;
+    } else if (e.type === 'burst') {
+      v.marks.push({ e, born: now });
+      spray(v, e.x, e.y - 10, 16, '#ffb02e', 340, 'spark', 3.5);
+      v.parts.push({ x: e.x, y: e.y, vx: 0, vy: 0, life: 0, max: 0.35, color: '#ffd27a', size: e.r, grav: 0, kind: 'ring' });
+      if (opt.shake) v.shake = Math.max(v.shake, 7);
     } else v.marks.push({ e, born: now });
   }
+  // 한 프레임에 여럿을 쓰러뜨렸으면 화면이 울린다
+  if (v.burstKills >= 6 && opt.shake) v.shake = Math.max(v.shake, Math.min(9, 2 + v.burstKills * 0.4));
+  if (v.burstKills >= 10) v.stopUntil = Math.max(v.stopUntil, now + 30);
+  v.burstKills = 0;
   s.events.length = 0;
   if (v.marks.length > 300) v.marks.splice(0, v.marks.length - 300);
 }
@@ -675,9 +728,10 @@ function frame(a: SpriteAsset, ms: number, offset = 0): CanvasImageSource | null
   return a.images[Math.floor((ms + offset) / (1000 / a.meta.fps)) % a.meta.frames] ?? null;
 }
 
-function drawSpriteAt(ctx: CanvasRenderingContext2D, a: SpriteAsset, img: CanvasImageSource, x: number, y: number, scale: number, flip: boolean, rot = 0, alpha = 1): void {
-  const w = a.meta.frameW * scale;
-  const h = a.meta.frameH * scale;
+function drawSpriteAt(ctx: CanvasRenderingContext2D, a: SpriteAsset, img: CanvasImageSource, x: number, y: number, scale: number, flip: boolean, rot = 0, alpha = 1, squash = 0): void {
+  // squash: 맞은 순간 옆으로 퍼지고 납작해진다(0~1)
+  const w = a.meta.frameW * scale * (1 + squash * 0.22);
+  const h = a.meta.frameH * scale * (1 - squash * 0.16);
   const [ax, ay] = a.meta.anchor;
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -1317,8 +1371,11 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   const sy = shake ? (Math.cos(now * 0.09) * shake) / 2 : 0;
   ctx.fillStyle = '#05040a';
   ctx.fillRect(0, 0, W, H);
+  // 줌 펀치(마지막 기술·보스 쓰러짐): 잠깐 당겼다 놓는다
+  const pz = 1 + 0.06 * Math.sin(Math.min(1, v.punch) * Math.PI) * v.punch;
+  v.punch = Math.max(0, v.punch - 0.05);
   ctx.translate(W / 2 + sx, H / 2 + sy);
-  ctx.scale(zoom, zoom);
+  ctx.scale(zoom * pz, zoom * pz);
   ctx.translate(-p.x, -p.y);
   const vw = W / zoom;
   const vh = H / zoom;
@@ -1574,12 +1631,13 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         if (a && img) {
           const flip = p.x > f.x;
           const rot = frozen ? 0 : Math.sin(now / 160 + f.uid) * 0.05;
-          drawSpriteAt(ctx, a, img, f.x, f.y - bob, sc, flip, rot);
+          const sq = Math.max(0, 1 - (s.t - f.hitAt) / 0.12);
+          drawSpriteAt(ctx, a, img, f.x, f.y - bob, sc, flip, rot, 1, sq);
           // 변종·속성 색(옅게 덧칠) — 강화된 놈은 금빛 테
-          if (tcol) drawSpriteAt(ctx, a, tintOf(img, a.meta.frameW, a.meta.frameH, tcol), f.x, f.y - bob, sc, flip, rot, f.variant === 'veteran' ? 0.28 : 0.34);
+          if (tcol) drawSpriteAt(ctx, a, tintOf(img, a.meta.frameW, a.meta.frameH, tcol), f.x, f.y - bob, sc, flip, rot, f.variant === 'veteran' ? 0.28 : 0.34, sq);
           if (s.t - f.hitAt < 0.08 || fuse) {
             // 맞은 순간: 하얀 실루엣(2026-11-21 타격감)
-            drawSpriteAt(ctx, a, fuse ? tintOf(img, a.meta.frameW, a.meta.frameH, '#ff3a2a') : whiteOf(img, a.meta.frameW, a.meta.frameH), f.x, f.y - bob, sc, flip, rot, 0.85);
+            drawSpriteAt(ctx, a, fuse ? tintOf(img, a.meta.frameW, a.meta.frameH, '#ff3a2a') : whiteOf(img, a.meta.frameW, a.meta.frameH), f.x, f.y - bob, sc, flip, rot, 0.85, sq);
           }
         } else {
           ctx.fillStyle = s.t - f.hitAt < 0.08 ? '#ffffff' : '#3a2a40';
@@ -2012,18 +2070,64 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'hit') {
       const k = age / 0.6;
       if (k > 1) continue;
-      ctx.font = `${e.crit ? 800 : 600} ${e.crit ? 18 : 13}px "IBM Plex Sans KR", sans-serif`;
+      // 튀어나왔다가(크게) 줄며 떠오른다 — 치명은 더 크고 금빛, 옆으로 살짝 튄다
+      const pop = age < 0.08 ? 1 + (e.crit ? 0.9 : 0.5) * (1 - age / 0.08) : 1;
+      const size = (e.crit ? 20 : 13) * pop * (e.damage >= 100 ? 1.2 : 1);
+      ctx.font = `${e.crit ? 900 : 700} ${Math.round(size)}px "IBM Plex Sans KR", sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillStyle = e.crit ? `rgba(255,214,90,${1 - k})` : `rgba(255,255,255,${0.85 * (1 - k)})`;
-      ctx.strokeStyle = `rgba(0,0,0,${0.7 * (1 - k)})`;
-      ctx.lineWidth = 3;
-      const y = e.y - 44 - k * 22;
-      ctx.strokeText(String(e.damage), e.x, y);
-      ctx.fillText(String(e.damage), e.x, y);
+      ctx.fillStyle = e.crit ? `rgba(255,214,90,${1 - k * k})` : `rgba(255,255,255,${0.9 * (1 - k * k)})`;
+      ctx.strokeStyle = `rgba(0,0,0,${0.75 * (1 - k)})`;
+      ctx.lineWidth = e.crit ? 4 : 3;
+      const dx = (m.flip ? -1 : 1) * (e.crit ? 14 : 6) * k;
+      const y = e.y - 44 - (1 - (1 - k) ** 2) * 30;
+      const txt = e.crit ? `${e.damage}!` : String(e.damage);
+      ctx.strokeText(txt, e.x + dx, y);
+      ctx.fillText(txt, e.x + dx, y);
     }
   }
   ctx.globalAlpha = 1;
   v.marks = v.marks.filter((m) => now - m.born < (m.e.type === 'kill' ? 1400 : m.e.type === 'counter' ? 900 : 700));
+  // 입자: 불티(가늘게 늘어진 빛) · 먹 조각(떨어져 튐) · 넋(흔들리며 올라감) · 터짐 고리
+  {
+    const dt = 1 / 60;
+    ctx.save();
+    for (const q of v.parts) {
+      q.life += dt;
+      q.vy += q.grav * dt;
+      q.vx *= 0.96;
+      q.x += q.vx * dt;
+      q.y += q.vy * dt;
+      const a = Math.max(0, 1 - q.life / q.max);
+      if (q.kind === 'ring') {
+        ctx.strokeStyle = hexA(q.color, a);
+        ctx.lineWidth = 6 * a + 1;
+        ctx.beginPath();
+        ctx.ellipse(q.x, q.y, q.size * (0.4 + 0.8 * (1 - a)), q.size * 0.62 * (0.4 + 0.8 * (1 - a)), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (q.kind === 'spark') {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.strokeStyle = hexA(q.color, a);
+        ctx.lineWidth = q.size * 0.7;
+        ctx.beginPath();
+        ctx.moveTo(q.x, q.y);
+        ctx.lineTo(q.x - q.vx * 0.03, q.y - q.vy * 0.03);
+        ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
+      } else if (q.kind === 'soul') {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = hexA(q.color, a * 0.8);
+        ctx.beginPath();
+        ctx.arc(q.x + Math.sin(q.life * 9 + q.size) * 4, q.y, q.size * (0.6 + a * 0.6), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      } else {
+        ctx.fillStyle = hexA(q.color, Math.min(1, a * 1.5));
+        ctx.fillRect(q.x - q.size / 2, q.y - q.size / 2, q.size, q.size);
+      }
+    }
+    ctx.restore();
+    v.parts = v.parts.filter((q) => q.life < q.max);
+  }
   // ── 맨 위: 적 탄 · 예고 원 테두리 · 인물 발 고리(내 이펙트에 묻히지 않게) ──
   for (const sh of s.shots) {
     if (sh.weapon || !inView(sh.x, sh.y)) continue;
@@ -2342,6 +2446,38 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   ctx.textAlign = 'left';
   ctx.fillStyle = '#fff';
   ctx.fillText(`Lv.${s.level}`, 6, 10);
+  // 연격(2026-11-22 타격감): 잇달아 쓰러뜨린 수 — 왼쪽 가운데, 오를 때마다 튀고 25마다 크게
+  const cAge = now - v.combo.at;
+  if (v.combo.n >= 5 && cAge < 2500) {
+    const pop = cAge < 110 ? 1 + 0.35 * (1 - cAge / 110) : 1;
+    const big = now - v.combo.pop < 600 ? 1 + 0.5 * (1 - (now - v.combo.pop) / 600) : 1;
+    const a = Math.min(1, (2500 - cAge) / 500);
+    const x = 18;
+    const y = Math.round(H * 0.42);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.translate(x, y);
+    ctx.scale(pop * big, pop * big);
+    ctx.textAlign = 'left';
+    ctx.font = font(34, 900);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(10,6,8,0.85)';
+    const col = v.combo.n >= 100 ? '#ff5a4a' : v.combo.n >= 50 ? '#ffb02e' : v.combo.n >= 25 ? '#ffd27a' : '#f3ead8';
+    ctx.strokeText(String(v.combo.n), 0, 0);
+    ctx.fillStyle = col;
+    ctx.fillText(String(v.combo.n), 0, 0);
+    const nw = ctx.measureText(String(v.combo.n)).width;
+    ctx.font = font(14, 800);
+    ctx.strokeText('연격', nw + 6, -4);
+    ctx.fillStyle = '#f3ead8';
+    ctx.fillText('연격', nw + 6, -4);
+    // 사라지기까지 남은 띠
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 8, 80, 3);
+    ctx.fillStyle = col;
+    ctx.fillRect(0, 8, 80 * (1 - cAge / 2500), 3);
+    ctx.restore();
+  }
   // 시계: 장에 남은 시간(무한 모드는 버틴 시간)
   const endless = s.mode === 'endless';
   const left = Math.max(0, CHAPTER_LENGTH - s.t);

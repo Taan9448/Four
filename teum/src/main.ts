@@ -10,6 +10,10 @@ import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
 import { autosave, bank, cheonoeCards, heroOpen, loadSave, slotLabel, writeSave, type SaveData, type Slot } from './save';
 import { createRng } from '../../src/engine/rng';
+import { lobbyStage } from './lobby-fx';
+import { ACTIONS, DEFAULT_KEYS, isKey, keyLabel, keyMap, type Action, type KeyMap } from './keys';
+import { DEFAULT_SOUND, initSound, music, play as sfx, setSound } from './sound';
+import { initIdle } from '../../src/render/idle';
 
 const app = document.getElementById('app')!;
 const params = new URLSearchParams(location.search);
@@ -64,6 +68,7 @@ function guestChosen(): boolean {
 function gate(): void {
   stopRun?.();
   screenKeys = null;
+  music('title');
   const id = el('input', { type: 'text', placeholder: '아이디', disabled: '', 'aria-label': '아이디' });
   const pw = el('input', { type: 'password', placeholder: '비밀번호', disabled: '', 'aria-label': '비밀번호' });
   const go = () => {
@@ -97,8 +102,9 @@ function gate(): void {
 }
 
 function backdrop(): HTMLElement {
+  // 2026-11-22 "메인 화면에 결이나 천외귀환처럼 잔잔한 애니메이션": 키 아트 위에 균열 빛·그림자 조각·불티·등불·안개
   const bg = realArt('keyart_teum_lobby');
-  return el('div', { class: `backdrop${bg ? ' art' : ''}`, style: bg ? `--bg:url("${bg}")` : '' }, el('div', { class: 'crack', 'aria-hidden': 'true' }));
+  return el('div', { class: `backdrop${bg ? ' art' : ''}` }, lobbyStage(bg), bg ? '' : el('div', { class: 'crack', 'aria-hidden': 'true' }), el('div', { class: 'backdrop-shade' }));
 }
 
 // ── 2. 메인 ──
@@ -118,6 +124,7 @@ const CORNER = [
 
 function lobby(): void {
   stopRun?.();
+  music('title');
   const sv = loadSave();
   const any = sv.slots.some(Boolean);
   const items = MENU.map((m, i) => {
@@ -844,10 +851,11 @@ function wardrobePopup(): void {
 }
 
 function optionsPopup(onClose?: () => void): void {
+  // 2026-11-22 전면 개편: 탭 넷(화면 · 소리 · 조작 · 기록), 소리 크기 막대, 키 설정
   const sv = loadSave();
-  const row = (label: string, input: HTMLElement) => el('label', { class: 'opt' }, el('span', {}, label), input);
-  const check = (key: 'shake' | 'numbers') => {
-    const c = el('input', { type: 'checkbox' });
+  const row = (label: string, input: HTMLElement, note?: string) => el('label', { class: 'opt' }, el('span', {}, label, note ? el('small', {}, note) : ''), input);
+  const toggle = (key: 'shake' | 'numbers') => {
+    const c = el('input', { type: 'checkbox', class: 'switch' });
     c.checked = sv.options[key];
     c.addEventListener('change', () => {
       sv.options[key] = c.checked;
@@ -855,44 +863,155 @@ function optionsPopup(onClose?: () => void): void {
     });
     return c;
   };
-  const map = el('select', {}, el('option', { value: 'small' }, '작게'), el('option', { value: 'large' }, '크게'));
-  map.value = sv.options.map;
-  map.addEventListener('change', () => {
-    sv.options.map = map.value as 'small' | 'large';
+  const range = (value: number, onInput: (v: number) => void, min = 0, max = 100, step = 5) => {
+    const r = el('input', { type: 'range', min: String(min), max: String(max), step: String(step) }) as HTMLInputElement;
+    const v = el('small', { class: 'val' }, `${Math.round(value)}%`);
+    r.value = String(Math.round(value));
+    r.addEventListener('input', () => {
+      v.textContent = `${r.value}%`;
+      onInput(Number(r.value));
+    });
+    return el('span', { class: 'range' }, r, v);
+  };
+  const seg = <T extends string>(value: T, opts: [T, string][], onPick: (v: T) => void) => {
+    const box = el('span', { class: 'seg' });
+    const draw = (cur: T) =>
+      box.replaceChildren(
+        ...opts.map(([id, name]) =>
+          btn(name, `seg-b${cur === id ? ' on' : ''}`, () => {
+            onPick(id);
+            draw(id);
+          }),
+        ),
+      );
+    draw(value);
+    return box;
+  };
+  // 화면
+  const screenTab = el(
+    'div',
+    { class: 'opts' },
+    row('화면 흔들림', toggle('shake'), '치명타·폭발·보스에서 화면이 울린다'),
+    row('피해 숫자', toggle('numbers')),
+    row('지도 크기', seg(sv.options.map, [['small', '작게'], ['large', '크게']], (v) => ((sv.options.map = v), writeSave(sv)))),
+    row('내 무공 이펙트 불투명도', range((sv.options.fxAlpha ?? { strong: 1, normal: 0.7, soft: 0.42 }[sv.options.fx ?? 'normal']) * 100, (v) => ((sv.options.fxAlpha = v / 100), writeSave(sv)), 15, 100)),
+    row('몸 둘레 범위 기술', seg(sv.options.areaFx ?? 'clean', [['clean', '깔끔하게'], ['simple', '선만'], ['fancy', '화려하게']], (v) => ((sv.options.areaFx = v), writeSave(sv)))),
+  );
+  // 소리
+  const snd = { ...DEFAULT_SOUND, ...sv.options.sound };
+  const setSnd = (k: keyof typeof snd, v: number) => {
+    snd[k] = v / 100;
+    sv.options.sound = { ...snd };
     writeSave(sv);
-  });
-  // 내 이펙트 불투명도 막대(2026-11-21 — VS처럼)
-  const fx = el('input', { type: 'range', min: '15', max: '100', step: '5' }) as HTMLInputElement;
-  const fxv = el('small', { class: 'val' });
-  fx.value = String(Math.round((sv.options.fxAlpha ?? { strong: 1, normal: 0.7, soft: 0.42 }[sv.options.fx ?? 'normal']) * 100));
-  fxv.textContent = `${fx.value}%`;
-  fx.addEventListener('input', () => {
-    sv.options.fxAlpha = Number(fx.value) / 100;
-    fxv.textContent = `${fx.value}%`;
+    setSound(snd);
+  };
+  const soundTab = el(
+    'div',
+    { class: 'opts' },
+    row('전체 소리', range(snd.master * 100, (v) => setSnd('master', v))),
+    row('배경 음악', range(snd.bgm * 100, (v) => setSnd('bgm', v))),
+    row('효과음', range(snd.sfx * 100, (v) => (setSnd('sfx', v), sfx('gem')))),
+    el('p', { class: 'note' }, '소리는 처음 누르거나 키를 칠 때 켜진다(브라우저 규칙).'),
+  );
+  // 조작(키 설정)
+  const keysBox = el('div', { class: 'keys' });
+  let waiting: { action: Action; slot: 0 | 1; b: HTMLButtonElement } | null = null;
+  const map = keyMap(sv.options.keys as Partial<KeyMap>);
+  const drawKeys = () => {
+    keysBox.replaceChildren(
+      ...(['move', 'skill', 'menu'] as const).map((g) =>
+        el(
+          'div',
+          { class: 'key-group' },
+          el('h4', {}, g === 'move' ? '움직임' : g === 'skill' ? '기술' : '레벨업 창'),
+          ...ACTIONS.filter((a) => a.group === g).map((a) =>
+            el(
+              'div',
+              { class: 'key-row' },
+              el('span', {}, a.name),
+              ...([0, 1] as const).map((slot) => {
+                const b = btn(keyLabel(map[a.id][slot]), `keycap${map[a.id][slot] ? '' : ' empty'}`, () => {
+                  waiting?.b.classList.remove('wait');
+                  waiting = { action: a.id, slot, b };
+                  b.classList.add('wait');
+                  b.textContent = '키를 누르세요';
+                });
+                return b;
+              }),
+            ),
+          ),
+        ),
+      ),
+      el(
+        'div',
+        { class: 'menu-row' },
+        btn('기본으로 되돌리기', 'btn small ghost', () => {
+          Object.assign(map, DEFAULT_KEYS);
+          sv.options.keys = { ...map };
+          writeSave(sv);
+          drawKeys();
+        }),
+      ),
+      el('p', { class: 'note' }, '키를 누른 칸을 고른 뒤 새 키를 누른다. 다른 동작에 이미 있는 키는 그 동작에서 빠진다. Delete는 보조 키 지우기.'),
+    );
+  };
+  drawKeys();
+  const keyListen = (e: KeyboardEvent) => {
+    if (!waiting) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const { action, slot } = waiting;
+    if (e.code === 'Delete' && slot === 1) map[action] = [map[action][0]];
+    else {
+      // 같은 무리(판 위·레벨업 창) 안에서 겹치면 다른 동작에서 뺀다
+      const grp = ACTIONS.find((a) => a.id === action)!.group === 'menu' ? 'menu' : 'play';
+      for (const a of ACTIONS) {
+        if ((a.group === 'menu' ? 'menu' : 'play') !== grp || a.id === action) continue;
+        const [k0, k1] = map[a.id];
+        if (k1 === e.code) map[a.id] = [k0];
+        else if (k0 === e.code) map[a.id] = k1 ? [k1] : [DEFAULT_KEYS[a.id][0]];
+      }
+      const cur = [...map[action]] as [string, string?];
+      cur[slot] = e.code;
+      map[action] = [cur[0] ?? e.code, cur[1]];
+    }
+    sv.options.keys = { ...map };
     writeSave(sv);
-  });
+    waiting = null;
+    drawKeys();
+  };
+  window.addEventListener('keydown', keyListen, { capture: true });
+  // 기록
   const tut = btn('처음 안내 다시 보기', 'btn small ghost', () => {
     sv.tutorial = false;
     writeSave(sv);
     tut.textContent = '1장을 열면 다시 나온다';
-  });
-  const area = el('select', {}, el('option', { value: 'clean' }, '깔끔하게(기본)'), el('option', { value: 'simple' }, '선만(가장 편함)'), el('option', { value: 'fancy' }, '화려하게'));
-  area.value = sv.options.areaFx ?? 'clean';
-  area.addEventListener('change', () => {
-    sv.options.areaFx = area.value as 'simple' | 'clean' | 'fancy';
-    writeSave(sv);
   });
   const reset = btn('이 기기의 「틈」 기록 모두 지우기', 'btn small danger', () => {
     if (!confirm('저장 칸·도감·옷장·옵션을 모두 지울까?')) return;
     localStorage.removeItem('teum.save');
     location.reload();
   });
-  const { root, close } = modal('옵션', el('div', { class: 'opts' }, row('화면 흔들림', check('shake')), row('피해 숫자', check('numbers')), row('지도 크기', map), row('내 무공 이펙트 불투명도', el('span', { class: 'range' }, fx, fxv)), row('몸 둘레 범위 기술', area), tut, el('p', { class: 'note' }, '조작: WASD·방향키 이동 · Space/Shift 보법 · Q 마지막 기술 · ESC 멈춤 · 레벨업 1~4 · R 다시 뽑기 · B 봉인 · S 건너뛰기'), reset));
-  if (onClose) {
-    const btnClose = root.querySelector('.modal-close') as HTMLButtonElement;
-    btnClose.addEventListener('click', onClose);
-    root.addEventListener('click', (e) => e.target === root && onClose());
-  }
+  const recordTab = el('div', { class: 'opts' }, row('처음 안내', tut), row('기록 지우기', reset, '되돌릴 수 없다'));
+  const tabs: [string, HTMLElement][] = [
+    ['화면', screenTab],
+    ['소리', soundTab],
+    ['조작', keysBox],
+    ['기록', recordTab],
+  ];
+  const body = el('div', { class: 'opt-body' });
+  const bar = el('div', { class: 'opt-tabs', role: 'tablist' });
+  const show = (i: number) => {
+    bar.replaceChildren(...tabs.map(([n], j) => btn(n, `opt-tab${i === j ? ' on' : ''}`, () => show(j), { role: 'tab' })));
+    body.replaceChildren(tabs[i][1]);
+  };
+  show(0);
+  const { root, close } = modal('옵션', bar, body);
+  root.querySelector('.modal-box')!.classList.add('options-box');
+  const done = () => window.removeEventListener('keydown', keyListen, { capture: true });
+  const btnClose = root.querySelector('.modal-close') as HTMLButtonElement;
+  btnClose.addEventListener('click', () => (done(), onClose?.()));
+  root.addEventListener('click', (e) => e.target === root && (done(), onClose?.()));
   void close;
 }
 
@@ -996,18 +1115,18 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   let wantDash = false;
   let wantUlt = false;
   let touch: { id: number; x0: number; y0: number; x: number; y: number } | null = null;
+  // 키 설정(2026-11-22): 옵션 「조작」에서 바꾼 키
+  let km = keyMap(sv.options.keys as Partial<KeyMap>);
   const onKey = (e: KeyboardEvent) => {
     if (e.type === 'keydown') {
-      if (!overlay.hidden && /^[1-4]$/.test(e.key) && s.pending) return pick(Number(e.key) - 1);
-      if (!overlay.hidden && s.pending && e.code === 'KeyR') return void (reroll(s) && showChoices());
-      if (!overlay.hidden && s.pending && e.code === 'KeyS') return void (skipChoice(s) ? (s.pending ? showChoices() : (overlay.hidden = true)) : 0);
-      if (!overlay.hidden && s.pending && e.code === 'KeyB') return void ((banMode = !banMode), showChoices());
-      if (e.code === 'Escape') {
-        if (document.querySelector('.modal')) return;
-        return void (paused ? resume() : pause());
-      }
-      if (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') wantDash = true;
-      if (e.code === 'KeyQ') wantUlt = true;
+      if (document.querySelector('.modal')) return;
+      if (!overlay.hidden && /^[1-9]$/.test(e.key) && s.pending) return pick(Number(e.key) - 1);
+      if (!overlay.hidden && s.pending && isKey(km, 'reroll', e.code)) return void (reroll(s) && showChoices());
+      if (!overlay.hidden && s.pending && isKey(km, 'skip', e.code)) return void (skipChoice(s) ? (s.pending ? showChoices() : (overlay.hidden = true)) : 0);
+      if (!overlay.hidden && s.pending && isKey(km, 'banish', e.code)) return void ((banMode = !banMode), showChoices());
+      if (isKey(km, 'pause', e.code)) return void (paused ? resume() : pause());
+      if (isKey(km, 'dash', e.code)) wantDash = true;
+      if (isKey(km, 'ult', e.code)) wantUlt = true;
       keys.add(e.code);
       if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
     } else keys.delete(e.code);
@@ -1043,10 +1162,11 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   const input = (): Input => {
     let x = 0;
     let y = 0;
-    if (keys.has('KeyA') || keys.has('ArrowLeft')) x -= 1;
-    if (keys.has('KeyD') || keys.has('ArrowRight')) x += 1;
-    if (keys.has('KeyW') || keys.has('ArrowUp')) y -= 1;
-    if (keys.has('KeyS') || keys.has('ArrowDown')) y += 1;
+    const held = (a: Action) => keys.has(km[a][0]) || (!!km[a][1] && keys.has(km[a][1]!));
+    if (held('left')) x -= 1;
+    if (held('right')) x += 1;
+    if (held('up')) y -= 1;
+    if (held('down')) y += 1;
     if (touch) {
       const dx = touch.x - touch.x0;
       const dy = touch.y - touch.y0;
@@ -1231,7 +1351,12 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
           'div',
           { class: 'menu-col' },
           btn('계속', 'btn primary', resume),
-          btn('옵션', 'btn ghost', () => optionsPopup(() => Object.assign(opt, loadSave().options))),
+          btn('옵션', 'btn ghost', () =>
+            optionsPopup(() => {
+              Object.assign(opt, loadSave().options);
+              km = keyMap(loadSave().options.keys as Partial<KeyMap>);
+            }),
+          ),
           btn(endless ? '그만두기' : '메인으로(이 장은 처음부터)', 'btn ghost', () => {
             if (confirm(endless ? '그만둘까? 번 금화·비급은 남는다(기록은 남지 않는다).' : '메인으로 나갈까? 이 장의 진행은 저장되지 않는다(장을 넘을 때만 자동 저장). 번 금화·비급은 남는다.')) {
               bankOnQuit();
@@ -1269,6 +1394,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
     banked = true;
     const xp = trainingXp(s);
     void gainXp(xp, null, null).catch(() => undefined);
+    sfx(s.result === 'clear' ? 'win' : 'lose');
     // 무한 모드: 버틴 시간 기록
     if (endless) {
       const best = (save.endlessBest ??= {});
@@ -1438,6 +1564,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
       }
     }
     last = now;
+    soundOf(s);
     absorb(view, s, now, opt);
     // 중간 보스를 넘은 자리를 칸에 적어 둔다(나가도 이어 할 수 있게)
     if (s.checkpoint && !cpSaved && !endless) {
@@ -1462,6 +1589,76 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
     ultBtn.classList.toggle('ready', s.ult >= RULES.ult.max);
     if (s.pending && overlay.hidden) showChoices();
     if (s.result && !ended) setTimeout(finish, s.result === 'lose' ? 900 : 1800);
+  };
+  // 소리(2026-11-22): 판 위 사건 → 효과음(인물에서 먼 것은 작고 옆으로)
+  const soundOf = (st: State) => {
+    const P = st.player;
+    const pan = (x: number) => (x - P.x) / 640;
+    const far = (x: number, y: number) => Math.max(0, 1 - Math.hypot(x - P.x, y - P.y) / 900);
+    let hits = 0;
+    for (const e of st.events) {
+      switch (e.type) {
+        case 'hit':
+          if (e.crit) sfx('crit', { pan: pan(e.x), vol: 0.7 });
+          else if (++hits <= 3) sfx('hit', { pan: pan(e.x), vol: 0.45 });
+          break;
+        case 'kill':
+          sfx(e.rank ? 'boom' : 'kill', { pan: pan(e.x), vol: e.rank ? 0.9 : 0.5 });
+          break;
+        case 'gem':
+          sfx('gem', { vol: 0.5 });
+          break;
+        case 'level':
+          sfx('level');
+          break;
+        case 'dash':
+          sfx('dash', { vol: 0.7 });
+          break;
+        case 'ult':
+          sfx('ult');
+          break;
+        case 'hurt':
+          sfx('hurt', { vol: 0.8 });
+          break;
+        case 'foeAct':
+          if (far(e.x, e.y) > 0) sfx(e.act, { pan: pan(e.x), vol: 0.35 * far(e.x, e.y) + 0.1 });
+          break;
+        case 'burst':
+        case 'bomb':
+          sfx('boom', { pan: pan(e.x), vol: 0.8 });
+          break;
+        case 'chest':
+          sfx(e.text.startsWith('각성') ? 'evolve' : 'chest');
+          break;
+        case 'item':
+          sfx(ITEMS.get(e.kind)?.place ? 'shop' : e.kind === 'gold' || e.kind === 'gold_bar' ? 'coin' : 'pick', { vol: 0.7 });
+          break;
+        case 'buy':
+          sfx('buy');
+          break;
+        case 'counter':
+          sfx('counter');
+          break;
+        case 'heal':
+          sfx('heal', { vol: 0.5 });
+          break;
+        case 'unlock':
+          sfx('chest');
+          break;
+        case 'phase':
+          sfx('boss', { vol: 0.8 });
+          break;
+        case 'event':
+          if (e.kind === 'boss' || e.kind === 'mid' || e.kind === 'bigwave') sfx('boss', { vol: e.kind === 'bigwave' ? 0.5 : 0.9 });
+          break;
+        case 'skill':
+          if (e.kind === 'line' || e.kind === 'zone') sfx(e.kind === 'line' ? 'zap' : 'boom', { pan: pan(e.x), vol: 0.4 * far(e.x, e.y) + 0.1 });
+          break;
+      }
+    }
+    // 배경음악: 보스가 있으면 보스 곡
+    const mood = st.boss && !st.boss.dead ? 'boss' : endless || st.chapterIndex >= 9 ? 'rift' : 'battle';
+    music(mood);
   };
   raf = requestAnimationFrame(loop);
   stopRun = () => {
@@ -1501,6 +1698,9 @@ const KIND_NAME: Record<string, string> = { slash: '베기', bolt: '날리기', 
 // 점검용 바로 가기: ?play=<장 1~10>&hero=<id> · ?endless&hero=<id>[&t=초] · ?screen=lobby|story|codex|wardrobe|options|load|save
 const direct = Number(params.get('play') ?? 0);
 const screen = params.get('screen');
+// 소리·쉬기(창을 떠나면 장식 움직임을 쉰다)
+initIdle();
+initSound(loadSave().options.sound);
 if (params.has('endless')) {
   // ?endless[&hero=]: 무한 모드 바로
   const hero = params.get('hero') ?? 'haun';
