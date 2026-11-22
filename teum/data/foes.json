@@ -187,7 +187,7 @@
      "style": "bubble",
      "zone": {
       "seconds": 2.5,
-      "dps": 5,
+      "dps": 3,
       "radius": 34,
       "element": "poison"
      }
@@ -321,7 +321,7 @@
      "style": "flame",
      "zone": {
       "seconds": 2,
-      "dps": 6,
+      "dps": 3,
       "radius": 28,
       "element": "fire"
      }
@@ -1823,7 +1823,7 @@
     },
     {
      "kind": "aimed",
-     "every": 2.6,
+     "every": 3.6,
      "damage": 7,
      "speed": 420,
      "color": "#ffcf6a",
@@ -1988,17 +1988,17 @@
    "skills": [
     {
      "kind": "fan",
-     "every": 3.4,
+     "every": 4.2,
      "count": 3,
      "spread": 0.35,
      "damage": 8,
      "speed": 200,
      "color": "#ff7a3a",
      "style": "flame",
-     "homing": 0.6,
+     "homing": 0.4,
      "zone": {
       "seconds": 2.4,
-      "dps": 7,
+      "dps": 3,
       "radius": 30,
       "element": "fire"
      }
@@ -2045,8 +2045,8 @@
    "skills": [
     {
      "kind": "radial",
-     "every": 4.5,
-     "count": 6,
+     "every": 5.5,
+     "count": 5,
      "damage": 6,
      "speed": 190,
      "color": "#ffe45a",

@@ -1,0 +1,21 @@
+id: teum_rift_shaman_death
+type: character-anim
+size: large
+character: teum_rift_shaman
+chroma: magenta
+summary: '「틈」 그림자 무녀 쓰러짐 6프레임'
+depends_on: [teum_rift_shaman_ref]
+reference: assets/source/teum_rift_shaman_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+frame_notes:
+  1: "hit hard, recoiling"
+  2: "the mask cracking, green mist bursting out, the rags falling empty — beginning"
+  3: "the mask cracking, green mist bursting out, the rags falling empty — halfway"
+  4: "the mask cracking, green mist bursting out, the rags falling empty — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: humanoid, color: '#2b3a2a', accent: '#7dff9a' }

@@ -778,3 +778,15 @@ input.switch:checked::after { transform: translateX(20px); }
 .cloud-side { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); }
 .cloud-side h4 { margin: 0; color: var(--gold); }
 @media (max-width: 560px) { .cloud-sides { grid-template-columns: 1fr; } }
+
+/* 인물 그림 맞춤(2026-11-22): 칸 모양 전용 그림(own)은 꽉 채우고, 반신 그림(stand)은 얼굴 쪽을, 픽셀 그림은 가운데 */
+img.fit-own, .portrait.fit-own img { object-fit: cover; object-position: 50% 30%; }
+img.fit-stand, .portrait.fit-stand img { object-fit: cover; object-position: 50% 8%; }
+img.fit-pixel, .portrait.fit-pixel img { object-fit: contain; image-rendering: pixelated; }
+/* Codex 단추 틀이 오면(btn-art) */
+:root.btn-art .btn.primary { border: 10px solid transparent; border-image: var(--bf1) 30 fill / 10px stretch; background: none; box-shadow: none; }
+:root.btn-art .btn.primary:hover:not([disabled]) { border-image-source: var(--bf2); }
+:root.btn-art .btn.primary:active:not([disabled]) { border-image-source: var(--bf3); }
+:root.btn-art .btn.ghost, :root.btn-art .btn:not(.primary):not(.danger) { border: 10px solid transparent; border-image: var(--bf4) 30 fill / 10px stretch; background: none; box-shadow: none; }
+:root.btn-art .btn.ghost:hover:not([disabled]), :root.btn-art .btn:not(.primary):not(.danger):hover:not([disabled]) { border-image-source: var(--bf5); }
+:root.btn-art .btn[disabled] { border-image-source: var(--bf6); }

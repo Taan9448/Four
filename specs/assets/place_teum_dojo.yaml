@@ -1,0 +1,18 @@
+id: place_teum_dojo
+type: character-anim
+size: large
+character: place_teum_dojo
+chroma: magenta
+summary: '「틈」 판 위 장소 그림 — 떠도는 수련소(2026-11-22 "줍는 것이 아니라 장소"). 게임이 들어가는 둘레·이름표·NPC를 따로 얹는다'
+depends_on: [place_teum_dojo_ref]
+reference: assets/source/place_teum_dojo_ref.png
+facing: left
+frames: 2
+fps: 2
+loop: true
+events: {}
+bbox_tolerance: 0.3
+frame_notes:
+  1: "a small open wooden pavilion with four red pillars and a dark tiled curved roof, a straw mat floor, a wooden training dummy and a weapon rack with a staff and two swords, two hanging lanterns; seen from slightly above (three-quarter top-down like the other props), filling most of the cell width, standing on the bottom of the cell, no people"
+  2: "exactly the same as frame 1, only the lantern glow a little brighter and a cloth corner moved by the wind"
+placeholder: { shape: object, color: '#6e4a2e', accent: '#f2a93b' }

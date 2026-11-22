@@ -1,0 +1,20 @@
+id: fire_scale_hound_walk
+type: character-anim
+size: large
+character: fire_scale_hound
+chroma: magenta
+summary: '「틈」 그림자 걷기 4프레임 — 불비늘 삼두견(2026-11-22 사용자 "적은 아직 걷는 동작이 없다"). 오기 전에는 대기 그림이 흔들린다'
+depends_on: [fire_scale_hound_ref]
+reference: assets/source/fire_scale_hound_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "same size, colors and outfit as the idle sheet; running to the LEFT, front legs reaching forward"
+  2: "same size, colors and outfit as the idle sheet; gathering: legs under the body, back arched"
+  3: "same size, colors and outfit as the idle sheet; pushing off: hind legs stretched back"
+  4: "same size, colors and outfit as the idle sheet; landing, loops back into frame 1"
+placeholder: { shape: beast, color: '#a0401a', accent: '#ffe08a' }

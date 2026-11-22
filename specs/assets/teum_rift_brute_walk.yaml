@@ -1,0 +1,20 @@
+id: teum_rift_brute_walk
+type: character-anim
+size: large
+character: teum_rift_brute
+chroma: magenta
+summary: '「틈」 틈 망치꾼 걷기 4프레임'
+depends_on: [teum_rift_brute_ref]
+reference: assets/source/teum_rift_brute_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "moving to the LEFT, first step/stride"
+  2: "weight shifting forward, body lower"
+  3: "second step/stride, body highest"
+  4: "back to the start of the cycle"
+placeholder: { shape: humanoid, color: '#4a3a2a', accent: '#ffb02e' }

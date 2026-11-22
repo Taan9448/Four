@@ -1,0 +1,8 @@
+id: portrait_teum_elia
+type: portrait
+character: elia
+summary: '「틈」 엘리아 네모 초상 — 저장 칸·장 카드·계정 판처럼 네모 칸에 꼭 맞는 그림(2026-11-22 사용자 "일러스트 재활용이 많아 칸에 넣으면 비율이 이상하다")'
+frame_notes:
+  1: "A square bust portrait: gentle silver-haired elf mage with slightly pointed ears, grey hooded robe, the twisted staff with a glowing blue crystal; head and shoulders with the weapon visible at the shoulder, looking slightly toward the viewer with a determined expression."
+framing: "Made for a SQUARE game card slot (shown 64 to 200 px): head and shoulders fill the middle, the face centered horizontally with the eyes at about 40% of the height, nothing important within 6% of the edges. Dark background of the night sky with a soft #8fd3ff rim light behind the shoulders and a faint crimson rift glow at the top. No frame, no text."
+placeholder: { color: '#1a1420' }

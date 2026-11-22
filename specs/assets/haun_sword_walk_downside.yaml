@@ -1,0 +1,21 @@
+id: haun_sword_walk_downside
+type: character-anim
+character: haun_sword
+summary: '「틈」 진하운(못생긴 검) 대각 앞(오른쪽 아래로) 6프레임 — 8방향 움직임(2026-11-22 사용자 "좌우만 있어 움직임이 어색 — 앞뒤·대각 추가"). 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [haun_sword_ref]
+reference: assets/source/haun_sword_ref.png
+facing: right
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(대기·옆 걷기와 같은 크기)
+frame_notes:
+  1: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; contact pose: one foot forward touching the ground, the other behind"
+  2: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; down pose: weight on the front foot, body a little lower"
+  3: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; passing pose: the back leg passing the front one, body at its highest"
+  4: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; contact pose with the other foot forward (mirror of frame 1)"
+  5: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; down pose on the other foot"
+  6: "THREE-QUARTER FRONT VIEW, walking diagonally toward the viewer and to the RIGHT (down-right on the screen), body turned about 45 degrees; the narrow plain sword in the right hand, the whole EMPTY black scabbard at the left hip; passing pose, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#4fb4ff' }

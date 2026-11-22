@@ -1,0 +1,21 @@
+id: teum_rift_brute_death
+type: character-anim
+size: large
+character: teum_rift_brute
+chroma: magenta
+summary: '「틈」 틈 망치꾼 쓰러짐 6프레임'
+depends_on: [teum_rift_brute_ref]
+reference: assets/source/teum_rift_brute_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+frame_notes:
+  1: "hit hard, recoiling"
+  2: "dropping the hammer, falling to one knee and breaking apart into black rock and orange sparks — beginning"
+  3: "dropping the hammer, falling to one knee and breaking apart into black rock and orange sparks — halfway"
+  4: "dropping the hammer, falling to one knee and breaking apart into black rock and orange sparks — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: humanoid, color: '#4a3a2a', accent: '#ffb02e' }

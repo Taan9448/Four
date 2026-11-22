@@ -1,0 +1,21 @@
+id: teum_rift_caster_walk
+type: character-anim
+size: large
+character: teum_rift_caster
+chroma: magenta
+summary: '「틈」 불씨 술사 걷기 4프레임'
+depends_on: [teum_rift_caster_ref]
+reference: assets/source/teum_rift_caster_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+row_align: false
+frame_notes:
+  1: "drifting to the LEFT, tilted forward"
+  2: "bobbing up, trail behind"
+  3: "drifting down"
+  4: "level again, loops"
+placeholder: { shape: humanoid, color: '#4a1a14', accent: '#ff7a3a' }

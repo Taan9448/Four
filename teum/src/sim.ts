@@ -282,7 +282,7 @@ export const RULES = rulesRaw as unknown as {
     dmg: { perMin: number; sq: number };
     spawn: { base: number; perMin: number; max: number };
     event: [number, number];
-    boss: { every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
+    boss: { aoeFrom: number; every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
     shop: { every: number; stay: number; skills: number };
     dojo: { every: number; stay: number };
     /** 판마다 무작위 무공 풀(2026-11-22 사용자 "무한 모드 무공은 무작위 — 직업 특성은 지킨다, 40~50종") */
@@ -298,7 +298,7 @@ export const RULES = rulesRaw as unknown as {
   /** 변종(2026-11-22): 보통 그림자가 이 확률로 변종이 된다(장·분마다 오른다) */
   variants: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number }; list: VariantDef[]; element: Record<string, { trail?: { every: number; radius: number; seconds: number; dps: number }; deathZone?: { radius: number; seconds: number; dps: number }; chill?: number; poison?: number; zap?: { every: number; range: number; delay: number; damage: number; width: number }; deathRing?: { radius: number; delay: number; damage: number } }> };
   /** 특수 그림자(2026-11-22): 장 무리 대신 이 확률로 섞인다 */
-  specials: { chance: { base: number; perChapter: number; perMin: number; max: number } };
+  specials: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number } };
 };
 export const STORY = storyRaw as unknown as {
   difficulties: Difficulty[];
@@ -634,8 +634,9 @@ export interface State {
   passives: Map<string, number>;
   bonusHp: number;
   foes: Foe[];
-  /** 적이 남긴 웅덩이(불·독·서리, 2026-11-22) */
+  /** 적이 남긴 웅덩이(불·독·서리, 2026-11-22) · 다음에 웅덩이가 다치게 하는 때 */
   foeZones: FoeZone[];
+  zoneHurtAt: number;
   shots: Shot[];
   zones: Zone[];
   slams: Slam[];
@@ -861,11 +862,14 @@ export function endlessPool(hero: HeroDef, rng: Rng): Set<string> {
     }
     return a;
   };
-  const base = [...WEAPONS.values()].filter((d) => !d.evolved && d.id !== hero.start);
-  const own = shuffle(base.filter((d) => d.owner === hero.id || hero.pool.includes(d.id)).map((d) => d.id));
-  const common = shuffle(base.filter((d) => d.owner === '*' && !hero.pool.includes(d.id)).map((d) => d.id));
-  const nOwn = Math.min(own.length, Math.round((nW - 1) * P.own));
-  const weapons = [hero.start, ...own.slice(0, nOwn), ...common.slice(0, nW - 1 - nOwn)];
+  // 인물의 바탕 무공(heroes.json pool — 직업 특성)은 늘 들고, 나머지는 인물 카드 무공(own 비율)과 공통 카드 무공에서 무작위
+  const core = [hero.start, ...hero.pool.filter((id) => id !== hero.start && WEAPONS.has(id))];
+  const base = [...WEAPONS.values()].filter((d) => !d.evolved && !core.includes(d.id));
+  const own = shuffle(base.filter((d) => d.owner === hero.id).map((d) => d.id));
+  const common = shuffle(base.filter((d) => d.owner === '*').map((d) => d.id));
+  const rest = Math.max(0, nW - core.length);
+  const nOwn = Math.min(own.length, Math.round(rest * P.own));
+  const weapons = [...core, ...own.slice(0, nOwn), ...common.slice(0, rest - nOwn)];
   const out = new Set(weapons);
   // 각성 짝 심법은 먼저(각성을 노릴 수 있게), 나머지는 무작위
   for (const id of weapons) {
@@ -910,6 +914,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     bonusHp: carry.bonusHp,
     foes: [],
     foeZones: [],
+    zoneHurtAt: 0,
     shots: [],
     zones: [],
     slams: [],
@@ -1365,7 +1370,7 @@ const VARIANTS = new Map(RULES.variants.list.map((v) => [v.id, v]));
 function giveVariant(s: State, f: Foe): void {
   const V = RULES.variants;
   if (s.mode === 'endless' && s.t / 60 < V.chance.endlessFrom) return;
-  const level = s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex;
+  const level = s.mode === 'endless' ? s.stage + s.t / 240 : s.chapterIndex;
   const chance = Math.min(V.chance.max, V.chance.base + V.chance.perChapter * level + (V.chance.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
   if (s.rng.next() >= chance) return;
   const pool = V.list.filter((v) => (v.from ?? 0) <= level && !(v.element && f.def.element) && !(v.fuse && f.def.fuse));
@@ -1418,7 +1423,8 @@ const rolePool = (c: ChapterDef, role: Role): string[] => (c.roles[role]?.length
 const SPECIALS = [...FOES.values()].filter((f) => f.special);
 function pickRole(s: State, mix: Partial<Record<Role, number>>): string {
   const SC = RULES.specials.chance;
-  const level = s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex;
+  // 무한 모드: endlessFrom분부터, 보스 넘긴 수 + 4분마다 한 장씩
+  const level = s.mode === 'endless' ? (s.t / 60 < SC.endlessFrom ? -99 : s.stage + s.t / 240) : s.chapterIndex;
   // 1장은 덜(처음 만나는 장이 너무 거칠지 않게)
   const chance = Math.min(SC.max, SC.base + SC.perChapter * level + (SC.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
   if (SPECIALS.length && s.rng.next() < chance) {
@@ -1588,7 +1594,7 @@ function runEndless(s: State): void {
   if (s.t >= s.nextRandomAt) {
     s.nextRandomAt = s.t + E.event[0] + s.rng.next() * (E.event[1] - E.event[0]);
     // 처음 4분은 거센 이벤트(매복·쏟아짐·광폭·저주 상자)를 빼고 몸을 풀게 한다
-    const harsh = (e: TimelineEvent) => ['ambush', 'surge', 'frenzy'].includes(e.kind) || e.item === 'cursed' || e.kind === 'bigwave';
+    const harsh = (e: TimelineEvent) => ['ambush', 'surge', 'frenzy', 'rain'].includes(e.kind) || e.item === 'cursed' || e.kind === 'bigwave';
     const pool = [...STORY.random.events, ...STORY.timeline.events.filter((e) => ['swarm', 'ring', 'bigwave'].includes(e.kind))].filter((e) => m >= 4 || !harsh(e));
     const ev = s.rng.weighted(pool, (e) => ('weight' in e ? (e as { weight: number }).weight : 2))!;
     s.timeline.push({ ...ev, at: s.t });
@@ -1864,7 +1870,7 @@ function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color
 }
 /** 웅덩이(불·독·서리)를 놓는다 — 너무 많으면 오래된 것부터 */
 function addFoeZone(s: State, x: number, y: number, r: number, dps: number, seconds: number, element: string): void {
-  if (s.foeZones.length > 60) s.foeZones.shift();
+  if (s.foeZones.length > 40) s.foeZones.shift();
   s.foeZones.push({ x, y, r, dps, until: s.t + seconds, born: s.t, element, next: s.t + 0.3 });
 }
 /** 속성 그림자의 걸음: 불 자국 · 번개 치기 */
@@ -1892,6 +1898,8 @@ function useSkills(s: State, f: Foe, d: number): void {
   const aim = Math.atan2(p.y - 20 - (f.y - 20), p.x - f.x);
   skills.forEach((k, i) => {
     if (s.t < f.skillAt[i]) return;
+    // 무한 모드 첫 보스(들)는 광역 예고 없이 — 보스를 aoeFrom번 넘긴 뒤부터
+    if (f.boss && s.mode === 'endless' && s.stage < RULES.endless.boss.aoeFrom && (k.kind === 'line' || k.kind === 'cone' || k.kind === 'ring' || k.kind === 'lob')) return;
     f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4) * (f.boss ? RULES.boss.haste ** (f.phase ?? 0) : 1);
     if (s.events.length < 400) s.events.push({ type: 'foeAct', act: k.kind === 'aimed' || k.kind === 'fan' || k.kind === 'radial' ? 'shot' : 'warn', x: f.x, y: f.y });
     switch (k.kind) {
@@ -2327,10 +2335,8 @@ function moveShots(s: State): void {
     sh.x += sh.vx * DT;
     sh.y += sh.vy * DT;
     sh.life -= DT;
-    if (sh.life <= 0) {
-      if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
-      continue;
-    }
+    // 웅덩이는 맞힌 자리(인물·벽)에만 — 날아가다 사라진 탄은 남기지 않는다(판이 웅덩이로 덮이지 않게)
+    if (sh.life <= 0) continue;
     // 벽은 적 탄과 불덩이·검광(관통이 적은 탄)을 막는다 — 검기(wave)는 넘는다
     const wallStop = !sh.weapon || WEAPONS.get(sh.weapon)?.kind === 'bolt';
     if (wallStop && blocksShot(s.terrain, sh.x, sh.y + 20)) {
@@ -2395,13 +2401,14 @@ function moveShots(s: State): void {
     s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color, kind: m.shape && m.shape !== 'circle' ? m.shape : m.zone ? 'zone' : undefined, angle: m.angle, r: m.r, len: m.len, w: m.w, r0: m.r0 });
   }
   s.slams = s.slams.filter((m) => s.t < m.at);
-  // 웅덩이: 안에 있으면 0.5초마다(보법 중엔 안 다친다)
-  for (const z of s.foeZones) {
-    if (s.t < z.next) continue;
-    z.next = s.t + 0.5;
-    if ((p.x - z.x) ** 2 + (p.y - z.y) ** 2 < (z.r + RULES.player.radius * 0.5) ** 2 && s.t >= p.dashUntil) {
-      hurtPlayer(s, z.dps * 0.5, true);
-      if (z.element === 'ice') s.chillUntil = Math.max(s.chillUntil, s.t + 1);
+  // 웅덩이: 안에 있으면 0.5초마다 — 겹쳐도 가장 센 것 하나만(보법 중엔 안 다친다)
+  if (s.t >= s.zoneHurtAt && s.t >= p.dashUntil) {
+    let worst: FoeZone | null = null;
+    for (const z of s.foeZones) if (s.t - z.born > 0.3 && (p.x - z.x) ** 2 + (p.y - z.y) ** 2 < (z.r + RULES.player.radius * 0.5) ** 2 && (!worst || z.dps > worst.dps)) worst = z;
+    if (worst) {
+      s.zoneHurtAt = s.t + 0.5;
+      hurtPlayer(s, worst.dps * 0.35, true);
+      if (worst.element === 'ice') s.chillUntil = Math.max(s.chillUntil, s.t + 1);
     }
   }
   s.foeZones = s.foeZones.filter((z) => s.t < z.until);

@@ -1,0 +1,20 @@
+id: shadow_fragment_walk
+type: character-anim
+size: large
+character: shadow_fragment
+chroma: magenta
+summary: '「틈」 그림자 걷기 4프레임 — 그림자(2026-11-22 사용자 "적은 아직 걷는 동작이 없다"). 오기 전에는 대기 그림이 흔들린다'
+depends_on: [shadow_fragment_ref]
+reference: assets/source/shadow_fragment_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "same size, colors and outfit as the idle sheet; walking to the LEFT, contact pose: the front foot touching the ground"
+  2: "same size, colors and outfit as the idle sheet; down pose: weight on the front foot, body lower"
+  3: "same size, colors and outfit as the idle sheet; passing pose: the back leg passing, body highest"
+  4: "same size, colors and outfit as the idle sheet; contact pose with the other foot forward, loops back"
+placeholder: { shape: humanoid, color: '#221d2c', accent: '#8a90a3' }

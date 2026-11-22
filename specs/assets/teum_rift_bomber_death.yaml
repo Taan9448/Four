@@ -1,0 +1,21 @@
+id: teum_rift_bomber_death
+type: character-anim
+size: large
+character: teum_rift_bomber
+chroma: magenta
+summary: '「틈」 틈벌레 자폭병 쓰러짐 6프레임'
+depends_on: [teum_rift_bomber_ref]
+reference: assets/source/teum_rift_bomber_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+frame_notes:
+  1: "hit hard, recoiling"
+  2: "curling up and swelling, the cracks flaring white-orange, then bursting into chunks and a ring of orange fire — beginning"
+  3: "curling up and swelling, the cracks flaring white-orange, then bursting into chunks and a ring of orange fire — halfway"
+  4: "curling up and swelling, the cracks flaring white-orange, then bursting into chunks and a ring of orange fire — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: beast, color: '#6a2a1a', accent: '#ff7a3a' }

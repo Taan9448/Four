@@ -1,0 +1,21 @@
+id: teum_rift_warden_death
+type: character-anim
+size: large
+character: teum_rift_warden
+chroma: magenta
+summary: '「틈」 방패 그림자 쓰러짐 6프레임'
+depends_on: [teum_rift_warden_ref]
+reference: assets/source/teum_rift_warden_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+frame_notes:
+  1: "hit hard, recoiling"
+  2: "the shield cracking in two and falling, the armor crumbling into dark stone pieces — beginning"
+  3: "the shield cracking in two and falling, the armor crumbling into dark stone pieces — halfway"
+  4: "the shield cracking in two and falling, the armor crumbling into dark stone pieces — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: humanoid, color: '#3d4459', accent: '#9fd8ff' }

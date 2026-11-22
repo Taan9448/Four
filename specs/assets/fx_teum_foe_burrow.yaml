@@ -1,0 +1,18 @@
+id: fx_teum_foe_burrow
+type: fx
+summary: '「틈」 적 기술 이펙트 — 땅굴 — 흙이 튀며 파고들기/솟기. 흰색·회색 + 진한 남색 테두리(2026-11-22 "적 스킬 이펙트가 너무 단순 — 전면 개편")'
+frames: 6
+fps: 14
+loop: false
+min_fill: 0.0005
+chroma: magenta
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#1d2433']
+style: "crisp pixel-art enemy attack effect, COLORLESS: only white and light-to-mid greys for the glowing parts (no hue at all), and a thick 1-2 block dark navy #1d2433 outline around every shape so it reads as DANGER on any background; the game tints the grey parts to each enemy skill's own color; clean stepped edges, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a crack in the ground in the center"
+  2: "dirt clods bursting up from the crack"
+  3: "a ring of dirt and stones flying out"
+  4: "stones falling back"
+  5: "a small mound of dirt"
+  6: "the mound settling"
+placeholder: { accent: '#c2c6d1' }

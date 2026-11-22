@@ -35,6 +35,15 @@ function btn(label: (Node | string)[] | string, cls: string, fn: () => void, att
   return b;
 }
 const realArt = (id: string, n = 1) => frameUrl(id, n, { realOnly: true });
+/** 인물 그림(2026-11-22 "일러스트 재활용 — 칸에 넣으면 비율이 이상"): 칸 모양에 맞춘 Codex 그림이 오면 그것 — square 네모 초상 · tall 세로 2:3 */
+const heroPic = (h: { id: string; stand: string; sprite: string }, shape: 'square' | 'tall'): { src: string; fit: string } | null => {
+  const own = realArt(shape === 'square' ? `portrait_teum_${h.id}` : `select_teum_${h.id}`);
+  if (own) return { src: own, fit: 'own' };
+  const st = realArt(h.stand);
+  if (st) return { src: st, fit: 'stand' };
+  const px = frameUrl(`${h.sprite}_idle`, 1);
+  return px ? { src: px, fit: 'pixel' } : null;
+};
 /** 전용 기술 그림 칸(Codex icons_teum_hero_skills 4×2: 보법 넷 · 마지막 기술 넷) */
 const HERO_SKILL_ICON: Record<string, number> = { cut: 1, charge: 2, blink: 3, stomp: 4, waves: 5, vow: 6, starfall: 7, quake: 8 };
 /** 그림이 오기 전의 단추 그림(선 그림) */
@@ -263,12 +272,13 @@ function openMenu(id: string): void {
 function slotCard(sv: SaveData, i: number, onPick: (() => void) | null, extra?: HTMLElement): HTMLElement {
   const s = sv.slots[i];
   const hero = s ? HEROES.find((h) => h.id === s.hero) : null;
-  const face = hero ? (realArt(hero.stand) ?? frameUrl(`${hero.sprite}_idle`, 1)) : null;
+  const pic = hero ? heroPic(hero, 'square') : null;
+  const face = pic?.src ?? null;
   const card = el(
     'div',
     { class: `slot${s ? '' : ' empty'}${sv.active === i ? ' active' : ''}` },
     el('span', { class: 'no' }, `${i + 1}`),
-    face ? el('img', { src: face, alt: '' }) : el('span', { class: 'ph' }, '빈 칸'),
+    face ? el('img', { src: face, alt: '', class: `fit-${pic!.fit}` }) : el('span', { class: 'ph' }, '빈 칸'),
     el('div', { class: 'info' }, el('b', {}, s ? `${i + 1}번 칸` : `${i + 1}번 칸 — 비어 있음`), el('small', {}, slotLabel(s)), s ? el('small', { class: 'date' }, new Date(s.updatedAt).toLocaleString('ko-KR')) : ''),
   );
   if (onPick) card.append(btn(s ? '고른다' : '여기에', 'btn small', onPick));
@@ -348,10 +358,11 @@ function storyPopup(): void {
       { class: 'heroes' },
       ...HEROES.map((h) => {
         const open = heroOpen(sv, h.id, ALL);
-        const art = realArt(h.stand) ?? frameUrl(`${h.sprite}_idle`, 1);
+        const pic = heroPic(h, 'tall');
+        const art = pic?.src;
         return btn(
           [
-            el('div', { class: 'portrait' }, art ? el('img', { src: art, alt: '' }) : ''),
+            el('div', { class: `portrait fit-${pic?.fit ?? 'none'}` }, art ? el('img', { src: art, alt: '' }) : ''),
             el('b', {}, h.name),
             el('small', {}, h.title),
             el('small', {}, `체력 ${h.hp} · 걸음 ${Math.round(h.speed * 100)}%${h.armor ? ` · 단단함 ${h.armor}` : ''}`),
@@ -467,8 +478,9 @@ function endlessPopup(): void {
       { class: 'heroes compact' },
       ...HEROES.map((h) => {
         const open = heroOpen(sv, h.id, ALL);
-        const art = realArt(h.stand) ?? frameUrl(`${h.sprite}_idle`, 1);
-        return btn([el('div', { class: 'portrait' }, art ? el('img', { src: art, alt: '' }) : ''), el('b', {}, h.name), el('small', {}, best[h.id] ? `최고 ${fmt(best[h.id])}` : '기록 없음'), open ? '' : el('small', { class: 'lock' }, `🔒 ${h.unlock?.text}`)], `hero${open ? '' : ' locked'}${hero === h.id ? ' on' : ''}`, () => open && ((hero = h.id), render()), open ? {} : { disabled: '' });
+        const pic = heroPic(h, 'tall');
+        const art = pic?.src;
+        return btn([el('div', { class: `portrait fit-${pic?.fit ?? 'none'}` }, art ? el('img', { src: art, alt: '' }) : ''), el('b', {}, h.name), el('small', {}, best[h.id] ? `최고 ${fmt(best[h.id])}` : '기록 없음'), open ? '' : el('small', { class: 'lock' }, `🔒 ${h.unlock?.text}`)], `hero${open ? '' : ' locked'}${hero === h.id ? ' on' : ''}`, () => open && ((hero = h.id), render()), open ? {} : { disabled: '' });
       }),
     );
     const P = E.pool;
@@ -1159,7 +1171,7 @@ function chapterCard(slot: Slot): void {
   const right = el(
     'aside',
     { class: 'cc-right' },
-    el('div', { class: 'cc-hero' }, el('img', { src: realArt(hero.stand) ?? frameUrl(`${hero.sprite}_idle`, 1) ?? '', alt: '' }), el('div', {}, el('b', {}, hero.name), el('small', {}, `Lv.${slot.carry.level} · ${hero.dash.glyph} ${hero.dash.name} · ${hero.ult.glyph} ${hero.ult.name}`))),
+    el('div', { class: 'cc-hero' }, el('img', { src: heroPic(hero, 'square')?.src ?? '', alt: '', class: `fit-${heroPic(hero, 'square')?.fit ?? 'none'}` }), el('div', {}, el('b', {}, hero.name), el('small', {}, `Lv.${slot.carry.level} · ${hero.dash.glyph} ${hero.dash.name} · ${hero.ult.glyph} ${hero.ult.name}`))),
     el('h4', {}, '가진 무공'),
     el('div', { class: 'cc-owned' }, ...(owned.length ? owned : [el('small', {}, '시작 무공 하나')])),
     el('h4', {}, `무공록 — 무공 ${weapons.length} · 심법 ${passives.length}`),
@@ -1838,6 +1850,11 @@ const screen = params.get('screen');
 // 소리·쉬기(창을 떠나면 장식 움직임을 쉰다)
 initIdle();
 initSound(loadSave().options.sound);
+// Codex 단추 틀(ui_teum_buttons 6칸)이 오면 모든 단추 테두리를 그 그림으로
+if (realArt('ui_teum_buttons', 1)) {
+  document.documentElement.classList.add('btn-art');
+  for (let i = 1; i <= 6; i++) document.documentElement.style.setProperty(`--bf${i}`, `url("${realArt('ui_teum_buttons', i)}")`);
+}
 // 계정(로그인해 두었으면 맞춘다) — 저장이 바뀌면 모아 올린다
 onSaveWrite(schedulePush);
 void bootCloud(askWhich);

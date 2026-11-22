@@ -1,0 +1,15 @@
+id: icons_teum_hero_skills
+type: icon-sheet
+frames: 8
+summary: '「틈」 오른쪽 아래 전용 기술 단추 그림 8칸(2026-11-22 "우하단 전용 스킬도 디자인을 입힐 것") — 1~4 보법(하운 낙운보 · 카일 방패 돌진 · 엘리아 점멸 · 보른 대지 박차기), 5~8 마지막 기술(천외귀운 · 수호 서약 · 별의 낙하 · 카즈둠의 심장). 둥근 단추 안에 그리므로 칸 가운데 원 안에'
+subject: 'bold skill icons for round action buttons, each a single clear symbol centered inside an imagined circle (about 80% of the cell), bright on a transparent background, readable at 48 px'
+frame_notes:
+  1: 'a crescent sword slash streak with a dashed after-image, white-blue'
+  2: 'a kite shield rushing forward with speed lines behind it, silver'
+  3: 'two small figures of light, one fading, linked by a dotted line, pale blue'
+  4: 'a heavy boot slamming down with cracks and dust spreading in a ring, orange-brown'
+  5: 'eight sword-light rays bursting out from a bright center, blue-white'
+  6: 'a glowing shield inside a ring of light, gold'
+  7: 'three falling stars with long trails, violet-white'
+  8: 'the ground splitting with a burst of rocks and a shock line, orange'
+placeholder: { color: '#1a1420', accent: '#4fb4ff' }

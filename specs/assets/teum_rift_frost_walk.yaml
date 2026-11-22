@@ -1,0 +1,21 @@
+id: teum_rift_frost_walk
+type: character-anim
+size: large
+character: teum_rift_frost
+chroma: magenta
+summary: '「틈」 서리 망령 걷기 4프레임'
+depends_on: [teum_rift_frost_ref]
+reference: assets/source/teum_rift_frost_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+row_align: false
+frame_notes:
+  1: "drifting to the LEFT, tilted forward"
+  2: "bobbing up, trail behind"
+  3: "drifting down"
+  4: "level again, loops"
+placeholder: { shape: humanoid, color: '#5d6478', accent: '#8fd3ff' }

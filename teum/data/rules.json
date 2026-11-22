@@ -516,15 +516,15 @@
    "passives": 10
   },
   "hp": {
-   "perMin": 0.05,
+   "perMin": 0.04,
    "sq": 0.012
   },
   "dmg": {
-   "perMin": 0.06,
+   "perMin": 0.05,
    "sq": 0.0025
   },
   "spawn": {
-   "base": 1.4,
+   "base": 1.2,
    "perMin": 0.45,
    "max": 15
   },
@@ -549,8 +549,9 @@
     6,
     5
    ],
-   "dmgBase": 0.55,
-   "dmgPerStage": 0.2
+   "dmgBase": 0.45,
+   "dmgPerStage": 0.15,
+   "aoeFrom": 1
   },
   "shop": {
    "every": 150,
@@ -594,7 +595,7 @@
    "perChapter": 0.03,
    "perMin": 0.015,
    "max": 0.32,
-   "endlessFrom": 1
+   "endlessFrom": 3
   },
   "list": [
    {
@@ -708,15 +709,15 @@
   "element": {
    "fire": {
     "trail": {
-     "every": 0.9,
-     "radius": 24,
-     "seconds": 2.6,
-     "dps": 7
+     "every": 1.4,
+     "radius": 20,
+     "seconds": 2,
+     "dps": 4
     },
     "deathZone": {
-     "radius": 56,
-     "seconds": 3,
-     "dps": 9
+     "radius": 50,
+     "seconds": 2.5,
+     "dps": 6
     }
    },
    "ice": {
@@ -737,11 +738,11 @@
     }
    },
    "poison": {
-    "poison": 2.5,
+    "poison": 1.5,
     "deathZone": {
-     "radius": 66,
-     "seconds": 4,
-     "dps": 6
+     "radius": 58,
+     "seconds": 3,
+     "dps": 4
     }
    }
   }
@@ -752,7 +753,8 @@
    "base": 0,
    "perChapter": 0.014,
    "perMin": 0.012,
-   "max": 0.16
+   "max": 0.16,
+   "endlessFrom": 3
   }
  }
 }

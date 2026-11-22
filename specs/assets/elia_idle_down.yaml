@@ -1,0 +1,19 @@
+id: elia_idle_down
+type: character-anim
+character: elia
+summary: '「틈」 엘리아 정면 대기 4프레임 — 8방향 움직임(2026-11-22 사용자 "좌우만 있어 움직임이 어색 — 앞뒤·대각 추가"). 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [elia_ref]
+reference: assets/source/elia_ref.png
+facing: right
+frames: 4
+fps: 6
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(대기·옆 걷기와 같은 크기)
+frame_notes:
+  1: "FRONT VIEW, standing still facing the viewer, calm breathing; the twisted wooden staff topped with a blue crystal in the right hand, the grey hood down; standing still, relaxed"
+  2: "FRONT VIEW, standing still facing the viewer, calm breathing; the twisted wooden staff topped with a blue crystal in the right hand, the grey hood down; chest rises slightly with a breath"
+  3: "FRONT VIEW, standing still facing the viewer, calm breathing; the twisted wooden staff topped with a blue crystal in the right hand, the grey hood down; shoulders settle, cloth sways a little"
+  4: "FRONT VIEW, standing still facing the viewer, calm breathing; the twisted wooden staff topped with a blue crystal in the right hand, the grey hood down; back to the pose of frame 1"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#8fd3ff' }

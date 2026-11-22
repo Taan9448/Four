@@ -6,8 +6,8 @@ import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
 export interface Art {
-  hero: { idle: Anim; walk: Anim; death: Anim };
-  foes: Map<string, { idle: Anim; death: Anim }>;
+  hero: { idle: Anim; walk: Anim; death: Anim; dirs: Record<string, Anim> };
+  foes: Map<string, { idle: Anim; death: Anim; walk?: Anim }>;
   fx: Map<string, Anim>;
   ground: Anim;
   terrain: Anim;
@@ -23,8 +23,11 @@ export interface Art {
   kinds: Map<string, SpriteAsset>;
   /** 장소(상인 수레·수련소 정자, 2026-11-22): place_teum_<id> 한 장 그림 + NPC(<npc>_idle) — 오기 전엔 코드로 그린다 */
   places: Map<string, { building: Anim; npc: Anim }>;
-  /** 무한 모드 맵 무늬(tex_teum_rift 4칸: 땅 · 오염된 땅 · 바위 · 허공) */
-  tex: Anim;
+  /** 무한 모드 맵 무늬(tex_teum_rift_ground·scar·rock·void: 땅 · 오염된 땅 · 바위 · 허공) */
+  tex: Anim[];
+  /** 적 탄 그림(fx_teum_shot_<모양>)·새 적 기술 그림(fx_teum_foe_<line·cone·ring·puddle·explode·heal·shield·burrow>) — 온 것만 */
+  shots: Map<string, SpriteAsset>;
+  foeFx: Map<string, SpriteAsset>;
 }
 
 /** 새 그림자(Codex teum_*)는 그림이 오기 전엔 「천외귀환」 그림(fallback) */
@@ -37,7 +40,7 @@ export function ensureFoeArt(art: Art, id: string): void {
   art.foes.set(id, { idle: null, death: null });
   if (!f) return;
   const sp = foeSprite(f.sprite, f.fallback);
-  void Promise.all([loadSprite(`${sp}_idle`), real(`${sp}_death`)]).then(([i, d]) => art.foes.set(id, { idle: i, death: d })).catch(() => undefined);
+  void Promise.all([loadSprite(`${sp}_idle`), real(`${sp}_death`), real(`${sp}_walk`)]).then(([i, d, w]) => art.foes.set(id, { idle: i, death: d, walk: w })).catch(() => undefined);
 }
 export interface Options {
   shake: boolean;
@@ -79,7 +82,10 @@ export function cardIcon(card: string | undefined): HTMLImageElement | null {
 
 export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   const [idle, walk, death] = await Promise.all([loadSprite(`${sprite}_idle`), real(`${sprite}_walk`), real(`${sprite}_death`)]);
-  const foes = new Map<string, { idle: Anim; death: Anim }>();
+  // 8방향(2026-11-22): 정면·뒷면·대각 걷기와 대기 — Codex 그림이 온 것만
+  const dirs: Record<string, Anim> = {};
+  await Promise.all(['walk_down', 'walk_up', 'walk_downside', 'walk_upside', 'idle_down', 'idle_up'].map(async (k) => (dirs[k] = await real(`${sprite}_${k}`))));
+  const foes = new Map<string, { idle: Anim; death: Anim; walk?: Anim }>();
   const ids = new Set<string>([...Object.values(s.chapter.roles).flat(), s.chapter.roles.mid, s.chapter.roles.boss]);
   for (const id of [...ids]) for (const k of FOES.get(id)?.skills ?? []) if (k.kind === 'summon') ids.add(k.foe);
   await Promise.all(
@@ -87,8 +93,8 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       const f = FOES.get(id);
       if (!f) return;
       const sp = foeSprite(f.sprite, f.fallback);
-      const [i, d] = await Promise.all([loadSprite(`${sp}_idle`), real(`${sp}_death`)]);
-      foes.set(id, { idle: i, death: d });
+      const [i, d, w] = await Promise.all([loadSprite(`${sp}_idle`), real(`${sp}_death`), real(`${sp}_walk`)]);
+      foes.set(id, { idle: i, death: d, walk: w });
     }),
   );
   const fxIds = new Set<string>();
@@ -117,8 +123,20 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
         places.set(d.id, { building, npc });
       }),
   );
-  const tex = s.chapter.tex ? await real(s.chapter.tex) : null;
-  const out: Art = { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex };
+  const tex = s.chapter.tex ? await Promise.all(['ground', 'scar', 'rock', 'void'].map((k) => real(`${s.chapter.tex}_${k}`))) : [];
+  const shots = new Map<string, SpriteAsset>();
+  const foeFx = new Map<string, SpriteAsset>();
+  await Promise.all([
+    ...['arrow', 'flame', 'shard', 'spark', 'bubble', 'shadow', 'bone', 'needle', 'blade'].map(async (k) => {
+      const a = await real(`fx_teum_shot_${k}`);
+      if (a) shots.set(k, a);
+    }),
+    ...['line', 'cone', 'ring', 'puddle', 'explode', 'heal', 'shield', 'burrow'].map(async (k) => {
+      const a = await real(`fx_teum_foe_${k}`);
+      if (a) foeFx.set(k, a);
+    }),
+  ]);
+  const out: Art = { hero: { idle, walk, death, dirs }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex, shots, foeFx };
   // 무한 모드: 다른 장 무리도 뒤에서 미리 불러 둔다(기다리지 않는다)
   if (s.mode === 'endless') for (const c of STORY.chapters) for (const id of [...Object.values(c.roles).flat(), c.roles.mid, c.roles.boss]) ensureFoeArt(out, id);
   return out;
@@ -891,7 +909,7 @@ function pattern(ctx: CanvasRenderingContext2D, img: CanvasImageSource | undefin
 function drawRiftTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: number, y0: number, x1: number, y1: number, now: number): void {
   const t = s.terrain;
   const [floor, floor2, wall, voidC] = s.chapter.color;
-  const tex = art.tex?.images ?? [];
+  const tex = art.tex.map((a) => a?.images[0] ?? null);
   ctx.fillStyle = pattern(ctx, tex[0]) ?? floor;
   ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
   const cx0 = Math.max(0, Math.floor(x0 / CELL) - 1);
@@ -1605,7 +1623,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       });
       continue;
     }
-    const a = art.foes.get(f.def.id)?.idle;
+    const fa = art.foes.get(f.def.id);
+    // 걷기(Codex 그림이 오면): 멈춰 있지 않으면 걷기 그림
+    const moving = !(s.t < s.freezeUntil || s.t < f.stunUntil || f.fuseAt);
+    const a = (moving && fa?.walk) || fa?.idle;
     const vcol = f.variant ? RULES.variants.list.find((x) => x.id === f.variant)?.color : undefined;
     const ecol = f.element ? ELEM_COLOR[f.element] : undefined;
     const tcol = vcol ?? f.def.tint ?? ecol;
@@ -1850,6 +1871,23 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.globalAlpha = PLAYER_FX.has(e.type) ? fxa : 1;
     // 새 적 기술(2026-11-22): 띠·부채꼴·고리가 떨어진 순간 · 회복 · 보호 · 땅굴 · 웅덩이
     if (e.type === 'skill' && e.kind && SKILL_MARK.has(e.kind)) {
+      const fa = art.foeFx.get(e.kind === 'zone' ? 'explode' : e.kind);
+      if (fa && age < fa.meta.frames / fa.meta.fps) {
+        // Codex 그림(흰·회색): 적 기술 색을 입혀 모양 크기에 맞춘다
+        const n = Math.min(fa.meta.frames - 1, Math.floor(age * fa.meta.fps));
+        const img = fa.images[n];
+        const size = e.kind === 'line' ? (e.len ?? 300) : (e.r ?? 60) * 2.2;
+        if (img) {
+          ctx.save();
+          ctx.translate(e.x, e.y);
+          if (e.kind === 'line' || e.kind === 'cone') ctx.rotate(e.angle ?? 0);
+          const w = size;
+          const h = (size * fa.meta.frameH) / fa.meta.frameW;
+          ctx.drawImage(img, e.kind === 'line' || e.kind === 'cone' ? 0 : -w / 2, -h / 2, w, h);
+          ctx.restore();
+        }
+        continue;
+      }
       if (age < 0.5) drawSkillMark(ctx, e, age);
       continue;
     }
@@ -2132,6 +2170,18 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   for (const sh of s.shots) {
     if (sh.weapon || !inView(sh.x, sh.y)) continue;
     if (sh.style && sh.style !== 'orb') {
+      const sa = art.shots.get(sh.style);
+      const si = sa ? frame(sa, now, sh.x) : null;
+      if (sa && si) {
+        // Codex 탄 그림: 칸의 약 30%가 탄 길이 — 탄 반지름의 3배 길이로
+        const S = (sh.r * 3) / (sa.meta.frameW * 0.3);
+        ctx.save();
+        ctx.translate(sh.x, sh.y);
+        ctx.rotate(Math.atan2(sh.vy, sh.vx));
+        ctx.drawImage(si, -sa.meta.frameW * S * 0.5, -sa.meta.frameH * S * 0.5, sa.meta.frameW * S, sa.meta.frameH * S);
+        ctx.restore();
+        continue;
+      }
       drawFoeShot(ctx, sh, now);
       continue;
     }
@@ -2264,9 +2314,16 @@ function drawHero(ctx: CanvasRenderingContext2D, s: State, art: Art, now: number
   ctx.fill();
   const dashing = s.t < p.dashUntil;
   const blink = s.t < p.hurtUntil && Math.floor(now / 60) % 2 === 0;
-  const walk = p.moving && art.hero.walk;
+  // 8방향: 위·아래·대각은 Codex 그림이 오면 그것(왼쪽은 오른쪽 그림을 뒤집는다), 아니면 옆 그림
+  const dx = Math.cos(p.facing);
+  const dy = Math.sin(p.facing);
+  const D = art.hero.dirs;
+  const dirKey = dy > 0.92 ? 'down' : dy < -0.92 ? 'up' : dy > 0.38 ? 'downside' : dy < -0.38 ? 'upside' : '';
+  const dirAnim = dirKey ? (p.moving ? D[`walk_${dirKey}`] : D[`idle_${dirKey === 'downside' ? 'down' : dirKey === 'upside' ? 'up' : dirKey}`]) : null;
+  void dx;
+  const walk = p.moving && (dirAnim ?? art.hero.walk);
   const dead = s.result === 'lose' && art.hero.death;
-  const a = dead ? art.hero.death : walk ? art.hero.walk : art.hero.idle;
+  const a = dead ? art.hero.death : dirAnim ? dirAnim : walk ? art.hero.walk : art.hero.idle;
   if (!a) return;
   const img = dead ? a.images[a.images.length - 1] : frame(a, now);
   if (!img) return;

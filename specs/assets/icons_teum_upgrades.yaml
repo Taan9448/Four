@@ -1,0 +1,17 @@
+id: icons_teum_upgrades
+type: icon-sheet
+frames: 10
+summary: '「틈」 장터 수련 도장 물건 그림 10칸(2026-11-22 "장터 디자인 전면 개편") — 칸 번호는 teum/data/rules.json upgrades.list 순서: 1 체력 · 2 위력 · 3 굳기 · 4 걸음 · 5 끌어당김 · 6 금화 · 7 다시 뽑기 · 8 봉인 · 9 건너뛰기 · 10 되살아나는 숨'
+subject: 'item icons for a wooden shop plaque in a wuxia game, each centered, three-quarter view, readable at 44 px'
+frame_notes:
+  1: 'HP: a red heart wrapped in a cloth bandage'
+  2: 'MIGHT: a sword blade with a bright edge glint'
+  3: 'ARMOR: a padded leather vest with metal studs'
+  4: 'SPEED: a straw sandal with wind lines'
+  5: 'PICKUP: a horseshoe magnet pulling small blue crystal shards'
+  6: 'GREED: a pile of gold coins with a sparkle'
+  7: 'REROLL: two dice tumbling'
+  8: 'BANISH: a scroll with a red seal stamped across it'
+  9: 'SKIP: a curved arrow jumping over a small block'
+  10: 'REVIVE: a small flame rising from a lotus'
+placeholder: { color: '#3a2618', accent: '#ffd27a' }

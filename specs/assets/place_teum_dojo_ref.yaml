@@ -1,0 +1,11 @@
+id: place_teum_dojo_ref
+type: character-ref
+size: large
+character: place_teum_dojo
+chroma: magenta
+summary: '「틈」 판 위 장소 기준 시트 — 떠도는 수련소(2026-11-22)'
+facing: left
+frame_notes:
+  1: "the whole structure in three-quarter top-down view (seen from slightly above like the other game props), standing on the bottom of the cell, no people"
+  2: "the same structure seen from the side, same proportions and colors"
+placeholder: { shape: object, color: '#6e4a2e', accent: '#f2a93b' }

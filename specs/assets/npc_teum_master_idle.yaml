@@ -1,0 +1,19 @@
+id: npc_teum_master_idle
+type: character-anim
+size: large
+character: npc_teum_master
+chroma: magenta
+summary: '「틈」 떠돌이 사범 대기 4프레임(가게 앞에 서서 숨 쉬고 손짓)'
+depends_on: [npc_teum_master_ref]
+reference: assets/source/npc_teum_master_ref.png
+facing: left
+frames: 4
+fps: 5
+loop: true
+events: {}
+frame_notes:
+  1: "standing by the shop, relaxed"
+  2: "one hand raised a little in a beckoning gesture"
+  3: "the hand lowered, a small nod"
+  4: "back to the pose of frame 1"
+placeholder: { shape: humanoid, color: '#e8e2d4', accent: '#8fd3ff' }

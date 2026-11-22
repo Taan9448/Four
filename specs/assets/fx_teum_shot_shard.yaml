@@ -1,0 +1,17 @@
+id: fx_teum_shot_shard
+type: fx
+summary: '「틈」 적 탄 — 얼음 조각(2026-11-22 "원거리 공격이 다 똑같다"). 오른쪽으로 날아가는 모습, 게임이 방향대로 돌린다. 테두리는 진한 남색(위험 표시)'
+frames: 6
+fps: 12
+loop: true
+min_fill: 0.0005
+chroma: magenta
+style: "crisp pixel-art enemy projectile with its own colors and a thick 1-2 block dark navy #1d2433 outline around the whole shape so it reads as an enemy shot on any background; clean stepped edges, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a sharp diamond-shaped ice shard flying RIGHT, pale blue with a white highlight edge, a few frost sparkles trailing, centered, about 30% of the cell long"
+  2: "the same, slightly flickering, a spark shed behind"
+  3: "the same, the trail a little longer"
+  4: "the same, the core pulsing brighter"
+  5: "the same, a spark on the edge"
+  6: "the same as frame 1 so the loop is seamless"
+placeholder: { accent: '#ff2f5f' }

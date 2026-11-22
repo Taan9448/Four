@@ -1,0 +1,12 @@
+id: bg_teum_market
+type: key-art
+summary: '「틈」 장터 배경 — 갈라진 하늘 아래 밤 장터(2026-11-22 "장터 디자인 전면 개편"). 왼쪽에 가게 판·주인, 가운데에 물건 판을 얹는다'
+frame_notes:
+  1: >-
+    A night market street in a Chinese martial-arts mountain town, painted like a calm hand-drawn anime background with soft watercolor
+    texture: rows of wooden stalls with cloth awnings, strings of warm red and orange paper lanterns overhead, scroll racks and weapon racks,
+    steam from a food stall, wet stone paving reflecting the lanterns, and far above the roofs a thin crimson crack in the dark blue sky.
+framing: >-
+  The left third and the center will be covered by dark UI panels, so keep detail mostly at the top edge (lanterns, roofs, the sky crack) and
+  at the far right. Darker toward the bottom. No people, no text.
+placeholder: { color: '#1a1014' }
