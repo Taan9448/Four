@@ -1,0 +1,14 @@
+Create ONE PNG sheet of game interface pieces, 1536x1024 px.
+Grid: 3 columns x 2 rows. Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. No scenery, no floor, no cast shadow on the background, no glow, no gradient.
+Subject: six button frames for "Teum", a dark wuxia survival game: wide rounded-rectangle plates seen straight from the front, made to be stretched as a 9-slice border (the game cuts 30 px corners), the middle left plain for the label.
+Cell 1: PRIMARY normal: a wide plate (about 440 x 150 px) of deep red lacquer (#b3261e to #7a1610) with a thin bright gold inner line 10 px from the edge, small cloud-scroll gold ornaments in the four corners, a soft highlight along the top edge
+Cell 2: PRIMARY hover: exactly the same plate, same size and place, the lacquer brighter (#d8453a) and the gold line glowing
+Cell 3: PRIMARY pressed: the same plate, darker (#6a120c), the top highlight gone, as if pushed in
+Cell 4: GHOST normal: the same shape in dark smoked glass/ink (#1a1414 at 85%), a thin pale gold line, plain corners
+Cell 5: GHOST hover: the same as cell 4 with the gold line brighter and a faint warm glow inside the edge
+Cell 6: DISABLED: the same shape in flat dark grey (#2a2628), the line dull grey, no highlights
+Composition: All six plates share the same center, size and corner shape so the game can swap them without jumping. Straight front view, no perspective, no text, no icons, the middle area plain. Cells are separated; nothing touches the cell edges.
+Style: hand-drawn 2D animated feature film look; clean, lively hand-inked line art with gentle line weight variation and warm dark-brown outlines; simple cel shading with one shadow tone and small highlights; light, airy, natural colors; softly painted watercolor-like backgrounds with rich natural detail and warm daylight; gentle, nostalgic atmosphere; East Asian wuxia world blended with a European fantasy forest; not photorealistic, not 3D, no heavy oil-paint texture. Crisp clean edge around every piece so it separates cleanly from the background.
+Never use magenta, pink or purple in the pieces.
+Rules: no text, no letters, no numbers, no signature, no watermark, nothing crosses into the next cell.

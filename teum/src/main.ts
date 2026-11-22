@@ -1851,9 +1851,54 @@ const screen = params.get('screen');
 initIdle();
 initSound(loadSave().options.sound);
 // Codex 단추 틀(ui_teum_buttons 6칸)이 오면 모든 단추 테두리를 그 그림으로
-if (realArt('ui_teum_buttons', 1)) {
-  document.documentElement.classList.add('btn-art');
-  for (let i = 1; i <= 6; i++) document.documentElement.style.setProperty(`--bf${i}`, `url("${realArt('ui_teum_buttons', i)}")`);
+// 칸 안에 판이 가운데 놓여 있으니(둘레 투명) 판만 잘라 쓴다 — 여섯 칸이 같은 자리라 첫 칸의 상자를 모두에 쓴다
+if (realArt('ui_teum_buttons', 1)) void cropFrames();
+async function cropFrames(): Promise<void> {
+  const load = (src: string) =>
+    new Promise<HTMLImageElement>((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = rej;
+      im.src = src;
+    });
+  try {
+    const ims = await Promise.all(Array.from({ length: 6 }, (_, i) => load(realArt('ui_teum_buttons', i + 1)!)));
+    const w = ims[0].naturalWidth;
+    const h = ims[0].naturalHeight;
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d')!;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (const im of ims) {
+      g.clearRect(0, 0, w, h);
+      g.drawImage(im, 0, 0);
+      const d = g.getImageData(0, 0, w, h).data;
+      for (let y = 0; y < h; y++)
+        for (let x = 0; x < w; x++)
+          if (d[(y * w + x) * 4 + 3] > 24) {
+            if (x < x0) x0 = x;
+            if (x > x1) x1 = x;
+            if (y < y0) y0 = y;
+            if (y > y1) y1 = y;
+          }
+    }
+    if (x1 < 0) return;
+    const o = document.createElement('canvas');
+    o.width = x1 - x0 + 1;
+    o.height = y1 - y0 + 1;
+    const og = o.getContext('2d')!;
+    ims.forEach((im, i) => {
+      og.clearRect(0, 0, o.width, o.height);
+      og.drawImage(im, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
+      document.documentElement.style.setProperty(`--bf${i + 1}`, `url("${o.toDataURL()}")`);
+    });
+    // 판 높이의 약 22%가 모서리 장식 — 9-slice 자르는 폭
+    document.documentElement.style.setProperty('--bf-slice', String(Math.round(o.height * 0.22)));
+    document.documentElement.classList.add('btn-art');
+  } catch {
+    /* 못 읽으면 CSS 단추 그대로 */
+  }
 }
 // 계정(로그인해 두었으면 맞춘다) — 저장이 바뀌면 모아 올린다
 onSaveWrite(schedulePush);
