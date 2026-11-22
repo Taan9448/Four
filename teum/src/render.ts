@@ -1718,7 +1718,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
             ctx.lineWidth = 3;
             ctx.strokeStyle = 'rgba(10,6,8,0.9)';
             ctx.fillStyle = '#ff8a5c';
-            const txt = f.affixes.map((id) => AFFIXES.find((a) => a.id === id)?.glyph ?? '').join(' ');
+            const txt = f.affixes.map((id) => AFFIXES.find((a) => a.id === id)?.name ?? '').join(' · ');
             ctx.strokeText(txt, f.x, f.y + 26);
             ctx.fillText(txt, f.x, f.y + 26);
           }
@@ -1884,8 +1884,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       ctx.lineWidth = 5;
       ctx.strokeStyle = `rgba(20,10,10,${1 - k})`;
       ctx.fillStyle = `rgba(255,224,138,${1 - k})`;
-      ctx.strokeText('看破', p.x, p.y - 90 - k * 20);
-      ctx.fillText('看破', p.x, p.y - 90 - k * 20);
+      ctx.strokeText('간파', p.x, p.y - 90 - k * 20);
+      ctx.fillText('간파', p.x, p.y - 90 - k * 20);
       continue;
     }
     if (e.type === 'fall') {

@@ -1599,7 +1599,7 @@ function runEndless(s: State): void {
   }
   if (s.t >= s.nextShopAt) {
     s.nextShopAt = s.t + E.shop.every;
-    if (placeItem(s, 'merchant', 300, 650, E.shop.stay)) s.events.push({ type: 'event', text: `떠돌이 상인이 수레를 세웠다 — 지도의 金 표식, ${E.shop.stay}초 뒤 떠난다`, kind: 'chest' });
+    if (placeItem(s, 'merchant', 300, 650, E.shop.stay)) s.events.push({ type: 'event', text: `떠돌이 상인이 수레를 세웠다 — 지도의 수레 표식, ${E.shop.stay}초 뒤 떠난다`, kind: 'chest' });
   }
   if (s.t >= s.nextDojoAt) {
     s.nextDojoAt = s.t + E.dojo.every;

@@ -44,7 +44,7 @@
   },
   {
    "id": "iron_dummy",
-   "name": "철목인(鐵木人)",
+   "name": "철목인",
    "ref": "iron_dummy",
    "sprite": "iron_dummy",
    "role": "tank",

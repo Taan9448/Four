@@ -47,7 +47,7 @@ const NAMES: Record<string, string> = {
   ArrowDown: '↓',
   ArrowLeft: '←',
   ArrowRight: '→',
-  Space: '스페이스',
+  Space: 'Space',
   ShiftLeft: '왼쪽 Shift',
   ShiftRight: '오른쪽 Shift',
   ControlLeft: '왼쪽 Ctrl',
