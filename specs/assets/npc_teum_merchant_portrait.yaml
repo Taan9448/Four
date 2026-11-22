@@ -1,0 +1,8 @@
+id: npc_teum_merchant_portrait
+type: portrait
+character: npc_teum_merchant
+summary: '「틈」 떠돌이 상인 반신 그림 — 가게 창·장터 가판대 주인(2026-11-22)'
+frame_notes:
+  1: "Waist-up portrait: a sly cheerful grin, one hand lifting the brim of the straw hat, a small pouch of coins in the other hand."
+framing: "Portrait for a shop window: head at the upper third, waist-up, slightly facing left toward the goods; warm lantern light from the left, a dark night-market background with blurred paper lanterns. No frame, no text."
+placeholder: { color: '#2a1d14' }

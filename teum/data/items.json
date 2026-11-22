@@ -1,11 +1,11 @@
 {
-  "$comment": "「틈」 줍는 것(2026-11-21 사용자 \"아이템이 너무 단순 — 15개 이상 늘려\"). drop: 그림자가 떨굴 확률, prop: 깨지는 것(항아리·등불)에서 나올 무게, ops: 주웠을 때 하는 일(sim.ts useItem — 기본 동작만, 아이템별 코드 없음). icon: [시트, 칸] 그림, 없으면 glyph 글자. event: 돌발 이벤트로만 놓인다",
+  "$comment": "「틈」 줍는 것(2026-11-21 사용자 \"아이템이 너무 단순 — 15개 이상 늘려\"). drop: 그림자가 떨굴 확률, prop: 깨지는 것(항아리·등불)에서 나올 무게, ops: 주웠을 때 하는 일(sim.ts useItem — 기본 동작만, 아이템별 코드 없음). icon: [시트, 칸] 그림, 없으면 glyph 한 글자(2026-11-22 한글로). event: 돌발 이벤트로만 놓인다",
   "items": [
     {
       "id": "food",
       "name": "주먹밥",
       "desc": "체력 30 회복",
-      "glyph": "飯",
+      "glyph": "주",
       "color": "#f1efe6",
       "icon": [
         "icons",
@@ -24,7 +24,7 @@
       "id": "herb",
       "name": "약초",
       "desc": "체력을 모두 회복",
-      "glyph": "草",
+      "glyph": "약",
       "color": "#6aa84f",
       "icon": [
         "items",
@@ -43,7 +43,7 @@
       "id": "magnet",
       "name": "자석",
       "desc": "판의 결 조각을 모두 끌어온다",
-      "glyph": "磁",
+      "glyph": "자",
       "color": "#4fb4ff",
       "icon": [
         "icons",
@@ -61,7 +61,7 @@
       "id": "bomb",
       "name": "벽력탄",
       "desc": "둘레 그림자를 한꺼번에 날린다",
-      "glyph": "爆",
+      "glyph": "벽",
       "color": "#ff6a3a",
       "icon": [
         "items",
@@ -81,7 +81,7 @@
       "id": "frost",
       "name": "서리 부적",
       "desc": "그림자를 5초 얼린다",
-      "glyph": "霜",
+      "glyph": "서",
       "color": "#9fe6ff",
       "icon": [
         "items",
@@ -100,7 +100,7 @@
       "id": "gold",
       "name": "금화",
       "desc": "금화 1~5 — 무공서고에서 비급을 산다",
-      "glyph": "金",
+      "glyph": "금",
       "color": "#ffd27a",
       "icon": [
         "items",
@@ -120,7 +120,7 @@
       "id": "ginseng",
       "name": "산삼",
       "desc": "최대 체력 +15(다음 장에도) · 15 회복",
-      "glyph": "蔘",
+      "glyph": "산",
       "color": "#e0cfae",
       "icon": [
         "items2",
@@ -143,7 +143,7 @@
       "id": "vajra",
       "name": "금강부",
       "desc": "6초 동안 어떤 공격도 받지 않는다",
-      "glyph": "剛",
+      "glyph": "금",
       "color": "#ffe08a",
       "icon": [
         "items2",
@@ -162,7 +162,7 @@
       "id": "wind_pill",
       "name": "질풍환",
       "desc": "12초 동안 걸음 +40%",
-      "glyph": "風",
+      "glyph": "질",
       "color": "#bfe3a0",
       "icon": [
         "items2",
@@ -183,7 +183,7 @@
       "id": "blood_pill",
       "name": "혈기단",
       "desc": "12초 동안 무공 위력 +50%",
-      "glyph": "血",
+      "glyph": "혈",
       "color": "#ff3b3b",
       "icon": [
         "items2",
@@ -204,7 +204,7 @@
       "id": "clear_pill",
       "name": "청심환",
       "desc": "12초 동안 무공이 40% 빨리 돈다",
-      "glyph": "淸",
+      "glyph": "청",
       "color": "#8fd3ff",
       "icon": [
         "items2",
@@ -225,7 +225,7 @@
       "id": "elixir",
       "name": "대환단",
       "desc": "체력을 모두 되찾고 최대 체력 +10, 금강 3초",
-      "glyph": "丹",
+      "glyph": "대",
       "color": "#f2a93b",
       "icon": [
         "items2",
@@ -252,7 +252,7 @@
       "id": "map_scrap",
       "name": "지도 조각",
       "desc": "둘레 넓게 지도를 밝히고 상자를 보인다",
-      "glyph": "圖",
+      "glyph": "지",
       "color": "#b8a184",
       "icon": [
         "items2",
@@ -271,7 +271,7 @@
       "id": "insight",
       "name": "깨달음의 서",
       "desc": "경험이 한 레벨의 60%만큼 찬다",
-      "glyph": "悟",
+      "glyph": "깨",
       "color": "#d4b8ff",
       "icon": [
         "items2",
@@ -290,7 +290,7 @@
       "id": "thunder",
       "name": "뇌전부",
       "desc": "3초 동안 보이는 그림자에 벼락 18번",
-      "glyph": "雷",
+      "glyph": "뇌",
       "color": "#d4b8ff",
       "icon": [
         "items2",
@@ -313,7 +313,7 @@
       "id": "purify",
       "name": "정화수",
       "desc": "날아오는 탄·붉은 원을 모두 지우고 20 회복",
-      "glyph": "淨",
+      "glyph": "정",
       "color": "#dff4ff",
       "icon": [
         "items2",
@@ -335,7 +335,7 @@
       "id": "gold_bar",
       "name": "금괴",
       "desc": "금화 25~40",
-      "glyph": "錠",
+      "glyph": "금",
       "color": "#ffd27a",
       "icon": [
         "items2",
@@ -355,7 +355,7 @@
       "id": "pouch",
       "name": "복주머니",
       "desc": "무엇이 들었는지 열어 봐야 안다",
-      "glyph": "福",
+      "glyph": "복",
       "color": "#ff8a5c",
       "icon": [
         "items2",
@@ -373,7 +373,7 @@
       "id": "fire_charm",
       "name": "화염부",
       "desc": "발밑에 8초 동안 불 장판",
-      "glyph": "炎",
+      "glyph": "화",
       "color": "#ff8a3a",
       "icon": [
         "items2",
@@ -396,7 +396,7 @@
       "id": "whirl_charm",
       "name": "회오리부",
       "desc": "둘레 그림자를 멀리 밀쳐 낸다",
-      "glyph": "旋",
+      "glyph": "회",
       "color": "#c2c6d1",
       "icon": [
         "items2",
@@ -417,7 +417,7 @@
       "id": "hourglass",
       "name": "모래시계",
       "desc": "10초 동안 그림자가 절반 빠르기로 걷는다",
-      "glyph": "沙",
+      "glyph": "모",
       "color": "#e0cfae",
       "icon": [
         "items2",
@@ -437,7 +437,7 @@
       "id": "secret_book",
       "name": "비급",
       "desc": "잠긴 무공·심법 하나가 영원히 열린다",
-      "glyph": "秘",
+      "glyph": "비",
       "color": "#a35cff",
       "icon": [
         "items2",
@@ -456,7 +456,7 @@
       "id": "shrine",
       "name": "축복의 샘",
       "desc": "30초 동안 강한 축복 하나",
-      "glyph": "泉",
+      "glyph": "축",
       "color": "#8fd3ff",
       "event": true,
       "ops": [
@@ -477,26 +477,32 @@
     {
       "id": "merchant",
       "name": "떠돌이 상인",
-      "desc": "금화로 물건을 산다",
-      "glyph": "商",
+      "desc": "수레를 세운 상인 — 안에 들어가면 물건과 무공을 판다",
+      "glyph": "떠",
       "color": "#f2a93b",
       "event": true,
       "ops": [
         {
           "op": "shop",
-          "count": 3
+          "count": 3,
+          "skills": 2
         }
       ],
       "icon": [
         "world",
         3
-      ]
+      ],
+      "place": {
+        "radius": 96,
+        "npc": "npc_teum_merchant",
+        "name": "떠돌이 상인의 수레"
+      }
     },
     {
       "id": "cursed",
       "name": "저주받은 상자",
       "desc": "열면 정예가 깨어난다 — 대신 상자 둘 몫",
-      "glyph": "呪",
+      "glyph": "저",
       "color": "#a02634",
       "event": true,
       "ops": [
@@ -520,7 +526,7 @@
       "id": "stele",
       "name": "비석",
       "desc": "원작 이야기 조각 — 도감 「비석」에 모인다 · 금화 10",
-      "glyph": "碑",
+      "glyph": "비",
       "color": "#c2c6d1",
       "icon": [
         "world",
@@ -537,7 +543,7 @@
       "id": "altar",
       "name": "수련 제단",
       "desc": "짧은 도전: 정한 시간 안에 그림자를 쓰러뜨리면 상자 둘",
-      "glyph": "壇",
+      "glyph": "수",
       "color": "#ff8a5c",
       "icon": [
         "world",
@@ -553,8 +559,8 @@
     {
       "id": "dojo",
       "name": "수련소",
-      "desc": "금화로 무공을 사고·올리고·내려놓는다(무한 모드)",
-      "glyph": "武",
+      "desc": "수련소 — 안에 들어가면 사범이 풀에 없는 무공을 팔고, 가진 무공을 올리거나 내려놓게 한다",
+      "glyph": "수",
       "color": "#8fd3ff",
       "icon": [
         "world",
@@ -566,13 +572,18 @@
           "op": "skillshop",
           "count": 3
         }
-      ]
+      ],
+      "place": {
+        "radius": 110,
+        "npc": "npc_teum_master",
+        "name": "떠도는 수련소"
+      }
     },
     {
       "id": "chest",
       "name": "보물상자",
       "desc": "무공 하나가 오르거나 각성한다",
-      "glyph": "箱",
+      "glyph": "보",
       "color": "#c89a3a",
       "icon": [
         "icons",

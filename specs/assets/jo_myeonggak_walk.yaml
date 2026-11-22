@@ -1,0 +1,20 @@
+id: jo_myeonggak_walk
+type: character-anim
+size: large
+character: jo_myeonggak
+chroma: magenta
+summary: '「틈」 그림자 걷기 4프레임 — 조명각(2026-11-22 사용자 "적은 아직 걷는 동작이 없다"). 오기 전에는 대기 그림이 흔들린다'
+depends_on: [jo_myeonggak_ref]
+reference: assets/source/jo_myeonggak_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "same size, colors and outfit as the idle sheet; heavy stride to the LEFT: the front foot planted, the whole body leaning forward"
+  2: "same size, colors and outfit as the idle sheet; weight shifting, shoulders rolling, cloth or cape swinging"
+  3: "same size, colors and outfit as the idle sheet; the other foot stepping forward heavily"
+  4: "same size, colors and outfit as the idle sheet; recovering the stance, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#a02634' }

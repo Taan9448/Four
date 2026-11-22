@@ -1,0 +1,21 @@
+id: born_walk_down
+type: character-anim
+character: born
+summary: '「틈」 보른 정면(화면 쪽으로 걸어옴) 6프레임 — 8방향 움직임(2026-11-22 사용자 "좌우만 있어 움직임이 어색 — 앞뒤·대각 추가"). 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [born_ref]
+reference: assets/source/born_ref.png
+facing: right
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(대기·옆 걷기와 같은 크기)
+frame_notes:
+  1: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; contact pose: one foot forward touching the ground, the other behind"
+  2: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; down pose: weight on the front foot, body a little lower"
+  3: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; passing pose: the back leg passing the front one, body at its highest"
+  4: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; contact pose with the other foot forward (mirror of frame 1)"
+  5: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; down pose on the other foot"
+  6: "FRONT VIEW, walking straight TOWARD the viewer (down the screen), face and chest visible; the big double-bladed battle axe held in both hands, the red beard in three braids; passing pose, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#8a6a4a', accent: '#ffb02e' }

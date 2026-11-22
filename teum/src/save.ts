@@ -59,12 +59,18 @@ export function loadSave(): SaveData {
   }
   return fresh();
 }
+const writeHooks = new Set<() => void>();
+/** 저장이 바뀔 때(계정에 올리기, 2026-11-22) */
+export function onSaveWrite(fn: () => void): void {
+  writeHooks.add(fn);
+}
 export function writeSave(s: SaveData): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(s));
   } catch {
     /* 사생활 보호 창 등 */
   }
+  for (const fn of writeHooks) fn();
 }
 
 export const heroOpen = (sv: SaveData, id: string, all = false): boolean => {

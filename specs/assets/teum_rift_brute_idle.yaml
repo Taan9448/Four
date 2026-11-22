@@ -1,0 +1,19 @@
+id: teum_rift_brute_idle
+type: character-anim
+size: large
+character: teum_rift_brute
+chroma: magenta
+summary: '「틈」 틈 망치꾼 대기 4프레임'
+depends_on: [teum_rift_brute_ref]
+reference: assets/source/teum_rift_brute_ref.png
+facing: left
+frames: 4
+fps: 6
+loop: true
+events: {}
+frame_notes:
+  1: "standing/hovering still, menacing"
+  2: "a small breath or pulse of its glow"
+  3: "the glow fades a little, a slight sway"
+  4: "back to the pose of frame 1"
+placeholder: { shape: humanoid, color: '#4a3a2a', accent: '#ffb02e' }

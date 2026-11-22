@@ -51,10 +51,28 @@ export interface PassiveDef {
   card?: string;
   rarity?: string;
 }
+/** 적 탄 모양(2026-11-22 "원거리 공격이 다 똑같다"): orb 알 · arrow 화살 · flame 불덩이 · shard 얼음 조각 · spark 번개 · bubble 독 거품 · shadow 그림자 · bone 뼈 · needle 독침 · blade 검기 */
+export type ShotStyle = 'orb' | 'arrow' | 'flame' | 'shard' | 'spark' | 'bubble' | 'shadow' | 'bone' | 'needle' | 'blade';
+/** 탄 꾸밈: style 모양 · homing 초당 꺾는 정도(라디안) · zone 사라질 때 남기는 웅덩이 */
+interface ShotMod {
+  style?: ShotStyle;
+  homing?: number;
+  r?: number;
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+}
 export type FoeSkill =
-  | { kind: 'aimed'; every: number; damage: number; speed: number; color: string; fx?: string }
-  | { kind: 'fan'; every: number; count: number; spread: number; damage: number; speed: number; color: string }
-  | { kind: 'radial'; every: number; count: number; damage: number; speed: number; color: string }
+  | ({ kind: 'aimed'; every: number; damage: number; speed: number; color: string; fx?: string } & ShotMod)
+  | ({ kind: 'fan'; every: number; count: number; spread: number; damage: number; speed: number; color: string } & ShotMod)
+  | ({ kind: 'radial'; every: number; count: number; damage: number; speed: number; color: string } & ShotMod)
+  /** 광역 예고(2026-11-22): line 그림자에서 인물 쪽 곧은 띠 · cone 앞쪽 부채꼴 · ring 제 둘레 고리 충격파 · lob 인물 자리에 던져 웅덩이 */
+  | { kind: 'line'; every: number; damage: number; len: number; width: number; delay: number; color: string }
+  | { kind: 'cone'; every: number; damage: number; radius: number; spread: number; delay: number; color: string; range?: number }
+  | { kind: 'ring'; every: number; damage: number; radius: number; width: number; delay: number; color: string; range?: number }
+  | { kind: 'lob'; every: number; damage: number; radius: number; delay: number; color: string; zone?: { seconds: number; dps: number; radius: number; element?: string } }
+  /** 돕는 기술: heal 둘레 그림자 체력 회복 · shield 둘레 그림자가 받는 피해 줄임 · burrow 땅속으로 숨었다가 인물 곁에서 솟는다 */
+  | { kind: 'heal'; every: number; radius: number; amount: number }
+  | { kind: 'shield'; every: number; radius: number; seconds: number; mul: number }
+  | { kind: 'burrow'; every: number; delay: number; radius: number; damage: number; color: string }
   | { kind: 'slam'; every: number; damage: number; radius: number; delay: number; color: string; count: number; fx?: string }
   | { kind: 'charge'; every: number; damage: number }
   | { kind: 'summon'; every: number; foe: string; count: number };
@@ -75,6 +93,43 @@ export interface FoeDef {
   fly?: boolean;
   element?: string;
   skills?: FoeSkill[];
+  /** 자폭(2026-11-22): 가까우면 내달려 불이 붙고 delay초 뒤 radius 안을 터뜨린다(다른 그림자도 다친다) */
+  fuse?: FuseDef;
+  /** 쓰러지면 작은 것 n으로 갈라진다 */
+  split?: number;
+  /** 특수 그림자(2026-11-22): 장 무리와 따로 from장(0부터)부터 섞여 나온다 */
+  special?: { from: number; weight: number };
+  /** Codex 그림이 오기 전에 쓸 「천외귀환」 그림 */
+  fallback?: string;
+  /** 다른 그림자 탄이 아닌 제 몸 빛(변종·속성 색) */
+  tint?: string;
+}
+export interface FuseDef {
+  range: number;
+  delay: number;
+  radius: number;
+  damage: number;
+  sprint: number;
+}
+/** 변종(rules.json variants, 2026-11-22 사용자 "강화된 적·특성 적·속성 적·자폭병"): 보통 그림자에 덧붙는 성질 */
+export interface VariantDef {
+  id: string;
+  name: string;
+  color: string;
+  weight: number;
+  from?: number;
+  hp?: number;
+  damage?: number;
+  speed?: number;
+  scale?: number;
+  xp?: number;
+  armor?: number;
+  regen?: number;
+  split?: number;
+  element?: 'fire' | 'ice' | 'shock' | 'poison';
+  fuse?: FuseDef;
+  firm?: boolean;
+  shots?: { every: number; speed: number; damage: number; style: ShotStyle };
 }
 export interface HeroDef {
   id: string;
@@ -160,6 +215,10 @@ export interface ChapterDef {
   gimmick?: Gimmick;
   /** 안개 속 비석 이야기 조각 */
   steles?: string[];
+  /** 그리기 결(2026-11-22): rift = 무한 모드 전용 「갈라진 들」(둥근 균열·바위 조각, 칸 네모 없이) */
+  style?: 'rift';
+  /** 무늬 시트(Codex tex_teum_rift: 땅 · 오염된 땅 · 바위 · 허공) */
+  tex?: string;
 }
 export interface Gimmick {
   kind: 'gust' | 'howl' | 'lava' | 'whiteout' | 'hands' | 'eclipse' | 'alley' | 'palm' | 'meteor' | 'collapse';
@@ -223,20 +282,28 @@ export const RULES = rulesRaw as unknown as {
     dmg: { perMin: number; sq: number };
     spawn: { base: number; perMin: number; max: number };
     event: [number, number];
-    boss: { every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
-    shop: { every: number };
-    dojo: { every: number };
+    boss: { aoeFrom: number; every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
+    shop: { every: number; stay: number; skills: number };
+    dojo: { every: number; stay: number };
+    /** 판마다 무작위 무공 풀(2026-11-22 사용자 "무한 모드 무공은 무작위 — 직업 특성은 지킨다, 40~50종") */
+    pool: { weapons: [number, number]; passives: [number, number]; own: number };
+    /** 상인·수련소가 파는 다른 문파 무공 값 배율 */
+    foreignPrice: number;
     chests: number;
     secrets: { steles: number; altars: number; merchants: number };
     dojoPrices: { buy: number; buyPerMin: number; up: number; upPerLv: number; sell: number };
   };
   /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
   sight: { cells: number; every: number };
+  /** 변종(2026-11-22): 보통 그림자가 이 확률로 변종이 된다(장·분마다 오른다) */
+  variants: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number }; list: VariantDef[]; element: Record<string, { trail?: { every: number; radius: number; seconds: number; dps: number }; deathZone?: { radius: number; seconds: number; dps: number }; chill?: number; poison?: number; zap?: { every: number; range: number; delay: number; damage: number; width: number }; deathRing?: { radius: number; delay: number; damage: number } }> };
+  /** 특수 그림자(2026-11-22): 장 무리 대신 이 확률로 섞인다 */
+  specials: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number } };
 };
 export const STORY = storyRaw as unknown as {
   difficulties: Difficulty[];
   /** 무한 모드 판(2026-11-21) */
-  endless: { name: string; line: string; ground: string; terrain: string; cg: string; color: [string, string, string, string]; terrainDef: TerrainDef };
+  endless: { name: string; line: string; ground: string; terrain: string; cg: string; color: [string, string, string, string]; terrainDef: TerrainDef; style?: 'rift'; tex?: string };
   timeline: { length: number; spawns: SpawnDef[]; events: TimelineEvent[]; chests: { every: number; min: number; max: number }; jitter: { seconds: number; roles: Record<string, Role[]> } };
   chapters: ChapterDef[];
   /** 돌발 이벤트(2026-11-21): 장마다 시드로 몇 개를 고른다 */
@@ -274,7 +341,7 @@ export type ItemOp =
   | { op: 'push'; radius: number; force: number; damage: number }
   | { op: 'slowfoes'; seconds: number; mul: number }
   | { op: 'unlock'; count: number }
-  | { op: 'shop'; count: number }
+  | { op: 'shop'; count: number; skills?: number }
   | { op: 'ambush'; count: number }
   | { op: 'chest' }
   | { op: 'stele' }
@@ -290,6 +357,8 @@ export interface ItemDef {
   drop?: number;
   prop?: number;
   event?: boolean;
+  /** 장소(2026-11-22 "상인·수련소는 줍는 것이 아니라 장소 — 안에 NPC가 판다"): 들어가면(radius) 가게가 열리고 사라지지 않는다. stay초 뒤 떠난다(무한 모드) */
+  place?: { radius: number; npc: string; name: string };
   ops: ItemOp[];
 }
 const ITEM_DATA = itemsRaw as unknown as { items: ItemDef[]; blessing: ItemOp[]; prices: Record<string, number> };
@@ -351,6 +420,19 @@ export interface Foe {
   dmgMul?: number;
   /** 작은 그림자(갈라진 것): 다시 갈라지지 않는다 */
   small?: boolean;
+  /** 변종 id · 속성(변종이나 정의) */
+  variant?: string;
+  element?: string;
+  /** 크기 배율(변종) */
+  scale?: number;
+  /** 방패 그림자가 씌운 보호: 이때까지 받는 피해 ×guardMul */
+  guardUntil?: number;
+  guardMul?: number;
+  /** 땅속(burrow): 이때 솟는다 — 그 전엔 맞지 않고 닿지 않는다 */
+  burrowUntil?: number;
+  /** 불타는 그림자가 다음에 불 자국을 남길 때 · 번개 품은 그림자가 다음에 번개를 칠 때 */
+  trailAt?: number;
+  zapAt?: number;
 }
 export interface Shot {
   x: number;
@@ -366,6 +448,21 @@ export interface Shot {
   hit?: Set<number>;
   element?: WeaponDef['element'];
   knock?: number;
+  /** 적 탄 모양 · 따라옴 · 끝에 남기는 웅덩이(2026-11-22) */
+  style?: ShotStyle;
+  homing?: number;
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+}
+/** 적이 남긴 웅덩이(불·독·서리): 안에 있으면 0.5초마다 피해(방어 무시 작은 피해) */
+export interface FoeZone {
+  x: number;
+  y: number;
+  r: number;
+  dps: number;
+  until: number;
+  born: number;
+  element: string;
+  next: number;
 }
 export interface Zone {
   x: number;
@@ -389,6 +486,18 @@ export interface Slam {
   at: number;
   color: string;
   fx?: string;
+  /** 모양(2026-11-22): circle(기본) · line(x,y에서 angle로 len, 반폭 w) · cone(반지름 r, 반각 w) · ring(r0~r) */
+  shape?: 'circle' | 'line' | 'cone' | 'ring';
+  angle?: number;
+  len?: number;
+  w?: number;
+  r0?: number;
+  /** 떨어진 뒤 남기는 웅덩이 */
+  zone?: { seconds: number; dps: number; radius: number; element?: string };
+  /** 그림자도 다친다(자폭) */
+  hurtsFoes?: boolean;
+  /** 이 그림자가 떨어뜨리는 것(땅굴: 솟는 자리) */
+  owner?: number;
 }
 export interface Gem {
   x: number;
@@ -410,6 +519,10 @@ export interface Item {
   hidden?: boolean;
   /** 비석 번호(장 안에서 0부터) */
   stele?: number;
+  /** 장소: 떠나는 때 · 진열(처음 들어갈 때 정한다) · 지금 안에 있나 */
+  until?: number;
+  stock?: Choice[];
+  inside?: boolean;
 }
 export interface Prop {
   x: number;
@@ -438,7 +551,7 @@ export type FxEvent =
   | { type: 'graze'; x: number; y: number }
   | { type: 'ult'; x: number; y: number; fx: string; color: string }
   | { type: 'event'; text: string; kind: string }
-  | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam'; angle?: number }
+  | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam' | 'heal' | 'shield' | 'burrow' | 'line' | 'cone' | 'ring' | 'zone'; angle?: number; r?: number; len?: number; w?: number; r0?: number }
   | { type: 'chain'; pts: [number, number][]; color: string }
   | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string }
   | { type: 'heal'; amount: number }
@@ -454,7 +567,11 @@ export type FxEvent =
   | { type: 'stele'; id: string; text: string }
   | { type: 'warn'; cells: number[]; at: number }
   | { type: 'terrain' }
-  | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string };
+  | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string }
+  | { type: 'buy'; id: string; kind: string }
+  /** 소리용(2026-11-22): 결 조각 주움 · 그림자가 쏨/예고함 */
+  | { type: 'gem' }
+  | { type: 'foeAct'; act: 'shot' | 'warn'; x: number; y: number };
 export interface Choice {
   /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 · buyskill/upskill/sellskill: 수련소(무한 모드, lv = 값/돌려받는 금화) */
   kind: 'weapon' | 'passive' | 'food' | 'gold' | 'buy' | 'leave' | 'buyskill' | 'upskill' | 'sellskill';
@@ -517,6 +634,9 @@ export interface State {
   passives: Map<string, number>;
   bonusHp: number;
   foes: Foe[];
+  /** 적이 남긴 웅덩이(불·독·서리, 2026-11-22) · 다음에 웅덩이가 다치게 하는 때 */
+  foeZones: FoeZone[];
+  zoneHurtAt: number;
   shots: Shot[];
   zones: Zone[];
   slams: Slam[];
@@ -614,6 +734,10 @@ export interface State {
   nextRandomAt: number;
   nextShopAt: number;
   nextDojoAt: number;
+  /** 무한 모드 무공 풀(판마다 무작위 40~50종) — 레벨업은 이 안에서만, 상인·수련소는 이 밖의 것을 판다. 스토리는 null */
+  pool: Set<string> | null;
+  /** 지금 열린 가게(장소) */
+  shopItem: Item | null;
 }
 
 export function xpNeed(level: number): number {
@@ -724,7 +848,39 @@ export interface ChapterOpts {
 function endlessChapter(): ChapterDef {
   const E = STORY.endless;
   const base = STORY.chapters[0];
-  return { ...base, id: 'endless', name: E.name, line: E.line, ground: E.ground, terrain: E.terrain, cg: E.cg, color: E.color, terrainDef: E.terrainDef, hp: 1, dmg: 1, rate: 1, extra: [], gimmick: undefined, steles: [], roles: { ...base.roles } };
+  return { ...base, id: 'endless', name: E.name, line: E.line, ground: E.ground, terrain: E.terrain, cg: E.cg, color: E.color, terrainDef: E.terrainDef, style: E.style, tex: E.tex, hp: 1, dmg: 1, rate: 1, extra: [], gimmick: undefined, steles: [], roles: { ...base.roles } };
+}
+/** 무한 모드 무공 풀: 인물 것(own 비율)과 공통 것을 섞은 무공 + 심법 — 시작 무공·각성 짝은 꼭 넣는다 */
+export function endlessPool(hero: HeroDef, rng: Rng): Set<string> {
+  const P = RULES.endless.pool;
+  const nW = rng.int(P.weapons[0], P.weapons[1]);
+  const nP = rng.int(P.passives[0], P.passives[1]);
+  const shuffle = <T>(a: T[]): T[] => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = rng.int(0, i);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  // 인물의 바탕 무공(heroes.json pool — 직업 특성)은 늘 들고, 나머지는 인물 카드 무공(own 비율)과 공통 카드 무공에서 무작위
+  const core = [hero.start, ...hero.pool.filter((id) => id !== hero.start && WEAPONS.has(id))];
+  const base = [...WEAPONS.values()].filter((d) => !d.evolved && !core.includes(d.id));
+  const own = shuffle(base.filter((d) => d.owner === hero.id).map((d) => d.id));
+  const common = shuffle(base.filter((d) => d.owner === '*').map((d) => d.id));
+  const rest = Math.max(0, nW - core.length);
+  const nOwn = Math.min(own.length, Math.round(rest * P.own));
+  const weapons = [...core, ...own.slice(0, nOwn), ...common.slice(0, rest - nOwn)];
+  const out = new Set(weapons);
+  // 각성 짝 심법은 먼저(각성을 노릴 수 있게), 나머지는 무작위
+  for (const id of weapons) {
+    const ev = WEAPONS.get(id)?.evolve;
+    if (ev && out.size < nW + nP) out.add(ev.with);
+  }
+  for (const id of shuffle([...PASSIVES.keys()])) {
+    if (out.size >= nW + nP) break;
+    out.add(id);
+  }
+  return out;
 }
 /** 무한 모드를 연다 */
 export function createEndless(seed: string, hero: string, opts: Omit<ChapterOpts, 'endless' | 'startAt' | 'rebuild'> = {}): State {
@@ -757,6 +913,8 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     passives,
     bonusHp: carry.bonusHp,
     foes: [],
+    foeZones: [],
+    zoneHurtAt: 0,
     shots: [],
     zones: [],
     slams: [],
@@ -828,8 +986,13 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     nextRandomAt: RULES.endless.event[0],
     nextShopAt: RULES.endless.shop.every,
     nextDojoAt: RULES.endless.dojo.every,
+    pool: null,
+    shopItem: null,
   };
-  if (endless) s.chestAt = RULES.endless.chests;
+  if (endless) {
+    s.chestAt = RULES.endless.chests;
+    s.pool = endlessPool(hero, rng.fork('pool'));
+  }
   if (opts.unlocked) {
     const open = new Set(opts.unlocked);
     s.locked = new Set(LOCKABLE.filter((id) => !open.has(id)));
@@ -956,6 +1119,11 @@ const hasAffix = (f: Foe, id: string): boolean => !!f.affixes?.includes(id);
 
 function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false): void {
   if (f.dead) return;
+  // 땅속에 있는 동안은 맞지 않는다
+  if (f.burrowUntil && s.t < f.burrowUntil) return;
+  // 갑옷 두른(변종) · 방패 그림자의 보호
+  const va = variantOf(f);
+  base *= (1 - (va?.armor ?? 0)) * (f.guardUntil && s.t < f.guardUntil ? (f.guardMul ?? 0.5) : 1);
   const crit = s.rng.next() < stat.crit(s);
   const S = RULES.sets;
   const vulnMul = s.t < f.vulnUntil ? (setOn(s, 'vuln') ? S.vuln.mul! : 1.25) : 1;
@@ -963,9 +1131,10 @@ function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDe
   const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * vulnMul * iceMul);
   f.hp -= dmg;
   f.hitAt = s.t;
-  const firm = hasAffix(f, 'steadfast');
-  if (element === 'ice' && !firm) f.slowUntil = s.t + 1.2;
-  if (element === 'fire') f.burnUntil = s.t + 2;
+  const firm = hasAffix(f, 'steadfast') || !!va?.firm;
+  // 같은 속성의 그림자는 그 속성이 듣지 않는다(불타는 놈은 안 탄다)
+  if (element === 'ice' && !firm && f.element !== 'ice') f.slowUntil = s.t + 1.2;
+  if (element === 'fire' && f.element !== 'fire') f.burnUntil = s.t + 2;
   if (element === 'shock' && !f.def.rank && !firm) f.stunUntil = s.t + 0.35;
   if (element === 'vuln') f.vulnUntil = s.t + (setOn(s, 'vuln') ? 5 : 3);
   // 가시 돋친(되돌리는) 정예: 때린 쪽이 조금 받는다
@@ -1074,6 +1243,30 @@ function killFoe(s: State, f: Foe): void {
   f.dead = true;
   s.kills++;
   s.chapterKills++;
+  // 갈라지는(정의·변종): 작은 것 n
+  const nSplit = f.small ? 0 : (f.def.split ?? variantOf(f)?.split ?? 0);
+  for (let i = 0; i < nSplit; i++) {
+    const a = (i / nSplit) * Math.PI * 2;
+    const k = spawnFoe(s, f.def.id, f.x + Math.cos(a) * 20, f.y + Math.sin(a) * 20);
+    if (k) {
+      k.small = true;
+      k.variant = undefined;
+      k.scale = 0.7;
+      k.hp = k.maxHp = Math.max(1, Math.round(f.maxHp * 0.3));
+      k.damage = f.damage * 0.6;
+      k.element = f.element;
+    }
+  }
+  // 속성 그림자가 쓰러지며 남기는 것: 불 웅덩이 · 독 구름 · 서리 고리
+  const EL = f.element ? RULES.variants.element[f.element] : undefined;
+  if (EL?.deathZone) addFoeZone(s, f.x, f.y, EL.deathZone.radius, EL.deathZone.dps * s.chapter.dmg, EL.deathZone.seconds, f.element!);
+  if (EL?.deathRing) s.slams.push({ x: f.x, y: f.y, r: EL.deathRing.radius, damage: EL.deathRing.damage * s.chapter.dmg, born: s.t, at: s.t + EL.deathRing.delay, color: '#8fd3ff', shape: 'ring', r0: EL.deathRing.radius * 0.55 });
+  // 자폭병을 먼저 쓰러뜨리면: 그 자리에서 터져 둘레 그림자만 다친다(인물은 안 다친다)
+  const fz = fuseOf(f);
+  if (fz) {
+    s.events.push({ type: 'burst', x: f.x, y: f.y, r: fz.radius });
+    for (const o of s.foes) if (!o.dead && o !== f && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < fz.radius ** 2) damageFoe(s, o, f.maxHp * 1.5 + 20, 30, undefined, true);
+  }
   // 화염 세트: 불붙은 채 쓰러지면 둘레로 번진다
   if (s.t < f.burnUntil && setOn(s, 'fire')) {
     const F = RULES.sets.fire;
@@ -1134,7 +1327,7 @@ function killFoe(s: State, f: Foe): void {
   }
 }
 
-function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe | null {
+export function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe | null {
   const def = FOES.get(id);
   if (!def) return null;
   if (!boss && !def.rank && s.foes.length >= RULES.foes.max) return null;
@@ -1167,8 +1360,32 @@ function spawnFoe(s: State, id: string, x: number, y: number, boss = false): Foe
   s.foes.push(f);
   if (boss) s.boss = f;
   if (def.rank === 'elite') giveAffixes(s, f);
+  f.element = def.element;
+  if (!def.rank && !boss) giveVariant(s, f);
   return f;
 }
+
+/** 변종: 보통 그림자에 강화·특성·속성·자폭 중 하나(장·분마다 확률이 오른다) */
+const VARIANTS = new Map(RULES.variants.list.map((v) => [v.id, v]));
+function giveVariant(s: State, f: Foe): void {
+  const V = RULES.variants;
+  if (s.mode === 'endless' && s.t / 60 < V.chance.endlessFrom) return;
+  const level = s.mode === 'endless' ? s.stage + s.t / 240 : s.chapterIndex;
+  const chance = Math.min(V.chance.max, V.chance.base + V.chance.perChapter * level + (V.chance.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
+  if (s.rng.next() >= chance) return;
+  const pool = V.list.filter((v) => (v.from ?? 0) <= level && !(v.element && f.def.element) && !(v.fuse && f.def.fuse));
+  const v = s.rng.weighted(pool, (x) => x.weight);
+  if (v) applyVariant(f, v);
+}
+export function applyVariant(f: Foe, v: VariantDef): void {
+  f.variant = v.id;
+  if (v.hp) f.hp = f.maxHp = Math.round(f.maxHp * v.hp);
+  if (v.damage) f.damage *= v.damage;
+  if (v.scale) f.scale = v.scale;
+  if (v.element) f.element = v.element;
+}
+const variantOf = (f: Foe): VariantDef | undefined => (f.variant ? VARIANTS.get(f.variant) : undefined);
+const fuseOf = (f: Foe): FuseDef | undefined => f.def.fuse ?? variantOf(f)?.fuse;
 
 /** 정예 수식어를 붙인다(뒤 장은 둘) */
 function giveAffixes(s: State, f: Foe): void {
@@ -1202,7 +1419,19 @@ function spawnPoint(s: State, fly: boolean, min = RULES.foes.spawnRadius[0], max
 }
 
 const rolePool = (c: ChapterDef, role: Role): string[] => (c.roles[role]?.length ? c.roles[role] : c.roles.main);
+/** 특수 그림자(자폭병·저격수·무녀…): 장마다·분마다 오르는 확률로 장 무리 대신 */
+const SPECIALS = [...FOES.values()].filter((f) => f.special);
 function pickRole(s: State, mix: Partial<Record<Role, number>>): string {
+  const SC = RULES.specials.chance;
+  // 무한 모드: endlessFrom분부터, 보스 넘긴 수 + 4분마다 한 장씩
+  const level = s.mode === 'endless' ? (s.t / 60 < SC.endlessFrom ? -99 : s.stage + s.t / 240) : s.chapterIndex;
+  // 1장은 덜(처음 만나는 장이 너무 거칠지 않게)
+  const chance = Math.min(SC.max, SC.base + SC.perChapter * level + (SC.perMin * s.t) / 60) * (level < 1 ? 0.35 : 1);
+  if (SPECIALS.length && s.rng.next() < chance) {
+    const open = SPECIALS.filter((f) => f.special!.from <= level);
+    const pick = open.length ? s.rng.weighted(open, (f) => f.special!.weight) : null;
+    if (pick) return pick.id;
+  }
   const roles = Object.keys(mix) as Role[];
   const role = s.rng.weighted(roles, (r) => mix[r] ?? 0) ?? 'main';
   const pool = rolePool(s.chapter, role);
@@ -1216,9 +1445,13 @@ function spawnAround(s: State, id: string, min?: number, max?: number, angle?: n
 }
 
 /** 물건 하나를 인물 둘레 min~max 걸을 수 있는 곳에 놓는다 */
-function placeItem(s: State, kind: string, min: number, max: number): boolean {
+function placeItem(s: State, kind: string, min: number, max: number, stay?: number): boolean {
   const pt = spawnPoint(s, false, min, max);
-  if (pt) s.items.push({ x: pt[0], y: pt[1], kind });
+  if (pt) {
+    s.items.push({ x: pt[0], y: pt[1], kind, until: stay ? s.t + stay : undefined });
+    // 장소는 지도에 보이게 둘레를 밝힌다
+    if (ITEMS.get(kind)?.place) reveal(s, 3, { x: pt[0], y: pt[1] });
+  }
   return !!pt;
 }
 /** 정예: 단단한 놈을 네 배 체력으로(상자를 떨군다) */
@@ -1361,7 +1594,7 @@ function runEndless(s: State): void {
   if (s.t >= s.nextRandomAt) {
     s.nextRandomAt = s.t + E.event[0] + s.rng.next() * (E.event[1] - E.event[0]);
     // 처음 4분은 거센 이벤트(매복·쏟아짐·광폭·저주 상자)를 빼고 몸을 풀게 한다
-    const harsh = (e: TimelineEvent) => ['ambush', 'surge', 'frenzy'].includes(e.kind) || e.item === 'cursed' || e.kind === 'bigwave';
+    const harsh = (e: TimelineEvent) => ['ambush', 'surge', 'frenzy', 'rain'].includes(e.kind) || e.item === 'cursed' || e.kind === 'bigwave';
     const pool = [...STORY.random.events, ...STORY.timeline.events.filter((e) => ['swarm', 'ring', 'bigwave'].includes(e.kind))].filter((e) => m >= 4 || !harsh(e));
     const ev = s.rng.weighted(pool, (e) => ('weight' in e ? (e as { weight: number }).weight : 2))!;
     s.timeline.push({ ...ev, at: s.t });
@@ -1372,11 +1605,11 @@ function runEndless(s: State): void {
   }
   if (s.t >= s.nextShopAt) {
     s.nextShopAt = s.t + E.shop.every;
-    if (placeItem(s, 'merchant', 300, 650)) s.events.push({ type: 'event', text: '떠돌이 상인이 왔다 — 지도를 보라', kind: 'chest' });
+    if (placeItem(s, 'merchant', 300, 650, E.shop.stay)) s.events.push({ type: 'event', text: `떠돌이 상인이 수레를 세웠다 — 지도의 수레 표식, ${E.shop.stay}초 뒤 떠난다`, kind: 'chest' });
   }
   if (s.t >= s.nextDojoAt) {
     s.nextDojoAt = s.t + E.dojo.every;
-    if (placeItem(s, 'dojo', 300, 650)) s.events.push({ type: 'event', text: '수련소가 열렸다 — 금화로 무공을 사고·올리고·내려놓는다', kind: 'chest' });
+    if (placeItem(s, 'dojo', 300, 650, E.dojo.stay)) s.events.push({ type: 'event', text: `수련소가 열렸다 — 풀에 없는 무공을 사고·올리고·내려놓는다(${E.dojo.stay}초)`, kind: 'chest' });
   }
   // 보스 광폭화: 나온 뒤 enrage초 안에 못 잡으면 보스와 무리가 거세진다(점점 더)
   const b = s.boss;
@@ -1408,27 +1641,52 @@ function endlessBossDown(s: State, f: Foe): void {
 /** 무한 모드 · 판 위 경과·다음 보스까지 */
 export const endlessInfo = (s: State): { stage: number; bossIn: number; enraged: boolean } => ({ stage: s.stage, bossIn: Math.max(0, s.nextBossAt - s.t), enraged: !!s.boss?.enraged });
 
-/** 수련소(무한 모드): 새 무공·심법 사기 · 가진 것 올리기 · 가진 것 내려놓기(금화를 돌려받고 칸을 비운다) + 지나가기 */
+/** 판의 무공 풀 밖의 것(무한 모드 상인·수련소가 판다): 인물 것·공통 것 먼저, 가끔 다른 문파 무공(값 foreignPrice배) */
+function offPool(s: State, count: number, price: number): Choice[] {
+  const owned = new Set([...s.weapons.map((w) => w.id), ...s.passives.keys()]);
+  const free = (id: string) => !owned.has(id) && !s.pool?.has(id) && !s.banished.has(id);
+  const mine = [...WEAPONS.values()].filter((d) => !d.evolved && free(d.id) && (d.owner === s.hero.id || d.owner === '*')).map((d) => d.id);
+  const foreign = [...WEAPONS.values()].filter((d) => !d.evolved && free(d.id) && d.owner !== s.hero.id && d.owner !== '*').map((d) => d.id);
+  const passives = [...PASSIVES.keys()].filter(free);
+  const out: Choice[] = [];
+  const take = (arr: string[], mul: number) => {
+    if (!arr.length) return;
+    const id = arr.splice(s.rng.int(0, arr.length - 1), 1)[0];
+    const r = rarityOf(id);
+    const rk = r === 'legendary' ? 1.8 : r === 'epic' ? 1.45 : r === 'rare' ? 1.2 : 1;
+    out.push({ kind: 'buyskill', id, lv: Math.round(price * mul * rk) });
+  };
+  for (let i = 0; i < count; i++) {
+    const roll = s.rng.next();
+    if (roll < 0.22 && foreign.length) take(foreign, RULES.endless.foreignPrice);
+    else if (roll < 0.45 && passives.length) take(passives, 0.8);
+    else if (mine.length) take(mine, 1);
+    else take(passives, 0.8);
+  }
+  return out;
+}
+/** 수련소(무한 모드): 풀 밖의 새 무공·심법 사기 · 가진 것 올리기 · 가진 것 내려놓기(금화를 돌려받고 칸을 비운다) + 지나가기 */
 function offerSkillShop(s: State, count: number): void {
   const P = RULES.endless.dojoPrices;
   const m = s.t / 60;
-  const out: Choice[] = [];
-  const fresh = choicePool(s).filter((c) => c.lv === 1);
-  for (let i = 0; i < count && fresh.length; i++) {
-    const c = fresh.splice(s.rng.int(0, fresh.length - 1), 1)[0];
-    out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
+  const out: Choice[] = s.pool ? offPool(s, count, P.buy + P.buyPerMin * m) : [];
+  if (!s.pool) {
+    const fresh = choicePool(s).filter((c) => c.lv === 1);
+    for (let i = 0; i < count && fresh.length; i++) {
+      const c = fresh.splice(s.rng.int(0, fresh.length - 1), 1)[0];
+      out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
+    }
   }
-  const ups = choicePool(s).filter((c) => c.lv > 1 && c.kind === 'weapon');
-  if (ups.length) {
-    const c = ups[s.rng.int(0, ups.length - 1)];
-    out.push({ kind: 'upskill', id: c.id, lv: P.up + P.upPerLv * c.lv });
+  const ups = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length);
+  for (let i = 0; i < 2 && ups.length; i++) {
+    const w = ups.splice(s.rng.int(0, ups.length - 1), 1)[0];
+    out.push({ kind: 'upskill', id: w.id, lv: P.up + P.upPerLv * (w.lv + 1) });
   }
   if (s.weapons.length > 1) {
     const w = s.weapons[s.rng.int(1, s.weapons.length - 1)];
     out.push({ kind: 'sellskill', id: w.id, lv: P.sell + 10 * w.lv });
   }
-  out.push({ kind: 'leave', id: 'leave', lv: 0 });
-  s.pending = out;
+  s.pending = [...out, { kind: 'leave', id: 'leave', lv: 0 }];
 }
 
 function runTimeline(s: State): void {
@@ -1605,8 +1863,31 @@ function counter(s: State, x: number, y: number): void {
   s.events.push({ type: 'counter', x, y });
 }
 
-function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string): void {
-  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: 7, damage: damage * s.chapter.dmg * (f.dmgMul ?? 1), life: 4, color, pierce: 0 });
+const ELEMENT_STYLE: Record<string, ShotStyle> = { fire: 'flame', ice: 'shard', shock: 'spark', poison: 'bubble' };
+function shoot(s: State, f: Foe, a: number, speed: number, damage: number, color: string, mod: ShotMod = {}): void {
+  const style = mod.style ?? (f.element ? ELEMENT_STYLE[f.element] : undefined) ?? 'orb';
+  s.shots.push({ x: f.x, y: f.y - 20, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r: mod.r ?? (style === 'needle' || style === 'arrow' ? 5 : style === 'flame' ? 9 : 7), damage: damage * s.chapter.dmg * (f.dmgMul ?? 1), life: 4, color, pierce: 0, style, homing: mod.homing, zone: mod.zone });
+}
+/** 웅덩이(불·독·서리)를 놓는다 — 너무 많으면 오래된 것부터 */
+function addFoeZone(s: State, x: number, y: number, r: number, dps: number, seconds: number, element: string): void {
+  if (s.foeZones.length > 40) s.foeZones.shift();
+  s.foeZones.push({ x, y, r, dps, until: s.t + seconds, born: s.t, element, next: s.t + 0.3 });
+}
+/** 속성 그림자의 걸음: 불 자국 · 번개 치기 */
+function elementTick(s: State, f: Foe, d: number): void {
+  const el = f.element ? RULES.variants.element[f.element] : undefined;
+  if (!el) return;
+  if (el.trail && s.t >= (f.trailAt ?? 0)) {
+    f.trailAt = s.t + el.trail.every;
+    if (d < 700) addFoeZone(s, f.x, f.y, el.trail.radius, el.trail.dps * s.chapter.dmg, el.trail.seconds, f.element!);
+  }
+  if (el.zap && d < el.zap.range && s.t >= (f.zapAt ?? s.t + 1)) {
+    f.zapAt = s.t + el.zap.every * (0.8 + s.rng.next() * 0.4);
+    const p = s.player;
+    const a = Math.atan2(p.y - f.y, p.x - f.x);
+    s.slams.push({ x: f.x, y: f.y, r: 0, damage: el.zap.damage * s.chapter.dmg, born: s.t, at: s.t + el.zap.delay, color: '#ffe45a', shape: 'line', angle: a, len: d + 60, w: el.zap.width });
+  }
+  if (f.zapAt === undefined) f.zapAt = s.t + 1 + s.rng.next() * 2;
 }
 
 function useSkills(s: State, f: Foe, d: number): void {
@@ -1617,17 +1898,72 @@ function useSkills(s: State, f: Foe, d: number): void {
   const aim = Math.atan2(p.y - 20 - (f.y - 20), p.x - f.x);
   skills.forEach((k, i) => {
     if (s.t < f.skillAt[i]) return;
+    // 무한 모드 첫 보스(들)는 광역 예고 없이 — 보스를 aoeFrom번 넘긴 뒤부터
+    if (f.boss && s.mode === 'endless' && s.stage < RULES.endless.boss.aoeFrom && (k.kind === 'line' || k.kind === 'cone' || k.kind === 'ring' || k.kind === 'lob')) return;
     f.skillAt[i] = s.t + k.every * (f.def.rank ? 1 : 1 + s.rng.next() * 0.4) * (f.boss ? RULES.boss.haste ** (f.phase ?? 0) : 1);
+    if (s.events.length < 400) s.events.push({ type: 'foeAct', act: k.kind === 'aimed' || k.kind === 'fan' || k.kind === 'radial' ? 'shot' : 'warn', x: f.x, y: f.y });
     switch (k.kind) {
       case 'aimed':
-        shoot(s, f, aim, k.speed, k.damage, k.color);
+        shoot(s, f, aim, k.speed, k.damage, k.color, k);
         break;
       case 'fan':
-        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (k.count > 1 ? (j / (k.count - 1) - 0.5) * k.spread * 2 : 0), k.speed, k.damage, k.color);
+        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (k.count > 1 ? (j / (k.count - 1) - 0.5) * k.spread * 2 : 0), k.speed, k.damage, k.color, k);
         break;
       case 'radial':
-        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (j / k.count) * Math.PI * 2, k.speed, k.damage, k.color);
+        for (let j = 0; j < k.count; j++) shoot(s, f, aim + (j / k.count) * Math.PI * 2, k.speed, k.damage, k.color, k);
         break;
+      case 'line':
+        s.slams.push({ x: f.x, y: f.y - 10, r: 0, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'line', angle: Math.atan2(p.y - f.y, p.x - f.x), len: k.len, w: k.width });
+        break;
+      case 'cone':
+        if (k.range && d > k.range) {
+          f.skillAt[i] = s.t + 0.5;
+          break;
+        }
+        s.slams.push({ x: f.x, y: f.y, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'cone', angle: Math.atan2(p.y - f.y, p.x - f.x), w: k.spread });
+        break;
+      case 'ring':
+        if (k.range && d > k.range) {
+          f.skillAt[i] = s.t + 0.5;
+          break;
+        }
+        s.slams.push({ x: f.x, y: f.y, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, shape: 'ring', r0: k.radius - k.width });
+        break;
+      case 'lob':
+        s.slams.push({ x: p.x + (s.rng.next() - 0.5) * 60, y: p.y + (s.rng.next() - 0.5) * 60, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, zone: k.zone });
+        break;
+      case 'heal': {
+        let healed = 0;
+        for (const o of s.foes)
+          if (!o.dead && o !== f && o.hp < o.maxHp && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < k.radius ** 2) {
+            o.hp = Math.min(o.maxHp, o.hp + o.maxHp * k.amount);
+            healed++;
+          }
+        if (healed) s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#7dff9a', kind: 'heal', r: k.radius });
+        break;
+      }
+      case 'shield': {
+        for (const o of s.foes)
+          if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < k.radius ** 2) {
+            o.guardUntil = s.t + k.seconds;
+            o.guardMul = k.mul;
+          }
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: '#9fd8ff', kind: 'shield', r: k.radius });
+        break;
+      }
+      case 'burrow': {
+        if (d > 520) {
+          f.skillAt[i] = s.t + 1;
+          break;
+        }
+        const tx = p.x + (s.rng.next() - 0.5) * 80;
+        const ty = p.y + (s.rng.next() - 0.5) * 80;
+        if (!f.def.fly && !walkable(s.terrain, tx, ty)) break;
+        f.burrowUntil = s.t + k.delay;
+        s.events.push({ type: 'skill', x: f.x, y: f.y, color: k.color, kind: 'burrow' });
+        s.slams.push({ x: tx, y: ty, r: k.radius, damage: k.damage * s.chapter.dmg * (f.dmgMul ?? 1), born: s.t, at: s.t + k.delay, color: k.color, owner: f.uid });
+        break;
+      }
       case 'slam':
         for (let j = 0; j < (k.count ?? 1); j++) {
           const ox = j ? (s.rng.next() - 0.5) * 240 : 0;
@@ -1694,19 +2030,28 @@ function moveFoes(s: State): void {
       continue;
     }
     if (frozen || s.t < f.stunUntil) continue;
-    // 터지는 놈: 가까우면 멈춰 불이 붙었다가 터진다
-    if (f.def.move === 'burst') {
-      if (!f.fuseAt && d < 60) f.fuseAt = s.t + 0.6;
+    // 땅속(땅굴 그림자): 솟을 때까지 숨어 있다
+    if (f.burrowUntil) {
+      if (s.t < f.burrowUntil) continue;
+      f.burrowUntil = 0;
+    }
+    const va = variantOf(f);
+    if (va?.regen && f.hp < f.maxHp) f.hp = Math.min(f.maxHp, f.hp + f.maxHp * va.regen * DT);
+    // 자폭(터지는 놈·자폭병·자폭 변종): 가까우면 내달리고, 붙으면 멈춰 불이 붙었다가 터진다(둘레 그림자도 다친다)
+    const fz = f.def.move === 'burst' ? (f.def.fuse ?? { range: 60, delay: 0.6, radius: 80, damage: 1, sprint: 1 }) : fuseOf(f);
+    if (fz) {
+      if (!f.fuseAt && d < fz.range) f.fuseAt = s.t + fz.delay;
       if (f.fuseAt) {
         if (s.t >= f.fuseAt) {
-          s.events.push({ type: 'burst', x: f.x, y: f.y, r: 80 });
-          if (d < 80 + RULES.player.radius) hurtPlayer(s, f.damage);
+          if (d < fz.radius + RULES.player.radius && s.t >= p.dashUntil) hurtPlayer(s, f.damage * fz.damage);
+          else if (d < fz.radius + RULES.player.radius) counter(s, p.x, p.y);
           killFoe(s, f);
         }
         continue;
       }
     }
-    let speed = f.def.speed * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed') * affixSpeed(f) * (f.boss ? RULES.boss.speed ** (f.phase ?? 0) : 1);
+    elementTick(s, f, d);
+    let speed = f.def.speed * (va?.speed ?? 1) * (fz && d < 280 ? fz.sprint : 1) * (s.t < f.slowUntil ? 0.55 : 1) * effMul(s, 'foeSpeed') * affixSpeed(f) * (f.boss ? RULES.boss.speed ** (f.phase ?? 0) : 1);
     let ux = dx / d;
     let uy = dy / d;
     if (!f.def.fly) {
@@ -1778,6 +2123,9 @@ function moveFoes(s: State): void {
         if (p.hurtUntil !== before) {
           if (hasAffix(f, 'venom')) s.poisonUntil = s.t + 3;
           if (hasAffix(f, 'frosty')) s.chillUntil = s.t + (AFFIX.get('frosty')!.chill ?? 2);
+          const el = f.element ? RULES.variants.element[f.element] : undefined;
+          if (el?.chill) s.chillUntil = Math.max(s.chillUntil, s.t + el.chill);
+          if (el?.poison) s.poisonUntil = Math.max(s.poisonUntil, s.t + el.poison);
         }
         // 되갚기(카드 심법): 몸으로 친 적에게 그대로 돌려준다
         if (p.hurtUntil !== before && stat.thorns(s) > 0) damageFoe(s, f, stat.thorns(s));
@@ -1972,14 +2320,28 @@ function fireWeapons(s: State): void {
 function moveShots(s: State): void {
   const p = s.player;
   for (const sh of s.shots) {
+    // 따라오는 탄(그림자 탄): 인물 쪽으로 조금씩 꺾는다
+    if (sh.homing && !sh.weapon && sh.life > 1) {
+      const want = Math.atan2(p.y - 20 - sh.y, p.x - sh.x);
+      const cur = Math.atan2(sh.vy, sh.vx);
+      let da = want - cur;
+      while (da > Math.PI) da -= Math.PI * 2;
+      while (da < -Math.PI) da += Math.PI * 2;
+      const turn = Math.max(-sh.homing * DT, Math.min(sh.homing * DT, da));
+      const sp = Math.hypot(sh.vx, sh.vy);
+      sh.vx = Math.cos(cur + turn) * sp;
+      sh.vy = Math.sin(cur + turn) * sp;
+    }
     sh.x += sh.vx * DT;
     sh.y += sh.vy * DT;
     sh.life -= DT;
+    // 웅덩이는 맞힌 자리(인물·벽)에만 — 날아가다 사라진 탄은 남기지 않는다(판이 웅덩이로 덮이지 않게)
     if (sh.life <= 0) continue;
     // 벽은 적 탄과 불덩이·검광(관통이 적은 탄)을 막는다 — 검기(wave)는 넘는다
     const wallStop = !sh.weapon || WEAPONS.get(sh.weapon)?.kind === 'bolt';
     if (wallStop && blocksShot(s.terrain, sh.x, sh.y + 20)) {
       sh.life = 0;
+      if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
       continue;
     }
     if (!sh.weapon) {
@@ -1988,6 +2350,7 @@ function moveShots(s: State): void {
       if (d2 < rr * rr && s.t >= p.dashUntil) {
         hurtPlayer(s, sh.damage);
         sh.life = 0;
+        if (sh.zone) addFoeZone(s, sh.x, sh.y + 20, sh.zone.radius, sh.zone.dps * s.chapter.dmg, sh.zone.seconds, sh.zone.element ?? 'fire');
       } else if (s.t < p.dashUntil && p.dashMove && d2 < RULES.counter.shotRadius ** 2) {
         // 보법으로 탄을 아슬하게 비켰다
         sh.life = 0;
@@ -2016,17 +2379,69 @@ function moveShots(s: State): void {
     for (const f of s.foes) if (!f.dead && (f.x - z.x) ** 2 + (f.y - z.y) ** 2 < (z.r + f.def.radius) ** 2) damageFoe(s, f, z.damage, 0, z.element);
   }
   s.zones = s.zones.filter((z) => s.t < z.until);
-  // 예고한 원이 떨어진다
+  // 예고한 자리(원·띠·부채꼴·고리)가 떨어진다
   for (const m of s.slams) {
     if (s.t < m.at) continue;
-    if ((p.x - m.x) ** 2 + (p.y - m.y) ** 2 < (m.r + RULES.player.radius) ** 2) {
+    if (inSlam(m, p.x, p.y, RULES.player.radius)) {
       // 내려찍기가 떨어지는 순간 보법 중이면 간파
       if (s.t < p.dashUntil) counter(s, p.x, p.y);
       else hurtPlayer(s, m.damage);
     }
-    s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color });
+    if (m.hurtsFoes) for (const f of s.foes) if (!f.dead && inSlam(m, f.x, f.y, f.def.radius)) damageFoe(s, f, m.damage * 2, 20, undefined, true);
+    if (m.zone) addFoeZone(s, m.x, m.y, m.zone.radius, m.zone.dps * s.chapter.dmg, m.zone.seconds, m.zone.element ?? 'poison');
+    // 땅굴 그림자: 이 자리에서 솟는다
+    if (m.owner !== undefined) {
+      const f = s.foes.find((x) => x.uid === m.owner);
+      if (f && !f.dead) {
+        f.x = m.x;
+        f.y = m.y;
+        f.burrowUntil = 0;
+      }
+    }
+    s.events.push({ type: 'skill', x: m.x, y: m.y, fx: m.fx, color: m.color, kind: m.shape && m.shape !== 'circle' ? m.shape : m.zone ? 'zone' : undefined, angle: m.angle, r: m.r, len: m.len, w: m.w, r0: m.r0 });
   }
   s.slams = s.slams.filter((m) => s.t < m.at);
+  // 웅덩이: 안에 있으면 0.5초마다 — 겹쳐도 가장 센 것 하나만(보법 중엔 안 다친다)
+  if (s.t >= s.zoneHurtAt && s.t >= p.dashUntil) {
+    let worst: FoeZone | null = null;
+    for (const z of s.foeZones) if (s.t - z.born > 0.3 && (p.x - z.x) ** 2 + (p.y - z.y) ** 2 < (z.r + RULES.player.radius * 0.5) ** 2 && (!worst || z.dps > worst.dps)) worst = z;
+    if (worst) {
+      s.zoneHurtAt = s.t + 0.5;
+      hurtPlayer(s, worst.dps * 0.35, true);
+      if (worst.element === 'ice') s.chillUntil = Math.max(s.chillUntil, s.t + 1);
+    }
+  }
+  s.foeZones = s.foeZones.filter((z) => s.t < z.until);
+}
+
+/** 예고 모양 안인가(pad: 맞는 쪽 반지름) */
+export function inSlam(m: Slam, x: number, y: number, pad: number): boolean {
+  const dx = x - m.x;
+  const dy = y - m.y;
+  switch (m.shape ?? 'circle') {
+    case 'line': {
+      const c = Math.cos(m.angle ?? 0);
+      const sn = Math.sin(m.angle ?? 0);
+      const along = dx * c + dy * sn;
+      const perp = Math.abs(-dx * sn + dy * c);
+      return along > -pad && along < (m.len ?? 0) + pad && perp < (m.w ?? 20) + pad;
+    }
+    case 'cone': {
+      const d = Math.hypot(dx, dy);
+      if (d > m.r + pad) return false;
+      if (d < pad) return true;
+      let da = Math.atan2(dy, dx) - (m.angle ?? 0);
+      while (da > Math.PI) da -= Math.PI * 2;
+      while (da < -Math.PI) da += Math.PI * 2;
+      return Math.abs(da) < (m.w ?? 0.6) + pad / d;
+    }
+    case 'ring': {
+      const d = Math.hypot(dx, dy);
+      return d < m.r + pad && d > (m.r0 ?? 0) - pad;
+    }
+    default:
+      return dx * dx + dy * dy < (m.r + pad) ** 2;
+  }
 }
 
 function pickups(s: State): void {
@@ -2046,6 +2461,7 @@ function pickups(s: State): void {
     g.y += (uy + ux * swirl) * Math.min(v, d);
     if (d < 18) {
       g.taken = true;
+      if (s.events.length < 400) s.events.push({ type: 'gem' });
       gainXp(s, g.xp * effMul(s, 'xp'));
     }
   }
@@ -2059,6 +2475,22 @@ function pickups(s: State): void {
     s.gems = s.gems.filter((g) => !drop.has(g));
   }
   for (const it of s.items) {
+    const def0 = ITEMS.get(it.kind);
+    // 장소(상인·수련소): 떠날 때가 되면 사라지고, 들어가면 가게가 열린다(나갔다 다시 들어오면 또)
+    if (def0?.place) {
+      const inR = Math.hypot(p.x - it.x, p.y - it.y) < def0.place.radius;
+      if (it.until !== undefined && s.t >= it.until && !inR) {
+        it.taken = true;
+        s.events.push({ type: 'event', text: `${def0.place.name}이 떠났다`, kind: 'item' });
+        continue;
+      }
+      if (inR && !it.inside && !s.pending && (!it.hidden || isExplored(s, it.x, it.y))) {
+        it.inside = true;
+        it.hidden = false;
+        openPlace(s, it, def0);
+      } else if (!inR) it.inside = false;
+      continue;
+    }
     if (Math.hypot(p.x - it.x, p.y - it.y) > RULES.player.radius + 22) continue;
     it.taken = true;
     s.events.push({ type: 'item', kind: it.kind, x: it.x, y: it.y });
@@ -2066,6 +2498,40 @@ function pickups(s: State): void {
     if (def) for (const op of def.ops) applyOp(s, op, def, it);
   }
   s.items = s.items.filter((it) => !it.taken);
+}
+
+/** 장소에 들어갔다: 처음이면 진열을 정하고(ops), 남은 진열 + 지나가기를 띄운다 */
+function openPlace(s: State, it: Item, def: ItemDef): void {
+  if (!it.stock) {
+    s.pending = null;
+    for (const op of def.ops) applyOp(s, op, def, it);
+    const got = (s as { pending: Choice[] | null }).pending ?? [];
+    it.stock = got.filter((c) => c.kind !== 'leave');
+  }
+  s.shopItem = it;
+  s.pending = [...it.stock.map((c) => ({ ...c })), { kind: 'leave', id: 'leave', lv: 0 }];
+  s.events.push({ type: 'item', kind: it.kind, x: it.x, y: it.y });
+}
+/** 가게에서 하나 샀다: 진열에서 빼고 가게는 그대로(지나가기를 누를 때까지) */
+function afterBuy(s: State, c: Choice): void {
+  const it = s.shopItem;
+  if (it?.stock) {
+    const k = it.stock.findIndex((x) => x.kind === c.kind && x.id === c.id);
+    if (k >= 0) it.stock.splice(k, 1);
+    // 올리기는 다음 레벨 값으로 다시 건다
+    if (c.kind === 'upskill') {
+      const w = s.weapons.find((x) => x.id === c.id);
+      if (w && w.lv < WEAPONS.get(w.id)!.levels.length) it.stock.splice(Math.max(0, k), 0, { kind: 'upskill', id: w.id, lv: RULES.endless.dojoPrices.up + RULES.endless.dojoPrices.upPerLv * (w.lv + 1) });
+    }
+    if (c.kind === 'sellskill') it.stock = it.stock.filter((x) => x.id !== c.id);
+    s.pending = [...it.stock.map((x) => ({ ...x })), { kind: 'leave', id: 'leave', lv: 0 }];
+  } else s.pending = null;
+}
+/** 가게를 닫는다 */
+function closeShop(s: State): void {
+  s.pending = null;
+  s.shopItem = null;
+  if (s.queuedLevels > 0) offerChoices(s);
 }
 
 /** 줍는 것의 기본 동작 하나(items.json ops) */
@@ -2142,7 +2608,7 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
       if (!unlockRandom(s, op.count).length) s.gold += 30;
       break;
     case 'shop':
-      offerShop(s, op.count);
+      offerShop(s, op.count, op.skills ?? 0);
       break;
     case 'skillshop':
       offerSkillShop(s, op.count);
@@ -2172,13 +2638,17 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
   }
 }
 
-/** 떠돌이 상인: 물건 count개 + 지나가기 */
-function offerShop(s: State, count: number): void {
+/** 떠돌이 상인: 물건 count개(+ 무한 모드는 풀 밖 무공 skills개) + 지나가기 */
+function offerShop(s: State, count: number, skills = 0): void {
   const ids = Object.keys(ITEM_DATA.prices).filter((id) => ITEMS.has(id));
   const picks: Choice[] = [];
   while (picks.length < count && ids.length) {
     const id = ids.splice(s.rng.int(0, ids.length - 1), 1)[0];
-    picks.push({ kind: 'buy', id, lv: Math.round(ITEM_DATA.prices[id] * (1 + s.chapterIndex * 0.15)) });
+    picks.push({ kind: 'buy', id, lv: Math.round(ITEM_DATA.prices[id] * (1 + s.chapterIndex * 0.15 + (s.mode === 'endless' ? s.t / 600 : 0))) });
+  }
+  if (s.pool && skills) {
+    const P = RULES.endless.dojoPrices;
+    picks.push(...offPool(s, skills, (P.buy + P.buyPerMin * (s.t / 60)) * 1.1));
   }
   picks.push({ kind: 'leave', id: 'leave', lv: 0 });
   s.pending = picks;
@@ -2222,7 +2692,10 @@ function openChest(s: State): void {
 const LOCKABLE_SET = new Set(LOCKABLE);
 /** 새로 나올 수 있나: 잠기지 않았고, 봉인하지 않았고, 카드 것이면 무공록에 있어야 */
 function offerable(s: State, id: string): boolean {
-  if (s.locked?.has(id) || s.banished.has(id)) return false;
+  if (s.banished.has(id)) return false;
+  // 무한 모드: 판의 무공 풀 안에서만(잠김·무공록과 상관없이)
+  if (s.pool) return s.pool.has(id);
+  if (s.locked?.has(id)) return false;
   if (s.book && LOCKABLE_SET.has(id) && !s.book.has(id)) return false;
   return true;
 }
@@ -2245,7 +2718,7 @@ export function choicePool(s: State): Choice[] {
   if (s.weapons.length < s.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
-    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
+    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (s.pool || d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
   }
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
@@ -2312,17 +2785,32 @@ export function skip(s: State): boolean {
 export function choose(s: State, i: number): void {
   const c = s.pending?.[i];
   if (!c) return;
-  // 수련소(무한 모드)
-  if (c.kind === 'buyskill' || c.kind === 'upskill' || c.kind === 'sellskill') {
+  // 가게(상인·수련소): 사도 가게는 열린 채, 지나가기로 닫는다
+  if (c.kind === 'leave') return closeShop(s);
+  if (c.kind === 'buyskill' || c.kind === 'upskill' || c.kind === 'sellskill' || c.kind === 'buy') {
     if (c.kind !== 'sellskill' && s.gold < c.lv) return;
-    if (c.kind === 'buyskill') {
+    if (c.kind === 'buy') {
+      s.gold -= c.lv;
+      const def = ITEMS.get(c.id);
+      const keep = s.pending;
+      s.pending = null;
+      if (def) for (const op of def.ops) applyOp(s, op, def);
+      // 물건이 다른 창(상자·가게)을 띄우지 않았으면 가게로 돌아간다
+      if (s.pending && s.pending !== keep) return;
+    } else if (c.kind === 'buyskill') {
       if (WEAPONS.has(c.id)) {
         if (s.weapons.length >= s.slots.weapons) return;
         s.weapons.push({ id: c.id, lv: 1, next: s.t });
       } else {
         if (s.passives.size >= s.slots.passives) return;
         s.passives.set(c.id, 1);
+        if ((PASSIVES.get(c.id)?.stat ?? c.id) === 'vigor') {
+          s.player.maxHp += 10;
+          s.player.hp += 10;
+        }
       }
+      // 산 것은 이 판의 풀에 든다(레벨업에서 올릴 수 있게)
+      s.pool?.add(c.id);
       s.gold -= c.lv;
     } else if (c.kind === 'upskill') {
       const w = s.weapons.find((x) => x.id === c.id);
@@ -2333,20 +2821,10 @@ export function choose(s: State, i: number): void {
       s.weapons = s.weapons.filter((x) => x.id !== c.id);
       s.gold += c.lv;
     }
+    s.events.push({ type: 'buy', id: c.id, kind: c.kind });
+    if (s.shopItem) return afterBuy(s, c);
     s.pending = null;
     if (s.queuedLevels > 0) offerChoices(s);
-    return;
-  }
-  // 상인: 사거나(금화가 모자라면 그대로) 지나간다 — 레벨업 고르기와 따로 센다
-  if (c.kind === 'buy' || c.kind === 'leave') {
-    if (c.kind === 'buy') {
-      if (s.gold < c.lv) return;
-      s.gold -= c.lv;
-      const def = ITEMS.get(c.id);
-      s.pending = null;
-      if (def) for (const op of def.ops) applyOp(s, op, def);
-    } else s.pending = null;
-    if (!s.pending && s.queuedLevels > 0) offerChoices(s);
     return;
   }
   if (c.kind === 'weapon') {

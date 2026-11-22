@@ -1,0 +1,22 @@
+id: teum_rift_slime_death
+type: character-anim
+size: large
+character: teum_rift_slime
+chroma: magenta
+summary: '「틈」 갈라지는 진흙 쓰러짐 6프레임'
+depends_on: [teum_rift_slime_ref]
+reference: assets/source/teum_rift_slime_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "hit hard, recoiling"
+  2: "splitting into three small blobs that splash flat — beginning"
+  3: "splitting into three small blobs that splash flat — halfway"
+  4: "splitting into three small blobs that splash flat — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: beast, color: '#3a4a2a', accent: '#9ad04a' }

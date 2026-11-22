@@ -1,0 +1,18 @@
+id: place_teum_merchant
+type: character-anim
+size: large
+character: place_teum_merchant
+chroma: magenta
+summary: '「틈」 판 위 장소 그림 — 떠돌이 상인의 수레(2026-11-22 "줍는 것이 아니라 장소"). 게임이 들어가는 둘레·이름표·NPC를 따로 얹는다'
+depends_on: [place_teum_merchant_ref]
+reference: assets/source/place_teum_merchant_ref.png
+facing: left
+frames: 2
+fps: 2
+loop: true
+events: {}
+bbox_tolerance: 0.3
+frame_notes:
+  1: "a two-wheeled wooden peddler cart with a curved orange-red cloth canopy, shelves of small goods (bottles, scrolls, pouches, charms), a hanging paper lantern glowing warm, a small sign board with no letters; seen from slightly above (three-quarter top-down like the other props), filling most of the cell width, standing on the bottom of the cell, no people"
+  2: "exactly the same as frame 1, only the lantern glow a little brighter and a cloth corner moved by the wind"
+placeholder: { shape: object, color: '#6e4a2e', accent: '#f2a93b' }

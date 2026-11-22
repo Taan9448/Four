@@ -1,0 +1,16 @@
+id: ui_teum_buttons
+type: ui-parts
+frames: 6
+summary: >-
+  six button frames for "Teum", a dark wuxia survival game: wide rounded-rectangle plates seen straight from the front, made to be
+  stretched as a 9-slice border (the game cuts 30 px corners), the middle left plain for the label
+# 2026-11-22 사용자 "버튼 UI/UX가 너무 촌스럽다 — 디자인 전면 개편, 필요하면 디자인 프롬프트". 오면 CSS --btn-frame(border-image)으로 쓴다
+frame_notes:
+  1: 'PRIMARY normal: a wide plate (about 440 x 150 px) of deep red lacquer (#b3261e to #7a1610) with a thin bright gold inner line 10 px from the edge, small cloud-scroll gold ornaments in the four corners, a soft highlight along the top edge'
+  2: 'PRIMARY hover: exactly the same plate, same size and place, the lacquer brighter (#d8453a) and the gold line glowing'
+  3: 'PRIMARY pressed: the same plate, darker (#6a120c), the top highlight gone, as if pushed in'
+  4: 'GHOST normal: the same shape in dark smoked glass/ink (#1a1414 at 85%), a thin pale gold line, plain corners'
+  5: 'GHOST hover: the same as cell 4 with the gold line brighter and a faint warm glow inside the edge'
+  6: 'DISABLED: the same shape in flat dark grey (#2a2628), the line dull grey, no highlights'
+framing: 'All six plates share the same center, size and corner shape so the game can swap them without jumping. Straight front view, no perspective, no text, no icons, the middle area plain. Cells are separated; nothing touches the cell edges.'
+placeholder: { color: '#1a1414', accent: '#c9a25a' }

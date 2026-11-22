@@ -1227,68 +1227,69 @@
   ]
  },
  "endless": {
-  "$comment": "무한 모드(2026-11-21 사용자): 시간은 끝없이, 30분 안에 쓰러질 만큼 어려워진다. 1~2분마다 돌발 이벤트, 3분마다 보스(못 잡으면 2분 30초 뒤 광폭화). 무공 5칸·심법 5칸. 맵은 스토리 대비 넓이 약 5.6배. 상인·수련소가 때때로 나온다",
-  "name": "무한 — 끝없는 틈",
-  "line": "틈은 닫히지 않는다. 얼마나 버티는가.",
+  "$comment": "무한 모드(2026-11-21 사용자): 시간은 끝없이, 30분 안에 쓰러질 만큼 어려워진다. 1~2분마다 돌발 이벤트, 3분마다 보스(못 잡으면 2분 30초 뒤 광폭화). 무공 10칸·심법 10칸(2026-11-22). 맵은 스토리 대비 넓이 약 5.6배. 상인·수련소는 장소로 머문다. 2026-11-22 전용 맵 「갈라진 들」(style rift): 칸 네모 대신 둥근 균열·바위 조각·오염된 땅을 코드로 그리고, Codex 무늬(tex_teum_rift)가 오면 그 무늬로 채운다",
+  "name": "무한 — 갈라진 들",
+  "line": "하늘의 틈이 땅까지 내려앉았다. 균열은 닫히지 않는다 — 얼마나 버티는가.",
   "ground": "tile_teum_rift",
   "terrain": "terrain_teum_ch06",
   "cg": "cg_teum_ch10",
   "color": [
-   "#1a1424",
-   "#241c30",
-   "#3a3048",
-   "#5a1020"
+   "#17121f",
+   "#2a2036",
+   "#4a3d5c",
+   "#05030a"
   ],
   "terrainDef": {
    "w": 320,
    "h": 320,
    "steps": [
     {
+     "kind": "cracks",
+     "count": 44,
+     "len": [
+      24,
+      70
+     ],
+     "width": [
+      1.2,
+      3.0
+     ],
+     "branch": 0.07,
+     "bridgeEvery": 8,
+     "scar": 0.4
+    },
+    {
      "kind": "blobs",
-     "count": 260,
+     "count": 140,
      "r": [
-      1.5,
-      3.5
+      1.2,
+      2.8
      ]
-    },
-    {
-     "kind": "river",
-     "count": 4,
-     "width": 3,
-     "bridges": 10,
-     "dir": "v",
-     "type": "hazard"
-    },
-    {
-     "kind": "river",
-     "count": 3,
-     "width": 3,
-     "bridges": 9,
-     "dir": "h",
-     "type": "slow"
-    },
-    {
-     "kind": "pillars",
-     "count": 160,
-     "size": 2
     },
     {
      "kind": "slow",
-     "count": 60,
+     "count": 36,
      "r": [
       2,
-      5
+      4
      ]
+    },
+    {
+     "kind": "pillars",
+     "count": 60,
+     "size": 1
     }
    ],
-   "props": 700
-  }
+   "props": 600
+  },
+  "style": "rift",
+  "tex": "tex_teum_rift"
  },
  "prologue": [
   {
    "cg": "cg_teum_prologue_1",
    "fallback": "keyart_teum_lobby",
-   "text": "천외(天外)에서 돌아온 자가 있었다. 이름은 진하운 — 청운문 뒷마당에서 장작을 패는 잡역."
+   "text": "천외에서 돌아온 자가 있었다. 이름은 진하운 — 청운문 뒷마당에서 장작을 패는 잡역."
   },
   {
    "cg": "cg_teum_prologue_2",

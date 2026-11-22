@@ -98,3 +98,33 @@ create policy "gyeol_saves: update own" on public.gyeol_saves for update to auth
 - `data`는 「결」 저장(`gyeol.save`)에서 설정(소리·판정 보정·화면 품질 — 기기마다 다르다)을 뺀 것이다. 수련 Lv.은 이 기록(이김·PERFECT·마친 장)으로 셈하므로 함께 따라간다.
 - 로그인 상태는 「천외귀환」과 같은 브라우저 키를 써서, 같은 주소에서 한쪽에 로그인하면 다른 쪽도 로그인돼 있다(로그아웃도 함께).
 - 확인: 「결」 시작 화면에서 로그인 → Table Editor → `gyeol_saves`에 행 하나, 대결을 마칠 때마다 `rev`가 오른다.
+
+## 6. 「틈」 저장 테이블 (2026-11-22, 한 번만)
+
+「틈」(`/Four/teum/`)도 같은 프로젝트·같은 계정(아이디 그대로)으로 로그인한다. 기록은 이 표에 올리고, 수련 경험치는 「천외귀환」 `saves` 행에 더한다(「결」과 같은 길). 모양과 행 보안은 `saves`·`gyeol_saves`와 같다.
+SQL Editor → New query → 붙여 넣고 Run. 실행하기 전에는 「틈」에서 로그인해도 "계정 표(teum_saves)가 아직 없다"고 나오고 기록은 이 기기에만 저장된다.
+
+```sql
+create table if not exists public.teum_saves (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  data jsonb not null,
+  rev bigint not null default 1,
+  updated_at timestamptz not null default now(),
+  device text
+);
+
+alter table public.teum_saves enable row level security;
+
+drop policy if exists "teum_saves: read own" on public.teum_saves;
+create policy "teum_saves: read own" on public.teum_saves for select to authenticated using ((select auth.uid()) = user_id);
+
+drop policy if exists "teum_saves: insert own" on public.teum_saves;
+create policy "teum_saves: insert own" on public.teum_saves for insert to authenticated with check ((select auth.uid()) = user_id);
+
+drop policy if exists "teum_saves: update own" on public.teum_saves;
+create policy "teum_saves: update own" on public.teum_saves for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+```
+
+- `data`는 「틈」 저장(`teum.save`)에서 옵션(소리·키 설정·흔들림 — 기기마다 다르다)을 뺀 것: 저장 칸 셋·넘은 장·금화 지갑·연 비급·장터 수련·무한 모드 기록·도감.
+- 이 기기와 계정에 서로 다른 기록이 있으면 「어느 기록으로 할까」 창에서 고른다. 고르지 않은 쪽은 `teum.backup`(이 브라우저)에 한 벌 남는다.
+- 확인: 「틈」 들어가기 화면에서 로그인 → Table Editor → `teum_saves`에 행 하나, 장을 마칠 때마다 `rev`가 오른다.

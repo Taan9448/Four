@@ -1,0 +1,11 @@
+id: npc_teum_merchant_ref
+type: character-ref
+size: large
+character: npc_teum_merchant
+chroma: magenta
+summary: '「틈」 떠돌이 상인 기준 시트 — 판 위 장소(수레·수련소)에 서 있는 사람(2026-11-22 사용자 "상인·수련소는 장소 같은 느낌, 그 안의 NPC가 판다")'
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, standing friendly"
+  2: "full body, side view facing LEFT, same proportions"
+placeholder: { shape: humanoid, color: '#6b4f8a', accent: '#c9a25a' }

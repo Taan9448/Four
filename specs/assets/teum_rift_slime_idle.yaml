@@ -1,0 +1,19 @@
+id: teum_rift_slime_idle
+type: character-anim
+size: large
+character: teum_rift_slime
+chroma: magenta
+summary: '「틈」 갈라지는 진흙 대기 4프레임'
+depends_on: [teum_rift_slime_ref]
+reference: assets/source/teum_rift_slime_ref.png
+facing: left
+frames: 4
+fps: 6
+loop: true
+events: {}
+frame_notes:
+  1: "standing/hovering still, menacing"
+  2: "a small breath or pulse of its glow"
+  3: "the glow fades a little, a slight sway"
+  4: "back to the pose of frame 1"
+placeholder: { shape: beast, color: '#3a4a2a', accent: '#9ad04a' }

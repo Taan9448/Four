@@ -706,4 +706,49 @@ subjects:
     a phantom inside the rift between worlds that takes the shape of someone longed for: a tall knight made of grey mist and pale blue
     frost, wearing the ghostly outline of silver plate armor with a faded snowflake-and-sword crest, a long straight sword of frost,
     the face blurred and shifting like a reflection in moving water, wisps of mist trailing from the edges
+  teum_rift_bomber: >-
+    a fat rift grub the size of a dog that crawled out of the sky crack: segmented dark brown-red body swollen with a glowing orange core
+    visible through cracks in its back, many short legs, a round mouth of tiny teeth; it rushes at people and bursts like a firebomb
+  teum_rift_sniper: >-
+    a gaunt hooded shadow archer from the rift in tattered dark grey robes, a long black recurve bow taller than itself, a single glowing
+    amber eye under the hood, a quiver of thin dark arrows on the back; thin limbs, patient and still
+  teum_rift_shaman: >-
+    a hunched shadow shaman woman from the rift in layered dark green-black rags, a mask of pale bone with no mouth, a gnarled staff hung
+    with small bells and green glowing charms, wisps of green mist curling around her hands; she heals other shadows
+  teum_rift_warden: >-
+    a broad armored shadow guard from the rift carrying a huge rectangular tower shield of dark stone carved with pale blue runes, a short
+    spear, heavy dark plate armor, a faint blue shimmer over the shield face; slow and sturdy
+  teum_rift_brute: >-
+    a hulking hunched shadow brute twice as wide as a man, grey-black hide split by glowing orange cracks, a giant stone hammer resting on
+    one shoulder, a small head sunk between huge shoulders and enormous forearms
+  teum_rift_burrower: >-
+    a mole-like rift beast with a long armored snout, huge shovel digging claws, rough brown-grey plates along its back, small glowing red
+    eyes; it digs under the ground and bursts up beneath people
+  teum_rift_caster: >-
+    a floating shadow sorcerer in tattered crimson robes with no legs (the robe ends in curling smoke), long thin arms with burning
+    fingertips, a small ember ball orbiting the hand, a dark face with two glowing orange eyes
+  teum_rift_slime: >-
+    a lumpy blob of toxic rift mud the size of a dog, dark olive-green with bubbling light-green pockets, two small bone shards stuck in it,
+    a wide grinning mouth line; it splits into smaller blobs when struck down
+  teum_rift_stormcaller: >-
+    a small floating storm cloud of dark grey shadow with a single yellow eye in the middle, thin lightning crackling around its edges and
+    a few dangling dark tendrils below; an elemental creature, no body
+  teum_rift_frost: >-
+    a floating ghost of a drowned soldier wrapped in frozen pale blue mist, holding a broken icy spear, frost crystals growing on the
+    shoulders, the lower body fading into cold vapor, hollow pale eyes
+  npc_teum_merchant: >-
+    a wandering peddler of the rift road: a lean middle-aged man in a faded purple travelling robe, a wide woven straw hat (sakkat), a
+    wooden abacus tucked in the belt, small cloth pouches hanging everywhere, a cheerful sly smile
+  npc_teum_master: >-
+    a wandering martial arts master: an old man with a long white beard and a topknot, a simple white training robe with a black sash,
+    a plain wooden staff, calm stern eyes and a straight back
+  npc_teum_librarian: >-
+    the keeper of a travelling martial-arts library: a scholarly young woman with round glasses, dark hair in a neat bun with a brush
+    pin, a dark green scholar robe, ink-stained fingers, holding old bound scrolls
+  place_teum_merchant: >-
+    the wandering merchant's two-wheeled wooden cart: a curved orange-red cloth canopy, shelves of small goods (bottles, scrolls, pouches,
+    charms), a paper lantern glowing warm; an inanimate structure, no people
+  place_teum_dojo: >-
+    a small open wooden training pavilion: four red pillars and a dark tiled curved roof, a straw mat floor, a wooden training dummy and a
+    weapon rack; an inanimate structure, no people
 ```

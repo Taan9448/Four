@@ -1,0 +1,19 @@
+id: kyle_idle_up
+type: character-anim
+character: kyle
+summary: '「틈」 카일 뒷면 대기 4프레임 — 8방향 움직임(2026-11-22 사용자 "좌우만 있어 움직임이 어색 — 앞뒤·대각 추가"). 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [kyle_ref]
+reference: assets/source/kyle_ref.png
+facing: right
+frames: 4
+fps: 6
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(대기·옆 걷기와 같은 크기)
+frame_notes:
+  1: "BACK VIEW, standing still with the back to the viewer, calm breathing; the red longsword in the right hand and the round shield with the snowflake crest on the left arm; standing still, relaxed"
+  2: "BACK VIEW, standing still with the back to the viewer, calm breathing; the red longsword in the right hand and the round shield with the snowflake crest on the left arm; chest rises slightly with a breath"
+  3: "BACK VIEW, standing still with the back to the viewer, calm breathing; the red longsword in the right hand and the round shield with the snowflake crest on the left arm; shoulders settle, cloth sways a little"
+  4: "BACK VIEW, standing still with the back to the viewer, calm breathing; the red longsword in the right hand and the round shield with the snowflake crest on the left arm; back to the pose of frame 1"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#c0392b' }

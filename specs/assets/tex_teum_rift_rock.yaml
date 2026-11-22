@@ -1,0 +1,10 @@
+id: tex_teum_rift_rock
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: '「틈」 무한 모드 전용 맵 「갈라진 들」 무늬 — rock(이어 붙는 무늬, 2026-11-22 "맵이 블록 형태 — 틈에 맞는 전용 맵"). 게임이 둥근 균열·바위 모양 안을 이 무늬로 채운다'
+frame_notes:
+  1: 'Rough dark grey-violet stone surface seen from above, chipped facets with a few pale edges, small purple crystal specks. Seamless on all four sides.'
+placeholder: { color: '#17121f' }
