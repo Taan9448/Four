@@ -160,6 +160,10 @@ export interface ChapterDef {
   gimmick?: Gimmick;
   /** 안개 속 비석 이야기 조각 */
   steles?: string[];
+  /** 그리기 결(2026-11-22): rift = 무한 모드 전용 「갈라진 들」(둥근 균열·바위 조각, 칸 네모 없이) */
+  style?: 'rift';
+  /** 무늬 시트(Codex tex_teum_rift: 땅 · 오염된 땅 · 바위 · 허공) */
+  tex?: string;
 }
 export interface Gimmick {
   kind: 'gust' | 'howl' | 'lava' | 'whiteout' | 'hands' | 'eclipse' | 'alley' | 'palm' | 'meteor' | 'collapse';
@@ -224,8 +228,12 @@ export const RULES = rulesRaw as unknown as {
     spawn: { base: number; perMin: number; max: number };
     event: [number, number];
     boss: { every: number; first: number; enrage: number; speed: number; damage: number; skillHaste: number; crowdSpeed: number; crowdSpawn: number; rampEvery: number; ramp: number; hpBase: number; hpPerStage: number; escort: [number, number]; dmgBase: number; dmgPerStage: number };
-    shop: { every: number };
-    dojo: { every: number };
+    shop: { every: number; stay: number; skills: number };
+    dojo: { every: number; stay: number };
+    /** 판마다 무작위 무공 풀(2026-11-22 사용자 "무한 모드 무공은 무작위 — 직업 특성은 지킨다, 40~50종") */
+    pool: { weapons: [number, number]; passives: [number, number]; own: number };
+    /** 상인·수련소가 파는 다른 문파 무공 값 배율 */
+    foreignPrice: number;
     chests: number;
     secrets: { steles: number; altars: number; merchants: number };
     dojoPrices: { buy: number; buyPerMin: number; up: number; upPerLv: number; sell: number };
@@ -236,7 +244,7 @@ export const RULES = rulesRaw as unknown as {
 export const STORY = storyRaw as unknown as {
   difficulties: Difficulty[];
   /** 무한 모드 판(2026-11-21) */
-  endless: { name: string; line: string; ground: string; terrain: string; cg: string; color: [string, string, string, string]; terrainDef: TerrainDef };
+  endless: { name: string; line: string; ground: string; terrain: string; cg: string; color: [string, string, string, string]; terrainDef: TerrainDef; style?: 'rift'; tex?: string };
   timeline: { length: number; spawns: SpawnDef[]; events: TimelineEvent[]; chests: { every: number; min: number; max: number }; jitter: { seconds: number; roles: Record<string, Role[]> } };
   chapters: ChapterDef[];
   /** 돌발 이벤트(2026-11-21): 장마다 시드로 몇 개를 고른다 */
@@ -274,7 +282,7 @@ export type ItemOp =
   | { op: 'push'; radius: number; force: number; damage: number }
   | { op: 'slowfoes'; seconds: number; mul: number }
   | { op: 'unlock'; count: number }
-  | { op: 'shop'; count: number }
+  | { op: 'shop'; count: number; skills?: number }
   | { op: 'ambush'; count: number }
   | { op: 'chest' }
   | { op: 'stele' }
@@ -290,6 +298,8 @@ export interface ItemDef {
   drop?: number;
   prop?: number;
   event?: boolean;
+  /** 장소(2026-11-22 "상인·수련소는 줍는 것이 아니라 장소 — 안에 NPC가 판다"): 들어가면(radius) 가게가 열리고 사라지지 않는다. stay초 뒤 떠난다(무한 모드) */
+  place?: { radius: number; npc: string; name: string };
   ops: ItemOp[];
 }
 const ITEM_DATA = itemsRaw as unknown as { items: ItemDef[]; blessing: ItemOp[]; prices: Record<string, number> };
@@ -410,6 +420,10 @@ export interface Item {
   hidden?: boolean;
   /** 비석 번호(장 안에서 0부터) */
   stele?: number;
+  /** 장소: 떠나는 때 · 진열(처음 들어갈 때 정한다) · 지금 안에 있나 */
+  until?: number;
+  stock?: Choice[];
+  inside?: boolean;
 }
 export interface Prop {
   x: number;
@@ -454,7 +468,8 @@ export type FxEvent =
   | { type: 'stele'; id: string; text: string }
   | { type: 'warn'; cells: number[]; at: number }
   | { type: 'terrain' }
-  | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string };
+  | { type: 'dash'; kind: string; x: number; y: number; x2: number; y2: number; color: string }
+  | { type: 'buy'; id: string; kind: string };
 export interface Choice {
   /** buy: 떠돌이 상인 물건(lv = 값) · leave: 그냥 지나간다 · buyskill/upskill/sellskill: 수련소(무한 모드, lv = 값/돌려받는 금화) */
   kind: 'weapon' | 'passive' | 'food' | 'gold' | 'buy' | 'leave' | 'buyskill' | 'upskill' | 'sellskill';
@@ -614,6 +629,10 @@ export interface State {
   nextRandomAt: number;
   nextShopAt: number;
   nextDojoAt: number;
+  /** 무한 모드 무공 풀(판마다 무작위 40~50종) — 레벨업은 이 안에서만, 상인·수련소는 이 밖의 것을 판다. 스토리는 null */
+  pool: Set<string> | null;
+  /** 지금 열린 가게(장소) */
+  shopItem: Item | null;
 }
 
 export function xpNeed(level: number): number {
@@ -724,7 +743,36 @@ export interface ChapterOpts {
 function endlessChapter(): ChapterDef {
   const E = STORY.endless;
   const base = STORY.chapters[0];
-  return { ...base, id: 'endless', name: E.name, line: E.line, ground: E.ground, terrain: E.terrain, cg: E.cg, color: E.color, terrainDef: E.terrainDef, hp: 1, dmg: 1, rate: 1, extra: [], gimmick: undefined, steles: [], roles: { ...base.roles } };
+  return { ...base, id: 'endless', name: E.name, line: E.line, ground: E.ground, terrain: E.terrain, cg: E.cg, color: E.color, terrainDef: E.terrainDef, style: E.style, tex: E.tex, hp: 1, dmg: 1, rate: 1, extra: [], gimmick: undefined, steles: [], roles: { ...base.roles } };
+}
+/** 무한 모드 무공 풀: 인물 것(own 비율)과 공통 것을 섞은 무공 + 심법 — 시작 무공·각성 짝은 꼭 넣는다 */
+export function endlessPool(hero: HeroDef, rng: Rng): Set<string> {
+  const P = RULES.endless.pool;
+  const nW = rng.int(P.weapons[0], P.weapons[1]);
+  const nP = rng.int(P.passives[0], P.passives[1]);
+  const shuffle = <T>(a: T[]): T[] => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = rng.int(0, i);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const base = [...WEAPONS.values()].filter((d) => !d.evolved && d.id !== hero.start);
+  const own = shuffle(base.filter((d) => d.owner === hero.id || hero.pool.includes(d.id)).map((d) => d.id));
+  const common = shuffle(base.filter((d) => d.owner === '*' && !hero.pool.includes(d.id)).map((d) => d.id));
+  const nOwn = Math.min(own.length, Math.round((nW - 1) * P.own));
+  const weapons = [hero.start, ...own.slice(0, nOwn), ...common.slice(0, nW - 1 - nOwn)];
+  const out = new Set(weapons);
+  // 각성 짝 심법은 먼저(각성을 노릴 수 있게), 나머지는 무작위
+  for (const id of weapons) {
+    const ev = WEAPONS.get(id)?.evolve;
+    if (ev && out.size < nW + nP) out.add(ev.with);
+  }
+  for (const id of shuffle([...PASSIVES.keys()])) {
+    if (out.size >= nW + nP) break;
+    out.add(id);
+  }
+  return out;
 }
 /** 무한 모드를 연다 */
 export function createEndless(seed: string, hero: string, opts: Omit<ChapterOpts, 'endless' | 'startAt' | 'rebuild'> = {}): State {
@@ -828,8 +876,13 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     nextRandomAt: RULES.endless.event[0],
     nextShopAt: RULES.endless.shop.every,
     nextDojoAt: RULES.endless.dojo.every,
+    pool: null,
+    shopItem: null,
   };
-  if (endless) s.chestAt = RULES.endless.chests;
+  if (endless) {
+    s.chestAt = RULES.endless.chests;
+    s.pool = endlessPool(hero, rng.fork('pool'));
+  }
   if (opts.unlocked) {
     const open = new Set(opts.unlocked);
     s.locked = new Set(LOCKABLE.filter((id) => !open.has(id)));
@@ -1216,9 +1269,13 @@ function spawnAround(s: State, id: string, min?: number, max?: number, angle?: n
 }
 
 /** 물건 하나를 인물 둘레 min~max 걸을 수 있는 곳에 놓는다 */
-function placeItem(s: State, kind: string, min: number, max: number): boolean {
+function placeItem(s: State, kind: string, min: number, max: number, stay?: number): boolean {
   const pt = spawnPoint(s, false, min, max);
-  if (pt) s.items.push({ x: pt[0], y: pt[1], kind });
+  if (pt) {
+    s.items.push({ x: pt[0], y: pt[1], kind, until: stay ? s.t + stay : undefined });
+    // 장소는 지도에 보이게 둘레를 밝힌다
+    if (ITEMS.get(kind)?.place) reveal(s, 3, { x: pt[0], y: pt[1] });
+  }
   return !!pt;
 }
 /** 정예: 단단한 놈을 네 배 체력으로(상자를 떨군다) */
@@ -1372,11 +1429,11 @@ function runEndless(s: State): void {
   }
   if (s.t >= s.nextShopAt) {
     s.nextShopAt = s.t + E.shop.every;
-    if (placeItem(s, 'merchant', 300, 650)) s.events.push({ type: 'event', text: '떠돌이 상인이 왔다 — 지도를 보라', kind: 'chest' });
+    if (placeItem(s, 'merchant', 300, 650, E.shop.stay)) s.events.push({ type: 'event', text: `떠돌이 상인이 수레를 세웠다 — 지도의 金 표식, ${E.shop.stay}초 뒤 떠난다`, kind: 'chest' });
   }
   if (s.t >= s.nextDojoAt) {
     s.nextDojoAt = s.t + E.dojo.every;
-    if (placeItem(s, 'dojo', 300, 650)) s.events.push({ type: 'event', text: '수련소가 열렸다 — 금화로 무공을 사고·올리고·내려놓는다', kind: 'chest' });
+    if (placeItem(s, 'dojo', 300, 650, E.dojo.stay)) s.events.push({ type: 'event', text: `수련소가 열렸다 — 풀에 없는 무공을 사고·올리고·내려놓는다(${E.dojo.stay}초)`, kind: 'chest' });
   }
   // 보스 광폭화: 나온 뒤 enrage초 안에 못 잡으면 보스와 무리가 거세진다(점점 더)
   const b = s.boss;
@@ -1408,27 +1465,52 @@ function endlessBossDown(s: State, f: Foe): void {
 /** 무한 모드 · 판 위 경과·다음 보스까지 */
 export const endlessInfo = (s: State): { stage: number; bossIn: number; enraged: boolean } => ({ stage: s.stage, bossIn: Math.max(0, s.nextBossAt - s.t), enraged: !!s.boss?.enraged });
 
-/** 수련소(무한 모드): 새 무공·심법 사기 · 가진 것 올리기 · 가진 것 내려놓기(금화를 돌려받고 칸을 비운다) + 지나가기 */
+/** 판의 무공 풀 밖의 것(무한 모드 상인·수련소가 판다): 인물 것·공통 것 먼저, 가끔 다른 문파 무공(값 foreignPrice배) */
+function offPool(s: State, count: number, price: number): Choice[] {
+  const owned = new Set([...s.weapons.map((w) => w.id), ...s.passives.keys()]);
+  const free = (id: string) => !owned.has(id) && !s.pool?.has(id) && !s.banished.has(id);
+  const mine = [...WEAPONS.values()].filter((d) => !d.evolved && free(d.id) && (d.owner === s.hero.id || d.owner === '*')).map((d) => d.id);
+  const foreign = [...WEAPONS.values()].filter((d) => !d.evolved && free(d.id) && d.owner !== s.hero.id && d.owner !== '*').map((d) => d.id);
+  const passives = [...PASSIVES.keys()].filter(free);
+  const out: Choice[] = [];
+  const take = (arr: string[], mul: number) => {
+    if (!arr.length) return;
+    const id = arr.splice(s.rng.int(0, arr.length - 1), 1)[0];
+    const r = rarityOf(id);
+    const rk = r === 'legendary' ? 1.8 : r === 'epic' ? 1.45 : r === 'rare' ? 1.2 : 1;
+    out.push({ kind: 'buyskill', id, lv: Math.round(price * mul * rk) });
+  };
+  for (let i = 0; i < count; i++) {
+    const roll = s.rng.next();
+    if (roll < 0.22 && foreign.length) take(foreign, RULES.endless.foreignPrice);
+    else if (roll < 0.45 && passives.length) take(passives, 0.8);
+    else if (mine.length) take(mine, 1);
+    else take(passives, 0.8);
+  }
+  return out;
+}
+/** 수련소(무한 모드): 풀 밖의 새 무공·심법 사기 · 가진 것 올리기 · 가진 것 내려놓기(금화를 돌려받고 칸을 비운다) + 지나가기 */
 function offerSkillShop(s: State, count: number): void {
   const P = RULES.endless.dojoPrices;
   const m = s.t / 60;
-  const out: Choice[] = [];
-  const fresh = choicePool(s).filter((c) => c.lv === 1);
-  for (let i = 0; i < count && fresh.length; i++) {
-    const c = fresh.splice(s.rng.int(0, fresh.length - 1), 1)[0];
-    out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
+  const out: Choice[] = s.pool ? offPool(s, count, P.buy + P.buyPerMin * m) : [];
+  if (!s.pool) {
+    const fresh = choicePool(s).filter((c) => c.lv === 1);
+    for (let i = 0; i < count && fresh.length; i++) {
+      const c = fresh.splice(s.rng.int(0, fresh.length - 1), 1)[0];
+      out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
+    }
   }
-  const ups = choicePool(s).filter((c) => c.lv > 1 && c.kind === 'weapon');
-  if (ups.length) {
-    const c = ups[s.rng.int(0, ups.length - 1)];
-    out.push({ kind: 'upskill', id: c.id, lv: P.up + P.upPerLv * c.lv });
+  const ups = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length);
+  for (let i = 0; i < 2 && ups.length; i++) {
+    const w = ups.splice(s.rng.int(0, ups.length - 1), 1)[0];
+    out.push({ kind: 'upskill', id: w.id, lv: P.up + P.upPerLv * (w.lv + 1) });
   }
   if (s.weapons.length > 1) {
     const w = s.weapons[s.rng.int(1, s.weapons.length - 1)];
     out.push({ kind: 'sellskill', id: w.id, lv: P.sell + 10 * w.lv });
   }
-  out.push({ kind: 'leave', id: 'leave', lv: 0 });
-  s.pending = out;
+  s.pending = [...out, { kind: 'leave', id: 'leave', lv: 0 }];
 }
 
 function runTimeline(s: State): void {
@@ -2059,6 +2141,22 @@ function pickups(s: State): void {
     s.gems = s.gems.filter((g) => !drop.has(g));
   }
   for (const it of s.items) {
+    const def0 = ITEMS.get(it.kind);
+    // 장소(상인·수련소): 떠날 때가 되면 사라지고, 들어가면 가게가 열린다(나갔다 다시 들어오면 또)
+    if (def0?.place) {
+      const inR = Math.hypot(p.x - it.x, p.y - it.y) < def0.place.radius;
+      if (it.until !== undefined && s.t >= it.until && !inR) {
+        it.taken = true;
+        s.events.push({ type: 'event', text: `${def0.place.name}이 떠났다`, kind: 'item' });
+        continue;
+      }
+      if (inR && !it.inside && !s.pending && (!it.hidden || isExplored(s, it.x, it.y))) {
+        it.inside = true;
+        it.hidden = false;
+        openPlace(s, it, def0);
+      } else if (!inR) it.inside = false;
+      continue;
+    }
     if (Math.hypot(p.x - it.x, p.y - it.y) > RULES.player.radius + 22) continue;
     it.taken = true;
     s.events.push({ type: 'item', kind: it.kind, x: it.x, y: it.y });
@@ -2066,6 +2164,40 @@ function pickups(s: State): void {
     if (def) for (const op of def.ops) applyOp(s, op, def, it);
   }
   s.items = s.items.filter((it) => !it.taken);
+}
+
+/** 장소에 들어갔다: 처음이면 진열을 정하고(ops), 남은 진열 + 지나가기를 띄운다 */
+function openPlace(s: State, it: Item, def: ItemDef): void {
+  if (!it.stock) {
+    s.pending = null;
+    for (const op of def.ops) applyOp(s, op, def, it);
+    const got = (s as { pending: Choice[] | null }).pending ?? [];
+    it.stock = got.filter((c) => c.kind !== 'leave');
+  }
+  s.shopItem = it;
+  s.pending = [...it.stock.map((c) => ({ ...c })), { kind: 'leave', id: 'leave', lv: 0 }];
+  s.events.push({ type: 'item', kind: it.kind, x: it.x, y: it.y });
+}
+/** 가게에서 하나 샀다: 진열에서 빼고 가게는 그대로(지나가기를 누를 때까지) */
+function afterBuy(s: State, c: Choice): void {
+  const it = s.shopItem;
+  if (it?.stock) {
+    const k = it.stock.findIndex((x) => x.kind === c.kind && x.id === c.id);
+    if (k >= 0) it.stock.splice(k, 1);
+    // 올리기는 다음 레벨 값으로 다시 건다
+    if (c.kind === 'upskill') {
+      const w = s.weapons.find((x) => x.id === c.id);
+      if (w && w.lv < WEAPONS.get(w.id)!.levels.length) it.stock.splice(Math.max(0, k), 0, { kind: 'upskill', id: w.id, lv: RULES.endless.dojoPrices.up + RULES.endless.dojoPrices.upPerLv * (w.lv + 1) });
+    }
+    if (c.kind === 'sellskill') it.stock = it.stock.filter((x) => x.id !== c.id);
+    s.pending = [...it.stock.map((x) => ({ ...x })), { kind: 'leave', id: 'leave', lv: 0 }];
+  } else s.pending = null;
+}
+/** 가게를 닫는다 */
+function closeShop(s: State): void {
+  s.pending = null;
+  s.shopItem = null;
+  if (s.queuedLevels > 0) offerChoices(s);
 }
 
 /** 줍는 것의 기본 동작 하나(items.json ops) */
@@ -2142,7 +2274,7 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
       if (!unlockRandom(s, op.count).length) s.gold += 30;
       break;
     case 'shop':
-      offerShop(s, op.count);
+      offerShop(s, op.count, op.skills ?? 0);
       break;
     case 'skillshop':
       offerSkillShop(s, op.count);
@@ -2172,13 +2304,17 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
   }
 }
 
-/** 떠돌이 상인: 물건 count개 + 지나가기 */
-function offerShop(s: State, count: number): void {
+/** 떠돌이 상인: 물건 count개(+ 무한 모드는 풀 밖 무공 skills개) + 지나가기 */
+function offerShop(s: State, count: number, skills = 0): void {
   const ids = Object.keys(ITEM_DATA.prices).filter((id) => ITEMS.has(id));
   const picks: Choice[] = [];
   while (picks.length < count && ids.length) {
     const id = ids.splice(s.rng.int(0, ids.length - 1), 1)[0];
-    picks.push({ kind: 'buy', id, lv: Math.round(ITEM_DATA.prices[id] * (1 + s.chapterIndex * 0.15)) });
+    picks.push({ kind: 'buy', id, lv: Math.round(ITEM_DATA.prices[id] * (1 + s.chapterIndex * 0.15 + (s.mode === 'endless' ? s.t / 600 : 0))) });
+  }
+  if (s.pool && skills) {
+    const P = RULES.endless.dojoPrices;
+    picks.push(...offPool(s, skills, (P.buy + P.buyPerMin * (s.t / 60)) * 1.1));
   }
   picks.push({ kind: 'leave', id: 'leave', lv: 0 });
   s.pending = picks;
@@ -2222,7 +2358,10 @@ function openChest(s: State): void {
 const LOCKABLE_SET = new Set(LOCKABLE);
 /** 새로 나올 수 있나: 잠기지 않았고, 봉인하지 않았고, 카드 것이면 무공록에 있어야 */
 function offerable(s: State, id: string): boolean {
-  if (s.locked?.has(id) || s.banished.has(id)) return false;
+  if (s.banished.has(id)) return false;
+  // 무한 모드: 판의 무공 풀 안에서만(잠김·무공록과 상관없이)
+  if (s.pool) return s.pool.has(id);
+  if (s.locked?.has(id)) return false;
   if (s.book && LOCKABLE_SET.has(id) && !s.book.has(id)) return false;
   return true;
 }
@@ -2245,7 +2384,7 @@ export function choicePool(s: State): Choice[] {
   if (s.weapons.length < s.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
-    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
+    for (const d of WEAPONS.values()) if (!d.evolved && !owned.has(d.id) && offerable(s, d.id) && (s.pool || d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
   }
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
@@ -2312,17 +2451,32 @@ export function skip(s: State): boolean {
 export function choose(s: State, i: number): void {
   const c = s.pending?.[i];
   if (!c) return;
-  // 수련소(무한 모드)
-  if (c.kind === 'buyskill' || c.kind === 'upskill' || c.kind === 'sellskill') {
+  // 가게(상인·수련소): 사도 가게는 열린 채, 지나가기로 닫는다
+  if (c.kind === 'leave') return closeShop(s);
+  if (c.kind === 'buyskill' || c.kind === 'upskill' || c.kind === 'sellskill' || c.kind === 'buy') {
     if (c.kind !== 'sellskill' && s.gold < c.lv) return;
-    if (c.kind === 'buyskill') {
+    if (c.kind === 'buy') {
+      s.gold -= c.lv;
+      const def = ITEMS.get(c.id);
+      const keep = s.pending;
+      s.pending = null;
+      if (def) for (const op of def.ops) applyOp(s, op, def);
+      // 물건이 다른 창(상자·가게)을 띄우지 않았으면 가게로 돌아간다
+      if (s.pending && s.pending !== keep) return;
+    } else if (c.kind === 'buyskill') {
       if (WEAPONS.has(c.id)) {
         if (s.weapons.length >= s.slots.weapons) return;
         s.weapons.push({ id: c.id, lv: 1, next: s.t });
       } else {
         if (s.passives.size >= s.slots.passives) return;
         s.passives.set(c.id, 1);
+        if ((PASSIVES.get(c.id)?.stat ?? c.id) === 'vigor') {
+          s.player.maxHp += 10;
+          s.player.hp += 10;
+        }
       }
+      // 산 것은 이 판의 풀에 든다(레벨업에서 올릴 수 있게)
+      s.pool?.add(c.id);
       s.gold -= c.lv;
     } else if (c.kind === 'upskill') {
       const w = s.weapons.find((x) => x.id === c.id);
@@ -2333,20 +2487,10 @@ export function choose(s: State, i: number): void {
       s.weapons = s.weapons.filter((x) => x.id !== c.id);
       s.gold += c.lv;
     }
+    s.events.push({ type: 'buy', id: c.id, kind: c.kind });
+    if (s.shopItem) return afterBuy(s, c);
     s.pending = null;
     if (s.queuedLevels > 0) offerChoices(s);
-    return;
-  }
-  // 상인: 사거나(금화가 모자라면 그대로) 지나간다 — 레벨업 고르기와 따로 센다
-  if (c.kind === 'buy' || c.kind === 'leave') {
-    if (c.kind === 'buy') {
-      if (s.gold < c.lv) return;
-      s.gold -= c.lv;
-      const def = ITEMS.get(c.id);
-      s.pending = null;
-      if (def) for (const op of def.ops) applyOp(s, op, def);
-    } else s.pending = null;
-    if (!s.pending && s.queuedLevels > 0) offerChoices(s);
     return;
   }
   if (c.kind === 'weapon') {

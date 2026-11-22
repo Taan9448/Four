@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { AFFIXES, CHAPTER_LENGTH, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { AFFIXES, CHAPTER_LENGTH, STORY, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -21,6 +21,20 @@ export interface Art {
   skills: Anim[];
   /** 무공 종류별 이펙트(fx_teum_<종류>, 2026-11-21) — 흰색·회색으로 그려져 오고, 무공 색을 입혀 그린다. 오기 전에는 코드로 그린다 */
   kinds: Map<string, SpriteAsset>;
+  /** 장소(상인 수레·수련소 정자, 2026-11-22): place_teum_<id> 한 장 그림 + NPC(<npc>_idle) — 오기 전엔 코드로 그린다 */
+  places: Map<string, { building: Anim; npc: Anim }>;
+  /** 무한 모드 맵 무늬(tex_teum_rift 4칸: 땅 · 오염된 땅 · 바위 · 허공) */
+  tex: Anim;
+}
+
+/** 판 도중 처음 나온 그림자(무한 모드는 보스를 넘길 때마다 다른 장 무리가 나온다)의 그림을 그때 불러온다 —
+ *  2026-11-22 사용자 "무한 모드 적이 구 형태로 나온다": 장 1 무리만 미리 불러 두어서 다른 장 그림자가 동그라미로 그려졌다 */
+export function ensureFoeArt(art: Art, id: string): void {
+  if (art.foes.has(id)) return;
+  const f = FOES.get(id);
+  art.foes.set(id, { idle: null, death: null });
+  if (!f) return;
+  void Promise.all([loadSprite(`${f.sprite}_idle`), real(`${f.sprite}_death`)]).then(([i, d]) => art.foes.set(id, { idle: i, death: d })).catch(() => undefined);
 }
 export interface Options {
   shake: boolean;
@@ -87,7 +101,20 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       if (a) kinds.set(k, a);
     }),
   );
-  return { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds };
+  const places = new Map<string, { building: Anim; npc: Anim }>();
+  await Promise.all(
+    [...ITEMS.values()]
+      .filter((d) => d.place)
+      .map(async (d) => {
+        const [building, npc] = await Promise.all([real(`place_teum_${d.id}`), real(`${d.place!.npc}_idle`)]);
+        places.set(d.id, { building, npc });
+      }),
+  );
+  const tex = s.chapter.tex ? await real(s.chapter.tex) : null;
+  const out: Art = { hero: { idle, walk, death }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex };
+  // 무한 모드: 다른 장 무리도 뒤에서 미리 불러 둔다(기다리지 않는다)
+  if (s.mode === 'endless') for (const c of STORY.chapters) for (const id of [...Object.values(c.roles).flat(), c.roles.mid, c.roles.boss]) ensureFoeArt(out, id);
+  return out;
 }
 
 interface Mark {
@@ -442,6 +469,7 @@ const hash = (x: number, y: number) => ((x * 73856093) ^ (y * 19349663)) >>> 0;
 
 /** 지형: 바닥(타일·무늬) → 위험·느림·다리 → 벽(윗면 + 앞면으로 높이). 지형 조각 그림(terrain_teum_<장>)이 오면 칸마다 그 그림 */
 function drawTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: number, y0: number, x1: number, y1: number, now: number): void {
+  if (s.chapter.style === 'rift') return drawRiftTerrain(ctx, s, art, x0, y0, x1, y1, now);
   const t = s.terrain;
   const [floor, floor2, wall, hazard] = s.chapter.color;
   ctx.fillStyle = floor;
@@ -532,10 +560,225 @@ function drawTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: numb
         ctx.fillRect(x + (h % 14), y - 12 + ((h >> 4) % 14), 8, 4);
       }
     }
-  // 안개: 아직 가 보지 않은 칸은 지형이 보이지 않는다(그림자·물건은 보인다)
-  ctx.fillStyle = 'rgba(6,5,10,0.9)';
+  drawFog(ctx, s, cx0, cy0, cx1, cy1);
+}
+
+/** 안개: 아직 가 보지 않은 칸은 지형이 보이지 않는다(그림자·물건은 보인다).
+ *  2026-11-22 "맵이 블록 같다" — 칸마다 네모로 덮지 않고, 칸 하나를 점 하나로 한 작은 그림을 부드럽게 늘려 가장자리가 번지게 */
+const fogCanvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+function drawFog(ctx: CanvasRenderingContext2D, s: State, cx0: number, cy0: number, cx1: number, cy1: number): void {
+  const t = s.terrain;
+  if (!fogCanvas) return;
+  const gx0 = Math.max(0, cx0 - 2);
+  const gy0 = Math.max(0, cy0 - 2);
+  const gx1 = Math.min(t.w - 1, cx1 + 2);
+  const gy1 = Math.min(t.h - 1, cy1 + 2);
+  const fw = gx1 - gx0 + 1;
+  const fh = gy1 - gy0 + 1;
+  if (fogCanvas.width !== fw || fogCanvas.height !== fh) {
+    fogCanvas.width = fw;
+    fogCanvas.height = fh;
+  }
+  const fc = fogCanvas.getContext('2d')!;
+  const img = fc.createImageData(fw, fh);
+  let any = false;
+  for (let y = 0; y < fh; y++)
+    for (let x = 0; x < fw; x++) {
+      if (s.explored[(gy0 + y) * t.w + gx0 + x]) continue;
+      any = true;
+      const k = (y * fw + x) * 4;
+      img.data[k] = 6;
+      img.data[k + 1] = 5;
+      img.data[k + 2] = 10;
+      img.data[k + 3] = 236;
+    }
+  if (!any) return;
+  fc.putImageData(img, 0, 0);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  // 점 하나 = 칸 하나(부드럽게 늘려 칸 사이가 번진다), 벽 윗면 14px도 덮게 위로 조금
+  ctx.drawImage(fogCanvas, gx0 * CELL, gy0 * CELL - 10, fw * CELL, fh * CELL);
+  ctx.restore();
+}
+
+/** 무한 모드 전용 「갈라진 들」(2026-11-22 "맵이 블록 형태 — 틈에 맞는 전용 맵"): 칸 네모를 그리지 않고
+ *  균열(허공)은 겹친 원으로 둥글게 파고 붉은 테가 숨 쉬듯 빛나며, 바위 조각은 칸마다 흔들린 다각형 + 보랏빛 수정,
+ *  오염된 땅은 번진 얼룩. Codex 무늬(tex_teum_rift)가 오면 그 무늬로 채운다 */
+const texPat = new Map<CanvasImageSource, CanvasPattern | null>();
+function pattern(ctx: CanvasRenderingContext2D, img: CanvasImageSource | undefined | null): CanvasPattern | null {
+  if (!img) return null;
+  if (!texPat.has(img)) texPat.set(img, ctx.createPattern(img, 'repeat'));
+  return texPat.get(img) ?? null;
+}
+function drawRiftTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: number, y0: number, x1: number, y1: number, now: number): void {
+  const t = s.terrain;
+  const [floor, floor2, wall, voidC] = s.chapter.color;
+  const tex = art.tex?.images ?? [];
+  ctx.fillStyle = pattern(ctx, tex[0]) ?? floor;
+  ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  const cx0 = Math.max(0, Math.floor(x0 / CELL) - 1);
+  const cy0 = Math.max(0, Math.floor(y0 / CELL) - 1);
+  const cx1 = Math.min(t.w - 1, Math.ceil(x1 / CELL) + 1);
+  const cy1 = Math.min(t.h - 1, Math.ceil(y1 / CELL) + 1);
+  const C = (cx: number, cy: number) => (cx < 0 || cy < 0 || cx >= t.w || cy >= t.h ? T.Wall : t.cells[cy * t.w + cx]);
+  // 땅 무늬: 먼지 낀 실금·작은 돌(무늬 그림이 없을 때)
+  if (!tex[0]) {
+    ctx.strokeStyle = hexA(floor2, 0.9);
+    ctx.lineWidth = 1.2;
+    for (let cy = cy0; cy <= cy1; cy++)
+      for (let cx = cx0; cx <= cx1; cx++) {
+        const h = hash(cx, cy);
+        if (C(cx, cy) !== T.Floor || h % 4) continue;
+        const x = cx * CELL + (h % 30);
+        const y = cy * CELL + ((h >> 6) % 30);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 6 + (h % 9), y + ((h >> 3) % 7) - 3);
+        ctx.lineTo(x + 10 + (h % 13), y + ((h >> 9) % 9) - 2);
+        ctx.stroke();
+      }
+  }
+  // 오염된 땅(느림): 번진 얼룩
+  ctx.fillStyle = pattern(ctx, tex[1]) ?? 'rgba(86,40,92,0.42)';
+  ctx.beginPath();
   for (let cy = cy0; cy <= cy1; cy++)
-    for (let cx = cx0; cx <= cx1; cx++) if (!s.explored[cy * t.w + cx]) ctx.fillRect(cx * CELL, cy * CELL - 14, CELL, CELL + 14);
+    for (let cx = cx0; cx <= cx1; cx++) {
+      if (C(cx, cy) !== T.Slow) continue;
+      const h = hash(cx, cy);
+      const r = CELL * (0.62 + (h % 30) / 100);
+      ctx.moveTo((cx + 0.5) * CELL + r, (cy + 0.5) * CELL);
+      ctx.arc((cx + 0.5) * CELL + ((h % 9) - 4), (cy + 0.5) * CELL + (((h >> 4) % 9) - 4), r, 0, Math.PI * 2);
+    }
+  ctx.fill();
+  // 균열(허공): 붉은 테(겹친 큰 원) → 검은 속(작은 원) → 안의 별빛
+  const pulse = 0.55 + 0.25 * Math.sin(now / 520);
+  const hz: [number, number, number][] = [];
+  for (let cy = cy0; cy <= cy1; cy++) for (let cx = cx0; cx <= cx1; cx++) if (C(cx, cy) === T.Hazard || C(cx, cy) === T.Bridge) hz.push([cx, cy, hash(cx, cy)]);
+  // 이웃한 균열 칸끼리 굵은 둥근 선으로 이어 칸 모양이 보이지 않게(매끈한 갈라짐)
+  const isHz = (cx: number, cy: number) => {
+    const c = C(cx, cy);
+    return c === T.Hazard || c === T.Bridge;
+  };
+  const tube = (w: number) => {
+    ctx.lineWidth = w;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (const [cx, cy] of hz) {
+      const x = (cx + 0.5) * CELL;
+      const y = (cy + 0.5) * CELL;
+      let linked = false;
+      for (const [dx, dy] of [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [1, -1],
+      ]) {
+        if (!isHz(cx + dx, cy + dy)) continue;
+        // 대각선은 옆 둘이 다 막혔을 때만(두꺼워지지 않게)
+        if (dx && dy && (isHz(cx + dx, cy) || isHz(cx, cy + dy))) continue;
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + dx * CELL, y + dy * CELL);
+        linked = true;
+      }
+      if (!linked) {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 0.1, y);
+      }
+    }
+    ctx.stroke();
+  };
+  ctx.save();
+  ctx.strokeStyle = `rgba(214,44,72,${0.6 * pulse})`;
+  ctx.shadowColor = 'rgba(255,60,90,0.9)';
+  ctx.shadowBlur = 16;
+  tube(CELL * 1.25);
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle = 'rgba(120,20,50,0.9)';
+  tube(CELL * 1.05);
+  ctx.strokeStyle = pattern(ctx, tex[3]) ?? voidC;
+  tube(CELL * 0.88);
+  ctx.restore();
+  for (const [cx, cy, h] of hz) {
+    if (h % 3) continue;
+    const tw = 0.4 + 0.6 * Math.abs(Math.sin(now / (300 + (h % 400)) + h));
+    ctx.fillStyle = h % 2 ? `rgba(255,120,150,${tw})` : `rgba(200,170,255,${tw})`;
+    ctx.fillRect(cx * CELL + (h % 34) + 3, cy * CELL + ((h >> 5) % 34) + 3, 2, 2);
+  }
+  // 떠오르는 불티(균열에서 위로)
+  for (const [cx, cy, h] of hz) {
+    if (h % 7) continue;
+    const k = ((now / 1000 + (h % 100) / 37) % 2.4) / 2.4;
+    ctx.fillStyle = `rgba(255,110,130,${0.7 * (1 - k)})`;
+    ctx.fillRect(cx * CELL + (h % 30) + Math.sin(k * 6 + h) * 4, cy * CELL + 20 - k * 60, 2, 3);
+  }
+  // 부서진 돌다리: 균열을 가로지르는 판돌(가로·세로 방향은 이웃 균열을 보고)
+  for (const [cx, cy, h] of hz) {
+    if (C(cx, cy) !== T.Bridge) continue;
+    const x = cx * CELL;
+    const y = cy * CELL;
+    const across = isHz(cx - 1, cy) && isHz(cx + 1, cy) ? 'v' : 'h';
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(x - 2, y + 4, CELL + 4, CELL);
+    for (let k = 0; k < 3; k++) {
+      ctx.fillStyle = k % 2 ? '#5a5060' : '#4a4252';
+      const j = ((h >> (k * 4)) % 5) - 2;
+      if (across === 'h') ctx.fillRect(x - 4 + j, y + 2 + k * 12, CELL + 8, 10);
+      else ctx.fillRect(x + 2 + k * 12, y - 4 + j, 10, CELL + 8);
+    }
+  }
+  // 바위 조각(벽): 흔들린 다각형 — 앞면(그림자) 먼저, 윗면, 가끔 보랏빛 수정
+  const rock = pattern(ctx, tex[2]);
+  for (let cy = cy0; cy <= cy1; cy++)
+    for (let cx = cx0; cx <= cx1; cx++) {
+      if (C(cx, cy) !== T.Wall) continue;
+      const h = hash(cx, cy);
+      const x = (cx + 0.5) * CELL;
+      const y = (cy + 0.5) * CELL;
+      const n = 6;
+      const pts: [number, number][] = [];
+      for (let k = 0; k < n; k++) {
+        const a = (k / n) * Math.PI * 2 + (h % 10) / 10;
+        const r = CELL * (0.58 + (((h >> (k * 3)) & 7) / 7) * 0.18);
+        pts.push([x + Math.cos(a) * r, y + Math.sin(a) * r * 0.85]);
+      }
+      if (C(cx, cy + 1) !== T.Wall) {
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        ctx.ellipse(x, y + CELL * 0.5, CELL * 0.6, CELL * 0.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = shade(wall, -0.4);
+        ctx.beginPath();
+        pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.fillStyle = rock ?? wall;
+      ctx.beginPath();
+      pts.forEach(([px, py], i) => (i ? ctx.lineTo(px, py - 12) : ctx.moveTo(px, py - 12)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = shade(wall, 0.25);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pts[3][0], pts[3][1] - 12);
+      ctx.lineTo(pts[4][0], pts[4][1] - 12);
+      ctx.lineTo(pts[5][0], pts[5][1] - 12);
+      ctx.stroke();
+      if (h % 9 === 0) {
+        const g = 0.6 + 0.4 * Math.sin(now / 700 + h);
+        ctx.fillStyle = `rgba(178,120,255,${0.75 * g})`;
+        ctx.beginPath();
+        ctx.moveTo(x - 4, y - 14);
+        ctx.lineTo(x, y - 34 - (h % 8));
+        ctx.lineTo(x + 5, y - 14);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+  drawFog(ctx, s, cx0, cy0, cx1, cy1);
 }
 
 /** 줍는 것 그림 칸: items.json icon [시트, 칸] — 시트 이름은 Art 열쇠(icons·items·items2) */
@@ -546,6 +789,151 @@ function drawItemIcon(ctx: CanvasRenderingContext2D, art: Art, kind: ItemKind | 
   if (!img) return false;
   ctx.drawImage(img, x - size / 2, y - size / 2, size, size);
   return true;
+}
+
+/** 장소의 바닥: 들어가는 둘레(점선 고리 + 옅은 깔개) — 안에 서 있으면 밝게 */
+function drawPlaceGround(ctx: CanvasRenderingContext2D, it: { x: number; y: number }, color: string, r: number, now: number, inside: boolean): void {
+  ctx.save();
+  ctx.fillStyle = hexA(color, inside ? 0.16 : 0.08);
+  ctx.beginPath();
+  ctx.ellipse(it.x, it.y, r, r * 0.62, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.setLineDash([10, 8]);
+  ctx.lineDashOffset = -now / 60;
+  ctx.strokeStyle = hexA(color, inside ? 0.85 : 0.5);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // 깔개(돗자리)
+  ctx.fillStyle = 'rgba(120,84,52,0.55)';
+  ctx.strokeStyle = 'rgba(60,38,22,0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(it.x, it.y + 6, r * 0.42, r * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+/** 장소 건물 + NPC: Codex 그림이 오면 그것(place_teum_<id>, <npc>_idle), 오기 전에는 수레·정자와 사람 그림자를 코드로 */
+function drawPlace(ctx: CanvasRenderingContext2D, art: Art, s: State, it: { x: number; y: number; kind: string; until?: number }, pd: { radius: number; name: string }, now: number): void {
+  const a = art.places.get(it.kind);
+  const dojo = it.kind === 'dojo';
+  const col = ITEMS.get(it.kind)?.color ?? '#f2a93b';
+  const bimg = a?.building ? frame(a.building, now) : null;
+  if (a?.building && bimg) drawSpriteAt(ctx, a.building, bimg, it.x, it.y + 10, (pd.radius * 2.1) / a.building.meta.frameW, false);
+  else if (dojo) {
+    // 정자: 기둥 넷 · 기와 지붕 · 깃발
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(it.x - 70, it.y - 4, 140, 10);
+    ctx.fillStyle = '#5b3a24';
+    for (const dx of [-62, -22, 22, 62]) ctx.fillRect(it.x + dx - 4, it.y - 92, 8, 92);
+    ctx.fillStyle = '#2b3442';
+    ctx.beginPath();
+    ctx.moveTo(it.x - 96, it.y - 88);
+    ctx.quadraticCurveTo(it.x - 40, it.y - 104, it.x, it.y - 132);
+    ctx.quadraticCurveTo(it.x + 40, it.y - 104, it.x + 96, it.y - 88);
+    ctx.lineTo(it.x + 80, it.y - 98);
+    ctx.lineTo(it.x - 80, it.y - 98);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#c9a25a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // 현판
+    ctx.fillStyle = '#1b1410';
+    ctx.fillRect(it.x - 30, it.y - 96, 60, 18);
+    ctx.strokeStyle = '#c9a25a';
+    ctx.strokeRect(it.x - 30, it.y - 96, 60, 18);
+    ctx.fillStyle = '#f3d79a';
+    ctx.font = '700 12px "Noto Serif KR", serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('수련소', it.x, it.y - 83);
+    // 목인(나무 인형)
+    ctx.fillStyle = '#8a5a34';
+    ctx.fillRect(it.x + 40, it.y - 40, 10, 40);
+    ctx.fillRect(it.x + 33, it.y - 30, 24, 5);
+  } else {
+    // 수레: 바퀴 둘 · 천막 · 짐
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(it.x, it.y + 2, 70, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#6e4a2e';
+    ctx.fillRect(it.x - 58, it.y - 36, 116, 24);
+    ctx.fillStyle = '#c0703a';
+    ctx.beginPath();
+    ctx.moveTo(it.x - 64, it.y - 36);
+    ctx.quadraticCurveTo(it.x, it.y - 96, it.x + 64, it.y - 36);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#f3d79a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    for (let i = 0; i < 4; i++) {
+      ctx.fillStyle = ['#d8b060', '#8fb37a', '#b06a6a', '#7a8fb3'][i];
+      ctx.fillRect(it.x - 46 + i * 24, it.y - 52, 18, 16);
+    }
+    ctx.fillStyle = '#2a1c12';
+    for (const dx of [-40, 40]) {
+      ctx.beginPath();
+      ctx.arc(it.x + dx, it.y - 8, 13, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = '#a67c4e';
+    for (const dx of [-40, 40]) {
+      ctx.beginPath();
+      ctx.arc(it.x + dx, it.y - 8, 9, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+  // NPC: 건물 앞에 선 사람(그림이 오면 숨 쉬는 동작)
+  const nx = it.x + (dojo ? -24 : -4);
+  const ny = it.y + 16;
+  const nimg = a?.npc ? frame(a.npc, now, it.x) : null;
+  if (a?.npc && nimg) drawSpriteAt(ctx, a.npc, nimg, nx, ny, 64 / a.npc.meta.frameH, s.player.x < nx);
+  else {
+    const br = Math.sin(now / 420 + it.x) * 1.2;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(nx, ny, 13, 4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = dojo ? '#e8e2d4' : '#6b4f8a';
+    ctx.beginPath();
+    ctx.moveTo(nx - 12, ny);
+    ctx.lineTo(nx - 8, ny - 30 - br);
+    ctx.lineTo(nx + 8, ny - 30 - br);
+    ctx.lineTo(nx + 12, ny);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#e9c9a4';
+    ctx.beginPath();
+    ctx.arc(nx, ny - 37 - br, 7, 0, Math.PI * 2);
+    ctx.fill();
+    // 삿갓(상인) · 상투(사범)
+    ctx.fillStyle = dojo ? '#2a2a2a' : '#c9a25a';
+    ctx.beginPath();
+    if (dojo) ctx.arc(nx, ny - 45 - br, 4, 0, Math.PI * 2);
+    else {
+      ctx.moveTo(nx - 15, ny - 40 - br);
+      ctx.lineTo(nx, ny - 52 - br);
+      ctx.lineTo(nx + 15, ny - 40 - br);
+    }
+    ctx.fill();
+  }
+  // 이름표 + 떠나기까지
+  const left = it.until !== undefined ? Math.max(0, it.until - s.t) : null;
+  const label = left !== null ? `${pd.name} · ${Math.floor(left / 60)}:${String(Math.floor(left % 60)).padStart(2, '0')}` : pd.name;
+  ctx.font = '700 13px "Noto Serif KR", serif';
+  ctx.textAlign = 'center';
+  const w = ctx.measureText(label).width + 18;
+  const ty = it.y - (dojo ? 150 : 112);
+  ctx.fillStyle = 'rgba(14,10,8,0.82)';
+  ctx.fillRect(it.x - w / 2, ty - 15, w, 22);
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(it.x - w / 2, ty - 15, w, 22);
+  ctx.fillStyle = left !== null && left < 15 ? '#ff8a6a' : '#f3ead8';
+  ctx.fillText(label, it.x, ty);
 }
 
 export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now: number, W: number, H: number, zoom: number, dpr: number, opt: Options): void {
@@ -646,7 +1034,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.fill();
   }
   for (const it of s.items) {
-    if (!inView(it.x, it.y) || (it.hidden && !isExplored(s, it.x, it.y))) continue;
+    if (!inView(it.x, it.y, 200) || (it.hidden && !isExplored(s, it.x, it.y))) continue;
+    const pd = ITEMS.get(it.kind)?.place;
+    if (pd) {
+      drawPlaceGround(ctx, it, ITEMS.get(it.kind)!.color, pd.radius, now, Math.hypot(p.x - it.x, p.y - it.y) < pd.radius);
+      continue;
+    }
     const bob = Math.sin(now / 200 + it.x) * 3;
     // 빛기둥: 멀리서도 보이게
     const evItem = ITEMS.get(it.kind)?.event;
@@ -738,8 +1131,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       },
     });
   }
+  for (const it of s.items) {
+    const pd = ITEMS.get(it.kind)?.place;
+    if (!pd || !inView(it.x, it.y, 200) || (it.hidden && !isExplored(s, it.x, it.y))) continue;
+    draws.push({ y: it.y, fn: () => drawPlace(ctx, art, s, it, pd, now) });
+  }
   for (const f of s.foes) {
     if (!inView(f.x, f.y, 140)) continue;
+    ensureFoeArt(art, f.def.id);
     const a = art.foes.get(f.def.id)?.idle;
     draws.push({
       y: f.y,
@@ -1350,16 +1749,28 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
   ctx.restore();
 }
 
-/** 아래 상태창: 무공 6칸 · 심법 6칸(아이콘 · Lv 점) */
-function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: number, y: number, slot: number): void {
+/** 아래 상태창: 무공 칸 · 심법 칸(아이콘 · Lv 점). 무한 모드 10+10칸처럼 한 줄에 안 들어가면 두 줄(위 무공 · 아래 심법) */
+export const statusLayout = (s: State, W: number): { slot: number; rows: 1 | 2; w: number } => {
+  const n = s.slots.weapons + s.slots.passives;
+  for (const slot of W < 640 ? [26, 22] : [34, 30]) {
+    const w = n * (slot + 4) + 14;
+    if (w <= W - 24) return { slot, rows: 1, w };
+  }
+  const slot = Math.max(20, Math.min(34, Math.floor((W - 24 - 14) / Math.max(s.slots.weapons, s.slots.passives)) - 4));
+  return { slot, rows: 2, w: Math.max(s.slots.weapons, s.slots.passives) * (slot + 4) + 14 };
+};
+function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: number, y0: number, slot: number, rows: 1 | 2 = 1): void {
   const slots = s.slots;
   const gap = 4;
-  const totalW = (slots.weapons + slots.passives) * (slot + gap) + 14;
+  const totalW = rows === 1 ? (slots.weapons + slots.passives) * (slot + gap) + 14 : Math.max(slots.weapons, slots.passives) * (slot + gap) + 6;
+  const rowH = slot + 18;
+  const top = y0 - (rows - 1) * rowH;
   ctx.fillStyle = 'rgba(8,8,12,0.72)';
-  ctx.fillRect(x - 8, y - 8, totalW, slot + 22);
+  ctx.fillRect(x - 8, top - 8, totalW, rows * rowH + 4);
   ctx.strokeStyle = 'rgba(243,234,216,0.25)';
-  ctx.strokeRect(x - 8.5, y - 8.5, totalW, slot + 22);
-  const cellAt2 = (i: number, extra: number) => x + i * (slot + gap) + extra;
+  ctx.strokeRect(x - 8.5, top - 8.5, totalW, rows * rowH + 4);
+  let y = y0;
+  const cellAt2 = (i: number, extra: number) => (rows === 2 && i >= slots.weapons ? x + (i - slots.weapons) * (slot + gap) : x + i * (slot + gap) + extra);
   const drawSlot = (cx: number, id: string | null, lv: number, max: number, color: string, label: string, evolved: boolean) => {
     ctx.fillStyle = id ? 'rgba(30,26,36,0.95)' : 'rgba(30,26,36,0.4)';
     ctx.fillRect(cx, y, slot, slot);
@@ -1395,6 +1806,7 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
       ctx.fillRect(cx + slot / 2 - (max * 6) / 2 + i * 6, y + slot + 4, 4, 4);
     }
   };
+  if (rows === 2) y = top;
   for (let i = 0; i < slots.weapons; i++) {
     const w = s.weapons[i];
     const d = w ? WEAPONS.get(w.id)! : null;
@@ -1407,6 +1819,7 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
       ctx.lineWidth = 1;
     }
   }
+  if (rows === 2) y = y0;
   const ps = [...s.passives.entries()];
   for (let i = 0; i < slots.passives; i++) {
     const [id, lv] = ps[i] ?? [null, 0];
@@ -1414,7 +1827,8 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     drawSlot(cellAt2(slots.weapons + i, 14), id, lv, pd?.max ?? 5, '#c8b4ff', pd?.name[0] ?? '', false);
   }
   ctx.fillStyle = 'rgba(243,234,216,0.35)';
-  ctx.fillRect(cellAt2(slots.weapons, 4), y + 4, 2, slot - 8);
+  if (rows === 1) ctx.fillRect(cellAt2(slots.weapons, 4), y + 4, 2, slot - 8);
+  y = top;
   // 속성 세트(같은 효과 무공 수) — 켜진 것은 금빛
   const ec = elementCounts(s);
   const sets = (Object.keys(RULES.sets).filter((k) => k !== '$comment') as (keyof typeof RULES.sets)[]).filter((k) => ec[k]);
@@ -1506,9 +1920,8 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
   const mapSize = opt.map === 'large' ? Math.min(220, W * 0.3) : Math.min(150, W * 0.28);
   drawMinimap(ctx, s, v, W - mapSize - 12, 20, mapSize, now);
   // 아래 상태창
-  const slot = W < 640 ? 26 : 34;
-  const barW = (s.slots.weapons + s.slots.passives) * (slot + 4) + 14;
-  drawStatusBar(ctx, s, art, Math.max(10, (W - barW) / 2), H - slot - 22, slot);
+  const lay = statusLayout(s, W);
+  drawStatusBar(ctx, s, art, Math.max(10, (W - lay.w) / 2), H - lay.slot - 22, lay.slot, lay.rows);
   // 알림 띠
   if (v.banner) {
     const age = now - v.banner.born;

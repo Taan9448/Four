@@ -19,7 +19,9 @@ export type TerrainStep =
   | { kind: 'caves'; fill: number; steps: number }
   | { kind: 'islands'; count: number; r: [number, number]; bridge: number }
   | { kind: 'slow'; count: number; r: [number, number] }
-  | { kind: 'pillars'; count: number; size?: number };
+  | { kind: 'pillars'; count: number; size?: number }
+  /** 틈(2026-11-22 무한 모드 전용 맵): 갈래 치며 구불구불 뻗는 허공 균열 — 폭이 들쭉날쭉, 가끔 부서진 돌다리, 둘레는 오염된 땅(느림) */
+  | { kind: 'cracks'; count: number; len: [number, number]; width: [number, number]; branch: number; bridgeEvery: number; scar: number };
 export interface TerrainDef {
   w: number;
   h: number;
@@ -154,6 +156,36 @@ export function buildTerrain(def: TerrainDef, rng: Rng): Terrain {
           tmp.set(next);
         }
         for (let i = 0; i < w * h; i++) if (tmp[i]) cells[i] = T.Wall;
+        break;
+      }
+      case 'cracks': {
+        const crack = (x0: number, y0: number, a0: number, len: number, wid: number, depth: number) => {
+          let x = x0;
+          let y = y0;
+          let a = a0;
+          let sinceBridge = 0;
+          for (let t = 0; t < len; t++) {
+            a += (rng.next() - 0.5) * 0.7;
+            x += Math.cos(a);
+            y += Math.sin(a);
+            if (x < 3 || y < 3 || x > w - 4 || y > h - 4) break;
+            // 끝으로 갈수록 가늘어진다
+            const r = Math.max(0.5, (wid * (1 - t / len) + 0.6) / 2);
+            sinceBridge++;
+            const bridge = sinceBridge > st.bridgeEvery && rng.next() < 0.25;
+            if (bridge) sinceBridge = 0;
+            for (let yy = Math.floor(y - r - 1); yy <= Math.ceil(y + r + 1); yy++)
+              for (let xx = Math.floor(x - r - 1); xx <= Math.ceil(x + r + 1); xx++) {
+                if (!inside(xx, yy)) continue;
+                const d = Math.hypot(xx - x, yy - y);
+                const i = at(xx, yy);
+                if (d <= r) cells[i] = bridge ? T.Bridge : cells[i] === T.Bridge ? T.Bridge : T.Hazard;
+                else if (d <= r + 1.4 && cells[i] === T.Floor && rng.next() < st.scar) cells[i] = T.Slow;
+              }
+            if (depth < 2 && rng.next() < st.branch) crack(x, y, a + (rng.next() < 0.5 ? -1 : 1) * (0.6 + rng.next() * 0.6), Math.floor(len * (0.3 + rng.next() * 0.3)), Math.max(1, wid - 1), depth + 1);
+          }
+        };
+        for (let i = 0; i < st.count; i++) crack(rng.int(4, w - 5), rng.int(4, h - 5), rng.next() * Math.PI * 2, rng.int(st.len[0], st.len[1]), st.width[0] + rng.next() * (st.width[1] - st.width[0]), 0);
         break;
       }
       case 'islands': {

@@ -211,7 +211,8 @@ describe('「틈」 엔진', () => {
         if (s.pending) choose(s, s.pending.length - 1);
         step(s, { x: 0, y: 0 });
       }
-      expect(s.items.some((it) => it.kind === d.id && it.x === s.player.x), d.id).toBe(false);
+      // 장소(상인·수련소)는 그 자리에 남는다(2026-11-22)
+      expect(s.items.some((it) => it.kind === d.id && it.x === s.player.x), d.id).toBe(!!d.place);
     }
   });
 
@@ -523,11 +524,11 @@ describe('「틈」 7차: 무한 모드 · 난이도', () => {
       step(s, { x: Math.cos(i / 120), y: Math.sin(i / 120) });
     }
   };
-  it('무한 모드: 맵 5배 이상 · 무공 5칸·심법 5칸 · 시간표 없이 시작', () => {
+  it('무한 모드: 맵 5배 이상 · 무공 10칸·심법 10칸 · 시간표 없이 시작', () => {
     const s = createEndless('e1', 'haun');
     expect(s.mode).toBe('endless');
     expect(s.terrain.w * s.terrain.h).toBeGreaterThan(135 * 135 * 5);
-    expect(s.slots).toEqual({ weapons: 5, passives: 5 });
+    expect(s.slots).toEqual({ weapons: 10, passives: 10 });
     expect(s.timeline.length).toBe(0);
   });
 
@@ -578,5 +579,80 @@ describe('「틈」 7차: 무한 모드 · 난이도', () => {
     expect(h.chapter.hp).toBeGreaterThan(n.chapter.hp * 1.5);
     expect(h.diff.affix).toBe(1);
     expect(STORY.difficulties.every((d) => d.open)).toBe(true);
+  });
+});
+
+describe('「틈」 8차: 무한 모드 무공 풀 · 장소 가게', () => {
+  it('판마다 무작위 무공 풀 40~50종 — 인물 것과 공통 것만, 시작 무공 포함, 시드마다 다르다', () => {
+    for (const hero of HEROES) {
+      const a = createEndless('pool-a', hero.id);
+      const b = createEndless('pool-b', hero.id);
+      expect(a.pool!.size).toBeGreaterThanOrEqual(40);
+      expect(a.pool!.size).toBeLessThanOrEqual(50);
+      expect(a.pool!.has(hero.start)).toBe(true);
+      for (const id of a.pool!) {
+        const w = WEAPONS.get(id);
+        if (w) expect(w.owner === hero.id || w.owner === '*' || hero.pool.includes(id), `${hero.id}:${id}`).toBe(true);
+      }
+      expect([...a.pool!].join()).not.toBe([...b.pool!].join());
+    }
+  });
+
+  it('레벨업 후보는 풀 안에서만 — 잠김·무공록과 상관없다', () => {
+    const s = createEndless('pool-c', 'elia', { unlocked: [], book: [] });
+    for (let i = 0; i < 30; i++) {
+      for (const c of choicePool(s)) if (c.lv === 1) expect(s.pool!.has(c.id)).toBe(true);
+      s.level++;
+      s.queuedLevels = 1;
+      s.pending = null;
+      // 오른 것 하나 고르기
+      const pool = choicePool(s);
+      s.pending = [pool[i % pool.length]];
+      choose(s, 0);
+    }
+    expect(s.weapons.length).toBeLessThanOrEqual(10);
+  });
+
+  it('상인·수련소는 장소: 들어가면 가게가 열리고, 사도 열린 채, 나갔다 오면 남은 진열 그대로', () => {
+    const s = createEndless('place', 'haun');
+    s.gold = 2000;
+    s.items.push({ x: s.player.x + 40, y: s.player.y, kind: 'dojo', until: s.t + 90 });
+    step(s, { x: 0, y: 0 });
+    expect(s.shopItem).not.toBeNull();
+    const buy = s.pending!.findIndex((c) => c.kind === 'buyskill');
+    expect(buy).toBeGreaterThanOrEqual(0);
+    const id = s.pending![buy].id;
+    // 풀 밖의 것을 판다
+    expect(s.pool!.has(id)).toBe(false);
+    const before = s.pending!.length;
+    choose(s, buy);
+    expect(s.pending).not.toBeNull();
+    expect(s.pending!.length).toBe(before - 1);
+    expect(s.pool!.has(id)).toBe(true);
+    choose(s, s.pending!.length - 1);
+    expect(s.pending).toBeNull();
+    // 안에 그대로 서 있으면 다시 열리지 않는다
+    step(s, { x: 0, y: 0 });
+    expect(s.pending).toBeNull();
+    // 나갔다가 다시 들어오면 남은 진열
+    s.player.x += 400;
+    step(s, { x: 0, y: 0 });
+    s.player.x -= 400;
+    step(s, { x: 0, y: 0 });
+    expect(s.pending!.length).toBe(before - 1);
+    choose(s, s.pending!.length - 1);
+    // 떠날 때가 지나면 사라진다
+    s.player.x += 400;
+    s.t += 100;
+    step(s, { x: 0, y: 0 });
+    expect(s.items.some((it) => it.kind === 'dojo')).toBe(false);
+  });
+
+  it('떠돌이 상인(무한 모드): 물건 + 풀 밖 무공을 판다', () => {
+    const s = createEndless('merch', 'kyle');
+    s.items.push({ x: s.player.x + 30, y: s.player.y, kind: 'merchant' });
+    step(s, { x: 0, y: 0 });
+    expect(s.pending!.some((c) => c.kind === 'buy')).toBe(true);
+    expect(s.pending!.some((c) => c.kind === 'buyskill')).toBe(true);
   });
 });

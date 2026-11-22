@@ -477,20 +477,26 @@
     {
       "id": "merchant",
       "name": "떠돌이 상인",
-      "desc": "금화로 물건을 산다",
+      "desc": "수레를 세운 상인 — 안에 들어가면 물건과 무공을 판다",
       "glyph": "商",
       "color": "#f2a93b",
       "event": true,
       "ops": [
         {
           "op": "shop",
-          "count": 3
+          "count": 3,
+          "skills": 2
         }
       ],
       "icon": [
         "world",
         3
-      ]
+      ],
+      "place": {
+        "radius": 96,
+        "npc": "npc_teum_merchant",
+        "name": "떠돌이 상인의 수레"
+      }
     },
     {
       "id": "cursed",
@@ -553,7 +559,7 @@
     {
       "id": "dojo",
       "name": "수련소",
-      "desc": "금화로 무공을 사고·올리고·내려놓는다(무한 모드)",
+      "desc": "수련소 — 안에 들어가면 사범이 풀에 없는 무공을 팔고, 가진 무공을 올리거나 내려놓게 한다",
       "glyph": "武",
       "color": "#8fd3ff",
       "icon": [
@@ -566,7 +572,12 @@
           "op": "skillshop",
           "count": 3
         }
-      ]
+      ],
+      "place": {
+        "radius": 110,
+        "npc": "npc_teum_master",
+        "name": "떠도는 수련소"
+      }
     },
     {
       "id": "chest",

@@ -537,3 +537,42 @@ button { font: inherit; }
 .modal-close { align-self: center; min-width: 140px !important; margin-top: 12px; }
 .skc-art img[src*="icons_teum_skills"], .thumb2 img[src*="icons_teum_skills"], .mini img[src*="icons_teum_skills"] { object-fit: contain; background: #1a1410; }
 @media (max-width: 600px) { .market-note.row { flex-wrap: wrap; } .market-note.row .btn { flex: 1 1 100%; } }
+
+/* ── 가게(장소 안의 NPC, 2026-11-22): 왼쪽 NPC · 오른쪽 진열 ── */
+.panel.shop-place { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 1fr auto; gap: 14px 18px; width: min(980px, 96vw); max-height: 92vh; padding: 18px; }
+.shop-place .npc { grid-row: 1 / 3; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border-radius: 8px; background: linear-gradient(180deg, rgba(60, 38, 22, 0.55), rgba(14, 10, 8, 0.75)); border: 1px solid rgba(201, 162, 90, 0.45); text-align: center; }
+.shop-place.dojo .npc { background: linear-gradient(180deg, rgba(30, 44, 58, 0.6), rgba(10, 12, 16, 0.8)); border-color: rgba(143, 211, 255, 0.4); }
+.shop-place .npc-face { width: 168px; height: 168px; object-fit: cover; border-radius: 6px; border: 2px solid rgba(201, 162, 90, 0.7); image-rendering: auto; }
+.shop-place .npc-face.ph { display: grid; place-items: center; background: radial-gradient(circle at 50% 38%, #4a3626 0 24%, #2a1c12 25% 60%, #160f0a 61%); font: 700 18px 'Nanum Myeongjo', serif; color: var(--gold); }
+.shop-place .npc b { font: 800 17px 'Nanum Myeongjo', serif; color: var(--gold); }
+.shop-place .npc-line { margin: 0; font-size: 13px; line-height: 1.5; color: #e9dcc2; font-style: italic; }
+.purse { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 210, 122, 0.4); }
+.purse b { font-size: 20px; color: var(--gold); }
+.purse small { font-size: 11px; color: var(--muted); }
+.coin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff2b8, #e0a83a 55%, #8a5a14); box-shadow: inset 0 0 0 2px rgba(120, 70, 10, 0.6); position: relative; }
+.coin::after { content: ''; position: absolute; inset: 4px; background: rgba(90, 50, 8, 0.75); }
+.shop-place .wares { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; overflow: auto; align-content: start; padding-right: 4px; }
+.ware { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 26px 10px 10px; border-radius: 8px; border: 1px solid rgba(243, 234, 216, 0.2); background: linear-gradient(180deg, #1e1812, #120e0b); color: var(--paper); cursor: pointer; text-align: left; transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s; }
+.ware:hover:not([disabled]) { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 210, 122, 0.4); }
+.ware[disabled] { opacity: 0.5; cursor: not-allowed; }
+.ware .key { position: absolute; right: 8px; top: 6px; font-size: 11px; color: var(--muted); }
+.ware .ware-kind { position: absolute; left: 0; top: 0; padding: 3px 10px; border-radius: 8px 0 8px 0; font-size: 11px; font-weight: 700; background: rgba(201, 162, 90, 0.28); color: var(--gold); }
+.ware.upskill .ware-kind { background: rgba(110, 200, 140, 0.25); color: #9ff0b8; }
+.ware.sellskill .ware-kind { background: rgba(200, 90, 80, 0.28); color: #ffb0a0; }
+.ware .skc { background: none; border: 0; padding: 0; }
+.ware .price { display: flex; align-items: center; gap: 6px; margin-top: auto; padding: 6px 10px; border-radius: 4px; background: rgba(0, 0, 0, 0.45); font-weight: 800; color: var(--gold); }
+.ware .price em { margin-left: auto; font-style: normal; font-size: 12px; color: var(--paper); font-weight: 700; }
+.ware.poor .price em { color: #ff8a7a; }
+.ware-item { display: flex; gap: 10px; align-items: center; }
+.ware-item img { width: 48px; height: 48px; image-rendering: pixelated; }
+.ware-item small { display: block; font-size: 12px; color: var(--muted); }
+.chip-s.foreign { border-color: #c8a0ff; color: #dcc4ff; }
+.shop-place .leave { grid-column: 2; justify-self: end; min-width: 180px; }
+.shop-place .sold { grid-column: 1 / -1; text-align: center; padding: 30px; }
+@media (max-width: 700px) {
+  .panel.shop-place { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+  .shop-place .npc { grid-row: auto; flex-direction: row; flex-wrap: wrap; justify-content: center; text-align: left; }
+  .shop-place .npc-face { width: 72px; height: 72px; }
+  .shop-place .npc-line { flex: 1 1 60%; }
+  .shop-place .leave { grid-column: 1; justify-self: stretch; }
+}

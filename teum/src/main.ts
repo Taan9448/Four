@@ -366,7 +366,7 @@ function endlessPopup(): void {
   const sv = loadSave();
   let hero = sv.endless?.hero ?? HEROES[0].id;
   const body = el('div', { class: 'endless' });
-  const slotOf = (): Slot => ({ hero, difficulty: 'normal', chapter: 0, carry: freshCarry(hero), updatedAt: Date.now(), book: sv.endless?.hero === hero ? sv.endless.book : undefined });
+  const slotOf = (): Slot => ({ hero, difficulty: 'normal', chapter: 0, carry: freshCarry(hero), updatedAt: Date.now() });
   const E = RULES.endless;
   const render = () => {
     const best = sv.endlessBest ?? {};
@@ -379,34 +379,27 @@ function endlessPopup(): void {
         return btn([el('div', { class: 'portrait' }, art ? el('img', { src: art, alt: '' }) : ''), el('b', {}, h.name), el('small', {}, best[h.id] ? `최고 ${fmt(best[h.id])}` : '기록 없음'), open ? '' : el('small', { class: 'lock' }, `🔒 ${h.unlock?.text}`)], `hero${open ? '' : ' locked'}${hero === h.id ? ' on' : ''}`, () => open && ((hero = h.id), render()), open ? {} : { disabled: '' });
       }),
     );
-    const slot = slotOf();
+    const P = E.pool;
     body.replaceChildren(
-      el('p', { class: 'b2-lead' }, '틈은 닫히지 않는다 — 얼마나 버티는가. 30분을 넘기기 어렵다.'),
+      el('p', { class: 'b2-lead' }, STORY.endless.line),
       el(
         'ul',
         { class: 'rules' },
-        el('li', {}, `${E.event[0] / 60}~${E.event[1] / 60}분마다 돌발 이벤트, ${E.boss.every / 60}분마다 보스`),
-        el('li', {}, `보스를 ${Math.floor(E.boss.enrage / 60)}분 ${E.boss.enrage % 60}초 안에 못 잡으면 광폭화 — 보스와 무리가 빨라지고 거세진다`),
-        el('li', {}, `무공 ${E.slots.weapons}칸 · 심법 ${E.slots.passives}칸 · 맵은 스토리의 다섯 배 넘게 넓다`),
-        el('li', {}, '떠돌이 상인과 수련소(무공 사기·올리기·내려놓기)가 때때로 나온다'),
+        el('li', {}, `${E.event[0] / 60}~${E.event[1] / 60}분마다 돌발 이벤트, ${E.boss.every / 60}분마다 보스 — ${Math.floor(E.boss.enrage / 60)}분 ${E.boss.enrage % 60}초 안에 못 잡으면 광폭화`),
+        el('li', {}, `무공 ${E.slots.weapons}칸 · 심법 ${E.slots.passives}칸(스토리의 두 배 가까이)`),
+        el('li', {}, `무공은 판마다 무작위로 ${P.weapons[0] + P.passives[0]}~${P.weapons[1] + P.passives[1]}종이 정해진다 — 인물의 무공 갈래는 지킨다(무공록·잠김과 상관없이)`),
+        el('li', {}, `떠돌이 상인의 수레(${E.shop.stay}초)·수련소(${E.dojo.stay}초)가 판 위에 선다 — 들어가면 그 판에 없는 무공·다른 문파 무공을 판다`),
+        el('li', {}, '전용 맵 「갈라진 들」 — 허공 균열·바위 조각·오염된 땅(느려짐)'),
       ),
       el('h4', {}, '누가 버티는가'),
       heroes,
       el(
         'div',
         { class: 'menu-row' },
-        btn('들어간다', 'btn primary', () => {
+        btn('들어간다', 'btn primary big', () => {
           close();
           void play(slotOf(), false, true);
         }),
-        btn(`무공록 편성 · ${splitBook(bookOf(slot, sv)).weapons.length + splitBook(bookOf(slot, sv)).passives.length}장`, 'btn ghost', () =>
-          bookPopup(slot, () => render(), (book) => {
-            const s2 = loadSave();
-            s2.endless = { hero, book };
-            writeSave(s2);
-            sv.endless = { hero, book };
-          }),
-        ),
       ),
     );
   };
@@ -1130,8 +1123,61 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   };
   let banMode = false;
   let rec: { index: number; reason: string } | null = null;
+  // 가게(2026-11-22 "상인·수련소는 장소 — 안의 NPC가 판다"): 왼쪽 NPC · 오른쪽 진열(값표) · 아래 지나간다
+  const NPC_LINE: Record<string, string[]> = {
+    merchant: ['어서 오시오, 틈 너머에서 건진 물건이오.', '금화만 있으면 무엇이든. 오래 머물진 않소.', '이 무공서는 다른 문파 것이라 값이 좀 나가오.'],
+    dojo: ['수련은 배신하지 않는다. 무엇을 익히겠나.', '이미 가진 것을 깊게 할 텐가, 새로 배울 텐가.', '맞지 않는 무공은 내려놓는 것도 수련이다.'],
+  };
+  const wareCard = (c: Choice, i: number): HTMLElement => {
+    const poor = c.kind !== 'sellskill' && c.kind !== 'leave' && s.gold < c.lv;
+    const full = c.kind === 'buyskill' && (WEAPONS.has(c.id) ? s.weapons.length >= s.slots.weapons : s.passives.size >= s.slots.passives);
+    let body: HTMLElement;
+    if (c.kind === 'buy') {
+      const it = ITEMS.get(c.id);
+      const ic = it?.icon ? realArt(({ items2: 'icons_teum_items_2', world: 'icons_teum_world', icons: 'icons_teum', items: 'icons_teum_items' } as Record<string, string>)[it.icon[0]] ?? 'icons_teum_items', it.icon[1]) : null;
+      body = el('div', { class: 'ware-item', style: `--c:${it?.color ?? '#c2c6d1'}` }, ic ? el('img', { src: ic, alt: '' }) : el('span', { class: 'glyph-big' }, it?.name[0] ?? '?'), el('div', {}, el('b', {}, it?.name ?? c.id), el('small', {}, it?.desc ?? '')));
+    } else {
+      const lv = c.kind === 'upskill' ? (s.weapons.find((w) => w.id === c.id)?.lv ?? 0) + 1 : c.kind === 'sellskill' ? s.weapons.find((w) => w.id === c.id)?.lv : undefined;
+      const w = WEAPONS.get(c.id);
+      const foreign = c.kind === 'buyskill' && w && w.owner !== '*' && w.owner !== s.hero.id;
+      body = skillCard(c.id, { lv, compact: true, extra: [foreign ? el('span', { class: 'chip-s foreign' }, `다른 문파 — ${HEROES.find((h) => h.id === w!.owner)?.name ?? ''}의 무공`) : ''] });
+    }
+    const verb = c.kind === 'buy' ? '산다' : c.kind === 'buyskill' ? '배운다' : c.kind === 'upskill' ? '수련한다' : '내려놓는다';
+    const tag = c.kind === 'sellskill' ? `금화 +${c.lv}` : `금화 ${c.lv}`;
+    const b = el('button', { class: `ware ${c.kind}${poor || full ? ' poor' : ''}`, type: 'button' }, el('span', { class: 'key' }, String(i + 1)), el('span', { class: 'ware-kind' }, c.kind === 'upskill' ? '수련' : c.kind === 'sellskill' ? '내려놓기' : c.kind === 'buyskill' ? (WEAPONS.has(c.id) ? '무공서' : '심법서') : '물건'), body, el('span', { class: 'price' }, el('i', { class: 'coin' }), tag, el('em', {}, poor ? '금화가 모자란다' : full ? '칸이 다 찼다' : verb)));
+    if (poor || full) b.setAttribute('disabled', '');
+    b.addEventListener('click', () => pick(i));
+    return b;
+  };
+  const showShop = () => {
+    overlay.hidden = false;
+    const kind = s.shopItem?.kind ?? 'merchant';
+    const def = ITEMS.get(kind);
+    const lines = NPC_LINE[kind] ?? NPC_LINE.merchant;
+    const face = realArt(`${def?.place?.npc ?? 'npc_teum_merchant'}_portrait`);
+    const wares = s.pending!.filter((c) => c.kind !== 'leave');
+    const leaveIdx = s.pending!.findIndex((c) => c.kind === 'leave');
+    overlay.replaceChildren(
+      el(
+        'div',
+        { class: `panel shop-place ${kind}` },
+        el(
+          'aside',
+          { class: 'npc' },
+          face ? el('img', { class: 'npc-face', src: face, alt: '' }) : el('div', { class: 'npc-face ph' }, el('span', {}, kind === 'dojo' ? '사범' : '상인')),
+          el('b', {}, def?.place?.name ?? def?.name ?? ''),
+          el('p', { class: 'npc-line' }, `“${lines[Math.floor(s.t) % lines.length]}”`),
+          el('div', { class: 'purse' }, el('i', { class: 'coin' }), el('b', {}, String(s.gold)), el('small', {}, '가진 금화')),
+          el('small', { class: 'muted' }, `무공 ${s.weapons.length}/${s.slots.weapons} · 심법 ${s.passives.size}/${s.slots.passives}`),
+        ),
+        el('div', { class: 'wares' }, ...(wares.length ? wares.map((c) => wareCard(c, s.pending!.indexOf(c))) : [el('p', { class: 'muted sold' }, '다 팔렸다 — 다음에 또 보자.')])),
+        btn('지나간다', 'btn ghost leave', () => pick(leaveIdx)),
+      ),
+    );
+  };
   const showChoices = () => {
     overlay.hidden = false;
+    if (s.shopItem || s.pending!.some((c) => c.kind === 'leave')) return showShop();
     rec = recommend(s, s.pending!);
     const shop = s.pending!.some((c) => c.kind === 'leave');
     // 후보 손보기(2026-11-21): 다시 뽑기 · 봉인 · 건너뛰기 — 장마다 횟수(장터 수련으로 늘린다)
@@ -1444,10 +1490,14 @@ async function fastForward(s: State, until: number): Promise<void> {
 const KIND_NAME: Record<string, string> = { slash: '베기', bolt: '날리기', wave: '검기', orbit: '둘레 돌기', nova: '고리', aura: '결계', strike: '내리꽂기', rain: '장판', chain: '연쇄', beam: '일직선', heal: '회복' };
 
 
-// 점검용 바로 가기: ?play=<장 1~10>&hero=<id> · ?screen=lobby|story|codex|wardrobe|options|load|save
+// 점검용 바로 가기: ?play=<장 1~10>&hero=<id> · ?endless&hero=<id>[&t=초] · ?screen=lobby|story|codex|wardrobe|options|load|save
 const direct = Number(params.get('play') ?? 0);
 const screen = params.get('screen');
-if (direct > 0) {
+if (params.has('endless')) {
+  // ?endless[&hero=]: 무한 모드 바로
+  const hero = params.get('hero') ?? 'haun';
+  void play({ hero, difficulty: 'normal', chapter: 0, carry: freshCarry(hero), updatedAt: Date.now() }, false, true);
+} else if (direct > 0) {
   const hero = params.get('hero') ?? 'haun';
   const carry = freshCarry(hero);
   // 뒤 장을 바로 볼 때는 그 장에 맞게 레벨을 올려 둔다

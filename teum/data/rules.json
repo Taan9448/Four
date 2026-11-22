@@ -510,10 +510,10 @@
   "phasesFrom": 2
  },
  "endless": {
-  "$comment": "무한 모드 수치: hp·dmg는 분(m)마다 1 + perMin·m + sq·m² 배(체력은 hpPerMinute도 더해진다), 무리는 base + perMin·m(최대 max)마리/초",
+  "$comment": "무한 모드 수치: hp·dmg는 분(m)마다 1 + perMin·m + sq·m² 배(체력은 hpPerMinute도 더해진다), 무리는 base + perMin·m(최대 max)마리/초 · 2026-11-22: 무공·심법 10칸씩, 판마다 무작위 무공 풀(pool — 인물 것 own 비율 + 공통, 심법), 상인·수련소는 장소(stay초 머문다)이고 풀 밖 무공을 판다(다른 문파 것은 foreignPrice배)",
   "slots": {
-   "weapons": 5,
-   "passives": 5
+   "weapons": 10,
+   "passives": 10
   },
   "hp": {
    "perMin": 0.05,
@@ -553,10 +553,13 @@
    "dmgPerStage": 0.2
   },
   "shop": {
-   "every": 150
+   "every": 150,
+   "stay": 75,
+   "skills": 2
   },
   "dojo": {
-   "every": 210
+   "every": 210,
+   "stay": 90
   },
   "chests": 45,
   "secrets": {
@@ -570,6 +573,18 @@
    "up": 30,
    "upPerLv": 12,
    "sell": 20
-  }
+  },
+  "pool": {
+   "weapons": [
+    26,
+    30
+   ],
+   "passives": [
+    15,
+    20
+   ],
+   "own": 0.6
+  },
+  "foreignPrice": 1.5
  }
 }
