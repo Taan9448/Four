@@ -903,8 +903,41 @@ function drawFog(ctx: CanvasRenderingContext2D, s: State, cx0: number, cy0: numb
 const texPat = new Map<CanvasImageSource, CanvasPattern | null>();
 function pattern(ctx: CanvasRenderingContext2D, img: CanvasImageSource | undefined | null): CanvasPattern | null {
   if (!img) return null;
-  if (!texPat.has(img)) texPat.set(img, ctx.createPattern(img, 'repeat'));
+  if (!texPat.has(img)) texPat.set(img, ctx.createPattern(opaqueCore(img), 'repeat'));
   return texPat.get(img) ?? null;
+}
+/** 이어 붙일 무늬의 불투명한 안쪽만(2026-11-22 #2319): 자르기 도구가 가장자리에 1px 투명 띠나 여백을 남기면 이음매에 줄이 보인다 —
+ *  알파가 찬 상자를 재고 안쪽으로 2px 더 들어가 자른다 */
+function opaqueCore(img: CanvasImageSource): CanvasImageSource {
+  const w = (img as HTMLImageElement).naturalWidth || (img as HTMLCanvasElement).width;
+  const h = (img as HTMLImageElement).naturalHeight || (img as HTMLCanvasElement).height;
+  if (!w || !h) return img;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const g = c.getContext('2d')!;
+  g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++)
+      if (d[(y * w + x) * 4 + 3] > 250) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+  if (x1 < 0) return img;
+  x0 += 2;
+  y0 += 2;
+  x1 -= 2;
+  y1 -= 2;
+  if (x0 === 2 && y0 === 2 && x1 === w - 3 && y1 === h - 3 && d[3] > 250) return img;
+  const o = document.createElement('canvas');
+  o.width = x1 - x0 + 1;
+  o.height = y1 - y0 + 1;
+  o.getContext('2d')!.drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
+  return o;
 }
 function drawRiftTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: number, y0: number, x1: number, y1: number, now: number): void {
   const t = s.terrain;
