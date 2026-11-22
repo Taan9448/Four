@@ -1,0 +1,6 @@
+Create ONE illustration, 1536x1024 px, full-bleed.
+Scene: A night market street in a Chinese martial-arts mountain town, painted like a calm hand-drawn anime background with soft watercolor texture: rows of wooden stalls with cloth awnings, strings of warm red and orange paper lanterns overhead, scroll racks and weapon racks, steam from a food stall, wet stone paving reflecting the lanterns, and far above the roofs a thin crimson crack in the dark blue sky.
+Composition: The left third and the center will be covered by dark UI panels, so keep detail mostly at the top edge (lanterns, roofs, the sky crack) and at the far right. Darker toward the bottom. No people, no text.
+No people, no characters, no creatures in the picture.
+Style: hand-drawn 2D animated feature film look; clean, lively hand-inked line art with gentle line weight variation and warm dark-brown outlines; simple cel shading with one shadow tone and small highlights; light, airy, natural colors; softly painted watercolor-like backgrounds with rich natural detail and warm daylight; gentle, nostalgic atmosphere; East Asian wuxia world blended with a European fantasy forest; not photorealistic, not 3D, no heavy oil-paint texture.
+Rules: no text, no letters, no numbers, no labels, no map legend, no compass rose, no signature, no watermark, no frame or border.
