@@ -10,11 +10,11 @@ fps: 6
 loop: true
 events: {}
 bbox_tolerance: 0.2
-# 2026-11-22 고침: 처음 명세가 붉은 검·방패를 적어 옆 그림(kyle_idle·kyle_walk — 은빛 검, 방패 없음)과 달라졌다(#2315). 옆 그림과 같게
+# 2026-11-24: 사용자 선택(#2315) — 붉은 검·눈꽃 방패(옆 그림 kyle_idle·kyle_walk는 은빛 검·방패 없음이라 다르다)
 # 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(대기·옆 걷기와 같은 크기)
 frame_notes:
-  1: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight SILVER double-edged sword held low in the right hand (NOT red) and NO shield (both hands free of a shield), exactly like the side-view sheets kyle_idle and kyle_walk; the blue cape with gold trim and the snowflake crest on the chest; standing still, relaxed"
-  2: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight SILVER double-edged sword held low in the right hand (NOT red) and NO shield (both hands free of a shield), exactly like the side-view sheets kyle_idle and kyle_walk; the blue cape with gold trim and the snowflake crest on the chest; chest rises slightly with a breath"
-  3: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight SILVER double-edged sword held low in the right hand (NOT red) and NO shield (both hands free of a shield), exactly like the side-view sheets kyle_idle and kyle_walk; the blue cape with gold trim and the snowflake crest on the chest; shoulders settle, cloth sways a little"
-  4: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight SILVER double-edged sword held low in the right hand (NOT red) and NO shield (both hands free of a shield), exactly like the side-view sheets kyle_idle and kyle_walk; the blue cape with gold trim and the snowflake crest on the chest; back to the pose of frame 1"
+  1: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight double-edged sword with a deep CRIMSON blade in the right hand and the round blue shield with the white snowflake crest on the left arm; the blue cape with gold trim and the snowflake crest on the chest; standing still, relaxed"
+  2: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight double-edged sword with a deep CRIMSON blade in the right hand and the round blue shield with the white snowflake crest on the left arm; the blue cape with gold trim and the snowflake crest on the chest; chest rises slightly with a breath"
+  3: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight double-edged sword with a deep CRIMSON blade in the right hand and the round blue shield with the white snowflake crest on the left arm; the blue cape with gold trim and the snowflake crest on the chest; shoulders settle, cloth sways a little"
+  4: "FRONT VIEW, standing still facing the viewer, calm breathing; the long straight double-edged sword with a deep CRIMSON blade in the right hand and the round blue shield with the white snowflake crest on the left arm; the blue cape with gold trim and the snowflake crest on the chest; back to the pose of frame 1"
 placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#c0392b' }
