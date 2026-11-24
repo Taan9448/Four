@@ -1,0 +1,12 @@
+id: kyle_teum_ref
+type: character-ref
+character: kyle_teum
+summary: '「틈」 카일(붉은 검·눈꽃 방패) 기준 시트(3/4 정면 + 오른쪽 측면) — 2026-11-24 사용자 선택 "붉은 검/눈꽃 방패 버전으로". 「틈」 8방향 그림(kyle_walk_down 등)과 같은 차림의 옆 그림 기준'
+# 「천외귀환」·「결」의 kyle(은빛 검)·kyle_red(붉은 검, 방패 없음)는 고치지 않는다. 「틈」만 이 그림을 쓴다(heroes.json side)
+depends_on: [kyle_red_ref]
+reference: assets/source/kyle_red_ref.png
+facing: right
+frame_notes:
+  1: "full body, three-quarter front view, confident upright stance with a light grin; the crimson-bladed long sword in the right hand held low and ready; the round blue shield with a gold rim and a large white snowflake crest on the LEFT arm, held in front of the body; blue tabard, blue cape with gold trim; the same face, hair, armor, body proportions and height as the attached reference sheet — only the shield is added (copy its look from Kyle's front/diagonal walk sprites in assets/sprites/kyle_walk_down and kyle_walk_downside)"
+  2: "full body, side view facing right, same armor, tabard and cape; the crimson-bladed sword held ready in the right (near-viewer) hand; the round blue snowflake shield strapped on the LEFT (far) arm, seen edge-on to three-quarter behind the body, its gold rim and part of the white snowflake visible"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }

@@ -5,7 +5,7 @@ import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
 import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
-import { absorb, draw, emptyView, loadArt, SKILL_ICON, type Art, type View } from './render';
+import { absorb, draw, emptyView, loadArt, sideSprite, SKILL_ICON, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
 import { autosave, bank, cheonoeCards, heroOpen, loadSave, onSaveWrite, slotLabel, writeSave, type SaveData, type Slot } from './save';
@@ -41,7 +41,7 @@ const heroPic = (h: { id: string; stand: string; sprite: string }, shape: 'squar
   if (own) return { src: own, fit: 'own' };
   const st = realArt(h.stand);
   if (st) return { src: st, fit: 'stand' };
-  const px = frameUrl(`${h.sprite}_idle`, 1);
+  const px = frameUrl(`${sideSprite(h)}_idle`, 1);
   return px ? { src: px, fit: 'pixel' } : null;
 };
 /** 전용 기술 그림 칸(Codex icons_teum_hero_skills 4×2: 보법 넷 · 마지막 기술 넷) */

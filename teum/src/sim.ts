@@ -136,6 +136,8 @@ export interface HeroDef {
   name: string;
   title: string;
   sprite: string;
+  /** 「틈」 전용 옆 그림(대기·걷기·쓰러짐) — 그림이 오면 sprite 대신 쓴다. 8방향은 sprite 그대로(2026-11-24 카일 붉은 검·눈꽃 방패) */
+  side?: string;
   stand: string;
   hp: number;
   speed: number;

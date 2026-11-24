@@ -80,8 +80,12 @@ export function cardIcon(card: string | undefined): HTMLImageElement | null {
   return img && img.complete && img.naturalWidth ? img : null;
 }
 
+/** 기본 옷의 옆 그림: 「틈」 전용(hero.side)이 왔으면 그것, 아니면 sprite */
+export const sideSprite = (hero: { sprite: string; side?: string }): string => (hero.side && spriteSource(`${hero.side}_idle`) === 'sprites' ? hero.side : hero.sprite);
+
 export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
-  const [idle, walk, death] = await Promise.all([loadSprite(`${sprite}_idle`), real(`${sprite}_walk`), real(`${sprite}_death`)]);
+  const side = sprite === s.hero.sprite ? sideSprite(s.hero) : sprite;
+  const [idle, walk, death] = await Promise.all([loadSprite(`${side}_idle`), real(`${side}_walk`), real(`${side}_death`)]);
   // 8방향(2026-11-22): 정면·뒷면·대각 걷기와 대기 — Codex 그림이 온 것만
   const dirs: Record<string, Anim> = {};
   await Promise.all(['walk_down', 'walk_up', 'walk_downside', 'walk_upside', 'idle_down', 'idle_up'].map(async (k) => (dirs[k] = await real(`${sprite}_${k}`))));
