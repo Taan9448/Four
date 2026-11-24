@@ -45,6 +45,7 @@
       "name": "카일 로웬",
       "title": "로웬 가문의 마지막 기사",
       "sprite": "kyle",
+      "side": "kyle_teum",
       "stand": "kyle_stand",
       "hp": 130,
       "speed": 0.94,

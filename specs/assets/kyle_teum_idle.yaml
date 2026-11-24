@@ -1,0 +1,18 @@
+id: kyle_teum_idle
+type: character-anim
+character: kyle_teum
+summary: '「틈」 카일(붉은 검·눈꽃 방패) 옆 대기 4프레임 — 2026-11-24 사용자 선택. 오기 전에는 kyle_idle(은빛 검)을 쓴다'
+depends_on: [kyle_teum_ref]
+reference: assets/source/kyle_teum_ref.png
+facing: right
+frames: 4
+fps: 6
+loop: true
+events: {}
+# 같은 키·같은 발 줄. 8방향 대기(kyle_idle_down)와 같은 크기
+frame_notes:
+  1: "ready knight stance, side view facing right, weight on the back foot, the crimson-bladed long sword in the right hand and the round blue snowflake shield with a gold rim on the left arm, exactly as in the attached kyle_teum_ref sheet, shield raised in front of the chest, sword held low and forward"
+  2: "the same stance, shoulders rise slightly with a breath, cape and tabard sway"
+  3: "the same stance, sword tip lifts a little, shield edge tilts slightly"
+  4: "settles back with a light grin, cape settling; loops back into frame 1"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }

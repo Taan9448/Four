@@ -108,6 +108,7 @@
 | elia | 엘리아 | 하프엘프 19세, 은발(뒤로 묶음), 끝이 살짝 솟은 귀, 회색 눈에 옅은 초록. **회색 망토와 두건**(귀를 가리는 버릇), 안에 갈색 여행복, **끝에 푸른 돌이 박힌 긴 나무 지팡이** | magenta | large |
 | kyle | 카일 로웬 | 금발, 장난기 있는 얼굴, 호리호리. 온몸 은빛 판금, 어깨·무릎의 둥근 쇠판, 가슴의 로웬 문장(푸른 바탕·흰 눈송이·은빛 검), 긴 양날 검 | magenta | large |
 | kyle_red | 카일 로웬(붉은 검, 2026-10-12 기본 전투 그림) | 같은 인물·같은 갑옷. **칼날이 짙은 진홍이고 날 끝이 식어 가는 숯불처럼 은은히 빛나는 긴 양날 검**(이그니스의 심장으로 벼림), 검은 쇠 코등이. 은빛 검(`kyle`)은 옷장 '은빛 기사검'으로 남는다 | magenta | large |
+| kyle_teum | 카일 로웬(「틈」 옆 그림, 2026-11-24 사용자 선택) | `kyle_red`와 같은 인물·같은 갑옷·같은 붉은 검 + **왼팔에 둥근 푸른 방패(흰 눈송이 문장, 금테)**, 금테 두른 푸른 망토. 「틈」 8방향 그림(`kyle_walk_down` 등)과 같은 차림. 「천외귀환」·「결」 그림(`kyle`·`kyle_red`)은 그대로 | magenta | large |
 | born | 보른(S1~S3, 도끼) | 작고 다부진 드워프(사람 키의 약 70%), 문짝 같은 어깨, 굵은 팔뚝, **얼굴 절반을 덮은 붉은 수염을 세 갈래로 땋음**, 자기 키만 한 양손 도끼. **방패 없음** | magenta | large |
 | born_hammer | 보른(S4~, 두린의 망치) | 같은 인물(붉은 수염은 그을려 끝이 조금 짧다). 드워프 문자가 새겨진 손잡이의 큰 전투 망치 | magenta | large |
 | skin_cheongun_haun | 진하운 옷장 「청운의 귀환」(노말 클리어, 반신 그림 `skin_cheongun_haun_stand` 포함 — 2026-11-03) | 같은 인물·같은 키와 비율(`haun_sword_ref` 기준), 옷과 무기만 바꾼다 — 5절 `subjects.skin_cheongun_haun` | magenta | large |
@@ -262,6 +263,12 @@ subjects:
     pauldrons and knee guards, the Rowen crest on the chest (a white snowflake over a silver sword on a blue
     field); a long straight double-edged sword whose blade is deep crimson, glowing faintly like cooling
     embers along the edge (forged from the fire lord's heart), with a dark steel crossguard
+  kyle_teum: >-
+    Kyle Rowen, a blond, slim young knight with a playful grin; full silver plate armor with round steel
+    pauldrons and knee guards, a blue tabard and a blue cape with gold trim, the Rowen crest on the chest (a
+    white snowflake on a blue field); in the right hand a long straight double-edged sword whose WHOLE blade is
+    deep crimson, glowing faintly like cooling embers along the edge, with a dark steel crossguard; on the
+    LEFT arm a round blue shield with a gold rim and a large white snowflake crest
   born: >-
     Born, a short, very stocky dwarf warrior about seventy percent of a man's height; shoulders as broad as a
     door, thick forearms; a red beard covering half his face, braided into three braids; a two-handed axe as
