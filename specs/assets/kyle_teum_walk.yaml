@@ -1,0 +1,21 @@
+id: kyle_teum_walk
+type: character-anim
+character: kyle_teum
+summary: '「틈」 카일(붉은 검·눈꽃 방패) 옆 걷기 6프레임 — 2026-11-24 사용자 선택. 오기 전에는 kyle_walk(은빛 검)을 쓴다'
+depends_on: [kyle_teum_ref]
+reference: assets/source/kyle_teum_ref.png
+facing: right
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 걷기 한 바퀴(6칸 반복). 서 있는 키는 대기(kyle_teum_idle)와 같게, 발 맨 아래 줄은 모든 칸에서 같은 줄. 방패는 모든 칸에서 왼팔에
+frame_notes:
+  1: "brisk walk cycle, side view facing right, contact pose: right foot forward touching the ground heel first, left foot behind; the crimson-bladed long sword in the right hand and the round blue snowflake shield with a gold rim on the left arm, exactly as in the attached kyle_teum_ref sheet; cape swaying"
+  2: "walk cycle, down pose: weight on the right foot, knee slightly bent, body a little lower, sword arm swinging opposite to the legs, shield stays on the left arm"
+  3: "walk cycle, passing pose: left leg passing the right, body at its highest, head level"
+  4: "walk cycle, contact pose: left foot forward touching the ground heel first, right foot behind (mirror of frame 1)"
+  5: "walk cycle, down pose: weight on the left foot, knee slightly bent, body a little lower"
+  6: "walk cycle, passing pose: right leg passing the left, body at its highest, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#c2c6d1', accent: '#d8402c' }

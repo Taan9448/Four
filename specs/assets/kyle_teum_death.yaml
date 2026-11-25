@@ -1,0 +1,19 @@
+id: kyle_teum_death
+type: character-anim
+character: kyle_teum
+summary: '「틈」 카일(붉은 검·눈꽃 방패) 쓰러짐 6프레임 — 2026-11-24 사용자 선택. 대기 그림과 같은 크기·같은 발 위치. 오기 전에는 kyle_death(은빛 검)을 쓴다'
+depends_on: [kyle_teum_ref]
+reference: assets/source/kyle_teum_ref.png
+facing: right
+frames: 6
+fps: 10
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "struck hard, side view facing right, head thrown back, the crimson-bladed long sword in the right hand and the round blue snowflake shield with a gold rim on the left arm, exactly as in the attached kyle_teum_ref sheet, the sword slipping in his grip, cape flaring"
+  2: "staggering backward, armored knees buckling, the snowflake shield dropping low"
+  3: "dropping to one knee, the crimson sword point digging into the ground, holding himself up, shield resting on the ground"
+  4: "the sword hand loosens, his body tipping sideways"
+  5: "falling onto his side with a clatter of armor, the cape spreading, the shield sliding off the arm"
+  6: "lying still on the ground, eyes closed, the crimson sword beside his open hand and the snowflake shield beside him"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#d8402c' }
