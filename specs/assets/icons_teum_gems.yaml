@@ -1,0 +1,13 @@
+id: icons_teum_gems
+type: icon-sheet
+summary: '「틈」 경험치 보석 등급 6칸(2026-11-25 사용자 "몬스터별로 떨어지는 경험치 보석 색깔 구분") — 칸 번호 = rules.json gems.tiers 순서: 1 푸른 결(일반) · 2 초록 결(원거리·비행·자폭) · 3 보랏빛 결(단단한 놈·특수) · 4 붉은 결(중간 보스·정예) · 5 금빛 결(구역 보스) · 6 무지개 결(보스). 땅에 떨어진 작은 보석, 위로 갈수록 크고 화려하게'
+frames: 6
+baseline: 0.5
+frame_notes:
+  1: 'a small pale blue diamond-shaped crystal shard with a white glint'
+  2: 'a small green diamond-shaped crystal shard with a white glint, slightly larger'
+  3: 'a violet faceted crystal with a soft glow, larger'
+  4: 'a red faceted crystal with a bright glow and tiny sparks, larger'
+  5: 'a golden faceted crystal with radiant light rays'
+  6: 'a large prismatic rainbow crystal with radiant light rays and sparkles'
+placeholder: { color: '#1f3f73', accent: '#8fd3ff' }

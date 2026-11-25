@@ -824,3 +824,35 @@ img.fit-pixel, .portrait.fit-pixel img { object-fit: contain; image-rendering: p
   .rc-part.into { grid-column: 1 / -1; padding-top: 4px; border-top: 1px dashed rgba(243, 234, 216, 0.15); }
   .rc-art { width: 32px; height: 22px; }
 }
+
+/* 도감 그림자 자세히(2026-11-25): 체력·공격력·이동속도·경험치 · 저항 · 기술 · 보석 등급 */
+button.entry { font: inherit; cursor: pointer; }
+button.entry.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+button.entry.unseen { cursor: default; }
+.foe-detail { border: 1px solid rgba(255, 210, 122, 0.4); border-radius: 8px; padding: 10px 12px; margin: 4px 0 10px; background: rgba(255, 210, 122, 0.05); text-align: left; }
+.fd-head { display: flex; gap: 12px; align-items: center; }
+.fd-head img { width: 72px; height: 72px; object-fit: contain; image-rendering: pixelated; }
+.fd-head > div { display: flex; flex-direction: column; gap: 2px; }
+.fd-head b { font-size: 17px; }
+.fd-head small { color: var(--muted); font-size: 12px; }
+.fd-head .gem { display: inline-flex; align-items: center; gap: 5px; }
+.fd-head .gem i { width: 9px; height: 12px; background: var(--g); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.fd-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 10px 0 6px; }
+.fd-stats .fs { background: rgba(8, 8, 12, 0.5); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; }
+.fd-stats .fs small { font-size: 11px; color: var(--muted); }
+.fd-stats .fs b { font-size: 15px; }
+.fd-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 6px; font-size: 13px; }
+.fd-row > small { flex: none; width: 34px; color: var(--gold); padding-top: 2px; }
+.fd-row .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.fd-row ul { margin: 0; padding-left: 16px; }
+.chip-s.debuff { border-color: #b070ff; color: #d4b8ff; }
+.chip-s.endless { border-color: #5fd0ff; color: #a8e6ff; }
+.elem.e-poison { background: #8fd65a; }
+.elem.e-bleed { background: #ff6a78; }
+.elem.e-weaken { background: #b8bcc8; }
+.elem.e-fear { background: #c8a0ff; }
+.elem.e-silence { background: #dff4ff; }
+.elem.e-root { background: #6fd6ff; }
+@media (max-width: 640px) {
+  .fd-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { AFFIXES, AREAS, isRelic, CHAPTER_LENGTH, STORY, type MapEvent, type FoeZone, type Slam, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { AFFIXES, AREAS, DEBUFFS, isRelic, CHAPTER_LENGTH, STORY, type MapEvent, type FoeZone, type Slam, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -34,6 +34,9 @@ export interface Art {
   castle: Anim;
   mapev: Anim;
   relics: Anim;
+  /** 경험치 보석 등급 6칸(icons_teum_gems, 2026-11-25) · 디버프 표식 6칸(icons_teum_debuffs) */
+  gems: Anim;
+  debuffs: Anim;
 }
 
 /** 새 그림자(Codex teum_*)는 그림이 오기 전엔 「천외귀환」 그림(fallback) */
@@ -68,7 +71,17 @@ const FX_ALPHA = { strong: 1, normal: 0.7, soft: 0.42 };
 const real = async (id: string): Promise<Anim> => (spriteSource(id) === 'sprites' ? loadSprite(id) : null);
 
 /** 무공·심법 아이콘 칸(icons_teum_skills_1·2·3, 16칸씩): 손으로 맞춘 무공 순서 다음에 심법(카드 무공은 카드 그림) */
-export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.values()].filter((w) => !w.card).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card).map((p) => p.id)].map((id, i) => [id, i]));
+/** 예전 순서 아이콘(손으로 맞춘 무공·심법 37 — 시트 1~3의 35칸 + 시트 4 앞 두 칸). 2026-11-25: 비전·새 무공이 끼어 심법 아이콘이 밀리던 것을 막으려
+ *  icon([시트, 칸])이 있는 것·비전·카드 것은 빼고 센다 */
+export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)].map((id, i) => [id, i]));
+/** 무공·심법 아이콘 자리 [시트(1부터), 칸(1부터)] — icons_teum_skills_<시트> */
+export function skillIconRef(id: string): [number, number] | null {
+  const own = WEAPONS.get(id)?.icon ?? PASSIVES.get(id)?.icon;
+  if (own) return own;
+  const i = SKILL_ICON.get(id);
+  if (i === undefined) return null;
+  return i < 35 ? [Math.floor(i / 16) + 1, (i % 16) + 1] : [4, i - 35 + 1];
+}
 /** 카드에서 온 무공·심법의 아이콘: 「천외귀환」 카드 그림(96×64)을 한 번 받아 둔다 */
 const cardImg = new Map<string, HTMLImageElement | null>();
 export function cardIcon(card: string | undefined): HTMLImageElement | null {
@@ -114,7 +127,7 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   fxIds.add(`fx_gyeol_tech_${s.hero.ult.id}_b`);
   const fx = new Map<string, Anim>();
   await Promise.all([...fxIds].map(async (id) => fx.set(id, await real(id))));
-  const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3'), real('icons_teum_skills_4')]);
+  const [ground, terrain, props, icons, items, ...skills] = await Promise.all([real(s.chapter.ground), real(s.chapter.terrain), real('props_teum'), real('icons_teum'), real('icons_teum_items'), real('icons_teum_skills_1'), real('icons_teum_skills_2'), real('icons_teum_skills_3'), real('icons_teum_skills_4'), real('icons_teum_skills_5'), real('icons_teum_skills_6'), real('icons_teum_skills_7')]);
   const items2 = await real('icons_teum_items_2');
   const world = await real('icons_teum_world');
   const kinds = new Map<string, SpriteAsset>();
@@ -155,8 +168,8 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       areaProps.set(z.def.id, pr);
     }),
   );
-  const [castle, mapev, relics] = await Promise.all([real('terrain_teum_castle'), real('icons_teum_mapevents'), real('icons_teum_relics')]);
-  const out: Art = { hero: { idle, walk, death, dirs }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex, shots, foeFx, areaTex, areaProps, castle, mapev, relics };
+  const [castle, mapev, relics, gems, debuffs] = await Promise.all([real('terrain_teum_castle'), real('icons_teum_mapevents'), real('icons_teum_relics'), real('icons_teum_gems'), real('icons_teum_debuffs')]);
+  const out: Art = { hero: { idle, walk, death, dirs }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex, shots, foeFx, areaTex, areaProps, castle, mapev, relics, gems, debuffs };
   // 구역 보스·구역 무리·둥지 그림은 뒤에서
   for (const z of s.areas) for (const id of [z.def.boss, ...z.def.foes]) ensureFoeArt(out, id);
   ensureFoeArt(out, 'rift_nest');
@@ -1840,10 +1853,37 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   // 결 조각·물건
   for (const g of s.gems) {
     if (!inView(g.x, g.y)) continue;
-    const big = g.xp >= 10;
-    if (drawItemIcon(ctx, art, 'gem', g.x, g.y, big ? 22 : 14)) continue;
-    ctx.fillStyle = big ? '#ffd27a' : g.xp >= 3 ? '#7fd6c8' : '#8fd3ff';
-    const r = big ? 8 : 5;
+    // 보석 등급(2026-11-25 그림자마다 색): 푸른 · 초록 · 보랏빛 · 붉은 · 금빛 · 무지개
+    const tier = g.tier ?? 0;
+    const tc = tier === 5 ? `hsl(${(now / 6) % 360},90%,72%)` : (RULES.gems.tiers[tier]?.color ?? '#8fd3ff');
+    const big = tier >= 3 || g.xp >= 10;
+    const sz = 14 + tier * 2.4;
+    const gi = art.gems?.images[tier];
+    if (gi) {
+      ctx.drawImage(gi, g.x - sz / 2, g.y - sz / 2, sz, sz);
+      continue;
+    }
+    const base = art.icons?.images[0];
+    if (base) {
+      ctx.drawImage(base, g.x - sz / 2, g.y - sz / 2, sz, sz);
+      if (tier) {
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(tintOf(base, (base as HTMLCanvasElement).width, (base as HTMLCanvasElement).height, tier === 5 ? '#ffffff' : tc), g.x - sz / 2, g.y - sz / 2, sz, sz);
+        ctx.globalAlpha = 1;
+      }
+      if (tier >= 4) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = hexA(tier === 5 ? '#ffffff' : tc, 0.25 + 0.15 * Math.sin(now / 150 + g.x));
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, sz * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      continue;
+    }
+    ctx.fillStyle = tc;
+    const r = big ? 8 : 4 + tier;
     ctx.beginPath();
     ctx.moveTo(g.x, g.y - r);
     ctx.lineTo(g.x + r * 0.7, g.y);
@@ -2053,6 +2093,45 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           const k = ((now / 500 + f.uid * 0.13) % 1);
           ctx.fillStyle = hexA(ecol, 0.9 * (1 - k));
           ctx.fillRect(f.x + Math.sin(f.uid * 7 + k * 6) * f.def.radius, f.y - f.def.radius * 2 - k * 18, 3, 3);
+        }
+        // 디버프(2026-11-25): 독 초록 거품 · 출혈 붉은 방울(겹 수) · 쇠약 잿빛 · 공포 보랏빛 · 침묵 흰 · 속박 푸른 사슬 — 머리 위 작은 표식
+        if (f.debuff) {
+          const on = DEBUFFS.filter((k) => (f.debuff![k] ?? 0) > s.t);
+          if (on.length) {
+            const hy = f.y - f.def.radius * 2.6 * (f.scale ?? 1) - 18;
+            on.forEach((k, i) => {
+              const bx = f.x + (i - (on.length - 1) / 2) * 13;
+              const di = art.debuffs?.images[DEBUFFS.indexOf(k)];
+              if (di) ctx.drawImage(di, bx - 6, hy - 6, 12, 12);
+              else {
+                ctx.fillStyle = RULES.debuffs.colors[k];
+                ctx.strokeStyle = '#1d2433';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(bx, hy, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+              }
+              if (k === 'bleed' && (f.bleedStacks ?? 0) > 1) {
+                ctx.font = '800 9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#ffe0e0';
+                ctx.fillText(String(f.bleedStacks), bx + 6, hy - 4);
+              }
+            });
+            // 몸 빛: 독은 초록, 공포는 떨림
+            if (on.includes('poison') && (f.uid + Math.floor(now / 140)) % 3 === 0) {
+              ctx.fillStyle = 'rgba(143,214,90,0.8)';
+              ctx.fillRect(f.x + Math.sin(f.uid + now / 200) * f.def.radius, f.y - f.def.radius * 1.6 - ((now / 8) % 16), 3, 3);
+            }
+            if (on.includes('root')) {
+              ctx.strokeStyle = 'rgba(111,214,255,0.8)';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.ellipse(f.x, f.y - 2, f.def.radius * 0.9, f.def.radius * 0.35, 0, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
         }
         // 변종 표식: 머리 위 작은 마름모(색 = 변종)
         if (vcol && !f.elite) {
@@ -2812,10 +2891,8 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     ctx.strokeStyle = id ? hexA(color, 0.9) : 'rgba(243,234,216,0.15)';
     ctx.strokeRect(cx + 0.5, y + 0.5, slot - 1, slot - 1);
     if (!id) return;
-    const idx = SKILL_ICON.get(id) ?? -1;
-    // 1~3번 시트는 손으로 맞춘 35개(16·16·3), 그 뒤(간파 심법 둘, 2026-11-21)는 4번 시트
-    const sheet = idx >= 0 ? art.skills[idx < 35 ? Math.floor(idx / 16) : 3] : null;
-    const img = sheet?.images[idx < 35 ? idx % 16 : idx - 35];
+    const ref = skillIconRef(id);
+    const img = ref ? art.skills[ref[0] - 1]?.images[ref[1] - 1] : null;
     const card = cardIcon(WEAPONS.get(id)?.card ?? PASSIVES.get(id)?.card);
     // 카드 그림(가로 3:2)은 가운데를 네모로 잘라 칸에
     if (card) ctx.drawImage(card, card.naturalWidth * 0.17, 0, card.naturalWidth * 0.66, card.naturalHeight, cx + 3, y + 3, slot - 6, slot - 6);

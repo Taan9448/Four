@@ -1,0 +1,23 @@
+id: icons_teum_skills_5
+type: icon-sheet
+summary: "「틈」 디버프 무공·심법 10 + 무한 모드 고유 심법 6 아이콘(2026-11-25 사용자 \"디버프 스킬·무한 모드 고유 스킬 20·극 10\") — 칸 번호 = teum/data/weapons.json icon [5, n]: 1 독바늘 · 2 피의 부채 · 3 쇠약의 저주 · 4 공포의 외침 · 5 봉인의 사슬 · 6 얼음 족쇄 · 7 독공 · 8 혈흔 · 9 쇠약의 기운 · 10 위압 · 11 공허 심장 · 12 균열 감각 · 13 망각 · 14 독의 피 · 15 틈 걸음 · 16 별의 가호. icons_teum_skills_1~4와 같은 결"
+frames: 16
+baseline: 0.5
+frame_notes:
+  1: "독바늘: three thin green-tipped poison needles flying diagonally with small green droplets"
+  2: "피의 부채: a red folding war fan with blood droplets flying off its edge"
+  3: "쇠약의 저주: a grey drooping skull rune with a downward arrow, ashen smoke"
+  4: "공포의 외침: a screaming purple ghost face with sound rings spreading out"
+  5: "봉인의 사슬: white chains wrapped around a sealed mouth sigil"
+  6: "얼음 족쇄: pale blue ice shackles clamped on the ground with frost"
+  7: "독공: a palm glowing green with a snake-shaped poison swirl"
+  8: "혈흔: a red footprint trail of blood drops"
+  9: "쇠약의 기운: a withered grey flower with falling petals"
+  10: "위압: a purple eye with a fearful shadow looming behind it"
+  11: "공허 심장: a dark violet heart cracked with glowing rift light"
+  12: "균열 감각: a narrow glowing violet eye inside a crack of light"
+  13: "망각: a blank white mask dissolving into mist"
+  14: "독의 피: a green-black drop of blood with poison bubbles"
+  15: "틈 걸음: a footstep leaving violet rift sparks"
+  16: "별의 가호: a small round shield with a golden star at its center"
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

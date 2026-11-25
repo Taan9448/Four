@@ -4,8 +4,8 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, evolveTable, slotWeapons, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
-import { absorb, draw, emptyView, loadArt, sideSprite, SKILL_ICON, type Art, type View } from './render';
+import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, evolveTable, slotWeapons, isSetElem, elemName, hasPartner, partnerName, gemTierOf, type FoeDef, type ResistKey, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { absorb, draw, emptyView, loadArt, sideSprite, skillIconRef, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
 import { autosave, bank, cheonoeCards, heroOpen, loadSave, onSaveWrite, slotLabel, writeSave, type SaveData, type Slot } from './save';
@@ -400,15 +400,18 @@ function storyPopup(): void {
 function skillArt(id: string): string | null {
   const card = WEAPONS.get(id)?.card ?? PASSIVES.get(id)?.card;
   if (card) return cardArtUrl(card);
-  const i = SKILL_ICON.get(id);
-  if (i === undefined) return null;
-  return i < 35 ? realArt(`icons_teum_skills_${Math.floor(i / 16) + 1}`, (i % 16) + 1) : realArt('icons_teum_skills_4', i - 35 + 1);
+  if (WEAPONS.get(id)?.relic) {
+    const ri = [...WEAPONS.values()].filter((w) => w.relic).findIndex((w) => w.id === id);
+    return realArt('icons_teum_relics', ri + 1);
+  }
+  const ref = skillIconRef(id);
+  return ref ? realArt(`icons_teum_skills_${ref[0]}`, ref[1]) : null;
 }
 /** 효과 배지(2026-11-21 7차 "효과 표시를 명확하게"): 속성마다 색·글자가 다르다 */
-const ELEM = { fire: ['화', '화염'], ice: ['서', '서리'], shock: ['뇌', '뇌전'], vuln: ['파', '파쇄'] } as const;
+const ELEM = { fire: ['화', '화염'], ice: ['서', '서리'], shock: ['뇌', '뇌전'], vuln: ['파', '파쇄'], poison: ['독', '중독'], bleed: ['혈', '출혈'], weaken: ['쇠', '쇠약'], fear: ['공', '공포'], silence: ['봉', '침묵'], root: ['속', '속박'] } as const;
 function elemBadge(e: keyof typeof ELEM | undefined, withName = true): HTMLElement | string {
   if (!e) return '';
-  return el('span', { class: `elem e-${e}`, title: RULES.sets[e].desc }, el('i', {}, ELEM[e][0]), withName ? ELEM[e][1] : '');
+  return el('span', { class: `elem e-${e}`, title: isSetElem(e) ? RULES.sets[e].desc : `디버프 — ${elemName(e)}` }, el('i', {}, ELEM[e][0]), withName ? ELEM[e][1] : '');
 }
 /** 무공·심법 카드(그림 · 등급 · 갈래 · 이름 · 효과 · 한 줄 설명 · 숫자) — 재편성·무공록·장터가 같이 쓴다 */
 function skillCard(id: string, opts: { lv?: number; extra?: (HTMLElement | string)[]; cls?: string; compact?: boolean } = {}): HTMLElement {
@@ -885,9 +888,47 @@ function rebuildPopup(slot: Slot, onDone: () => void): void {
   root.querySelector('.modal-box')!.insertBefore(body, root.querySelector('.modal-close'));
 }
 
+/** 도감 그림자 자세히(2026-11-25) */
+const foeArtId = (f: FoeDef): string => (f.fallback && !realArt(`${f.sprite}_idle`) ? f.fallback : f.sprite);
+const foeRankName = (f: FoeDef): string => (f.rank === 'boss' ? '보스' : f.area ? '구역 보스' : f.role === 'nest' ? '맵 이벤트' : f.rank === 'elite' ? '중간 보스' : f.special ? '특수' : '일반');
+const SKILL_KIND_NAME: Record<string, string> = { aimed: '조준 탄', fan: '부채꼴 탄', radial: '사방 탄', line: '일직선 예고', cone: '부채꼴 휘두르기', ring: '충격파 고리', lob: '던지기(웅덩이)', heal: '둘레 회복', shield: '둘레 보호막', burrow: '땅굴(곁에서 솟음)', slam: '내려찍기', charge: '돌진', summon: '불러내기' };
+const ELEM_NAME: Record<string, string> = { fire: '화염', ice: '서리', shock: '뇌전', poison: '독' };
+function foeSkills(f: FoeDef): string[] {
+  const out: string[] = [];
+  if (f.fly) out.push('비행(지형을 넘는다)');
+  if (f.move === 'charge') out.push('돌진');
+  if (f.move === 'ranged') out.push('거리를 두고 쏜다');
+  if (f.fuse || f.move === 'burst') out.push('자폭(곁에서 터진다)');
+  if (f.split) out.push(`쓰러지면 ${f.split}으로 갈라진다`);
+  if (f.element) out.push(`${ELEM_NAME[f.element] ?? f.element} 속성`);
+  for (const k of f.skills ?? []) {
+    const name = SKILL_KIND_NAME[k.kind] ?? k.kind;
+    const extra = k.kind === 'summon' ? ` — ${FOES.get(k.foe)?.name ?? k.foe} ×${k.count}` : 'damage' in k && k.damage ? ` — 피해 ${k.damage}` : k.kind === 'heal' ? ` — ${Math.round(k.amount * 100)}%` : '';
+    out.push(`${name}${extra} · ${k.every}초마다`);
+  }
+  return out;
+}
+function foeDetail(f: FoeDef): HTMLElement {
+  const img = frameUrl(`${foeArtId(f)}_idle`, 1);
+  const spd = f.speed === 0 ? '움직이지 않음' : f.speed < 55 ? '느림' : f.speed < 85 ? '보통' : f.speed < 105 ? '빠름' : '매우 빠름';
+  const res = Object.entries(f.resist ?? {}).filter(([, v]) => v > 0);
+  const gt = RULES.gems.tiers[gemTierOf(f)];
+  const skills = foeSkills(f);
+  const stat = (label: string, v: string, cls = '') => el('div', { class: `fs ${cls}` }, el('small', {}, label), el('b', {}, v));
+  return el(
+    'div',
+    { class: 'foe-detail' },
+    el('div', { class: 'fd-head' }, img ? el('img', { src: img, alt: '' }) : '', el('div', {}, el('b', {}, f.name), el('small', {}, foeRankName(f)), el('small', { class: 'gem', style: `--g:${gt?.color ?? '#8fd3ff'}` }, el('i', {}), gt?.name ?? ''))),
+    el('div', { class: 'fd-stats' }, stat('체력', String(f.hp)), stat('공격력', String(f.damage)), stat('이동속도', `${f.speed} · ${spd}`), stat('경험치', String(f.xp))),
+    el('div', { class: 'fd-row' }, el('small', {}, '저항'), res.length ? el('div', { class: 'chips' }, ...res.map(([k, v]) => el('span', { class: `chip-s${v >= 1 ? ' on' : ''}` }, `${RULES.resist.names[k as ResistKey] ?? k} ${v >= 1 ? '면역' : `${Math.round(v * 100)}%`}`))) : el('span', { class: 'muted' }, '없음')),
+    el('div', { class: 'fd-row' }, el('small', {}, '기술'), skills.length ? el('ul', {}, ...skills.map((t) => el('li', {}, t))) : el('span', { class: 'muted' }, '없음 — 몸으로 부딪친다')),
+  );
+}
+
 function codexPopup(): void {
   const sv = loadSave();
   let tab: 'foes' | 'weapons' | 'passives' | 'items' | 'steles' = 'foes';
+  let pickFoe = '';
   const openSet = new Set(sv.unlocked);
   const lockable = new Set(LOCKABLE);
   const isLocked = (id: string) => !ALL && lockable.has(id) && !openSet.has(id);
@@ -896,22 +937,22 @@ function codexPopup(): void {
     const tabs = el('div', { class: 'row-pick' }, ...([['foes', '그림자'], ['weapons', '무공'], ['passives', '심법'], ['items', '줍는 것'], ['steles', '비석']] as const).map(([k, n]) => btn(n, `chip${tab === k ? ' on' : ''}`, () => ((tab = k), render()))));
     let list: HTMLElement[];
     if (tab === 'foes') {
-      list = STORY.chapters.flatMap((c) => {
-        const ids = [...new Set([...Object.values(c.roles).flat(), c.roles.mid, c.roles.boss])].filter((id) => FOES.has(id));
-        return [
-          el('h4', {}, c.name),
-          el(
-            'div',
-            { class: 'grid' },
-            ...ids.map((id) => {
-              const f = FOES.get(id)!;
-              const seen = sv.seen.includes(id);
-              const img = frameUrl(`${f.sprite}_idle`, 1);
-              return el('div', { class: `entry${seen ? '' : ' unseen'}`, title: seen ? (enemyLore.get(f.ref ?? '') ?? '') : '아직 만나지 못했다' }, img ? el('img', { src: img, alt: '' }) : '', el('b', {}, seen ? f.name : '???'), el('small', {}, f.rank === 'boss' ? '보스' : f.rank === 'elite' ? '중간 보스' : ''));
-            }),
-          ),
-        ];
-      });
+      // 2026-11-25 "몬스터마다 체력·공격력·이동속도·특수능력 저항·스킬": 누르면 위 칸에 자세히
+      const entry = (id: string) => {
+        const f = FOES.get(id)!;
+        const seen = ALL || sv.seen.includes(id);
+        const img = frameUrl(`${foeArtId(f)}_idle`, 1);
+        const b = el('button', { type: 'button', class: `entry${seen ? '' : ' unseen'}${pickFoe === id ? ' on' : ''}`, title: seen ? (enemyLore.get(f.ref ?? '') ?? '') : '아직 만나지 못했다' }, img ? el('img', { src: img, alt: '' }) : '', el('b', {}, seen ? f.name : '???'), el('small', {}, foeRankName(f)));
+        if (seen) b.addEventListener('click', () => ((pickFoe = id), render()));
+        return b;
+      };
+      const groups: [string, string[]][] = [
+        ...STORY.chapters.map((c) => [c.name, [...new Set([...Object.values(c.roles).flat(), c.roles.mid, c.roles.boss])].filter((id) => FOES.has(id))] as [string, string[]]),
+        ['특수 그림자', [...FOES.values()].filter((f) => f.special).map((f) => f.id)],
+        ['구역 보스 · 맵 이벤트', [...FOES.values()].filter((f) => f.area || f.role === 'nest').map((f) => f.id)],
+      ];
+      const pf = pickFoe ? FOES.get(pickFoe) : undefined;
+      list = [pf ? foeDetail(pf) : el('p', { class: 'note' }, '만난 그림자를 누르면 체력·공격력·이동속도·저항·기술을 본다'), ...groups.flatMap(([name, ids]) => [el('h4', {}, name), el('div', { class: 'grid' }, ...ids.map(entry))])];
     } else if (tab === 'weapons') {
       const ws = [...WEAPONS.values()];
       list = [el('p', { class: 'note' }, `무공 ${ws.length}개 — 손으로 맞춘 ${ws.filter((w) => !w.card).length} · 「천외귀환」 카드 ${ws.filter((w) => w.card).length}`), el('div', { class: 'grid text' }, ...ws.map((w) => { const a = cardArtUrl(w.card ?? ''); const lk = isLocked(w.id); return el('div', { class: `entry${lk ? ' locked' : ''}`, style: `--c:${w.color}` }, a ? el('img', { class: 'thumb', src: a, alt: '', loading: 'lazy' }) : '', el('b', {}, `${lk ? '🔒 ' : ''}${w.name}${w.evolved ? ' ★' : ''}`), el('small', {}, `${w.owner === '*' ? '모두' : (HEROES.find((h) => h.id === w.owner)?.name ?? '')} · ${KIND_NAME[w.kind]}`), el('small', {}, w.desc)); }))];
@@ -1355,17 +1396,19 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
     const role = roleOf(c.id);
     const nums = keyNumbers(c.id, c.lv);
     const info = describe(c.id);
-    const partner = pd ? partnersOf(s).get(pd.id) : undefined;
+    const partner = partnersOf(s).get(c.id);
     const ec = elementCounts(s);
     const art = skillArt(c.id);
     const icon = el('span', { class: `role role-${role.key}` });
     icon.innerHTML = roleIcon(role.key);
     const chips: (HTMLElement | string)[] = [];
-    if (w?.element) {
-      const n = (ec[w.element] ?? 0) + (c.lv === 1 ? 1 : 0);
-      chips.push(el('span', { class: `chip-s${n >= RULES.sets[w.element].need ? ' on' : ''}` }, `${RULES.sets[w.element].name} ${n}/${RULES.sets[w.element].need}`));
-    }
-    if (w?.evolve) chips.push(el('span', { class: `chip-s${s.passives.has(w.evolve.with) ? ' on' : ''}` }, `각성 짝: ${PASSIVES.get(w.evolve.with)?.name}${s.passives.has(w.evolve.with) ? ' ✓' : ''}`));
+    if (isSetElem(w?.element)) {
+      const e = w!.element as keyof typeof RULES.sets;
+      const n = (ec[e] ?? 0) + (c.lv === 1 ? 1 : 0);
+      chips.push(el('span', { class: `chip-s${n >= RULES.sets[e].need ? ' on' : ''}` }, `${RULES.sets[e].name} ${n}/${RULES.sets[e].need}`));
+    } else if (w?.element) chips.push(el('span', { class: 'chip-s debuff' }, `디버프 · ${elemName(w.element)}`));
+    if (w?.endless) chips.push(el('span', { class: 'chip-s endless' }, '무한 모드 고유'));
+    if (w?.evolve) chips.push(el('span', { class: `chip-s${hasPartner(s, w.evolve.with) ? ' on' : ''}` }, `각성 짝: ${partnerName(w.evolve.with)}${WEAPONS.has(w.evolve.with) ? '(무공)' : ''}${hasPartner(s, w.evolve.with) ? ' ✓' : ''}`));
     if (partner) chips.push(el('span', { class: 'chip-s on' }, `★ 「${WEAPONS.get(partner)?.name}」 각성 짝`));
     const b = el(
       'button',
@@ -1494,10 +1537,11 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
       return a ? el('img', { class: 'rc-art', src: a, alt: '' }) : el('span', { class: 'rc-art ph' }, '');
     };
     const pips = (n: number, max: number) => el('span', { class: 'rc-pips', 'aria-label': `Lv.${n}/${max}` }, ...Array.from({ length: max }, (_, i) => el('i', { class: i < n ? 'on' : '' })));
-    const STATUS: Record<string, string> = { done: '각성함', ready: '상자를 열면 각성!', lv: '무공 레벨을 끝까지', passive: '짝 심법이 필요', weapon: '무공이 필요', none: '' };
+    const STATUS: Record<string, string> = { done: '각성함', ready: '상자를 열면 각성!', lv: '무공 레벨을 끝까지', passive: '짝이 필요', weapon: '무공이 필요', none: '' };
     const row = (r: (typeof rows)[number]) => {
       const w = WEAPONS.get(r.weapon)!;
-      const p = PASSIVES.get(r.passive)!;
+      const pw = WEAPONS.has(r.passive);
+      const pName = partnerName(r.passive);
       const x = WEAPONS.get(r.into)!;
       const status = r.open ? STATUS[r.state] : r.why === 'slots' ? '칸이 가득 차 이 판에서는 어렵다' : '이 판에서는 나오지 않는다';
       return el(
@@ -1505,9 +1549,9 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
         { class: `rc-row st-${r.state}${r.open ? '' : ' shut'}`, style: `--c:${x.color ?? w.color}` },
         el('div', { class: `rc-part${r.lv ? ' have' : ''}` }, pic(r.weapon), el('div', {}, el('b', {}, w.name), r.lv ? pips(r.lv, r.max) : el('small', {}, `무공 · 최대 Lv.${r.max}`))),
         el('span', { class: 'rc-op' }, '+'),
-        el('div', { class: `rc-part${r.plv ? ' have' : ''}` }, pic(r.passive), el('div', {}, el('b', {}, p.name), el('small', {}, r.plv ? `심법 Lv.${r.plv} ✓` : '심법'))),
+        el('div', { class: `rc-part${r.plv ? ' have' : ''}` }, pic(r.passive), el('div', {}, el('b', {}, pName), el('small', {}, `${pw ? '무공(합쳐짐)' : '심법'}${r.plv ? ` Lv.${r.plv} ✓` : ''}`))),
         el('span', { class: 'rc-op' }, '→'),
-        el('div', { class: 'rc-part into' }, pic(r.into), el('div', {}, el('b', {}, `★ ${x.name}`), el('small', {}, x.desc.replace(/^각성 — [^.]*\.\s*/, '').replace(/^[^.]*심법\.\s*/, '')))),
+        el('div', { class: 'rc-part into' }, pic(r.into), el('div', {}, el('b', {}, `★ ${x.name}`), el('small', {}, x.desc.replace(/^(각성|극) — [^.]*\.\s*/, '').replace(/^[^.]*심법\.\s*/, '')))),
         status ? el('span', { class: 'rc-status' }, status) : '',
       );
     };

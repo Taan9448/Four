@@ -1,5 +1,5 @@
 {
- "$comment": "「틈」 그림자(GAME_DESIGN 2·8절). sprite는 「천외귀환」 적 그림(<sprite>_idle·_death), ref는 천외귀환 적 id(도감 설명). role은 기본 수치(hp·속도·피해·경험·크기)의 틀이고 칸마다 덮어쓴다. 장 배율(story.json chapters[].hp·dmg)을 곱한다. move: chase·charge·ranged·burst, fly면 지형을 넘는다. skills: aimed·fan·radial·slam·charge·summon(GAME_DESIGN 8절) · 2026-11-22: 탄 모양(style)·따라옴(homing)·웅덩이(zone), 광역 예고 line·cone·ring·lob, heal·shield·burrow, 자폭(fuse)·갈라짐(split), 특수 그림자 10(special — sprite는 Codex teum_*, 오기 전엔 fallback 그림) · 2026-11-25 구역 보스 zb_*(area: 구역 밖으로 쫓아오지 않는다 — zones.json)·그림자 둥지 rift_nest(맵 이벤트, 움직이지 않고 불러낸다)",
+ "$comment": "「틈」 그림자(GAME_DESIGN 2·8절). sprite는 「천외귀환」 적 그림(<sprite>_idle·_death), ref는 천외귀환 적 id(도감 설명). role은 기본 수치(hp·속도·피해·경험·크기)의 틀이고 칸마다 덮어쓴다. 장 배율(story.json chapters[].hp·dmg)을 곱한다. move: chase·charge·ranged·burst, fly면 지형을 넘는다. skills: aimed·fan·radial·slam·charge·summon(GAME_DESIGN 8절) · 2026-11-22: 탄 모양(style)·따라옴(homing)·웅덩이(zone), 광역 예고 line·cone·ring·lob, heal·shield·burrow, 자폭(fuse)·갈라짐(split), 특수 그림자 10(special — sprite는 Codex teum_*, 오기 전엔 fallback 그림) · 2026-11-25 구역 보스 zb_*(area: 구역 밖으로 쫓아오지 않는다 — zones.json)·그림자 둥지 rift_nest(맵 이벤트, 움직이지 않고 불러낸다) · 2026-11-25 resist: 저항 0~1(1 면역 — rules.json resist), 일반 그림자는 없다",
  "foes": [
   {
    "id": "oak_stump",
@@ -83,7 +83,14 @@
      "color": "#cfe6ff",
      "style": "blade"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "kwak_dojin_cliff",
@@ -133,7 +140,19 @@
      "delay": 1.2,
      "color": "#ffcf6a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "goblin",
@@ -251,7 +270,14 @@
      "foe": "goblin",
      "count": 6
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "veilak",
@@ -296,7 +322,19 @@
      "delay": 0.85,
      "color": "#9ad04a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "fire_spirit",
@@ -431,7 +469,14 @@
      "delay": 0.9,
      "color": "#ffb02e"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "ignis",
@@ -496,7 +541,19 @@
       "element": "fire"
      }
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "ice_wolf",
@@ -606,7 +663,15 @@
      "style": "shard"
     }
    ],
-   "element": "ice"
+   "element": "ice",
+   "resist": {
+    "slow": 1,
+    "freeze": 1,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "celias",
@@ -667,7 +732,19 @@
      "color": "#8fd3ff"
     }
    ],
-   "element": "ice"
+   "element": "ice",
+   "resist": {
+    "slow": 1,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "rock_eater",
@@ -789,7 +866,14 @@
      "delay": 1.0,
      "color": "#ff7a3a"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "gormon",
@@ -838,7 +922,19 @@
      "delay": 1.0,
      "color": "#c89a5a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "shadow_fragment",
@@ -984,7 +1080,14 @@
      "delay": 0.7,
      "color": "#b48cff"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "vargas",
@@ -1044,7 +1147,19 @@
      "delay": 0.8,
      "color": "#b48cff"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "blood_guard",
@@ -1139,7 +1254,14 @@
      "count": 1,
      "fx": "fx_gyeol_skill_black_gust"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "jo_myeonggak",
@@ -1195,7 +1317,19 @@
      "delay": 0.8,
      "color": "#ffcf6a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "blood_cultist",
@@ -1327,7 +1461,14 @@
      "count": 1,
      "fx": "fx_gyeol_skill_poison_mist"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "hyeolsu",
@@ -1377,7 +1518,19 @@
      "delay": 1.0,
      "color": "#ff4a5a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "stair_archer",
@@ -1519,7 +1672,14 @@
      "delay": 0.85,
      "color": "#ffcf6a"
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "sa_mugyeol",
@@ -1579,7 +1739,19 @@
      "delay": 0.75,
      "color": "#ff4a5a"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "fire_scale_hound",
@@ -1701,7 +1873,14 @@
      "foe": "shadow_wraith",
      "count": 8
     }
-   ]
+   ],
+   "resist": {
+    "freeze": 0.5,
+    "knock": 0.85,
+    "stun": 0.8,
+    "fear": 0.6,
+    "root": 0.5
+   }
   },
   {
    "id": "mordecai",
@@ -1766,7 +1945,19 @@
      "delay": 1.0,
      "color": "#b48cff"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 0.5,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "poison": 0.3,
+    "bleed": 0.3,
+    "weaken": 0.3,
+    "fear": 1,
+    "silence": 0.5,
+    "root": 0.8
+   }
   },
   {
    "id": "rift_bomber",
@@ -1792,7 +1983,11 @@
     "from": 0,
     "weight": 3
    },
-   "tint": "#ff6a3a"
+   "tint": "#ff6a3a",
+   "resist": {
+    "burn": 1,
+    "fear": 0.5
+   }
   },
   {
    "id": "rift_sniper",
@@ -1829,7 +2024,11 @@
      "color": "#ffcf6a",
      "style": "arrow"
     }
-   ]
+   ],
+   "resist": {
+    "knock": 0.3,
+    "fear": 0.5
+   }
   },
   {
    "id": "rift_shaman",
@@ -1870,7 +2069,11 @@
       "element": "poison"
      }
     }
-   ]
+   ],
+   "resist": {
+    "poison": 0.5,
+    "silence": 0.5
+   }
   },
   {
    "id": "rift_warden",
@@ -1907,7 +2110,12 @@
      "color": "#9fd8ff",
      "range": 220
     }
-   ]
+   ],
+   "resist": {
+    "knock": 0.8,
+    "stun": 0.5,
+    "weaken": 0.3
+   }
   },
   {
    "id": "rift_brute",
@@ -1936,7 +2144,12 @@
      "color": "#ffb02e",
      "range": 200
     }
-   ]
+   ],
+   "resist": {
+    "knock": 0.9,
+    "stun": 0.4,
+    "root": 0.5
+   }
   },
   {
    "id": "rift_burrower",
@@ -1964,7 +2177,11 @@
      "damage": 14,
      "color": "#c89a5a"
     }
-   ]
+   ],
+   "resist": {
+    "knock": 0.5,
+    "root": 1
+   }
   },
   {
    "id": "rift_caster",
@@ -2003,7 +2220,11 @@
       "element": "fire"
      }
     }
-   ]
+   ],
+   "resist": {
+    "burn": 1,
+    "root": 1
+   }
   },
   {
    "id": "rift_slime",
@@ -2022,6 +2243,11 @@
    "special": {
     "from": 0,
     "weight": 2
+   },
+   "resist": {
+    "slow": 0.4,
+    "poison": 1,
+    "bleed": 1
    }
   },
   {
@@ -2052,7 +2278,11 @@
      "color": "#ffe45a",
      "style": "spark"
     }
-   ]
+   ],
+   "resist": {
+    "stun": 1,
+    "root": 1
+   }
   },
   {
    "id": "rift_frost",
@@ -2091,7 +2321,12 @@
      "color": "#8fd3ff",
      "style": "shard"
     }
-   ]
+   ],
+   "resist": {
+    "slow": 1,
+    "freeze": 1,
+    "root": 1
+   }
   },
   {
    "id": "zb_dream_queen",
@@ -2137,7 +2372,16 @@
      "count": 3
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "weaken": 0.5,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 1
+   }
   },
   {
    "id": "zb_demon_shade",
@@ -2187,7 +2431,17 @@
      "style": "shadow"
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "burn": 0.5,
+    "stun": 0.8,
+    "weaken": 0.4,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "zb_blood_bishop",
@@ -2233,7 +2487,17 @@
      "amount": 0.08
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "poison": 0.5,
+    "bleed": 1,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "zb_bone_lord",
@@ -2275,7 +2539,17 @@
      "count": 1
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "poison": 1,
+    "bleed": 1,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "zb_frost_warden",
@@ -2323,7 +2597,16 @@
      "range": 240
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "slow": 1,
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "zb_forge_demon",
@@ -2374,7 +2657,16 @@
      "count": 1
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "burn": 1,
+    "stun": 0.8,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "zb_mirror_witch",
@@ -2417,7 +2709,15 @@
      "count": 3
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "fear": 1,
+    "silence": 0.8,
+    "root": 1
+   }
   },
   {
    "id": "zb_plague_lord",
@@ -2464,7 +2764,17 @@
      "amount": 0.06
     }
    ],
-   "area": true
+   "area": true,
+   "resist": {
+    "freeze": 1,
+    "knock": 0.9,
+    "stun": 0.8,
+    "poison": 1,
+    "bleed": 0.5,
+    "fear": 1,
+    "silence": 0.4,
+    "root": 0.6
+   }
   },
   {
    "id": "rift_nest",
@@ -2487,7 +2797,15 @@
      "foe": "shadow_fragment",
      "count": 2
     }
-   ]
+   ],
+   "resist": {
+    "slow": 1,
+    "freeze": 1,
+    "knock": 1,
+    "stun": 1,
+    "fear": 1,
+    "root": 1
+   }
   }
  ]
 }

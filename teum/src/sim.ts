@@ -31,8 +31,8 @@ export interface WeaponDef {
   desc: string;
   color: string;
   levels: WeaponLevel[];
-  /** 맞은 적에게 남기는 것: ice 느림 · fire 태움 · shock 잠깐 멈춤 · vuln 받는 피해 +25% */
-  element?: 'ice' | 'fire' | 'shock' | 'vuln';
+  /** 맞은 적에게 남기는 것: ice 느림 · fire 태움 · shock 잠깐 멈춤 · vuln 받는 피해 +25% · (2026-11-25 디버프) poison 중독 · bleed 출혈 · weaken 쇠약 · fear 공포 · silence 침묵 · root 속박 */
+  element?: 'ice' | 'fire' | 'shock' | 'vuln' | Debuff;
   knock?: number;
   fx?: string;
   evolved?: boolean;
@@ -43,7 +43,16 @@ export interface WeaponDef {
   rarity?: string;
   /** 비전(2026-11-25): 구역 보스를 쓰러뜨려야만 얻는다 — 무공 칸 밖 비전 칸 */
   relic?: boolean;
+  /** 무한 모드에만 나오는 고유 무공(2026-11-25) */
+  endless?: boolean;
+  /** 아이콘 칸 [시트, 칸](icons_teum_skills_<시트>) — 없으면 예전 순서 */
+  icon?: [number, number];
 }
+/** 플레이어가 거는 디버프(2026-11-25 rules.json debuffs) */
+export type Debuff = 'poison' | 'bleed' | 'weaken' | 'fear' | 'silence' | 'root';
+export const DEBUFFS: Debuff[] = ['poison', 'bleed', 'weaken', 'fear', 'silence', 'root'];
+/** 저항 열쇠(rules.json resist.names) */
+export type ResistKey = 'slow' | 'freeze' | 'knock' | 'burn' | 'stun' | 'vuln' | Debuff;
 export interface PassiveDef {
   id: string;
   name: string;
@@ -53,6 +62,8 @@ export interface PassiveDef {
   max: number;
   card?: string;
   rarity?: string;
+  endless?: boolean;
+  icon?: [number, number];
 }
 /** 적 탄 모양(2026-11-22 "원거리 공격이 다 똑같다"): orb 알 · arrow 화살 · flame 불덩이 · shard 얼음 조각 · spark 번개 · bubble 독 거품 · shadow 그림자 · bone 뼈 · needle 독침 · blade 검기 */
 export type ShotStyle = 'orb' | 'arrow' | 'flame' | 'shard' | 'spark' | 'bubble' | 'shadow' | 'bone' | 'needle' | 'blade';
@@ -108,6 +119,10 @@ export interface FoeDef {
   tint?: string;
   /** 구역 보스(2026-11-25 zones.json): 구역 밖으로는 쫓아오지 않는다 */
   area?: boolean;
+  /** 저항 0~1(1 면역, 2026-11-25) — 일반 그림자는 없다 */
+  resist?: Partial<Record<ResistKey, number>>;
+  /** 경험치 보석 등급(rules.json gems.tiers id) — 없으면 몫·급으로 */
+  gem?: string;
 }
 export interface FuseDef {
   range: number;
@@ -293,7 +308,7 @@ export const RULES = rulesRaw as unknown as {
     shop: { every: number; stay: number; skills: number };
     dojo: { every: number; stay: number };
     /** 판마다 무작위 무공 풀(2026-11-22 사용자 "무한 모드 무공은 무작위 — 직업 특성은 지킨다, 40~50종") */
-    pool: { weapons: [number, number]; passives: [number, number]; own: number };
+    pool: { weapons: [number, number]; passives: [number, number]; own: number; unique: { weapons: [number, number]; passives: [number, number] } };
     /** 상인·수련소가 파는 다른 문파 무공 값 배율 */
     foreignPrice: number;
     chests: number;
@@ -303,10 +318,30 @@ export const RULES = rulesRaw as unknown as {
   /** 안개(2026-11-19 사용자 "맵이 전부 밝혀진 채 시작하면 안 된다"): 인물 둘레 cells칸을 every초마다 밝힌다 */
   sight: { cells: number; every: number };
   /** 변종(2026-11-22): 보통 그림자가 이 확률로 변종이 된다(장·분마다 오른다) */
+  resist: { names: Record<ResistKey, string> };
+  debuffs: {
+    poison: { seconds: number; dps: number };
+    bleed: { seconds: number; perStack: number; maxStacks: number };
+    weaken: { seconds: number; mul: number };
+    fear: { seconds: number; speed: number };
+    silence: { seconds: number };
+    root: { seconds: number };
+    names: Record<Debuff, string>;
+    colors: Record<Debuff, string>;
+  };
+  gems: { tiers: { id: string; name: string; color: string }[]; byRole: Record<string, string> };
   variants: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number }; list: VariantDef[]; element: Record<string, { trail?: { every: number; radius: number; seconds: number; dps: number }; deathZone?: { radius: number; seconds: number; dps: number }; chill?: number; poison?: number; zap?: { every: number; range: number; delay: number; damage: number; width: number }; deathRing?: { radius: number; delay: number; damage: number } }> };
   /** 특수 그림자(2026-11-22): 장 무리 대신 이 확률로 섞인다 */
   specials: { chance: { base: number; perChapter: number; perMin: number; max: number; endlessFrom: number } };
 };
+/** 저항(0~1): 일반 그림자는 0 */
+export const resistOf = (f: { def: FoeDef }, k: ResistKey): number => Math.max(0, Math.min(1, f.def.resist?.[k] ?? 0));
+/** 경험치 보석 등급 번호: foes.json gem → 몫·급 */
+export function gemTierOf(def: FoeDef): number {
+  const G = RULES.gems;
+  const key = def.gem ?? (def.rank === 'boss' ? G.byRole.boss : def.area ? G.byRole.zboss : def.role === 'nest' ? G.byRole.nest : def.rank === 'elite' ? G.byRole.mid : def.special ? G.byRole.special : (G.byRole[def.fly ? 'fly' : def.role] ?? G.byRole.main));
+  return Math.max(0, G.tiers.findIndex((t) => t.id === key));
+}
 export const STORY = storyRaw as unknown as {
   difficulties: Difficulty[];
   /** 무한 모드 판(2026-11-21) */
@@ -544,6 +579,10 @@ export interface Foe {
   area?: number;
   /** 맵 이벤트로 나온 것(둥지·야영지) */
   mapEvent?: number;
+  /** 플레이어가 건 디버프(2026-11-25): 끝나는 때 · 출혈 겹 · 다음 독·출혈 피해 때 */
+  debuff?: Partial<Record<Debuff, number>>;
+  bleedStacks?: number;
+  dotAt?: number;
 }
 export interface Shot {
   x: number;
@@ -618,6 +657,8 @@ export interface Gem {
   taken?: boolean;
   /** 끌려온 시간(곡선) */
   pt?: number;
+  /** 보석 등급(rules.json gems.tiers 번호, 2026-11-25) */
+  tier?: number;
 }
 /** items.json의 id */
 export type ItemKind = string;
@@ -985,20 +1026,25 @@ export function endlessPool(hero: HeroDef, rng: Rng): Set<string> {
   };
   // 인물의 바탕 무공(heroes.json pool — 직업 특성)은 늘 들고, 나머지는 인물 카드 무공(own 비율)과 공통 카드 무공에서 무작위
   const core = [hero.start, ...hero.pool.filter((id) => id !== hero.start && WEAPONS.has(id))];
-  const base = [...WEAPONS.values()].filter((d) => !d.evolved && !d.relic && !core.includes(d.id));
+  const base = [...WEAPONS.values()].filter((d) => !d.evolved && !d.relic && !d.endless && !core.includes(d.id));
   const own = shuffle(base.filter((d) => d.owner === hero.id).map((d) => d.id));
   const common = shuffle(base.filter((d) => d.owner === '*').map((d) => d.id));
   const rest = Math.max(0, nW - core.length);
   const nOwn = Math.min(own.length, Math.round(rest * P.own));
-  const weapons = [...core, ...own.slice(0, nOwn), ...common.slice(0, rest - nOwn)];
+  // 무한 모드 고유 무공(2026-11-25): 판마다 unique만큼 섞는다
+  const U = P.unique;
+  const uniq = shuffle([...WEAPONS.values()].filter((d) => d.endless && !d.evolved).map((d) => d.id)).slice(0, rng.int(U.weapons[0], U.weapons[1]));
+  const weapons = [...core, ...own.slice(0, nOwn), ...common.slice(0, rest - nOwn), ...uniq];
   const out = new Set(weapons);
+  for (const id of shuffle([...PASSIVES.values()].filter((p) => p.endless).map((p) => p.id)).slice(0, rng.int(U.passives[0], U.passives[1]))) out.add(id);
   // 각성 짝 심법은 먼저(각성을 노릴 수 있게), 나머지는 무작위
+  const cap = nW + nP + U.weapons[1] + U.passives[1];
   for (const id of weapons) {
     const ev = WEAPONS.get(id)?.evolve;
-    if (ev && out.size < nW + nP) out.add(ev.with);
+    if (ev && out.size < cap) out.add(ev.with);
   }
-  for (const id of shuffle([...PASSIVES.keys()])) {
-    if (out.size >= nW + nP) break;
+  for (const id of shuffle([...PASSIVES.values()].filter((p) => !p.endless).map((p) => p.id))) {
+    if (out.size >= cap) break;
     out.add(id);
   }
   return out;
@@ -1574,8 +1620,41 @@ export function elementCounts(s: State): Record<string, number> {
   }
   return c;
 }
+/** 속성 세트가 있는 효과인가(디버프는 세트가 없다) */
+export const isSetElem = (el: string | undefined): el is keyof typeof RULES.sets => !!el && el !== '$comment' && el in RULES.sets;
+/** 효과 이름(세트 이름 또는 디버프 이름) */
+export const elemName = (el: string | undefined): string => (!el ? '' : isSetElem(el) ? RULES.sets[el].name : (RULES.debuffs.names[el as Debuff] ?? el));
+/** 각성 짝을 가졌나(심법 또는 무공, 2026-11-25 무공 + 무공 합성) */
+export const hasPartner = (s: { passives: Map<string, number>; weapons: { id: string }[] }, id: string): boolean => s.passives.has(id) || s.weapons.some((w) => w.id === id);
+/** 각성 짝 이름 · 무공인가 */
+export const partnerName = (id: string): string => PASSIVES.get(id)?.name ?? WEAPONS.get(id)?.name ?? id;
 export const setOn = (s: State, el: keyof typeof RULES.sets): boolean => (elementCounts(s)[el] ?? 0) >= RULES.sets[el].need;
 const hasAffix = (f: Foe, id: string): boolean => !!f.affixes?.includes(id);
+
+/** 디버프 심법 능력치 → 디버프 */
+const PROC_STATS: [string, Debuff][] = [
+  ['poisonOn', 'poison'],
+  ['bleedOn', 'bleed'],
+  ['weakenOn', 'weaken'],
+  ['fearOn', 'fear'],
+  ['silenceOn', 'silence'],
+  ['rootOn', 'root'],
+];
+/** 디버프를 건다(저항만큼 짧게, 면역이면 안 걸린다) */
+export function applyDebuff(s: State, f: Foe, k: Debuff): void {
+  const r = resistOf(f, k);
+  if (r >= 1 || f.dead) return;
+  const D = RULES.debuffs;
+  const until = s.t + D[k].seconds * (1 - r);
+  f.debuff ??= {};
+  f.debuff[k] = Math.max(f.debuff[k] ?? 0, until);
+  if (k === 'bleed') f.bleedStacks = Math.min(D.bleed.maxStacks, (f.bleedStacks ?? 0) + 1);
+  f.dotAt ??= s.t + 0.5;
+}
+/** 디버프가 걸려 있나 */
+export const hasDebuff = (s: State, f: Foe, k: Debuff): boolean => (f.debuff?.[k] ?? 0) > s.t;
+/** 지속 피해 배율(뒤 장·무한 모드 분마다 오른다) */
+const dotScale = (s: State): number => 1 + 0.35 * (s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex);
 
 function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false): void {
   if (f.dead) return;
@@ -1593,16 +1672,26 @@ function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDe
   f.hitAt = s.t;
   const firm = hasAffix(f, 'steadfast') || !!va?.firm;
   // 같은 속성의 그림자는 그 속성이 듣지 않는다(불타는 놈은 안 탄다)
-  if (element === 'ice' && !firm && f.element !== 'ice') f.slowUntil = s.t + 1.2;
-  if (element === 'fire' && f.element !== 'fire') f.burnUntil = s.t + 2;
-  if (element === 'shock' && !f.def.rank && !firm) f.stunUntil = s.t + 0.35;
-  if (element === 'vuln') f.vulnUntil = s.t + (setOn(s, 'vuln') ? 5 : 3);
+  // 저항(2026-11-25 foes.json resist): 상태 시간·밀림에 (1 - 저항)
+  const rs = (k: ResistKey) => 1 - resistOf(f, k);
+  if (element === 'ice' && !firm && f.element !== 'ice' && rs('slow') > 0) f.slowUntil = Math.max(f.slowUntil, s.t + 1.2 * rs('slow'));
+  if (element === 'fire' && f.element !== 'fire' && rs('burn') > 0) f.burnUntil = Math.max(f.burnUntil, s.t + 2 * rs('burn'));
+  if (element === 'shock' && !firm && rs('stun') > 0) f.stunUntil = Math.max(f.stunUntil, s.t + 0.35 * rs('stun'));
+  if (element === 'vuln' && rs('vuln') > 0) f.vulnUntil = Math.max(f.vulnUntil, s.t + (setOn(s, 'vuln') ? 5 : 3) * rs('vuln'));
+  if (element && (DEBUFFS as string[]).includes(element)) applyDebuff(s, f, element as Debuff);
+  // 디버프 심법: 맞힐 때 확률(독·출혈·지속 피해에는 다시 걸지 않는다)
+  if (!chained)
+    for (const [st, k] of PROC_STATS) {
+      const c = pv(s, st);
+      if (c > 0 && s.rng.next() < c) applyDebuff(s, f, k);
+    }
   // 가시 돋친(되돌리는) 정예: 때린 쪽이 조금 받는다
   if (hasAffix(f, 'spiteful') && s.t >= s.thornAt) {
     s.thornAt = s.t + 0.5;
     hurtPlayer(s, AFFIX.get('spiteful')!.thorns ?? 3, true);
   }
-  if (knock && !f.def.rank && !firm) {
+  if (knock && !firm && rs('knock') > 0) {
+    knock *= rs('knock');
     const dx = f.x - s.player.x;
     const dy = f.y - s.player.y;
     const d = Math.hypot(dx, dy) || 1;
@@ -1767,7 +1856,7 @@ function killFoe(s: State, f: Foe): void {
   const rank = f.def.rank;
   s.ult = Math.min(RULES.ult.max, s.ult + (rank === 'boss' ? RULES.ult.boss : rank === 'elite' ? RULES.ult.elite : RULES.ult.kill));
   s.events.push({ type: 'kill', x: f.x, y: f.y, foe: f.def.id, rank });
-  if (f.def.xp > 0) s.gems.push({ x: f.x, y: f.y, xp: f.def.xp * (1 + 0.15 * s.chapterIndex) * (fa >= 0 ? AREAS.reward.xp * (fau?.kind === 'tyrant' ? fau.xp : 1) : 1), pulled: false });
+  if (f.def.xp > 0) s.gems.push({ tier: gemTierOf(f.def), x: f.x, y: f.y, xp: f.def.xp * (1 + 0.15 * s.chapterIndex) * (fa >= 0 ? AREAS.reward.xp * (fau?.kind === 'tyrant' ? fau.xp : 1) : 1), pulled: false });
   if (f.golden) {
     // 금빛 그림자: 금괴 셋 + 상자
     for (let i = 0; i < 3; i++) s.items.push({ x: f.x + (i - 1) * 26, y: f.y + 14, kind: 'gold_bar' });
@@ -2525,7 +2614,20 @@ function moveFoes(s: State): void {
       if (pt) [f.x, f.y] = pt;
       continue;
     }
-    if (frozen || s.t < f.stunUntil) continue;
+    // 빙결 저항이 반 넘으면 얼리는 물건(빙결부)이 듣지 않는다
+    if ((frozen && resistOf(f, 'freeze') < 0.5) || s.t < f.stunUntil) continue;
+    // 디버프: 독·출혈 지속 피해(0.5초마다) · 출혈이 끝나면 겹이 풀린다
+    if (f.debuff) {
+      const D = RULES.debuffs;
+      if (f.bleedStacks && !hasDebuff(s, f, 'bleed')) f.bleedStacks = 0;
+      if (s.t >= (f.dotAt ?? 0)) {
+        f.dotAt = s.t + 0.5;
+        const k = dotScale(s);
+        if (hasDebuff(s, f, 'poison')) damageFoe(s, f, (D.poison.dps / 2) * k, 0, undefined, true);
+        if (!f.dead && f.bleedStacks) damageFoe(s, f, (D.bleed.perStack / 2) * f.bleedStacks * k, 0, undefined, true);
+        if (f.dead) continue;
+      }
+    }
     // 땅속(땅굴 그림자): 솟을 때까지 숨어 있다
     if (f.burrowUntil) {
       if (s.t < f.burrowUntil) continue;
@@ -2559,6 +2661,13 @@ function moveFoes(s: State): void {
       uy = -dy / d;
       speed *= 0.6;
     }
+    // 공포: 인물에게서 달아난다 · 속박: 걷지 못한다(2026-11-25 디버프)
+    const feared = hasDebuff(s, f, 'fear');
+    if (feared) {
+      ux = -dx / d;
+      uy = -dy / d;
+      speed *= RULES.debuffs.fear.speed;
+    }
     if (f.def.move === 'charge' && s.t >= f.dashAt && d < 420) {
       f.dashUntil = s.t + 0.45;
       f.dashAt = s.t + 3 + s.rng.next() * 2;
@@ -2570,6 +2679,7 @@ function moveFoes(s: State): void {
       uy = f.vy;
       speed *= 2.4;
     }
+    if (hasDebuff(s, f, 'root')) speed = 0;
     let mx = ux * speed * DT;
     let my = uy * speed * DT;
     const cx = Math.floor(f.x / cell);
@@ -2606,7 +2716,8 @@ function moveFoes(s: State): void {
     if (s.t < f.burnUntil && Math.floor(s.t * 2) !== Math.floor((s.t - DT) * 2)) damageFoe(s, f, 4);
     if (f.dead) continue;
     const rr = f.def.radius + RULES.player.radius;
-    if ((p.x - f.x) ** 2 + (p.y - f.y) ** 2 < rr * rr) {
+    const weakMul = hasDebuff(s, f, 'weaken') ? RULES.debuffs.weaken.mul : 1;
+    if (!feared && (p.x - f.x) ** 2 + (p.y - f.y) ** 2 < rr * rr) {
       if (s.t < p.dashUntil) {
         if (!p.grazed.has(f.uid)) {
           p.grazed.add(f.uid);
@@ -2622,7 +2733,7 @@ function moveFoes(s: State): void {
         // 막고 있는 동안 닿은 놈은 살짝 밀려난다
       } else {
         const before = p.hurtUntil;
-        hurtPlayer(s, f.damage);
+        hurtPlayer(s, f.damage * weakMul);
         if (p.hurtUntil !== before) {
           if (hasAffix(f, 'venom')) s.poisonUntil = s.t + 3;
           if (hasAffix(f, 'frosty')) s.chillUntil = s.t + (AFFIX.get('frosty')!.chill ?? 2);
@@ -2634,7 +2745,15 @@ function moveFoes(s: State): void {
         if (p.hurtUntil !== before && stat.thorns(s) > 0) damageFoe(s, f, stat.thorns(s));
       }
     }
+    // 공포·침묵: 기술을 못 쓴다 · 쇠약: 이번에 낸 탄·예고의 피해가 준다
+    if (feared || hasDebuff(s, f, 'silence')) continue;
+    const n0 = s.shots.length;
+    const m0 = s.slams.length;
     useSkills(s, f, d);
+    if (weakMul < 1) {
+      for (let i = n0; i < s.shots.length; i++) s.shots[i].damage *= weakMul;
+      for (let i = m0; i < s.slams.length; i++) s.slams[i].damage *= weakMul;
+    }
   }
 }
 
@@ -2973,7 +3092,11 @@ function pickups(s: State): void {
     const far = s.gems.filter((g) => !g.pulled).sort((a, b) => Math.hypot(b.x - p.x, b.y - p.y) - Math.hypot(a.x - p.x, a.y - p.y));
     const merge = far.slice(0, s.gems.length - 400);
     const keep = far[merge.length];
-    if (keep) for (const g of merge) keep.xp += g.xp;
+    if (keep)
+      for (const g of merge) {
+        keep.xp += g.xp;
+        keep.tier = Math.max(keep.tier ?? 0, g.tier ?? 0);
+      }
     const drop = new Set(merge);
     s.gems = s.gems.filter((g) => !drop.has(g));
   }
@@ -3171,7 +3294,9 @@ function gainXp(s: State, xp: number): void {
 function openChest(s: State): void {
   for (const w of s.weapons) {
     const d = WEAPONS.get(w.id)!;
-    if (d.evolve && w.lv >= d.levels.length && s.passives.has(d.evolve.with)) {
+    if (d.evolve && w.lv >= d.levels.length && hasPartner(s, d.evolve.with)) {
+      // 짝이 무공이면 두 무공이 하나로 합쳐진다(짝 무공은 사라져 칸이 빈다)
+      if (WEAPONS.has(d.evolve.with)) s.weapons = s.weapons.filter((o) => o === w || o.id !== d.evolve!.with);
       w.id = d.evolve.into;
       w.lv = 1;
       w.next = s.t;
@@ -3239,14 +3364,15 @@ export function evolveTable(s: State): EvolveRow[] {
     if (!d.evolve) continue;
     const lv = has.get(d.id) ?? 0;
     const done = has.has(d.evolve.into);
-    const mine = d.owner === s.hero.id || d.owner === '*' || s.hero.pool.includes(d.id);
+    const mine = (d.owner === s.hero.id || d.owner === '*' || s.hero.pool.includes(d.id)) && (!d.endless || s.mode === 'endless');
     if (!mine && !lv && !done) continue;
-    const plv = s.passives.get(d.evolve.with) ?? 0;
+    const plv = s.passives.get(d.evolve.with) ?? s.weapons.find((o) => o.id === d.evolve!.with)?.lv ?? 0;
     const max = d.levels.length;
     const state = done ? 'done' : lv >= max && plv ? 'ready' : lv && plv ? 'lv' : lv ? 'passive' : plv ? 'weapon' : 'none';
     const canW = lv > 0 || done || (slotWeapons(s) < s.slots.weapons && offerable(s, d.id));
-    const canP = plv > 0 || (s.passives.size < s.slots.passives && offerable(s, d.evolve.with));
-    const slotsFull = (!lv && !done && slotWeapons(s) >= s.slots.weapons) || (!plv && s.passives.size >= s.slots.passives);
+    const pIsW = WEAPONS.has(d.evolve.with);
+    const canP = plv > 0 || ((pIsW ? slotWeapons(s) < s.slots.weapons - (lv ? 0 : 1) : s.passives.size < s.slots.passives) && offerable(s, d.evolve.with));
+    const slotsFull = (!lv && !done && slotWeapons(s) >= s.slots.weapons) || (!plv && (pIsW ? slotWeapons(s) >= s.slots.weapons : s.passives.size >= s.slots.passives));
     const open = done || (canW && canP);
     rows.push({ weapon: d.id, passive: d.evolve.with, into: d.evolve.into, lv: done ? max : lv, max, plv, state, open, why: open ? undefined : slotsFull ? 'slots' : 'locked', own: d.owner === s.hero.id });
   }
@@ -3263,11 +3389,12 @@ export function choicePool(s: State): Choice[] {
   if (slotWeapons(s) < s.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));
     for (const w of s.weapons) for (const d of WEAPONS.values()) if (d.evolve?.into === w.id) owned.add(d.id);
-    for (const d of WEAPONS.values()) if (!d.evolved && !d.relic && !owned.has(d.id) && offerable(s, d.id) && (s.pool || d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
+    for (const d of WEAPONS.values()) if (!d.evolved && !d.relic && (!d.endless || s.mode === 'endless') && !owned.has(d.id) && offerable(s, d.id) && (s.pool || d.owner === '*' || d.owner === s.hero.id || s.hero.pool.includes(d.id))) out.push({ kind: 'weapon', id: d.id, lv: 1 });
   }
   for (const pd of PASSIVES.values()) {
     const lv = s.passives.get(pd.id) ?? 0;
     if (lv >= pd.max) continue;
+    if (pd.endless && s.mode !== 'endless') continue;
     if (lv === 0 && (s.passives.size >= s.slots.passives || !offerable(s, pd.id))) continue;
     out.push({ kind: 'passive', id: pd.id, lv: lv + 1 });
   }
@@ -3293,7 +3420,7 @@ function offerChoices(s: State): void {
   // 각성 짝 심법은 잘 나오게(2026-11-21 "각성을 노리고 키우는 게 사실상 불가능")
   const partners = partnersOf(s);
   while (picks.length < many && rest.length) {
-    const c = s.rng.weighted(rest, (x) => (x.lv > 1 ? Math.max(1.6, fresh / Math.max(1, ups) / 2) : 1) * (x.kind === 'passive' && partners.has(x.id) ? RULES.build.partnerWeight : 1))!;
+    const c = s.rng.weighted(rest, (x) => (x.lv > 1 ? Math.max(1.6, fresh / Math.max(1, ups) / 2) : 1) * (partners.has(x.id) && x.lv === 1 ? RULES.build.partnerWeight : 1))!;
     picks.push(c);
     rest.splice(rest.indexOf(c), 1);
   }
@@ -3466,7 +3593,7 @@ function useDash(s: State): void {
     }
     const r = D.radius ?? 130;
     s.events.push({ type: 'nova', x: p.dashFromX, y: p.dashFromY, r, color: '#9fe6ff', weapon: '' });
-    for (const f of s.foes) if (!f.dead && (f.x - p.dashFromX) ** 2 + (f.y - p.dashFromY) ** 2 < r * r) f.slowUntil = s.t + (D.slow ?? 2.5);
+    for (const f of s.foes) if (!f.dead && (f.x - p.dashFromX) ** 2 + (f.y - p.dashFromY) ** 2 < r * r) f.slowUntil = s.t + (D.slow ?? 2.5) * (1 - resistOf(f, 'slow'));
   }
   // 얇은 벽·강 넘기: 바로 앞이 막혔으면 vault칸 안의 걸을 수 있는 곳으로 건너뛴다
   if (p.dashMove) {
