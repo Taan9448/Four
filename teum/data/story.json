@@ -241,19 +241,19 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "bands",
-      "rows": 4,
-      "gaps": 8,
+      "rows": 7,
+      "gaps": 14,
       "gap": 7,
       "thick": 2
      },
      {
       "kind": "blobs",
-      "count": 28,
+      "count": 84,
       "r": [
        1.5,
        3
@@ -261,14 +261,14 @@
      },
      {
       "kind": "slow",
-      "count": 10,
+      "count": 30,
       "r": [
        2,
        4
       ]
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "gust",
@@ -334,12 +334,12 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "blobs",
-      "count": 87,
+      "count": 261,
       "r": [
        1.5,
        3.6
@@ -347,14 +347,14 @@
      },
      {
       "kind": "slow",
-      "count": 22,
+      "count": 66,
       "r": [
        2,
        5
       ]
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "howl",
@@ -425,32 +425,32 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "river",
-      "count": 3,
+      "count": 5,
       "width": 4,
-      "bridges": 6,
+      "bridges": 10,
       "dir": "v",
       "type": "hazard"
      },
      {
       "kind": "pillars",
-      "count": 63,
+      "count": 189,
       "size": 2
      },
      {
       "kind": "blobs",
-      "count": 19,
+      "count": 57,
       "r": [
        1.5,
        2.5
       ]
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "lava",
@@ -518,8 +518,8 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "rooms",
@@ -529,7 +529,7 @@
      },
      {
       "kind": "slow",
-      "count": 40,
+      "count": 120,
       "r": [
        2,
        5
@@ -537,11 +537,11 @@
      },
      {
       "kind": "pillars",
-      "count": 36,
+      "count": 108,
       "size": 2
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "whiteout",
@@ -611,8 +611,8 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "caves",
@@ -621,7 +621,7 @@
      },
      {
       "kind": "blobs",
-      "count": 18,
+      "count": 54,
       "r": [
        1,
        2
@@ -629,7 +629,7 @@
       "type": "hazard"
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "hands",
@@ -699,8 +699,8 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "rooms",
@@ -710,19 +710,19 @@
      },
      {
       "kind": "pillars",
-      "count": 68,
+      "count": 204,
       "size": 2
      },
      {
       "kind": "slow",
-      "count": 18,
+      "count": 54,
       "r": [
        2,
        4
       ]
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "eclipse",
@@ -788,14 +788,14 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "river",
-      "count": 2,
+      "count": 3,
       "width": 3,
-      "bridges": 8,
+      "bridges": 14,
       "dir": "h",
       "type": "hazard"
      },
@@ -807,14 +807,14 @@
      },
      {
       "kind": "blobs",
-      "count": 22,
+      "count": 66,
       "r": [
        1,
        2
       ]
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "alley",
@@ -884,8 +884,8 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "rooms",
@@ -895,7 +895,7 @@
      },
      {
       "kind": "blobs",
-      "count": 54,
+      "count": 162,
       "r": [
        1.2,
        2.6
@@ -903,11 +903,11 @@
      },
      {
       "kind": "pillars",
-      "count": 27,
+      "count": 81,
       "size": 2
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "palm",
@@ -979,19 +979,19 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "bands",
-      "rows": 12,
-      "gaps": 3,
+      "rows": 21,
+      "gaps": 5,
       "gap": 4,
       "thick": 2
      },
      {
       "kind": "slow",
-      "count": 36,
+      "count": 108,
       "r": [
        2,
        4
@@ -999,11 +999,11 @@
      },
      {
       "kind": "pillars",
-      "count": 32,
+      "count": 96,
       "size": 2
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "meteor",
@@ -1075,12 +1075,12 @@
     }
    ],
    "terrainDef": {
-    "w": 135,
-    "h": 135,
+    "w": 234,
+    "h": 234,
     "steps": [
      {
       "kind": "islands",
-      "count": 36,
+      "count": 108,
       "r": [
        5,
        9
@@ -1089,11 +1089,11 @@
      },
      {
       "kind": "pillars",
-      "count": 22,
+      "count": 66,
       "size": 2
      }
     ],
-    "props": 135
+    "props": 405
    },
    "gimmick": {
     "kind": "collapse",
@@ -1240,12 +1240,12 @@
    "#05030a"
   ],
   "terrainDef": {
-   "w": 320,
-   "h": 320,
+   "w": 554,
+   "h": 554,
    "steps": [
     {
      "kind": "cracks",
-     "count": 44,
+     "count": 132,
      "len": [
       24,
       70
@@ -1260,7 +1260,7 @@
     },
     {
      "kind": "blobs",
-     "count": 140,
+     "count": 420,
      "r": [
       1.2,
       2.8
@@ -1268,7 +1268,7 @@
     },
     {
      "kind": "slow",
-     "count": 36,
+     "count": 108,
      "r": [
       2,
       4
@@ -1276,11 +1276,11 @@
     },
     {
      "kind": "pillars",
-     "count": 60,
+     "count": 180,
      "size": 1
     }
    ],
-   "props": 600
+   "props": 1800
   },
   "style": "rift",
   "tex": "tex_teum_rift"

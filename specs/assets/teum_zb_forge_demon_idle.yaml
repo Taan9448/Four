@@ -1,0 +1,19 @@
+id: teum_zb_forge_demon_idle
+type: character-anim
+size: large
+character: teum_zb_forge_demon
+chroma: magenta
+summary: "「틈」 구역 보스 대장간 악마 대기 4프레임"
+depends_on: [teum_zb_forge_demon_ref]
+reference: assets/source/teum_zb_forge_demon_ref.png
+facing: left
+frames: 4
+fps: 6
+loop: true
+events: {}
+frame_notes:
+  1: "standing/hovering still, menacing boss stance"
+  2: "a slow breath or pulse of its glow"
+  3: "the glow fades a little, a slight sway"
+  4: "back to the pose of frame 1"
+placeholder: { shape: humanoid, color: "#2a140a", accent: "#ff8a2a" }

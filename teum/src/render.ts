@@ -1,7 +1,7 @@
 // 「틈」 그리기(2026-11-18 2차): 지형 판 · 그림자 · 무공 · 예고 원 · 지도(오른쪽 위) · 상태창(아래).
 // 그림은 「천외귀환」·「결」 것을 그대로 쓰고, Codex 그림(바닥 타일·지형 조각·소품·아이콘)은 오면 쓰고(realOnly) 오기 전에는 코드로 그린다.
 import { cardArtUrl, loadSprite, spriteSource, type SpriteAsset } from '../../src/render/assets';
-import { AFFIXES, CHAPTER_LENGTH, STORY, type FoeZone, type Slam, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
+import { AFFIXES, AREAS, isRelic, CHAPTER_LENGTH, STORY, type MapEvent, type FoeZone, type Slam, effOn, elementCounts, endlessInfo, exploredShare, FOES, RULES, isExplored, ITEMS, PASSIVES, WEAPONS, stat, xpNeed, type FxEvent, type ItemKind, type State } from './sim';
 import { CELL, T } from './terrain';
 
 type Anim = SpriteAsset | null;
@@ -28,6 +28,12 @@ export interface Art {
   /** 적 탄 그림(fx_teum_shot_<모양>)·새 적 기술 그림(fx_teum_foe_<line·cone·ring·puddle·explode·heal·shield·burrow>) — 온 것만 */
   shots: Map<string, SpriteAsset>;
   foeFx: Map<string, SpriteAsset>;
+  /** 구역(2026-11-25): 바닥 무늬(tex_teum_zone_<id>) · 꾸밈 소품 4칸(props_teum_zone_<id>) · 성벽 조각(terrain_teum_castle: 윗면·앞면·탑·화로) · 맵 이벤트 표식 8칸(icons_teum_mapevents) · 비전 그림 8칸(icons_teum_relics) */
+  areaTex: Map<string, Anim>;
+  areaProps: Map<string, Anim>;
+  castle: Anim;
+  mapev: Anim;
+  relics: Anim;
 }
 
 /** 새 그림자(Codex teum_*)는 그림이 오기 전엔 「천외귀환」 그림(fallback) */
@@ -140,7 +146,20 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
       if (a) foeFx.set(k, a);
     }),
   ]);
-  const out: Art = { hero: { idle, walk, death, dirs }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex, shots, foeFx };
+  const areaTex = new Map<string, Anim>();
+  const areaProps = new Map<string, Anim>();
+  await Promise.all(
+    s.areas.map(async (z) => {
+      const [tx, pr] = await Promise.all([real(z.def.tex), real(z.def.props)]);
+      areaTex.set(z.def.id, tx);
+      areaProps.set(z.def.id, pr);
+    }),
+  );
+  const [castle, mapev, relics] = await Promise.all([real('terrain_teum_castle'), real('icons_teum_mapevents'), real('icons_teum_relics')]);
+  const out: Art = { hero: { idle, walk, death, dirs }, foes, fx, ground, terrain, props, icons, items, items2, world, skills, kinds, places, tex, shots, foeFx, areaTex, areaProps, castle, mapev, relics };
+  // 구역 보스·구역 무리·둥지 그림은 뒤에서
+  for (const z of s.areas) for (const id of [z.def.boss, ...z.def.foes]) ensureFoeArt(out, id);
+  ensureFoeArt(out, 'rift_nest');
   // 무한 모드: 다른 장 무리도 뒤에서 미리 불러 둔다(기다리지 않는다)
   if (s.mode === 'endless') for (const c of STORY.chapters) for (const id of [...Object.values(c.roles).flat(), c.roles.mid, c.roles.boss]) ensureFoeArt(out, id);
   return out;
@@ -154,6 +173,9 @@ interface Mark {
 export interface View {
   marks: Mark[];
   banner: { text: string; born: number; kind: string } | null;
+  /** 구역 이름 띠 · 비전 얻음(2026-11-25) */
+  areaBanner?: { name: string; line: string; color: string; boss: boolean; born: number } | null;
+  relicCut?: { id: string; name: string; text: string; color: string; born: number } | null;
   shake: number;
   hurtFlash: number;
   ultFlash: { born: number; fx: string; color: string } | null;
@@ -204,6 +226,11 @@ function spray(v: View, x: number, y: number, n: number, color: string, speed: n
 export function absorb(v: View, s: State, now: number, opt: Options): void {
   for (const e of s.events) {
     if (e.type === 'event') v.banner = { text: e.text, born: now, kind: e.kind };
+    if (e.type === 'area') v.areaBanner = { name: e.name, line: e.line, color: e.color, boss: e.boss, born: now };
+    if (e.type === 'relic') {
+      v.relicCut = { id: e.id, name: e.name, text: e.text, color: e.color, born: now };
+      v.punch = 1;
+    }
     else if (e.type === 'chest') {
       v.banner = { text: e.text, born: now, kind: 'chest' };
       v.chestRoll = { text: e.text, evolve: e.text.startsWith('각성') };
@@ -859,6 +886,7 @@ function drawTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: numb
         ctx.fillRect(x + (h % 14), y - 12 + ((h >> 4) % 14), 8, 4);
       }
     }
+  drawAreaLayer(ctx, s, art, cx0, cy0, cx1, cy1, now);
   drawFog(ctx, s, cx0, cy0, cx1, cy1);
 }
 
@@ -943,6 +971,208 @@ function opaqueCore(img: CanvasImageSource): CanvasImageSource {
   o.getContext('2d')!.drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
   return o;
 }
+/** 구역 성(2026-11-25): 구역 바닥(무늬 그림이 오면 그것, 아니면 구역 빛깔 + 무늬) · 가운데 소환진 · 성벽(검은 돌 + 성가퀴 + 구역 빛 줄) · 성문 화로 · 꾸밈 소품 */
+const AREA_PROP_SPOTS = 7;
+function drawAreaLayer(ctx: CanvasRenderingContext2D, s: State, art: Art, cx0: number, cy0: number, cx1: number, cy1: number, now: number): void {
+  const t = s.terrain;
+  s.areas.forEach((z, ai) => {
+    const H = z.hc + 1;
+    const ax0 = Math.max(cx0, z.cx - H);
+    const ax1 = Math.min(cx1, z.cx + H);
+    const ay0 = Math.max(cy0, z.cy - H);
+    const ay1 = Math.min(cy1, z.cy + H);
+    if (ax0 > ax1 || ay0 > ay1) return;
+    const id = ai + 1;
+    const col = z.def.color;
+    const texImg = art.areaTex.get(z.def.id)?.images[0] ?? null;
+    // 바닥
+    ctx.save();
+    ctx.beginPath();
+    for (let cy = ay0; cy <= ay1; cy++)
+      for (let cx = ax0; cx <= ax1; cx++) {
+        const i = cy * t.w + cx;
+        if (t.zone[i] !== id || t.cells[i] === T.Wall || t.cells[i] === T.Hazard) continue;
+        ctx.rect(cx * CELL, cy * CELL, CELL, CELL);
+      }
+    ctx.fillStyle = pattern(ctx, texImg) ?? hexA(z.def.ground, 0.72);
+    ctx.fill();
+    if (!texImg) {
+      ctx.clip();
+      // 구역마다 바닥 무늬(코드): 몽마 꽃잎 · 옥좌 붉은 길 · 성당 핏자국 · 납골당 뼛조각 · 감옥 얼음 금 · 대장간 불티 · 회랑 거울 빛 · 늪 거품
+      for (let cy = ay0; cy <= ay1; cy++)
+        for (let cx = ax0; cx <= ax1; cx++) {
+          const h = hash(cx, cy);
+          if (t.zone[cy * t.w + cx] !== id || h % 3) continue;
+          const x = cx * CELL + (h % 28) + 4;
+          const y = cy * CELL + ((h >> 5) % 28) + 4;
+          ctx.fillStyle = hexA(col, 0.18 + ((h >> 3) % 10) / 60);
+          ctx.strokeStyle = hexA(col, 0.3);
+          ctx.lineWidth = 1.5;
+          switch (z.def.id) {
+            case 'dream':
+              ctx.beginPath();
+              ctx.arc(x - 2, y, 2.5, 0, Math.PI * 2);
+              ctx.arc(x + 2, y, 2.5, 0, Math.PI * 2);
+              ctx.moveTo(x - 4.5, y + 1);
+              ctx.lineTo(x, y + 6);
+              ctx.lineTo(x + 4.5, y + 1);
+              ctx.fill();
+              break;
+            case 'throne':
+            case 'blood':
+              ctx.beginPath();
+              ctx.ellipse(x, y, 5 + (h % 5), 3 + (h % 3), (h % 7) / 3, 0, Math.PI * 2);
+              ctx.fill();
+              break;
+            case 'ossuary':
+              ctx.fillRect(x - 5, y - 1, 10, 2.5);
+              ctx.fillRect(x - 6, y - 2.5, 2.5, 5);
+              ctx.fillRect(x + 3.5, y - 2.5, 2.5, 5);
+              break;
+            case 'frost':
+            case 'mirror':
+              ctx.beginPath();
+              ctx.moveTo(x - 6, y - 4);
+              ctx.lineTo(x, y + 1);
+              ctx.lineTo(x + 7, y - 2);
+              ctx.moveTo(x, y + 1);
+              ctx.lineTo(x + 1, y + 7);
+              ctx.stroke();
+              break;
+            case 'forge':
+              ctx.fillStyle = hexA(col, 0.25 + 0.25 * Math.abs(Math.sin(now / 300 + h)));
+              ctx.fillRect(x, y, 3, 3);
+              break;
+            default:
+              ctx.beginPath();
+              ctx.arc(x, y, 2 + (h % 3), 0, Math.PI * 2);
+              ctx.stroke();
+          }
+        }
+    }
+    ctx.restore();
+    // 옥좌: 성문에서 가운데로 붉은 길 · 그 밖은 가운데 소환진
+    if (z.def.id === 'throne') {
+      ctx.fillStyle = hexA('#7a1020', 0.32);
+      for (const g of z.gates) {
+        const horiz = g === 1 || g === 3;
+        const len = z.half - CELL;
+        const sx = g === 1 ? z.x : g === 3 ? z.x - len : z.x - CELL;
+        const sy = g === 2 ? z.y : g === 0 ? z.y - len : z.y - CELL;
+        ctx.fillRect(sx, sy, horiz ? len : CELL * 2, horiz ? CELL * 2 : len);
+      }
+    }
+    const alive = !z.cleared;
+    const R = CELL * 3.2;
+    ctx.save();
+    ctx.translate(z.x, z.y);
+    ctx.strokeStyle = hexA(col, alive ? 0.55 + 0.2 * Math.sin(now / 400) : 0.18);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, R, R * 0.62, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, R * 0.78, R * 0.48, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // 다섯 꼭지 별(돌아간다)
+    const rot = alive ? now / 4000 : 0;
+    ctx.beginPath();
+    for (let k = 0; k <= 5; k++) {
+      const a = rot + (k * 2 * Math.PI * 2) / 5 - Math.PI / 2;
+      const px = Math.cos(a) * R * 0.78;
+      const py = Math.sin(a) * R * 0.48;
+      if (k) ctx.lineTo(px, py);
+      else ctx.moveTo(px, py);
+    }
+    ctx.stroke();
+    ctx.restore();
+    // 성벽
+    const top = art.castle?.images[0] ?? null;
+    const face = art.castle?.images[1] ?? null;
+    const tower = art.castle?.images[2] ?? null;
+    for (let cy = ay0; cy <= ay1; cy++)
+      for (let cx = ax0; cx <= ax1; cx++) {
+        const i = cy * t.w + cx;
+        if (t.zone[i] !== id || t.cells[i] !== T.Wall) continue;
+        const x = cx * CELL;
+        const y = cy * CELL;
+        const below = cy + 1 < t.h ? t.cells[i + t.w] : T.Wall;
+        const above = cy > 0 ? t.cells[i - t.w] : T.Wall;
+        const corner = Math.abs(cx - z.cx) >= z.hc - 1 && Math.abs(cy - z.cy) >= z.hc - 1;
+        if (below !== T.Wall) {
+          if (face) ctx.drawImage(face, x, y + CELL - 16, CELL, 20);
+          else {
+            ctx.fillStyle = '#100c14';
+            ctx.fillRect(x, y + CELL - 16, CELL, 20);
+            ctx.fillStyle = hexA(col, 0.5 + 0.2 * Math.sin(now / 500 + cx));
+            ctx.fillRect(x + 6, y + CELL - 6, CELL - 12, 2);
+          }
+        }
+        if (corner && tower) ctx.drawImage(tower, x - 2, y - 20, CELL + 4, CELL + 4);
+        else if (top) ctx.drawImage(top, x, y - 16, CELL, CELL);
+        else {
+          ctx.fillStyle = corner ? '#2a2230' : '#1e1824';
+          ctx.fillRect(x, y - 16, CELL, CELL);
+          ctx.fillStyle = '#342a3c';
+          ctx.fillRect(x + 2, y - 14, CELL - 4, 4);
+          // 성가퀴: 바깥(위가 빈) 쪽에 이빨
+          if (above !== T.Wall) {
+            ctx.fillStyle = '#2c2434';
+            for (let k = 0; k < 3; k++) ctx.fillRect(x + 3 + k * 13, y - 24, 8, 9);
+          }
+          ctx.fillStyle = hexA(col, 0.35);
+          ctx.fillRect(x, y - 16 + CELL - 3, CELL, 2);
+        }
+      }
+    // 성문 화로(양옆) — 구역 빛깔 불꽃
+    for (const g of z.gates) {
+      const ox = g === 1 ? 1 : g === 3 ? -1 : 0;
+      const oy = g === 2 ? 1 : g === 0 ? -1 : 0;
+      const off = (z.hc + 1.5) * CELL;
+      for (const side of [-1, 1]) {
+        const bx = z.x + ox * off + (oy ? side * CELL * 3.6 : 0);
+        const by = z.y + oy * off + (ox ? side * CELL * 3.6 : 0);
+        if (bx < cx0 * CELL - 60 || bx > (cx1 + 1) * CELL + 60 || by < cy0 * CELL - 60 || by > (cy1 + 1) * CELL + 60) continue;
+        const br = art.castle?.images[3] ?? null;
+        if (br) ctx.drawImage(br, bx - 16, by - 34, 32, 40);
+        else {
+          ctx.fillStyle = '#1a1420';
+          ctx.fillRect(bx - 6, by - 18, 12, 18);
+          ctx.fillStyle = '#3a2f44';
+          ctx.fillRect(bx - 10, by - 22, 20, 5);
+        }
+        const fl = 0.7 + 0.3 * Math.sin(now / 90 + bx);
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = hexA(col, 0.35 * fl);
+        ctx.beginPath();
+        ctx.arc(bx, by - 28, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = hexA(col, 0.85);
+        ctx.beginPath();
+        ctx.moveTo(bx - 6, by - 22);
+        ctx.quadraticCurveTo(bx, by - 40 - 6 * fl, bx + 6, by - 22);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    // 꾸밈 소품(Codex props_teum_zone_<id> 4칸): 구역 안 바닥 칸에 정해진 자리
+    const pr = art.areaProps.get(z.def.id);
+    if (pr) {
+      for (let k = 0; k < AREA_PROP_SPOTS; k++) {
+        const h = hash(z.cx * 31 + k, z.cy * 17 + k * 7);
+        const px = z.cx + ((h % (z.hc * 2 - 6)) - (z.hc - 3));
+        const py = z.cy + (((h >> 8) % (z.hc * 2 - 6)) - (z.hc - 3));
+        if (Math.abs(px - z.cx) < 5 && Math.abs(py - z.cy) < 5) continue;
+        if (px < cx0 - 1 || px > cx1 + 1 || py < cy0 - 1 || py > cy1 + 1 || t.cells[py * t.w + px] !== T.Floor) continue;
+        const img = pr.images[k % pr.images.length];
+        ctx.drawImage(img, px * CELL - 8, py * CELL - 24, CELL + 16, CELL + 16);
+      }
+    }
+  });
+}
+
 function drawRiftTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: number, y0: number, x1: number, y1: number, now: number): void {
   const t = s.terrain;
   const [floor, floor2, wall, voidC] = s.chapter.color;
@@ -1110,6 +1340,7 @@ function drawRiftTerrain(ctx: CanvasRenderingContext2D, s: State, art: Art, x0: 
         ctx.fill();
       }
     }
+  drawAreaLayer(ctx, s, art, cx0, cy0, cx1, cy1, now);
   drawFog(ctx, s, cx0, cy0, cx1, cy1);
 }
 
@@ -1272,6 +1503,86 @@ function drawFoeZone(ctx: CanvasRenderingContext2D, z: FoeZone, now: number, t: 
 }
 
 /** 장소의 바닥: 들어가는 둘레(점선 고리 + 옅은 깔개) — 안에 서 있으면 밝게 */
+/** 맵 이벤트 표식(2026-11-25): Codex icons_teum_mapevents(0 행진 · 1 함정 · 2 둥지 · 3 균열 문 · 4 수련자 · 5 제단 · 6 야영지 · 7 도깨비) — 오기 전엔 코드 그림. 균열 문·수련자는 원과 차오르는 띠 */
+/** 비전 그림 칸 순서(icons_teum_relics 4×2) = weapons.json의 relic 순서 */
+const RELIC_IDS = [...WEAPONS.values()].filter((w) => w.relic).map((w) => w.id);
+const MAPEV_ICON: Record<string, number> = { horde: 0, trap: 1, nest: 2, portal: 3, rescue: 4, camp: 6, golden: 7 };
+const MAPEV_GLYPH: Record<string, string> = { horde: '행', trap: '함', nest: '둥', portal: '문', rescue: '옥', camp: '영', golden: '금' };
+const MAPEV_COLOR: Record<string, string> = { horde: '#ff5a4a', trap: '#d8d0c0', nest: '#a35cff', portal: '#c070ff', rescue: '#ffd27a', camp: '#ff8a3a', golden: '#ffd27a' };
+function drawMapEvent(ctx: CanvasRenderingContext2D, art: Art, s: State, e: MapEvent, now: number): void {
+  const d = e.def;
+  const col = MAPEV_COLOR[d.kind] ?? '#f3ead8';
+  if ((d.kind === 'portal' || d.kind === 'rescue') && (e.state === 'active' || e.state === 'idle')) {
+    const R = d.radius ?? 100;
+    const k = Math.min(1, e.progress / (d.seconds ?? 5));
+    ctx.save();
+    ctx.strokeStyle = hexA(col, e.state === 'active' ? 0.8 : 0.35);
+    ctx.lineWidth = 2;
+    ctx.setLineDash([10, 8]);
+    ctx.lineDashOffset = -now / 40;
+    ctx.beginPath();
+    ctx.ellipse(e.x, e.y, R, R * 0.62, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if (e.state === 'active') {
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = hexA(col, 0.9);
+      ctx.beginPath();
+      ctx.ellipse(e.x, e.y, R, R * 0.62, 0, -Math.PI / 2, -Math.PI / 2 + k * Math.PI * 2);
+      ctx.stroke();
+    }
+    if (d.kind === 'portal') {
+      // 갈라진 틈: 도는 보랏빛 소용돌이
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 3; i++) {
+        ctx.strokeStyle = hexA(col, 0.5 - i * 0.12);
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(e.x, e.y - 30, 26 - i * 7, 40 - i * 10, Math.sin(now / 600 + i) * 0.3, now / (300 + i * 80), now / (300 + i * 80) + Math.PI * 1.4);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+  if (d.kind === 'trap' && e.state === 'active') {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(216,208,192,0.45)';
+    ctx.setLineDash([6, 10]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(e.x, e.y, d.area ?? 300, (d.area ?? 300) * 0.62, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (e.state !== 'idle' && d.kind !== 'portal' && d.kind !== 'rescue') return;
+  const bob = Math.sin(now / 260 + e.x) * 3;
+  const icon = art.mapev?.images[MAPEV_ICON[d.kind] ?? 0];
+  // 멀리서도 보이게 빛기둥
+  const g = ctx.createLinearGradient(e.x, e.y - 110, e.x, e.y);
+  g.addColorStop(0, hexA(col, 0));
+  g.addColorStop(1, hexA(col, 0.35));
+  ctx.fillStyle = g;
+  ctx.fillRect(e.x - 9, e.y - 110, 18, 110);
+  if (icon) {
+    ctx.drawImage(icon, e.x - 24, e.y - 52 + bob, 48, 48);
+    return;
+  }
+  ctx.save();
+  ctx.translate(e.x, e.y - 26 + bob);
+  ctx.fillStyle = 'rgba(10,8,14,0.85)';
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 17, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = col;
+  ctx.font = '800 16px "Nanum Myeongjo", serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(MAPEV_GLYPH[d.kind] ?? '?', 0, 6);
+  ctx.restore();
+}
+
 function drawPlaceGround(ctx: CanvasRenderingContext2D, it: { x: number; y: number }, color: string, r: number, now: number, inside: boolean): void {
   ctx.save();
   ctx.fillStyle = hexA(color, inside ? 0.16 : 0.08);
@@ -1541,6 +1852,10 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     ctx.closePath();
     ctx.fill();
   }
+  for (const e of s.mapEvents) {
+    if (e.state === 'done' || !inView(e.x, e.y, 260) || (e.state === 'idle' && !isExplored(s, e.x, e.y))) continue;
+    drawMapEvent(ctx, art, s, e, now);
+  }
   for (const it of s.items) {
     if (!inView(it.x, it.y, 200) || (it.hidden && !isExplored(s, it.x, it.y))) continue;
     const pd = ITEMS.get(it.kind)?.place;
@@ -1666,7 +1981,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const a = (moving && fa?.walk) || fa?.idle;
     const vcol = f.variant ? RULES.variants.list.find((x) => x.id === f.variant)?.color : undefined;
     const ecol = f.element ? ELEM_COLOR[f.element] : undefined;
-    const tcol = vcol ?? f.def.tint ?? ecol;
+    // 구역 보스: 몸 빛(tint)은 빌린 그림일 때만(Codex 그림이 오면 제 색)
+    const tcol = vcol ?? (f.def.area && foeSprite(f.def.sprite, f.def.fallback) === f.def.sprite ? undefined : f.def.tint) ?? ecol;
     const sc = f.def.scale * (f.scale ?? 1);
     draws.push({
       y: f.y,
@@ -1752,6 +2068,27 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
+        }
+        if (f.area !== undefined) {
+          // 구역 보스: 발밑 구역 빛 소용돌이 · 머리 위 이름(돌아가는 중이면 흐리게)
+          const zc = s.areas[f.area]?.def.color ?? '#ff5a4a';
+          const back = s.areaIn !== f.area;
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.strokeStyle = hexA(zc, back ? 0.25 : 0.6);
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(f.x, f.y, f.def.radius * 1.7, f.def.radius * 0.7, 0, now / 300, now / 300 + Math.PI * 1.5);
+          ctx.stroke();
+          ctx.restore();
+          ctx.font = '800 13px "IBM Plex Sans KR", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'rgba(10,6,8,0.9)';
+          ctx.fillStyle = back ? 'rgba(243,234,216,0.55)' : zc;
+          const ny = f.y - f.def.radius * 2.8 * sc - 8;
+          ctx.strokeText(`♛ ${f.def.name}${back ? ' — 제자리로' : ''}`, f.x, ny);
+          ctx.fillText(`♛ ${f.def.name}${back ? ' — 제자리로' : ''}`, f.x, ny);
         }
         if (f.golden || f.elite) {
           // 금빛 그림자·정예: 몸에 빛을 두른다
@@ -2427,6 +2764,19 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
   for (const f of s.foes) if (!f.def.rank && near(f.x, f.y)) dot(f.x, f.y, 2, '#ff5a4a');
   for (const it of s.items) if (isExplored(s, it.x, it.y)) dot(it.x, it.y, it.kind === 'chest' ? 5 : 3, it.kind === 'chest' ? '#ffd27a' : '#f3ead8');
   for (const f of s.foes) if (f.def.rank) dot(f.x, f.y, f.boss ? 8 : 6, f.boss ? '#ff2a3a' : '#ffb02e');
+  // 구역(본 것만): 성 테두리 · 보스가 있으면 해골, 넘기면 ✓
+  for (const z of s.areas) {
+    if (!z.seen) continue;
+    ctx.strokeStyle = hexA(z.def.color, 0.9);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x + (z.x - z.half) * k, y + (z.y - z.half) * k, z.half * 2 * k, z.half * 2 * k);
+    ctx.font = `800 ${Math.max(8, Math.round(size / 18))}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = z.cleared ? 'rgba(243,234,216,0.7)' : z.def.color;
+    ctx.fillText(z.cleared ? '✓' : '☠', x + z.x * k, y + z.y * k + 4);
+  }
+  // 맵 이벤트(본 것 · 끝나지 않은 것)
+  for (const e of s.mapEvents) if (e.state !== 'done' && (e.state === 'active' || isExplored(s, e.x, e.y))) dot(e.x, e.y, 4, MAPEV_COLOR[e.def.kind] ?? '#f3ead8');
   // 화면에 보이는 범위
   ctx.strokeStyle = 'rgba(243,234,216,0.35)';
   ctx.strokeRect(x + (s.player.x - s.view) * k, y + (s.player.y - s.view * 0.6) * k, s.view * 2 * k, s.view * 1.2 * k);
@@ -2492,8 +2842,9 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
     }
   };
   if (rows === 2) y = top;
+  const normal = s.weapons.filter((w) => !isRelic(w.id));
   for (let i = 0; i < slots.weapons; i++) {
-    const w = s.weapons[i];
+    const w = normal[i];
     const d = w ? WEAPONS.get(w.id)! : null;
     drawSlot(cellAt2(i, 0), w?.id ?? null, w?.lv ?? 0, d?.levels.length ?? 5, d?.color ?? '#888', d?.name[0] ?? '', !!d?.evolved);
     // 각성 조건(Lv.5 + 짝 심법)이 갖춰지면 반짝 — 상자를 열면 각성
@@ -2514,6 +2865,46 @@ function drawStatusBar(ctx: CanvasRenderingContext2D, s: State, art: Art, x: num
   ctx.fillStyle = 'rgba(243,234,216,0.35)';
   if (rows === 1) ctx.fillRect(cellAt2(slots.weapons, 4), y + 4, 2, slot - 8);
   y = top;
+  // 비전 칸(2026-11-25 구역 보스): 상태창 오른쪽 위 작은 금테 칸
+  const rel = s.weapons.filter((w) => isRelic(w.id));
+  if (rel.length || s.areas.length) {
+    const rs = Math.round(slot * 0.78);
+    const n = AREAS.relicSlots;
+    // 왼쪽 위(오른쪽은 휴대폰 기술 단추와 겹친다)
+    const rx = x - 8 + 36;
+    // 속성 세트 글자(상태창 바로 위) 위로
+    const ry = top - rs - 30;
+    ctx.fillStyle = 'rgba(8,8,12,0.72)';
+    ctx.fillRect(rx - 34, ry - 4, n * (rs + 3) + 38, rs + 8);
+    ctx.font = '700 11px "IBM Plex Sans KR", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffd27a';
+    ctx.fillText('비전', rx - 30, ry + rs / 2 + 4);
+    for (let i = 0; i < n; i++) {
+      const w = rel[i];
+      const d = w ? WEAPONS.get(w.id) : null;
+      const cx = rx + i * (rs + 3);
+      ctx.fillStyle = w ? 'rgba(40,30,20,0.95)' : 'rgba(40,30,20,0.35)';
+      ctx.fillRect(cx, ry, rs, rs);
+      ctx.strokeStyle = w ? '#ffd27a' : 'rgba(255,210,122,0.25)';
+      ctx.strokeRect(cx + 0.5, ry + 0.5, rs - 1, rs - 1);
+      if (!w || !d) continue;
+      const icon = art.relics?.images[RELIC_IDS.indexOf(w.id)];
+      if (icon) ctx.drawImage(icon, cx + 2, ry + 2, rs - 4, rs - 4);
+      else {
+        ctx.fillStyle = hexA(d.color, 0.45);
+        ctx.fillRect(cx + 2, ry + 2, rs - 4, rs - 4);
+        ctx.fillStyle = '#f3ead8';
+        ctx.font = `800 ${Math.round(rs * 0.48)}px "Nanum Myeongjo", serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(d.name[0], cx + rs / 2, ry + rs * 0.68);
+      }
+      ctx.fillStyle = '#ffd27a';
+      ctx.font = '800 9px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(String(w.lv), cx + rs - 2, ry + rs - 2);
+    }
+  }
   // 속성 세트(같은 효과 무공 수) — 켜진 것은 금빛
   const ec = elementCounts(s);
   const sets = (Object.keys(RULES.sets).filter((k) => k !== '$comment') as (keyof typeof RULES.sets)[]).filter((k) => ec[k]);
@@ -2612,6 +3003,24 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
     ctx.fillStyle = '#f3ead8';
     ctx.fillText(s.boss.def.name, W / 2, 82);
   }
+  // 구역 보스 체력 띠(그 구역 안에 있을 때)
+  const ab = s.areaIn >= 0 ? s.areas[s.areaIn]?.boss : null;
+  if (ab && !ab.dead) {
+    const zc = s.areas[s.areaIn].def.color;
+    const bw = Math.min(420, W - 280);
+    const bx = (W - bw) / 2;
+    const by = s.boss && !s.boss.dead ? 100 : 76;
+    ctx.fillStyle = 'rgba(8,6,10,0.75)';
+    ctx.fillRect(bx - 4, by, bw + 8, 22);
+    ctx.fillStyle = hexA(zc, 0.25);
+    ctx.fillRect(bx, by + 10, bw, 7);
+    ctx.fillStyle = zc;
+    ctx.fillRect(bx, by + 10, (bw * Math.max(0, ab.hp)) / ab.maxHp, 7);
+    ctx.font = font(10, 700);
+    ctx.fillStyle = '#f3ead8';
+    ctx.textAlign = 'center';
+    ctx.fillText(`♛ ${ab.def.name} · ${s.areas[s.areaIn].def.name}`, W / 2, by + 8);
+  }
   // 왼쪽 위: 쓰러뜨림·금화
   ctx.textAlign = 'left';
   ctx.font = font(12, 700);
@@ -2648,11 +3057,80 @@ function drawHud(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View, now
       const big = v.banner.kind === 'boss' || v.banner.kind === 'bigwave' || v.banner.kind === 'mid';
       ctx.textAlign = 'center';
       ctx.font = font(big ? 24 : 16, 800);
-      const yy = H * 0.26;
+      // 구역 이름 띠가 떠 있으면 그 아래로
+      const yy = v.areaBanner ? Math.max(H * 0.26, 214) : H * 0.26;
       ctx.fillStyle = `rgba(8,6,10,${0.6 * a})`;
       ctx.fillRect(0, yy - (big ? 32 : 24), W, big ? 46 : 34);
       ctx.fillStyle = big ? `rgba(255,90,74,${a})` : v.banner.kind === 'chest' ? `rgba(255,224,138,${a})` : `rgba(243,234,216,${a})`;
       ctx.fillText(v.banner.text, W / 2, yy);
+    }
+  }
+  // 구역 이름 띠(2026-11-25): 들어서면 크게 이름 · 아래 특성 한 줄
+  if (v.areaBanner) {
+    const ab2 = v.areaBanner;
+    const age = now - ab2.born;
+    const life = ab2.boss ? 3200 : 2800;
+    if (age > life) v.areaBanner = null;
+    else {
+      const a = Math.min(1, age / 250, (life - age) / 500);
+      const yy = 156;
+      ctx.textAlign = 'center';
+      const g = ctx.createLinearGradient(0, 0, W, 0);
+      g.addColorStop(0, 'rgba(8,6,10,0)');
+      g.addColorStop(0.5, `rgba(8,6,10,${0.72 * a})`);
+      g.addColorStop(1, 'rgba(8,6,10,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, yy - 34, W, 62);
+      ctx.fillStyle = hexA(ab2.color, a);
+      ctx.fillRect(W / 2 - 160 * a, yy - 34, 320 * a, 2);
+      ctx.fillRect(W / 2 - 160 * a, yy + 26, 320 * a, 2);
+      ctx.font = `800 ${W < 520 ? 22 : 28}px "Nanum Myeongjo", serif`;
+      ctx.fillStyle = hexA(ab2.boss ? '#ffb0a0' : ab2.color, a);
+      ctx.fillText(ab2.boss ? `♛ ${ab2.name}` : ab2.name, W / 2, yy);
+      ctx.font = font(W < 520 ? 11 : 13, 600);
+      ctx.fillStyle = `rgba(243,234,216,${0.9 * a})`;
+      ctx.fillText(ab2.line, W / 2, yy + 19);
+    }
+  }
+  // 비전을 얻음: 가운데 금빛 판
+  if (v.relicCut) {
+    const rc = v.relicCut;
+    const age = now - rc.born;
+    if (age > 2800) v.relicCut = null;
+    else {
+      const a = Math.min(1, age / 200, (2800 - age) / 450);
+      const sc2 = 0.85 + 0.15 * Math.min(1, age / 250);
+      const pw = Math.min(380, W - 40) * sc2;
+      const ph = 112 * sc2;
+      const px = W / 2 - pw / 2;
+      const py = H * 0.38 - ph / 2;
+      ctx.fillStyle = `rgba(12,8,14,${0.88 * a})`;
+      ctx.fillRect(px, py, pw, ph);
+      ctx.strokeStyle = hexA(rc.color, a);
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px + 1, py + 1, pw - 2, ph - 2);
+      const ri = RELIC_IDS.indexOf(rc.id);
+      const icon = ri >= 0 ? art.relics?.images[ri] : null;
+      const isz = 64 * sc2;
+      if (icon) ctx.drawImage(icon, px + 18, py + (ph - isz) / 2, isz, isz);
+      else {
+        ctx.fillStyle = hexA(rc.color, 0.35 * a);
+        ctx.fillRect(px + 18, py + (ph - isz) / 2, isz, isz);
+        ctx.fillStyle = `rgba(243,234,216,${a})`;
+        ctx.font = `800 ${Math.round(isz * 0.5)}px "Nanum Myeongjo", serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(rc.name[0], px + 18 + isz / 2, py + ph / 2 + isz * 0.18);
+      }
+      ctx.textAlign = 'left';
+      ctx.font = font(12, 700);
+      ctx.fillStyle = hexA(rc.color, a);
+      ctx.fillText('비전', px + 34 + isz, py + ph / 2 - 18);
+      ctx.font = `800 ${Math.round(20 * sc2)}px "Nanum Myeongjo", serif`;
+      ctx.fillStyle = `rgba(255,224,138,${a})`;
+      ctx.fillText(rc.name, px + 34 + isz, py + ph / 2 + 6);
+      ctx.font = font(11, 600);
+      ctx.fillStyle = `rgba(243,234,216,${0.85 * a})`;
+      ctx.fillText(rc.text, px + 34 + isz, py + ph / 2 + 26);
     }
   }
 }

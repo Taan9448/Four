@@ -1,0 +1,11 @@
+id: teum_rift_nest_ref
+type: character-ref
+size: large
+character: teum_rift_nest
+chroma: magenta
+summary: "「틈」 맵 이벤트 그림자 둥지 기준 시트(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\" · 맵 이벤트) — 움직이지 않고 그림자를 낳는다"
+facing: left
+frame_notes:
+  1: "the whole nest, three-quarter front view"
+  2: "the same nest seen from the LEFT side"
+placeholder: { color: '#1a1020', accent: '#a35cff' }

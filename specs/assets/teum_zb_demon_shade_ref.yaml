@@ -1,0 +1,11 @@
+id: teum_zb_demon_shade_ref
+type: character-ref
+size: large
+character: teum_zb_demon_shade
+chroma: magenta
+summary: "「틈」 구역 보스 기준 시트 — 마왕의 그림자(「마왕의 옥좌」의 주인, 2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\"). 오기 전엔 「천외귀환」 그림을 빌려 빛깔만 입힌다"
+facing: left
+frame_notes:
+  1: "full body, three-quarter front view, the whole creature in its usual stance, imposing boss presence"
+  2: "full body, side view facing LEFT, same proportions and colors"
+placeholder: { shape: humanoid, color: "#240c0e", accent: "#ff4a4a" }

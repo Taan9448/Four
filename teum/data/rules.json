@@ -464,12 +464,12 @@
   "grazeUlt": 1.5
  },
  "explore": {
-  "$comment": "안개 보상: 안개 속 비석(이야기 조각, 도감)·수련 제단(짧은 도전)·비밀 상인, 판을 reward만큼 밝히면 금화",
+  "$comment": "안개 보상: 안개 속 비석(이야기 조각, 도감)·수련 제단(짧은 도전)·비밀 상인, 판을 reward만큼 밝히면 금화 · 2026-11-25 맵 3배: 비밀 상인 둘, 밝히기 보상 50%",
   "steles": 3,
   "altars": 1,
-  "merchants": 1,
+  "merchants": 2,
   "minDist": 700,
-  "reward": 0.85,
+  "reward": 0.5,
   "gold": 60,
   "altar": {
    "seconds": 20,
@@ -565,8 +565,8 @@
   "chests": 45,
   "secrets": {
    "steles": 0,
-   "altars": 5,
-   "merchants": 4
+   "altars": 10,
+   "merchants": 8
   },
   "dojoPrices": {
    "buy": 40,

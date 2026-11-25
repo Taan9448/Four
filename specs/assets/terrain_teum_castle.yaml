@@ -1,0 +1,12 @@
+id: terrain_teum_castle
+type: icon-sheet
+tiles: true
+summary: "「틈」 구역 성벽 조각 4칸(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\") — 칸 번호는 teum/src/render.ts drawAreaLayer: 1 성벽 윗면 · 2 성벽 앞면 · 3 모서리 탑 윗면 · 4 성문 화로(불꽃은 게임이 구역 빛깔로 그린다). 모든 구역이 같이 쓰니 색은 검은 돌·회색만(구역 빛깔은 게임이 덧입힌다)"
+frames: 4
+subject: 'top-down terrain tiles for a dark demonic castle wall in a survival-action map, black and charcoal-grey stone only, no hue, consistent pixel size so they fit together'
+frame_notes:
+  1: 'castle wall top: dark charcoal stone blocks seen from above with battlement merlons along the top edge, fills the cell, slightly lighter on the upper left'
+  2: 'castle wall front face: the front face of the same black stone wall with mortar lines and a thin empty groove (where the game adds a glowing line), darker than tile 1, fills the cell'
+  3: 'corner tower top: a round black stone tower top seen from above with a ring of merlons, fills the cell'
+  4: 'gate brazier: an empty black iron brazier bowl on a short stone pedestal, no fire (the game draws the flame), centered at the bottom of the cell'
+placeholder: { color: '#1e1824', accent: '#8a90a3' }

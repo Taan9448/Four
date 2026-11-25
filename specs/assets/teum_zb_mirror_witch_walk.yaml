@@ -1,0 +1,20 @@
+id: teum_zb_mirror_witch_walk
+type: character-anim
+size: large
+character: teum_zb_mirror_witch
+chroma: magenta
+summary: "「틈」 구역 보스 거울 마녀 걷기 4프레임 — 대기 그림과 같은 크기·색"
+depends_on: [teum_zb_mirror_witch_ref]
+reference: assets/source/teum_zb_mirror_witch_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "moving to the LEFT, gliding forward, mirror shards orbiting, first step"
+  2: "weight shifting forward, body lower"
+  3: "second step, body highest"
+  4: "back to the start of the cycle"
+placeholder: { shape: humanoid, color: "#1a1428", accent: "#c8a0ff" }

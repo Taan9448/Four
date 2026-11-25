@@ -71,7 +71,8 @@ describe('먹·한지 UI 그림 명세(2026-11-13)', () => {
     expect(icons.frames).toBe(Object.keys(INK_ICON).length);
     expect(Math.max(...Object.values(INK_ICON))).toBe(icons.frames);
     expect(loadSpec('ui_gyeol_ink').frames).toBe(6);
-  });
+    // 화면 모듈(dom)을 불러오느라 전체 테스트 부하에서는 30초를 넘길 때가 있다(2026-11-25)
+  }, 90000);
 });
 
 describe('매끄러운 이야기(2026-11-13)', () => {

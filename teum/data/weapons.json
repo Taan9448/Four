@@ -1,5 +1,5 @@
 {
- "$comment": "「틈」 무공·심법. 종류(kind)마다 움직임은 엔진이 정하고 무공별 코드는 없다(GAME_DESIGN 4절). levels[i] = Lv.i+1 값. area는 배율, duration은 초, speed는 탄 속도(px/s) 또는 회전 속도(rad/s). evolve: Lv.5 + 짝 심법으로 상자를 열면 각성",
+ "$comment": "「틈」 무공·심법. 종류(kind)마다 움직임은 엔진이 정하고 무공별 코드는 없다(GAME_DESIGN 4절). levels[i] = Lv.i+1 값. area는 배율, duration은 초, speed는 탄 속도(px/s) 또는 회전 속도(rad/s). evolve: Lv.5 + 짝 심법으로 상자를 열면 각성 · relic: 비전 무공(2026-11-25) — 구역 보스(zones.json)를 쓰러뜨려야만 얻고, 무공 칸 밖 비전 칸(relicSlots)에 들어간다. 레벨업으로 오른다",
  "weapons": [
   {
    "id": "grain_cut",
@@ -1349,6 +1349,461 @@
      "duration": 2
     }
    ]
+  },
+  {
+   "id": "relic_dream_kiss",
+   "name": "몽마의 입맞춤",
+   "owner": "*",
+   "kind": "chain",
+   "desc": "비전 — 몽마 여왕을 쓰러뜨려 얻는다. 분홍 번개가 그림자 사이를 튀며 받는 피해를 늘린다.",
+   "color": "#ff8ad8",
+   "levels": [
+    {
+     "damage": 26,
+     "cooldown": 1.6,
+     "area": 1,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 31,
+     "cooldown": 1.52,
+     "area": 1.08,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 37,
+     "cooldown": 1.44,
+     "area": 1.16,
+     "count": 6,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 44,
+     "cooldown": 1.36,
+     "area": 1.25,
+     "count": 7,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 52,
+     "cooldown": 1.25,
+     "area": 1.35,
+     "count": 8,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "vuln",
+   "relic": true
+  },
+  {
+   "id": "relic_demon_brand",
+   "name": "마왕의 낙인",
+   "owner": "*",
+   "kind": "strike",
+   "desc": "비전 — 마왕의 그림자를 쓰러뜨려 얻는다. 화면 안 그림자 위로 붉은 낙인이 떨어져 불태운다.",
+   "color": "#ff4a4a",
+   "levels": [
+    {
+     "damage": 70,
+     "cooldown": 2.4,
+     "area": 1.2,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 84,
+     "cooldown": 2.28,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 99,
+     "cooldown": 2.16,
+     "area": 1.39,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 118,
+     "cooldown": 2.04,
+     "area": 1.5,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 140,
+     "cooldown": 1.87,
+     "area": 1.62,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "fire",
+   "relic": true
+  },
+  {
+   "id": "relic_blood_grail",
+   "name": "피의 성배",
+   "owner": "*",
+   "kind": "nova",
+   "desc": "비전 — 피의 주교를 쓰러뜨려 얻는다. 둘레로 핏빛 고리가 퍼져 받는 피해를 늘린다.",
+   "color": "#e0304a",
+   "levels": [
+    {
+     "damage": 42,
+     "cooldown": 2.4,
+     "area": 1.25,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 50,
+     "cooldown": 2.28,
+     "area": 1.35,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 60,
+     "cooldown": 2.16,
+     "area": 1.45,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 71,
+     "cooldown": 2.04,
+     "area": 1.56,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 84,
+     "cooldown": 1.87,
+     "area": 1.69,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "vuln",
+   "relic": true
+  },
+  {
+   "id": "relic_bone_crown",
+   "name": "뼈의 왕관",
+   "owner": "*",
+   "kind": "orbit",
+   "desc": "비전 — 해골 군주를 쓰러뜨려 얻는다. 뼈 칼날이 쉬지 않고 둘레를 돈다.",
+   "color": "#e8dcb8",
+   "levels": [
+    {
+     "damage": 18,
+     "cooldown": 3.2,
+     "area": 1.2,
+     "count": 3,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4.2
+    },
+    {
+     "damage": 22,
+     "cooldown": 3.04,
+     "area": 1.3,
+     "count": 4,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4.2
+    },
+    {
+     "damage": 26,
+     "cooldown": 2.88,
+     "area": 1.39,
+     "count": 4,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4.2
+    },
+    {
+     "damage": 30,
+     "cooldown": 2.72,
+     "area": 1.5,
+     "count": 5,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4.2
+    },
+    {
+     "damage": 36,
+     "cooldown": 2.5,
+     "area": 1.62,
+     "count": 6,
+     "speed": 3.2,
+     "pierce": 0,
+     "duration": 4.2
+    }
+   ],
+   "knock": 40,
+   "relic": true
+  },
+  {
+   "id": "relic_frozen_key",
+   "name": "얼어붙은 열쇠",
+   "owner": "*",
+   "kind": "rain",
+   "desc": "비전 — 서리 간수를 쓰러뜨려 얻는다. 서리 비가 내려 그림자를 느리게 한다.",
+   "color": "#8fd3ff",
+   "levels": [
+    {
+     "damage": 16,
+     "cooldown": 3.4,
+     "area": 1.3,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 19,
+     "cooldown": 3.23,
+     "area": 1.4,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 23,
+     "cooldown": 3.06,
+     "area": 1.51,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 27,
+     "cooldown": 2.89,
+     "area": 1.62,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    },
+    {
+     "damage": 32,
+     "cooldown": 2.65,
+     "area": 1.76,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    }
+   ],
+   "element": "ice",
+   "relic": true
+  },
+  {
+   "id": "relic_hellfire_hammer",
+   "name": "지옥불 망치",
+   "owner": "*",
+   "kind": "wave",
+   "desc": "비전 — 대장간 악마를 쓰러뜨려 얻는다. 불꽃 검기가 앞으로 꿰뚫고 나간다.",
+   "color": "#ff8a2a",
+   "levels": [
+    {
+     "damage": 48,
+     "cooldown": 2.2,
+     "area": 1.3,
+     "count": 2,
+     "speed": 480,
+     "pierce": 99,
+     "duration": 1.4
+    },
+    {
+     "damage": 58,
+     "cooldown": 2.09,
+     "area": 1.4,
+     "count": 2,
+     "speed": 480,
+     "pierce": 99,
+     "duration": 1.4
+    },
+    {
+     "damage": 68,
+     "cooldown": 1.98,
+     "area": 1.51,
+     "count": 3,
+     "speed": 480,
+     "pierce": 99,
+     "duration": 1.4
+    },
+    {
+     "damage": 81,
+     "cooldown": 1.87,
+     "area": 1.62,
+     "count": 3,
+     "speed": 480,
+     "pierce": 99,
+     "duration": 1.4
+    },
+    {
+     "damage": 96,
+     "cooldown": 1.72,
+     "area": 1.76,
+     "count": 4,
+     "speed": 480,
+     "pierce": 99,
+     "duration": 1.4
+    }
+   ],
+   "relic": true
+  },
+  {
+   "id": "relic_mirror_shard",
+   "name": "거울 조각",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "비전 — 거울 마녀를 쓰러뜨려 얻는다. 거울 조각이 여러 갈래로 꿰뚫는다.",
+   "color": "#d4b8ff",
+   "levels": [
+    {
+     "damage": 22,
+     "cooldown": 0.9,
+     "area": 1,
+     "count": 3,
+     "speed": 420,
+     "pierce": 3,
+     "duration": 2
+    },
+    {
+     "damage": 26,
+     "cooldown": 0.85,
+     "area": 1.08,
+     "count": 4,
+     "speed": 420,
+     "pierce": 3,
+     "duration": 2
+    },
+    {
+     "damage": 31,
+     "cooldown": 0.81,
+     "area": 1.16,
+     "count": 4,
+     "speed": 420,
+     "pierce": 3,
+     "duration": 2
+    },
+    {
+     "damage": 37,
+     "cooldown": 0.77,
+     "area": 1.25,
+     "count": 5,
+     "speed": 420,
+     "pierce": 3,
+     "duration": 2
+    },
+    {
+     "damage": 44,
+     "cooldown": 0.7,
+     "area": 1.35,
+     "count": 6,
+     "speed": 420,
+     "pierce": 3,
+     "duration": 2
+    }
+   ],
+   "element": "shock",
+   "relic": true
+  },
+  {
+   "id": "relic_plague_censer",
+   "name": "역병의 향로",
+   "owner": "*",
+   "kind": "aura",
+   "desc": "비전 — 역병 군주를 쓰러뜨려 얻는다. 둘레에 독기가 서려 받는 피해를 늘린다.",
+   "color": "#8fd65a",
+   "levels": [
+    {
+     "damage": 9,
+     "cooldown": 0.5,
+     "area": 1.35,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 11,
+     "cooldown": 0.5,
+     "area": 1.46,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 13,
+     "cooldown": 0.47,
+     "area": 1.57,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 15,
+     "cooldown": 0.45,
+     "area": 1.69,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 18,
+     "cooldown": 0.42,
+     "area": 1.82,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "vuln",
+   "relic": true
   }
  ],
  "passives": [
