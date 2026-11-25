@@ -1,7 +1,7 @@
 // 「틈」 키 설정(2026-11-22 사용자 "옵션에서 키 설정 기능 추가"): 동작마다 키 둘(주 · 보조). 옵션 「조작」에서 바꾸고 저장(teum.save options.keys).
 // 판 위 동작(이동·보법·마지막 기술·멈춤)과 레벨업 창 동작(다시 뽑기·봉인·건너뛰기)은 따로 겹쳐도 된다(창이 떠 있을 때만 창 동작).
 
-export type Action = 'up' | 'down' | 'left' | 'right' | 'dash' | 'ult' | 'pause' | 'reroll' | 'banish' | 'skip';
+export type Action = 'up' | 'down' | 'left' | 'right' | 'dash' | 'ult' | 'pause' | 'recipes' | 'reroll' | 'banish' | 'skip';
 export type KeyMap = Record<Action, [string, string?]>;
 
 export const ACTIONS: { id: Action; name: string; group: 'move' | 'skill' | 'menu' }[] = [
@@ -12,6 +12,7 @@ export const ACTIONS: { id: Action; name: string; group: 'move' | 'skill' | 'men
   { id: 'dash', name: '보법(피하기)', group: 'skill' },
   { id: 'ult', name: '마지막 기술', group: 'skill' },
   { id: 'pause', name: '멈춤', group: 'skill' },
+  { id: 'recipes', name: '각성 조합표', group: 'skill' },
   { id: 'reroll', name: '레벨업 · 다시 뽑기', group: 'menu' },
   { id: 'banish', name: '레벨업 · 봉인', group: 'menu' },
   { id: 'skip', name: '레벨업 · 건너뛰기', group: 'menu' },
@@ -25,6 +26,7 @@ export const DEFAULT_KEYS: KeyMap = {
   dash: ['Space', 'ShiftLeft'],
   ult: ['KeyQ', 'KeyE'],
   pause: ['Escape', 'KeyP'],
+  recipes: ['KeyC', 'Tab'],
   reroll: ['KeyR'],
   banish: ['KeyB'],
   skip: ['KeyX'],

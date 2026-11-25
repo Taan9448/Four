@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { AFFIXES, banish, carryOf, elementCounts, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
+import { AFFIXES, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
 import { buildTerrain, CELL, T } from '../src/terrain';
 import { runChapter } from './bot';
 
@@ -655,5 +655,33 @@ describe('「틈」 8차: 무한 모드 무공 풀 · 장소 가게', () => {
     step(s, { x: 0, y: 0 });
     expect(s.pending!.some((c) => c.kind === 'buy')).toBe(true);
     expect(s.pending!.some((c) => c.kind === 'buyskill')).toBe(true);
+  });
+});
+
+describe('각성 조합표', () => {
+  it('인물·공통 조합을 모두 싣고, 진행 상태를 맞게 적는다', () => {
+    const s = createChapter(0, 'evo', freshCarry('haun'));
+    const all = evolveTable(s);
+    const expected = [...WEAPONS.values()].filter((w) => w.evolve && (w.owner === 'haun' || w.owner === '*' || s.hero.pool.includes(w.id)));
+    expect(all.map((r) => r.weapon).sort()).toEqual(expected.map((w) => w.id).sort());
+    const d = expected.find((w) => s.weapons.some((x) => x.id === w.id)) ?? expected[0];
+    // 무공 Lv 최대 + 짝 심법 → 상자를 열면 각성(맨 앞)
+    let w = s.weapons.find((x) => x.id === d.id);
+    if (!w) s.weapons.push((w = { id: d.id, lv: 1, next: 0 } as (typeof s.weapons)[number]));
+    expect(evolveTable(s).find((r) => r.weapon === d.id)?.state).toBe('passive');
+    s.passives.set(d.evolve!.with, 1);
+    expect(evolveTable(s).find((r) => r.weapon === d.id)?.state).toBe('lv');
+    w.lv = d.levels.length;
+    const ready = evolveTable(s);
+    expect(ready[0]).toMatchObject({ weapon: d.id, state: 'ready', open: true });
+    // 각성한 뒤
+    w.id = d.evolve!.into;
+    expect(evolveTable(s).find((r) => r.weapon === d.id)?.state).toBe('done');
+  });
+  it('봉인한 무공의 조합은 막힌 것으로', () => {
+    const s = createChapter(0, 'evo2', freshCarry('kyle'));
+    const r0 = evolveTable(s).find((r) => r.lv === 0 && r.open)!;
+    s.banished.add(r0.weapon);
+    expect(evolveTable(s).find((r) => r.weapon === r0.weapon)).toMatchObject({ open: false, why: 'locked' });
   });
 });

@@ -4,7 +4,7 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, evolveTable, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, sideSprite, SKILL_ICON, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
@@ -1255,10 +1255,17 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   const onKey = (e: KeyboardEvent) => {
     if (e.type === 'keydown') {
       if (document.querySelector('.modal')) return;
-      if (!overlay.hidden && /^[1-9]$/.test(e.key) && s.pending) return pick(Number(e.key) - 1);
-      if (!overlay.hidden && s.pending && isKey(km, 'reroll', e.code)) return void (reroll(s) && showChoices());
-      if (!overlay.hidden && s.pending && isKey(km, 'skip', e.code)) return void (skipChoice(s) ? (s.pending ? showChoices() : (overlay.hidden = true)) : 0);
-      if (!overlay.hidden && s.pending && isKey(km, 'banish', e.code)) return void ((banMode = !banMode), showChoices());
+      if (!overlay.hidden && /^[1-9]$/.test(e.key) && s.pending && !recipesOpen) return pick(Number(e.key) - 1);
+      if (!overlay.hidden && s.pending && !recipesOpen && isKey(km, 'reroll', e.code)) return void (reroll(s) && showChoices());
+      if (!overlay.hidden && s.pending && !recipesOpen && isKey(km, 'skip', e.code)) return void (skipChoice(s) ? (s.pending ? showChoices() : (overlay.hidden = true)) : 0);
+      if (!overlay.hidden && s.pending && !recipesOpen && isKey(km, 'banish', e.code)) return void ((banMode = !banMode), showChoices());
+      if (isKey(km, 'recipes', e.code)) {
+        e.preventDefault();
+        if (recipesOpen) return closeRecipes();
+        if (!s.result && !(s.pending && (s.shopItem || s.pending.some((c) => c.kind === 'leave')))) return showRecipes(s.pending ? showChoices : paused ? pause : resume);
+        return;
+      }
+      if (recipesOpen) return void (isKey(km, 'pause', e.code) && closeRecipes());
       if (isKey(km, 'pause', e.code)) return void (paused ? resume() : pause());
       if (isKey(km, 'dash', e.code)) wantDash = true;
       if (isKey(km, 'ult', e.code)) wantUlt = true;
@@ -1456,6 +1463,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
             if (s.pending) showChoices();
             else overlay.hidden = true;
           }, s.skips ? {} : { disabled: '' }),
+          btn('각성 조합표', 'btn small ghost', () => showRecipes(showChoices)),
         );
     overlay.replaceChildren(el('div', { class: `panel levelup${shop ? ' shop' : ''}` }, el('h3', {}, shop ? `떠돌이 상인 — 가진 금화 ${s.gold}` : `Lv.${s.level - s.queuedLevels + 1} — 하나를 고른다`), el('div', { class: 'choices' }, ...s.pending!.map(choiceCard)), tools));
   };
@@ -1470,6 +1478,65 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
     if (s.pending) showChoices();
     else overlay.hidden = true;
   };
+
+  // 각성 조합표(2026-11-25 사용자 "무기 진화 조합표를 게임 중에 확인"): 멈춤 창 · 레벨업 창 · 단축키(조합표)
+  let recipesOpen = false;
+  let recipesBack: () => void = () => undefined;
+  const showRecipes = (back: () => void) => {
+    recipesOpen = true;
+    recipesBack = back;
+    // 레벨업 창에서 열면 이미 멈춰 있다(paused는 건드리지 않는다)
+    if (!s.pending) paused = true;
+    overlay.hidden = false;
+    const rows = evolveTable(s);
+    const pic = (id: string) => {
+      const a = skillArt(id);
+      return a ? el('img', { class: 'rc-art', src: a, alt: '' }) : el('span', { class: 'rc-art ph' }, '');
+    };
+    const pips = (n: number, max: number) => el('span', { class: 'rc-pips', 'aria-label': `Lv.${n}/${max}` }, ...Array.from({ length: max }, (_, i) => el('i', { class: i < n ? 'on' : '' })));
+    const STATUS: Record<string, string> = { done: '각성함', ready: '상자를 열면 각성!', lv: '무공 레벨을 끝까지', passive: '짝 심법이 필요', weapon: '무공이 필요', none: '' };
+    const row = (r: (typeof rows)[number]) => {
+      const w = WEAPONS.get(r.weapon)!;
+      const p = PASSIVES.get(r.passive)!;
+      const x = WEAPONS.get(r.into)!;
+      const status = r.open ? STATUS[r.state] : r.why === 'slots' ? '칸이 가득 차 이 판에서는 어렵다' : '이 판에서는 나오지 않는다';
+      return el(
+        'div',
+        { class: `rc-row st-${r.state}${r.open ? '' : ' shut'}`, style: `--c:${x.color ?? w.color}` },
+        el('div', { class: `rc-part${r.lv ? ' have' : ''}` }, pic(r.weapon), el('div', {}, el('b', {}, w.name), r.lv ? pips(r.lv, r.max) : el('small', {}, `무공 · 최대 Lv.${r.max}`))),
+        el('span', { class: 'rc-op' }, '+'),
+        el('div', { class: `rc-part${r.plv ? ' have' : ''}` }, pic(r.passive), el('div', {}, el('b', {}, p.name), el('small', {}, r.plv ? `심법 Lv.${r.plv} ✓` : '심법'))),
+        el('span', { class: 'rc-op' }, '→'),
+        el('div', { class: 'rc-part into' }, pic(r.into), el('div', {}, el('b', {}, `★ ${x.name}`), el('small', {}, x.desc.replace(/^각성 — [^.]*\.\s*/, '').replace(/^[^.]*심법\.\s*/, '')))),
+        status ? el('span', { class: 'rc-status' }, status) : '',
+      );
+    };
+    const groups: [string, typeof rows][] = [
+      ['진행 중', rows.filter((r) => r.open && r.state !== 'done' && r.state !== 'none')],
+      ['노려 볼 수 있는 조합', rows.filter((r) => r.open && r.state === 'none')],
+      ['각성함', rows.filter((r) => r.state === 'done')],
+      ['이 판에서는 어려운 조합', rows.filter((r) => !r.open)],
+    ];
+    overlay.replaceChildren(
+      el(
+        'div',
+        { class: 'panel recipes' },
+        el('h3', {}, '각성 조합표'),
+        el('p', { class: 'muted' }, '무공을 최대 레벨까지 올리고 짝 심법을 가진 채 상자를 열면 각성한다.'),
+        el(
+          'div',
+          { class: 'rc-list' },
+          ...groups.filter(([, g]) => g.length).flatMap(([name, g]) => [el('h4', {}, `${name} ${g.length}`), ...g.map(row)]),
+          rows.length ? '' : el('p', { class: 'muted' }, '이 인물이 각성할 수 있는 무공이 없다.'),
+        ),
+        el('div', { class: 'menu-row' }, btn(matchMedia('(pointer: coarse)').matches ? '돌아가기' : `돌아가기 (${keyLabel(km.recipes[0])})`, 'btn primary', closeRecipes)),
+      ),
+    );
+  };
+  function closeRecipes(): void {
+    recipesOpen = false;
+    recipesBack();
+  }
 
   let paused = false;
   const pause = () => {
@@ -1486,6 +1553,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
           'div',
           { class: 'menu-col' },
           btn('계속', 'btn primary', resume),
+          btn('각성 조합표', 'btn ghost', () => showRecipes(pause)),
           btn('옵션', 'btn ghost', () =>
             optionsPopup(() => {
               Object.assign(opt, loadSave().options);
