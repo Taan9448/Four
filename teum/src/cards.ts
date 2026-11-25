@@ -52,7 +52,8 @@ export interface CardSkills {
 }
 
 /** 이미 있는 무공·심법과 이름이 같은 카드는 건너뛴다(낙운무흔·방패벽 등은 손으로 맞춘 무공이 있다) */
-export function cardSkills(taken: Set<string>): CardSkills {
+/** passiveNames: 손으로 맞춘 심법 id → 이름(각성 설명에 id 대신 이름을 쓴다, 2026-11-25) */
+export function cardSkills(taken: Set<string>, passiveNames: Record<string, string> = {}): CardSkills {
   const weapons: WeaponDef[] = [];
   const passives: PassiveDef[] = [];
   const names = new Set(taken);
@@ -118,7 +119,7 @@ export function cardSkills(taken: Set<string>): CardSkills {
           name: `${c.name} · 극의`,
           owner,
           kind,
-          desc: `각성 — ${c.name} Lv.5 + 「${partner}」 심법. ${(T.kindDesc as Record<string, string>)[kind]}${tail}, 훨씬 세게.`,
+          desc: `각성 — ${c.name} Lv.5 + 「${passiveNames[partner] ?? partner}」 심법. ${(T.kindDesc as Record<string, string>)[kind]}${tail}, 훨씬 세게.`,
           color,
           levels: [{ ...top, damage: Math.round(top.damage * 2.2), cooldown: Math.round(top.cooldown * 0.7 * 100) / 100, count: top.count + (kind === 'slash' ? 2 : 2), area: Math.round(top.area * 1.25 * 100) / 100 }],
           ...(effect ? { element: effect as WeaponDef['element'] } : {}),

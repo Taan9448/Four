@@ -370,7 +370,7 @@ export const FOES = new Map((foesRaw.foes as unknown as FoeDef[]).map((f) => [f.
 // 손으로 맞춘 무공·심법(weapons.json) + 「천외귀환」 카드 286장에서 바꾼 것(cards.ts, 2026-11-19 스킬 10배)
 const handWeapons = weaponsRaw.weapons as unknown as WeaponDef[];
 const handPassives = weaponsRaw.passives as PassiveDef[];
-const fromCards = cardSkills(new Set([...handWeapons.map((w) => w.name), ...handPassives.map((p) => p.name)]));
+const fromCards = cardSkills(new Set([...handWeapons.map((w) => w.name), ...handPassives.map((p) => p.name)]), Object.fromEntries(handPassives.map((p) => [p.id, p.name])));
 export const WEAPONS = new Map([...handWeapons, ...fromCards.weapons].map((w) => [w.id, w]));
 export const PASSIVES = new Map([...handPassives, ...fromCards.passives].map((p) => [p.id, p]));
 export const HEROES = heroesRaw.heroes as unknown as HeroDef[];
@@ -2709,6 +2709,48 @@ export function partnersOf(s: State): Map<string, string> {
     if (ev) m.set(ev.with, w.id);
   }
   return m;
+}
+
+/** 각성 조합표 한 줄(2026-11-25 사용자 "무기 진화 조합표를 게임 중에 확인") */
+export interface EvolveRow {
+  weapon: string;
+  passive: string;
+  into: string;
+  /** 가진 무공 Lv(0 = 없음) · 만렙 */
+  lv: number;
+  max: number;
+  /** 가진 심법 Lv(0 = 없음) */
+  plv: number;
+  /** done 각성함 · ready 상자를 열면 각성 · lv 둘 다 있고 무공 Lv 모자람 · passive 심법 없음 · weapon 무공 없음 · none 둘 다 없음 */
+  state: 'done' | 'ready' | 'lv' | 'passive' | 'weapon' | 'none';
+  /** 이 판에서 아직 무공·심법을 얻을 수 있나(가진 것은 true) */
+  open: boolean;
+  /** 못 얻는 까닭: slots 칸이 가득 · locked 잠김·봉인·이 판 풀에 없음 */
+  why?: 'slots' | 'locked';
+  /** 이 인물 것(아니면 공통·다른 인물 것) */
+  own: boolean;
+}
+/** 각성 조합표: 이 인물·공통 무공의 조합 + 가진 다른 인물 무공의 조합. 진행 중인 것 → 얻을 수 있는 것 → 막힌 것 순 */
+export function evolveTable(s: State): EvolveRow[] {
+  const has = new Map(s.weapons.map((w) => [w.id, w.lv]));
+  const rows: EvolveRow[] = [];
+  for (const d of WEAPONS.values()) {
+    if (!d.evolve) continue;
+    const lv = has.get(d.id) ?? 0;
+    const done = has.has(d.evolve.into);
+    const mine = d.owner === s.hero.id || d.owner === '*' || s.hero.pool.includes(d.id);
+    if (!mine && !lv && !done) continue;
+    const plv = s.passives.get(d.evolve.with) ?? 0;
+    const max = d.levels.length;
+    const state = done ? 'done' : lv >= max && plv ? 'ready' : lv && plv ? 'lv' : lv ? 'passive' : plv ? 'weapon' : 'none';
+    const canW = lv > 0 || done || (s.weapons.length < s.slots.weapons && offerable(s, d.id));
+    const canP = plv > 0 || (s.passives.size < s.slots.passives && offerable(s, d.evolve.with));
+    const slotsFull = (!lv && !done && s.weapons.length >= s.slots.weapons) || (!plv && s.passives.size >= s.slots.passives);
+    const open = done || (canW && canP);
+    rows.push({ weapon: d.id, passive: d.evolve.with, into: d.evolve.into, lv: done ? max : lv, max, plv, state, open, why: open ? undefined : slotsFull ? 'slots' : 'locked', own: d.owner === s.hero.id });
+  }
+  const rank = (r: EvolveRow) => (r.state === 'ready' ? 0 : r.state === 'done' ? 4 : r.lv || r.plv ? 1 : r.open ? 2 : 3);
+  return rows.sort((a, b) => rank(a) - rank(b) || Number(b.own) - Number(a.own));
 }
 
 export function choicePool(s: State): Choice[] {
