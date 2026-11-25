@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #ffffff, #f1efe6, #c2c6d1, #8a90a3, #5d6478, #3d4459, #2b2b3a.
+Frames:
+Cell 1: GRAND evolved version: a hair-thin vertical line of light from the top of the cell (inside the margin) down to a point at 75% of the cell height in the middle; small sparks at the bottom — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_strike (the hero/target point in the same place), only the shape changes
+Cell 2: GRAND evolved version: impact: a thick vertical pillar of light, white core, slamming into the ground point at 75% height; a wide flat oval flash and a starburst at the bottom — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground
+Cell 3: GRAND evolved version: the pillar thinner, a ring of light spreading flat on the ground around the impact point, blocky debris sparks flying up and out — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground
+Cell 4: GRAND evolved version: the pillar breaking into short stepped segments from the top down, the ground ring wider and thinner — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground
+Cell 5: GRAND evolved version: a faint short pillar stub and a fading ground ring with sparks — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground
+Cell 6: GRAND evolved version: a few fading sparks above the impact point — but bigger, brighter and more ornate: a pillar of light from the sky with a rune circle on the ground
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Preserve the attached common strike's exact column axis and ground impact point (source x256,y384; delivered x80,y128), with cell 2 impact and the same six-frame timing. Keep the ornate white double ground ring, but flatten its ellipse and SHORTEN every lower diamond/rune ornament so absolutely nothing extends below y450 inside each 512px source cell. No particle, top spike, rune, or ring outside x52..460 and y52..460. Do not move the impact point or shrink the column height. The last cell has only faint ring fragments and a few dying sparks, not a complete bright ring. White/grey only.
