@@ -1,0 +1,20 @@
+id: teum_zb_blood_bishop_walk
+type: character-anim
+size: large
+character: teum_zb_blood_bishop
+chroma: magenta
+summary: "「틈」 구역 보스 피의 주교 걷기 4프레임 — 대기 그림과 같은 크기·색"
+depends_on: [teum_zb_blood_bishop_ref]
+reference: assets/source/teum_zb_blood_bishop_ref.png
+facing: left
+frames: 4
+fps: 8
+loop: true
+events: {}
+bbox_tolerance: 0.2
+frame_notes:
+  1: "moving to the LEFT, slow solemn walk, the censer swinging, first step"
+  2: "weight shifting forward, body lower"
+  3: "second step, body highest"
+  4: "back to the start of the cycle"
+placeholder: { shape: humanoid, color: "#2a0a12", accent: "#c8203a" }

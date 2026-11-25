@@ -1,0 +1,15 @@
+id: icons_teum_relics
+type: icon-sheet
+summary: "「틈」 비전 무공 그림 8칸(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\") — 칸 순서 = teum/data/weapons.json의 relic 순서: 1 몽마의 입맞춤 · 2 마왕의 낙인 · 3 피의 성배 · 4 뼈의 왕관 · 5 얼어붙은 열쇠 · 6 지옥불 망치 · 7 거울 조각 · 8 역병의 향로. 비전 칸·레벨업 카드·비전 획득 창에 쓴다"
+frames: 8
+subject: 'legendary relic item icons from defeated demon lords, each centered, bold readable silhouette at 32x32 px, dark gothic fantasy with a glowing accent'
+frame_notes:
+  1: "몽마의 입맞춤 — a pink lip-shaped crystal amulet crackling with pink lightning, on a dark round background with a thin gold rim"
+  2: "마왕의 낙인 — a red-hot branding iron shaped like a horned demon sigil, glowing red, on a dark round background with a thin gold rim"
+  3: "피의 성배 — an ornate golden chalice overflowing with glowing dark red blood, on a dark round background with a thin gold rim"
+  4: "뼈의 왕관 — a crown made of bones and small skulls with pale yellow glow, on a dark round background with a thin gold rim"
+  5: "얼어붙은 열쇠 — a large antique iron key encased in blue ice, frost mist around it, on a dark round background with a thin gold rim"
+  6: "지옥불 망치 — a black smith hammer with a molten orange glowing head and sparks, on a dark round background with a thin gold rim"
+  7: "거울 조각 — a sharp floating mirror shard with a violet glow and smaller shards around, on a dark round background with a thin gold rim"
+  8: "역병의 향로 — a small iron censer lantern leaking green poison smoke, on a dark round background with a thin gold rim"
+placeholder: { color: '#2a1e10', accent: '#ffd27a' }

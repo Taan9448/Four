@@ -226,7 +226,7 @@ export function recommend(s: State, choices: Choice[]): { index: number; reason:
           r = '각성 준비 완료';
         }
       } else {
-        v = G[gradeOf(c.id)] + (s.weapons.length < 3 ? 12 : 0);
+        v = G[gradeOf(c.id)] + (s.weapons.filter((w) => !WEAPONS.get(w.id)?.relic).length < 3 ? 12 : 0);
         r = `${gradeOf(c.id)}급 새 무공`;
         if (w.element) {
           const n = (ec[w.element] ?? 0) + 1;

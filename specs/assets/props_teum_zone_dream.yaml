@@ -1,0 +1,11 @@
+id: props_teum_zone_dream
+type: icon-sheet
+summary: "「틈」 구역 「몽마의 침소」 꾸밈 소품 4칸(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\"). 성 안 바닥에 흩어 놓는다(부서지지 않는 장식). 위에서 약간 비스듬히 본 모습, props_teum과 같은 결"
+frames: 4
+subject: "decorative props for the demonic castle area 「몽마의 침소」 seen from slightly above (three-quarter top-down view), each centered and standing on the bottom of the cell, readable at 56x56 px, dark gothic fantasy mood with #e070c0 accent light"
+frame_notes:
+  1: "a tall gothic canopy bed post wrapped in torn pink silk curtains"
+  2: "a cracked heart-shaped vanity mirror on an ornate stand, pink glow inside"
+  3: "a floating cluster of dark pink candles dripping wax"
+  4: "a stone statue of a sleeping winged succubus curled on a pedestal"
+placeholder: { color: "#2a1430", accent: "#e070c0" }

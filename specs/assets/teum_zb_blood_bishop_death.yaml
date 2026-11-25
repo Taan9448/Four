@@ -1,0 +1,22 @@
+id: teum_zb_blood_bishop_death
+type: character-anim
+size: large
+character: teum_zb_blood_bishop
+chroma: magenta
+summary: "「틈」 구역 보스 피의 주교 쓰러짐 6프레임 — 1프레임은 대기 그림과 같은 크기"
+depends_on: [teum_zb_blood_bishop_ref]
+reference: assets/source/teum_zb_blood_bishop_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "hit hard, recoiling, same size as the idle pose"
+  2: "collapsing to his knees, the vestments melting into a pool of blood — beginning"
+  3: "collapsing to his knees, the vestments melting into a pool of blood — halfway"
+  4: "collapsing to his knees, the vestments melting into a pool of blood — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: humanoid, color: "#2a0a12", accent: "#c8203a" }

@@ -1,0 +1,19 @@
+id: teum_zb_mirror_witch_idle
+type: character-anim
+size: large
+character: teum_zb_mirror_witch
+chroma: magenta
+summary: "「틈」 구역 보스 거울 마녀 대기 4프레임"
+depends_on: [teum_zb_mirror_witch_ref]
+reference: assets/source/teum_zb_mirror_witch_ref.png
+facing: left
+frames: 4
+fps: 6
+loop: true
+events: {}
+frame_notes:
+  1: "standing/hovering still, menacing boss stance"
+  2: "a slow breath or pulse of its glow"
+  3: "the glow fades a little, a slight sway"
+  4: "back to the pose of frame 1"
+placeholder: { shape: humanoid, color: "#1a1428", accent: "#c8a0ff" }

@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { AFFIXES, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
-import { buildTerrain, CELL, T } from '../src/terrain';
+import { AFFIXES, AREAS, areaAt, isRelic, slotWeapons, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
+import { buildTerrain, CELL, T, updateFlow } from '../src/terrain';
 import { runChapter } from './bot';
 
 const real = (id: string) => existsSync(`assets/sprites/${id}/meta.json`);
@@ -194,11 +194,11 @@ describe('「틈」 엔진', () => {
     expect(s.result).toBe('clear');
   });
 
-  it('잘 고르는 봇도 1장이 만만하지 않다 — 인물 넷 중 둘 이상은 넘는다(2026-11-19 적 강화, GAME_DESIGN 12절)', () => {
-    const runs = HEROES.map((h) => runChapter(0, 'a', freshCarry(h.id), 'smart').s);
-    expect(runs.filter((s) => s.result === 'clear').length).toBeGreaterThanOrEqual(2);
+  it('잘 고르는 봇도 1장이 만만하지 않다 — 시드 셋 × 인물 넷 중 셋에 하나 이상은 넘는다(2026-11-19 적 강화 · 2026-11-25 맵 3배·구역 뒤 시드 셋으로, GAME_DESIGN 12절)', () => {
+    const runs = ['a', 'b', 'c'].flatMap((sd) => HEROES.map((h) => runChapter(0, sd, freshCarry(h.id), 'smart').s));
+    expect(runs.filter((s) => s.result === 'clear').length).toBeGreaterThanOrEqual(4);
     for (const s of runs) if (s.result === 'clear') expect(s.t).toBeGreaterThan(4 * 60);
-  }, 120000);
+  }, 240000);
 
   // ── 2026-11-21 사용자 요청: 무공 해금 · 장 난이도 누적 · 맵 1.5배 · 줍는 것 · 인물 기술 · 돌발 이벤트 ──
   it('줍는 것은 20가지가 넘고, 모두 주우면 탈 없이 돈다', () => {
@@ -285,10 +285,10 @@ describe('「틈」 엔진', () => {
     expect(b.warm).toBeGreaterThan(a.warm);
   });
 
-  it('맵은 135×135칸(1.5배)', () => {
-    for (const c of STORY.chapters) expect([c.terrainDef.w, c.terrainDef.h]).toEqual([135, 135]);
+  it('맵은 234×234칸(2026-11-25 넓이 3배)', () => {
+    for (const c of STORY.chapters) expect([c.terrainDef.w, c.terrainDef.h]).toEqual([234, 234]);
     const s = createChapter(4, 'map', freshCarry('haun'));
-    expect(s.terrain.w).toBe(135);
+    expect(s.terrain.w).toBe(234);
   });
 
   it('인물마다 보법·마지막 기술이 다르다 — 모두 돌고, 카일 서약 동안은 맞지 않는다', () => {
@@ -683,5 +683,104 @@ describe('각성 조합표', () => {
     const r0 = evolveTable(s).find((r) => r.lv === 0 && r.open)!;
     s.banished.add(r0.weapon);
     expect(evolveTable(s).find((r) => r.weapon === r0.weapon)).toMatchObject({ open: false, why: 'locked' });
+  });
+});
+
+describe('구역(성)·구역 보스·비전·맵 이벤트(2026-11-25)', () => {
+  const walkTo = (s: State, x: number, y: number) => {
+    s.player.x = x;
+    s.player.y = y;
+    step(s, { x: 0, y: 0 });
+  };
+  it('판마다 4~5구역을 성으로 새기고(성벽·성문), 가운데까지 걸어갈 수 있다 — 시드마다 고르는 구역이 다르다', () => {
+    const sets = new Set<string>();
+    for (const sd of ['z1', 'z2', 'z3', 'z4']) {
+      const s = createChapter(0, sd, freshCarry('haun'));
+      expect(s.areas.length).toBeGreaterThanOrEqual(AREAS.count.story[0] - 1);
+      expect(s.areas.length).toBeLessThanOrEqual(AREAS.count.story[1]);
+      sets.add(s.areas.map((z) => z.def.id).sort().join(','));
+      const t = s.terrain;
+      updateFlow(t, s.player.x, s.player.y, 100000);
+      for (const [i, z] of s.areas.entries()) {
+        expect(areaAt(s, z.x, z.y)).toBe(i);
+        expect(t.dist[z.cy * t.w + z.cx]).toBeGreaterThanOrEqual(0);
+        // 성벽 모서리는 벽, 성문 가운데는 바닥
+        expect(t.cells[(z.cy - z.hc) * t.w + z.cx - z.hc]).toBe(T.Wall);
+        const g = z.gates[0];
+        const gx = z.cx + (g === 1 ? z.hc : g === 3 ? -z.hc : 0);
+        const gy = z.cy + (g === 2 ? z.hc : g === 0 ? -z.hc : 0);
+        expect(t.cells[gy * t.w + gx]).not.toBe(T.Wall);
+      }
+    }
+    expect(sets.size).toBeGreaterThan(1);
+  });
+  it('구역에 들어서면 매복 + 구역 보스가 깨어나고, 밖으로 나가면 보스는 가운데로 돌아가며 체력을 되찾는다', () => {
+    const s = createChapter(0, 'area', freshCarry('kyle'));
+    s.player.hp = s.player.maxHp = 1e6;
+    const z = s.areas[0];
+    const n0 = s.foes.length;
+    walkTo(s, z.x + z.half * 0.4, z.y);
+    expect(s.areaIn).toBe(0);
+    expect(z.entered).toBe(true);
+    expect(z.boss?.area).toBe(0);
+    expect(s.foes.length).toBeGreaterThan(n0 + 8);
+    const b = z.boss!;
+    b.x = z.x + z.half * 0.5;
+    b.hp = b.maxHp * 0.5;
+    s.player.x = z.x + z.half + 600;
+    for (let i = 0; i < 240; i++) {
+      s.player.hp = s.player.maxHp;
+      if (s.pending) choose(s, 0);
+      step(s, { x: 0, y: 0 });
+    }
+    expect(s.areaIn).not.toBe(0);
+    expect(Math.hypot(b.x - z.x, b.y - z.y)).toBeLessThan(z.half * 0.5 - 40);
+    expect(b.hp).toBeGreaterThan(b.maxHp * 0.6);
+  });
+  it('구역 보스를 쓰러뜨리면 비전 무공 — 무공 칸 밖(비전 칸)이고, 레벨업 새 무공으로는 안 나온다', () => {
+    const s = createChapter(0, 'relic', freshCarry('elia'));
+    s.player.hp = s.player.maxHp = 1e6;
+    const z = s.areas[0];
+    walkTo(s, z.x, z.y + 60);
+    const b = z.boss!;
+    b.hp = 1;
+    for (let i = 0; i < 120 && !b.dead; i++) {
+      if (s.pending) choose(s, 0);
+      step(s, { x: 0, y: 0 });
+    }
+    expect(b.dead).toBe(true);
+    expect(z.cleared).toBe(true);
+    expect(s.weapons.some((w) => w.id === z.def.relic)).toBe(true);
+    expect(isRelic(z.def.relic)).toBe(true);
+    expect(slotWeapons(s)).toBe(s.weapons.length - 1);
+    for (let k = 0; k < 20; k++) {
+      s.pending = null;
+      s.queuedLevels = 1;
+      s.xp = 0;
+      for (const c of choicePool(s)) if (c.lv === 1) expect(isRelic(c.id)).toBe(false);
+    }
+  });
+  it('맵 이벤트: 행진은 무리가 몰려오고, 균열 문은 원 안에서 버티면 닫혀 상자를 남긴다', () => {
+    const s = createChapter(0, 'mapev', freshCarry('born'));
+    s.player.hp = s.player.maxHp = 1e6;
+    const horde = AREAS.events.find((e) => e.kind === 'horde')!;
+    const portal = AREAS.events.find((e) => e.kind === 'portal')!;
+    s.mapEvents = [
+      { def: horde, x: s.player.x + 2000, y: s.player.y, state: 'idle', until: 0, next: 0, progress: 0 },
+      { def: portal, x: s.player.x - 2000, y: s.player.y, state: 'idle', until: 0, next: 0, progress: 0 },
+    ];
+    const n0 = s.foes.length;
+    walkTo(s, s.player.x + 2000 - 50, s.player.y);
+    expect(s.mapEvents[0].state).toBe('done');
+    expect(s.foes.length).toBeGreaterThan(n0 + 10);
+    s.events.length = 0;
+    for (let i = 0; i < 60 * (portal.seconds! + 1); i++) {
+      s.player.x = s.mapEvents[1].x + 10;
+      s.player.y = s.mapEvents[1].y;
+      if (s.pending) choose(s, 0);
+      step(s, { x: 0, y: 0 });
+    }
+    expect(s.mapEvents[1].state).toBe('done');
+    expect(s.events.some((e) => e.type === 'event' && e.text.startsWith(`${portal.name} — 닫았다`))).toBe(true);
   });
 });

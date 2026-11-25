@@ -743,6 +743,25 @@ subjects:
   teum_rift_frost: >-
     a floating ghost of a drowned soldier wrapped in frozen pale blue mist, holding a broken icy spear, frost crystals growing on the
     shoulders, the lower body fading into cold vapor, hollow pale eyes
+  teum_zb_dream_queen: >-
+    a seductive nightmare queen (succubus) floating above the ground: pale lavender skin, long flowing magenta hair, curled black horns, large tattered bat wings, a gown of torn pink and black silk trailing into smoke, glowing pink eyes, a heart-shaped dark crystal in one hand
+  teum_zb_demon_shade: >-
+    the shadow of the demon king: a towering hunched figure of living black smoke shaped like armored demon royalty, a jagged crown of black iron horns, burning red eyes, a long tattered cape, massive clawed gauntlets, red embers drifting off the body
+  teum_zb_blood_bishop: >-
+    a corrupted blood bishop: tall gaunt priest in heavy crimson and black vestments, a tall pointed mitre, a pale cracked face with a sewn mouth, holding a long iron censer-staff dripping blood, a halo of floating blood droplets
+  teum_zb_bone_lord: >-
+    a hulking bone lord: a giant skeleton king made of many fused bones and skulls, a ribcage armor, a crown of antlers and bone spikes, glowing pale yellow eyes, holding a huge bone club, tattered grey banner cloth
+  teum_zb_frost_warden: >-
+    a frost jailer warden: an armored knight encased in thick blue ice, a great ring of iron prison keys at the belt, a jagged ice halberd, a helmet with a narrow glowing pale-blue visor, frost mist pouring from the joints
+  teum_zb_forge_demon: >-
+    a hellforge demon smith: a broad horned demon with charred black skin cracked by glowing orange magma veins, a leather apron, one arm ending in a molten hammer, a furnace-like glow in the chest, sparks flying
+  teum_zb_mirror_witch: >-
+    a mirror witch floating above the ground: a slender sorceress in a violet and silver gown made of shards of mirror glass, a faceless mirror mask, long silver hair, several small mirror shards orbiting her, violet glow
+  teum_zb_plague_lord: >-
+    a plague lord: a bloated hunched figure in a rotting dark green robe and a long-beaked plague-doctor mask, a staff topped with a smoking green lantern, swollen green pustules, flies and green fumes around him
+  teum_rift_nest: >-
+    a living shadow nest: a lumpy mound of black chitin and solidified shadow as wide as two men, pulsing violet light leaking from deep
+    cracks, small shadow wisps crawling around it, no face, no limbs
   npc_teum_merchant: >-
     a wandering peddler of the rift road: a lean middle-aged man in a faded purple travelling robe, a wide woven straw hat (sakkat), a
     wooden abacus tucked in the belt, small cloth pouches hanging everywhere, a cheerful sly smile

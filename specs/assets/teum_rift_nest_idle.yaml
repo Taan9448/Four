@@ -1,0 +1,19 @@
+id: teum_rift_nest_idle
+type: character-anim
+size: large
+character: teum_rift_nest
+chroma: magenta
+summary: '「틈」 그림자 둥지 대기 4프레임(살아 있는 듯 맥동)'
+depends_on: [teum_rift_nest_ref]
+reference: assets/source/teum_rift_nest_ref.png
+facing: left
+frames: 4
+fps: 6
+loop: true
+events: {}
+frame_notes:
+  1: "the nest pulsing slowly, violet light inside the cracks"
+  2: "swelling slightly, the inner light brighter"
+  3: "a small shadow wisp crawling out of a crack"
+  4: "back to the pose of frame 1"
+placeholder: { color: '#1a1020', accent: '#a35cff' }

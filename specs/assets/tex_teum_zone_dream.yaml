@@ -1,0 +1,10 @@
+id: tex_teum_zone_dream
+type: background
+tile: true
+canvas: [1024, 1024]
+draw: [256, 256]
+logical: [256, 256]
+summary: "「틈」 구역 「몽마의 침소」 바닥 무늬(이어 붙는 무늬, 2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\"). 게임이 성벽 안 바닥을 이 무늬로 채운다(오기 전엔 구역 빛깔 + 코드 무늬)"
+frame_notes:
+  1: "Soft dusky violet-pink marble floor of a nightmare boudoir seen from directly above: faded rose-petal stains, thin swirling smoke-like veins, a few scattered dark petals. Very dark and low contrast. Seamless on all four sides. No walls, no objects, no characters."
+placeholder: { color: "#2a1430" }

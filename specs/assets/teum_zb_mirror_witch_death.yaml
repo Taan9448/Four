@@ -1,0 +1,22 @@
+id: teum_zb_mirror_witch_death
+type: character-anim
+size: large
+character: teum_zb_mirror_witch
+chroma: magenta
+summary: "「틈」 구역 보스 거울 마녀 쓰러짐 6프레임 — 1프레임은 대기 그림과 같은 크기"
+depends_on: [teum_zb_mirror_witch_ref]
+reference: assets/source/teum_zb_mirror_witch_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "hit hard, recoiling, same size as the idle pose"
+  2: "shattering like a broken mirror into violet glass pieces — beginning"
+  3: "shattering like a broken mirror into violet glass pieces — halfway"
+  4: "shattering like a broken mirror into violet glass pieces — mostly gone"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { shape: humanoid, color: "#1a1428", accent: "#c8a0ff" }

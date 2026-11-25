@@ -1,0 +1,15 @@
+id: icons_teum_mapevents
+type: icon-sheet
+summary: "「틈」 맵 이벤트 표식 8칸(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\" · 「맵 이벤트가 너무 적다」) — 칸 번호는 teum/src/render.ts MAPEV_ICON·items.json icon [mapev, n]: 1 그림자 행진 · 2 가시 함정 · 3 그림자 둥지 · 4 균열 문 · 5 갇힌 수련자 · 6 악마의 제단 · 7 정예 야영지 · 8 금화 도깨비. 안개 속 바닥에 놓이는 표식, 위에서 약간 비스듬히 본 모습, icons_teum_world와 같은 결"
+frames: 8
+baseline: 0.5
+frame_notes:
+  1: 'shadow march: a torn black war banner on a spear stuck in the ground with a red claw mark, dark smoke at its base'
+  2: 'spike trap: a square of stone floor tiles with rusty iron spikes half raised, a faint warning glow in the cracks'
+  3: 'shadow nest: a lumpy black organic mound with violet glowing cracks and small shadow wisps'
+  4: 'rift gate: a tall jagged crack of violet light floating upright above two broken stones'
+  5: 'trapped prisoner: a small wooden cage with a bowed martial-artist silhouette inside, chains and a padlock'
+  6: 'demon altar: a black stone altar with a horned skull on top, two red candles and a dark red bowl of blood'
+  7: 'elite camp: a small dark tent with a crude red banner and a campfire with orange flames'
+  8: 'gold goblin: a fat sack overflowing with gold coins with a small mischievous goblin ear sticking out'
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

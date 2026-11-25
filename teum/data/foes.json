@@ -1,5 +1,5 @@
 {
- "$comment": "「틈」 그림자(GAME_DESIGN 2·8절). sprite는 「천외귀환」 적 그림(<sprite>_idle·_death), ref는 천외귀환 적 id(도감 설명). role은 기본 수치(hp·속도·피해·경험·크기)의 틀이고 칸마다 덮어쓴다. 장 배율(story.json chapters[].hp·dmg)을 곱한다. move: chase·charge·ranged·burst, fly면 지형을 넘는다. skills: aimed·fan·radial·slam·charge·summon(GAME_DESIGN 8절) · 2026-11-22: 탄 모양(style)·따라옴(homing)·웅덩이(zone), 광역 예고 line·cone·ring·lob, heal·shield·burrow, 자폭(fuse)·갈라짐(split), 특수 그림자 10(special — sprite는 Codex teum_*, 오기 전엔 fallback 그림)",
+ "$comment": "「틈」 그림자(GAME_DESIGN 2·8절). sprite는 「천외귀환」 적 그림(<sprite>_idle·_death), ref는 천외귀환 적 id(도감 설명). role은 기본 수치(hp·속도·피해·경험·크기)의 틀이고 칸마다 덮어쓴다. 장 배율(story.json chapters[].hp·dmg)을 곱한다. move: chase·charge·ranged·burst, fly면 지형을 넘는다. skills: aimed·fan·radial·slam·charge·summon(GAME_DESIGN 8절) · 2026-11-22: 탄 모양(style)·따라옴(homing)·웅덩이(zone), 광역 예고 line·cone·ring·lob, heal·shield·burrow, 자폭(fuse)·갈라짐(split), 특수 그림자 10(special — sprite는 Codex teum_*, 오기 전엔 fallback 그림) · 2026-11-25 구역 보스 zb_*(area: 구역 밖으로 쫓아오지 않는다 — zones.json)·그림자 둥지 rift_nest(맵 이벤트, 움직이지 않고 불러낸다)",
  "foes": [
   {
    "id": "oak_stump",
@@ -2090,6 +2090,402 @@
      "speed": 240,
      "color": "#8fd3ff",
      "style": "shard"
+    }
+   ]
+  },
+  {
+   "id": "zb_dream_queen",
+   "name": "몽마 여왕",
+   "sprite": "teum_zb_dream_queen",
+   "fallback": "celias",
+   "role": "zboss",
+   "hp": 1600,
+   "speed": 58,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "fly": true,
+   "tint": "#e070c0",
+   "skills": [
+    {
+     "kind": "fan",
+     "every": 2.6,
+     "count": 5,
+     "spread": 0.8,
+     "damage": 9,
+     "speed": 210,
+     "color": "#ff8ad8",
+     "style": "bubble",
+     "homing": 0.6
+    },
+    {
+     "kind": "ring",
+     "every": 7,
+     "damage": 14,
+     "radius": 230,
+     "width": 46,
+     "delay": 1.1,
+     "color": "#e070c0",
+     "range": 260
+    },
+    {
+     "kind": "summon",
+     "every": 11,
+     "foe": "rift_phantom",
+     "count": 3
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_demon_shade",
+   "name": "마왕의 그림자",
+   "sprite": "teum_zb_demon_shade",
+   "fallback": "mordecai",
+   "role": "zboss",
+   "hp": 1900,
+   "speed": 64,
+   "damage": 15,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "tint": "#ff4a4a",
+   "skills": [
+    {
+     "kind": "slam",
+     "every": 5,
+     "damage": 18,
+     "radius": 95,
+     "delay": 1.0,
+     "color": "#ff4a4a",
+     "count": 3
+    },
+    {
+     "kind": "line",
+     "every": 8,
+     "damage": 14,
+     "len": 560,
+     "width": 26,
+     "delay": 1.1,
+     "color": "#ff6a3a"
+    },
+    {
+     "kind": "charge",
+     "every": 6,
+     "damage": 0
+    },
+    {
+     "kind": "radial",
+     "every": 9,
+     "count": 14,
+     "damage": 8,
+     "speed": 190,
+     "color": "#9a2030",
+     "style": "shadow"
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_blood_bishop",
+   "name": "피의 주교",
+   "sprite": "teum_zb_blood_bishop",
+   "fallback": "branch_lord",
+   "role": "zboss",
+   "hp": 1600,
+   "speed": 58,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "tint": "#c8203a",
+   "skills": [
+    {
+     "kind": "lob",
+     "every": 3.6,
+     "damage": 12,
+     "radius": 80,
+     "delay": 1.1,
+     "color": "#c8203a",
+     "zone": {
+      "seconds": 5,
+      "dps": 6,
+      "radius": 70,
+      "element": "fire"
+     }
+    },
+    {
+     "kind": "aimed",
+     "every": 1.8,
+     "damage": 9,
+     "speed": 260,
+     "color": "#ff4a6a",
+     "style": "needle"
+    },
+    {
+     "kind": "heal",
+     "every": 6,
+     "radius": 260,
+     "amount": 0.08
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_bone_lord",
+   "name": "해골 군주",
+   "sprite": "teum_zb_bone_lord",
+   "fallback": "bone_giant",
+   "role": "zboss",
+   "hp": 1800,
+   "speed": 50,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "tint": "#e8dcb8",
+   "skills": [
+    {
+     "kind": "summon",
+     "every": 8,
+     "foe": "tomb_warrior",
+     "count": 4
+    },
+    {
+     "kind": "radial",
+     "every": 4.5,
+     "count": 10,
+     "damage": 9,
+     "speed": 200,
+     "color": "#e8dcb8",
+     "style": "bone"
+    },
+    {
+     "kind": "slam",
+     "every": 6,
+     "damage": 18,
+     "radius": 110,
+     "delay": 1.0,
+     "color": "#c8b890",
+     "count": 1
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_frost_warden",
+   "name": "서리 간수",
+   "sprite": "teum_zb_frost_warden",
+   "fallback": "ice_gatekeeper",
+   "role": "zboss",
+   "hp": 1600,
+   "speed": 58,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "element": "ice",
+   "tint": "#8fd3ff",
+   "skills": [
+    {
+     "kind": "cone",
+     "every": 4.5,
+     "damage": 15,
+     "radius": 260,
+     "spread": 0.6,
+     "delay": 1.0,
+     "color": "#8fd3ff"
+    },
+    {
+     "kind": "fan",
+     "every": 3,
+     "count": 4,
+     "spread": 0.5,
+     "damage": 9,
+     "speed": 240,
+     "color": "#bfe8ff",
+     "style": "shard"
+    },
+    {
+     "kind": "ring",
+     "every": 9,
+     "damage": 12,
+     "radius": 200,
+     "width": 40,
+     "delay": 1.2,
+     "color": "#dff4ff",
+     "range": 240
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_forge_demon",
+   "name": "대장간 악마",
+   "sprite": "teum_zb_forge_demon",
+   "fallback": "ignis",
+   "role": "zboss",
+   "hp": 1800,
+   "speed": 58,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "element": "fire",
+   "tint": "#ff8a2a",
+   "skills": [
+    {
+     "kind": "lob",
+     "every": 3,
+     "damage": 14,
+     "radius": 85,
+     "delay": 1.1,
+     "color": "#ff8a2a",
+     "zone": {
+      "seconds": 5,
+      "dps": 7,
+      "radius": 72,
+      "element": "fire"
+     }
+    },
+    {
+     "kind": "radial",
+     "every": 6,
+     "count": 12,
+     "damage": 9,
+     "speed": 210,
+     "color": "#ff6a2a",
+     "style": "flame"
+    },
+    {
+     "kind": "slam",
+     "every": 7,
+     "damage": 20,
+     "radius": 120,
+     "delay": 1.2,
+     "color": "#ff4a1a",
+     "count": 1
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_mirror_witch",
+   "name": "거울 마녀",
+   "sprite": "teum_zb_mirror_witch",
+   "fallback": "rift_phantom",
+   "role": "zboss",
+   "hp": 1600,
+   "speed": 66,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "fly": true,
+   "tint": "#c8a0ff",
+   "skills": [
+    {
+     "kind": "burrow",
+     "every": 6,
+     "delay": 1.0,
+     "radius": 90,
+     "damage": 14,
+     "color": "#c8a0ff"
+    },
+    {
+     "kind": "fan",
+     "every": 2.4,
+     "count": 3,
+     "spread": 0.4,
+     "damage": 10,
+     "speed": 280,
+     "color": "#d4b8ff",
+     "style": "blade"
+    },
+    {
+     "kind": "summon",
+     "every": 9,
+     "foe": "shadow_assassin_fading",
+     "count": 3
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "zb_plague_lord",
+   "name": "역병 군주",
+   "sprite": "teum_zb_plague_lord",
+   "fallback": "poison_palm_elder",
+   "role": "zboss",
+   "hp": 1800,
+   "speed": 52,
+   "damage": 13,
+   "xp": 90,
+   "radius": 36,
+   "scale": 0.95,
+   "rank": "elite",
+   "tint": "#8fd65a",
+   "skills": [
+    {
+     "kind": "lob",
+     "every": 3.2,
+     "damage": 10,
+     "radius": 90,
+     "delay": 1.1,
+     "color": "#8fd65a",
+     "zone": {
+      "seconds": 6,
+      "dps": 6,
+      "radius": 80,
+      "element": "poison"
+     }
+    },
+    {
+     "kind": "aimed",
+     "every": 2.2,
+     "damage": 10,
+     "speed": 180,
+     "color": "#bfe3a0",
+     "style": "bubble",
+     "homing": 0.9
+    },
+    {
+     "kind": "heal",
+     "every": 7,
+     "radius": 240,
+     "amount": 0.06
+    }
+   ],
+   "area": true
+  },
+  {
+   "id": "rift_nest",
+   "name": "그림자 둥지",
+   "sprite": "teum_rift_nest",
+   "fallback": "black_crystal",
+   "role": "nest",
+   "hp": 380,
+   "speed": 0,
+   "damage": 6,
+   "xp": 24,
+   "radius": 26,
+   "scale": 0.62,
+   "rank": "elite",
+   "tint": "#a35cff",
+   "skills": [
+    {
+     "kind": "summon",
+     "every": 3.2,
+     "foe": "shadow_fragment",
+     "count": 2
     }
    ]
   }

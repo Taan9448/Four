@@ -1,0 +1,22 @@
+id: teum_rift_nest_death
+type: character-anim
+size: large
+character: teum_rift_nest
+chroma: magenta
+summary: '「틈」 그림자 둥지 부서짐 6프레임'
+depends_on: [teum_rift_nest_ref]
+reference: assets/source/teum_rift_nest_ref.png
+facing: left
+frames: 6
+fps: 10
+loop: false
+events: {}
+bbox_tolerance: null
+frame_notes:
+  1: "cracking open, violet light bursting from the cracks, same size as idle"
+  2: "breaking into large black chunks — beginning"
+  3: "breaking into large black chunks — halfway"
+  4: "chunks scattering, violet smoke rising"
+  5: "only small pieces and wisps left"
+  6: "almost nothing left, a last faint wisp"
+placeholder: { color: '#1a1020', accent: '#a35cff' }

@@ -29,10 +29,21 @@ export interface TerrainDef {
   /** 깨지는 것(항아리·등불) 수 */
   props: number;
 }
+/** 구역 성(2026-11-25 zones.json): 가운데 칸 · 반 너비(칸) · 성문 쪽(0 위 · 1 오른쪽 · 2 아래 · 3 왼쪽) · 안쪽 지형 */
+export interface ZoneStamp {
+  cx: number;
+  cy: number;
+  half: number;
+  gates: number[];
+  gateWidth: number;
+  inner: TerrainStep[];
+}
 export interface Terrain {
   w: number;
   h: number;
   cells: Uint8Array;
+  /** 칸마다 구역 번호+1(0 = 구역 밖) — 성벽 칸도 그 구역 */
+  zone: Uint8Array;
   /** 흐름장: 인물 칸까지 걸음 수(못 가면 -1) */
   dist: Int16Array;
   /** 깨지는 것이 놓일 자리(세계 좌표) */
@@ -43,9 +54,10 @@ export interface Terrain {
 
 const walkCell = (c: number) => c === T.Floor || c === T.Slow || c === T.Bridge;
 
-export function buildTerrain(def: TerrainDef, rng: Rng): Terrain {
+export function buildTerrain(def: TerrainDef, rng: Rng, stamps: ZoneStamp[] = []): Terrain {
   const { w, h } = def;
   const cells = new Uint8Array(w * h);
+  const zone = new Uint8Array(w * h);
   const at = (x: number, y: number) => y * w + x;
   const inside = (x: number, y: number) => x >= 0 && y >= 0 && x < w && y < h;
   const disc = (cx: number, cy: number, r: number, v: number, only?: number) => {
@@ -210,6 +222,59 @@ export function buildTerrain(def: TerrainDef, rng: Rng): Terrain {
       }
     }
   }
+  // 구역 성: 둘레 길(2칸)을 비우고 · 사각 성벽(2칸 두께) + 모서리 탑 · 성문 · 안쪽 지형(가운데 보스 자리는 비운다)
+  stamps.forEach((z, zi) => {
+    const H = z.half;
+    for (let y = z.cy - H - 3; y <= z.cy + H + 3; y++)
+      for (let x = z.cx - H - 3; x <= z.cx + H + 3; x++) {
+        if (!inside(x, y)) continue;
+        cells[at(x, y)] = T.Floor;
+        if (Math.abs(x - z.cx) <= H + 1 && Math.abs(y - z.cy) <= H + 1) zone[at(x, y)] = zi + 1;
+      }
+    // 안쪽 지형(성벽 안 3칸 띄움)
+    const lo = (c: number) => c - H + 3;
+    const hi = (c: number) => c + H - 3;
+    for (const st of z.inner) {
+      const n = 'count' in st ? st.count : 0;
+      for (let i = 0; i < n; i++) {
+        const x = rng.int(lo(z.cx), hi(z.cx));
+        const y = rng.int(lo(z.cy), hi(z.cy));
+        if (Math.hypot(x - z.cx, y - z.cy) < 5) continue;
+        if (st.kind === 'pillars') {
+          const sz = st.size ?? 2;
+          for (let yy = y; yy < y + sz; yy++) for (let xx = x; xx < x + sz; xx++) if (inside(xx, yy)) cells[at(xx, yy)] = T.Wall;
+        } else if (st.kind === 'blobs' || st.kind === 'slow') {
+          const r = st.r[0] + rng.next() * (st.r[1] - st.r[0]);
+          disc(x, y, r, st.kind === 'slow' ? T.Slow : typeOf(st.type), T.Floor);
+        }
+      }
+    }
+    // 성벽(H-1..H) · 모서리 탑(3칸 사각, 바깥으로 1칸 튀어나옴)
+    for (let y = z.cy - H; y <= z.cy + H; y++)
+      for (let x = z.cx - H; x <= z.cx + H; x++) if (inside(x, y) && (Math.abs(x - z.cx) >= H - 1 || Math.abs(y - z.cy) >= H - 1)) cells[at(x, y)] = T.Wall;
+    for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]])
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const x = z.cx + sx * H + dx;
+        const y = z.cy + sy * H + dy;
+        if (inside(x, y)) cells[at(x, y)] = T.Wall;
+      }
+    // 성문: 변 가운데를 gateWidth칸 뚫고 바깥으로 길을 잇는다
+    const gw = z.gateWidth;
+    for (const g of z.gates) {
+      const ox = g === 1 ? 1 : g === 3 ? -1 : 0;
+      const oy = g === 2 ? 1 : g === 0 ? -1 : 0;
+      for (let k = H - 3; k <= H + 6; k++)
+        for (let j = -Math.floor(gw / 2); j <= Math.floor((gw - 1) / 2); j++) {
+          const x = z.cx + ox * k + (oy ? j : 0);
+          const y = z.cy + oy * k + (ox ? j : 0);
+          if (!inside(x, y) || x < 1 || y < 1 || x >= w - 1 || y >= h - 1) continue;
+          const c = cells[at(x, y)];
+          cells[at(x, y)] = c === T.Hazard ? T.Bridge : T.Floor;
+        }
+    }
+    // 보스 자리
+    disc(z.cx, z.cy, 3.5, T.Floor);
+  });
   // 가장자리는 벽, 가운데 시작 자리는 넓게 비운다
   for (let x = 0; x < w; x++) (cells[at(x, 0)] = T.Wall), (cells[at(x, h - 1)] = T.Wall);
   for (let y = 0; y < h; y++) (cells[at(0, y)] = T.Wall), (cells[at(w - 1, y)] = T.Wall);
@@ -217,7 +282,7 @@ export function buildTerrain(def: TerrainDef, rng: Rng): Terrain {
   const cy = Math.floor(h / 2);
   for (let y = cy - 4; y <= cy + 4; y++) for (let x = cx - 4; x <= cx + 4; x++) if (cells[at(x, y)] !== T.Bridge) cells[at(x, y)] = T.Floor;
   connect(cells, w, h, cx, cy);
-  const t: Terrain = { w, h, cells, dist: new Int16Array(w * h).fill(-1), props: [], start: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL } };
+  const t: Terrain = { w, h, cells, zone, dist: new Int16Array(w * h).fill(-1), props: [], start: { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL } };
   // 깨지는 것: 시작 자리에서 조금 떨어진 바닥에
   for (let i = 0, tries = 0; i < def.props && tries < def.props * 30; tries++) {
     const x = rng.int(2, w - 3);
@@ -249,60 +314,60 @@ function carve(cells: Uint8Array, w: number, h: number, x0: number, y0: number, 
 
 /** 끊긴 바닥 무리를 가운데 무리에 잇는다(작은 무리는 메운다) */
 function connect(cells: Uint8Array, w: number, h: number, cx: number, cy: number): void {
-  for (let pass = 0; pass < 40; pass++) {
-    const region = new Int32Array(w * h).fill(-1);
-    const flood = (sx: number, sy: number, id: number): number[] => {
-      const out: number[] = [];
-      const q = [sy * w + sx];
-      region[q[0]] = id;
-      while (q.length) {
-        const i = q.pop()!;
-        out.push(i);
-        const x = i % w;
-        const y = (i / w) | 0;
-        for (const [nx, ny] of [
-          [x + 1, y],
-          [x - 1, y],
-          [x, y + 1],
-          [x, y - 1],
+  // 2026-11-25 맵 3배: 끊긴 무리마다 가장 가까운 가운데 무리 칸을 사각 고리로 넓혀 찾아 한 번에 잇는다(예전엔 한 바퀴에 하나씩 — 큰 맵에서 느리고 덜 이어졌다)
+  const region = new Int32Array(w * h);
+  const q = new Int32Array(w * h);
+  const flood = (start: number, id: number, out: number[] | null): void => {
+    let n = 0;
+    q[n++] = start;
+    region[start] = id;
+    while (n) {
+      const i = q[--n];
+      if (out) out.push(i);
+      const x = i % w;
+      const y = (i / w) | 0;
+      if (x + 1 < w && region[i + 1] === -1 && walkCell(cells[i + 1])) (region[i + 1] = id), (q[n++] = i + 1);
+      if (x > 0 && region[i - 1] === -1 && walkCell(cells[i - 1])) (region[i - 1] = id), (q[n++] = i - 1);
+      if (y + 1 < h && region[i + w] === -1 && walkCell(cells[i + w])) (region[i + w] = id), (q[n++] = i + w);
+      if (y > 0 && region[i - w] === -1 && walkCell(cells[i - w])) (region[i - w] = id), (q[n++] = i - w);
+    }
+  };
+  const nearestMain = (ax: number, ay: number): number => {
+    const maxR = Math.max(w, h);
+    for (let rad = 1; rad < maxR; rad++) {
+      for (let k = -rad; k <= rad; k++) {
+        for (const [x, y] of [
+          [ax + k, ay - rad],
+          [ax + k, ay + rad],
+          [ax - rad, ay + k],
+          [ax + rad, ay + k],
         ]) {
-          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-          const j = ny * w + nx;
-          if (region[j] === -1 && walkCell(cells[j])) {
-            region[j] = id;
-            q.push(j);
-          }
+          if (x < 0 || y < 0 || x >= w || y >= h) continue;
+          if (region[y * w + x] === 0) return y * w + x;
         }
       }
-      return out;
-    };
-    const main = flood(cx, cy, 0);
-    const mainSet = new Set(main);
+    }
+    return -1;
+  };
+  for (let pass = 0; pass < 6; pass++) {
+    region.fill(-1);
+    flood(cy * w + cx, 0, null);
     let id = 1;
-    let fixed = false;
+    let fixed = 0;
     for (let i = 0; i < w * h; i++) {
       if (region[i] !== -1 || !walkCell(cells[i])) continue;
-      const r = flood(i % w, (i / w) | 0, id++);
+      const r: number[] = [];
+      flood(i, id++, r);
       if (r.length < 12) {
         for (const k of r) cells[k] = T.Wall;
         continue;
       }
-      // 이 무리에서 가운데 무리의 가장 가까운 칸으로 판다
       const a = r[0];
-      let best = -1;
-      let bd = Infinity;
-      for (const m of main) {
-        const d = Math.abs((m % w) - (a % w)) + Math.abs(((m / w) | 0) - ((a / w) | 0));
-        if (d < bd) {
-          bd = d;
-          best = m;
-        }
-      }
-      if (best >= 0 && !mainSet.has(a)) {
-        carve(cells, w, h, a % w, (a / w) | 0, best % w, (best / w) | 0, 3, T.Bridge);
-        fixed = true;
-        break;
-      }
+      const best = nearestMain(a % w, (a / w) | 0);
+      if (best < 0) continue;
+      carve(cells, w, h, a % w, (a / w) | 0, best % w, (best / w) | 0, 3, T.Bridge);
+      for (const k of r) region[k] = 0;
+      fixed++;
     }
     if (!fixed) return;
   }

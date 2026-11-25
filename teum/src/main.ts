@@ -4,7 +4,7 @@ import './style.css';
 import { frameUrl } from '../../src/render/assets';
 import { currentTraining, gainXp } from '../../gyeol/src/training';
 import progressRaw from '../../gyeol/data/progress.json';
-import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, evolveTable, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
+import { applyVariant, banish, spawnFoe, CHAPTER_LENGTH, createEndless, practiceSlam, carryOf, choose, createChapter, dashCooldown, DT, elementCounts, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, partnersOf, evolveTable, slotWeapons, PASSIVES, rarityOf, reroll, RULES, skip as skipChoice, STORY, step, trainingXp, WEAPONS, type Carry, type Choice, type Input, type State } from './sim';
 import { absorb, draw, emptyView, loadArt, sideSprite, SKILL_ICON, type Art, type View } from './render';
 import { cardArtUrl } from '../../src/render/assets';
 import { advice, BOOK_SLOTS, bookSummary, describe, gradeOf, keyNumbers, presets, recommend, roleIcon, roleOf, splitBook, suggest } from './book';
@@ -1400,11 +1400,11 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
   };
   const wareCard = (c: Choice, i: number): HTMLElement => {
     const poor = c.kind !== 'sellskill' && c.kind !== 'leave' && s.gold < c.lv;
-    const full = c.kind === 'buyskill' && (WEAPONS.has(c.id) ? s.weapons.length >= s.slots.weapons : s.passives.size >= s.slots.passives);
+    const full = c.kind === 'buyskill' && (WEAPONS.has(c.id) ? slotWeapons(s) >= s.slots.weapons : s.passives.size >= s.slots.passives);
     let body: HTMLElement;
     if (c.kind === 'buy') {
       const it = ITEMS.get(c.id);
-      const ic = it?.icon ? realArt(({ items2: 'icons_teum_items_2', world: 'icons_teum_world', icons: 'icons_teum', items: 'icons_teum_items' } as Record<string, string>)[it.icon[0]] ?? 'icons_teum_items', it.icon[1]) : null;
+      const ic = it?.icon ? realArt(({ items2: 'icons_teum_items_2', world: 'icons_teum_world', icons: 'icons_teum', items: 'icons_teum_items', mapev: 'icons_teum_mapevents' } as Record<string, string>)[it.icon[0]] ?? 'icons_teum_items', it.icon[1]) : null;
       body = el('div', { class: 'ware-item', style: `--c:${it?.color ?? '#c2c6d1'}` }, ic ? el('img', { src: ic, alt: '' }) : el('span', { class: 'glyph-big' }, it?.name[0] ?? '?'), el('div', {}, el('b', {}, it?.name ?? c.id), el('small', {}, it?.desc ?? '')));
     } else {
       const lv = c.kind === 'upskill' ? (s.weapons.find((w) => w.id === c.id)?.lv ?? 0) + 1 : c.kind === 'sellskill' ? s.weapons.find((w) => w.id === c.id)?.lv : undefined;
@@ -1438,7 +1438,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
           el('b', {}, def?.place?.name ?? def?.name ?? ''),
           el('p', { class: 'npc-line' }, `“${lines[Math.floor(s.t) % lines.length]}”`),
           el('div', { class: 'purse' }, el('i', { class: 'coin' }), el('b', {}, String(s.gold)), el('small', {}, '가진 금화')),
-          el('small', { class: 'muted' }, `무공 ${s.weapons.length}/${s.slots.weapons} · 심법 ${s.passives.size}/${s.slots.passives}`),
+          el('small', { class: 'muted' }, `무공 ${slotWeapons(s)}/${s.slots.weapons} · 심법 ${s.passives.size}/${s.slots.passives}`),
         ),
         el('div', { class: 'wares' }, ...(wares.length ? wares.map((c) => wareCard(c, s.pending!.indexOf(c))) : [el('p', { class: 'muted sold' }, '다 팔렸다 — 다음에 또 보자.')])),
         btn('지나간다', 'btn ghost leave', () => pick(leaveIdx)),
@@ -1865,6 +1865,12 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
         case 'phase':
           sfx('boss', { vol: 0.8 });
           break;
+        case 'area':
+          if (e.boss) sfx('boss', { vol: 0.8 });
+          break;
+        case 'relic':
+          sfx('evolve');
+          break;
         case 'event':
           if (e.kind === 'boss' || e.kind === 'mid' || e.kind === 'bigwave') sfx('boss', { vol: e.kind === 'bigwave' ? 0.5 : 0.9 });
           break;
@@ -1874,7 +1880,8 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
       }
     }
     // 배경음악: 보스가 있으면 보스 곡
-    const mood = st.boss && !st.boss.dead ? 'boss' : endless || st.chapterIndex >= 9 ? 'rift' : 'battle';
+    const areaBoss = st.areaIn >= 0 ? st.areas[st.areaIn]?.boss : null;
+    const mood = (st.boss && !st.boss.dead) || (areaBoss && !areaBoss.dead) ? 'boss' : endless || st.chapterIndex >= 9 ? 'rift' : 'battle';
     music(mood);
   };
   raf = requestAnimationFrame(loop);

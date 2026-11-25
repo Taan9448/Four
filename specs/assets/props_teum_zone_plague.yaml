@@ -1,0 +1,11 @@
+id: props_teum_zone_plague
+type: icon-sheet
+summary: "「틈」 구역 「역병의 늪」 꾸밈 소품 4칸(2026-11-25 사용자 \"구역별 4~5가지 악마 관련 성 · 엑스트라 보스 · 특별한 스킬\"). 성 안 바닥에 흩어 놓는다(부서지지 않는 장식). 위에서 약간 비스듬히 본 모습, props_teum과 같은 결"
+frames: 4
+subject: "decorative props for the demonic castle area 「역병의 늪」 seen from slightly above (three-quarter top-down view), each centered and standing on the bottom of the cell, readable at 56x56 px, dark gothic fantasy mood with #8fd65a accent light"
+frame_notes:
+  1: "a rotten wooden post with a hanging crow skeleton and green moss"
+  2: "a bubbling cauldron of green poison on a small fire"
+  3: "a cluster of sickly glowing green mushrooms"
+  4: "a half-sunken plague-doctor mask on a stick in the mud"
+placeholder: { color: "#141e10", accent: "#8fd65a" }
