@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell; it will be removed to transparency. Never use magenta, pink or purple in the effect.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art enemy attack effect, COLORLESS: only white and light-to-mid greys for the glowing parts (no hue at all), and a thick 1-2 block dark navy #1d2433 outline around every shape so it reads as DANGER on any background; the game tints the grey parts to each enemy skill's own color; clean stepped edges, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #ffffff, #f1efe6, #c2c6d1, #8a90a3, #5d6478, #3d4459, #1d2433.
+Frames:
+Cell 1: a flat round puddle seen from above filling 70% of the cell, bubbles at the rim
+Cell 2: the same puddle, bubbles in other places, one popping
+Cell 3: the same puddle, a small splash in the middle
+Cell 4: the same puddle, bubbles rising at the rim
+Cell 5: the same puddle, a bubble popping on the left
+Cell 6: the same as frame 1 so the loop is seamless
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Review fix: Draw a FLAT TWO-DIMENSIONAL CIRCULAR PUDDLE viewed straight DOWN from directly overhead, never a sphere, dome, orb, floating ball or perspective ellipse. Its diameter is about 70% of each 512px cell, with a uniform 1-2-block #1d2433 outline. Fill the broad central disc almost entirely ONE FLAT LIGHT GREY #c2c6d1; NO upper-left white reflection, NO lower dark crescent, NO rounded volume shading, NO cast shadow, NO radial gradient and NO central mound. Across cells 1-6 keep the same circular disc shape, diameter and center; animate only a few tiny grey/white bubbles and popping bubbles ALONG THE RIM, with any small cell-3 splash placed immediately at the inner rim so the center stays nearly flat. The attached effect is for crisp pixel edges and navy outline style only, not its three-dimensional splash silhouette. Cell 6 must be IDENTICAL to cell 1, including bubble positions, for a seamless loop. Use only the specified white/grey/navy palette and keep every rim bubble inside the central 80% containment.
