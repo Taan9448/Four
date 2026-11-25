@@ -1,0 +1,24 @@
+Create ONE PNG pixel-art icon sheet.
+Canvas: 1024x1024 px. Grid: 4 columns x 4 rows.
+Each cell is exactly 256x256 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 64x64 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid magenta #FF00FF in every cell.
+Subject: one game status icon per cell, a single bold symbol centered in the cell, about 48x48 sprite pixels, readable when shown at 28x28 px on screen. All icons share ONE consistent style and size, like a set: bold simple shapes, 2-3 flat tone steps, light from the upper left, no background plate or circle behind the symbol.
+Style: crisp detailed 64x64 pixel art in the style of a late 16-bit era game sprite; 1-pixel dark navy (#1d2433) outline around the silhouette, 2-3 flat tone steps per color with light from the upper left, clear readable silhouette, no anti-aliasing, no gradients, no dithering noise, no blur.
+Palette: use at most 12 colors per cell, only from this list: #0b0b10, #1d2433, #2b2b3a, #3d4459, #5d6478, #8a90a3, #c2c6d1, #f1efe6, #2a1d16, #4a3426, #6e5440, #8f7a63, #b8a184, #e0cfae, #f2c8a0, #c98f6b, #5a1020, #a02634, #ff3b3b, #ff8a5c, #b8741a, #f2a93b, #ffe08a, #2f5a3a, #6aa84f, #bfe3a0, #1f3f73, #3a6ea5, #4fb4ff, #8fd3ff, #dff4ff, #4b3a6b, #6b4fa3, #a35cff, #d4b8ff.
+Never use magenta or similar hues in the icons.
+Icons:
+Cell 1: 틈새 칼날 · 극: six large violet blades in a wide spinning ring, radiant, ultimate version
+Cell 2: 공허 구체 · 극: three huge dark violet spheres with blazing cores, ultimate version
+Cell 3: 균열 낙뢰 · 극: a storm of violet lightning bolts raining down, ultimate version
+Cell 4: 유성우 · 극: a sky full of burning meteors falling, ultimate version
+Cell 5: 생명의 등불 · 극: a radiant golden lantern of life with a blooming green flower of light, ultimate version
+Cell 6: 그림자 학살 · 극: four shadow swordsmen in a circle with a crimson whirlwind of blood, ultimate version
+Cell 7: 망령 사슬 · 극: glowing chains linking screaming wraith faces, ultimate version
+Cell 8: 역병 안개 · 극: a huge green plague fog skull cloud, ultimate version
+Cell 9: 멈춘 시간의 창 · 극: three ice lances piercing through a cracked frozen clock, ultimate version
+Cell 10: 혼돈 역류 · 극: golden stars riding a reversing blue wave in all directions, ultimate version
+Cells 11 to 16 are completely empty magenta.
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 5 sprite pixels of empty space inside every cell edge.
+Fix: Redraw the entire sheet. EVERY occupied icon in cells 1-10 must have a clearly visible ornate GOLD contour and accents following its silhouette in #b8741a, #f2a93b and #ffe08a, plus a thin dark navy outermost outline; no separate background plates or square frames. Keep exactly SIX violet blades in cell 1, THREE spheres in cell 2, FOUR shadow swordsmen in cell 6, and THREE ice lances through a cracked frozen clock in cell 9. IMPORTANT: the clock face in cell 9 must have ONLY simple short rectangular tick marks and hands, absolutely NO Roman numerals, NO Arabic digits, NO letters or writing anywhere. Roman numerals such as XII and IX are forbidden. Retain the ten subjects in the original order and leave cells 11-16 entirely magenta. Keep each icon and all its gold decorations comfortably inside its own cell with at least five sprite pixels of empty margin.
