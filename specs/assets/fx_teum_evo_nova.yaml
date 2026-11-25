@@ -1,0 +1,17 @@
+id: fx_teum_evo_nova
+type: fx
+summary: "「틈」 극(각성) 무공 전용 이펙트 — 충격파(2026-11-25 사용자 \"극 스킬은 이펙트가 전체적으로 바뀌게 · 스킬 이펙트가 아직 비슷하다\"). 극·각성 무공은 이 그림으로 통째로 바뀐다(기본 fx_teum_nova 대신). fx_teum_nova와 자리·크기·때가 같고 더 크고 화려하게 — a double expanding ring with a circle of runes between the rings and radial light rays. 무색(흰·회색)으로 그리고 게임이 무공 색 + 금빛 룬 덧칠을 입힌다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "GRAND evolved version: seen from directly above: a small bright white burst in the exact center, a thin ring around it at 15% of the cell width — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_nova (the hero/target point in the same place), only the shape changes"
+  2: "GRAND evolved version: impact: a thick bright ring of light at 35% of the cell width, white inner edge, jagged short spikes on its outer edge, a soft flash inside — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays"
+  3: "GRAND evolved version: the ring at 55% of the cell width, thinner, a second faint ring inside it, single-block sparks on the ring — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays"
+  4: "GRAND evolved version: the ring at 70% of the cell width, thin and broken into stepped arcs — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays"
+  5: "GRAND evolved version: the ring at 78% of the cell width, broken into a few faint arcs — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays"
+  6: "GRAND evolved version: a few faint sparks on a large circle near 80% of the cell width — but bigger, brighter and more ornate: a double expanding ring with a circle of runes between the rings and radial light rays"
+placeholder: { accent: '#f1efe6' }

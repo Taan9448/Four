@@ -24,7 +24,22 @@
   "kill": 0.4,
   "elite": 12,
   "boss": 30,
-  "radius": 700
+  "radius": 700,
+  "scale": {
+   "base": 0.45,
+   "perMin": 0.14,
+   "perChapter": 1.5,
+   "max": 4
+  },
+  "rankMul": {
+   "boss": 0.5,
+   "elite": 0.7
+  },
+  "rankCap": {
+   "boss": 0.15,
+   "elite": 0.3
+  },
+  "$comment": "마지막 기술(Q, 2026-11-25 사용자 \"보스가 한 방에 죽는다 — 시간마다 데미지가 오르게\"): 피해 배율 = min(max, base + perMin × 분), 스토리의 분은 지난 시간 + 장마다 perChapter분. 보스·정예(중간·구역 보스 포함)는 rankMul배만 받고, 한 번 쓸 때 최대 체력의 rankCap까지만 깎인다"
  },
  "xp": {
   "base": 4,

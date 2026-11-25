@@ -45,6 +45,8 @@ export interface WeaponDef {
   relic?: boolean;
   /** 무한 모드에만 나오는 고유 무공(2026-11-25) */
   endless?: boolean;
+  /** 이펙트 변형(fx_teum_<종류>_b·_c, 2026-11-25) — 없으면 id로 고른다 */
+  fxStyle?: 'a' | 'b' | 'c';
   /** 아이콘 칸 [시트, 칸](icons_teum_skills_<시트>) — 없으면 예전 순서 */
   icon?: [number, number];
 }
@@ -281,7 +283,7 @@ const AFFIX = new Map(AFFIXES.map((a) => [a.id, a]));
 export const RULES = rulesRaw as unknown as {
   player: { hp: number; speed: number; radius: number; pickup: number; hurtCooldown: number; slots: { weapons: number; passives: number } };
   dash: { duration: number; speed: number; cooldown: number; graze: { radius: number; damage: number } };
-  ult: { max: number; kill: number; elite: number; boss: number; radius: number };
+  ult: { max: number; kill: number; elite: number; boss: number; radius: number; scale: { base: number; perMin: number; perChapter: number; max: number }; rankMul: { boss: number; elite: number }; rankCap: { boss: number; elite: number } };
   xp: { base: number; perLevel: number; square: number };
   foes: { max: number; spawnRadius: [number, number]; despawn: number; hpPerMinute: number; overtimeDamagePerMinute: number; separation: number };
   props: { hp: number };
@@ -583,6 +585,9 @@ export interface Foe {
   debuff?: Partial<Record<Debuff, number>>;
   bleedStacks?: number;
   dotAt?: number;
+  /** 마지막 기술: 이번 한 번(ultCast)에 받은 피해(보스·정예 상한) */
+  ultCast?: number;
+  ultDealt?: number;
 }
 export interface Shot {
   x: number;
@@ -691,9 +696,9 @@ export interface OwnedWeapon {
   touched?: Map<number, number>;
 }
 export type FxEvent =
-  | { type: 'slash'; x: number; y: number; angle: number; r: number; arc: number; color: string }
-  | { type: 'nova'; x: number; y: number; r: number; color: string; weapon: string }
-  | { type: 'strike'; x: number; y: number; r: number; color: string; fx?: string }
+  | { type: 'slash'; x: number; y: number; angle: number; r: number; arc: number; color: string; evo?: boolean; wid?: string }
+  | { type: 'nova'; x: number; y: number; r: number; color: string; weapon: string; evo?: boolean }
+  | { type: 'strike'; x: number; y: number; r: number; color: string; fx?: string; evo?: boolean; wid?: string }
   | { type: 'hit'; x: number; y: number; damage: number; crit: boolean }
   | { type: 'kill'; x: number; y: number; foe: string; rank?: string }
   | { type: 'hurt'; damage: number }
@@ -704,9 +709,11 @@ export type FxEvent =
   | { type: 'ult'; x: number; y: number; fx: string; color: string }
   | { type: 'event'; text: string; kind: string }
   | { type: 'skill'; x: number; y: number; fx?: string; color: string; kind?: 'charge' | 'summon' | 'slam' | 'heal' | 'shield' | 'burrow' | 'line' | 'cone' | 'ring' | 'zone'; angle?: number; r?: number; len?: number; w?: number; r0?: number }
-  | { type: 'chain'; pts: [number, number][]; color: string }
-  | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string }
-  | { type: 'heal'; amount: number }
+  | { type: 'chain'; pts: [number, number][]; color: string; evo?: boolean; wid?: string }
+  | { type: 'beam'; x: number; y: number; angle: number; len: number; w: number; color: string; evo?: boolean; wid?: string }
+  /** 상태·디버프가 새로 걸린 순간(2026-11-25 적중 그림) */
+  | { type: 'status'; x: number; y: number; k: string }
+  | { type: 'heal'; amount: number; wid?: string }
   | { type: 'burst'; x: number; y: number; r: number }
   | { type: 'prop'; x: number; y: number }
   | { type: 'bomb'; x: number; y: number }
@@ -836,7 +843,7 @@ export interface State {
   /** 판 전체 효과: foeSpeed 그림자 빠르기 · xp 결 조각 · spawn 무리 · fog 안개 */
   effects: { kind: 'foeSpeed' | 'xp' | 'spawn' | 'fog'; mul: number; until: number }[];
   /** 벼락·별비: 보이는 그림자 위로 every초마다 */
-  storms: { until: number; every: number; next: number; damage: number; r: number; color: string }[];
+  storms: { until: number; every: number; next: number; damage: number; r: number; color: string; ult?: boolean }[];
   /** 서약: 둘레를 밀치며 벤다 */
   pulses: { until: number; every: number; next: number; damage: number; r: number; color: string }[];
   /** 늦게 시작한 장의 앞당김(초) */
@@ -900,6 +907,8 @@ export interface State {
   /** 맵 이벤트(안개 속) · 무한 모드 다음 채우기 */
   mapEvents: MapEvent[];
   nextMapEventsAt: number;
+  /** 마지막 기술을 쓴 횟수(한 번마다 보스 피해 상한을 새로 센다) */
+  ultCast: number;
 }
 
 export function xpNeed(level: number): number {
@@ -1162,6 +1171,7 @@ export function createChapter(chapterIndex: number, seed: string, carry: Carry, 
     areaPull: null,
     mapEvents: [],
     nextMapEventsAt: endless ? AREAS.endlessRefill.every : Infinity,
+    ultCast: 0,
   };
   if (endless) {
     s.chestAt = RULES.endless.chests;
@@ -1646,6 +1656,7 @@ export function applyDebuff(s: State, f: Foe, k: Debuff): void {
   if (r >= 1 || f.dead) return;
   const D = RULES.debuffs;
   const until = s.t + D[k].seconds * (1 - r);
+  if ((f.debuff?.[k] ?? 0) <= s.t && s.events.length < 400) s.events.push({ type: 'status', x: f.x, y: f.y, k });
   f.debuff ??= {};
   f.debuff[k] = Math.max(f.debuff[k] ?? 0, until);
   if (k === 'bleed') f.bleedStacks = Math.min(D.bleed.maxStacks, (f.bleedStacks ?? 0) + 1);
@@ -1656,10 +1667,10 @@ export const hasDebuff = (s: State, f: Foe, k: Debuff): boolean => (f.debuff?.[k
 /** 지속 피해 배율(뒤 장·무한 모드 분마다 오른다) */
 const dotScale = (s: State): number => 1 + 0.35 * (s.mode === 'endless' ? s.stage + s.t / 180 : s.chapterIndex);
 
-function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false): void {
-  if (f.dead) return;
+function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element'], chained = false, cap = Infinity): number {
+  if (f.dead) return 0;
   // 땅속에 있는 동안은 맞지 않는다
-  if (f.burrowUntil && s.t < f.burrowUntil) return;
+  if (f.burrowUntil && s.t < f.burrowUntil) return 0;
   // 갑옷 두른(변종) · 방패 그림자의 보호
   const va = variantOf(f);
   base *= (1 - (va?.armor ?? 0)) * (f.guardUntil && s.t < f.guardUntil ? (f.guardMul ?? 0.5) : 1);
@@ -1667,13 +1678,20 @@ function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDe
   const S = RULES.sets;
   const vulnMul = s.t < f.vulnUntil ? (setOn(s, 'vuln') ? S.vuln.mul! : 1.25) : 1;
   const iceMul = s.t < f.slowUntil && setOn(s, 'ice') ? S.ice.mul! : 1;
-  const dmg = Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * vulnMul * iceMul);
+  const dmg = Math.min(Math.max(0, Math.floor(cap)), Math.round(base * stat.might(s) * (crit ? stat.critMul(s) : 1) * vulnMul * iceMul));
   f.hp -= dmg;
   f.hitAt = s.t;
   const firm = hasAffix(f, 'steadfast') || !!va?.firm;
   // 같은 속성의 그림자는 그 속성이 듣지 않는다(불타는 놈은 안 탄다)
   // 저항(2026-11-25 foes.json resist): 상태 시간·밀림에 (1 - 저항)
   const rs = (k: ResistKey) => 1 - resistOf(f, k);
+  const fresh = (until: number, k: string) => {
+    if (until <= s.t && s.events.length < 400) s.events.push({ type: 'status', x: f.x, y: f.y, k });
+  };
+  if (element === 'ice' && rs('slow') > 0 && f.element !== 'ice') fresh(f.slowUntil, 'ice');
+  if (element === 'fire' && rs('burn') > 0 && f.element !== 'fire') fresh(f.burnUntil, 'fire');
+  if (element === 'shock' && rs('stun') > 0) fresh(f.stunUntil, 'shock');
+  if (element === 'vuln' && rs('vuln') > 0) fresh(f.vulnUntil, 'vuln');
   if (element === 'ice' && !firm && f.element !== 'ice' && rs('slow') > 0) f.slowUntil = Math.max(f.slowUntil, s.t + 1.2 * rs('slow'));
   if (element === 'fire' && f.element !== 'fire' && rs('burn') > 0) f.burnUntil = Math.max(f.burnUntil, s.t + 2 * rs('burn'));
   if (element === 'shock' && !firm && rs('stun') > 0) f.stunUntil = Math.max(f.stunUntil, s.t + 0.35 * rs('stun'));
@@ -1728,7 +1746,30 @@ function damageFoe(s: State, f: Foe, base: number, knock = 0, element?: WeaponDe
   }
   if (f.boss && !f.dead) bossPhase(s, f);
   if (f.hp <= 0 && !f.dead) killFoe(s, f);
+  return dmg;
 }
+/** 마지막 기술 피해(2026-11-25): 보스·정예는 rankMul배, 한 번 쓸 때 최대 체력의 rankCap까지만 */
+function ultHit(s: State, f: Foe, base: number, knock = 0, element?: WeaponDef['element']): void {
+  const U = RULES.ult;
+  const rank = f.boss || f.def.rank === 'boss' ? 'boss' : f.def.rank || f.elite || f.area !== undefined ? 'elite' : null;
+  if (!rank) {
+    damageFoe(s, f, base, knock, element);
+    return;
+  }
+  if (f.ultCast !== s.ultCast) {
+    f.ultCast = s.ultCast;
+    f.ultDealt = 0;
+  }
+  const left = f.maxHp * U.rankCap[rank] - (f.ultDealt ?? 0);
+  if (left <= 0) return;
+  f.ultDealt = (f.ultDealt ?? 0) + damageFoe(s, f, base * U.rankMul[rank], knock, element, false, left);
+}
+/** 마지막 기술 피해 배율: 시간(스토리는 장마다 더)마다 오른다 */
+export const ultScale = (s: State): number => {
+  const S = RULES.ult.scale;
+  const m = s.t / 60 + (s.mode === 'endless' ? 0 : s.chapterIndex * S.perChapter);
+  return Math.min(S.max, S.base + S.perMin * m);
+};
 
 /** 위험 칸에 빠짐: 보통 그림자는 끝, 정예·보스는 큰 피해(every초에 한 번) */
 function fallFoe(s: State, f: Foe): void {
@@ -2383,7 +2424,7 @@ function runTimeline(s: State): void {
     if (!seen.length) continue;
     const t = seen[s.rng.int(0, seen.length - 1)];
     s.events.push({ type: 'strike', x: t.x, y: t.y, r: st.r, color: st.color });
-    for (const f of s.foes) if (!f.dead && (f.x - t.x) ** 2 + (f.y - t.y) ** 2 < (st.r + f.def.radius) ** 2) damageFoe(s, f, st.damage, 0, 'shock');
+    for (const f of s.foes) if (!f.dead && (f.x - t.x) ** 2 + (f.y - t.y) ** 2 < (st.r + f.def.radius) ** 2) (st.ult ? ultHit(s, f, st.damage, 0, 'shock') : damageFoe(s, f, st.damage, 0, 'shock'));
   }
   s.storms = s.storms.filter((x) => s.t < x.until);
   // 서약: 둘레를 밀치며 벤다
@@ -2391,7 +2432,7 @@ function runTimeline(s: State): void {
     if (s.t >= pu.until || s.t < pu.next) continue;
     pu.next = s.t + pu.every;
     s.events.push({ type: 'nova', x: s.player.x, y: s.player.y, r: pu.r, color: pu.color, weapon: '' });
-    for (const f of s.foes) if (!f.dead && (f.x - s.player.x) ** 2 + (f.y - s.player.y) ** 2 < (pu.r + f.def.radius) ** 2) damageFoe(s, f, pu.damage, 40);
+    for (const f of s.foes) if (!f.dead && (f.x - s.player.x) ** 2 + (f.y - s.player.y) ** 2 < (pu.r + f.def.radius) ** 2) ultHit(s, f, pu.damage, 40);
   }
   s.pulses = s.pulses.filter((x) => s.t < x.until);
   s.buffs = s.buffs.filter((b) => s.t < b.until);
@@ -2826,7 +2867,7 @@ function fireWeapons(s: State): void {
         hitProps(s, p.x, p.y, R * 0.8);
         for (const off of dirs) {
           const a = aim + off;
-          s.events.push({ type: 'slash', x: p.x, y: p.y, angle: a, r: R, arc, color });
+          s.events.push({ type: 'slash', x: p.x, y: p.y, angle: a, r: R, arc, color, evo: d.evolved, wid: d.id });
           for (const f of s.foes) {
             if (f.dead) continue;
             const dx = f.x - p.x;
@@ -2860,7 +2901,7 @@ function fireWeapons(s: State): void {
       case 'nova': {
         w.ringAt = s.t;
         w.ringHit = new Set();
-        s.events.push({ type: 'nova', x: p.x, y: p.y, r: 150 * L.area * area, color, weapon: d.id });
+        s.events.push({ type: 'nova', x: p.x, y: p.y, r: 150 * L.area * area, color, weapon: d.id, evo: d.evolved });
         if (L.count >= 2) w.next = s.t + (L.cooldown * stat.haste(s)) / 2;
         break;
       }
@@ -2869,7 +2910,7 @@ function fireWeapons(s: State): void {
         const R = 46 * L.area * area;
         for (let i = 0; i < L.count && near2.length; i++) {
           const t = near2.splice(s.rng.int(0, near2.length - 1), 1)[0];
-          s.events.push({ type: 'strike', x: t.x, y: t.y, r: R, color, fx: d.fx });
+          s.events.push({ type: 'strike', x: t.x, y: t.y, r: R, color, fx: d.fx, evo: d.evolved, wid: d.id });
           hitProps(s, t.x, t.y, R);
           for (const f of s.foes) if (!f.dead && (f.x - t.x) ** 2 + (f.y - t.y) ** 2 < (R + f.def.radius) ** 2) damageFoe(s, f, L.damage, d.knock ?? 0, d.element);
         }
@@ -2899,7 +2940,7 @@ function fireWeapons(s: State): void {
           }
           t = next;
         }
-        s.events.push({ type: 'chain', pts, color });
+        s.events.push({ type: 'chain', pts, color, evo: d.evolved, wid: d.id });
         break;
       }
       case 'beam': {
@@ -2908,7 +2949,7 @@ function fireWeapons(s: State): void {
         const wdt = 18 * L.area * area;
         const ux = Math.cos(aim);
         const uy = Math.sin(aim);
-        s.events.push({ type: 'beam', x: p.x, y: p.y - 20, angle: aim, len, w: wdt, color });
+        s.events.push({ type: 'beam', x: p.x, y: p.y - 20, angle: aim, len, w: wdt, color, evo: d.evolved, wid: d.id });
         for (const f of s.foes) {
           if (f.dead) continue;
           const rx = f.x - p.x;
@@ -2922,7 +2963,7 @@ function fireWeapons(s: State): void {
       case 'heal': {
         const before = p.hp;
         p.hp = Math.min(p.maxHp, p.hp + L.damage);
-        if (p.hp > before) s.events.push({ type: 'heal', amount: Math.round(p.hp - before) });
+        if (p.hp > before) s.events.push({ type: 'heal', amount: Math.round(p.hp - before), wid: d.id });
         break;
       }
       case 'rain': {
@@ -2986,7 +3027,8 @@ function moveShots(s: State): void {
       const rr = sh.r + f.def.radius;
       if ((f.x - sh.x) ** 2 + (f.y - 20 - sh.y) ** 2 > rr * rr) continue;
       sh.hit!.add(f.uid);
-      damageFoe(s, f, sh.damage, sh.knock ?? 0, sh.element);
+      if (sh.weapon === 'ult') ultHit(s, f, sh.damage, sh.knock ?? 0, sh.element);
+      else damageFoe(s, f, sh.damage, sh.knock ?? 0, sh.element);
       if (sh.pierce-- <= 0) {
         sh.life = 0;
         break;
@@ -3527,11 +3569,12 @@ function useUlt(s: State): void {
   const p = s.player;
   const u = s.hero.ult;
   s.events.push({ type: 'ult', x: p.x, y: p.y, fx: `fx_gyeol_tech_${u.id}_a`, color: u.color });
-  const k = 1 + 0.05 * s.level;
+  s.ultCast++;
+  const k = ultScale(s);
   const inRange = (f: Foe) => !f.dead && (f.x - p.x) ** 2 + (f.y - p.y) ** 2 < RULES.ult.radius ** 2;
   switch (u.kind) {
     case 'waves': {
-      for (const f of s.foes) if (inRange(f)) damageFoe(s, f, u.damage * k);
+      for (const f of s.foes) if (inRange(f)) ultHit(s, f, u.damage * k);
       const n = u.waves ?? 8;
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2;
@@ -3546,14 +3589,14 @@ function useUlt(s: State): void {
       break;
     case 'starfall': {
       const n = u.count ?? 30;
-      s.storms.push({ until: s.t + (u.seconds ?? 4), every: (u.seconds ?? 4) / n, next: s.t, damage: u.damage * k, r: u.radius ?? 90, color: u.color });
+      s.storms.push({ until: s.t + (u.seconds ?? 4), every: (u.seconds ?? 4) / n, next: s.t, damage: u.damage * k, r: u.radius ?? 90, color: u.color, ult: true });
       break;
     }
     case 'quake':
       for (const f of s.foes)
         if (inRange(f)) {
           f.stunUntil = s.t + (u.stun ?? 2.5) * (f.def.rank ? 0.4 : 1);
-          damageFoe(s, f, u.damage * k);
+          ultHit(s, f, u.damage * k);
         }
       s.buffs.push({ stat: 'armor', mul: 1, add: u.armor ?? 6, until: s.t + (u.seconds ?? 10) });
       break;

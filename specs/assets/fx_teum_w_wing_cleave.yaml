@@ -1,0 +1,16 @@
+id: fx_teum_w_wing_cleave
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「날개 베기」(충격파, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_nova 대신 이 그림으로 그린다. fx_teum_nova와 자리·크기·때가 같고, 제 색(#ff5a4a) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #ff5a4a with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "seen from directly above: a small bright white burst in the exact center, a thin ring around it at 15% of the cell width — draw it as a red slash shaped like a torn dragon wing spreading into a ring. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_nova; only the look changes"
+  2: "impact: a thick bright ring of light at 35% of the cell width, white inner edge, jagged short spikes on its outer edge, a soft flash inside — draw it as a red slash shaped like a torn dragon wing spreading into a ring"
+  3: "the ring at 55% of the cell width, thinner, a second faint ring inside it, single-block sparks on the ring — draw it as a red slash shaped like a torn dragon wing spreading into a ring"
+  4: "the ring at 70% of the cell width, thin and broken into stepped arcs — draw it as a red slash shaped like a torn dragon wing spreading into a ring"
+  5: "the ring at 78% of the cell width, broken into a few faint arcs — draw it as a red slash shaped like a torn dragon wing spreading into a ring"
+  6: "a few faint sparks on a large circle near 80% of the cell width — draw it as a red slash shaped like a torn dragon wing spreading into a ring"
+placeholder: { accent: "#ff5a4a" }

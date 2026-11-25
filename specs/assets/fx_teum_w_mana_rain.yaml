@@ -1,0 +1,16 @@
+id: fx_teum_w_mana_rain
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「마나 화살비」(장판, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_rain 대신 이 그림으로 그린다. fx_teum_rain와 자리·크기·때가 같고, 제 색(#5fd0ff) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 12
+loop: true
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #5fd0ff with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "a flat oval patch on the ground in the lower middle of the cell (70% of the cell wide, 40% tall), dim inside with a bright thin rim; 4 short slanted streaks of light falling from above toward the patch — draw it as glowing cyan mana arrows raining into a round area. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_rain; only the look changes"
+  2: "the same patch; the streaks moved lower, one streak hits the patch with a small splash of blocky sparks — draw it as glowing cyan mana arrows raining into a round area"
+  3: "the same patch; new streaks appear at the top, two small splashes on the patch — draw it as glowing cyan mana arrows raining into a round area"
+  4: "the same patch; streaks lower, a splash in a different spot — draw it as glowing cyan mana arrows raining into a round area"
+  5: "the same patch; new streaks at the top, small splashes — draw it as glowing cyan mana arrows raining into a round area"
+  6: "the same patch; streak positions continue smoothly into frame 1 so the loop is seamless — draw it as glowing cyan mana arrows raining into a round area"
+placeholder: { accent: "#5fd0ff" }

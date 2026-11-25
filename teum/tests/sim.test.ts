@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { AFFIXES, AREAS, applyDebuff, endlessPool, gemTierOf, hasDebuff, resistOf, areaAt, isRelic, slotWeapons, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
+import { AFFIXES, AREAS, ultScale, applyDebuff, endlessPool, gemTierOf, hasDebuff, resistOf, areaAt, isRelic, slotWeapons, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
 import * as sim from '../src/sim';
 import { buildTerrain, CELL, T, updateFlow } from '../src/terrain';
 import { runChapter } from './bot';
@@ -869,5 +869,40 @@ describe('몬스터 저항·디버프·보석 등급·무한 모드 고유 무�
     expect(legacy.length).toBe(37);
     expect(legacy.indexOf('might')).toBe(27);
     expect(legacy.indexOf('afterimage')).toBe(36);
+  });
+});
+
+describe('마지막 기술(Q) 밸런스(2026-11-25 "보스가 한 방에 죽는다")', () => {
+  it('피해 배율은 시간·장마다 오르고 상한이 있다', () => {
+    const a = createChapter(0, 'u1', freshCarry('haun'));
+    const b = createChapter(5, 'u1', freshCarry('haun'));
+    const k0 = ultScale(a);
+    a.t = 240;
+    expect(ultScale(a)).toBeGreaterThan(k0);
+    expect(ultScale(b)).toBeGreaterThan(ultScale(a) - 0.6);
+    b.t = 3600;
+    expect(ultScale(b)).toBe(RULES.ult.scale.max);
+  });
+  it('보스는 한 번 쓸 때 최대 체력의 rankCap까지만 깎인다(아무리 세도)', () => {
+    for (const hero of HEROES) {
+      const s = createChapter(9, 'u2', freshCarry(hero.id));
+      s.player.hp = s.player.maxHp = 1e9;
+      s.t = 3600;
+      s.passives.set('might', 5);
+      const boss = sim.spawnFoe(s, 'kwak_dojin_cliff', s.player.x + 120, s.player.y, true)!;
+      s.foes = [boss];
+      s.weapons = [];
+      s.ult = RULES.ult.max;
+      for (let i = 0; i < 60 * 7; i++) {
+        s.player.hp = s.player.maxHp;
+        if (s.pending) choose(s, 0);
+        step(s, { x: 0, y: 0, ult: i === 0 });
+        // 필살기 피해만 재려고 다른 그림자(자폭병 등)·무공은 치운다
+        s.weapons = [];
+        s.foes = s.foes.filter((f) => f === boss);
+      }
+      expect(boss.dead, hero.id).toBe(false);
+      expect(boss.maxHp - boss.hp, hero.id).toBeLessThanOrEqual(boss.maxHp * RULES.ult.rankCap.boss + 1);
+    }
   });
 });

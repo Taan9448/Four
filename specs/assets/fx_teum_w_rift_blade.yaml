@@ -1,0 +1,16 @@
+id: fx_teum_w_rift_blade
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「틈새 칼날」(둘레 칼, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_orbit 대신 이 그림으로 그린다. fx_teum_orbit와 자리·크기·때가 같고, 제 색(#c070ff) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 12
+loop: true
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #c070ff with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "one small glowing four-pointed throwing blade (like a shuriken star of light) in the exact center, about 35% of the cell wide, white core, pointing up — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_orbit; only the look changes"
+  2: "the same blade rotated 15 degrees clockwise, a faint short motion trail behind its points — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks"
+  3: "rotated 30 degrees clockwise, trail — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks"
+  4: "rotated 45 degrees clockwise, trail — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks"
+  5: "rotated 60 degrees clockwise, trail — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks"
+  6: "rotated 75 degrees clockwise, trail; the next step (90 degrees) looks exactly like frame 1 so the loop is seamless — draw it as curved violet blades torn out of small rift cracks, orbiting with tiny void sparks"
+placeholder: { accent: "#c070ff" }

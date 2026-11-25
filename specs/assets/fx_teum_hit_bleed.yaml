@@ -1,0 +1,16 @@
+id: fx_teum_hit_bleed
+type: fx
+summary: "「틈」 상태·디버프 적중 이펙트 — 출혈(2026-11-25 사용자 \"극 스킬은 이펙트가 전체적으로 바뀌게 · 스킬 이펙트가 아직 비슷하다\"). 그림자에게 출혈이(가) 새로 걸린 순간 그 자리에 한 번(0.5초). 제 색(#e0303a) + 진한 남색 테두리, 게임이 색을 바꾸지 않는다. 작게(72px) 줄여도 알아보게 굵고 단순하게"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art small status-effect burst, bold readable shapes with a thick 1-2 block dark navy #1d2433 outline, flat stepped colors, centered on the target point in the middle of the cell, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "red blood droplets spurting from the target point"
+  2: "a burst of red droplets arcing outward"
+  3: "droplets falling with a small red splash ring"
+  4: "droplets on the ground"
+  5: "fading drops"
+  6: "a last drop"
+placeholder: { accent: "#e0303a" }

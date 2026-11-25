@@ -1,0 +1,17 @@
+id: fx_teum_strike_c
+type: fx
+summary: "「틈」 무공 이펙트 변형 — 내리꽂기 c형(망치 내리찍기, 2026-11-25 사용자 \"극 스킬은 이펙트가 전체적으로 바뀌게 · 스킬 이펙트가 아직 비슷하다\"). 같은 종류 무공도 무공마다 a(기본 fx_teum_strike)·b·c 중 하나로 그려 덜 비슷하게. fx_teum_strike와 자리·크기·때가 같다 — keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_strike (the hero/target point in the same place), only the shape changes. 무색(흰·회색)으로 그리고 게임이 무공 색을 입힌다"
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a big square block of light dropping from above toward the ground point. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_strike (the hero/target point in the same place), only the shape changes"
+  2: "impact: a square shockwave on the ground with cracks radiating outward"
+  3: "the square shockwave expanding, debris blocks flying"
+  4: "the square ring wider, cracks fading"
+  5: "faint square outline"
+  6: "a few fading debris blocks"
+placeholder: { accent: '#f1efe6' }

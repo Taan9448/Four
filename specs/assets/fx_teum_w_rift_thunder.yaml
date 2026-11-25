@@ -1,0 +1,16 @@
+id: fx_teum_w_rift_thunder
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「균열 낙뢰」(내리꽂기, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_strike 대신 이 그림으로 그린다. fx_teum_strike와 자리·크기·때가 같고, 제 색(#cdb8ff) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #cdb8ff with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "a hair-thin vertical line of light from the top of the cell (inside the margin) down to a point at 75% of the cell height in the middle; small sparks at the bottom — draw it as a violet lightning bolt falling out of a crack in the sky. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_strike; only the look changes"
+  2: "impact: a thick vertical pillar of light, white core, slamming into the ground point at 75% height; a wide flat oval flash and a starburst at the bottom — draw it as a violet lightning bolt falling out of a crack in the sky"
+  3: "the pillar thinner, a ring of light spreading flat on the ground around the impact point, blocky debris sparks flying up and out — draw it as a violet lightning bolt falling out of a crack in the sky"
+  4: "the pillar breaking into short stepped segments from the top down, the ground ring wider and thinner — draw it as a violet lightning bolt falling out of a crack in the sky"
+  5: "a faint short pillar stub and a fading ground ring with sparks — draw it as a violet lightning bolt falling out of a crack in the sky"
+  6: "a few fading sparks above the impact point — draw it as a violet lightning bolt falling out of a crack in the sky"
+placeholder: { accent: "#cdb8ff" }

@@ -1,0 +1,16 @@
+id: fx_teum_w_relic_hellfire_hammer
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「지옥불 망치」(검기, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_wave 대신 이 그림으로 그린다. fx_teum_wave와 자리·크기·때가 같고, 제 색(#ff8a2a) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 15
+loop: true
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #ff8a2a with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "a crescent-shaped wave of cutting light flying to the RIGHT: the curved bulge faces right, both tips point back to the left, about 55% of the cell tall, thick white leading edge, 2-3 short speed lines trailing to the left — draw it as a blazing hellfire crescent with molten metal drips and sparks. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_wave; only the look changes"
+  2: "the same crescent, its edge flickering slightly thicker, speed lines shifted — draw it as a blazing hellfire crescent with molten metal drips and sparks"
+  3: "the same crescent, a few single-block sparks peeling off the tips to the left — draw it as a blazing hellfire crescent with molten metal drips and sparks"
+  4: "the same crescent slightly thinner, speed lines shifted — draw it as a blazing hellfire crescent with molten metal drips and sparks"
+  5: "the same crescent, sparks at the tips — draw it as a blazing hellfire crescent with molten metal drips and sparks"
+  6: "the same crescent, leading edge bright again, so the loop is seamless — draw it as a blazing hellfire crescent with molten metal drips and sparks"
+placeholder: { accent: "#ff8a2a" }

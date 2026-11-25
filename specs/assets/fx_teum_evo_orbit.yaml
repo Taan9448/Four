@@ -1,0 +1,17 @@
+id: fx_teum_evo_orbit
+type: fx
+summary: "「틈」 극(각성) 무공 전용 이펙트 — 둘레 칼(2026-11-25 사용자 \"극 스킬은 이펙트가 전체적으로 바뀌게 · 스킬 이펙트가 아직 비슷하다\"). 극·각성 무공은 이 그림으로 통째로 바뀐다(기본 fx_teum_orbit 대신). fx_teum_orbit와 자리·크기·때가 같고 더 크고 화려하게 — a long spectral blade with three fading afterimages and a halo. 무색(흰·회색)으로 그리고 게임이 무공 색 + 금빛 룬 덧칠을 입힌다"
+frames: 6
+fps: 12
+loop: true
+min_fill: 0.0005
+palette: ['#ffffff', '#f1efe6', '#c2c6d1', '#8a90a3', '#5d6478', '#3d4459', '#2b2b3a']
+style: "crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "GRAND evolved version: one small glowing four-pointed throwing blade (like a shuriken star of light) in the exact center, about 35% of the cell wide, white core, pointing up — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_orbit (the hero/target point in the same place), only the shape changes"
+  2: "GRAND evolved version: the same blade rotated 15 degrees clockwise, a faint short motion trail behind its points — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo"
+  3: "GRAND evolved version: rotated 30 degrees clockwise, trail — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo"
+  4: "GRAND evolved version: rotated 45 degrees clockwise, trail — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo"
+  5: "GRAND evolved version: rotated 60 degrees clockwise, trail — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo"
+  6: "GRAND evolved version: rotated 75 degrees clockwise, trail; the next step (90 degrees) looks exactly like frame 1 so the loop is seamless — but bigger, brighter and more ornate: a long spectral blade with three fading afterimages and a halo"
+placeholder: { accent: '#f1efe6' }
