@@ -131,12 +131,36 @@ export async function loadArt(s: State, sprite = s.hero.sprite): Promise<Art> {
   const items2 = await real('icons_teum_items_2');
   const world = await real('icons_teum_world');
   const kinds = new Map<string, SpriteAsset>();
-  await Promise.all(
-    KIND_FX.map(async (k) => {
+  await Promise.all([
+    ...KIND_FX.map(async (k) => {
       const a = await real(`fx_teum_${k}`);
       if (a) kinds.set(k, a);
     }),
-  );
+    // 극(각성) 무공 전용 이펙트(2026-11-25 "극 스킬로 가면 이펙트가 전체적으로 바뀌게"): fx_teum_evo_<종류>
+    ...EVO_KINDS.map(async (k) => {
+      const a = await real(`fx_teum_evo_${k}`);
+      if (a) kinds.set(`evo_${k}`, a);
+    }),
+    // 종류별 변형(fx_teum_<종류>_b·_c) — 같은 종류 무공도 무공마다 다르게
+    ...Object.entries(FX_VARIANTS).flatMap(([k, vs]) =>
+      vs.map(async (v) => {
+        const a = await real(`fx_teum_${k}_${v}`);
+        if (a) kinds.set(`${k}_${v}`, a);
+      }),
+    ),
+    // 무공 전용 이펙트(fx_teum_w_<무공 id>, 제 색) — 손으로 맞춘 무공마다(카드 무공은 변형 a·b·c)
+    ...[...WEAPONS.values()]
+      .filter((w) => !w.card)
+      .map(async (w) => {
+        const a = await real(`fx_teum_w_${w.id}`);
+        if (a) kinds.set(`w_${w.id}`, a);
+      }),
+    // 상태·디버프 적중(fx_teum_hit_<효과>)
+    ...STATUS_FX.map(async (k) => {
+      const a = await real(`fx_teum_hit_${k}`);
+      if (a) kinds.set(`hit_${k}`, a);
+    }),
+  ]);
   const places = new Map<string, { building: Anim; npc: Anim }>();
   await Promise.all(
     [...ITEMS.values()]
@@ -317,6 +341,27 @@ export function absorb(v: View, s: State, now: number, opt: Options): void {
   if (v.marks.length > 300) v.marks.splice(0, v.marks.length - 300);
 }
 
+/** 극(각성) 무공 전용 이펙트 종류 — fx_teum_evo_<종류>(그림 안 자리는 fx_teum_<종류>와 같다) */
+export const EVO_KINDS = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal'] as const;
+/** 종류별 변형 그림(2026-11-25 "스킬 이펙트가 아직 비슷하다"): 무공마다 a(기본)·b·c 중 하나(weapons.json fxStyle, 없으면 id로) */
+export const FX_VARIANTS: Record<string, string[]> = { slash: ['b', 'c'], bolt: ['b', 'c'], nova: ['b', 'c'], wave: ['b', 'c'], orbit: ['b', 'c'], strike: ['b', 'c'], rain: ['b', 'c'] };
+/** 상태·디버프가 새로 걸린 순간 그림(fx_teum_hit_<효과>) */
+export const STATUS_FX = ['fire', 'ice', 'shock', 'vuln', 'poison', 'bleed', 'weaken', 'fear', 'silence', 'root'] as const;
+const STATUS_COLOR: Record<string, string> = { fire: '#ff8a3a', ice: '#8fd3ff', shock: '#cdb8ff', vuln: '#ffd27a', poison: '#8fd65a', bleed: '#e0303a', weaken: '#9aa0b0', fear: '#b070ff', silence: '#dff4ff', root: '#6fd6ff' };
+const STATUS_GLYPH: Record<string, string> = { fire: '화', ice: '서', shock: '뇌', vuln: '파', poison: '독', bleed: '혈', weaken: '쇠', fear: '공', silence: '봉', root: '속' };
+const hashId = (id: string): number => {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+};
+/** 무공 이펙트 변형(극은 따로 evo) */
+export function fxVariant(wid: string | undefined, kind: string): string | undefined {
+  if (!wid || !FX_VARIANTS[kind]) return undefined;
+  const d = WEAPONS.get(wid);
+  if (!d || d.evolved) return undefined;
+  const v = d.fxStyle ?? ['a', 'b', 'c'][hashId(wid) % 3];
+  return v === 'a' ? undefined : v;
+}
 const KIND_FX = ['slash', 'orbit', 'wave', 'bolt', 'nova', 'aura', 'strike', 'rain', 'beam', 'chain', 'heal', 'foe_shot', 'foe_warn', 'foe_slam', 'foe_burst', 'foe_charge', 'foe_summon'];
 /**
  * 그림 안 자리(프레임 비율, 2026-11-21 Codex 그림을 재서 맞춤 — 160px 프레임에 128px 그림이 아래로 붙어 있다):
@@ -347,8 +392,14 @@ const KG = {
  * k: 한 번 재생(0~1), 아니면 ms로 되풀이
  */
 const tintCache = new WeakMap<object, Map<string, HTMLCanvasElement>>();
-function kindImg(art: Art, kind: string, color: string, at: { k?: number; ms?: number }): CanvasImageSource | null {
-  const a = art.kinds.get(kind);
+function kindImg(art: Art, kind: string, color: string, at: { k?: number; ms?: number; evo?: boolean; v?: string; wid?: string }): CanvasImageSource | null {
+  // 무공 전용 그림이 있으면 그것(제 색 그대로 — 색을 입히지 않는다)
+  const own = at.wid ? art.kinds.get(`w_${at.wid}`) : undefined;
+  if (own) {
+    const n = at.k !== undefined ? Math.max(0, Math.min(own.meta.frames - 1, Math.floor(at.k * own.meta.frames))) : Math.floor((at.ms ?? 0) / (1000 / own.meta.fps)) % own.meta.frames;
+    return own.images[n] ?? null;
+  }
+  const a = (at.evo && art.kinds.get(`evo_${kind}`)) || (at.v && art.kinds.get(`${kind}_${at.v}`)) || art.kinds.get(kind);
   if (!a) return null;
   const n = at.k !== undefined ? Math.max(0, Math.min(a.meta.frames - 1, Math.floor(at.k * a.meta.frames))) : Math.floor((at.ms ?? 0) / (1000 / a.meta.fps)) % a.meta.frames;
   const img = a.images[n];
@@ -419,6 +470,69 @@ function tintOf(img: CanvasImageSource, w: number, h: number, color: string): Ca
 }
 const ELEM_COLOR: Record<string, string> = { fire: '#ff7a3a', ice: '#8fd3ff', shock: '#ffe45a', poison: '#9ad04a' };
 /** 적 탄(2026-11-22 "원거리 공격이 다 똑같다"): 모양마다 다르게 — 위험 분홍 번짐 + 진한 남색 테두리는 모두 같다(적 탄이라는 표시) */
+/** 극 무공 덧칠(2026-11-25): 금빛 룬 고리가 돌고 별빛이 튄다. 전용 그림(fx_teum_evo_*)이 없으면 더 짙게 — 극으로 가면 한눈에 달라 보이게 */
+const EVO_GOLD = '#ffd27a';
+function evoFlair(ctx: CanvasRenderingContext2D, art: Art, kind: string, x: number, y: number, r: number, k: number, now: number): void {
+  const strong = !art.kinds.has(`evo_${kind}`);
+  const a = Math.max(0, 1 - k) * (strong ? 1 : 0.55);
+  if (a <= 0.02) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // 룬 고리(바깥 실선 + 안쪽 점선, 서로 반대로 돈다)
+  ctx.strokeStyle = hexA(EVO_GOLD, 0.7 * a);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(x, y, r * (0.9 + 0.2 * k), r * 0.6 * (0.9 + 0.2 * k), 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([6, 8]);
+  ctx.lineDashOffset = -now / 30;
+  ctx.beginPath();
+  ctx.ellipse(x, y, r * 0.7, r * 0.42, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // 별빛 여섯
+  for (let i = 0; i < 6; i++) {
+    const ang = (i / 6) * Math.PI * 2 + now / 700;
+    const rr = r * (0.55 + 0.6 * k);
+    const sx = x + Math.cos(ang) * rr;
+    const sy = y + Math.sin(ang) * rr * 0.6 - 10 * k;
+    const sz = (strong ? 5 : 3.5) * a + 1;
+    ctx.fillStyle = hexA(i % 2 ? '#ffffff' : EVO_GOLD, 0.9 * a);
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - sz * 1.6);
+    ctx.lineTo(sx + sz * 0.4, sy - sz * 0.4);
+    ctx.lineTo(sx + sz * 1.6, sy);
+    ctx.lineTo(sx + sz * 0.4, sy + sz * 0.4);
+    ctx.lineTo(sx, sy + sz * 1.6);
+    ctx.lineTo(sx - sz * 0.4, sy + sz * 0.4);
+    ctx.lineTo(sx - sz * 1.6, sy);
+    ctx.lineTo(sx - sz * 0.4, sy - sz * 0.4);
+    ctx.closePath();
+    ctx.fill();
+  }
+  if (strong) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, hexA(EVO_GOLD, 0.22 * a));
+    g.addColorStop(1, hexA(EVO_GOLD, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+/** 극 무공 그림을 한 겹 더(금빛, 조금 크게) — 전용 그림이 없을 때만 */
+function evoEcho(ctx: CanvasRenderingContext2D, art: Art, kind: string, img: CanvasImageSource | null, draw: (im: CanvasImageSource, scale: number) => void): void {
+  if (!img || art.kinds.has(`evo_${kind}`)) return;
+  const meta = art.kinds.get(kind)?.meta;
+  if (!meta) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalAlpha = 0.5;
+  draw(tintOf(img, meta.frameW, meta.frameH, EVO_GOLD), 1.18);
+  ctx.restore();
+}
+
 function drawFoeShot(ctx: CanvasRenderingContext2D, sh: { x: number; y: number; vx: number; vy: number; r: number; color: string; style?: string; life: number }, now: number): void {
   const a = Math.atan2(sh.vy, sh.vx);
   const r = sh.r;
@@ -1768,7 +1882,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   ctx.globalAlpha = fxa;
   for (const z of s.zones) {
     const k = Math.max(0, Math.min(1, (z.until - s.t) / 0.4));
-    const zimg = fancy && z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7 }) : null;
+    const zimg = fancy && z.weapon && WEAPONS.get(z.weapon)?.kind === 'rain' ? kindImg(art, 'rain', z.color, { ms: now + z.x * 7, evo: WEAPONS.get(z.weapon)?.evolved, v: fxVariant(z.weapon, 'rain'), wid: z.weapon }) : null;
     if (zimg) {
       // 그림의 둥근 자리(칸 너비 70%)를 장판 크기에 맞춘다
       const S = (z.r * 2) / KG.rain.span;
@@ -1857,10 +1971,41 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const tier = g.tier ?? 0;
     const tc = tier === 5 ? `hsl(${(now / 6) % 360},90%,72%)` : (RULES.gems.tiers[tier]?.color ?? '#8fd3ff');
     const big = tier >= 3 || g.xp >= 10;
-    const sz = 14 + tier * 2.4;
+    // 2026-11-25 "보석이 잘 안 보인다": 더 크게 · 발밑 빛 무리 · 살짝 떠오름 · 가끔 반짝
+    const sz = 22 + tier * 3;
+    const bob = Math.sin(now / 260 + g.x * 0.05) * 2.5;
+    const gy = g.y - 4 + bob;
+    const halo = tier === 5 ? '#ffffff' : tc;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const hg = ctx.createRadialGradient(g.x, gy, 0, g.x, gy, sz * 0.95);
+    hg.addColorStop(0, hexA(halo, 0.55));
+    hg.addColorStop(1, hexA(halo, 0));
+    ctx.fillStyle = hg;
+    ctx.beginPath();
+    ctx.arc(g.x, gy, sz * 0.95, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(g.x, g.y + sz * 0.38, sz * 0.32, sz * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
     const gi = art.gems?.images[tier];
     if (gi) {
-      ctx.drawImage(gi, g.x - sz / 2, g.y - sz / 2, sz, sz);
+      ctx.drawImage(gi, g.x - sz / 2, gy - sz / 2, sz, sz);
+      // 반짝(보석마다 때가 다르다)
+      const tw = (now / 900 + g.x * 0.013 + g.y * 0.007) % 1;
+      if (tw < 0.12) {
+        const a = 1 - tw / 0.12;
+        ctx.strokeStyle = `rgba(255,255,255,${a})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(g.x + sz * 0.18, gy - sz * 0.42);
+        ctx.lineTo(g.x + sz * 0.18, gy - sz * 0.12);
+        ctx.moveTo(g.x + sz * 0.03, gy - sz * 0.27);
+        ctx.lineTo(g.x + sz * 0.33, gy - sz * 0.27);
+        ctx.stroke();
+      }
       continue;
     }
     const base = art.icons?.images[0];
@@ -1945,7 +2090,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     if (d.kind !== 'aura') continue;
     const L = d.levels[Math.min(w.lv, d.levels.length) - 1];
     const R = 90 * L.area * stat.area(s);
-    const aimg = fancy ? kindImg(art, 'aura', d.color, { ms: now + w.id.length * 53 }) : null;
+    const aimg = fancy ? kindImg(art, 'aura', d.color, { ms: now + w.id.length * 53, evo: d.evolved, wid: d.id }) : null;
+    if (d.evolved) evoFlair(ctx, art, 'aura', p.x, p.y - 4, R, 0.3, now);
     if (aimg) {
       const S = (R * 2) / KG.aura.span;
       blit(ctx, aimg, p.x, p.y - 4, S, S * 0.7, KG.aura.ax, KG.aura.ay, 0, 0.5 * fxa);
@@ -2240,7 +2386,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         const a = s.t * L.speed + (i / L.count) * Math.PI * 2;
         const bx = p.x + Math.cos(a) * R;
         const by = p.y - 24 + Math.sin(a) * R * 0.8;
-        const oimg = fancy ? kindImg(art, 'orbit', d.color, { ms: now + i * 37 }) : null;
+        const oimg = fancy ? kindImg(art, 'orbit', d.color, { ms: now + i * 37, evo: d.evolved, v: fxVariant(d.id, 'orbit'), wid: d.id }) : null;
         if (oimg) {
           const S = (36 * area) / KG.orbit.span;
           blit(ctx, oimg, bx, by, S, S, KG.orbit.ax, KG.orbit.ay);
@@ -2288,12 +2434,28 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
   for (const sh of s.shots) {
     if (!sh.weapon || !inView(sh.x, sh.y)) continue;
     const sk = sh.weapon ? WEAPONS.get(sh.weapon)?.kind : undefined;
-    const simg = sk === 'wave' || sk === 'bolt' ? kindImg(art, sk, sh.color, { ms: now + sh.x }) : null;
+    const shEvo = !!(sh.weapon && WEAPONS.get(sh.weapon)?.evolved);
+    const simg = sk === 'wave' || sk === 'bolt' ? kindImg(art, sk, sh.color, { ms: now + sh.x, evo: shEvo, v: fxVariant(sh.weapon, sk), wid: sh.weapon }) : null;
+    if (shEvo && (sk === 'wave' || sk === 'bolt')) {
+      // 극 탄: 금빛 꼬리 별빛
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 1; i <= 4; i++) {
+        const tx = sh.x - sh.vx * 0.018 * i;
+        const ty = sh.y - sh.vy * 0.018 * i;
+        ctx.fillStyle = hexA(i % 2 ? '#ffd27a' : '#ffffff', 0.6 - i * 0.12);
+        ctx.beginPath();
+        ctx.arc(tx + Math.sin(now / 80 + i) * 4, ty + Math.cos(now / 90 + i) * 4, 3.5 - i * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     if (simg) {
       // 검기: 초승달 높이(칸 55%)가 탄 지름, 탄: 머리(칸 22%)가 탄 지름의 1.3배
       const g = sk === 'wave' ? KG.wave : KG.bolt;
       const S = (sh.r * (sk === 'wave' ? 2.2 : 2.4)) / g.span;
       blit(ctx, simg, sh.x, sh.y, S, S, g.ax, g.ay, Math.atan2(sh.vy, sh.vx));
+      if (shEvo) evoEcho(ctx, art, sk ?? 'bolt', simg, (im, sc) => blit(ctx, im, sh.x, sh.y, S * sc, S * sc, g.ax, g.ay, Math.atan2(sh.vy, sh.vx)));
       continue;
     }
     ctx.save();
@@ -2322,6 +2484,28 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const e = m.e;
     const age = (now - m.born) / 1000;
     ctx.globalAlpha = PLAYER_FX.has(e.type) ? fxa : 1;
+    // 상태·디버프가 새로 걸린 순간(2026-11-25): fx_teum_hit_<효과>(제 색 그대로), 없으면 색 고리 + 글자
+    if (e.type === 'status') {
+      if (age > 0.5) continue;
+      const k = age / 0.5;
+      const ha = art.kinds.get(`hit_${e.k}`);
+      const col = STATUS_COLOR[e.k] ?? '#ffffff';
+      if (ha) {
+        const img = ha.images[Math.min(ha.meta.frames - 1, Math.floor(k * ha.meta.frames))];
+        if (img) blit(ctx, img, e.x, e.y - 22, 72, 72, 0.5, 0.6, 0, 1);
+        continue;
+      }
+      ctx.strokeStyle = hexA(col, 0.9 * (1 - k));
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.ellipse(e.x, e.y - 18, 10 + 18 * k, (10 + 18 * k) * 0.7, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.font = '800 13px "Nanum Myeongjo", serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = hexA(col, 1 - k);
+      ctx.fillText(STATUS_GLYPH[e.k] ?? '', e.x, e.y - 38 - 10 * k);
+      continue;
+    }
     // 새 적 기술(2026-11-22): 띠·부채꼴·고리가 떨어진 순간 · 회복 · 보호 · 땅굴 · 웅덩이
     if (e.type === 'skill' && e.kind && SKILL_MARK.has(e.kind)) {
       const fa = art.foeFx.get(e.kind === 'zone' ? 'explode' : e.kind);
@@ -2407,10 +2591,14 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
       continue;
     }
     if (e.type === 'slash') {
-      const img = kindImg(art, 'slash', e.color, { k: age / 0.25 });
+      const img = kindImg(art, 'slash', e.color, { k: age / 0.25, evo: e.evo, v: fxVariant(e.wid, 'slash'), wid: e.wid });
+      if (e.evo && age < 0.3) evoFlair(ctx, art, 'slash', e.x, e.y - 20, e.r, age / 0.3, now);
       if (img) {
         // 초승달이 칸 가운데에서 칸 너비 35% 떨어져 돈다
-        if (age < 0.25) blit(ctx, img, e.x, e.y - 20, e.r / KG.slash.span, e.r / KG.slash.span, KG.slash.ax, KG.slash.ay, e.angle);
+        if (age < 0.25) {
+          blit(ctx, img, e.x, e.y - 20, e.r / KG.slash.span, e.r / KG.slash.span, KG.slash.ax, KG.slash.ay, e.angle);
+          if (e.evo) evoEcho(ctx, art, 'slash', img, (im, sc) => blit(ctx, im, e.x, e.y - 20, (e.r * sc) / KG.slash.span, (e.r * sc) / KG.slash.span, KG.slash.ax, KG.slash.ay, e.angle + 0.15));
+        }
         continue;
       }
       const k = age / 0.18;
@@ -2442,10 +2630,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         continue;
       }
       // 그림 앞 두 칸(가운데 번쩍임)은 크게 늘리면 인물을 가린다 — 고리 칸부터, 작게 시작해 퍼지게
-      const img = kindImg(art, 'nova', e.color, { k: 0.34 + 0.66 * k });
+      const img = kindImg(art, 'nova', e.color, { k: 0.34 + 0.66 * k, evo: e.evo, v: fxVariant(e.weapon, 'nova'), wid: e.weapon });
+      if (e.evo) evoFlair(ctx, art, 'nova', e.x, e.y - 10, e.r, k, now);
       if (img) {
         const S = ((e.r * 2) / KG.nova.span) * (0.45 + 0.55 * Math.min(1, k * 2.5));
         blit(ctx, img, e.x, e.y - 10, S, S * 0.75, KG.nova.ax, KG.nova.ay, 0, 0.9);
+        if (e.evo) evoEcho(ctx, art, 'nova', img, (im, sc) => blit(ctx, im, e.x, e.y - 10, S * sc, S * 0.75 * sc, KG.nova.ax, KG.nova.ay, 0, 0.9));
         continue;
       }
       ctx.strokeStyle = hexA(e.color, 0.8 * (1 - k));
@@ -2465,8 +2655,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
         if (img) ctx.drawImage(img, e.x - size / 2, e.y - size * 0.7, size, size);
       } else if (e.type === 'strike' && art.kinds.has('strike')) {
         // 바닥 닿는 곳이 칸 높이 75%, 땅 고리가 칸 너비 절반쯤
-        const img = kindImg(art, 'strike', e.color, { k });
+        const img = kindImg(art, 'strike', e.color, { k, evo: e.evo, v: fxVariant(e.wid, 'strike'), wid: e.wid });
         if (img) blit(ctx, img, e.x, e.y, (r * 2) / KG.strike.span, (r * 2) / KG.strike.span, KG.strike.ax, KG.strike.ay);
+        if (e.evo) {
+          evoFlair(ctx, art, 'strike', e.x, e.y, r, k, now);
+          evoEcho(ctx, art, 'strike', img, (im, sc) => blit(ctx, im, e.x, e.y, (r * 2 * sc) / KG.strike.span, (r * 2 * sc) / KG.strike.span, KG.strike.ax, KG.strike.ay));
+        }
       } else {
         ctx.fillStyle = hexA(e.color, 0.7 * (1 - k));
         if (e.type === 'strike') ctx.fillRect(e.x - 6 * (1 - k) - 2, e.y - 400, 12 * (1 - k) + 4, 400);
@@ -2487,7 +2681,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'chain') {
       const k = age / 0.25;
       if (k > 1) continue;
-      const img = kindImg(art, 'chain', e.color, { k });
+      const img = kindImg(art, 'chain', e.color, { k, evo: e.evo, wid: e.wid });
+      if (e.evo) for (const [px, py] of e.pts.slice(1)) evoFlair(ctx, art, 'chain', px, py + 20, 36, k, now);
       if (img) {
         // 그림은 칸 10%~90%를 가로지른다 — 두 적 사이에 늘인다
         for (let i = 1; i < e.pts.length; i++) {
@@ -2514,10 +2709,12 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'beam') {
       const k = age / 0.25;
       if (k > 1) continue;
-      const img = kindImg(art, 'beam', e.color, { k });
+      const img = kindImg(art, 'beam', e.color, { k, evo: e.evo, wid: e.wid });
+      if (e.evo) evoFlair(ctx, art, 'beam', e.x + Math.cos(e.angle) * e.len * 0.5, e.y + Math.sin(e.angle) * e.len * 0.5, e.len * 0.3, k, now);
       if (img) {
         // 그림의 빛줄기(칸 10%~90%, 두께 18%)를 길이·너비에 맞춘다
         blit(ctx, img, e.x, e.y, e.len / KG.beam.span, (e.w * 2) / KG.beam.thick, KG.beam.ax, KG.beam.ay, e.angle);
+        if (e.evo) evoEcho(ctx, art, 'beam', img, (im, sc) => blit(ctx, im, e.x, e.y, e.len / KG.beam.span, (e.w * 2 * sc * 1.4) / KG.beam.thick, KG.beam.ax, KG.beam.ay, e.angle));
         continue;
       }
       ctx.save();
@@ -2531,7 +2728,7 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     } else if (e.type === 'heal') {
       const k = age / 0.7;
       if (k > 1) continue;
-      const img = fancy && age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45 }) : null;
+      const img = fancy && age < 0.45 ? kindImg(art, 'heal', '#7fe08a', { k: age / 0.45, wid: e.wid }) : null;
       if (img) blit(ctx, img, p.x, p.y, 60 / KG.heal.span, 60 / KG.heal.span, KG.heal.ax, KG.heal.ay);
       else if (clean) drawHealClean(ctx, p.x, p.y, k);
       ctx.font = '700 14px "IBM Plex Sans KR", sans-serif';
@@ -2859,7 +3056,36 @@ function drawMinimap(ctx: CanvasRenderingContext2D, s: State, v: View, x: number
   // 화면에 보이는 범위
   ctx.strokeStyle = 'rgba(243,234,216,0.35)';
   ctx.strokeRect(x + (s.player.x - s.view) * k, y + (s.player.y - s.view * 0.6) * k, s.view * 2 * k, s.view * 1.2 * k);
-  dot(s.player.x, s.player.y, 5 + Math.sin(now / 200), '#7fd6ff');
+  // 내 자리(2026-11-25 "지도에서 내 위치가 잘 안 보인다"): 퍼지는 고리 + 바라보는 쪽 화살표(흰 몸 · 검은 테 · 금빛 가운데)
+  const px = x + s.player.x * k;
+  const py = y + s.player.y * k;
+  const ping = (now % 1400) / 1400;
+  ctx.strokeStyle = `rgba(255,224,138,${0.9 * (1 - ping)})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(px, py, 4 + ping * size * 0.09, 0, Math.PI * 2);
+  ctx.stroke();
+  const ar = Math.max(6, size * 0.05);
+  const fa = s.player.facing;
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(fa);
+  ctx.beginPath();
+  ctx.moveTo(ar, 0);
+  ctx.lineTo(-ar * 0.7, ar * 0.65);
+  ctx.lineTo(-ar * 0.35, 0);
+  ctx.lineTo(-ar * 0.7, -ar * 0.65);
+  ctx.closePath();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#0b0b10';
+  ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#ffd27a';
+  ctx.beginPath();
+  ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
 }
 

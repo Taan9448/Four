@@ -1,0 +1,16 @@
+id: fx_teum_w_healing_lantern
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「치유의 등불」(회복, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_heal 대신 이 그림으로 그린다. fx_teum_heal와 자리·크기·때가 같고, 제 색(#ffe08a) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 14
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #ffe08a with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "a flat thin oval ring of light on the ground at 80% of the cell height, 50% of the cell wide — draw it as a warm golden lantern glow with a green healing cross rising. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_heal; only the look changes"
+  2: "impact: the ground ring brighter, many small diamond-shaped motes and tiny leaf shapes of light rising from it in a loose column up to the middle of the cell, the middle of the column left clear for the hero — draw it as a warm golden lantern glow with a green healing cross rising"
+  3: "the motes risen higher (to 30% of the cell height), a few small plus-shaped sparkles among them — draw it as a warm golden lantern glow with a green healing cross rising"
+  4: "the motes spread out and fading near the top, the ground ring fading — draw it as a warm golden lantern glow with a green healing cross rising"
+  5: "a few motes and plus sparkles near the top — draw it as a warm golden lantern glow with a green healing cross rising"
+  6: "one or two tiny fading sparkles — draw it as a warm golden lantern glow with a green healing cross rising"
+placeholder: { accent: "#ffe08a" }

@@ -1,0 +1,16 @@
+id: fx_teum_w_axe_chop
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「도끼질」(베기, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_slash 대신 이 그림으로 그린다. fx_teum_slash와 자리·크기·때가 같고, 제 색(#e0c090) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 24
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #e0c090 with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "the cell center is where the hero stands (leave it empty). A thin bright crescent line starts on the upper right, curving around the right side of the center at about 35% of the cell width away from it — draw it as a heavy brown-gold axe arc with wood chips and dust. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_slash; only the look changes"
+  2: "impact: a wide crescent blade of light sweeping around the RIGHT side of the center from upper right to lower right (a 130-degree arc), thick white core in the middle of the arc, tapering to sharp points at both ends — draw it as a heavy brown-gold axe arc with wood chips and dust"
+  3: "the crescent at full length and full thickness, a second thinner arc just inside it, a few single-block sparks flying outward to the right — draw it as a heavy brown-gold axe arc with wood chips and dust"
+  4: "the crescent thinning and breaking into short stepped segments, sparks drifting outward — draw it as a heavy brown-gold axe arc with wood chips and dust"
+  5: "faint thin arc fragments and a few sparks — draw it as a heavy brown-gold axe arc with wood chips and dust"
+  6: "two or three tiny fading sparks on the right side — draw it as a heavy brown-gold axe arc with wood chips and dust"
+placeholder: { accent: "#e0c090" }

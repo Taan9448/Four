@@ -1,0 +1,16 @@
+id: fx_teum_w_unhae
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「운해귀종」(결계, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_aura 대신 이 그림으로 그린다. fx_teum_aura와 자리·크기·때가 같고, 제 색(#ffd27a) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다)."
+frames: 6
+fps: 10
+loop: true
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #ffd27a with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "seen from directly above: a magic circle filling 80% of the cell: an outer thin ring, an inner ring of small square rune marks, and a faint eight-pointed star in the middle; the center is calm and dim so the hero stands on it — draw it as a swirling sea of golden clouds circling at the feet. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_aura; only the look changes"
+  2: "the same circle, the rune ring rotated 7.5 degrees clockwise, a few sparks rising at the rim — draw it as a swirling sea of golden clouds circling at the feet"
+  3: "rotated 15 degrees, the outer ring slightly brighter — draw it as a swirling sea of golden clouds circling at the feet"
+  4: "rotated 22.5 degrees, sparks at the rim — draw it as a swirling sea of golden clouds circling at the feet"
+  5: "rotated 30 degrees — draw it as a swirling sea of golden clouds circling at the feet"
+  6: "rotated 37.5 degrees; the next step (45 degrees) matches frame 1 so the loop is seamless — draw it as a swirling sea of golden clouds circling at the feet"
+placeholder: { accent: "#ffd27a" }

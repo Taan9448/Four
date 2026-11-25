@@ -1,0 +1,16 @@
+id: fx_teum_w_crystal_lance_x
+type: fx
+summary: "「틈」 무공 전용 이펙트 — 「멈춘 시간의 창 · 극」(일직선, 2026-11-25 사용자 「스킬 이펙트가 아직 비슷하다 — 최대한 퍼펙트하게」). 이 무공은 공용 fx_teum_beam 대신 이 그림으로 그린다. fx_teum_beam와 자리·크기·때가 같고, 제 색(#bfe8ff) + 진한 남색 테두리로 그린다(게임이 색을 바꾸지 않는다). 극·각성 무공이라 더 크고 화려하게, 금빛 룬·별빛을 곁들인다."
+frames: 6
+fps: 24
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art visual effect in its own colors (main color #bfe8ff with lighter highlights and darker shades of the same hue, a little white in the hottest core), a thick 1-2 block dark navy #1d2433 outline around the shapes so it reads on any background, clean stepped edges, a few single-block sparks, no smoke blur, no gradients, no anti-aliasing"
+frame_notes:
+  1: "a thin horizontal line of light from 10% to 90% of the cell width at the vertical middle, a small bright flare at the left start — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings. Keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_beam; only the look changes"
+  2: "impact: a thick horizontal beam from 10% to 90% of the cell width, about 18% of the cell tall, pure white core band, 2 grey bands at its top and bottom edges, a bright round flare at the left start, the right end tapering to a point — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings"
+  3: "the beam at full thickness with small blocky sparks streaming along its edges to the right — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings"
+  4: "the beam thinner, its edges breaking into stepped dashes — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings"
+  5: "a thin fading line with sparks along it — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings"
+  6: "a few fading sparks along the middle — draw it as three ice lances piercing through a cracked frozen clock with golden rune rings"
+placeholder: { accent: "#bfe8ff" }

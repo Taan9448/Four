@@ -1,0 +1,16 @@
+id: fx_teum_hit_silence
+type: fx
+summary: "「틈」 상태·디버프 적중 이펙트 — 침묵(2026-11-25 사용자 \"극 스킬은 이펙트가 전체적으로 바뀌게 · 스킬 이펙트가 아직 비슷하다\"). 그림자에게 침묵이(가) 새로 걸린 순간 그 자리에 한 번(0.5초). 제 색(#dff4ff) + 진한 남색 테두리, 게임이 색을 바꾸지 않는다. 작게(72px) 줄여도 알아보게 굵고 단순하게"
+frames: 6
+fps: 12
+events: { impact: 2 }
+min_fill: 0.0005
+style: "crisp pixel-art small status-effect burst, bold readable shapes with a thick 1-2 block dark navy #1d2433 outline, flat stepped colors, centered on the target point in the middle of the cell, no gradients, no blur, no anti-aliasing"
+frame_notes:
+  1: "a white circular seal sigil appearing over the target point"
+  2: "the seal with an X across it, bright"
+  3: "the sealed sigil pulsing"
+  4: "the sigil fading"
+  5: "faint sigil lines"
+  6: "a last glint"
+placeholder: { accent: "#dff4ff" }
