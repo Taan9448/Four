@@ -1,7 +1,8 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../../src/engine/rng';
-import { AFFIXES, AREAS, areaAt, isRelic, slotWeapons, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
+import { AFFIXES, AREAS, applyDebuff, endlessPool, gemTierOf, hasDebuff, resistOf, areaAt, isRelic, slotWeapons, banish, carryOf, elementCounts, evolveTable, setOn, chapterEvents, choicePool, choose, createChapter, FOES, freshCarry, HEROES, ITEMS, LOCKABLE, PASSIVES, reroll, RULES, skip, step, STORY, WEAPONS, xpNeed, type State } from '../src/sim';
+import * as sim from '../src/sim';
 import { buildTerrain, CELL, T, updateFlow } from '../src/terrain';
 import { runChapter } from './bot';
 
@@ -47,7 +48,8 @@ describe('「틈」 데이터', () => {
       expect(spec(`${h.sprite}_walk`), h.sprite).toBe(true);
       for (const w of h.pool) expect(WEAPONS.get(w)?.owner, w).toBe(h.id);
     }
-    for (const w of WEAPONS.values()) if (w.evolve) expect(WEAPONS.get(w.evolve.into)?.evolved && PASSIVES.has(w.evolve.with), w.id).toBe(true);
+    // 각성 짝은 심법 또는 (2026-11-25 무한 모드 극) 무공
+    for (const w of WEAPONS.values()) if (w.evolve) expect(WEAPONS.get(w.evolve.into)?.evolved && (PASSIVES.has(w.evolve.with) || WEAPONS.has(w.evolve.with)), w.id).toBe(true);
     for (const id of ['props_teum', 'icons_teum', 'icons_teum_items', 'icons_teum_skills_1', 'icons_teum_skills_2', 'icons_teum_skills_3', 'icons_teum_menu', 'keyart_teum_lobby']) expect(spec(id), id).toBe(true);
     // 스킬 10배(2026-11-19): 손으로 맞춘 35 + 「천외귀환」 카드 무공·심법 — 카드에서 온 것은 모두 카드 그림이 있다
     expect(WEAPONS.size + PASSIVES.size).toBeGreaterThanOrEqual(320);
@@ -584,12 +586,13 @@ describe('「틈」 7차: 무한 모드 · 난이도', () => {
 });
 
 describe('「틈」 8차: 무한 모드 무공 풀 · 장소 가게', () => {
-  it('판마다 무작위 무공 풀 40~50종 — 인물 것과 공통 것만, 시작 무공 포함, 시드마다 다르다', () => {
+  it('판마다 무작위 무공 풀 40~50종 + 무한 모드 고유 11~14 — 인물 것과 공통 것만, 시작 무공 포함, 시드마다 다르다', () => {
+    const U = RULES.endless.pool.unique;
     for (const hero of HEROES) {
       const a = createEndless('pool-a', hero.id);
       const b = createEndless('pool-b', hero.id);
-      expect(a.pool!.size).toBeGreaterThanOrEqual(40);
-      expect(a.pool!.size).toBeLessThanOrEqual(50);
+      expect(a.pool!.size).toBeGreaterThanOrEqual(40 + U.weapons[0] + U.passives[0]);
+      expect(a.pool!.size).toBeLessThanOrEqual(50 + U.weapons[1] + U.passives[1]);
       expect(a.pool!.has(hero.start)).toBe(true);
       for (const id of a.pool!) {
         const w = WEAPONS.get(id);
@@ -662,7 +665,8 @@ describe('각성 조합표', () => {
   it('인물·공통 조합을 모두 싣고, 진행 상태를 맞게 적는다', () => {
     const s = createChapter(0, 'evo', freshCarry('haun'));
     const all = evolveTable(s);
-    const expected = [...WEAPONS.values()].filter((w) => w.evolve && (w.owner === 'haun' || w.owner === '*' || s.hero.pool.includes(w.id)));
+    // 스토리: 무한 모드 고유 무공의 극은 빠진다
+    const expected = [...WEAPONS.values()].filter((w) => w.evolve && !w.endless && (w.owner === 'haun' || w.owner === '*' || s.hero.pool.includes(w.id)));
     expect(all.map((r) => r.weapon).sort()).toEqual(expected.map((w) => w.id).sort());
     const d = expected.find((w) => s.weapons.some((x) => x.id === w.id)) ?? expected[0];
     // 무공 Lv 최대 + 짝 심법 → 상자를 열면 각성(맨 앞)
@@ -782,5 +786,88 @@ describe('구역(성)·구역 보스·비전·맵 이벤트(2026-11-25)', () => 
     }
     expect(s.mapEvents[1].state).toBe('done');
     expect(s.events.some((e) => e.type === 'event' && e.text.startsWith(`${portal.name} — 닫았다`))).toBe(true);
+  });
+});
+
+describe('몬스터 저항·디버프·보석 등급·무한 모드 고유 무공(2026-11-25)', () => {
+  it('일반 그림자는 저항이 없고, 특수·정예·보스·구역 보스는 저항이 있다(보스는 넉백·공포 면역)', () => {
+    for (const f of FOES.values()) {
+      const special = !!(f.rank || f.special || f.area || f.role === 'nest');
+      expect(!!f.resist && Object.keys(f.resist).length > 0, f.id).toBe(special);
+    }
+    const boss = [...FOES.values()].find((f) => f.rank === 'boss')!;
+    expect(resistOf({ def: boss }, 'knock')).toBe(1);
+    expect(resistOf({ def: boss }, 'fear')).toBe(1);
+    const frost = FOES.get('rift_frost')!;
+    expect(resistOf({ def: frost }, 'slow')).toBe(1);
+  });
+  it('보석 등급: 일반은 푸른 결, 보스는 무지개 결 — 몬스터마다 다른 색', () => {
+    const tier = (id: string) => RULES.gems.tiers[gemTierOf(FOES.get(id)!)].id;
+    expect(tier('oak_stump')).toBe('blue');
+    expect(tier('knotted_stump')).toBe('violet');
+    expect(tier('rift_bomber')).toBe('violet');
+    expect(tier('inner_senior_head')).toBe('red');
+    expect(tier('zb_dream_queen')).toBe('gold');
+    expect(tier('kwak_dojin_cliff')).toBe('rainbow');
+  });
+  it('디버프: 독은 체력을 깎고, 공포는 달아나게, 속박은 묶고, 면역이면 안 걸린다', () => {
+    const s = createChapter(0, 'debuff', freshCarry('haun'));
+    s.player.hp = s.player.maxHp = 1e6;
+    s.weapons = [];
+    const a = sim.spawnFoe(s, 'knotted_stump', s.player.x + 220, s.player.y)!;
+    a.hp = a.maxHp = 500;
+    applyDebuff(s, a, 'poison');
+    applyDebuff(s, a, 'fear');
+    expect(hasDebuff(s, a, 'poison')).toBe(true);
+    const x0 = a.x;
+    for (let i = 0; i < 60; i++) step(s, { x: 0, y: 0 });
+    expect(a.hp).toBeLessThan(500);
+    expect(a.x).toBeGreaterThan(x0);
+    const b = sim.spawnFoe(s, 'knotted_stump', s.player.x - 220, s.player.y)!;
+    applyDebuff(s, b, 'root');
+    const bx = b.x;
+    for (let i = 0; i < 30; i++) step(s, { x: 0, y: 0 });
+    expect(Math.abs(b.x - bx)).toBeLessThan(2);
+    const boss = sim.spawnFoe(s, 'kwak_dojin_cliff', s.player.x, s.player.y + 400, true)!;
+    applyDebuff(s, boss, 'fear');
+    expect(hasDebuff(s, boss, 'fear')).toBe(false);
+  });
+  it('무한 모드 고유 무공·심법은 스토리 레벨업에 안 나오고, 무한 모드 풀에는 판마다 섞인다', () => {
+    const endlessIds = new Set([...WEAPONS.values(), ...PASSIVES.values()].filter((d) => d.endless).map((d) => d.id));
+    expect([...WEAPONS.values()].filter((w) => w.endless && !w.evolved).length).toBe(14);
+    expect([...PASSIVES.values()].filter((p) => p.endless).length).toBe(6);
+    expect([...WEAPONS.values()].filter((w) => w.endless && w.evolved).length).toBe(10);
+    const s = createChapter(0, 'nostory', freshCarry('kyle'));
+    for (let k = 0; k < 30; k++) for (const c of choicePool(s)) expect(endlessIds.has(c.id), c.id).toBe(false);
+    const pool = endlessPool(HEROES[0], createRng('ep'));
+    const uw = [...pool].filter((id) => WEAPONS.get(id)?.endless);
+    expect(uw.length).toBeGreaterThanOrEqual(RULES.endless.pool.unique.weapons[0]);
+    // 고유 무공의 각성 짝은 풀에 있다
+    for (const id of uw) {
+      const ev = WEAPONS.get(id)!.evolve;
+      if (ev) expect(pool.has(ev.with), `${id} 짝 ${ev.with}`).toBe(true);
+    }
+  });
+  it('극: 무공 + 무공 합성 — 짝 무공은 합쳐져 사라지고 칸이 빈다', () => {
+    const s = createEndless('fuse', 'haun');
+    s.player.hp = s.player.maxHp = 1e6;
+    s.weapons = [{ id: 'shade_clone', lv: 5, next: 0 }, { id: 'blood_scythe', lv: 2, next: 0 }];
+    expect(evolveTable(s).find((r) => r.weapon === 'shade_clone')?.state).toBe('ready');
+    s.items.push({ x: s.player.x, y: s.player.y, kind: 'chest' });
+    for (let i = 0; i < 5; i++) {
+      if (s.pending) choose(s, 0);
+      step(s, { x: 0, y: 0 });
+    }
+    expect(s.weapons.map((w) => w.id)).toContain('shade_clone_x');
+    expect(s.weapons.some((w) => w.id === 'blood_scythe')).toBe(false);
+  });
+  it('새 무공·심법 40개는 아이콘 칸이 겹치지 않고, 예전 심법 아이콘 자리는 그대로다', () => {
+    const refs = [...WEAPONS.values(), ...PASSIVES.values()].filter((d) => d.icon).map((d) => d.icon!.join(':'));
+    expect(refs.length).toBe(40);
+    expect(new Set(refs).size).toBe(40);
+    const legacy = [...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)];
+    expect(legacy.length).toBe(37);
+    expect(legacy.indexOf('might')).toBe(27);
+    expect(legacy.indexOf('afterimage')).toBe(36);
   });
 });

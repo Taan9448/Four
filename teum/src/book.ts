@@ -2,7 +2,9 @@
 // 무공·심법 자세한 설명, 함께 쓰면 좋은 짝, 추천 묶음(세트·탄막·근접·극의·인물)을 데이터(rules.json build)에서 만든다.
 // 화면 없이 도는 순수 함수 — main.ts(무공록·레벨업 카드)와 테스트가 같이 쓴다.
 import table from '../data/cardskills.json';
-import { elementCounts, HEROES, LOCKABLE, partnersOf, PASSIVES, rarityOf, RULES, WEAPONS, type Choice, type Kind, type State } from './sim';
+import { elementCounts, elemName, isSetElem, partnerName, type Debuff, HEROES, LOCKABLE, partnersOf, PASSIVES, rarityOf, RULES, WEAPONS, type Choice, type Kind, type State } from './sim';
+/** 디버프 설명(2026-11-25) */
+const DEBUFF_DESC: Record<Debuff, string> = { poison: '0.5초마다 독 피해', bleed: '겹칠수록 커지는 출혈 피해', weaken: '그림자가 주는 피해 -40%', fear: '겁먹고 달아나며 공격·기술을 못 쓴다', silence: '탄·내려찍기 같은 기술을 못 쓴다', root: '그 자리에 묶여 움직이지 못한다' };
 
 const T = table as unknown as { kindName: Record<string, string>; kindDesc: Record<string, string>; effectName: Record<string, string>; stats: { stat: string; name: string; unit: string }[] };
 export const KIND_NAME = T.kindName;
@@ -41,10 +43,11 @@ export function describe(id: string): SkillInfo {
       `${T.kindDesc[w.kind] ?? w.desc}${RANGED.includes(w.kind) ? ' (멀리)' : w.kind === 'heal' ? '' : ' (몸 둘레)'}`,
       w.kind === 'heal' ? `회복 ${a.damage} → ${z.damage} · 대기 ${a.cooldown}초 → ${z.cooldown}초` : `피해 ${a.damage} → ${z.damage} · 대기 ${a.cooldown}초 → ${z.cooldown}초${a.count > 1 || z.count > 1 ? ` · 개수 ${a.count} → ${z.count}` : ''}${a.area !== z.area ? ` · 범위 ×${a.area} → ×${z.area}` : ''}`,
     ];
-    if (w.element) lines.push(`맞은 적을 ${T.effectName[w.element]} — ${RULES.sets[w.element].name} 세트(${RULES.sets[w.element].need}개면: ${RULES.sets[w.element].desc})`);
-    if (w.evolve) lines.push(`각성: Lv.5 + 「${PASSIVES.get(w.evolve.with)?.name}」 심법을 들고 상자를 열면 「${WEAPONS.get(w.evolve.into)?.name}」`);
+    if (isSetElem(w.element)) lines.push(`맞은 적을 ${T.effectName[w.element]} — ${RULES.sets[w.element].name} 세트(${RULES.sets[w.element].need}개면: ${RULES.sets[w.element].desc})`);
+    else if (w.element) lines.push(`맞은 적에게 ${elemName(w.element)} — ${DEBUFF_DESC[w.element as Debuff] ?? ''}`);
+    if (w.evolve) lines.push(`각성: Lv.5 + 「${partnerName(w.evolve.with)}」 ${WEAPONS.has(w.evolve.with) ? '무공(합쳐져 사라진다)' : '심법'}을 들고 상자를 열면 「${WEAPONS.get(w.evolve.into)?.name}」`);
     if (w.evolved) lines.push('각성한 무공 — 상자로만 얻는다');
-    const tag = ['무공', KIND_NAME[w.kind], ownerName(w.owner), w.rarity ? RARITY_NAME[w.rarity] : '기본', w.element ? RULES.sets[w.element].name : ''].filter(Boolean).join(' · ');
+    const tag = ['무공', KIND_NAME[w.kind], ownerName(w.owner), w.rarity ? RARITY_NAME[w.rarity] : '기본', w.element ? elemName(w.element) : '', w.endless ? '무한 모드' : ''].filter(Boolean).join(' · ');
     return { name: w.name, tag, lines };
   }
   const p = PASSIVES.get(id);
@@ -228,7 +231,7 @@ export function recommend(s: State, choices: Choice[]): { index: number; reason:
       } else {
         v = G[gradeOf(c.id)] + (s.weapons.filter((w) => !WEAPONS.get(w.id)?.relic).length < 3 ? 12 : 0);
         r = `${gradeOf(c.id)}급 새 무공`;
-        if (w.element) {
+        if (isSetElem(w.element)) {
           const n = (ec[w.element] ?? 0) + 1;
           if (n === RULES.sets[w.element].need) {
             v += 28;
@@ -310,7 +313,7 @@ export function suggest(heroId: string, open: Iterable<string>, deck: Iterable<s
     let score = GRADE_ORDER[g] * 10;
     const why: string[] = [`${g}급`];
     if (w) {
-      if (w.element) {
+      if (isSetElem(w.element)) {
         const n = (ec[w.element] ?? 0) + 1;
         const need = RULES.sets[w.element].need;
         if (n >= need && (ec[w.element] ?? 0) < need) {

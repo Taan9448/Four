@@ -14,7 +14,7 @@ export function pickIndex(s: State, how: Picker): number {
   if (how === 'first') return 0;
   const want = new Set(s.weapons.map((w) => WEAPONS.get(w.id)!.evolve?.with).filter(Boolean) as string[]);
   const score = (x: Choice) =>
-    x.kind === 'weapon' ? (x.lv > 1 ? 30 + x.lv : s.weapons.length < 4 ? 25 : 8) : x.kind === 'passive' ? (want.has(x.id) ? 20 : ['might', 'haste', 'area', 'vigor'].includes(x.id) ? 12 : 6) : 1;
+    x.kind === 'weapon' ? (x.lv > 1 ? 30 + x.lv : want.has(x.id) ? 22 : s.weapons.length < 4 ? 25 : 8) : x.kind === 'passive' ? (want.has(x.id) ? 20 : ['might', 'haste', 'area', 'vigor'].includes(x.id) ? 12 : 6) : 1;
   let best = 0;
   c.forEach((x, i) => score(x) > score(c[best]) && (best = i));
   return best;

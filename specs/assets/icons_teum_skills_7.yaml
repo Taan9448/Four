@@ -1,0 +1,17 @@
+id: icons_teum_skills_7
+type: icon-sheet
+summary: "「틈」 무한 모드 극 무공 10 아이콘(2026-11-25 사용자 \"디버프 스킬·무한 모드 고유 스킬 20·극 10\") — 칸 번호 = teum/data/weapons.json icon [7, n]: 1 틈새 칼날 · 극 · 2 공허 구체 · 극 · 3 균열 낙뢰 · 극 · 4 유성우 · 극 · 5 생명의 등불 · 극 · 6 그림자 학살 · 극 · 7 망령 사슬 · 극 · 8 역병 안개 · 극 · 9 멈춘 시간의 창 · 극 · 10 혼돈 역류 · 극. icons_teum_skills_1~4와 같은 결 — 극은 더 화려하게, 금빛 테"
+frames: 10
+baseline: 0.5
+frame_notes:
+  1: "틈새 칼날 · 극: six large violet blades in a wide spinning ring, radiant, ultimate version"
+  2: "공허 구체 · 극: three huge dark violet spheres with blazing cores, ultimate version"
+  3: "균열 낙뢰 · 극: a storm of violet lightning bolts raining down, ultimate version"
+  4: "유성우 · 극: a sky full of burning meteors falling, ultimate version"
+  5: "생명의 등불 · 극: a radiant golden lantern of life with a blooming green flower of light, ultimate version"
+  6: "그림자 학살 · 극: four shadow swordsmen in a circle with a crimson whirlwind of blood, ultimate version"
+  7: "망령 사슬 · 극: glowing chains linking screaming wraith faces, ultimate version"
+  8: "역병 안개 · 극: a huge green plague fog skull cloud, ultimate version"
+  9: "멈춘 시간의 창 · 극: three ice lances piercing through a cracked frozen clock, ultimate version"
+  10: "혼돈 역류 · 극: golden stars riding a reversing blue wave in all directions, ultimate version"
+placeholder: { color: '#3a3020', accent: '#ffd27a' }

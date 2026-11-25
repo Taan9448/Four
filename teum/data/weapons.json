@@ -1,5 +1,5 @@
 {
- "$comment": "「틈」 무공·심법. 종류(kind)마다 움직임은 엔진이 정하고 무공별 코드는 없다(GAME_DESIGN 4절). levels[i] = Lv.i+1 값. area는 배율, duration은 초, speed는 탄 속도(px/s) 또는 회전 속도(rad/s). evolve: Lv.5 + 짝 심법으로 상자를 열면 각성 · relic: 비전 무공(2026-11-25) — 구역 보스(zones.json)를 쓰러뜨려야만 얻고, 무공 칸 밖 비전 칸(relicSlots)에 들어간다. 레벨업으로 오른다",
+ "$comment": "「틈」 무공·심법. 종류(kind)마다 움직임은 엔진이 정하고 무공별 코드는 없다(GAME_DESIGN 4절). levels[i] = Lv.i+1 값. area는 배율, duration은 초, speed는 탄 속도(px/s) 또는 회전 속도(rad/s). evolve: Lv.5 + 짝 심법으로 상자를 열면 각성 · relic: 비전 무공(2026-11-25) — 구역 보스(zones.json)를 쓰러뜨려야만 얻고, 무공 칸 밖 비전 칸(relicSlots)에 들어간다. 레벨업으로 오른다 · 2026-11-25 10차: 디버프(element poison·bleed·weaken·fear·silence·root, 심법 stat poisonOn·bleedOn·weakenOn·fearOn·silenceOn) · endless(무한 모드에만 나오는 고유 무공·심법·극) · evolve.with가 무공이면 두 무공이 합쳐진다(짝 무공은 사라짐) · icon [시트, 칸](icons_teum_skills_<시트>)",
  "weapons": [
   {
    "id": "grain_cut",
@@ -1804,6 +1804,1520 @@
    ],
    "element": "vuln",
    "relic": true
+  },
+  {
+   "id": "poison_needles",
+   "name": "독바늘",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "독 묻은 바늘을 날려 중독시킨다(0.5초마다 독 피해).",
+   "color": "#8fd65a",
+   "levels": [
+    {
+     "damage": 8,
+     "cooldown": 1.0,
+     "area": 1,
+     "count": 2,
+     "speed": 360,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 10,
+     "cooldown": 0.95,
+     "area": 1.08,
+     "count": 3,
+     "speed": 360,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 12,
+     "cooldown": 0.9,
+     "area": 1.16,
+     "count": 3,
+     "speed": 360,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 14,
+     "cooldown": 0.85,
+     "area": 1.25,
+     "count": 4,
+     "speed": 360,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 16,
+     "cooldown": 0.78,
+     "area": 1.35,
+     "count": 4,
+     "speed": 360,
+     "pierce": 1,
+     "duration": 2
+    }
+   ],
+   "element": "poison",
+   "icon": [
+    5,
+    1
+   ]
+  },
+  {
+   "id": "bleed_fan",
+   "name": "피의 부채",
+   "owner": "*",
+   "kind": "slash",
+   "desc": "앞을 부채꼴로 베어 출혈을 겹겹이 남긴다(겹칠수록 아프다).",
+   "color": "#e0303a",
+   "levels": [
+    {
+     "damage": 12,
+     "cooldown": 1.1,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 15,
+     "cooldown": 1.04,
+     "area": 1.08,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 17,
+     "cooldown": 0.99,
+     "area": 1.16,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 21,
+     "cooldown": 0.94,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 25,
+     "cooldown": 0.86,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "bleed",
+   "icon": [
+    5,
+    2
+   ]
+  },
+  {
+   "id": "weaken_curse",
+   "name": "쇠약의 저주",
+   "owner": "*",
+   "kind": "nova",
+   "desc": "둘레에 저주를 퍼뜨려 그림자가 주는 피해를 줄인다.",
+   "color": "#9aa0b0",
+   "levels": [
+    {
+     "damage": 10,
+     "cooldown": 3.2,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.04,
+     "area": 1.3,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 14,
+     "cooldown": 2.88,
+     "area": 1.39,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 17,
+     "cooldown": 2.72,
+     "area": 1.5,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 2.5,
+     "area": 1.62,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "weaken",
+   "icon": [
+    5,
+    3
+   ]
+  },
+  {
+   "id": "fear_howl",
+   "name": "공포의 외침",
+   "owner": "*",
+   "kind": "nova",
+   "desc": "외침으로 둘레 그림자를 겁주어 달아나게 한다(그동안 공격하지 못한다).",
+   "color": "#b070ff",
+   "levels": [
+    {
+     "damage": 8,
+     "cooldown": 5,
+     "area": 1.3,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 10,
+     "cooldown": 4.7,
+     "area": 1.4,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 12,
+     "cooldown": 4.4,
+     "area": 1.51,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 14,
+     "cooldown": 4.1,
+     "area": 1.62,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 16,
+     "cooldown": 3.75,
+     "area": 1.76,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "fear",
+   "icon": [
+    5,
+    4
+   ]
+  },
+  {
+   "id": "silence_chain",
+   "name": "봉인의 사슬",
+   "owner": "*",
+   "kind": "chain",
+   "desc": "사슬이 그림자 사이를 튀며 기술을 봉인한다(탄·내려찍기를 못 쓴다).",
+   "color": "#dff4ff",
+   "levels": [
+    {
+     "damage": 14,
+     "cooldown": 2.2,
+     "area": 1,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 17,
+     "cooldown": 2.09,
+     "area": 1.08,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 1.98,
+     "area": 1.16,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 24,
+     "cooldown": 1.87,
+     "area": 1.25,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 29,
+     "cooldown": 1.72,
+     "area": 1.35,
+     "count": 6,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "silence",
+   "icon": [
+    5,
+    5
+   ]
+  },
+  {
+   "id": "root_frost",
+   "name": "얼음 족쇄",
+   "owner": "*",
+   "kind": "rain",
+   "desc": "얼음 족쇄가 떨어져 그림자를 그 자리에 묶는다.",
+   "color": "#6fd6ff",
+   "levels": [
+    {
+     "damage": 6,
+     "cooldown": 4,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 7,
+     "cooldown": 3.8,
+     "area": 1.08,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 9,
+     "cooldown": 3.6,
+     "area": 1.16,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 10,
+     "cooldown": 3.4,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.12,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    }
+   ],
+   "element": "root",
+   "icon": [
+    5,
+    6
+   ]
+  },
+  {
+   "id": "rift_blade",
+   "name": "틈새 칼날",
+   "owner": "*",
+   "kind": "orbit",
+   "desc": "무한 모드 — 틈에서 뽑은 칼날이 둘레를 돈다.",
+   "color": "#c070ff",
+   "levels": [
+    {
+     "damage": 12,
+     "cooldown": 3.6,
+     "area": 1,
+     "count": 2,
+     "speed": 3.0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 15,
+     "cooldown": 3.42,
+     "area": 1.08,
+     "count": 3,
+     "speed": 3.0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 17,
+     "cooldown": 3.24,
+     "area": 1.16,
+     "count": 3,
+     "speed": 3.0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 21,
+     "cooldown": 3.06,
+     "area": 1.25,
+     "count": 4,
+     "speed": 3.0,
+     "pierce": 0,
+     "duration": 3.5
+    },
+    {
+     "damage": 25,
+     "cooldown": 2.81,
+     "area": 1.35,
+     "count": 4,
+     "speed": 3.0,
+     "pierce": 0,
+     "duration": 3.5
+    }
+   ],
+   "knock": 20,
+   "evolve": {
+    "with": "area",
+    "into": "rift_blade_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    1
+   ]
+  },
+  {
+   "id": "void_orb",
+   "name": "공허 구체",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "무한 모드 — 느리게 나아가며 모든 것을 꿰뚫는 공허 구체, 맞으면 약점이 드러난다.",
+   "color": "#7a5cff",
+   "levels": [
+    {
+     "damage": 20,
+     "cooldown": 1.6,
+     "area": 1.4,
+     "count": 1,
+     "speed": 220,
+     "pierce": 99,
+     "duration": 3
+    },
+    {
+     "damage": 24,
+     "cooldown": 1.52,
+     "area": 1.51,
+     "count": 1,
+     "speed": 220,
+     "pierce": 99,
+     "duration": 3
+    },
+    {
+     "damage": 29,
+     "cooldown": 1.44,
+     "area": 1.62,
+     "count": 2,
+     "speed": 220,
+     "pierce": 99,
+     "duration": 3
+    },
+    {
+     "damage": 34,
+     "cooldown": 1.36,
+     "area": 1.75,
+     "count": 2,
+     "speed": 220,
+     "pierce": 99,
+     "duration": 3
+    },
+    {
+     "damage": 41,
+     "cooldown": 1.25,
+     "area": 1.89,
+     "count": 3,
+     "speed": 220,
+     "pierce": 99,
+     "duration": 3
+    }
+   ],
+   "element": "vuln",
+   "evolve": {
+    "with": "might",
+    "into": "void_orb_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    2
+   ]
+  },
+  {
+   "id": "rift_thunder",
+   "name": "균열 낙뢰",
+   "owner": "*",
+   "kind": "strike",
+   "desc": "무한 모드 — 화면 안 그림자 위로 틈의 벼락이 떨어진다.",
+   "color": "#cdb8ff",
+   "levels": [
+    {
+     "damage": 46,
+     "cooldown": 2.4,
+     "area": 1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 56,
+     "cooldown": 2.28,
+     "area": 1.08,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 67,
+     "cooldown": 2.16,
+     "area": 1.16,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 79,
+     "cooldown": 2.04,
+     "area": 1.25,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 94,
+     "cooldown": 1.87,
+     "area": 1.35,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "shock",
+   "evolve": {
+    "with": "haste",
+    "into": "rift_thunder_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    3
+   ]
+  },
+  {
+   "id": "shade_clone",
+   "name": "그림자 분신",
+   "owner": "*",
+   "kind": "slash",
+   "desc": "무한 모드 — 그림자 분신이 함께 베어 출혈을 남긴다.",
+   "color": "#6a5a8a",
+   "levels": [
+    {
+     "damage": 16,
+     "cooldown": 1.2,
+     "area": 1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 1.14,
+     "area": 1.08,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 23,
+     "cooldown": 1.08,
+     "area": 1.16,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 28,
+     "cooldown": 1.02,
+     "area": 1.25,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 33,
+     "cooldown": 0.94,
+     "area": 1.35,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "bleed",
+   "evolve": {
+    "with": "blood_scythe",
+    "into": "shade_clone_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    4
+   ]
+  },
+  {
+   "id": "meteor_arrow",
+   "name": "별똥 화살",
+   "owner": "*",
+   "kind": "rain",
+   "desc": "무한 모드 — 하늘에서 불붙은 별똥 화살이 쏟아진다.",
+   "color": "#ff8a3a",
+   "levels": [
+    {
+     "damage": 10,
+     "cooldown": 3.6,
+     "area": 1.1,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.42,
+     "area": 1.19,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 14,
+     "cooldown": 3.24,
+     "area": 1.28,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 17,
+     "cooldown": 3.06,
+     "area": 1.38,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    },
+    {
+     "damage": 20,
+     "cooldown": 2.81,
+     "area": 1.49,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 3
+    }
+   ],
+   "element": "fire",
+   "evolve": {
+    "with": "grain",
+    "into": "meteor_arrow_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    5
+   ]
+  },
+  {
+   "id": "void_chain",
+   "name": "허공 사슬",
+   "owner": "*",
+   "kind": "chain",
+   "desc": "무한 모드 — 허공의 사슬이 튀며 그림자를 묶는다.",
+   "color": "#6fd6ff",
+   "levels": [
+    {
+     "damage": 16,
+     "cooldown": 2,
+     "area": 1,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 1.9,
+     "area": 1.08,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 23,
+     "cooldown": 1.8,
+     "area": 1.16,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 28,
+     "cooldown": 1.7,
+     "area": 1.25,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 33,
+     "cooldown": 1.56,
+     "area": 1.35,
+     "count": 6,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "root",
+   "evolve": {
+    "with": "wraith_ring",
+    "into": "void_chain_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    6
+   ]
+  },
+  {
+   "id": "wraith_ring",
+   "name": "망령 고리",
+   "owner": "*",
+   "kind": "nova",
+   "desc": "무한 모드 — 망령의 비명이 고리로 퍼져 그림자를 겁준다.",
+   "color": "#b070ff",
+   "levels": [
+    {
+     "damage": 18,
+     "cooldown": 3.4,
+     "area": 1.2,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 22,
+     "cooldown": 3.23,
+     "area": 1.3,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 26,
+     "cooldown": 3.06,
+     "area": 1.39,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 31,
+     "cooldown": 2.89,
+     "area": 1.5,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 37,
+     "cooldown": 2.65,
+     "area": 1.62,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "fear",
+   "endless": true,
+   "icon": [
+    6,
+    7
+   ]
+  },
+  {
+   "id": "corrosion",
+   "name": "부식 안개",
+   "owner": "*",
+   "kind": "aura",
+   "desc": "무한 모드 — 둘레에 부식 안개가 서려 그림자를 중독시킨다.",
+   "color": "#8fd65a",
+   "levels": [
+    {
+     "damage": 4,
+     "cooldown": 0.5,
+     "area": 1.1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 5,
+     "cooldown": 0.5,
+     "area": 1.19,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 6,
+     "cooldown": 0.47,
+     "area": 1.28,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 7,
+     "cooldown": 0.45,
+     "area": 1.38,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 8,
+     "cooldown": 0.42,
+     "area": 1.49,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "poison",
+   "evolve": {
+    "with": "venom_blood",
+    "into": "corrosion_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    8
+   ]
+  },
+  {
+   "id": "crystal_lance",
+   "name": "결정 창",
+   "owner": "*",
+   "kind": "beam",
+   "desc": "무한 모드 — 겨눈 쪽으로 결정 창이 꿰뚫고 나가 그림자를 느리게 한다.",
+   "color": "#8fd3ff",
+   "levels": [
+    {
+     "damage": 28,
+     "cooldown": 2.6,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 34,
+     "cooldown": 2.47,
+     "area": 1.08,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 41,
+     "cooldown": 2.34,
+     "area": 1.16,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 48,
+     "cooldown": 2.21,
+     "area": 1.25,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 57,
+     "cooldown": 2.03,
+     "area": 1.35,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "ice",
+   "knock": 6,
+   "evolve": {
+    "with": "time_rift",
+    "into": "crystal_lance_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    9
+   ]
+  },
+  {
+   "id": "blood_scythe",
+   "name": "피의 낫",
+   "owner": "*",
+   "kind": "slash",
+   "desc": "무한 모드 — 큰 낫으로 둘레를 베어 깊은 출혈을 남긴다.",
+   "color": "#c8203a",
+   "levels": [
+    {
+     "damage": 20,
+     "cooldown": 1.6,
+     "area": 1.4,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 24,
+     "cooldown": 1.52,
+     "area": 1.51,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 29,
+     "cooldown": 1.44,
+     "area": 1.62,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 34,
+     "cooldown": 1.36,
+     "area": 1.75,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 41,
+     "cooldown": 1.25,
+     "area": 1.89,
+     "count": 2,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "bleed",
+   "endless": true,
+   "icon": [
+    6,
+    10
+   ]
+  },
+  {
+   "id": "time_rift",
+   "name": "시간 균열",
+   "owner": "*",
+   "kind": "nova",
+   "desc": "무한 모드 — 시간이 갈라져 둘레 그림자의 기술이 멎는다.",
+   "color": "#dff4ff",
+   "levels": [
+    {
+     "damage": 14,
+     "cooldown": 4,
+     "area": 1.4,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 17,
+     "cooldown": 3.8,
+     "area": 1.51,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 20,
+     "cooldown": 3.6,
+     "area": 1.62,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 24,
+     "cooldown": 3.4,
+     "area": 1.75,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 29,
+     "cooldown": 3.12,
+     "area": 1.89,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "element": "silence",
+   "endless": true,
+   "icon": [
+    6,
+    11
+   ]
+  },
+  {
+   "id": "backflow",
+   "name": "역류 파동",
+   "owner": "*",
+   "kind": "wave",
+   "desc": "무한 모드 — 거꾸로 흐르는 파동이 꿰뚫고 나가 그림자를 쇠약하게 한다.",
+   "color": "#5fd0ff",
+   "levels": [
+    {
+     "damage": 26,
+     "cooldown": 2.6,
+     "area": 1,
+     "count": 1,
+     "speed": 400,
+     "pierce": 8,
+     "duration": 1.2
+    },
+    {
+     "damage": 32,
+     "cooldown": 2.47,
+     "area": 1.08,
+     "count": 1,
+     "speed": 400,
+     "pierce": 8,
+     "duration": 1.2
+    },
+    {
+     "damage": 38,
+     "cooldown": 2.34,
+     "area": 1.16,
+     "count": 2,
+     "speed": 400,
+     "pierce": 8,
+     "duration": 1.2
+    },
+    {
+     "damage": 45,
+     "cooldown": 2.21,
+     "area": 1.25,
+     "count": 2,
+     "speed": 400,
+     "pierce": 8,
+     "duration": 1.2
+    },
+    {
+     "damage": 53,
+     "cooldown": 2.03,
+     "area": 1.35,
+     "count": 3,
+     "speed": 400,
+     "pierce": 8,
+     "duration": 1.2
+    }
+   ],
+   "element": "weaken",
+   "evolve": {
+    "with": "chaos_star",
+    "into": "backflow_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    12
+   ]
+  },
+  {
+   "id": "chaos_star",
+   "name": "혼돈의 별",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "무한 모드 — 여러 갈래로 튀는 별이 그림자를 잠깐 멈춘다.",
+   "color": "#ffd27a",
+   "levels": [
+    {
+     "damage": 10,
+     "cooldown": 0.8,
+     "area": 1,
+     "count": 3,
+     "speed": 380,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 12,
+     "cooldown": 0.76,
+     "area": 1.08,
+     "count": 4,
+     "speed": 380,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 14,
+     "cooldown": 0.72,
+     "area": 1.16,
+     "count": 4,
+     "speed": 380,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 17,
+     "cooldown": 0.68,
+     "area": 1.25,
+     "count": 5,
+     "speed": 380,
+     "pierce": 1,
+     "duration": 2
+    },
+    {
+     "damage": 20,
+     "cooldown": 0.62,
+     "area": 1.35,
+     "count": 6,
+     "speed": 380,
+     "pierce": 1,
+     "duration": 2
+    }
+   ],
+   "element": "shock",
+   "endless": true,
+   "icon": [
+    6,
+    13
+   ]
+  },
+  {
+   "id": "healing_lantern",
+   "name": "치유의 등불",
+   "owner": "*",
+   "kind": "heal",
+   "desc": "무한 모드 — 등불이 때마다 몸을 고친다.",
+   "color": "#ffe08a",
+   "levels": [
+    {
+     "damage": 6,
+     "cooldown": 5,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 7,
+     "cooldown": 4.6,
+     "area": 1.08,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 9,
+     "cooldown": 4.25,
+     "area": 1.16,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 10,
+     "cooldown": 3.9,
+     "area": 1.25,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    },
+    {
+     "damage": 12,
+     "cooldown": 3.5,
+     "area": 1.35,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolve": {
+    "with": "breath",
+    "into": "healing_lantern_x"
+   },
+   "endless": true,
+   "icon": [
+    6,
+    14
+   ]
+  },
+  {
+   "id": "rift_blade_x",
+   "name": "틈새 칼날 · 극",
+   "owner": "*",
+   "kind": "orbit",
+   "desc": "극 — 틈새 칼날 + 영역(심법). 칼날 여섯이 쉬지 않고 넓게 돈다.",
+   "color": "#e0a0ff",
+   "levels": [
+    {
+     "damage": 40,
+     "cooldown": 2.4,
+     "area": 1.8,
+     "count": 6,
+     "speed": 3.6,
+     "pierce": 0,
+     "duration": 99
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "knock": 30,
+   "icon": [
+    7,
+    1
+   ]
+  },
+  {
+   "id": "void_orb_x",
+   "name": "공허 구체 · 극",
+   "owner": "*",
+   "kind": "bolt",
+   "desc": "극 — 공허 구체 + 벼린 날. 거대한 구체 셋이 모든 것을 꿰뚫는다.",
+   "color": "#a08cff",
+   "levels": [
+    {
+     "damage": 70,
+     "cooldown": 1.3,
+     "area": 2.2,
+     "count": 3,
+     "speed": 240,
+     "pierce": 99,
+     "duration": 3.5
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "vuln",
+   "icon": [
+    7,
+    2
+   ]
+  },
+  {
+   "id": "rift_thunder_x",
+   "name": "균열 낙뢰 · 극",
+   "owner": "*",
+   "kind": "strike",
+   "desc": "극 — 균열 낙뢰 + 질풍. 벼락이 쉬지 않고 쏟아진다.",
+   "color": "#e8dcff",
+   "levels": [
+    {
+     "damage": 120,
+     "cooldown": 1.2,
+     "area": 1.3,
+     "count": 5,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "shock",
+   "icon": [
+    7,
+    3
+   ]
+  },
+  {
+   "id": "meteor_arrow_x",
+   "name": "유성우 · 극",
+   "owner": "*",
+   "kind": "rain",
+   "desc": "극 — 별똥 화살 + 결 읽기. 화면을 덮는 유성우.",
+   "color": "#ffb060",
+   "levels": [
+    {
+     "damage": 30,
+     "cooldown": 2.4,
+     "area": 1.6,
+     "count": 6,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 4
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "fire",
+   "icon": [
+    7,
+    4
+   ]
+  },
+  {
+   "id": "healing_lantern_x",
+   "name": "생명의 등불 · 극",
+   "owner": "*",
+   "kind": "heal",
+   "desc": "극 — 치유의 등불 + 청운호흡. 크게, 자주 몸을 고친다.",
+   "color": "#fff0a8",
+   "levels": [
+    {
+     "damage": 28,
+     "cooldown": 3,
+     "area": 1,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "icon": [
+    7,
+    5
+   ]
+  },
+  {
+   "id": "shade_clone_x",
+   "name": "그림자 학살 · 극",
+   "owner": "*",
+   "kind": "slash",
+   "desc": "극 — 그림자 분신 + 피의 낫. 분신 넷이 둘레를 베어 피바다를 만든다.",
+   "color": "#9a3a6a",
+   "levels": [
+    {
+     "damage": 60,
+     "cooldown": 0.9,
+     "area": 1.7,
+     "count": 4,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "bleed",
+   "icon": [
+    7,
+    6
+   ]
+  },
+  {
+   "id": "void_chain_x",
+   "name": "망령 사슬 · 극",
+   "owner": "*",
+   "kind": "chain",
+   "desc": "극 — 허공 사슬 + 망령 고리. 튀는 사슬마다 묶고 겁준다.",
+   "color": "#a0b8ff",
+   "levels": [
+    {
+     "damage": 48,
+     "cooldown": 1.4,
+     "area": 1.3,
+     "count": 8,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "fear",
+   "icon": [
+    7,
+    7
+   ]
+  },
+  {
+   "id": "corrosion_x",
+   "name": "역병 안개 · 극",
+   "owner": "*",
+   "kind": "aura",
+   "desc": "극 — 부식 안개 + 독의 피. 넓은 독안개가 모든 그림자를 녹인다.",
+   "color": "#a0e070",
+   "levels": [
+    {
+     "damage": 14,
+     "cooldown": 0.4,
+     "area": 1.9,
+     "count": 1,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "poison",
+   "icon": [
+    7,
+    8
+   ]
+  },
+  {
+   "id": "crystal_lance_x",
+   "name": "멈춘 시간의 창 · 극",
+   "owner": "*",
+   "kind": "beam",
+   "desc": "극 — 결정 창 + 시간 균열. 세 갈래 창이 꿰뚫으며 기술과 걸음을 멎게 한다.",
+   "color": "#bfe8ff",
+   "levels": [
+    {
+     "damage": 90,
+     "cooldown": 1.6,
+     "area": 1.5,
+     "count": 3,
+     "speed": 0,
+     "pierce": 0,
+     "duration": 0
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "silence",
+   "knock": 8,
+   "icon": [
+    7,
+    9
+   ]
+  },
+  {
+   "id": "backflow_x",
+   "name": "혼돈 역류 · 극",
+   "owner": "*",
+   "kind": "wave",
+   "desc": "극 — 역류 파동 + 혼돈의 별. 사방으로 거꾸로 흐르는 별의 파동.",
+   "color": "#ffe08a",
+   "levels": [
+    {
+     "damage": 80,
+     "cooldown": 1.6,
+     "area": 1.4,
+     "count": 4,
+     "speed": 460,
+     "pierce": 99,
+     "duration": 1.5
+    }
+   ],
+   "evolved": true,
+   "endless": true,
+   "element": "weaken",
+   "icon": [
+    7,
+    10
+   ]
   }
  ],
  "passives": [
@@ -1886,6 +3400,132 @@
    "stat": "dashcd",
    "per": 0.08,
    "max": 5
+  },
+  {
+   "id": "venom_art",
+   "name": "독공",
+   "desc": "무공에 맞은 그림자가 6%(레벨마다) 확률로 중독된다",
+   "stat": "poisonOn",
+   "per": 0.06,
+   "max": 5,
+   "icon": [
+    5,
+    7
+   ]
+  },
+  {
+   "id": "blood_trace",
+   "name": "혈흔",
+   "desc": "무공에 맞은 그림자에 6%(레벨마다) 확률로 출혈이 겹친다",
+   "stat": "bleedOn",
+   "per": 0.06,
+   "max": 5,
+   "icon": [
+    5,
+    8
+   ]
+  },
+  {
+   "id": "wither",
+   "name": "쇠약의 기운",
+   "desc": "무공에 맞은 그림자가 5%(레벨마다) 확률로 쇠약해진다(주는 피해 -40%)",
+   "stat": "weakenOn",
+   "per": 0.05,
+   "max": 5,
+   "icon": [
+    5,
+    9
+   ]
+  },
+  {
+   "id": "dread",
+   "name": "위압",
+   "desc": "무공에 맞은 그림자가 4%(레벨마다) 확률로 겁먹고 달아난다",
+   "stat": "fearOn",
+   "per": 0.04,
+   "max": 5,
+   "icon": [
+    5,
+    10
+   ]
+  },
+  {
+   "id": "void_heart",
+   "name": "공허 심장",
+   "desc": "무한 모드 — 무공 피해 +8%(레벨마다)",
+   "stat": "might",
+   "per": 0.08,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    11
+   ]
+  },
+  {
+   "id": "rift_sense",
+   "name": "균열 감각",
+   "desc": "무한 모드 — 치명 확률 +5%(레벨마다)",
+   "stat": "grain",
+   "per": 0.05,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    12
+   ]
+  },
+  {
+   "id": "oblivion",
+   "name": "망각",
+   "desc": "무한 모드 — 무공에 맞은 그림자가 5%(레벨마다) 확률로 기술이 봉인된다",
+   "stat": "silenceOn",
+   "per": 0.05,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    13
+   ]
+  },
+  {
+   "id": "venom_blood",
+   "name": "독의 피",
+   "desc": "무한 모드 — 무공에 맞은 그림자가 7%(레벨마다) 확률로 중독된다",
+   "stat": "poisonOn",
+   "per": 0.07,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    14
+   ]
+  },
+  {
+   "id": "rift_step",
+   "name": "틈 걸음",
+   "desc": "무한 모드 — 걸음 +8%(레벨마다)",
+   "stat": "swift",
+   "per": 0.08,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    15
+   ]
+  },
+  {
+   "id": "star_ward",
+   "name": "별의 가호",
+   "desc": "무한 모드 — 갑옷 +1 · 최대 체력 +10(레벨마다)",
+   "stat": "vigor",
+   "per": 1,
+   "max": 5,
+   "endless": true,
+   "icon": [
+    5,
+    16
+   ]
   }
  ]
 }

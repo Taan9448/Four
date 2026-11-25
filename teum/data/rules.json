@@ -510,7 +510,7 @@
   "phasesFrom": 2
  },
  "endless": {
-  "$comment": "무한 모드 수치: hp·dmg는 분(m)마다 1 + perMin·m + sq·m² 배(체력은 hpPerMinute도 더해진다), 무리는 base + perMin·m(최대 max)마리/초 · 2026-11-22: 무공·심법 10칸씩, 판마다 무작위 무공 풀(pool — 인물 것 own 비율 + 공통, 심법), 상인·수련소는 장소(stay초 머문다)이고 풀 밖 무공을 판다(다른 문파 것은 foreignPrice배)",
+  "$comment": "무한 모드 수치: hp·dmg는 분(m)마다 1 + perMin·m + sq·m² 배(체력은 hpPerMinute도 더해진다), 무리는 base + perMin·m(최대 max)마리/초 · 2026-11-22: 무공·심법 10칸씩, 판마다 무작위 무공 풀(pool — 인물 것 own 비율 + 공통, 심법), 상인·수련소는 장소(stay초 머문다)이고 풀 밖 무공을 판다(다른 문파 것은 foreignPrice배) · 2026-11-25 무한 모드 고유 무공·심법(weapons.json endless)은 판마다 pool.unique만큼 풀에 섞인다",
   "slots": {
    "weapons": 10,
    "passives": 10
@@ -584,7 +584,17 @@
     15,
     20
    ],
-   "own": 0.6
+   "own": 0.6,
+   "unique": {
+    "weapons": [
+     8,
+     10
+    ],
+    "passives": [
+     3,
+     4
+    ]
+   }
   },
   "foreignPrice": 1.5
  },
@@ -755,6 +765,114 @@
    "perMin": 0.012,
    "max": 0.16,
    "endlessFrom": 3
+  }
+ },
+ "resist": {
+  "$comment": "몬스터 저항(2026-11-25 사용자 \"몬스터마다 체력·공격력·이동속도·특수능력 저항·스킬\"): foes.json resist[키] = 0~1(1이면 면역). 상태 효과 시간·밀림 거리에 (1 - 저항)을 곱한다. 일반 그림자는 저항이 없다",
+  "names": {
+   "slow": "둔화",
+   "freeze": "빙결",
+   "knock": "넉백",
+   "burn": "화상",
+   "stun": "기절",
+   "vuln": "약점",
+   "poison": "중독",
+   "bleed": "출혈",
+   "weaken": "쇠약",
+   "fear": "공포",
+   "silence": "침묵",
+   "root": "속박"
+  }
+ },
+ "debuffs": {
+  "$comment": "플레이어가 거는 디버프(2026-11-25 \"디버프 관련 스킬\"): 무공 element 또는 심법(맞힐 때 확률)로 건다. poison 0.5초마다 dps/2(겹치면 긴 쪽) · bleed 겹칠수록(최대 maxStacks) 0.5초마다 perStack/2 · weaken 그림자가 주는 피해 ×mul · fear 인물에게서 달아나고 공격·기술을 못 쓴다 · silence 기술을 못 쓴다 · root 움직이지 못한다",
+  "poison": {
+   "seconds": 4,
+   "dps": 8
+  },
+  "bleed": {
+   "seconds": 4,
+   "perStack": 3,
+   "maxStacks": 10
+  },
+  "weaken": {
+   "seconds": 4,
+   "mul": 0.6
+  },
+  "fear": {
+   "seconds": 1.6,
+   "speed": 0.9
+  },
+  "silence": {
+   "seconds": 3
+  },
+  "root": {
+   "seconds": 1.4
+  },
+  "names": {
+   "poison": "중독",
+   "bleed": "출혈",
+   "weaken": "쇠약",
+   "fear": "공포",
+   "silence": "침묵",
+   "root": "속박"
+  },
+  "colors": {
+   "poison": "#8fd65a",
+   "bleed": "#e0303a",
+   "weaken": "#9aa0b0",
+   "fear": "#b070ff",
+   "silence": "#dff4ff",
+   "root": "#6fd6ff"
+  }
+ },
+ "gems": {
+  "$comment": "경험치 보석 등급(2026-11-25 \"몬스터별로 떨어지는 보석 색깔 구분\"): foes.json gem이 있으면 그것, 없으면 몫(role)·급(rank)으로. 결 조각 양은 그림자 xp 그대로",
+  "tiers": [
+   {
+    "id": "blue",
+    "name": "푸른 결",
+    "color": "#8fd3ff"
+   },
+   {
+    "id": "green",
+    "name": "초록 결",
+    "color": "#7fe08a"
+   },
+   {
+    "id": "violet",
+    "name": "보랏빛 결",
+    "color": "#b48cff"
+   },
+   {
+    "id": "red",
+    "name": "붉은 결",
+    "color": "#ff5a6a"
+   },
+   {
+    "id": "gold",
+    "name": "금빛 결",
+    "color": "#ffd27a"
+   },
+   {
+    "id": "rainbow",
+    "name": "무지개 결",
+    "color": "#ffffff"
+   }
+  ],
+  "byRole": {
+   "main": "blue",
+   "fast": "blue",
+   "fly": "green",
+   "ranged": "green",
+   "burst": "green",
+   "tank": "violet",
+   "special": "violet",
+   "elite": "red",
+   "mid": "red",
+   "nest": "red",
+   "zboss": "gold",
+   "boss": "rainbow"
   }
  }
 }

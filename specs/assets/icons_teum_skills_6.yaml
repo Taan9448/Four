@@ -1,0 +1,21 @@
+id: icons_teum_skills_6
+type: icon-sheet
+summary: "「틈」 무한 모드 고유 무공 14 아이콘(2026-11-25 사용자 \"디버프 스킬·무한 모드 고유 스킬 20·극 10\") — 칸 번호 = teum/data/weapons.json icon [6, n]: 1 틈새 칼날 · 2 공허 구체 · 3 균열 낙뢰 · 4 그림자 분신 · 5 별똥 화살 · 6 허공 사슬 · 7 망령 고리 · 8 부식 안개 · 9 결정 창 · 10 피의 낫 · 11 시간 균열 · 12 역류 파동 · 13 혼돈의 별 · 14 치유의 등불. icons_teum_skills_1~4와 같은 결"
+frames: 14
+baseline: 0.5
+frame_notes:
+  1: "틈새 칼날: curved violet blades orbiting in a circle around a rift crack"
+  2: "공허 구체: a slow dark purple sphere with a glowing core pierced by a light line"
+  3: "균열 낙뢰: a violet lightning bolt striking down from a sky crack"
+  4: "그림자 분신: two overlapping shadow swordsman silhouettes slashing with red trails"
+  5: "별똥 화살: a burning orange arrow falling like a meteor"
+  6: "허공 사슬: pale blue chains bouncing between points of a void crack"
+  7: "망령 고리: a ring of screaming purple wraith faces"
+  8: "부식 안개: a green corrosive fog cloud with dissolving bubbles"
+  9: "결정 창: a long pale blue ice crystal lance thrusting forward"
+  10: "피의 낫: a large crimson scythe with a curved blood trail"
+  11: "시간 균열: a cracked white clock face with frozen shards"
+  12: "역류 파동: a blue wave curling backward with reverse arrows"
+  13: "혼돈의 별: a golden star splitting into many sparks in different directions"
+  14: "치유의 등불: a small warm golden lantern with a green healing cross glow"
+placeholder: { color: '#3a3020', accent: '#ffd27a' }
