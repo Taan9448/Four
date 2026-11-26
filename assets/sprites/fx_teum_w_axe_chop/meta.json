@@ -1,0 +1,36 @@
+{
+  "id": "fx_teum_w_axe_chop",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 12.005,
+  "gridDetected": true,
+  "nativeSize": [
+    42,
+    42
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 24,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "8265ebada9dec8b1",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.565
+}
