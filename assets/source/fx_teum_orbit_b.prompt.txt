@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #ffffff, #f1efe6, #c2c6d1, #8a90a3, #5d6478, #3d4459, #2b2b3a.
+Frames:
+Cell 1: a spinning round chakram disc blade of light with notched edges. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_orbit (the hero/target point in the same place), only the shape changes
+Cell 2: the disc rotated 30 degrees
+Cell 3: the disc rotated 60 degrees, motion streaks
+Cell 4: the disc rotated 90 degrees
+Cell 5: the disc rotated 120 degrees
+Cell 6: back to frame 1 (loop)
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Retain the ROUND circular chakram with small central hole and shallow notches; never four long arms. The last delivered disc+streaks was only46px across versus common64px, and centered y104 instead of92. ENLARGE the complete disc and streaks by40%, and move their SOURCE center UP by40px to x256,y256. In each512px source cell the complete effect should span about x128..384,y128..384, with the disc itself about220px diameter. Same fixed center in all6, rotating30deg,3impact,6returns1. White/grey only,4px blocks, same reference pixel density.
