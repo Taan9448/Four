@@ -156,6 +156,8 @@ export function fitFrames(natives, spec, rows = natives.map(() => 0)) {
   if (spec.type === 'card-frame') return natives.map(fillFrame(T, TH));
   // 카드 그림: 칸을 꽉 채운 그림. 옆 칸이 스며든 가장자리 1px을 덜고 칸 크기에 맞춘다
   if (spec.type === 'card-art-sheet') return natives.map(fillFrame(T, TH, 1));
+  // 이어 붙는 무늬: 가장자리 여백 없이 프레임을 꽉 채운다(여백 1px도 이어 붙이면 격자 줄로 보인다)
+  if (spec.tile) return natives.map(fillFrame(T, TH));
   const grounded = spec.type === 'character-ref' || spec.type === 'character-anim';
   let imgs = natives;
   let fit = 'pad';
@@ -325,7 +327,12 @@ export function processPixelSheet(raw, spec, palette, cells) {
   // 이펙트의 가는 선·불꽃은 블록 감지를 엉뚱한 주기로 끌고 가기 쉽다(fx_rapier_flurry: 9.7px · 일치도 42%).
   // 감지한 격자로 일치도가 50% 미만이면 명세 배율로 다시 자르고 '감지 못 함'으로 둔다(검증은 경고 + 눈 확인, 2026-10-12)
   // 겹치는 테두리(overlay)도 같다: 거의 빈 캔버스의 가는 띠는 블록 감지를 82px 같은 주기로 끌고 간다(card_frame_forge_10, #1236)
-  if ((spec.type === 'fx' || spec.overlay) && grid.detected && sampled.reduce((a, s) => a + s.purity, 0) / sampled.length < 0.5) {
+  // 이어 붙는 무늬(tile)는 캔버스를 꽉 채운 그림이라 명세 배율이 곧 정답이다. 감지가 6.06px처럼 굵게 잡히면 원래 해상도가
+  // 207px로 줄어 256px 프레임에 투명 여백이 남는다(tex_teum_zone_dream, #2356·#2367) → 명세 배율로 자른다
+  if (spec.tile) {
+    grid = { block: (spec.pixel_scale * raw.width) / spec.canvas[0], phaseX: 0, phaseY: 0, score: grid.score, detected: grid.detected };
+    sampled = sample(grid);
+  } else if ((spec.type === 'fx' || spec.overlay) && grid.detected && sampled.reduce((a, s) => a + s.purity, 0) / sampled.length < 0.5) {
     grid = { block: (spec.pixel_scale * raw.width) / spec.canvas[0], phaseX: 0, phaseY: 0, score: grid.score, detected: false };
     sampled = sample(grid);
   }

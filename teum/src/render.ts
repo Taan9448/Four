@@ -2167,8 +2167,8 @@ export function draw(ctx: CanvasRenderingContext2D, s: State, art: Art, v: View,
     const a = (moving && fa?.walk) || fa?.idle;
     const vcol = f.variant ? RULES.variants.list.find((x) => x.id === f.variant)?.color : undefined;
     const ecol = f.element ? ELEM_COLOR[f.element] : undefined;
-    // 구역 보스: 몸 빛(tint)은 빌린 그림일 때만(Codex 그림이 오면 제 색)
-    const tcol = vcol ?? (f.def.area && foeSprite(f.def.sprite, f.def.fallback) === f.def.sprite ? undefined : f.def.tint) ?? ecol;
+    // 몸 빛(tint): 빌린 그림(fallback)이 있는 적은 빌린 그림일 때만 — 제 그림이 오면 제 색(구역 보스·둥지·틈 그림자 4종)
+    const tcol = vcol ?? (f.def.fallback && foeSprite(f.def.sprite, f.def.fallback) === f.def.sprite ? undefined : f.def.tint) ?? ecol;
     const sc = f.def.scale * (f.scale ?? 1);
     draws.push({
       y: f.y,

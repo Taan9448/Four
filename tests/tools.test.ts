@@ -370,6 +370,28 @@ describe('카드 틀(card-frame, 2026-10-11)', () => {
   });
 });
 
+describe('이어 붙는 무늬(tile, 2026-11-26 #2367)', () => {
+  it('블록이 굵게 감지돼도 명세 배율로 잘라 256×256을 여백 없이 꽉 채운다', async () => {
+    const spec = loadSpec('tex_teum_zone_dream');
+    const p = paths(root);
+    mkdirSync(join(root, 'assets/source'), { recursive: true });
+    // 1254px 캔버스에 약 6.06px 블록(207칸)으로 그린 무늬 — 감지가 6.06px을 잡으면 예전엔 207×207로 줄어 여백이 남았다
+    const W = 1254, N = 207, buf = Buffer.alloc(W * W * 4);
+    for (let y = 0; y < W; y++) for (let x = 0; x < W; x++) {
+      const bx = Math.floor((x * N) / W), by = Math.floor((y * N) / W), v = (bx * 7 + by * 13) % 5;
+      const i = (y * W + x) * 4;
+      buf[i] = 0x20 + v * 12; buf[i + 1] = 0x10 + v * 6; buf[i + 2] = 0x30 + v * 10; buf[i + 3] = 255;
+    }
+    writeFileSync(p.source(spec.id), await sharp(buf, { raw: { width: W, height: W, channels: 4 } }).png().toBuffer());
+    const meta = await sliceSheet(spec, { src: p.source(spec.id), outDir: p.sprites(spec.id) });
+    expect([meta.frameW, meta.frameH]).toEqual([256, 256]);
+    const { data } = await sharp(join(p.sprites(spec.id), 'frame_01.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let clear = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] < 255) clear++;
+    expect(clear).toBe(0);
+  });
+});
+
 describe('카드 그림(card-art-sheet, 2026-10-11)', () => {
   it('상태 카드를 뺀 모든 카드가 카드 그림 시트 하나에 한 번씩 있고, 칸 수·메모 수가 맞는다', async () => {
     const { gameData } = await import('../src/engine/data');
