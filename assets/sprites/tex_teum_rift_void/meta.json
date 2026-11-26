@@ -10,7 +10,7 @@
     256,
     256
   ],
-  "fit": "downscale",
+  "fit": "pad",
   "frames": 1,
   "fps": 1,
   "loop": false,
