@@ -123,7 +123,7 @@ function gate(): void {
     panel.onkeydown = (e) => e.key === 'Enter' && submit.click();
   };
   draw();
-  app.replaceChildren(el('section', { class: 'screen gate' }, backdrop(), el('div', { class: 'seal' }, el('span', {}, '틈'), el('i', { class: 'stamp' })), el('p', { class: 'ko-title' }, '천외귀환 외전'), el('p', { class: 'tagline' }, '하늘이 갈라진 밤, 틈에서 쏟아지는 그림자를 열 장 동안 버틴다.'), panel));
+  app.replaceChildren(el('section', { class: 'screen gate' }, backdrop(), el('div', { class: 'seal' }, el('span', { lang: 'zh', 'aria-label': '틈' }, '隙'), el('i', { class: 'stamp' })), el('p', { class: 'ko-title' }, '천외귀환 외전'), el('p', { class: 'tagline' }, '하늘이 갈라진 밤, 틈에서 쏟아지는 그림자를 열 장 동안 버틴다.'), panel));
 }
 
 /** 계정 기록과 이 기기 기록이 다를 때 고르는 창 */
@@ -198,7 +198,7 @@ function lobby(): void {
       'section',
       { class: 'screen lobby' },
       backdrop(),
-      el('div', { class: 'lobby-center' }, el('div', { class: 'seal small' }, el('span', {}, '틈'), el('i', { class: 'stamp' })), el('div', { class: 'menu' }, ...items)),
+      el('div', { class: 'lobby-center' }, el('div', { class: 'seal small' }, el('span', { lang: 'zh', 'aria-label': '틈' }, '隙'), el('i', { class: 'stamp' })), el('div', { class: 'menu' }, ...items)),
       accountPanel(lv),
       corner,
     ),

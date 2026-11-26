@@ -640,7 +640,10 @@ button { font: inherit; }
 .round { width: 60px; height: 60px; border-radius: 18px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(36, 28, 26, 0.9), rgba(12, 10, 10, 0.92)); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45); transition: transform 0.15s, border-color 0.15s; }
 .round:hover { transform: translateY(-3px); border-color: var(--line-hi); }
 .round.other { border-radius: 50%; }
-.seal span { font-family: 'Song Myung', 'Nanum Myeongjo', serif; font-weight: 700; }
+.seal span { font-family: 'Yuji Syuku', 'Song Myung', 'Nanum Myeongjo', serif; font-weight: 400; }
+/* 메인: 인장(바깥 테두리 13px + 빛) 과 메뉴 사이를 띄운다(2026-11-26 사용자 「제목과 메뉴 버튼이 너무 가깝다」) */
+.lobby-center .seal { margin-bottom: 34px; }
+@media (max-height: 620px) { .lobby-center .seal { margin-bottom: 22px; } }
 
 /* 옵션: 탭 · 알약 고르기 · 스위치 · 키 단추 */
 .options-box { width: min(620px, 94vw); }
