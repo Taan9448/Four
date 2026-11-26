@@ -906,3 +906,41 @@ describe('마지막 기술(Q) 밸런스(2026-11-25 "보스가 한 방에 죽는�
     }
   });
 });
+
+// ── 2026-11-26: 악마의 제단(sacrifice)이 엔진에 없어 피를 바치지 않고 버프만 받던 버그 ──
+describe('줍는 것 기본 동작', () => {
+  it('데이터가 쓰는 동작 이름은 모두 엔진에 있다(items·blessing·구역 맵 이벤트)', async () => {
+    const items = (await import('../data/items.json')).default as { items: { id: string; ops?: { op: string }[] }[]; blessing: { op: string }[] };
+    const zones = (await import('../data/zones.json')).default as { events: { id: string; ops?: { op: string }[] }[] };
+    const used = [
+      ...items.items.flatMap((d) => (d.ops ?? []).map((o) => [d.id, o.op])),
+      ...items.blessing.map((o) => ['blessing', o.op]),
+      ...zones.events.flatMap((e) => (e.ops ?? []).map((o) => [e.id, o.op])),
+    ];
+    expect(used.length).toBeGreaterThan(30);
+    for (const [id, op] of used) expect(sim.ITEM_OPS, `${id}: ${op}`).toHaveProperty(op);
+  });
+
+  it('악마의 제단: 최대 체력의 25%를 바치고 90초 동안 피해·대기 버프를 받는다', () => {
+    const s = createChapter(2, 'altar', freshCarry('haun'), { unlocked: [] });
+    const p = s.player;
+    p.hp = p.maxHp;
+    const before = p.hp;
+    s.items.push({ x: p.x, y: p.y, kind: 'demon_altar' });
+    step(s, { x: 0, y: 0 });
+    expect(s.items.some((it) => it.kind === 'demon_altar')).toBe(false);
+    expect(before - p.hp).toBeGreaterThanOrEqual(Math.round(p.maxHp * 0.25) - 2);
+    expect(s.buffs.some((b) => b.stat === 'might' && b.mul === 1.35)).toBe(true);
+    expect(s.buffs.some((b) => b.stat === 'haste' && b.mul === 0.85)).toBe(true);
+  });
+
+  it('악마의 제단: 체력이 적어도 바친 피로 쓰러지지는 않는다', () => {
+    const s = createChapter(2, 'altar-low', freshCarry('haun'), { unlocked: [] });
+    const p = s.player;
+    p.hp = 3;
+    s.items.push({ x: p.x, y: p.y, kind: 'demon_altar' });
+    step(s, { x: 0, y: 0 });
+    expect(p.hp).toBeGreaterThanOrEqual(1);
+    expect(s.result).not.toBe('lose');
+  });
+});

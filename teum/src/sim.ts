@@ -390,7 +390,14 @@ export type ItemOp =
   | { op: 'chest' }
   | { op: 'stele' }
   | { op: 'trial' }
-  | { op: 'skillshop'; count: number };
+  | { op: 'skillshop'; count: number }
+  | { op: 'sacrifice'; frac: number };
+/** 줍는 것 기본 동작 이름 전부 — 데이터(items.json·zones.json)가 없는 이름을 쓰면 테스트가 잡는다(2026-11-26 제단 sacrifice 누락) */
+export const ITEM_OPS: Record<ItemOp['op'], true> = {
+  heal: true, maxhp: true, magnet: true, bomb: true, freeze: true, gold: true, shield: true, buff: true, reveal: true, xp: true,
+  storm: true, purge: true, random: true, field: true, push: true, slowfoes: true, unlock: true, shop: true, ambush: true,
+  chest: true, stele: true, trial: true, skillshop: true, sacrifice: true,
+};
 export interface ItemDef {
   id: string;
   name: string;
@@ -3287,6 +3294,14 @@ function applyOp(s: State, op: ItemOp, def: ItemDef, it?: Item): void {
     case 'chest':
       openChest(s);
       break;
+    case 'sacrifice': {
+      // 피를 바친다: 최대 체력의 frac만큼 잃되 쓰러지지는 않는다(악마의 제단)
+      const cost = Math.round(p.maxHp * op.frac);
+      const lost = Math.min(cost, Math.max(0, p.hp - 1));
+      p.hp -= lost;
+      if (lost > 0) s.events.push({ type: 'hurt', damage: lost });
+      break;
+    }
     case 'stele': {
       const n = it?.stele ?? 0;
       const id = `${s.chapter.id}-${n}`;
