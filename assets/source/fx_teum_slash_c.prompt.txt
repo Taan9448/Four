@@ -1,0 +1,19 @@
+Create ONE PNG pixel-art sprite sheet.
+Canvas: 1536x1024 px. Grid: 3 columns x 2 rows.
+Each cell is exactly 512x512 px. Read cells left-to-right, top-to-bottom; cell numbers start at 1.
+PIXEL GRID: Every cell is a 128x128 pixel-art sprite scaled up exactly 4x. Draw ONLY with solid square blocks of exactly 4x4 px aligned to a 4 px grid that starts at the cell's top-left corner. No anti-aliasing, no blur, no gradients, no soft edges, no half-blocks, no detail smaller than one block. Every block in the whole image must be the SAME size on ONE straight grid.
+Background: flat solid black #000000 in every cell.
+Subject: a glowing visual effect only; no character, no ground, no background elements.
+Containment: the whole effect stays inside the central 80% of every cell, including its biggest burst. Waves, beams, pillars, mist and flames taper off or break into a few scattered blocks before the cell margin; draw the effect smaller rather than let any part touch or be cut by the cell edge. No straight cut edges.
+Style: crisp pixel-art visual effect of pure light on black, COLORLESS: only white and cool light-to-mid greys (no hue at all, no blue, no gold, no red), because the game tints it to each skill's own color; a pure white core, then 2-3 stepped grey bands outward that get darker toward the edge, clean stepped edges, a few single-block sparks, no smoke, no gradients, no blur, no anti-aliasing.
+Palette: use at most 12 colors per cell, only from this list: #ffffff, #f1efe6, #c2c6d1, #8a90a3, #5d6478, #3d4459, #2b2b3a.
+Frames:
+Cell 1: the cell center is the hero (leave it empty). One straight slash line appears on the right side. keep exactly the same layout, anchor point, size in the cell and timing as fx_teum_slash (the hero/target point in the same place), only the shape changes
+Cell 2: impact: a second slash crosses the first forming a big X of light on the RIGHT side of the center, bright white crossing point
+Cell 3: the X at full size, a flash at the crossing point, sparks
+Cell 4: the X lines thinning and breaking
+Cell 5: faint broken X fragments
+Cell 6: two or three tiny fading sparks
+Rules: no grid lines, no borders, no text, no numbers, no labels, no watermark.
+Nothing crosses a cell boundary; keep at least 10 sprite pixels of empty space inside every cell edge.
+Fix: Keep the current X-slash shape, right-side horizontal position and scale. Correct ONLY the vertical placement: move every effect in all six cells DOWN by 40 SOURCE pixels relative to the last rendering, so the full X crossing is at source y292..300 rather than y250. This compensates for the delivered upscale placement and puts its crossing at the common slash target height y92. Do not recenter it upward. Keep the whole X and fragments within y60..460 of each SOURCE cell. One diagonal1, X impact2, fullest3, broken4-5, only sparks6. White/grey only.
