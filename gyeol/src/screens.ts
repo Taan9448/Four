@@ -168,6 +168,8 @@ function continueNote(save: ReturnType<typeof loadSave>): string {
 
 /** 「천외귀환」 주소(같은 배포의 한 단계 위 — 개발 서버에서는 /) */
 export const CHEONOE_URL = new URL('../', location.href).href;
+/** 「틈」 주소(같은 배포의 teum/, 2026-11-27 사용자 요청 — 바로가기) */
+export const TEUM_URL = new URL('../teum/', location.href).href;
 
 /**
  * 메인(2026-11-11 사용자 요청 — 「천외귀환」 시작 화면과 같은 구성): 가운데 제목과 메뉴, 왼쪽 아래 명패(계정·수련),
@@ -184,6 +186,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     sfx('click');
     if (id === 'settings') nav.settings();
     else if (id === 'cheonoe') location.href = CHEONOE_URL;
+    else if (id === 'teum') location.href = TEUM_URL;
     // 2026-11-15 「천외귀환」처럼: 이어하기 = 지금 칸의 이야기 지도 · 새로 시작·불러오기 = 저장 3칸
     else if (id === 'continue') {
       writeSave(useSlot(loadSave(), loadSave().slot));
@@ -214,7 +217,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
   const corner = lobby.corner.map((c) =>
     {
       const ic = c.id in INK_ICON ? inkIcon(c.id as keyof typeof INK_ICON) : null;
-      return button([ic ? el('img', { class: 'medal-icon', src: ic, alt: '' }) : '', el('b', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : ''}${ic ? ' has-icon' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` });
+      return button([ic ? el('img', { class: 'medal-icon', src: ic, alt: '' }) : '', el('b', {}, c.name)], `medal lobby-medal${c.id === 'cheonoe' ? ' to-cheonoe' : c.id === 'teum' ? ' to-teum' : ''}${ic ? ' has-icon' : ''}`, () => go(c.id), { 'aria-label': c.name, title: `${c.name} — ${c.note}` });
     },
   );
   // 뒤뜰 그림 위 잔잔한 움직임(달무리·등불·안개·별·반딧불·댓잎 — lobby-fx.ts). 그림이 아직 없으면 CSS 바탕 그대로
@@ -232,7 +235,7 @@ export function renderLobby(app: HTMLElement, nav: Nav): void {
     ),
     // 계정·수련은 왼쪽 아래 명패로(「천외귀환」과 같다). 로그인하기를 누르면 로그인 판으로
     playerPlate(() => nav.go(accountState().kind === 'none' ? 'title' : 'lobby')),
-    el('nav', { class: 'lobby-corner', 'aria-label': '옷장 · 도감 · 설정 · 천외귀환' }, ...corner),
+    el('nav', { class: 'lobby-corner', 'aria-label': '옷장 · 도감 · 설정 · 천외귀환 · 틈' }, ...corner),
   );
   app.replaceChildren(section);
   setKeys((e) => {

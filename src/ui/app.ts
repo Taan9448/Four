@@ -570,6 +570,8 @@ export class App {
           h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
           // 「결」 바로가기(2026-11-14 사용자 요청): 같은 배포의 gyeol/ — 계정·수련 Lv.은 함께 쓴다
           h('button', { class: 'medal title-medal to-gyeol', 'aria-label': '「결」로', ...tipAttrs('결', '진하운의 결 읽기 대결 — 같은 계정으로'), onclick: () => (location.href = new URL('gyeol/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '決'), h('span', {}, '결')),
+          // 「틈」 바로가기(2026-11-27 사용자 요청): 같은 배포의 teum/ — 계정·수련 Lv.은 함께 쓴다
+          h('button', { class: 'medal title-medal to-teum', 'aria-label': '「틈」으로', ...tipAttrs('틈', '천외귀환 외전 30분 생존 액션 — 같은 계정으로'), onclick: () => (location.href = new URL('teum/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '隙'), h('span', {}, '틈')),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
         h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),

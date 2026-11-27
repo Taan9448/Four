@@ -155,6 +155,8 @@ small, .note { color: var(--paper-dim); }
 .medal.lobby-medal:hover, .medal.lobby-medal:focus-visible { border-color: var(--paper); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
 .medal.lobby-medal.to-cheonoe { background: var(--shu); border-color: var(--shu); color: #fbf3e4; }
 .medal.lobby-medal.to-cheonoe b { font-size: 13px; }
+.medal.lobby-medal.to-teum { background: #6a1424; border-color: #6a1424; color: #fbf3e4; }
+.medal.lobby-medal.to-teum b { font-size: 13px; }
 .medal.lobby-medal.to-cheonoe::before { border-left-color: var(--line); }
 .medal.lobby-medal.has-icon { grid-template-rows: 1fr auto; padding: 8px 0 6px; }
 .medal-icon { width: 28px; height: 28px; }
