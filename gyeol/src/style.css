@@ -564,6 +564,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 .medal.lobby-medal span { position: absolute; left: 50%; bottom: -19px; transform: translateX(-50%); font: 700 12px/1 var(--font-body); color: #e8dcc0; white-space: nowrap; text-shadow: 0 1px 3px #000; letter-spacing: 0.08em; }
 .medal.lobby-medal.to-cheonoe { margin-left: 10px; background: radial-gradient(circle at 40% 35%, #3a1d1a, #140808 72%); border-color: #d06a4f; color: #ffd8b8; }
 .medal.lobby-medal.to-cheonoe::before { content: ''; position: absolute; left: -13px; top: 12px; bottom: 12px; border-left: 1px solid rgba(226, 180, 92, 0.3); }
+.medal.lobby-medal.to-teum { background: radial-gradient(circle at 40% 35%, #3a1426, #12080e 72%); border-color: #c0283a; color: #ff9aa8; }
 .wardrobe .outfit-grid { margin-top: 12px; }
 @media (max-width: 640px) {
   .lobby.main { grid-template-columns: 1fr; min-height: 0; height: auto; padding-bottom: 150px; }
@@ -812,7 +813,21 @@ kbd { display: inline-block; min-width: 1.6em; padding: 1px 6px; border: 1px sol
 /* 한글 표식(2026-11-11 접근성: 한자 대신 한글) — 둥근 표식은 이름을 안에, 명패 인장은 글자 수에 맞춰 */
 .medal.lobby-medal { width: 64px; height: 64px; font-family: var(--font-title); font-size: 15px; font-weight: 800; letter-spacing: 0; }
 .medal.lobby-medal b { font-weight: 800; line-height: 1.15; white-space: nowrap; }
-.medal.lobby-medal.to-cheonoe b { font-size: 12px; }
+.medal.lobby-medal.to-cheonoe b, .medal.lobby-medal.to-teum b { font-size: 12px; }
+/* 휴대폰: 둥근 표식 다섯(옷장·도감·설정·천외귀환·틈, 2026-11-27)이 좁은 화면 밖으로 나가지 않게 */
+@media (max-width: 640px) {
+  /* 왼쪽 아래 명패(계정·수련, 높이 약 92px)와 겹치지 않게 그 위로 올린다 */
+  .lobby-corner { right: 10px; gap: 8px; bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+  .lobby.main { padding-bottom: 210px; }
+  .medal.lobby-medal { width: 54px; height: 54px; font-size: 14px; }
+  .medal.lobby-medal.to-cheonoe { margin-left: 6px; }
+  .medal.lobby-medal.to-cheonoe::before { left: -8px; }
+  .medal.lobby-medal.to-cheonoe b, .medal.lobby-medal.to-teum b { font-size: 11px; }
+}
+@media (max-width: 370px) {
+  .lobby-corner { gap: 6px; }
+  .medal.lobby-medal { width: 50px; height: 50px; }
+}
 .plate-seal { font-family: var(--font-title); font-weight: 800; font-size: 22px; }
 .title-plate.guest .plate-seal { font-size: 15px; }
 .pin-seal, .sc-seal { font-family: var(--font-title); font-weight: 800; }
