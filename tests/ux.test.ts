@@ -37,10 +37,10 @@ describe('결과 화면: 폭주로 잃은 체력(3-3)', () => {
 });
 
 describe('도감·설정·접근성(2026-10-11 UI/UX 4단계)', () => {
-  it('하운·공용 카드의 용어집은 武·技·心 낙관을 풀이한다', async () => {
+  it('하운·공용 카드의 용어집은 공·기·심 낙관을 풀이한다(2026-11-27 한자 → 한글)', async () => {
     const { cardGlossary } = await import('../src/engine/text');
     const haun = [...data.cards.values()].find((c) => c.owner === 'haun')!;
-    expect(cardGlossary(data, haun.id).join('\n')).toContain('武 공격 · 技 기술 · 心 심법');
+    expect(cardGlossary(data, haun.id).join('\n')).toContain('공(공격) · 기(기술) · 심(심법)');
     const elia = [...data.cards.values()].find((c) => c.owner === 'elia')!;
     expect(cardGlossary(data, elia.id).join('\n')).not.toContain('낙관');
   });

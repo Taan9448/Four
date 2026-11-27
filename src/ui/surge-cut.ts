@@ -13,10 +13,10 @@ export const SURGE_CUT_MS = 2200;
 export function surgeChips(data: GameData, count: number): [string, string][] {
   const b = data.balance.rift;
   return [
-    ['血', `체력 −${Math.round(b.surgeRatio * 100) * count}%`],
-    ['力', `적 힘 +${b.surgeEnemyStrength}`],
-    ['響', `잔향 ${b.surgeEchoToHand}`],
-    ['裂', `상흔 +${b.surgeScar}`],
+    ['체력', `체력 −${Math.round(b.surgeRatio * 100) * count}%`],
+    ['힘', `적 힘 +${b.surgeEnemyStrength}`],
+    ['잔향', `잔향 ${b.surgeEchoToHand}`],
+    ['상흔', `상흔 +${b.surgeScar}`],
   ];
 }
 

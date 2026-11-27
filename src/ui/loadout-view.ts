@@ -137,7 +137,7 @@ export function loadoutView(data: GameData, run: RunState, title: string, handle
       h(
         'header',
         { class: 'loadout-head panel' },
-        h('span', { class: 'seal' }, '編'),
+        h('span', { class: 'seal' }, '편'),
         h('div', { class: 'loadout-title' }, h('h2', {}, '편성'), h('small', {}, title), h('p', { class: 'loadout-hint' }, '이번 스테이지에 얻는 카드는 편성과 상관없이 덱에 들어간다. 다음 편성부터 고른다.')),
       ),
       // 동료 줄: 주인마다 한 칸(이름 · 채운 장수 · 점수 막대 · 갈래 보너스). 칸 폭이 같아 줄이 흐트러지지 않는다

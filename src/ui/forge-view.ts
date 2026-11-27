@@ -196,7 +196,7 @@ export function openSmithy(data: GameData, run: RunState, onChange: (r: ForgeRes
             disabled: doneAll || run.gold < price || striking,
             onclick: strike,
           },
-          h('span', { class: 'smithy-hammer-ico', 'aria-hidden': 'true' }, '鎚'),
+          h('span', { class: 'smithy-hammer-ico', 'aria-hidden': 'true' }, '⚒'),
           doneAll ? '완성' : run.gold < price ? '골드가 모자란다' : '강화',
         ),
         result,

@@ -36,7 +36,7 @@ export function hubView(data: GameData, run: RunState, handlers: HubHandlers): H
     h(
       'div',
       { class: 'hub-top' },
-      h('div', { class: 'hub-mode' }, h('span', { class: 'seal', 'aria-hidden': 'true' }, '巡'), h('b', {}, '순례 모드'), h('small', modeTipAttrs(data, run), mode)),
+      h('div', { class: 'hub-mode' }, h('span', { class: 'seal', 'aria-hidden': 'true' }, '순'), h('b', {}, '순례 모드'), h('small', modeTipAttrs(data, run), mode)),
       h(
         'div',
         { class: 'hub-actions' },

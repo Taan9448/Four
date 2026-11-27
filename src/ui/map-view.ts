@@ -20,10 +20,10 @@ import { readWardrobe } from './storage';
 import { abyssScale, loopLabel, nemesisEvery, WORLD_NAME } from '../engine/abyss';
 
 /** 노드 표식: 두루마리 위의 한자 */
-const NODE_GLYPH: Record<string, string> = { story: '史', battle: '戰', elite: '精', event: '事', rest: '休', inn: '宿', shop: '市', boss: '王' };
+const NODE_GLYPH: Record<string, string> = { story: '이', battle: '전', elite: '정', event: '사', rest: '휴', inn: '여', shop: '상', boss: '보' };
 const NODE_LABEL: Record<string, string> = { story: '이야기', battle: '전투', elite: '엘리트', event: '사건', rest: '휴식', inn: '여관', shop: '상점', boss: '보스' };
 /** 범례에만 더하는 표식: 폭주가 연 裂 틈새(GAME_DESIGN 7절) */
-const LEGEND_EXTRA: Record<string, [string, string]> = { crack: ['裂', '틈새'] };
+const LEGEND_EXTRA: Record<string, [string, string]> = { crack: ['틈', '틈새'] };
 /** 노드 아이콘 시트(icons_nodes, 2026-10-12): 칸 순서. 그림이 오기 전에는 한자 */
 const NODE_ICON = ['story', 'battle', 'elite', 'event', 'rest', 'inn', 'shop', 'boss', 'crack'];
 const nodeMark = (kind: string, glyph: string) => artOrGlyph('icons_nodes', NODE_ICON.indexOf(kind) + 1, glyph, 'node-glyph');
@@ -36,7 +36,7 @@ const RIFT_REVEAL_STAGE = 's8';
 const GATE = { x: 47, y: 74 };
 /** 여정 띠의 지역: 그림에서 차지하는 가로 범위(%)와 이름. 아직 들어선 적 없는 지역은 안개로 덮는다(GAME_DESIGN 14절) */
 const REGIONS = {
-  murim: { from: 0, to: 49, tag: '武林 · 무림', unknown: '낯선 땅' },
+  murim: { from: 0, to: 49, tag: '무림', unknown: '낯선 땅' },
   elheim: { from: 51, to: 100, tag: '엘하임 · Elheim', unknown: '낯선 세계' },
 } as const;
 
@@ -436,11 +436,11 @@ export function mapView(data: GameData, run: RunState, handlers: MapViewHandlers
           class: `node node-crack${visited ? ' done' : ''}${open ? ' open' : ''}${run.position === n.id ? ' here' : ''}`,
           style: `left:${p.x}%;top:${p.y}%;--tilt:${(wobble(n.id, 3) * 5).toFixed(1)}deg`,
           disabled: !open,
-          'aria-label': `裂 틈새, ${n.floor}층${open ? ' — 갈 수 있다' : visited ? ' — 지나온 곳' : ''}`,
+          'aria-label': `틈새, ${n.floor}층${open ? ' — 갈 수 있다' : visited ? ' — 지나온 곳' : ''}`,
           onclick: () => handlers.onEnter(n),
-          ...tipAttrs(`${n.floor}층 · 裂 틈새`, [visited ? mod?.name ?? '' : '폭주가 연 자리. 틈의 짐승(이기면 상흔 -5와 유물)이나 틈새의 거래(감소 카드·봉인 유물)가 있다.', open ? '갈 수 있다' : ''].filter(Boolean).join('\n'), 'rift'),
+          ...tipAttrs(`${n.floor}층 · 틈새`, [visited ? mod?.name ?? '' : '폭주가 연 자리. 틈의 짐승(이기면 상흔 -5와 유물)이나 틈새의 거래(감소 카드·봉인 유물)가 있다.', open ? '갈 수 있다' : ''].filter(Boolean).join('\n'), 'rift'),
         },
-        nodeMark('crack', '裂'),
+        nodeMark('crack', '틈'),
       );
     if (!visited && !open && !revealAll)
       return h(
@@ -703,7 +703,7 @@ function scarTip(data: GameData): string {
   return (
     `균열이 남긴 흔적. 상흔 ${sc.startRiftPer}마다 전투 시작 균열 +1(${startRiftMaxText(data)}).\n상흔 ${sc.restAt} 이상이면 휴식 회복 -${Math.round((1 - sc.restHealMul) * 100)}%.` +
     `\n상흔 ${sc.shopAt} 이상이면 상점 값 +${Math.round((sc.shopPriceMul - 1) * 100)}%, 대신 균열 감소 카드가 반드시 나오고 꿰매기(-${sc.shopStitch}, ${sc.shopStitchGold}금)를 판다.` +
-    (crackAt !== undefined ? `\n상흔 ${crackAt} 이상으로 새 지도에 들어서면 지도가 한 번 갈라진다(裂 틈새 하나).` : '') +
+    (crackAt !== undefined ? `\n상흔 ${crackAt} 이상으로 새 지도에 들어서면 지도가 한 번 갈라진다(틈새 하나).` : '') +
     `\n휴식의 꿰매기(상흔 -${sc.stitch}), 폭주 없이 보스를 넘기면(상흔 -${sc.bossCleanBonus}) 아문다.`
   );
 }

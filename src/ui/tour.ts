@@ -43,7 +43,7 @@ export const TOUR_LIST: { id: string; label: string }[] = [
   { id: 'battle-elements', label: '속성' },
   { id: 'notice-rift', label: '균열' },
   { id: 'notice-scar', label: '상흔' },
-  { id: 'notice-surge-map', label: '끊긴 길 · 裂 틈새' },
+  { id: 'notice-surge-map', label: '끊긴 길 · 틈새' },
   { id: 'loadout', label: '편성' },
   { id: 'surge-guide', label: '첫 폭주' },
   { id: 'battle-rift-heart', label: '틈의 심장' },

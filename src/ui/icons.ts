@@ -6,7 +6,7 @@ import { tipAttrs } from './tooltip';
 
 /** icons_intent 시트의 칸 번호(specs/assets/icons_intent.yaml과 같다) */
 const INTENT_FRAME: Record<string, number> = { attack: 1, defend: 2, buff: 3, debuff: 4, special: 5, block: 6 };
-const INTENT_GLYPH: Record<string, string> = { attack: '攻', defend: '守', buff: '強', debuff: '咒', special: '奇', block: '盾' };
+const INTENT_GLYPH: Record<string, string> = { attack: '공', defend: '방', buff: '강', debuff: '약', special: '특', block: '막' };
 export const INTENT_LABEL: Record<string, string> = { attack: '공격', defend: '방어', buff: '강화', debuff: '약화', special: '특수' };
 
 /**
@@ -87,7 +87,7 @@ export function controlMark(data: GameData, statuses: Record<string, number>): H
 }
 
 /** 속성 표시: 화염 炎(붉은 주황) · 냉기 冷(하늘색) · 번개 雷(노란빛) */
-const ELEMENT_GLYPH: Record<string, string> = { fire: '炎', ice: '冷', lightning: '雷' };
+const ELEMENT_GLYPH: Record<string, string> = { fire: '화', ice: '냉', lightning: '번' };
 const ELEMENT_NAME: Record<string, string> = { fire: '화염', ice: '냉기', lightning: '번개' };
 export function elementMark(element: string): HTMLElement {
   return h('span', { class: `el-mark el-${element}`, title: ELEMENT_NAME[element] ?? element }, ELEMENT_GLYPH[element] ?? '?');

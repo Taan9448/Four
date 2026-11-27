@@ -764,7 +764,7 @@ export function applyBattleOutcome(data: GameData, run: RunState, enc: Encounter
   // 폭주가 지도를 가른다(스테이지가 이어질 때만 — 보스를 넘기면 지도가 끝난다)
   if ((outcome.tally?.surges ?? 0) > 0 && enc.node.type !== 'boss') {
     splitMapBySurge(data, run, outcome.tally!.surges, enc.node.id);
-    out.push('폭주가 지도를 갈랐다 — 앞길 하나가 끊기고 裂 틈새가 열렸다.');
+    out.push('폭주가 지도를 갈랐다 — 앞길 하나가 끊기고 틈새가 열렸다.');
   }
   if (isAbyss(run)) {
     // 심연: 쓰러진 채 끝난 동료는 부상(다음 굽이까지 최대 체력 감소). 보스·엘리트 수는 점수에. 이야기 clearEffects는 없다

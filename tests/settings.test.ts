@@ -28,7 +28,7 @@ describe('폭주 그림(2026-10-13)', () => {
   it('그림 위 네 가지 칩은 balance.rift 값을 쓰고, 같은 전투 n번째 폭주면 체력 손실이 ×n', () => {
     const b = data.balance.rift;
     const one = surgeChips(data, 1);
-    expect(one.map(([g]) => g)).toEqual(['血', '力', '響', '裂']);
+    expect(one.map(([g]) => g)).toEqual(['체력', '힘', '잔향', '상흔']);
     expect(one[0][1]).toBe(`체력 −${Math.round(b.surgeRatio * 100)}%`);
     expect(one[3][1]).toBe(`상흔 +${b.surgeScar}`);
     expect(surgeChips(data, 2)[0][1]).toBe(`체력 −${Math.round(b.surgeRatio * 100) * 2}%`);

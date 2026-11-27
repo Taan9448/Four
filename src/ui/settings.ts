@@ -37,7 +37,6 @@ export interface Settings {
   /** 글자 크기(2026-10-11 UI/UX 4-2): 1 보통(100%) · 1.12 크게(112%, html font-size). 기본 보통 */
   fontScale: number;
   /** 둥근 표식(抽·棄·滅·冊·記·設) 아래에 작은 글자(뽑을·버림…)를 함께 */
-  glyphLabels: boolean;
   /** 색각 보정: 등급 보석에 모양(◇ △ ○ ☆ ✦), 상태 이름표에 ▲ 이로움 · ▼ 해로움 · ◆ 특성 */
   colorAssist: boolean;
   /** 장면 글자 속도(2026-10-12 B3): 1 지금 · 2 두 배 · 3 즉시 */
@@ -73,7 +72,7 @@ export const SHAKES: { value: number; label: string }[] = [
   { value: 1, label: '보통' },
 ];
 
-const DEFAULTS: Settings = { speed: 1, cutIn: true, surgeArt: true, motion: true, pauseUnfocused: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8, fontScale: 1, glyphLabels: false, colorAssist: false, textSpeed: 1, autoAdvance: false, skipSeenScenes: false, confirmPotion: true };
+const DEFAULTS: Settings = { speed: 1, cutIn: true, surgeArt: true, motion: true, pauseUnfocused: true, confirmEndTurn: true, shake: 1, master: 0.8, bgm: 0.6, sfx: 0.8, fontScale: 1, colorAssist: false, textSpeed: 1, autoAdvance: false, skipSeenScenes: false, confirmPotion: true };
 
 const volume = (v: unknown, d: number) => (typeof v === 'number' && v >= 0 && v <= 1 ? v : d);
 
@@ -98,7 +97,6 @@ function load(): Settings {
       bgm: volume(raw.bgm, DEFAULTS.bgm),
       sfx: volume(raw.sfx, DEFAULTS.sfx),
       fontScale: FONT_SCALES.some((f) => f.value === raw.fontScale) ? raw.fontScale! : DEFAULTS.fontScale,
-      glyphLabels: typeof raw.glyphLabels === 'boolean' ? raw.glyphLabels : DEFAULTS.glyphLabels,
       colorAssist: typeof raw.colorAssist === 'boolean' ? raw.colorAssist : DEFAULTS.colorAssist,
       textSpeed: raw.textSpeed === 2 || raw.textSpeed === 3 ? raw.textSpeed : DEFAULTS.textSpeed,
       autoAdvance: typeof raw.autoAdvance === 'boolean' ? raw.autoAdvance : DEFAULTS.autoAdvance,
@@ -132,7 +130,6 @@ export function applySettings(): void {
   const root = document.documentElement;
   root.classList.toggle('no-motion', !settings.motion);
   setIdleEnabled(settings.pauseUnfocused);
-  root.classList.toggle('glyph-labels', settings.glyphLabels);
   root.classList.toggle('color-assist', settings.colorAssist);
   root.style.fontSize = settings.fontScale === 1 ? '' : `${settings.fontScale * 100}%`;
   setVolumes(settings);
@@ -148,12 +145,12 @@ export function update(patch: Partial<Settings>): void {
 export type SettingsTab = 'sound' | 'battle' | 'view' | 'scene' | 'help' | 'save';
 
 export const SETTINGS_TABS: { id: SettingsTab; seal: string; label: string; desc: string; lead: string; keys: (keyof Settings)[] }[] = [
-  { id: 'sound', seal: '聲', label: '소리', desc: '크기 세 가지', lead: '배경음악과 효과음을 따로 조절한다.', keys: ['master', 'bgm', 'sfx'] },
-  { id: 'battle', seal: '戰', label: '전투', desc: '속도·연출·확인', lead: '전투 화면에서만 쓰이는 설정.', keys: ['speed', 'shake', 'cutIn', 'surgeArt', 'confirmEndTurn', 'confirmPotion'] },
-  { id: 'view', seal: '畵', label: '화면', desc: '글자·움직임·보조', lead: '글자 크기와 화면 움직임, 읽기를 돕는 표시.', keys: ['fontScale', 'motion', 'pauseUnfocused', 'glyphLabels', 'colorAssist'] },
-  { id: 'scene', seal: '幕', label: '장면', desc: '대사 속도·진행', lead: '이야기 장면의 대사가 넘어가는 방식.', keys: ['textSpeed', 'autoAdvance', 'skipSeenScenes'] },
-  { id: 'help', seal: '助', label: '도움말', desc: '안내·단축키·용어', lead: '처음 안내를 다시 보거나, 조작·용어를 찾아본다.', keys: [] },
-  { id: 'save', seal: '存', label: '저장', desc: '백업·가져오기', lead: '저장은 지도에 설 때마다 자동으로 된다. 전투·이벤트 도중 새로고침하면 그 직전 지도에서 이어진다.', keys: [] },
+  { id: 'sound', seal: '소', label: '소리', desc: '크기 세 가지', lead: '배경음악과 효과음을 따로 조절한다.', keys: ['master', 'bgm', 'sfx'] },
+  { id: 'battle', seal: '전', label: '전투', desc: '속도·연출·확인', lead: '전투 화면에서만 쓰이는 설정.', keys: ['speed', 'shake', 'cutIn', 'surgeArt', 'confirmEndTurn', 'confirmPotion'] },
+  { id: 'view', seal: '화', label: '화면', desc: '글자·움직임·보조', lead: '글자 크기와 화면 움직임, 읽기를 돕는 표시.', keys: ['fontScale', 'motion', 'pauseUnfocused', 'colorAssist'] },
+  { id: 'scene', seal: '장', label: '장면', desc: '대사 속도·진행', lead: '이야기 장면의 대사가 넘어가는 방식.', keys: ['textSpeed', 'autoAdvance', 'skipSeenScenes'] },
+  { id: 'help', seal: '도', label: '도움말', desc: '안내·단축키·용어', lead: '처음 안내를 다시 보거나, 조작·용어를 찾아본다.', keys: [] },
+  { id: 'save', seal: '저', label: '저장', desc: '백업·가져오기', lead: '저장은 지도에 설 때마다 자동으로 된다. 전투·이벤트 도중 새로고침하면 그 직전 지도에서 이어진다.', keys: [] },
 ];
 
 /** 마지막으로 본 탭(이번 접속 동안 기억). 전투 메뉴는 늘 「전투」로 연다 */
@@ -250,7 +247,7 @@ function seg(key: 'speed' | 'shake' | 'fontScale' | 'textSpeed', name: string, h
 }
 
 /** 켜고 끄기: 줄 전체가 스위치(속은 role=switch 체크박스) */
-function toggle(key: 'cutIn' | 'surgeArt' | 'motion' | 'pauseUnfocused' | 'confirmEndTurn' | 'glyphLabels' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', name: string, hint: string): HTMLElement {
+function toggle(key: 'cutIn' | 'surgeArt' | 'motion' | 'pauseUnfocused' | 'confirmEndTurn' | 'colorAssist' | 'autoAdvance' | 'skipSeenScenes' | 'confirmPotion', name: string, hint: string): HTMLElement {
   return row(
     name,
     hint,
@@ -316,7 +313,6 @@ function tabRows(tab: SettingsTab, opts: { onGlossary?: () => void }): (HTMLElem
         toggle('motion', '배경 움직임', '시작 화면의 빛·안개·입자, 영웅·전설 카드의 빛, 내공·마나 구슬의 물결·기포, 결과 창·폭주 그림의 움직임'),
         toggle('pauseUnfocused', '창을 떠나면 쉬기', '다른 창을 보는 동안 움직임을 멈춰 컴퓨터를 가볍게'),
         head('읽기 보조'),
-        toggle('glyphLabels', '표식에 한글 함께', '抽 뽑을 · 棄 버림 · 滅 소멸 · 冊 덱 · 記 기록 · 設 설정'),
         toggle('colorAssist', '색각 보정', '등급 보석에 ◇△○☆✦, 상태에 ▲이로움 ▼해로움 ◆특성'),
       ];
     case 'scene':
