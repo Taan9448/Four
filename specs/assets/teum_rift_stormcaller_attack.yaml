@@ -1,0 +1,18 @@
+id: teum_rift_stormcaller_attack
+type: character-anim
+size: large
+character: teum_rift_stormcaller
+chroma: magenta
+summary: "「틈」 뇌운 그림자 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_rift_stormcaller_ref]
+reference: assets/source/teum_rift_stormcaller_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "gathers a dark storm cloud overhead"
+  2: "the cloud crackles with violet lightning"
+  3: "lifts a hand toward the left"
+  4: "lightning strikes at full reach to the left, violet sparks bursting"
+  5: "the cloud thins"
+  6: "returns to floating"
+placeholder: { shape: humanoid, color: "#1a1830", accent: "#cdb8ff" }

@@ -1,6 +1,7 @@
 [
   {
     "id": "kyle_strike",
+    "fx": "fx_teum_w_knight_strike",
     "name": "기사의 일격",
     "owner": "kyle",
     "type": "attack",

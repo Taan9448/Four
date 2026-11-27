@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_dream_queen
+type: fx
+summary: '「결」 결정타 꿈 깨우기(破夢) — 「틈」 몽마 여왕 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a pink dream veil around a crowned silhouette'
+  2: 'impact: a thin golden slash splits the veil with a burst of pink petals'
+  3: 'the dream shatters into glass-like pink shards'
+  4: 'petals falling'
+  5: 'faint pink mist'
+  6: 'fading sparkles'
+placeholder: { accent: '#e070c0' }

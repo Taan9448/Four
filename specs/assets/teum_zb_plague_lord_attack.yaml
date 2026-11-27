@@ -1,0 +1,18 @@
+id: teum_zb_plague_lord_attack
+type: character-anim
+size: large
+character: teum_zb_plague_lord
+chroma: magenta
+summary: "「틈」 역병 군주 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_plague_lord_ref]
+reference: assets/source/teum_zb_plague_lord_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the plague staff, censer swinging"
+  2: "lurches forward to the left"
+  3: "green fumes pour from the censer"
+  4: "strikes at full reach to the left, toxic green droplets bursting"
+  5: "fumes swirl around it"
+  6: "returns to the hunched stance"
+placeholder: { shape: humanoid, color: "#141e10", accent: "#8fd65a" }

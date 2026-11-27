@@ -1,0 +1,14 @@
+id: teum_zb_blood_bishop_hit
+type: character-anim
+size: large
+character: teum_zb_blood_bishop
+chroma: magenta
+summary: "「틈」 피의 주교 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_blood_bishop_ref]
+reference: assets/source/teum_zb_blood_bishop_ref.png
+facing: left
+frame_notes:
+  1: "struck, the bishop reels, blood droplets flying"
+  2: "the mitre tilts, robes shaking"
+  3: "recovers, gripping the censer"
+placeholder: { shape: humanoid, color: "#2a0a12", accent: "#c8203a" }

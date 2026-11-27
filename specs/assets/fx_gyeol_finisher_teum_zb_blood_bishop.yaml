@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_blood_bishop
+type: fx
+summary: '「결」 결정타 성배 가르기(裂杯) — 「틈」 피의 주교 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a blood-red chalice glowing in the air'
+  2: 'impact: a golden slash splits the chalice with a spray of blood droplets'
+  3: 'the chalice halves falling apart'
+  4: 'blood droplets scattering'
+  5: 'a thin red mist'
+  6: 'fading red sparks'
+placeholder: { accent: '#c8203a' }

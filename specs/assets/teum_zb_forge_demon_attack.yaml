@@ -1,0 +1,18 @@
+id: teum_zb_forge_demon_attack
+type: character-anim
+size: large
+character: teum_zb_forge_demon
+chroma: magenta
+summary: "「틈」 대장간 악마 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_forge_demon_ref]
+reference: assets/source/teum_zb_forge_demon_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "heaves the glowing hammer overhead"
+  2: "stomps forward to the left"
+  3: "the hammer blazes with heat"
+  4: "slams at full reach to the left, molten sparks and lava bursting"
+  5: "steam hisses from its body"
+  6: "returns to the stance"
+placeholder: { shape: humanoid, color: "#2a140a", accent: "#ff8a2a" }

@@ -55,6 +55,7 @@
   },
   {
     "id": "haun_cloud_form",
+    "fx": "fx_teum_w_eighteen",
     "name": "청운십팔식",
     "owner": "haun",
     "type": "attack",
@@ -69,6 +70,7 @@
   },
   {
     "id": "haun_waterwheel",
+    "fx": "fx_teum_w_waterwheel",
     "name": "물레방아",
     "owner": "haun",
     "type": "power",
@@ -386,6 +388,7 @@
   },
   {
     "id": "haun_eighteen",
+    "fx": "fx_teum_w_eighteen",
     "name": "청운십팔식 연환",
     "owner": "haun",
     "type": "attack",

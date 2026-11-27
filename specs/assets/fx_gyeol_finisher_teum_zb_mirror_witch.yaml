@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_mirror_witch
+type: fx
+summary: '「결」 결정타 거울 가르기(割鏡) — 「틈」 거울 마녀 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a tall violet mirror reflecting a ghostly face'
+  2: 'impact: a golden slash splits the mirror with a burst of violet glass'
+  3: 'mirror shards scattering'
+  4: 'glints of glass falling'
+  5: 'violet haze'
+  6: 'fading sparkles'
+placeholder: { accent: '#c8a0ff' }

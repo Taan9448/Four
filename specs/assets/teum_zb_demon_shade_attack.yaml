@@ -1,0 +1,18 @@
+id: teum_zb_demon_shade_attack
+type: character-anim
+size: large
+character: teum_zb_demon_shade
+chroma: magenta
+summary: "「틈」 마왕의 그림자 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_demon_shade_ref]
+reference: assets/source/teum_zb_demon_shade_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises a shadow blade high, red cloak billowing"
+  2: "lunges forward to the left"
+  3: "the blade glows with red shadow"
+  4: "cleaves at full reach to the left, red shadow flames bursting"
+  5: "the cloak settles"
+  6: "returns to the menacing stance"
+placeholder: { shape: humanoid, color: "#140808", accent: "#ff4a4a" }

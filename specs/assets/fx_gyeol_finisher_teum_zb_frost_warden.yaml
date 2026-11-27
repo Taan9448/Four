@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_frost_warden
+type: fx
+summary: '「결」 결정타 족쇄 끊기(斷鎖) — 「틈」 서리 간수 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'an icy shackle chain glowing blue'
+  2: 'impact: a golden slash cuts the chain with a burst of ice shards'
+  3: 'ice links shattering'
+  4: 'snowflakes falling'
+  5: 'cold blue mist'
+  6: 'fading frost sparkles'
+placeholder: { accent: '#8fd3ff' }

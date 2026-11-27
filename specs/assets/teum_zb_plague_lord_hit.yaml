@@ -1,0 +1,14 @@
+id: teum_zb_plague_lord_hit
+type: character-anim
+size: large
+character: teum_zb_plague_lord
+chroma: magenta
+summary: "「틈」 역병 군주 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_plague_lord_ref]
+reference: assets/source/teum_zb_plague_lord_ref.png
+facing: left
+frame_notes:
+  1: "struck, rotten cloth tears and green fumes burst"
+  2: "the lord sags, censer swinging wildly"
+  3: "recovers, wheezing"
+placeholder: { shape: humanoid, color: "#141e10", accent: "#8fd65a" }

@@ -164,6 +164,8 @@ describe('모듈·적이 지도에 나올 수 있다', () => {
     for (const e of data.enemies.values()) {
       if (e.transform) viaEnemy.add(e.transform.into);
       for (const mv of e.moves) for (const ef of mv.effects) if (ef.enemy) viaEnemy.add(ef.enemy);
+      // 쓰러질 때 불러내는 적(「틈」 갈라지는 진흙 → 작은 진흙, 2026-11-27)
+      for (const ef of e.deathEffects) if (ef.enemy) viaEnemy.add(ef.enemy);
     }
     const orphans = [...data.enemies.keys()].filter((id) => !id.startsWith('test_') && !inModules.has(id) && !viaEnemy.has(id));
     expect(orphans).toEqual([]);

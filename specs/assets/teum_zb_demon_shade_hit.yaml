@@ -1,0 +1,14 @@
+id: teum_zb_demon_shade_hit
+type: character-anim
+size: large
+character: teum_zb_demon_shade
+chroma: magenta
+summary: "「틈」 마왕의 그림자 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_demon_shade_ref]
+reference: assets/source/teum_zb_demon_shade_ref.png
+facing: left
+frame_notes:
+  1: "struck, the shade staggers, shadow smoke tearing"
+  2: "its red eyes flicker"
+  3: "recovers, cloak whipping"
+placeholder: { shape: humanoid, color: "#140808", accent: "#ff4a4a" }

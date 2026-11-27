@@ -677,7 +677,9 @@ export function splitMapBySurge(data: GameData, run: RunState, surges: number, k
       const mod = options.length ? rng.pick(options) : null;
       if (!mod) return null;
       used.add(mod.id);
-      return { moduleId: mod.id, type: mod.type, enemies: beast ? [...rng.pick(elites).content.enemies!] : undefined };
+      // 틈의 짐승: 모듈이 제 적을 정해 두었으면 그 적(「틈」의 구역 보스, 2026-11-27), 아니면 이 스테이지의 엘리트 무리
+      const own = mod.content.enemies?.length ? mod.content.enemies : null;
+      return { moduleId: mod.id, type: mod.type, enemies: beast ? [...(own ?? rng.pick(elites).content.enemies!)] : undefined };
     });
     if (mark.crack) made += 1;
   }

@@ -1,0 +1,18 @@
+id: teum_zb_blood_bishop_attack
+type: character-anim
+size: large
+character: teum_zb_blood_bishop
+chroma: magenta
+summary: "「틈」 피의 주교 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_blood_bishop_ref]
+reference: assets/source/teum_zb_blood_bishop_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises the blood censer high"
+  2: "steps forward to the left"
+  3: "the censer swings in a wide arc"
+  4: "strikes at full reach to the left, blood droplets spraying"
+  5: "the censer chain rattles"
+  6: "returns to the solemn stance"
+placeholder: { shape: humanoid, color: "#2a0a12", accent: "#c8203a" }

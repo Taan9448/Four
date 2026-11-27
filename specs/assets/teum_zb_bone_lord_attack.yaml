@@ -1,0 +1,18 @@
+id: teum_zb_bone_lord_attack
+type: character-anim
+size: large
+character: teum_zb_bone_lord
+chroma: magenta
+summary: "「틈」 해골 군주 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_bone_lord_ref]
+reference: assets/source/teum_zb_bone_lord_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "lifts the bone mace overhead, crown glinting"
+  2: "stomps forward to the left"
+  3: "the mace swings down"
+  4: "smashes at full reach to the left, bone shards bursting"
+  5: "bones rattle as it straightens"
+  6: "returns to standing"
+placeholder: { shape: humanoid, color: "#1e1c18", accent: "#e8dcb8" }
