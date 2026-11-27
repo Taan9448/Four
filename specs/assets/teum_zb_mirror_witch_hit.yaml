@@ -1,0 +1,14 @@
+id: teum_zb_mirror_witch_hit
+type: character-anim
+size: large
+character: teum_zb_mirror_witch
+chroma: magenta
+summary: "「틈」 거울 마녀 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_mirror_witch_ref]
+reference: assets/source/teum_zb_mirror_witch_ref.png
+facing: left
+frame_notes:
+  1: "struck, her mirror image cracks"
+  2: "glass fragments scatter"
+  3: "recovers, a new reflection forming"
+placeholder: { shape: humanoid, color: "#1a1428", accent: "#c8a0ff" }

@@ -1,0 +1,14 @@
+id: teum_zb_bone_lord_hit
+type: character-anim
+size: large
+character: teum_zb_bone_lord
+chroma: magenta
+summary: "「틈」 해골 군주 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_bone_lord_ref]
+reference: assets/source/teum_zb_bone_lord_ref.png
+facing: left
+frame_notes:
+  1: "struck, ribs crack and bone chips fly"
+  2: "the skull rocks back, crown wobbling"
+  3: "the bones lock back together"
+placeholder: { shape: humanoid, color: "#1e1c18", accent: "#e8dcb8" }

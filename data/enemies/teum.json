@@ -1,0 +1,1142 @@
+[
+  {
+    "id": "teum_rift_bomber",
+    "name": "틈벌레 자폭병",
+    "maxHp": 240,
+    "sprite": "teum_rift_bomber",
+    "hitFx": "fx_teum_hit_fire",
+    "tier": "normal",
+    "pattern": "cycle",
+    "ordered": true,
+    "weak": [
+      "ice"
+    ],
+    "resist": [
+      "fire"
+    ],
+    "color": "#ff7a2a",
+    "scale": 0.9,
+    "lore": "틈 너머 마성의 벌레. 등에 지고 다니는 불씨 주머니에 불이 붙으면 곧장 몸을 던진다. 심지가 타는 동안 쓰러뜨리는 것이 상책이다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "kindle",
+        "name": "심지에 불을 붙인다",
+        "intent": "buff",
+        "fx": "fx_teum_foe_warn",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 2,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "burst",
+        "name": "터진다",
+        "intent": "attack",
+        "fx": "fx_teum_foe_explode",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 60,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "burn",
+            "stacks": 2,
+            "target": "all_enemies"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_sniper",
+    "name": "틈 저격수",
+    "maxHp": 280,
+    "sprite": "teum_rift_sniper",
+    "hitFx": "fx_teum_hit_vuln",
+    "tier": "normal",
+    "pattern": "cycle",
+    "color": "#6a6a8a",
+    "lore": "틈의 그늘에 숨어 활을 당기는 그림자. 먼저 표적을 겨누고, 다음 차례에 꿰뚫는다. 겨눈 동안 막을 준비를 하라. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "aim",
+        "name": "겨눈다",
+        "intent": "debuff",
+        "targeting": "haun",
+        "fx": "fx_teum_foe_line",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "vulnerable",
+            "stacks": 2
+          }
+        ]
+      },
+      {
+        "id": "shot",
+        "name": "꿰뚫는 화살",
+        "intent": "attack",
+        "targeting": "haun",
+        "fx": "fx_teum_shot_arrow",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 110
+          }
+        ]
+      },
+      {
+        "id": "volley",
+        "name": "흩어 쏘기",
+        "intent": "attack",
+        "fx": "fx_teum_shot_arrow",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 35,
+            "times": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_shaman",
+    "name": "그림자 무녀",
+    "maxHp": 300,
+    "sprite": "teum_rift_shaman",
+    "hitFx": "fx_teum_hit_weaken",
+    "tier": "normal",
+    "pattern": "random",
+    "color": "#4a3a6a",
+    "lore": "그림자를 짜서 동료에게 두르는 무녀. 일행 전체를 약하게 만드는 주문을 먼저 건다. 오래 두면 무리가 단단해진다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "hex",
+        "name": "쇠약의 주문",
+        "intent": "debuff",
+        "fx": "fx_teum_w_weaken_curse",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "weak",
+            "stacks": 2,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "ward",
+        "name": "그림자 장막",
+        "intent": "defend",
+        "fx": "fx_teum_foe_shield",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 70,
+            "target": "all_allies"
+          }
+        ]
+      },
+      {
+        "id": "needle",
+        "name": "그림자 바늘",
+        "intent": "attack",
+        "fx": "fx_teum_shot_shadow",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_warden",
+    "name": "방패 그림자",
+    "maxHp": 380,
+    "sprite": "teum_rift_warden",
+    "hitFx": "fx_hit_strike",
+    "tier": "normal",
+    "pattern": "cycle",
+    "color": "#5a5a6a",
+    "lore": "커다란 그림자 방패를 든 파수꾼. 방패를 세운 차례에는 거의 다치지 않는다. 방패를 내린 틈을 노린다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "shield",
+        "name": "방패를 세운다",
+        "intent": "defend",
+        "fx": "fx_teum_foe_shield",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 130,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "bash",
+        "name": "방패 치기",
+        "intent": "attack",
+        "fx": "fx_teum_foe_slam",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 70
+          },
+          {
+            "op": "apply_status",
+            "status": "weak",
+            "stacks": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_brute",
+    "name": "틈 망치꾼",
+    "maxHp": 400,
+    "sprite": "teum_rift_brute",
+    "hitFx": "fx_teum_hit_vuln",
+    "tier": "normal",
+    "pattern": "cycle",
+    "ordered": true,
+    "color": "#6a3a2a",
+    "scale": 1.1,
+    "lore": "틈의 돌을 깎아 만든 망치를 휘두르는 덩치. 치켜든 다음 차례의 내려찍기는 한 사람을 무너뜨린다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "windup",
+        "name": "망치를 치켜든다",
+        "intent": "buff",
+        "fx": "fx_teum_foe_charge",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 3,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "smash",
+        "name": "내려찍기",
+        "intent": "attack",
+        "fx": "fx_teum_foe_slam",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 140
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_burrower",
+    "name": "땅굴 그림자",
+    "maxHp": 280,
+    "sprite": "teum_rift_burrower",
+    "hitFx": "fx_hit_strike",
+    "tier": "normal",
+    "pattern": "cycle",
+    "color": "#3a3a2a",
+    "lore": "땅을 파고 다니다가 가장 지친 사람 발밑에서 솟는다. 숨은 차례에는 칼이 잘 들지 않는다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "burrow",
+        "name": "땅속으로 숨는다",
+        "intent": "defend",
+        "fx": "fx_teum_foe_burrow",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 100,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "ambush",
+        "name": "솟아오르며 물기",
+        "intent": "attack",
+        "targeting": "lowest_hp",
+        "fx": "fx_teum_foe_burst",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 50,
+            "times": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_caster",
+    "name": "불씨 술사",
+    "maxHp": 260,
+    "sprite": "teum_rift_caster",
+    "hitFx": "fx_teum_hit_fire",
+    "tier": "normal",
+    "pattern": "random",
+    "weak": [
+      "ice"
+    ],
+    "resist": [
+      "fire"
+    ],
+    "color": "#c84a1a",
+    "lore": "손끝에 불씨를 굴리는 술사. 일행 모두에게 불씨를 뿌려 화상을 남긴다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "embers",
+        "name": "불씨 뿌리기",
+        "intent": "attack",
+        "fx": "fx_teum_shot_flame",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 40,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "burn",
+            "stacks": 2,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "fireball",
+        "name": "불덩이",
+        "intent": "attack",
+        "fx": "fx_teum_w_fireball",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 90
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_slime",
+    "name": "갈라지는 진흙",
+    "maxHp": 240,
+    "sprite": "teum_rift_slime",
+    "hitFx": "fx_teum_hit_poison",
+    "tier": "normal",
+    "pattern": "cycle",
+    "color": "#5a8a3a",
+    "lore": "썩은 늪의 진흙이 뭉쳐 움직인다. 체력이 절반 아래로 내려가면 작은 진흙 둘을 떼어 낸다. 독은 오래 남는다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "ooze",
+        "name": "독 진흙",
+        "intent": "debuff",
+        "fx": "fx_teum_foe_puddle",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "poison",
+            "stacks": 2
+          }
+        ]
+      },
+      {
+        "id": "engulf",
+        "name": "삼키기",
+        "intent": "attack",
+        "fx": "fx_teum_shot_bubble",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 50
+          },
+          {
+            "op": "apply_status",
+            "status": "poison",
+            "stacks": 1
+          }
+        ]
+      },
+      {
+        "id": "split",
+        "name": "갈라진다",
+        "intent": "special",
+        "condition": {
+          "hpRatioLte": 0.5
+        },
+        "oncePerBattle": true,
+        "phase": true,
+        "fx": "fx_teum_foe_summon",
+        "effects": [
+          {
+            "op": "summon",
+            "enemy": "teum_rift_slime_small",
+            "count": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_slime_small",
+    "name": "작은 진흙",
+    "maxHp": 60,
+    "sprite": "teum_rift_slime",
+    "hitFx": "fx_teum_hit_poison",
+    "tier": "normal",
+    "pattern": "cycle",
+    "color": "#5a8a3a",
+    "scale": 0.6,
+    "lore": "갈라지는 진흙에서 떨어져 나온 조각. 작지만 독은 그대로다.",
+    "moves": [
+      {
+        "id": "spit",
+        "name": "독 뱉기",
+        "intent": "attack",
+        "fx": "fx_teum_shot_bubble",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 20
+          },
+          {
+            "op": "apply_status",
+            "status": "poison",
+            "stacks": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_stormcaller",
+    "name": "뇌운 그림자",
+    "maxHp": 280,
+    "sprite": "teum_rift_stormcaller",
+    "hitFx": "fx_teum_hit_shock",
+    "tier": "normal",
+    "pattern": "random",
+    "weak": [
+      "ice"
+    ],
+    "resist": [
+      "lightning"
+    ],
+    "color": "#7a6ad8",
+    "lore": "떠다니는 먹구름 속 그림자. 번개를 여러 갈래로 떨어뜨리고 감전을 남긴다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "storm",
+        "name": "번개 구름",
+        "intent": "attack",
+        "fx": "fx_teum_w_rift_thunder",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 30,
+            "times": 3
+          },
+          {
+            "op": "apply_status",
+            "status": "shock",
+            "stacks": 1
+          }
+        ]
+      },
+      {
+        "id": "charge",
+        "name": "구름을 모은다",
+        "intent": "buff",
+        "fx": "fx_teum_foe_charge",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 2,
+            "target": "self"
+          },
+          {
+            "op": "block",
+            "amount": 50,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_frost",
+    "name": "서리 망령",
+    "maxHp": 300,
+    "sprite": "teum_rift_frost",
+    "hitFx": "fx_teum_hit_ice",
+    "tier": "normal",
+    "pattern": "random",
+    "weak": [
+      "fire"
+    ],
+    "resist": [
+      "ice"
+    ],
+    "color": "#8fd3ff",
+    "lore": "얼어붙은 감옥에서 새어 나온 망령. 숨결에 서리가 끼고, 얼음 조각에 맞으면 한 차례 얼어붙는다. 「틈」에서 넘어왔다.",
+    "moves": [
+      {
+        "id": "breath",
+        "name": "서리 숨",
+        "intent": "debuff",
+        "fx": "fx_teum_foe_cone",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 40,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "chill",
+            "stacks": 2,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "shard",
+        "name": "얼음 조각",
+        "intent": "attack",
+        "fx": "fx_teum_shot_shard",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 80
+          },
+          {
+            "op": "apply_status",
+            "status": "bind",
+            "stacks": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_rift_nest",
+    "name": "그림자 둥지",
+    "maxHp": 520,
+    "sprite": "teum_rift_nest",
+    "hitFx": "fx_hit_strike",
+    "tier": "elite",
+    "pattern": "cycle",
+    "ordered": true,
+    "silhouette": "object",
+    "color": "#2a2440",
+    "scale": 1.1,
+    "lore": "틈의 그림자가 고여 굳은 둥지. 움직이지 않지만 부수지 않으면 끝없이 깨어난다. 「틈」에서는 부수면 상자가 나왔다.",
+    "moves": [
+      {
+        "id": "hatch",
+        "name": "깨어난다",
+        "intent": "special",
+        "fx": "fx_teum_foe_summon",
+        "effects": [
+          {
+            "op": "summon",
+            "enemy": "teum_rift_burrower",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "id": "pulse",
+        "name": "맥동",
+        "intent": "defend",
+        "fx": "fx_teum_foe_ring",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 120,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "spawn",
+        "name": "틈벌레를 낳는다",
+        "intent": "special",
+        "fx": "fx_teum_foe_summon",
+        "effects": [
+          {
+            "op": "summon",
+            "enemy": "teum_rift_bomber",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_dream_queen",
+    "name": "몽마 여왕",
+    "maxHp": 820,
+    "sprite": "teum_zb_dream_queen",
+    "hitFx": "fx_teum_hit_weaken",
+    "tier": "elite",
+    "pattern": "cycle",
+    "color": "#e070c0",
+    "scale": 1.15,
+    "lore": "몽마의 침소를 다스리는 여왕. 자장가로 일행을 졸게 하고, 입맞춤으로 생기를 빨아 제 상처를 메운다. 체력이 절반 아래로 내려가면 꿈을 깨고 거세진다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "lullaby",
+        "name": "달콤한 자장가",
+        "intent": "debuff",
+        "fx": "fx_teum_w_relic_dream_kiss",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "drowsy",
+            "stacks": 1,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "weak",
+            "stacks": 1,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "kiss",
+        "name": "몽마의 입맞춤",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_dream_kiss",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 90
+          },
+          {
+            "op": "heal",
+            "amount": 60,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "nightmare",
+        "name": "악몽",
+        "intent": "attack",
+        "fx": "fx_teum_foe_ring",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 45,
+            "times": 2,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "awaken",
+        "name": "꿈이 깨어진다",
+        "intent": "buff",
+        "condition": {
+          "hpRatioLte": 0.5
+        },
+        "oncePerBattle": true,
+        "phase": true,
+        "fx": "fx_teum_evo_aura",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 3,
+            "target": "self"
+          },
+          {
+            "op": "heal",
+            "amount": 120,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_demon_shade",
+    "name": "마왕의 그림자",
+    "maxHp": 900,
+    "sprite": "teum_zb_demon_shade",
+    "hitFx": "fx_teum_hit_fear",
+    "tier": "elite",
+    "pattern": "cycle",
+    "color": "#ff4a4a",
+    "scale": 1.2,
+    "lore": "마왕의 옥좌에 남은 그림자. 기세를 올릴수록 일행이 취약해지고, 가장 단단한 사람부터 베어 넘긴다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "tyrant",
+        "name": "폭군의 기세",
+        "intent": "buff",
+        "fx": "fx_teum_w_relic_demon_brand",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 2,
+            "target": "self"
+          },
+          {
+            "op": "apply_status",
+            "status": "vulnerable",
+            "stacks": 1,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "cleave",
+        "name": "그림자 참격",
+        "intent": "attack",
+        "targeting": "highest_hp",
+        "fx": "fx_teum_w_shade_clone",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 150
+          }
+        ]
+      },
+      {
+        "id": "brand",
+        "name": "마왕의 낙인",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_demon_brand",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 60,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "weak",
+            "stacks": 1,
+            "target": "all_enemies"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_blood_bishop",
+    "name": "피의 주교",
+    "maxHp": 800,
+    "sprite": "teum_zb_blood_bishop",
+    "hitFx": "fx_teum_hit_bleed",
+    "tier": "elite",
+    "pattern": "random",
+    "color": "#c8203a",
+    "scale": 1.1,
+    "lore": "피의 성당을 지키는 주교. 가장 지친 사람의 피를 빨아 제 상처를 메운다. 빨리 끝내야 한다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "rite",
+        "name": "피의 의식",
+        "intent": "attack",
+        "targeting": "lowest_hp",
+        "fx": "fx_teum_w_relic_blood_grail",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 70
+          },
+          {
+            "op": "heal",
+            "amount": 70,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "rain",
+        "name": "핏빛 비",
+        "intent": "attack",
+        "fx": "fx_teum_w_bleed_fan",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 40,
+            "times": 3
+          }
+        ]
+      },
+      {
+        "id": "ward",
+        "name": "성배의 가호",
+        "intent": "defend",
+        "fx": "fx_teum_w_relic_blood_grail",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 140,
+            "target": "self"
+          },
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 1,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_bone_lord",
+    "name": "해골 군주",
+    "maxHp": 880,
+    "sprite": "teum_zb_bone_lord",
+    "hitFx": "fx_teum_hit_vuln",
+    "tier": "elite",
+    "pattern": "cycle",
+    "color": "#e8dcb8",
+    "scale": 1.2,
+    "lore": "뼈의 납골당을 다스리는 군주. 쓰러진 것들을 다시 일으켜 세우고, 뼈 망치로 한 사람을 무너뜨린다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "raise",
+        "name": "뼈를 일으킨다",
+        "intent": "special",
+        "fx": "fx_teum_foe_summon",
+        "effects": [
+          {
+            "op": "summon",
+            "enemy": "teum_rift_burrower",
+            "count": 1
+          },
+          {
+            "op": "block",
+            "amount": 80,
+            "target": "self"
+          }
+        ]
+      },
+      {
+        "id": "crush",
+        "name": "뼈 망치",
+        "intent": "attack",
+        "fx": "fx_teum_foe_slam",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 170
+          }
+        ]
+      },
+      {
+        "id": "storm",
+        "name": "뼈 폭풍",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_bone_crown",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 55,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "vulnerable",
+            "stacks": 1,
+            "target": "all_enemies"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_frost_warden",
+    "name": "서리 간수",
+    "maxHp": 840,
+    "sprite": "teum_zb_frost_warden",
+    "hitFx": "fx_teum_hit_ice",
+    "tier": "elite",
+    "pattern": "cycle",
+    "weak": [
+      "fire"
+    ],
+    "resist": [
+      "ice"
+    ],
+    "color": "#8fd3ff",
+    "scale": 1.15,
+    "lore": "서리 감옥의 간수. 하운을 얼음 족쇄로 묶고, 눈보라로 일행을 얼린다. 불에 약하다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "chains",
+        "name": "얼음 족쇄",
+        "intent": "debuff",
+        "targeting": "haun",
+        "fx": "fx_teum_w_root_frost",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 60
+          },
+          {
+            "op": "apply_status",
+            "status": "bind",
+            "stacks": 1
+          }
+        ]
+      },
+      {
+        "id": "blizzard",
+        "name": "눈보라",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_frozen_key",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 50,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "chill",
+            "stacks": 2,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "wall",
+        "name": "얼음 벽",
+        "intent": "defend",
+        "fx": "fx_teum_w_frost_ward",
+        "effects": [
+          {
+            "op": "block",
+            "amount": 160,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_forge_demon",
+    "name": "대장간 악마",
+    "maxHp": 880,
+    "sprite": "teum_zb_forge_demon",
+    "hitFx": "fx_teum_hit_fire",
+    "tier": "elite",
+    "pattern": "cycle",
+    "weak": [
+      "ice"
+    ],
+    "resist": [
+      "fire"
+    ],
+    "color": "#ff8a2a",
+    "scale": 1.2,
+    "lore": "지옥 대장간의 주인. 풀무질로 달군 망치가 떨어지면 화상이 오래 남는다. 냉기에 약하다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "hammer",
+        "name": "지옥불 망치",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_hellfire_hammer",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 160
+          },
+          {
+            "op": "apply_status",
+            "status": "burn",
+            "stacks": 2
+          }
+        ]
+      },
+      {
+        "id": "molten",
+        "name": "녹은 쇳물",
+        "intent": "attack",
+        "fx": "fx_teum_foe_puddle",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 45,
+            "target": "all_enemies"
+          },
+          {
+            "op": "apply_status",
+            "status": "burn",
+            "stacks": 3,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "stoke",
+        "name": "풀무질",
+        "intent": "buff",
+        "fx": "fx_teum_foe_charge",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "strength",
+            "stacks": 2,
+            "target": "self"
+          },
+          {
+            "op": "block",
+            "amount": 80,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_mirror_witch",
+    "name": "거울 마녀",
+    "maxHp": 780,
+    "sprite": "teum_zb_mirror_witch",
+    "hitFx": "fx_teum_hit_silence",
+    "tier": "elite",
+    "pattern": "random",
+    "color": "#c8a0ff",
+    "scale": 1.1,
+    "lore": "거울의 회랑에 사는 마녀. 거울 속 그림자를 불러내고, 되비추는 동안에는 때리는 손이 다친다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "mirror",
+        "name": "거울 속 그림자",
+        "intent": "special",
+        "fx": "fx_teum_w_relic_mirror_shard",
+        "effects": [
+          {
+            "op": "summon",
+            "enemy": "rift_phantom",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "id": "shatter",
+        "name": "거울 깨뜨리기",
+        "intent": "attack",
+        "fx": "fx_teum_w_relic_mirror_shard",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 35,
+            "times": 4
+          }
+        ]
+      },
+      {
+        "id": "reflect",
+        "name": "되비추기",
+        "intent": "defend",
+        "fx": "fx_teum_foe_shield",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "thorns",
+            "stacks": 3,
+            "target": "self"
+          },
+          {
+            "op": "block",
+            "amount": 90,
+            "target": "self"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teum_zb_plague_lord",
+    "name": "역병 군주",
+    "maxHp": 860,
+    "sprite": "teum_zb_plague_lord",
+    "hitFx": "fx_teum_hit_poison",
+    "tier": "elite",
+    "pattern": "cycle",
+    "color": "#8fd65a",
+    "scale": 1.2,
+    "lore": "역병의 늪을 다스리는 군주. 향로의 안개가 일행 모두에게 독을 쌓는다. 오래 끌수록 불리하다. 「틈」의 구역 보스였다.",
+    "moves": [
+      {
+        "id": "miasma",
+        "name": "역병 안개",
+        "intent": "debuff",
+        "fx": "fx_teum_w_relic_plague_censer",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "poison",
+            "stacks": 3,
+            "target": "all_enemies"
+          }
+        ]
+      },
+      {
+        "id": "touch",
+        "name": "썩은 손길",
+        "intent": "attack",
+        "fx": "fx_teum_w_corrosion",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 80
+          },
+          {
+            "op": "apply_status",
+            "status": "poison",
+            "stacks": 3
+          }
+        ]
+      },
+      {
+        "id": "rot",
+        "name": "썩게 한다",
+        "intent": "debuff",
+        "fx": "fx_teum_w_weaken_curse",
+        "effects": [
+          {
+            "op": "apply_status",
+            "status": "weak",
+            "stacks": 2
+          },
+          {
+            "op": "apply_status",
+            "status": "vulnerable",
+            "stacks": 1
+          }
+        ]
+      }
+    ]
+  }
+]

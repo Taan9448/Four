@@ -1,6 +1,7 @@
 [
   {
     "id": "elia_fireball",
+    "fx": "fx_teum_w_fireball",
     "name": "불덩이",
     "hitFx": "fx_hit_fire",
     "owner": "elia",

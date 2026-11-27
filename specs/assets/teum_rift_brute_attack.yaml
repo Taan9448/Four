@@ -1,0 +1,18 @@
+id: teum_rift_brute_attack
+type: character-anim
+size: large
+character: teum_rift_brute
+chroma: magenta
+summary: "「틈」 틈 망치꾼 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_rift_brute_ref]
+reference: assets/source/teum_rift_brute_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "hoists the rift-stone hammer onto its shoulder"
+  2: "raises it high, leaning back"
+  3: "steps forward to the left"
+  4: "smashes down at full reach to the left, rock chips bursting"
+  5: "the hammer drags on the ground"
+  6: "returns to standing"
+placeholder: { shape: humanoid, color: "#2a1814", accent: "#ff9a4a" }

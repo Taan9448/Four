@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_rift_stormcaller
+type: fx
+summary: '「결」 결정타 구름 가르기(斬雲) — 「틈」 뇌운 그림자 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a dark thunder cloud crackling with violet lightning'
+  2: 'impact: a golden slash cuts the cloud with a violet flash'
+  3: 'the cloud tearing apart'
+  4: 'sparks raining down'
+  5: 'faint mist'
+  6: 'fading glints'
+placeholder: { accent: '#cdb8ff' }

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_plague_lord
+type: fx
+summary: '「결」 결정타 향로 깨기(破爐) — 「틈」 역병 군주 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a smoking censer leaking green plague fumes'
+  2: 'impact: a golden slash splits the censer with a burst of green droplets'
+  3: 'censer halves falling'
+  4: 'green droplets scattering'
+  5: 'thin green mist'
+  6: 'fading spores'
+placeholder: { accent: '#8fd65a' }

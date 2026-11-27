@@ -143,6 +143,7 @@
   },
   {
     "id": "born_axe",
+    "fx": "fx_teum_w_axe_chop",
     "name": "도끼질",
     "owner": "born",
     "type": "attack",

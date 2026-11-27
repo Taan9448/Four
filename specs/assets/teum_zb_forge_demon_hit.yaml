@@ -1,0 +1,14 @@
+id: teum_zb_forge_demon_hit
+type: character-anim
+size: large
+character: teum_zb_forge_demon
+chroma: magenta
+summary: "「틈」 대장간 악마 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_forge_demon_ref]
+reference: assets/source/teum_zb_forge_demon_ref.png
+facing: left
+frame_notes:
+  1: "struck, molten cracks flare and sparks fly"
+  2: "the demon reels, hammer dipping"
+  3: "recovers, snorting smoke"
+placeholder: { shape: humanoid, color: "#2a140a", accent: "#ff8a2a" }

@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_rift_brute
+type: fx
+summary: '「결」 결정타 자루 끊기(斷柄) — 「틈」 틈 망치꾼 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a heavy stone hammer head with a cracked handle'
+  2: 'impact: a golden slash cuts the handle with a burst of stone chips'
+  3: 'the hammer head dropping'
+  4: 'dust bursting'
+  5: 'dust settling'
+  6: 'a few pebbles'
+placeholder: { accent: '#ff9a4a' }

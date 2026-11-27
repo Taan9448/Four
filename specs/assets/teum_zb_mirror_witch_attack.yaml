@@ -1,0 +1,18 @@
+id: teum_zb_mirror_witch_attack
+type: character-anim
+size: large
+character: teum_zb_mirror_witch
+chroma: magenta
+summary: "「틈」 거울 마녀 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_mirror_witch_ref]
+reference: assets/source/teum_zb_mirror_witch_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "raises a hand, mirror shards gathering"
+  2: "glides forward to the left"
+  3: "shards spin around her hand"
+  4: "flings the shards at full reach to the left, violet glass bursting"
+  5: "the shards fade"
+  6: "returns to the stance"
+placeholder: { shape: humanoid, color: "#1a1428", accent: "#c8a0ff" }

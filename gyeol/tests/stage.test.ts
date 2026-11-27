@@ -139,7 +139,8 @@ describe('원작 상대 20종 · 기술 다섯(2026-11-15)', () => {
   it('결투장 새 상대: 있는 장에서 열리고, 그림·결정타·기술 이펙트 명세가 있다', async () => {
     const story = (await import('../data/story.json')).default as unknown as { chapters: { id: string }[] };
     const chapters = new Set(story.chapters.map((c) => c.id));
-    const fresh = foes.filter((f) => f.arenaAfter);
+    // 원작 상대 20종(「틈」에서 건너온 상대 teum_*은 아래 따로)
+    const fresh = foes.filter((f) => f.arenaAfter && !f.id.startsWith('teum_'));
     expect(fresh.length).toBe(20);
     for (const f of fresh) {
       expect(chapters.has(f.arenaAfter!), f.id).toBe(true);
@@ -184,13 +185,35 @@ describe('원작 상대 20종 이야기 배치(2026-11-16)', () => {
   it('20종이 모두 그 장의 이야기 대결에 있고, 어려움 정의가 있다', async () => {
     const story = (await import('../data/story.json')).default as unknown as { chapters: { id: string; bouts?: { foe: string; intro?: unknown[] }[] }[] };
     type F = { id: string; arenaAfter?: string; hard?: unknown };
-    const fresh = (data as unknown as { foes: F[] }).foes.filter((f) => f.arenaAfter);
+    const fresh = (data as unknown as { foes: F[] }).foes.filter((f) => f.arenaAfter && !f.id.startsWith('teum_'));
     for (const f of fresh) {
       const ch = story.chapters.find((c) => c.id === f.arenaAfter)!;
       const bout = ch.bouts?.find((b) => b.foe === f.id);
       expect(bout, `${f.id} in ${ch.id}`).toBeTruthy();
       expect(bout!.intro?.length, f.id).toBeGreaterThan(0);
       expect(f.hard, f.id).toBeTruthy();
+    }
+  });
+});
+
+describe('「틈」에서 건너온 상대(2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)', () => {
+  it('구역 보스 8 · 틈 그림자 2 — 마지막 장(10장)을 마치면 결투장에 열리고, 그림·결정타·기술 이펙트 명세가 있다', async () => {
+    const story = (await import('../data/story.json')).default as unknown as { chapters: { id: string }[] };
+    const chapters = new Set(story.chapters.map((c) => c.id));
+    type T = { id: string; sprite: string; arenaAfter?: string; storyOnly?: boolean; moves: Record<string, { fx?: string; unblockable?: boolean }> };
+    const teum = (data as unknown as { foes: T[] }).foes.filter((f) => f.id.startsWith('teum_'));
+    expect(teum.length).toBe(10);
+    expect(teum.filter((f) => f.id.startsWith('teum_zb_')).length).toBe(8);
+    for (const f of teum) {
+      expect(f.sprite, f.id).toBe(f.id);
+      expect(chapters.has(f.arenaAfter!), f.id).toBe(true);
+      expect(f.storyOnly, f.id).toBeFalsy();
+      // 대기·쓰러짐은 「틈」 그림 그대로, 공격·피격·결정타는 「결」용으로 새로(Codex) — 오기 전엔 대기 그림을 당겼다 미는 연출
+      for (const a of ['idle', 'death', 'attack', 'hit']) expect(existsSync(`specs/assets/${f.sprite}_${a}.yaml`), `${f.sprite}_${a}`).toBe(true);
+      expect(existsSync(`specs/assets/fx_gyeol_finisher_${f.id}.yaml`), f.id).toBe(true);
+      // 구역 보스는 「틈」 비전 무공 이펙트를 쓰는 붉은 결(받을 수 없는 수)이 하나씩 있다
+      if (f.id.startsWith('teum_zb_')) expect(Object.values(f.moves).some((m) => m.unblockable && m.fx?.startsWith('fx_teum_w_')), `${f.id} 붉은 결`).toBe(true);
+      for (const m of Object.values(f.moves)) if (m.fx) expect(existsSync(`specs/assets/${m.fx}.yaml`), m.fx).toBe(true);
     }
   });
 });

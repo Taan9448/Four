@@ -25064,6 +25064,1274 @@
           }
         ]
       }
+    },
+    {
+      "id": "teum_zb_dream_queen",
+      "title": "몽마 여왕",
+      "sprite": "teum_zb_dream_queen",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "leaves",
+      "clashPower": 0.6,
+      "note": "「틈」 몽마의 침소를 다스리는 여왕. 자장가가 결을 흐리게 가린다 — 집중해야 결이 다 보인다. 입맞춤(붉은 결)은 받을 수 없으니 피한다.",
+      "hp": 130,
+      "posture": 90,
+      "postureRegen": 9,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "claw": {
+          "name": "손톱 할퀴기",
+          "windup": 420,
+          "recover": 260,
+          "damage": 9,
+          "posture": 9
+        },
+        "sway": {
+          "name": "흔들리는 춤",
+          "windup": 560,
+          "recover": 320,
+          "damage": 13,
+          "posture": 12,
+          "feint": 360
+        },
+        "kiss": {
+          "name": "몽마의 입맞춤",
+          "windup": 900,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_dream_kiss"
+        },
+        "wing": {
+          "name": "날개 치기",
+          "windup": 680,
+          "recover": 400,
+          "damage": 16,
+          "posture": 16
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "claw"
+            },
+            {
+              "move": "claw",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "sway"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "wing"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "claw"
+            },
+            {
+              "move": "kiss",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "꿈 깨우기",
+        "hanja": "破夢",
+        "style": "shatter",
+        "line": "꿈은 여기까지다."
+      },
+      "lines": {
+        "start": [
+          "(자장가가 들려온다 — 눈꺼풀이 무겁다)"
+        ],
+        "stagger": [
+          "(자장가가 끊긴다)"
+        ],
+        "lose": [
+          "(분홍빛 안개로 흩어진다)"
+        ],
+        "win": [
+          "…편히 잠들렴."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "veil": 0.6
+      },
+      "phases": [
+        {
+          "name": "깨어난 악몽",
+          "line": "꿈에서 깨면… 악몽이란다.",
+          "hp": 70,
+          "speed": 0.85,
+          "roar": 1400
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_demon_shade",
+      "title": "마왕의 그림자",
+      "sprite": "teum_zb_demon_shade",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "embers",
+      "clashPower": 0.6,
+      "note": "「틈」 마왕의 옥좌에 남은 그림자. 패턴을 이어 갈수록 손이 빨라진다 — 길게 끌지 말고 체간을 무너뜨리자. 낙인(붉은 결)은 피한다.",
+      "hp": 150,
+      "posture": 110,
+      "postureRegen": 10,
+      "idle": [
+        700,
+        1100
+      ],
+      "moves": {
+        "cleave": {
+          "name": "그림자 참격",
+          "windup": 520,
+          "recover": 320,
+          "damage": 14,
+          "posture": 14
+        },
+        "thrust": {
+          "name": "찌르기",
+          "windup": 380,
+          "recover": 240,
+          "damage": 10,
+          "posture": 10
+        },
+        "brand": {
+          "name": "마왕의 낙인",
+          "windup": 960,
+          "recover": 540,
+          "damage": 26,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_demon_brand"
+        },
+        "crush": {
+          "name": "옥좌의 무게",
+          "windup": 760,
+          "recover": 460,
+          "damage": 20,
+          "posture": 22,
+          "clash": true
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "cleave"
+            },
+            {
+              "move": "thrust",
+              "after": 100
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "crush"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "thrust"
+            },
+            {
+              "move": "thrust",
+              "after": 90
+            },
+            {
+              "move": "cleave",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "cleave"
+            },
+            {
+              "move": "brand",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "그림자 끊기",
+        "hanja": "斷影",
+        "style": "shadow",
+        "line": "그림자는 빛 앞에 선다."
+      },
+      "lines": {
+        "start": [
+          "무릎 꿇어라."
+        ],
+        "stagger": [
+          "(그림자가 일그러진다)"
+        ],
+        "lose": [
+          "(옥좌 위의 그림자가 꺼진다)"
+        ],
+        "win": [
+          "옥좌는 비지 않는다."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "accelerate": {
+          "step": 0.94,
+          "min": 0.75
+        }
+      },
+      "phases": [
+        {
+          "name": "폭군의 기세",
+          "line": "…마왕의 이름을 가볍게 보았구나.",
+          "hp": 80,
+          "speed": 0.85,
+          "roar": 1500
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_blood_bishop",
+      "title": "피의 주교",
+      "sprite": "teum_zb_blood_bishop",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "ash",
+      "clashPower": 0.6,
+      "note": "「틈」 피의 성당의 주교. 맞지 않고 숨을 고르면 상처가 메워진다 — 쉬지 말고 몰아붙이자. 핏빛 비(붉은 결)는 피한다.",
+      "hp": 130,
+      "posture": 85,
+      "postureRegen": 9,
+      "idle": [
+        800,
+        1200
+      ],
+      "moves": {
+        "censer": {
+          "name": "향로 휘두르기",
+          "windup": 540,
+          "recover": 320,
+          "damage": 12,
+          "posture": 12
+        },
+        "needle": {
+          "name": "피의 바늘",
+          "windup": 360,
+          "recover": 220,
+          "damage": 8,
+          "posture": 8
+        },
+        "rain": {
+          "name": "핏빛 비",
+          "windup": 880,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_bleed_fan"
+        },
+        "rite": {
+          "name": "성배의 의식",
+          "windup": 640,
+          "recover": 380,
+          "damage": 15,
+          "posture": 15,
+          "feint": 300
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "needle"
+            },
+            {
+              "move": "needle",
+              "after": 90
+            },
+            {
+              "move": "censer",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "rite"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "censer"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "needle"
+            },
+            {
+              "move": "rain",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "성배 가르기",
+        "hanja": "裂杯",
+        "style": "cross",
+        "line": "피는 피로 갚는다."
+      },
+      "lines": {
+        "start": [
+          "피를 바쳐라."
+        ],
+        "stagger": [
+          "(성배가 기운다)"
+        ],
+        "lose": [
+          "(핏물이 바닥으로 스민다)"
+        ],
+        "win": [
+          "성배가 찼다."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "regen": 3
+      },
+      "phases": [
+        {
+          "name": "성배의 축복",
+          "line": "성배여, 다시 채워라.",
+          "hp": 70,
+          "speed": 0.88,
+          "roar": 1300
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_bone_lord",
+      "title": "해골 군주",
+      "sprite": "teum_zb_bone_lord",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "ash",
+      "clashPower": 0.6,
+      "note": "「틈」 뼈의 납골당의 군주. 뼈 갑옷이 칼을 튕겨 처음 비틀거리기 전까지 베기가 덜 든다 — 받아 내 체간부터 무너뜨리자. 뼈 폭풍(붉은 결)은 피한다.",
+      "hp": 150,
+      "posture": 100,
+      "postureRegen": 11,
+      "idle": [
+        800,
+        1300
+      ],
+      "moves": {
+        "mace": {
+          "name": "뼈 망치",
+          "windup": 640,
+          "recover": 400,
+          "damage": 18,
+          "posture": 18,
+          "clash": true
+        },
+        "jab": {
+          "name": "갈비뼈 찌르기",
+          "windup": 420,
+          "recover": 260,
+          "damage": 10,
+          "posture": 10
+        },
+        "storm": {
+          "name": "뼈 폭풍",
+          "windup": 980,
+          "recover": 560,
+          "damage": 26,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_bone_crown"
+        },
+        "stomp": {
+          "name": "발 구르기",
+          "windup": 520,
+          "recover": 320,
+          "damage": 12,
+          "posture": 14
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "jab"
+            },
+            {
+              "move": "mace",
+              "after": 140
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "stomp"
+            },
+            {
+              "move": "stomp",
+              "after": 120
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "mace"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "jab"
+            },
+            {
+              "move": "storm",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "왕관 쪼개기",
+        "hanja": "碎冠",
+        "style": "shatter",
+        "line": "뼈에도 결이 있다."
+      },
+      "lines": {
+        "start": [
+          "(뼈가 덜그럭거리며 일어선다)"
+        ],
+        "stagger": [
+          "(갈비뼈가 흩어진다)"
+        ],
+        "lose": [
+          "(왕관이 굴러 떨어진다)"
+        ],
+        "win": [
+          "(뼈 위에 뼈가 쌓인다)"
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "armor": 0.5
+      },
+      "phases": [
+        {
+          "name": "다시 일어선 뼈",
+          "line": "(흩어진 뼈가 다시 모인다)",
+          "hp": 80,
+          "speed": 0.88,
+          "roar": 1500
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_frost_warden",
+      "title": "서리 간수",
+      "sprite": "teum_zb_frost_warden",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "snow",
+      "clashPower": 0.6,
+      "note": "「틈」 서리 감옥의 간수. 얼음 도끼는 느리지만 무겁다. 서리 족쇄(붉은 결)는 받을 수 없으니 피한다.",
+      "hp": 140,
+      "posture": 95,
+      "postureRegen": 9,
+      "idle": [
+        850,
+        1300
+      ],
+      "moves": {
+        "axe": {
+          "name": "얼음 도끼",
+          "windup": 700,
+          "recover": 420,
+          "damage": 18,
+          "posture": 18,
+          "element": "ice",
+          "clash": true
+        },
+        "chain": {
+          "name": "사슬 휘두르기",
+          "windup": 460,
+          "recover": 280,
+          "damage": 10,
+          "posture": 10,
+          "element": "ice"
+        },
+        "shackle": {
+          "name": "서리 족쇄",
+          "windup": 920,
+          "recover": 540,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_root_frost",
+          "element": "ice"
+        },
+        "key": {
+          "name": "열쇠 꾸러미",
+          "windup": 380,
+          "recover": 240,
+          "damage": 8,
+          "posture": 8
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "chain"
+            },
+            {
+              "move": "key",
+              "after": 100
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "axe"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "key"
+            },
+            {
+              "move": "key",
+              "after": 90
+            },
+            {
+              "move": "chain",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "chain"
+            },
+            {
+              "move": "shackle",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "족쇄 끊기",
+        "hanja": "斷鎖",
+        "style": "chain",
+        "line": "얼음도 결 따라 갈라진다."
+      },
+      "lines": {
+        "start": [
+          "(열쇠 꾸러미가 짤랑인다)"
+        ],
+        "stagger": [
+          "(얼음 갑옷에 금이 간다)"
+        ],
+        "lose": [
+          "(감옥 문이 녹아내린다)"
+        ],
+        "win": [
+          "다음 죄수다."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "phases": [
+        {
+          "name": "얼어붙은 감옥",
+          "line": "감옥은 닫히지 않는다.",
+          "hp": 75,
+          "speed": 0.86,
+          "roar": 1400
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_forge_demon",
+      "title": "대장간 악마",
+      "sprite": "teum_zb_forge_demon",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "embers",
+      "clashPower": 0.6,
+      "note": "「틈」 지옥 대장간의 주인. 달군 망치는 무겁고 갑옷이 두껍다. 녹은 쇳물(붉은 결)은 피한다.",
+      "hp": 160,
+      "posture": 110,
+      "postureRegen": 12,
+      "idle": [
+        800,
+        1250
+      ],
+      "moves": {
+        "hammer": {
+          "name": "지옥불 망치",
+          "windup": 760,
+          "recover": 460,
+          "damage": 22,
+          "posture": 22,
+          "element": "fire",
+          "clash": true
+        },
+        "tongs": {
+          "name": "집게",
+          "windup": 420,
+          "recover": 260,
+          "damage": 10,
+          "posture": 10,
+          "element": "fire"
+        },
+        "molten": {
+          "name": "녹은 쇳물",
+          "windup": 980,
+          "recover": 560,
+          "damage": 26,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_hellfire_hammer",
+          "element": "fire"
+        },
+        "bellows": {
+          "name": "풀무 바람",
+          "windup": 560,
+          "recover": 340,
+          "damage": 13,
+          "posture": 12,
+          "feint": 320,
+          "element": "fire"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "tongs"
+            },
+            {
+              "move": "tongs",
+              "after": 100
+            },
+            {
+              "move": "hammer",
+              "after": 160
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "bellows"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "hammer"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "tongs"
+            },
+            {
+              "move": "molten",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "모루 가르기",
+        "hanja": "裂砧",
+        "style": "quench",
+        "line": "달군 쇠는 식으면 갈라진다."
+      },
+      "lines": {
+        "start": [
+          "(풀무가 울린다)"
+        ],
+        "stagger": [
+          "(망치가 손에서 미끄러진다)"
+        ],
+        "lose": [
+          "(용광로의 불이 꺼진다)"
+        ],
+        "win": [
+          "좋은 쇠였다."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "armor": 0.6
+      },
+      "phases": [
+        {
+          "name": "달아오른 모루",
+          "line": "불을 더 지펴라!",
+          "hp": 85,
+          "speed": 0.86,
+          "roar": 1500
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_mirror_witch",
+      "title": "거울 마녀",
+      "sprite": "teum_zb_mirror_witch",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "rain",
+      "clashPower": 0.6,
+      "note": "「틈」 거울의 회랑의 마녀. 거울에 비친 손이 먼저 움직이는 척한다 — 속임수가 많다. 거울 조각(붉은 결)은 피한다.",
+      "hp": 120,
+      "posture": 85,
+      "postureRegen": 9,
+      "idle": [
+        700,
+        1100
+      ],
+      "moves": {
+        "shard": {
+          "name": "거울 조각",
+          "windup": 380,
+          "recover": 240,
+          "damage": 8,
+          "posture": 8
+        },
+        "image": {
+          "name": "거울 속 손",
+          "windup": 620,
+          "recover": 360,
+          "damage": 14,
+          "posture": 13,
+          "feint": 420
+        },
+        "shatter": {
+          "name": "거울 깨뜨리기",
+          "windup": 900,
+          "recover": 520,
+          "damage": 22,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_mirror_shard"
+        },
+        "reflect": {
+          "name": "되비추기",
+          "windup": 660,
+          "recover": 380,
+          "damage": 15,
+          "posture": 15,
+          "feint": 300
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "shard"
+            },
+            {
+              "move": "shard",
+              "after": 90
+            },
+            {
+              "move": "shard",
+              "after": 90
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "image"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "reflect"
+            },
+            {
+              "move": "shard",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "image"
+            },
+            {
+              "move": "shatter",
+              "after": 240
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "거울 가르기",
+        "hanja": "割鏡",
+        "style": "shatter",
+        "line": "비친 것은 결이 없다."
+      },
+      "lines": {
+        "start": [
+          "(거울마다 다른 얼굴이 웃는다)"
+        ],
+        "stagger": [
+          "(거울에 금이 간다)"
+        ],
+        "lose": [
+          "(조각난 거울 속으로 사라진다)"
+        ],
+        "win": [
+          "너도 거울 속에 남으렴."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "phases": [
+        {
+          "name": "깨진 거울",
+          "line": "깨진 거울은 더 많이 비춘다.",
+          "hp": 65,
+          "speed": 0.84,
+          "roar": 1300
+        }
+      ]
+    },
+    {
+      "id": "teum_zb_plague_lord",
+      "title": "역병 군주",
+      "sprite": "teum_zb_plague_lord",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "rain",
+      "clashPower": 0.6,
+      "note": "「틈」 역병의 늪의 군주. 향로 연기가 결을 가리고, 맞지 않으면 썩은 살이 메워진다. 역병 안개(붉은 결)는 피한다.",
+      "hp": 150,
+      "posture": 95,
+      "postureRegen": 10,
+      "idle": [
+        850,
+        1300
+      ],
+      "moves": {
+        "staff": {
+          "name": "지팡이 내려치기",
+          "windup": 600,
+          "recover": 360,
+          "damage": 15,
+          "posture": 15
+        },
+        "spit": {
+          "name": "독침 뱉기",
+          "windup": 400,
+          "recover": 240,
+          "damage": 9,
+          "posture": 9
+        },
+        "miasma": {
+          "name": "역병 안개",
+          "windup": 960,
+          "recover": 560,
+          "damage": 24,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_relic_plague_censer"
+        },
+        "lunge": {
+          "name": "썩은 손길",
+          "windup": 700,
+          "recover": 420,
+          "damage": 18,
+          "posture": 18,
+          "clash": true
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "spit"
+            },
+            {
+              "move": "spit",
+              "after": 100
+            },
+            {
+              "move": "staff",
+              "after": 130
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "lunge"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "staff"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "spit"
+            },
+            {
+              "move": "miasma",
+              "after": 260
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "향로 깨기",
+        "hanja": "破爐",
+        "style": "cross",
+        "line": "썩은 것도 결은 남는다."
+      },
+      "lines": {
+        "start": [
+          "(향로에서 초록 연기가 흐른다)"
+        ],
+        "stagger": [
+          "(향로가 기운다)"
+        ],
+        "lose": [
+          "(늪 바닥으로 가라앉는다)"
+        ],
+        "win": [
+          "늪이 너를 반긴다."
+        ]
+      },
+      "arenaAfter": "ch10",
+      "gimmicks": {
+        "veil": 0.75,
+        "regen": 2
+      },
+      "phases": [
+        {
+          "name": "썩지 않는 군주",
+          "line": "역병은 끝나지 않는다.",
+          "hp": 80,
+          "speed": 0.87,
+          "roar": 1400
+        }
+      ]
+    },
+    {
+      "id": "teum_rift_brute",
+      "title": "틈 망치꾼",
+      "sprite": "teum_rift_brute",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "ash",
+      "clashPower": 0.5,
+      "note": "「틈」의 그림자. 망치를 치켜들면 길게 끌었다가 내리찍는다 — 박자를 세고 받아 내자.",
+      "hp": 100,
+      "posture": 80,
+      "postureRegen": 9,
+      "idle": [
+        800,
+        1200
+      ],
+      "moves": {
+        "smash": {
+          "name": "내려찍기",
+          "windup": 820,
+          "recover": 460,
+          "damage": 18,
+          "posture": 20,
+          "clash": true
+        },
+        "swing": {
+          "name": "옆으로 휘두르기",
+          "windup": 520,
+          "recover": 320,
+          "damage": 11,
+          "posture": 11
+        },
+        "fakeout": {
+          "name": "치켜든 척",
+          "windup": 640,
+          "recover": 360,
+          "damage": 14,
+          "posture": 14,
+          "feint": 480
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "swing"
+            },
+            {
+              "move": "swing",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "smash"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "fakeout"
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "swing"
+            },
+            {
+              "move": "smash",
+              "after": 200
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "자루 끊기",
+        "hanja": "斷柄",
+        "style": "cross",
+        "line": "무거운 쪽으로 결이 쏠린다."
+      },
+      "lines": {
+        "start": [
+          "(망치를 어깨에 걸친다)"
+        ],
+        "stagger": [
+          "(망치에 끌려 휘청인다)"
+        ],
+        "lose": [
+          "(그림자로 흩어진다)"
+        ],
+        "win": [
+          "(망치를 땅에 꽂는다)"
+        ]
+      },
+      "arenaAfter": "ch10"
+    },
+    {
+      "id": "teum_rift_stormcaller",
+      "title": "뇌운 그림자",
+      "sprite": "teum_rift_stormcaller",
+      "bg": "bg_rift",
+      "scale": 1.0,
+      "weather": "rain",
+      "clashPower": 0.4,
+      "note": "「틈」의 그림자. 먹구름 속에서 번개가 잇달아 떨어진다 — 빠른 세 박자. 낙뢰(붉은 결)는 피한다.",
+      "hp": 90,
+      "posture": 70,
+      "postureRegen": 8,
+      "idle": [
+        700,
+        1100
+      ],
+      "moves": {
+        "spark": {
+          "name": "번개 가시",
+          "windup": 340,
+          "recover": 220,
+          "damage": 7,
+          "posture": 7,
+          "element": "lightning"
+        },
+        "bolt": {
+          "name": "뇌전",
+          "windup": 600,
+          "recover": 360,
+          "damage": 13,
+          "posture": 13,
+          "element": "lightning"
+        },
+        "strike": {
+          "name": "균열 낙뢰",
+          "windup": 880,
+          "recover": 500,
+          "damage": 20,
+          "posture": 0,
+          "unblockable": true,
+          "fx": "fx_teum_w_rift_thunder",
+          "element": "lightning"
+        }
+      },
+      "patterns": [
+        {
+          "weight": 3,
+          "steps": [
+            {
+              "move": "spark"
+            },
+            {
+              "move": "spark",
+              "after": 80
+            },
+            {
+              "move": "spark",
+              "after": 80
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "bolt"
+            }
+          ]
+        },
+        {
+          "weight": 2,
+          "steps": [
+            {
+              "move": "spark"
+            },
+            {
+              "move": "bolt",
+              "after": 110
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "steps": [
+            {
+              "move": "spark"
+            },
+            {
+              "move": "strike",
+              "after": 220
+            }
+          ]
+        }
+      ],
+      "finisher": {
+        "name": "구름 가르기",
+        "hanja": "斬雲",
+        "style": "cross",
+        "line": "번개도 결 따라 흐른다."
+      },
+      "lines": {
+        "start": [
+          "(먹구름이 우르릉댄다)"
+        ],
+        "stagger": [
+          "(구름이 흩어진다)"
+        ],
+        "lose": [
+          "(비가 그친다)"
+        ],
+        "win": [
+          "(천둥이 웃는다)"
+        ]
+      },
+      "arenaAfter": "ch10"
     }
   ],
   "techs": [

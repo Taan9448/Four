@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_bone_lord
+type: fx
+summary: '「결」 결정타 왕관 쪼개기(碎冠) — 「틈」 해골 군주 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a bone crown floating over a ribcage'
+  2: 'impact: a golden slash splits the crown with a burst of bone chips'
+  3: 'bone fragments scattering'
+  4: 'dust falling'
+  5: 'pale dust cloud'
+  6: 'a few bone chips'
+placeholder: { accent: '#e8dcb8' }

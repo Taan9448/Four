@@ -1,0 +1,14 @@
+id: teum_zb_dream_queen_hit
+type: character-anim
+size: large
+character: teum_zb_dream_queen
+chroma: magenta
+summary: "「틈」 몽마 여왕 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_zb_dream_queen_ref]
+reference: assets/source/teum_zb_dream_queen_ref.png
+facing: left
+frame_notes:
+  1: "struck, the queen recoils, petals scattering"
+  2: "her wings flinch, a pink glow flickering"
+  3: "recovers, smiling coldly"
+placeholder: { shape: humanoid, color: "#2a1430", accent: "#e070c0" }

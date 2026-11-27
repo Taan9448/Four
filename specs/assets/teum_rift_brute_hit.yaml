@@ -1,0 +1,14 @@
+id: teum_rift_brute_hit
+type: character-anim
+size: large
+character: teum_rift_brute
+chroma: magenta
+summary: "「틈」 틈 망치꾼 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_rift_brute_ref]
+reference: assets/source/teum_rift_brute_ref.png
+facing: left
+frame_notes:
+  1: "struck, the brute grunts and rocks back"
+  2: "stone chips fly from its arm"
+  3: "recovers, gripping the hammer"
+placeholder: { shape: humanoid, color: "#2a1814", accent: "#ff9a4a" }

@@ -1,0 +1,14 @@
+id: teum_rift_stormcaller_hit
+type: character-anim
+size: large
+character: teum_rift_stormcaller
+chroma: magenta
+summary: "「틈」 뇌운 그림자 피격 3프레임(「결」 결투장 상대)"
+depends_on: [teum_rift_stormcaller_ref]
+reference: assets/source/teum_rift_stormcaller_ref.png
+facing: left
+frame_notes:
+  1: "struck, the shadow flickers, the cloud scattering"
+  2: "violet sparks crackle off its body"
+  3: "recovers, the cloud regathering"
+placeholder: { shape: humanoid, color: "#1a1830", accent: "#cdb8ff" }

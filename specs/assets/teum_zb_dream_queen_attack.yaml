@@ -1,0 +1,18 @@
+id: teum_zb_dream_queen_attack
+type: character-anim
+size: large
+character: teum_zb_dream_queen
+chroma: magenta
+summary: "「틈」 몽마 여왕 공격 6프레임(「결」 결투장 상대, 2026-11-27 사용자 요청 「틈의 몬스터를 결·천외귀환에도」)"
+depends_on: [teum_zb_dream_queen_ref]
+reference: assets/source/teum_zb_dream_queen_ref.png
+facing: left
+events: { hit: 4 }
+frame_notes:
+  1: "draws back, wings folding, claws raised"
+  2: "glides forward to the left"
+  3: "claws flash in a pink arc"
+  4: "rakes at full reach to the left, pink petals and dream mist bursting"
+  5: "wings snap open, drifting back"
+  6: "returns to the hovering stance"
+placeholder: { shape: humanoid, color: "#2a1430", accent: "#e070c0" }

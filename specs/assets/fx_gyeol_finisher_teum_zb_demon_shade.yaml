@@ -1,0 +1,15 @@
+id: fx_gyeol_finisher_teum_zb_demon_shade
+type: fx
+summary: '「결」 결정타 그림자 끊기(斷影) — 「틈」 마왕의 그림자 전용 마무리(2026-11-27 결투장 새 상대). 화려하게, 칸을 크게 쓰되 칸 안쪽에서 끝나게'
+frames: 6
+fps: 18
+events: { impact: 2 }
+min_fill: 0.0005
+frame_notes:
+  1: 'a looming black shadow with burning red eyes'
+  2: 'impact: a golden slash cuts the shadow in two with a red flash'
+  3: 'shadow tatters scattering like black cloth'
+  4: 'red embers drifting'
+  5: 'dark smoke'
+  6: 'faint red glints'
+placeholder: { accent: '#ff4a4a' }
