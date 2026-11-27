@@ -92,7 +92,7 @@ export function confirmDialog(title: string, message: string, okLabel: string): 
     const el = h(
       'div',
       { class: 'overlay pop-overlay', onclick: (e: Event) => e.target === el && close() },
-      popPanel({ seal: '問', sealKind: 'solid', eyebrow: '확인', title, tone: 'lose', lead: message, actions: [h('button', { class: 'btn', onclick: () => close() }, '취소'), ok] }),
+      popPanel({ seal: '확', sealKind: 'solid', eyebrow: '확인', title, tone: 'lose', lead: message, actions: [h('button', { class: 'btn', onclick: () => close() }, '취소'), ok] }),
     );
     document.addEventListener('keydown', onKey, true);
     document.body.appendChild(el);
@@ -125,7 +125,7 @@ export function surgeGuide(lines: [string, string][], foot: string[]): Promise<v
       h('ol', {}, lines.map(([g, t]) => h('li', {}, h('span', { class: 'sg-glyph', 'aria-hidden': 'true' }, g), h('span', {}, t)))),
       foot.map((t) => h('p', { class: 'sg-foot' }, t)),
     );
-    const el = h('div', { class: 'overlay pop-overlay surge-pop' }, popPanel({ seal: '裂', sealKind: 'solid', eyebrow: '첫 폭주', title: '폭주 — 하늘이 터졌다', tone: 'lose', lead: list, actions: [ok] }));
+    const el = h('div', { class: 'overlay pop-overlay surge-pop' }, popPanel({ seal: '폭', sealKind: 'solid', eyebrow: '첫 폭주', title: '폭주 — 하늘이 터졌다', tone: 'lose', lead: list, actions: [ok] }));
     document.addEventListener('keydown', onKey, true);
     document.body.appendChild(el);
     requestAnimationFrame(() => ok.focus());

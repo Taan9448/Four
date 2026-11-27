@@ -133,7 +133,7 @@ export function guestNotice(): Promise<boolean> {
       'div',
       { class: 'overlay pop-overlay', onclick: (e: Event) => e.target === el && close() },
       popPanel({
-        seal: '客',
+        seal: '손',
         sealKind: 'muted',
         eyebrow: '게스트',
         title: '저장 안 됨',

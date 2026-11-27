@@ -34,7 +34,7 @@ export function glossaryTab(data: GameData): HTMLElement {
     { name: '치명타', def: '공격이 가끔 크게 들어간다(레벨로 오른다).', num: `기본 ${pct(b.crit.chance)} · ×${b.crit.multiplier}`, icon: 9 },
     { name: '심법', def: '한 번 쓰면 소멸하고, 지속 효과가 전투가 끝날 때까지 남는 카드.', num: '파워 카드', icon: 10 },
     { name: '편성 점수', def: '동료마다 덱에 넣는 카드의 등급 합. 상한을 넘을 수 없다.', num: `${pts} · 상한 ${b.loadout.cap.perCharacter}(공용 ${b.loadout.cap.common}) · 같은 갈래 ${b.loadout.focusMin}장이면 갈래 보너스`, icon: 11 },
-    { name: '裂 틈새', def: '폭주가 연 자리. 틈의 짐승(엘리트+접사) 또는 틈새의 거래(감소 카드·봉인 유물).', num: `지도마다 최대 ${r.map.maxCracks}곳 · 짐승일 확률 ${pct(r.map.beastChance)}`, icon: 12 },
+    { name: '틈새', def: '폭주가 연 자리. 틈의 짐승(엘리트+접사) 또는 틈새의 거래(감소 카드·봉인 유물).', num: `지도마다 최대 ${r.map.maxCracks}곳 · 짐승일 확률 ${pct(r.map.beastChance)}`, icon: 12 },
     { name: '순례 보상', def: '각 스테이지를 처음 다시 넘길 때 한 번 더 받는 카드 하나. 순례 길에서 얻은 것은 보스를 넘기면 모두 남는다.', num: '스테이지당 한 번', icon: 13 },
     { name: '심연 카드', def: '심연에서 얻은 카드는 도감에만 기록되고 보유 카드로 돌아가지 않는다. 틈의 카드는 심연에서만.', num: `숙적 ${b.abyss.nemesisEvery}굽이마다`, icon: 14 },
   ];

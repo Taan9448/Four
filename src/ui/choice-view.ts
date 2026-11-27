@@ -17,7 +17,7 @@ import { describeChoice } from '../engine/text';
 
 const TYPE_LABEL: Record<string, string> = { event: '이벤트', rest: '휴식', inn: '여관', shop: '상점', story: '이야기' };
 /** 판 머리의 붉은 낙관(지도 노드와 같은 한자) */
-const TYPE_SEAL: Record<string, string> = { event: '事', rest: '休', inn: '宿', shop: '市', story: '史' };
+const TYPE_SEAL: Record<string, string> = { event: '사', rest: '휴', inn: '여', shop: '상', story: '이' };
 
 /** 판 머리: 낙관 + 갈래 + 제목 */
 function panelHead(seal: string, kind: string, title: string): HTMLElement {
@@ -126,7 +126,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
   };
   const render = (result?: string[], resultText?: string, gains: RunGain[] = []) => {
     box.replaceChildren(
-      panelHead(TYPE_SEAL[module.type] ?? '事', TYPE_LABEL[module.type] ?? module.type, module.name),
+      panelHead(TYPE_SEAL[module.type] ?? '사', TYPE_LABEL[module.type] ?? module.type, module.name),
       h('p', { class: 'choice-text' }, module.content.text ?? ''),
       module.type === 'rest' || module.type === 'inn' ? partyStrip(data, run) : '',
       // 지금 상흔으로 걸린 효과(2026-10-12 A5): 휴식 회복 감소
@@ -175,7 +175,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
               ? h(
                   'button',
                   { class: 'btn choice choice-loadout', onclick: opts.onEditLoadout },
-                  h('span', { class: 'choice-mark' }, '編'),
+                  h('span', { class: 'choice-mark' }, '▸'),
                   h('span', {}, '편성 바꾸기 — 여관에서만, 이번 스테이지에 얻은 카드는 그대로'),
                 )
               : null,
@@ -185,10 +185,10 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
   // 카드 바꾸기·팔기: 보유 카드 한 장을 고른다(필수 카드는 빠진다)
   const pickOwned = (title: string, index: number, resultText?: string) => {
     // 심연: 보유 목록이 없다. 덱의 카드 한 장
-    if (run.abyss) return pickDeck('換', title, '덱의 카드 한 장을 고른다.', run.deck.filter((c) => data.cards.get(c.cardId)!.type !== 'status'), index, resultText);
+    if (run.abyss) return pickDeck('바', title, '덱의 카드 한 장을 고른다.', run.deck.filter((c) => data.cards.get(c.cardId)!.type !== 'status'), index, resultText);
     const ids = swappableCards(data, run).sort((a, b) => (data.cards.get(a)!.owner).localeCompare(data.cards.get(b)!.owner) || a.localeCompare(b));
     box.replaceChildren(
-      panelHead('換', module.name, title),
+      panelHead('바', module.name, title),
       h('p', { class: 'choice-text' }, '보유 카드 한 장을 고른다. 편성에 들어 있었으면 그 자리도 바뀐다.'),
       ids.length
         ? h(
@@ -206,7 +206,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
   };
   // 버리기(심연 휴식·틈의 거래): 덱에서 뺄 카드
   const pickRemove = (filter: Parameters<typeof removeCandidates>[2], index: number, resultText?: string) =>
-    pickDeck('棄', '덜어 낼 카드', '덱에서 영영 빠진다.', removeCandidates(data, run, filter), index, resultText);
+    pickDeck('덜', '덜어 낼 카드', '덱에서 영영 빠진다.', removeCandidates(data, run, filter), index, resultText);
   const pickDeck = (seal: string, title: string, text: string, list: ReturnType<typeof removeCandidates>, index: number, resultText?: string) => {
     box.replaceChildren(
       panelHead(seal, module.name, title),
@@ -236,7 +236,7 @@ export function choiceView(data: GameData, run: RunState, module: ModuleDef, onD
       return true;
     });
     box.replaceChildren(
-      panelHead('練', '수련', '강화할 카드'),
+      panelHead('수', '수련', '강화할 카드'),
       h('p', { class: 'choice-text' }, '+1~+3은 수치가 오르고, +4·+5에는 특수 스킬(★)이 붙는다. 강화 뒤 모습으로 보여 준다.'),
       list.length
         ? h(
@@ -313,7 +313,7 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
   const box = h('div', { class: 'choice-box panel reward-box' });
   const main = () =>
     box.replaceChildren(
-      panelHead('賞', '전투 승리', '전리품'),
+      panelHead('승', '전투 승리', '전리품'),
       ...(loot ? [lootLine(data, loot.run, loot.shown)] : []),
       h('p', { class: 'choice-text' }, '카드 한 장을 골라 덱에 더한다. 마음에 드는 카드가 없으면 넘어간다.'),
       // 보상 카드의 행선지(2026-10-12 A1): 캠페인은 보유 카드로 → 다음 편성에서 덱에. 심연은 덱에 바로
@@ -338,7 +338,7 @@ export function rewardView(data: GameData, options: string[], onPick: (cardId: s
     );
   const pickRemove = () =>
     box.replaceChildren(
-      panelHead('棄', '전투 승리', '덜어 낼 카드'),
+      panelHead('덜', '전투 승리', '덜어 낼 카드'),
       h('p', { class: 'choice-text' }, '보상 대신 덱에서 카드 한 장을 영영 뺀다.'),
       h(
         'div',
@@ -397,7 +397,7 @@ export function bossLootView(data: GameData, run: RunState, shown: LootShown, on
     h(
       'div',
       { class: 'choice-box panel reward-box' },
-      panelHead('寶', '보스 격파', '전리품'),
+      panelHead('보', '보스 격파', '전리품'),
       lootLine(data, run, shown),
       choices.length ? h('p', { class: 'choice-text' }, '유물 하나를 고른다.') : null,
       h(
@@ -439,7 +439,7 @@ export function pilgrimRewardView(data: GameData, hub: RunState, offers: Pilgrim
     h(
       'div',
       { class: 'choice-box panel reward-box pilgrim-reward' },
-      panelHead('巡', '순례', '순례의 보상'),
+      panelHead('순', '순례', '순례의 보상'),
       h('p', { class: 'choice-text' }, '이 길을 처음 다시 걸었다. 놓친 것 하나를 줍는다. 고른 카드는 보유 카드에 영구로 남는다.'),
       h(
         'div',
@@ -517,7 +517,7 @@ export function levelUpView(data: GameData, run: RunState, onDone: () => void): 
       return render();
     }
     box.replaceChildren(
-      panelHead('昇', '성장', '레벨이 올랐다'),
+      panelHead('성', '성장', '레벨이 올랐다'),
       list.length ? h('ul', { class: 'lv-list' }, list) : '',
       done.length ? h('ul', { class: 'gains' }, done.map((d) => h('li', {}, d))) : '',
       upgrade ?? h('div', { class: 'panel-actions' }, h('button', { class: 'btn btn-primary', onclick: () => ((run.levelLog = []), onDone()) }, '계속')),

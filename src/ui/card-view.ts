@@ -10,7 +10,7 @@ import { tipAttrs } from './tooltip';
 import { h } from './dom';
 
 const RARITY_LABEL: Record<string, string> = { common: '일반', uncommon: '고급', rare: '희귀', epic: '영웅', legendary: '전설' };
-const SEAL_BY_TYPE: Record<string, string> = { attack: '武', skill: '技', power: '心' };
+const SEAL_BY_TYPE: Record<string, string> = { attack: '공', skill: '기', power: '심' };
 const TYPE_LABEL: Record<string, string> = { attack: '공격', skill: '기술', power: '심법', status: '상태' };
 
 /** 대강화 틀 단계(+8·+9·+10, GAME_DESIGN 16절 ⑦): 카드에 forge-8 같은 이름을 붙인다 */
@@ -97,7 +97,7 @@ function cardViewInner(data: GameData, inst: CardInstance | string, opts: CardVi
     h('div', { class: 'card-owner' }, h('span', {}, owner?.name ?? (def.owner === 'status' ? '상태' : '공용')), def.rarity !== 'special' ? h('span', { class: 'card-rarity' }, RARITY_LABEL[def.rarity]) : null),
     h('div', { class: 'card-text', ...glossaryTip(data, inst) }, ...textBlocks(cardTextParts(data, inst))),
     def.flavor && opts.flavor ? h('div', { class: `card-flavor${opts.flavor === 'hover' ? ' flavor-hover' : ''}` }, def.flavor) : null,
-    world === 'murim' ? h('span', { class: 'seal', 'aria-hidden': 'true' }, def.seal ?? SEAL_BY_TYPE[def.type] ?? '武') : null,
+    world === 'murim' ? h('span', { class: 'seal', 'aria-hidden': 'true' }, def.seal ?? SEAL_BY_TYPE[def.type] ?? '공') : null,
     world === 'elheim' ? h('span', { class: 'circle', 'aria-hidden': 'true' }) : null,
   );
 }
@@ -148,7 +148,7 @@ function pixelCardView(
   const name = def.name + (card.level ? ` +${card.level}` : '');
   const nameSize = name.length > 9 ? ' cpx-name-s' : name.length > 7 ? ' cpx-name-m' : '';
   const rarityUrl = def.rarity !== 'special' ? gem(def.rarity) : null;
-  const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '武';
+  const seal = world === 'elheim' ? '✧' : def.seal ?? SEAL_BY_TYPE[def.type] ?? '공';
   const artUrl = cardArtUrl(def.id);
   const shine = def.rarity === 'epic' || def.rarity === 'legendary';
   const forgeFrame = card.forge >= 3 && !fullFrame ? frameUrl(`card_frame_forge_${card.level}`, 1, { realOnly }) : null;

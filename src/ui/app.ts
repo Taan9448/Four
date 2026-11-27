@@ -133,7 +133,7 @@ function slotSummary(run: RunState): string {
 }
 
 /** 스테이지 끝 화면 머리의 세계 이름 */
-const WORLD_LABEL: Record<string, string> = { murim: '武林 · 무림', elheim: '엘하임', nocturna: '마왕성', rift: '세계의 틈' };
+const WORLD_LABEL: Record<string, string> = { murim: '무림', elheim: '엘하임', nocturna: '마왕성', rift: '세계의 틈' };
 
 export class App {
   private run: RunState | null = null;
@@ -428,7 +428,6 @@ export class App {
     return h(
       'div',
       { class: 'title-training', ...tipAttrs(`수련 Lv.${t.level}`, tip) },
-      h('b', {}, '修'),
       h('span', {}, `수련 Lv.${t.level}`),
       t.need
         ? h('span', { class: 'training-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(t.need), 'aria-valuenow': String(t.into), 'aria-label': `다음 레벨까지 ${t.into}/${t.need}` }, h('i', { style: `width:${Math.round((t.into / t.need) * 100)}%` }))
@@ -438,14 +437,14 @@ export class App {
 
   /**
    * 시작 화면 왼쪽 아래 명패(2026-10-17 사용자 결정 B안): 인장 + 계정(아이디·저장 상태·로그아웃) + 수련 Lv.
-   * 오른쪽 아래 衣·錄·設 표식과 짝을 이루고, 가운데에는 제목과 메뉴만 둔다. 계정 저장을 끈 빌드는 수련 줄만
+   * 오른쪽 아래 옷장·도감·설정 표식과 짝을 이루고, 가운데에는 제목과 메뉴만 둔다. 계정 저장을 끈 빌드는 수련 줄만
    */
   private playerPlate(): HTMLElement {
     const t = trainingLevel(data, readTraining().xp);
     const gold = readProfile().clears >= 1 ? trainingGold(data, t.level) : 0;
     const extra = gold ? h('small', { class: 'plate-gold' }, `심연 시작 금화 +${gold}`) : null;
     if (!cloudEnabled())
-      return h('div', { class: 'title-plate local' }, h('span', { class: 'plate-seal', 'aria-hidden': 'true' }, '修'), h('div', { class: 'plate-body' }, this.trainingLine(), extra));
+      return h('div', { class: 'title-plate local' }, h('span', { class: 'plate-seal', 'aria-hidden': 'true' }, '수'), h('div', { class: 'plate-body' }, this.trainingLine(), extra));
     const { user, status } = cloudState();
     const SYNC: Record<string, string> = { syncing: '☁ 맞추는 중', offline: '오프라인', held: '동기화 멈춤', error: '올리지 못함' };
     let seal: string;
@@ -454,13 +453,13 @@ export class App {
     let sync: string;
     let action: HTMLElement | null;
     if (user) {
-      [seal, kind, name, sync] = ['名', 'signed-in', user.name, SYNC[status.state] ?? '☁ 저장됨'];
+      [seal, kind, name, sync] = [(user.name[0] ?? '나').toUpperCase(), 'signed-in', user.name, SYNC[status.state] ?? '☁ 저장됨'];
       action = h('button', { class: 'link-btn', type: 'button', onclick: () => void signOut().then(() => this.title()) }, '로그아웃');
     } else if (hasStoredSession()) {
       // 로그인해 둔 세션을 확인하는 중(서버에 닿지 않으면 이 기기에 저장하며 계속)
-      [seal, kind, name, sync, action] = ['名', 'pending', status.state === 'offline' ? '오프라인' : '로그인 확인 중…', status.state === 'offline' ? '이 기기에 저장, 연결되면 올린다' : '', null];
+      [seal, kind, name, sync, action] = ['…', 'pending', status.state === 'offline' ? '오프라인' : '로그인 확인 중…', status.state === 'offline' ? '이 기기에 저장, 연결되면 올린다' : '', null];
     } else {
-      [seal, kind, name, sync] = ['客', 'guest', '게스트', '이 기기에만 저장'];
+      [seal, kind, name, sync] = ['손님', 'guest', '게스트', '이 기기에만 저장'];
       action = h('button', { class: 'link-btn', type: 'button', onclick: () => (chooseGuest(false), this.title()) }, '로그인 · 회원가입');
     }
     return h(
@@ -527,7 +526,7 @@ export class App {
           'div',
           { class: 'title-center' },
           h('h1', {}, '천외귀환'),
-          h('div', { class: 'title-sub' }, '天外歸還 · 세계의 틈'),
+          h('div', { class: 'title-sub' }, '세계의 틈'),
           // 로그인 판(2026-10-15 사용자 결정 — 보통 게임처럼): 로그인하지 않았고 이번 접속에서 게스트도 고르지 않았으면 메뉴 대신
           gate ? h('div', { class: 'title-login' }, loginPanel({ onDone: () => this.title(), onGuest: () => this.title() })) : null,
           gate
@@ -564,14 +563,14 @@ export class App {
           { class: 'title-corner' },
           // 옷장(2026-10-12): 도감 왼쪽. 캠페인을 한 번 마쳤거나 연 옷이 있으면
           readProfile().clears > 0 || readWardrobe(data).unlocked.length
-            ? h('button', { class: 'medal title-medal', 'aria-label': '옷장', ...tipAttrs('옷장', '순례·심연에서 네 동료가 입는 옷'), onclick: () => this.wardrobe() }, h('b', {}, '衣'), h('span', {}, '옷장'))
+            ? h('button', { class: 'medal title-medal', 'aria-label': '옷장', ...tipAttrs('옷장', '순례·심연에서 네 동료가 입는 옷'), onclick: () => this.wardrobe() }, h('b', {}, '옷장'))
             : null,
-          h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '錄'), h('span', {}, '도감')),
-          h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '設'), h('span', {}, '설정')),
+          h('button', { class: 'medal title-medal', 'aria-label': '도감', ...tipAttrs('도감', '본 카드 · 적 · 장면 · 기록'), onclick: () => this.codex() }, h('b', {}, '도감')),
+          h('button', { class: 'medal title-medal', 'aria-label': '설정', ...tipAttrs('설정', '소리 · 속도 · 연출'), onclick: () => this.openSettings() }, h('b', {}, '설정')),
           // 「결」 바로가기(2026-11-14 사용자 요청): 같은 배포의 gyeol/ — 계정·수련 Lv.은 함께 쓴다
-          h('button', { class: 'medal title-medal to-gyeol', 'aria-label': '「결」로', ...tipAttrs('결', '진하운의 결 읽기 대결 — 같은 계정으로'), onclick: () => (location.href = new URL('gyeol/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '決'), h('span', {}, '결')),
+          h('button', { class: 'medal title-medal to-gyeol', 'aria-label': '「결」로', ...tipAttrs('결', '진하운의 결 읽기 대결 — 같은 계정으로'), onclick: () => (location.href = new URL('gyeol/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '결')),
           // 「틈」 바로가기(2026-11-27 사용자 요청): 같은 배포의 teum/ — 계정·수련 Lv.은 함께 쓴다
-          h('button', { class: 'medal title-medal to-teum', 'aria-label': '「틈」으로', ...tipAttrs('틈', '천외귀환 외전 30분 생존 액션 — 같은 계정으로'), onclick: () => (location.href = new URL('teum/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '隙'), h('span', {}, '틈')),
+          h('button', { class: 'medal title-medal to-teum', 'aria-label': '「틈」으로', ...tipAttrs('틈', '천외귀환 외전 30분 생존 액션 — 같은 계정으로'), onclick: () => (location.href = new URL('teum/', location.href.split(/[?#]/)[0]).href) }, h('b', {}, '틈')),
         ),
         h('p', { class: 'title-foot' }, '장작을 패던 소년이 결을 따라, 두 세계를 가른다.'),
         h('small', { class: 'title-build', 'aria-hidden': 'true' }, `빌드 ${BUILD_SHORT}`),
@@ -799,12 +798,12 @@ export class App {
     if (run.usedModules.includes('s1_story_first_snow') && !tourSeen('notice-rift'))
       return runTour([{ title: '균열', text: `융합 카드(내공과 마나를 함께 쓰는 카드)를 쓰면 하늘에 금이 간다. 전투의 균열이 ${data.balance.rift.max}이 되면 터진다 — 폭주.` }], { id: 'notice-rift' });
     if (run.flags.includes('rift_known') && !tourSeen('notice-scar'))
-      return runTour([{ title: '상흔', text: `전투가 끝날 때 남은 균열과 폭주가 상흔으로 남는다. 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(${startRiftMaxText(data)}). 휴식의 꿰매기, 폭주 없이 넘긴 보스, 裂 틈새로 덜어 낸다.` }], { id: 'notice-scar' });
+      return runTour([{ title: '상흔', text: `전투가 끝날 때 남은 균열과 폭주가 상흔으로 남는다. 전투 시작 균열 = 상흔 ÷ ${sc.startRiftPer}(${startRiftMaxText(data)}). 휴식의 꿰매기, 폭주 없이 넘긴 보스, 틈새로 덜어 낸다.` }], { id: 'notice-scar' });
     if (run.map.cuts?.length && !tourSeen('notice-surge-map'))
       return runTour(
         [
           { target: '.map-lines', title: '길이 끊겼다', text: '폭주가 지도를 갈랐다. 검은 금이 그어진 길로는 더 갈 수 없다.' },
-          { target: '.node-crack', title: '裂 틈새', text: '폭주가 연 자리. 들어가면 상흔을 덜 수 있다 — 틈의 짐승을 이기거나, 틈새의 거래에서.' },
+          { target: '.node-crack', title: '틈새', text: '폭주가 연 자리. 들어가면 상흔을 덜 수 있다 — 틈의 짐승을 이기거나, 틈새의 거래에서.' },
         ],
         { id: 'notice-surge-map' },
       );
@@ -1324,7 +1323,7 @@ export class App {
         h('p', { class: 'hint' }, `심연 풀: 하운 ${counts.haun ?? 0}장 · 공용 ${counts.common ?? 0}장${fighters.map((c) => ` · ${c.name} ${counts[c.id] ?? 0}장`).join('')}. 캠페인에서 보거나 얻은 카드만 보상에 나온다 — 더 보고 오면 넓어진다.`),
         h('h3', {}, `길 — ${picks.picks}개 고르기${picks.gold ? ` (덤: 골드 +${picks.gold})` : ''}`),
         h('p', { class: 'hint' }, '동료가 적을수록 길을 더 고른다(1명: 2개와 골드 100 · 2명: 1개와 골드 50 · 3명: 1개).'),
-        ...(trainingGold(data, trainLv) ? [h('p', { class: 'hint abyss-training' }, `修 수련 Lv.${trainLv} — 시작 금화 +${trainingGold(data, trainLv)}(오늘의 심연에도)`)] : []),
+        ...(trainingGold(data, trainLv) ? [h('p', { class: 'hint abyss-training' }, `수련 Lv.${trainLv} — 시작 금화 +${trainingGold(data, trainLv)}(오늘의 심연에도)`)] : []),
         h(
           'div',
           { class: 'abyss-paths' },
@@ -1643,7 +1642,7 @@ export class App {
             'div',
             { class: 'end-box' },
             h('h1', {}, finale ? '천외귀환' : win ? `${last.name}까지` : '여기까지'),
-            finale ? h('p', { class: 'end-sub' }, '天外歸還 — 세계의 틈 · 완') : null,
+            finale ? h('p', { class: 'end-sub' }, '천외귀환 — 세계의 틈 · 완') : null,
             h(
               'p',
               { class: 'outro' },

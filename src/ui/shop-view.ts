@@ -72,7 +72,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
     const head = h(
       'header',
       { class: 'shop-head panel' },
-      h('span', { class: 'seal' }, '市'),
+      h('span', { class: 'seal' }, '상'),
       h(
         'div',
         { class: 'shop-title' },
@@ -150,7 +150,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
             ? h(
                 'div',
                 { class: `shop-line${shop.swapUsed ? ' sold' : ''}` },
-                h('span', { class: 'service-glyph' }, '棄'),
+                h('span', { class: 'service-glyph' }, '지'),
                 h('div', { class: 'shop-desc' }, h('b', {}, '카드 지우기'), h('small', {}, '덱에서 카드 한 장을 영영 뺀다. 쓸 때마다 값이 오른다.')),
                 price(removePrice(data, run), shop.swapUsed),
                 shop.swapUsed
@@ -168,7 +168,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
             : h(
             'div',
             { class: `shop-line${shop.swapUsed ? ' sold' : ''}` },
-            h('span', { class: 'service-glyph' }, '換'),
+            h('span', { class: 'service-glyph' }, '바'),
             h('div', { class: 'shop-desc' }, h('b', {}, '카드 바꾸기'), h('small', {}, '보유 카드 한 장을 같은 주인의 다른 카드(아직 없는 것 우선)로 바꾼다. 편성에 있었으면 그 자리에 들어간다. 쓸 때마다 값이 오른다.')),
             price(swapCost, shop.swapUsed),
             shop.swapUsed
@@ -193,7 +193,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
             ? h(
                 'div',
                 { class: `shop-line${shop.stitchUsed ? ' sold' : ''}` },
-                h('span', { class: 'service-glyph' }, '縫'),
+                h('span', { class: 'service-glyph' }, '꿰'),
                 h('div', { class: 'shop-desc' }, h('b', {}, '꿰매기'), h('small', {}, `하늘의 금을 꿰맨다. 상흔 -${data.balance.rift.scar.shopStitch}(지금 ${run.scar}).`)),
                 price(data.balance.rift.scar.shopStitchGold, !!shop.stitchUsed),
                 shop.stitchUsed ? null : h('button', { class: 'btn btn-small', disabled: run.gold < data.balance.rift.scar.shopStitchGold, onclick: () => result(buyStitch(data, run)) }, '꿰매기'),
@@ -202,7 +202,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           h(
             'div',
             { class: `shop-line${shop.upgradeUsed ? ' sold' : ''}` },
-            h('span', { class: 'service-glyph' }, '鍛'),
+            h('span', { class: 'service-glyph' }, '강'),
             h('div', { class: 'shop-desc' }, h('b', {}, '카드 강화'), h('small', {}, run.abyss ? '덱의 카드 한 장을 강화한다(+1, 이번 심연에서만).' : '이번 덱의 카드 한 장을 강화한다(+1, 보유 카드에 남는다).')),
             price(upCost, shop.upgradeUsed),
             shop.upgradeUsed
@@ -221,7 +221,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           h(
             'div',
             { class: 'shop-line' },
-            h('span', { class: 'service-glyph' }, '鎚'),
+            h('span', { class: 'service-glyph' }, '각'),
             h(
               'div',
               { class: 'shop-desc' },
@@ -239,7 +239,7 @@ export function shopView(data: GameData, run: RunState, module: ModuleDef, nodeI
           h(
             'div',
             { class: 'shop-line' },
-            h('span', { class: 'service-glyph' }, '刻'),
+            h('span', { class: 'service-glyph' }, '새'),
             h(
               'div',
               { class: 'shop-desc' },

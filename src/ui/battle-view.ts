@@ -195,7 +195,7 @@ export class BattleView {
           {
             target: '.unit-enemy .intent',
             title: '속성 공격',
-            text: `炎 화염 → 화상(차례 시작마다 피해).\n冷 냉기 → ${bal.elements.ice.threshold?.at}이면 빙결(보스 ${bal.elements.ice.threshold?.bossAt}), 한 차례 쉰다.\n雷 번개 → 감전(차례마다 1 가라앉음), ${bal.elements.lightning.threshold?.at}이면 마비(보스 ${bal.elements.lightning.threshold?.bossAt}).\n냉기가 붙은 적에게 번개는 ${bal.elements.lightning.conduct?.multiplier ?? 1}배.`,
+            text: `화염 → 화상(차례 시작마다 피해).\n냉기 → ${bal.elements.ice.threshold?.at}이면 빙결(보스 ${bal.elements.ice.threshold?.bossAt}), 한 차례 쉰다.\n번개 → 감전(차례마다 1 가라앉음), ${bal.elements.lightning.threshold?.at}이면 마비(보스 ${bal.elements.lightning.threshold?.bossAt}).\n냉기가 붙은 적에게 번개는 ${bal.elements.lightning.conduct?.multiplier ?? 1}배.`,
           },
           { target: '.hand', title: '상극과 치명타', text: '화염은 냉기를 녹이고, 냉기는 화상을 끈다. 번개는 아무것도 지우지 않지만, 얼어붙은 적에겐 감전이, 마비된 적에겐 냉기가 쌓이지 않는다.\n아군의 공격은 가끔 치명타(1.5배)가 터진다. 확률은 피해 미리보기에 적힌다.' },
         ],
@@ -215,7 +215,7 @@ export class BattleView {
         { target: '.b-rift', title: '균열', text: '내공과 마나를 함께 쓰는 융합 카드를 쓰면 쌓인다. 너무 쌓이면 틈의 잔향이 덱에 섞이고, 가득 차면 폭주한다.' },
         { target: '.btn-endturn', title: '턴 종료', text: '쓸 카드를 다 썼으면 턴을 끝낸다(단축키 E). 그다음 적이 움직인다.' },
         // 다섯 표식(2026-10-11 UI/UX 4-3)
-        { target: '.medal-row', title: '다섯 표식', text: '抽 뽑을 더미 · 棄 버린 더미 · 滅 소멸한 카드 · 冊 이번 전투의 덱 전체 · 設 메뉴와 설정. 記는 전투 기록을 보이고 숨긴다. 설정의 "표식에 글자 함께"를 켜면 아래에 이름이 붙는다.' },
+        { target: '.medal-row', title: '다섯 표식', text: '뽑기 — 뽑을 더미 · 버림 — 버린 더미 · 소멸 — 소멸한 카드 · 덱 — 이번 전투의 덱 전체 · 설정 — 메뉴와 설정. 기록은 전투 기록을 보이고 숨긴다.' },
       ],
       { id: 'battle-basics', once: true, onDone: elements },
     );
@@ -246,7 +246,7 @@ export class BattleView {
         style: seal[0] ? `--seal:url("${seal[0]}");--seal-hot:url("${seal[1] ?? seal[0]}");--seal-off:url("${seal[2] ?? seal[0]}")` : '',
         onclick: () => this.onEndTurn(),
       },
-      h('b', {}, '終'),
+      h('b', {}, '끝'),
       h('span', {}, '턴 종료'),
     ) as HTMLButtonElement;
     this.aimEl = h('div', { class: 'aim-ribbon' });
@@ -280,10 +280,10 @@ export class BattleView {
             'div',
             { class: 'medal-row' },
             this.pilesEl,
-            (this.deckMedal = medal('冊', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
+            (this.deckMedal = medal('덱', '덱', '이번 전투의 카드 전부(손패·뽑을·버림·소멸)', () => this.showPiles(), 0)),
             // 전투 기록: 기본은 숨김, 누르면 반투명 판 위에(2026-10-11 UI/UX 2-2)
-            (this.logMedal = medal('記', '전투 기록', '최근 일어난 일 다섯 줄을 보이고 숨긴다', () => this.toggleLog())),
-            medal('設', '설정', '설정 · 전투 나가기', () => this.showMenu()),
+            (this.logMedal = medal('기록', '전투 기록', '최근 일어난 일 다섯 줄을 보이고 숨긴다', () => this.toggleLog())),
+            medal('설정', '설정', '설정 · 전투 나가기', () => this.showMenu()),
             // 단축키 표(키보드가 없는 기기에서는 CSS로 숨긴다 — pointer: coarse)
             h('button', { class: 'medal medal-help', 'aria-label': '단축키', onclick: () => openShortcuts(), ...tipAttrs('단축키', '1~0 카드 · E 턴 종료 · Esc 취소 · Tab/←→ 대상 · Enter/Space 확정 · D 덱 보기') }, h('b', {}, '?')),
           ),
@@ -472,7 +472,7 @@ export class BattleView {
         // 격노까지 남은 턴
         if (edef.enrage) {
           const left = edef.enrage.afterTurn - s.turn;
-          const chip = gaugeChip('enrage', left > 0 ? `${left}` : '怒', left > 0 ? `격노까지 ${left}턴` : '격노', left > 0 ? `${left}턴 뒤 격노` : '격노', edef.enrage.text);
+          const chip = gaugeChip('enrage', left > 0 ? `${left}` : '격', left > 0 ? `격노까지 ${left}턴` : '격노', left > 0 ? `${left}턴 뒤 격노` : '격노', edef.enrage.text);
           if (left <= 0) chip.classList.add('on');
           u.statuses.appendChild(chip);
         }
@@ -507,9 +507,9 @@ export class BattleView {
     this.riftEl.classList.toggle('near', near);
     if (near) this.riftEl.append(h('span', { class: 'surge-warn' }, `다음 +${bal.rift.max - s.rift}이면 폭주`));
     this.pilesEl.replaceChildren(
-      medal('抽', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
-      medal('棄', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
-      medal('滅', '소멸', '이번 전투에서 사라진 카드', () => this.showPiles(), s.exhaust.length),
+      medal('뽑기', '뽑을 더미', '다음에 뽑을 카드(순서는 감춤). 누르면 더미 보기', () => this.showPiles(), s.draw.length),
+      medal('버림', '버린 더미', '쓰거나 버린 카드. 뽑을 더미가 비면 섞여 돌아간다', () => this.showPiles(), s.discard.length),
+      medal('소멸', '소멸', '이번 전투에서 사라진 카드', () => this.showPiles(), s.exhaust.length),
     );
     this.deckMedal.querySelector('i')!.textContent = String(s.hand.length + s.draw.length + s.discard.length + s.exhaust.length);
 
@@ -1563,7 +1563,7 @@ export class BattleView {
         case 'power': {
           // 파워(발동 상태)가 일어났다: 그 상태 이름을 띄운다
           const u = this.units.get(ev.uid);
-          if (u) floatOver(this.fxLayer, u.el, `${this.data.statuses.get(ev.status)?.glyph ?? ''} ${this.data.statuses.get(ev.status)?.name ?? ev.status}`, 'status');
+          if (u) floatOver(this.fxLayer, u.el, `${this.data.statuses.get(ev.status)?.name ?? ev.status}`, 'status');
           sfx('power', { volume: 0.5 });
           await this.wait(160);
           break;
@@ -1870,10 +1870,10 @@ export class BattleView {
       { class: `result-overlay ${win ? 'win' : 'lose'}` },
       popPanel(
         s.survived
-          ? { seal: '守', eyebrow: '전투 결과', title: '버텼다', tone: 'win', lead: `${s.turn}턴, 끝까지 자리를 지켰다.`, stats, actions: [go] }
+          ? { seal: '버', eyebrow: '전투 결과', title: '버텼다', tone: 'win', lead: `${s.turn}턴, 끝까지 자리를 지켰다.`, stats, actions: [go] }
           : win
-            ? { seal: '勝', sealKind: 'solid', eyebrow: '전투 승리', title: '이겼다', tone: 'win', lead: '결을 따라, 날을 얹었다.', stats, actions: [go] }
-            : { seal: '敗', sealKind: 'muted', eyebrow: '전투 패배', title: '쓰러졌다', tone: 'lose', lead: cause, stats, actions: [go] },
+            ? { seal: '승', sealKind: 'solid', eyebrow: '전투 승리', title: '이겼다', tone: 'win', lead: '결을 따라, 날을 얹었다.', stats, actions: [go] }
+            : { seal: '패', sealKind: 'muted', eyebrow: '전투 패배', title: '쓰러졌다', tone: 'lose', lead: cause, stats, actions: [go] },
       ),
     );
     this.root.appendChild(overlay);
@@ -1902,9 +1902,7 @@ export class BattleView {
 }
 
 
-/** 오른쪽 위 둥근 표식: 한자 한 글자 + 숫자 배지(count가 없으면 배지 없음). 이름·설명은 주석(툴팁)으로 */
-/** 표식 아래 작은 글자(설정 '표식에 글자 함께') */
-const MEDAL_SHORT: Record<string, string> = { 抽: '뽑을', 棄: '버림', 滅: '소멸', 冊: '덱', 記: '기록', 設: '설정' };
+/** 오른쪽 위 둥근 표식: 한글 이름(2026-11-27 사용자 요청 — 한자 대신 한글) + 숫자 배지(count가 없으면 배지 없음). 설명은 주석(툴팁)으로 */
 
 function medal(glyph: string, label: string, body: string, onclick: () => void, count?: number): HTMLElement {
   return h(
@@ -1912,7 +1910,6 @@ function medal(glyph: string, label: string, body: string, onclick: () => void, 
     { class: 'medal', 'aria-label': count === undefined ? label : `${label} ${count}`, onclick, ...tipAttrs(count === undefined ? label : `${label} ${count}`, body) },
     h('b', {}, glyph),
     count === undefined ? null : h('i', {}, count),
-    MEDAL_SHORT[glyph] ? h('small', { class: 'medal-label', 'aria-hidden': 'true' }, MEDAL_SHORT[glyph]) : null,
   );
 }
 
@@ -1929,11 +1926,11 @@ export function openSurgeGuide(data: GameData): Promise<void> {
   const b = data.balance.rift;
   return surgeGuide(
     [
-      ['血', `일행 모두 최대 체력의 ${Math.round(b.surgeRatio * 100)}%를 잃는다(하운은 ${b.surgeHaunExtra} 더). 같은 전투에서 또 터지면 ×2, ×3.`],
-      ['力', `적 모두 힘 +${b.surgeEnemyStrength}. 흐름을 먹는 적은 체력 ${b.surgeEnemyHeal}을 채운다.`],
-      ['響', `틈의 잔향 ${b.surgeEchoToHand}장이 손에 들어온다. 든 채 턴을 끝내면 균열 +1 — 내공 1로 털어 낼 수 있다.`],
-      ['裂', `상흔 +${b.surgeScar}. 지도로 돌아가면 앞길 하나가 끊기고 裂 틈새가 열린다.`],
+      ['체력', `일행 모두 최대 체력의 ${Math.round(b.surgeRatio * 100)}%를 잃는다(하운은 ${b.surgeHaunExtra} 더). 같은 전투에서 또 터지면 ×2, ×3.`],
+      ['힘', `적 모두 힘 +${b.surgeEnemyStrength}. 흐름을 먹는 적은 체력 ${b.surgeEnemyHeal}을 채운다.`],
+      ['잔향', `틈의 잔향 ${b.surgeEchoToHand}장이 손에 들어온다. 든 채 턴을 끝내면 균열 +1 — 내공 1로 털어 낼 수 있다.`],
+      ['상흔', `상흔 +${b.surgeScar}. 지도로 돌아가면 앞길 하나가 끊기고 틈새가 열린다.`],
     ],
-    [`균열은 ${b.surgeResetTo}으로 돌아온다.`, '막는 법: 숨 세기 같은 감소 카드 · 봉인 · 휴식의 꿰매기 · 지도의 裂 틈새'],
+    [`균열은 ${b.surgeResetTo}으로 돌아온다.`, '막는 법: 숨 세기 같은 감소 카드 · 봉인 · 휴식의 꿰매기 · 지도의 틈새'],
   );
 }
