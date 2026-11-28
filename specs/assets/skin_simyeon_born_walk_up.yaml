@@ -1,0 +1,22 @@
+id: skin_simyeon_born_walk_up
+type: character-anim
+character: skin_simyeon_born
+summary: '「틈」 옷장 「심연을 걷는 자」 보른 뒷면 걷기 6프레임 — 옷을 입고 걸을 때(2026-11-28 사용자 「옷장도 Codex 작업이 다 되었는지 확인」). 오기 전에는 대기 그림이 미끄러진다. 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [skin_simyeon_born_ref]
+reference: assets/source/skin_simyeon_born_ref.png
+facing: right
+chroma: green
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(이 옷의 대기 그림과 같은 크기)
+frame_notes:
+  1: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); contact pose: one foot forward touching the ground, the other behind"
+  2: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); down pose: weight on the front foot, body a little lower"
+  3: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); passing pose: the back leg passing the front one, body at its highest"
+  4: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); contact pose with the other foot forward (mirror of frame 1)"
+  5: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); down pose on the other foot"
+  6: "BACK VIEW, walking straight AWAY from the viewer (up the screen), the back of the head and the back of the outfit visible, the face NOT visible; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); passing pose, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#6e5440', accent: '#9b5cff' }

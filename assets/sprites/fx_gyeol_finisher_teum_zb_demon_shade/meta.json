@@ -1,0 +1,36 @@
+{
+  "id": "fx_gyeol_finisher_teum_zb_demon_shade",
+  "type": "fx",
+  "frameW": 160,
+  "frameH": 160,
+  "track": "pixel",
+  "pixelScale": 8.01,
+  "gridDetected": true,
+  "nativeSize": [
+    64,
+    64
+  ],
+  "fit": "upscale",
+  "frames": 6,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "events": {
+    "impact": 2
+  },
+  "blend": "normal",
+  "facing": "right",
+  "fallbackLevel": 1,
+  "virtualFrames": 6,
+  "sourceHash": "79713d1c6431f43e",
+  "placeholder": false,
+  "resizedFrom": null,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "gridPurity": 0.708
+}

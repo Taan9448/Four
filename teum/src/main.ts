@@ -169,9 +169,25 @@ const CORNER = [
   { id: 'options', name: '옵션', icon: 7 },
 ] as const;
 
+/** 2026-11-28 사용자 「메인 메뉴를 결 디자인(기준)과 똑같게」: 결의 먹 붓 판(ui_gyeol_ink 1 먹 · 2 주홍 · 3 옅은 먹)과 먹 원(ui_gyeol_frames 5)을 같이 쓴다 */
+function applyInkArt(): void {
+  const root = document.documentElement;
+  const ink = [1, 2, 3].map((n) => realArt('ui_gyeol_ink', n));
+  if (ink.every(Boolean)) {
+    ink.forEach((u, i) => root.style.setProperty(`--ink-art-${i + 1}`, `url("${u}")`));
+    root.classList.add('art-ink');
+  }
+  const enso = realArt('ui_gyeol_frames', 5);
+  if (enso) {
+    root.style.setProperty('--enso', `url("${enso}")`);
+    root.classList.add('art-enso');
+  }
+}
+
 function lobby(): void {
   stopRun?.();
   music('title');
+  applyInkArt();
   const sv = loadSave();
   const any = sv.slots.some(Boolean);
   const items = MENU.map((m, i) => {
@@ -186,10 +202,9 @@ function lobby(): void {
     { class: 'corner', 'aria-label': '도감·옷장·옵션·다른 게임' },
     ...CORNER.map((c) => {
       const icon = realArt('icons_teum_menu', c.icon);
-      return btn([icon ? el('img', { src: icon, alt: '' }) : el('span', { class: 'glyph' }, c.name[0]), el('small', {}, c.name)], 'round', () => openMenu(c.id), { 'aria-label': c.name });
+      return btn([icon ? el('img', { class: 'medal-icon', src: icon, alt: '' }) : el('span', { class: 'glyph' }, c.name[0]), el('small', {}, c.name)], 'round', () => openMenu(c.id), { 'aria-label': c.name });
     }),
-    el('span', { class: 'sep' }),
-    btn([el('small', {}, '천외귀환')], 'round other', () => (location.href = '../'), { 'aria-label': '「천외귀환」으로' }),
+    btn([el('small', {}, '천외귀환')], 'round other to-cheonoe', () => (location.href = '../'), { 'aria-label': '「천외귀환」으로' }),
     btn([el('small', {}, '결')], 'round other gyeol', () => (location.href = '../gyeol/'), { 'aria-label': '「결」로' }),
   );
   const lv = currentTraining().level;
@@ -198,7 +213,7 @@ function lobby(): void {
       'section',
       { class: 'screen lobby' },
       backdrop(),
-      el('div', { class: 'lobby-center' }, el('div', { class: 'seal small' }, el('span', { lang: 'zh', 'aria-label': '틈' }, '隙'), el('i', { class: 'stamp' })), el('div', { class: 'menu' }, ...items)),
+      el('div', { class: 'lobby-center' }, el('h1', { class: 'lobby-logo', 'aria-label': '틈' }, el('span', { class: 'ink-han', lang: 'zh', 'aria-hidden': 'true' }, '隙'), el('i', { class: 'stamp' })), el('div', { class: 'menu' }, ...items)),
       accountPanel(lv),
       corner,
     ),
@@ -208,7 +223,7 @@ function lobby(): void {
     if (n >= 1 && n <= MENU.length) items[n - 1].click();
     if (e.key === 'Escape' && !document.querySelector('.modal')) gate();
   };
-  (app.querySelector('.menu-btn:not([disabled])') as HTMLButtonElement | null)?.focus();
+  (app.querySelector<HTMLButtonElement>('.menu-btn.primary:not([disabled])') ?? app.querySelector<HTMLButtonElement>('.menu-btn:not([disabled])'))?.focus();
 }
 
 /** 왼쪽 아래 계정 판(2026-11-22 로그인): 이름 · 맞춘 상태 · 수련 Lv. · 로그인/로그아웃/지금 맞추기 */
@@ -237,21 +252,27 @@ function accountPanel(lv: number): HTMLElement {
       {},
       el('b', {}, user ? user.name : '게스트'),
       el('small', { class: `sync s-${status.state}` }, st),
-      el('div', { class: 'train' }, `수련 Lv.${lv}`, el('small', {}, ' · 「천외귀환」·「결」과 함께')),
+      trainingLine(lv),
       el(
         'div',
         { class: 'acct-btns' },
         user
-          ? btn('로그아웃', 'btn small ghost', async () => {
+          ? btn('로그아웃', 'acct-link', async () => {
               await signOut();
               lobby();
             })
-          : btn('로그인 · 회원가입', 'btn small primary', gate),
-        user ? btn('지금 맞추기', 'btn small ghost', () => void syncNow()) : '',
+          : btn('로그인 · 회원가입', 'acct-link', gate),
+        user ? btn('지금 맞추기', 'acct-link', () => void syncNow()) : '',
       ),
     ),
   );
   return box;
+}
+/** 수련 Lv. + 다음 레벨까지 막대(결 명패와 같다) */
+function trainingLine(lv: number): HTMLElement {
+  const t = currentTraining();
+  const bar = t.need > 0 ? el('span', { class: 'training-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(t.need), 'aria-valuenow': String(t.into), 'aria-label': `다음 레벨까지 ${t.into}/${t.need}` }, el('i', { style: `width:${Math.round((t.into / t.need) * 100)}%` })) : '';
+  return el('div', { class: 'train', title: '「천외귀환」·「결」과 같은 계정 수련' }, el('span', {}, `수련 Lv.${lv}`), bar);
 }
 function refreshAccount(): void {
   const old = document.querySelector('.screen.lobby .account');
@@ -586,7 +607,7 @@ function shopPopup(initial: 'up' | 'book' = 'up'): void {
           const max = u.cost.length;
           const price = u.cost[lv];
           const poor = price === undefined || sv.wallet < price;
-          const ic = realArt('icons_teum_upgrades', i + 1);
+          const ic = u.icon ? realArt(u.icon[0], u.icon[1]) : realArt('icons_teum_upgrades', i + 1);
           return el(
             'div',
             { class: `plaque${price === undefined ? ' done' : ''}` },
@@ -1551,15 +1572,18 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
         el('span', { class: 'rc-op' }, '+'),
         el('div', { class: `rc-part${r.plv ? ' have' : ''}` }, pic(r.passive), el('div', {}, el('b', {}, pName), el('small', {}, `${pw ? '무공(합쳐짐)' : '심법'}${r.plv ? ` Lv.${r.plv} ✓` : ''}`))),
         el('span', { class: 'rc-op' }, '→'),
-        el('div', { class: 'rc-part into' }, pic(r.into), el('div', {}, el('b', {}, `★ ${x.name}`), el('small', {}, x.desc.replace(/^(각성|극) — [^.]*\.\s*/, '').replace(/^[^.]*심법\.\s*/, '')))),
+        el('div', { class: 'rc-part into' }, pic(r.into), el('div', {}, el('b', {}, `★ ${x.name}`, x.xTier && x.xTier !== '비전' ? el('span', { class: `grade g-${x.xTier}`, title: `${x.xTier}급 무공의 극 — 약할수록 크게 오른다` }, `${x.xTier}→극`) : ''), el('small', {}, x.desc.replace(/^(각성|극) — [^.]*\.\s*/, '').replace(/^[^.]*심법(\(상자\))?\.\s*/, '')))),
         status ? el('span', { class: 'rc-status' }, status) : '',
       );
     };
-    const groups: [string, typeof rows][] = [
-      ['진행 중', rows.filter((r) => r.open && r.state !== 'done' && r.state !== 'none')],
-      ['노려 볼 수 있는 조합', rows.filter((r) => r.open && r.state === 'none')],
-      ['각성함', rows.filter((r) => r.state === 'done')],
-      ['이 판에서는 어려운 조합', rows.filter((r) => !r.open)],
+    // 무공마다 극이 있어(2026-11-28) 조합이 많다 — 손으로 맞춘 각성 먼저, 노려 볼 조합·어려운 조합은 몇 개만
+    const auto = (r: (typeof rows)[number]) => (WEAPONS.get(r.into)?.xFrom ? 1 : 0);
+    const by = (g: typeof rows) => [...g].sort((a, b) => auto(a) - auto(b));
+    const groups: [string, typeof rows, number][] = [
+      ['진행 중', by(rows.filter((r) => r.open && r.state !== 'done' && r.state !== 'none')), 99],
+      ['노려 볼 수 있는 조합', by(rows.filter((r) => r.open && r.state === 'none')), 16],
+      ['각성함', rows.filter((r) => r.state === 'done'), 99],
+      ['이 판에서는 어려운 조합', by(rows.filter((r) => !r.open)), 8],
     ];
     overlay.replaceChildren(
       el(
@@ -1570,7 +1594,7 @@ async function play(slot: Slot, fromCheckpoint = false, endless = false): Promis
         el(
           'div',
           { class: 'rc-list' },
-          ...groups.filter(([, g]) => g.length).flatMap(([name, g]) => [el('h4', {}, `${name} ${g.length}`), ...g.map(row)]),
+          ...groups.filter(([, g]) => g.length).flatMap(([name, g, max]) => [el('h4', {}, `${name} ${g.length}`), ...g.slice(0, max).map(row), g.length > max ? el('p', { class: 'muted rc-more' }, `… 외 ${g.length - max}개`) : '']),
           rows.length ? '' : el('p', { class: 'muted' }, '이 인물이 각성할 수 있는 무공이 없다.'),
         ),
         el('div', { class: 'menu-row' }, btn(matchMedia('(pointer: coarse)').matches ? '돌아가기' : `돌아가기 (${keyLabel(km.recipes[0])})`, 'btn primary', closeRecipes)),
