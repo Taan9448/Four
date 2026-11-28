@@ -1,0 +1,21 @@
+id: skin_moon_dancer_elia_walk_upside
+type: character-anim
+character: skin_moon_dancer_elia
+summary: '「틈」 옷장 「달빛 무희」 엘리아 대각 뒤 걷기 6프레임 — 옷을 입고 걸을 때(2026-11-28 사용자 「옷장도 Codex 작업이 다 되었는지 확인」). 오기 전에는 대기 그림이 미끄러진다. 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [skin_moon_dancer_elia_ref]
+reference: assets/source/skin_moon_dancer_elia_ref.png
+facing: right
+frames: 6
+fps: 10
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(이 옷의 대기 그림과 같은 크기)
+frame_notes:
+  1: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); contact pose: one foot forward touching the ground, the other behind"
+  2: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); down pose: weight on the front foot, body a little lower"
+  3: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); passing pose: the back leg passing the front one, body at its highest"
+  4: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); contact pose with the other foot forward (mirror of frame 1)"
+  5: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); down pose on the other foot"
+  6: "THREE-QUARTER BACK VIEW, walking diagonally away from the viewer and to the RIGHT (up-right on the screen), mostly the back and the right shoulder visible, face hidden; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); passing pose, loops back into frame 1"
+placeholder: { shape: humanoid, color: '#2a3a7a', accent: '#c8d8ff' }

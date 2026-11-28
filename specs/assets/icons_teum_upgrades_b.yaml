@@ -1,0 +1,17 @@
+id: icons_teum_upgrades_b
+type: icon-sheet
+frames: 10
+summary: '「틈」 장터 수련 도장 물건 그림 둘째 판 10칸(2026-11-28 "수련 종류가 너무 적다 — 뱀서 참고해서 늘려라") — rules.json upgrades.list의 icon ["icons_teum_upgrades_b", n]: 1 숨 고르기 · 2 빠른 손 · 3 넓은 결 · 4 오래 남는 기 · 5 한 갈래 더 · 6 급소 보기 · 7 깨달음 · 8 운수 · 9 날랜 보법 · 10 필살 기운. 첫째 판(icons_teum_upgrades)과 같은 화풍·크기'
+subject: 'item icons for a wooden shop plaque in a wuxia game, each centered, three-quarter view, readable at 44 px, same style as icons_teum_upgrades'
+frame_notes:
+  1: 'REGEN: a steaming teacup with a green leaf and a small rising heart'
+  2: 'COOLDOWN: a small brass hourglass with sand running fast and a motion streak'
+  3: 'AREA: a ring of blue ink spreading outward on paper'
+  4: 'DURATION: a slow-burning incense stick with a long curl of smoke'
+  5: 'AMOUNT: three throwing knives fanned out side by side'
+  6: 'CRIT: a red target mark with a needle stuck in the center'
+  7: 'GROWTH: an open book with a glowing blue crystal shard above it'
+  8: 'LUCK: a four-petal clover charm tied with a red string'
+  9: 'DASH: a pair of light cloth boots with a blue afterimage trail'
+  10: 'ULTIMATE: a round golden seal glowing with a radiant burst'
+placeholder: { color: '#3a2618', accent: '#ffd27a' }
