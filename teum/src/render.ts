@@ -73,9 +73,12 @@ const real = async (id: string): Promise<Anim> => (spriteSource(id) === 'sprites
 /** 무공·심법 아이콘 칸(icons_teum_skills_1·2·3, 16칸씩): 손으로 맞춘 무공 순서 다음에 심법(카드 무공은 카드 그림) */
 /** 예전 순서 아이콘(손으로 맞춘 무공·심법 37 — 시트 1~3의 35칸 + 시트 4 앞 두 칸). 2026-11-25: 비전·새 무공이 끼어 심법 아이콘이 밀리던 것을 막으려
  *  icon([시트, 칸])이 있는 것·비전·카드 것은 빼고 센다 */
-export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)].map((id, i) => [id, i]));
+export const SKILL_ICON = new Map<string, number>([...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon && !w.xFrom).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)].map((id, i) => [id, i]));
 /** 무공·심법 아이콘 자리 [시트(1부터), 칸(1부터)] — icons_teum_skills_<시트> */
 export function skillIconRef(id: string): [number, number] | null {
+  // 자동 극(2026-11-28)은 바탕 무공의 아이콘을 빌린다
+  const from = WEAPONS.get(id)?.xFrom;
+  if (from) return skillIconRef(from);
   const own = WEAPONS.get(id)?.icon ?? PASSIVES.get(id)?.icon;
   if (own) return own;
   const i = SKILL_ICON.get(id);

@@ -49,6 +49,10 @@ export interface WeaponDef {
   fxStyle?: 'a' | 'b' | 'c';
   /** 아이콘 칸 [시트, 칸](icons_teum_skills_<시트>) — 없으면 예전 순서 */
   icon?: [number, number];
+  /** 자동 극(2026-11-28)의 바탕 등급(C·B·A·S · 비전) — 약한 무공일수록 크게 오른다 */
+  xTier?: string;
+  /** 자동 극의 바탕 무공 id(아이콘·설명을 빌린다) */
+  xFrom?: string;
 }
 /** 플레이어가 거는 디버프(2026-11-25 rules.json debuffs) */
 export type Debuff = 'poison' | 'bleed' | 'weaken' | 'fear' | 'silence' | 'root';
@@ -293,7 +297,16 @@ export const RULES = rulesRaw as unknown as {
   unlock: { boss: number; mid: number; rarityWeight: Record<string, number>; ownWeight: number; price: Record<string, number>; shop: { offers: number; reroll: number } };
   build: { bookMax: number; bookAuto: number; reroll: number; banish: number; skip: number; skipGold: number; partnerWeight: number };
   sets: Record<'fire' | 'ice' | 'shock' | 'vuln', { need: number; name: string; desc: string; damage?: number; radius?: number; mul?: number; frac?: number; range?: number }>;
-  upgrades: { list: { id: string; name: string; desc: string; per: number; cost: number[] }[] };
+  upgrades: { list: { id: string; name: string; desc: string; per: number; cost: number[]; icon?: [string, number] }[] };
+  /** 극 자동 생성(2026-11-28) — 정해 둔 각성이 없는 무공 · 비전 10레벨과 극 */
+  evolveAuto: {
+    with: Record<string, string>;
+    tiers: { upTo: number; grade: string; damage: number; cooldown: number; count: number; area: number; floor: number; line: string }[];
+    countKinds: string[];
+    ref: { at: number; mul: number };
+    cap: number;
+    relic: { levels: number; step: { damage: number; cooldown: number; area: number }; x: { damage: number; cooldown: number; count: number; area: number } };
+  };
   counter: { window: number; might: number; slowmo: number; ult: number; shotRadius: number; cooldown: number; grazeUlt: number };
   explore: { steles: number; altars: number; merchants: number; minDist: number; reward: number; gold: number; altar: { seconds: number; base: number; perChapter: number; chests: number } };
   fall: { rank: number; every: number };
@@ -521,6 +534,62 @@ const handWeapons = weaponsRaw.weapons as unknown as WeaponDef[];
 const handPassives = weaponsRaw.passives as PassiveDef[];
 const fromCards = cardSkills(new Set([...handWeapons.map((w) => w.name), ...handPassives.map((p) => p.name)]), Object.fromEntries(handPassives.map((p) => [p.id, p.name])));
 export const WEAPONS = new Map([...handWeapons, ...fromCards.weapons].map((w) => [w.id, w]));
+autoEvolve();
+
+/** 바탕 힘: 마지막 레벨의 피해 × 개수 × 범위 × 관통 / 대기 — 극 등급(약할수록 크게)과 바닥값을 정한다 */
+function weaponPower(w: WeaponDef): number {
+  const t = w.levels[w.levels.length - 1];
+  return (t.damage * Math.max(1, t.count) * t.area * (1 + t.pierce * 0.15)) / Math.max(0.2, t.cooldown);
+}
+/** 극 레벨 하나: 마지막 레벨에 배율 */
+function xLevel(kind: string, top: WeaponLevel, m: { damage: number; cooldown: number; count: number; area: number }): WeaponLevel {
+  const EA = RULES.evolveAuto;
+  return {
+    ...top,
+    damage: Math.max(1, Math.round(top.damage * m.damage)),
+    cooldown: Math.round(top.cooldown * m.cooldown * 100) / 100,
+    count: top.count + (EA.countKinds.includes(kind) ? m.count : 0),
+    area: Math.round(top.area * m.area * 100) / 100,
+    duration: kind === 'orbit' || kind === 'rain' ? Math.round(top.duration * 1.3 * 100) / 100 : top.duration,
+  };
+}
+/**
+ * 극 자동 생성(2026-11-28 사용자 "모든 무기가 극으로 · 시작 무기도 극 · C/D급은 약하지만 극이 되면 강해지는 메커니즘 · 4대 천왕 무기 10강 → 11강 극"):
+ * ① 정해 둔 각성이 없는 무공(손으로 맞춘 것 · 카드 · 인물 시작 무공)에 「<이름> · 극」을 만들어 evolve를 단다 — 짝은 종류별 심법(rules.json evolveAuto.with).
+ *    바탕 힘 순위로 등급(C·B·A·S)을 매겨 약할수록 배율이 크고, 기준 힘(ref)의 floor배 이상 · cap배 이하로 피해를 맞춘다 — 약할수록 바닥이 높아 극에서는 C급이 S급과 맞먹는다.
+ * ② 비전(구역 보스 무공)은 레벨 10까지 늘리고(6~10 step), 「<이름> · 극」(relic.x)을 만든다 — 비전은 구역 보스를 다시 쓰러뜨릴 때만 오르고, 10에서 한 번 더면 극.
+ */
+function autoEvolve(): void {
+  const EA = RULES.evolveAuto;
+  const base = [...WEAPONS.values()].filter((w) => !w.evolved && !w.relic);
+  const powers = base.map(weaponPower).sort((a, b) => a - b);
+  const pct = (v: number) => powers.filter((p) => p <= v).length / powers.length;
+  const ref = powers[Math.min(powers.length - 1, Math.floor(powers.length * EA.ref.at))] * EA.ref.mul;
+  const passiveName = (id: string) => handPassives.find((p) => p.id === id)?.name ?? id;
+  for (const w of base) {
+    if (w.evolve) continue;
+    const partner = EA.with[w.kind];
+    if (!partner || WEAPONS.has(`${w.id}_x`)) continue;
+    const tier = EA.tiers.find((t) => pct(weaponPower(w)) <= t.upTo) ?? EA.tiers[EA.tiers.length - 1];
+    const lv = xLevel(w.kind, w.levels[w.levels.length - 1], tier);
+    const x: WeaponDef = { ...w, id: `${w.id}_x`, name: `${w.name} · 극`, levels: [lv], evolved: true, evolve: undefined, xTier: tier.grade, xFrom: w.id, desc: `극 — ${w.name} 최대 레벨 + 「${passiveName(partner)}」 심법(상자). ${tier.line}.` };
+    // 약할수록 바닥이 높다(C급 극 ≈ S급 극), 모든 극은 상한 아래
+    const p = weaponPower(x);
+    const want = Math.min(ref * EA.cap, Math.max(p, ref * tier.floor));
+    if (want !== p) lv.damage = Math.max(1, Math.round(lv.damage * (want / p)));
+    w.evolve = { with: partner, into: x.id };
+    WEAPONS.set(x.id, x);
+  }
+  const R = EA.relic;
+  for (const w of [...WEAPONS.values()].filter((d) => d.relic && !d.evolved)) {
+    while (w.levels.length < R.levels) {
+      const t = w.levels[w.levels.length - 1];
+      const n = w.levels.length + 1;
+      w.levels.push({ ...t, damage: Math.round(t.damage * (1 + R.step.damage)), cooldown: Math.round(t.cooldown * R.step.cooldown * 100) / 100, area: Math.round((t.area + R.step.area) * 100) / 100, count: t.count + (n % 2 === 0 && EA.countKinds.includes(w.kind) ? 1 : 0) });
+    }
+    if (!WEAPONS.has(`${w.id}_x`)) WEAPONS.set(`${w.id}_x`, { ...w, id: `${w.id}_x`, name: `${w.name} · 극`, levels: [xLevel(w.kind, w.levels[w.levels.length - 1], R.x)], evolved: true, xTier: '비전', xFrom: w.id, desc: `비전의 극 — 레벨 ${R.levels}에서 구역 보스를 한 번 더 쓰러뜨리면. ${w.desc.replace(/^비전 — /, '')}` });
+  }
+}
 export const PASSIVES = new Map([...handPassives, ...fromCards.passives].map((p) => [p.id, p]));
 export const HEROES = heroesRaw.heroes as unknown as HeroDef[];
 export const CHAPTER_LENGTH = STORY.timeline.length;
@@ -943,24 +1012,26 @@ const UPG = new Map(RULES.upgrades.list.map((u) => [u.id, u]));
 export const metaVal = (s: { meta: Record<string, number> }, id: string): number => (s.meta[id] ?? 0) * (UPG.get(id)?.per ?? 0);
 export const stat = {
   might: (s: State) => (1 + pv(s, 'might') + metaVal(s, 'might')) * buffMul(s, 'might') * (s.t < s.counterUntil ? RULES.counter.might : 1),
-  haste: (s: State) => Math.max(0.25, Math.max(0.35, 1 - pv(s, 'haste')) * buffMul(s, 'haste')),
-  area: (s: State) => (1 + pv(s, 'area')) * buffMul(s, 'area'),
+  haste: (s: State) => Math.max(0.25, Math.max(0.35, 1 - pv(s, 'haste') - metaVal(s, 'haste')) * buffMul(s, 'haste')),
+  area: (s: State) => (1 + pv(s, 'area') + metaVal(s, 'area')) * buffMul(s, 'area'),
   speed: (s: State) => RULES.player.speed * s.hero.speed * (1 + pv(s, 'swift') + metaVal(s, 'speed')) * buffMul(s, 'speed') * (s.t < s.slowUntil ? s.slowMul : 1) * (s.t < s.chillUntil ? 0.7 : 1) * areaSpeed(s),
   armor: (s: State) => (s.hero.armor ?? 0) + pv(s, 'vigor') + buffAdd(s, 'armor') + metaVal(s, 'armor'),
-  regen: (s: State) => pv(s, 'breath'),
-  crit: (s: State) => pv(s, 'grain'),
+  regen: (s: State) => pv(s, 'breath') + metaVal(s, 'regen'),
+  crit: (s: State) => pv(s, 'grain') + metaVal(s, 'crit'),
   pickup: (s: State) => RULES.player.pickup * (1 + pv(s, 'yoke') + metaVal(s, 'pickup')),
-  xpMul: (s: State) => 1 + pv(s, 'yoke') * 0.17,
-  amount: (s: State) => Math.floor(pv(s, 'amount')),
-  duration: (s: State) => 1 + pv(s, 'duration'),
+  xpMul: (s: State) => 1 + pv(s, 'yoke') * 0.17 + metaVal(s, 'growth'),
+  amount: (s: State) => Math.floor(pv(s, 'amount') + metaVal(s, 'amount')),
+  duration: (s: State) => 1 + pv(s, 'duration') + metaVal(s, 'duration'),
   critMul: (s: State) => 2 + pv(s, 'critdmg'),
   greed: (s: State) => 1 + pv(s, 'greed') + metaVal(s, 'greed'),
   /** 보법 쿨타임 배율(잔영보) */
-  dashcd: (s: State) => Math.max(0.4, 1 - pv(s, 'dashcd')),
+  dashcd: (s: State) => Math.max(0.4, 1 - pv(s, 'dashcd') - metaVal(s, 'dash')),
   /** 간파 피해·반격 시간(간파의 눈) */
   graze: (s: State) => 1 + pv(s, 'graze'),
   thorns: (s: State) => pv(s, 'thorns'),
-  luck: (s: State) => pv(s, 'luck'),
+  luck: (s: State) => pv(s, 'luck') + metaVal(s, 'luck'),
+  /** 마지막 기술 게이지가 차는 배율(장터 수련 필살 기운) */
+  ultGain: (s: State) => 1 + metaVal(s, 'ult'),
 };
 
 /** 굳은살 같은(능력치 vigor) 심법 레벨의 합 — 레벨마다 최대 체력 +10 */
@@ -1057,7 +1128,8 @@ export function endlessPool(hero: HeroDef, rng: Rng): Set<string> {
   const cap = nW + nP + U.weapons[1] + U.passives[1];
   for (const id of weapons) {
     const ev = WEAPONS.get(id)?.evolve;
-    if (ev && out.size < cap) out.add(ev.with);
+    // 짝 심법은 늘 든다 — 판의 어떤 무공이든 극까지 갈 수 있게(2026-11-28)
+    if (ev) out.add(ev.with);
   }
   for (const id of shuffle([...PASSIVES.values()].filter((p) => !p.endless).map((p) => p.id))) {
     if (out.size >= cap) break;
@@ -1320,7 +1392,7 @@ function enterArea(s: State, ai: number): void {
 }
 
 /** 구역 보스를 넘겼다: 비전 무공(가진 것이면 레벨 +1, 비전 칸이 가득이면 금화) · 상자 · 금괴 */
-function areaBossDown(s: State, f: Foe): void {
+export function areaBossDown(s: State, f: Foe): void {
   const z = s.areas[f.area!];
   if (!z) return;
   z.boss = null;
@@ -1328,11 +1400,22 @@ function areaBossDown(s: State, f: Foe): void {
   if (s.mode === 'endless') z.respawnAt = s.t + AREAS.boss.respawn;
   const id = z.def.relic;
   const d = WEAPONS.get(id);
-  const own = s.weapons.find((w) => w.id === id);
+  // 비전은 구역 보스를 다시 쓰러뜨릴 때만 오른다(무한 모드, 레벨 10까지) — 10에서 한 번 더면 「극」(2026-11-28)
+  const own = s.weapons.find((w) => w.id === id || w.id === `${id}_x`);
   let text: string;
-  if (own) {
-    if (d && own.lv < d.levels.length) own.lv++;
-    text = `비전 「${d?.name}」 Lv.${own.lv}`;
+  if (own && own.id !== id) {
+    s.gold += 60;
+    text = `「${WEAPONS.get(own.id)?.name}」은 이미 극 — 금화 60`;
+  } else if (own) {
+    if (d && own.lv < d.levels.length) {
+      own.lv++;
+      text = own.lv === d.levels.length ? `비전 「${d.name}」 Lv.${own.lv} — 한 번 더 쓰러뜨리면 극` : `비전 「${d?.name}」 Lv.${own.lv}`;
+    } else if (WEAPONS.has(`${id}_x`)) {
+      own.id = `${id}_x`;
+      own.lv = 1;
+      own.next = s.t;
+      text = `비전의 극 — 「${WEAPONS.get(own.id)!.name}」`;
+    } else text = `비전 「${d?.name}」 Lv.${own.lv}`;
   } else if (relicCount(s) < AREAS.relicSlots) {
     s.weapons.push({ id, lv: 1, next: s.t });
     text = `비전 「${d?.name}」을 얻었다`;
@@ -1902,7 +1985,7 @@ function killFoe(s: State, f: Foe): void {
     if (a?.deathSlam) s.slams.push({ x: f.x, y: f.y, r: a.deathSlam.radius, damage: a.deathSlam.damage * s.chapter.dmg, born: s.t, at: s.t + a.deathSlam.delay, color: '#ff4a6a' });
   }
   const rank = f.def.rank;
-  s.ult = Math.min(RULES.ult.max, s.ult + (rank === 'boss' ? RULES.ult.boss : rank === 'elite' ? RULES.ult.elite : RULES.ult.kill));
+  s.ult = Math.min(RULES.ult.max, s.ult + (rank === 'boss' ? RULES.ult.boss : rank === 'elite' ? RULES.ult.elite : RULES.ult.kill) * stat.ultGain(s));
   s.events.push({ type: 'kill', x: f.x, y: f.y, foe: f.def.id, rank });
   if (f.def.xp > 0) s.gems.push({ tier: gemTierOf(f.def), x: f.x, y: f.y, xp: f.def.xp * (1 + 0.15 * s.chapterIndex) * (fa >= 0 ? AREAS.reward.xp * (fau?.kind === 'tyrant' ? fau.xp : 1) : 1), pulled: false });
   if (f.golden) {
@@ -2294,7 +2377,7 @@ function offerSkillShop(s: State, count: number): void {
       out.push({ kind: 'buyskill', id: c.id, lv: Math.round(P.buy + P.buyPerMin * m) });
     }
   }
-  const ups = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length);
+  const ups = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length && !isRelic(w.id));
   for (let i = 0; i < 2 && ups.length; i++) {
     const w = ups.splice(s.rng.int(0, ups.length - 1), 1)[0];
     out.push({ kind: 'upskill', id: w.id, lv: P.up + P.upPerLv * (w.lv + 1) });
@@ -2477,7 +2560,7 @@ function counter(s: State, x: number, y: number): void {
   s.counterReadyAt = s.t + C.cooldown;
   s.counterUntil = s.t + C.window + (stat.graze(s) - 1) * 1.25;
   s.slowmoUntil = s.t + C.slowmo;
-  s.ult = Math.min(RULES.ult.max, s.ult + C.ult);
+  s.ult = Math.min(RULES.ult.max, s.ult + C.ult * stat.ultGain(s));
   s.events.push({ type: 'counter', x, y });
 }
 
@@ -2772,7 +2855,7 @@ function moveFoes(s: State): void {
           s.events.push({ type: 'graze', x: f.x, y: f.y });
           // 간파: 스칠 때마다 마지막 기술이 차고, 돌진하던 정예·보스를 피하면 반격
           s.grazeCombo++;
-          s.ult = Math.min(RULES.ult.max, s.ult + RULES.counter.grazeUlt);
+          s.ult = Math.min(RULES.ult.max, s.ult + RULES.counter.grazeUlt * stat.ultGain(s));
           if ((f.def.rank || f.elite) && s.t < f.dashUntil) counter(s, f.x, f.y);
           const gd = RULES.dash.graze.damage * (1 + 0.06 * s.level) * stat.graze(s);
           for (const o of s.foes) if (!o.dead && (o.x - f.x) ** 2 + (o.y - f.y) ** 2 < RULES.dash.graze.radius ** 2) damageFoe(s, o, gd);
@@ -3196,7 +3279,7 @@ function afterBuy(s: State, c: Choice): void {
     // 올리기는 다음 레벨 값으로 다시 건다
     if (c.kind === 'upskill') {
       const w = s.weapons.find((x) => x.id === c.id);
-      if (w && w.lv < WEAPONS.get(w.id)!.levels.length) it.stock.splice(Math.max(0, k), 0, { kind: 'upskill', id: w.id, lv: RULES.endless.dojoPrices.up + RULES.endless.dojoPrices.upPerLv * (w.lv + 1) });
+      if (w && w.lv < WEAPONS.get(w.id)!.levels.length && !isRelic(w.id)) it.stock.splice(Math.max(0, k), 0, { kind: 'upskill', id: w.id, lv: RULES.endless.dojoPrices.up + RULES.endless.dojoPrices.upPerLv * (w.lv + 1) });
     }
     if (c.kind === 'sellskill') it.stock = it.stock.filter((x) => x.id !== c.id);
     s.pending = [...it.stock.map((x) => ({ ...x })), { kind: 'leave', id: 'leave', lv: 0 }];
@@ -3361,7 +3444,7 @@ function openChest(s: State): void {
       return;
     }
   }
-  const up = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length);
+  const up = s.weapons.filter((w) => w.lv < WEAPONS.get(w.id)!.levels.length && !isRelic(w.id));
   if (up.length) {
     const w = up[s.rng.int(0, up.length - 1)];
     w.lv++;
@@ -3441,7 +3524,8 @@ export function choicePool(s: State): Choice[] {
   const out: Choice[] = [];
   for (const w of s.weapons) {
     const d = WEAPONS.get(w.id)!;
-    if (w.lv < d.levels.length) out.push({ kind: 'weapon', id: w.id, lv: w.lv + 1 });
+    // 비전은 레벨업으로 오르지 않는다(구역 보스를 다시 쓰러뜨려야, 2026-11-28)
+    if (w.lv < d.levels.length && !d.relic) out.push({ kind: 'weapon', id: w.id, lv: w.lv + 1 });
   }
   if (slotWeapons(s) < s.slots.weapons) {
     const owned = new Set(s.weapons.map((w) => w.id));

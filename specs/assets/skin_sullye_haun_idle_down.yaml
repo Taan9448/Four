@@ -1,0 +1,19 @@
+id: skin_sullye_haun_idle_down
+type: character-anim
+character: skin_sullye_haun
+summary: '「틈」 옷장 「순례의 끝」 진하운 정면 대기 4프레임 — 옷을 입고 걸을 때(2026-11-28 사용자 「옷장도 Codex 작업이 다 되었는지 확인」). 오기 전에는 대기 그림이 미끄러진다. 왼쪽 방향은 게임이 좌우로 뒤집는다'
+depends_on: [skin_sullye_haun_ref]
+reference: assets/source/skin_sullye_haun_ref.png
+facing: right
+frames: 4
+fps: 6
+loop: true
+events: {}
+bbox_tolerance: 0.2
+# 같은 인물·같은 키·같은 옷. 발 맨 아래 줄은 모든 칸에서 같은 줄(이 옷의 대기 그림과 같은 크기)
+frame_notes:
+  1: "FRONT VIEW, standing still facing the viewer, calm breathing; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); standing still, relaxed"
+  2: "FRONT VIEW, standing still facing the viewer, calm breathing; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); chest rises slightly with a breath"
+  3: "FRONT VIEW, standing still facing the viewer, calm breathing; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); shoulders settle, cloth sways a little"
+  4: "FRONT VIEW, standing still facing the viewer, calm breathing; EXACTLY the same outfit, hair, colors and weapon as the reference sheet (this wardrobe costume, NOT the default costume); back to the pose of frame 1"
+placeholder: { shape: humanoid, color: '#8a90a3', accent: '#e2c27a' }

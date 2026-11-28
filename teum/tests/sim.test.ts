@@ -836,7 +836,7 @@ describe('몬스터 저항·디버프·보석 등급·무한 모드 고유 무�
     const endlessIds = new Set([...WEAPONS.values(), ...PASSIVES.values()].filter((d) => d.endless).map((d) => d.id));
     expect([...WEAPONS.values()].filter((w) => w.endless && !w.evolved).length).toBe(14);
     expect([...PASSIVES.values()].filter((p) => p.endless).length).toBe(6);
-    expect([...WEAPONS.values()].filter((w) => w.endless && w.evolved).length).toBe(10);
+    expect([...WEAPONS.values()].filter((w) => w.endless && w.evolved && !w.xFrom).length).toBe(10);
     const s = createChapter(0, 'nostory', freshCarry('kyle'));
     for (let k = 0; k < 30; k++) for (const c of choicePool(s)) expect(endlessIds.has(c.id), c.id).toBe(false);
     const pool = endlessPool(HEROES[0], createRng('ep'));
@@ -862,10 +862,10 @@ describe('몬스터 저항·디버프·보석 등급·무한 모드 고유 무�
     expect(s.weapons.some((w) => w.id === 'blood_scythe')).toBe(false);
   });
   it('새 무공·심법 40개는 아이콘 칸이 겹치지 않고, 예전 심법 아이콘 자리는 그대로다', () => {
-    const refs = [...WEAPONS.values(), ...PASSIVES.values()].filter((d) => d.icon).map((d) => d.icon!.join(':'));
+    const refs = [...WEAPONS.values(), ...PASSIVES.values()].filter((d) => d.icon && !('xFrom' in d && d.xFrom)).map((d) => d.icon!.join(':'));
     expect(refs.length).toBe(40);
     expect(new Set(refs).size).toBe(40);
-    const legacy = [...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)];
+    const legacy = [...[...WEAPONS.values()].filter((w) => !w.card && !w.relic && !w.icon && !w.xFrom).map((w) => w.id), ...[...PASSIVES.values()].filter((p) => !p.card && !p.icon).map((p) => p.id)];
     expect(legacy.length).toBe(37);
     expect(legacy.indexOf('might')).toBe(27);
     expect(legacy.indexOf('afterimage')).toBe(36);
@@ -942,5 +942,88 @@ describe('줍는 것 기본 동작', () => {
     step(s, { x: 0, y: 0 });
     expect(p.hp).toBeGreaterThanOrEqual(1);
     expect(s.result).not.toBe('lose');
+  });
+});
+
+// ── 2026-11-28 사용자: 모든 무기 극 · 시작 무기 극 · C/D급 극 역전 · 4대 천왕(구역 보스) 무기 10강 → 11강 극 ──
+describe('극 체계(2026-11-28)', () => {
+  const power = (id: string) => {
+    const t = WEAPONS.get(id)!.levels.at(-1)!;
+    return (t.damage * Math.max(1, t.count) * t.area * (1 + t.pierce * 0.15)) / Math.max(0.2, t.cooldown);
+  };
+  it('모든 무공(손으로 맞춘 것·카드·무한 고유)에 극이 있고, 짝 심법·극 무공이 실제로 있다', () => {
+    const base = [...WEAPONS.values()].filter((w) => !w.evolved && !w.relic);
+    expect(base.length).toBeGreaterThan(200);
+    for (const w of base) {
+      expect(w.evolve, w.id).toBeTruthy();
+      expect(WEAPONS.get(w.evolve!.into)?.evolved, w.id).toBe(true);
+      expect(PASSIVES.has(w.evolve!.with) || WEAPONS.has(w.evolve!.with), w.id).toBe(true);
+    }
+  });
+  it('인물 시작 무공도 극이 된다', () => {
+    for (const h of HEROES) expect(WEAPONS.get(h.start)?.evolve?.into, h.id).toBeTruthy();
+  });
+  it('약한 무공(C)일수록 크게 올라 극에서는 센 무공(S)의 극과 맞먹는다', () => {
+    const auto = [...WEAPONS.values()].filter((w) => w.xFrom && w.xTier !== '비전');
+    const med = (g: string) => {
+      const v = auto.filter((w) => w.xTier === g).map((w) => power(w.id)).sort((a, b) => a - b);
+      return v[Math.floor(v.length / 2)];
+    };
+    const gain = (g: string) => {
+      const v = auto.filter((w) => w.xTier === g).map((w) => power(w.id) / power(w.xFrom!)).sort((a, b) => a - b);
+      return v[Math.floor(v.length / 2)];
+    };
+    expect(med('C')).toBeGreaterThanOrEqual(med('S') * 0.95);
+    expect(gain('C')).toBeGreaterThan(gain('S') * 2);
+  });
+  it('무한 모드 풀의 무공은 모두 짝 심법도 풀에 있다(어떤 무공이든 극까지)', () => {
+    for (const sd of ['p1', 'p2', 'p3']) {
+      const s = createEndless(sd, 'kyle');
+      for (const id of s.pool!) {
+        const ev = WEAPONS.get(id)?.evolve;
+        if (ev) expect(s.pool!.has(ev.with), `${sd} ${id}`).toBe(true);
+      }
+    }
+  });
+  it('비전은 레벨 10까지, 구역 보스를 다시 쓰러뜨릴 때만 오르고(레벨업에 안 나온다) — 10에서 한 번 더면 극', () => {
+    const s = createEndless('relic-x', 'elia');
+    const z = s.areas[0];
+    const fake = { area: 0, x: z.x, y: z.y } as unknown as Parameters<typeof sim.areaBossDown>[1];
+    const id = z.def.relic;
+    expect(WEAPONS.get(id)!.levels.length).toBe(10);
+    sim.areaBossDown(s, fake);
+    expect(s.weapons.find((w) => w.id === id)?.lv).toBe(1);
+    expect(choicePool(s).some((c) => c.id === id)).toBe(false);
+    for (let k = 2; k <= 10; k++) sim.areaBossDown(s, fake);
+    expect(s.weapons.find((w) => w.id === id)?.lv).toBe(10);
+    sim.areaBossDown(s, fake);
+    const x = s.weapons.find((w) => w.id === `${id}_x`);
+    expect(x).toBeTruthy();
+    expect(isRelic(x!.id)).toBe(true);
+    expect(WEAPONS.get(x!.id)!.levels[0].damage).toBeGreaterThan(WEAPONS.get(id)!.levels[9].damage * 2);
+  });
+});
+
+describe('장터 수련 20종(2026-11-28)', () => {
+  const STAT: Record<string, keyof typeof sim.stat> = { might: 'might', haste: 'haste', area: 'area', speed: 'speed', armor: 'armor', regen: 'regen', crit: 'crit', pickup: 'pickup', growth: 'xpMul', amount: 'amount', duration: 'duration', greed: 'greed', dash: 'dashcd', luck: 'luck', ult: 'ultGain' };
+  it('20종 — 값이 오를수록 비싸지고, 그림 칸이 있다', () => {
+    const list = RULES.upgrades.list;
+    expect(list.length).toBe(20);
+    expect(new Set(list.map((u) => u.id)).size).toBe(20);
+    for (const u of list) {
+      for (let i = 1; i < u.cost.length; i++) expect(u.cost[i], u.id).toBeGreaterThan(u.cost[i - 1]);
+      const sheet = u.icon?.[0] ?? 'icons_teum_upgrades';
+      expect(existsSync(`specs/assets/${sheet}.yaml`), u.id).toBe(true);
+    }
+  });
+  it('능력치 수련은 한 단계마다 그 능력치를 바꾼다(줄어드는 쪽: 재사용·보법 대기)', () => {
+    const base = createChapter(0, 'up0', freshCarry('haun'));
+    for (const [id, k] of Object.entries(STAT)) {
+      const s = createChapter(0, 'up0', freshCarry('haun'), { meta: { [id]: id === 'amount' ? 1 : 3 } });
+      const a = (sim.stat[k] as (x: State) => number)(base);
+      const b = (sim.stat[k] as (x: State) => number)(s);
+      if (k === 'haste' || k === 'dashcd') expect(b, id).toBeLessThan(a);
+      else expect(b, id).toBeGreaterThan(a);
+    }
   });
 });
