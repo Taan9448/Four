@@ -1,5 +1,6 @@
 /* 「틈」 화면(2026-11-18 2차): 「결」의 먹·한지·주홍 결을 따른다 — 붓 자국 메뉴, 먹 원 인장, 둥근 표식, 한지 창 */
 :root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.35' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.89 0 0 0 0 0.8 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
   --ink: #0b0b10;
   --paper: #f3ead8;
   --muted: rgba(243, 234, 216, 0.68);
@@ -646,7 +647,11 @@ button { font: inherit; }
 @media (max-height: 620px) { .lobby-center .seal { margin-bottom: 22px; } }
 
 /* 옵션: 탭 · 알약 고르기 · 스위치 · 키 단추 */
-.options-box { width: min(620px, 94vw); }
+/* 2026-11-28 사용자 「화면/소리 탭을 누르면 크기가 왔다갔다」: 창은 크기를 고정하고 탭 안만 바뀐다(넘치면 안에서 굴림) */
+.modal-box.options-box { width: min(620px, 94vw); height: min(600px, 88vh); max-height: none; display: flex; flex-direction: column; overflow: hidden; }
+.options-box > h3, .options-box > .opt-tabs, .options-box > .modal-close { flex: none; }
+.options-box > .opt-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; padding-right: 4px; }
+.options-box > .modal-close { align-self: flex-start; }
 .opt-tabs { display: flex; gap: 6px; padding: 4px; border-radius: 12px; background: rgba(0, 0, 0, 0.35); margin: 6px 0 12px; }
 .opt-tab { flex: 1; height: 36px; border: 0; border-radius: 9px; background: none; color: var(--muted); font-weight: 700; cursor: pointer; }
 .opt-tab.on { background: linear-gradient(180deg, #c8402f, #8a1d14); color: #fff; box-shadow: 0 4px 10px rgba(120, 20, 12, 0.4); }
@@ -793,6 +798,11 @@ img.fit-pixel, .portrait.fit-pixel img { object-fit: contain; image-rendering: p
 :root.btn-art .btn.ghost, :root.btn-art .btn:not(.primary):not(.danger) { border: 12px solid transparent; border-image: var(--bf4) var(--bf-slice, 30) fill / 12px stretch; background: none; box-shadow: none; }
 :root.btn-art .btn.ghost:hover:not([disabled]), :root.btn-art .btn:not(.primary):not(.danger):hover:not([disabled]) { border-image-source: var(--bf5); }
 :root.btn-art .btn[disabled] { border-image-source: var(--bf6); }
+/* 글자 잘림(2026-11-28 사용자 「글자-버튼 크기가 안 맞아 글자가 잘린다」): 틀 그림은 12px 그대로(border-image 너비) 두고 실제 테두리만 얇게 —
+   작은 단추(높이 32px)는 테두리 12px이면 글자 자리가 8~10px뿐이라 글자 위아래가 4~6px 잘렸다 */
+:root.btn-art .btn.small, .btn.small.has-frame { border-width: 4px !important; }
+:root.btn-art .btn:not(.small), .btn.has-frame:not(.small) { border-width: 8px !important; }
+.btn { line-height: 1.2; }
 
 /* 각성 조합표(2026-11-25): 무공 + 짝 심법 → 각성 무공. 진행 중 → 노려 볼 것 → 각성함 → 어려운 것 */
 .panel.recipes { width: min(900px, 100%); text-align: left; display: flex; flex-direction: column; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); }
@@ -858,4 +868,78 @@ button.entry.unseen { cursor: default; }
 .elem.e-root { background: #6fd6ff; }
 @media (max-width: 640px) {
   .fd-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── 메인 메뉴: 「결」 로비와 같은 모양(2026-11-28 사용자 「메인 메뉴에서 결 디자인(기준) - 틈 디자인이 똑같게」) ──
+   로고 = 먹 원 + 한지 빛 + 붉은 먹 글자 · 메뉴 = 먹 붓 판(ui_gyeol_ink 1, 올리면 2 주홍, 잠김 3) · 아이콘 + 가운데 이름
+   오른쪽 아래 = 먹 원 표식(아이콘 + 이름, 천외귀환 주홍 · 결 먹) · 왼쪽 아래 = 명패(인장 + 이름 + 수련 막대) */
+.lobby .lobby-center { gap: 0; }
+.lobby-logo { position: relative; display: grid; place-items: center; width: 210px; height: 210px; margin: 0 0 18px; font-size: 118px; line-height: 1; }
+.lobby-logo::before { content: ''; position: absolute; inset: 15%; border-radius: 50%; background: radial-gradient(circle, rgba(246, 238, 222, 0.96) 0 60%, rgba(232, 220, 196, 0.6) 66%, rgba(232, 220, 196, 0) 71%); filter: blur(2px); }
+:root.art-enso .lobby-logo { background: var(--enso) center / contain no-repeat; filter: drop-shadow(0 0 18px rgba(255, 236, 200, 0.35)); }
+:root:not(.art-enso) .lobby-logo::after { content: ''; position: absolute; inset: 8%; border-radius: 50%; border: 10px solid rgba(10, 8, 8, 0.9); }
+.lobby-logo .ink-han { position: relative; z-index: 1; display: inline-block; font-family: 'Yuji Syuku', 'Song Myung', serif; font-weight: 400; color: #a3171a; text-shadow: 0 0 1px rgba(90, 8, 8, 0.8), 0 2px 10px rgba(163, 23, 26, 0.35); transform: translate(-4px, -6px) rotate(-3deg); animation: inkBreathe 6s ease-in-out infinite; }
+:root.art-enso .lobby-logo .stamp { display: none; }
+.lobby-logo .stamp { position: absolute; right: 26px; bottom: 34px; z-index: 1; width: 22px; height: 22px; background: var(--shu); border-radius: 2px; }
+@keyframes inkBreathe { 0%, 100% { filter: url(#ink-bleed); } 50% { filter: url(#ink-bleed) drop-shadow(0 0 6px rgba(200, 40, 30, 0.45)); } }
+@media (prefers-reduced-motion: reduce) { .lobby-logo .ink-han { animation: none; filter: url(#ink-bleed); } }
+@media (max-height: 820px) { .lobby-logo { width: 170px; height: 170px; font-size: 96px; margin-bottom: 12px; } .lobby-logo .stamp { right: 20px; bottom: 28px; width: 18px; height: 18px; } }
+
+.lobby .menu { gap: 10px; }
+.lobby .menu-btn { width: 300px; height: 62px; min-height: 0; padding: 0 26px; justify-content: center; gap: 14px; border-radius: 0; text-align: center; transform: none; transition: transform 0.15s, filter 0.15s; }
+.lobby .menu-btn::before { border-radius: 0; box-shadow: none; background: rgba(10, 8, 6, 0.86); -webkit-mask: var(--brush) center / 100% 100% no-repeat; mask: var(--brush) center / 100% 100% no-repeat; transition: background-color 0.18s; }
+.lobby .menu-btn::after { display: none; }
+.lobby .menu-btn:hover:not([disabled])::before, .lobby .menu-btn:focus-visible::before { background: var(--shu); box-shadow: none; }
+.lobby .menu-btn.primary::before { background-color: rgba(120, 30, 22, 0.9); background-image: none; }
+:root.art-ink .lobby .menu-btn::before { -webkit-mask: none; mask: none; background: var(--ink-art-1) center / 103% 341% no-repeat; }
+:root.art-ink .lobby .menu-btn[disabled]::before { background-image: var(--ink-art-3); }
+:root.art-ink .lobby .menu-btn:hover:not([disabled])::before, :root.art-ink .lobby .menu-btn:focus-visible::before, :root.art-ink .lobby .menu-btn.primary::before { background: var(--ink-art-2) center / 103% 341% no-repeat; }
+:root.art-ink .lobby .menu-btn.primary { filter: drop-shadow(0 0 8px rgba(214, 64, 46, 0.45)); }
+.lobby .menu-btn:hover:not([disabled]), .lobby .menu-btn:focus-visible { transform: none; }
+.lobby .menu-btn:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; border-radius: 10px; }
+.lobby .menu-btn .mi-label { align-items: center; }
+.lobby .menu-btn b { font: 400 24px 'Song Myung', serif; letter-spacing: 0.08em; }
+.lobby .menu-btn .mi-icon { width: 30px; height: 30px; image-rendering: auto; filter: grayscale(0.4) sepia(0.25) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)); }
+.lobby .menu-btn[disabled], .lobby .menu-btn.locked { opacity: 0.4; }
+
+.lobby .corner { right: 24px; bottom: 34px; gap: 14px; }
+.lobby .round { position: relative; width: 58px; height: 58px; padding: 8px 0 6px; border-radius: 50%; display: grid; grid-template-rows: 1fr auto; place-items: center; gap: 0; background: var(--grain, none), rgba(14, 12, 10, 0.86); border: 1px solid rgba(236, 226, 204, 0.32); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); color: var(--paper); font-family: 'Song Myung', serif; transition: transform 0.12s, box-shadow 0.12s; }
+.lobby .round:hover, .lobby .round:focus-visible { transform: translateY(-2px); border-color: var(--paper); box-shadow: 0 0 12px rgba(245, 217, 140, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5); outline: none; }
+.lobby .round:active { transform: scale(0.94); }
+.lobby .round img, .lobby .round .medal-icon { width: 28px; height: 28px; image-rendering: auto; }
+.lobby .round small { font: 400 11px/1.1 'Song Myung', serif; letter-spacing: 0.04em; white-space: nowrap; }
+.lobby .round.other { display: grid; grid-template-rows: 1fr; padding: 0; }
+.lobby .round.other small { font-size: 13px; }
+.lobby .round.to-cheonoe { margin-left: 10px; background: var(--shu); border-color: var(--shu); color: #fbf3e4; }
+.lobby .round.to-cheonoe::before { content: ''; position: absolute; left: -13px; top: 12px; bottom: 12px; border-left: 1px solid rgba(236, 226, 204, 0.2); }
+.lobby .round.gyeol { background: var(--grain, none), #15120f; border-color: rgba(236, 226, 204, 0.5); color: #fbf3e4; }
+
+.lobby .account { left: 24px; bottom: 22px; min-width: 260px; gap: 12px; align-items: center; padding: 10px 16px 10px 10px; border-radius: 3px; background: var(--grain, none), rgba(14, 12, 10, 0.86); border: 1px solid rgba(236, 226, 204, 0.2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.lobby .account .face { width: 52px; height: 52px; flex: none; border-radius: 2px; background: #3d372f; color: #f6e7cf; font: 400 15px 'Song Myung', serif; }
+.lobby .account.in .face { background: var(--shu); color: #fbf3e4; }
+.lobby .account b { font: 400 18px 'Song Myung', serif; color: #f4ead6; margin-right: 8px; }
+.lobby .account .sync { display: inline; font-size: 12px; }
+.lobby .account .train { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 13px; color: #e9dcc0; }
+.training-bar { position: relative; width: 96px; height: 6px; border-radius: 3px; background: rgba(0, 0, 0, 0.55); overflow: hidden; border: 1px solid rgba(236, 226, 204, 0.2); }
+.training-bar i { position: absolute; inset: 0 auto 0 0; background: var(--paper-dim, #b4a88f); }
+.lobby .acct-btns { margin-top: 4px; gap: 12px; }
+.acct-link { background: none; border: 0; padding: 0; color: var(--paper, #ece2cc); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.acct-link:hover, .acct-link:focus-visible { color: var(--gold); }
+
+@media (max-width: 720px), (max-height: 560px) {
+  .lobby .menu { gap: 4px; }
+  .lobby .menu-btn { height: 48px; }
+  .lobby .menu-btn b { font-size: 19px; }
+  .lobby-logo { width: 110px; height: 110px; font-size: 60px; margin-bottom: 6px; }
+  .lobby-logo .stamp { right: 12px; bottom: 18px; width: 12px; height: 12px; }
+  .lobby .corner { right: 12px; bottom: 132px; gap: 10px; }
+  .lobby .account { top: auto; left: 24px; right: auto; bottom: 12px; transform: none; min-width: 0; max-width: calc(100vw - 48px); }
+  .lobby .round { width: 48px; height: 48px; }
+  .lobby .round img, .lobby .round .medal-icon { width: 22px; height: 22px; }
+  .lobby .round small { font-size: 10px; }
+}
+/* 가로로 누운 휴대폰: 표식·명패를 양쪽 아래 구석에 작게 */
+@media (max-height: 560px) and (min-width: 721px) {
+  .lobby .corner { bottom: 10px; }
+  .lobby .account { bottom: 10px; transform: scale(0.75); transform-origin: left bottom; }
 }
